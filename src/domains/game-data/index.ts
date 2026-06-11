@@ -40,16 +40,8 @@ export interface DropTableDefinition {
 }
 
 export type DropTableEntry =
-  | {
-      itemId: ItemId;
-      weight: number;
-      quantity: number | { min: number; max: number };
-    }
-  | {
-      itemId: null;
-      weight: number;
-      quantity?: never;
-    };
+  | { itemId: ItemId; weight: number; quantity: number | { min: number; max: number } }
+  | { itemId: null; weight: number; quantity?: never };
 
 export interface ProducerDefinition {
   itemId: ItemId;
@@ -108,32 +100,34 @@ export interface GameDataManifest {
 
 const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
 
-// This file is the whole static game definition. Migrations create tables; this
-// manifest defines the content that must exist after every app start. When a
-// balance value or drop list changes, change this file instead of writing a
-// content-only migration.
+// Single source of truth for static gameplay data. Migrations create storage;
+// this manifest defines the current game rules and is synced on every boot.
 export const gameDataManifest = {
   game: {
     id: "arkini",
     title: "Arkini",
-    dataVersion: 2,
+    dataVersion: 3,
     board: { width: 7, height: 9 },
     inventory: { slots: 36 },
   },
   assets: [
-    { id: "asset:item-seed", kind: "item", label: "Seed", src: svg("item-seed"), sort: 10 },
-    { id: "asset:item-sprout", kind: "item", label: "Sprout", src: svg("item-sprout"), sort: 20 },
-    { id: "asset:item-leaf", kind: "item", label: "Leaf", src: svg("item-leaf"), sort: 30 },
-    { id: "asset:item-twig", kind: "item", label: "Twig", src: svg("item-twig"), sort: 40 },
-    { id: "asset:item-branch", kind: "item", label: "Branch", src: svg("item-branch"), sort: 50 },
-    { id: "asset:item-log", kind: "item", label: "Log", src: svg("item-log"), sort: 60 },
-    { id: "asset:item-pebble", kind: "item", label: "Pebble", src: svg("item-pebble"), sort: 70 },
-    { id: "asset:item-stone", kind: "item", label: "Stone", src: svg("item-stone"), sort: 80 },
-    { id: "asset:item-crystal", kind: "item", label: "Crystal", src: svg("item-crystal"), sort: 90 },
-    { id: "asset:item-blueprint", kind: "item", label: "Blueprint", src: svg("item-blueprint"), sort: 100 },
-    { id: "asset:item-townhall", kind: "item", label: "Town Hall", src: svg("item-townhall"), sort: 110 },
-    { id: "asset:item-crate", kind: "item", label: "Crate", src: svg("item-crate"), sort: 120 },
-    { id: "asset:item-water", kind: "item", label: "Water", src: svg("item-water"), sort: 130 },
+    asset("asset:item-seed", "Seed", "item-seed", 10),
+    asset("asset:item-sprout", "Sprout", "item-sprout", 20),
+    asset("asset:item-leaf", "Leaf", "item-leaf", 30),
+    asset("asset:item-twig", "Twig", "item-twig", 40),
+    asset("asset:item-branch", "Branch", "item-branch", 50),
+    asset("asset:item-log", "Log", "item-log", 60),
+    asset("asset:item-pebble", "Pebble", "item-pebble", 70),
+    asset("asset:item-stone", "Stone", "item-stone", 80),
+    asset("asset:item-crystal", "Crystal", "item-crystal", 90),
+    asset("asset:item-water", "Water", "item-water", 100),
+    asset("asset:item-blueprint", "Blueprint", "item-blueprint", 110),
+    asset("asset:item-townhall", "Town Hall", "item-townhall", 120),
+    asset("asset:item-lumber-camp", "Lumber Camp", "item-lumber-camp", 130),
+    asset("asset:item-quarry", "Quarry", "item-quarry", 140),
+    asset("asset:item-crate", "Common Crate", "item-crate", 150),
+    asset("asset:item-crate-sturdy", "Sturdy Crate", "item-crate-sturdy", 160),
+    asset("asset:item-crate-rare", "Rare Crate", "item-crate-rare", 170),
     { id: "asset:ui-slot", kind: "ui", label: "Board Slot", src: svg("ui-slot"), sort: 1000 },
   ],
   items: [
@@ -147,10 +141,26 @@ export const gameDataManifest = {
     item("item:stone", "asset:item-stone", "stone", "Stone", 2, 50, "Rock with self-esteem.", ["material", "stone"], 80),
     item("item:crystal", "asset:item-crystal", "crystal", "Crystal", 3, 25, "Shiny enough to justify bad decisions.", ["material", "stone", "rare"], 90),
     item("item:water", "asset:item-water", "water", "Water", 1, 50, "Liquid logistics. Somehow still your problem.", ["material", "water"], 100),
+
     item("item:blueprint-townhall", "asset:item-blueprint", "blueprint-townhall", "Town Hall Blueprint", 1, 5, "Consumable plan for one town hall.", ["blueprint"], 200),
+    item("item:blueprint-lumber-camp", "asset:item-blueprint", "blueprint-lumber-camp", "Lumber Camp Blueprint", 1, 5, "Consumable plan for a wood producer.", ["blueprint"], 210),
+    item("item:blueprint-quarry", "asset:item-blueprint", "blueprint-quarry", "Quarry Blueprint", 1, 5, "Consumable plan for a stone producer.", ["blueprint"], 220),
+
     item("item:townhall-1", "asset:item-townhall", "townhall-1", "Town Hall I", 1, 1, "A tiny bureaucracy that spits out progress.", ["producer", "building", "townhall"], 300),
     item("item:townhall-2", "asset:item-townhall", "townhall-2", "Town Hall II", 2, 1, "Same bureaucracy, slightly shinier clipboard.", ["producer", "building", "townhall"], 310),
-    item("item:common-crate", "asset:item-crate", "common-crate", "Common Crate", 1, 1, "A finite producer with opinions inside.", ["producer", "container"], 400),
+    item("item:townhall-3", "asset:item-townhall", "townhall-3", "Town Hall III", 3, 1, "Municipal paperwork with actual momentum.", ["producer", "building", "townhall"], 320),
+
+    item("item:lumber-camp-1", "asset:item-lumber-camp", "lumber-camp-1", "Lumber Camp I", 1, 1, "A polite machine for turning time into sticks.", ["producer", "building", "wood"], 330),
+    item("item:lumber-camp-2", "asset:item-lumber-camp", "lumber-camp-2", "Lumber Camp II", 2, 1, "Still wood, but now with ambition.", ["producer", "building", "wood"], 340),
+    item("item:lumber-camp-3", "asset:item-lumber-camp", "lumber-camp-3", "Lumber Camp III", 3, 1, "A compact shrine to deforestation.", ["producer", "building", "wood"], 350),
+
+    item("item:quarry-1", "asset:item-quarry", "quarry-1", "Quarry I", 1, 1, "A hole in the ground with a business model.", ["producer", "building", "stone"], 360),
+    item("item:quarry-2", "asset:item-quarry", "quarry-2", "Quarry II", 2, 1, "A deeper hole, because progress is weird.", ["producer", "building", "stone"], 370),
+    item("item:quarry-3", "asset:item-quarry", "quarry-3", "Quarry III", 3, 1, "Rocks leaving the earth at startup velocity.", ["producer", "building", "stone"], 380),
+
+    item("item:crate-1", "asset:item-crate", "crate-1", "Common Crate", 1, 1, "A finite producer with suspicious contents.", ["producer", "container"], 400),
+    item("item:crate-2", "asset:item-crate-sturdy", "crate-2", "Sturdy Crate", 2, 1, "Same box, fewer disappointments.", ["producer", "container"], 410),
+    item("item:crate-3", "asset:item-crate-rare", "crate-3", "Rare Crate", 3, 1, "A tiny treasure economy in a box.", ["producer", "container", "rare"], 420),
   ],
   merges: [
     merge("merge:seed-sprout", "item:seed", "item:sprout"),
@@ -160,65 +170,153 @@ export const gameDataManifest = {
     merge("merge:pebble-stone", "item:pebble", "item:stone"),
     merge("merge:stone-crystal", "item:stone", "item:crystal"),
     merge("merge:townhall-1-townhall-2", "item:townhall-1", "item:townhall-2"),
+    merge("merge:townhall-2-townhall-3", "item:townhall-2", "item:townhall-3"),
+    merge("merge:lumber-camp-1-lumber-camp-2", "item:lumber-camp-1", "item:lumber-camp-2"),
+    merge("merge:lumber-camp-2-lumber-camp-3", "item:lumber-camp-2", "item:lumber-camp-3"),
+    merge("merge:quarry-1-quarry-2", "item:quarry-1", "item:quarry-2"),
+    merge("merge:quarry-2-quarry-3", "item:quarry-2", "item:quarry-3"),
+    merge("merge:crate-1-crate-2", "item:crate-1", "item:crate-2"),
+    merge("merge:crate-2-crate-3", "item:crate-2", "item:crate-3"),
   ],
   dropTables: [
-    {
-      id: "drop:townhall-1",
-      label: "Town Hall I drops",
-      entries: [
-        { itemId: "item:twig", weight: 42, quantity: 1 },
-        { itemId: "item:pebble", weight: 42, quantity: 1 },
-        { itemId: "item:common-crate", weight: 10, quantity: 1 },
-        { itemId: "item:blueprint-townhall", weight: 6, quantity: 1 },
-      ],
-    },
-    {
-      id: "drop:townhall-2",
-      label: "Town Hall II drops",
-      entries: [
-        // Upgraded producers still leak low-tier materials. Without that, the
-        // economy soft-locks itself like a tiny bureaucratic masterpiece.
-        { itemId: "item:branch", weight: 28, quantity: 1 },
-        { itemId: "item:stone", weight: 24, quantity: 1 },
-        { itemId: "item:twig", weight: 16, quantity: 1 },
-        { itemId: "item:pebble", weight: 16, quantity: 1 },
-        { itemId: "item:water", weight: 10, quantity: { min: 1, max: 2 } },
-        { itemId: "item:common-crate", weight: 4, quantity: 1 },
-        { itemId: "item:blueprint-townhall", weight: 2, quantity: 1 },
-      ],
-    },
-    {
-      id: "drop:common-crate",
-      label: "Common crate drops",
-      entries: [
-        { itemId: "item:seed", weight: 30, quantity: { min: 1, max: 2 } },
-        { itemId: "item:twig", weight: 30, quantity: { min: 1, max: 2 } },
-        { itemId: "item:pebble", weight: 30, quantity: { min: 1, max: 2 } },
-        { itemId: "item:blueprint-townhall", weight: 10, quantity: 1 },
-      ],
-    },
+    drop("drop:townhall-1", "Town Hall I drops", [
+      entry("item:blueprint-lumber-camp", 18),
+      entry("item:blueprint-quarry", 18),
+      entry("item:blueprint-townhall", 8),
+      entry("item:twig", 22),
+      entry("item:pebble", 22),
+      entry("item:crate-1", 12),
+    ]),
+    drop("drop:townhall-2", "Town Hall II drops", [
+      entry("item:blueprint-lumber-camp", 12),
+      entry("item:blueprint-quarry", 12),
+      entry("item:blueprint-townhall", 6),
+      entry("item:branch", 20),
+      entry("item:stone", 18),
+      entry("item:twig", 12),
+      entry("item:pebble", 12),
+      entry("item:crate-1", 6),
+      entry("item:crate-2", 2),
+    ]),
+    drop("drop:townhall-3", "Town Hall III drops", [
+      entry("item:blueprint-lumber-camp", 10),
+      entry("item:blueprint-quarry", 10),
+      entry("item:blueprint-townhall", 7),
+      entry("item:log", 18),
+      entry("item:crystal", 15),
+      entry("item:branch", 12),
+      entry("item:stone", 12),
+      entry("item:twig", 6),
+      entry("item:pebble", 6),
+      entry("item:crate-2", 3),
+      entry("item:crate-3", 1),
+    ]),
+    drop("drop:lumber-camp-1", "Lumber Camp I drops", [
+      entry("item:twig", 70),
+      entry("item:seed", 18),
+      entry("item:branch", 12),
+    ]),
+    drop("drop:lumber-camp-2", "Lumber Camp II drops", [
+      entry("item:branch", 54),
+      entry("item:twig", 22),
+      entry("item:leaf", 14),
+      entry("item:log", 8),
+      entry("item:crate-1", 2),
+    ]),
+    drop("drop:lumber-camp-3", "Lumber Camp III drops", [
+      entry("item:log", 48),
+      entry("item:branch", 26),
+      entry("item:twig", 14),
+      entry("item:leaf", 8),
+      entry("item:crate-2", 4),
+    ]),
+    drop("drop:quarry-1", "Quarry I drops", [
+      entry("item:pebble", 72),
+      entry("item:stone", 18),
+      entry("item:crystal", 2),
+      entry("item:crate-1", 8),
+    ]),
+    drop("drop:quarry-2", "Quarry II drops", [
+      entry("item:stone", 56),
+      entry("item:pebble", 22),
+      entry("item:crystal", 14),
+      entry("item:crate-1", 6),
+      entry("item:crate-2", 2),
+    ]),
+    drop("drop:quarry-3", "Quarry III drops", [
+      entry("item:crystal", 44),
+      entry("item:stone", 30),
+      entry("item:pebble", 16),
+      entry("item:crate-2", 8),
+      entry("item:crate-3", 2),
+    ]),
+    drop("drop:crate-1", "Common crate drops", [
+      entry("item:seed", 25, { min: 1, max: 2 }),
+      entry("item:twig", 24, { min: 1, max: 2 }),
+      entry("item:pebble", 24, { min: 1, max: 2 }),
+      entry("item:water", 12, { min: 1, max: 2 }),
+      entry("item:blueprint-lumber-camp", 6),
+      entry("item:blueprint-quarry", 6),
+      entry("item:blueprint-townhall", 3),
+    ]),
+    drop("drop:crate-2", "Sturdy crate drops", [
+      entry("item:branch", 24, { min: 1, max: 2 }),
+      entry("item:stone", 24, { min: 1, max: 2 }),
+      entry("item:leaf", 16, { min: 1, max: 2 }),
+      entry("item:water", 12, { min: 2, max: 3 }),
+      entry("item:blueprint-lumber-camp", 8),
+      entry("item:blueprint-quarry", 8),
+      entry("item:blueprint-townhall", 6),
+      entry("item:crate-1", 2),
+    ]),
+    drop("drop:crate-3", "Rare crate drops", [
+      entry("item:log", 26, { min: 1, max: 2 }),
+      entry("item:crystal", 24, { min: 1, max: 2 }),
+      entry("item:water", 18, { min: 2, max: 4 }),
+      entry("item:blueprint-lumber-camp", 10),
+      entry("item:blueprint-quarry", 10),
+      entry("item:blueprint-townhall", 10),
+      entry("item:crate-2", 2),
+    ]),
   ],
   producers: [
     producer("item:townhall-1", 2_500, "drop:townhall-1", 1, { type: "infinite" }),
     producer("item:townhall-2", 1_800, "drop:townhall-2", 1, { type: "infinite" }),
-    producer("item:common-crate", 1_500, "drop:common-crate", { min: 2, max: 4 }, { type: "finite", charges: 1, onDepleted: "remove" }),
+    producer("item:townhall-3", 1_300, "drop:townhall-3", 1, { type: "infinite" }),
+    producer("item:lumber-camp-1", 1_800, "drop:lumber-camp-1", 1, { type: "infinite" }),
+    producer("item:lumber-camp-2", 1_400, "drop:lumber-camp-2", 1, { type: "infinite" }),
+    producer("item:lumber-camp-3", 1_100, "drop:lumber-camp-3", 1, { type: "infinite" }),
+    producer("item:quarry-1", 1_800, "drop:quarry-1", 1, { type: "infinite" }),
+    producer("item:quarry-2", 1_400, "drop:quarry-2", 1, { type: "infinite" }),
+    producer("item:quarry-3", 1_100, "drop:quarry-3", 1, { type: "infinite" }),
+    producer("item:crate-1", 1_100, "drop:crate-1", { min: 2, max: 4 }, { type: "finite", charges: 1, onDepleted: "remove" }),
+    producer("item:crate-2", 950, "drop:crate-2", { min: 3, max: 5 }, { type: "finite", charges: 1, onDepleted: "remove" }),
+    producer("item:crate-3", 800, "drop:crate-3", { min: 4, max: 6 }, { type: "finite", charges: 1, onDepleted: "remove" }),
   ],
   buildRecipes: [
-    {
-      id: "build:townhall-1",
-      blueprintItemId: "item:blueprint-townhall",
-      resultItemId: "item:townhall-1",
-      costs: [
-        { itemId: "item:twig", quantity: 4 },
-        { itemId: "item:pebble", quantity: 3 },
-      ],
-    },
+    build("build:townhall-1", "item:blueprint-townhall", "item:townhall-1", [
+      { itemId: "item:twig", quantity: 4 },
+      { itemId: "item:pebble", quantity: 3 },
+    ]),
+    build("build:lumber-camp-1", "item:blueprint-lumber-camp", "item:lumber-camp-1", [
+      { itemId: "item:twig", quantity: 4 },
+      { itemId: "item:leaf", quantity: 2 },
+    ]),
+    build("build:quarry-1", "item:blueprint-quarry", "item:quarry-1", [
+      { itemId: "item:pebble", quantity: 4 },
+      { itemId: "item:twig", quantity: 2 },
+    ]),
   ],
   startingState: {
     inventory: [
       { itemId: "item:blueprint-townhall", quantity: 1 },
-      { itemId: "item:twig", quantity: 4 },
-      { itemId: "item:pebble", quantity: 3 },
+      { itemId: "item:blueprint-lumber-camp", quantity: 1 },
+      { itemId: "item:blueprint-quarry", quantity: 1 },
+      { itemId: "item:twig", quantity: 12 },
+      { itemId: "item:pebble", quantity: 12 },
+      { itemId: "item:leaf", quantity: 4 },
+      { itemId: "item:seed", quantity: 4 },
+      { itemId: "item:crate-1", quantity: 2 },
     ],
     board: [],
   },
@@ -291,14 +389,18 @@ export function assertGameDataManifest(manifest: GameDataManifest = gameDataMani
 
   for (const inventoryStack of manifest.startingState.inventory) {
     assert(itemIds.has(inventoryStack.itemId), `Starting inventory references missing item ${inventoryStack.itemId}`);
-    assert(inventoryStack.quantity > 0, `Starting inventory quantity must be positive`);
+    assert(inventoryStack.quantity > 0, "Starting inventory quantity must be positive");
   }
 
   for (const boardItem of manifest.startingState.board) {
     assert(itemIds.has(boardItem.itemId), `Starting board references missing item ${boardItem.itemId}`);
-    assert(boardItem.x >= 0 && boardItem.x < manifest.game.board.width, `Starting board x is out of bounds`);
-    assert(boardItem.y >= 0 && boardItem.y < manifest.game.board.height, `Starting board y is out of bounds`);
+    assert(boardItem.x >= 0 && boardItem.x < manifest.game.board.width, "Starting board x is out of bounds");
+    assert(boardItem.y >= 0 && boardItem.y < manifest.game.board.height, "Starting board y is out of bounds");
   }
+}
+
+function asset(id: AssetId, label: string, file: string, sort: number): AssetDefinition {
+  return { id, kind: "item", label, src: svg(file), sort };
 }
 
 function item(
@@ -317,6 +419,23 @@ function item(
 
 function merge(id: MergeDefinitionId, inputItemId: ItemId, outputItemId: ItemId): MergeDefinition {
   return { id, inputItemId, inputCount: 2, outputItemId };
+}
+
+function drop(id: DropTableId, label: string, entries: readonly DropTableEntry[]): DropTableDefinition {
+  return { id, label, entries };
+}
+
+function entry(itemId: ItemId, weight: number, quantity: DropTableEntry["quantity"] = 1): DropTableEntry {
+  return { itemId, weight, quantity };
+}
+
+function build(
+  id: BuildRecipeId,
+  blueprintItemId: ItemId,
+  resultItemId: ItemId,
+  costs: readonly BuildRecipeCost[],
+): BuildRecipeDefinition {
+  return { id, blueprintItemId, resultItemId, costs };
 }
 
 function producer(

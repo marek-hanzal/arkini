@@ -24,7 +24,7 @@ export function BuildModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-4 shadow-2xl shadow-slate-950/80"
+        className="flex max-h-[75vh] w-full max-w-lg flex-col rounded-md border border-slate-700 bg-slate-900 p-4 shadow-xl shadow-slate-950/70"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
@@ -38,14 +38,14 @@ export function BuildModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-950 px-3 py-1 text-sm font-semibold text-slate-300 transition hover:bg-slate-800"
+            className="rounded-sm bg-slate-950 px-3 py-1 text-sm font-semibold text-slate-300 transition hover:bg-slate-800"
           >
             Close
           </button>
         </div>
 
         {availableRecipes.length ? (
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 grid min-h-0 gap-3 overflow-y-auto pr-1">
             {availableRecipes.map((recipe) => {
               const result = game.items[recipe.resultItemId];
               const blueprint = game.items[recipe.blueprintItemId];
@@ -56,7 +56,7 @@ export function BuildModal({
                   disabled={pending || !recipe.canBuild}
                   onClick={() => onBuild(recipe.id)}
                   className={[
-                    "rounded-xl border p-3 text-left transition",
+                    "rounded-sm border p-3 text-left transition",
                     recipe.canBuild
                       ? "border-amber-300/40 bg-amber-300/10 hover:bg-amber-300/15"
                       : "border-slate-800 bg-slate-950/50 opacity-50",
@@ -78,7 +78,7 @@ export function BuildModal({
             })}
           </div>
         ) : (
-          <div className="mt-4 rounded-xl border border-dashed border-slate-700 bg-slate-950/50 p-5 text-sm leading-6 text-slate-400">
+          <div className="mt-4 rounded-sm border border-dashed border-slate-700 bg-slate-950/50 p-5 text-sm leading-6 text-slate-400">
             No blueprints in inventory. Make a producer cough one up first, because apparently civilization starts with paperwork.
           </div>
         )}

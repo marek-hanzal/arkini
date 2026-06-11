@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Rare crate">
+  <rect x="18" y="24" width="92" height="86" rx="12" fill="#581c87"/>
+  <rect x="28" y="34" width="72" height="66" rx="6" fill="#7e22ce"/>
+  <path d="M32 40 96 94M96 40 32 94" stroke="#a855f7" stroke-width="10" stroke-linecap="round"/>
+  <path d="M18 54h92M18 82h92" stroke="#facc15" stroke-width="8" opacity=".9"/>
+  <path d="m64 18 8 14 16 3-12 11 2 16-14-8-14 8 2-16-12-11 16-3z" fill="#fde047"/>
+</svg>

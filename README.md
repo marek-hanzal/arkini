@@ -7,12 +7,14 @@ Client-only offline merge-game prototype. This is a plain static Vite + React SP
 Arkini is a classic 1×1 tile merge game with a second economy layer:
 
 - The board is the active play space. Items are dragged, merged, produced, and placed there.
-- Inventory is limited 3×9 vertical storage. Items stack there up to each item definition's `maxStackSize`.
+- Inventory is limited 4×9 vertical storage. Items stack there up to each item definition's `maxStackSize`.
 - Merging happens only on the board. Inventory stores and swaps stacks, but does not auto-merge.
 - Producers live on the board and drop items around themselves. If there is not enough free space, production fails without spending cooldown.
 - Producers always have cooldowns. Rapid repeat clicking is blocked.
-- Producer drops animate out one by one instead of appearing as one ugly pile of instant database truth.
+- Producer drops animate out one by one from the producer instead of appearing as one ugly pile of instant database truth.
 - Producers may be infinite, like a town hall, or finite, like a crate that empties and disappears.
+- The first tutorial economy starts with town hall, lumber camp, and quarry blueprints plus enough materials to build all three.
+- Town halls, lumber camps, quarries, and crates currently merge up to level 3.
 - Blueprints are consumable inventory items. Click an empty board cell, choose an owned blueprint from the build modal, then building consumes blueprint plus inventory materials and places the result on the board.
 - Everything remains 1×1. Multi-tile buildings are explicitly out of scope.
 - Producer upgrades are merges. Two `townhall-1` items become `townhall-2`; the new producer starts with default fresh state.
@@ -129,13 +131,14 @@ src/domains/game-data/index.ts
 
 That manifest defines:
 
-- board size and 3×9 inventory slot count
+- board size and 4×9 inventory slot count
 - SVG assets
 - items and max stack sizes
 - merge definitions
 - drop tables
 - producer definitions and cooldowns; upgraded producers still drop some low-tier materials so build recipes do not soft-lock
 - finite/infinite producer modes
+- starter economy: Town Hall, Lumber Camp, Quarry, and three crate tiers
 - build recipes
 - starting inventory/board state
 

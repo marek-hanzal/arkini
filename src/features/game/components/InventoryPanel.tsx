@@ -25,7 +25,7 @@ export function InventoryPanel({
   const columns = 4;
 
   return (
-    <section className="w-fit max-w-full rounded-2xl border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
+    <section className="w-fit max-w-full rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div className="flex items-baseline gap-3">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300">Inventory</p>
@@ -33,7 +33,7 @@ export function InventoryPanel({
         </div>
         <p className="text-xs font-medium text-slate-500">{game.inventory.length} slots</p>
       </div>
-      <div className="mt-3 grid w-fit gap-0 overflow-hidden rounded-xl border border-slate-800" style={{ gridTemplateColumns: `repeat(${columns}, ${cellSize})` }}>
+      <div className="mt-3 grid w-fit gap-0 overflow-hidden rounded-sm border border-slate-800" style={{ gridTemplateColumns: `repeat(${columns}, ${cellSize})` }}>
           {game.inventory.map((slot) => (
             <InventorySlotCell
               key={slot.slotIndex}
@@ -143,14 +143,14 @@ function InventoryItemCard({
       ref={setNodeRef}
       onDoubleClick={handleDoubleClick}
       className={[
-        "flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 rounded-lg transition active:cursor-grabbing",
+        "flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 rounded-sm transition active:cursor-grabbing",
         isDragging ? "opacity-0" : "hover:bg-slate-800/70",
       ].join(" ")}
       {...listeners}
       {...attributes}
     >
       <TileContent item={item} />
-      <span className="absolute bottom-1 right-1.5 rounded-full bg-slate-900 px-1.5 text-[0.7rem] font-bold text-slate-100">
+      <span className="absolute bottom-1 right-1.5 rounded-sm bg-slate-900 px-1.5 text-[0.7rem] font-bold text-slate-100">
         {quantity}
       </span>
     </div>

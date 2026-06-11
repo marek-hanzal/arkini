@@ -23,6 +23,7 @@ import { DragPreview } from "~/features/game/components/DragPreview";
 import { FlyoutTile } from "~/features/game/components/FlyoutTile";
 import { GameCard } from "~/features/game/components/GameCard";
 import { InventoryPanel } from "~/features/game/components/InventoryPanel";
+import { SplashScreen } from "~/features/game/components/SplashScreen";
 import { boardPulseMs, invalidDropReturnMs, mergePulseMs, stashAnimationMs } from "~/features/game/components/constants";
 import { boardCellId, boardCellKey, parseBoardCellId } from "~/features/game/components/helpers/boardCellId";
 import { canMergeBoardItems } from "~/features/game/components/helpers/canMergeBoardItems";
@@ -51,6 +52,12 @@ export function GameShell() {
   const [hiddenBoardItemIds, setHiddenBoardItemIds] = useState<Set<string>>(() => new Set());
   const [buildCell, setBuildCell] = useState<BuildCell>(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
+  const [splashReady, setSplashReady] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setSplashReady(true), 900);
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     if (activeDrag) return;
@@ -373,8 +380,8 @@ export function GameShell() {
       .otherwise(() => reject(overId));
   }
 
-  if (game.isLoading) {
-    return <GameCard title="Loading game">Opening the local OPFS SQLite database.</GameCard>;
+  if (game.isLoading || !splashReady) {
+    return <SplashScreen />;
   }
 
   if (game.isError) {

@@ -21,29 +21,33 @@ export function DbStatusCard() {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="mr-auto">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Local database</p>
-          <h2 className="mt-1 text-lg font-semibold text-white">SQLite / OPFS</h2>
+    <section className="w-fit rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-lg shadow-slate-950/25">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="min-w-40">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Local database</p>
+          <h2 className="mt-1 text-base font-semibold text-white">SQLite / OPFS</h2>
+          <span
+            className={[
+              "mt-2 inline-flex rounded-sm px-2 py-1 text-xs font-semibold",
+              crossOriginIsolated ? "bg-emerald-400/10 text-emerald-200" : "bg-amber-400/10 text-amber-200",
+            ].join(" ")}
+          >
+            {crossOriginIsolated ? "isolated" : "headers missing"}
+          </span>
         </div>
-        <StatusPill label="DB" value={status.isSuccess ? status.data.databasePath : "arkini.sqlite3"} />
-        <StatusPill label="Sync" value={status.isSuccess ? status.data.gameDataHash.slice(0, 10) : "pending"} />
-        <StatusPill label="Items" value={status.isSuccess ? String(status.data.itemCount) : "…"} />
-        <StatusPill label="Prod" value={status.isSuccess ? String(status.data.producerCount) : "…"} />
-        <span
-          className={[
-            "rounded-full px-3 py-1 text-xs font-semibold",
-            crossOriginIsolated ? "bg-emerald-400/10 text-emerald-200" : "bg-amber-400/10 text-amber-200",
-          ].join(" ")}
-        >
-          {crossOriginIsolated ? "isolated" : "headers missing"}
-        </span>
+
+        <div className="grid w-64 grid-cols-2 gap-2">
+          <StatusPill label="DB" value={status.isSuccess ? status.data.databasePath : "arkini.sqlite3"} />
+          <StatusPill label="Sync" value={status.isSuccess ? status.data.gameDataHash.slice(0, 10) : "pending"} />
+          <StatusPill label="Items" value={status.isSuccess ? String(status.data.itemCount) : "…"} />
+          <StatusPill label="Prod" value={status.isSuccess ? String(status.data.producerCount) : "…"} />
+        </div>
+
         <button
           type="button"
           disabled={resetState === "pending"}
           onClick={hardResetDatabase}
-          className="rounded-xl border border-red-400/30 bg-red-950/30 px-4 py-2 text-sm font-semibold text-red-100 transition hover:border-red-300 hover:bg-red-950/50 disabled:cursor-wait disabled:opacity-60"
+          className="rounded-sm border border-red-400/30 bg-red-950/30 px-6 py-3 text-sm font-semibold text-red-100 transition hover:border-red-300 hover:bg-red-950/50 disabled:cursor-wait disabled:opacity-60"
         >
           {resetState === "pending" ? "Dropping DB…" : "Hard reset DB"}
         </button>
@@ -57,7 +61,7 @@ export function DbStatusCard() {
 
 function StatusPill({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
-    <div className="min-w-20 rounded-xl bg-slate-950/60 px-3 py-2">
+    <div className="min-w-0 rounded-sm bg-slate-950/60 px-3 py-2">
       <div className="text-[0.62rem] uppercase tracking-[0.18em] text-slate-500">{label}</div>
       <div className="truncate text-sm font-medium text-slate-100">{value}</div>
     </div>

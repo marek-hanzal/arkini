@@ -50,18 +50,18 @@ export function BoardPanel({
   }));
 
   return (
-    <section className="w-fit max-w-full rounded-2xl border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
+    <section className="w-fit max-w-full rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-baseline gap-3">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-300">Board</p>
           <h2 className="text-base font-semibold text-white">Merge space</h2>
         </div>
-        <p className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-400">
+        <p className="rounded-sm bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-400">
           {game.save.boardWidth}×{game.save.boardHeight}
         </p>
       </div>
 
-      <div className="grid w-fit gap-0 overflow-hidden rounded-xl border border-slate-800" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, ${cellSize})` }}>
+      <div className="grid w-fit gap-0 overflow-hidden rounded-sm border border-slate-800" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, ${cellSize})` }}>
         {cells.map((cell) => {
           const key = boardCellKey(cell.x, cell.y);
           const boardItem = itemByCell.get(key);
@@ -258,7 +258,7 @@ function BoardItemCard({
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       className={[
-        "relative flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 overflow-hidden rounded-lg text-center transition duration-200 active:cursor-grabbing disabled:cursor-not-allowed",
+        "relative flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 overflow-hidden rounded-sm text-center transition duration-200 active:cursor-grabbing disabled:cursor-not-allowed",
         item.canProduce ? "bg-amber-300/10 shadow-inner shadow-amber-950/30" : "",
         selected ? "bg-emerald-500/15 ring-1 ring-emerald-300" : "hover:bg-slate-800/70",
         mergePulse ? "scale-110 bg-emerald-500/20 ring-2 ring-emerald-200" : "scale-100",
@@ -276,7 +276,7 @@ function BoardItemCard({
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1">
         <TileContent item={item} />
         {cooldown.coolingDown ? (
-          <span className="absolute right-1 top-1 rounded-full bg-slate-950/85 px-1.5 text-[0.58rem] font-bold text-amber-100">
+          <span className="absolute right-1 top-1 rounded-sm bg-slate-950/85 px-1.5 text-[0.58rem] font-bold text-amber-100">
             {Math.ceil(cooldown.remainingMs / 1000)}s
           </span>
         ) : null}

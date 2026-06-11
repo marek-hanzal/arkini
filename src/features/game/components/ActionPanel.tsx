@@ -16,7 +16,7 @@ export function ActionPanel({
   const invalidSelection = selectedBoardItem ? invalidTargetId === selectedBoardItem.id : false;
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
+    <section className="rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Actions</p>
       <p className="mt-2 text-sm leading-6 text-slate-300">
         Drag items to move, merge, stash, or reorder inventory. Click an empty board cell to build from owned blueprints.
@@ -25,7 +25,7 @@ export function ActionPanel({
       {selectedItem && selectedBoardItem ? (
         <div
           className={[
-            "mt-3 rounded-xl bg-slate-950/60 p-3 transition",
+            "mt-3 rounded-sm bg-slate-950/60 p-3 transition",
             invalidSelection ? "ring-1 ring-red-300 bg-red-950/30" : "",
           ].join(" ")}
         >

@@ -22,7 +22,7 @@ try {
 } catch (error) {
   createRoot(rootElement).render(
     <main className="mx-auto flex min-h-screen max-w-2xl items-center px-6 py-12">
-      <section className="rounded-3xl border border-red-400/30 bg-red-950/30 p-6 text-red-50">
+      <section className="rounded-sm border border-red-400/30 bg-red-950/30 p-6 text-red-50">
         <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-200">
           OPFS blocked
         </p>
@@ -31,7 +31,7 @@ try {
           Arkini needs COOP/COEP isolation before browser SQLite can persist into OPFS.
           The service worker tried to enable the required isolation on static hosting.
         </p>
-        <pre className="mt-4 overflow-auto rounded-2xl bg-red-950/70 p-4 text-xs text-red-100">
+        <pre className="mt-4 overflow-auto rounded-md bg-red-950/70 p-4 text-xs text-red-100">
           {error instanceof Error ? error.message : String(error)}
         </pre>
       </section>

@@ -17,7 +17,7 @@ export function FlyoutTile({ game, flyout }: Readonly<{ game: GameView; flyout: 
 
   return (
     <div
-      className="pointer-events-none fixed z-50 rounded-2xl border border-sky-300 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/80"
+      className="pointer-events-none fixed z-50 rounded-md border border-sky-300 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/80"
       style={{
         left: flyout.from.left,
         top: flyout.from.top,

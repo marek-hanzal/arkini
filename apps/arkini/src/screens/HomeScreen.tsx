@@ -27,8 +27,8 @@ export function HomeScreen() {
 
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
             Board merge, limited inventory, blueprint building, cooldown producers, finite crates,
-            and manifest-synced SQLite definitions. Pořád je to button-first prototyp, ne hotová
-            hra, takže priorita je funkční loop, ne hrdinská landing page, která sežere půl viewportu.
+            and manifest-synced SQLite definitions. The priority is a tight playable loop, not a heroic
+            landing page that eats half the viewport before the game even starts.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2">

@@ -8,7 +8,7 @@ import "./styles.css";
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
-  throw new Error("Arkini root element is missing. The DOM has one job. Naturally.");
+  throw new Error("Arkini root element is missing.");
 }
 
 try {
@@ -29,8 +29,7 @@ try {
         <h1 className="mt-3 text-3xl font-bold">Cross-origin isolation failed</h1>
         <p className="mt-4 text-sm leading-6 text-red-100">
           Arkini needs COOP/COEP isolation before browser SQLite can persist into OPFS.
-          The service worker fallback tried to help, because apparently even static
-          hosting needs a tiny bureaucrat now.
+          The service worker tried to enable the required isolation on static hosting.
         </p>
         <pre className="mt-4 overflow-auto rounded-2xl bg-red-950/70 p-4 text-xs text-red-100">
           {error instanceof Error ? error.message : String(error)}

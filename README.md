@@ -1,6 +1,6 @@
 # Arkini
 
-Client-only offline merge-game prototype. The app is a static SPA, not a server app. If a future change adds SSR, server functions, or runtime HTTP APIs, assume a small architecture goblin escaped and put it back in the cage.
+Client-only offline merge-game prototype. The app is a static SPA, not a server app. Future changes must not add SSR, server functions, or runtime HTTP APIs.
 
 ## What the game is supposed to become
 
@@ -8,9 +8,9 @@ Arkini is a classic 1×1 tile merge game with a second economy layer:
 
 - The board is the active play space. Items are dragged, merged, and produced there.
 - Inventory is limited storage. Items stack there up to each item definition's `maxStackSize`.
-- Merging happens only on the board. Inventory does not auto-merge, because then the board becomes decorative sadness.
+- Merging happens only on the board. Inventory does not auto-merge because the board is the core play space.
 - Producers live on the board and drop items around themselves. If there is not enough free space, production should fail without spending cooldown.
-- Producers always have cooldowns. No spam-clicking like caffeinated raccoons.
+- Producers always have cooldowns. Rapid repeat clicking is intentionally blocked.
 - Producers may be infinite, like a town hall, or finite, like a crate that empties and disappears.
 - Blueprints are consumable inventory items. Building/crafting consumes a blueprint plus inventory materials, then places the result on the board.
 - Everything remains 1×1. Multi-tile buildings are explicitly out of scope.
@@ -22,9 +22,11 @@ Arkini is a classic 1×1 tile merge game with a second economy layer:
 - TanStack Router, code-based route tree, hash history for static hosting
 - TanStack Query for async local state flows
 - Tailwind CSS v4 through the Vite plugin
+- DnD Kit for the single drag-and-drop interaction model
+- Sonner for rare toast-level feedback
 - SQLite in browser OPFS via SQLocal
 - Kysely typed query layer
-- Bun-first scripts, npm fallback when the world is being difficult
+- Bun-first scripts; npm works when Bun is not available
 
 No TanStack Start. No SSR. No server routes. No running server beyond static file serving.
 
@@ -54,7 +56,7 @@ For GitHub Pages under a repository path, set the Vite base:
 VITE_BASE=/your-repo-name/ bun run build
 ```
 
-The router currently uses hash history, so static hosts do not need SPA rewrite rules for future client routes. Ugly URL hashes are less ugly than a server requirement, which is a sentence humanity somehow earned.
+The router currently uses hash history, so static hosts do not need SPA rewrite rules for future client routes.
 
 ## OPFS and cross-origin isolation
 
@@ -71,7 +73,7 @@ Configured places:
 - Static `_headers` file for hosts that support it: `apps/arkini/public/_headers`
 - Vercel headers: `apps/arkini/vercel.json`
 
-GitHub Pages does not provide normal custom response headers, so `apps/arkini/public/coi-serviceworker.js` is used as a static-host fallback. On the first visit it registers, reloads once, and then re-serves same-origin files with COOP/COEP headers. Proper headers are still preferred whenever hosting supports them.
+GitHub Pages does not provide normal custom response headers, so `apps/arkini/public/coi-serviceworker.js` is the static-host COI path. On the first visit it registers, reloads once, and then re-serves same-origin files with COOP/COEP headers. Proper headers are still preferred whenever hosting supports them.
 
 ## Source layout
 
@@ -82,9 +84,9 @@ apps/arkini
   src/router.tsx             TanStack Router + Query provider. No generated route tree.
   src/screens/HomeScreen.tsx Current playable prototype shell.
   src/components/GameShell.tsx
-                             Button-first board/inventory/build UI. Drag comes later.
+                             Drag-first board, inventory, producer, and build UI.
   src/hooks/useGameView.ts   Tiny TanStack Query bridge over local DB actions.
-  public/coi-serviceworker.js Static-host COOP/COEP fallback.
+  public/coi-serviceworker.js Static-host COOP/COEP service worker.
 
 packages/game-data
   src/index.ts               The single static game-data manifest.
@@ -99,24 +101,25 @@ packages/db
 
 ## Current playable blocks
 
-This is still not the final drag-and-drop game. It is a deliberately boring button-first gameplay slice so the data model proves itself before animations and touch UX arrive to make everything more dramatic. Current actions:
+The prototype uses one primary interaction model: drag and drop through `@dnd-kit/core`. There is no click-placement path. Current actions:
 
-- select an inventory stack, then click an empty board cell to place one item
-- select a board item, then select another identical board item to merge into the next manifest-defined level
-- select a board producer and click produce; drops appear around it only when enough free adjacent space exists
+- drag an inventory stack onto an empty board cell to place one item
+- drag a board item onto an empty board cell to move it
+- drag a board item onto an identical board item to merge into the next manifest-defined level
+- select a producer and click produce; drops appear around it only when enough free adjacent space exists
 - finite producers, such as crates, spend charges and disappear when depleted
-- select a blueprint build recipe, then click an empty board cell to consume blueprint/materials from inventory and place the result
-- stash a board item back into inventory, respecting stack size and slot limits
+- drag a blueprint build recipe onto an empty board cell to consume blueprint/materials from inventory and place the result
+- drag a board item onto an inventory slot to store it, respecting stack size and slot limits
 - reset save for prototype testing
 - hard reset the whole OPFS database when migrations changed during local development
 
-The code is intentionally small and direct. `packages/db/src/gameplay.ts` is the gameplay boundary for now. Keep new mechanics there until there is actual pressure to split them; do not create a service cathedral because one function got mildly embarrassed.
+The code is intentionally small and direct. `packages/db/src/gameplay.ts` is the gameplay boundary for now. Keep new mechanics there until there is actual pressure to split them.
 
 ## Development hard reset
 
-Browser OPFS databases persist across rebuilds. During early development we do **not** support backward compatibility for stale local schema. If a migration changed and your local DB starts crying about a missing column, use the **Hard reset DB + rerun migrations** button in the SQLite status card.
+Browser OPFS databases persist across rebuilds. During early development we do **not** support backward compatibility for stale local schema. If a migration changed and your local DB reports a missing column, use the **Hard reset DB + rerun migrations** button in the SQLite status card.
 
-That button deletes the SQLocal OPFS database file, reloads the app, then the normal boot path runs all migrations from an empty database and syncs the manifest. Brutal, clean, and vastly better than keeping prototype schema-repair code around like a cursed family heirloom.
+That button deletes the SQLocal OPFS database file, reloads the app, then the normal boot path runs all migrations from an empty database and syncs the manifest.
 
 ## Data rules
 
@@ -138,7 +141,7 @@ That manifest defines:
 - build recipes
 - starting inventory/board state
 
-Migrations create database shape. The manifest creates game content. Do not hide balance changes in migrations unless you enjoy leaving landmines for the next model, which is rude even by software standards.
+Migrations create database shape. The manifest creates game content. Do not hide balance changes in migrations.
 
 On every app bootstrap:
 
@@ -159,7 +162,7 @@ Use data before code. An item is the base identity. Behavior comes from optional
 - producer definition: can generate drops
 - build recipe: blueprint can craft/place a result
 
-Avoid class inheritance and avoid one obese nullable item object. Keep gameplay operations small and direct. A tiny helper that removes duplication is fine; a helper that exists because someone wanted to feel architectural should be deleted with theatrical contempt.
+Avoid class inheritance and avoid one large nullable item object. Keep gameplay operations small and direct. A tiny helper that removes duplication is fine; speculative abstractions should be removed.
 
 ## Commit hygiene
 

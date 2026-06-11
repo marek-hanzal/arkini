@@ -7,6 +7,7 @@ export { syncGameDataManifest } from "./syncGameData";
 export {
   buildRecipe,
   mergeBoardItems,
+  moveBoardItem,
   placeInventoryItem,
   produceBoardItem,
   readGameView,

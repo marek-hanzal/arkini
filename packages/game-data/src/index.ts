@@ -110,8 +110,8 @@ const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href
 
 // This file is the whole static game definition. Migrations create tables; this
 // manifest defines the content that must exist after every app start. When a
-// balance value or drop list changes, change this file instead of writing some
-// ceremonial migration goblin ritual.
+// balance value or drop list changes, change this file instead of writing a
+// content-only migration.
 export const gameDataManifest = {
   game: {
     id: "arkini",
@@ -332,7 +332,7 @@ function producer(
 }
 
 function assertUnique(values: readonly string[], label: string) {
-  assert(new Set(values).size === values.length, `Duplicate ${label}. Yes, even data can be annoying.`);
+  assert(new Set(values).size === values.length, `Duplicate ${label}.`);
 }
 
 function assertRange(value: number | { min: number; max: number }, label: string) {

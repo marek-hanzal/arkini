@@ -59,8 +59,8 @@ export function DbStatusCard() {
       </button>
 
       <p className="mt-2 text-xs leading-5 text-slate-500">
-        Dev-only atomovka: smaže lokální SQLite soubor a reloadne appku. Žádná schema kompatibilita,
-        žádné mazlení se starou DB, protože ještě nestavíme banku pro křečky.
+        Dev-only database nuke: deletes the local SQLite file and reloads the app. No schema compatibility,
+        no old-database care package, because this is still clean pre-release development.
       </p>
 
       {status.isError ? (
@@ -71,7 +71,7 @@ export function DbStatusCard() {
 
       {resetState === "failed" ? (
         <p className="mt-4 rounded-2xl border border-red-400/30 bg-red-950/40 p-3 text-sm text-red-100">
-          Hard reset failed. Browser se zase rozhodl být malý úředník; mrkni do konzole.
+          Hard reset failed. Check the browser console for details.
         </p>
       ) : null}
     </section>

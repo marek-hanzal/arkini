@@ -173,7 +173,7 @@ export async function placeInventoryItem(slotIndex: number, x: number, y: number
   });
 }
 
-export async function stashBoardItem(boardItemId: string) {
+export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
   await kysely.transaction().execute(async (tx) => {
     const boardItem = await tx
       .selectFrom("boardItem")
@@ -184,14 +184,47 @@ export async function stashBoardItem(boardItemId: string) {
 
     if (!boardItem) throw new GameActionError("Board item does not exist.");
 
-    await addInventoryItems(tx, boardItem.itemDefinitionId, 1);
+    await addInventoryItems(tx, boardItem.itemDefinitionId, 1, slotIndex);
     await tx.deleteFrom("boardItem").where("id", "=", boardItem.id).execute();
+  });
+}
+
+export async function moveBoardItem(boardItemId: string, x: number, y: number) {
+  await kysely.transaction().execute(async (tx) => {
+    const [save, boardItem, existingBoardItem] = await Promise.all([
+      tx.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
+      tx
+        .selectFrom("boardItem")
+        .selectAll()
+        .where("id", "=", boardItemId)
+        .where("saveGameId", "=", defaultSaveGameId)
+        .executeTakeFirst(),
+      tx
+        .selectFrom("boardItem")
+        .select("id")
+        .where("saveGameId", "=", defaultSaveGameId)
+        .where("x", "=", x)
+        .where("y", "=", y)
+        .executeTakeFirst(),
+    ]);
+
+    assertInsideBoard(save, x, y);
+    if (!boardItem) throw new GameActionError("Board item does not exist.");
+    if (existingBoardItem && existingBoardItem.id !== boardItem.id) {
+      throw new GameActionError("Drop on an empty board cell or merge matching items.");
+    }
+
+    await tx
+      .updateTable("boardItem")
+      .set({ x, y, updatedAt: now() })
+      .where("id", "=", boardItem.id)
+      .execute();
   });
 }
 
 export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItemId: string) {
   if (sourceBoardItemId === targetBoardItemId) {
-    throw new GameActionError("Pick two different board items to merge. Revolutionary, I know.");
+    throw new GameActionError("Pick two different board items to merge.");
   }
 
   await kysely.transaction().execute(async (tx) => {
@@ -252,7 +285,7 @@ export async function produceBoardItem(boardItemId: string) {
     const timestamp = Date.now();
 
     if (producerState.cooldownUntil && Date.parse(producerState.cooldownUntil) > timestamp) {
-      throw new GameActionError("Producer is cooling down. Let the poor box breathe.");
+      throw new GameActionError("Producer is still cooling down.");
     }
 
     if (producerState.remainingCharges !== null && producerState.remainingCharges !== undefined && producerState.remainingCharges <= 0) {
@@ -505,6 +538,7 @@ async function addInventoryItems(
   tx: Transaction<Database>,
   itemId: string,
   quantity: number,
+  preferredSlotIndex?: number,
 ) {
   let remaining = quantity;
   const item = gameDataManifest.items.find((definition) => definition.id === itemId);
@@ -517,6 +551,43 @@ async function addInventoryItems(
     .where("saveGameId", "=", defaultSaveGameId)
     .orderBy("slotIndex")
     .execute();
+
+  if (preferredSlotIndex !== undefined) {
+    if (preferredSlotIndex < 0 || preferredSlotIndex >= save.inventorySlots) {
+      throw new GameActionError("Inventory slot is outside the inventory.");
+    }
+
+    const preferredStack = stacks.find((stack) => stack.slotIndex === preferredSlotIndex);
+
+    if (preferredStack) {
+      if (preferredStack.itemDefinitionId !== itemId || preferredStack.quantity >= item.maxStackSize) {
+        throw new GameActionError("Inventory slot cannot accept this item.");
+      }
+
+      const canAdd = Math.min(remaining, item.maxStackSize - preferredStack.quantity);
+      await tx
+        .updateTable("inventoryStack")
+        .set({ quantity: preferredStack.quantity + canAdd, updatedAt: now() })
+        .where("id", "=", preferredStack.id)
+        .execute();
+      remaining -= canAdd;
+      if (remaining === 0) return;
+    } else {
+      const inserted = Math.min(remaining, item.maxStackSize);
+      await tx
+        .insertInto("inventoryStack")
+        .values({
+          id: createId("inventory"),
+          saveGameId: defaultSaveGameId,
+          slotIndex: preferredSlotIndex,
+          itemDefinitionId: itemId,
+          quantity: inserted,
+        })
+        .execute();
+      remaining -= inserted;
+      if (remaining === 0) return;
+    }
+  }
 
   for (const stack of stacks.filter((candidate) => candidate.itemDefinitionId === itemId && candidate.quantity < item.maxStackSize)) {
     const canAdd = Math.min(remaining, item.maxStackSize - stack.quantity);

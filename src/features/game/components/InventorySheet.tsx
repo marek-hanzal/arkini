@@ -2,7 +2,7 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import type { GameView, InventorySlot, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
-import { useDoubleActivate } from "../useDoubleActivate";
+import { usePressActions } from "../usePressActions";
 import type { DragData, DropData } from "../types";
 import { Tile } from "./Tile";
 
@@ -124,21 +124,21 @@ function InventoryTile({ slot, item, hidden, onDoubleActivate }: Readonly<{ slot
     disabled: !stack,
     data: stack ? { kind: "inventory", slotIndex: slot.slotIndex, itemId: stack.itemId, quantity: stack.quantity } satisfies DragData : undefined,
   });
-  const tapHandlers = useDoubleActivate(onDoubleActivate);
+  const press = usePressActions({ onDouble: onDoubleActivate });
 
   if (!stack) return null;
 
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    tapHandlers.onPointerDown(event);
+    press.onPointerDown(event);
     listeners?.onPointerDown?.(event);
   }
 
   function pointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    tapHandlers.onPointerMove(event);
+    press.onPointerMove(event);
   }
 
   function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    tapHandlers.onPointerUp(event);
+    press.onPointerUp(event);
   }
 
   return (
@@ -147,10 +147,8 @@ function InventoryTile({ slot, item, hidden, onDoubleActivate }: Readonly<{ slot
       {...listeners}
       {...attributes}
       className={cn("absolute inset-0 touch-none", (hidden || isDragging) && "opacity-0")}
-      onDoubleClick={(event) => {
-        event.stopPropagation();
-        onDoubleActivate();
-      }}
+      onClick={press.onClick}
+      onDoubleClick={press.onDoubleClick}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}

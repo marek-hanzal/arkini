@@ -4,7 +4,7 @@ import { resolveMergeRule, type ItemId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import { cellKey } from "../helpers";
-import { useDoubleActivate } from "../useDoubleActivate";
+import { usePressActions } from "../usePressActions";
 import { columns, rows, type BuildCell, type DragData, type DropData } from "../types";
 import { Tile } from "./Tile";
 
@@ -18,8 +18,8 @@ export function Board({
   mergedBoardCellKey,
   nowMs,
   onEmptyDoubleActivate,
+  onTileSingleActivate,
   onTileDoubleActivate,
-  onTogglePause,
 }: Readonly<{
   game: GameView;
   activeDrag: DragData | null;
@@ -30,8 +30,8 @@ export function Board({
   mergedBoardCellKey: string | null;
   nowMs: number;
   onEmptyDoubleActivate(cell: BuildCell): void;
+  onTileSingleActivate(item: BoardViewItem): void;
   onTileDoubleActivate(item: BoardViewItem): void;
-  onTogglePause(item: BoardViewItem): void;
 }>) {
   const cells = useMemo(() => Array.from({ length: columns * rows }, (_, index) => ({ x: index % columns, y: Math.floor(index / columns) })), []);
 
@@ -66,8 +66,8 @@ export function Board({
                   || (committedDrag?.kind === "board" && committedDrag.boardItemId === boardItem.id)
                 }
                 nowMs={nowMs}
+                onSingleActivate={() => onTileSingleActivate(boardItem)}
                 onDoubleActivate={() => onTileDoubleActivate(boardItem)}
-                onTogglePause={() => onTogglePause(boardItem)}
               />
             ) : null}
           </BoardCell>
@@ -100,8 +100,10 @@ function BoardCell({
 }>) {
   const id = `cell:${x}:${y}`;
   const { setNodeRef, isOver } = useDroppable({ id, data: { kind: "cell", x, y, boardItemId: boardItem?.id ?? null } satisfies DropData });
-  const tapHandlers = useDoubleActivate(() => {
-    if (!boardItem) onEmptyDoubleActivate({ x, y });
+  const press = usePressActions({
+    onDouble: () => {
+      if (!boardItem) onEmptyDoubleActivate({ x, y });
+    },
   });
 
   return (
@@ -118,10 +120,11 @@ function BoardCell({
         pulsed && !invalid && !merged && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
         merged && !invalid && "ak-merge-pop bg-emerald-950/35 ring-2 ring-inset ring-emerald-200/80",
       )}
-      onDoubleClick={() => !boardItem && onEmptyDoubleActivate({ x, y })}
-      onPointerDown={tapHandlers.onPointerDown}
-      onPointerMove={tapHandlers.onPointerMove}
-      onPointerUp={tapHandlers.onPointerUp}
+      onClick={press.onClick}
+      onDoubleClick={press.onDoubleClick}
+      onPointerDown={press.onPointerDown}
+      onPointerMove={press.onPointerMove}
+      onPointerUp={press.onPointerUp}
     >
       {children}
     </div>
@@ -133,33 +136,33 @@ function BoardTile({
   item,
   hidden,
   nowMs,
+  onSingleActivate,
   onDoubleActivate,
-  onTogglePause,
 }: Readonly<{
   boardItem: BoardViewItem;
   item: ViewItem;
   hidden: boolean;
   nowMs: number;
+  onSingleActivate(): void;
   onDoubleActivate(): void;
-  onTogglePause(): void;
 }>) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `board:${boardItem.id}`,
     data: { kind: "board", boardItemId: boardItem.id, itemId: boardItem.itemId } satisfies DragData,
   });
-  const tapHandlers = useDoubleActivate(onDoubleActivate);
+  const press = usePressActions({ onSingle: onSingleActivate, onDouble: onDoubleActivate });
 
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    tapHandlers.onPointerDown(event);
+    press.onPointerDown(event);
     listeners?.onPointerDown?.(event);
   }
 
   function pointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    tapHandlers.onPointerMove(event);
+    press.onPointerMove(event);
   }
 
   function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    tapHandlers.onPointerUp(event);
+    press.onPointerUp(event);
   }
 
   return (
@@ -169,15 +172,13 @@ function BoardTile({
       {...attributes}
       data-board-item-id={boardItem.id}
       className={cn("absolute inset-0 touch-none", (hidden || isDragging) && "opacity-0")}
-      onDoubleClick={(event) => {
-        event.stopPropagation();
-        onDoubleActivate();
-      }}
+      onClick={press.onClick}
+      onDoubleClick={press.onDoubleClick}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
     >
-      <Tile item={item} producer={boardItem.producer} nowMs={nowMs} onTogglePause={onTogglePause} />
+      <Tile item={item} producer={boardItem.producer} nowMs={nowMs} />
     </div>
   );
 }

@@ -10,7 +10,6 @@ export function Tile({
   nowMs,
   dragOverlay,
   overlaySize,
-  onTogglePause,
 }: Readonly<{
   item: ViewItem;
   quantity?: number;
@@ -18,7 +17,6 @@ export function Tile({
   nowMs?: number;
   dragOverlay?: boolean;
   overlaySize?: Pick<RectLike, "width" | "height"> | null;
-  onTogglePause?(): void;
 }>) {
   const producerUi = producer ? getProducerUiState(producer, nowMs ?? Date.now()) : null;
 
@@ -34,7 +32,7 @@ export function Tile({
     >
       <img src={item.assetSrc} alt="" draggable={false} className="h-full w-full object-contain" />
       {quantity && quantity > 1 ? <span className="absolute bottom-0.5 right-0.5 rounded-sm bg-slate-950/80 px-1 text-[0.62rem] font-bold text-slate-100">{quantity}</span> : null}
-      {producer && producerUi ? <ProducerBadge producer={producer} ui={producerUi} onTogglePause={onTogglePause} /> : null}
+      {producer && producerUi ? <ProducerBadge producer={producer} ui={producerUi} /> : null}
     </div>
   );
 }
@@ -47,35 +45,16 @@ interface ProducerUiState {
   paused: boolean;
 }
 
-function ProducerBadge({ producer, ui, onTogglePause }: Readonly<{ producer: ProducerView; ui: ProducerUiState; onTogglePause?(): void }>) {
-  const content = (
-    <>
+function ProducerBadge({ ui }: Readonly<{ producer: ProducerView; ui: ProducerUiState }>) {
+  return (
+    <span title={ui.title} className="absolute left-0.5 top-0.5 min-w-5 rounded-sm bg-slate-950/85 px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-bold text-emerald-200">
       <span>{ui.label}</span>
       {ui.progress !== null ? (
         <span className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden rounded-b-sm bg-slate-700/80">
           <span className="block h-full bg-emerald-300/80 transition-[width] duration-300" style={{ width: `${ui.progress * 100}%` }} />
         </span>
       ) : null}
-    </>
-  );
-
-  if (producer.trigger !== "auto") {
-    return <span title={ui.title} className="absolute left-0.5 top-0.5 min-w-5 rounded-sm bg-slate-950/85 px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-bold text-emerald-200">{content}</span>;
-  }
-
-  return (
-    <button
-      type="button"
-      title={ui.title}
-      className="absolute left-0.5 top-0.5 min-w-5 rounded-sm bg-slate-950/85 px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-bold text-emerald-200"
-      onPointerDown={(event) => event.stopPropagation()}
-      onClick={(event) => {
-        event.stopPropagation();
-        onTogglePause?.();
-      }}
-    >
-      {content}
-    </button>
+    </span>
   );
 }
 

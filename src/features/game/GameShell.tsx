@@ -281,21 +281,25 @@ export function GameShell() {
           mergedBoardCellKey={feedback.mergedBoardCellKey}
           nowMs={nowMs}
           onEmptyDoubleActivate={setBuildCell}
+          onTileSingleActivate={(item) => {
+            if (!item.producer) return;
+            void produceFrom(item, "single");
+          }}
           onTileDoubleActivate={(item) => {
             if (!item.producer) {
               void stashWithFly(item);
               return;
             }
 
-            if (item.producer.trigger === "auto") {
+            if (canPauseProducer(item)) {
               togglePause.mutate({ boardItemId: item.id }, { onError: feedback.showError });
               return;
             }
 
-            const activation = shouldExhaustOnDoubleActivate(item.itemId) ? "exhaust" : "single";
-            void produceFrom(item, activation);
+            if (shouldExhaustOnDoubleActivate(item.itemId)) {
+              void produceFrom(item, "exhaust");
+            }
           }}
-          onTogglePause={(item) => togglePause.mutate({ boardItemId: item.id }, { onError: feedback.showError })}
         />
 
         <BuildSheet
@@ -347,6 +351,10 @@ export function GameShell() {
       </DragOverlay>
     </DndContext>
   );
+}
+
+function canPauseProducer(item: BoardViewItem) {
+  return item.producer?.trigger === "auto";
 }
 
 function shouldExhaustOnDoubleActivate(itemId: string) {

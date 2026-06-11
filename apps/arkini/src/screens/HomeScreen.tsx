@@ -9,9 +9,9 @@ const overviewPills = [
 
 export function HomeScreen() {
   return (
-    <main className="mx-auto flex min-h-screen w-fit max-w-full flex-col gap-5 px-4 py-6 sm:px-6 lg:px-8">
-      <header>
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-2xl shadow-slate-950/50 sm:p-6">
+    <main className="mx-auto flex min-h-screen w-fit max-w-full flex-col items-start gap-5 px-4 py-6 sm:px-6 lg:px-8">
+      <header className="w-fit max-w-full">
+        <section className="w-fit max-w-4xl rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-2xl shadow-slate-950/50 sm:p-6">
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300 sm:text-sm">
               Arkini playable blocks

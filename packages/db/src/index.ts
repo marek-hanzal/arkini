@@ -13,5 +13,6 @@ export {
   readGameView,
   resetDefaultSaveGame,
   stashBoardItem,
+  swapInventorySlots,
   type GameView,
 } from "./gameplay";

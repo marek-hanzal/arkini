@@ -34,10 +34,10 @@ jobs:
         run: bun install
 
       - name: Typecheck
-        run: bun run typecheck
+        run: cd apps/arkini && bun run typecheck
 
       - name: Build static app
-        run: bun run build
+        run: cd apps/arkini && bun run build
         env:
           VITE_BASE: /arkini/
 

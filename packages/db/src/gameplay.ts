@@ -174,6 +174,59 @@ export async function placeInventoryItem(slotIndex: number, x: number, y: number
   });
 }
 
+export async function swapInventorySlots(sourceSlotIndex: number, targetSlotIndex: number) {
+  if (sourceSlotIndex === targetSlotIndex) return;
+
+  await kysely.transaction().execute(async (tx) => {
+    const save = await tx.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow();
+
+    if (sourceSlotIndex < 0 || targetSlotIndex < 0 || sourceSlotIndex >= save.inventorySlots || targetSlotIndex >= save.inventorySlots) {
+      throw new GameActionError("Inventory slot is outside the inventory.");
+    }
+
+    const stacks = await tx
+      .selectFrom("inventoryStack")
+      .selectAll()
+      .where("saveGameId", "=", defaultSaveGameId)
+      .where("slotIndex", "in", [sourceSlotIndex, targetSlotIndex])
+      .execute();
+
+    const source = stacks.find((stack) => stack.slotIndex === sourceSlotIndex);
+    const target = stacks.find((stack) => stack.slotIndex === targetSlotIndex);
+
+    if (!source) throw new GameActionError("Inventory slot is empty.");
+
+    if (!target) {
+      await tx
+        .updateTable("inventoryStack")
+        .set({ slotIndex: targetSlotIndex, updatedAt: now() })
+        .where("id", "=", source.id)
+        .execute();
+      return;
+    }
+
+    const temporarySlotIndex = -1;
+
+    await tx
+      .updateTable("inventoryStack")
+      .set({ slotIndex: temporarySlotIndex, updatedAt: now() })
+      .where("id", "=", source.id)
+      .execute();
+
+    await tx
+      .updateTable("inventoryStack")
+      .set({ slotIndex: sourceSlotIndex, updatedAt: now() })
+      .where("id", "=", target.id)
+      .execute();
+
+    await tx
+      .updateTable("inventoryStack")
+      .set({ slotIndex: targetSlotIndex, updatedAt: now() })
+      .where("id", "=", source.id)
+      .execute();
+  });
+}
+
 export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
   await kysely.transaction().execute(async (tx) => {
     const boardItem = await tx

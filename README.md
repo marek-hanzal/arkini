@@ -84,7 +84,8 @@ apps/arkini
   src/router.tsx             TanStack Router + Query provider. No generated route tree.
   src/screens/HomeScreen.tsx Current playable prototype shell.
   src/components/GameShell.tsx
-                             Drag-first board, inventory, producer, and build UI.
+                             Small orchestrator for DnD, mutations, and transient feedback.
+  src/components/game/*      Board, inventory, action panel, drag preview, animation, and helper files.
   src/hooks/useGameView.ts   Tiny TanStack Query bridge over local DB actions.
   public/coi-serviceworker.js Static-host COOP/COEP service worker.
 
@@ -96,7 +97,7 @@ packages/db
   src/migrations             Schema only. Do not put item balance here.
   src/syncGameData.ts        Idempotent manifest-to-SQLite sync on every bootstrap.
   src/save.ts                Creates the default save once, then leaves player state alone.
-  src/gameplay.ts            Small direct actions: place, stash, merge, produce, build, reset.
+  src/gameplay.ts            Small direct actions: place, stash, swap, merge, produce, build, reset.
 ```
 
 ## Current playable blocks
@@ -104,18 +105,19 @@ packages/db
 The prototype uses one primary interaction model: drag and drop through `@dnd-kit/core`. There is no click-placement path. Current actions:
 
 - drag an inventory stack onto an empty board cell to place one item
+- drag an inventory stack onto another inventory slot to move/swap stacks
 - drag a board item onto an empty board cell to move it
-- drag a board item onto a valid merge target; cells show valid/invalid feedback before drop
+- drag a board item onto a valid merge target; cells show valid/invalid feedback before drop and successful merges scale-pulse the target
 - double-click a producer to produce; drops appear around it only when enough free adjacent space exists
 - producer tiles show cooldown progress directly in the tile background; cooldown failures flash the tile instead of also throwing a toast
 - finite producers, such as crates, spend charges and disappear when depleted
 - drag a blueprint build recipe onto an empty board cell to consume blueprint/materials from inventory and place the result
-- drag a board item onto inventory to store it; existing compatible stacks are preferred before empty slots
+- drag a board item onto inventory to store it; existing compatible stacks are preferred before empty slots and the chosen slot pulses
 - double-click a non-producer board item to animate it into the resolved inventory stack/slot
 - reset save for prototype testing
 - hard reset the whole OPFS database when migrations changed during local development
 
-The code is intentionally small and direct. `packages/db/src/gameplay.ts` is the gameplay boundary for now. Keep new mechanics there until there is actual pressure to split them.
+The code is intentionally small and direct. `GameShell` is only the orchestration layer now; tile UI and small pure helpers live under `src/components/game`. `packages/db/src/gameplay.ts` is still the gameplay persistence boundary for now.
 
 ## Development hard reset
 

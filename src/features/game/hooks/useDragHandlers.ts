@@ -10,58 +10,23 @@ import {
 import { useCallback } from "react";
 import { match } from "ts-pattern";
 import type { GameView } from "~/domains/database";
-import { invalidDropReturnMs } from "~/features/game/components/constants";
-import { boardCellKey } from "~/features/game/components/helpers/boardCellId";
-import { canMergeBoardItems } from "~/features/game/components/helpers/canMergeBoardItems";
-import { canStashBoardItem } from "~/features/game/components/helpers/canStashBoardItem";
-import { resolveInventoryDestination } from "~/features/game/components/helpers/resolveInventoryDestination";
+import { cellKey } from "~/features/game/components/helpers/cellKey";
+import { canMerge } from "~/features/game/components/helpers/canMerge";
+import { canStash } from "~/features/game/components/helpers/canStash";
+import { findInventorySlot } from "~/features/game/components/helpers/findInventorySlot";
 import type { DragData, DropData } from "~/features/game/components/types";
 import { useGameUiStore } from "~/features/game/state/gameUiStore";
 import { useGameFeedback } from "./useGameFeedback";
+import { useDropActions } from "./useDropActions";
 import type { GameMutations } from "./useGameMutations";
 
 export function useDragHandlers(game: GameView | null | undefined, mutations: GameMutations) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
-  const { markInvalid, pulseInventory, pulseBoard, pulseMerge, pulseDragOrigin, showActionError } = useGameFeedback();
-  const setSelection = useGameUiStore((state) => state.setSelection);
+  const { markInvalid, pulseInventory, pulseBoard, pulseMerge } = useGameFeedback();
+  const { commit, reject } = useDropActions(game);
   const setActiveDrag = useGameUiStore((state) => state.setActiveDrag);
   const setActiveOverId = useGameUiStore((state) => state.setActiveOverId);
-  const setCommittedDrag = useGameUiStore((state) => state.setCommittedDrag);
   const setReturningDrag = useGameUiStore((state) => state.setReturningDrag);
-
-  const runDrop = useCallback(
-    async (action: () => Promise<unknown>, source: DragData, invalidId?: string, onSuccess?: () => void) => {
-      setCommittedDrag(source);
-      setReturningDrag(null);
-      setActiveDrag(null);
-
-      try {
-        await action();
-        onSuccess?.();
-        setSelection(null);
-      } catch (error) {
-        setCommittedDrag(null);
-        showActionError(error, invalidId);
-        return;
-      }
-
-      setCommittedDrag(null);
-    },
-    [setActiveDrag, setCommittedDrag, setReturningDrag, setSelection, showActionError],
-  );
-
-  const rejectDrop = useCallback(
-    (source: DragData, invalidId?: string) => {
-      setReturningDrag(source);
-      setActiveDrag(null);
-      markInvalid(invalidId);
-      window.setTimeout(() => {
-        setReturningDrag(null);
-        pulseDragOrigin(game, source);
-      }, invalidDropReturnMs + 120);
-    },
-    [game, markInvalid, pulseDragOrigin, setActiveDrag, setReturningDrag],
-  );
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveDrag(event.active.data.current as DragData | null);
@@ -91,31 +56,31 @@ export function useDragHandlers(game: GameView | null | undefined, mutations: Ga
       return;
     }
 
-    const reject = (invalidId = overId ?? String(event.active.id)) => rejectDrop(active, invalidId);
+    const rejectActive = (invalidId = overId ?? String(event.active.id)) => reject(active, invalidId);
     if (!over) {
-      reject(String(event.active.id));
+      rejectActive(String(event.active.id));
       return;
     }
 
     void match([active, over] as const)
       .with([{ type: "inventory" }, { type: "board-cell" }], ([source, target]) => {
         if (target.boardItemId) {
-          reject(overId);
+          rejectActive(overId);
           return;
         }
-        void runDrop(
+        void commit(
           () => mutations.placeInventory.mutateAsync({ slotIndex: source.slotIndex, x: target.x, y: target.y }),
           active,
           overId,
-          () => pulseBoard(boardCellKey(target.x, target.y)),
+          () => pulseBoard(cellKey(target.x, target.y)),
         );
       })
       .with([{ type: "inventory" }, { type: "inventory-slot" }], ([source, target]) => {
         if (source.slotIndex === target.slotIndex) {
-          reject(overId);
+          rejectActive(overId);
           return;
         }
-        void runDrop(
+        void commit(
           () => mutations.swapInventory.mutateAsync({ sourceSlotIndex: source.slotIndex, targetSlotIndex: target.slotIndex }),
           active,
           overId,
@@ -124,17 +89,17 @@ export function useDragHandlers(game: GameView | null | undefined, mutations: Ga
       })
       .with([{ type: "board" }, { type: "board-cell" }], ([source, target]) => {
         if (source.boardItemId === target.boardItemId) {
-          reject(overId);
+          rejectActive(overId);
           return;
         }
 
         if (target.boardItemId) {
-          if (!canMergeBoardItems(game, source.boardItemId, target.boardItemId)) {
-            reject(overId);
+          if (!canMerge(game, source.boardItemId, target.boardItemId)) {
+            rejectActive(overId);
             return;
           }
 
-          void runDrop(
+          void commit(
             () => mutations.mergeBoard.mutateAsync({ sourceBoardItemId: source.boardItemId, targetBoardItemId: target.boardItemId! }),
             active,
             overId,
@@ -143,39 +108,39 @@ export function useDragHandlers(game: GameView | null | undefined, mutations: Ga
           return;
         }
 
-        void runDrop(
+        void commit(
           () => mutations.moveBoard.mutateAsync({ boardItemId: source.boardItemId, x: target.x, y: target.y }),
           active,
           overId,
-          () => pulseBoard(boardCellKey(target.x, target.y)),
+          () => pulseBoard(cellKey(target.x, target.y)),
         );
       })
       .with([{ type: "board" }, { type: "inventory-slot" }], ([source, target]) => {
         const boardItem = game.boardItemsById[source.boardItemId];
         if (!boardItem) {
-          reject(overId);
+          rejectActive(overId);
           return;
         }
 
-        if (!canStashBoardItem(game, source.boardItemId, Date.now())) {
-          reject(source.boardItemId);
+        if (!canStash(game, source.boardItemId, Date.now())) {
+          rejectActive(source.boardItemId);
           return;
         }
 
-        const targetSlotIndex = resolveInventoryDestination(game, boardItem.itemId, target.slotIndex);
+        const targetSlotIndex = findInventorySlot(game, boardItem.itemId, target.slotIndex);
         if (targetSlotIndex === null) {
-          reject(overId);
+          rejectActive(overId);
           return;
         }
 
-        void runDrop(
+        void commit(
           () => mutations.stashBoard.mutateAsync({ boardItemId: source.boardItemId, slotIndex: targetSlotIndex }),
           active,
           `inventory:${targetSlotIndex}`,
           () => pulseInventory(targetSlotIndex),
         );
       })
-      .otherwise(() => reject(overId));
+      .otherwise(() => rejectActive(overId));
   }, [
     game,
     markInvalid,
@@ -187,8 +152,8 @@ export function useDragHandlers(game: GameView | null | undefined, mutations: Ga
     pulseBoard,
     pulseInventory,
     pulseMerge,
-    rejectDrop,
-    runDrop,
+    reject,
+    commit,
     setActiveDrag,
     setActiveOverId,
   ]);

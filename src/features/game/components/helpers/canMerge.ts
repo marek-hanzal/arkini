@@ -1,6 +1,6 @@
 import type { GameView } from "~/domains/database";
 
-export function canMergeBoardItems(game: GameView, sourceBoardItemId: string, targetBoardItemId: string) {
+export function canMerge(game: GameView, sourceBoardItemId: string, targetBoardItemId: string) {
   if (sourceBoardItemId === targetBoardItemId) return false;
   const source = game.boardItemsById[sourceBoardItemId];
   const target = game.boardItemsById[targetBoardItemId];

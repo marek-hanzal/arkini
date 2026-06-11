@@ -26,6 +26,7 @@ Arkini is a classic 1×1 tile merge game with a second economy layer:
 - TanStack Query for async local database reads/mutations
 - Zustand for short-lived gameplay UI state, drag feedback, pulses, flyouts, and cooldown clock state
 - Tailwind CSS v4 through the Vite plugin
+- `tailwind-merge` for conditional class composition; do not hand-build class arrays with `.join(" ")`
 - DnD Kit for the single drag-and-drop interaction model
 - Sonner for rare toast-level feedback without a concrete tile/slot target
 - SQLite in browser OPFS via SQLocal
@@ -157,7 +158,9 @@ When schema changes during pre-release development, hard-reset the local OPFS DB
 
 ## Cleanup and rendering notes
 
-The game UI keeps persisted state in SQLite and short-lived interaction state in `src/features/game/state/gameUiStore.ts`. Cooldown ticking no longer re-renders the whole `GameShell`; producer cooldown UI subscribes to the clock directly. Board cells and inventory slots subscribe to the specific UI flags they need from Zustand, so pulses/invalid targets do not force the shell and every panel prop chain to thrash like a spreadsheet with ambition. Tile content, drag previews, and modal/card pieces are split into smaller memoized components.
+The game UI keeps persisted state in SQLite and short-lived interaction state in `src/features/game/state/gameUiStore.ts`. Cooldown ticking no longer re-renders the whole `GameShell`; producer cooldown UI subscribes to the clock directly. Board cells and inventory slots subscribe to the specific UI flags they need from Zustand, so pulses/invalid targets do not force the shell and every panel prop chain to thrash like a spreadsheet with ambition. Tile content, drag previews, and modal/card pieces are split into smaller components. Memo is kept only where props are stable or tiny enough to earn it; broad UI state should be read locally from Zustand or React Query instead of pushed through prop chains.
+
+Class strings use `src/lib/cn.ts`, a tiny `tailwind-merge` wrapper. Prefer `cn(...)` with inline conditionals and `ts-pattern` for state branches over manual class arrays.
 
 Database code uses `src/domains/database/db.ts` for the single typed database handle and `src/domains/database/tables.ts` for the tiny mutable-save table map. Static game definitions are indexed once from the manifest through `gameDataIndex`; gameplay code should use those indexes instead of repeated manifest scans or raw table strings sprinkled around like confetti from a bug parade.
 
@@ -171,7 +174,7 @@ Use data before code. An item is the base identity. Behavior comes from optional
 - producer definition: can generate drops
 - build recipe: blueprint can craft/place a result
 
-Avoid class inheritance and avoid one large nullable item object. Keep gameplay operations small and direct. Split by domain when files start mixing responsibilities, but do not invent “frameworks inside the framework” just to feel productive. Humanity has suffered enough.
+Avoid class inheritance and avoid one large nullable item object. Keep gameplay operations small and direct. Split by domain when files start mixing responsibilities, but do not invent “frameworks inside the framework” just to feel productive. Exported functions/components should live in same-named files. If a function/component owns local types, prefer a same-name namespace such as `export namespace Foo { ... }` next to `export function Foo(...)` or `export const Foo = ...`. Humanity has suffered enough.
 
 ## Commit hygiene
 

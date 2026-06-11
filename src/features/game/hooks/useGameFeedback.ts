@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import type { GameView } from "~/domains/database";
 import { boardPulseMs, mergePulseMs } from "~/features/game/components/constants";
-import { boardCellKey } from "~/features/game/components/helpers/boardCellId";
+import { cellKey } from "~/features/game/components/helpers/cellKey";
 import type { DragData } from "~/features/game/components/types";
 import { useGameUiStore } from "~/features/game/state/gameUiStore";
 
@@ -51,7 +51,7 @@ export function useGameFeedback() {
 
     const boardItem = game.boardItemsById[source.boardItemId];
     if (!boardItem) return;
-    pulseBoard(boardCellKey(boardItem.x, boardItem.y));
+    pulseBoard(cellKey(boardItem.x, boardItem.y));
   }, [pulseBoard, pulseInventory]);
 
   return { markInvalid, pulseInventory, pulseBoard, pulseMerge, pulseDragOrigin, showActionError };

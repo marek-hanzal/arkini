@@ -1,6 +1,6 @@
 import type { GameView } from "~/domains/database";
 
-export function resolveInventoryDestination(game: GameView, itemId: string, preferredSlotIndex?: number) {
+export function findInventorySlot(game: GameView, itemId: string, preferredSlotIndex?: number) {
   const item = game.items[itemId];
   if (!item) return null;
 

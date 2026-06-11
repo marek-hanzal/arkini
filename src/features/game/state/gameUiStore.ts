@@ -1,44 +1,48 @@
 import { create } from "zustand";
-import type { DragData, BuildCell, Flyout, Selection } from "~/features/game/components/types";
+import type { BuildCell, DragData, Flyout, Selection } from "~/features/game/components/types";
 
-export interface GameUiState {
-  selection: Selection;
-  activeDrag: DragData | null;
-  activeOverId: string | null;
-  committedDrag: DragData | null;
-  returningDrag: DragData | null;
-  invalidTargetId: string | null;
-  inventoryPulseSlot: number | null;
-  boardPulseCell: string | null;
-  mergePulseBoardItemId: string | null;
-  flyout: Flyout | null;
-  hiddenBoardItemIds: ReadonlySet<string>;
-  buildCell: BuildCell;
-  splashReady: boolean;
-  nowMs: number;
-}
+export namespace useGameUiStore {
+  export interface State {
+    selection: Selection;
+    activeDrag: DragData | null;
+    activeOverId: string | null;
+    committedDrag: DragData | null;
+    returningDrag: DragData | null;
+    invalidTargetId: string | null;
+    inventoryPulseSlot: number | null;
+    boardPulseCell: string | null;
+    mergePulseBoardItemId: string | null;
+    flyout: Flyout | null;
+    hiddenBoardItemIds: ReadonlySet<string>;
+    buildCell: BuildCell;
+    splashReady: boolean;
+    nowMs: number;
+  }
 
-export interface GameUiActions {
-  setSelection(selection: Selection): void;
-  setActiveDrag(activeDrag: DragData | null): void;
-  setActiveOverId(activeOverId: string | null): void;
-  setCommittedDrag(committedDrag: DragData | null): void;
-  setReturningDrag(returningDrag: DragData | null): void;
-  setInvalidTargetId(invalidTargetId: string | null): void;
-  setInventoryPulseSlot(inventoryPulseSlot: number | null): void;
-  setBoardPulseCell(boardPulseCell: string | null): void;
-  setMergePulseBoardItemId(mergePulseBoardItemId: string | null): void;
-  setFlyout(flyout: Flyout | null): void;
-  setHiddenBoardItemIds(hiddenBoardItemIds: ReadonlySet<string> | ((current: ReadonlySet<string>) => ReadonlySet<string>)): void;
-  setBuildCell(buildCell: BuildCell): void;
-  setSplashReady(splashReady: boolean): void;
-  setNowMs(nowMs: number): void;
-  clearDragState(): void;
+  export interface Actions {
+    setSelection(selection: Selection): void;
+    setActiveDrag(activeDrag: DragData | null): void;
+    setActiveOverId(activeOverId: string | null): void;
+    setCommittedDrag(committedDrag: DragData | null): void;
+    setReturningDrag(returningDrag: DragData | null): void;
+    setInvalidTargetId(invalidTargetId: string | null): void;
+    setInventoryPulseSlot(inventoryPulseSlot: number | null): void;
+    setBoardPulseCell(boardPulseCell: string | null): void;
+    setMergePulseBoardItemId(mergePulseBoardItemId: string | null): void;
+    setFlyout(flyout: Flyout | null): void;
+    setHiddenBoardItemIds(hiddenBoardItemIds: ReadonlySet<string> | ((current: ReadonlySet<string>) => ReadonlySet<string>)): void;
+    setBuildCell(buildCell: BuildCell): void;
+    setSplashReady(splashReady: boolean): void;
+    setNowMs(nowMs: number): void;
+    clearDragState(): void;
+  }
+
+  export type Store = State & Actions;
 }
 
 const emptyBoardItemIds = new Set<string>();
 
-export const useGameUiStore = create<GameUiState & GameUiActions>((set) => ({
+export const useGameUiStore = create<useGameUiStore.Store>((set) => ({
   selection: null,
   activeDrag: null,
   activeOverId: null,
@@ -74,5 +78,3 @@ export const useGameUiStore = create<GameUiState & GameUiActions>((set) => ({
   setNowMs: (nowMs) => set({ nowMs }),
   clearDragState: () => set({ activeDrag: null, activeOverId: null, returningDrag: null }),
 }));
-
-export const gameUiActions = () => useGameUiStore.getState();

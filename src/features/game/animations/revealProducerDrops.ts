@@ -1,7 +1,9 @@
 import type { ProducerDropResult } from "~/domains/database";
 import { stashAnimationMs } from "~/features/game/components/constants";
-import { boardCellKey } from "~/features/game/components/helpers/boardCellId";
-import { cssEscape, snapshotRect, wait } from "~/features/game/components/helpers/dom";
+import { cellKey } from "~/features/game/components/helpers/cellKey";
+import { cssEscape } from "~/features/game/components/helpers/cssEscape";
+import { rectOf } from "~/features/game/components/helpers/rectOf";
+import { wait } from "~/features/game/components/helpers/wait";
 import type { Flyout } from "~/features/game/components/types";
 
 type HiddenBoardItemSetter = (next: ReadonlySet<string> | ((current: ReadonlySet<string>) => ReadonlySet<string>)) => void;
@@ -28,14 +30,14 @@ export async function revealProducerDrops({
   }
 
   const sourceNode = document.querySelector<HTMLElement>(`[data-board-item-id="${cssEscape(producerBoardItemId)}"]`);
-  const sourceRect = sourceNode ? snapshotRect(sourceNode.getBoundingClientRect()) : null;
+  const sourceRect = sourceNode ? rectOf(sourceNode.getBoundingClientRect()) : null;
 
   setHiddenBoardItemIds(new Set(result.drops.map((drop) => drop.boardItemId)));
   await invalidateGameData();
   await wait(40);
 
   for (const drop of result.drops) {
-    const targetCellKey = boardCellKey(drop.x, drop.y);
+    const targetCellKey = cellKey(drop.x, drop.y);
     const targetNode = document.querySelector<HTMLElement>(`[data-board-cell-id="${targetCellKey}"]`);
 
     if (sourceRect && targetNode) {
@@ -43,7 +45,7 @@ export async function revealProducerDrops({
         id: Date.now() + Math.random(),
         itemId: drop.itemId,
         from: sourceRect,
-        to: snapshotRect(targetNode.getBoundingClientRect()),
+        to: rectOf(targetNode.getBoundingClientRect()),
       });
       await wait(stashAnimationMs);
     }

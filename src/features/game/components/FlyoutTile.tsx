@@ -1,19 +1,23 @@
-import type { GameView } from "~/domains/database";
 import { useEffect, useState } from "react";
+import { useGameView } from "~/hooks/useGameView";
+import { useGameUiStore } from "~/features/game/state/gameUiStore";
 import { stashAnimationMs } from "./constants";
-import type { Flyout } from "./types";
 import { TileContent } from "./TileContent";
 
-export function FlyoutTile({ game, flyout }: Readonly<{ game: GameView; flyout: Flyout }>) {
+export function FlyoutTile() {
+  const game = useGameView((view) => ({ items: view.items }));
+  const flyout = useGameUiStore((state) => state.flyout);
   const [arrived, setArrived] = useState(false);
-  const item = game.items[flyout.itemId];
+  const item = flyout && game.data ? game.data.items[flyout.itemId] : null;
 
   useEffect(() => {
+    if (!flyout) return;
+    setArrived(false);
     const frame = window.requestAnimationFrame(() => setArrived(true));
     return () => window.cancelAnimationFrame(frame);
-  }, [flyout.id]);
+  }, [flyout?.id]);
 
-  if (!item) return null;
+  if (!flyout || !item) return null;
 
   return (
     <div

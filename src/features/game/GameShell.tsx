@@ -12,7 +12,6 @@ import { GameCard } from "~/features/game/components/GameCard";
 import { InventoryPanel } from "~/features/game/components/InventoryPanel";
 import { SplashScreen } from "~/features/game/components/SplashScreen";
 import { invalidDropReturnMs } from "~/features/game/components/constants";
-import { isMergeOverlayFaded } from "~/features/game/components/helpers/isMergeOverlayFaded";
 import { useCooldownClock } from "~/features/game/hooks/useCooldownClock";
 import { useGameInteractions } from "~/features/game/hooks/useGameInteractions";
 import { useSplashDelay } from "~/features/game/hooks/useSplashDelay";
@@ -24,10 +23,7 @@ export function GameShell() {
   const ui = useGameUiStore(
     useShallow((state) => ({
       activeDrag: state.activeDrag,
-      activeOverId: state.activeOverId,
       dropAnimationDisabled: state.committedDrag !== null,
-      flyout: state.flyout,
-      buildCell: state.buildCell,
       splashReady: state.splashReady,
       setSelection: state.setSelection,
       setBuildCell: state.setBuildCell,
@@ -49,7 +45,6 @@ export function GameShell() {
 
   if (!game.data) return null;
 
-  const overlayFaded = isMergeOverlayFaded(game.data, ui.activeDrag, ui.activeOverId);
 
   return (
     <>
@@ -89,7 +84,7 @@ export function GameShell() {
           </div>
 
           <div className="grid w-full gap-3 xl:grid-cols-[minmax(18rem,24rem)_1fr]">
-            <ActionPanel game={game.data} pending={interactions.pending} />
+            <ActionPanel />
             <DbStatusCard />
           </div>
         </section>
@@ -99,17 +94,11 @@ export function GameShell() {
           }
           modifiers={[snapCenterToCursor]}
         >
-          {ui.activeDrag ? <DragPreview game={game.data} drag={ui.activeDrag} faded={overlayFaded} /> : null}
+          {ui.activeDrag ? <DragPreview game={game.data} drag={ui.activeDrag} /> : null}
         </DragOverlay>
       </DndContext>
-      <BuildModal
-        game={game.data}
-        cell={ui.buildCell}
-        pending={interactions.pending}
-        onClose={interactions.handleCloseBuild}
-        onBuild={interactions.handleBuild}
-      />
-      {ui.flyout ? <FlyoutTile game={game.data} flyout={ui.flyout} /> : null}
+      <BuildModal pending={interactions.pending} onClose={interactions.handleCloseBuild} onBuild={interactions.handleBuild} />
+      <FlyoutTile />
     </>
   );
 }

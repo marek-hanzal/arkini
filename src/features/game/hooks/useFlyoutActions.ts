@@ -3,10 +3,13 @@ import type { GameView } from "~/domains/database";
 import { useGameDataInvalidation } from "~/hooks/useGameView";
 import { revealProducerDrops } from "~/features/game/animations/revealProducerDrops";
 import { stashAnimationMs } from "~/features/game/components/constants";
-import { boardCellId, boardCellKey } from "~/features/game/components/helpers/boardCellId";
-import { cssEscape, snapshotRect, wait } from "~/features/game/components/helpers/dom";
-import { findFirstFreeBoardCell } from "~/features/game/components/helpers/findFirstFreeBoardCell";
-import { resolveInventoryDestination } from "~/features/game/components/helpers/resolveInventoryDestination";
+import { cellId } from "~/features/game/components/helpers/cellId";
+import { cellKey } from "~/features/game/components/helpers/cellKey";
+import { cssEscape } from "~/features/game/components/helpers/cssEscape";
+import { rectOf } from "~/features/game/components/helpers/rectOf";
+import { wait } from "~/features/game/components/helpers/wait";
+import { findFreeCell } from "~/features/game/components/helpers/findFreeCell";
+import { findInventorySlot } from "~/features/game/components/helpers/findInventorySlot";
 import { useGameUiStore } from "~/features/game/state/gameUiStore";
 import { useGameFeedback } from "./useGameFeedback";
 import type { GameMutations } from "./useGameMutations";
@@ -24,7 +27,7 @@ export function useFlyoutActions(game: GameView | null | undefined, mutations: G
     async (boardItemId: string, itemId: string) => {
       if (!game) return;
 
-      const targetSlotIndex = resolveInventoryDestination(game, itemId);
+      const targetSlotIndex = findInventorySlot(game, itemId);
       if (targetSlotIndex === null) {
         markInvalid(boardItemId);
         return;
@@ -80,24 +83,24 @@ export function useFlyoutActions(game: GameView | null | undefined, mutations: G
     async (slotIndex: number, itemId: string) => {
       if (!game) return;
 
-      const targetCell = findFirstFreeBoardCell(game);
+      const targetCell = findFreeCell(game);
       if (!targetCell) {
         markInvalid(`inventory:${slotIndex}`);
         return;
       }
 
-      const cellKey = boardCellKey(targetCell.x, targetCell.y);
+      const key = cellKey(targetCell.x, targetCell.y);
       setCommittedDrag({ type: "inventory", slotIndex });
       await animateFlyout({
         itemId,
         setFlyout,
         sourceSelector: `[data-inventory-slot-index="${slotIndex}"]`,
-        targetSelector: `[data-board-cell-id="${cellKey}"]`,
+        targetSelector: `[data-board-cell-id="${key}"]`,
       });
 
       try {
         await mutations.placeInventory.mutateAsync({ slotIndex, x: targetCell.x, y: targetCell.y });
-        pulseBoard(cellKey);
+        pulseBoard(key);
         setSelection(null);
       } catch (error) {
         showActionError(error, `inventory:${slotIndex}`);
@@ -117,10 +120,10 @@ export function useFlyoutActions(game: GameView | null | undefined, mutations: G
 
       try {
         await mutations.build.mutateAsync({ recipeId, x: target.x, y: target.y });
-        pulseBoard(boardCellKey(target.x, target.y));
+        pulseBoard(cellKey(target.x, target.y));
         setSelection(null);
       } catch (error) {
-        showActionError(error, boardCellId(target.x, target.y));
+        showActionError(error, cellId(target.x, target.y));
       }
     },
     [mutations.build, pulseBoard, setBuildCell, setSelection, showActionError],
@@ -149,8 +152,8 @@ async function animateFlyout({
   setFlyout({
     id: Date.now(),
     itemId,
-    from: snapshotRect(sourceNode.getBoundingClientRect()),
-    to: snapshotRect(targetNode.getBoundingClientRect()),
+    from: rectOf(sourceNode.getBoundingClientRect()),
+    to: rectOf(targetNode.getBoundingClientRect()),
   });
   await wait(stashAnimationMs);
 }

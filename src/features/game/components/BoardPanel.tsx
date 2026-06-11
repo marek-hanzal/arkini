@@ -2,7 +2,7 @@ import { memo, useMemo } from "react";
 import type { GameView } from "~/domains/database";
 import { cellSize } from "./constants";
 import { BoardCell } from "./BoardCell";
-import { boardCellKey } from "./helpers/boardCellId";
+import { cellKey } from "./helpers/cellKey";
 import type { BuildCell, Selection } from "./types";
 
 export const BoardPanel = memo(function BoardPanel({
@@ -43,7 +43,7 @@ export const BoardPanel = memo(function BoardPanel({
 
       <div className="grid w-fit gap-0 overflow-hidden rounded-sm border border-slate-800" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, ${cellSize})` }}>
         {cells.map((cell) => {
-          const key = boardCellKey(cell.x, cell.y);
+          const key = cellKey(cell.x, cell.y);
           return (
             <BoardCell
               key={key}

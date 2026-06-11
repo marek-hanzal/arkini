@@ -1,6 +1,6 @@
 import type { GameView } from "~/domains/database";
 
-export function findFirstFreeBoardCell(game: GameView) {
+export function findFreeCell(game: GameView) {
   const occupied = new Set(Object.keys(game.boardItemByCellKey));
 
   for (let y = 0; y < game.save.boardHeight; y += 1) {

@@ -1,6 +1,7 @@
-import type { ColumnType, Generated } from "kysely";
+import type { ColumnType } from "kysely";
 
 export type Timestamp = ColumnType<string, string | undefined, string>;
+export type Enabled = 0 | 1;
 
 export interface MetadataTable {
   key: string;
@@ -13,7 +14,10 @@ export interface AssetDefinitionTable {
   kind: "item" | "ui";
   label: string;
   src: string;
+  sort: number;
+  isEnabled: Enabled;
   createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export interface ItemDefinitionTable {
@@ -22,17 +26,63 @@ export interface ItemDefinitionTable {
   code: string;
   name: string;
   tier: number;
-  description: string | null;
+  maxStackSize: number;
+  description: string;
+  tagsJson: string;
   sort: number;
+  isEnabled: Enabled;
   createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
-export interface MergeRecipeTable {
+export interface MergeDefinitionTable {
   id: string;
   inputItemId: string;
-  outputItemId: string;
   inputCount: number;
+  outputItemId: string;
+  isEnabled: Enabled;
   createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface DropTableDefinitionTable {
+  id: string;
+  label: string;
+  isEnabled: Enabled;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface DropTableEntryTable {
+  id: string;
+  dropTableId: string;
+  itemDefinitionId: string | null;
+  weight: number;
+  quantityJson: string | null;
+  sort: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface ProducerDefinitionTable {
+  itemDefinitionId: string;
+  cooldownMs: number;
+  modeJson: string;
+  spawnJson: string;
+  rollsJson: string;
+  isEnabled: Enabled;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface BuildRecipeDefinitionTable {
+  id: string;
+  blueprintItemId: string;
+  resultItemId: string;
+  costsJson: string;
+  isEnabled: Enabled;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export interface SaveGameTable {
@@ -40,17 +90,28 @@ export interface SaveGameTable {
   name: string;
   boardWidth: number;
   boardHeight: number;
+  inventorySlots: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
 
-export interface BoardSlotTable {
-  id: Generated<number>;
+export interface BoardItemTable {
+  id: string;
   saveGameId: string;
+  itemDefinitionId: string;
   x: number;
   y: number;
-  itemDefinitionId: string | null;
-  stack: number;
+  stateJson: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface InventoryStackTable {
+  id: string;
+  saveGameId: string;
+  slotIndex: number;
+  itemDefinitionId: string;
+  quantity: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -59,7 +120,12 @@ export interface Database {
   metadata: MetadataTable;
   assetDefinition: AssetDefinitionTable;
   itemDefinition: ItemDefinitionTable;
-  mergeRecipe: MergeRecipeTable;
+  mergeDefinition: MergeDefinitionTable;
+  dropTableDefinition: DropTableDefinitionTable;
+  dropTableEntry: DropTableEntryTable;
+  producerDefinition: ProducerDefinitionTable;
+  buildRecipeDefinition: BuildRecipeDefinitionTable;
   saveGame: SaveGameTable;
-  boardSlot: BoardSlotTable;
+  boardItem: BoardItemTable;
+  inventoryStack: InventoryStackTable;
 }

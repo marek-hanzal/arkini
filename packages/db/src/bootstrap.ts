@@ -1,10 +1,12 @@
 import { databasePath } from "./client";
 import { assertBrowserDatabaseSupport } from "./capabilities";
 import { migrator } from "./migrator";
-import { seedDatabase } from "./seed";
+import { ensureDefaultSaveGame } from "./save";
+import { syncGameDataManifest } from "./syncGameData";
 
 let bootstrapPromise: Promise<void> | undefined;
 let migrationState: "pending" | "ready" = "pending";
+let gameDataHash = "pending";
 
 export async function bootstrapDatabase() {
   assertBrowserDatabaseSupport();
@@ -16,7 +18,8 @@ export async function bootstrapDatabase() {
       throw result.error;
     }
 
-    await seedDatabase();
+    gameDataHash = await syncGameDataManifest();
+    await ensureDefaultSaveGame();
     migrationState = "ready";
   })();
 
@@ -29,4 +32,8 @@ export function readMigrationState() {
 
 export function readDatabasePath() {
   return databasePath;
+}
+
+export function readGameDataHash() {
+  return gameDataHash;
 }

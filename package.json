@@ -9,10 +9,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun --cwd apps/arkini dev",
-    "build": "bun --cwd apps/arkini build",
-    "typecheck": "bun --cwd apps/arkini typecheck",
-    "lint": "bun --cwd apps/arkini lint"
+    "dev": "cd apps/arkini && vite dev",
+    "build": "cd apps/arkini && vite build",
+    "typecheck": "cd apps/arkini && tsc --noEmit"
   },
   "devDependencies": {
     "typescript": "6.0.3"

@@ -1,7 +1,16 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createRouter } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
-import type { RouterContext } from "./routerContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  Outlet,
+  createHashHistory,
+  createRootRouteWithContext,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
+import { HomeScreen } from "~/screens/HomeScreen";
+
+export interface RouterContext {
+  queryClient: QueryClient;
+}
 
 export function createArkiniQueryClient() {
   return new QueryClient({
@@ -17,23 +26,41 @@ export function createArkiniQueryClient() {
   });
 }
 
-export function getRouter() {
-  const queryClient = createArkiniQueryClient();
+const queryClient = createArkiniQueryClient();
+const history = createHashHistory();
 
-  return createRouter({
-    routeTree,
-    context: {
-      queryClient,
-    } satisfies RouterContext,
-    defaultPreload: "intent",
-    scrollRestoration: true,
-  });
+const rootRoute = createRootRouteWithContext<RouterContext>()({
+  component: RootShell,
+});
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: HomeScreen,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute]);
+
+export const router = createRouter({
+  routeTree,
+  context: { queryClient },
+  history,
+  defaultPreload: "intent",
+  scrollRestoration: true,
+});
+
+function RootShell() {
+  const { queryClient } = rootRoute.useRouteContext();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Outlet />
+    </QueryClientProvider>
+  );
 }
-
-export type ArkiniRouter = ReturnType<typeof getRouter>;
 
 declare module "@tanstack/react-router" {
   interface Register {
-    router: ArkiniRouter;
+    router: typeof router;
   }
 }

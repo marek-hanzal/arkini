@@ -1,6 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import { fileURLToPath } from "node:url";
 import sqlocal from "sqlocal/vite";
 import { defineConfig } from "vite";
 
@@ -10,6 +10,7 @@ const crossOriginIsolationHeaders = {
 } as const;
 
 export default defineConfig({
+  base: process.env.VITE_BASE ?? "/",
   clearScreen: false,
   server: {
     port: 4040,
@@ -22,13 +23,14 @@ export default defineConfig({
     headers: crossOriginIsolationHeaders,
   },
   resolve: {
-    tsconfigPaths: true,
+    alias: {
+      "~": fileURLToPath(new URL("./src", import.meta.url)),
+    },
   },
   plugins: [
-    tanstackStart(),
+    // SQLocal wires browser SQLite workers and enables OPFS-friendly dev headers.
     sqlocal(),
     tailwindcss(),
-    // React plugin must stay after TanStack Start.
     viteReact(),
   ],
   build: {

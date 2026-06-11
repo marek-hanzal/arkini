@@ -27,9 +27,11 @@ export function DbStatusCard() {
 
       <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
         <StatusPill label="DB" value={status.isSuccess ? status.data.databasePath : "arkini.sqlite3"} />
-        <StatusPill label="Migrations" value={status.isSuccess ? status.data.migrationState : "pending"} />
-        <StatusPill label="Assets" value={status.isSuccess ? String(status.data.assetCount) : "…"} />
+        <StatusPill label="Sync" value={status.isSuccess ? status.data.gameDataHash.slice(0, 12) : "pending"} />
         <StatusPill label="Items" value={status.isSuccess ? String(status.data.itemCount) : "…"} />
+        <StatusPill label="Producers" value={status.isSuccess ? String(status.data.producerCount) : "…"} />
+        <StatusPill label="Recipes" value={status.isSuccess ? String(status.data.buildRecipeCount) : "…"} />
+        <StatusPill label="Drops" value={status.isSuccess ? String(status.data.dropTableCount) : "…"} />
       </div>
 
       {status.isError ? (

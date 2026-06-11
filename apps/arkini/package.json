@@ -7,16 +7,13 @@
     "dev": "vite dev",
     "build": "vite build",
     "serve": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src --max-warnings=0"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@arkini/assets": "file:../../packages/assets",
     "@arkini/db": "file:../../packages/db",
-    "@arkini/game": "file:../../packages/game",
+    "@arkini/game-data": "file:../../packages/game-data",
     "@tanstack/react-query": "5.101.0",
     "@tanstack/react-router": "1.170.15",
-    "@tanstack/react-start": "1.168.25",
     "kysely": "0.29.2",
     "react": "19.2.7",
     "react-dom": "19.2.7",
@@ -28,7 +25,6 @@
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
-    "eslint": "10.4.1",
     "tailwindcss": "4.3.0",
     "typescript": "6.0.3",
     "vite": "8.0.16"

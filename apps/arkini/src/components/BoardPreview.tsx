@@ -1,7 +1,8 @@
-import { boardConfig } from "@arkini/game";
+import { gameDataManifest } from "@arkini/game-data";
 
 export function BoardPreview() {
-  const cells = Array.from({ length: boardConfig.width * boardConfig.height }, (_, index) => index);
+  const { width, height } = gameDataManifest.game.board;
+  const cells = Array.from({ length: width * height }, (_, index) => index);
 
   return (
     <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-slate-950/40">
@@ -11,7 +12,7 @@ export function BoardPreview() {
             Board shell
           </p>
           <h2 className="mt-2 text-xl font-semibold text-white">
-            {boardConfig.width} × {boardConfig.height} placeholder
+            {width} × {height} 1×1 grid
           </h2>
         </div>
         <p className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-400">
@@ -21,7 +22,7 @@ export function BoardPreview() {
 
       <div
         className="mt-5 grid gap-2"
-        style={{ gridTemplateColumns: `repeat(${boardConfig.width}, minmax(0, 1fr))` }}
+        style={{ gridTemplateColumns: `repeat(${width}, minmax(0, 1fr))` }}
       >
         {cells.map((cell) => (
           <div

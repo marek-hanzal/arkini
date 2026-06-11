@@ -7,8 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@arkini/assets": "file:../assets",
-    "@arkini/game": "file:../game",
+    "@arkini/game-data": "file:../game-data",
     "kysely": "0.29.2",
     "sqlocal": "0.18.0"
   },

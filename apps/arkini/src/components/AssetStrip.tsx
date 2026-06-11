@@ -1,14 +1,14 @@
-import { assetDefinitions } from "@arkini/assets";
+import { gameDataManifest } from "@arkini/game-data";
 
 export function AssetStrip() {
   return (
     <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-slate-950/40">
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300">
-        Generated SVG assets
+        Manifest SVG assets
       </p>
-      <h2 className="mt-2 text-xl font-semibold text-white">First tiny icons</h2>
+      <h2 className="mt-2 text-xl font-semibold text-white">Central asset registry</h2>
       <div className="mt-5 grid grid-cols-5 gap-3">
-        {assetDefinitions.map((asset) => (
+        {gameDataManifest.assets.map((asset) => (
           <figure
             key={asset.id}
             className="rounded-2xl border border-slate-800 bg-slate-950/60 p-3 text-center"

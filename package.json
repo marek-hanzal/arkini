@@ -1,0 +1,20 @@
+{
+  "name": "arkini",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.2.17",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun --cwd apps/arkini dev",
+    "build": "bun --cwd apps/arkini build",
+    "typecheck": "bun --cwd apps/arkini typecheck",
+    "lint": "bun --cwd apps/arkini lint"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

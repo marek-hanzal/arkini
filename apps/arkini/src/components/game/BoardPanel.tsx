@@ -4,6 +4,7 @@ import type { MouseEvent } from "react";
 import { useMemo } from "react";
 import { cellClass, cellSize } from "./constants";
 import type { BoardItem, DragData, DropData, Selection } from "./types";
+import { boardCellId, boardCellKey } from "./helpers/boardCellId";
 import { getBoardCellDropState } from "./helpers/getBoardCellDropState";
 import { getCooldown } from "./helpers/getCooldown";
 import { TileContent } from "./TileContent";
@@ -16,6 +17,7 @@ export function BoardPanel({
   invalidTargetId,
   committedDrag,
   mergePulseBoardItemId,
+  boardPulseCell,
   nowMs,
   onSelect,
   onProduce,
@@ -28,13 +30,14 @@ export function BoardPanel({
   invalidTargetId: string | null;
   committedDrag: DragData | null;
   mergePulseBoardItemId: string | null;
+  boardPulseCell: string | null;
   nowMs: number;
   onSelect(selection: Selection): void;
   onProduce(boardItemId: string): void;
   onStash(boardItemId: string, itemId: string): void;
 }>) {
   const itemByCell = useMemo(
-    () => new Map(game.boardItems.map((item) => [`${item.x}:${item.y}`, item])),
+    () => new Map(game.boardItems.map((item) => [boardCellKey(item.x, item.y), item])),
     [game.boardItems],
   );
   const cells = Array.from({ length: game.save.boardWidth * game.save.boardHeight }, (_, index) => ({
@@ -57,10 +60,10 @@ export function BoardPanel({
       <div className="mt-4 max-w-full overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/30 p-2">
         <div className="grid w-fit gap-2" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, ${cellSize})` }}>
           {cells.map((cell) => {
-            const boardItem = itemByCell.get(`${cell.x}:${cell.y}`);
+            const boardItem = itemByCell.get(boardCellKey(cell.x, cell.y));
             return (
               <BoardCell
-                key={`${cell.x}:${cell.y}`}
+                key={boardCellKey(cell.x, cell.y)}
                 game={game}
                 x={cell.x}
                 y={cell.y}
@@ -71,6 +74,7 @@ export function BoardPanel({
                 invalidTargetId={invalidTargetId}
                 committedDrag={committedDrag}
                 mergePulse={mergePulseBoardItemId === boardItem?.id}
+                boardPulse={boardPulseCell === boardCellKey(cell.x, cell.y)}
                 nowMs={nowMs}
                 onSelect={onSelect}
                 onProduce={onProduce}
@@ -95,6 +99,7 @@ function BoardCell({
   invalidTargetId,
   committedDrag,
   mergePulse,
+  boardPulse,
   nowMs,
   onSelect,
   onProduce,
@@ -110,12 +115,13 @@ function BoardCell({
   invalidTargetId: string | null;
   committedDrag: DragData | null;
   mergePulse: boolean;
+  boardPulse: boolean;
   nowMs: number;
   onSelect(selection: Selection): void;
   onProduce(boardItemId: string): void;
   onStash(boardItemId: string, itemId: string): void;
 }>) {
-  const dropId = `board:${x}:${y}`;
+  const dropId = boardCellId(x, y);
   const { isOver, setNodeRef } = useDroppable({
     id: dropId,
     data: { type: "board-cell", x, y, boardItemId: boardItem?.id } satisfies DropData,
@@ -130,16 +136,19 @@ function BoardCell({
   return (
     <div
       ref={setNodeRef}
+      data-board-cell-id={boardCellKey(x, y)}
       className={[
         cellClass,
         "bg-slate-950/80 shadow-inner shadow-black/30",
         invalid
           ? "border-red-300 bg-red-950/40"
-          : dropState === "valid"
-            ? "border-emerald-300 bg-emerald-950/40"
-            : dropState === "invalid"
-              ? "border-red-300 bg-red-950/40"
-              : "border-slate-800",
+          : boardPulse
+            ? "border-sky-200 bg-sky-500/20 ring-2 ring-sky-300/50"
+            : dropState === "valid"
+              ? "border-emerald-300 bg-emerald-950/40"
+              : dropState === "invalid"
+                ? "border-red-300 bg-red-950/40"
+                : "border-slate-800",
       ].join(" ")}
     >
       {visibleBoardItem && item ? (
@@ -150,7 +159,7 @@ function BoardCell({
           pending={pending}
           mergePulse={mergePulse}
           nowMs={nowMs}
-          onSelect={() => onSelect(selected ? null : { type: "board", boardItemId: visibleBoardItem.id })}
+          onSelect={() => onSelect({ type: "board", boardItemId: visibleBoardItem.id })}
           onProduce={() => onProduce(visibleBoardItem.id)}
           onStash={() => onStash(visibleBoardItem.id, visibleBoardItem.itemId)}
         />
@@ -191,9 +200,15 @@ function BoardItemCard({
   });
   const cooldown = getCooldown(item, boardItem, nowMs);
 
+  function handleClick(event: MouseEvent<HTMLButtonElement>) {
+    if (event.detail > 1) return;
+    onSelect();
+  }
+
   function handleDoubleClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
+    onSelect();
 
     if (item.canProduce) {
       onProduce();
@@ -209,7 +224,7 @@ function BoardItemCard({
       type="button"
       disabled={pending}
       data-board-item-id={boardItem.id}
-      onClick={onSelect}
+      onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       className={[
         "relative flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 overflow-hidden rounded-lg text-center transition duration-200 active:cursor-grabbing disabled:cursor-not-allowed",

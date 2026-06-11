@@ -1,5 +1,6 @@
 import type { GameView } from "@arkini/db";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+import type { MouseEvent } from "react";
 import { cellClass, cellSize } from "./constants";
 import type { DragData, DropData, InventorySlot } from "./types";
 import { TileContent } from "./TileContent";
@@ -11,6 +12,7 @@ export function InventoryPanel({
   committedDrag,
   previewSlotIndex,
   pulseSlotIndex,
+  onPlaceStack,
 }: Readonly<{
   game: GameView;
   pending: boolean;
@@ -18,6 +20,7 @@ export function InventoryPanel({
   committedDrag: DragData | null;
   previewSlotIndex: number | null;
   pulseSlotIndex: number | null;
+  onPlaceStack(slotIndex: number, itemId: string): void;
 }>) {
   const columns = game.save.boardWidth;
 
@@ -42,6 +45,7 @@ export function InventoryPanel({
               committedDrag={committedDrag}
               preview={previewSlotIndex === slot.slotIndex}
               pulse={pulseSlotIndex === slot.slotIndex}
+              onPlaceStack={onPlaceStack}
             />
           ))}
         </div>
@@ -58,6 +62,7 @@ function InventorySlotCell({
   committedDrag,
   preview,
   pulse,
+  onPlaceStack,
 }: Readonly<{
   game: GameView;
   slot: InventorySlot;
@@ -66,6 +71,7 @@ function InventorySlotCell({
   committedDrag: DragData | null;
   preview: boolean;
   pulse: boolean;
+  onPlaceStack(slotIndex: number, itemId: string): void;
 }>) {
   const dropId = `inventory:${slot.slotIndex}`;
   const { isOver, setNodeRef } = useDroppable({
@@ -97,7 +103,13 @@ function InventorySlotCell({
       ].join(" ")}
     >
       {item && visibleStack ? (
-        <InventoryItemCard item={item} quantity={visibleStack.quantity} slotIndex={slot.slotIndex} pending={pending} />
+        <InventoryItemCard
+          item={item}
+          quantity={visibleStack.quantity}
+          slotIndex={slot.slotIndex}
+          pending={pending}
+          onPlace={() => onPlaceStack(slot.slotIndex, visibleStack.itemId)}
+        />
       ) : null}
     </div>
   );
@@ -108,11 +120,13 @@ function InventoryItemCard({
   quantity,
   slotIndex,
   pending,
+  onPlace,
 }: Readonly<{
   item: GameView["items"][string];
   quantity: number;
   slotIndex: number;
   pending: boolean;
+  onPlace(): void;
 }>) {
   const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
     id: `inventory-item:${slotIndex}`,
@@ -120,9 +134,16 @@ function InventoryItemCard({
     disabled: pending,
   });
 
+  function handleDoubleClick(event: MouseEvent<HTMLDivElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    onPlace();
+  }
+
   return (
     <div
       ref={setNodeRef}
+      onDoubleClick={handleDoubleClick}
       className={[
         "flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 rounded-lg transition active:cursor-grabbing",
         isDragging ? "opacity-0" : "hover:bg-slate-800/70",

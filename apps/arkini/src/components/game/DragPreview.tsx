@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import type { DragData } from "./types";
 import { TileContent } from "./TileContent";
 
-export function DragPreview({ game, drag }: Readonly<{ game: GameView; drag: DragData }>) {
+export function DragPreview({ game, drag, faded }: Readonly<{ game: GameView; drag: DragData; faded: boolean }>) {
   const item = match(drag)
     .with({ type: "inventory" }, ({ slotIndex }) => {
       const stack = game.inventory.find((slot) => slot.slotIndex === slotIndex)?.stack;
@@ -22,7 +22,12 @@ export function DragPreview({ game, drag }: Readonly<{ game: GameView; drag: Dra
   if (!item) return null;
 
   return (
-    <div className="h-24 w-24 rounded-2xl border border-emerald-300 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/80">
+    <div
+      className={[
+        "h-24 w-24 rounded-2xl border border-emerald-300 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/80 transition-opacity duration-150",
+        faded ? "opacity-40" : "opacity-100",
+      ].join(" ")}
+    >
       <TileContent item={item} />
     </div>
   );

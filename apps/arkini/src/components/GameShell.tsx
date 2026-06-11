@@ -14,6 +14,7 @@ import { snapCenterToCursor } from "@dnd-kit/modifiers";
 import { useEffect, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { match } from "ts-pattern";
+import type { GameView } from "@arkini/db";
 import { DbStatusCard } from "~/components/DbStatusCard";
 import { ActionPanel } from "~/components/game/ActionPanel";
 import { BoardPanel } from "~/components/game/BoardPanel";
@@ -21,9 +22,11 @@ import { DragPreview } from "~/components/game/DragPreview";
 import { FlyoutTile } from "~/components/game/FlyoutTile";
 import { GameCard } from "~/components/game/GameCard";
 import { InventoryPanel } from "~/components/game/InventoryPanel";
-import { stashAnimationMs, mergePulseMs } from "~/components/game/constants";
+import { boardPulseMs, invalidDropReturnMs, mergePulseMs, stashAnimationMs } from "~/components/game/constants";
+import { boardCellKey, parseBoardCellId } from "~/components/game/helpers/boardCellId";
 import { canMergeBoardItems } from "~/components/game/helpers/canMergeBoardItems";
 import { cssEscape, snapshotRect, wait } from "~/components/game/helpers/dom";
+import { findFirstFreeBoardCell } from "~/components/game/helpers/findFirstFreeBoardCell";
 import { getInventoryPreviewSlot } from "~/components/game/helpers/getInventoryPreviewSlot";
 import { resolveInventoryDestination } from "~/components/game/helpers/resolveInventoryDestination";
 import type { DragData, DropData, Flyout, Selection } from "~/components/game/types";
@@ -35,8 +38,10 @@ export function GameShell() {
   const [activeDrag, setActiveDrag] = useState<DragData | null>(null);
   const [activeOverId, setActiveOverId] = useState<string | null>(null);
   const [committedDrag, setCommittedDrag] = useState<DragData | null>(null);
+  const [returningDrag, setReturningDrag] = useState<DragData | null>(null);
   const [invalidTargetId, setInvalidTargetId] = useState<string | null>(null);
   const [inventoryPulseSlot, setInventoryPulseSlot] = useState<number | null>(null);
+  const [boardPulseCell, setBoardPulseCell] = useState<string | null>(null);
   const [mergePulseBoardItemId, setMergePulseBoardItemId] = useState<string | null>(null);
   const [flyout, setFlyout] = useState<Flyout | null>(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -92,6 +97,12 @@ export function GameShell() {
     window.setTimeout(() => setInventoryPulseSlot(null), 700);
   }
 
+  function pulseBoard(cellKey: string | null | undefined) {
+    if (!cellKey) return;
+    setBoardPulseCell(cellKey);
+    window.setTimeout(() => setBoardPulseCell(null), boardPulseMs);
+  }
+
   function pulseMerge(boardItemId: string) {
     setMergePulseBoardItemId(boardItemId);
     window.setTimeout(() => setMergePulseBoardItemId(null), mergePulseMs);
@@ -103,10 +114,14 @@ export function GameShell() {
     toast.error(error instanceof Error ? error.message : "Action failed.");
   }
 
-  async function runAction(action: () => Promise<unknown>, invalidId?: string) {
+  async function runAction(
+    action: () => Promise<unknown>,
+    invalidId?: string,
+    options: { clearSelection?: boolean } = {},
+  ) {
     try {
       await action();
-      setSelection(null);
+      if (options.clearSelection ?? true) setSelection(null);
     } catch (error) {
       showActionError(error, invalidId);
     }
@@ -114,6 +129,9 @@ export function GameShell() {
 
   async function runDrop(action: () => Promise<unknown>, source: DragData, invalidId?: string, onSuccess?: () => void) {
     setCommittedDrag(source);
+    setReturningDrag(null);
+    setActiveDrag(null);
+
     try {
       await action();
       onSuccess?.();
@@ -123,7 +141,17 @@ export function GameShell() {
       showActionError(error, invalidId);
       return;
     }
+
     setCommittedDrag(null);
+  }
+
+  function rejectDrop(source: DragData, invalidId?: string) {
+    setReturningDrag(source);
+    markInvalid(invalidId);
+    window.setTimeout(() => {
+      setReturningDrag(null);
+      setActiveDrag(null);
+    }, invalidDropReturnMs + 50);
   }
 
   async function stashWithFlyout(boardItemId: string, itemId: string) {
@@ -162,8 +190,46 @@ export function GameShell() {
     }
   }
 
+  async function placeInventoryWithFlyout(slotIndex: number, itemId: string) {
+    if (!game.data) return;
+
+    const targetCell = findFirstFreeBoardCell(game.data);
+    if (!targetCell) {
+      markInvalid(`inventory:${slotIndex}`);
+      return;
+    }
+
+    const cellKey = boardCellKey(targetCell.x, targetCell.y);
+    const sourceNode = document.querySelector<HTMLElement>(`[data-inventory-slot-index="${slotIndex}"]`);
+    const targetNode = document.querySelector<HTMLElement>(`[data-board-cell-id="${cellKey}"]`);
+
+    setCommittedDrag({ type: "inventory", slotIndex });
+
+    if (sourceNode && targetNode) {
+      setFlyout({
+        id: Date.now(),
+        itemId,
+        from: snapshotRect(sourceNode.getBoundingClientRect()),
+        to: snapshotRect(targetNode.getBoundingClientRect()),
+      });
+      await wait(stashAnimationMs);
+    }
+
+    try {
+      await placeInventory.mutateAsync({ slotIndex, x: targetCell.x, y: targetCell.y });
+      pulseBoard(cellKey);
+      setSelection(null);
+    } catch (error) {
+      showActionError(error, `inventory:${slotIndex}`);
+    } finally {
+      setFlyout(null);
+      setCommittedDrag(null);
+    }
+  }
+
   function handleDragStart(event: DragStartEvent) {
     setActiveDrag(event.active.data.current as DragData | null);
+    setReturningDrag(null);
     setActiveOverId(null);
   }
 
@@ -173,6 +239,7 @@ export function GameShell() {
 
   function handleDragCancel(_event: DragCancelEvent) {
     setActiveDrag(null);
+    setReturningDrag(null);
     setActiveOverId(null);
   }
 
@@ -180,24 +247,39 @@ export function GameShell() {
     const active = event.active.data.current as DragData | undefined;
     const over = event.over?.data.current as DropData | undefined;
     const overId = event.over ? String(event.over.id) : undefined;
-    setActiveDrag(null);
     setActiveOverId(null);
 
-    if (!active || !over || !game.data) {
+    if (!active || !game.data) {
+      setActiveDrag(null);
       markInvalid(overId ?? String(event.active.id));
+      return;
+    }
+
+    const reject = (invalidId = overId ?? String(event.active.id)) => rejectDrop(active, invalidId);
+
+    if (!over) {
+      reject(String(event.active.id));
       return;
     }
 
     void match([active, over] as const)
       .with([{ type: "inventory" }, { type: "board-cell" }], ([source, target]) => {
         if (target.boardItemId) {
-          markInvalid(overId);
+          reject(overId);
           return;
         }
-        void runDrop(() => placeInventory.mutateAsync({ slotIndex: source.slotIndex, x: target.x, y: target.y }), active, overId);
+        void runDrop(
+          () => placeInventory.mutateAsync({ slotIndex: source.slotIndex, x: target.x, y: target.y }),
+          active,
+          overId,
+          () => pulseBoard(boardCellKey(target.x, target.y)),
+        );
       })
       .with([{ type: "inventory" }, { type: "inventory-slot" }], ([source, target]) => {
-        if (source.slotIndex === target.slotIndex) return;
+        if (source.slotIndex === target.slotIndex) {
+          reject(overId);
+          return;
+        }
         void runDrop(
           () => swapInventory.mutateAsync({ sourceSlotIndex: source.slotIndex, targetSlotIndex: target.slotIndex }),
           active,
@@ -207,18 +289,26 @@ export function GameShell() {
       })
       .with([{ type: "build" }, { type: "board-cell" }], ([source, target]) => {
         if (target.boardItemId) {
-          markInvalid(overId);
+          reject(overId);
           return;
         }
-        void runDrop(() => build.mutateAsync({ recipeId: source.recipeId, x: target.x, y: target.y }), active, overId);
+        void runDrop(
+          () => build.mutateAsync({ recipeId: source.recipeId, x: target.x, y: target.y }),
+          active,
+          overId,
+          () => pulseBoard(boardCellKey(target.x, target.y)),
+        );
       })
       .with([{ type: "board" }, { type: "board-cell" }], ([source, target]) => {
-        if (source.boardItemId === target.boardItemId) return;
+        if (source.boardItemId === target.boardItemId) {
+          reject(overId);
+          return;
+        }
 
         const targetBoardItemId = target.boardItemId;
         if (targetBoardItemId) {
           if (!canMergeBoardItems(game.data, source.boardItemId, targetBoardItemId)) {
-            markInvalid(overId);
+            reject(overId);
             return;
           }
 
@@ -231,18 +321,23 @@ export function GameShell() {
           return;
         }
 
-        void runDrop(() => moveBoard.mutateAsync({ boardItemId: source.boardItemId, x: target.x, y: target.y }), active, overId);
+        void runDrop(
+          () => moveBoard.mutateAsync({ boardItemId: source.boardItemId, x: target.x, y: target.y }),
+          active,
+          overId,
+          () => pulseBoard(boardCellKey(target.x, target.y)),
+        );
       })
       .with([{ type: "board" }, { type: "inventory-slot" }], ([source, target]) => {
         const boardItem = game.data.boardItems.find((item) => item.id === source.boardItemId);
         if (!boardItem) {
-          markInvalid(overId);
+          reject(overId);
           return;
         }
 
         const targetSlotIndex = resolveInventoryDestination(game.data, boardItem.itemId, target.slotIndex);
         if (targetSlotIndex === null) {
-          markInvalid(overId);
+          reject(overId);
           return;
         }
 
@@ -253,7 +348,7 @@ export function GameShell() {
           () => pulseInventory(targetSlotIndex),
         );
       })
-      .otherwise(() => markInvalid(overId));
+      .otherwise(() => reject(overId));
   }
 
   if (game.isLoading) {
@@ -267,6 +362,8 @@ export function GameShell() {
   if (!game.data) return null;
 
   const inventoryPreviewSlot = getInventoryPreviewSlot(game.data, activeDrag, activeOverId);
+  const hiddenDrag = committedDrag ?? returningDrag;
+  const overlayFaded = isMergeOverlayFaded(game.data, activeDrag, activeOverId);
 
   return (
     <>
@@ -296,20 +393,22 @@ export function GameShell() {
               activeDrag={activeDrag}
               pending={pending}
               invalidTargetId={invalidTargetId}
-              committedDrag={committedDrag}
+              committedDrag={hiddenDrag}
               mergePulseBoardItemId={mergePulseBoardItemId}
+              boardPulseCell={boardPulseCell}
               nowMs={nowMs}
               onSelect={setSelection}
-              onProduce={(boardItemId) => runAction(() => produce.mutateAsync({ boardItemId }), boardItemId)}
+              onProduce={(boardItemId) => runAction(() => produce.mutateAsync({ boardItemId }), boardItemId, { clearSelection: false })}
               onStash={stashWithFlyout}
             />
             <InventoryPanel
               game={game.data}
               pending={pending}
               invalidTargetId={invalidTargetId}
-              committedDrag={committedDrag}
+              committedDrag={hiddenDrag}
               previewSlotIndex={inventoryPreviewSlot}
               pulseSlotIndex={inventoryPulseSlot}
+              onPlaceStack={(slotIndex, itemId) => void placeInventoryWithFlyout(slotIndex, itemId)}
             />
           </div>
 
@@ -319,17 +418,32 @@ export function GameShell() {
               selection={selection}
               pending={pending}
               invalidTargetId={invalidTargetId}
-              committedDrag={committedDrag}
+              committedDrag={hiddenDrag}
               onReset={() => runAction(() => reset.mutateAsync(undefined))}
             />
             <DbStatusCard />
           </aside>
         </section>
-        <DragOverlay dropAnimation={committedDrag ? null : undefined} modifiers={[snapCenterToCursor]}>
-          {activeDrag ? <DragPreview game={game.data} drag={activeDrag} /> : null}
+        <DragOverlay
+          dropAnimation={committedDrag ? null : { duration: invalidDropReturnMs, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }}
+          modifiers={[snapCenterToCursor]}
+        >
+          {activeDrag ? <DragPreview game={game.data} drag={activeDrag} faded={overlayFaded} /> : null}
         </DragOverlay>
       </DndContext>
       {flyout ? <FlyoutTile game={game.data} flyout={flyout} /> : null}
     </>
   );
+}
+
+function isMergeOverlayFaded(game: GameView, activeDrag: DragData | null, activeOverId: string | null) {
+  if (activeDrag?.type !== "board") return false;
+
+  const targetCell = parseBoardCellId(activeOverId);
+  if (!targetCell) return false;
+
+  const target = game.boardItems.find((item) => item.x === targetCell.x && item.y === targetCell.y);
+  if (!target) return false;
+
+  return canMergeBoardItems(game, activeDrag.boardItemId, target.id);
 }

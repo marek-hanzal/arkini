@@ -82,7 +82,7 @@ apps/arkini
   index.html                 Static SPA entry document.
   src/main.tsx               Browser-only React entry. Ensures COI before rendering.
   src/router.tsx             TanStack Router + Query provider. No generated route tree.
-  src/screens/HomeScreen.tsx Current playable prototype shell.
+  src/screens/HomeScreen.tsx Minimal app header and playable prototype shell.
   src/components/GameShell.tsx
                              Small orchestrator for DnD, mutations, and transient feedback.
   src/components/game/*      Board, inventory, action panel, drag preview, animation, and helper files.
@@ -105,11 +105,13 @@ packages/db
 The prototype uses one primary interaction model: drag and drop through `@dnd-kit/core`. There is no click-placement path. Current actions:
 
 - drag an inventory stack onto an empty board cell to place one item
+- double-click an inventory stack to animate one item into the first free board cell
 - drag an inventory stack onto another inventory slot to move/swap stacks
 - drag a board item onto an empty board cell to move it
-- drag a board item onto a valid merge target; cells show valid/invalid feedback before drop and successful merges scale-pulse the target
-- double-click a producer to produce; drops appear around it only when enough free adjacent space exists
+- drag a board item onto a valid merge target; cells show valid/invalid feedback before drop, the dragged overlay fades over valid merge targets, and successful merges scale-pulse the target
+- double-click a producer to produce; it remains selected so its details do not flicker away after the action
 - producer tiles show cooldown progress directly in the tile background; cooldown failures flash the tile instead of also throwing a toast
+- invalid drops animate back to their source while the source stays hidden until the return finishes
 - finite producers, such as crates, spend charges and disappear when depleted
 - drag a blueprint build recipe onto an empty board cell to consume blueprint/materials from inventory and place the result
 - drag a board item onto inventory to store it; existing compatible stacks are preferred before empty slots and the chosen slot pulses

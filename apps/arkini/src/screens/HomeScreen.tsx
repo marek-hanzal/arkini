@@ -1,26 +1,50 @@
 import { DbStatusCard } from "~/components/DbStatusCard";
 import { GameShell } from "~/components/GameShell";
 
+const overviewPills = [
+  "Board merge",
+  "Limited inventory",
+  "Blueprint builds",
+  "Cooldown producers",
+];
+
 export function HomeScreen() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-6 py-8 lg:px-8">
-      <header className="rounded-3xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-slate-950/50">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-300">
-          Arkini playable blocks
-        </p>
-        <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-end">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-              Offline merge economy prototype
-            </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
-              Board merge, limited inventory, blueprint building, cooldown producers, finite crates,
-              and manifest-synced SQLite definitions. Pořád je to button-first prototyp, ne hotová
-              hra, takže klid, grafická extáze přijde později a bude stát další kus duše.
+    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <header className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start">
+        <section className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-950/50 sm:p-7">
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300 sm:text-sm">
+              Arkini playable blocks
             </p>
+            <div className="rounded-full border border-slate-800 bg-slate-950/70 px-3 py-1 text-xs font-medium text-slate-300">
+              Client-only SPA + OPFS SQLite
+            </div>
           </div>
-          <DbStatusCard />
-        </div>
+
+          <h1 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            Offline merge economy prototype
+          </h1>
+
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+            Board merge, limited inventory, blueprint building, cooldown producers, finite crates,
+            and manifest-synced SQLite definitions. Pořád je to button-first prototyp, ne hotová
+            hra, takže priorita je funkční loop, ne hrdinská landing page, která sežere půl viewportu.
+          </p>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {overviewPills.map((pill) => (
+              <span
+                key={pill}
+                className="rounded-full border border-slate-800 bg-slate-950/70 px-3 py-1 text-xs font-medium text-slate-300"
+              >
+                {pill}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        <DbStatusCard />
       </header>
 
       <GameShell />

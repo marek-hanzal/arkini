@@ -94,10 +94,10 @@ On boot:
 
 1. Browser capability checks run.
 2. Kysely migrations run.
-3. `syncGameDataManifest()` validates and hashes the manifest.
+3. `syncGameDataManifest()` validates and hashes the manifest for debug visibility.
 4. `ensureDefaultSaveGame()` creates the default save only when missing.
 
-During this early rewrite, stale local OPFS data should be hard reset with the database card. Backward-compatible migrations for prototype saves are not worth inventing a tiny bureaucracy for.
+Prototype saves are disposable. If local OPFS state goes bad after data changes, use the always-visible database reset button. Do not add compatibility migrations or data-version branching for gameplay definitions.
 
 ## Minimal-code philosophy
 

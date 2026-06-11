@@ -78,7 +78,6 @@ export interface GameDataManifest {
   game: {
     id: "arkini";
     title: "Arkini";
-    dataVersion: number;
     board: { width: 7; height: 9 };
     inventory: { slots: number };
   };
@@ -99,7 +98,6 @@ export const gameDataManifest = {
   game: {
     id: "arkini",
     title: "Arkini",
-    dataVersion: 5,
     board: { width: 7, height: 9 },
     inventory: { slots: 36 },
   },

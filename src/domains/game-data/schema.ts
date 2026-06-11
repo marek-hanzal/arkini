@@ -15,7 +15,6 @@ export const gameDataManifestSchema = z.object({
   game: z.object({
     id: z.literal("arkini"),
     title: z.string().min(1),
-    dataVersion: positiveInteger,
     board: z.object({ width: z.literal(7), height: z.literal(9) }),
     inventory: z.object({ slots: positiveInteger }),
   }),

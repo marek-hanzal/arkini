@@ -99,7 +99,7 @@ export const gameDataManifest = {
   game: {
     id: "arkini",
     title: "Arkini",
-    dataVersion: 4,
+    dataVersion: 5,
     board: { width: 7, height: 9 },
     inventory: { slots: 36 },
   },
@@ -201,26 +201,26 @@ export const gameDataManifest = {
 
     item("item:lumber-camp-1", "asset:item-lumber-camp", "lumber-camp-1", "Lumber Camp I", 1, 1, "A polite machine for turning time into sticks.", ["producer", "building", "wood"], 330, {
       merge: [same("merge:lumber-camp-1-lumber-camp-2", "item:lumber-camp-1", "item:lumber-camp-2")],
-      producer: autoProducer(5000, 4, 120000, drops([drop("item:twig", 70), drop("item:branch", 25), empty(5)])),
+      producer: clickProducer(5000, drops([drop("item:twig", 70), drop("item:branch", 25), empty(5)])),
     }),
     item("item:lumber-camp-2", "asset:item-lumber-camp", "lumber-camp-2", "Lumber Camp II", 2, 1, "Still wood, but now with ambition.", ["producer", "building", "wood"], 340, {
       merge: [same("merge:lumber-camp-2-lumber-camp-3", "item:lumber-camp-2", "item:lumber-camp-3")],
-      producer: autoProducer(4500, 5, 100000, drops([drop("item:twig", 30), drop("item:branch", 55), drop("item:log", 15)])),
+      producer: clickProducer(4500, drops([drop("item:twig", 30), drop("item:branch", 55), drop("item:log", 15)])),
     }),
     item("item:lumber-camp-3", "asset:item-lumber-camp", "lumber-camp-3", "Lumber Camp III", 3, 1, "A compact shrine to deforestation.", ["producer", "building", "wood"], 350, {
-      producer: autoProducer(4000, 6, 90000, drops([drop("item:branch", 40), drop("item:log", 55), empty(5)])),
+      producer: clickProducer(4000, drops([drop("item:branch", 40), drop("item:log", 55), empty(5)])),
     }),
 
     item("item:quarry-1", "asset:item-quarry", "quarry-1", "Quarry I", 1, 1, "A hole in the ground with a business model.", ["producer", "building", "stone"], 360, {
       merge: [same("merge:quarry-1-quarry-2", "item:quarry-1", "item:quarry-2")],
-      producer: autoProducer(5500, 4, 120000, drops([drop("item:pebble", 72), drop("item:stone", 23), empty(5)])),
+      producer: clickProducer(5500, drops([drop("item:pebble", 72), drop("item:stone", 23), empty(5)])),
     }),
     item("item:quarry-2", "asset:item-quarry", "quarry-2", "Quarry II", 2, 1, "A deeper hole, because progress is weird.", ["producer", "building", "stone"], 370, {
       merge: [same("merge:quarry-2-quarry-3", "item:quarry-2", "item:quarry-3")],
-      producer: autoProducer(5000, 5, 100000, drops([drop("item:pebble", 30), drop("item:stone", 55), drop("item:crystal", 15)])),
+      producer: clickProducer(5000, drops([drop("item:pebble", 30), drop("item:stone", 55), drop("item:crystal", 15)])),
     }),
     item("item:quarry-3", "asset:item-quarry", "quarry-3", "Quarry III", 3, 1, "Rocks leaving the earth at startup velocity.", ["producer", "building", "stone"], 380, {
-      producer: autoProducer(4500, 6, 90000, drops([drop("item:stone", 44), drop("item:crystal", 51), empty(5)])),
+      producer: clickProducer(4500, drops([drop("item:stone", 44), drop("item:crystal", 51), empty(5)])),
     }),
 
     item("item:crate-1", "asset:item-crate", "crate-1", "Common Crate", 1, 1, "A finite producer with suspicious contents.", ["producer", "container"], 400, {

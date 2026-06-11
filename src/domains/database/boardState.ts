@@ -40,12 +40,26 @@ export function readProducerView(itemId: string, state: BoardItemState): Produce
   const initial = createInitialBoardState(itemId).producer ?? {};
   const producerState = { ...initial, ...(state.producer ?? {}) };
 
+  if (producer.trigger === "click") {
+    return {
+      trigger: producer.trigger,
+      mode: producer.mode ?? { type: "infinite" },
+      cooldownMs: producer.cooldownMs ?? null,
+      cooldownUntil: producerState.cooldownUntil ?? null,
+      remainingCharges: producerState.remainingCharges ?? null,
+      paused: false,
+      autoAvailable: null,
+      nextDropAt: null,
+      rechargeUntil: null,
+    };
+  }
+
   return {
     trigger: producer.trigger,
     mode: producer.mode ?? { type: "infinite" },
     cooldownMs: producer.cooldownMs ?? null,
-    cooldownUntil: producerState.cooldownUntil ?? null,
-    remainingCharges: producerState.remainingCharges ?? null,
+    cooldownUntil: null,
+    remainingCharges: null,
     paused: producerState.paused ?? false,
     autoAvailable: producerState.autoAvailable ?? null,
     nextDropAt: producerState.nextDropAt ?? null,

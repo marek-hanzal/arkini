@@ -8,7 +8,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
-import { gameDataIndex, type BuildRecipeId, type ItemId } from "~/domains/game-data";
+import { resolveMergeRule, type BuildRecipeId, type ItemId } from "~/domains/game-data";
 import type { BoardViewItem, InventorySlot, ProducerDropResult } from "~/domains/database";
 import { useGameAction, useGameDataInvalidation, useGameView } from "~/hooks/useGameView";
 import { Board } from "./components/Board";
@@ -48,7 +48,6 @@ export function GameShell() {
     { invalidateOnSuccess: false },
   );
   const advanceAuto = useGameAction((db) => db.advanceAutoProducers(), { invalidateOnSuccess: false });
-  const togglePause = useGameAction((db, input: { boardItemId: string }) => db.toggleProducerPause(input.boardItemId));
   const build = useGameAction((db, input: { recipeId: BuildRecipeId; x: number; y: number }) => db.buildRecipe(input.recipeId, input.x, input.y));
 
   useEffect(() => {
@@ -89,15 +88,27 @@ export function GameShell() {
   async function handleDragEnd(event: DragEndEvent) {
     const source = event.active.data.current as DragData | undefined;
     const target = event.over?.data.current as DropData | undefined;
-    setActiveDrag(null);
+    const dragRect = (event.active.rect.current.translated ?? event.active.rect.current.initial) as RectLike | null;
     setDragPreviewRect(null);
 
-    if (!source || !target || !game) return;
+    if (!source || !target || !game) {
+      setActiveDrag(null);
+      return;
+    }
+
+    if (isRejectedBoardMerge(source, target)) {
+      await animateRejectedDrop(source, dragRect);
+      feedback.flashInvalidTarget(source, target, game);
+      return;
+    }
+
+    setActiveDrag(null);
 
     try {
       await runDropAction(source, target);
     } catch (error) {
       setCommittedDrag(null);
+      await animateRejectedDrop(source, dragRect);
       feedback.flashInvalidTarget(source, target, game);
       feedback.showError(error);
     }
@@ -116,10 +127,14 @@ export function GameShell() {
     if (source.kind === "inventory" && target.kind === "inventory-slot") {
       if (source.slotIndex === target.slotIndex) return;
 
-      setCommittedDrag({ source, hideSource: true });
-      await swapInventory.mutateAsync({ sourceSlotIndex: source.slotIndex, targetSlotIndex: target.slotIndex });
-      feedback.pulseInventorySlot(target.slotIndex);
-      setCommittedDrag(null);
+      const hiddenSlots = await animateInventorySwap(source, target.slotIndex);
+      try {
+        await swapInventory.mutateAsync({ sourceSlotIndex: source.slotIndex, targetSlotIndex: target.slotIndex });
+        feedback.pulseInventorySlot(target.slotIndex);
+      } finally {
+        for (const slotIndex of hiddenSlots) showInventorySlot(slotIndex);
+        setCommittedDrag(null);
+      }
       return;
     }
 
@@ -244,6 +259,74 @@ export function GameShell() {
     await wait(flyMs);
   }
 
+  async function animateInventorySwap(source: Extract<DragData, { kind: "inventory" }>, targetSlotIndex: number) {
+    const sourceSlot = game?.inventoryBySlotIndex[source.slotIndex] ?? null;
+    const targetSlot = game?.inventoryBySlotIndex[targetSlotIndex] ?? null;
+    const sourceRect = queryRect(`[data-inventory-slot="${source.slotIndex}"]`);
+    const targetRect = queryRect(`[data-inventory-slot="${targetSlotIndex}"]`);
+    const hiddenSlots = [source.slotIndex];
+
+    setCommittedDrag({ source, hideSource: true });
+    if (!sourceSlot?.stack || !sourceRect || !targetRect) return hiddenSlots;
+
+    hideInventorySlot(source.slotIndex);
+    addFlyer(sourceSlot.stack.itemId, tileVisualRect(sourceRect), tileVisualRect(targetRect));
+
+    const shouldSwapBack = Boolean(targetSlot?.stack && targetSlot.stack.itemId !== sourceSlot.stack.itemId);
+    if (shouldSwapBack && targetSlot?.stack) {
+      hiddenSlots.push(targetSlotIndex);
+      hideInventorySlot(targetSlotIndex);
+      addFlyer(targetSlot.stack.itemId, tileVisualRect(targetRect), tileVisualRect(sourceRect));
+    }
+
+    await wait(flyMs);
+    return hiddenSlots;
+  }
+
+  async function animateRejectedDrop(source: DragData, dragRect: RectLike | null) {
+    const from = dragRect ? tileVisualRect(dragRect) : null;
+    if (!from) {
+      setActiveDrag(null);
+      return;
+    }
+
+    if (source.kind === "board") {
+      const boardItem = game?.boardItemsById[source.boardItemId];
+      const targetRect = boardItem ? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`) : null;
+      if (!targetRect) {
+        setActiveDrag(null);
+        return;
+      }
+
+      hideBoardItem(source.boardItemId);
+      setActiveDrag(null);
+      addFlyer(source.itemId, from, tileVisualRect(targetRect));
+      await wait(flyMs);
+      showBoardItem(source.boardItemId);
+      return;
+    }
+
+    const targetRect = queryRect(`[data-inventory-slot="${source.slotIndex}"]`);
+    if (!targetRect) {
+      setActiveDrag(null);
+      return;
+    }
+
+    hideInventorySlot(source.slotIndex);
+    setActiveDrag(null);
+    addFlyer(source.itemId, from, tileVisualRect(targetRect));
+    await wait(flyMs);
+    showInventorySlot(source.slotIndex);
+  }
+
+  function isRejectedBoardMerge(source: DragData, target: DropData) {
+    if (source.kind !== "board" || target.kind !== "cell" || !target.boardItemId) return false;
+    if (target.boardItemId === source.boardItemId) return false;
+    const targetItem = game?.boardItemsById[target.boardItemId];
+    if (!targetItem) return false;
+    return !resolveMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId);
+  }
+
   function hideBoardItem(id: string) {
     setHiddenBoardIds((current) => new Set(current).add(id));
   }
@@ -287,27 +370,11 @@ export function GameShell() {
           pulsedBoardCellKey={feedback.pulsedBoardCellKey}
           mergedBoardCellKey={feedback.mergedBoardCellKey}
           nowMs={nowMs}
-          onEmptyDoubleActivate={setBuildCell}
+          onEmptyActivate={setBuildCell}
           onTileSingleActivate={(item) => {
             if (!item.producer) return;
             void produceFrom(item, "single");
           }}
-          onTileDoubleActivate={(item) => {
-            if (!item.producer) {
-              void stashWithFly(item);
-              return;
-            }
-
-            if (canPauseProducer(item)) {
-              togglePause.mutate({ boardItemId: item.id }, { onError: feedback.showError });
-              return;
-            }
-
-            if (shouldExhaustOnDoubleActivate(item.itemId)) {
-              void produceFrom(item, "exhaust");
-            }
-          }}
-          getTilePressMode={(item) => hasMeaningfulDoubleAction(item) ? "delayed" : "instant"}
         />
 
         <BuildSheet
@@ -342,7 +409,7 @@ export function GameShell() {
         invalidInventorySlot={feedback.invalidInventorySlot}
         pulsedInventorySlot={feedback.pulsedInventorySlot}
         onOpenChange={setSheetOpen}
-        onSlotDoubleActivate={placeInventoryFromDoubleTap}
+        onSlotActivate={placeInventoryFromDoubleTap}
       />
 
       {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} />)}
@@ -359,17 +426,4 @@ export function GameShell() {
       </DragOverlay>
     </DndContext>
   );
-}
-
-function hasMeaningfulDoubleAction(item: BoardViewItem) {
-  return !item.producer || canPauseProducer(item) || shouldExhaustOnDoubleActivate(item.itemId);
-}
-
-function canPauseProducer(item: BoardViewItem) {
-  return item.producer?.trigger === "auto";
-}
-
-function shouldExhaustOnDoubleActivate(itemId: string) {
-  const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
-  return producer?.doubleClickBehavior === "exhaust";
 }

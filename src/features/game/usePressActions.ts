@@ -1,58 +1,17 @@
-import { useEffect, useRef, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
+import { useRef, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
 
-const doubleTapMs = 320;
-const singleDelayMs = 340;
 const moveTolerancePx = 8;
 
-export type PressMode = "instant" | "delayed";
-
 export interface PressActions {
-  mode?: PressMode;
   onSingle?(): void;
-  onDouble?(): void;
 }
 
-// Pointer/click glue for game tiles. Most producers should react instantly on a
-// clean click so the drag sensor does not keep a stale delayed action around.
-// Only tiles with a meaningful double action use delayed single activation.
-export function usePressActions({ mode = "delayed", onSingle, onDouble }: PressActions) {
-  const singleTimerRef = useRef<number | null>(null);
-  const lastTapMsRef = useRef(0);
+// Tiny click guard shared by board and inventory cells. No timers, no delayed
+// double-click ceremony, no haunted click that runs after the user already moved
+// on with their life. Drag owns movement; click owns activation.
+export function usePressActions({ onSingle }: PressActions) {
   const movedRef = useRef(false);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
-  const suppressClickUntilRef = useRef(0);
-
-  useEffect(() => () => clearSingleTimer(), []);
-
-  function clearSingleTimer() {
-    if (singleTimerRef.current === null) return;
-    window.clearTimeout(singleTimerRef.current);
-    singleTimerRef.current = null;
-  }
-
-  function runSingle() {
-    clearSingleTimer();
-    onSingle?.();
-  }
-
-  function scheduleSingle() {
-    if (!onSingle) return;
-    if (mode === "instant") {
-      runSingle();
-      return;
-    }
-
-    clearSingleTimer();
-    singleTimerRef.current = window.setTimeout(() => {
-      singleTimerRef.current = null;
-      onSingle();
-    }, singleDelayMs);
-  }
-
-  function runDouble() {
-    clearSingleTimer();
-    onDouble?.();
-  }
 
   function movedPastTolerance(event: ReactPointerEvent<HTMLElement>) {
     const start = pointerStartRef.current;
@@ -61,21 +20,13 @@ export function usePressActions({ mode = "delayed", onSingle, onDouble }: PressA
   }
 
   return {
-    cancel: clearSingleTimer,
     onClick(event: ReactMouseEvent<HTMLElement>) {
       event.stopPropagation();
-      if (Date.now() < suppressClickUntilRef.current) return;
       if (movedRef.current) {
         movedRef.current = false;
         return;
       }
-      if (event.detail !== 1) return;
-      scheduleSingle();
-    },
-    onDoubleClick(event: ReactMouseEvent<HTMLElement>) {
-      event.preventDefault();
-      event.stopPropagation();
-      runDouble();
+      onSingle?.();
     },
     onPointerDown(event: ReactPointerEvent<HTMLElement>) {
       movedRef.current = false;
@@ -84,25 +35,10 @@ export function usePressActions({ mode = "delayed", onSingle, onDouble }: PressA
     onPointerMove(event: ReactPointerEvent<HTMLElement>) {
       if (movedPastTolerance(event)) {
         movedRef.current = true;
-        clearSingleTimer();
       }
     },
-    onPointerUp(event: ReactPointerEvent<HTMLElement>) {
-      if (event.pointerType === "mouse" || movedRef.current) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-      suppressClickUntilRef.current = Date.now() + 500;
-
-      const now = Date.now();
-      if (now - lastTapMsRef.current <= doubleTapMs) {
-        lastTapMsRef.current = 0;
-        runDouble();
-        return;
-      }
-
-      lastTapMsRef.current = now;
-      scheduleSingle();
+    onPointerUp() {
+      pointerStartRef.current = null;
     },
   };
 }

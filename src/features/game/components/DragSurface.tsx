@@ -1,7 +1,7 @@
 import { useDraggable, useDroppable, type Data } from "@dnd-kit/core";
 import type { HTMLAttributes, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { cn } from "~/lib/cn";
-import { usePressActions, type PressMode } from "../usePressActions";
+import { usePressActions } from "../usePressActions";
 import { BottomSheet, type BottomSheetProps } from "./BottomSheet";
 
 export function DroppableCell({
@@ -63,14 +63,13 @@ export function DraggableTileShell({
   data,
   hidden,
   className,
-  pressMode = "delayed",
+  dragDisabled = false,
   onSingleActivate,
-  onDoubleActivate,
   children,
   ...props
 }: Readonly<DraggableTileShellProps>) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data });
-  const press = usePressActions({ mode: pressMode, onSingle: onSingleActivate, onDouble: onDoubleActivate });
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data, disabled: dragDisabled });
+  const press = usePressActions({ onSingle: onSingleActivate });
 
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     press.onPointerDown(event);
@@ -92,7 +91,6 @@ export function DraggableTileShell({
       {...props}
       className={cn(className, (hidden || isDragging) && "opacity-0")}
       onClick={press.onClick}
-      onDoubleClick={press.onDoubleClick}
       onKeyDown={listeners?.onKeyDown}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
@@ -107,8 +105,7 @@ export interface DraggableTileShellProps extends Omit<HTMLAttributes<HTMLDivElem
   id: string;
   data: Data;
   hidden: boolean;
-  pressMode?: PressMode;
+  dragDisabled?: boolean;
   onSingleActivate?(): void;
-  onDoubleActivate?(): void;
   children: ReactNode;
 }

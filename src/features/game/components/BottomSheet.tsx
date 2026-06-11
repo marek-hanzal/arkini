@@ -33,6 +33,19 @@ export const BottomSheet = forwardRef<HTMLElement, BottomSheetProps>(function Bo
     return () => window.clearTimeout(timeout);
   }, [keepMounted, open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousOverscroll = document.body.style.overscrollBehavior;
+    document.body.style.overflow = "hidden";
+    document.body.style.overscrollBehavior = "none";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.overscrollBehavior = previousOverscroll;
+    };
+  }, [open]);
+
   if (!mounted) return null;
 
   return (

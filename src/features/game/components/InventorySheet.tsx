@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type { GameView, InventorySlot, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
-import { usePressActions } from "../usePressActions";
 import type { CommittedDrag, DragData, DropData } from "../types";
 import { DraggableTileShell, DroppableBottomSheet, DroppableCell } from "./DragSurface";
 import { Tile } from "./Tile";
@@ -15,7 +14,7 @@ export function InventorySheet({
   invalidInventorySlot,
   pulsedInventorySlot,
   onOpenChange,
-  onSlotDoubleActivate,
+  onSlotActivate,
 }: Readonly<{
   game: GameView;
   open: boolean;
@@ -25,13 +24,13 @@ export function InventorySheet({
   invalidInventorySlot: number | null;
   pulsedInventorySlot: number | null;
   onOpenChange(open: boolean): void;
-  onSlotDoubleActivate(slot: InventorySlot): void;
+  onSlotActivate(slot: InventorySlot): void;
 }>) {
   const filled = game.inventory.filter((slot) => slot.stack).length;
 
   return (
     <InventoryDropBin open={open} overClassName="ring-2 ring-emerald-300/70" onClose={() => onOpenChange(false)}>
-      <div data-inventory-summary className="border-b border-slate-800/80 px-4 py-3">
+      <div data-inventory-summary className="h-20 border-b border-slate-800/80 px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">Inventory</p>
@@ -47,8 +46,8 @@ export function InventorySheet({
         </div>
       </div>
 
-      <div className="max-h-[60vh] overflow-y-auto px-3 pb-4 pt-3">
-        <div className="grid grid-cols-4 gap-1.5">
+      <div className="max-h-[60vh] overflow-y-auto overscroll-contain pb-4">
+        <div className="grid grid-cols-4 gap-0 overflow-hidden border-x border-slate-800">
           {game.inventory.map((slot) => (
             <InventoryCell
               key={slot.slotIndex}
@@ -61,7 +60,7 @@ export function InventorySheet({
               }
               invalid={invalidInventorySlot === slot.slotIndex}
               pulsed={pulsedInventorySlot === slot.slotIndex}
-              onDoubleActivate={() => onSlotDoubleActivate(slot)}
+              onActivate={() => onSlotActivate(slot)}
             />
           ))}
         </div>
@@ -94,17 +93,16 @@ function InventoryCell({
   hidden,
   invalid,
   pulsed,
-  onDoubleActivate,
+  onActivate,
 }: Readonly<{
   slot: InventorySlot;
   item: ViewItem | null;
   hidden: boolean;
   invalid: boolean;
   pulsed: boolean;
-  onDoubleActivate(): void;
+  onActivate(): void;
 }>) {
   const stack = slot.stack;
-  const press = usePressActions({ onDouble: onDoubleActivate });
 
   return (
     <DroppableCell
@@ -112,23 +110,18 @@ function InventoryCell({
       data={{ kind: "inventory-slot", slotIndex: slot.slotIndex } satisfies DropData}
       data-inventory-slot={slot.slotIndex}
       className={(isOver) => cn(
-        "relative aspect-square rounded-sm border border-slate-800 bg-slate-900/70 transition-colors duration-200",
+        "relative aspect-square border-b border-r border-slate-800 bg-slate-900/70 transition-colors duration-200",
         isOver && "bg-slate-800 ring-1 ring-emerald-300/70",
         invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
         pulsed && !invalid && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
       )}
-      onClick={press.onClick}
-      onDoubleClick={press.onDoubleClick}
-      onPointerDown={press.onPointerDown}
-      onPointerMove={press.onPointerMove}
-      onPointerUp={press.onPointerUp}
     >
-      {stack && item ? <InventoryTile slot={slot} item={item} hidden={hidden} onDoubleActivate={onDoubleActivate} /> : null}
+      {stack && item ? <InventoryTile slot={slot} item={item} hidden={hidden} onActivate={onActivate} /> : null}
     </DroppableCell>
   );
 }
 
-function InventoryTile({ slot, item, hidden, onDoubleActivate }: Readonly<{ slot: InventorySlot; item: ViewItem; hidden: boolean; onDoubleActivate(): void }>) {
+function InventoryTile({ slot, item, hidden }: Readonly<{ slot: InventorySlot; item: ViewItem; hidden: boolean; onActivate(): void }>) {
   const stack = slot.stack;
 
   if (!stack) return null;
@@ -139,7 +132,6 @@ function InventoryTile({ slot, item, hidden, onDoubleActivate }: Readonly<{ slot
       data={{ kind: "inventory", slotIndex: slot.slotIndex, itemId: stack.itemId, quantity: stack.quantity } satisfies DragData}
       hidden={hidden}
       className="absolute inset-0 touch-none"
-      onDoubleActivate={onDoubleActivate}
     >
       <Tile item={item} quantity={stack.quantity} />
     </DraggableTileShell>

@@ -1,4 +1,3 @@
-import { DbStatusCard } from "~/components/DbStatusCard";
 import { GameShell } from "~/components/GameShell";
 
 const overviewPills = [
@@ -11,7 +10,7 @@ const overviewPills = [
 export function HomeScreen() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-      <header className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start">
+      <header>
         <section className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-950/50 sm:p-7">
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300 sm:text-sm">
@@ -43,8 +42,6 @@ export function HomeScreen() {
             ))}
           </div>
         </section>
-
-        <DbStatusCard />
       </header>
 
       <GameShell />

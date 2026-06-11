@@ -2,6 +2,7 @@ import type { GameView } from "@arkini/db";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
+import { DbStatusCard } from "~/components/DbStatusCard";
 import { useGameAction, useGameView } from "~/hooks/useGameView";
 
 type Selection =
@@ -81,6 +82,7 @@ export function GameShell() {
           onProduce={(boardItemId) => run(() => produce.mutateAsync({ boardItemId }), "Producer dropped items around itself.")}
           onReset={() => run(() => reset.mutateAsync(undefined), "Save reset to manifest starting state.")}
         />
+        <DbStatusCard />
         {error ? <p className="rounded-3xl border border-red-400/30 bg-red-950/40 p-4 text-sm text-red-100">{(error as Error).message}</p> : null}
       </aside>
     </section>

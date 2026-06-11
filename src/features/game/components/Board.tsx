@@ -1,11 +1,11 @@
-import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { useMemo, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { resolveMergeRule, type ItemId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import { cellKey } from "../helpers";
 import { usePressActions } from "../usePressActions";
-import { columns, rows, type BuildCell, type DragData, type DropData } from "../types";
+import { columns, rows, type BuildCell, type CommittedDrag, type DragData, type DropData } from "../types";
+import { DraggableTileShell, DroppableCell } from "./DragSurface";
 import { Tile } from "./Tile";
 
 export function Board({
@@ -20,10 +20,11 @@ export function Board({
   onEmptyDoubleActivate,
   onTileSingleActivate,
   onTileDoubleActivate,
+  getTilePressMode,
 }: Readonly<{
   game: GameView;
   activeDrag: DragData | null;
-  committedDrag: DragData | null;
+  committedDrag: CommittedDrag | null;
   hiddenBoardIds: ReadonlySet<string>;
   invalidBoardCellKey: string | null;
   pulsedBoardCellKey: string | null;
@@ -32,6 +33,7 @@ export function Board({
   onEmptyDoubleActivate(cell: BuildCell): void;
   onTileSingleActivate(item: BoardViewItem): void;
   onTileDoubleActivate(item: BoardViewItem): void;
+  getTilePressMode(item: BoardViewItem): "instant" | "delayed";
 }>) {
   const cells = useMemo(() => Array.from({ length: columns * rows }, (_, index) => ({ x: index % columns, y: Math.floor(index / columns) })), []);
 
@@ -63,9 +65,10 @@ export function Board({
                 hidden={
                   hiddenBoardIds.has(boardItem.id)
                   || (activeDrag?.kind === "board" && activeDrag.boardItemId === boardItem.id)
-                  || (committedDrag?.kind === "board" && committedDrag.boardItemId === boardItem.id)
+                  || (committedDrag?.hideSource === true && committedDrag.source.kind === "board" && committedDrag.source.boardItemId === boardItem.id)
                 }
                 nowMs={nowMs}
+                pressMode={getTilePressMode(boardItem)}
                 onSingleActivate={() => onTileSingleActivate(boardItem)}
                 onDoubleActivate={() => onTileDoubleActivate(boardItem)}
               />
@@ -99,7 +102,6 @@ function BoardCell({
   onEmptyDoubleActivate(cell: BuildCell): void;
 }>) {
   const id = `cell:${x}:${y}`;
-  const { setNodeRef, isOver } = useDroppable({ id, data: { kind: "cell", x, y, boardItemId: boardItem?.id ?? null } satisfies DropData });
   const press = usePressActions({
     onDouble: () => {
       if (!boardItem) onEmptyDoubleActivate({ x, y });
@@ -107,10 +109,11 @@ function BoardCell({
   });
 
   return (
-    <div
-      ref={setNodeRef}
+    <DroppableCell
+      id={id}
+      data={{ kind: "cell", x, y, boardItemId: boardItem?.id ?? null } satisfies DropData}
       data-board-cell={`${x}:${y}`}
-      className={cn(
+      className={(isOver) => cn(
         "relative aspect-square border-b border-r border-slate-800/80 bg-slate-900/55 transition-colors duration-200",
         x === columns - 1 && "border-r-0",
         y === rows - 1 && "border-b-0",
@@ -127,7 +130,7 @@ function BoardCell({
       onPointerUp={press.onPointerUp}
     >
       {children}
-    </div>
+    </DroppableCell>
   );
 }
 
@@ -136,6 +139,7 @@ function BoardTile({
   item,
   hidden,
   nowMs,
+  pressMode,
   onSingleActivate,
   onDoubleActivate,
 }: Readonly<{
@@ -143,42 +147,22 @@ function BoardTile({
   item: ViewItem;
   hidden: boolean;
   nowMs: number;
+  pressMode: "instant" | "delayed";
   onSingleActivate(): void;
   onDoubleActivate(): void;
 }>) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `board:${boardItem.id}`,
-    data: { kind: "board", boardItemId: boardItem.id, itemId: boardItem.itemId } satisfies DragData,
-  });
-  const press = usePressActions({ onSingle: onSingleActivate, onDouble: onDoubleActivate });
-
-  function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    press.onPointerDown(event);
-    listeners?.onPointerDown?.(event);
-  }
-
-  function pointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    press.onPointerMove(event);
-  }
-
-  function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    press.onPointerUp(event);
-  }
-
   return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
+    <DraggableTileShell
+      id={`board:${boardItem.id}`}
+      data={{ kind: "board", boardItemId: boardItem.id, itemId: boardItem.itemId } satisfies DragData}
       data-board-item-id={boardItem.id}
-      className={cn("absolute inset-0 touch-none", (hidden || isDragging) && "opacity-0")}
-      onClick={press.onClick}
-      onDoubleClick={press.onDoubleClick}
-      onPointerDown={pointerDown}
-      onPointerMove={pointerMove}
-      onPointerUp={pointerUp}
+      hidden={hidden}
+      className="absolute inset-0 touch-none"
+      pressMode={pressMode}
+      onSingleActivate={onSingleActivate}
+      onDoubleActivate={onDoubleActivate}
     >
       <Tile item={item} producer={boardItem.producer} nowMs={nowMs} />
-    </div>
+    </DraggableTileShell>
   );
 }

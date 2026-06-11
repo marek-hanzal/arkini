@@ -17,7 +17,7 @@ import { Flyer } from "./components/Flyer";
 import { InventorySheet } from "./components/InventorySheet";
 import { Tile } from "./components/Tile";
 import { cellKey, cssEscape, firstFreeCell, inventorySinkRect, queryRect, tileVisualRect, wait, without } from "./helpers";
-import { flyMs, type BuildCell, type DragData, type DropData, type RectLike } from "./types";
+import { flyMs, type BuildCell, type CommittedDrag, type DragData, type DropData, type RectLike } from "./types";
 import { useFlyers } from "./useFlyers";
 import { useGameFeedback } from "./useGameFeedback";
 
@@ -26,7 +26,7 @@ export function GameShell() {
   const game = gameQuery.data;
   const invalidateGameData = useGameDataInvalidation();
   const [activeDrag, setActiveDrag] = useState<DragData | null>(null);
-  const [committedDrag, setCommittedDrag] = useState<DragData | null>(null);
+  const [committedDrag, setCommittedDrag] = useState<CommittedDrag | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [buildCell, setBuildCell] = useState<BuildCell | null>(null);
   const [hiddenBoardIds, setHiddenBoardIds] = useState(() => new Set<string>());
@@ -74,9 +74,16 @@ export function GameShell() {
   }, [advanceAuto, invalidateGameData]);
 
   function handleDragStart(event: DragStartEvent) {
+    setCommittedDrag(null);
     setActiveDrag(event.active.data.current as DragData | null);
     const rect = (event.active.rect.current.initial ?? event.active.rect.current.translated) as RectLike | null;
     setDragPreviewRect(rect ? { width: rect.width, height: rect.height } : null);
+  }
+
+  function handleDragCancel() {
+    setActiveDrag(null);
+    setCommittedDrag(null);
+    setDragPreviewRect(null);
   }
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -99,7 +106,7 @@ export function GameShell() {
   async function runDropAction(source: DragData, target: DropData) {
     if (source.kind === "inventory" && target.kind === "cell") {
       if (target.boardItemId) throw new Error("Cell is occupied.");
-      setCommittedDrag(source);
+      setCommittedDrag({ source, hideSource: source.quantity <= 1 });
       await placeInventory.mutateAsync({ slotIndex: source.slotIndex, x: target.x, y: target.y });
       feedback.pulseBoardCell(cellKey(target.x, target.y));
       setCommittedDrag(null);
@@ -109,7 +116,7 @@ export function GameShell() {
     if (source.kind === "inventory" && target.kind === "inventory-slot") {
       if (source.slotIndex === target.slotIndex) return;
 
-      setCommittedDrag(source);
+      setCommittedDrag({ source, hideSource: true });
       await swapInventory.mutateAsync({ sourceSlotIndex: source.slotIndex, targetSlotIndex: target.slotIndex });
       feedback.pulseInventorySlot(target.slotIndex);
       setCommittedDrag(null);
@@ -119,7 +126,7 @@ export function GameShell() {
     if (source.kind === "board" && target.kind === "cell") {
       if (target.boardItemId === source.boardItemId) return;
 
-      setCommittedDrag(source);
+      setCommittedDrag({ source, hideSource: true });
       if (target.boardItemId) {
         await mergeBoard.mutateAsync({ sourceBoardItemId: source.boardItemId, targetBoardItemId: target.boardItemId });
         feedback.pulseMergeCell(cellKey(target.x, target.y));
@@ -134,7 +141,7 @@ export function GameShell() {
     }
 
     if (source.kind === "board" && target.kind === "inventory-slot") {
-      setCommittedDrag(source);
+      setCommittedDrag({ source, hideSource: true });
       await stashBoard.mutateAsync({ boardItemId: source.boardItemId, slotIndex: target.slotIndex });
       feedback.pulseInventorySlot(target.slotIndex);
       setCommittedDrag(null);
@@ -142,7 +149,7 @@ export function GameShell() {
     }
 
     if (source.kind === "board" && target.kind === "inventory-bin") {
-      setCommittedDrag(source);
+      setCommittedDrag({ source, hideSource: true });
       await stashBoard.mutateAsync({ boardItemId: source.boardItemId });
       setCommittedDrag(null);
     }
@@ -264,7 +271,7 @@ export function GameShell() {
   const activeItem = activeDrag ? game.items[activeDrag.itemId] : null;
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
       <section className="relative flex w-[min(100vw-1.5rem,430px)] flex-col gap-3 pb-3">
         <div className="rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
           <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Arkini</p>
@@ -300,6 +307,7 @@ export function GameShell() {
               void produceFrom(item, "exhaust");
             }
           }}
+          getTilePressMode={(item) => hasMeaningfulDoubleAction(item) ? "delayed" : "instant"}
         />
 
         <BuildSheet
@@ -351,6 +359,10 @@ export function GameShell() {
       </DragOverlay>
     </DndContext>
   );
+}
+
+function hasMeaningfulDoubleAction(item: BoardViewItem) {
+  return !item.producer || canPauseProducer(item) || shouldExhaustOnDoubleActivate(item.itemId);
 }
 
 function canPauseProducer(item: BoardViewItem) {

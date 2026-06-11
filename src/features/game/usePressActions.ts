@@ -4,16 +4,18 @@ const doubleTapMs = 320;
 const singleDelayMs = 340;
 const moveTolerancePx = 8;
 
+export type PressMode = "instant" | "delayed";
+
 export interface PressActions {
+  mode?: PressMode;
   onSingle?(): void;
   onDouble?(): void;
 }
 
-// Pointer/click glue for game tiles. It deliberately delays the single action a
-// hair so a double action can cancel it. Otherwise double-clicking a producer
-// would first fire the producer and then pause/open it, because browsers enjoy
-// small acts of procedural cruelty.
-export function usePressActions({ onSingle, onDouble }: PressActions) {
+// Pointer/click glue for game tiles. Most producers should react instantly on a
+// clean click so the drag sensor does not keep a stale delayed action around.
+// Only tiles with a meaningful double action use delayed single activation.
+export function usePressActions({ mode = "delayed", onSingle, onDouble }: PressActions) {
   const singleTimerRef = useRef<number | null>(null);
   const lastTapMsRef = useRef(0);
   const movedRef = useRef(false);
@@ -28,8 +30,18 @@ export function usePressActions({ onSingle, onDouble }: PressActions) {
     singleTimerRef.current = null;
   }
 
+  function runSingle() {
+    clearSingleTimer();
+    onSingle?.();
+  }
+
   function scheduleSingle() {
     if (!onSingle) return;
+    if (mode === "instant") {
+      runSingle();
+      return;
+    }
+
     clearSingleTimer();
     singleTimerRef.current = window.setTimeout(() => {
       singleTimerRef.current = null;
@@ -49,6 +61,7 @@ export function usePressActions({ onSingle, onDouble }: PressActions) {
   }
 
   return {
+    cancel: clearSingleTimer,
     onClick(event: ReactMouseEvent<HTMLElement>) {
       event.stopPropagation();
       if (Date.now() < suppressClickUntilRef.current) return;
@@ -71,6 +84,7 @@ export function usePressActions({ onSingle, onDouble }: PressActions) {
     onPointerMove(event: ReactPointerEvent<HTMLElement>) {
       if (movedPastTolerance(event)) {
         movedRef.current = true;
+        clearSingleTimer();
       }
     },
     onPointerUp(event: ReactPointerEvent<HTMLElement>) {

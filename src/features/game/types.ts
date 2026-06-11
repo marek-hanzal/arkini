@@ -9,6 +9,11 @@ export type DropData =
   | { kind: "inventory-slot"; slotIndex: number }
   | { kind: "inventory-bin" };
 
+export interface CommittedDrag {
+  source: DragData;
+  hideSource: boolean;
+}
+
 export interface RectLike {
   left: number;
   top: number;

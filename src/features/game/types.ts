@@ -16,24 +16,21 @@ export interface RectLike {
   height: number;
 }
 
+export type FlyerKind = "move" | "stash";
+
 export interface FlyerModel {
   id: string;
   itemId: string;
   from: RectLike;
   to: RectLike;
+  kind: FlyerKind;
 }
 
-export interface InlineFeedback {
-  id: string;
-  message: string;
-  tone: "info" | "error";
-}
 
 export type BuildCell = { x: number; y: number };
 export type ProducerView = NonNullable<BoardViewItem["producer"]>;
 
 export const columns = 7;
 export const rows = 9;
-export const flyMs = 280;
-export const feedbackMs = 1400;
+export const flyMs = 320;
 export const flashMs = 650;

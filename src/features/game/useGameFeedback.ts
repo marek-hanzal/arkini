@@ -1,24 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { GameView } from "~/domains/database";
 import { cellKey } from "./helpers";
-import { feedbackMs, flashMs, type DragData, type DropData, type InlineFeedback } from "./types";
+import { flashMs, type DragData, type DropData } from "./types";
 
 export function useGameFeedback() {
   const [invalidBoardCellKey, setInvalidBoardCellKey] = useState<string | null>(null);
   const [pulsedBoardCellKey, setPulsedBoardCellKey] = useState<string | null>(null);
   const [invalidInventorySlot, setInvalidInventorySlot] = useState<number | null>(null);
   const [pulsedInventorySlot, setPulsedInventorySlot] = useState<number | null>(null);
-  const [inlineFeedback, setInlineFeedback] = useState<InlineFeedback | null>(null);
-  const feedbackTimeoutRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (feedbackTimeoutRef.current !== null) {
-        window.clearTimeout(feedbackTimeoutRef.current);
-      }
-    };
-  }, []);
-
   function flashBoardCell(key: string | null, tone: "pulse" | "error") {
     if (!key) return;
 
@@ -71,21 +60,10 @@ export function useGameFeedback() {
     }
   }
 
-  function showFeedback(message: string, tone: InlineFeedback["tone"] = "info") {
-    const id = crypto.randomUUID();
-    setInlineFeedback({ id, message, tone });
-
-    if (feedbackTimeoutRef.current !== null) {
-      window.clearTimeout(feedbackTimeoutRef.current);
-    }
-
-    feedbackTimeoutRef.current = window.setTimeout(() => {
-      setInlineFeedback((current) => current?.id === id ? null : current);
-    }, feedbackMs);
-  }
-
   function showError(error: unknown) {
-    showFeedback(error instanceof Error ? error.message : String(error), "error");
+    if (import.meta.env.DEV) {
+      console.debug("Game action rejected", error);
+    }
   }
 
   return {
@@ -93,7 +71,6 @@ export function useGameFeedback() {
     pulsedBoardCellKey,
     invalidInventorySlot,
     pulsedInventorySlot,
-    inlineFeedback,
     flashBoardCell,
     pulseBoardCell,
     flashInventorySlot,

@@ -7,7 +7,7 @@ export function Flyer({ flyer, item }: Readonly<{ flyer: FlyerModel; item: ViewI
 
   return (
     <div
-      className="ak-fly pointer-events-none fixed z-50"
+      className={`ak-fly ak-fly--${flyer.kind} pointer-events-none fixed z-50`}
       style={{
         left: flyer.from.left,
         top: flyer.from.top,
@@ -16,6 +16,7 @@ export function Flyer({ flyer, item }: Readonly<{ flyer: FlyerModel; item: ViewI
         "--ak-x": `${flyer.to.left - flyer.from.left}px`,
         "--ak-y": `${flyer.to.top - flyer.from.top}px`,
         "--ak-scale": `${scale}`,
+        "--ak-exit-y": `${flyer.to.top - flyer.from.top + 34}px`,
       } as CSSProperties}
     >
       <img src={item.assetSrc} alt="" className="h-full w-full object-contain" />

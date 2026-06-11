@@ -10,7 +10,6 @@ import {
 import { useEffect, useState } from "react";
 import { gameDataIndex, type BuildRecipeId, type ItemId } from "~/domains/game-data";
 import type { BoardViewItem, InventorySlot, ProducerDropResult } from "~/domains/database";
-import { cn } from "~/lib/cn";
 import { useGameAction, useGameDataInvalidation, useGameView } from "~/hooks/useGameView";
 import { Board } from "./components/Board";
 import { BuildSheet } from "./components/BuildSheet";
@@ -164,7 +163,7 @@ export function GameShell() {
     const from = tileVisualRect(rect);
     const to = inventorySinkRect(from);
     hideBoardItem(boardItem.id);
-    addFlyer(boardItem.itemId, from, to);
+    addFlyer(boardItem.itemId, from, to, "stash");
 
     try {
       await wait(flyMs);
@@ -263,15 +262,6 @@ export function GameShell() {
         <div className="rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
           <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Arkini</p>
           <h1 className="text-lg font-semibold text-slate-50">Merge board</h1>
-          {feedback.inlineFeedback ? (
-            <p className={cn(
-              "ak-feedback mt-2 rounded-sm px-2 py-1 text-xs",
-              feedback.inlineFeedback.tone === "error" ? "bg-red-950/40 text-red-100" : "bg-sky-950/40 text-sky-100",
-            )}
-            >
-              {feedback.inlineFeedback.message}
-            </p>
-          ) : null}
         </div>
 
         <Board

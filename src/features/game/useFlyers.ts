@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { flyMs, type FlyerModel, type RectLike } from "./types";
+import { flyMs, type FlyerKind, type FlyerModel, type RectLike } from "./types";
 
 export function useFlyers() {
   const [flyers, setFlyers] = useState<FlyerModel[]>([]);
 
-  function addFlyer(itemId: string, from: RectLike, to: RectLike) {
+  function addFlyer(itemId: string, from: RectLike, to: RectLike, kind: FlyerKind = "move") {
     const id = crypto.randomUUID();
-    setFlyers((current) => [...current, { id, itemId, from, to }]);
+    setFlyers((current) => [...current, { id, itemId, from, to, kind }]);
     window.setTimeout(() => setFlyers((current) => current.filter((flyer) => flyer.id !== id)), flyMs + 80);
   }
 

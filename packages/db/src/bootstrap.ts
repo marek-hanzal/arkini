@@ -1,6 +1,7 @@
 import { databasePath } from "./client";
 import { assertBrowserDatabaseSupport } from "./capabilities";
 import { migrator } from "./migrator";
+import { repairPrototypeSchemaDrift } from "./schemaCompatibility";
 import { ensureDefaultSaveGame } from "./save";
 import { syncGameDataManifest } from "./syncGameData";
 
@@ -18,6 +19,7 @@ export async function bootstrapDatabase() {
       throw result.error;
     }
 
+    await repairPrototypeSchemaDrift();
     gameDataHash = await syncGameDataManifest();
     await ensureDefaultSaveGame();
     migrationState = "ready";

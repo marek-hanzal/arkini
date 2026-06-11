@@ -9,7 +9,8 @@
   "dependencies": {
     "@arkini/game-data": "file:../game-data",
     "kysely": "0.29.2",
-    "sqlocal": "0.18.0"
+    "sqlocal": "0.18.0",
+    "ts-pattern": "5.9.0"
   },
   "devDependencies": {
     "typescript": "6.0.3"

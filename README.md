@@ -80,7 +80,10 @@ apps/arkini
   index.html                 Static SPA entry document.
   src/main.tsx               Browser-only React entry. Ensures COI before rendering.
   src/router.tsx             TanStack Router + Query provider. No generated route tree.
-  src/screens/HomeScreen.tsx Current phase-one shell UI.
+  src/screens/HomeScreen.tsx Current playable prototype shell.
+  src/components/GameShell.tsx
+                             Button-first board/inventory/build UI. Drag comes later.
+  src/hooks/useGameView.ts   Tiny TanStack Query bridge over local DB actions.
   public/coi-serviceworker.js Static-host COOP/COEP fallback.
 
 packages/game-data
@@ -89,9 +92,29 @@ packages/game-data
 
 packages/db
   src/migrations             Schema only. Do not put item balance here.
+  src/schemaCompatibility.ts Prototype repair for old OPFS DBs missing additive columns.
   src/syncGameData.ts        Idempotent manifest-to-SQLite sync on every bootstrap.
   src/save.ts                Creates the default save once, then leaves player state alone.
+  src/gameplay.ts            Small direct actions: place, stash, merge, produce, build, reset.
 ```
+
+## Current playable blocks
+
+This is still not the final drag-and-drop game. It is a deliberately boring button-first gameplay slice so the data model proves itself before animations and touch UX arrive to make everything more dramatic. Current actions:
+
+- select an inventory stack, then click an empty board cell to place one item
+- select a board item, then select another identical board item to merge into the next manifest-defined level
+- select a board producer and click produce; drops appear around it only when enough free adjacent space exists
+- finite producers, such as crates, spend charges and disappear when depleted
+- select a blueprint build recipe, then click an empty board cell to consume blueprint/materials from inventory and place the result
+- stash a board item back into inventory, respecting stack size and slot limits
+- reset save for prototype testing
+
+The code is intentionally small and direct. `packages/db/src/gameplay.ts` is the gameplay boundary for now. Keep new mechanics there until there is actual pressure to split them; do not create a service cathedral because one function got mildly embarrassed.
+
+## Prototype schema repair
+
+Browser OPFS databases persist across rebuilds. During early prototyping the first migration changed while local DBs already thought it had run, which caused errors like `no such column: isEnabled`. `repairPrototypeSchemaDrift()` adds known additive columns before manifest sync. This is not a license to mutate schema randomly forever; proper structural changes still need new migrations. It only keeps early test databases from faceplanting over additive prototype drift.
 
 ## Data rules
 
@@ -141,6 +164,7 @@ Commits should explain architectural movement, not just file churn. Good example
 - `Replace Start with static TanStack Router app`
 - `Centralize game definitions in manifest sync`
 - `Add producer and blueprint data model`
+- `Add playable board inventory producer blocks`
 
 Bad examples:
 

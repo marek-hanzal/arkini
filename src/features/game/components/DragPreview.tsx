@@ -7,11 +7,11 @@ import { TileContent } from "./TileContent";
 export const DragPreview = memo(function DragPreview({ game, drag, faded }: Readonly<{ game: GameView; drag: DragData; faded: boolean }>) {
   const item = match(drag)
     .with({ type: "inventory" }, ({ slotIndex }) => {
-      const stack = game.inventory.find((slot) => slot.slotIndex === slotIndex)?.stack;
+      const stack = game.inventoryBySlotIndex[slotIndex]?.stack;
       return stack ? game.items[stack.itemId] : null;
     })
     .with({ type: "board" }, ({ boardItemId }) => {
-      const boardItem = game.boardItems.find((candidate) => candidate.id === boardItemId);
+      const boardItem = game.boardItemsById[boardItemId];
       return boardItem ? game.items[boardItem.itemId] : null;
     })
     .exhaustive();

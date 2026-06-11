@@ -1,134 +1,21 @@
 import { P, match } from "ts-pattern";
 import type {
-  BuildRecipeCost,
+  BuildRecipeId,
   DropTableEntry,
+  DropTableId,
   ItemId,
   ProducerMode,
   ProducerRoll,
 } from "~/domains/game-data";
-import { gameDataManifest } from "~/domains/game-data";
+import { gameDataIndex } from "~/domains/game-data";
+import { canPayCosts } from "./gameView";
+import { GameActionError, type BoardItemState, type InventorySlot, type ProducerDropResult } from "./gameplayTypes";
 import { db, type ArkiniTransaction } from "./db";
 import { table } from "./tables";
 import { defaultSaveGameId } from "./save";
 
-export interface GameView {
-  save: { id: string; boardWidth: number; boardHeight: number; inventorySlots: number };
-  items: Record<string, ViewItem>;
-  boardItems: BoardViewItem[];
-  inventory: InventorySlot[];
-  buildRecipes: BuildRecipeView[];
-}
-
-export interface ViewItem {
-  id: string;
-  name: string;
-  description: string;
-  assetSrc: string;
-  maxStackSize: number;
-  tags: string[];
-  canProduce: boolean;
-  canMerge: boolean;
-  producerCooldownMs: number | null;
-}
-
-export interface BoardViewItem {
-  id: string;
-  itemId: string;
-  x: number;
-  y: number;
-  state: BoardItemState;
-}
-
-export interface InventorySlot {
-  slotIndex: number;
-  stack: { id: string; itemId: string; quantity: number } | null;
-}
-
-export interface BuildRecipeView {
-  id: string;
-  blueprintItemId: string;
-  resultItemId: string;
-  costs: BuildRecipeCost[];
-  canBuild: boolean;
-}
-
-export interface ProducerDropResult {
-  producerBoardItemId: string;
-  drops: { boardItemId: string; itemId: string; x: number; y: number }[];
-}
-
-interface BoardItemState {
-  producer?: {
-    cooldownUntil?: string;
-    remainingCharges?: number | null;
-  };
-}
-
-class GameActionError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "GameActionError";
-  }
-}
-
 const json = (value: unknown) => JSON.stringify(value);
 const parseJson = <T>(value: string): T => JSON.parse(value) as T;
-
-export async function readGameView(): Promise<GameView> {
-  const [save, boardRows, inventoryRows] = await Promise.all([
-    db.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
-    db
-      .selectFrom(table.boardItem)
-      .selectAll()
-      .where("saveGameId", "=", defaultSaveGameId)
-      .orderBy("y")
-      .orderBy("x")
-      .execute(),
-    db
-      .selectFrom(table.inventoryStack)
-      .selectAll()
-      .where("saveGameId", "=", defaultSaveGameId)
-      .orderBy("slotIndex")
-      .execute(),
-  ]);
-
-  const inventoryMap = new Map(inventoryRows.map((stack) => [stack.slotIndex, stack]));
-  const inventory = Array.from({ length: save.inventorySlots }, (_, slotIndex) => {
-    const stack = inventoryMap.get(slotIndex);
-    return {
-      slotIndex,
-      stack: stack ? { id: stack.id, itemId: stack.itemDefinitionId, quantity: stack.quantity } : null,
-    };
-  });
-
-  return {
-    save: {
-      id: save.id,
-      boardWidth: save.boardWidth,
-      boardHeight: save.boardHeight,
-      inventorySlots: save.inventorySlots,
-    },
-    items: createViewItemMap(),
-    boardItems: boardRows.map((item) => ({
-      id: item.id,
-      itemId: item.itemDefinitionId,
-      x: item.x,
-      y: item.y,
-      state: parseJson<BoardItemState>(item.stateJson),
-    })),
-    inventory,
-    buildRecipes: gameDataManifest.buildRecipes.map((recipe) => ({
-      id: recipe.id,
-      blueprintItemId: recipe.blueprintItemId,
-      resultItemId: recipe.resultItemId,
-      costs: [...recipe.costs],
-      canBuild: canPayCosts(inventory, [
-        { itemId: recipe.blueprintItemId, quantity: 1 },
-        ...recipe.costs,
-      ]),
-    })),
-  };
-}
 
 export async function placeInventoryItem(slotIndex: number, x: number, y: number) {
   await db.transaction().execute(async (tx) => {
@@ -305,9 +192,7 @@ export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItem
       throw new GameActionError("Only identical board items can merge.");
     }
 
-    const merge = gameDataManifest.merges.find(
-      (definition) => definition.inputItemId === source.itemDefinitionId && definition.inputCount === 2,
-    );
+    const merge = gameDataIndex.mergesByInputItemId.get(source.itemDefinitionId as ItemId);
 
     if (!merge) throw new GameActionError("This item has no next merge level.");
 
@@ -339,7 +224,7 @@ export async function produceBoardItem(boardItemId: string): Promise<ProducerDro
 
     if (!boardItem) throw new GameActionError("Producer does not exist.");
 
-    const producer = gameDataManifest.producers.find((definition) => definition.itemId === boardItem.itemDefinitionId);
+    const producer = gameDataIndex.producersByItemId.get(boardItem.itemDefinitionId as ItemId);
     if (!producer) throw new GameActionError("This item is not a producer.");
 
     const state = parseJson<BoardItemState>(boardItem.stateJson);
@@ -444,7 +329,7 @@ export async function buildRecipe(recipeId: string, x: number, y: number) {
     assertInsideBoard(save, x, y);
     if (existingBoardItem) throw new GameActionError("Build target is occupied.");
 
-    const recipe = gameDataManifest.buildRecipes.find((definition) => definition.id === recipeId);
+    const recipe = gameDataIndex.buildRecipesById.get(recipeId as BuildRecipeId);
     if (!recipe) throw new GameActionError("Unknown build recipe.");
 
     const costs = [{ itemId: recipe.blueprintItemId, quantity: 1 }, ...recipe.costs];
@@ -475,52 +360,16 @@ export async function buildRecipe(recipeId: string, x: number, y: number) {
   });
 }
 
-export async function resetDefaultSaveGame() {
-  await db.transaction().execute(async (tx) => {
-    await tx.deleteFrom(table.saveGame).where("id", "=", defaultSaveGameId).execute();
-  });
-  const { ensureDefaultSaveGame } = await import("./save");
-  await ensureDefaultSaveGame();
-}
-
 function isProducerCoolingDown(itemId: string, state: BoardItemState) {
-  const producer = gameDataManifest.producers.find((definition) => definition.itemId === itemId);
+  const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
   if (!producer) return false;
 
   const cooldownUntil = state.producer?.cooldownUntil;
   return Boolean(cooldownUntil && Date.parse(cooldownUntil) > Date.now());
 }
 
-function createViewItemMap() {
-  const assetById = new Map<string, (typeof gameDataManifest.assets)[number]>(gameDataManifest.assets.map((asset) => [asset.id, asset]));
-  const producerByItemId = new Map(gameDataManifest.producers.map((producer) => [producer.itemId, producer]));
-  const mergeIds = new Set(gameDataManifest.merges.map((merge) => merge.inputItemId));
-
-  return Object.fromEntries(
-    gameDataManifest.items.map((item) => {
-      const asset = assetById.get(item.assetId);
-      if (!asset) throw new Error(`Missing asset for ${item.id}`);
-
-      return [
-        item.id,
-        {
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          assetSrc: asset.src,
-          maxStackSize: item.maxStackSize,
-          tags: [...item.tags],
-          canProduce: producerByItemId.has(item.id),
-          canMerge: mergeIds.has(item.id),
-          producerCooldownMs: producerByItemId.get(item.id)?.cooldownMs ?? null,
-        } satisfies ViewItem,
-      ];
-    }),
-  );
-}
-
 function createInitialBoardState(itemId: string): BoardItemState {
-  const producer = gameDataManifest.producers.find((definition) => definition.itemId === itemId);
+  const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
 
   if (!producer) return {};
 
@@ -539,7 +388,7 @@ function rollProducerDrops(rolls: readonly ProducerRoll[]) {
 
   for (const roll of rolls) {
     const count = resolveQuantity(roll.count);
-    const dropTable = gameDataManifest.dropTables.find((table) => table.id === roll.dropTableId);
+    const dropTable = gameDataIndex.dropTablesById.get(roll.dropTableId as DropTableId);
     if (!dropTable) throw new GameActionError("Producer references a missing drop table.");
 
     for (let index = 0; index < count; index += 1) {
@@ -600,17 +449,6 @@ function findFreeCellsAround(
   return cells;
 }
 
-function canPayCosts(inventory: readonly InventorySlot[], costs: readonly BuildRecipeCost[]) {
-  const owned = new Map<string, number>();
-
-  for (const slot of inventory) {
-    if (!slot.stack) continue;
-    owned.set(slot.stack.itemId, (owned.get(slot.stack.itemId) ?? 0) + slot.stack.quantity);
-  }
-
-  return costs.every((cost) => (owned.get(cost.itemId) ?? 0) >= cost.quantity);
-}
-
 async function addInventoryItems(
   tx: ArkiniTransaction,
   itemId: string,
@@ -618,7 +456,7 @@ async function addInventoryItems(
   preferredSlotIndex?: number,
 ) {
   let remaining = quantity;
-  const item = gameDataManifest.items.find((definition) => definition.id === itemId);
+  const item = gameDataIndex.itemsById.get(itemId as ItemId);
   if (!item) throw new GameActionError("Unknown item definition.");
 
   const save = await tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow();

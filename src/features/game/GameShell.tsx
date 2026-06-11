@@ -12,7 +12,6 @@ import { GameCard } from "~/features/game/components/GameCard";
 import { InventoryPanel } from "~/features/game/components/InventoryPanel";
 import { SplashScreen } from "~/features/game/components/SplashScreen";
 import { invalidDropReturnMs } from "~/features/game/components/constants";
-import { getInventoryPreviewSlot } from "~/features/game/components/helpers/getInventoryPreviewSlot";
 import { isMergeOverlayFaded } from "~/features/game/components/helpers/isMergeOverlayFaded";
 import { useCooldownClock } from "~/features/game/hooks/useCooldownClock";
 import { useGameInteractions } from "~/features/game/hooks/useGameInteractions";
@@ -24,17 +23,10 @@ export function GameShell() {
   const game = useGameView();
   const ui = useGameUiStore(
     useShallow((state) => ({
-      selection: state.selection,
       activeDrag: state.activeDrag,
       activeOverId: state.activeOverId,
-      committedDrag: state.committedDrag,
-      returningDrag: state.returningDrag,
-      invalidTargetId: state.invalidTargetId,
-      inventoryPulseSlot: state.inventoryPulseSlot,
-      boardPulseCell: state.boardPulseCell,
-      mergePulseBoardItemId: state.mergePulseBoardItemId,
+      dropAnimationDisabled: state.committedDrag !== null,
       flyout: state.flyout,
-      hiddenBoardItemIds: state.hiddenBoardItemIds,
       buildCell: state.buildCell,
       splashReady: state.splashReady,
       setSelection: state.setSelection,
@@ -57,8 +49,6 @@ export function GameShell() {
 
   if (!game.data) return null;
 
-  const hiddenDrag = ui.committedDrag ?? ui.returningDrag;
-  const inventoryPreviewSlot = getInventoryPreviewSlot(game.data, ui.activeDrag, ui.activeOverId, Date.now());
   const overlayFaded = isMergeOverlayFaded(game.data, ui.activeDrag, ui.activeOverId);
 
   return (
@@ -85,14 +75,7 @@ export function GameShell() {
           <div className="flex w-fit max-w-full items-start gap-3 overflow-x-auto pb-1">
             <BoardPanel
               game={game.data}
-              selection={ui.selection}
-              activeDrag={ui.activeDrag}
               pending={interactions.pending}
-              invalidTargetId={ui.invalidTargetId}
-              committedDrag={hiddenDrag}
-              hiddenBoardItemIds={ui.hiddenBoardItemIds}
-              mergePulseBoardItemId={ui.mergePulseBoardItemId}
-              boardPulseCell={ui.boardPulseCell}
               onSelect={ui.setSelection}
               onProduce={interactions.handleProduce}
               onStash={interactions.handleStash}
@@ -101,22 +84,18 @@ export function GameShell() {
             <InventoryPanel
               game={game.data}
               pending={interactions.pending}
-              invalidTargetId={ui.invalidTargetId}
-              committedDrag={hiddenDrag}
-              previewSlotIndex={inventoryPreviewSlot}
-              pulseSlotIndex={ui.inventoryPulseSlot}
               onPlaceStack={interactions.handlePlaceStack}
             />
           </div>
 
           <div className="grid w-full gap-3 xl:grid-cols-[minmax(18rem,24rem)_1fr]">
-            <ActionPanel game={game.data} selection={ui.selection} pending={interactions.pending} invalidTargetId={ui.invalidTargetId} />
+            <ActionPanel game={game.data} pending={interactions.pending} />
             <DbStatusCard />
           </div>
         </section>
         <DragOverlay
           dropAnimation={
-            ui.committedDrag ? null : { duration: invalidDropReturnMs, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
+            ui.dropAnimationDisabled ? null : { duration: invalidDropReturnMs, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
           }
           modifiers={[snapCenterToCursor]}
         >

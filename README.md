@@ -90,7 +90,7 @@ src/router.tsx              TanStack Router + Query provider. No generated route
 src/screens/HomeScreen.tsx  Minimal app header and playable prototype shell.
 
 src/domains/game-data/      Static game-data manifest, SVG assets, and Zod manifest schema.
-src/domains/database/       SQLocal/Kysely client, typed table map, schema migrations, manifest sync, save, gameplay persistence.
+src/domains/database/       SQLocal/Kysely client, typed table map, schema migrations, manifest hash sync, save, gameplay persistence.
 src/features/game/          Playable game UI orchestration, panels, DnD helpers, Zustand UI store, transient animation state.
 src/components/             App-level shared UI only, currently the database status card.
 src/hooks/                  Tiny TanStack Query bridge over local database actions.
@@ -150,16 +150,16 @@ On every app bootstrap:
 
 1. Browser capability checks run.
 2. Kysely migrations run.
-3. `syncGameDataManifest()` validates and synchronizes all static definition tables.
+3. `syncGameDataManifest()` validates the manifest and stores its hash/version in metadata. Static definitions stay in TypeScript, not duplicated into SQLite.
 4. `ensureDefaultSaveGame()` creates the initial save only if it does not exist.
 
 When schema changes during pre-release development, hard-reset the local OPFS DB instead of writing compatibility patches.
 
 ## Cleanup and rendering notes
 
-The game UI keeps persisted state in SQLite and short-lived interaction state in `src/features/game/state/gameUiStore.ts`. Cooldown ticking no longer re-renders the whole `GameShell`; producer cooldown UI subscribes to the clock directly. Board cells, inventory cells, tile content, drag previews, and modal/card pieces are split into smaller memoized components so a drag pulse does not need to invite the entire page to the re-render party.
+The game UI keeps persisted state in SQLite and short-lived interaction state in `src/features/game/state/gameUiStore.ts`. Cooldown ticking no longer re-renders the whole `GameShell`; producer cooldown UI subscribes to the clock directly. Board cells and inventory slots subscribe to the specific UI flags they need from Zustand, so pulses/invalid targets do not force the shell and every panel prop chain to thrash like a spreadsheet with ambition. Tile content, drag previews, and modal/card pieces are split into smaller memoized components.
 
-Database code uses `src/domains/database/db.ts` for the single typed database handle and `src/domains/database/tables.ts` for table names. Gameplay code should import those instead of sprinkling raw table strings around like confetti from a bug parade.
+Database code uses `src/domains/database/db.ts` for the single typed database handle and `src/domains/database/tables.ts` for the tiny mutable-save table map. Static game definitions are indexed once from the manifest through `gameDataIndex`; gameplay code should use those indexes instead of repeated manifest scans or raw table strings sprinkled around like confetti from a bug parade.
 
 Game-data validation has two layers: Zod checks manifest shape, then `assertGameDataManifest()` checks references, uniqueness, and gameplay invariants. Zod is for structure; the custom assertions are for domain rules.
 

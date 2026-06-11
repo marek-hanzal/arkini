@@ -49,7 +49,7 @@ export function useGameFeedback() {
       return;
     }
 
-    const boardItem = game.boardItems.find((item) => item.id === source.boardItemId);
+    const boardItem = game.boardItemsById[source.boardItemId];
     if (!boardItem) return;
     pulseBoard(boardCellKey(boardItem.x, boardItem.y));
   }, [pulseBoard, pulseInventory]);

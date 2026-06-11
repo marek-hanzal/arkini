@@ -3,41 +3,23 @@ import type { GameView } from "~/domains/database";
 import { cellSize } from "./constants";
 import { BoardCell } from "./BoardCell";
 import { boardCellKey } from "./helpers/boardCellId";
-import type { BuildCell, DragData, Selection } from "./types";
+import type { BuildCell, Selection } from "./types";
 
 export const BoardPanel = memo(function BoardPanel({
   game,
-  selection,
-  activeDrag,
   pending,
-  invalidTargetId,
-  committedDrag,
-  hiddenBoardItemIds,
-  mergePulseBoardItemId,
-  boardPulseCell,
   onSelect,
   onProduce,
   onStash,
   onOpenBuild,
 }: Readonly<{
   game: GameView;
-  selection: Selection;
-  activeDrag: DragData | null;
   pending: boolean;
-  invalidTargetId: string | null;
-  committedDrag: DragData | null;
-  hiddenBoardItemIds: ReadonlySet<string>;
-  mergePulseBoardItemId: string | null;
-  boardPulseCell: string | null;
   onSelect(selection: Selection): void;
   onProduce(boardItemId: string): void;
   onStash(boardItemId: string, itemId: string): void;
   onOpenBuild(cell: BuildCell): void;
 }>) {
-  const itemByCell = useMemo(
-    () => new Map(game.boardItems.map((item) => [boardCellKey(item.x, item.y), item])),
-    [game.boardItems],
-  );
   const cells = useMemo(
     () =>
       Array.from({ length: game.save.boardWidth * game.save.boardHeight }, (_, index) => ({
@@ -62,22 +44,14 @@ export const BoardPanel = memo(function BoardPanel({
       <div className="grid w-fit gap-0 overflow-hidden rounded-sm border border-slate-800" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, ${cellSize})` }}>
         {cells.map((cell) => {
           const key = boardCellKey(cell.x, cell.y);
-          const boardItem = itemByCell.get(key);
           return (
             <BoardCell
               key={key}
               game={game}
               x={cell.x}
               y={cell.y}
-              boardItem={boardItem ?? null}
-              selected={selection?.type === "board" && selection.boardItemId === boardItem?.id}
-              activeDrag={activeDrag}
+              boardItem={game.boardItemByCellKey[key] ?? null}
               pending={pending}
-              invalidTargetId={invalidTargetId}
-              committedDrag={committedDrag}
-              hidden={Boolean(boardItem && hiddenBoardItemIds.has(boardItem.id))}
-              mergePulse={mergePulseBoardItemId === boardItem?.id}
-              boardPulse={boardPulseCell === key}
               onSelect={onSelect}
               onProduce={onProduce}
               onStash={onStash}

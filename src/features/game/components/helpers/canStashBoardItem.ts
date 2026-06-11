@@ -2,7 +2,7 @@ import type { GameView } from "~/domains/database";
 import { getCooldown } from "./getCooldown";
 
 export function canStashBoardItem(game: GameView, boardItemId: string, nowMs: number) {
-  const boardItem = game.boardItems.find((item) => item.id === boardItemId);
+  const boardItem = game.boardItemsById[boardItemId];
   if (!boardItem) return false;
 
   const item = game.items[boardItem.itemId];

@@ -151,7 +151,7 @@ export function useDragHandlers(game: GameView | null | undefined, mutations: Ga
         );
       })
       .with([{ type: "board" }, { type: "inventory-slot" }], ([source, target]) => {
-        const boardItem = game.boardItems.find((item) => item.id === source.boardItemId);
+        const boardItem = game.boardItemsById[source.boardItemId];
         if (!boardItem) {
           reject(overId);
           return;

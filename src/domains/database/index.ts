@@ -10,10 +10,9 @@ export {
   moveBoardItem,
   placeInventoryItem,
   produceBoardItem,
-  readGameView,
-  resetDefaultSaveGame,
   stashBoardItem,
   swapInventorySlots,
-  type GameView,
-  type ProducerDropResult,
 } from "./gameplay";
+
+export { readGameView } from "./gameView";
+export type { GameView, ProducerDropResult } from "./gameplayTypes";

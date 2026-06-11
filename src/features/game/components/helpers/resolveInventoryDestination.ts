@@ -4,13 +4,13 @@ export function resolveInventoryDestination(game: GameView, itemId: string, pref
   const item = game.items[itemId];
   if (!item) return null;
 
-  const existingStack = game.inventory.find((slot) => slot.stack?.itemId === itemId && slot.stack.quantity < item.maxStackSize);
+  const existingStack = game.inventoryStacksByItemId[itemId]?.find((slot) => (slot.stack?.quantity ?? 0) < item.maxStackSize);
   if (existingStack) return existingStack.slotIndex;
 
   if (preferredSlotIndex !== undefined) {
-    const preferredSlot = game.inventory.find((slot) => slot.slotIndex === preferredSlotIndex);
-    if (preferredSlot && !preferredSlot.stack) return preferredSlot.slotIndex;
+    const preferredSlot = game.inventoryBySlotIndex[preferredSlotIndex];
+    if (preferredSlot && !preferredSlot.stack) return preferredSlotIndex;
   }
 
-  return game.inventory.find((slot) => !slot.stack)?.slotIndex ?? null;
+  return game.firstEmptyInventorySlotIndex;
 }

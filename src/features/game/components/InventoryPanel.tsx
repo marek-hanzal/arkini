@@ -2,23 +2,14 @@ import { memo } from "react";
 import type { GameView } from "~/domains/database";
 import { cellSize } from "./constants";
 import { InventorySlotCell } from "./InventorySlotCell";
-import type { DragData } from "./types";
 
 export const InventoryPanel = memo(function InventoryPanel({
   game,
   pending,
-  invalidTargetId,
-  committedDrag,
-  previewSlotIndex,
-  pulseSlotIndex,
   onPlaceStack,
 }: Readonly<{
   game: GameView;
   pending: boolean;
-  invalidTargetId: string | null;
-  committedDrag: DragData | null;
-  previewSlotIndex: number | null;
-  pulseSlotIndex: number | null;
   onPlaceStack(slotIndex: number, itemId: string): void;
 }>) {
   const columns = 4;
@@ -34,17 +25,7 @@ export const InventoryPanel = memo(function InventoryPanel({
       </div>
       <div className="mt-3 grid w-fit gap-0 overflow-hidden rounded-sm border border-slate-800" style={{ gridTemplateColumns: `repeat(${columns}, ${cellSize})` }}>
         {game.inventory.map((slot) => (
-          <InventorySlotCell
-            key={slot.slotIndex}
-            game={game}
-            slot={slot}
-            pending={pending}
-            invalidTargetId={invalidTargetId}
-            committedDrag={committedDrag}
-            preview={previewSlotIndex === slot.slotIndex}
-            pulse={pulseSlotIndex === slot.slotIndex}
-            onPlaceStack={onPlaceStack}
-          />
+          <InventorySlotCell key={slot.slotIndex} game={game} slot={slot} pending={pending} onPlaceStack={onPlaceStack} />
         ))}
       </div>
     </section>

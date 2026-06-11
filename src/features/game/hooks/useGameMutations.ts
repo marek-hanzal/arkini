@@ -24,7 +24,6 @@ export function useGameMutations() {
     build: useGameAction((db, input: { recipeId: string; x: number; y: number }) =>
       db.buildRecipe(input.recipeId, input.x, input.y),
     ),
-    reset: useGameAction((db) => db.resetDefaultSaveGame()),
   };
 }
 

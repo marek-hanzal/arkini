@@ -9,7 +9,7 @@ export function isMergeOverlayFaded(game: GameView, activeDrag: DragData | null,
   const targetCell = parseBoardCellId(activeOverId);
   if (!targetCell) return false;
 
-  const target = game.boardItems.find((item) => item.x === targetCell.x && item.y === targetCell.y);
+  const target = game.boardItemByCellKey[`${targetCell.x}:${targetCell.y}`];
   if (!target) return false;
 
   return canMergeBoardItems(game, activeDrag.boardItemId, target.id);

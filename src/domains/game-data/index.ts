@@ -325,6 +325,46 @@ export const gameDataManifest = {
 
 export type GameData = typeof gameDataManifest;
 
+export interface GameDataIndex {
+  assetsById: ReadonlyMap<AssetId, AssetDefinition>;
+  itemsById: ReadonlyMap<ItemId, ItemDefinition>;
+  producersByItemId: ReadonlyMap<ItemId, ProducerDefinition>;
+  mergesByInputItemId: ReadonlyMap<ItemId, MergeDefinition>;
+  dropTablesById: ReadonlyMap<DropTableId, DropTableDefinition>;
+  buildRecipesById: ReadonlyMap<BuildRecipeId, BuildRecipeDefinition>;
+  buildRecipesByBlueprintItemId: ReadonlyMap<ItemId, readonly BuildRecipeDefinition[]>;
+  mergeableItemIds: ReadonlySet<ItemId>;
+}
+
+export function createGameDataIndex(manifest: GameDataManifest): GameDataIndex {
+  const buildRecipesByBlueprintItemId = new Map<ItemId, BuildRecipeDefinition[]>();
+
+  for (const recipe of manifest.buildRecipes) {
+    const recipes = buildRecipesByBlueprintItemId.get(recipe.blueprintItemId) ?? [];
+    recipes.push(recipe);
+    buildRecipesByBlueprintItemId.set(recipe.blueprintItemId, recipes);
+  }
+
+  return {
+    assetsById: new Map(manifest.assets.map((asset) => [asset.id, asset])),
+    itemsById: new Map(manifest.items.map((item) => [item.id, item])),
+    producersByItemId: new Map(manifest.producers.map((producer) => [producer.itemId, producer])),
+    mergesByInputItemId: new Map(manifest.merges.map((mergeDefinition) => [mergeDefinition.inputItemId, mergeDefinition])),
+    dropTablesById: new Map(manifest.dropTables.map((dropTable) => [dropTable.id, dropTable])),
+    buildRecipesById: new Map(manifest.buildRecipes.map((recipe) => [recipe.id, recipe])),
+    buildRecipesByBlueprintItemId,
+    mergeableItemIds: new Set(manifest.merges.map((mergeDefinition) => mergeDefinition.inputItemId)),
+  };
+}
+
+export const gameDataIndex = createGameDataIndex(gameDataManifest);
+
+export function requireGameItem(itemId: string): ItemDefinition {
+  const item = gameDataIndex.itemsById.get(itemId as ItemId);
+  if (!item) throw new Error(`Unknown item definition: ${itemId}`);
+  return item;
+}
+
 export function assertGameDataManifest(manifest: GameDataManifest = gameDataManifest) {
   parseGameDataManifest(manifest);
   const assetIds = new Set(manifest.assets.map((asset) => asset.id));

@@ -17,7 +17,7 @@ import { BuildSheet } from "./components/BuildSheet";
 import { Flyer } from "./components/Flyer";
 import { InventorySheet } from "./components/InventorySheet";
 import { Tile } from "./components/Tile";
-import { cellKey, cssEscape, firstFreeCell, queryRect, syntheticBottomRect, wait, without } from "./helpers";
+import { cellKey, cssEscape, firstFreeCell, inventorySinkRect, queryRect, tileVisualRect, wait, without } from "./helpers";
 import { flyMs, type BuildCell, type DragData, type DropData, type RectLike } from "./types";
 import { useFlyers } from "./useFlyers";
 import { useGameFeedback } from "./useGameFeedback";
@@ -161,12 +161,13 @@ export function GameShell() {
     const rect = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`);
     if (!rect) return;
 
-    const targetRect = queryRect("[data-inventory-summary]") ?? syntheticBottomRect();
+    const from = tileVisualRect(rect);
+    const to = inventorySinkRect(from);
     hideBoardItem(boardItem.id);
-    addFlyer(boardItem.itemId, rect, targetRect);
+    addFlyer(boardItem.itemId, from, to);
 
     try {
-      await wait(flyMs * 0.65);
+      await wait(flyMs);
       await stashBoard.mutateAsync({ boardItemId: boardItem.id });
       feedback.pulseInventorySlot(game?.firstEmptyInventorySlotIndex ?? null);
     } catch (error) {
@@ -191,11 +192,11 @@ export function GameShell() {
 
     if (sourceRect && targetRect) {
       if (isLastItem) hideInventorySlot(slot.slotIndex);
-      addFlyer(slot.stack.itemId, sourceRect, targetRect);
+      addFlyer(slot.stack.itemId, tileVisualRect(sourceRect), tileVisualRect(targetRect));
     }
 
     try {
-      await wait(flyMs * 0.55);
+      await wait(sourceRect && targetRect ? flyMs : 0);
       await placeInventory.mutateAsync({ slotIndex: slot.slotIndex, x: cell.x, y: cell.y });
       if (isLastItem) {
         window.setTimeout(() => showInventorySlot(slot.slotIndex), 120);
@@ -212,14 +213,20 @@ export function GameShell() {
     for (const result of results) {
       const sourceRect = queryRect(`[data-board-item-id="${cssEscape(result.producerBoardItemId)}"]`);
       if (!sourceRect) continue;
+      const from = tileVisualRect(sourceRect);
 
       for (const placement of result.placements) {
         const targetRect = placement.kind === "board"
           ? queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`)
-          : queryRect(`[data-inventory-slot="${placement.slotIndex}"]`) ?? queryRect("[data-inventory-summary]");
+          : sheetOpen ? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`) : null;
 
-        if (!targetRect) continue;
-        addFlyer(placement.itemId, sourceRect, targetRect);
+        if (placement.kind === "board") {
+          if (!targetRect) continue;
+          addFlyer(placement.itemId, from, tileVisualRect(targetRect));
+          continue;
+        }
+
+        addFlyer(placement.itemId, from, targetRect ? tileVisualRect(targetRect) : inventorySinkRect(from));
       }
     }
   }

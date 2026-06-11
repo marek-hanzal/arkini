@@ -18,13 +18,23 @@ export function queryRect(selector: string) {
   return document.querySelector<HTMLElement>(selector)?.getBoundingClientRect() ?? null;
 }
 
-export function syntheticBottomRect(): RectLike {
+export function tileVisualRect(rect: RectLike, insetRatio = 0.1): RectLike {
+  const inset = Math.min(rect.width, rect.height) * insetRatio;
+
   return {
-    left: window.innerWidth / 2 - 28,
-    top: window.innerHeight - 92,
-    width: 56,
-    height: 56,
+    left: rect.left + inset,
+    top: rect.top + inset,
+    width: Math.max(1, rect.width - inset * 2),
+    height: Math.max(1, rect.height - inset * 2),
   };
+}
+
+export function inventorySinkRect(source: RectLike, anchor: RectLike | null = queryRect("[data-inventory-summary]")): RectLike {
+  const size = Math.max(22, Math.min(42, Math.min(source.width, source.height) * 0.55));
+  const left = window.innerWidth / 2 - size / 2;
+  const top = anchor ? anchor.top + anchor.height / 2 - size / 2 : window.innerHeight - 72 - size / 2;
+
+  return { left, top, width: size, height: size };
 }
 
 export function cssEscape(value: string) {

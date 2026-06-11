@@ -38,6 +38,7 @@ export function Board({
       {cells.map((cell) => {
         const key = cellKey(cell.x, cell.y);
         const boardItem = game.boardItemByCellKey[key] ?? null;
+        const viewItem = boardItem ? game.items[boardItem.itemId] : null;
         const canMerge = activeDrag?.kind === "board" && boardItem && boardItem.id !== activeDrag.boardItemId
           ? Boolean(resolveMergeRule(activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
           : false;
@@ -54,17 +55,17 @@ export function Board({
             merged={mergedBoardCellKey === key}
             onEmptyActivate={onEmptyActivate}
           >
-            {boardItem ? (
+            {boardItem && viewItem ? (
               <BoardTile
                 boardItem={boardItem}
-                item={game.items[boardItem.itemId]}
+                item={viewItem}
                 hidden={
                   hiddenBoardIds.has(boardItem.id)
                   || (activeDrag?.kind === "board" && activeDrag.boardItemId === boardItem.id)
                   || (committedDrag?.hideSource === true && committedDrag.source.kind === "board" && committedDrag.source.boardItemId === boardItem.id)
                 }
                 nowMs={nowMs}
-                dragDisabled={item.canProduce}
+                dragDisabled={viewItem.canProduce}
                 onSingleActivate={() => onTileSingleActivate(boardItem)}
               />
             ) : null}

@@ -7,7 +7,7 @@ Client-only offline merge-game prototype. The app is a static SPA, not a server 
 Arkini is a classic 1×1 tile merge game with a second economy layer:
 
 - The board is the active play space. Items are dragged, merged, and produced there.
-- Inventory is limited storage. Items stack there up to each item definition's `maxStackSize`.
+- Inventory is limited 7×3 storage. Items stack there up to each item definition's `maxStackSize`.
 - Merging happens only on the board. Inventory does not auto-merge because the board is the core play space.
 - Producers live on the board and drop items around themselves. If there is not enough free space, production should fail without spending cooldown.
 - Producers always have cooldowns. Rapid repeat clicking is intentionally blocked.
@@ -131,7 +131,7 @@ packages/game-data/src/index.ts
 
 That manifest defines:
 
-- board size and inventory slot count
+- board size and 7×3 inventory slot count
 - SVG assets
 - items and max stack sizes
 - merge definitions

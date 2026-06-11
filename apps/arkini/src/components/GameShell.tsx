@@ -34,6 +34,7 @@ export function GameShell() {
   const game = useGameView();
   const [selection, setSelection] = useState<Selection>(null);
   const [activeDrag, setActiveDrag] = useState<DragData | null>(null);
+  const [committedDrag, setCommittedDrag] = useState<DragData | null>(null);
   const [invalidTargetId, setInvalidTargetId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -75,13 +76,26 @@ export function GameShell() {
     window.setTimeout(() => setInvalidTargetId(null), 650);
   }
 
-  async function run(action: () => Promise<unknown>, invalidId?: string) {
+  async function runAction(action: () => Promise<unknown>, invalidId?: string) {
     try {
       await action();
       setSelection(null);
     } catch (error) {
       markInvalid(invalidId);
       toast.error(error instanceof Error ? error.message : "Action failed.");
+    }
+  }
+
+  async function runDrop(action: () => Promise<unknown>, source: DragData, invalidId?: string) {
+    setCommittedDrag(source);
+    try {
+      await action();
+      setSelection(null);
+    } catch (error) {
+      markInvalid(invalidId);
+      toast.error(error instanceof Error ? error.message : "Action failed.");
+    } finally {
+      setCommittedDrag(null);
     }
   }
 
@@ -106,31 +120,32 @@ export function GameShell() {
           markInvalid(overId);
           return;
         }
-        void run(() => placeInventory.mutateAsync({ slotIndex: source.slotIndex, x: target.x, y: target.y }), overId);
+        void runDrop(() => placeInventory.mutateAsync({ slotIndex: source.slotIndex, x: target.x, y: target.y }), active, overId);
       })
       .with([{ type: "build" }, { type: "board-cell" }], ([source, target]) => {
         if (target.boardItemId) {
           markInvalid(overId);
           return;
         }
-        void run(() => build.mutateAsync({ recipeId: source.recipeId, x: target.x, y: target.y }), overId);
+        void runDrop(() => build.mutateAsync({ recipeId: source.recipeId, x: target.x, y: target.y }), active, overId);
       })
       .with([{ type: "board" }, { type: "board-cell" }], ([source, target]) => {
         if (source.boardItemId === target.boardItemId) return;
 
         const targetBoardItemId = target.boardItemId;
         if (targetBoardItemId) {
-          void run(
+          void runDrop(
             () => mergeBoard.mutateAsync({ sourceBoardItemId: source.boardItemId, targetBoardItemId }),
+            active,
             overId,
           );
           return;
         }
 
-        void run(() => moveBoard.mutateAsync({ boardItemId: source.boardItemId, x: target.x, y: target.y }), overId);
+        void runDrop(() => moveBoard.mutateAsync({ boardItemId: source.boardItemId, x: target.x, y: target.y }), active, overId);
       })
       .with([{ type: "board" }, { type: "inventory-slot" }], ([source, target]) => {
-        void run(() => stashBoard.mutateAsync({ boardItemId: source.boardItemId, slotIndex: target.slotIndex }), overId);
+        void runDrop(() => stashBoard.mutateAsync({ boardItemId: source.boardItemId, slotIndex: target.slotIndex }), active, overId);
       })
       .otherwise(() => {
         markInvalid(overId);
@@ -167,9 +182,10 @@ export function GameShell() {
               selection={selection}
               pending={pending}
               invalidTargetId={invalidTargetId}
+              committedDrag={committedDrag}
               onSelect={setSelection}
             />
-            <InventoryPanel game={game.data} pending={pending} invalidTargetId={invalidTargetId} />
+            <InventoryPanel game={game.data} pending={pending} invalidTargetId={invalidTargetId} committedDrag={committedDrag} />
           </div>
 
           <aside className="flex flex-col gap-4">
@@ -178,13 +194,14 @@ export function GameShell() {
               selection={selection}
               pending={pending}
               invalidTargetId={invalidTargetId}
-              onProduce={(boardItemId) => run(() => produce.mutateAsync({ boardItemId }), boardItemId)}
-              onReset={() => run(() => reset.mutateAsync(undefined))}
+              committedDrag={committedDrag}
+              onProduce={(boardItemId) => runAction(() => produce.mutateAsync({ boardItemId }), boardItemId)}
+              onReset={() => runAction(() => reset.mutateAsync(undefined))}
             />
             <DbStatusCard />
           </aside>
         </section>
-        <DragOverlay>{activeDrag ? <DragPreview game={game.data} drag={activeDrag} /> : null}</DragOverlay>
+        <DragOverlay dropAnimation={null}>{activeDrag ? <DragPreview game={game.data} drag={activeDrag} /> : null}</DragOverlay>
       </DndContext>
     </>
   );
@@ -195,12 +212,14 @@ function GameBoard({
   selection,
   pending,
   invalidTargetId,
+  committedDrag,
   onSelect,
 }: Readonly<{
   game: GameView;
   selection: Selection;
   pending: boolean;
   invalidTargetId: string | null;
+  committedDrag: DragData | null;
   onSelect(selection: Selection): void;
 }>) {
   const itemByCell = useMemo(
@@ -238,6 +257,7 @@ function GameBoard({
                 selected={selection?.type === "board" && selection.boardItemId === boardItem?.id}
                 pending={pending}
                 invalidTargetId={invalidTargetId}
+                committedDrag={committedDrag}
                 onSelect={onSelect}
               />
             );
@@ -256,6 +276,7 @@ function BoardCell({
   selected,
   pending,
   invalidTargetId,
+  committedDrag,
   onSelect,
 }: Readonly<{
   game: GameView;
@@ -265,6 +286,7 @@ function BoardCell({
   selected: boolean;
   pending: boolean;
   invalidTargetId: string | null;
+  committedDrag: DragData | null;
   onSelect(selection: Selection): void;
 }>) {
   const dropId = `board:${x}:${y}`;
@@ -273,8 +295,10 @@ function BoardCell({
     data: { type: "board-cell", x, y, boardItemId: boardItem?.id } satisfies DropData,
     disabled: pending,
   });
+  const sourceCommitted = committedDrag?.type === "board" && committedDrag.boardItemId === boardItem?.id;
+  const visibleBoardItem = sourceCommitted ? null : boardItem;
   const invalid = invalidTargetId === dropId || invalidTargetId === boardItem?.id;
-  const item = boardItem ? game.items[boardItem.itemId] : null;
+  const item = visibleBoardItem ? game.items[visibleBoardItem.itemId] : null;
 
   return (
     <div
@@ -285,13 +309,13 @@ function BoardCell({
         invalid ? "border-red-300 bg-red-950/40" : isOver ? "border-emerald-300 bg-emerald-950/40" : "border-slate-800",
       ].join(" ")}
     >
-      {boardItem && item ? (
+      {visibleBoardItem && item ? (
         <BoardItemCard
           item={item}
-          boardItemId={boardItem.id}
+          boardItemId={visibleBoardItem.id}
           selected={selected}
           pending={pending}
-          onSelect={() => onSelect(selected ? null : { type: "board", boardItemId: boardItem.id })}
+          onSelect={() => onSelect(selected ? null : { type: "board", boardItemId: visibleBoardItem.id })}
         />
       ) : (
         <div className="flex h-full items-center justify-center text-[0.6rem] text-slate-700">
@@ -330,7 +354,7 @@ function BoardItemCard({
       className={[
         "flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 rounded-lg text-center transition active:cursor-grabbing disabled:cursor-not-allowed",
         selected ? "bg-emerald-500/15 ring-1 ring-emerald-300" : "hover:bg-slate-800/70",
-        isDragging ? "opacity-30" : "opacity-100",
+        isDragging ? "opacity-0" : "opacity-100",
       ].join(" ")}
       {...listeners}
       {...attributes}
@@ -344,12 +368,14 @@ function InventoryPanel({
   game,
   pending,
   invalidTargetId,
+  committedDrag,
 }: Readonly<{
   game: GameView;
   pending: boolean;
   invalidTargetId: string | null;
+  committedDrag: DragData | null;
 }>) {
-  const columns = Math.ceil(game.inventory.length / 2);
+  const columns = game.save.boardWidth;
 
   return (
     <section className="w-fit max-w-full rounded-3xl border border-slate-800 bg-slate-900/70 p-4 shadow-2xl shadow-slate-950/40">
@@ -369,6 +395,7 @@ function InventoryPanel({
               slot={slot}
               pending={pending}
               invalidTargetId={invalidTargetId}
+              committedDrag={committedDrag}
             />
           ))}
         </div>
@@ -382,11 +409,13 @@ function InventorySlotCell({
   slot,
   pending,
   invalidTargetId,
+  committedDrag,
 }: Readonly<{
   game: GameView;
   slot: GameView["inventory"][number];
   pending: boolean;
   invalidTargetId: string | null;
+  committedDrag: DragData | null;
 }>) {
   const dropId = `inventory:${slot.slotIndex}`;
   const { isOver, setNodeRef } = useDroppable({
@@ -394,7 +423,9 @@ function InventorySlotCell({
     data: { type: "inventory-slot", slotIndex: slot.slotIndex } satisfies DropData,
     disabled: pending,
   });
-  const item = slot.stack ? game.items[slot.stack.itemId] : null;
+  const sourceCommitted = committedDrag?.type === "inventory" && committedDrag.slotIndex === slot.slotIndex;
+  const visibleStack = sourceCommitted ? null : slot.stack;
+  const item = visibleStack ? game.items[visibleStack.itemId] : null;
   const invalid = invalidTargetId === dropId;
 
   return (
@@ -406,8 +437,8 @@ function InventorySlotCell({
         invalid ? "border-red-300 bg-red-950/40" : isOver ? "border-sky-300 bg-sky-950/40" : "border-slate-800",
       ].join(" ")}
     >
-      {item && slot.stack ? (
-        <InventoryItemCard item={item} quantity={slot.stack.quantity} slotIndex={slot.slotIndex} pending={pending} />
+      {item && visibleStack ? (
+        <InventoryItemCard item={item} quantity={visibleStack.quantity} slotIndex={slot.slotIndex} pending={pending} />
       ) : null}
     </div>
   );
@@ -435,7 +466,7 @@ function InventoryItemCard({
       ref={setNodeRef}
       className={[
         "flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 rounded-lg transition active:cursor-grabbing",
-        isDragging ? "opacity-30" : "hover:bg-slate-800/70",
+        isDragging ? "opacity-0" : "hover:bg-slate-800/70",
       ].join(" ")}
       {...listeners}
       {...attributes}
@@ -453,6 +484,7 @@ function ActionPanel({
   selection,
   pending,
   invalidTargetId,
+  committedDrag,
   onProduce,
   onReset,
 }: Readonly<{
@@ -460,6 +492,7 @@ function ActionPanel({
   selection: Selection;
   pending: boolean;
   invalidTargetId: string | null;
+  committedDrag: DragData | null;
   onProduce(boardItemId: string): void;
   onReset(): void;
 }>) {
@@ -502,7 +535,7 @@ function ActionPanel({
         </div>
       ) : null}
 
-      <BuildPanel game={game} pending={pending} />
+      <BuildPanel game={game} pending={pending} committedDrag={committedDrag} />
 
       <button
         type="button"
@@ -519,16 +552,18 @@ function ActionPanel({
 function BuildPanel({
   game,
   pending,
+  committedDrag,
 }: Readonly<{
   game: GameView;
   pending: boolean;
+  committedDrag: DragData | null;
 }>) {
   return (
     <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
       <p className="text-sm font-semibold text-white">Blueprint builds</p>
       <div className="mt-3 grid gap-3">
         {game.buildRecipes.map((recipe) => (
-          <BuildRecipeCard key={recipe.id} game={game} recipe={recipe} pending={pending} />
+          <BuildRecipeCard key={recipe.id} game={game} recipe={recipe} pending={pending} committedDrag={committedDrag} />
         ))}
       </div>
       <p className="mt-3 text-xs leading-5 text-slate-500">Drag a build card onto an empty board cell. Crafting consumes the blueprint and inventory materials.</p>
@@ -540,13 +575,16 @@ function BuildRecipeCard({
   game,
   recipe,
   pending,
+  committedDrag,
 }: Readonly<{
   game: GameView;
   recipe: GameView["buildRecipes"][number];
   pending: boolean;
+  committedDrag: DragData | null;
 }>) {
   const result = game.items[recipe.resultItemId];
   const blueprint = game.items[recipe.blueprintItemId];
+  const hidden = committedDrag?.type === "build" && committedDrag.recipeId === recipe.id;
   const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
     id: `build:${recipe.id}`,
     data: { type: "build", recipeId: recipe.id } satisfies DragData,
@@ -559,7 +597,7 @@ function BuildRecipeCard({
       className={[
         "rounded-2xl border p-3 text-left transition",
         recipe.canBuild ? "cursor-grab border-slate-800 bg-slate-900/60 hover:border-amber-300 active:cursor-grabbing" : "border-slate-800 bg-slate-950/40 opacity-40",
-        isDragging ? "opacity-30" : "",
+        hidden || isDragging ? "opacity-0" : "",
       ].join(" ")}
       {...listeners}
       {...attributes}

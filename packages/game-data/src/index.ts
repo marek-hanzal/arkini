@@ -118,7 +118,7 @@ export const gameDataManifest = {
     title: "Arkini",
     dataVersion: 1,
     board: { width: 7, height: 9 },
-    inventory: { slots: 18 },
+    inventory: { slots: 21 },
   },
   assets: [
     { id: "asset:item-seed", kind: "item", label: "Seed", src: svg("item-seed"), sort: 10 },

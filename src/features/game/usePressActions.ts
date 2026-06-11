@@ -1,7 +1,7 @@
 import { useEffect, useRef, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
 
 const doubleTapMs = 320;
-const singleDelayMs = 230;
+const singleDelayMs = 340;
 const moveTolerancePx = 8;
 
 export interface PressActions {

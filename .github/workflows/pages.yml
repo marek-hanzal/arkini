@@ -34,17 +34,17 @@ jobs:
         run: bun install
 
       - name: Typecheck
-        run: cd apps/arkini && bun run typecheck
+        run: bun run typecheck
 
       - name: Build static app
-        run: cd apps/arkini && bun run build
+        run: bun run build
         env:
           VITE_BASE: /arkini/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/arkini/dist
+          path: dist
 
   deploy:
     environment:

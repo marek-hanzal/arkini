@@ -1,18 +1,19 @@
 # Arkini
 
-Client-only offline merge-game prototype. The app is a static SPA, not a server app. Future changes must not add SSR, server functions, or runtime HTTP APIs.
+Client-only offline merge-game prototype. This is a plain static Vite + React SPA. No monorepo, no server runtime, no SSR, no server functions, no runtime HTTP API. The only persistence is browser OPFS SQLite.
 
 ## What the game is supposed to become
 
 Arkini is a classic 1×1 tile merge game with a second economy layer:
 
-- The board is the active play space. Items are dragged, merged, and produced there.
+- The board is the active play space. Items are dragged, merged, produced, and placed there.
 - Inventory is limited 7×3 storage. Items stack there up to each item definition's `maxStackSize`.
-- Merging happens only on the board. Inventory does not auto-merge because the board is the core play space.
-- Producers live on the board and drop items around themselves. If there is not enough free space, production should fail without spending cooldown.
-- Producers always have cooldowns. Rapid repeat clicking is intentionally blocked.
+- Merging happens only on the board. Inventory stores and swaps stacks, but does not auto-merge.
+- Producers live on the board and drop items around themselves. If there is not enough free space, production fails without spending cooldown.
+- Producers always have cooldowns. Rapid repeat clicking is blocked.
+- Producer drops animate out one by one instead of appearing as one ugly pile of instant database truth.
 - Producers may be infinite, like a town hall, or finite, like a crate that empties and disappears.
-- Blueprints are consumable inventory items. Building/crafting consumes a blueprint plus inventory materials, then places the result on the board.
+- Blueprints are consumable inventory items. Building consumes a blueprint plus inventory materials, then places the result on the board.
 - Everything remains 1×1. Multi-tile buildings are explicitly out of scope.
 - Producer upgrades are merges. Two `townhall-1` items become `townhall-2`; the new producer starts with default fresh state.
 
@@ -27,8 +28,6 @@ Arkini is a classic 1×1 tile merge game with a second economy layer:
 - SQLite in browser OPFS via SQLocal
 - Kysely typed query layer
 - Bun-first scripts; npm works when Bun is not available
-
-No TanStack Start. No SSR. No server routes. No running server beyond static file serving.
 
 ## Run
 
@@ -53,10 +52,10 @@ bun run build
 For GitHub Pages under a repository path, set the Vite base:
 
 ```bash
-VITE_BASE=/your-repo-name/ bun run build
+VITE_BASE=/arkini/ bun run build
 ```
 
-The repository includes `.github/workflows/pages.yml`, which builds with `VITE_BASE=/arkini/` and uploads `apps/arkini/dist` to GitHub Pages. The router currently uses hash history, so static hosts do not need SPA rewrite rules for future client routes.
+The repository includes `.github/workflows/pages.yml`, which runs from the repo root, builds with `VITE_BASE=/arkini/`, and uploads `dist` to GitHub Pages. The router uses hash history, so static hosts do not need SPA rewrite rules for future client routes.
 
 ## OPFS and cross-origin isolation
 
@@ -69,40 +68,35 @@ Cross-Origin-Opener-Policy: same-origin
 
 Configured places:
 
-- Vite dev/preview headers: `apps/arkini/vite.config.ts`
-- Static `_headers` file for hosts that support it: `apps/arkini/public/_headers`
-- Vercel headers: `apps/arkini/vercel.json`
+- Vite dev/preview headers: `vite.config.ts`
+- Static `_headers` file for hosts that support it: `public/_headers`
+- Vercel headers: `vercel.json`
 
-GitHub Pages does not provide normal custom response headers, so `apps/arkini/public/coi-serviceworker.js` is the static-host COI path. On the first visit it registers, reloads once, and then re-serves same-origin files with COOP/COEP headers. Proper headers are still preferred whenever hosting supports them.
+GitHub Pages does not provide normal custom response headers, so `public/coi-serviceworker.js` is the static-host COI path. On the first visit it registers, reloads once, and then re-serves same-origin files with COOP/COEP headers. Proper headers are still preferred whenever hosting supports them.
 
 ## Source layout
 
 ```txt
-apps/arkini
-  index.html                 Static SPA entry document.
-  src/main.tsx               Browser-only React entry. Ensures COI before rendering.
-  src/router.tsx             TanStack Router + Query provider. No generated route tree.
-  src/screens/HomeScreen.tsx Minimal app header and playable prototype shell.
-  src/components/GameShell.tsx
-                             Small orchestrator for DnD, mutations, and transient feedback.
-  src/components/game/*      Board, inventory, action panel, drag preview, animation, and helper files.
-  src/hooks/useGameView.ts   Tiny TanStack Query bridge over local DB actions.
-  public/coi-serviceworker.js Static-host COOP/COEP service worker.
+index.html                  Static SPA entry document.
+vite.config.ts              Vite, Tailwind, SQLocal, dev COOP/COEP headers.
+public/                     Static assets, .nojekyll, _headers, COI service worker.
 
-packages/game-data
-  src/index.ts               The single static game-data manifest.
-  src/svg/*.svg              Tiny SVG assets referenced by the manifest.
+src/main.tsx                Browser-only React entry. Ensures COI before rendering.
+src/router.tsx              TanStack Router + Query provider. No generated route tree.
+src/screens/HomeScreen.tsx  Minimal app header and playable prototype shell.
 
-packages/db
-  src/migrations             Schema only. Do not put item balance here.
-  src/syncGameData.ts        Idempotent manifest-to-SQLite sync on every bootstrap.
-  src/save.ts                Creates the default save once, then leaves player state alone.
-  src/gameplay.ts            Small direct actions: place, stash, swap, merge, produce, build, reset.
+src/domains/game-data/      The single static game-data manifest and SVG assets.
+src/domains/database/       SQLocal/Kysely client, schema migrations, manifest sync, save, gameplay persistence.
+src/features/game/          Playable game UI orchestration, panels, DnD helpers, transient animation state.
+src/components/             App-level shared UI only, currently the database status card.
+src/hooks/                  Tiny TanStack Query bridge over local database actions.
 ```
+
+The app is now a normal repo. Do not add `apps/*`, `packages/*`, workspace package aliases, or other monorepo ceremonies unless there is an actual second app/package that earns its keep. Tiny projects do not need a shipping container to carry a sandwich.
 
 ## Current playable blocks
 
-The prototype uses one primary interaction model: drag and drop through `@dnd-kit/core`. There is no click-placement path. Current actions:
+The prototype uses one primary interaction model: drag and drop through `@dnd-kit/core`. Current actions:
 
 - drag an inventory stack onto an empty board cell to place one item
 - double-click an inventory stack to animate one item into the first free board cell
@@ -110,6 +104,7 @@ The prototype uses one primary interaction model: drag and drop through `@dnd-ki
 - drag a board item onto an empty board cell to move it
 - drag a board item onto a valid merge target; cells show valid/invalid feedback before drop, the dragged overlay fades over valid merge targets, and successful merges scale-pulse the target
 - double-click a producer to produce; it remains selected so its details do not flicker away after the action
+- producer drops are staged, hidden, and revealed one by one with flyout animation from the producer into target cells
 - producer tiles have a distinct generator treatment and show cooldown progress directly in the tile background; cooldown failures flash the tile instead of also throwing a toast
 - invalid drops animate back to their source while the source stays hidden until the return finishes
 - finite producers, such as crates, spend charges and disappear when depleted
@@ -118,8 +113,6 @@ The prototype uses one primary interaction model: drag and drop through `@dnd-ki
 - double-click a non-producer board item to animate it into the resolved inventory stack/slot
 - reset save for prototype testing
 - hard reset the whole OPFS database when migrations changed during local development
-
-The code is intentionally small and direct. `GameShell` is only the orchestration layer now; tile UI and small pure helpers live under `src/components/game`. `packages/db/src/gameplay.ts` is still the gameplay persistence boundary for now.
 
 ## Development hard reset
 
@@ -132,7 +125,7 @@ That button deletes the SQLocal OPFS database file, reloads the app, then the no
 The static game data has exactly one source of truth:
 
 ```txt
-packages/game-data/src/index.ts
+src/domains/game-data/index.ts
 ```
 
 That manifest defines:
@@ -158,8 +151,6 @@ On every app bootstrap:
 
 When schema changes during pre-release development, hard-reset the local OPFS DB instead of writing compatibility patches.
 
-The sync disables stale top-level definitions instead of hard-deleting item definitions, because old saves may still reference old item IDs. Drop-table entries are regenerated because they are pure manifest cache.
-
 ## Minimal-code philosophy
 
 Use data before code. An item is the base identity. Behavior comes from optional definitions:
@@ -168,7 +159,7 @@ Use data before code. An item is the base identity. Behavior comes from optional
 - producer definition: can generate drops
 - build recipe: blueprint can craft/place a result
 
-Avoid class inheritance and avoid one large nullable item object. Keep gameplay operations small and direct. A tiny helper that removes duplication is fine; speculative abstractions should be removed.
+Avoid class inheritance and avoid one large nullable item object. Keep gameplay operations small and direct. Split by domain when files start mixing responsibilities, but do not invent “frameworks inside the framework” just to feel productive. Humanity has suffered enough.
 
 ## Commit hygiene
 
@@ -177,7 +168,7 @@ Commits should explain architectural movement, not just file churn. Good example
 - `Replace Start with static TanStack Router app`
 - `Centralize game definitions in manifest sync`
 - `Add producer and blueprint data model`
-- `Add playable board inventory producer blocks`
+- `Flatten app into a plain SPA repo`
 
 Bad examples:
 

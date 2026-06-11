@@ -28,7 +28,7 @@ export function BuildSheet({ game, cell, onClose, onBuild }: Readonly<{ game: Ga
                 <img src={result.assetSrc} alt="" className="h-10 w-10 object-contain" />
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold text-slate-100">{result.name}</span>
-                  <span className="block truncate text-xs text-slate-400">{blueprint.name} + {recipe.costs.map((cost) => `${cost.quantity}× ${game.items[cost.itemId]?.name ?? cost.itemId}`).join(", ")}</span>
+                  <span className="block truncate text-xs text-slate-400">{blueprint.name} + {recipe.costs.map((cost) => `${cost.quantity}x ${game.items[cost.itemId]?.name ?? cost.itemId}`).join(", ")}</span>
                 </span>
               </button>
             );

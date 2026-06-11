@@ -3,7 +3,6 @@ import { resolveMergeRule, type ItemId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import { cellKey } from "../helpers";
-import { usePressActions } from "../usePressActions";
 import { columns, rows, type BuildCell, type CommittedDrag, type DragData, type DropData } from "../types";
 import { DraggableTileShell, DroppableCell } from "./DragSurface";
 import { Tile } from "./Tile";
@@ -17,7 +16,7 @@ export function Board({
   pulsedBoardCellKey,
   mergedBoardCellKey,
   nowMs,
-  onEmptyActivate,
+  onEmptyDoubleActivate,
   onTileSingleActivate,
 }: Readonly<{
   game: GameView;
@@ -28,7 +27,7 @@ export function Board({
   pulsedBoardCellKey: string | null;
   mergedBoardCellKey: string | null;
   nowMs: number;
-  onEmptyActivate(cell: BuildCell): void;
+  onEmptyDoubleActivate(cell: BuildCell): void;
   onTileSingleActivate(item: BoardViewItem): void;
 }>) {
   const cells = useMemo(() => Array.from({ length: columns * rows }, (_, index) => ({ x: index % columns, y: Math.floor(index / columns) })), []);
@@ -53,7 +52,7 @@ export function Board({
             invalid={invalidBoardCellKey === key}
             pulsed={pulsedBoardCellKey === key}
             merged={mergedBoardCellKey === key}
-            onEmptyActivate={onEmptyActivate}
+            onEmptyDoubleActivate={onEmptyDoubleActivate}
           >
             {boardItem && viewItem ? (
               <BoardTile
@@ -65,7 +64,6 @@ export function Board({
                   || (committedDrag?.hideSource === true && committedDrag.source.kind === "board" && committedDrag.source.boardItemId === boardItem.id)
                 }
                 nowMs={nowMs}
-                dragDisabled={viewItem.canProduce}
                 onSingleActivate={() => onTileSingleActivate(boardItem)}
               />
             ) : null}
@@ -85,7 +83,7 @@ function BoardCell({
   pulsed,
   merged,
   children,
-  onEmptyActivate,
+  onEmptyDoubleActivate,
 }: Readonly<{
   x: number;
   y: number;
@@ -95,14 +93,9 @@ function BoardCell({
   pulsed: boolean;
   merged: boolean;
   children: ReactNode;
-  onEmptyActivate(cell: BuildCell): void;
+  onEmptyDoubleActivate(cell: BuildCell): void;
 }>) {
   const id = `cell:${x}:${y}`;
-  const press = usePressActions({
-    onSingle: () => {
-      if (!boardItem) onEmptyActivate({ x, y });
-    },
-  });
 
   return (
     <DroppableCell
@@ -119,10 +112,10 @@ function BoardCell({
         pulsed && !invalid && !merged && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
         merged && !invalid && "ak-merge-pop bg-emerald-950/35 ring-2 ring-inset ring-emerald-200/80",
       )}
-      onClick={press.onClick}
-      onPointerDown={press.onPointerDown}
-      onPointerMove={press.onPointerMove}
-      onPointerUp={press.onPointerUp}
+      onDoubleClick={(event) => {
+        event.stopPropagation();
+        if (!boardItem) onEmptyDoubleActivate({ x, y });
+      }}
     >
       {children}
     </DroppableCell>
@@ -134,14 +127,12 @@ function BoardTile({
   item,
   hidden,
   nowMs,
-  dragDisabled,
   onSingleActivate,
 }: Readonly<{
   boardItem: BoardViewItem;
   item: ViewItem;
   hidden: boolean;
   nowMs: number;
-  dragDisabled: boolean;
   onSingleActivate(): void;
 }>) {
   return (
@@ -151,7 +142,6 @@ function BoardTile({
       data-board-item-id={boardItem.id}
       hidden={hidden}
       className="absolute inset-0 touch-none"
-      dragDisabled={dragDisabled}
       onSingleActivate={onSingleActivate}
     >
       <Tile item={item} producer={boardItem.producer} nowMs={nowMs} />

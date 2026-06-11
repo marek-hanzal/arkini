@@ -84,6 +84,10 @@ export function DraggableTileShell({
     press.onPointerUp(event);
   }
 
+  function pointerCancel() {
+    press.onPointerCancel();
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -95,6 +99,7 @@ export function DraggableTileShell({
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
+      onPointerCancel={pointerCancel}
     >
       {children}
     </div>

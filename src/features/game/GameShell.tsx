@@ -318,7 +318,7 @@ export function GameShell() {
           pulsedBoardCellKey={feedback.pulsedBoardCellKey}
           mergedBoardCellKey={feedback.mergedBoardCellKey}
           nowMs={nowMs}
-          onEmptyActivate={setBuildCell}
+          onEmptyDoubleActivate={setBuildCell}
           onTileSingleActivate={(item) => {
             if (!item.producer) return;
             void produceFrom(item, "single");

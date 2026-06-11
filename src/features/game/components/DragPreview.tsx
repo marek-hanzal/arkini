@@ -1,9 +1,10 @@
+import { memo } from "react";
 import type { GameView } from "~/domains/database";
 import { match } from "ts-pattern";
 import type { DragData } from "./types";
 import { TileContent } from "./TileContent";
 
-export function DragPreview({ game, drag, faded }: Readonly<{ game: GameView; drag: DragData; faded: boolean }>) {
+export const DragPreview = memo(function DragPreview({ game, drag, faded }: Readonly<{ game: GameView; drag: DragData; faded: boolean }>) {
   const item = match(drag)
     .with({ type: "inventory" }, ({ slotIndex }) => {
       const stack = game.inventory.find((slot) => slot.slotIndex === slotIndex)?.stack;
@@ -25,4 +26,4 @@ export function DragPreview({ game, drag, faded }: Readonly<{ game: GameView; dr
       <TileContent item={item} />
     </div>
   );
-}
+});

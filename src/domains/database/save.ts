@@ -1,5 +1,6 @@
 import { gameDataManifest } from "~/domains/game-data";
-import { kysely } from "./client";
+import { db } from "./db";
+import { table } from "./tables";
 
 export const defaultSaveGameId = "save:default";
 
@@ -9,8 +10,8 @@ export const defaultSaveGameId = "save:default";
 type StartingBoardItem = { itemId: string; x: number; y: number };
 
 export async function ensureDefaultSaveGame() {
-  const existing = await kysely
-    .selectFrom("saveGame")
+  const existing = await db
+    .selectFrom(table.saveGame)
     .select("id")
     .where("id", "=", defaultSaveGameId)
     .executeTakeFirst();
@@ -19,9 +20,9 @@ export async function ensureDefaultSaveGame() {
     return;
   }
 
-  await kysely.transaction().execute(async (tx) => {
+  await db.transaction().execute(async (tx) => {
     await tx
-      .insertInto("saveGame")
+      .insertInto(table.saveGame)
       .values({
         id: defaultSaveGameId,
         name: "Default save",
@@ -33,7 +34,7 @@ export async function ensureDefaultSaveGame() {
 
     for (const [slotIndex, stack] of gameDataManifest.startingState.inventory.entries()) {
       await tx
-        .insertInto("inventoryStack")
+        .insertInto(table.inventoryStack)
         .values({
           id: `${defaultSaveGameId}:inventory:${slotIndex}`,
           saveGameId: defaultSaveGameId,
@@ -46,7 +47,7 @@ export async function ensureDefaultSaveGame() {
 
     for (const [index, boardItem] of (gameDataManifest.startingState.board as readonly StartingBoardItem[]).entries()) {
       await tx
-        .insertInto("boardItem")
+        .insertInto(table.boardItem)
         .values({
           id: `${defaultSaveGameId}:board:${index}`,
           saveGameId: defaultSaveGameId,
@@ -59,7 +60,7 @@ export async function ensureDefaultSaveGame() {
     }
 
     await tx
-      .updateTable("saveGame")
+      .updateTable(table.saveGame)
       .set({ updatedAt: new Date().toISOString() })
       .where("id", "=", defaultSaveGameId)
       .execute();

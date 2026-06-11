@@ -6,10 +6,9 @@ import type {
   ProducerMode,
   ProducerRoll,
 } from "~/domains/game-data";
-import type { Transaction } from "kysely";
 import { gameDataManifest } from "~/domains/game-data";
-import { kysely } from "./client";
-import type { Database } from "./schema";
+import { db, type ArkiniTransaction } from "./db";
+import { table } from "./tables";
 import { defaultSaveGameId } from "./save";
 
 export interface GameView {
@@ -77,16 +76,16 @@ const parseJson = <T>(value: string): T => JSON.parse(value) as T;
 
 export async function readGameView(): Promise<GameView> {
   const [save, boardRows, inventoryRows] = await Promise.all([
-    kysely.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
-    kysely
-      .selectFrom("boardItem")
+    db.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
+    db
+      .selectFrom(table.boardItem)
       .selectAll()
       .where("saveGameId", "=", defaultSaveGameId)
       .orderBy("y")
       .orderBy("x")
       .execute(),
-    kysely
-      .selectFrom("inventoryStack")
+    db
+      .selectFrom(table.inventoryStack)
       .selectAll()
       .where("saveGameId", "=", defaultSaveGameId)
       .orderBy("slotIndex")
@@ -132,17 +131,17 @@ export async function readGameView(): Promise<GameView> {
 }
 
 export async function placeInventoryItem(slotIndex: number, x: number, y: number) {
-  await kysely.transaction().execute(async (tx) => {
+  await db.transaction().execute(async (tx) => {
     const [save, stack, existingBoardItem] = await Promise.all([
-      tx.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
+      tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
       tx
-        .selectFrom("inventoryStack")
+        .selectFrom(table.inventoryStack)
         .selectAll()
         .where("saveGameId", "=", defaultSaveGameId)
         .where("slotIndex", "=", slotIndex)
         .executeTakeFirst(),
       tx
-        .selectFrom("boardItem")
+        .selectFrom(table.boardItem)
         .select("id")
         .where("saveGameId", "=", defaultSaveGameId)
         .where("x", "=", x)
@@ -155,7 +154,7 @@ export async function placeInventoryItem(slotIndex: number, x: number, y: number
     if (existingBoardItem) throw new GameActionError("Board cell is occupied.");
 
     await tx
-      .insertInto("boardItem")
+      .insertInto(table.boardItem)
       .values({
         id: createId("board"),
         saveGameId: defaultSaveGameId,
@@ -167,12 +166,12 @@ export async function placeInventoryItem(slotIndex: number, x: number, y: number
       .execute();
 
     if (stack.quantity <= 1) {
-      await tx.deleteFrom("inventoryStack").where("id", "=", stack.id).execute();
+      await tx.deleteFrom(table.inventoryStack).where("id", "=", stack.id).execute();
       return;
     }
 
     await tx
-      .updateTable("inventoryStack")
+      .updateTable(table.inventoryStack)
       .set({ quantity: stack.quantity - 1, updatedAt: now() })
       .where("id", "=", stack.id)
       .execute();
@@ -182,15 +181,15 @@ export async function placeInventoryItem(slotIndex: number, x: number, y: number
 export async function swapInventorySlots(sourceSlotIndex: number, targetSlotIndex: number) {
   if (sourceSlotIndex === targetSlotIndex) return;
 
-  await kysely.transaction().execute(async (tx) => {
-    const save = await tx.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow();
+  await db.transaction().execute(async (tx) => {
+    const save = await tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow();
 
     if (sourceSlotIndex < 0 || targetSlotIndex < 0 || sourceSlotIndex >= save.inventorySlots || targetSlotIndex >= save.inventorySlots) {
       throw new GameActionError("Inventory slot is outside the inventory.");
     }
 
     const stacks = await tx
-      .selectFrom("inventoryStack")
+      .selectFrom(table.inventoryStack)
       .selectAll()
       .where("saveGameId", "=", defaultSaveGameId)
       .where("slotIndex", "in", [sourceSlotIndex, targetSlotIndex])
@@ -203,7 +202,7 @@ export async function swapInventorySlots(sourceSlotIndex: number, targetSlotInde
 
     if (!target) {
       await tx
-        .updateTable("inventoryStack")
+        .updateTable(table.inventoryStack)
         .set({ slotIndex: targetSlotIndex, updatedAt: now() })
         .where("id", "=", source.id)
         .execute();
@@ -213,19 +212,19 @@ export async function swapInventorySlots(sourceSlotIndex: number, targetSlotInde
     const temporarySlotIndex = -1;
 
     await tx
-      .updateTable("inventoryStack")
+      .updateTable(table.inventoryStack)
       .set({ slotIndex: temporarySlotIndex, updatedAt: now() })
       .where("id", "=", source.id)
       .execute();
 
     await tx
-      .updateTable("inventoryStack")
+      .updateTable(table.inventoryStack)
       .set({ slotIndex: sourceSlotIndex, updatedAt: now() })
       .where("id", "=", target.id)
       .execute();
 
     await tx
-      .updateTable("inventoryStack")
+      .updateTable(table.inventoryStack)
       .set({ slotIndex: targetSlotIndex, updatedAt: now() })
       .where("id", "=", source.id)
       .execute();
@@ -233,9 +232,9 @@ export async function swapInventorySlots(sourceSlotIndex: number, targetSlotInde
 }
 
 export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
-  await kysely.transaction().execute(async (tx) => {
+  await db.transaction().execute(async (tx) => {
     const boardItem = await tx
-      .selectFrom("boardItem")
+      .selectFrom(table.boardItem)
       .selectAll()
       .where("id", "=", boardItemId)
       .where("saveGameId", "=", defaultSaveGameId)
@@ -248,22 +247,22 @@ export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
     }
 
     await addInventoryItems(tx, boardItem.itemDefinitionId, 1, slotIndex);
-    await tx.deleteFrom("boardItem").where("id", "=", boardItem.id).execute();
+    await tx.deleteFrom(table.boardItem).where("id", "=", boardItem.id).execute();
   });
 }
 
 export async function moveBoardItem(boardItemId: string, x: number, y: number) {
-  await kysely.transaction().execute(async (tx) => {
+  await db.transaction().execute(async (tx) => {
     const [save, boardItem, existingBoardItem] = await Promise.all([
-      tx.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
+      tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
       tx
-        .selectFrom("boardItem")
+        .selectFrom(table.boardItem)
         .selectAll()
         .where("id", "=", boardItemId)
         .where("saveGameId", "=", defaultSaveGameId)
         .executeTakeFirst(),
       tx
-        .selectFrom("boardItem")
+        .selectFrom(table.boardItem)
         .select("id")
         .where("saveGameId", "=", defaultSaveGameId)
         .where("x", "=", x)
@@ -278,7 +277,7 @@ export async function moveBoardItem(boardItemId: string, x: number, y: number) {
     }
 
     await tx
-      .updateTable("boardItem")
+      .updateTable(table.boardItem)
       .set({ x, y, updatedAt: now() })
       .where("id", "=", boardItem.id)
       .execute();
@@ -290,9 +289,9 @@ export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItem
     throw new GameActionError("Pick two different board items to merge.");
   }
 
-  await kysely.transaction().execute(async (tx) => {
+  await db.transaction().execute(async (tx) => {
     const boardItems = await tx
-      .selectFrom("boardItem")
+      .selectFrom(table.boardItem)
       .selectAll()
       .where("saveGameId", "=", defaultSaveGameId)
       .where("id", "in", [sourceBoardItemId, targetBoardItemId])
@@ -312,9 +311,9 @@ export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItem
 
     if (!merge) throw new GameActionError("This item has no next merge level.");
 
-    await tx.deleteFrom("boardItem").where("id", "=", source.id).execute();
+    await tx.deleteFrom(table.boardItem).where("id", "=", source.id).execute();
     await tx
-      .updateTable("boardItem")
+      .updateTable(table.boardItem)
       .set({
         itemDefinitionId: merge.outputItemId,
         stateJson: json(createInitialBoardState(merge.outputItemId)),
@@ -326,16 +325,16 @@ export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItem
 }
 
 export async function produceBoardItem(boardItemId: string): Promise<ProducerDropResult> {
-  return kysely.transaction().execute(async (tx) => {
+  return db.transaction().execute(async (tx) => {
     const [save, boardItem, boardItems] = await Promise.all([
-      tx.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
+      tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
       tx
-        .selectFrom("boardItem")
+        .selectFrom(table.boardItem)
         .selectAll()
         .where("id", "=", boardItemId)
         .where("saveGameId", "=", defaultSaveGameId)
         .executeTakeFirst(),
-      tx.selectFrom("boardItem").selectAll().where("saveGameId", "=", defaultSaveGameId).execute(),
+      tx.selectFrom(table.boardItem).selectAll().where("saveGameId", "=", defaultSaveGameId).execute(),
     ]);
 
     if (!boardItem) throw new GameActionError("Producer does not exist.");
@@ -369,7 +368,7 @@ export async function produceBoardItem(boardItemId: string): Promise<ProducerDro
       const id = createId("board");
       insertedDrops.push({ boardItemId: id, itemId: drop.itemId, x: cell.x, y: cell.y });
       await tx
-        .insertInto("boardItem")
+        .insertInto(table.boardItem)
         .values({
           id,
           saveGameId: defaultSaveGameId,
@@ -399,11 +398,11 @@ export async function produceBoardItem(boardItemId: string): Promise<ProducerDro
     if (shouldDeplete) {
       await match(producer.mode as ProducerMode)
         .with({ type: "finite", onDepleted: "remove" }, async () => {
-          await tx.deleteFrom("boardItem").where("id", "=", boardItem.id).execute();
+          await tx.deleteFrom(table.boardItem).where("id", "=", boardItem.id).execute();
         })
         .with({ type: "finite", onDepleted: { replaceWithItemId: P.string } }, async ({ onDepleted }) => {
           await tx
-            .updateTable("boardItem")
+            .updateTable(table.boardItem)
             .set({
               itemDefinitionId: onDepleted.replaceWithItemId,
               stateJson: json(createInitialBoardState(onDepleted.replaceWithItemId)),
@@ -419,7 +418,7 @@ export async function produceBoardItem(boardItemId: string): Promise<ProducerDro
     }
 
     await tx
-      .updateTable("boardItem")
+      .updateTable(table.boardItem)
       .set({ stateJson: json(nextState), updatedAt: now() })
       .where("id", "=", boardItem.id)
       .execute();
@@ -429,17 +428,17 @@ export async function produceBoardItem(boardItemId: string): Promise<ProducerDro
 }
 
 export async function buildRecipe(recipeId: string, x: number, y: number) {
-  await kysely.transaction().execute(async (tx) => {
+  await db.transaction().execute(async (tx) => {
     const [save, existingBoardItem, inventoryRows] = await Promise.all([
-      tx.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
+      tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
       tx
-        .selectFrom("boardItem")
+        .selectFrom(table.boardItem)
         .select("id")
         .where("saveGameId", "=", defaultSaveGameId)
         .where("x", "=", x)
         .where("y", "=", y)
         .executeTakeFirst(),
-      tx.selectFrom("inventoryStack").selectAll().where("saveGameId", "=", defaultSaveGameId).execute(),
+      tx.selectFrom(table.inventoryStack).selectAll().where("saveGameId", "=", defaultSaveGameId).execute(),
     ]);
 
     assertInsideBoard(save, x, y);
@@ -463,7 +462,7 @@ export async function buildRecipe(recipeId: string, x: number, y: number) {
     }
 
     await tx
-      .insertInto("boardItem")
+      .insertInto(table.boardItem)
       .values({
         id: createId("board"),
         saveGameId: defaultSaveGameId,
@@ -477,8 +476,8 @@ export async function buildRecipe(recipeId: string, x: number, y: number) {
 }
 
 export async function resetDefaultSaveGame() {
-  await kysely.transaction().execute(async (tx) => {
-    await tx.deleteFrom("saveGame").where("id", "=", defaultSaveGameId).execute();
+  await db.transaction().execute(async (tx) => {
+    await tx.deleteFrom(table.saveGame).where("id", "=", defaultSaveGameId).execute();
   });
   const { ensureDefaultSaveGame } = await import("./save");
   await ensureDefaultSaveGame();
@@ -613,7 +612,7 @@ function canPayCosts(inventory: readonly InventorySlot[], costs: readonly BuildR
 }
 
 async function addInventoryItems(
-  tx: Transaction<Database>,
+  tx: ArkiniTransaction,
   itemId: string,
   quantity: number,
   preferredSlotIndex?: number,
@@ -622,9 +621,9 @@ async function addInventoryItems(
   const item = gameDataManifest.items.find((definition) => definition.id === itemId);
   if (!item) throw new GameActionError("Unknown item definition.");
 
-  const save = await tx.selectFrom("saveGame").selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow();
+  const save = await tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow();
   const stacks = await tx
-    .selectFrom("inventoryStack")
+    .selectFrom(table.inventoryStack)
     .selectAll()
     .where("saveGameId", "=", defaultSaveGameId)
     .orderBy("slotIndex")
@@ -639,7 +638,7 @@ async function addInventoryItems(
   for (const stack of stacks.filter((candidate) => candidate.itemDefinitionId === itemId && candidate.quantity < item.maxStackSize)) {
     const canAdd = Math.min(remaining, item.maxStackSize - stack.quantity);
     await tx
-      .updateTable("inventoryStack")
+      .updateTable(table.inventoryStack)
       .set({ quantity: stack.quantity + canAdd, updatedAt: now() })
       .where("id", "=", stack.id)
       .execute();
@@ -652,7 +651,7 @@ async function addInventoryItems(
   if (preferredSlotIndex !== undefined && !occupiedSlots.has(preferredSlotIndex)) {
     const inserted = Math.min(remaining, item.maxStackSize);
     await tx
-      .insertInto("inventoryStack")
+      .insertInto(table.inventoryStack)
       .values({
         id: createId("inventory"),
         saveGameId: defaultSaveGameId,
@@ -670,7 +669,7 @@ async function addInventoryItems(
     if (occupiedSlots.has(slotIndex)) continue;
     const inserted = Math.min(remaining, item.maxStackSize);
     await tx
-      .insertInto("inventoryStack")
+      .insertInto(table.inventoryStack)
       .values({
         id: createId("inventory"),
         saveGameId: defaultSaveGameId,
@@ -686,13 +685,13 @@ async function addInventoryItems(
   if (remaining > 0) throw new GameActionError("Inventory is full.");
 }
 async function removeInventoryItems(
-  tx: Transaction<Database>,
+  tx: ArkiniTransaction,
   itemId: string,
   quantity: number,
 ) {
   let remaining = quantity;
   const stacks = await tx
-    .selectFrom("inventoryStack")
+    .selectFrom(table.inventoryStack)
     .selectAll()
     .where("saveGameId", "=", defaultSaveGameId)
     .where("itemDefinitionId", "=", itemId)
@@ -704,10 +703,10 @@ async function removeInventoryItems(
     const nextQuantity = stack.quantity - removed;
 
     if (nextQuantity === 0) {
-      await tx.deleteFrom("inventoryStack").where("id", "=", stack.id).execute();
+      await tx.deleteFrom(table.inventoryStack).where("id", "=", stack.id).execute();
     } else {
       await tx
-        .updateTable("inventoryStack")
+        .updateTable(table.inventoryStack)
         .set({ quantity: nextQuantity, updatedAt: now() })
         .where("id", "=", stack.id)
         .execute();

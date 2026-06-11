@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+import { parseGameDataManifest } from "./schema";
 
 export type AssetId = `asset:${string}`;
 export type ItemId = `item:${string}`;
@@ -325,6 +326,7 @@ export const gameDataManifest = {
 export type GameData = typeof gameDataManifest;
 
 export function assertGameDataManifest(manifest: GameDataManifest = gameDataManifest) {
+  parseGameDataManifest(manifest);
   const assetIds = new Set(manifest.assets.map((asset) => asset.id));
   const itemIds = new Set(manifest.items.map((manifestItem) => manifestItem.id));
   const dropTableIds = new Set(manifest.dropTables.map((dropTable) => dropTable.id));

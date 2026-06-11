@@ -1,7 +1,8 @@
+import { memo } from "react";
 import type { GameView } from "~/domains/database";
 import type { BuildCell } from "./types";
 
-export function BuildModal({
+export const BuildModal = memo(function BuildModal({
   game,
   cell,
   pending,
@@ -85,4 +86,4 @@ export function BuildModal({
       </div>
     </div>
   );
-}
+});

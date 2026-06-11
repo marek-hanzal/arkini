@@ -1,9 +1,11 @@
-import type { Dispatch, SetStateAction } from "react";
 import type { ProducerDropResult } from "~/domains/database";
 import { stashAnimationMs } from "~/features/game/components/constants";
 import { boardCellKey } from "~/features/game/components/helpers/boardCellId";
 import { cssEscape, snapshotRect, wait } from "~/features/game/components/helpers/dom";
 import type { Flyout } from "~/features/game/components/types";
+
+type HiddenBoardItemSetter = (next: ReadonlySet<string> | ((current: ReadonlySet<string>) => ReadonlySet<string>)) => void;
+type FlyoutSetter = (next: Flyout | null) => void;
 
 export async function revealProducerDrops({
   producerBoardItemId,
@@ -16,8 +18,8 @@ export async function revealProducerDrops({
   producerBoardItemId: string;
   result: ProducerDropResult;
   invalidateGameData(): Promise<void>;
-  setHiddenBoardItemIds: Dispatch<SetStateAction<Set<string>>>;
-  setFlyout: Dispatch<SetStateAction<Flyout | null>>;
+  setHiddenBoardItemIds: HiddenBoardItemSetter;
+  setFlyout: FlyoutSetter;
   pulseBoard(cellKey: string): void;
 }) {
   if (!result.drops.length) {

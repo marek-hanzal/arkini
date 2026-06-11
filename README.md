@@ -23,12 +23,14 @@ Arkini is a classic 1×1 tile merge game with a second economy layer:
 
 - Vite + React SPA
 - TanStack Router, code-based route tree, hash history for static hosting
-- TanStack Query for async local state flows
+- TanStack Query for async local database reads/mutations
+- Zustand for short-lived gameplay UI state, drag feedback, pulses, flyouts, and cooldown clock state
 - Tailwind CSS v4 through the Vite plugin
 - DnD Kit for the single drag-and-drop interaction model
 - Sonner for rare toast-level feedback without a concrete tile/slot target
 - SQLite in browser OPFS via SQLocal
-- Kysely typed query layer
+- Kysely typed query layer with one centralized `Kysely<Database>` handle and typed table-name map
+- Zod validation for manifest shape before cross-reference assertions run
 - Bun-first scripts; npm works when Bun is not available
 
 ## Run
@@ -87,9 +89,9 @@ src/main.tsx                Browser-only React entry. Ensures COI before renderi
 src/router.tsx              TanStack Router + Query provider. No generated route tree.
 src/screens/HomeScreen.tsx  Minimal app header and playable prototype shell.
 
-src/domains/game-data/      The single static game-data manifest and SVG assets.
-src/domains/database/       SQLocal/Kysely client, schema migrations, manifest sync, save, gameplay persistence.
-src/features/game/          Playable game UI orchestration, panels, DnD helpers, transient animation state.
+src/domains/game-data/      Static game-data manifest, SVG assets, and Zod manifest schema.
+src/domains/database/       SQLocal/Kysely client, typed table map, schema migrations, manifest sync, save, gameplay persistence.
+src/features/game/          Playable game UI orchestration, panels, DnD helpers, Zustand UI store, transient animation state.
 src/components/             App-level shared UI only, currently the database status card.
 src/hooks/                  Tiny TanStack Query bridge over local database actions.
 ```
@@ -152,6 +154,14 @@ On every app bootstrap:
 4. `ensureDefaultSaveGame()` creates the initial save only if it does not exist.
 
 When schema changes during pre-release development, hard-reset the local OPFS DB instead of writing compatibility patches.
+
+## Cleanup and rendering notes
+
+The game UI keeps persisted state in SQLite and short-lived interaction state in `src/features/game/state/gameUiStore.ts`. Cooldown ticking no longer re-renders the whole `GameShell`; producer cooldown UI subscribes to the clock directly. Board cells, inventory cells, tile content, drag previews, and modal/card pieces are split into smaller memoized components so a drag pulse does not need to invite the entire page to the re-render party.
+
+Database code uses `src/domains/database/db.ts` for the single typed database handle and `src/domains/database/tables.ts` for table names. Gameplay code should import those instead of sprinkling raw table strings around like confetti from a bug parade.
+
+Game-data validation has two layers: Zod checks manifest shape, then `assertGameDataManifest()` checks references, uniqueness, and gameplay invariants. Zod is for structure; the custom assertions are for domain rules.
 
 ## Minimal-code philosophy
 

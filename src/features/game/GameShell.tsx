@@ -11,8 +11,8 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { snapCenterToCursor } from "@dnd-kit/modifiers";
-import { useEffect, useState } from "react";
-import { toast, Toaster } from "sonner";
+import { useCallback } from "react";
+import { Toaster } from "sonner";
 import { match } from "ts-pattern";
 import type { GameView } from "~/domains/database";
 import { DbStatusCard } from "~/components/DbStatusCard";
@@ -24,7 +24,7 @@ import { FlyoutTile } from "~/features/game/components/FlyoutTile";
 import { GameCard } from "~/features/game/components/GameCard";
 import { InventoryPanel } from "~/features/game/components/InventoryPanel";
 import { SplashScreen } from "~/features/game/components/SplashScreen";
-import { boardPulseMs, invalidDropReturnMs, mergePulseMs, stashAnimationMs } from "~/features/game/components/constants";
+import { invalidDropReturnMs, stashAnimationMs } from "~/features/game/components/constants";
 import { boardCellId, boardCellKey, parseBoardCellId } from "~/features/game/components/helpers/boardCellId";
 import { canMergeBoardItems } from "~/features/game/components/helpers/canMergeBoardItems";
 import { canStashBoardItem } from "~/features/game/components/helpers/canStashBoardItem";
@@ -32,44 +32,46 @@ import { cssEscape, snapshotRect, wait } from "~/features/game/components/helper
 import { findFirstFreeBoardCell } from "~/features/game/components/helpers/findFirstFreeBoardCell";
 import { getInventoryPreviewSlot } from "~/features/game/components/helpers/getInventoryPreviewSlot";
 import { resolveInventoryDestination } from "~/features/game/components/helpers/resolveInventoryDestination";
-import type { BuildCell, DragData, DropData, Flyout, Selection } from "~/features/game/components/types";
+import type { DragData, DropData } from "~/features/game/components/types";
 import { useGameDataInvalidation, useGameView } from "~/hooks/useGameView";
 import { revealProducerDrops } from "~/features/game/animations/revealProducerDrops";
 import { useGameMutations } from "~/features/game/hooks/useGameMutations";
+import { useGameFeedback } from "~/features/game/hooks/useGameFeedback";
+import { useCooldownClock } from "~/features/game/hooks/useCooldownClock";
+import { useSplashDelay } from "~/features/game/hooks/useSplashDelay";
+import { useGameUiStore } from "~/features/game/state/gameUiStore";
 
 export function GameShell() {
   const game = useGameView();
-  const [selection, setSelection] = useState<Selection>(null);
-  const [activeDrag, setActiveDrag] = useState<DragData | null>(null);
-  const [activeOverId, setActiveOverId] = useState<string | null>(null);
-  const [committedDrag, setCommittedDrag] = useState<DragData | null>(null);
-  const [returningDrag, setReturningDrag] = useState<DragData | null>(null);
-  const [invalidTargetId, setInvalidTargetId] = useState<string | null>(null);
-  const [inventoryPulseSlot, setInventoryPulseSlot] = useState<number | null>(null);
-  const [boardPulseCell, setBoardPulseCell] = useState<string | null>(null);
-  const [mergePulseBoardItemId, setMergePulseBoardItemId] = useState<string | null>(null);
-  const [flyout, setFlyout] = useState<Flyout | null>(null);
-  const [hiddenBoardItemIds, setHiddenBoardItemIds] = useState<Set<string>>(() => new Set());
-  const [buildCell, setBuildCell] = useState<BuildCell>(null);
-  const [nowMs, setNowMs] = useState(() => Date.now());
-  const [splashReady, setSplashReady] = useState(false);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setSplashReady(true), 1500);
-    return () => window.clearTimeout(timeout);
-  }, []);
-
-  useEffect(() => {
-    if (activeDrag) return;
-
-    const interval = window.setInterval(() => setNowMs(Date.now()), 150);
-    return () => window.clearInterval(interval);
-  }, [activeDrag]);
+  const selection = useGameUiStore((state) => state.selection);
+  const activeDrag = useGameUiStore((state) => state.activeDrag);
+  const activeOverId = useGameUiStore((state) => state.activeOverId);
+  const committedDrag = useGameUiStore((state) => state.committedDrag);
+  const returningDrag = useGameUiStore((state) => state.returningDrag);
+  const invalidTargetId = useGameUiStore((state) => state.invalidTargetId);
+  const inventoryPulseSlot = useGameUiStore((state) => state.inventoryPulseSlot);
+  const boardPulseCell = useGameUiStore((state) => state.boardPulseCell);
+  const mergePulseBoardItemId = useGameUiStore((state) => state.mergePulseBoardItemId);
+  const flyout = useGameUiStore((state) => state.flyout);
+  const hiddenBoardItemIds = useGameUiStore((state) => state.hiddenBoardItemIds);
+  const buildCell = useGameUiStore((state) => state.buildCell);
+  const splashReady = useGameUiStore((state) => state.splashReady);
+  const setSelection = useGameUiStore((state) => state.setSelection);
+  const setActiveDrag = useGameUiStore((state) => state.setActiveDrag);
+  const setActiveOverId = useGameUiStore((state) => state.setActiveOverId);
+  const setCommittedDrag = useGameUiStore((state) => state.setCommittedDrag);
+  const setReturningDrag = useGameUiStore((state) => state.setReturningDrag);
+  const setFlyout = useGameUiStore((state) => state.setFlyout);
+  const setHiddenBoardItemIds = useGameUiStore((state) => state.setHiddenBoardItemIds);
+  const setBuildCell = useGameUiStore((state) => state.setBuildCell);
+  useSplashDelay(1500);
+  useCooldownClock(150);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const invalidateGameData = useGameDataInvalidation();
 
   const { placeInventory, moveBoard, stashBoard, mergeBoard, swapInventory, produce, build } = useGameMutations();
+  const { markInvalid, pulseInventory, pulseBoard, pulseMerge, pulseDragOrigin, showActionError } = useGameFeedback();
 
   const pending =
     placeInventory.isPending ||
@@ -83,185 +85,175 @@ export function GameShell() {
     hiddenBoardItemIds.size > 0 ||
     returningDrag !== null;
 
-  function markInvalid(targetId?: string) {
-    if (!targetId) return;
-    setInvalidTargetId(targetId);
-    window.setTimeout(() => setInvalidTargetId(null), 650);
-  }
-
-  function pulseInventory(slotIndex: number | null | undefined) {
-    if (slotIndex === null || slotIndex === undefined) return;
-    setInventoryPulseSlot(slotIndex);
-    window.setTimeout(() => setInventoryPulseSlot(null), 700);
-  }
-
-  function pulseBoard(cellKey: string | null | undefined) {
-    if (!cellKey) return;
-    setBoardPulseCell(cellKey);
-    window.setTimeout(() => setBoardPulseCell(null), boardPulseMs);
-  }
-
-  function pulseMerge(boardItemId: string) {
-    setMergePulseBoardItemId(boardItemId);
-    window.setTimeout(() => setMergePulseBoardItemId(null), mergePulseMs);
-  }
-
-  function showActionError(error: unknown, invalidId?: string) {
-    markInvalid(invalidId);
-    if (invalidId) return;
-    toast.error(error instanceof Error ? error.message : "Action failed.");
-  }
-
-  async function runDrop(action: () => Promise<unknown>, source: DragData, invalidId?: string, onSuccess?: () => void) {
-    setCommittedDrag(source);
-    setReturningDrag(null);
-    setActiveDrag(null);
-
-    try {
-      await action();
-      onSuccess?.();
-      setSelection(null);
-    } catch (error) {
-      setCommittedDrag(null);
-      showActionError(error, invalidId);
-      return;
-    }
-
-    setCommittedDrag(null);
-  }
-
-  function pulseDragOrigin(source: DragData) {
-    if (!game.data) return;
-
-    if (source.type === "inventory") {
-      pulseInventory(source.slotIndex);
-      return;
-    }
-
-    if (source.type === "board") {
-      const boardItem = game.data.boardItems.find((item) => item.id === source.boardItemId);
-      if (!boardItem) return;
-      pulseBoard(boardCellKey(boardItem.x, boardItem.y));
-    }
-  }
-
-  function rejectDrop(source: DragData, invalidId?: string) {
-    setReturningDrag(source);
-    setActiveDrag(null);
-    markInvalid(invalidId);
-    window.setTimeout(() => {
+  const runDrop = useCallback(
+    async (action: () => Promise<unknown>, source: DragData, invalidId?: string, onSuccess?: () => void) => {
+      setCommittedDrag(source);
       setReturningDrag(null);
-      pulseDragOrigin(source);
-    }, invalidDropReturnMs + 120);
-  }
+      setActiveDrag(null);
 
-  async function stashWithFlyout(boardItemId: string, itemId: string) {
-    if (!game.data) return;
+      try {
+        await action();
+        onSuccess?.();
+        setSelection(null);
+      } catch (error) {
+        setCommittedDrag(null);
+        showActionError(error, invalidId);
+        return;
+      }
 
-    const targetSlotIndex = resolveInventoryDestination(game.data, itemId);
-    if (targetSlotIndex === null) {
-      markInvalid(boardItemId);
-      return;
-    }
-
-    const sourceNode = document.querySelector<HTMLElement>(`[data-board-item-id="${cssEscape(boardItemId)}"]`);
-    const targetNode = document.querySelector<HTMLElement>(`[data-inventory-slot-index="${targetSlotIndex}"]`);
-
-    setCommittedDrag({ type: "board", boardItemId });
-
-    if (sourceNode && targetNode) {
-      setFlyout({
-        id: Date.now(),
-        itemId,
-        from: snapshotRect(sourceNode.getBoundingClientRect()),
-        to: snapshotRect(targetNode.getBoundingClientRect()),
-      });
-      await wait(stashAnimationMs);
-    }
-
-    try {
-      await stashBoard.mutateAsync({ boardItemId, slotIndex: targetSlotIndex });
-      pulseInventory(targetSlotIndex);
-      setSelection(null);
-    } catch (error) {
-      showActionError(error, boardItemId);
-    } finally {
-      setFlyout(null);
       setCommittedDrag(null);
-    }
-  }
+    },
+    [setActiveDrag, setCommittedDrag, setReturningDrag, setSelection, showActionError],
+  );
 
-  async function produceWithSequence(boardItemId: string) {
-    setSelection({ type: "board", boardItemId });
+  const rejectDrop = useCallback(
+    (source: DragData, invalidId?: string) => {
+      setReturningDrag(source);
+      setActiveDrag(null);
+      markInvalid(invalidId);
+      window.setTimeout(() => {
+        setReturningDrag(null);
+        pulseDragOrigin(game.data, source);
+      }, invalidDropReturnMs + 120);
+    },
+    [game.data, markInvalid, pulseDragOrigin, setActiveDrag, setReturningDrag],
+  );
 
-    try {
-      const result = await produce.mutateAsync({ boardItemId });
-      await revealProducerDrops({
-        producerBoardItemId: boardItemId,
-        result,
-        invalidateGameData,
-        setHiddenBoardItemIds,
-        setFlyout,
-        pulseBoard,
-      });
-    } catch (error) {
-      showActionError(error, boardItemId);
-    } finally {
-      setFlyout(null);
-      setHiddenBoardItemIds(new Set());
-    }
-  }
+  const stashWithFlyout = useCallback(
+    async (boardItemId: string, itemId: string) => {
+      if (!game.data) return;
 
-  async function placeInventoryWithFlyout(slotIndex: number, itemId: string) {
-    if (!game.data) return;
+      const targetSlotIndex = resolveInventoryDestination(game.data, itemId);
+      if (targetSlotIndex === null) {
+        markInvalid(boardItemId);
+        return;
+      }
 
-    const targetCell = findFirstFreeBoardCell(game.data);
-    if (!targetCell) {
-      markInvalid(`inventory:${slotIndex}`);
-      return;
-    }
+      const sourceNode = document.querySelector<HTMLElement>(`[data-board-item-id="${cssEscape(boardItemId)}"]`);
+      const targetNode = document.querySelector<HTMLElement>(`[data-inventory-slot-index="${targetSlotIndex}"]`);
 
-    const cellKey = boardCellKey(targetCell.x, targetCell.y);
-    const sourceNode = document.querySelector<HTMLElement>(`[data-inventory-slot-index="${slotIndex}"]`);
-    const targetNode = document.querySelector<HTMLElement>(`[data-board-cell-id="${cellKey}"]`);
+      setCommittedDrag({ type: "board", boardItemId });
 
-    setCommittedDrag({ type: "inventory", slotIndex });
+      if (sourceNode && targetNode) {
+        setFlyout({
+          id: Date.now(),
+          itemId,
+          from: snapshotRect(sourceNode.getBoundingClientRect()),
+          to: snapshotRect(targetNode.getBoundingClientRect()),
+        });
+        await wait(stashAnimationMs);
+      }
 
-    if (sourceNode && targetNode) {
-      setFlyout({
-        id: Date.now(),
-        itemId,
-        from: snapshotRect(sourceNode.getBoundingClientRect()),
-        to: snapshotRect(targetNode.getBoundingClientRect()),
-      });
-      await wait(stashAnimationMs);
-    }
+      try {
+        await stashBoard.mutateAsync({ boardItemId, slotIndex: targetSlotIndex });
+        pulseInventory(targetSlotIndex);
+        setSelection(null);
+      } catch (error) {
+        showActionError(error, boardItemId);
+      } finally {
+        setFlyout(null);
+        setCommittedDrag(null);
+      }
+    },
+    [game.data, markInvalid, pulseInventory, setCommittedDrag, setFlyout, setSelection, showActionError, stashBoard],
+  );
 
-    try {
-      await placeInventory.mutateAsync({ slotIndex, x: targetCell.x, y: targetCell.y });
-      pulseBoard(cellKey);
-      setSelection(null);
-    } catch (error) {
-      showActionError(error, `inventory:${slotIndex}`);
-    } finally {
-      setFlyout(null);
-      setCommittedDrag(null);
-    }
-  }
+  const produceWithSequence = useCallback(
+    async (boardItemId: string) => {
+      setSelection({ type: "board", boardItemId });
 
-  async function buildIntoCell(recipeId: string) {
-    if (!buildCell) return;
-    const target = buildCell;
+      try {
+        const result = await produce.mutateAsync({ boardItemId });
+        await revealProducerDrops({
+          producerBoardItemId: boardItemId,
+          result,
+          invalidateGameData,
+          setHiddenBoardItemIds,
+          setFlyout,
+          pulseBoard,
+        });
+      } catch (error) {
+        showActionError(error, boardItemId);
+      } finally {
+        setFlyout(null);
+        setHiddenBoardItemIds(new Set());
+      }
+    },
+    [invalidateGameData, produce, pulseBoard, setFlyout, setHiddenBoardItemIds, setSelection, showActionError],
+  );
+
+  const placeInventoryWithFlyout = useCallback(
+    async (slotIndex: number, itemId: string) => {
+      if (!game.data) return;
+
+      const targetCell = findFirstFreeBoardCell(game.data);
+      if (!targetCell) {
+        markInvalid(`inventory:${slotIndex}`);
+        return;
+      }
+
+      const cellKey = boardCellKey(targetCell.x, targetCell.y);
+      const sourceNode = document.querySelector<HTMLElement>(`[data-inventory-slot-index="${slotIndex}"]`);
+      const targetNode = document.querySelector<HTMLElement>(`[data-board-cell-id="${cellKey}"]`);
+
+      setCommittedDrag({ type: "inventory", slotIndex });
+
+      if (sourceNode && targetNode) {
+        setFlyout({
+          id: Date.now(),
+          itemId,
+          from: snapshotRect(sourceNode.getBoundingClientRect()),
+          to: snapshotRect(targetNode.getBoundingClientRect()),
+        });
+        await wait(stashAnimationMs);
+      }
+
+      try {
+        await placeInventory.mutateAsync({ slotIndex, x: targetCell.x, y: targetCell.y });
+        pulseBoard(cellKey);
+        setSelection(null);
+      } catch (error) {
+        showActionError(error, `inventory:${slotIndex}`);
+      } finally {
+        setFlyout(null);
+        setCommittedDrag(null);
+      }
+    },
+    [game.data, markInvalid, placeInventory, pulseBoard, setCommittedDrag, setFlyout, setSelection, showActionError],
+  );
+
+  const buildIntoCell = useCallback(
+    async (recipeId: string) => {
+      if (!buildCell) return;
+      const target = buildCell;
+      setBuildCell(null);
+
+      try {
+        await build.mutateAsync({ recipeId, x: target.x, y: target.y });
+        pulseBoard(boardCellKey(target.x, target.y));
+        setSelection(null);
+      } catch (error) {
+        showActionError(error, boardCellId(target.x, target.y));
+      }
+    },
+    [build, buildCell, pulseBoard, setBuildCell, setSelection, showActionError],
+  );
+
+  const handleProduce = useCallback((boardItemId: string) => {
+    void produceWithSequence(boardItemId);
+  }, [produceWithSequence]);
+
+  const handlePlaceStack = useCallback((slotIndex: number, itemId: string) => {
+    void placeInventoryWithFlyout(slotIndex, itemId);
+  }, [placeInventoryWithFlyout]);
+
+  const handleBuild = useCallback((recipeId: string) => {
+    void buildIntoCell(recipeId);
+  }, [buildIntoCell]);
+
+  const handleCloseBuild = useCallback(() => {
     setBuildCell(null);
-
-    try {
-      await build.mutateAsync({ recipeId, x: target.x, y: target.y });
-      pulseBoard(boardCellKey(target.x, target.y));
-      setSelection(null);
-    } catch (error) {
-      showActionError(error, boardCellId(target.x, target.y));
-    }
-  }
+  }, [setBuildCell]);
 
   function handleDragStart(event: DragStartEvent) {
     setActiveDrag(event.active.data.current as DragData | null);
@@ -359,7 +351,7 @@ export function GameShell() {
           return;
         }
 
-        if (!canStashBoardItem(game.data, source.boardItemId, nowMs)) {
+        if (!canStashBoardItem(game.data, source.boardItemId, Date.now())) {
           reject(source.boardItemId);
           return;
         }
@@ -390,7 +382,7 @@ export function GameShell() {
 
   if (!game.data) return null;
 
-  const inventoryPreviewSlot = getInventoryPreviewSlot(game.data, activeDrag, activeOverId, nowMs);
+  const inventoryPreviewSlot = getInventoryPreviewSlot(game.data, activeDrag, activeOverId, Date.now());
   const hiddenDrag = committedDrag ?? returningDrag;
   const overlayFaded = isMergeOverlayFaded(game.data, activeDrag, activeOverId);
 
@@ -426,9 +418,8 @@ export function GameShell() {
               hiddenBoardItemIds={hiddenBoardItemIds}
               mergePulseBoardItemId={mergePulseBoardItemId}
               boardPulseCell={boardPulseCell}
-              nowMs={nowMs}
               onSelect={setSelection}
-              onProduce={(boardItemId) => void produceWithSequence(boardItemId)}
+              onProduce={handleProduce}
               onStash={stashWithFlyout}
               onOpenBuild={setBuildCell}
             />
@@ -439,17 +430,12 @@ export function GameShell() {
               committedDrag={hiddenDrag}
               previewSlotIndex={inventoryPreviewSlot}
               pulseSlotIndex={inventoryPulseSlot}
-              onPlaceStack={(slotIndex, itemId) => void placeInventoryWithFlyout(slotIndex, itemId)}
+              onPlaceStack={handlePlaceStack}
             />
           </div>
 
           <div className="grid w-full gap-3 xl:grid-cols-[minmax(18rem,24rem)_1fr]">
-            <ActionPanel
-              game={game.data}
-              selection={selection}
-              pending={pending}
-              invalidTargetId={invalidTargetId}
-            />
+            <ActionPanel game={game.data} selection={selection} pending={pending} invalidTargetId={invalidTargetId} />
             <DbStatusCard />
           </div>
         </section>
@@ -460,7 +446,7 @@ export function GameShell() {
           {activeDrag ? <DragPreview game={game.data} drag={activeDrag} faded={overlayFaded} /> : null}
         </DragOverlay>
       </DndContext>
-      <BuildModal game={game.data} cell={buildCell} pending={pending} onClose={() => setBuildCell(null)} onBuild={(recipeId) => void buildIntoCell(recipeId)} />
+      <BuildModal game={game.data} cell={buildCell} pending={pending} onClose={handleCloseBuild} onBuild={handleBuild} />
       {flyout ? <FlyoutTile game={game.data} flyout={flyout} /> : null}
     </>
   );

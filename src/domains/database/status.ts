@@ -1,5 +1,7 @@
-import { kysely } from "./client";
 import { readDatabasePath, readGameDataHash, readMigrationState } from "./bootstrap";
+import { db } from "./db";
+import type { Database } from "./schema";
+import { table } from "./tables";
 
 export interface DatabaseStatus {
   databasePath: string;
@@ -14,43 +16,32 @@ export interface DatabaseStatus {
   saveGameCount: number;
 }
 
+const statusTables = {
+  assetCount: table.assetDefinition,
+  itemCount: table.itemDefinition,
+  mergeCount: table.mergeDefinition,
+  producerCount: table.producerDefinition,
+  buildRecipeCount: table.buildRecipeDefinition,
+  dropTableCount: table.dropTableDefinition,
+  saveGameCount: table.saveGame,
+} as const;
+
 export async function readDatabaseStatus(): Promise<DatabaseStatus> {
-  const [asset, item, merge, producer, buildRecipe, dropTable, saveGame] = await Promise.all([
-    count("assetDefinition"),
-    count("itemDefinition"),
-    count("mergeDefinition"),
-    count("producerDefinition"),
-    count("buildRecipeDefinition"),
-    count("dropTableDefinition"),
-    count("saveGame"),
-  ]);
+  const counts = await Promise.all(Object.entries(statusTables).map(async ([key, name]) => [key, await count(name)] as const));
 
   return {
     databasePath: readDatabasePath(),
     migrationState: readMigrationState(),
     gameDataHash: readGameDataHash(),
-    assetCount: asset,
-    itemCount: item,
-    mergeCount: merge,
-    producerCount: producer,
-    buildRecipeCount: buildRecipe,
-    dropTableCount: dropTable,
-    saveGameCount: saveGame,
-  };
+    ...Object.fromEntries(counts),
+  } as DatabaseStatus;
 }
 
-type CountableTable =
-  | "assetDefinition"
-  | "itemDefinition"
-  | "mergeDefinition"
-  | "producerDefinition"
-  | "buildRecipeDefinition"
-  | "dropTableDefinition"
-  | "saveGame";
+type CountableTable = (typeof statusTables)[keyof typeof statusTables];
 
-async function count(table: CountableTable) {
-  const row = await kysely
-    .selectFrom(table)
+async function count(tableName: CountableTable) {
+  const row = await db
+    .selectFrom(tableName as keyof Database)
     .select((eb) => eb.fn.countAll<number>().as("count"))
     .executeTakeFirstOrThrow();
 

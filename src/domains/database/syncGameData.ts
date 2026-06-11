@@ -3,7 +3,8 @@ import {
   gameDataManifest,
   type GameDataManifest,
 } from "~/domains/game-data";
-import { kysely } from "./client";
+import { db } from "./db";
+import { table } from "./tables";
 
 const enabled = 1 as const;
 const disabled = 0 as const;
@@ -18,13 +19,13 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
 
   const manifestHash = await hashManifest(manifest);
 
-  await kysely.transaction().execute(async (tx) => {
+  await db.transaction().execute(async (tx) => {
     const now = new Date().toISOString();
 
-    await tx.updateTable("assetDefinition").set({ isEnabled: disabled, updatedAt: now }).execute();
+    await tx.updateTable(table.assetDefinition).set({ isEnabled: disabled, updatedAt: now }).execute();
     for (const asset of manifest.assets) {
       await tx
-        .insertInto("assetDefinition")
+        .insertInto(table.assetDefinition)
         .values({ ...asset, isEnabled: enabled })
         .onConflict((oc) =>
           oc.column("id").doUpdateSet({
@@ -39,10 +40,10 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
         .execute();
     }
 
-    await tx.updateTable("itemDefinition").set({ isEnabled: disabled, updatedAt: now }).execute();
+    await tx.updateTable(table.itemDefinition).set({ isEnabled: disabled, updatedAt: now }).execute();
     for (const item of manifest.items) {
       await tx
-        .insertInto("itemDefinition")
+        .insertInto(table.itemDefinition)
         .values({
           id: item.id,
           assetId: item.assetId,
@@ -72,10 +73,10 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
         .execute();
     }
 
-    await tx.updateTable("mergeDefinition").set({ isEnabled: disabled, updatedAt: now }).execute();
+    await tx.updateTable(table.mergeDefinition).set({ isEnabled: disabled, updatedAt: now }).execute();
     for (const merge of manifest.merges) {
       await tx
-        .insertInto("mergeDefinition")
+        .insertInto(table.mergeDefinition)
         .values({ ...merge, isEnabled: enabled })
         .onConflict((oc) =>
           oc.column("id").doUpdateSet({
@@ -89,11 +90,11 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
         .execute();
     }
 
-    await tx.deleteFrom("dropTableEntry").execute();
-    await tx.updateTable("dropTableDefinition").set({ isEnabled: disabled, updatedAt: now }).execute();
+    await tx.deleteFrom(table.dropTableEntry).execute();
+    await tx.updateTable(table.dropTableDefinition).set({ isEnabled: disabled, updatedAt: now }).execute();
     for (const dropTable of manifest.dropTables) {
       await tx
-        .insertInto("dropTableDefinition")
+        .insertInto(table.dropTableDefinition)
         .values({ id: dropTable.id, label: dropTable.label, isEnabled: enabled })
         .onConflict((oc) =>
           oc.column("id").doUpdateSet({
@@ -106,7 +107,7 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
 
       for (const [index, entry] of dropTable.entries.entries()) {
         await tx
-          .insertInto("dropTableEntry")
+          .insertInto(table.dropTableEntry)
           .values({
             id: `${dropTable.id}:${index}`,
             dropTableId: dropTable.id,
@@ -119,10 +120,10 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
       }
     }
 
-    await tx.updateTable("producerDefinition").set({ isEnabled: disabled, updatedAt: now }).execute();
+    await tx.updateTable(table.producerDefinition).set({ isEnabled: disabled, updatedAt: now }).execute();
     for (const producer of manifest.producers) {
       await tx
-        .insertInto("producerDefinition")
+        .insertInto(table.producerDefinition)
         .values({
           itemDefinitionId: producer.itemId,
           cooldownMs: producer.cooldownMs,
@@ -144,10 +145,10 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
         .execute();
     }
 
-    await tx.updateTable("buildRecipeDefinition").set({ isEnabled: disabled, updatedAt: now }).execute();
+    await tx.updateTable(table.buildRecipeDefinition).set({ isEnabled: disabled, updatedAt: now }).execute();
     for (const recipe of manifest.buildRecipes) {
       await tx
-        .insertInto("buildRecipeDefinition")
+        .insertInto(table.buildRecipeDefinition)
         .values({
           id: recipe.id,
           blueprintItemId: recipe.blueprintItemId,
@@ -168,13 +169,13 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
     }
 
     await tx
-      .insertInto("metadata")
+      .insertInto(table.metadata)
       .values({ key: "gameDataHash", value: manifestHash })
       .onConflict((oc) => oc.column("key").doUpdateSet({ value: manifestHash, updatedAt: now }))
       .execute();
 
     await tx
-      .insertInto("metadata")
+      .insertInto(table.metadata)
       .values({ key: "gameDataVersion", value: String(manifest.game.dataVersion) })
       .onConflict((oc) =>
         oc.column("key").doUpdateSet({ value: String(manifest.game.dataVersion), updatedAt: now }),

@@ -1,8 +1,8 @@
 import { Migrator } from "kysely/migration";
-import { kysely } from "./client";
+import { db } from "./db";
 
 export const migrator = new Migrator({
-  db: kysely,
+  db,
   provider: {
     async getMigrations() {
       const { migrations } = await import("./migrations");

@@ -1,4 +1,5 @@
-export function SplashScreen() {
+import { memo } from "react";
+export const SplashScreen = memo(function SplashScreen() {
   return (
     <section className="flex min-h-[24rem] w-full items-center justify-center">
       <div className="text-center">
@@ -7,4 +8,4 @@ export function SplashScreen() {
       </div>
     </section>
   );
-}
+});

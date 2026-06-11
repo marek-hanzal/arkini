@@ -1,7 +1,8 @@
+import { memo } from "react";
 import type { GameView } from "~/domains/database";
 import type { Selection } from "./types";
 
-export function ActionPanel({
+export const ActionPanel = memo(function ActionPanel({
   game,
   selection,
   invalidTargetId,
@@ -43,4 +44,4 @@ export function ActionPanel({
       ) : null}
     </section>
   );
-}
+});

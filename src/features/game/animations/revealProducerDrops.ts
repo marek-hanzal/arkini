@@ -1,7 +1,6 @@
 import type { ProducerDropResult } from "~/domains/database";
 import { stashAnimationMs } from "~/features/game/components/constants";
 import { cellKey } from "~/features/game/components/helpers/cellKey";
-import { cssEscape } from "~/features/game/components/helpers/cssEscape";
 import { rectOf } from "~/features/game/components/helpers/rectOf";
 import { wait } from "~/features/game/components/helpers/wait";
 import type { Flyout } from "~/features/game/components/types";
@@ -29,7 +28,7 @@ export async function revealProducerDrops({
     return;
   }
 
-  const sourceNode = document.querySelector<HTMLElement>(`[data-board-item-id="${cssEscape(producerBoardItemId)}"]`);
+  const sourceNode = document.querySelector<HTMLElement>(`[data-board-item-id="${producerBoardItemId}"]`);
   const sourceRect = sourceNode ? rectOf(sourceNode.getBoundingClientRect()) : null;
 
   setHiddenBoardItemIds(new Set(result.drops.map((drop) => drop.boardItemId)));

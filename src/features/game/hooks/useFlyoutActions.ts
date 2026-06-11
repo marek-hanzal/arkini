@@ -5,7 +5,6 @@ import { revealProducerDrops } from "~/features/game/animations/revealProducerDr
 import { stashAnimationMs } from "~/features/game/components/constants";
 import { cellId } from "~/features/game/components/helpers/cellId";
 import { cellKey } from "~/features/game/components/helpers/cellKey";
-import { cssEscape } from "~/features/game/components/helpers/cssEscape";
 import { rectOf } from "~/features/game/components/helpers/rectOf";
 import { wait } from "~/features/game/components/helpers/wait";
 import { findFreeCell } from "~/features/game/components/helpers/findFreeCell";
@@ -37,7 +36,7 @@ export function useFlyoutActions(game: GameView | null | undefined, mutations: G
       await animateFlyout({
         itemId,
         setFlyout,
-        sourceSelector: `[data-board-item-id="${cssEscape(boardItemId)}"]`,
+        sourceSelector: `[data-board-item-id="${boardItemId}"]`,
         targetSelector: `[data-inventory-slot-index="${targetSlotIndex}"]`,
       });
 

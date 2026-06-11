@@ -62,8 +62,8 @@ export function GameShell() {
       advanceAuto.mutate(undefined, {
         async onSuccess(results) {
           if (results.length === 0) return;
+          await animateProducerDrops(results);
           await invalidateGameData();
-          pulseProducerDrops(results);
         },
         onError(error) {
           feedback.showError(error);
@@ -107,6 +107,8 @@ export function GameShell() {
     }
 
     if (source.kind === "inventory" && target.kind === "inventory-slot") {
+      if (source.slotIndex === target.slotIndex) return;
+
       setCommittedDrag(source);
       await swapInventory.mutateAsync({ sourceSlotIndex: source.slotIndex, targetSlotIndex: target.slotIndex });
       feedback.pulseInventorySlot(target.slotIndex);
@@ -115,6 +117,8 @@ export function GameShell() {
     }
 
     if (source.kind === "board" && target.kind === "cell") {
+      if (target.boardItemId === source.boardItemId) return;
+
       setCommittedDrag(source);
       if (target.boardItemId) {
         await mergeBoard.mutateAsync({ sourceBoardItemId: source.boardItemId, targetBoardItemId: target.boardItemId });
@@ -147,8 +151,8 @@ export function GameShell() {
   async function produceFrom(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") {
     try {
       const result = await produce.mutateAsync({ boardItemId: boardItem.id, activation });
+      await animateProducerDrops([result], activation === "exhaust" ? 130 : 0);
       await invalidateGameData();
-      pulseProducerDrops([result]);
       feedback.pulseBoardCell(cellKey(boardItem.x, boardItem.y));
     } catch (error) {
       feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
@@ -208,7 +212,7 @@ export function GameShell() {
     }
   }
 
-  function pulseProducerDrops(results: ProducerDropResult[]) {
+  async function animateProducerDrops(results: ProducerDropResult[], stepDelayMs = 0) {
     for (const result of results) {
       const sourceRect = queryRect(`[data-board-item-id="${cssEscape(result.producerBoardItemId)}"]`);
       if (!sourceRect) continue;
@@ -222,12 +226,15 @@ export function GameShell() {
         if (placement.kind === "board") {
           if (!targetRect) continue;
           addFlyer(placement.itemId, from, tileVisualRect(targetRect));
-          continue;
+        } else {
+          addFlyer(placement.itemId, from, targetRect ? tileVisualRect(targetRect) : inventorySinkRect(from));
         }
 
-        addFlyer(placement.itemId, from, targetRect ? tileVisualRect(targetRect) : inventorySinkRect(from));
+        if (stepDelayMs > 0) await wait(stepDelayMs);
       }
     }
+
+    await wait(flyMs);
   }
 
   function hideBoardItem(id: string) {

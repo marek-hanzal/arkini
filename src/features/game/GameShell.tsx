@@ -9,14 +9,14 @@ import {
 } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import { resolveMergeRule, type BuildRecipeId, type ItemId } from "~/domains/game-data";
-import type { BoardViewItem, InventorySlot, ProducerDropResult } from "~/domains/database";
+import type { BoardViewItem, ProducerDropResult } from "~/domains/database";
 import { useGameAction, useGameDataInvalidation, useGameView } from "~/hooks/useGameView";
 import { Board } from "./components/Board";
 import { BuildSheet } from "./components/BuildSheet";
 import { Flyer } from "./components/Flyer";
 import { InventorySheet } from "./components/InventorySheet";
 import { Tile } from "./components/Tile";
-import { cellKey, cssEscape, firstFreeCell, inventorySinkRect, queryRect, tileVisualRect, wait, without } from "./helpers";
+import { cellKey, cssEscape, inventorySinkRect, queryRect, tileVisualRect, wait, without } from "./helpers";
 import { flyMs, type BuildCell, type CommittedDrag, type DragData, type DropData, type RectLike } from "./types";
 import { useFlyers } from "./useFlyers";
 import { useGameFeedback } from "./useGameFeedback";
@@ -178,58 +178,6 @@ export function GameShell() {
       feedback.pulseBoardCell(cellKey(boardItem.x, boardItem.y));
     } catch (error) {
       feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-      feedback.showError(error);
-    }
-  }
-
-  async function stashWithFly(boardItem: BoardViewItem) {
-    const rect = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`);
-    if (!rect) return;
-
-    const from = tileVisualRect(rect);
-    const to = inventorySinkRect(from);
-    hideBoardItem(boardItem.id);
-    addFlyer(boardItem.itemId, from, to, "stash");
-
-    try {
-      await wait(flyMs);
-      await stashBoard.mutateAsync({ boardItemId: boardItem.id });
-      feedback.pulseInventorySlot(game?.firstEmptyInventorySlotIndex ?? null);
-    } catch (error) {
-      showBoardItem(boardItem.id);
-      feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-      feedback.showError(error);
-    }
-  }
-
-  async function placeInventoryFromDoubleTap(slot: InventorySlot) {
-    if (!slot.stack || !game) return;
-    const cell = firstFreeCell(game);
-    if (!cell) {
-      feedback.flashInventorySlot(slot.slotIndex, "error");
-      feedback.showError(new Error("Board is full."));
-      return;
-    }
-
-    const sourceRect = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
-    const targetRect = queryRect(`[data-board-cell="${cell.x}:${cell.y}"]`);
-    const isLastItem = slot.stack.quantity <= 1;
-
-    if (sourceRect && targetRect) {
-      if (isLastItem) hideInventorySlot(slot.slotIndex);
-      addFlyer(slot.stack.itemId, tileVisualRect(sourceRect), tileVisualRect(targetRect));
-    }
-
-    try {
-      await wait(sourceRect && targetRect ? flyMs : 0);
-      await placeInventory.mutateAsync({ slotIndex: slot.slotIndex, x: cell.x, y: cell.y });
-      if (isLastItem) {
-        window.setTimeout(() => showInventorySlot(slot.slotIndex), 120);
-      }
-      feedback.pulseBoardCell(cellKey(cell.x, cell.y));
-    } catch (error) {
-      showInventorySlot(slot.slotIndex);
-      feedback.flashInventorySlot(slot.slotIndex, "error");
       feedback.showError(error);
     }
   }
@@ -409,7 +357,6 @@ export function GameShell() {
         invalidInventorySlot={feedback.invalidInventorySlot}
         pulsedInventorySlot={feedback.pulsedInventorySlot}
         onOpenChange={setSheetOpen}
-        onSlotActivate={placeInventoryFromDoubleTap}
       />
 
       {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} />)}

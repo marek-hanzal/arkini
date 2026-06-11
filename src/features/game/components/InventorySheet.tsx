@@ -14,7 +14,6 @@ export function InventorySheet({
   invalidInventorySlot,
   pulsedInventorySlot,
   onOpenChange,
-  onSlotActivate,
 }: Readonly<{
   game: GameView;
   open: boolean;
@@ -24,7 +23,6 @@ export function InventorySheet({
   invalidInventorySlot: number | null;
   pulsedInventorySlot: number | null;
   onOpenChange(open: boolean): void;
-  onSlotActivate(slot: InventorySlot): void;
 }>) {
   const filled = game.inventory.filter((slot) => slot.stack).length;
 
@@ -60,7 +58,6 @@ export function InventorySheet({
               }
               invalid={invalidInventorySlot === slot.slotIndex}
               pulsed={pulsedInventorySlot === slot.slotIndex}
-              onActivate={() => onSlotActivate(slot)}
             />
           ))}
         </div>
@@ -93,14 +90,12 @@ function InventoryCell({
   hidden,
   invalid,
   pulsed,
-  onActivate,
 }: Readonly<{
   slot: InventorySlot;
   item: ViewItem | null;
   hidden: boolean;
   invalid: boolean;
   pulsed: boolean;
-  onActivate(): void;
 }>) {
   const stack = slot.stack;
 
@@ -116,12 +111,12 @@ function InventoryCell({
         pulsed && !invalid && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
       )}
     >
-      {stack && item ? <InventoryTile slot={slot} item={item} hidden={hidden} onActivate={onActivate} /> : null}
+      {stack && item ? <InventoryTile slot={slot} item={item} hidden={hidden} /> : null}
     </DroppableCell>
   );
 }
 
-function InventoryTile({ slot, item, hidden }: Readonly<{ slot: InventorySlot; item: ViewItem; hidden: boolean; onActivate(): void }>) {
+function InventoryTile({ slot, item, hidden }: Readonly<{ slot: InventorySlot; item: ViewItem; hidden: boolean }>) {
   const stack = slot.stack;
 
   if (!stack) return null;

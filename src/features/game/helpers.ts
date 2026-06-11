@@ -1,14 +1,4 @@
-import type { GameView } from "~/domains/database";
 import type { RectLike } from "./types";
-
-export function firstFreeCell(game: GameView) {
-  for (let y = 0; y < game.save.boardHeight; y += 1) {
-    for (let x = 0; x < game.save.boardWidth; x += 1) {
-      if (!game.boardItemByCellKey[cellKey(x, y)]) return { x, y };
-    }
-  }
-  return null;
-}
 
 export function cellKey(x: number, y: number) {
   return `${x}:${y}`;

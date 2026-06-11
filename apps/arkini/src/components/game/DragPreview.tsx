@@ -23,10 +23,8 @@ export function DragPreview({ game, drag, faded }: Readonly<{ game: GameView; dr
 
   return (
     <div
-      className={[
-        "h-24 w-24 rounded-2xl border border-emerald-300 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/80 transition-opacity duration-150",
-        faded ? "opacity-40" : "opacity-100",
-      ].join(" ")}
+      className="h-24 w-24 rounded-2xl border border-emerald-300 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/80 will-change-[opacity]"
+      style={{ opacity: faded ? 0.35 : 1, transition: "opacity 220ms ease-out" }}
     >
       <TileContent item={item} />
     </div>

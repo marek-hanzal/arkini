@@ -238,6 +238,10 @@ export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
 
     if (!boardItem) throw new GameActionError("Board item does not exist.");
 
+    if (isProducerCoolingDown(boardItem.itemDefinitionId, parseJson<BoardItemState>(boardItem.stateJson))) {
+      throw new GameActionError("Producer is still cooling down.");
+    }
+
     await addInventoryItems(tx, boardItem.itemDefinitionId, 1, slotIndex);
     await tx.deleteFrom("boardItem").where("id", "=", boardItem.id).execute();
   });
@@ -467,6 +471,14 @@ export async function resetDefaultSaveGame() {
   });
   const { ensureDefaultSaveGame } = await import("./save");
   await ensureDefaultSaveGame();
+}
+
+function isProducerCoolingDown(itemId: string, state: BoardItemState) {
+  const producer = gameDataManifest.producers.find((definition) => definition.itemId === itemId);
+  if (!producer) return false;
+
+  const cooldownUntil = state.producer?.cooldownUntil;
+  return Boolean(cooldownUntil && Date.parse(cooldownUntil) > Date.now());
 }
 
 function createViewItemMap() {

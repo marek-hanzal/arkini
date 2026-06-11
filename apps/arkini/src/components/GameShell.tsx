@@ -25,6 +25,7 @@ import { InventoryPanel } from "~/components/game/InventoryPanel";
 import { boardPulseMs, invalidDropReturnMs, mergePulseMs, stashAnimationMs } from "~/components/game/constants";
 import { boardCellKey, parseBoardCellId } from "~/components/game/helpers/boardCellId";
 import { canMergeBoardItems } from "~/components/game/helpers/canMergeBoardItems";
+import { canStashBoardItem } from "~/components/game/helpers/canStashBoardItem";
 import { cssEscape, snapshotRect, wait } from "~/components/game/helpers/dom";
 import { findFirstFreeBoardCell } from "~/components/game/helpers/findFirstFreeBoardCell";
 import { getInventoryPreviewSlot } from "~/components/game/helpers/getInventoryPreviewSlot";
@@ -47,9 +48,11 @@ export function GameShell() {
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {
+    if (activeDrag) return;
+
     const interval = window.setInterval(() => setNowMs(Date.now()), 150);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [activeDrag]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -145,13 +148,29 @@ export function GameShell() {
     setCommittedDrag(null);
   }
 
+  function pulseDragOrigin(source: DragData) {
+    if (!game.data) return;
+
+    if (source.type === "inventory") {
+      pulseInventory(source.slotIndex);
+      return;
+    }
+
+    if (source.type === "board") {
+      const boardItem = game.data.boardItems.find((item) => item.id === source.boardItemId);
+      if (!boardItem) return;
+      pulseBoard(boardCellKey(boardItem.x, boardItem.y));
+    }
+  }
+
   function rejectDrop(source: DragData, invalidId?: string) {
     setReturningDrag(source);
+    setActiveDrag(null);
     markInvalid(invalidId);
     window.setTimeout(() => {
       setReturningDrag(null);
-      setActiveDrag(null);
-    }, invalidDropReturnMs + 50);
+      pulseDragOrigin(source);
+    }, invalidDropReturnMs + 80);
   }
 
   async function stashWithFlyout(boardItemId: string, itemId: string) {
@@ -335,6 +354,11 @@ export function GameShell() {
           return;
         }
 
+        if (!canStashBoardItem(game.data, source.boardItemId, nowMs)) {
+          reject(source.boardItemId);
+          return;
+        }
+
         const targetSlotIndex = resolveInventoryDestination(game.data, boardItem.itemId, target.slotIndex);
         if (targetSlotIndex === null) {
           reject(overId);
@@ -361,7 +385,7 @@ export function GameShell() {
 
   if (!game.data) return null;
 
-  const inventoryPreviewSlot = getInventoryPreviewSlot(game.data, activeDrag, activeOverId);
+  const inventoryPreviewSlot = getInventoryPreviewSlot(game.data, activeDrag, activeOverId, nowMs);
   const hiddenDrag = committedDrag ?? returningDrag;
   const overlayFaded = isMergeOverlayFaded(game.data, activeDrag, activeOverId);
 

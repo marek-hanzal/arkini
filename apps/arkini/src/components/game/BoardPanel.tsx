@@ -148,7 +148,9 @@ function BoardCell({
               ? "border-emerald-300 bg-emerald-950/40"
               : dropState === "invalid"
                 ? "border-red-300 bg-red-950/40"
-                : "border-slate-800",
+                : item?.canProduce
+                  ? "border-amber-400/40 bg-amber-950/15"
+                  : "border-slate-800",
       ].join(" ")}
     >
       {visibleBoardItem && item ? (
@@ -163,11 +165,7 @@ function BoardCell({
           onProduce={() => onProduce(visibleBoardItem.id)}
           onStash={() => onStash(visibleBoardItem.id, visibleBoardItem.itemId)}
         />
-      ) : (
-        <div className="flex h-full items-center justify-center text-[0.65rem] text-slate-700">
-          {x},{y}
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -228,6 +226,7 @@ function BoardItemCard({
       onDoubleClick={handleDoubleClick}
       className={[
         "relative flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 overflow-hidden rounded-lg text-center transition duration-200 active:cursor-grabbing disabled:cursor-not-allowed",
+        item.canProduce ? "bg-amber-400/5 ring-1 ring-amber-300/20" : "",
         selected ? "bg-emerald-500/15 ring-1 ring-emerald-300" : "hover:bg-slate-800/70",
         mergePulse ? "scale-110 bg-emerald-500/20 ring-2 ring-emerald-200" : "scale-100",
         isDragging ? "opacity-0" : "opacity-100",
@@ -235,10 +234,15 @@ function BoardItemCard({
       {...listeners}
       {...attributes}
     >
+      {item.canProduce ? (
+        <div className="pointer-events-none absolute left-1 top-1 z-10 rounded-full border border-amber-300/30 bg-amber-950/80 px-1.5 py-0.5 text-[0.52rem] font-bold uppercase tracking-[0.12em] text-amber-100">
+          Gen
+        </div>
+      ) : null}
       {cooldown.coolingDown ? (
         <div
-          className="absolute inset-x-0 bottom-0 bg-amber-400/15 transition-[height] duration-150"
-          style={{ height: `${Math.round(cooldown.progress * 100)}%` }}
+          className="absolute inset-x-0 bottom-0 origin-bottom bg-amber-400/15 transition-transform duration-200 ease-out will-change-transform"
+          style={{ transform: `scaleY(${cooldown.progress})` }}
         />
       ) : null}
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1">

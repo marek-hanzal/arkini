@@ -110,11 +110,11 @@ The prototype uses one primary interaction model: drag and drop through `@dnd-ki
 - drag a board item onto an empty board cell to move it
 - drag a board item onto a valid merge target; cells show valid/invalid feedback before drop, the dragged overlay fades over valid merge targets, and successful merges scale-pulse the target
 - double-click a producer to produce; it remains selected so its details do not flicker away after the action
-- producer tiles show cooldown progress directly in the tile background; cooldown failures flash the tile instead of also throwing a toast
+- producer tiles have a distinct generator treatment and show cooldown progress directly in the tile background; cooldown failures flash the tile instead of also throwing a toast
 - invalid drops animate back to their source while the source stays hidden until the return finishes
 - finite producers, such as crates, spend charges and disappear when depleted
 - drag a blueprint build recipe onto an empty board cell to consume blueprint/materials from inventory and place the result
-- drag a board item onto inventory to store it; existing compatible stacks are preferred before empty slots and the chosen slot pulses
+- drag a board item onto inventory to store it; existing compatible stacks are preferred before empty slots and the chosen slot pulses. Cooling producers cannot be stashed, because that would bypass their timer like a tiny local exploit
 - double-click a non-producer board item to animate it into the resolved inventory stack/slot
 - reset save for prototype testing
 - hard reset the whole OPFS database when migrations changed during local development

@@ -23,7 +23,7 @@ Arkini is a classic 1×1 tile merge game with a second economy layer:
 - TanStack Query for async local state flows
 - Tailwind CSS v4 through the Vite plugin
 - DnD Kit for the single drag-and-drop interaction model
-- Sonner for rare toast-level feedback
+- Sonner for rare toast-level feedback without a concrete tile/slot target
 - SQLite in browser OPFS via SQLocal
 - Kysely typed query layer
 - Bun-first scripts; npm works when Bun is not available
@@ -56,7 +56,7 @@ For GitHub Pages under a repository path, set the Vite base:
 VITE_BASE=/your-repo-name/ bun run build
 ```
 
-The router currently uses hash history, so static hosts do not need SPA rewrite rules for future client routes.
+The repository includes `.github/workflows/pages.yml`, which builds with `VITE_BASE=/arkini/` and uploads `apps/arkini/dist` to GitHub Pages. The router currently uses hash history, so static hosts do not need SPA rewrite rules for future client routes.
 
 ## OPFS and cross-origin isolation
 
@@ -107,7 +107,7 @@ The prototype uses one primary interaction model: drag and drop through `@dnd-ki
 - drag a board item onto an empty board cell to move it
 - drag a board item onto a valid merge target; cells show valid/invalid feedback before drop
 - double-click a producer to produce; drops appear around it only when enough free adjacent space exists
-- producer tiles show cooldown progress directly in the tile background
+- producer tiles show cooldown progress directly in the tile background; cooldown failures flash the tile instead of also throwing a toast
 - finite producers, such as crates, spend charges and disappear when depleted
 - drag a blueprint build recipe onto an empty board cell to consume blueprint/materials from inventory and place the result
 - drag a board item onto inventory to store it; existing compatible stacks are preferred before empty slots
@@ -138,7 +138,7 @@ That manifest defines:
 - items and max stack sizes
 - merge definitions
 - drop tables
-- producer definitions and cooldowns; Town Hall producers are intentionally short during prototype testing
+- producer definitions and cooldowns; upgraded producers still drop some low-tier materials so build recipes do not soft-lock
 - finite/infinite producer modes
 - build recipes
 - starting inventory/board state

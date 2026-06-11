@@ -47,7 +47,8 @@ type Flyout = {
   to: RectSnapshot;
 };
 
-const cellClass = "h-20 w-20 shrink-0 rounded-xl border p-1.5 transition";
+const cellSize = "6rem";
+const cellClass = "h-24 w-24 shrink-0 rounded-2xl border p-2 transition";
 const stashAnimationMs = 240;
 
 export function GameShell() {
@@ -112,13 +113,23 @@ export function GameShell() {
     window.setTimeout(() => setInventoryPulseSlot(null), 700);
   }
 
+  function showActionError(error: unknown, invalidId?: string) {
+    markInvalid(invalidId);
+
+    // When a concrete tile/slot flashes red, that is the feedback. Toasts are
+    // reserved for failures without a visible target, because double-reporting
+    // errors is how UI starts nagging like tax software.
+    if (invalidId) return;
+
+    toast.error(error instanceof Error ? error.message : "Action failed.");
+  }
+
   async function runAction(action: () => Promise<unknown>, invalidId?: string) {
     try {
       await action();
       setSelection(null);
     } catch (error) {
-      markInvalid(invalidId);
-      toast.error(error instanceof Error ? error.message : "Action failed.");
+      showActionError(error, invalidId);
     }
   }
 
@@ -129,8 +140,7 @@ export function GameShell() {
       onSuccess?.();
       setSelection(null);
     } catch (error) {
-      markInvalid(invalidId);
-      toast.error(error instanceof Error ? error.message : "Action failed.");
+      showActionError(error, invalidId);
     } finally {
       setCommittedDrag(null);
     }
@@ -142,7 +152,6 @@ export function GameShell() {
     const targetSlotIndex = resolveInventoryDestination(game.data, itemId);
     if (targetSlotIndex === null) {
       markInvalid(boardItemId);
-      toast.error("Inventory is full.");
       return;
     }
 
@@ -166,8 +175,7 @@ export function GameShell() {
       pulseInventory(targetSlotIndex);
       setSelection(null);
     } catch (error) {
-      markInvalid(boardItemId);
-      toast.error(error instanceof Error ? error.message : "Action failed.");
+      showActionError(error, boardItemId);
     } finally {
       setFlyout(null);
       setCommittedDrag(null);
@@ -222,7 +230,6 @@ export function GameShell() {
         if (targetBoardItemId) {
           if (!canMergeBoardItems(game.data, source.boardItemId, targetBoardItemId)) {
             markInvalid(overId);
-            toast.error("These items cannot merge.");
             return;
           }
 
@@ -246,7 +253,6 @@ export function GameShell() {
         const targetSlotIndex = resolveInventoryDestination(game.data, boardItem.itemId, target.slotIndex);
         if (targetSlotIndex === null) {
           markInvalid(overId);
-          toast.error("Inventory is full.");
           return;
         }
 
@@ -293,7 +299,7 @@ export function GameShell() {
         onDragCancel={handleDragCancel}
         onDragEnd={handleDragEnd}
       >
-        <section className="grid w-fit max-w-full gap-4 xl:grid-cols-[auto_20rem]">
+        <section className="grid w-fit max-w-full gap-3 xl:grid-cols-[auto_20rem]">
           <div className="flex min-w-0 flex-col gap-4">
             <GameBoard
               game={game.data}
@@ -383,7 +389,7 @@ function GameBoard({
       </div>
 
       <div className="mt-4 max-w-full overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/30 p-2">
-        <div className="grid w-fit gap-1.5" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, 5rem)` }}>
+        <div className="grid w-fit gap-1.5" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, ${cellSize})` }}>
           {cells.map((cell) => {
             const boardItem = itemByCell.get(`${cell.x}:${cell.y}`);
             return (
@@ -586,7 +592,7 @@ function InventoryPanel({
         <p className="text-xs font-medium text-slate-500">{game.inventory.length} slots</p>
       </div>
       <div className="mt-4 max-w-full overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/30 p-2">
-        <div className="grid w-fit gap-1.5" style={{ gridTemplateColumns: `repeat(${columns}, 5rem)` }}>
+        <div className="grid w-fit gap-1.5" style={{ gridTemplateColumns: `repeat(${columns}, ${cellSize})` }}>
           {game.inventory.map((slot) => (
             <InventorySlotCell
               key={slot.slotIndex}
@@ -840,7 +846,7 @@ function DragPreview({ game, drag }: Readonly<{ game: GameView; drag: DragData }
   if (!item) return null;
 
   return (
-    <div className="h-20 w-20 rounded-xl border border-emerald-300 bg-slate-950/95 p-1.5 shadow-2xl shadow-slate-950/80">
+    <div className="h-24 w-24 rounded-2xl border border-emerald-300 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/80">
       <TileContent item={item} />
     </div>
   );
@@ -859,7 +865,7 @@ function FlyoutTile({ game, flyout }: Readonly<{ game: GameView; flyout: Flyout 
 
   return (
     <div
-      className="pointer-events-none fixed z-50 rounded-xl border border-sky-300 bg-slate-950/95 p-1.5 shadow-2xl shadow-slate-950/80"
+      className="pointer-events-none fixed z-50 rounded-2xl border border-sky-300 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/80"
       style={{
         left: flyout.from.left,
         top: flyout.from.top,
@@ -880,8 +886,8 @@ function FlyoutTile({ game, flyout }: Readonly<{ game: GameView; flyout: Flyout 
 function TileContent({ item }: Readonly<{ item: GameView["items"][string] }>) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-center">
-      <img src={item.assetSrc} alt="" className="h-8 w-8" />
-      <span className="line-clamp-1 max-w-full text-[0.58rem] font-medium leading-tight text-slate-200">{item.name}</span>
+      <img src={item.assetSrc} alt="" className="h-10 w-10" />
+      <span className="line-clamp-1 max-w-full text-[0.65rem] font-medium leading-tight text-slate-200">{item.name}</span>
     </div>
   );
 }

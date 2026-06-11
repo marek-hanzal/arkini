@@ -116,7 +116,7 @@ export const gameDataManifest = {
   game: {
     id: "arkini",
     title: "Arkini",
-    dataVersion: 1,
+    dataVersion: 2,
     board: { width: 7, height: 9 },
     inventory: { slots: 21 },
   },
@@ -176,11 +176,15 @@ export const gameDataManifest = {
       id: "drop:townhall-2",
       label: "Town Hall II drops",
       entries: [
-        { itemId: "item:branch", weight: 36, quantity: 1 },
-        { itemId: "item:stone", weight: 32, quantity: 1 },
-        { itemId: "item:water", weight: 18, quantity: { min: 1, max: 2 } },
-        { itemId: "item:common-crate", weight: 10, quantity: 1 },
-        { itemId: "item:blueprint-townhall", weight: 4, quantity: 1 },
+        // Upgraded producers still leak low-tier materials. Without that, the
+        // economy soft-locks itself like a tiny bureaucratic masterpiece.
+        { itemId: "item:branch", weight: 28, quantity: 1 },
+        { itemId: "item:stone", weight: 24, quantity: 1 },
+        { itemId: "item:twig", weight: 16, quantity: 1 },
+        { itemId: "item:pebble", weight: 16, quantity: 1 },
+        { itemId: "item:water", weight: 10, quantity: { min: 1, max: 2 } },
+        { itemId: "item:common-crate", weight: 4, quantity: 1 },
+        { itemId: "item:blueprint-townhall", weight: 2, quantity: 1 },
       ],
     },
     {

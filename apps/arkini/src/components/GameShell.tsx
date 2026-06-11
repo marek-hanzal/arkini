@@ -53,8 +53,8 @@ export function GameShell() {
   if (!game.data) return null;
 
   return (
-    <section className="grid gap-8 xl:grid-cols-[1fr_24rem]">
-      <div className="flex flex-col gap-6">
+    <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="flex min-w-0 flex-col gap-4">
         <GameBoard
           game={game.data}
           selection={selection}
@@ -70,7 +70,7 @@ export function GameShell() {
         <InventoryPanel game={game.data} selection={selection} pending={pending} onSelect={setSelection} />
       </div>
 
-      <aside className="flex flex-col gap-6">
+      <aside className="flex flex-col gap-4">
         <ActionPanel
           game={game.data}
           selection={selection}
@@ -138,16 +138,19 @@ function GameBoard({
   }
 
   return (
-    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-slate-950/40">
-      <div className="flex items-start justify-between gap-4">
-        <div>
+    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-4 shadow-2xl shadow-slate-950/40">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-baseline gap-3">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-300">Board</p>
-          <h2 className="mt-2 text-xl font-semibold text-white">Merge + producer space</h2>
+          <h2 className="text-base font-semibold text-white">Merge space</h2>
         </div>
-        <p className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-400">1×1 only</p>
+        <p className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-400">{game.save.boardWidth}×{game.save.boardHeight}, 1×1</p>
       </div>
 
-      <div className="mt-5 grid gap-2" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, minmax(0, 1fr))` }}>
+      <div
+        className="mt-4 grid max-w-full justify-start gap-1.5 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/30 p-2"
+        style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, minmax(2.85rem, 4.4rem))` }}
+      >
         {cells.map((cell) => {
           const boardItem = itemByCell.get(`${cell.x}:${cell.y}`);
           const item = boardItem ? game.items[boardItem.itemId] : null;
@@ -160,17 +163,17 @@ function GameBoard({
               disabled={pending}
               onClick={() => clickCell(cell.x, cell.y)}
               className={[
-                "aspect-square rounded-2xl border p-2 text-left shadow-inner shadow-black/30 transition",
+                "aspect-square rounded-xl border p-1 text-left shadow-inner shadow-black/30 transition",
                 selected ? "border-emerald-300 bg-emerald-950/50" : "border-slate-800 bg-slate-950/80 hover:border-slate-500",
               ].join(" ")}
             >
               {item ? (
                 <div className="flex h-full flex-col items-center justify-center gap-1">
-                  <img src={item.assetSrc} alt="" className="h-10 w-10 sm:h-12 sm:w-12" />
-                  <span className="line-clamp-1 text-center text-[0.65rem] font-medium text-slate-200">{item.name}</span>
+                  <img src={item.assetSrc} alt="" className="h-8 w-8 sm:h-9 sm:w-9" />
+                  <span className="line-clamp-1 max-w-full text-center text-[0.58rem] font-medium leading-tight text-slate-200">{item.name}</span>
                 </div>
               ) : (
-                <span className="flex h-full items-center justify-center text-xs text-slate-700">{cell.x},{cell.y}</span>
+                <span className="flex h-full items-center justify-center text-[0.6rem] text-slate-700">{cell.x},{cell.y}</span>
               )}
             </button>
           );
@@ -192,10 +195,18 @@ function InventoryPanel({
   onSelect(selection: Selection): void;
 }>) {
   return (
-    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-slate-950/40">
-      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300">Inventory</p>
-      <h2 className="mt-2 text-xl font-semibold text-white">Limited stack storage</h2>
-      <div className="mt-5 grid grid-cols-6 gap-2 md:grid-cols-9">
+    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-4 shadow-2xl shadow-slate-950/40">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <div className="flex items-baseline gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300">Inventory</p>
+          <h2 className="text-base font-semibold text-white">Stack storage</h2>
+        </div>
+        <p className="text-xs font-medium text-slate-500">{game.inventory.length} slots</p>
+      </div>
+      <div
+        className="mt-4 grid justify-start gap-1.5 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/30 p-2"
+        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(2.85rem, 3.5rem))" }}
+      >
         {game.inventory.map((slot) => {
           const item = slot.stack ? game.items[slot.stack.itemId] : null;
           const selected = selection?.type === "inventory" && selection.slotIndex === slot.slotIndex;
@@ -207,15 +218,15 @@ function InventoryPanel({
               disabled={pending || !slot.stack}
               onClick={() => onSelect(selected ? null : { type: "inventory", slotIndex: slot.slotIndex })}
               className={[
-                "relative aspect-square rounded-2xl border p-2 transition",
+                "relative aspect-square rounded-xl border p-1.5 transition",
                 selected ? "border-sky-300 bg-sky-950/50" : "border-slate-800 bg-slate-950/80 hover:border-slate-500",
                 !slot.stack ? "opacity-50" : "",
               ].join(" ")}
             >
               {item && slot.stack ? (
                 <>
-                  <img src={item.assetSrc} alt="" className="mx-auto h-9 w-9" />
-                  <span className="absolute bottom-1 right-2 rounded-full bg-slate-900 px-1.5 text-xs font-bold text-slate-100">
+                  <img src={item.assetSrc} alt="" className="mx-auto h-8 w-8" />
+                  <span className="absolute bottom-0.5 right-1 rounded-full bg-slate-900 px-1.5 text-[0.65rem] font-bold text-slate-100">
                     {slot.stack.quantity}
                   </span>
                 </>
@@ -251,7 +262,7 @@ function ActionPanel({
   const selectedItem = selectedBoardItem ? game.items[selectedBoardItem.itemId] : null;
 
   return (
-    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-slate-950/40">
+    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-4 shadow-2xl shadow-slate-950/40">
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Actions</p>
       <h2 className="mt-2 text-xl font-semibold text-white">Small blocks, no ceremony</h2>
       <p className="mt-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-sm leading-6 text-slate-300">{message}</p>
@@ -339,7 +350,7 @@ function BuildPanel({
 
 function GameCard({ title, children }: Readonly<{ title: string; children: ReactNode }>) {
   return (
-    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-slate-950/40">
+    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-4 shadow-2xl shadow-slate-950/40">
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Arkini</p>
       <h2 className="mt-2 text-xl font-semibold text-white">{title}</h2>
       <p className="mt-4 text-sm leading-6 text-slate-300">{children}</p>

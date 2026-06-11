@@ -6,12 +6,15 @@ import {
   useDroppable,
   useSensor,
   useSensors,
+  type DragCancelEvent,
   type DragEndEvent,
+  type DragOverEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { snapCenterToCursor } from "@dnd-kit/modifiers";
 import type { GameView } from "@arkini/db";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { match } from "ts-pattern";
 import { DbStatusCard } from "~/components/DbStatusCard";
@@ -28,14 +31,40 @@ type DropData =
   | { type: "board-cell"; x: number; y: number; boardItemId?: string }
   | { type: "inventory-slot"; slotIndex: number };
 
+type DropState = "neutral" | "valid" | "invalid";
+
+type RectSnapshot = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+type Flyout = {
+  id: number;
+  itemId: string;
+  from: RectSnapshot;
+  to: RectSnapshot;
+};
+
 const cellClass = "h-20 w-20 shrink-0 rounded-xl border p-1.5 transition";
+const stashAnimationMs = 240;
 
 export function GameShell() {
   const game = useGameView();
   const [selection, setSelection] = useState<Selection>(null);
   const [activeDrag, setActiveDrag] = useState<DragData | null>(null);
+  const [activeOverId, setActiveOverId] = useState<string | null>(null);
   const [committedDrag, setCommittedDrag] = useState<DragData | null>(null);
   const [invalidTargetId, setInvalidTargetId] = useState<string | null>(null);
+  const [inventoryPulseSlot, setInventoryPulseSlot] = useState<number | null>(null);
+  const [flyout, setFlyout] = useState<Flyout | null>(null);
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNowMs(Date.now()), 150);
+    return () => window.clearInterval(interval);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -49,7 +78,7 @@ export function GameShell() {
   const moveBoard = useGameAction((db, input: { boardItemId: string; x: number; y: number }) =>
     db.moveBoardItem(input.boardItemId, input.x, input.y),
   );
-  const stashBoard = useGameAction((db, input: { boardItemId: string; slotIndex: number }) =>
+  const stashBoard = useGameAction((db, input: { boardItemId: string; slotIndex?: number }) =>
     db.stashBoardItem(input.boardItemId, input.slotIndex),
   );
   const mergeBoard = useGameAction((db, input: { sourceBoardItemId: string; targetBoardItemId: string }) =>
@@ -68,12 +97,19 @@ export function GameShell() {
     mergeBoard.isPending ||
     produce.isPending ||
     build.isPending ||
-    reset.isPending;
+    reset.isPending ||
+    flyout !== null;
 
   function markInvalid(targetId?: string) {
     if (!targetId) return;
     setInvalidTargetId(targetId);
     window.setTimeout(() => setInvalidTargetId(null), 650);
+  }
+
+  function pulseInventory(slotIndex: number | null | undefined) {
+    if (slotIndex === null || slotIndex === undefined) return;
+    setInventoryPulseSlot(slotIndex);
+    window.setTimeout(() => setInventoryPulseSlot(null), 700);
   }
 
   async function runAction(action: () => Promise<unknown>, invalidId?: string) {
@@ -86,10 +122,11 @@ export function GameShell() {
     }
   }
 
-  async function runDrop(action: () => Promise<unknown>, source: DragData, invalidId?: string) {
+  async function runDrop(action: () => Promise<unknown>, source: DragData, invalidId?: string, onSuccess?: () => void) {
     setCommittedDrag(source);
     try {
       await action();
+      onSuccess?.();
       setSelection(null);
     } catch (error) {
       markInvalid(invalidId);
@@ -99,8 +136,56 @@ export function GameShell() {
     }
   }
 
+  async function stashWithFlyout(boardItemId: string, itemId: string) {
+    if (!game.data) return;
+
+    const targetSlotIndex = resolveInventoryDestination(game.data, itemId);
+    if (targetSlotIndex === null) {
+      markInvalid(boardItemId);
+      toast.error("Inventory is full.");
+      return;
+    }
+
+    const sourceNode = document.querySelector<HTMLElement>(`[data-board-item-id="${cssEscape(boardItemId)}"]`);
+    const targetNode = document.querySelector<HTMLElement>(`[data-inventory-slot-index="${targetSlotIndex}"]`);
+
+    setCommittedDrag({ type: "board", boardItemId });
+
+    if (sourceNode && targetNode) {
+      setFlyout({
+        id: Date.now(),
+        itemId,
+        from: snapshotRect(sourceNode.getBoundingClientRect()),
+        to: snapshotRect(targetNode.getBoundingClientRect()),
+      });
+      await wait(stashAnimationMs);
+    }
+
+    try {
+      await stashBoard.mutateAsync({ boardItemId, slotIndex: targetSlotIndex });
+      pulseInventory(targetSlotIndex);
+      setSelection(null);
+    } catch (error) {
+      markInvalid(boardItemId);
+      toast.error(error instanceof Error ? error.message : "Action failed.");
+    } finally {
+      setFlyout(null);
+      setCommittedDrag(null);
+    }
+  }
+
   function handleDragStart(event: DragStartEvent) {
     setActiveDrag(event.active.data.current as DragData | null);
+    setActiveOverId(null);
+  }
+
+  function handleDragOver(event: DragOverEvent) {
+    setActiveOverId(event.over ? String(event.over.id) : null);
+  }
+
+  function handleDragCancel(_event: DragCancelEvent) {
+    setActiveDrag(null);
+    setActiveOverId(null);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -108,8 +193,9 @@ export function GameShell() {
     const over = event.over?.data.current as DropData | undefined;
     const overId = event.over ? String(event.over.id) : undefined;
     setActiveDrag(null);
+    setActiveOverId(null);
 
-    if (!active || !over) {
+    if (!active || !over || !game.data) {
       markInvalid(overId ?? String(event.active.id));
       return;
     }
@@ -134,6 +220,12 @@ export function GameShell() {
 
         const targetBoardItemId = target.boardItemId;
         if (targetBoardItemId) {
+          if (!canMergeBoardItems(game.data, source.boardItemId, targetBoardItemId)) {
+            markInvalid(overId);
+            toast.error("These items cannot merge.");
+            return;
+          }
+
           void runDrop(
             () => mergeBoard.mutateAsync({ sourceBoardItemId: source.boardItemId, targetBoardItemId }),
             active,
@@ -145,7 +237,25 @@ export function GameShell() {
         void runDrop(() => moveBoard.mutateAsync({ boardItemId: source.boardItemId, x: target.x, y: target.y }), active, overId);
       })
       .with([{ type: "board" }, { type: "inventory-slot" }], ([source, target]) => {
-        void runDrop(() => stashBoard.mutateAsync({ boardItemId: source.boardItemId, slotIndex: target.slotIndex }), active, overId);
+        const boardItem = game.data.boardItems.find((item) => item.id === source.boardItemId);
+        if (!boardItem) {
+          markInvalid(overId);
+          return;
+        }
+
+        const targetSlotIndex = resolveInventoryDestination(game.data, boardItem.itemId, target.slotIndex);
+        if (targetSlotIndex === null) {
+          markInvalid(overId);
+          toast.error("Inventory is full.");
+          return;
+        }
+
+        void runDrop(
+          () => stashBoard.mutateAsync({ boardItemId: source.boardItemId, slotIndex: targetSlotIndex }),
+          active,
+          `inventory:${targetSlotIndex}`,
+          () => pulseInventory(targetSlotIndex),
+        );
       })
       .otherwise(() => {
         markInvalid(overId);
@@ -162,6 +272,8 @@ export function GameShell() {
 
   if (!game.data) return null;
 
+  const inventoryPreviewSlot = getInventoryPreviewSlot(game.data, activeDrag, activeOverId);
+
   return (
     <>
       <Toaster
@@ -174,18 +286,35 @@ export function GameShell() {
           },
         }}
       />
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem]">
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragCancel={handleDragCancel}
+        onDragEnd={handleDragEnd}
+      >
+        <section className="grid w-fit max-w-full gap-4 xl:grid-cols-[auto_20rem]">
           <div className="flex min-w-0 flex-col gap-4">
             <GameBoard
               game={game.data}
               selection={selection}
+              activeDrag={activeDrag}
               pending={pending}
               invalidTargetId={invalidTargetId}
               committedDrag={committedDrag}
+              nowMs={nowMs}
               onSelect={setSelection}
+              onProduce={(boardItemId) => runAction(() => produce.mutateAsync({ boardItemId }), boardItemId)}
+              onStash={stashWithFlyout}
             />
-            <InventoryPanel game={game.data} pending={pending} invalidTargetId={invalidTargetId} committedDrag={committedDrag} />
+            <InventoryPanel
+              game={game.data}
+              pending={pending}
+              invalidTargetId={invalidTargetId}
+              committedDrag={committedDrag}
+              previewSlotIndex={inventoryPreviewSlot}
+              pulseSlotIndex={inventoryPulseSlot}
+            />
           </div>
 
           <aside className="flex flex-col gap-4">
@@ -195,14 +324,16 @@ export function GameShell() {
               pending={pending}
               invalidTargetId={invalidTargetId}
               committedDrag={committedDrag}
-              onProduce={(boardItemId) => runAction(() => produce.mutateAsync({ boardItemId }), boardItemId)}
               onReset={() => runAction(() => reset.mutateAsync(undefined))}
             />
             <DbStatusCard />
           </aside>
         </section>
-        <DragOverlay dropAnimation={null}>{activeDrag ? <DragPreview game={game.data} drag={activeDrag} /> : null}</DragOverlay>
+        <DragOverlay dropAnimation={null} modifiers={[snapCenterToCursor]}>
+          {activeDrag ? <DragPreview game={game.data} drag={activeDrag} /> : null}
+        </DragOverlay>
       </DndContext>
+      {flyout ? <FlyoutTile game={game.data} flyout={flyout} /> : null}
     </>
   );
 }
@@ -210,17 +341,25 @@ export function GameShell() {
 function GameBoard({
   game,
   selection,
+  activeDrag,
   pending,
   invalidTargetId,
   committedDrag,
+  nowMs,
   onSelect,
+  onProduce,
+  onStash,
 }: Readonly<{
   game: GameView;
   selection: Selection;
+  activeDrag: DragData | null;
   pending: boolean;
   invalidTargetId: string | null;
   committedDrag: DragData | null;
+  nowMs: number;
   onSelect(selection: Selection): void;
+  onProduce(boardItemId: string): void;
+  onStash(boardItemId: string, itemId: string): void;
 }>) {
   const itemByCell = useMemo(
     () => new Map(game.boardItems.map((item) => [`${item.x}:${item.y}`, item])),
@@ -255,10 +394,14 @@ function GameBoard({
                 y={cell.y}
                 boardItem={boardItem ?? null}
                 selected={selection?.type === "board" && selection.boardItemId === boardItem?.id}
+                activeDrag={activeDrag}
                 pending={pending}
                 invalidTargetId={invalidTargetId}
                 committedDrag={committedDrag}
+                nowMs={nowMs}
                 onSelect={onSelect}
+                onProduce={onProduce}
+                onStash={onStash}
               />
             );
           })}
@@ -274,20 +417,28 @@ function BoardCell({
   y,
   boardItem,
   selected,
+  activeDrag,
   pending,
   invalidTargetId,
   committedDrag,
+  nowMs,
   onSelect,
+  onProduce,
+  onStash,
 }: Readonly<{
   game: GameView;
   x: number;
   y: number;
   boardItem: GameView["boardItems"][number] | null;
   selected: boolean;
+  activeDrag: DragData | null;
   pending: boolean;
   invalidTargetId: string | null;
   committedDrag: DragData | null;
+  nowMs: number;
   onSelect(selection: Selection): void;
+  onProduce(boardItemId: string): void;
+  onStash(boardItemId: string, itemId: string): void;
 }>) {
   const dropId = `board:${x}:${y}`;
   const { isOver, setNodeRef } = useDroppable({
@@ -299,6 +450,7 @@ function BoardCell({
   const visibleBoardItem = sourceCommitted ? null : boardItem;
   const invalid = invalidTargetId === dropId || invalidTargetId === boardItem?.id;
   const item = visibleBoardItem ? game.items[visibleBoardItem.itemId] : null;
+  const dropState = isOver ? getBoardCellDropState(game, activeDrag, boardItem) : "neutral";
 
   return (
     <div
@@ -306,16 +458,25 @@ function BoardCell({
       className={[
         cellClass,
         "bg-slate-950/80 shadow-inner shadow-black/30",
-        invalid ? "border-red-300 bg-red-950/40" : isOver ? "border-emerald-300 bg-emerald-950/40" : "border-slate-800",
+        invalid
+          ? "border-red-300 bg-red-950/40"
+          : dropState === "valid"
+            ? "border-emerald-300 bg-emerald-950/40"
+            : dropState === "invalid"
+              ? "border-red-300 bg-red-950/40"
+              : "border-slate-800",
       ].join(" ")}
     >
       {visibleBoardItem && item ? (
         <BoardItemCard
           item={item}
-          boardItemId={visibleBoardItem.id}
+          boardItem={visibleBoardItem}
           selected={selected}
           pending={pending}
+          nowMs={nowMs}
           onSelect={() => onSelect(selected ? null : { type: "board", boardItemId: visibleBoardItem.id })}
+          onProduce={() => onProduce(visibleBoardItem.id)}
+          onStash={() => onStash(visibleBoardItem.id, visibleBoardItem.itemId)}
         />
       ) : (
         <div className="flex h-full items-center justify-center text-[0.6rem] text-slate-700">
@@ -328,38 +489,72 @@ function BoardCell({
 
 function BoardItemCard({
   item,
-  boardItemId,
+  boardItem,
   selected,
   pending,
+  nowMs,
   onSelect,
+  onProduce,
+  onStash,
 }: Readonly<{
   item: GameView["items"][string];
-  boardItemId: string;
+  boardItem: GameView["boardItems"][number];
   selected: boolean;
   pending: boolean;
+  nowMs: number;
   onSelect(): void;
+  onProduce(): void;
+  onStash(): void;
 }>) {
   const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
-    id: `board-item:${boardItemId}`,
-    data: { type: "board", boardItemId } satisfies DragData,
+    id: `board-item:${boardItem.id}`,
+    data: { type: "board", boardItemId: boardItem.id } satisfies DragData,
     disabled: pending,
   });
+  const cooldown = getCooldown(item, boardItem, nowMs);
+
+  function handleDoubleClick(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (item.canProduce) {
+      onProduce();
+      return;
+    }
+
+    onStash();
+  }
 
   return (
     <button
       ref={setNodeRef}
       type="button"
       disabled={pending}
+      data-board-item-id={boardItem.id}
       onClick={onSelect}
+      onDoubleClick={handleDoubleClick}
       className={[
-        "flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 rounded-lg text-center transition active:cursor-grabbing disabled:cursor-not-allowed",
+        "relative flex h-full w-full cursor-grab flex-col items-center justify-center gap-1 overflow-hidden rounded-lg text-center transition active:cursor-grabbing disabled:cursor-not-allowed",
         selected ? "bg-emerald-500/15 ring-1 ring-emerald-300" : "hover:bg-slate-800/70",
         isDragging ? "opacity-0" : "opacity-100",
       ].join(" ")}
       {...listeners}
       {...attributes}
     >
-      <TileContent item={item} />
+      {cooldown.coolingDown ? (
+        <div
+          className="absolute inset-x-0 bottom-0 bg-amber-400/15 transition-[height] duration-150"
+          style={{ height: `${Math.round(cooldown.progress * 100)}%` }}
+        />
+      ) : null}
+      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1">
+        <TileContent item={item} />
+        {cooldown.coolingDown ? (
+          <span className="absolute right-0.5 top-0.5 rounded-full bg-slate-950/90 px-1.5 text-[0.58rem] font-bold text-amber-100">
+            {Math.ceil(cooldown.remainingMs / 1000)}s
+          </span>
+        ) : null}
+      </div>
     </button>
   );
 }
@@ -369,11 +564,15 @@ function InventoryPanel({
   pending,
   invalidTargetId,
   committedDrag,
+  previewSlotIndex,
+  pulseSlotIndex,
 }: Readonly<{
   game: GameView;
   pending: boolean;
   invalidTargetId: string | null;
   committedDrag: DragData | null;
+  previewSlotIndex: number | null;
+  pulseSlotIndex: number | null;
 }>) {
   const columns = game.save.boardWidth;
 
@@ -396,6 +595,8 @@ function InventoryPanel({
               pending={pending}
               invalidTargetId={invalidTargetId}
               committedDrag={committedDrag}
+              preview={previewSlotIndex === slot.slotIndex}
+              pulse={pulseSlotIndex === slot.slotIndex}
             />
           ))}
         </div>
@@ -410,12 +611,16 @@ function InventorySlotCell({
   pending,
   invalidTargetId,
   committedDrag,
+  preview,
+  pulse,
 }: Readonly<{
   game: GameView;
   slot: GameView["inventory"][number];
   pending: boolean;
   invalidTargetId: string | null;
   committedDrag: DragData | null;
+  preview: boolean;
+  pulse: boolean;
 }>) {
   const dropId = `inventory:${slot.slotIndex}`;
   const { isOver, setNodeRef } = useDroppable({
@@ -431,10 +636,19 @@ function InventorySlotCell({
   return (
     <div
       ref={setNodeRef}
+      data-inventory-slot-index={slot.slotIndex}
       className={[
         cellClass,
         "relative bg-slate-950/80",
-        invalid ? "border-red-300 bg-red-950/40" : isOver ? "border-sky-300 bg-sky-950/40" : "border-slate-800",
+        invalid
+          ? "border-red-300 bg-red-950/40"
+          : pulse
+            ? "border-sky-200 bg-sky-500/20 ring-2 ring-sky-300/50"
+            : preview
+              ? "border-sky-300 bg-sky-950/40"
+              : isOver
+                ? "border-slate-500 bg-slate-900/60"
+                : "border-slate-800",
       ].join(" ")}
     >
       {item && visibleStack ? (
@@ -485,7 +699,6 @@ function ActionPanel({
   pending,
   invalidTargetId,
   committedDrag,
-  onProduce,
   onReset,
 }: Readonly<{
   game: GameView;
@@ -493,7 +706,6 @@ function ActionPanel({
   pending: boolean;
   invalidTargetId: string | null;
   committedDrag: DragData | null;
-  onProduce(boardItemId: string): void;
   onReset(): void;
 }>) {
   const selectedBoardItem = selection?.type === "board" ? game.boardItems.find((item) => item.id === selection.boardItemId) : null;
@@ -505,7 +717,7 @@ function ActionPanel({
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Actions</p>
       <h2 className="mt-2 text-xl font-semibold text-white">Drag-first controls</h2>
       <p className="mt-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-sm leading-6 text-slate-300">
-        Drag inventory items onto empty board cells. Drag board items onto matching items to merge, empty cells to move, or inventory slots to store.
+        Drag inventory items onto empty board cells. Drag board items onto empty cells to move, matching merge targets to combine, or the inventory to store.
       </p>
 
       {selectedItem && selectedBoardItem ? (
@@ -522,16 +734,9 @@ function ActionPanel({
               <p className="text-xs text-slate-400">{selectedItem.description}</p>
             </div>
           </div>
-          {selectedItem.canProduce ? (
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => onProduce(selectedBoardItem.id)}
-              className="mt-4 w-full rounded-2xl bg-emerald-300 px-4 py-2 text-sm font-bold text-emerald-950 disabled:opacity-50"
-            >
-              Produce around item
-            </button>
-          ) : null}
+          <p className="mt-3 text-xs leading-5 text-slate-500">
+            Double-click producers to drop items. Double-click regular board items to send them to the first matching inventory stack.
+          </p>
         </div>
       ) : null}
 
@@ -641,6 +846,37 @@ function DragPreview({ game, drag }: Readonly<{ game: GameView; drag: DragData }
   );
 }
 
+function FlyoutTile({ game, flyout }: Readonly<{ game: GameView; flyout: Flyout }>) {
+  const [arrived, setArrived] = useState(false);
+  const item = game.items[flyout.itemId];
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setArrived(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [flyout.id]);
+
+  if (!item) return null;
+
+  return (
+    <div
+      className="pointer-events-none fixed z-50 rounded-xl border border-sky-300 bg-slate-950/95 p-1.5 shadow-2xl shadow-slate-950/80"
+      style={{
+        left: flyout.from.left,
+        top: flyout.from.top,
+        width: flyout.from.width,
+        height: flyout.from.height,
+        opacity: arrived ? 0.15 : 1,
+        transform: arrived
+          ? `translate(${flyout.to.left - flyout.from.left}px, ${flyout.to.top - flyout.from.top}px) scale(0.72)`
+          : "translate(0, 0) scale(1)",
+        transition: `transform ${stashAnimationMs}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${stashAnimationMs}ms ease`,
+      }}
+    >
+      <TileContent item={item} />
+    </div>
+  );
+}
+
 function TileContent({ item }: Readonly<{ item: GameView["items"][string] }>) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-center">
@@ -658,4 +894,89 @@ function GameCard({ title, children }: Readonly<{ title: string; children: React
       <p className="mt-4 text-sm leading-6 text-slate-300">{children}</p>
     </section>
   );
+}
+
+function getBoardCellDropState(game: GameView, activeDrag: DragData | null, target: GameView["boardItems"][number] | null): DropState {
+  if (!activeDrag) return "neutral";
+
+  return match(activeDrag)
+    .with({ type: "inventory" }, () => (target ? "invalid" : "valid") as DropState)
+    .with({ type: "build" }, () => (target ? "invalid" : "valid") as DropState)
+    .with({ type: "board" }, ({ boardItemId }) => {
+      if (!target) return "valid";
+      if (target.id === boardItemId) return "neutral";
+      return canMergeBoardItems(game, boardItemId, target.id) ? "valid" : "invalid";
+    })
+    .exhaustive();
+}
+
+function canMergeBoardItems(game: GameView, sourceBoardItemId: string, targetBoardItemId: string) {
+  if (sourceBoardItemId === targetBoardItemId) return false;
+  const source = game.boardItems.find((item) => item.id === sourceBoardItemId);
+  const target = game.boardItems.find((item) => item.id === targetBoardItemId);
+  if (!source || !target) return false;
+  return source.itemId === target.itemId && game.items[source.itemId]?.canMerge === true;
+}
+
+function getInventoryPreviewSlot(game: GameView, activeDrag: DragData | null, activeOverId: string | null) {
+  if (!activeDrag || activeDrag.type !== "board" || !activeOverId?.startsWith("inventory:")) return null;
+  const boardItem = game.boardItems.find((item) => item.id === activeDrag.boardItemId);
+  if (!boardItem) return null;
+  const preferredSlotIndex = Number(activeOverId.replace("inventory:", ""));
+  return resolveInventoryDestination(game, boardItem.itemId, preferredSlotIndex);
+}
+
+function resolveInventoryDestination(game: GameView, itemId: string, preferredSlotIndex?: number) {
+  const item = game.items[itemId];
+  if (!item) return null;
+
+  const existingStack = game.inventory.find((slot) => slot.stack?.itemId === itemId && slot.stack.quantity < item.maxStackSize);
+  if (existingStack) return existingStack.slotIndex;
+
+  if (preferredSlotIndex !== undefined) {
+    const preferredSlot = game.inventory.find((slot) => slot.slotIndex === preferredSlotIndex);
+    if (preferredSlot && !preferredSlot.stack) return preferredSlot.slotIndex;
+  }
+
+  return game.inventory.find((slot) => !slot.stack)?.slotIndex ?? null;
+}
+
+function getCooldown(item: GameView["items"][string], boardItem: GameView["boardItems"][number], nowMs: number) {
+  const cooldownUntil = boardItem.state.producer?.cooldownUntil;
+  const cooldownMs = item.producerCooldownMs ?? 0;
+  if (!cooldownUntil || cooldownMs <= 0) {
+    return { coolingDown: false, progress: 1, remainingMs: 0 };
+  }
+
+  const remainingMs = Math.max(0, Date.parse(cooldownUntil) - nowMs);
+  if (remainingMs <= 0) {
+    return { coolingDown: false, progress: 1, remainingMs: 0 };
+  }
+
+  return {
+    coolingDown: true,
+    progress: Math.max(0, Math.min(1, 1 - remainingMs / cooldownMs)),
+    remainingMs,
+  };
+}
+
+function snapshotRect(rect: DOMRect): RectSnapshot {
+  return {
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    height: rect.height,
+  };
+}
+
+function cssEscape(value: string) {
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+    return CSS.escape(value);
+  }
+
+  return value.replace(/[^a-zA-Z0-9_-]/g, "\\$&");
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }

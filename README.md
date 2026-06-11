@@ -105,11 +105,13 @@ The prototype uses one primary interaction model: drag and drop through `@dnd-ki
 
 - drag an inventory stack onto an empty board cell to place one item
 - drag a board item onto an empty board cell to move it
-- drag a board item onto an identical board item to merge into the next manifest-defined level
-- select a producer and click produce; drops appear around it only when enough free adjacent space exists
+- drag a board item onto a valid merge target; cells show valid/invalid feedback before drop
+- double-click a producer to produce; drops appear around it only when enough free adjacent space exists
+- producer tiles show cooldown progress directly in the tile background
 - finite producers, such as crates, spend charges and disappear when depleted
 - drag a blueprint build recipe onto an empty board cell to consume blueprint/materials from inventory and place the result
-- drag a board item onto an inventory slot to store it, respecting stack size and slot limits
+- drag a board item onto inventory to store it; existing compatible stacks are preferred before empty slots
+- double-click a non-producer board item to animate it into the resolved inventory stack/slot
 - reset save for prototype testing
 - hard reset the whole OPFS database when migrations changed during local development
 
@@ -136,7 +138,7 @@ That manifest defines:
 - items and max stack sizes
 - merge definitions
 - drop tables
-- producer definitions and cooldowns
+- producer definitions and cooldowns; Town Hall producers are intentionally short during prototype testing
 - finite/infinite producer modes
 - build recipes
 - starting inventory/board state

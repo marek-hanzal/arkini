@@ -29,6 +29,7 @@ export interface ViewItem {
   tags: string[];
   canProduce: boolean;
   canMerge: boolean;
+  producerCooldownMs: number | null;
 }
 
 export interface BoardViewItem {
@@ -417,7 +418,7 @@ export async function resetDefaultSaveGame() {
 
 function createViewItemMap() {
   const assetById = new Map<string, (typeof gameDataManifest.assets)[number]>(gameDataManifest.assets.map((asset) => [asset.id, asset]));
-  const producerIds = new Set(gameDataManifest.producers.map((producer) => producer.itemId));
+  const producerByItemId = new Map(gameDataManifest.producers.map((producer) => [producer.itemId, producer]));
   const mergeIds = new Set(gameDataManifest.merges.map((merge) => merge.inputItemId));
 
   return Object.fromEntries(
@@ -434,8 +435,9 @@ function createViewItemMap() {
           assetSrc: asset.src,
           maxStackSize: item.maxStackSize,
           tags: [...item.tags],
-          canProduce: producerIds.has(item.id),
+          canProduce: producerByItemId.has(item.id),
           canMerge: mergeIds.has(item.id),
+          producerCooldownMs: producerByItemId.get(item.id)?.cooldownMs ?? null,
         } satisfies ViewItem,
       ];
     }),
@@ -552,43 +554,12 @@ async function addInventoryItems(
     .orderBy("slotIndex")
     .execute();
 
-  if (preferredSlotIndex !== undefined) {
-    if (preferredSlotIndex < 0 || preferredSlotIndex >= save.inventorySlots) {
-      throw new GameActionError("Inventory slot is outside the inventory.");
-    }
-
-    const preferredStack = stacks.find((stack) => stack.slotIndex === preferredSlotIndex);
-
-    if (preferredStack) {
-      if (preferredStack.itemDefinitionId !== itemId || preferredStack.quantity >= item.maxStackSize) {
-        throw new GameActionError("Inventory slot cannot accept this item.");
-      }
-
-      const canAdd = Math.min(remaining, item.maxStackSize - preferredStack.quantity);
-      await tx
-        .updateTable("inventoryStack")
-        .set({ quantity: preferredStack.quantity + canAdd, updatedAt: now() })
-        .where("id", "=", preferredStack.id)
-        .execute();
-      remaining -= canAdd;
-      if (remaining === 0) return;
-    } else {
-      const inserted = Math.min(remaining, item.maxStackSize);
-      await tx
-        .insertInto("inventoryStack")
-        .values({
-          id: createId("inventory"),
-          saveGameId: defaultSaveGameId,
-          slotIndex: preferredSlotIndex,
-          itemDefinitionId: itemId,
-          quantity: inserted,
-        })
-        .execute();
-      remaining -= inserted;
-      if (remaining === 0) return;
-    }
+  if (preferredSlotIndex !== undefined && (preferredSlotIndex < 0 || preferredSlotIndex >= save.inventorySlots)) {
+    throw new GameActionError("Inventory slot is outside the inventory.");
   }
 
+  // Stashing always fills existing stacks first. Dragging onto any inventory
+  // slot therefore behaves like one clear rule instead of a fussy slot puzzle.
   for (const stack of stacks.filter((candidate) => candidate.itemDefinitionId === itemId && candidate.quantity < item.maxStackSize)) {
     const canAdd = Math.min(remaining, item.maxStackSize - stack.quantity);
     await tx
@@ -601,6 +572,24 @@ async function addInventoryItems(
   }
 
   const occupiedSlots = new Set(stacks.map((stack) => stack.slotIndex));
+
+  if (preferredSlotIndex !== undefined && !occupiedSlots.has(preferredSlotIndex)) {
+    const inserted = Math.min(remaining, item.maxStackSize);
+    await tx
+      .insertInto("inventoryStack")
+      .values({
+        id: createId("inventory"),
+        saveGameId: defaultSaveGameId,
+        slotIndex: preferredSlotIndex,
+        itemDefinitionId: itemId,
+        quantity: inserted,
+      })
+      .execute();
+    remaining -= inserted;
+    occupiedSlots.add(preferredSlotIndex);
+    if (remaining === 0) return;
+  }
+
   for (let slotIndex = 0; slotIndex < save.inventorySlots && remaining > 0; slotIndex += 1) {
     if (occupiedSlots.has(slotIndex)) continue;
     const inserted = Math.min(remaining, item.maxStackSize);
@@ -615,11 +604,11 @@ async function addInventoryItems(
       })
       .execute();
     remaining -= inserted;
+    occupiedSlots.add(slotIndex);
   }
 
   if (remaining > 0) throw new GameActionError("Inventory is full.");
 }
-
 async function removeInventoryItems(
   tx: Transaction<Database>,
   itemId: string,

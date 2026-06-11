@@ -195,8 +195,8 @@ export const gameDataManifest = {
     },
   ],
   producers: [
-    producer("item:townhall-1", 10_000, "drop:townhall-1", 1, { type: "infinite" }),
-    producer("item:townhall-2", 8_000, "drop:townhall-2", 1, { type: "infinite" }),
+    producer("item:townhall-1", 2_500, "drop:townhall-1", 1, { type: "infinite" }),
+    producer("item:townhall-2", 1_800, "drop:townhall-2", 1, { type: "infinite" }),
     producer("item:common-crate", 1_500, "drop:common-crate", { min: 2, max: 4 }, { type: "finite", charges: 1, onDepleted: "remove" }),
   ],
   buildRecipes: [

@@ -1,4 +1,5 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import type { GameView, InventorySlot, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import { useDoubleActivate } from "../useDoubleActivate";
@@ -127,6 +128,19 @@ function InventoryTile({ slot, item, hidden, onDoubleActivate }: Readonly<{ slot
 
   if (!stack) return null;
 
+  function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    tapHandlers.onPointerDown(event);
+    listeners?.onPointerDown?.(event);
+  }
+
+  function pointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    tapHandlers.onPointerMove(event);
+  }
+
+  function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    tapHandlers.onPointerUp(event);
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -137,9 +151,9 @@ function InventoryTile({ slot, item, hidden, onDoubleActivate }: Readonly<{ slot
         event.stopPropagation();
         onDoubleActivate();
       }}
-      onPointerDown={tapHandlers.onPointerDown}
-      onPointerMove={tapHandlers.onPointerMove}
-      onPointerUp={tapHandlers.onPointerUp}
+      onPointerDown={pointerDown}
+      onPointerMove={pointerMove}
+      onPointerUp={pointerUp}
     >
       <Tile item={item} quantity={stack.quantity} />
     </div>

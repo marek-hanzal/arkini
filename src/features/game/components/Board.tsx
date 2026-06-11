@@ -1,5 +1,5 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { resolveMergeRule, type ItemId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
@@ -143,6 +143,19 @@ function BoardTile({
   });
   const tapHandlers = useDoubleActivate(onDoubleActivate);
 
+  function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    tapHandlers.onPointerDown(event);
+    listeners?.onPointerDown?.(event);
+  }
+
+  function pointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    tapHandlers.onPointerMove(event);
+  }
+
+  function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    tapHandlers.onPointerUp(event);
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -154,9 +167,9 @@ function BoardTile({
         event.stopPropagation();
         onDoubleActivate();
       }}
-      onPointerDown={tapHandlers.onPointerDown}
-      onPointerMove={tapHandlers.onPointerMove}
-      onPointerUp={tapHandlers.onPointerUp}
+      onPointerDown={pointerDown}
+      onPointerMove={pointerMove}
+      onPointerUp={pointerUp}
     >
       <Tile item={item} producer={boardItem.producer} nowMs={nowMs} onTogglePause={onTogglePause} />
     </div>

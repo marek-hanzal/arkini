@@ -20,7 +20,7 @@ export const ActionPanel = memo(function ActionPanel({
     <section className="rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Actions</p>
       <p className="mt-2 text-sm leading-6 text-slate-300">
-        Drag items to move, merge, stash, or reorder inventory. Click an empty board cell to build from owned blueprints.
+        Drag items to move, merge, stash, or reorder inventory. Double-click an empty board cell to build from owned blueprints.
       </p>
 
       {selectedItem && selectedBoardItem ? (

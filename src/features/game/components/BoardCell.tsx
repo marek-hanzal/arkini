@@ -56,7 +56,7 @@ export const BoardCell = memo(function BoardCell({
   const dropState = isOver ? getBoardCellDropState(game, activeDrag, boardItem) : "neutral";
   const empty = !boardItem;
 
-  function handleEmptyClick(event: MouseEvent<HTMLDivElement>) {
+  function handleEmptyDoubleClick(event: MouseEvent<HTMLDivElement>) {
     if (!empty || pending || activeDrag) return;
     event.preventDefault();
     event.stopPropagation();
@@ -67,7 +67,7 @@ export const BoardCell = memo(function BoardCell({
     <div
       ref={setNodeRef}
       data-board-cell-id={boardCellKey(x, y)}
-      onClick={handleEmptyClick}
+      onDoubleClick={handleEmptyDoubleClick}
       className={[
         cellClass,
         "group/cell relative bg-slate-950/80 shadow-inner shadow-black/30",

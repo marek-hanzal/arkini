@@ -15,7 +15,7 @@ Arkini is a classic 1×1 tile merge game with a second economy layer:
 - Producers may be infinite, like a town hall, or finite, like a crate that empties and disappears.
 - The first tutorial economy starts with town hall, lumber camp, and quarry blueprints plus enough materials to build all three.
 - Town halls, lumber camps, quarries, and crates currently merge up to level 3.
-- Blueprints are consumable inventory items. Click an empty board cell, choose an owned blueprint from the build modal, then building consumes blueprint plus inventory materials and places the result on the board.
+- Blueprints are consumable inventory items. Double-click an empty board cell, choose an owned blueprint from the build modal, then building consumes blueprint plus inventory materials and places the result on the board.
 - Everything remains 1×1. Multi-tile buildings are explicitly out of scope.
 - Producer upgrades are merges. Two `townhall-1` items become `townhall-2`; the new producer starts with default fresh state.
 
@@ -112,7 +112,7 @@ The prototype uses one primary interaction model: drag and drop through `@dnd-ki
 - producer tiles have a distinct generator treatment and show cooldown progress directly in the tile background; cooldown failures flash the tile instead of also throwing a toast
 - invalid drops animate back to their source while the source stays hidden until the return finishes
 - finite producers, such as crates, spend charges and disappear when depleted
-- hover an empty board cell to see the hammer build affordance, then click it to open the owned-blueprint build modal
+- hover an empty board cell to see the hammer build affordance, then double-click it to open the owned-blueprint build modal
 - drag a board item onto inventory to store it; existing compatible stacks are preferred before empty slots and the chosen slot pulses. Cooling producers cannot be stashed, because that would bypass their timer like a tiny local exploit
 - double-click a non-producer board item to animate it into the resolved inventory stack/slot
 - hard reset the whole OPFS database when migrations change during local development

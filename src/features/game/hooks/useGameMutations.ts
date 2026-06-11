@@ -27,3 +27,5 @@ export function useGameMutations() {
     reset: useGameAction((db) => db.resetDefaultSaveGame()),
   };
 }
+
+export type GameMutations = ReturnType<typeof useGameMutations>;

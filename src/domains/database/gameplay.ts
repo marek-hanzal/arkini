@@ -1,67 +1,42 @@
 import { P, match } from "ts-pattern";
-import type {
-  BuildRecipeId,
-  DropTableEntry,
-  DropTableId,
-  ItemId,
-  ProducerMode,
-  ProducerRoll,
+import {
+  gameDataIndex,
+  resolveMergeRule,
+  type BuildRecipeId,
+  type ItemId,
+  type ProducerDefinition,
+  type ProducerDrop,
+  type ProducerMode,
+  type Quantity,
 } from "~/domains/game-data";
-import { gameDataIndex } from "~/domains/game-data";
+import { createInitialBoardState, json, parseJson } from "./boardState";
 import { canPayCosts } from "./gameView";
-import { GameActionError, type BoardItemState, type InventorySlot, type ProducerDropResult } from "./gameplayTypes";
 import { db, type ArkiniTransaction } from "./db";
-import { table } from "./tables";
 import { defaultSaveGameId } from "./save";
+import { table } from "./tables";
+import type { BoardItemState, InventorySlot, ProducerDropResult, ProducerPlacement } from "./gameplayTypes";
+import { GameActionError } from "./gameplayTypes";
 
-const json = (value: unknown) => JSON.stringify(value);
-const parseJson = <T>(value: string): T => JSON.parse(value) as T;
+interface SaveShape {
+  boardWidth: number;
+  boardHeight: number;
+  inventorySlots: number;
+}
+
+type BoardRow = { id: string; itemDefinitionId: string; x: number; y: number; stateJson: string };
+type InventoryRow = { id: string; itemDefinitionId: string; slotIndex: number; quantity: number };
 
 export async function placeInventoryItem(slotIndex: number, x: number, y: number) {
   await db.transaction().execute(async (tx) => {
-    const [save, stack, existingBoardItem] = await Promise.all([
-      tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
-      tx
-        .selectFrom(table.inventoryStack)
-        .selectAll()
-        .where("saveGameId", "=", defaultSaveGameId)
-        .where("slotIndex", "=", slotIndex)
-        .executeTakeFirst(),
-      tx
-        .selectFrom(table.boardItem)
-        .select("id")
-        .where("saveGameId", "=", defaultSaveGameId)
-        .where("x", "=", x)
-        .where("y", "=", y)
-        .executeTakeFirst(),
-    ]);
-
+    const { save, boardRows, inventoryRows } = await readMutableSave(tx);
     assertInsideBoard(save, x, y);
+
+    const stack = inventoryRows.find((row) => row.slotIndex === slotIndex);
     if (!stack) throw new GameActionError("Inventory slot is empty.");
-    if (existingBoardItem) throw new GameActionError("Board cell is occupied.");
+    if (boardRows.some((row) => row.x === x && row.y === y)) throw new GameActionError("Board cell is occupied.");
 
-    await tx
-      .insertInto(table.boardItem)
-      .values({
-        id: createId("board"),
-        saveGameId: defaultSaveGameId,
-        itemDefinitionId: stack.itemDefinitionId,
-        x,
-        y,
-        stateJson: json(createInitialBoardState(stack.itemDefinitionId)),
-      })
-      .execute();
-
-    if (stack.quantity <= 1) {
-      await tx.deleteFrom(table.inventoryStack).where("id", "=", stack.id).execute();
-      return;
-    }
-
-    await tx
-      .updateTable(table.inventoryStack)
-      .set({ quantity: stack.quantity - 1, updatedAt: now() })
-      .where("id", "=", stack.id)
-      .execute();
+    await insertBoardItem(tx, stack.itemDefinitionId, x, y);
+    await spendInventoryStack(tx, stack, 1);
   });
 }
 
@@ -69,139 +44,89 @@ export async function swapInventorySlots(sourceSlotIndex: number, targetSlotInde
   if (sourceSlotIndex === targetSlotIndex) return;
 
   await db.transaction().execute(async (tx) => {
-    const save = await tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow();
+    const { save, inventoryRows } = await readMutableSave(tx);
+    assertInsideInventory(save, sourceSlotIndex);
+    assertInsideInventory(save, targetSlotIndex);
 
-    if (sourceSlotIndex < 0 || targetSlotIndex < 0 || sourceSlotIndex >= save.inventorySlots || targetSlotIndex >= save.inventorySlots) {
-      throw new GameActionError("Inventory slot is outside the inventory.");
-    }
-
-    const stacks = await tx
-      .selectFrom(table.inventoryStack)
-      .selectAll()
-      .where("saveGameId", "=", defaultSaveGameId)
-      .where("slotIndex", "in", [sourceSlotIndex, targetSlotIndex])
-      .execute();
-
-    const source = stacks.find((stack) => stack.slotIndex === sourceSlotIndex);
-    const target = stacks.find((stack) => stack.slotIndex === targetSlotIndex);
-
+    const source = inventoryRows.find((row) => row.slotIndex === sourceSlotIndex);
+    const target = inventoryRows.find((row) => row.slotIndex === targetSlotIndex);
     if (!source) throw new GameActionError("Inventory slot is empty.");
 
-    if (!target) {
-      await tx
-        .updateTable(table.inventoryStack)
-        .set({ slotIndex: targetSlotIndex, updatedAt: now() })
-        .where("id", "=", source.id)
-        .execute();
+    // Same item stacks combine before they swap. This keeps inventory as storage,
+    // not a little shuffling minigame from a cursed accounting department.
+    if (target && target.itemDefinitionId === source.itemDefinitionId) {
+      const item = getItem(source.itemDefinitionId);
+      const movable = Math.min(source.quantity, item.maxStackSize - target.quantity);
+      if (movable <= 0) return;
+      await tx.updateTable(table.inventoryStack).set({ quantity: target.quantity + movable, updatedAt: now() }).where("id", "=", target.id).execute();
+      await spendInventoryStack(tx, source, movable);
       return;
     }
 
-    const temporarySlotIndex = -1;
+    if (!target) {
+      await tx.updateTable(table.inventoryStack).set({ slotIndex: targetSlotIndex, updatedAt: now() }).where("id", "=", source.id).execute();
+      return;
+    }
 
-    await tx
-      .updateTable(table.inventoryStack)
-      .set({ slotIndex: temporarySlotIndex, updatedAt: now() })
-      .where("id", "=", source.id)
-      .execute();
-
-    await tx
-      .updateTable(table.inventoryStack)
-      .set({ slotIndex: sourceSlotIndex, updatedAt: now() })
-      .where("id", "=", target.id)
-      .execute();
-
-    await tx
-      .updateTable(table.inventoryStack)
-      .set({ slotIndex: targetSlotIndex, updatedAt: now() })
-      .where("id", "=", source.id)
-      .execute();
+    await tx.updateTable(table.inventoryStack).set({ slotIndex: -1, updatedAt: now() }).where("id", "=", source.id).execute();
+    await tx.updateTable(table.inventoryStack).set({ slotIndex: sourceSlotIndex, updatedAt: now() }).where("id", "=", target.id).execute();
+    await tx.updateTable(table.inventoryStack).set({ slotIndex: targetSlotIndex, updatedAt: now() }).where("id", "=", source.id).execute();
   });
 }
 
 export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
   await db.transaction().execute(async (tx) => {
-    const boardItem = await tx
-      .selectFrom(table.boardItem)
-      .selectAll()
-      .where("id", "=", boardItemId)
-      .where("saveGameId", "=", defaultSaveGameId)
-      .executeTakeFirst();
-
+    const { save, boardRows, inventoryRows } = await readMutableSave(tx);
+    const boardItem = boardRows.find((row) => row.id === boardItemId);
     if (!boardItem) throw new GameActionError("Board item does not exist.");
-
-    if (isProducerCoolingDown(boardItem.itemDefinitionId, parseJson<BoardItemState>(boardItem.stateJson))) {
-      throw new GameActionError("Producer is still cooling down.");
+    if (gameDataIndex.producersByItemId.has(boardItem.itemDefinitionId as ItemId)) {
+      throw new GameActionError("Producer lives on the board. Pause it instead of hiding its state in inventory.");
     }
 
-    await addInventoryItems(tx, boardItem.itemDefinitionId, 1, slotIndex);
+    if (slotIndex !== undefined) assertInsideInventory(save, slotIndex);
+
+    const virtualInventory = cloneInventory(inventoryRows);
+    const preferred = slotIndex === undefined ? undefined : [slotIndex];
+    const plan = planInventoryPlacement(save, virtualInventory, boardItem.itemDefinitionId as ItemId, preferred);
+    if (!plan) throw new GameActionError("Inventory is full.");
+
+    await applyInventoryPlacementPlan(tx, plan);
     await tx.deleteFrom(table.boardItem).where("id", "=", boardItem.id).execute();
   });
 }
 
 export async function moveBoardItem(boardItemId: string, x: number, y: number) {
   await db.transaction().execute(async (tx) => {
-    const [save, boardItem, existingBoardItem] = await Promise.all([
-      tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
-      tx
-        .selectFrom(table.boardItem)
-        .selectAll()
-        .where("id", "=", boardItemId)
-        .where("saveGameId", "=", defaultSaveGameId)
-        .executeTakeFirst(),
-      tx
-        .selectFrom(table.boardItem)
-        .select("id")
-        .where("saveGameId", "=", defaultSaveGameId)
-        .where("x", "=", x)
-        .where("y", "=", y)
-        .executeTakeFirst(),
-    ]);
-
+    const { save, boardRows } = await readMutableSave(tx);
     assertInsideBoard(save, x, y);
-    if (!boardItem) throw new GameActionError("Board item does not exist.");
-    if (existingBoardItem && existingBoardItem.id !== boardItem.id) {
-      throw new GameActionError("Drop on an empty board cell or merge matching items.");
-    }
 
-    await tx
-      .updateTable(table.boardItem)
-      .set({ x, y, updatedAt: now() })
-      .where("id", "=", boardItem.id)
-      .execute();
+    const boardItem = boardRows.find((row) => row.id === boardItemId);
+    if (!boardItem) throw new GameActionError("Board item does not exist.");
+    const occupied = boardRows.find((row) => row.x === x && row.y === y && row.id !== boardItem.id);
+    if (occupied) throw new GameActionError("Drop on an empty board cell or merge a valid recipe.");
+
+    await tx.updateTable(table.boardItem).set({ x, y, updatedAt: now() }).where("id", "=", boardItem.id).execute();
   });
 }
 
 export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItemId: string) {
-  if (sourceBoardItemId === targetBoardItemId) {
-    throw new GameActionError("Pick two different board items to merge.");
-  }
+  if (sourceBoardItemId === targetBoardItemId) throw new GameActionError("Pick two different board items to merge.");
 
   await db.transaction().execute(async (tx) => {
-    const boardItems = await tx
-      .selectFrom(table.boardItem)
-      .selectAll()
-      .where("saveGameId", "=", defaultSaveGameId)
-      .where("id", "in", [sourceBoardItemId, targetBoardItemId])
-      .execute();
-
-    const source = boardItems.find((item) => item.id === sourceBoardItemId);
-    const target = boardItems.find((item) => item.id === targetBoardItemId);
-
+    const { boardRows } = await readMutableSave(tx);
+    const source = boardRows.find((row) => row.id === sourceBoardItemId);
+    const target = boardRows.find((row) => row.id === targetBoardItemId);
     if (!source || !target) throw new GameActionError("Both board items must exist.");
-    if (source.itemDefinitionId !== target.itemDefinitionId) {
-      throw new GameActionError("Only identical board items can merge.");
-    }
 
-    const merge = gameDataIndex.mergesByInputItemId.get(source.itemDefinitionId as ItemId);
-
-    if (!merge) throw new GameActionError("This item has no next merge level.");
+    const rule = resolveMergeRule(source.itemDefinitionId as ItemId, target.itemDefinitionId as ItemId);
+    if (!rule) throw new GameActionError("No merge recipe discovered here.");
 
     await tx.deleteFrom(table.boardItem).where("id", "=", source.id).execute();
     await tx
       .updateTable(table.boardItem)
       .set({
-        itemDefinitionId: merge.outputItemId,
-        stateJson: json(createInitialBoardState(merge.outputItemId)),
+        itemDefinitionId: rule.resultItemId,
+        stateJson: json(createInitialBoardState(rule.resultItemId)),
         updatedAt: now(),
       })
       .where("id", "=", target.id)
@@ -209,27 +134,18 @@ export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItem
   });
 }
 
-export async function produceBoardItem(boardItemId: string): Promise<ProducerDropResult> {
+export async function produceBoardItem(boardItemId: string, activation: "single" | "exhaust" = "single"): Promise<ProducerDropResult> {
   return db.transaction().execute(async (tx) => {
-    const [save, boardItem, boardItems] = await Promise.all([
-      tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
-      tx
-        .selectFrom(table.boardItem)
-        .selectAll()
-        .where("id", "=", boardItemId)
-        .where("saveGameId", "=", defaultSaveGameId)
-        .executeTakeFirst(),
-      tx.selectFrom(table.boardItem).selectAll().where("saveGameId", "=", defaultSaveGameId).execute(),
-    ]);
+    const mutable = await readMutableSave(tx);
+    const producerRow = mutable.boardRows.find((row) => row.id === boardItemId);
+    if (!producerRow) throw new GameActionError("Producer does not exist.");
 
-    if (!boardItem) throw new GameActionError("Producer does not exist.");
+    const producer = getProducer(producerRow.itemDefinitionId);
+    if (producer.trigger !== "click") throw new GameActionError("This producer runs by itself.");
 
-    const producer = gameDataIndex.producersByItemId.get(boardItem.itemDefinitionId as ItemId);
-    if (!producer) throw new GameActionError("This item is not a producer.");
-
-    const state = parseJson<BoardItemState>(boardItem.stateJson);
-    const producerState = state.producer ?? createInitialBoardState(boardItem.itemDefinitionId).producer ?? {};
     const timestamp = Date.now();
+    const state = readBoardState(producerRow);
+    const producerState = { ...(createInitialBoardState(producerRow.itemDefinitionId, timestamp).producer ?? {}), ...(state.producer ?? {}) };
 
     if (producerState.cooldownUntil && Date.parse(producerState.cooldownUntil) > timestamp) {
       throw new GameActionError("Producer is still cooling down.");
@@ -239,173 +155,200 @@ export async function produceBoardItem(boardItemId: string): Promise<ProducerDro
       throw new GameActionError("Producer is empty.");
     }
 
-    const drops = rollProducerDrops(producer.rolls);
-    const freeCells = findFreeCellsAround(save, boardItems, boardItem.x, boardItem.y, producer.spawn.radius);
+    const mode = producer.mode ?? { type: "infinite" as const };
+    const steps = activation === "exhaust" && mode.type === "finite"
+      ? Math.max(1, producerState.remainingCharges ?? mode.charges)
+      : 1;
 
-    if (freeCells.length < drops.length) {
-      throw new GameActionError("Not enough free space around the producer.");
-    }
+    const allDrops = Array.from({ length: steps }, () => rollProducerDrops(producer.drops)).flat();
+    const plan = planPlacements(mutable.save, mutable.boardRows, mutable.inventoryRows, allDrops);
+    if (!plan) throw new GameActionError("Board and inventory are full.");
 
-    const insertedDrops: ProducerDropResult["drops"] = [];
-
-    for (const [index, drop] of drops.entries()) {
-      const cell = freeCells[index];
-      const id = createId("board");
-      insertedDrops.push({ boardItemId: id, itemId: drop.itemId, x: cell.x, y: cell.y });
-      await tx
-        .insertInto(table.boardItem)
-        .values({
-          id,
-          saveGameId: defaultSaveGameId,
-          itemDefinitionId: drop.itemId,
-          x: cell.x,
-          y: cell.y,
-          stateJson: json(createInitialBoardState(drop.itemId)),
-        })
-        .execute();
-    }
-
-    const nextRemainingCharges = match(producer.mode as ProducerMode)
+    const placements = await applyPlacementPlan(tx, plan);
+    const nextRemainingCharges = match(mode as ProducerMode)
       .with({ type: "infinite" }, () => null)
-      .with({ type: "finite" }, () => Math.max(0, (producerState.remainingCharges ?? 1) - 1))
+      .with({ type: "finite" }, () => Math.max(0, (producerState.remainingCharges ?? 1) - steps))
+      .with({ type: "auto" }, () => null)
       .exhaustive();
 
-    const nextState: BoardItemState = {
-      ...state,
-      producer: {
-        cooldownUntil: new Date(timestamp + producer.cooldownMs).toISOString(),
-        remainingCharges: nextRemainingCharges,
-      },
-    };
-
     const shouldDeplete = nextRemainingCharges !== null && nextRemainingCharges <= 0;
-
     if (shouldDeplete) {
-      await match(producer.mode as ProducerMode)
-        .with({ type: "finite", onDepleted: "remove" }, async () => {
-          await tx.deleteFrom(table.boardItem).where("id", "=", boardItem.id).execute();
-        })
-        .with({ type: "finite", onDepleted: { replaceWithItemId: P.string } }, async ({ onDepleted }) => {
-          await tx
-            .updateTable(table.boardItem)
-            .set({
-              itemDefinitionId: onDepleted.replaceWithItemId,
-              stateJson: json(createInitialBoardState(onDepleted.replaceWithItemId)),
-              updatedAt: now(),
-            })
-            .where("id", "=", boardItem.id)
-            .execute();
-        })
-        .with({ type: "infinite" }, async () => undefined)
-        .exhaustive();
-
-      return { producerBoardItemId: boardItem.id, drops: insertedDrops };
+      await depleteProducer(tx, producerRow, mode);
+      return { producerBoardItemId: producerRow.id, placements };
     }
 
     await tx
       .updateTable(table.boardItem)
-      .set({ stateJson: json(nextState), updatedAt: now() })
-      .where("id", "=", boardItem.id)
+      .set({
+        stateJson: json({
+          ...state,
+          producer: {
+            ...producerState,
+            cooldownUntil: new Date(timestamp + (producer.cooldownMs ?? 0)).toISOString(),
+            remainingCharges: nextRemainingCharges,
+          },
+        } satisfies BoardItemState),
+        updatedAt: now(),
+      })
+      .where("id", "=", producerRow.id)
       .execute();
 
-    return { producerBoardItemId: boardItem.id, drops: insertedDrops };
+    return { producerBoardItemId: producerRow.id, placements };
+  });
+}
+
+export async function advanceAutoProducers(): Promise<ProducerDropResult[]> {
+  return db.transaction().execute(async (tx) => {
+    const mutable = await readMutableSave(tx);
+    const results: ProducerDropResult[] = [];
+    const timestamp = Date.now();
+
+    for (const row of [...mutable.boardRows]) {
+      const producer = gameDataIndex.producersByItemId.get(row.itemDefinitionId as ItemId);
+      if (!producer || producer.trigger !== "auto") continue;
+      const mode = producer.mode;
+      if (!mode || mode.type !== "auto") continue;
+
+      const state = readBoardState(row);
+      const initial = createInitialBoardState(row.itemDefinitionId, timestamp).producer ?? {};
+      const producerState = { ...initial, ...(state.producer ?? {}) };
+      if (producerState.paused) continue;
+
+      let autoAvailable = producerState.autoAvailable ?? mode.capacity;
+      let nextDropAt = producerState.nextDropAt ? Date.parse(producerState.nextDropAt) : timestamp + mode.tickMs;
+      let rechargeUntil = producerState.rechargeUntil ? Date.parse(producerState.rechargeUntil) : null;
+
+      if (rechargeUntil !== null && rechargeUntil <= timestamp) {
+        autoAvailable = mode.capacity;
+        rechargeUntil = null;
+        nextDropAt = timestamp + mode.tickMs;
+      }
+
+      if (autoAvailable <= 0) {
+        rechargeUntil ??= timestamp + mode.rechargeMs;
+        await saveProducerState(tx, row.id, state, { ...producerState, autoAvailable, rechargeUntil: new Date(rechargeUntil).toISOString() });
+        continue;
+      }
+
+      let changed = false;
+      let guard = 0;
+      while (autoAvailable > 0 && nextDropAt <= timestamp && guard < mode.capacity) {
+        guard += 1;
+        const drops = rollProducerDrops(producer.drops);
+        const plan = planPlacements(mutable.save, mutable.boardRows, mutable.inventoryRows, drops);
+
+        if (!plan) {
+          // Full storage should not eat capacity. Push the next retry a little so
+          // we do not hot-loop the DB because a human made a hoarding simulator.
+          nextDropAt = timestamp + 1000;
+          changed = true;
+          break;
+        }
+
+        const placements = await applyPlacementPlan(tx, plan);
+        commitVirtualPlacements(mutable.boardRows, mutable.inventoryRows, placements);
+        results.push({ producerBoardItemId: row.id, placements });
+        autoAvailable -= 1;
+        nextDropAt += mode.tickMs;
+        changed = true;
+      }
+
+      if (autoAvailable <= 0) {
+        rechargeUntil = timestamp + mode.rechargeMs;
+      }
+
+      if (changed || rechargeUntil !== null) {
+        await saveProducerState(tx, row.id, state, {
+          ...producerState,
+          autoAvailable,
+          nextDropAt: new Date(nextDropAt).toISOString(),
+          rechargeUntil: rechargeUntil === null ? null : new Date(rechargeUntil).toISOString(),
+        });
+      }
+    }
+
+    return results;
+  });
+}
+
+export async function toggleProducerPause(boardItemId: string) {
+  await db.transaction().execute(async (tx) => {
+    const row = await tx.selectFrom(table.boardItem).selectAll().where("id", "=", boardItemId).where("saveGameId", "=", defaultSaveGameId).executeTakeFirst();
+    if (!row) throw new GameActionError("Producer does not exist.");
+
+    const producer = getProducer(row.itemDefinitionId);
+    if (producer.trigger !== "auto") throw new GameActionError("Only auto producers can be paused.");
+    const mode = producer.mode;
+    if (!mode || mode.type !== "auto") throw new GameActionError("Producer has no auto schedule.");
+
+    const state = readBoardState(row);
+    const producerState = { ...(createInitialBoardState(row.itemDefinitionId).producer ?? {}), ...(state.producer ?? {}) };
+    const paused = !(producerState.paused ?? false);
+
+    await saveProducerState(tx, row.id, state, {
+      ...producerState,
+      paused,
+      nextDropAt: paused ? producerState.nextDropAt : new Date(Date.now() + mode.tickMs).toISOString(),
+    });
   });
 }
 
 export async function buildRecipe(recipeId: string, x: number, y: number) {
   await db.transaction().execute(async (tx) => {
-    const [save, existingBoardItem, inventoryRows] = await Promise.all([
-      tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
-      tx
-        .selectFrom(table.boardItem)
-        .select("id")
-        .where("saveGameId", "=", defaultSaveGameId)
-        .where("x", "=", x)
-        .where("y", "=", y)
-        .executeTakeFirst(),
-      tx.selectFrom(table.inventoryStack).selectAll().where("saveGameId", "=", defaultSaveGameId).execute(),
-    ]);
-
+    const { save, boardRows, inventoryRows } = await readMutableSave(tx);
     assertInsideBoard(save, x, y);
-    if (existingBoardItem) throw new GameActionError("Build target is occupied.");
+    if (boardRows.some((row) => row.x === x && row.y === y)) throw new GameActionError("Build target is occupied.");
 
     const recipe = gameDataIndex.buildRecipesById.get(recipeId as BuildRecipeId);
     if (!recipe) throw new GameActionError("Unknown build recipe.");
 
     const costs = [{ itemId: recipe.blueprintItemId, quantity: 1 }, ...recipe.costs];
-    const inventory = inventoryRows.map((row) => ({
-      slotIndex: row.slotIndex,
-      stack: { id: row.id, itemId: row.itemDefinitionId, quantity: row.quantity },
-    }));
-
-    if (!canPayCosts(inventory, costs)) {
-      throw new GameActionError("Inventory is missing blueprint or materials.");
-    }
+    const inventory = inventoryRows.map((row) => ({ slotIndex: row.slotIndex, stack: { id: row.id, itemId: row.itemDefinitionId, quantity: row.quantity } }));
+    if (!canPayCosts(inventory, costs)) throw new GameActionError("Inventory is missing blueprint or materials.");
 
     for (const cost of costs) {
       await removeInventoryItems(tx, cost.itemId, cost.quantity);
     }
 
-    await tx
-      .insertInto(table.boardItem)
-      .values({
-        id: createId("board"),
-        saveGameId: defaultSaveGameId,
-        itemDefinitionId: recipe.resultItemId,
-        x,
-        y,
-        stateJson: json(createInitialBoardState(recipe.resultItemId)),
-      })
-      .execute();
+    await insertBoardItem(tx, recipe.resultItemId, x, y);
   });
 }
 
-function isProducerCoolingDown(itemId: string, state: BoardItemState) {
+async function readMutableSave(tx: ArkiniTransaction) {
+  const [save, boardRows, inventoryRows] = await Promise.all([
+    tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
+    tx.selectFrom(table.boardItem).selectAll().where("saveGameId", "=", defaultSaveGameId).execute(),
+    tx.selectFrom(table.inventoryStack).selectAll().where("saveGameId", "=", defaultSaveGameId).orderBy("slotIndex").execute(),
+  ]);
+
+  return { save, boardRows, inventoryRows };
+}
+
+function readBoardState(row: Pick<BoardRow, "stateJson">) {
+  return parseJson<BoardItemState>(row.stateJson || "{}");
+}
+
+function getItem(itemId: string) {
+  const item = gameDataIndex.itemsById.get(itemId as ItemId);
+  if (!item) throw new GameActionError(`Unknown item definition ${itemId}.`);
+  return item;
+}
+
+function getProducer(itemId: string) {
   const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
-  if (!producer) return false;
-
-  const cooldownUntil = state.producer?.cooldownUntil;
-  return Boolean(cooldownUntil && Date.parse(cooldownUntil) > Date.now());
+  if (!producer) throw new GameActionError("This item is not a producer.");
+  return producer;
 }
 
-function createInitialBoardState(itemId: string): BoardItemState {
-  const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
+function rollProducerDrops(entries: readonly ProducerDrop[]) {
+  const entry = pickWeighted(entries);
+  if (!entry.itemId) return [];
 
-  if (!producer) return {};
-
-  return {
-    producer: {
-      remainingCharges: match(producer.mode as ProducerMode)
-        .with({ type: "infinite" }, () => null)
-        .with({ type: "finite" }, (mode) => mode.charges)
-        .exhaustive(),
-    },
-  };
+  const quantity = resolveQuantity(entry.quantity ?? 1);
+  return Array.from({ length: quantity }, () => entry.itemId as ItemId);
 }
 
-function rollProducerDrops(rolls: readonly ProducerRoll[]) {
-  const drops: { itemId: ItemId }[] = [];
-
-  for (const roll of rolls) {
-    const count = resolveQuantity(roll.count);
-    const dropTable = gameDataIndex.dropTablesById.get(roll.dropTableId as DropTableId);
-    if (!dropTable) throw new GameActionError("Producer references a missing drop table.");
-
-    for (let index = 0; index < count; index += 1) {
-      const entry = pickWeighted(dropTable.entries);
-      if (!entry.itemId) continue;
-
-      const quantity = resolveQuantity(entry.quantity);
-      for (let itemIndex = 0; itemIndex < quantity; itemIndex += 1) {
-        drops.push({ itemId: entry.itemId });
-      }
-    }
-  }
-
-  return drops;
-}
-
-function pickWeighted(entries: readonly DropTableEntry[]) {
+function pickWeighted(entries: readonly ProducerDrop[]) {
   const total = entries.reduce((sum, entry) => sum + entry.weight, 0);
   let roll = Math.random() * total;
 
@@ -414,119 +357,167 @@ function pickWeighted(entries: readonly DropTableEntry[]) {
     if (roll <= 0) return entry;
   }
 
-  return entries.at(-1) ?? fail("Drop table is empty.");
+  return entries.at(-1) ?? fail("Producer has no drops.");
 }
 
-function resolveQuantity(quantity: number | { min: number; max: number }) {
-  if (typeof quantity === "number") {
-    return quantity;
-  }
-
+function resolveQuantity(quantity: Quantity) {
+  if (typeof quantity === "number") return quantity;
   return quantity.min + Math.floor(Math.random() * (quantity.max - quantity.min + 1));
 }
 
-function findFreeCellsAround(
-  save: { boardWidth: number; boardHeight: number },
-  boardItems: readonly { x: number; y: number }[],
-  x: number,
-  y: number,
-  radius: 1,
-) {
-  const occupied = new Set(boardItems.map((item) => `${item.x}:${item.y}`));
+interface PlacementPlan {
+  board: { itemId: ItemId; x: number; y: number }[];
+  inventory: InventoryPlacementPlan[];
+}
+
+type InventoryPlacementPlan =
+  | { type: "update"; stackId: string; slotIndex: number; itemId: ItemId; quantity: number }
+  | { type: "insert"; stackId: string; slotIndex: number; itemId: ItemId; quantity: number };
+
+function planPlacements(save: SaveShape, boardRows: readonly BoardRow[], inventoryRows: readonly InventoryRow[], drops: readonly ItemId[]): PlacementPlan | null {
+  const freeCells = findFreeBoardCells(save, boardRows);
+  const virtualInventory = cloneInventory(inventoryRows);
+  const plan: PlacementPlan = { board: [], inventory: [] };
+
+  for (const itemId of drops) {
+    const cell = freeCells.shift();
+    if (cell) {
+      plan.board.push({ itemId, ...cell });
+      continue;
+    }
+
+    const inventoryPlan = planInventoryPlacement(save, virtualInventory, itemId);
+    if (!inventoryPlan) return null;
+    plan.inventory.push(...inventoryPlan);
+  }
+
+  return plan;
+}
+
+function planInventoryPlacement(save: SaveShape, inventory: InventoryRow[], itemId: ItemId | string, preferredSlots: number[] = []): InventoryPlacementPlan[] | null {
+  const item = getItem(itemId);
+  const plans: InventoryPlacementPlan[] = [];
+  const orderedStacks = [...inventory].sort((a, b) => a.slotIndex - b.slotIndex);
+
+  for (const stack of orderedStacks) {
+    if (stack.itemDefinitionId !== itemId || stack.quantity >= item.maxStackSize) continue;
+    stack.quantity += 1;
+    plans.push({ type: "update", stackId: stack.id, slotIndex: stack.slotIndex, itemId: itemId as ItemId, quantity: stack.quantity });
+    return plans;
+  }
+
+  for (const slotIndex of [...preferredSlots, ...Array.from({ length: save.inventorySlots }, (_, index) => index)]) {
+    if (slotIndex < 0 || slotIndex >= save.inventorySlots) continue;
+    if (inventory.some((stack) => stack.slotIndex === slotIndex)) continue;
+    const id = createId("inventory:virtual");
+    inventory.push({ id, itemDefinitionId: itemId, slotIndex, quantity: 1 });
+    plans.push({ type: "insert", stackId: id, slotIndex, itemId: itemId as ItemId, quantity: 1 });
+    return plans;
+  }
+
+  return null;
+}
+
+async function applyPlacementPlan(tx: ArkiniTransaction, plan: PlacementPlan): Promise<ProducerPlacement[]> {
+  const placements: ProducerPlacement[] = [];
+
+  for (const placement of plan.board) {
+    const boardItemId = await insertBoardItem(tx, placement.itemId, placement.x, placement.y);
+    placements.push({ kind: "board", itemId: placement.itemId, boardItemId, x: placement.x, y: placement.y });
+  }
+
+  for (const placement of plan.inventory) {
+    if (placement.type === "update") {
+      await tx.updateTable(table.inventoryStack).set({ quantity: placement.quantity, updatedAt: now() }).where("id", "=", placement.stackId).execute();
+    } else {
+      await tx
+        .insertInto(table.inventoryStack)
+        .values({
+          id: placement.stackId,
+          saveGameId: defaultSaveGameId,
+          slotIndex: placement.slotIndex,
+          itemDefinitionId: placement.itemId,
+          quantity: placement.quantity,
+        })
+        .execute();
+    }
+    placements.push({ kind: "inventory", itemId: placement.itemId, slotIndex: placement.slotIndex });
+  }
+
+  return placements;
+}
+
+async function applyInventoryPlacementPlan(tx: ArkiniTransaction, plan: readonly InventoryPlacementPlan[]) {
+  await applyPlacementPlan(tx, { board: [], inventory: [...plan] });
+}
+
+function commitVirtualPlacements(boardRows: BoardRow[], inventoryRows: InventoryRow[], placements: readonly ProducerPlacement[]) {
+  for (const placement of placements) {
+    if (placement.kind === "board") {
+      boardRows.push({
+        id: placement.boardItemId ?? createId("board:virtual"),
+        itemDefinitionId: placement.itemId,
+        x: placement.x ?? 0,
+        y: placement.y ?? 0,
+        stateJson: json(createInitialBoardState(placement.itemId)),
+      });
+      continue;
+    }
+
+    const slotIndex = placement.slotIndex ?? 0;
+    const stack = inventoryRows.find((row) => row.slotIndex === slotIndex);
+    if (stack && stack.itemDefinitionId === placement.itemId) {
+      stack.quantity += 1;
+    } else {
+      inventoryRows.push({ id: createId("inventory:virtual"), itemDefinitionId: placement.itemId, slotIndex, quantity: 1 });
+    }
+  }
+}
+
+function cloneInventory(rows: readonly InventoryRow[]) {
+  return rows.map((row) => ({ ...row }));
+}
+
+function findFreeBoardCells(save: SaveShape, boardRows: readonly { x: number; y: number }[]) {
+  const occupied = new Set(boardRows.map((item) => `${item.x}:${item.y}`));
   const cells: { x: number; y: number }[] = [];
 
-  for (let dy = -radius; dy <= radius; dy += 1) {
-    for (let dx = -radius; dx <= radius; dx += 1) {
-      if (dx === 0 && dy === 0) continue;
-      const nextX = x + dx;
-      const nextY = y + dy;
-      if (nextX < 0 || nextY < 0 || nextX >= save.boardWidth || nextY >= save.boardHeight) continue;
-      if (occupied.has(`${nextX}:${nextY}`)) continue;
-      cells.push({ x: nextX, y: nextY });
+  for (let y = 0; y < save.boardHeight; y += 1) {
+    for (let x = 0; x < save.boardWidth; x += 1) {
+      if (!occupied.has(`${x}:${y}`)) cells.push({ x, y });
     }
   }
 
   return cells;
 }
 
-async function addInventoryItems(
-  tx: ArkiniTransaction,
-  itemId: string,
-  quantity: number,
-  preferredSlotIndex?: number,
-) {
-  let remaining = quantity;
-  const item = gameDataIndex.itemsById.get(itemId as ItemId);
-  if (!item) throw new GameActionError("Unknown item definition.");
-
-  const save = await tx.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow();
-  const stacks = await tx
-    .selectFrom(table.inventoryStack)
-    .selectAll()
-    .where("saveGameId", "=", defaultSaveGameId)
-    .orderBy("slotIndex")
+async function insertBoardItem(tx: ArkiniTransaction, itemId: string, x: number, y: number) {
+  const id = createId("board");
+  await tx
+    .insertInto(table.boardItem)
+    .values({
+      id,
+      saveGameId: defaultSaveGameId,
+      itemDefinitionId: itemId,
+      x,
+      y,
+      stateJson: json(createInitialBoardState(itemId)),
+    })
     .execute();
-
-  if (preferredSlotIndex !== undefined && (preferredSlotIndex < 0 || preferredSlotIndex >= save.inventorySlots)) {
-    throw new GameActionError("Inventory slot is outside the inventory.");
-  }
-
-  // Stashing always fills existing stacks first. Dragging onto any inventory
-  // slot therefore behaves like one clear rule instead of a fussy slot puzzle.
-  for (const stack of stacks.filter((candidate) => candidate.itemDefinitionId === itemId && candidate.quantity < item.maxStackSize)) {
-    const canAdd = Math.min(remaining, item.maxStackSize - stack.quantity);
-    await tx
-      .updateTable(table.inventoryStack)
-      .set({ quantity: stack.quantity + canAdd, updatedAt: now() })
-      .where("id", "=", stack.id)
-      .execute();
-    remaining -= canAdd;
-    if (remaining === 0) return;
-  }
-
-  const occupiedSlots = new Set(stacks.map((stack) => stack.slotIndex));
-
-  if (preferredSlotIndex !== undefined && !occupiedSlots.has(preferredSlotIndex)) {
-    const inserted = Math.min(remaining, item.maxStackSize);
-    await tx
-      .insertInto(table.inventoryStack)
-      .values({
-        id: createId("inventory"),
-        saveGameId: defaultSaveGameId,
-        slotIndex: preferredSlotIndex,
-        itemDefinitionId: itemId,
-        quantity: inserted,
-      })
-      .execute();
-    remaining -= inserted;
-    occupiedSlots.add(preferredSlotIndex);
-    if (remaining === 0) return;
-  }
-
-  for (let slotIndex = 0; slotIndex < save.inventorySlots && remaining > 0; slotIndex += 1) {
-    if (occupiedSlots.has(slotIndex)) continue;
-    const inserted = Math.min(remaining, item.maxStackSize);
-    await tx
-      .insertInto(table.inventoryStack)
-      .values({
-        id: createId("inventory"),
-        saveGameId: defaultSaveGameId,
-        slotIndex,
-        itemDefinitionId: itemId,
-        quantity: inserted,
-      })
-      .execute();
-    remaining -= inserted;
-    occupiedSlots.add(slotIndex);
-  }
-
-  if (remaining > 0) throw new GameActionError("Inventory is full.");
+  return id;
 }
-async function removeInventoryItems(
-  tx: ArkiniTransaction,
-  itemId: string,
-  quantity: number,
-) {
+
+async function spendInventoryStack(tx: ArkiniTransaction, stack: InventoryRow, quantity: number) {
+  const nextQuantity = stack.quantity - quantity;
+  if (nextQuantity <= 0) {
+    await tx.deleteFrom(table.inventoryStack).where("id", "=", stack.id).execute();
+    return;
+  }
+
+  await tx.updateTable(table.inventoryStack).set({ quantity: nextQuantity, updatedAt: now() }).where("id", "=", stack.id).execute();
+}
+
+async function removeInventoryItems(tx: ArkiniTransaction, itemId: string, quantity: number) {
   let remaining = quantity;
   const stacks = await tx
     .selectFrom(table.inventoryStack)
@@ -538,18 +529,7 @@ async function removeInventoryItems(
 
   for (const stack of stacks) {
     const removed = Math.min(remaining, stack.quantity);
-    const nextQuantity = stack.quantity - removed;
-
-    if (nextQuantity === 0) {
-      await tx.deleteFrom(table.inventoryStack).where("id", "=", stack.id).execute();
-    } else {
-      await tx
-        .updateTable(table.inventoryStack)
-        .set({ quantity: nextQuantity, updatedAt: now() })
-        .where("id", "=", stack.id)
-        .execute();
-    }
-
+    await spendInventoryStack(tx, stack, removed);
     remaining -= removed;
     if (remaining === 0) return;
   }
@@ -557,9 +537,38 @@ async function removeInventoryItems(
   throw new GameActionError("Inventory is missing required items.");
 }
 
-function assertInsideBoard(save: { boardWidth: number; boardHeight: number }, x: number, y: number) {
+async function saveProducerState(tx: ArkiniTransaction, boardItemId: string, state: BoardItemState, producerState: NonNullable<BoardItemState["producer"]>) {
+  await tx
+    .updateTable(table.boardItem)
+    .set({ stateJson: json({ ...state, producer: producerState } satisfies BoardItemState), updatedAt: now() })
+    .where("id", "=", boardItemId)
+    .execute();
+}
+
+async function depleteProducer(tx: ArkiniTransaction, row: BoardRow, mode: ProducerMode) {
+  await match(mode)
+    .with({ type: "finite", onDepleted: "remove" }, async () => {
+      await tx.deleteFrom(table.boardItem).where("id", "=", row.id).execute();
+    })
+    .with({ type: "finite", onDepleted: { replaceWithItemId: P.string } }, async ({ onDepleted }) => {
+      await tx
+        .updateTable(table.boardItem)
+        .set({ itemDefinitionId: onDepleted.replaceWithItemId, stateJson: json(createInitialBoardState(onDepleted.replaceWithItemId)), updatedAt: now() })
+        .where("id", "=", row.id)
+        .execute();
+    })
+    .otherwise(async () => undefined);
+}
+
+function assertInsideBoard(save: SaveShape, x: number, y: number) {
   if (x < 0 || y < 0 || x >= save.boardWidth || y >= save.boardHeight) {
     throw new GameActionError("Target cell is outside the board.");
+  }
+}
+
+function assertInsideInventory(save: SaveShape, slotIndex: number) {
+  if (slotIndex < 0 || slotIndex >= save.inventorySlots) {
+    throw new GameActionError("Inventory slot is outside the inventory.");
   }
 }
 

@@ -1,4 +1,4 @@
-import type { BuildRecipeCost } from "~/domains/game-data";
+import type { BuildRecipeCost, BuildRecipeId, ItemId, ProducerMode } from "~/domains/game-data";
 
 export interface GameView {
   save: { id: string; boardWidth: number; boardHeight: number; inventorySlots: number };
@@ -21,8 +21,8 @@ export interface ViewItem {
   maxStackSize: number;
   tags: string[];
   canProduce: boolean;
+  producerTrigger: "click" | "auto" | null;
   canMerge: boolean;
-  producerCooldownMs: number | null;
 }
 
 export interface BoardViewItem {
@@ -31,6 +31,7 @@ export interface BoardViewItem {
   x: number;
   y: number;
   state: BoardItemState;
+  producer: ProducerView | null;
 }
 
 export interface InventorySlot {
@@ -39,22 +40,49 @@ export interface InventorySlot {
 }
 
 export interface BuildRecipeView {
-  id: string;
-  blueprintItemId: string;
-  resultItemId: string;
+  id: BuildRecipeId;
+  blueprintItemId: ItemId;
+  resultItemId: ItemId;
   costs: BuildRecipeCost[];
   canBuild: boolean;
 }
 
+export interface ProducerView {
+  trigger: "click" | "auto";
+  mode: ProducerMode;
+  cooldownMs: number | null;
+  cooldownUntil: string | null;
+  remainingCharges: number | null;
+  paused: boolean;
+  autoAvailable: number | null;
+  nextDropAt: string | null;
+  rechargeUntil: string | null;
+}
+
+export interface ProducerPlacement {
+  kind: "board" | "inventory";
+  itemId: ItemId;
+  boardItemId?: string;
+  x?: number;
+  y?: number;
+  slotIndex?: number;
+}
+
 export interface ProducerDropResult {
   producerBoardItemId: string;
-  drops: { boardItemId: string; itemId: string; x: number; y: number }[];
+  placements: ProducerPlacement[];
 }
+
+export interface AutoProducerResult extends ProducerDropResult {}
 
 export interface BoardItemState {
   producer?: {
-    cooldownUntil?: string;
+    cooldownUntil?: string | null;
     remainingCharges?: number | null;
+    paused?: boolean;
+    autoAvailable?: number | null;
+    nextDropAt?: string | null;
+    rechargeUntil?: string | null;
   };
 }
 

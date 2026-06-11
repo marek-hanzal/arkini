@@ -34,10 +34,10 @@ export async function readDatabaseStatus(): Promise<DatabaseStatus> {
     gameDataHash: readGameDataHash(),
     assetCount: gameDataManifest.assets.length,
     itemCount: gameDataManifest.items.length,
-    mergeCount: gameDataManifest.merges.length,
-    producerCount: gameDataManifest.producers.length,
-    buildRecipeCount: gameDataManifest.buildRecipes.length,
-    dropTableCount: gameDataManifest.dropTables.length,
+    mergeCount: gameDataManifest.items.reduce((sum, item) => sum + (item.merge?.length ?? 0), 0),
+    producerCount: gameDataManifest.items.filter((item) => item.producer).length,
+    buildRecipeCount: gameDataManifest.items.filter((item) => item.build).length,
+    dropTableCount: 0,
     ...Object.fromEntries(counts),
   } as DatabaseStatus;
 }

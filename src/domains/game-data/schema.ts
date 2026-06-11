@@ -4,8 +4,6 @@ const positiveInteger = z.number().int().positive();
 const nonNegativeInteger = z.number().int().nonnegative();
 const itemId = z.string().startsWith("item:");
 const assetId = z.string().startsWith("asset:");
-const dropTableId = z.string().startsWith("drop:");
-
 const quantitySchema = z.union([
   positiveInteger,
   z.object({ min: positiveInteger, max: positiveInteger }).refine((value) => value.max >= value.min, {
@@ -41,57 +39,47 @@ export const gameDataManifestSchema = z.object({
       description: z.string(),
       tags: z.array(z.string().min(1)),
       sort: nonNegativeInteger,
-    }),
-  ),
-  merges: z.array(
-    z.object({
-      id: z.string().startsWith("merge:"),
-      inputItemId: itemId,
-      inputCount: z.number().int().min(2),
-      outputItemId: itemId,
-    }),
-  ),
-  dropTables: z.array(
-    z.object({
-      id: dropTableId,
-      label: z.string().min(1),
-      entries: z.array(
-        z.union([
-          z.object({ itemId, weight: positiveInteger, quantity: quantitySchema }),
-          z.object({ itemId: z.null(), weight: positiveInteger }),
-        ]),
-      ).min(1),
-    }),
-  ),
-  producers: z.array(
-    z.object({
-      itemId,
-      cooldownMs: positiveInteger,
-      mode: z.discriminatedUnion("type", [
-        z.object({ type: z.literal("infinite") }),
+      merge: z.array(
         z.object({
-          type: z.literal("finite"),
-          charges: positiveInteger,
-          onDepleted: z.union([
-            z.literal("remove"),
-            z.object({ replaceWithItemId: itemId }),
-          ]),
+          id: z.string().startsWith("merge:"),
+          withItemId: itemId,
+          resultItemId: itemId,
+          inputCount: z.literal(2).optional(),
+          secret: z.boolean().optional(),
         }),
-      ]),
-      spawn: z.object({
-        type: z.literal("around_self"),
-        radius: z.literal(1),
-        placement: z.literal("all_or_nothing"),
-      }),
-      rolls: z.array(z.object({ dropTableId, count: quantitySchema })).min(1),
-    }),
-  ),
-  buildRecipes: z.array(
-    z.object({
-      id: z.string().startsWith("build:"),
-      blueprintItemId: itemId,
-      resultItemId: itemId,
-      costs: z.array(z.object({ itemId, quantity: positiveInteger })),
+      ).optional(),
+      producer: z.object({
+        trigger: z.enum(["click", "auto"]),
+        placement: z.literal("board_then_inventory"),
+        cooldownMs: positiveInteger.optional(),
+        drops: z.array(
+          z.union([
+            z.object({ itemId, weight: positiveInteger, quantity: quantitySchema.optional() }),
+            z.object({ itemId: z.null(), weight: positiveInteger }),
+          ]),
+        ).min(1),
+        doubleClickBehavior: z.enum(["exhaust"]).optional(),
+        mode: z.discriminatedUnion("type", [
+          z.object({ type: z.literal("infinite") }),
+          z.object({
+            type: z.literal("finite"),
+            charges: positiveInteger,
+            onDepleted: z.union([z.literal("remove"), z.object({ replaceWithItemId: itemId })]),
+          }),
+          z.object({
+            type: z.literal("auto"),
+            tickMs: positiveInteger,
+            capacity: positiveInteger,
+            rechargeMs: positiveInteger,
+            enabledByDefault: z.boolean(),
+          }),
+        ]).optional(),
+      }).optional(),
+      build: z.object({
+        id: z.string().startsWith("build:"),
+        resultItemId: itemId,
+        costs: z.array(z.object({ itemId, quantity: positiveInteger })),
+      }).optional(),
     }),
   ),
   startingState: z.object({

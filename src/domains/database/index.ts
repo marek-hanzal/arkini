@@ -5,6 +5,7 @@ export { readDatabaseStatus, type DatabaseStatus } from "./status";
 export { syncGameDataManifest } from "./syncGameData";
 
 export {
+  advanceAutoProducers,
   buildRecipe,
   mergeBoardItems,
   moveBoardItem,
@@ -12,7 +13,8 @@ export {
   produceBoardItem,
   stashBoardItem,
   swapInventorySlots,
+  toggleProducerPause,
 } from "./gameplay";
 
 export { readGameView } from "./gameView";
-export type { GameView, ProducerDropResult } from "./gameplayTypes";
+export type { AutoProducerResult, BoardViewItem, GameView, InventorySlot, ProducerDropResult, ViewItem } from "./gameplayTypes";

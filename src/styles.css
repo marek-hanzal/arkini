@@ -7,10 +7,38 @@ body,
 }
 
 body {
+  margin: 0;
+  background: radial-gradient(circle at top, #172033 0, #020617 38rem);
+  color: #e2e8f0;
+  overscroll-behavior: none;
   user-select: none;
 }
 
 * {
   -webkit-user-select: none;
   user-select: none;
+  box-sizing: border-box;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+.ak-fly {
+  animation: ak-fly 280ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes ak-fly {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  75% {
+    opacity: 0.94;
+    transform: translate3d(var(--ak-x), var(--ak-y), 0) scale(calc((1 + var(--ak-scale, 1)) / 2));
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--ak-x), var(--ak-y), 0) scale(var(--ak-scale, 1));
+  }
 }

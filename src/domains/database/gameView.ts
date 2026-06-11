@@ -1,28 +1,17 @@
-import { gameDataIndex, gameDataManifest } from "~/domains/game-data";
+import { gameDataIndex, gameDataManifest, type ItemId } from "~/domains/game-data";
+import { json, parseJson, readProducerView } from "./boardState";
 import { db } from "./db";
 import { defaultSaveGameId } from "./save";
 import { table } from "./tables";
 import type { BoardItemState, GameView, InventorySlot, ViewItem } from "./gameplayTypes";
 
-const parseJson = <T>(value: string): T => JSON.parse(value) as T;
 const viewItems = createViewItemMap();
 
 export async function readGameView(): Promise<GameView> {
   const [save, boardRows, inventoryRows] = await Promise.all([
     db.selectFrom(table.saveGame).selectAll().where("id", "=", defaultSaveGameId).executeTakeFirstOrThrow(),
-    db
-      .selectFrom(table.boardItem)
-      .selectAll()
-      .where("saveGameId", "=", defaultSaveGameId)
-      .orderBy("y")
-      .orderBy("x")
-      .execute(),
-    db
-      .selectFrom(table.inventoryStack)
-      .selectAll()
-      .where("saveGameId", "=", defaultSaveGameId)
-      .orderBy("slotIndex")
-      .execute(),
+    db.selectFrom(table.boardItem).selectAll().where("saveGameId", "=", defaultSaveGameId).orderBy("y").orderBy("x").execute(),
+    db.selectFrom(table.inventoryStack).selectAll().where("saveGameId", "=", defaultSaveGameId).orderBy("slotIndex").execute(),
   ]);
 
   const inventoryMap = new Map(inventoryRows.map((stack) => [stack.slotIndex, stack]));
@@ -33,13 +22,17 @@ export async function readGameView(): Promise<GameView> {
       stack: stack ? { id: stack.id, itemId: stack.itemDefinitionId, quantity: stack.quantity } : null,
     };
   });
-  const boardItems = boardRows.map((item) => ({
-    id: item.id,
-    itemId: item.itemDefinitionId,
-    x: item.x,
-    y: item.y,
-    state: parseJson<BoardItemState>(item.stateJson),
-  }));
+  const boardItems = boardRows.map((item) => {
+    const state = parseJson<BoardItemState>(item.stateJson || json({}));
+    return {
+      id: item.id,
+      itemId: item.itemDefinitionId,
+      x: item.x,
+      y: item.y,
+      state,
+      producer: readProducerView(item.itemDefinitionId, state),
+    };
+  });
   const inventoryStacksByItemId = inventory.reduce<Record<string, InventorySlot[]>>((byItemId, slot) => {
     if (!slot.stack) return byItemId;
     byItemId[slot.stack.itemId] ??= [];
@@ -62,7 +55,7 @@ export async function readGameView(): Promise<GameView> {
     inventoryBySlotIndex: Object.fromEntries(inventory.map((slot) => [slot.slotIndex, slot])),
     inventoryStacksByItemId,
     firstEmptyInventorySlotIndex: inventory.find((slot) => !slot.stack)?.slotIndex ?? null,
-    buildRecipes: gameDataManifest.buildRecipes.map((recipe) => ({
+    buildRecipes: gameDataIndex.buildRecipes.map((recipe) => ({
       id: recipe.id,
       blueprintItemId: recipe.blueprintItemId,
       resultItemId: recipe.resultItemId,
@@ -74,7 +67,6 @@ export async function readGameView(): Promise<GameView> {
 
 export function canPayCosts(inventory: readonly InventorySlot[], costs: readonly { itemId: string; quantity: number }[]) {
   const owned = new Map<string, number>();
-
   for (const slot of inventory) {
     if (!slot.stack) continue;
     owned.set(slot.stack.itemId, (owned.get(slot.stack.itemId) ?? 0) + slot.stack.quantity);
@@ -100,8 +92,8 @@ function createViewItemMap() {
           maxStackSize: item.maxStackSize,
           tags: [...item.tags],
           canProduce: Boolean(producer),
-          canMerge: gameDataIndex.mergeableItemIds.has(item.id),
-          producerCooldownMs: producer?.cooldownMs ?? null,
+          producerTrigger: producer?.trigger ?? null,
+          canMerge: gameDataIndex.mergeableItemIds.has(item.id as ItemId),
         } satisfies ViewItem,
       ];
     }),

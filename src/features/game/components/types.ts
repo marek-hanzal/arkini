@@ -4,8 +4,7 @@ export type Selection = { type: "board"; boardItemId: string } | null;
 
 export type DragData =
   | { type: "inventory"; slotIndex: number }
-  | { type: "board"; boardItemId: string }
-  | { type: "build"; recipeId: string };
+  | { type: "board"; boardItemId: string };
 
 export type DropData =
   | { type: "board-cell"; x: number; y: number; boardItemId?: string }
@@ -26,6 +25,8 @@ export type Flyout = {
   from: RectSnapshot;
   to: RectSnapshot;
 };
+
+export type BuildCell = { x: number; y: number } | null;
 
 export type ViewItem = GameView["items"][string];
 export type BoardItem = GameView["boardItems"][number];

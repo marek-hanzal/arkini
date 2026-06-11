@@ -8,7 +8,6 @@ export function getBoardCellDropState(game: GameView, activeDrag: DragData | nul
 
   return match(activeDrag)
     .with({ type: "inventory" }, () => (target ? "invalid" : "valid") as DropState)
-    .with({ type: "build" }, () => (target ? "invalid" : "valid") as DropState)
     .with({ type: "board" }, ({ boardItemId }) => {
       if (!target) return "valid";
       if (target.id === boardItemId) return "neutral";

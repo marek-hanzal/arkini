@@ -17,20 +17,21 @@ import { match } from "ts-pattern";
 import type { GameView } from "~/domains/database";
 import { DbStatusCard } from "~/components/DbStatusCard";
 import { ActionPanel } from "~/features/game/components/ActionPanel";
+import { BuildModal } from "~/features/game/components/BuildModal";
 import { BoardPanel } from "~/features/game/components/BoardPanel";
 import { DragPreview } from "~/features/game/components/DragPreview";
 import { FlyoutTile } from "~/features/game/components/FlyoutTile";
 import { GameCard } from "~/features/game/components/GameCard";
 import { InventoryPanel } from "~/features/game/components/InventoryPanel";
 import { boardPulseMs, invalidDropReturnMs, mergePulseMs, stashAnimationMs } from "~/features/game/components/constants";
-import { boardCellKey, parseBoardCellId } from "~/features/game/components/helpers/boardCellId";
+import { boardCellId, boardCellKey, parseBoardCellId } from "~/features/game/components/helpers/boardCellId";
 import { canMergeBoardItems } from "~/features/game/components/helpers/canMergeBoardItems";
 import { canStashBoardItem } from "~/features/game/components/helpers/canStashBoardItem";
 import { cssEscape, snapshotRect, wait } from "~/features/game/components/helpers/dom";
 import { findFirstFreeBoardCell } from "~/features/game/components/helpers/findFirstFreeBoardCell";
 import { getInventoryPreviewSlot } from "~/features/game/components/helpers/getInventoryPreviewSlot";
 import { resolveInventoryDestination } from "~/features/game/components/helpers/resolveInventoryDestination";
-import type { DragData, DropData, Flyout, Selection } from "~/features/game/components/types";
+import type { BuildCell, DragData, DropData, Flyout, Selection } from "~/features/game/components/types";
 import { useGameDataInvalidation, useGameView } from "~/hooks/useGameView";
 import { revealProducerDrops } from "~/features/game/animations/revealProducerDrops";
 import { useGameMutations } from "~/features/game/hooks/useGameMutations";
@@ -48,6 +49,7 @@ export function GameShell() {
   const [mergePulseBoardItemId, setMergePulseBoardItemId] = useState<string | null>(null);
   const [flyout, setFlyout] = useState<Flyout | null>(null);
   const [hiddenBoardItemIds, setHiddenBoardItemIds] = useState<Set<string>>(() => new Set());
+  const [buildCell, setBuildCell] = useState<BuildCell>(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export function GameShell() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const invalidateGameData = useGameDataInvalidation();
 
-  const { placeInventory, moveBoard, stashBoard, mergeBoard, swapInventory, produce, build, reset } = useGameMutations();
+  const { placeInventory, moveBoard, stashBoard, mergeBoard, swapInventory, produce, build } = useGameMutations();
 
   const pending =
     placeInventory.isPending ||
@@ -70,7 +72,6 @@ export function GameShell() {
     swapInventory.isPending ||
     produce.isPending ||
     build.isPending ||
-    reset.isPending ||
     flyout !== null ||
     hiddenBoardItemIds.size > 0;
 
@@ -101,19 +102,6 @@ export function GameShell() {
     markInvalid(invalidId);
     if (invalidId) return;
     toast.error(error instanceof Error ? error.message : "Action failed.");
-  }
-
-  async function runAction(
-    action: () => Promise<unknown>,
-    invalidId?: string,
-    options: { clearSelection?: boolean } = {},
-  ) {
-    try {
-      await action();
-      if (options.clearSelection ?? true) setSelection(null);
-    } catch (error) {
-      showActionError(error, invalidId);
-    }
   }
 
   async function runDrop(action: () => Promise<unknown>, source: DragData, invalidId?: string, onSuccess?: () => void) {
@@ -253,6 +241,20 @@ export function GameShell() {
     }
   }
 
+  async function buildIntoCell(recipeId: string) {
+    if (!buildCell) return;
+    const target = buildCell;
+    setBuildCell(null);
+
+    try {
+      await build.mutateAsync({ recipeId, x: target.x, y: target.y });
+      pulseBoard(boardCellKey(target.x, target.y));
+      setSelection(null);
+    } catch (error) {
+      showActionError(error, boardCellId(target.x, target.y));
+    }
+  }
+
   function handleDragStart(event: DragStartEvent) {
     setActiveDrag(event.active.data.current as DragData | null);
     setReturningDrag(null);
@@ -311,18 +313,6 @@ export function GameShell() {
           active,
           overId,
           () => pulseInventory(target.slotIndex),
-        );
-      })
-      .with([{ type: "build" }, { type: "board-cell" }], ([source, target]) => {
-        if (target.boardItemId) {
-          reject(overId);
-          return;
-        }
-        void runDrop(
-          () => build.mutateAsync({ recipeId: source.recipeId, x: target.x, y: target.y }),
-          active,
-          overId,
-          () => pulseBoard(boardCellKey(target.x, target.y)),
         );
       })
       .with([{ type: "board" }, { type: "board-cell" }], ([source, target]) => {
@@ -416,8 +406,8 @@ export function GameShell() {
         onDragCancel={handleDragCancel}
         onDragEnd={handleDragEnd}
       >
-        <section className="grid w-fit max-w-full gap-3 xl:grid-cols-[auto_20rem]">
-          <div className="flex min-w-0 flex-col gap-4">
+        <section className="flex w-fit max-w-full flex-col gap-3">
+          <div className="flex max-w-full items-start gap-3 overflow-x-auto pb-1">
             <BoardPanel
               game={game.data}
               selection={selection}
@@ -432,6 +422,7 @@ export function GameShell() {
               onSelect={setSelection}
               onProduce={(boardItemId) => void produceWithSequence(boardItemId)}
               onStash={stashWithFlyout}
+              onOpenBuild={setBuildCell}
             />
             <InventoryPanel
               game={game.data}
@@ -444,17 +435,15 @@ export function GameShell() {
             />
           </div>
 
-          <aside className="flex flex-col gap-4">
+          <div className="grid gap-3 xl:grid-cols-[minmax(18rem,24rem)_1fr]">
             <ActionPanel
               game={game.data}
               selection={selection}
               pending={pending}
               invalidTargetId={invalidTargetId}
-              committedDrag={hiddenDrag}
-              onReset={() => runAction(() => reset.mutateAsync(undefined))}
             />
             <DbStatusCard />
-          </aside>
+          </div>
         </section>
         <DragOverlay
           dropAnimation={committedDrag ? null : { duration: invalidDropReturnMs, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }}
@@ -463,6 +452,7 @@ export function GameShell() {
           {activeDrag ? <DragPreview game={game.data} drag={activeDrag} faded={overlayFaded} /> : null}
         </DragOverlay>
       </DndContext>
+      <BuildModal game={game.data} cell={buildCell} pending={pending} onClose={() => setBuildCell(null)} onBuild={(recipeId) => void buildIntoCell(recipeId)} />
       {flyout ? <FlyoutTile game={game.data} flyout={flyout} /> : null}
     </>
   );

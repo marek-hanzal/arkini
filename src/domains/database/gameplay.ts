@@ -161,7 +161,7 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
       : 1;
 
     const allDrops = Array.from({ length: steps }, () => rollProducerDrops(producer.drops)).flat();
-    const plan = planPlacements(mutable.save, mutable.boardRows, mutable.inventoryRows, allDrops);
+    const plan = planPlacements(mutable.save, mutable.boardRows, mutable.inventoryRows, allDrops, producerRow);
     if (!plan) throw new GameActionError("Board and inventory are full.");
 
     const placements = await applyPlacementPlan(tx, plan);
@@ -235,7 +235,7 @@ export async function advanceAutoProducers(): Promise<ProducerDropResult[]> {
       while (autoAvailable > 0 && nextDropAt <= timestamp && guard < mode.capacity) {
         guard += 1;
         const drops = rollProducerDrops(producer.drops);
-        const plan = planPlacements(mutable.save, mutable.boardRows, mutable.inventoryRows, drops);
+        const plan = planPlacements(mutable.save, mutable.boardRows, mutable.inventoryRows, drops, row);
 
         if (!plan) {
           // Full storage should not eat capacity. Push the next retry a little so
@@ -374,8 +374,14 @@ type InventoryPlacementPlan =
   | { type: "update"; stackId: string; slotIndex: number; itemId: ItemId; quantity: number }
   | { type: "insert"; stackId: string; slotIndex: number; itemId: ItemId; quantity: number };
 
-function planPlacements(save: SaveShape, boardRows: readonly BoardRow[], inventoryRows: readonly InventoryRow[], drops: readonly ItemId[]): PlacementPlan | null {
-  const freeCells = findFreeBoardCells(save, boardRows);
+function planPlacements(
+  save: SaveShape,
+  boardRows: readonly BoardRow[],
+  inventoryRows: readonly InventoryRow[],
+  drops: readonly ItemId[],
+  origin?: { x: number; y: number },
+): PlacementPlan | null {
+  const freeCells = findFreeBoardCells(save, boardRows, origin);
   const virtualInventory = cloneInventory(inventoryRows);
   const plan: PlacementPlan = { board: [], inventory: [] };
 
@@ -478,7 +484,7 @@ function cloneInventory(rows: readonly InventoryRow[]) {
   return rows.map((row) => ({ ...row }));
 }
 
-function findFreeBoardCells(save: SaveShape, boardRows: readonly { x: number; y: number }[]) {
+function findFreeBoardCells(save: SaveShape, boardRows: readonly { x: number; y: number }[], origin?: { x: number; y: number }) {
   const occupied = new Set(boardRows.map((item) => `${item.x}:${item.y}`));
   const cells: { x: number; y: number }[] = [];
 
@@ -488,7 +494,20 @@ function findFreeBoardCells(save: SaveShape, boardRows: readonly { x: number; y:
     }
   }
 
-  return cells;
+  if (!origin) return cells;
+
+  return cells.sort((a, b) => {
+    const aDistance = manhattanDistance(a, origin);
+    const bDistance = manhattanDistance(b, origin);
+
+    if (aDistance !== bDistance) return aDistance - bDistance;
+    if (a.y !== b.y) return a.y - b.y;
+    return a.x - b.x;
+  });
+}
+
+function manhattanDistance(a: { x: number; y: number }, b: { x: number; y: number }) {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
 async function insertBoardItem(tx: ArkiniTransaction, itemId: string, x: number, y: number) {

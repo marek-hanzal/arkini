@@ -1,7 +1,6 @@
 import { databasePath } from "./client";
 import { assertBrowserDatabaseSupport } from "./capabilities";
 import { migrator } from "./migrator";
-import { repairPrototypeSchemaDrift } from "./schemaCompatibility";
 import { ensureDefaultSaveGame } from "./save";
 import { syncGameDataManifest } from "./syncGameData";
 
@@ -19,7 +18,6 @@ export async function bootstrapDatabase() {
       throw result.error;
     }
 
-    await repairPrototypeSchemaDrift();
     gameDataHash = await syncGameDataManifest();
     await ensureDefaultSaveGame();
     migrationState = "ready";
@@ -38,4 +36,17 @@ export function readDatabasePath() {
 
 export function readGameDataHash() {
   return gameDataHash;
+}
+
+// Development-only escape hatch: remove the OPFS SQLite file so the next page
+// load starts from empty storage, runs every migration, then syncs the manifest.
+// This project is still pre-release, so we deliberately avoid schema drift
+// repair code and use a hard reset when local prototype data gets stale.
+export async function hardResetDatabaseFile() {
+  bootstrapPromise = undefined;
+  migrationState = "pending";
+  gameDataHash = "pending";
+
+  const { sqlite } = await import("./client");
+  await sqlite.deleteDatabaseFile(undefined, true);
 }

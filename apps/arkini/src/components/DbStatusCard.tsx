@@ -1,10 +1,25 @@
+import { useState } from "react";
 import { useArkiniDatabaseStatus } from "~/hooks/useArkiniDatabaseStatus";
 
 export function DbStatusCard() {
   const status = useArkiniDatabaseStatus();
+  const [resetState, setResetState] = useState<"idle" | "pending" | "failed">("idle");
 
   const crossOriginIsolated =
     typeof window === "undefined" ? false : window.crossOriginIsolated === true;
+
+  async function hardResetDatabase() {
+    setResetState("pending");
+
+    try {
+      const db = await import("@arkini/db");
+      await db.hardResetDatabaseFile();
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      setResetState("failed");
+    }
+  }
 
   return (
     <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-slate-950/40">
@@ -34,9 +49,29 @@ export function DbStatusCard() {
         <StatusPill label="Drops" value={status.isSuccess ? String(status.data.dropTableCount) : "…"} />
       </div>
 
+      <button
+        type="button"
+        disabled={resetState === "pending"}
+        onClick={hardResetDatabase}
+        className="mt-4 w-full rounded-2xl border border-red-400/30 bg-red-950/30 px-4 py-3 text-sm font-semibold text-red-100 transition hover:border-red-300 hover:bg-red-950/50 disabled:cursor-wait disabled:opacity-60"
+      >
+        {resetState === "pending" ? "Dropping OPFS database…" : "Hard reset DB + rerun migrations"}
+      </button>
+
+      <p className="mt-2 text-xs leading-5 text-slate-500">
+        Dev-only atomovka: smaže lokální SQLite soubor a reloadne appku. Žádná schema kompatibilita,
+        žádné mazlení se starou DB, protože ještě nestavíme banku pro křečky.
+      </p>
+
       {status.isError ? (
         <p className="mt-4 rounded-2xl border border-red-400/30 bg-red-950/40 p-3 text-sm text-red-100">
           {(status.error as Error).message}
+        </p>
+      ) : null}
+
+      {resetState === "failed" ? (
+        <p className="mt-4 rounded-2xl border border-red-400/30 bg-red-950/40 p-3 text-sm text-red-100">
+          Hard reset failed. Browser se zase rozhodl být malý úředník; mrkni do konzole.
         </p>
       ) : null}
     </section>

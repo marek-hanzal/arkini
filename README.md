@@ -92,7 +92,6 @@ packages/game-data
 
 packages/db
   src/migrations             Schema only. Do not put item balance here.
-  src/schemaCompatibility.ts Prototype repair for old OPFS DBs missing additive columns.
   src/syncGameData.ts        Idempotent manifest-to-SQLite sync on every bootstrap.
   src/save.ts                Creates the default save once, then leaves player state alone.
   src/gameplay.ts            Small direct actions: place, stash, merge, produce, build, reset.
@@ -109,12 +108,15 @@ This is still not the final drag-and-drop game. It is a deliberately boring butt
 - select a blueprint build recipe, then click an empty board cell to consume blueprint/materials from inventory and place the result
 - stash a board item back into inventory, respecting stack size and slot limits
 - reset save for prototype testing
+- hard reset the whole OPFS database when migrations changed during local development
 
 The code is intentionally small and direct. `packages/db/src/gameplay.ts` is the gameplay boundary for now. Keep new mechanics there until there is actual pressure to split them; do not create a service cathedral because one function got mildly embarrassed.
 
-## Prototype schema repair
+## Development hard reset
 
-Browser OPFS databases persist across rebuilds. During early prototyping the first migration changed while local DBs already thought it had run, which caused errors like `no such column: isEnabled`. `repairPrototypeSchemaDrift()` adds known additive columns before manifest sync. This is not a license to mutate schema randomly forever; proper structural changes still need new migrations. It only keeps early test databases from faceplanting over additive prototype drift.
+Browser OPFS databases persist across rebuilds. During early development we do **not** support backward compatibility for stale local schema. If a migration changed and your local DB starts crying about a missing column, use the **Hard reset DB + rerun migrations** button in the SQLite status card.
+
+That button deletes the SQLocal OPFS database file, reloads the app, then the normal boot path runs all migrations from an empty database and syncs the manifest. Brutal, clean, and vastly better than keeping prototype schema-repair code around like a cursed family heirloom.
 
 ## Data rules
 
@@ -144,6 +146,8 @@ On every app bootstrap:
 2. Kysely migrations run.
 3. `syncGameDataManifest()` validates and synchronizes all static definition tables.
 4. `ensureDefaultSaveGame()` creates the initial save only if it does not exist.
+
+When schema changes during pre-release development, hard-reset the local OPFS DB instead of writing compatibility patches.
 
 The sync disables stale top-level definitions instead of hard-deleting item definitions, because old saves may still reference old item IDs. Drop-table entries are regenerated because they are pure manifest cache.
 

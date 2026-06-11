@@ -61,7 +61,7 @@ export function BoardPanel({
         </p>
       </div>
 
-      <div className="grid w-fit gap-2" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, ${cellSize})` }}>
+      <div className="grid w-fit gap-0 overflow-hidden rounded-xl border border-slate-800" style={{ gridTemplateColumns: `repeat(${game.save.boardWidth}, ${cellSize})` }}>
         {cells.map((cell) => {
           const key = boardCellKey(cell.x, cell.y);
           const boardItem = itemByCell.get(key);

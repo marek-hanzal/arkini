@@ -176,3 +176,11 @@ Bad examples:
 - `fix maybe`
 
 The repository history is part of the handoff memory for future agents and future tired humans.
+
+
+## Current interaction notes
+
+- Board and inventory grids intentionally use zero cell gap so DnD has no blind spots between cells.
+- Invalid drags keep the drag overlay mounted until the return animation finishes; successful drops still hide the source immediately.
+- GitHub Pages builds copy `.nojekyll` into `dist` after Vite finishes so Pages serves the SPA without Jekyll interference.
+- Inventory is now 4 × 9. During development, use the hard DB reset after manifest slot changes.

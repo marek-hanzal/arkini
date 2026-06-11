@@ -22,7 +22,7 @@ export function InventoryPanel({
   pulseSlotIndex: number | null;
   onPlaceStack(slotIndex: number, itemId: string): void;
 }>) {
-  const columns = 3;
+  const columns = 4;
 
   return (
     <section className="w-fit max-w-full rounded-2xl border border-slate-800 bg-slate-900/60 p-3 shadow-xl shadow-slate-950/30">
@@ -33,7 +33,7 @@ export function InventoryPanel({
         </div>
         <p className="text-xs font-medium text-slate-500">{game.inventory.length} slots</p>
       </div>
-      <div className="mt-3 grid w-fit gap-2" style={{ gridTemplateColumns: `repeat(${columns}, ${cellSize})` }}>
+      <div className="mt-3 grid w-fit gap-0 overflow-hidden rounded-xl border border-slate-800" style={{ gridTemplateColumns: `repeat(${columns}, ${cellSize})` }}>
           {game.inventory.map((slot) => (
             <InventorySlotCell
               key={slot.slotIndex}

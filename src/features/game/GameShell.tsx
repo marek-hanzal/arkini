@@ -73,7 +73,8 @@ export function GameShell() {
     produce.isPending ||
     build.isPending ||
     flyout !== null ||
-    hiddenBoardItemIds.size > 0;
+    hiddenBoardItemIds.size > 0 ||
+    returningDrag !== null;
 
   function markInvalid(targetId?: string) {
     if (!targetId) return;
@@ -139,12 +140,12 @@ export function GameShell() {
 
   function rejectDrop(source: DragData, invalidId?: string) {
     setReturningDrag(source);
-    setActiveDrag(null);
     markInvalid(invalidId);
     window.setTimeout(() => {
+      setActiveDrag(null);
       setReturningDrag(null);
       pulseDragOrigin(source);
-    }, invalidDropReturnMs + 80);
+    }, invalidDropReturnMs + 100);
   }
 
   async function stashWithFlyout(boardItemId: string, itemId: string) {
@@ -407,7 +408,7 @@ export function GameShell() {
         onDragEnd={handleDragEnd}
       >
         <section className="flex w-fit max-w-full flex-col gap-3">
-          <div className="flex max-w-full items-start gap-3 overflow-x-auto pb-1">
+          <div className="flex w-fit max-w-full items-start gap-3 overflow-x-auto pb-1">
             <BoardPanel
               game={game.data}
               selection={selection}
@@ -435,7 +436,7 @@ export function GameShell() {
             />
           </div>
 
-          <div className="grid gap-3 xl:grid-cols-[minmax(18rem,24rem)_1fr]">
+          <div className="grid w-full gap-3 xl:grid-cols-[minmax(18rem,24rem)_1fr]">
             <ActionPanel
               game={game.data}
               selection={selection}

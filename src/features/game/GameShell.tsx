@@ -378,7 +378,7 @@ export function GameShell() {
           <h1 className="text-lg font-semibold text-slate-50">Merge board</h1>
           {inlineFeedback ? (
             <p className={cn(
-              "mt-2 rounded-sm px-2 py-1 text-xs",
+              "ak-feedback mt-2 rounded-sm px-2 py-1 text-xs",
               inlineFeedback.tone === "error" ? "bg-red-950/40 text-red-100" : "bg-sky-950/40 text-sky-100",
             )}
             >
@@ -565,8 +565,8 @@ function BoardCell({
         y === rows - 1 && "border-b-0",
         isOver && "bg-slate-800/80",
         canMerge && isOver && "ring-2 ring-inset ring-emerald-300/80",
-        invalid && "bg-red-950/40 ring-2 ring-inset ring-red-300/70",
-        pulsed && !invalid && "bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
+        invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
+        pulsed && !invalid && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
       )}
       onDoubleClick={() => !boardItem && onEmptyDoubleActivate({ x, y })}
       onPointerDown={tapHandlers.onPointerDown}
@@ -721,8 +721,8 @@ function InventoryCell({
       className={cn(
         "relative aspect-square rounded-sm border border-slate-800 bg-slate-900/70 transition-colors duration-200",
         isOver && "bg-slate-800 ring-1 ring-emerald-300/70",
-        invalid && "bg-red-950/40 ring-2 ring-inset ring-red-300/70",
-        pulsed && !invalid && "bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
+        invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
+        pulsed && !invalid && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
       )}
     >
       {stack && item ? <InventoryTile slot={slot} item={item} hidden={hidden} onDoubleActivate={onDoubleActivate} /> : null}
@@ -777,48 +777,61 @@ function Tile({
   overlaySize?: Pick<RectLike, "width" | "height"> | null;
   onTogglePause?(): void;
 }>) {
-  const waiting = producer ? isProducerWaiting(producer, nowMs ?? Date.now()) : false;
+  const producerUi = producer ? getProducerUiState(producer, nowMs ?? Date.now()) : null;
 
   return (
     <div
       className={cn(
         "relative grid h-full w-full place-items-center p-[10%] text-slate-50 transition-opacity duration-300",
-        waiting && "opacity-80",
+        producerUi?.waiting && "opacity-80",
+        producerUi?.paused && "opacity-65",
         dragOverlay && "shadow-2xl shadow-black/50",
       )}
       style={dragOverlay && overlaySize ? { width: overlaySize.width, height: overlaySize.height } : undefined}
     >
       <img src={item.assetSrc} alt="" draggable={false} className="h-full w-full object-contain" />
       {quantity && quantity > 1 ? <span className="absolute bottom-0.5 right-0.5 rounded-sm bg-slate-950/80 px-1 text-[0.62rem] font-bold text-slate-100">{quantity}</span> : null}
-      {producer ? <ProducerBadge producer={producer} nowMs={nowMs ?? Date.now()} onTogglePause={onTogglePause} /> : null}
+      {producer && producerUi ? <ProducerBadge producer={producer} ui={producerUi} onTogglePause={onTogglePause} /> : null}
     </div>
   );
 }
 
-function ProducerBadge({ producer, nowMs, onTogglePause }: Readonly<{ producer: NonNullable<BoardViewItem["producer"]>; nowMs: number; onTogglePause?(): void }>) {
-  const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
-  const nextDropAt = producer.nextDropAt ? Date.parse(producer.nextDropAt) : 0;
-  const rechargeUntil = producer.rechargeUntil ? Date.parse(producer.rechargeUntil) : 0;
-  const waitingMs = Math.max(0, cooldownUntil - nowMs, nextDropAt - nowMs, rechargeUntil - nowMs);
-  const label = producer.trigger === "auto"
-    ? producer.paused ? "||" : producer.rechargeUntil && rechargeUntil > nowMs ? formatMs(waitingMs) : String(producer.autoAvailable ?? "∞")
-    : waitingMs > 0 ? formatMs(waitingMs) : producer.remainingCharges !== null && producer.remainingCharges !== undefined ? String(producer.remainingCharges) : "▶";
+interface ProducerUiState {
+  label: string;
+  title: string;
+  progress: number | null;
+  waiting: boolean;
+  paused: boolean;
+}
+
+function ProducerBadge({ producer, ui, onTogglePause }: Readonly<{ producer: NonNullable<BoardViewItem["producer"]>; ui: ProducerUiState; onTogglePause?(): void }>) {
+  const content = (
+    <>
+      <span>{ui.label}</span>
+      {ui.progress !== null ? (
+        <span className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden rounded-b-sm bg-slate-700/80">
+          <span className="block h-full bg-emerald-300/80 transition-[width] duration-300" style={{ width: `${ui.progress * 100}%` }} />
+        </span>
+      ) : null}
+    </>
+  );
 
   if (producer.trigger !== "auto") {
-    return <span className="absolute left-0.5 top-0.5 rounded-sm bg-slate-950/80 px-1 text-[0.56rem] font-bold text-emerald-200">{label}</span>;
+    return <span title={ui.title} className="absolute left-0.5 top-0.5 min-w-5 rounded-sm bg-slate-950/85 px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-bold text-emerald-200">{content}</span>;
   }
 
   return (
     <button
       type="button"
-      className="absolute left-0.5 top-0.5 rounded-sm bg-slate-950/80 px-1 text-[0.56rem] font-bold text-emerald-200"
+      title={ui.title}
+      className="absolute left-0.5 top-0.5 min-w-5 rounded-sm bg-slate-950/85 px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-bold text-emerald-200"
       onPointerDown={(event) => event.stopPropagation()}
       onClick={(event) => {
         event.stopPropagation();
         onTogglePause?.();
       }}
     >
-      {label}
+      {content}
     </button>
   );
 }
@@ -920,11 +933,70 @@ function shouldExhaustOnDoubleActivate(itemId: string) {
   return producer?.doubleClickBehavior === "exhaust";
 }
 
-function isProducerWaiting(producer: NonNullable<BoardViewItem["producer"]>, nowMs: number) {
+function getProducerUiState(producer: NonNullable<BoardViewItem["producer"]>, nowMs: number): ProducerUiState {
   const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
   const nextDropAt = producer.nextDropAt ? Date.parse(producer.nextDropAt) : 0;
   const rechargeUntil = producer.rechargeUntil ? Date.parse(producer.rechargeUntil) : 0;
-  return producer.paused || cooldownUntil > nowMs || nextDropAt > nowMs || rechargeUntil > nowMs;
+
+  if (producer.paused) {
+    return { label: "||", title: "Paused", progress: null, waiting: true, paused: true };
+  }
+
+  if (producer.trigger === "click") {
+    const cooldownLeft = Math.max(0, cooldownUntil - nowMs);
+    const max = producer.cooldownMs ?? cooldownLeft;
+    if (cooldownLeft > 0) {
+      return {
+        label: formatMs(cooldownLeft),
+        title: `Cooling down: ${formatMs(cooldownLeft)}`,
+        progress: max > 0 ? 1 - cooldownLeft / max : null,
+        waiting: true,
+        paused: false,
+      };
+    }
+
+    const charges = producer.remainingCharges;
+    return {
+      label: charges !== null && charges !== undefined ? String(charges) : "▶",
+      title: charges !== null && charges !== undefined ? `${charges} charges left` : "Ready",
+      progress: null,
+      waiting: false,
+      paused: false,
+    };
+  }
+
+  const rechargeLeft = Math.max(0, rechargeUntil - nowMs);
+  if (rechargeLeft > 0) {
+    const max = producer.mode.type === "auto" ? producer.mode.rechargeMs : rechargeLeft;
+    return {
+      label: formatMs(rechargeLeft),
+      title: `Recharging: ${formatMs(rechargeLeft)}`,
+      progress: max > 0 ? 1 - rechargeLeft / max : null,
+      waiting: true,
+      paused: false,
+    };
+  }
+
+  const tickLeft = Math.max(0, nextDropAt - nowMs);
+  const available = producer.autoAvailable ?? 0;
+  if (tickLeft > 0) {
+    const max = producer.mode.type === "auto" ? producer.mode.tickMs : tickLeft;
+    return {
+      label: String(available),
+      title: `Next drop in ${formatMs(tickLeft)} · ${available} queued charges`,
+      progress: max > 0 ? 1 - tickLeft / max : null,
+      waiting: true,
+      paused: false,
+    };
+  }
+
+  return {
+    label: String(available || "▶"),
+    title: `${available} queued charges ready`,
+    progress: null,
+    waiting: false,
+    paused: false,
+  };
 }
 
 function firstFreeCell(game: GameView) {

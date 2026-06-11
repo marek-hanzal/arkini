@@ -15,6 +15,7 @@ export function Board({
   hiddenBoardIds,
   invalidBoardCellKey,
   pulsedBoardCellKey,
+  mergedBoardCellKey,
   nowMs,
   onEmptyDoubleActivate,
   onTileDoubleActivate,
@@ -26,6 +27,7 @@ export function Board({
   hiddenBoardIds: ReadonlySet<string>;
   invalidBoardCellKey: string | null;
   pulsedBoardCellKey: string | null;
+  mergedBoardCellKey: string | null;
   nowMs: number;
   onEmptyDoubleActivate(cell: BuildCell): void;
   onTileDoubleActivate(item: BoardViewItem): void;
@@ -51,6 +53,7 @@ export function Board({
             canMerge={canMerge}
             invalid={invalidBoardCellKey === key}
             pulsed={pulsedBoardCellKey === key}
+            merged={mergedBoardCellKey === key}
             onEmptyDoubleActivate={onEmptyDoubleActivate}
           >
             {boardItem ? (
@@ -81,6 +84,7 @@ function BoardCell({
   canMerge,
   invalid,
   pulsed,
+  merged,
   children,
   onEmptyDoubleActivate,
 }: Readonly<{
@@ -90,6 +94,7 @@ function BoardCell({
   canMerge: boolean;
   invalid: boolean;
   pulsed: boolean;
+  merged: boolean;
   children: ReactNode;
   onEmptyDoubleActivate(cell: BuildCell): void;
 }>) {
@@ -110,7 +115,8 @@ function BoardCell({
         isOver && "bg-slate-800/80",
         canMerge && isOver && "ring-2 ring-inset ring-emerald-300/80",
         invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
-        pulsed && !invalid && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
+        pulsed && !invalid && !merged && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
+        merged && !invalid && "ak-merge-pop bg-emerald-950/35 ring-2 ring-inset ring-emerald-200/80",
       )}
       onDoubleClick={() => !boardItem && onEmptyDoubleActivate({ x, y })}
       onPointerDown={tapHandlers.onPointerDown}

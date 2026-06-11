@@ -122,7 +122,7 @@ export function GameShell() {
       setCommittedDrag(source);
       if (target.boardItemId) {
         await mergeBoard.mutateAsync({ sourceBoardItemId: source.boardItemId, targetBoardItemId: target.boardItemId });
-        feedback.pulseBoardCell(cellKey(target.x, target.y));
+        feedback.pulseMergeCell(cellKey(target.x, target.y));
         setCommittedDrag(null);
         return;
       }
@@ -278,6 +278,7 @@ export function GameShell() {
           hiddenBoardIds={hiddenBoardIds}
           invalidBoardCellKey={feedback.invalidBoardCellKey}
           pulsedBoardCellKey={feedback.pulsedBoardCellKey}
+          mergedBoardCellKey={feedback.mergedBoardCellKey}
           nowMs={nowMs}
           onEmptyDoubleActivate={setBuildCell}
           onTileDoubleActivate={(item) => {

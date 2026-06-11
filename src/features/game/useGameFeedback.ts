@@ -6,6 +6,7 @@ import { flashMs, type DragData, type DropData } from "./types";
 export function useGameFeedback() {
   const [invalidBoardCellKey, setInvalidBoardCellKey] = useState<string | null>(null);
   const [pulsedBoardCellKey, setPulsedBoardCellKey] = useState<string | null>(null);
+  const [mergedBoardCellKey, setMergedBoardCellKey] = useState<string | null>(null);
   const [invalidInventorySlot, setInvalidInventorySlot] = useState<number | null>(null);
   const [pulsedInventorySlot, setPulsedInventorySlot] = useState<number | null>(null);
   function flashBoardCell(key: string | null, tone: "pulse" | "error") {
@@ -23,6 +24,15 @@ export function useGameFeedback() {
 
   function pulseBoardCell(key: string | null) {
     flashBoardCell(key, "pulse");
+  }
+
+  function pulseMergeCell(key: string | null) {
+    if (!key) return;
+    setMergedBoardCellKey(null);
+    window.requestAnimationFrame(() => {
+      setMergedBoardCellKey(key);
+      window.setTimeout(() => setMergedBoardCellKey((current) => current === key ? null : current), 560);
+    });
   }
 
   function flashInventorySlot(slotIndex: number | null, tone: "pulse" | "error") {
@@ -69,10 +79,12 @@ export function useGameFeedback() {
   return {
     invalidBoardCellKey,
     pulsedBoardCellKey,
+    mergedBoardCellKey,
     invalidInventorySlot,
     pulsedInventorySlot,
     flashBoardCell,
     pulseBoardCell,
+    pulseMergeCell,
     flashInventorySlot,
     pulseInventorySlot,
     flashInvalidTarget,

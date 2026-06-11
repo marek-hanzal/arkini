@@ -4,6 +4,7 @@ import type { GameView, InventorySlot, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import { usePressActions } from "../usePressActions";
 import type { DragData, DropData } from "../types";
+import { BottomSheet } from "./BottomSheet";
 import { Tile } from "./Tile";
 
 export function InventorySheet({
@@ -31,55 +32,52 @@ export function InventorySheet({
   const filled = game.inventory.filter((slot) => slot.stack).length;
 
   return (
-    <>
-      {open ? <button type="button" aria-label="Close inventory" className="fixed inset-0 z-20 bg-slate-950/50" onClick={() => onOpenChange(false)} /> : null}
-
-      <aside
-        ref={setNodeRef}
-        style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
-        className={cn(
-          "fixed inset-x-0 z-30 mx-auto w-[min(100vw-1.5rem,430px)] rounded-t-lg border border-slate-800 bg-slate-950/96 shadow-2xl shadow-black/60 transition-transform duration-200",
-          open ? "translate-y-0" : "translate-y-[calc(100%-5rem)]",
-          isOver && "ring-2 ring-emerald-300/70",
-        )}
-      >
-        <div data-inventory-summary className="border-b border-slate-800/80 px-4 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">Inventory</p>
-              <p className="text-sm text-slate-300">{filled}/{game.inventory.length} slots</p>
-            </div>
-            <button
-              type="button"
-              className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300"
-              onClick={() => onOpenChange(!open)}
-            >
-              {open ? "Close" : "Open"}
-            </button>
+    <BottomSheet
+      ref={setNodeRef}
+      open={open}
+      keepMounted
+      closedClassName="translate-y-[calc(100%-5rem)]"
+      backdropClassName="z-20 bg-slate-950/50"
+      sheetClassName="z-30"
+      className={cn(isOver && "ring-2 ring-emerald-300/70")}
+      onClose={() => onOpenChange(false)}
+    >
+      <div data-inventory-summary className="border-b border-slate-800/80 px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">Inventory</p>
+            <p className="text-sm text-slate-300">{filled}/{game.inventory.length} slots</p>
           </div>
+          <button
+            type="button"
+            className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300"
+            onClick={() => onOpenChange(!open)}
+          >
+            {open ? "Close" : "Open"}
+          </button>
         </div>
+      </div>
 
-        <div className="max-h-[60vh] overflow-y-auto px-3 pb-4 pt-3">
-          <div className="grid grid-cols-4 gap-1.5">
-            {game.inventory.map((slot) => (
-              <InventoryCell
-                key={slot.slotIndex}
-                slot={slot}
-                item={slot.stack ? game.items[slot.stack.itemId] : null}
-                hidden={
-                  hiddenInventorySlots.has(slot.slotIndex)
-                  || (activeDrag?.kind === "inventory" && activeDrag.slotIndex === slot.slotIndex && (slot.stack?.quantity ?? 0) <= 1)
-                  || (committedDrag?.kind === "inventory" && committedDrag.slotIndex === slot.slotIndex && (slot.stack?.quantity ?? 0) <= 1)
-                }
-                invalid={invalidInventorySlot === slot.slotIndex}
-                pulsed={pulsedInventorySlot === slot.slotIndex}
-                onDoubleActivate={() => onSlotDoubleActivate(slot)}
-              />
-            ))}
-          </div>
+      <div className="max-h-[60vh] overflow-y-auto px-3 pb-4 pt-3">
+        <div className="grid grid-cols-4 gap-1.5">
+          {game.inventory.map((slot) => (
+            <InventoryCell
+              key={slot.slotIndex}
+              slot={slot}
+              item={slot.stack ? game.items[slot.stack.itemId] : null}
+              hidden={
+                hiddenInventorySlots.has(slot.slotIndex)
+                || (activeDrag?.kind === "inventory" && activeDrag.slotIndex === slot.slotIndex && (slot.stack?.quantity ?? 0) <= 1)
+                || (committedDrag?.kind === "inventory" && committedDrag.slotIndex === slot.slotIndex && (slot.stack?.quantity ?? 0) <= 1)
+              }
+              invalid={invalidInventorySlot === slot.slotIndex}
+              pulsed={pulsedInventorySlot === slot.slotIndex}
+              onDoubleActivate={() => onSlotDoubleActivate(slot)}
+            />
+          ))}
         </div>
-      </aside>
-    </>
+      </div>
+    </BottomSheet>
   );
 }
 

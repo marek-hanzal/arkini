@@ -21,8 +21,8 @@ export function DbStatusCard() {
   }
 
   return (
-    <section className="w-fit rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-lg shadow-slate-950/25">
-      <div className="flex flex-wrap items-center gap-4">
+    <section className="w-full rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-lg shadow-slate-950/25">
+      <div className="flex h-full flex-wrap items-center gap-4">
         <div className="min-w-40">
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Local database</p>
           <h2 className="mt-1 text-base font-semibold text-white">SQLite / OPFS</h2>
@@ -36,7 +36,7 @@ export function DbStatusCard() {
           </span>
         </div>
 
-        <div className="grid w-64 grid-cols-2 gap-2">
+        <div className="grid min-w-64 flex-1 grid-cols-2 gap-2">
           <StatusPill label="DB" value={status.isSuccess ? status.data.databasePath : "arkini.sqlite3"} />
           <StatusPill label="Sync" value={status.isSuccess ? status.data.gameDataHash.slice(0, 10) : "pending"} />
           <StatusPill label="Items" value={status.isSuccess ? String(status.data.itemCount) : "…"} />

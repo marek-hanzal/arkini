@@ -55,7 +55,7 @@ export function GameShell() {
   const [splashReady, setSplashReady] = useState(false);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setSplashReady(true), 900);
+    const timeout = window.setTimeout(() => setSplashReady(true), 1500);
     return () => window.clearTimeout(timeout);
   }, []);
 
@@ -147,12 +147,12 @@ export function GameShell() {
 
   function rejectDrop(source: DragData, invalidId?: string) {
     setReturningDrag(source);
+    setActiveDrag(null);
     markInvalid(invalidId);
     window.setTimeout(() => {
-      setActiveDrag(null);
       setReturningDrag(null);
       pulseDragOrigin(source);
-    }, invalidDropReturnMs + 100);
+    }, invalidDropReturnMs + 120);
   }
 
   async function stashWithFlyout(boardItemId: string, itemId: string) {

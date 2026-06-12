@@ -10,7 +10,10 @@ type StartingBoardItem = { itemId: string; x: number; y: number };
 
 export async function ensureDefaultSaveGame() {
   const existing = await db.selectFrom(table.saveGame).select("id").where("id", "=", defaultSaveGameId).executeTakeFirst();
-  if (existing) return;
+  if (existing) {
+    await syncDefaultSaveShape();
+    return;
+  }
 
   await db.transaction().execute(async (tx) => {
     await tx
@@ -52,5 +55,28 @@ export async function ensureDefaultSaveGame() {
     }
 
     await tx.updateTable(table.saveGame).set({ updatedAt: new Date().toISOString() }).where("id", "=", defaultSaveGameId).execute();
+  });
+}
+
+async function syncDefaultSaveShape() {
+  const inventorySlots = gameDataManifest.game.inventory.slots;
+
+  await db.transaction().execute(async (tx) => {
+    await tx
+      .updateTable(table.saveGame)
+      .set({
+        boardWidth: gameDataManifest.game.board.width,
+        boardHeight: gameDataManifest.game.board.height,
+        inventorySlots,
+        updatedAt: new Date().toISOString(),
+      })
+      .where("id", "=", defaultSaveGameId)
+      .execute();
+
+    await tx
+      .deleteFrom(table.inventoryStack)
+      .where("saveGameId", "=", defaultSaveGameId)
+      .where("slotIndex", ">=", inventorySlots)
+      .execute();
   });
 }

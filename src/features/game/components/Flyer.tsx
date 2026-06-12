@@ -5,7 +5,7 @@ import type { FlyerModel } from "../types";
 import { playFlyerTimeline } from "../utils/animation";
 import { Tile } from "./Tile";
 
-export function Flyer({ flyer, item, nowMs, onComplete }: Readonly<{ flyer: FlyerModel; item: ViewItem; nowMs: number; onComplete(id: string): void }>) {
+export function Flyer({ flyer, item, nowMs, onSettle }: Readonly<{ flyer: FlyerModel; item: ViewItem; nowMs: number; onSettle(id: string): void }>) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -14,13 +14,13 @@ export function Flyer({ flyer, item, nowMs, onComplete }: Readonly<{ flyer: Flye
 
     let disposed = false;
     void playFlyerTimeline(element, flyer).then(() => {
-      if (!disposed) onComplete(flyer.id);
+      if (!disposed) onSettle(flyer.id);
     });
 
     return () => {
       disposed = true;
     };
-  }, [flyer, onComplete]);
+  }, [flyer, onSettle]);
 
   return (
     <div

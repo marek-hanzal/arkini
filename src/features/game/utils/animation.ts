@@ -106,18 +106,18 @@ export function animateBottomSheet({ panel, backdrop, open }: { panel: HTMLEleme
 
   if (open) {
     gsap.set([panel, backdrop], { pointerEvents: "auto" });
-    gsap.timeline({ defaults: { ease: "power3.out" } })
-      .to(backdrop, { opacity: 1, duration: 0.18 }, 0)
-      .to(panel, { opacity: 1, y: 0, duration: sheetDurationSeconds }, 0);
+    gsap.timeline({ defaults: { duration: sheetDurationSeconds, ease: "power3.out" } })
+      .to(backdrop, { opacity: 1, backdropFilter: "blur(10px)", webkitBackdropFilter: "blur(10px)" }, 0)
+      .to(panel, { opacity: 1, y: 0 }, 0);
     return;
   }
 
   gsap.timeline({
-    defaults: { ease: "power2.in" },
+    defaults: { duration: sheetDurationSeconds, ease: "power3.inOut" },
     onComplete: () => gsap.set([panel, backdrop], { pointerEvents: "none" }),
   })
-    .to(backdrop, { opacity: 0, duration: 0.16 }, 0)
-    .to(panel, { opacity: 0, y: "calc(100% + 1rem)", duration: 0.2 }, 0);
+    .to(backdrop, { opacity: 0, backdropFilter: "blur(0px)", webkitBackdropFilter: "blur(0px)" }, 0)
+    .to(panel, { opacity: 0, y: "calc(100% + 1rem)" }, 0);
 }
 
 function once(fn: () => void) {

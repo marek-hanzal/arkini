@@ -82,6 +82,9 @@ button {
   background: rgb(2 6 23 / 0.68);
   opacity: 0;
   pointer-events: none;
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  will-change: opacity, backdrop-filter;
 }
 
 .ak-bottom-sheet-panel {

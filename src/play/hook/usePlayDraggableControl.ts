@@ -9,6 +9,7 @@ import {
   type GameDragActions,
   type GameDragFeedback,
 } from "./playDragRules";
+import { resolveMagneticGameDropTarget } from "./resolveMagneticGameDropTarget";
 
 export type { GameDragActions, GameDragFeedback } from "./playDragRules";
 
@@ -32,6 +33,7 @@ export function usePlayDraggableControl({
   const control = useDraggableControl<string, GameDragSource, GameDropTarget, GameVisualMeta, FlyerKind>({
     schedule: (operation) => schedule("drag/drop", operation),
     resolveDrop: (context) => resolveGameDrop(context, game, actions, feedback),
+    resolveMagneticDropTarget: resolveMagneticGameDropTarget,
     animate: (animation) => addFlyer(animation.itemId, animation.from, animation.to, animation.kind, animation.overlay),
     onError(error, context) {
       flashGameDrop(context, game, feedback);

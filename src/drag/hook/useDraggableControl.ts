@@ -76,11 +76,17 @@ export interface DropContext<ItemId extends string = string, Source = unknown, T
   target: DroppablePayload<Target> | null;
 }
 
+export interface MagneticDropContext<ItemId extends string = string, Source = unknown, Overlay = unknown> {
+  source: DraggablePayload<ItemId, Source, Overlay>;
+  dragRect: RectLike;
+}
+
 export interface UseDraggableControlOptions<ItemId extends string = string, Source = unknown, Target = unknown, Overlay = unknown, Kind extends string = string> {
   resolveDrop(context: DropContext<ItemId, Source, Target, Overlay>): DropPlan<ItemId, Kind, Overlay> | Promise<DropPlan<ItemId, Kind, Overlay>>;
   animate(animation: ResolvedDraggableAnimation<ItemId, Kind, Overlay>): Promise<void> | void;
   schedule?(operation: () => Promise<void>): Promise<void>;
   onError?(error: unknown, context: DropContext<ItemId, Source, Target, Overlay>): void | Promise<void>;
+  resolveMagneticDropTarget?(context: MagneticDropContext<ItemId, Source, Overlay>): DroppablePayload<Target> | null;
   getDragBoundaryNodeId?(source: DraggablePayload<ItemId, Source, Overlay>): string | null | undefined;
   activationDistance?: number;
 }
@@ -98,6 +104,7 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
   animate,
   onError,
   schedule,
+  resolveMagneticDropTarget,
   getDragBoundaryNodeId,
   activationDistance = 5,
 }: UseDraggableControlOptions<ItemId, Source, Target, Overlay, Kind>) {
@@ -143,9 +150,10 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
 
   async function handleDragEnd(event: DragEndEvent) {
     const source = event.active.data.current as DraggablePayload<ItemId, Source, Overlay> | undefined;
-    const target = (event.over?.data.current as DroppablePayload<Target> | undefined) ?? null;
-    const context = source ? { source, target } : null;
+    const directTarget = (event.over?.data.current as DroppablePayload<Target> | undefined) ?? null;
     const dragRect = (event.active.rect.current.translated ?? event.active.rect.current.initial) as RectLike | null;
+    const target = source && dragRect ? (directTarget ?? resolveMagneticDropTarget?.({ source, dragRect }) ?? null) : directTarget;
+    const context = source ? { source, target } : null;
     setDragPreviewRect(null);
 
     if (!source || !context) {

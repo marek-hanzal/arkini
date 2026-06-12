@@ -48,9 +48,11 @@ Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts` and
 
 Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle.
 
-Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/hook/usePlayDraggableControl.ts` only wires those rules into the generic control.
+Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/hook/usePlayDraggableControl.ts` only wires those rules into the generic control. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: when dnd-kit does not report a direct target, it snaps board and inventory drags to the nearest same-surface action within the magnetic threshold. Missing a cell edge by a few pixels should not be treated like a moral failure.
 
 Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
+
+Board merge hints are delayed by `src/board/hook/useDelayedMergeHints.ts`. They only appear after a short hold while dragging a board item and disappear when the drag context changes. Immediate global highlighting was too noisy, because apparently even tiny tree games can invent UX debt.
 
 ## React data subscriptions
 

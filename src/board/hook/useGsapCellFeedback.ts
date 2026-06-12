@@ -1,7 +1,14 @@
 import { useEffect, useRef, type RefObject } from "react";
 import { playCellError, playCellSuccess } from "~/play/util/animation";
 
-export function useGsapCellFeedback<TElement extends HTMLElement>(ref: RefObject<TElement | null>, { invalid, success }: Readonly<{ invalid: boolean; success: boolean }>) {
+export namespace useGsapCellFeedback {
+  export interface Props {
+    invalid: boolean;
+    success: boolean;
+  }
+}
+
+export function useGsapCellFeedback<TElement extends HTMLElement>(ref: RefObject<TElement | null>, { invalid, success }: Readonly<useGsapCellFeedback.Props>) {
   const wasInvalidRef = useRef(false);
   const wasSuccessRef = useRef(success);
   const didMountSuccessRef = useRef(false);

@@ -3,7 +3,16 @@ import type { BuildRecipeId } from "~/manifest/data/manifestId";
 import type { BoardCell } from "~/board/boardIdentity";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 
-export function BuildSheet({ game, cell, onClose, onBuild }: Readonly<{ game: GameView; cell: BoardCell | null; onClose(): void; onBuild(recipeId: BuildRecipeId): void }>) {
+export namespace BuildSheet {
+  export interface Props {
+    game: GameView;
+    cell: BoardCell | null;
+    onClose(): void;
+    onBuild(recipeId: BuildRecipeId): void;
+  }
+}
+
+export function BuildSheet({ game, cell, onClose, onBuild }: Readonly<BuildSheet.Props>) {
   return (
     <div>
       <SheetHeader

@@ -6,19 +6,23 @@ import { usePlayAction, usePlayDataInvalidation } from "~/play/hook/usePlayView"
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import type { ActiveSheet } from "~/play/ui/BottomNavigation";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
-import { cssEscape, queryRect } from "~/shared/util/dom";
+import { queryRect } from "~/shared/util/queryRect";
+
+export namespace usePlayProducerActions {
+  export interface Props {
+    activeSheet: ActiveSheet;
+    addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
+    feedback: GameDragFeedback;
+    schedule(label: string, operation: () => Promise<void>): Promise<void>;
+  }
+}
 
 export function usePlayProducerActions({
   activeSheet,
   addFlyer,
   feedback,
   schedule,
-}: Readonly<{
-  activeSheet: ActiveSheet;
-  addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
-  feedback: GameDragFeedback;
-  schedule(label: string, operation: () => Promise<void>): Promise<void>;
-}>) {
+}: Readonly<usePlayProducerActions.Props>) {
   const invalidatePlayData = usePlayDataInvalidation();
   const produce = usePlayAction(
     (db, input: { boardItemId: string; activation?: "single" | "exhaust" }) =>
@@ -30,7 +34,7 @@ export function usePlayProducerActions({
     const animations: Promise<void>[] = [];
 
     for (const result of results) {
-      const sourceRect = queryRect(`[data-board-item-id="${cssEscape(result.producerBoardItemId)}"]`);
+      const sourceRect = queryRect(`[data-board-item-id="${result.producerBoardItemId}"]`);
       if (!sourceRect) continue;
       const from = sourceRect;
 

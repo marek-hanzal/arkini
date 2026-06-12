@@ -4,6 +4,17 @@ import { cn } from "~/shared/cn";
 import type { DraggablePayload, DroppablePayload } from "~/drag/hook/useDraggableControl";
 import { usePressActions } from "~/shared/hook/usePressActions";
 
+export namespace DroppableSurface {
+  export interface Props<Target> extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "children"> {
+    id: string;
+    nodeId?: string;
+    payload: DroppablePayload<Target>;
+    className?: string | ((isOver: boolean) => string);
+    nodeRef?(node: HTMLDivElement | null): void;
+    children: ReactNode;
+  }
+}
+
 export function DroppableSurface<Target>({
   id,
   nodeId = id,
@@ -12,7 +23,7 @@ export function DroppableSurface<Target>({
   children,
   nodeRef,
   ...props
-}: Readonly<DroppableSurfaceProps<Target>>) {
+}: Readonly<DroppableSurface.Props<Target>>) {
   const data = { ...payload, targetNodeId: payload.targetNodeId ?? nodeId } satisfies DroppablePayload<Target>;
   const { setNodeRef, isOver } = useDroppable({ id, data: data as unknown as Data });
   const setRefs = useCallback((node: HTMLDivElement | null) => {
@@ -32,13 +43,18 @@ export function DroppableSurface<Target>({
   );
 }
 
-export interface DroppableSurfaceProps<Target> extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "children"> {
-  id: string;
-  nodeId?: string;
-  payload: DroppablePayload<Target>;
-  className?: string | ((isOver: boolean) => string);
-  nodeRef?(node: HTMLDivElement | null): void;
-  children: ReactNode;
+export namespace DraggableSurface {
+  export interface Props<ItemId extends string, Source, Overlay = unknown> extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+    id: string;
+    nodeId?: string;
+    payload: DraggablePayload<ItemId, Source, Overlay>;
+    hidden: boolean;
+    dragDisabled?: boolean;
+    delaySingleWhenDouble?: boolean;
+    onSingleActivate?(): void;
+    onDoubleActivate?(): void;
+    children: ReactNode;
+  }
 }
 
 export function DraggableSurface<ItemId extends string, Source, Overlay = unknown>({
@@ -53,7 +69,7 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
   onDoubleActivate,
   children,
   ...props
-}: Readonly<DraggableSurfaceProps<ItemId, Source, Overlay>>) {
+}: Readonly<DraggableSurface.Props<ItemId, Source, Overlay>>) {
   const data = { ...payload, sourceNodeId: payload.sourceNodeId ?? nodeId } satisfies DraggablePayload<ItemId, Source, Overlay>;
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data: data as unknown as Data, disabled: dragDisabled });
   const press = usePressActions({
@@ -88,16 +104,4 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
       {children}
     </div>
   );
-}
-
-export interface DraggableSurfaceProps<ItemId extends string, Source, Overlay = unknown> extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
-  id: string;
-  nodeId?: string;
-  payload: DraggablePayload<ItemId, Source, Overlay>;
-  hidden: boolean;
-  dragDisabled?: boolean;
-  delaySingleWhenDouble?: boolean;
-  onSingleActivate?(): void;
-  onDoubleActivate?(): void;
-  children: ReactNode;
 }

@@ -14,19 +14,23 @@ import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { Tile } from "~/item/ui/Tile";
 
+export namespace InventorySheet {
+  export interface Props {
+    game: GameView;
+    isSourceHidden(sourceId: string): boolean;
+    invalidInventorySlot: number | null;
+    onClose(): void;
+    onSlotDoubleActivate(slot: InventorySlot): void;
+  }
+}
+
 export function InventorySheet({
   game,
   isSourceHidden,
   invalidInventorySlot,
   onClose,
   onSlotDoubleActivate,
-}: Readonly<{
-  game: GameView;
-  isSourceHidden(sourceId: string): boolean;
-  invalidInventorySlot: number | null;
-  onClose(): void;
-  onSlotDoubleActivate(slot: InventorySlot): void;
-}>) {
+}: Readonly<InventorySheet.Props>) {
   const inventory = game.inventory.slice(0, inventorySlots);
   const filled = inventory.filter((slot) => slot.stack).length;
 
@@ -61,19 +65,17 @@ export function InventorySheet({
   );
 }
 
-function InventoryCell({
-  slot,
-  item,
-  hidden,
-  invalid,
-  onDoubleActivate,
-}: Readonly<{
-  slot: InventorySlot;
-  item: ViewItem | null;
-  hidden: boolean;
-  invalid: boolean;
-  onDoubleActivate(): void;
-}>) {
+namespace InventoryCell {
+  export interface Props {
+    slot: InventorySlot;
+    item: ViewItem | null;
+    hidden: boolean;
+    invalid: boolean;
+    onDoubleActivate(): void;
+  }
+}
+
+function InventoryCell({ slot, item, hidden, invalid, onDoubleActivate }: Readonly<InventoryCell.Props>) {
   const stack = slot.stack;
   const nodeId = inventorySlotNodeId(slot.slotIndex);
   const cellRef = useRef<HTMLDivElement | null>(null);
@@ -97,17 +99,16 @@ function InventoryCell({
   );
 }
 
-function InventoryTile({
-  slot,
-  item,
-  hidden,
-  onDoubleActivate,
-}: Readonly<{
-  slot: InventorySlot;
-  item: ViewItem;
-  hidden: boolean;
-  onDoubleActivate(): void;
-}>) {
+namespace InventoryTile {
+  export interface Props {
+    slot: InventorySlot;
+    item: ViewItem;
+    hidden: boolean;
+    onDoubleActivate(): void;
+  }
+}
+
+function InventoryTile({ slot, item, hidden, onDoubleActivate }: Readonly<InventoryTile.Props>) {
   const stack = slot.stack;
 
   if (!stack) return null;

@@ -1,7 +1,14 @@
 export type ActiveSheet = "inventory" | "database" | "build" | null;
 export type BottomNavSheet = "inventory" | "database";
 
-export function BottomNavigation({ activeSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; onOpen(sheet: BottomNavSheet): void }>) {
+export namespace BottomNavigation {
+  export interface Props {
+    activeSheet: ActiveSheet;
+    onOpen(sheet: BottomNavSheet): void;
+  }
+}
+
+export function BottomNavigation({ activeSheet, onOpen }: Readonly<BottomNavigation.Props>) {
   return (
     <nav className="ak-bottom-nav">
       <div className="ak-bottom-nav-inner">
@@ -12,7 +19,17 @@ export function BottomNavigation({ activeSheet, onOpen }: Readonly<{ activeSheet
   );
 }
 
-function BottomNavButton({ active, label, icon, tone, onClick }: Readonly<{ active: boolean; label: string; icon: string; tone: BottomNavSheet; onClick(): void }>) {
+namespace BottomNavButton {
+  export interface Props {
+    active: boolean;
+    label: string;
+    icon: string;
+    tone: BottomNavSheet;
+    onClick(): void;
+  }
+}
+
+function BottomNavButton({ active, label, icon, tone, onClick }: Readonly<BottomNavButton.Props>) {
   return (
     <button
       type="button"

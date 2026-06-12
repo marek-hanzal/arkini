@@ -12,7 +12,7 @@ import { getItem, getProducer } from "./gameDefinitionLookup";
 import { insertBoardItem } from "~/board/logic/boardItemStore";
 import { readMutableSave } from "./readMutableSave";
 import { removeInventoryItems, spendInventoryStack } from "~/inventory/logic/inventoryStackStore";
-import { rollProducerDrops } from "~/producer/logic/producerDrops";
+import { rollProducerDrops } from "~/producer/logic/rollProducerDrops";
 import { localTimestamp } from "./localTimestamp";
 import { canPayCosts } from "./gameView";
 import { db } from "~/database/local/db";

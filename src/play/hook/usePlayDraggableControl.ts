@@ -11,19 +11,23 @@ import {
 
 export type { GameDragActions, GameDragFeedback } from "./playDragRules";
 
+export namespace usePlayDraggableControl {
+  export interface Props {
+    game: GameView | null | undefined;
+    actions: GameDragActions;
+    feedback: GameDragFeedback;
+    addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
+    schedule(label: string, operation: () => Promise<void>): Promise<void>;
+  }
+}
+
 export function usePlayDraggableControl({
   game,
   actions,
   feedback,
   addFlyer,
   schedule,
-}: Readonly<{
-  game: GameView | null | undefined;
-  actions: GameDragActions;
-  feedback: GameDragFeedback;
-  addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
-  schedule(label: string, operation: () => Promise<void>): Promise<void>;
-}>) {
+}: Readonly<usePlayDraggableControl.Props>) {
   const control = useDraggableControl<string, GameDragSource, GameDropTarget, GameVisualMeta, FlyerKind>({
     schedule: (operation) => schedule("drag/drop", operation),
     resolveDrop: (context) => resolveGameDrop(context, game, actions, feedback),

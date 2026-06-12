@@ -4,26 +4,28 @@ import { usePress, type PressEvent, type PressResult } from "@react-aria/interac
 const doublePressMs = 320;
 const doublePressDistancePx = 24;
 
-type LastPress = {
-  time: number;
-  x: number;
-  y: number;
-  pointerType: PressEvent["pointerType"];
-};
+export namespace usePressActions {
+  export interface Props {
+    onSingle?(): void;
+    onDouble?(): void;
+    delaySingleWhenDouble?: boolean;
+    isDisabled?: boolean;
+  }
 
-export interface PressActions {
-  onSingle?(): void;
-  onDouble?(): void;
-  delaySingleWhenDouble?: boolean;
-  isDisabled?: boolean;
+  export interface Result extends PressResult {}
+
+  export interface LastPress {
+    time: number;
+    x: number;
+    y: number;
+    pointerType: PressEvent["pointerType"];
+  }
 }
-
-export interface PressActionResult extends PressResult {}
 
 // React Aria owns the ugly cross-browser press recognition. We only keep the
 // tiny game rule on top: two nearby presses on the same target mean double press.
-export function usePressActions({ onSingle, onDouble, delaySingleWhenDouble = false, isDisabled = false }: PressActions): PressActionResult {
-  const lastPressRef = useRef<LastPress | null>(null);
+export function usePressActions({ onSingle, onDouble, delaySingleWhenDouble = false, isDisabled = false }: usePressActions.Props): usePressActions.Result {
+  const lastPressRef = useRef<usePressActions.LastPress | null>(null);
   const singlePressTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => () => clearSinglePressTimeout(), []);

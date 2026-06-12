@@ -59,7 +59,14 @@ export function DbStatusCard() {
   );
 }
 
-function StatusPill({ label, value }: Readonly<{ label: string; value: string }>) {
+namespace StatusPill {
+  export interface Props {
+    label: string;
+    value: string;
+  }
+}
+
+function StatusPill({ label, value }: Readonly<StatusPill.Props>) {
   return (
     <div className="min-w-0 rounded-sm bg-slate-950/60 px-3 py-2">
       <div className="text-[0.62rem] uppercase tracking-[0.18em] text-slate-500">{label}</div>

@@ -18,35 +18,33 @@ import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
 import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
 import { Tile } from "~/item/ui/Tile";
 
-export interface BoardDragState {
-  activeDrag: GameDragData | null;
-  isSourceHidden(sourceId: string): boolean;
+export namespace Board {
+  export interface DragState {
+    activeDrag: GameDragData | null;
+    isSourceHidden(sourceId: string): boolean;
+  }
+
+  export interface FeedbackState {
+    invalidCellKey: string | null;
+    mergedCellKey: string | null;
+  }
+
+  export interface Actions {
+    emptyDoubleActivate(cell: BoardCell): void;
+    tileSingleActivate(item: BoardViewItem): void;
+    tileDoubleActivate(item: BoardViewItem): void;
+  }
+
+  export interface Props {
+    game: GameView;
+    drag: DragState;
+    feedback: FeedbackState;
+    actions: Actions;
+    nowMs: number;
+  }
 }
 
-export interface BoardFeedbackState {
-  invalidCellKey: string | null;
-  mergedCellKey: string | null;
-}
-
-export interface BoardActions {
-  emptyDoubleActivate(cell: BoardCell): void;
-  tileSingleActivate(item: BoardViewItem): void;
-  tileDoubleActivate(item: BoardViewItem): void;
-}
-
-export function Board({
-  game,
-  drag,
-  feedback,
-  actions,
-  nowMs,
-}: Readonly<{
-  game: GameView;
-  drag: BoardDragState;
-  feedback: BoardFeedbackState;
-  actions: BoardActions;
-  nowMs: number;
-}>) {
+export function Board({ game, drag, feedback, actions, nowMs }: Readonly<Board.Props>) {
   const cells = useMemo(() => Array.from({ length: boardColumns * boardRows }, (_, index) => ({ x: index % boardColumns, y: Math.floor(index / boardColumns) })), []);
 
   return (
@@ -93,6 +91,20 @@ export function Board({
   );
 }
 
+namespace BoardCell {
+  export interface Props {
+    x: number;
+    y: number;
+    boardItem: BoardViewItem | null;
+    canMerge: boolean;
+    invalid: boolean;
+    merged: boolean;
+    producerReady: boolean;
+    children: ReactNode;
+    onEmptyDoubleActivate(cell: BoardCell): void;
+  }
+}
+
 function BoardCell({
   x,
   y,
@@ -103,17 +115,7 @@ function BoardCell({
   producerReady,
   children,
   onEmptyDoubleActivate,
-}: Readonly<{
-  x: number;
-  y: number;
-  boardItem: BoardViewItem | null;
-  canMerge: boolean;
-  invalid: boolean;
-  merged: boolean;
-  producerReady: boolean;
-  children: ReactNode;
-  onEmptyDoubleActivate(cell: BoardCell): void;
-}>) {
+}: Readonly<BoardCell.Props>) {
   const id = boardCellNodeId(x, y);
   const cellRef = useRef<HTMLDivElement | null>(null);
   const press = usePressActions({
@@ -154,6 +156,17 @@ function isProducerReady(producer: BoardViewItem["producer"], nowMs: number) {
   return hasCharges && cooldownUntil <= nowMs;
 }
 
+namespace BoardTile {
+  export interface Props {
+    boardItem: BoardViewItem;
+    item: ViewItem;
+    hidden: boolean;
+    nowMs: number;
+    onSingleActivate(): void;
+    onDoubleActivate(): void;
+  }
+}
+
 function BoardTile({
   boardItem,
   item,
@@ -161,14 +174,7 @@ function BoardTile({
   nowMs,
   onSingleActivate,
   onDoubleActivate,
-}: Readonly<{
-  boardItem: BoardViewItem;
-  item: ViewItem;
-  hidden: boolean;
-  nowMs: number;
-  onSingleActivate(): void;
-  onDoubleActivate(): void;
-}>) {
+}: Readonly<BoardTile.Props>) {
   const sourceId = boardSourceId(boardItem.id);
   const sourceNodeId = boardCellNodeId(boardItem.x, boardItem.y);
 

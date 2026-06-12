@@ -1,40 +1,34 @@
-import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { cn } from "~/shared/cn";
 import { animateBottomSheet } from "~/play/util/animation";
-import { assignRef } from "~/shared/util/refs";
 
-export interface BottomSheetProps {
-  /**
-   * The sheet is always mounted. `open` only flips interactivity; GSAP owns the
-   * slide/backdrop timeline so React does not remount the panel mid-gesture.
-   */
-  open: boolean;
-  children: ReactNode;
-  className?: string;
-  containerClassName?: string;
-  contentClassName?: string;
-  "data-drag-node-id"?: string;
-  onClose(): void;
+export namespace BottomSheet {
+  export interface Props {
+    /**
+     * The sheet is always mounted. `open` only flips interactivity; GSAP owns the
+     * slide/backdrop timeline so React does not remount the panel mid-gesture.
+     */
+    open: boolean;
+    children: ReactNode;
+    className?: string;
+    containerClassName?: string;
+    contentClassName?: string;
+    "data-drag-node-id"?: string;
+    onClose(): void;
+  }
 }
 
-export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function BottomSheet(
-  {
-    open,
-    children,
-    className,
-    containerClassName,
-    contentClassName,
-    onClose,
-    "data-drag-node-id": dragNodeId,
-  },
-  forwardedRef,
-) {
+export function BottomSheet({
+  open,
+  children,
+  className,
+  containerClassName,
+  contentClassName,
+  onClose,
+  "data-drag-node-id": dragNodeId,
+}: Readonly<BottomSheet.Props>) {
   const backdropRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const setPanelRef = useCallback((node: HTMLDivElement | null) => {
-    panelRef.current = node;
-    assignRef(forwardedRef, node);
-  }, [forwardedRef]);
 
   useLayoutEffect(() => {
     const panel = panelRef.current;
@@ -66,7 +60,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
       />
 
       <section
-        ref={setPanelRef}
+        ref={panelRef}
         data-drag-node-id={dragNodeId}
         className={cn("ak-bottom-sheet-panel", className, containerClassName)}
       >
@@ -76,4 +70,4 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
       </section>
     </div>
   );
-});
+}

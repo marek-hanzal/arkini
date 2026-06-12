@@ -5,7 +5,7 @@ export function useArkiniDatabaseStatus() {
     queryKey: ["arkini", "database", "status"],
     enabled: typeof window !== "undefined",
     async queryFn() {
-      const db = await import("~/play/server/playServer");
+      const db = await import("~/play/logic/playBackend");
 
       await db.bootstrapDatabase();
 

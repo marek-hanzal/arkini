@@ -2,52 +2,63 @@
 
 Client-only offline merge-game prototype. Plain Vite + React SPA, static-host friendly, no SSR, no server runtime, no HTTP API. Mutable player state lives in browser OPFS SQLite through SQLocal/Kysely. Static gameplay rules live in TypeScript.
 
-## Current rewrite direction
+## Direction
 
-This branch intentionally rewrites the gameplay slice from the ground up while keeping the existing stack: Vite, React, TanStack Router/Query, DnD Kit, React Aria Interactions for press/tap recognition, Zustand dependency available but not required, Tailwind v4, Kysely, SQLocal, Zod, ts-pattern.
+Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, build, and local database/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
-The core rule is simple: **item definitions drive gameplay shape**. An item may define:
+The game has one gameplay source of truth: `GameConfig` in `src/manifest/data/gameDataManifest.ts`. It carries the game shape, board size, inventory size, assets, item definitions, item behavior, and starting state. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins.
+
+Item definitions drive behavior. An item may define:
 
 - normal merge rules, for example `seed + seed -> sprout`
 - mixed/secret merge rules, for example `twig + water -> sprout`
-- click producers, which produce on a plain single click/tap
-- optional item display labels, for example tiny level numbers over reused building art
+- click producers, including finite crates that exhaust all charges on double tap
+- optional item display labels, for reused building art with tiny level numbers
 - blueprint build recipes
 
-There are no separate static `merges`, `dropTables`, `producers`, and `buildRecipes` arrays anymore. Those are derived indexes over `src/domains/game-data/index.ts`. Humanity briefly survives another abstraction.
+There are no separate static `merges`, `dropTables`, `producers`, and `buildRecipes` arrays. Those are derived indexes over the config.
 
 ## Gameplay model
 
-- Board is a 7×9 grid.
-- Inventory is 35 slots shown from the bottom navigation. Database/debug controls live in the same sheet system.
+- Board size comes from `GameConfig.game.board`, currently 7×9.
+- Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.
 - Board and inventory use zero-gap square cells to avoid DnD blind spots.
 - Merging happens on the board only.
 - Inventory stores stacks and can combine compatible stacks.
-- Dragging one item out of an inventory stack with quantity greater than one keeps the source stack visible; it only disappears when the last item leaves. That old flicker bug can go sit in the bin.
+- Drag is intentionally local to a surface now: board item to board cell, inventory slot to inventory slot. Board↔inventory drag is obsolete.
+- Board items go into inventory by double-click/tap on the board item.
+- Inventory items go to the first empty board cell by double-click/tap inside inventory.
+- Double-click/tap an empty board cell opens the build sheet.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
 - Click producers use cooldowns and optional finite charges.
-- Double-click/tap board items to animate them into the inventory bottom area. Single press on producers still produces immediately; no delayed click timer is used.
-- Double-click/tap an empty board cell to open the build sheet. Tap/press recognition is centralized in `src/features/game/usePressActions.ts` and built on React Aria `usePress`; keep raw touch/pointer plumbing out of board/tile components unless you enjoy browser archaeology. Build, inventory, and database panels all share one always-mounted custom bottom sheet. The sheet never unmounts; `data-open` only lets CSS slide it and dim the locked background.
-- Dragging a board item lightly highlights known merge targets for accessibility. Rejected drops flash the target while the item flies back.
-- Inventory-to-board placement fades the travelling item out under the inventory sheet and fades the target tile in after the commit.
+- Finite producer exhaust deliberately dumps all remaining charges at once. Crates are meant to vomit loot, not politely ask for a calendar invite.
 
-## Dragging model
+## Interaction model
 
-`src/features/game/useDraggableControl.ts` is deliberately domain-agnostic. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, and app-provided move animations. It does not branch on board, inventory, cells, slots, merges, producers, or any other game rule.
+Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts` and built on `@react-aria/interactions`. Keep raw touch/pointer timing out of board/tile components unless you enjoy debugging mobile browsers like some kind of punishment enthusiast.
 
-Game-specific policy lives in `src/features/game/useGameDraggableControl.ts`. That adapter translates board/inventory drops into generic accept/reject plans and calls gameplay mutations. Board and inventory components only describe payloads and visual source/target ids through the generic `DragSurface` components. If a new grid/surface is added later, wire it into the adapter rules, not into the generic control. Yes, this is the part where we try not to rebuild a tiny cursed browser physics engine three times.
+Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle.
+
+Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/hook/usePlayDraggableControl.ts` only wires those rules into the generic control.
+
+Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
 ## Source layout
 
 ```txt
-src/domains/game-data/index.ts   Single source of truth for item identity and item behavior.
-src/domains/game-data/schema.ts  Zod structural validation for the manifest.
-src/domains/database/            OPFS SQLite bootstrap, schema, gameplay mutations, view projection.
-src/features/game/GameShell.tsx  Fixed-viewport board, bottom navigation, shared bottom sheet orchestration, producer actions.
-src/features/game/components/BottomSheet.tsx  Shared always-mounted custom sheet; CSS drives backdrop and open/close transforms through `data-open`.
-src/features/game/useDraggableControl.ts  Generic DnD lifecycle/control engine.
-src/features/game/useGameDraggableControl.ts  Arkini-specific accept/reject rules over the generic DnD engine.
-src/hooks/useGameView.ts         TanStack Query bridge over the local SQLite backend.
+src/app/                         App entry, router, global styles, cross-origin isolation fallback.
+src/manifest/data/               GameConfig, Zod manifest schema, validation, derived indexes, SVG assets.
+src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.
+src/play/logic/                  Client-side game backend: bootstrap, save lifecycle, mutations, view projection.
+src/play/hook/                   React Query bridge, event queue, feedback, clock, sheet state, action orchestration.
+src/play/ui/                     Main shell, sheets, bottom navigation, flyers, database status UI.
+src/drag/                        Generic DnD lifecycle and draggable/droppable surfaces.
+src/board/                       Board identity, board state logic, board UI, cell feedback.
+src/inventory/                   Inventory identity, stack planning/storage logic, inventory sheet UI.
+src/producer/                    Producer drop rolling and depletion logic.
+src/build/                       Build sheet UI.
+src/item/                        Shared item tile UI.
+src/shared/                      Small UI/util hooks and helpers.
 ```
 
 ## Local run
@@ -60,7 +71,7 @@ bun run dev
 Fallback when Bun is not available:
 
 ```bash
-npm install --no-package-lock
+npm install
 npm run dev
 ```
 
@@ -70,13 +81,23 @@ npm run dev
 bun run build
 ```
 
+Fallback:
+
+```bash
+npm run build
+```
+
 For GitHub Pages under a repository path:
 
 ```bash
-VITE_BASE=/arkini/ bun run build
+VITE_BASE=/arkini/ npm run build
 ```
 
 The router uses hash history, so static hosts do not need SPA rewrite rules.
+
+## GitHub Pages deploy
+
+The workflow uses Node + `npm ci` against the committed `package-lock.json`. Bun is still fine locally, but CI must be boring and reproducible, because deploy pipelines with floating runtimes are just slot machines with YAML.
 
 ## OPFS and cross-origin isolation
 
@@ -94,19 +115,24 @@ Configured places:
 - Vercel headers in `vercel.json`
 - fallback service worker in `public/coi-serviceworker.js` for static hosts such as GitHub Pages
 
-## Data rules
+## Data and save lifecycle
 
-`src/domains/game-data/index.ts` is the only place to change balance and content. Migrations create storage shape. The manifest creates game rules.
+Migrations only create or change storage shape. They do not preserve old gameplay data.
 
 On boot:
 
 1. Browser capability checks run.
 2. Kysely migrations run.
-3. `syncGameDataManifest()` validates and hashes the manifest for debug visibility.
-4. `ensureDefaultSaveGame()` creates the default save only when missing.
+3. `syncGameDataManifest()` validates and hashes `GameConfig`.
+4. If the stored hash differs from the current hash, the default save is deleted.
+5. `ensureDefaultSaveGame()` creates the default save from the current starting state when missing.
 
-Prototype saves are disposable. If local OPFS state goes bad after data changes, use the always-visible database reset button. Do not add compatibility migrations or data-version branching for gameplay definitions.
+There is no gameplay data backward compatibility. Ever. Old saves are disposable prototype state, not sacred museum artifacts.
+
+## Validation policy
+
+SQLite is local storage, not the final game authority. Gameplay inputs and loaded mutable rows are validated with Zod in `src/play/logic/gameActionSchemas.ts` and `readMutableSave()`. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
 
 ## Minimal-code philosophy
 
-Prefer direct data and small operations. Avoid class hierarchies, hidden frameworks, and helper confetti. When behavior can live on an item definition, put it there. When UI state is transient, keep it in the UI. When state must survive reloads, store it in SQLite. Everything else is probably just code wearing a fake mustache.
+Prefer direct data and small operations. Avoid class hierarchies, hidden frameworks, and helper confetti. When behavior can live on an item definition, put it in `GameConfig`. When UI state is transient, keep it in a small hook. When state must survive reloads, store it in SQLite. Everything else is probably just code wearing a fake mustache.

@@ -1,7 +1,7 @@
 import { useMemo, useRef, type ReactNode } from "react";
-import { resolveItemMergeRule } from "~/manifest/server/resolveItemMergeRule";
-import type { BoardViewItem, GameView, ViewItem } from "~/play/server/playTypes";
-import type { ItemId } from "~/manifest/server/manifestId";
+import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
+import type { BoardViewItem, GameView, ViewItem } from "~/play/logic/playTypes";
+import type { ItemId } from "~/manifest/data/manifestId";
 import { cn } from "~/shared/cn";
 import { cellKey } from "~/board/util/cell";
 import {

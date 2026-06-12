@@ -1,6 +1,6 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
-import type { BuildRecipeId } from "~/manifest/server/manifestId";
+import type { BuildRecipeId } from "~/manifest/data/manifestId";
 import { usePlayAction, usePlayView } from "~/play/hook/usePlayView";
 import { Board } from "~/board/ui/Board";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";

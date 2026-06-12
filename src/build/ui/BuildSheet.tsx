@@ -1,5 +1,5 @@
-import type { GameView } from "~/play/server/playTypes";
-import type { BuildRecipeId } from "~/manifest/server/manifestId";
+import type { GameView } from "~/play/logic/playTypes";
+import type { BuildRecipeId } from "~/manifest/data/manifestId";
 import type { BoardCell } from "~/board/boardIdentity";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 

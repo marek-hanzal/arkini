@@ -1,4 +1,4 @@
-import type { BoardViewItem, ViewItem } from "~/play/server/playTypes";
+import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
 import { cn } from "~/shared/cn";
 import { formatMs } from "~/shared/util/format";
 import type { ProducerView, RectLike } from "~/play/types";

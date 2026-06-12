@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { cellKey } from "~/board/util/cell";
 import { inventorySinkRect } from "~/inventory/util/inventory";
-import type { BoardViewItem, ProducerDropResult } from "~/play/server/playTypes";
+import type { BoardViewItem, ProducerDropResult } from "~/play/logic/playTypes";
 import { usePlayAction, usePlayDataInvalidation } from "~/play/hook/usePlayView";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import type { ActiveSheet } from "~/play/ui/BottomNavigation";

@@ -1,21 +1,25 @@
 import { useDraggable, useDroppable, type Data } from "@dnd-kit/core";
 import type { HTMLAttributes, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { cn } from "~/lib/cn";
+import type { DraggablePayload, DroppablePayload } from "../useDraggableControl";
 import { usePressActions } from "../usePressActions";
 import { BottomSheet, type BottomSheetProps } from "./BottomSheet";
 
-export function DroppableCell({
+export function DroppableSurface<Target>({
   id,
-  data,
+  nodeId = id,
+  payload,
   className,
   children,
   ...props
-}: Readonly<DroppableCellProps>) {
-  const { setNodeRef, isOver } = useDroppable({ id, data });
+}: Readonly<DroppableSurfaceProps<Target>>) {
+  const data = { ...payload, targetNodeId: payload.targetNodeId ?? nodeId } satisfies DroppablePayload<Target>;
+  const { setNodeRef, isOver } = useDroppable({ id, data: data as unknown as Data });
 
   return (
     <div
       ref={setNodeRef}
+      data-drag-node-id={nodeId}
       className={typeof className === "function" ? className(isOver) : className}
       {...props}
     >
@@ -24,25 +28,29 @@ export function DroppableCell({
   );
 }
 
-export interface DroppableCellProps extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "children"> {
+export interface DroppableSurfaceProps<Target> extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "children"> {
   id: string;
-  data: Data;
+  nodeId?: string;
+  payload: DroppablePayload<Target>;
   className?: string | ((isOver: boolean) => string);
   children: ReactNode;
 }
 
-export function DroppableBottomSheet({
+export function DroppableBottomSheet<Target>({
   id,
-  data,
+  nodeId = id,
+  payload,
   className,
   children,
   ...props
-}: Readonly<DroppableBottomSheetProps>) {
-  const { setNodeRef, isOver } = useDroppable({ id, data });
+}: Readonly<DroppableBottomSheetProps<Target>>) {
+  const data = { ...payload, targetNodeId: payload.targetNodeId ?? nodeId } satisfies DroppablePayload<Target>;
+  const { setNodeRef, isOver } = useDroppable({ id, data: data as unknown as Data });
 
   return (
     <BottomSheet
       ref={setNodeRef}
+      data-drag-node-id={nodeId}
       className={typeof className === "function" ? className(isOver) : className}
       {...props}
     >
@@ -51,16 +59,18 @@ export function DroppableBottomSheet({
   );
 }
 
-export interface DroppableBottomSheetProps extends Omit<BottomSheetProps, "className" | "children"> {
+export interface DroppableBottomSheetProps<Target> extends Omit<BottomSheetProps, "className" | "children"> {
   id: string;
-  data: Data;
+  nodeId?: string;
+  payload: DroppablePayload<Target>;
   className?: string | ((isOver: boolean) => string);
   children: ReactNode;
 }
 
-export function DraggableTileShell({
+export function DraggableSurface<ItemId extends string, Source, Overlay = unknown>({
   id,
-  data,
+  nodeId = id,
+  payload,
   hidden,
   className,
   dragDisabled = false,
@@ -68,8 +78,9 @@ export function DraggableTileShell({
   onDoubleActivate,
   children,
   ...props
-}: Readonly<DraggableTileShellProps>) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data, disabled: dragDisabled });
+}: Readonly<DraggableSurfaceProps<ItemId, Source, Overlay>>) {
+  const data = { ...payload, sourceNodeId: payload.sourceNodeId ?? nodeId } satisfies DraggablePayload<ItemId, Source, Overlay>;
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data: data as unknown as Data, disabled: dragDisabled });
   const press = usePressActions({ onSingle: onSingleActivate, onDouble: onDoubleActivate });
 
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
@@ -92,6 +103,7 @@ export function DraggableTileShell({
   return (
     <div
       ref={setNodeRef}
+      data-drag-node-id={nodeId}
       {...attributes}
       {...props}
       className={cn(className, (hidden || isDragging) && "opacity-0")}
@@ -107,9 +119,10 @@ export function DraggableTileShell({
   );
 }
 
-export interface DraggableTileShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+export interface DraggableSurfaceProps<ItemId extends string, Source, Overlay = unknown> extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   id: string;
-  data: Data;
+  nodeId?: string;
+  payload: DraggablePayload<ItemId, Source, Overlay>;
   hidden: boolean;
   dragDisabled?: boolean;
   onSingleActivate?(): void;

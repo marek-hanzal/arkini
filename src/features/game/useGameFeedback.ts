@@ -1,7 +1,5 @@
 import { useState } from "react";
-import type { GameView } from "~/domains/database";
-import { cellKey } from "./helpers";
-import { flashMs, type DragData, type DropData } from "./types";
+import { flashMs } from "./types";
 
 export function useGameFeedback() {
   const [invalidBoardCellKey, setInvalidBoardCellKey] = useState<string | null>(null);
@@ -52,24 +50,6 @@ export function useGameFeedback() {
     flashInventorySlot(slotIndex, "pulse");
   }
 
-  function flashInvalidTarget(source: DragData, target: DropData, currentGame: GameView) {
-    if (source.kind === "board") {
-      const boardItem = currentGame.boardItemsById[source.boardItemId];
-      if (boardItem) flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-    } else {
-      flashInventorySlot(source.slotIndex, "error");
-    }
-
-    if (target.kind === "cell") {
-      flashBoardCell(cellKey(target.x, target.y), "error");
-      return;
-    }
-
-    if (target.kind === "inventory-slot") {
-      flashInventorySlot(target.slotIndex, "error");
-    }
-  }
-
   function showError(error: unknown) {
     if (import.meta.env.DEV) {
       console.debug("Game action rejected", error);
@@ -87,7 +67,6 @@ export function useGameFeedback() {
     pulseMergeCell,
     flashInventorySlot,
     pulseInventorySlot,
-    flashInvalidTarget,
     showError,
   };
 }

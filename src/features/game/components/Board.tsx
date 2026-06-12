@@ -3,16 +3,23 @@ import { resolveMergeRule, type ItemId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import { cellKey } from "../helpers";
-import { columns, rows, type BuildCell, type CommittedDrag, type DragData, type DropData } from "../types";
+import {
+  boardCellNodeId,
+  boardSourceId,
+  columns,
+  rows,
+  type BuildCell,
+  type GameDragData,
+  type GameDropData,
+} from "../types";
 import { usePressActions } from "../usePressActions";
-import { DraggableTileShell, DroppableCell } from "./DragSurface";
+import { DraggableSurface, DroppableSurface } from "./DragSurface";
 import { Tile } from "./Tile";
 
 export function Board({
   game,
   activeDrag,
-  committedDrag,
-  hiddenBoardIds,
+  isSourceHidden,
   invalidBoardCellKey,
   pulsedBoardCellKey,
   mergedBoardCellKey,
@@ -22,9 +29,8 @@ export function Board({
   onTileDoubleActivate,
 }: Readonly<{
   game: GameView;
-  activeDrag: DragData | null;
-  committedDrag: CommittedDrag | null;
-  hiddenBoardIds: ReadonlySet<string>;
+  activeDrag: GameDragData | null;
+  isSourceHidden(sourceId: string): boolean;
   invalidBoardCellKey: string | null;
   pulsedBoardCellKey: string | null;
   mergedBoardCellKey: string | null;
@@ -41,7 +47,7 @@ export function Board({
         const key = cellKey(cell.x, cell.y);
         const boardItem = game.boardItemByCellKey[key] ?? null;
         const viewItem = boardItem ? game.items[boardItem.itemId] : null;
-        const canMerge = activeDrag?.kind === "board" && boardItem && boardItem.id !== activeDrag.boardItemId
+        const canMerge = activeDrag?.source.kind === "board" && boardItem && boardItem.id !== activeDrag.source.boardItemId
           ? Boolean(resolveMergeRule(activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
           : false;
 
@@ -61,11 +67,7 @@ export function Board({
               <BoardTile
                 boardItem={boardItem}
                 item={viewItem}
-                hidden={
-                  hiddenBoardIds.has(boardItem.id)
-                  || (activeDrag?.kind === "board" && activeDrag.boardItemId === boardItem.id)
-                  || (committedDrag?.hideSource === true && committedDrag.source.kind === "board" && committedDrag.source.boardItemId === boardItem.id)
-                }
+                hidden={isSourceHidden(boardSourceId(boardItem.id))}
                 nowMs={nowMs}
                 onSingleActivate={() => onTileSingleActivate(boardItem)}
                 onDoubleActivate={() => onTileDoubleActivate(boardItem)}
@@ -99,7 +101,7 @@ function BoardCell({
   children: ReactNode;
   onEmptyDoubleActivate(cell: BuildCell): void;
 }>) {
-  const id = `cell:${x}:${y}`;
+  const id = boardCellNodeId(x, y);
   const press = usePressActions({
     onDouble: () => {
       if (!boardItem) onEmptyDoubleActivate({ x, y });
@@ -107,9 +109,10 @@ function BoardCell({
   });
 
   return (
-    <DroppableCell
+    <DroppableSurface
       id={id}
-      data={{ kind: "cell", x, y, boardItemId: boardItem?.id ?? null } satisfies DropData}
+      nodeId={id}
+      payload={{ targetId: id, targetNodeId: id, target: { kind: "cell", x, y, boardItemId: boardItem?.id ?? null } } satisfies GameDropData}
       data-board-cell={`${x}:${y}`}
       className={(isOver) => cn(
         "relative aspect-square border-b border-r border-slate-800/80 bg-slate-900/55 transition-colors duration-200",
@@ -128,7 +131,7 @@ function BoardCell({
       onPointerCancel={press.onPointerCancel}
     >
       {children}
-    </DroppableCell>
+    </DroppableSurface>
   );
 }
 
@@ -147,10 +150,20 @@ function BoardTile({
   onSingleActivate(): void;
   onDoubleActivate(): void;
 }>) {
+  const sourceId = boardSourceId(boardItem.id);
+  const sourceNodeId = boardCellNodeId(boardItem.x, boardItem.y);
+
   return (
-    <DraggableTileShell
-      id={`board:${boardItem.id}`}
-      data={{ kind: "board", boardItemId: boardItem.id, itemId: boardItem.itemId } satisfies DragData}
+    <DraggableSurface
+      id={sourceId}
+      nodeId={`${sourceId}:drag`}
+      payload={{
+        sourceId,
+        sourceNodeId,
+        itemId: boardItem.itemId,
+        source: { kind: "board", boardItemId: boardItem.id },
+        hideWhenActive: true,
+      } satisfies GameDragData}
       data-board-item-id={boardItem.id}
       hidden={hidden}
       className="absolute inset-0 touch-none"
@@ -158,6 +171,6 @@ function BoardTile({
       onDoubleActivate={onDoubleActivate}
     >
       <Tile item={item} producer={boardItem.producer} nowMs={nowMs} />
-    </DraggableTileShell>
+    </DraggableSurface>
   );
 }

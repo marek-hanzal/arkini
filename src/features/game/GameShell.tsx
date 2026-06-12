@@ -9,8 +9,18 @@ import { Flyer } from "./components/Flyer";
 import { InventorySheet } from "./components/InventorySheet";
 import { Tile } from "./components/Tile";
 import { cellKey, cssEscape, inventorySinkRect, queryRect, tileVisualRect, wait } from "./helpers";
-import { columns, flyMs, rows, type BuildCell, type DragData } from "./types";
-import { useDraggableControl } from "./useDraggableControl";
+import {
+  boardCellNodeId,
+  boardSourceId,
+  columns,
+  flyMs,
+  inventorySlotNodeId,
+  inventorySourceId,
+  rows,
+  type BuildCell,
+  type GameDragData,
+} from "./types";
+import { useGameDraggableControl } from "./useGameDraggableControl";
 import { useFlyers } from "./useFlyers";
 import { useGameFeedback } from "./useGameFeedback";
 
@@ -37,9 +47,8 @@ export function GameShell() {
   const advanceAuto = useGameAction((db) => db.advanceAutoProducers(), { invalidateOnSuccess: false });
   const build = useGameAction((db, input: { recipeId: BuildRecipeId; x: number; y: number }) => db.buildRecipe(input.recipeId, input.x, input.y));
 
-  const drag = useDraggableControl({
+  const drag = useGameDraggableControl({
     game,
-    items: game?.items,
     actions: {
       placeInventory: (input) => placeInventory.mutateAsync(input),
       moveBoard: (input) => moveBoard.mutateAsync(input),
@@ -51,7 +60,8 @@ export function GameShell() {
       pulseBoardCell: feedback.pulseBoardCell,
       pulseMergeCell: feedback.pulseMergeCell,
       pulseInventorySlot: feedback.pulseInventorySlot,
-      flashInvalidTarget: feedback.flashInvalidTarget,
+      flashBoardCell: feedback.flashBoardCell,
+      flashInventorySlot: feedback.flashInventorySlot,
       showError: feedback.showError,
     },
     addFlyer,
@@ -92,14 +102,20 @@ export function GameShell() {
   }
 
   async function stashBoardWithFly(boardItem: BoardViewItem) {
-    const source: DragData = { kind: "board", boardItemId: boardItem.id, itemId: boardItem.itemId };
+    const source: GameDragData = {
+      sourceId: boardSourceId(boardItem.id),
+      sourceNodeId: boardCellNodeId(boardItem.x, boardItem.y),
+      itemId: boardItem.itemId,
+      source: { kind: "board", boardItemId: boardItem.id },
+      hideWhenActive: true,
+    };
     const sourceRect = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`)
       ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
     const from = sourceRect ? tileVisualRect(sourceRect) : null;
 
     try {
       if (from) {
-        drag.commitSource(source, true);
+        drag.hideSources([source.sourceId]);
         addFlyer(boardItem.itemId, from, inventorySinkRect(from), "stash");
       }
 
@@ -112,7 +128,7 @@ export function GameShell() {
       feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
       feedback.showError(error);
     } finally {
-      drag.clearCommittedDrag();
+      drag.clearHiddenSources();
     }
   }
 
@@ -125,7 +141,14 @@ export function GameShell() {
       return;
     }
 
-    const source: DragData = { kind: "inventory", slotIndex: slot.slotIndex, itemId: stack.itemId, quantity: stack.quantity };
+    const source: GameDragData = {
+      sourceId: inventorySourceId(slot.slotIndex),
+      sourceNodeId: inventorySlotNodeId(slot.slotIndex),
+      itemId: stack.itemId,
+      source: { kind: "inventory", slotIndex: slot.slotIndex, quantity: stack.quantity },
+      overlay: { quantity: stack.quantity },
+      hideWhenActive: stack.quantity <= 1,
+    };
     const sourceRect = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
     const targetRect = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
     const from = sourceRect ? tileVisualRect(sourceRect) : null;
@@ -133,7 +156,7 @@ export function GameShell() {
 
     try {
       if (from && to) {
-        drag.commitSource(source, stack.quantity <= 1);
+        if (source.hideWhenActive !== false) drag.hideSources([source.sourceId]);
         addFlyer(stack.itemId, from, to);
         await wait(flyMs);
       }
@@ -144,7 +167,7 @@ export function GameShell() {
       feedback.flashInventorySlot(slot.slotIndex, "error");
       feedback.showError(error);
     } finally {
-      drag.clearCommittedDrag();
+      drag.clearHiddenSources();
     }
   }
 
@@ -192,8 +215,7 @@ export function GameShell() {
         <Board
           game={game}
           activeDrag={drag.activeDrag}
-          committedDrag={drag.committedDrag}
-          hiddenBoardIds={drag.hiddenBoardIds}
+          isSourceHidden={drag.isSourceHidden}
           invalidBoardCellKey={feedback.invalidBoardCellKey}
           pulsedBoardCellKey={feedback.pulsedBoardCellKey}
           mergedBoardCellKey={feedback.mergedBoardCellKey}
@@ -234,9 +256,7 @@ export function GameShell() {
       <InventorySheet
         game={game}
         open={sheetOpen}
-        hiddenInventorySlots={drag.hiddenInventorySlots}
-        committedDrag={drag.committedDrag}
-        activeDrag={drag.activeDrag}
+        isSourceHidden={drag.isSourceHidden}
         invalidInventorySlot={feedback.invalidInventorySlot}
         pulsedInventorySlot={feedback.pulsedInventorySlot}
         onOpenChange={setSheetOpen}
@@ -252,7 +272,7 @@ export function GameShell() {
           <Tile
             item={drag.activeItem}
             dragOverlay
-            quantity={drag.activeDrag?.kind === "inventory" ? 1 : undefined}
+            quantity={drag.activeDrag?.overlay?.quantity && drag.activeDrag.overlay.quantity > 1 ? 1 : undefined}
             overlaySize={drag.dragPreviewRect}
           />
         ) : null}

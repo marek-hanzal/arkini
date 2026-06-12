@@ -6,269 +6,222 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useState } from "react";
-import { resolveMergeRule, type ItemId } from "~/domains/game-data";
-import type { GameView } from "~/domains/database";
-import { cellKey, cssEscape, queryRect, tileVisualRect, wait, without } from "./helpers";
-import { flyMs, type CommittedDrag, type DragData, type DropData, type FlyerKind, type RectLike } from "./types";
+import { cssEscape, queryRect, tileVisualRect, wait, without } from "./helpers";
+import type { RectLike } from "./types";
 
-export interface DraggableControlItemShape {
-  id: string;
+export interface DraggablePayload<ItemId extends string = string, Source = unknown, Overlay = unknown> {
+  /** Stable key of the visual source. Used only for hiding/showing DOM during committed state. */
+  sourceId: string;
+  /** Node measured when a rejected drop flies back. */
+  sourceNodeId: string;
+  /** Asset/item key used by the app-provided animation renderer. */
+  itemId: ItemId;
+  /** App-owned source data. The control never inspects it. */
+  source: Source;
+  /** Extra app-owned overlay data. The control never inspects it. */
+  overlay?: Overlay;
+  /** Multi-stack sources can stay visible while dragged; single visual objects usually hide. */
+  hideWhenActive?: boolean;
 }
 
-export interface UseDraggableControlOptions<Item extends DraggableControlItemShape> {
-  game: GameView | null | undefined;
-  items: Record<string, Item> | null | undefined;
-  actions: DraggableControlActions;
-  feedback: DraggableControlFeedback;
-  addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind): void;
+export interface DroppablePayload<Target = unknown> {
+  /** Stable key of the drop target. */
+  targetId: string;
+  /** Node measured by generic animations. */
+  targetNodeId: string;
+  /** App-owned target data. The control never inspects it. */
+  target: Target;
 }
 
-export interface DraggableControlActions {
-  placeInventory(input: { slotIndex: number; x: number; y: number }): Promise<unknown>;
-  moveBoard(input: { boardItemId: string; x: number; y: number }): Promise<unknown>;
-  stashBoard(input: { boardItemId: string; slotIndex?: number }): Promise<unknown>;
-  swapInventory(input: { sourceSlotIndex: number; targetSlotIndex: number }): Promise<unknown>;
-  mergeBoard(input: { sourceBoardItemId: string; targetBoardItemId: string }): Promise<unknown>;
+export interface DraggableAnimation<ItemId extends string = string, Kind extends string = string> {
+  itemId: ItemId;
+  kind?: Kind;
+  fromNodeId?: string;
+  toNodeId?: string;
+  from?: RectLike;
+  to?: RectLike;
 }
 
-export interface DraggableControlFeedback {
-  pulseBoardCell(key: string): void;
-  pulseMergeCell(key: string): void;
-  pulseInventorySlot(slotIndex: number): void;
-  flashInvalidTarget(source: DragData, target: DropData, game: GameView): void;
-  showError(error: unknown): void;
+export interface ResolvedDraggableAnimation<ItemId extends string = string, Kind extends string = string> {
+  itemId: ItemId;
+  kind?: Kind;
+  from: RectLike;
+  to: RectLike;
+}
+
+export type DropPlan<ItemId extends string = string, Kind extends string = string> =
+  | { type: "ignore" }
+  | { type: "reject"; feedback?(): void | Promise<void>; animateReturn?: boolean }
+  | {
+    type: "accept";
+    /** Source ids hidden while commit/animations are being resolved. */
+    hide?: string[];
+    /** Generic pre/post move animations. */
+    animations?: DraggableAnimation<ItemId, Kind>[];
+    animationTiming?: "beforeCommit" | "afterCommit";
+    commit(): Promise<unknown> | unknown;
+    feedback?(): void | Promise<void>;
+  };
+
+export interface DropContext<ItemId extends string = string, Source = unknown, Target = unknown, Overlay = unknown> {
+  source: DraggablePayload<ItemId, Source, Overlay>;
+  target: DroppablePayload<Target> | null;
+}
+
+export interface UseDraggableControlOptions<ItemId extends string = string, Source = unknown, Target = unknown, Overlay = unknown, Kind extends string = string> {
+  resolveDrop(context: DropContext<ItemId, Source, Target, Overlay>): DropPlan<ItemId, Kind> | Promise<DropPlan<ItemId, Kind>>;
+  animate(animation: ResolvedDraggableAnimation<ItemId, Kind>): void;
+  onError?(error: unknown, context: DropContext<ItemId, Source, Target, Overlay>): void | Promise<void>;
+  animationMs?: number;
+  activationDistance?: number;
 }
 
 /**
- * One drag/drop workflow for every game surface.
+ * Generic drag/drop workflow.
  *
- * Board cells and inventory slots only describe their DragData/DropData shape.
- * This hook owns the shared dnd-kit state, committed-source hiding, rejected-drop
- * return animation and swap animation, so grids do not invent slightly different
- * physics like tiny frontend monarchies. App development, apparently.
+ * This hook deliberately knows nothing about domain rules, surfaces, or
+ * persistence. It only owns dnd-kit state, source
+ * hiding, generic return animation, generic app-provided move animations, and
+ * the accept/reject/commit lifecycle returned by `resolveDrop`.
  */
-export function useDraggableControl<Item extends DraggableControlItemShape>({
-  game,
-  items,
-  actions,
-  feedback,
-  addFlyer,
-}: UseDraggableControlOptions<Item>) {
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
-  const [activeDrag, setActiveDrag] = useState<DragData | null>(null);
-  const [committedDrag, setCommittedDrag] = useState<CommittedDrag | null>(null);
-  const [hiddenBoardIds, setHiddenBoardIds] = useState(() => new Set<string>());
-  const [hiddenInventorySlots, setHiddenInventorySlots] = useState(() => new Set<number>());
+export function useDraggableControl<ItemId extends string = string, Source = unknown, Target = unknown, Overlay = unknown, Kind extends string = string>({
+  resolveDrop,
+  animate,
+  onError,
+  animationMs = 320,
+  activationDistance = 5,
+}: UseDraggableControlOptions<ItemId, Source, Target, Overlay, Kind>) {
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: activationDistance } }));
+  const [activeDrag, setActiveDrag] = useState<DraggablePayload<ItemId, Source, Overlay> | null>(null);
+  const [hiddenSourceIds, setHiddenSourceIds] = useState(() => new Set<string>());
   const [dragPreviewRect, setDragPreviewRect] = useState<Pick<RectLike, "width" | "height"> | null>(null);
 
   function handleDragStart(event: DragStartEvent) {
-    setCommittedDrag(null);
-    setActiveDrag(event.active.data.current as DragData | null);
+    clearHiddenSources();
+    setActiveDrag(event.active.data.current as DraggablePayload<ItemId, Source, Overlay> | null);
     const rect = (event.active.rect.current.initial ?? event.active.rect.current.translated) as RectLike | null;
     setDragPreviewRect(rect ? { width: rect.width, height: rect.height } : null);
   }
 
   function handleDragCancel() {
-    clearTransientDragState();
+    clearTransientState();
   }
 
   async function handleDragEnd(event: DragEndEvent) {
-    const source = event.active.data.current as DragData | undefined;
-    const target = event.over?.data.current as DropData | undefined;
+    const source = event.active.data.current as DraggablePayload<ItemId, Source, Overlay> | undefined;
+    const target = (event.over?.data.current as DroppablePayload<Target> | undefined) ?? null;
+    const context = source ? { source, target } : null;
     const dragRect = (event.active.rect.current.translated ?? event.active.rect.current.initial) as RectLike | null;
     setDragPreviewRect(null);
 
-    if (!source || !target || !game) {
+    if (!source || !context) {
       setActiveDrag(null);
       return;
     }
-
-    if (isRejectedBoardMerge(source, target)) {
-      await animateRejectedDrop(source, dragRect);
-      feedback.flashInvalidTarget(source, target, game);
-      return;
-    }
-
-    setActiveDrag(null);
 
     try {
-      await runDropAction(source, target);
+      await runPlan(context, await resolveDrop(context), dragRect);
     } catch (error) {
-      setCommittedDrag(null);
-      await animateRejectedDrop(source, dragRect);
-      feedback.flashInvalidTarget(source, target, game);
-      feedback.showError(error);
+      await failDrop(error, context, dragRect);
     }
   }
 
-  async function runDropAction(source: DragData, target: DropData) {
-    if (source.kind === "inventory" && target.kind === "cell") {
-      if (target.boardItemId) throw new Error("Cell is occupied.");
-      setCommittedDrag({ source, hideSource: source.quantity <= 1 });
-      await actions.placeInventory({ slotIndex: source.slotIndex, x: target.x, y: target.y });
-      feedback.pulseBoardCell(cellKey(target.x, target.y));
-      setCommittedDrag(null);
+  async function runPlan(context: DropContext<ItemId, Source, Target, Overlay>, plan: DropPlan<ItemId, Kind>, dragRect: RectLike | null) {
+    if (plan.type === "ignore") {
+      setActiveDrag(null);
       return;
     }
 
-    if (source.kind === "inventory" && target.kind === "inventory-slot") {
-      if (source.slotIndex === target.slotIndex) return;
-
-      const targetSlot = game.inventoryBySlotIndex[target.slotIndex] ?? null;
-      if (!targetSlot?.stack) {
-        // Empty-slot moves should behave like board moves: commit the source,
-        // write the new state, then reveal the updated view. Animating from the
-        // pickup slot after the user already dragged the tile there is the kind
-        // of visual lie that makes UI feel possessed.
-        setCommittedDrag({ source, hideSource: source.quantity <= 1 });
-        await actions.swapInventory({ sourceSlotIndex: source.slotIndex, targetSlotIndex: target.slotIndex });
-        feedback.pulseInventorySlot(target.slotIndex);
-        setCommittedDrag(null);
-        return;
-      }
-
-      const hiddenSlots = await animateInventorySwap(source, target.slotIndex);
-      try {
-        await actions.swapInventory({ sourceSlotIndex: source.slotIndex, targetSlotIndex: target.slotIndex });
-        feedback.pulseInventorySlot(target.slotIndex);
-      } finally {
-        for (const slotIndex of hiddenSlots) showInventorySlot(slotIndex);
-        setCommittedDrag(null);
-      }
+    if (plan.type === "reject") {
+      if (plan.animateReturn !== false) await animateReturn(context.source, dragRect);
+      else setActiveDrag(null);
+      await plan.feedback?.();
       return;
     }
 
-    if (source.kind === "board" && target.kind === "cell") {
-      if (target.boardItemId === source.boardItemId) return;
+    setActiveDrag(null);
+    hideSources(plan.hide ?? []);
 
-      setCommittedDrag({ source, hideSource: true });
-      if (target.boardItemId) {
-        await actions.mergeBoard({ sourceBoardItemId: source.boardItemId, targetBoardItemId: target.boardItemId });
-        feedback.pulseMergeCell(cellKey(target.x, target.y));
-        setCommittedDrag(null);
-        return;
-      }
-
-      await actions.moveBoard({ boardItemId: source.boardItemId, x: target.x, y: target.y });
-      feedback.pulseBoardCell(cellKey(target.x, target.y));
-      setCommittedDrag(null);
-      return;
+    if (plan.animations?.length && plan.animationTiming !== "afterCommit") {
+      await playAnimations(plan.animations);
     }
 
-    if (source.kind === "board" && target.kind === "inventory-slot") {
-      setCommittedDrag({ source, hideSource: true });
-      await actions.stashBoard({ boardItemId: source.boardItemId, slotIndex: target.slotIndex });
-      feedback.pulseInventorySlot(target.slotIndex);
-      setCommittedDrag(null);
-      return;
+    await plan.commit();
+
+    if (plan.animations?.length && plan.animationTiming === "afterCommit") {
+      await playAnimations(plan.animations);
     }
 
-    if (source.kind === "board" && target.kind === "inventory-bin") {
-      setCommittedDrag({ source, hideSource: true });
-      await actions.stashBoard({ boardItemId: source.boardItemId });
-      setCommittedDrag(null);
-    }
+    await plan.feedback?.();
+    clearHiddenSources();
   }
 
-  async function animateInventorySwap(source: Extract<DragData, { kind: "inventory" }>, targetSlotIndex: number) {
-    const sourceSlot = game?.inventoryBySlotIndex[source.slotIndex] ?? null;
-    const targetSlot = game?.inventoryBySlotIndex[targetSlotIndex] ?? null;
-    const sourceRect = queryRect(`[data-inventory-slot="${source.slotIndex}"]`);
-    const targetRect = queryRect(`[data-inventory-slot="${targetSlotIndex}"]`);
-    const hiddenSlots = [source.slotIndex];
-
-    setCommittedDrag({ source, hideSource: true });
-    if (!sourceSlot?.stack || !sourceRect || !targetRect) return hiddenSlots;
-
-    hideInventorySlot(source.slotIndex);
-    addFlyer(sourceSlot.stack.itemId, tileVisualRect(sourceRect), tileVisualRect(targetRect));
-
-    const shouldSwapBack = Boolean(targetSlot?.stack && targetSlot.stack.itemId !== sourceSlot.stack.itemId);
-    if (shouldSwapBack && targetSlot?.stack) {
-      hiddenSlots.push(targetSlotIndex);
-      hideInventorySlot(targetSlotIndex);
-      addFlyer(targetSlot.stack.itemId, tileVisualRect(targetRect), tileVisualRect(sourceRect));
-    }
-
-    await wait(flyMs);
-    return hiddenSlots;
+  async function failDrop(error: unknown, context: DropContext<ItemId, Source, Target, Overlay>, dragRect: RectLike | null) {
+    clearHiddenSources();
+    await animateReturn(context.source, dragRect);
+    await onError?.(error, context);
   }
 
-  async function animateRejectedDrop(source: DragData, dragRect: RectLike | null) {
+  async function playAnimations(animations: DraggableAnimation<ItemId, Kind>[]) {
+    const resolved = animations.map(resolveAnimation).filter((animation): animation is ResolvedDraggableAnimation<ItemId, Kind> => Boolean(animation));
+    for (const animation of resolved) animate(animation);
+    if (resolved.length > 0) await wait(animationMs);
+  }
+
+  function resolveAnimation(animation: DraggableAnimation<ItemId, Kind>): ResolvedDraggableAnimation<ItemId, Kind> | null {
+    const from = animation.from ?? rectForNode(animation.fromNodeId);
+    const to = animation.to ?? rectForNode(animation.toNodeId);
+    if (!from || !to) return null;
+    return { itemId: animation.itemId, kind: animation.kind, from, to };
+  }
+
+  async function animateReturn(source: DraggablePayload<ItemId, Source, Overlay>, dragRect: RectLike | null) {
     const from = dragRect ? tileVisualRect(dragRect) : null;
-    if (!from) {
+    const to = rectForNode(source.sourceNodeId);
+
+    if (!from || !to) {
       setActiveDrag(null);
       return;
     }
 
-    if (source.kind === "board") {
-      const boardItem = game?.boardItemsById[source.boardItemId];
-      const targetRect = boardItem ? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`) : null;
-      if (!targetRect) {
-        setActiveDrag(null);
-        return;
-      }
-
-      hideBoardItem(source.boardItemId);
-      setActiveDrag(null);
-      addFlyer(source.itemId, from, tileVisualRect(targetRect));
-      await wait(flyMs);
-      showBoardItem(source.boardItemId);
-      return;
-    }
-
-    const targetRect = queryRect(`[data-inventory-slot="${source.slotIndex}"]`);
-    if (!targetRect) {
-      setActiveDrag(null);
-      return;
-    }
-
-    hideInventorySlot(source.slotIndex);
+    if (source.hideWhenActive !== false) hideSources([source.sourceId]);
     setActiveDrag(null);
-    addFlyer(source.itemId, from, tileVisualRect(targetRect));
-    await wait(flyMs);
-    showInventorySlot(source.slotIndex);
+    animate({ itemId: source.itemId, from, to });
+    await wait(animationMs);
+    clearHiddenSources();
   }
 
-  function isRejectedBoardMerge(source: DragData, target: DropData) {
-    if (source.kind !== "board" || target.kind !== "cell" || !target.boardItemId) return false;
-    if (target.boardItemId === source.boardItemId) return false;
-    const targetItem = game?.boardItemsById[target.boardItemId];
-    if (!targetItem) return false;
-    return !resolveMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId);
+  function rectForNode(nodeId: string | undefined) {
+    if (!nodeId) return null;
+    const rect = queryRect(`[data-drag-node-id="${cssEscape(nodeId)}"]`);
+    return rect ? tileVisualRect(rect) : null;
   }
 
-  function hideBoardItem(id: string) {
-    setHiddenBoardIds((current) => new Set(current).add(id));
+  function hideSources(ids: readonly string[]) {
+    setHiddenSourceIds((current) => {
+      const next = new Set(current);
+      for (const id of ids) next.add(id);
+      return next;
+    });
   }
 
-  function showBoardItem(id: string) {
-    setHiddenBoardIds((current) => without(current, id));
+  function showSource(id: string) {
+    setHiddenSourceIds((current) => without(current, id));
   }
 
-  function hideInventorySlot(slotIndex: number) {
-    setHiddenInventorySlots((current) => new Set(current).add(slotIndex));
+  function clearHiddenSources() {
+    setHiddenSourceIds(new Set());
   }
 
-  function showInventorySlot(slotIndex: number) {
-    setHiddenInventorySlots((current) => without(current, slotIndex));
-  }
-
-  function commitSource(source: DragData, hideSource = true) {
-    setCommittedDrag({ source, hideSource });
-  }
-
-  function clearCommittedDrag() {
-    setCommittedDrag(null);
-  }
-
-  function clearTransientDragState() {
+  function clearTransientState() {
     setActiveDrag(null);
-    setCommittedDrag(null);
     setDragPreviewRect(null);
+    clearHiddenSources();
   }
 
-  const activeItem = activeDrag && items ? (items[activeDrag.itemId] ?? null) : null;
+  function isSourceHidden(sourceId: string) {
+    return hiddenSourceIds.has(sourceId) || (activeDrag?.hideWhenActive !== false && activeDrag?.sourceId === sourceId);
+  }
 
   return {
     contextProps: {
@@ -278,12 +231,11 @@ export function useDraggableControl<Item extends DraggableControlItemShape>({
       onDragCancel: handleDragCancel,
     },
     activeDrag,
-    activeItem,
-    committedDrag,
-    hiddenBoardIds,
-    hiddenInventorySlots,
+    hiddenSourceIds,
     dragPreviewRect,
-    commitSource,
-    clearCommittedDrag,
+    isSourceHidden,
+    hideSources,
+    showSource,
+    clearHiddenSources,
   };
 }

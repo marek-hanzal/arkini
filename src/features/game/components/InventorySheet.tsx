@@ -1,16 +1,20 @@
 import type { ReactNode } from "react";
 import type { GameView, InventorySlot, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
-import type { CommittedDrag, DragData, DropData } from "../types";
-import { DraggableTileShell, DroppableBottomSheet, DroppableCell } from "./DragSurface";
+import {
+  inventoryBinNodeId,
+  inventorySlotNodeId,
+  inventorySourceId,
+  type GameDragData,
+  type GameDropData,
+} from "../types";
+import { DraggableSurface, DroppableBottomSheet, DroppableSurface } from "./DragSurface";
 import { Tile } from "./Tile";
 
 export function InventorySheet({
   game,
   open,
-  hiddenInventorySlots,
-  committedDrag,
-  activeDrag,
+  isSourceHidden,
   invalidInventorySlot,
   pulsedInventorySlot,
   onOpenChange,
@@ -18,9 +22,7 @@ export function InventorySheet({
 }: Readonly<{
   game: GameView;
   open: boolean;
-  hiddenInventorySlots: ReadonlySet<number>;
-  committedDrag: CommittedDrag | null;
-  activeDrag: DragData | null;
+  isSourceHidden(sourceId: string): boolean;
   invalidInventorySlot: number | null;
   pulsedInventorySlot: number | null;
   onOpenChange(open: boolean): void;
@@ -53,11 +55,7 @@ export function InventorySheet({
               key={slot.slotIndex}
               slot={slot}
               item={slot.stack ? game.items[slot.stack.itemId] : null}
-              hidden={
-                hiddenInventorySlots.has(slot.slotIndex)
-                || (activeDrag?.kind === "inventory" && activeDrag.slotIndex === slot.slotIndex && (slot.stack?.quantity ?? 0) <= 1)
-                || (committedDrag?.hideSource === true && committedDrag.source.kind === "inventory" && committedDrag.source.slotIndex === slot.slotIndex)
-              }
+              hidden={isSourceHidden(inventorySourceId(slot.slotIndex))}
               invalid={invalidInventorySlot === slot.slotIndex}
               pulsed={pulsedInventorySlot === slot.slotIndex}
               onDoubleActivate={() => onSlotDoubleActivate(slot)}
@@ -72,8 +70,9 @@ export function InventorySheet({
 function InventoryDropBin({ children, open, overClassName, onClose }: Readonly<{ children: ReactNode; open: boolean; overClassName: string; onClose(): void }>) {
   return (
     <DroppableBottomSheet
-      id="inventory-bin"
-      data={{ kind: "inventory-bin" } satisfies DropData}
+      id={inventoryBinNodeId}
+      nodeId={inventoryBinNodeId}
+      payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
       open={open}
       keepMounted
       closedClassName="translate-y-[calc(100%-5rem)]"
@@ -103,11 +102,13 @@ function InventoryCell({
   onDoubleActivate(): void;
 }>) {
   const stack = slot.stack;
+  const nodeId = inventorySlotNodeId(slot.slotIndex);
 
   return (
-    <DroppableCell
-      id={`inventory:${slot.slotIndex}`}
-      data={{ kind: "inventory-slot", slotIndex: slot.slotIndex } satisfies DropData}
+    <DroppableSurface
+      id={nodeId}
+      nodeId={nodeId}
+      payload={{ targetId: nodeId, targetNodeId: nodeId, target: { kind: "inventory-slot", slotIndex: slot.slotIndex } } satisfies GameDropData}
       data-inventory-slot={slot.slotIndex}
       className={(isOver) => cn(
         "relative aspect-square border-b border-r border-slate-800 bg-slate-900/70 transition-colors duration-200",
@@ -117,7 +118,7 @@ function InventoryCell({
       )}
     >
       {stack && item ? <InventoryTile slot={slot} item={item} hidden={hidden} onDoubleActivate={onDoubleActivate} /> : null}
-    </DroppableCell>
+    </DroppableSurface>
   );
 }
 
@@ -136,15 +137,26 @@ function InventoryTile({
 
   if (!stack) return null;
 
+  const sourceId = inventorySourceId(slot.slotIndex);
+  const sourceNodeId = inventorySlotNodeId(slot.slotIndex);
+
   return (
-    <DraggableTileShell
-      id={`inventory:${slot.slotIndex}:drag`}
-      data={{ kind: "inventory", slotIndex: slot.slotIndex, itemId: stack.itemId, quantity: stack.quantity } satisfies DragData}
+    <DraggableSurface
+      id={`${sourceId}:drag`}
+      nodeId={`${sourceId}:drag-node`}
+      payload={{
+        sourceId,
+        sourceNodeId,
+        itemId: stack.itemId,
+        source: { kind: "inventory", slotIndex: slot.slotIndex, quantity: stack.quantity },
+        overlay: { quantity: stack.quantity },
+        hideWhenActive: stack.quantity <= 1,
+      } satisfies GameDragData}
       hidden={hidden}
       className="absolute inset-0 touch-none"
       onDoubleActivate={onDoubleActivate}
     >
       <Tile item={item} quantity={stack.quantity} />
-    </DraggableTileShell>
+    </DraggableSurface>
   );
 }

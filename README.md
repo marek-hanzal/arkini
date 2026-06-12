@@ -34,7 +34,9 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 
 ## Dragging model
 
-Board and inventory use the same drag/drop control hook, `useDraggableControl`, so active drag state, committed-source hiding, rejected-drop return animation, and swap/move animation policy live in one place. It is still a game-level control, not a domain-agnostic drag library: it knows about board cells, inventory slots, stash targets, and merge rules. The reusable low-level pieces are `DragSurface` and `usePressActions`; do not fork board/inventory behavior back into separate physics engines unless you miss teleporting rocks for some reason.
+`src/features/game/useDraggableControl.ts` is deliberately domain-agnostic. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, and app-provided move animations. It does not branch on board, inventory, cells, slots, merges, producers, or any other game rule.
+
+Game-specific policy lives in `src/features/game/useGameDraggableControl.ts`. That adapter translates board/inventory drops into generic accept/reject plans and calls gameplay mutations. Board and inventory components only describe payloads and visual source/target ids through the generic `DragSurface` components. If a new grid/surface is added later, wire it into the adapter rules, not into the generic control. Yes, this is the part where we try not to rebuild a tiny cursed browser physics engine three times.
 
 ## Source layout
 
@@ -43,7 +45,8 @@ src/domains/game-data/index.ts   Single source of truth for item identity and it
 src/domains/game-data/schema.ts  Zod structural validation for the manifest.
 src/domains/database/            OPFS SQLite bootstrap, schema, gameplay mutations, view projection.
 src/features/game/GameShell.tsx  Mobile-first board, bottom-sheet inventory, producer actions, build sheet.
-src/features/game/useDraggableControl.ts  Shared DnD workflow for board and inventory grids.
+src/features/game/useDraggableControl.ts  Generic DnD lifecycle/control engine.
+src/features/game/useGameDraggableControl.ts  Arkini-specific accept/reject rules over the generic DnD engine.
 src/hooks/useGameView.ts         TanStack Query bridge over the local SQLite backend.
 ```
 

@@ -12,11 +12,12 @@ import { Flyer } from "./components/Flyer";
 import { InventorySheet } from "./components/InventorySheet";
 import { SheetHeader } from "./components/SheetHeader";
 import { Tile } from "./components/Tile";
-import { cellKey, cssEscape, inventorySinkRect, queryRect, tileVisualRect, wait } from "./helpers";
+import { cellKey, cssEscape, inventorySinkRect, queryRect, wait } from "./helpers";
 import {
   boardCellNodeId,
   boardSourceId,
   columns,
+  flyHoldMs,
   flyMs,
   inventorySlotNodeId,
   inventorySourceId,
@@ -114,7 +115,7 @@ export function GameShell() {
     for (const result of results) {
       const sourceRect = queryRect(`[data-board-item-id="${cssEscape(result.producerBoardItemId)}"]`);
       if (!sourceRect) continue;
-      const from = tileVisualRect(sourceRect);
+      const from = sourceRect;
 
       for (const placement of result.placements) {
         const targetRect = placement.kind === "board"
@@ -123,16 +124,16 @@ export function GameShell() {
 
         if (placement.kind === "board") {
           if (!targetRect) continue;
-          addFlyer(placement.itemId, from, tileVisualRect(targetRect));
+          addFlyer(placement.itemId, from, targetRect);
         } else {
-          addFlyer(placement.itemId, from, targetRect ? tileVisualRect(targetRect) : inventorySinkRect(from));
+          addFlyer(placement.itemId, from, targetRect ?? inventorySinkRect(from));
         }
 
         if (stepDelayMs > 0) await wait(stepDelayMs);
       }
     }
 
-    await wait(flyMs);
+    await wait(flyMs + flyHoldMs);
   }, [activeSheet, addFlyer]);
 
   const autoProducerTickRef = useLatestValue({
@@ -179,7 +180,6 @@ export function GameShell() {
       const result = await produce.mutateAsync({ boardItemId: boardItem.id, activation });
       await animateProducerDrops([result], activation === "exhaust" ? 130 : 0);
       await invalidateGameData();
-      feedback.pulseMergeCell(cellKey(boardItem.x, boardItem.y));
     } catch (error) {
       feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
       feedback.showError(error);
@@ -196,7 +196,7 @@ export function GameShell() {
     };
     const sourceRect = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`)
       ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
-    const from = sourceRect ? tileVisualRect(sourceRect) : null;
+    const from = sourceRect;
 
     try {
       if (from) {
@@ -234,8 +234,8 @@ export function GameShell() {
     };
     const sourceRect = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
     const targetRect = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
-    const from = sourceRect ? tileVisualRect(sourceRect) : null;
-    const to = targetRect ? tileVisualRect(targetRect) : null;
+    const from = sourceRect;
+    const to = targetRect;
 
     try {
       if (from && to) {
@@ -350,7 +350,7 @@ export function GameShell() {
 
       {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} nowMs={nowMs} />)}
 
-      <DragOverlay dropAnimation={null}>
+      <DragOverlay adjustScale={false} dropAnimation={null}>
         {drag.activeItem ? (
           <Tile
             item={drag.activeItem}

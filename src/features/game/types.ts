@@ -41,6 +41,7 @@ export type ProducerView = NonNullable<BoardViewItem["producer"]>;
 export const columns = 7;
 export const rows = 9;
 export const flyMs = 320;
+export const flyHoldMs = 96;
 export const flashMs = 650;
 
 export function boardSourceId(boardItemId: string) {

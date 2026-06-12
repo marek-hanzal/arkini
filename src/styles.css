@@ -111,15 +111,6 @@ button {
   animation: ak-cell-success-glow 560ms ease-out;
 }
 
-.ak-cell-success::after {
-  content: "";
-  position: absolute;
-  inset: 0.18rem;
-  pointer-events: none;
-  border-radius: 0.45rem;
-  animation: ak-cell-success-ring 560ms ease-out;
-}
-
 @keyframes ak-shake {
   0%, 100% {
     transform: translate3d(0, 0, 0);
@@ -151,22 +142,6 @@ button {
     box-shadow: inset 0 0 0 0.45rem rgb(167 243 208 / 0);
   }
 }
-
-@keyframes ak-cell-success-ring {
-  0% {
-    opacity: 0.95;
-    transform: scale(0.84);
-    border: 1px solid rgb(167 243 208 / 0.82);
-    box-shadow: 0 0 1rem rgb(16 185 129 / 0.34);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.34);
-    border: 1px solid rgb(167 243 208 / 0.12);
-    box-shadow: 0 0 1.4rem rgb(16 185 129 / 0);
-  }
-}
-
 
 :root {
   --ak-bottom-nav-height: calc(5rem + env(safe-area-inset-bottom));

@@ -8,17 +8,6 @@ export function queryRect(selector: string) {
   return document.querySelector<HTMLElement>(selector)?.getBoundingClientRect() ?? null;
 }
 
-export function tileVisualRect(rect: RectLike, insetRatio = 0.1): RectLike {
-  const inset = Math.min(rect.width, rect.height) * insetRatio;
-
-  return {
-    left: rect.left + inset,
-    top: rect.top + inset,
-    width: Math.max(1, rect.width - inset * 2),
-    height: Math.max(1, rect.height - inset * 2),
-  };
-}
-
 export function inventorySinkRect(source: RectLike, anchor: RectLike | null = queryRect("[data-inventory-summary]")): RectLike {
   const size = Math.max(22, Math.min(42, Math.min(source.width, source.height) * 0.55));
   const left = anchor ? anchor.left + anchor.width / 2 - size / 2 : window.innerWidth / 2 - size / 2;

@@ -21,7 +21,7 @@ export function Flyer({ flyer, item, nowMs }: Readonly<{ flyer: FlyerModel; item
         "--ak-exit-y": `${flyer.to.top - flyer.from.top + 34}px`,
       } as CSSProperties}
     >
-      <Tile item={item} quantity={flyer.quantity} producer={flyer.producer ?? undefined} nowMs={nowMs} fit="visual" />
+      <Tile item={item} quantity={flyer.quantity} producer={flyer.producer ?? undefined} nowMs={nowMs} />
     </div>
   );
 }

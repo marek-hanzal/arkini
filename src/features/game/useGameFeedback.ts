@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { flashMs } from "./types";
 
 export function useGameFeedback() {
@@ -7,7 +7,8 @@ export function useGameFeedback() {
   const [mergedBoardCellKey, setMergedBoardCellKey] = useState<string | null>(null);
   const [invalidInventorySlot, setInvalidInventorySlot] = useState<number | null>(null);
   const [pulsedInventorySlot, setPulsedInventorySlot] = useState<number | null>(null);
-  function flashBoardCell(key: string | null, tone: "pulse" | "error") {
+
+  const flashBoardCell = useCallback((key: string | null, tone: "pulse" | "error") => {
     if (!key) return;
 
     if (tone === "error") {
@@ -18,22 +19,22 @@ export function useGameFeedback() {
 
     setPulsedBoardCellKey(key);
     window.setTimeout(() => setPulsedBoardCellKey((current) => current === key ? null : current), flashMs);
-  }
+  }, []);
 
-  function pulseBoardCell(key: string | null) {
+  const pulseBoardCell = useCallback((key: string | null) => {
     flashBoardCell(key, "pulse");
-  }
+  }, [flashBoardCell]);
 
-  function pulseMergeCell(key: string | null) {
+  const pulseMergeCell = useCallback((key: string | null) => {
     if (!key) return;
     setMergedBoardCellKey(null);
     window.requestAnimationFrame(() => {
       setMergedBoardCellKey(key);
       window.setTimeout(() => setMergedBoardCellKey((current) => current === key ? null : current), 560);
     });
-  }
+  }, []);
 
-  function flashInventorySlot(slotIndex: number | null, tone: "pulse" | "error") {
+  const flashInventorySlot = useCallback((slotIndex: number | null, tone: "pulse" | "error") => {
     if (slotIndex === null || slotIndex === undefined) return;
 
     if (tone === "error") {
@@ -44,17 +45,17 @@ export function useGameFeedback() {
 
     setPulsedInventorySlot(slotIndex);
     window.setTimeout(() => setPulsedInventorySlot((current) => current === slotIndex ? null : current), flashMs);
-  }
+  }, []);
 
-  function pulseInventorySlot(slotIndex: number | null) {
+  const pulseInventorySlot = useCallback((slotIndex: number | null) => {
     flashInventorySlot(slotIndex, "pulse");
-  }
+  }, [flashInventorySlot]);
 
-  function showError(error: unknown) {
+  const showError = useCallback((error: unknown) => {
     if (import.meta.env.DEV) {
       console.debug("Game action rejected", error);
     }
-  }
+  }, []);
 
   return {
     invalidBoardCellKey,

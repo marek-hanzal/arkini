@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { GameView } from "~/domains/database";
 
@@ -29,12 +30,12 @@ export namespace useGameView {
 export function useGameDataInvalidation() {
   const queryClient = useQueryClient();
 
-  return async () => {
+  return useCallback(async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: gameQueryKey }),
       queryClient.invalidateQueries({ queryKey: databaseStatusQueryKey }),
     ]);
-  };
+  }, [queryClient]);
 }
 
 export function useGameAction<TVariables, TResult = void>(

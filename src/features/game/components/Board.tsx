@@ -165,6 +165,7 @@ function BoardTile({
       hidden={hidden}
       className="absolute inset-0 touch-none"
       onSingleActivate={onSingleActivate}
+      delaySingleWhenDouble={boardItem.producer?.doubleClickBehavior === "exhaust"}
       onDoubleActivate={onDoubleActivate}
     >
       <Tile item={item} producer={boardItem.producer} nowMs={nowMs} />

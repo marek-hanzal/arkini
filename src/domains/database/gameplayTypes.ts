@@ -52,6 +52,7 @@ export interface ProducerView {
   trigger: "click" | "auto";
   mode: ProducerMode;
   cooldownMs: number | null;
+  doubleClickBehavior: "exhaust" | null;
   cooldownUntil: string | null;
   remainingCharges: number | null;
   paused: boolean;

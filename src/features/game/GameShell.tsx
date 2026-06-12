@@ -1,5 +1,5 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DbStatusCard } from "~/components/DbStatusCard";
 import type { BuildRecipeId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, InventorySlot, ProducerDropResult } from "~/domains/database";
@@ -10,6 +10,7 @@ import { BottomSheet } from "./components/BottomSheet";
 import { BuildSheet } from "./components/BuildSheet";
 import { Flyer } from "./components/Flyer";
 import { InventorySheet } from "./components/InventorySheet";
+import { SheetHeader } from "./components/SheetHeader";
 import { Tile } from "./components/Tile";
 import { cellKey, cssEscape, inventorySinkRect, queryRect, tileVisualRect, wait } from "./helpers";
 import {
@@ -80,23 +81,6 @@ export function GameShell() {
     return () => window.clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      if (advanceAuto.isPending) return;
-      advanceAuto.mutate(undefined, {
-        async onSuccess(results) {
-          if (results.length === 0) return;
-          await animateProducerDrops(results);
-          await invalidateGameData();
-        },
-        onError(error) {
-          feedback.showError(error);
-        },
-      });
-    }, 1000);
-    return () => window.clearInterval(interval);
-  }, [advanceAuto, invalidateGameData]);
-
   function blurActiveElement() {
     const element = document.activeElement;
     if (element instanceof HTMLElement) element.blur();
@@ -127,6 +111,70 @@ export function GameShell() {
       setPulsedNavSheet((current) => (current === sheet ? null : current));
     }, 560);
   }
+
+  const animateProducerDrops = useCallback(async (results: ProducerDropResult[], stepDelayMs = 0) => {
+    for (const result of results) {
+      const sourceRect = queryRect(`[data-board-item-id="${cssEscape(result.producerBoardItemId)}"]`);
+      if (!sourceRect) continue;
+      const from = tileVisualRect(sourceRect);
+
+      for (const placement of result.placements) {
+        const targetRect = placement.kind === "board"
+          ? queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`)
+          : activeSheet === "inventory" ? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`) : null;
+
+        if (placement.kind === "board") {
+          if (!targetRect) continue;
+          addFlyer(placement.itemId, from, tileVisualRect(targetRect));
+        } else {
+          addFlyer(placement.itemId, from, targetRect ? tileVisualRect(targetRect) : inventorySinkRect(from));
+        }
+
+        if (stepDelayMs > 0) await wait(stepDelayMs);
+      }
+    }
+
+    await wait(flyMs);
+  }, [activeSheet, addFlyer]);
+
+  const autoProducerTickRef = useLatestValue({
+    advance: advanceAuto.mutateAsync,
+    animate: animateProducerDrops,
+    invalidate: invalidateGameData,
+    showError: feedback.showError,
+  });
+
+  useEffect(() => {
+    let disposed = false;
+    let running = false;
+
+    async function tickAutoProducers() {
+      if (running) return;
+      running = true;
+
+      try {
+        const { advance, animate, invalidate } = autoProducerTickRef.current;
+        const results = await advance(undefined);
+        if (disposed || results.length === 0) return;
+
+        await animate(results);
+        if (!disposed) await invalidate();
+      } catch (error) {
+        if (!disposed) autoProducerTickRef.current.showError(error);
+      } finally {
+        running = false;
+      }
+    }
+
+    const interval = window.setInterval(() => {
+      void tickAutoProducers();
+    }, 1000);
+
+    return () => {
+      disposed = true;
+      window.clearInterval(interval);
+    };
+  }, [autoProducerTickRef]);
 
   async function produceFrom(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") {
     try {
@@ -211,30 +259,6 @@ export function GameShell() {
     }
   }
 
-  async function animateProducerDrops(results: ProducerDropResult[], stepDelayMs = 0) {
-    for (const result of results) {
-      const sourceRect = queryRect(`[data-board-item-id="${cssEscape(result.producerBoardItemId)}"]`);
-      if (!sourceRect) continue;
-      const from = tileVisualRect(sourceRect);
-
-      for (const placement of result.placements) {
-        const targetRect = placement.kind === "board"
-          ? queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`)
-          : activeSheet === "inventory" ? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`) : null;
-
-        if (placement.kind === "board") {
-          if (!targetRect) continue;
-          addFlyer(placement.itemId, from, tileVisualRect(targetRect));
-        } else {
-          addFlyer(placement.itemId, from, targetRect ? tileVisualRect(targetRect) : inventorySinkRect(from));
-        }
-
-        if (stepDelayMs > 0) await wait(stepDelayMs);
-      }
-    }
-
-    await wait(flyMs);
-  }
 
   if (gameQuery.isPending) {
     return <div className="grid h-dvh w-dvw place-items-center text-sm text-slate-400">Booting SQLite…</div>;
@@ -268,6 +292,13 @@ export function GameShell() {
                 void produceFrom(item, "single");
               }}
               onTileDoubleActivate={(item) => {
+                if (item.producer?.doubleClickBehavior === "exhaust") {
+                  void produceFrom(item, "exhaust");
+                  return;
+                }
+
+                if (item.producer) return;
+
                 void stashBoardWithFly(item);
               }}
             />
@@ -292,15 +323,11 @@ export function GameShell() {
             />
           </section>
 
-          <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain p-4" hidden={renderedSheet !== "database"}>
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[0.62rem] uppercase tracking-[0.22em] text-emerald-300">System</p>
-                <p className="text-sm text-slate-300">Local database</p>
-              </div>
-              <button type="button" className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300" onClick={closeSheet}>Close</button>
+          <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain" hidden={renderedSheet !== "database"}>
+            <SheetHeader eyebrow="System" description="Local database" onClose={closeSheet} />
+            <div className="p-4 pt-1">
+              <DbStatusCard />
             </div>
-            <DbStatusCard />
           </section>
 
           <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain" hidden={renderedSheet !== "build"}>
@@ -381,4 +408,10 @@ function findFirstEmptyBoardCell(game: GameView): BuildCell | null {
   }
 
   return null;
+}
+
+function useLatestValue<T>(value: T) {
+  const ref = useRef(value);
+  ref.current = value;
+  return ref;
 }

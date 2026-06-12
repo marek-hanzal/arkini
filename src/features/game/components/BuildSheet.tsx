@@ -1,20 +1,19 @@
 import type { BuildRecipeId } from "~/domains/game-data";
 import type { GameView } from "~/domains/database";
 import type { BuildCell } from "../types";
+import { SheetHeader } from "./SheetHeader";
 
 export function BuildSheet({ game, cell, onClose, onBuild }: Readonly<{ game: GameView; cell: BuildCell | null; onClose(): void; onBuild(recipeId: BuildRecipeId): void }>) {
   return (
-    <div className="p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div>
-          <p className="text-[0.62rem] uppercase tracking-[0.22em] text-emerald-300">Build</p>
-          <p className="text-sm text-slate-300">{cell ? `Cell ${cell.x}:${cell.y}` : "Choose an empty board cell"}</p>
-        </div>
-        <button type="button" className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300" onClick={onClose}>Close</button>
-      </div>
+    <div>
+      <SheetHeader
+        eyebrow="Build"
+        description={cell ? `Cell ${cell.x}:${cell.y}` : "Choose an empty board cell"}
+        onClose={onClose}
+      />
 
       {cell ? (
-        <div className="grid gap-2">
+        <div className="grid gap-2 p-4 pt-1">
           {game.buildRecipes.map((recipe) => {
             const result = game.items[recipe.resultItemId];
             const blueprint = game.items[recipe.blueprintItemId];
@@ -30,7 +29,7 @@ export function BuildSheet({ game, cell, onClose, onBuild }: Readonly<{ game: Ga
           })}
         </div>
       ) : (
-        <p className="rounded-sm border border-slate-800 bg-slate-900/70 p-3 text-sm text-slate-400">Double-click an empty board cell to build there.</p>
+        <p className="m-4 mt-1 rounded-sm border border-slate-800 bg-slate-900/70 p-3 text-sm text-slate-400">Double-click an empty board cell to build there.</p>
       )}
     </div>
   );

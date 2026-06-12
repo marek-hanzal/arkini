@@ -83,7 +83,7 @@ function resolveGameDrop(
     case "board->cell":
       return boardToCell(context as GameDropContext<"board", "cell">, game, actions, feedback);
     case "board->inventory-slot":
-      return boardToInventorySlot(context as GameDropContext<"board", "inventory-slot">, actions, feedback);
+      return boardToInventorySlot(context as GameDropContext<"board", "inventory-slot">, game, actions, feedback);
     case "board->inventory-bin":
       return boardToInventoryBin(context as GameDropContext<"board", "inventory-bin">, actions);
     default:
@@ -173,9 +173,18 @@ function boardToCell(
 
 function boardToInventorySlot(
   { source, target }: GameDropContext<"board", "inventory-slot">,
+  game: GameView,
   actions: GameDragActions,
   feedback: GameDragFeedback,
 ): DropPlan<string, FlyerKind> {
+  const targetStack = game.inventoryBySlotIndex[target.target.slotIndex]?.stack ?? null;
+  const targetItem = targetStack ? game.items[targetStack.itemId] : null;
+  const cannotStack = targetStack && (targetStack.itemId !== source.itemId || !targetItem || targetStack.quantity >= targetItem.maxStackSize);
+
+  if (cannotStack) {
+    return reject(() => feedback.flashInventorySlot(target.target.slotIndex, "error"));
+  }
+
   return accept({
     hide: [source.sourceId],
     commit: () => actions.stashBoard({ boardItemId: source.source.boardItemId, slotIndex: target.target.slotIndex }),

@@ -119,6 +119,7 @@ function BoardCell({
         x === columns - 1 && "border-r-0",
         y === rows - 1 && "border-b-0",
         isOver && "bg-slate-800/80",
+        canMerge && !isOver && "bg-emerald-950/15 outline outline-1 -outline-offset-2 outline-emerald-300/25",
         canMerge && isOver && "ring-2 ring-inset ring-emerald-300/80",
         invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
         pulsed && !invalid && !merged && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",

@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { cn } from "~/lib/cn";
 import type { ViewItem } from "~/domains/database";
 import type { FlyerModel } from "../types";
 
@@ -7,7 +8,7 @@ export function Flyer({ flyer, item }: Readonly<{ flyer: FlyerModel; item: ViewI
 
   return (
     <div
-      className={`ak-fly ak-fly--${flyer.kind} pointer-events-none fixed z-50`}
+      className={cn("ak-fly pointer-events-none fixed", flyer.kind === "place" ? "z-10" : "z-50", `ak-fly--${flyer.kind}`)}
       style={{
         left: flyer.from.left,
         top: flyer.from.top,

@@ -22,6 +22,7 @@ export function Tile({
 
   return (
     <div
+      data-ak-tile
       className={cn(
         "relative grid h-full w-full place-items-center p-[10%] text-slate-50 transition-opacity duration-300",
         producerUi?.waiting && "opacity-80",

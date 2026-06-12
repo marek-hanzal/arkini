@@ -20,7 +20,7 @@ export interface RectLike {
   height: number;
 }
 
-export type FlyerKind = "move" | "stash";
+export type FlyerKind = "move" | "stash" | "place";
 
 export interface FlyerModel {
   id: string;

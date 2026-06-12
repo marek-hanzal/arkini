@@ -157,7 +157,7 @@ export function GameShell() {
     try {
       if (from && to) {
         if (source.hideWhenActive !== false) drag.hideSources([source.sourceId]);
-        addFlyer(stack.itemId, from, to);
+        addFlyer(stack.itemId, from, to, "place");
         await wait(flyMs);
       }
 

@@ -107,6 +107,12 @@ function inventoryToCell(
 
   return accept({
     hide: hiddenSource(source),
+    animations: [{
+      itemId: source.itemId,
+      fromNodeId: source.sourceNodeId,
+      toNodeId: target.targetNodeId,
+      kind: "place",
+    }],
     commit: () => actions.placeInventory({ slotIndex: source.source.slotIndex, x: target.target.x, y: target.target.y }),
     feedback: () => feedback.pulseBoardCell(cellKey(target.target.x, target.target.y)),
   });

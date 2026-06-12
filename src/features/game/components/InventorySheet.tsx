@@ -8,6 +8,7 @@ import {
   type GameDropData,
 } from "../types";
 import { DraggableSurface, DroppableSurface } from "./DragSurface";
+import { SheetHeader } from "./SheetHeader";
 import { Tile } from "./Tile";
 
 export function InventorySheet({
@@ -34,13 +35,12 @@ export function InventorySheet({
       payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
       className={(isOver) => cn("flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col", isOver && "outline outline-2 -outline-offset-2 outline-emerald-300/70")}
     >
-      <div data-inventory-summary className="flex items-center justify-between gap-3 border-b border-slate-800/80 p-4">
-        <div>
-          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">Inventory</p>
-          <p className="text-sm text-slate-300">{filled}/{game.inventory.length} slots</p>
-        </div>
-        <button type="button" className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300" onClick={onClose}>Close</button>
-      </div>
+      <SheetHeader
+        eyebrow="Inventory"
+        description={`${filled}/${game.inventory.length} slots`}
+        anchor="inventory-summary"
+        onClose={onClose}
+      />
 
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
         <div className="grid grid-cols-4 gap-0 overflow-hidden border-l border-t border-slate-800">

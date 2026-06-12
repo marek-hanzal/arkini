@@ -83,12 +83,11 @@ export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
       throw new GameActionError("Producer lives on the board. Pause it instead of hiding its state in inventory.");
     }
 
-    if (slotIndex !== undefined) assertInsideInventory(save, slotIndex);
-
     const virtualInventory = cloneInventory(inventoryRows);
-    const preferred = slotIndex === undefined ? undefined : [slotIndex];
-    const plan = planInventoryPlacement(save, virtualInventory, boardItem.itemDefinitionId as ItemId, preferred);
-    if (!plan) throw new GameActionError("Inventory is full.");
+    const plan = slotIndex === undefined
+      ? planInventoryPlacement(save, virtualInventory, boardItem.itemDefinitionId as ItemId)
+      : planExactInventorySlotPlacement(save, virtualInventory, boardItem.itemDefinitionId as ItemId, slotIndex);
+    if (!plan) throw new GameActionError(slotIndex === undefined ? "Inventory is full." : "Inventory slot cannot accept this item.");
 
     await applyInventoryPlacementPlan(tx, plan);
     await tx.deleteFrom(table.boardItem).where("id", "=", boardItem.id).execute();
@@ -147,7 +146,10 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
     const state = readBoardState(producerRow);
     const producerState = { ...(createInitialBoardState(producerRow.itemDefinitionId, timestamp).producer ?? {}), ...(state.producer ?? {}) };
 
-    if (producerState.cooldownUntil && Date.parse(producerState.cooldownUntil) > timestamp) {
+    const mode = producer.mode ?? { type: "infinite" as const };
+    const isFiniteExhaust = activation === "exhaust" && mode.type === "finite";
+
+    if (!isFiniteExhaust && producerState.cooldownUntil && Date.parse(producerState.cooldownUntil) > timestamp) {
       throw new GameActionError("Producer is still cooling down.");
     }
 
@@ -155,8 +157,7 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
       throw new GameActionError("Producer is empty.");
     }
 
-    const mode = producer.mode ?? { type: "infinite" as const };
-    const steps = activation === "exhaust" && mode.type === "finite"
+    const steps = isFiniteExhaust
       ? Math.max(1, producerState.remainingCharges ?? mode.charges)
       : 1;
 
@@ -167,7 +168,7 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
     const placements = await applyPlacementPlan(tx, plan);
     const nextRemainingCharges = match(mode as ProducerMode)
       .with({ type: "infinite" }, () => null)
-      .with({ type: "finite" }, () => Math.max(0, (producerState.remainingCharges ?? 1) - steps))
+      .with({ type: "finite" }, (finiteMode) => Math.max(0, (producerState.remainingCharges ?? finiteMode.charges) - steps))
       .with({ type: "auto" }, () => null)
       .exhaustive();
 
@@ -400,28 +401,48 @@ function planPlacements(
   return plan;
 }
 
-function planInventoryPlacement(save: SaveShape, inventory: InventoryRow[], itemId: ItemId | string, preferredSlots: number[] = []): InventoryPlacementPlan[] | null {
-  const item = getItem(itemId);
-  const plans: InventoryPlacementPlan[] = [];
-  const orderedStacks = [...inventory].sort((a, b) => a.slotIndex - b.slotIndex);
+function planInventoryPlacement(save: SaveShape, inventory: InventoryRow[], itemId: ItemId | string): InventoryPlacementPlan[] | null {
+  const stackPlan = planStackPlacement(inventory, itemId);
+  if (stackPlan) return stackPlan;
 
-  for (const stack of orderedStacks) {
-    if (stack.itemDefinitionId !== itemId || stack.quantity >= item.maxStackSize) continue;
-    stack.quantity += 1;
-    plans.push({ type: "update", stackId: stack.id, slotIndex: stack.slotIndex, itemId: itemId as ItemId, quantity: stack.quantity });
-    return plans;
-  }
-
-  for (const slotIndex of [...preferredSlots, ...Array.from({ length: save.inventorySlots }, (_, index) => index)]) {
-    if (slotIndex < 0 || slotIndex >= save.inventorySlots) continue;
-    if (inventory.some((stack) => stack.slotIndex === slotIndex)) continue;
-    const id = createId("inventory:virtual");
-    inventory.push({ id, itemDefinitionId: itemId, slotIndex, quantity: 1 });
-    plans.push({ type: "insert", stackId: id, slotIndex, itemId: itemId as ItemId, quantity: 1 });
-    return plans;
+  for (let slotIndex = 0; slotIndex < save.inventorySlots; slotIndex += 1) {
+    const insertPlan = planEmptySlotPlacement(save, inventory, itemId, slotIndex);
+    if (insertPlan) return insertPlan;
   }
 
   return null;
+}
+
+function planExactInventorySlotPlacement(save: SaveShape, inventory: InventoryRow[], itemId: ItemId | string, slotIndex: number): InventoryPlacementPlan[] | null {
+  assertInsideInventory(save, slotIndex);
+
+  const target = inventory.find((stack) => stack.slotIndex === slotIndex);
+  if (!target) return planEmptySlotPlacement(save, inventory, itemId, slotIndex);
+  if (target.itemDefinitionId !== itemId) return null;
+
+  return planStackPlacement([target], itemId);
+}
+
+function planStackPlacement(inventory: InventoryRow[], itemId: ItemId | string): InventoryPlacementPlan[] | null {
+  const item = getItem(itemId);
+  const stack = [...inventory]
+    .sort((a, b) => a.slotIndex - b.slotIndex)
+    .find((row) => row.itemDefinitionId === itemId && row.quantity < item.maxStackSize);
+
+  if (!stack) return null;
+
+  stack.quantity += 1;
+  return [{ type: "update", stackId: stack.id, slotIndex: stack.slotIndex, itemId: itemId as ItemId, quantity: stack.quantity }];
+}
+
+function planEmptySlotPlacement(save: SaveShape, inventory: InventoryRow[], itemId: ItemId | string, slotIndex: number): InventoryPlacementPlan[] | null {
+  if (slotIndex < 0 || slotIndex >= save.inventorySlots) return null;
+  if (inventory.some((stack) => stack.slotIndex === slotIndex)) return null;
+
+  const stackId = createId("inventory:virtual");
+  inventory.push({ id: stackId, itemDefinitionId: itemId, slotIndex, quantity: 1 });
+
+  return [{ type: "insert", stackId, slotIndex, itemId: itemId as ItemId, quantity: 1 }];
 }
 
 async function applyPlacementPlan(tx: ArkiniTransaction, plan: PlacementPlan): Promise<ProducerPlacement[]> {

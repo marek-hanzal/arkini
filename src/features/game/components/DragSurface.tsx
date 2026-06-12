@@ -42,6 +42,7 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
   hidden,
   className,
   dragDisabled = false,
+  delaySingleWhenDouble = false,
   onSingleActivate,
   onDoubleActivate,
   children,
@@ -49,7 +50,12 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
 }: Readonly<DraggableSurfaceProps<ItemId, Source, Overlay>>) {
   const data = { ...payload, sourceNodeId: payload.sourceNodeId ?? nodeId } satisfies DraggablePayload<ItemId, Source, Overlay>;
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data: data as unknown as Data, disabled: dragDisabled });
-  const press = usePressActions({ onSingle: onSingleActivate, onDouble: onDoubleActivate, isDisabled: dragDisabled });
+  const press = usePressActions({
+    onSingle: onSingleActivate,
+    onDouble: onDoubleActivate,
+    delaySingleWhenDouble,
+    isDisabled: dragDisabled,
+  });
   const pressProps = press.pressProps as HTMLAttributes<HTMLDivElement>;
 
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
@@ -84,6 +90,7 @@ export interface DraggableSurfaceProps<ItemId extends string, Source, Overlay = 
   payload: DraggablePayload<ItemId, Source, Overlay>;
   hidden: boolean;
   dragDisabled?: boolean;
+  delaySingleWhenDouble?: boolean;
   onSingleActivate?(): void;
   onDoubleActivate?(): void;
   children: ReactNode;

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { usePress, type PressEvent, type PressResult } from "@react-aria/interactions";
 
 const doublePressMs = 320;
@@ -14,6 +14,7 @@ type LastPress = {
 export interface PressActions {
   onSingle?(): void;
   onDouble?(): void;
+  delaySingleWhenDouble?: boolean;
   isDisabled?: boolean;
 }
 
@@ -21,8 +22,11 @@ export interface PressActionResult extends PressResult {}
 
 // React Aria owns the ugly cross-browser press recognition. We only keep the
 // tiny game rule on top: two nearby presses on the same target mean double press.
-export function usePressActions({ onSingle, onDouble, isDisabled = false }: PressActions): PressActionResult {
+export function usePressActions({ onSingle, onDouble, delaySingleWhenDouble = false, isDisabled = false }: PressActions): PressActionResult {
   const lastPressRef = useRef<LastPress | null>(null);
+  const singlePressTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => () => clearSinglePressTimeout(), []);
 
   const press = usePress({
     isDisabled,
@@ -41,6 +45,7 @@ export function usePressActions({ onSingle, onDouble, isDisabled = false }: Pres
       );
 
       if (isNearbyDouble) {
+        clearSinglePressTimeout();
         lastPressRef.current = null;
         onDouble?.();
         return;
@@ -55,9 +60,27 @@ export function usePressActions({ onSingle, onDouble, isDisabled = false }: Pres
         };
       }
 
-      onSingle?.();
+      if (!onSingle) return;
+
+      if (onDouble && delaySingleWhenDouble) {
+        clearSinglePressTimeout();
+        singlePressTimeoutRef.current = window.setTimeout(() => {
+          singlePressTimeoutRef.current = null;
+          lastPressRef.current = null;
+          onSingle();
+        }, doublePressMs);
+        return;
+      }
+
+      onSingle();
     },
   });
 
   return press;
+
+  function clearSinglePressTimeout() {
+    if (singlePressTimeoutRef.current === null) return;
+    window.clearTimeout(singlePressTimeoutRef.current);
+    singlePressTimeoutRef.current = null;
+  }
 }

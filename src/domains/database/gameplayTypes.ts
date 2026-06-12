@@ -22,7 +22,7 @@ export interface ViewItem {
   maxStackSize: number;
   tags: string[];
   canProduce: boolean;
-  producerTrigger: "click" | "auto" | null;
+  producerTrigger: "click" | null;
   canMerge: boolean;
 }
 
@@ -49,16 +49,12 @@ export interface BuildRecipeView {
 }
 
 export interface ProducerView {
-  trigger: "click" | "auto";
+  trigger: "click";
   mode: ProducerMode;
   cooldownMs: number | null;
   doubleClickBehavior: "exhaust" | null;
   cooldownUntil: string | null;
   remainingCharges: number | null;
-  paused: boolean;
-  autoAvailable: number | null;
-  nextDropAt: string | null;
-  rechargeUntil: string | null;
 }
 
 export interface ProducerPlacement {
@@ -75,16 +71,10 @@ export interface ProducerDropResult {
   placements: ProducerPlacement[];
 }
 
-export interface AutoProducerResult extends ProducerDropResult {}
-
 export interface BoardItemState {
   producer?: {
     cooldownUntil?: string | null;
     remainingCharges?: number | null;
-    paused?: boolean;
-    autoAvailable?: number | null;
-    nextDropAt?: string | null;
-    rechargeUntil?: string | null;
   };
 }
 

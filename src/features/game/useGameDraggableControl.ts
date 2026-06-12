@@ -239,7 +239,7 @@ function getGameDragBoundaryNodeId(source: DraggablePayload<string, GameDragSour
 type AcceptPlan = Omit<Extract<DropPlan<string, FlyerKind, GameVisualMeta>, { type: "accept" }>, "type">;
 
 function accept(plan: AcceptPlan): DropPlan<string, FlyerKind, GameVisualMeta> {
-  return { type: "accept", animationTiming: "beforeCommit", ...plan, hide: (plan.hide ?? []).filter(Boolean) };
+  return { type: "accept", animationTiming: "afterCommit", ...plan, hide: (plan.hide ?? []).filter(Boolean) };
 }
 
 function reject(feedback?: () => void): DropPlan<string, FlyerKind, GameVisualMeta> {

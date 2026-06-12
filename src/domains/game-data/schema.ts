@@ -49,9 +49,9 @@ export const gameDataManifestSchema = z.object({
         }),
       ).optional(),
       producer: z.object({
-        trigger: z.enum(["click", "auto"]),
+        trigger: z.literal("click"),
         placement: z.literal("board_then_inventory"),
-        cooldownMs: positiveInteger.optional(),
+        cooldownMs: positiveInteger,
         drops: z.array(
           z.union([
             z.object({ itemId, weight: positiveInteger, quantity: quantitySchema.optional() }),
@@ -65,13 +65,6 @@ export const gameDataManifestSchema = z.object({
             type: z.literal("finite"),
             charges: positiveInteger,
             onDepleted: z.union([z.literal("remove"), z.object({ replaceWithItemId: itemId })]),
-          }),
-          z.object({
-            type: z.literal("auto"),
-            tickMs: positiveInteger,
-            capacity: positiveInteger,
-            rechargeMs: positiveInteger,
-            enabledByDefault: z.boolean(),
           }),
         ]).optional(),
       }).optional(),

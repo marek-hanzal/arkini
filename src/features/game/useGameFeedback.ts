@@ -5,6 +5,7 @@ export function useGameFeedback() {
   const [invalidBoardCellKey, setInvalidBoardCellKey] = useState<string | null>(null);
   const [mergedBoardCellKey, setMergedBoardCellKey] = useState<string | null>(null);
   const [invalidInventorySlot, setInvalidInventorySlot] = useState<number | null>(null);
+  const [actionErrorKey, setActionErrorKey] = useState(0);
 
   const flashBoardCell = useCallback((key: string | null, tone: "error") => {
     if (!key || tone !== "error") return;
@@ -30,6 +31,8 @@ export function useGameFeedback() {
   }, []);
 
   const showError = useCallback((error: unknown) => {
+    setActionErrorKey((current) => current + 1);
+
     if (import.meta.env.DEV) {
       console.debug("Game action rejected", error);
     }
@@ -39,6 +42,7 @@ export function useGameFeedback() {
     invalidBoardCellKey,
     mergedBoardCellKey,
     invalidInventorySlot,
+    actionErrorKey,
     flashBoardCell,
     pulseMergeCell,
     flashInventorySlot,

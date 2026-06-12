@@ -59,14 +59,16 @@ export async function ensureDefaultSaveGame() {
 }
 
 async function syncDefaultSaveShape() {
+  const boardWidth = gameDataManifest.game.board.width;
+  const boardHeight = gameDataManifest.game.board.height;
   const inventorySlots = gameDataManifest.game.inventory.slots;
 
   await db.transaction().execute(async (tx) => {
     await tx
       .updateTable(table.saveGame)
       .set({
-        boardWidth: gameDataManifest.game.board.width,
-        boardHeight: gameDataManifest.game.board.height,
+        boardWidth,
+        boardHeight,
         inventorySlots,
         updatedAt: new Date().toISOString(),
       })
@@ -78,5 +80,10 @@ async function syncDefaultSaveShape() {
       .where("saveGameId", "=", defaultSaveGameId)
       .where("slotIndex", ">=", inventorySlots)
       .execute();
+
+    await tx.deleteFrom(table.boardItem).where("saveGameId", "=", defaultSaveGameId).where("x", "<", 0).execute();
+    await tx.deleteFrom(table.boardItem).where("saveGameId", "=", defaultSaveGameId).where("y", "<", 0).execute();
+    await tx.deleteFrom(table.boardItem).where("saveGameId", "=", defaultSaveGameId).where("x", ">=", boardWidth).execute();
+    await tx.deleteFrom(table.boardItem).where("saveGameId", "=", defaultSaveGameId).where("y", ">=", boardHeight).execute();
   });
 }

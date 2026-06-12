@@ -12,7 +12,6 @@ The core rule is simple: **item definitions drive gameplay shape**. An item may 
 - mixed/secret merge rules, for example `twig + water -> sprout`
 - click producers, which produce on a plain single click/tap
 - optional item display labels, for example tiny level numbers over reused building art
-- auto producers, which run by themselves, can be paused, have capacity, tick timing, and recharge timing
 - blueprint build recipes
 
 There are no separate static `merges`, `dropTables`, `producers`, and `buildRecipes` arrays anymore. Those are derived indexes over `src/domains/game-data/index.ts`. Humanity briefly survives another abstraction.
@@ -20,15 +19,13 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 ## Gameplay model
 
 - Board is a 7×9 grid.
-- Inventory is 36 slots shown from the bottom navigation. Database/debug controls live in the same sheet system.
+- Inventory is 35 slots shown from the bottom navigation. Database/debug controls live in the same sheet system.
 - Board and inventory use zero-gap square cells to avoid DnD blind spots.
 - Merging happens on the board only.
 - Inventory stores stacks and can combine compatible stacks.
 - Dragging one item out of an inventory stack with quantity greater than one keeps the source stack visible; it only disappears when the last item leaves. That old flicker bug can go sit in the bin.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
 - Click producers use cooldowns and optional finite charges.
-- Auto producers persist pause state, available capacity, next drop time, and recharge time in `boardItem.stateJson`.
-- Auto producers tick from the client and save progress into SQLite, so reloads do not reset their timers like a cheap casino machine.
 - Double-click/tap board items to animate them into the inventory bottom area. Single press on producers still produces immediately; no delayed click timer is used.
 - Double-click/tap an empty board cell to open the build sheet. Tap/press recognition is centralized in `src/features/game/usePressActions.ts` and built on React Aria `usePress`; keep raw touch/pointer plumbing out of board/tile components unless you enjoy browser archaeology. Build, inventory, and database panels all share one always-mounted custom bottom sheet. The sheet never unmounts; `data-open` only lets CSS slide it and dim the locked background.
 - Dragging a board item lightly highlights known merge targets for accessibility. Rejected drops flash the target while the item flies back.

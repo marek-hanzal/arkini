@@ -139,16 +139,11 @@ function BoardCell({
 
 
 function isProducerReady(producer: BoardViewItem["producer"], nowMs: number) {
-  if (!producer || producer.paused) return false;
+  if (!producer) return false;
 
-  if (producer.trigger === "click") {
-    const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
-    const hasCharges = producer.remainingCharges === null || producer.remainingCharges === undefined || producer.remainingCharges > 0;
-    return hasCharges && cooldownUntil <= nowMs;
-  }
-
-  const rechargeUntil = producer.rechargeUntil ? Date.parse(producer.rechargeUntil) : 0;
-  return rechargeUntil <= nowMs && (producer.autoAvailable ?? 0) > 0;
+  const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
+  const hasCharges = producer.remainingCharges === null || producer.remainingCharges === undefined || producer.remainingCharges > 0;
+  return hasCharges && cooldownUntil <= nowMs;
 }
 
 function BoardTile({

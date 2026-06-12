@@ -94,16 +94,6 @@ button {
     0 0 1rem rgb(16 185 129 / 0.2);
 }
 
-.ak-merge-target::after {
-  content: "";
-  position: absolute;
-  inset: 12%;
-  pointer-events: none;
-  border: 1px solid rgb(167 243 208 / 0.78);
-  border-radius: 0.45rem;
-  background: radial-gradient(circle, rgb(110 231 183 / 0.18), transparent 68%);
-}
-
 .ak-merge-target-over {
   background: rgb(6 95 70 / 0.58);
   box-shadow:
@@ -116,8 +106,18 @@ button {
   animation: ak-shake 260ms ease-out both;
 }
 
-.ak-cell-pulse {
-  animation: ak-cell-pulse 520ms ease-out both;
+.ak-cell-success {
+  position: relative;
+  animation: ak-cell-success-glow 560ms ease-out;
+}
+
+.ak-cell-success::after {
+  content: "";
+  position: absolute;
+  inset: 0.18rem;
+  pointer-events: none;
+  border-radius: 0.45rem;
+  animation: ak-cell-success-ring 560ms ease-out;
 }
 
 @keyframes ak-shake {
@@ -135,72 +135,35 @@ button {
   }
 }
 
-.ak-cell-pulse [data-ak-tile] {
-  animation: ak-tile-fade-in 180ms ease-out both;
-}
-
-@keyframes ak-tile-fade-in {
+@keyframes ak-cell-success-glow {
   0% {
-    opacity: 0;
-    transform: scale(0.94);
+    background-color: rgb(6 78 59 / 0.18);
+    box-shadow: inset 0 0 0 0 rgb(167 243 208 / 0.78);
+  }
+  42% {
+    background-color: rgb(6 95 70 / 0.38);
+    box-shadow:
+      inset 0 0 0 0.16rem rgb(167 243 208 / 0.88),
+      inset 0 0 1.2rem rgb(52 211 153 / 0.24);
   }
   100% {
-    opacity: 1;
-    transform: scale(1);
+    background-color: rgb(15 23 42 / 0);
+    box-shadow: inset 0 0 0 0.45rem rgb(167 243 208 / 0);
   }
 }
 
-@keyframes ak-cell-pulse {
-  0% {
-    box-shadow: inset 0 0 0 0 rgb(125 211 252 / 0.7);
-  }
-  100% {
-    box-shadow: inset 0 0 0 0.45rem rgb(125 211 252 / 0);
-  }
-}
-
-.ak-merge-pop {
-  will-change: transform, filter;
-  animation: ak-merge-pop 520ms cubic-bezier(0.2, 0.9, 0.2, 1.1) both;
-}
-.ak-merge-pop::after {
-  content: "";
-  position: absolute;
-  inset: 9%;
-  pointer-events: none;
-  border: 1px solid rgb(167 243 208 / 0.85);
-  border-radius: 0.35rem;
-  box-shadow: 0 0 1.25rem rgb(16 185 129 / 0.38);
-  animation: ak-merge-ring 560ms ease-out both;
-}
-
-@keyframes ak-merge-pop {
-  0% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  36% {
-    transform: scale(1.075);
-    filter: brightness(1.25);
-  }
-  68% {
-    transform: scale(0.985);
-    filter: brightness(1.08);
-  }
-  100% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-}
-
-@keyframes ak-merge-ring {
+@keyframes ak-cell-success-ring {
   0% {
     opacity: 0.95;
-    transform: scale(0.72);
+    transform: scale(0.84);
+    border: 1px solid rgb(167 243 208 / 0.82);
+    box-shadow: 0 0 1rem rgb(16 185 129 / 0.34);
   }
   100% {
     opacity: 0;
-    transform: scale(1.55);
+    transform: scale(1.34);
+    border: 1px solid rgb(167 243 208 / 0.12);
+    box-shadow: 0 0 1.4rem rgb(16 185 129 / 0);
   }
 }
 

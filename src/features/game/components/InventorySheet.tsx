@@ -16,14 +16,12 @@ export function InventorySheet({
   game,
   isSourceHidden,
   invalidInventorySlot,
-  pulsedInventorySlot,
   onClose,
   onSlotDoubleActivate,
 }: Readonly<{
   game: GameView;
   isSourceHidden(sourceId: string): boolean;
   invalidInventorySlot: number | null;
-  pulsedInventorySlot: number | null;
   onClose(): void;
   onSlotDoubleActivate(slot: InventorySlot): void;
 }>) {
@@ -34,7 +32,6 @@ export function InventorySheet({
       id={inventoryBinNodeId}
       nodeId={inventoryBinNodeId}
       payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
-      data-drag-boundary-id={inventoryContainerNodeId}
       className={(isOver) => cn("flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col", isOver && "outline outline-2 -outline-offset-2 outline-emerald-300/70")}
     >
       <SheetHeader
@@ -45,7 +42,7 @@ export function InventorySheet({
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
-        <div className="grid grid-cols-4 gap-0 overflow-hidden border-l border-t border-slate-800">
+        <div data-drag-boundary-id={inventoryContainerNodeId} className="grid grid-cols-4 gap-0 overflow-hidden border-l border-t border-slate-800">
           {game.inventory.map((slot) => (
             <InventoryCell
               key={slot.slotIndex}
@@ -53,7 +50,6 @@ export function InventorySheet({
               item={slot.stack ? game.items[slot.stack.itemId] : null}
               hidden={isSourceHidden(inventorySourceId(slot.slotIndex))}
               invalid={invalidInventorySlot === slot.slotIndex}
-              pulsed={pulsedInventorySlot === slot.slotIndex}
               onDoubleActivate={() => onSlotDoubleActivate(slot)}
             />
           ))}
@@ -68,14 +64,12 @@ function InventoryCell({
   item,
   hidden,
   invalid,
-  pulsed,
   onDoubleActivate,
 }: Readonly<{
   slot: InventorySlot;
   item: ViewItem | null;
   hidden: boolean;
   invalid: boolean;
-  pulsed: boolean;
   onDoubleActivate(): void;
 }>) {
   const stack = slot.stack;
@@ -91,7 +85,6 @@ function InventoryCell({
         "relative aspect-square border-b border-r border-slate-800 bg-slate-900/70 transition-colors duration-200",
         isOver && "bg-slate-800 outline outline-2 -outline-offset-2 outline-emerald-300/80",
         invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
-        pulsed && !invalid && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
       )}
     >
       {stack && item ? <InventoryTile slot={slot} item={item} hidden={hidden} onDoubleActivate={onDoubleActivate} /> : null}

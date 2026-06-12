@@ -2,8 +2,9 @@ import type { CSSProperties } from "react";
 import { cn } from "~/lib/cn";
 import type { ViewItem } from "~/domains/database";
 import type { FlyerModel } from "../types";
+import { Tile } from "./Tile";
 
-export function Flyer({ flyer, item }: Readonly<{ flyer: FlyerModel; item: ViewItem }>) {
+export function Flyer({ flyer, item, nowMs }: Readonly<{ flyer: FlyerModel; item: ViewItem; nowMs: number }>) {
   const scale = flyer.from.width > 0 ? flyer.to.width / flyer.from.width : 1;
 
   return (
@@ -20,7 +21,7 @@ export function Flyer({ flyer, item }: Readonly<{ flyer: FlyerModel; item: ViewI
         "--ak-exit-y": `${flyer.to.top - flyer.from.top + 34}px`,
       } as CSSProperties}
     >
-      <img src={item.assetSrc} alt="" className="h-full w-full object-contain" />
+      <Tile item={item} quantity={flyer.quantity} producer={flyer.producer ?? undefined} nowMs={nowMs} fit="visual" />
     </div>
   );
 }

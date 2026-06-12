@@ -1,13 +1,13 @@
 import { useState } from "react";
+import { cn } from "~/lib/cn";
 import { useArkiniDatabaseStatus } from "~/hooks/useArkiniDatabaseStatus";
 
 export function DbStatusCard() {
   const status = useArkiniDatabaseStatus();
   const [resetState, setResetState] = useState<"idle" | "pending" | "failed">("idle");
+  const isolated = typeof window !== "undefined" && window.crossOriginIsolated === true;
 
-  const crossOriginIsolated = typeof window === "undefined" ? false : window.crossOriginIsolated === true;
-
-  async function hardResetDatabase() {
+  async function resetDb() {
     setResetState("pending");
 
     try {
@@ -27,12 +27,12 @@ export function DbStatusCard() {
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Local database</p>
           <h2 className="mt-1 text-base font-semibold text-white">SQLite / OPFS</h2>
           <span
-            className={[
+            className={cn(
               "mt-2 inline-flex rounded-sm px-2 py-1 text-xs font-semibold",
-              crossOriginIsolated ? "bg-emerald-400/10 text-emerald-200" : "bg-amber-400/10 text-amber-200",
-            ].join(" ")}
+              isolated ? "bg-emerald-400/10 text-emerald-200" : "bg-amber-400/10 text-amber-200",
+            )}
           >
-            {crossOriginIsolated ? "isolated" : "headers missing"}
+            {isolated ? "isolated" : "headers missing"}
           </span>
         </div>
 
@@ -46,7 +46,7 @@ export function DbStatusCard() {
         <button
           type="button"
           disabled={resetState === "pending"}
-          onClick={hardResetDatabase}
+          onClick={resetDb}
           className="rounded-sm border border-red-400/30 bg-red-950/30 px-6 py-3 text-sm font-semibold text-red-100 transition hover:border-red-300 hover:bg-red-950/50 disabled:cursor-wait disabled:opacity-60"
         >
           {resetState === "pending" ? "Dropping DB…" : "Hard reset DB"}

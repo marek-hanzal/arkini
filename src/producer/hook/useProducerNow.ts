@@ -4,27 +4,29 @@ import type { ProducerView } from "~/play/logic/playTypes";
 const producerClockTickMs = 250;
 
 export function useProducerNow(producer: ProducerView | null | undefined) {
-  const [nowMs, setNowMs] = useState(Date.now);
-  const cooldownUntil = producer?.cooldownUntil ?? null;
+	const [nowMs, setNowMs] = useState(Date.now);
+	const cooldownUntil = producer?.cooldownUntil ?? null;
 
-  useEffect(() => {
-    if (!cooldownUntil) return;
+	useEffect(() => {
+		if (!cooldownUntil) return;
 
-    const cooldownUntilMs = Date.parse(cooldownUntil);
-    const tick = () => {
-      const nextNowMs = Date.now();
-      setNowMs(nextNowMs);
-      return nextNowMs;
-    };
+		const cooldownUntilMs = Date.parse(cooldownUntil);
+		const tick = () => {
+			const nextNowMs = Date.now();
+			setNowMs(nextNowMs);
+			return nextNowMs;
+		};
 
-    if (cooldownUntilMs <= tick()) return;
+		if (cooldownUntilMs <= tick()) return;
 
-    const interval = window.setInterval(() => {
-      if (cooldownUntilMs <= tick()) window.clearInterval(interval);
-    }, producerClockTickMs);
+		const interval = window.setInterval(() => {
+			if (cooldownUntilMs <= tick()) window.clearInterval(interval);
+		}, producerClockTickMs);
 
-    return () => window.clearInterval(interval);
-  }, [cooldownUntil]);
+		return () => window.clearInterval(interval);
+	}, [
+		cooldownUntil,
+	]);
 
-  return nowMs;
+	return nowMs;
 }

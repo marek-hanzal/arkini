@@ -4,9 +4,14 @@ import { pickWeightedProducerDrop } from "~/producer/logic/pickWeightedProducerD
 import { resolveProducerDropQuantity } from "~/producer/logic/resolveProducerDropQuantity";
 
 export function rollProducerDrops(entries: readonly ProducerDrop[]) {
-  const entry = pickWeightedProducerDrop(entries);
-  if (!entry.itemId) return [];
+	const entry = pickWeightedProducerDrop(entries);
+	if (!entry.itemId) return [];
 
-  const quantity = resolveProducerDropQuantity(entry.quantity ?? 1);
-  return Array.from({ length: quantity }, () => entry.itemId as ItemId);
+	const quantity = resolveProducerDropQuantity(entry.quantity ?? 1);
+	return Array.from(
+		{
+			length: quantity,
+		},
+		() => entry.itemId as ItemId,
+	);
 }

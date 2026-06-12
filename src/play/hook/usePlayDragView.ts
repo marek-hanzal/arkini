@@ -4,14 +4,17 @@ import { usePlayBoard } from "./usePlayBoard";
 import { usePlayInventory } from "./usePlayInventory";
 
 export function usePlayDragView(): GameDragView | null {
-  const board = usePlayBoard().data;
-  const inventory = usePlayInventory().data;
+	const board = usePlayBoard().data;
+	const inventory = usePlayInventory().data;
 
-  return useMemo(() => {
-    if (!board || !inventory) return null;
-    return {
-      boardItemsById: board.byId,
-      inventoryBySlotIndex: inventory.bySlotIndex,
-    };
-  }, [board, inventory]);
+	return useMemo(() => {
+		if (!board || !inventory) return null;
+		return {
+			boardItemsById: board.byId,
+			inventoryBySlotIndex: inventory.bySlotIndex,
+		};
+	}, [
+		board,
+		inventory,
+	]);
 }

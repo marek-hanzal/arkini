@@ -3,273 +3,273 @@
 html,
 body,
 #root {
-  width: 100dvw;
-  height: 100dvh;
-  min-width: 100dvw;
-  min-height: 100dvh;
-  overflow: hidden;
+	width: 100dvw;
+	height: 100dvh;
+	min-width: 100dvw;
+	min-height: 100dvh;
+	overflow: hidden;
 }
 
 body {
-  margin: 0;
-  background: radial-gradient(circle at top, #172033 0, #020617 38rem);
-  color: #e2e8f0;
-  overscroll-behavior: none;
-  user-select: none;
+	margin: 0;
+	background: radial-gradient(circle at top, #172033 0, #020617 38rem);
+	color: #e2e8f0;
+	overscroll-behavior: none;
+	user-select: none;
 }
 
 * {
-  -webkit-user-select: none;
-  user-select: none;
-  box-sizing: border-box;
+	-webkit-user-select: none;
+	user-select: none;
+	box-sizing: border-box;
 }
 
 button {
-  touch-action: manipulation;
+	touch-action: manipulation;
 }
 
 .ak-game-width {
-  width: min(calc(100dvw - 1.5rem), 430px);
+	width: min(calc(100dvw - 1.5rem), 430px);
 }
 
 .ak-fly {
-  transform-origin: top left;
-  will-change: transform, opacity;
+	transform-origin: top left;
+	will-change: transform, opacity;
 }
 
 .ak-board-cell {
-  transition:
-    background 260ms ease,
-    box-shadow 260ms ease,
-    transform 260ms ease;
+	transition:
+		background 260ms ease,
+		box-shadow 260ms ease,
+		transform 260ms ease;
 }
 
 .ak-merge-target {
-  position: relative;
-  background: rgb(6 78 59 / 0.42);
-  animation: ak-merge-target-in 320ms ease-out both;
-  box-shadow:
-    inset 0 0 0 2px rgb(110 231 183 / 0.82),
-    inset 0 0 1.2rem rgb(16 185 129 / 0.24),
-    0 0 1rem rgb(16 185 129 / 0.2);
+	position: relative;
+	background: rgb(6 78 59 / 0.42);
+	animation: ak-merge-target-in 320ms ease-out both;
+	box-shadow:
+		inset 0 0 0 2px rgb(110 231 183 / 0.82),
+		inset 0 0 1.2rem rgb(16 185 129 / 0.24),
+		0 0 1rem rgb(16 185 129 / 0.2);
 }
 
 .ak-merge-target::after {
-  content: "";
-  position: absolute;
-  inset: 0.28rem;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: 0.65rem;
-  box-shadow: inset 0 0 0 1px rgb(209 250 229 / 0.44);
-  opacity: 0.5;
-  animation: ak-merge-target-breathe 1.55s ease-in-out infinite;
+	content: "";
+	position: absolute;
+	inset: 0.28rem;
+	z-index: 1;
+	pointer-events: none;
+	border-radius: 0.65rem;
+	box-shadow: inset 0 0 0 1px rgb(209 250 229 / 0.44);
+	opacity: 0.5;
+	animation: ak-merge-target-breathe 1.55s ease-in-out infinite;
 }
 
 .ak-merge-target-over {
-  background: rgb(6 95 70 / 0.58);
-  box-shadow:
-    inset 0 0 0 3px rgb(167 243 208 / 0.95),
-    inset 0 0 1.45rem rgb(52 211 153 / 0.34),
-    0 0 1.35rem rgb(52 211 153 / 0.32);
+	background: rgb(6 95 70 / 0.58);
+	box-shadow:
+		inset 0 0 0 3px rgb(167 243 208 / 0.95),
+		inset 0 0 1.45rem rgb(52 211 153 / 0.34),
+		0 0 1.35rem rgb(52 211 153 / 0.32);
 }
 
 .ak-merge-target-over::after {
-  opacity: 0.78;
-  animation-duration: 1.05s;
+	opacity: 0.78;
+	animation-duration: 1.05s;
 }
 
 @keyframes ak-merge-target-in {
-  from {
-    box-shadow:
-      inset 0 0 0 0 rgb(110 231 183 / 0),
-      inset 0 0 0 rgb(16 185 129 / 0),
-      0 0 0 rgb(16 185 129 / 0);
-    transform: scale(0.985);
-  }
+	from {
+		box-shadow:
+			inset 0 0 0 0 rgb(110 231 183 / 0),
+			inset 0 0 0 rgb(16 185 129 / 0),
+			0 0 0 rgb(16 185 129 / 0);
+		transform: scale(0.985);
+	}
 
-  to {
-    transform: scale(1);
-  }
+	to {
+		transform: scale(1);
+	}
 }
 
 @keyframes ak-merge-target-breathe {
-  0%,
-  100% {
-    opacity: 0.36;
-    transform: scale(0.985);
-  }
+	0%,
+	100% {
+		opacity: 0.36;
+		transform: scale(0.985);
+	}
 
-  50% {
-    opacity: 0.72;
-    transform: scale(1.015);
-  }
+	50% {
+		opacity: 0.72;
+		transform: scale(1.015);
+	}
 }
 
 .ak-cell-error {
-  background: rgb(69 10 10 / 0.4);
-  box-shadow: inset 0 0 0 2px rgb(252 165 165 / 0.7);
+	background: rgb(69 10 10 / 0.4);
+	box-shadow: inset 0 0 0 2px rgb(252 165 165 / 0.7);
 }
 
 .ak-action-error-pulse {
-  position: absolute;
-  inset: 0.5rem;
-  z-index: 20;
-  pointer-events: none;
-  border-radius: 0.75rem;
-  animation: ak-action-error-pulse 360ms ease-out both;
+	position: absolute;
+	inset: 0.5rem;
+	z-index: 20;
+	pointer-events: none;
+	border-radius: 0.75rem;
+	animation: ak-action-error-pulse 360ms ease-out both;
 }
 
 @keyframes ak-action-error-pulse {
-  0% {
-    box-shadow: inset 0 0 0 0 rgb(248 113 113 / 0);
-    opacity: 0;
-  }
+	0% {
+		box-shadow: inset 0 0 0 0 rgb(248 113 113 / 0);
+		opacity: 0;
+	}
 
-  35% {
-    box-shadow: inset 0 0 0 2px rgb(248 113 113 / 0.56);
-    opacity: 1;
-  }
+	35% {
+		box-shadow: inset 0 0 0 2px rgb(248 113 113 / 0.56);
+		opacity: 1;
+	}
 
-  100% {
-    box-shadow: inset 0 0 0 10px rgb(248 113 113 / 0);
-    opacity: 0;
-  }
+	100% {
+		box-shadow: inset 0 0 0 10px rgb(248 113 113 / 0);
+		opacity: 0;
+	}
 }
 
 :root {
-  --ak-bottom-nav-height: calc(5rem + env(safe-area-inset-bottom));
-  --ak-sheet-width: 100dvw;
-  --ak-sheet-max-height: 85dvh;
+	--ak-bottom-nav-height: calc(5rem + env(safe-area-inset-bottom));
+	--ak-sheet-width: 100dvw;
+	--ak-sheet-max-height: 85dvh;
 }
 
 .ak-bottom-sheet {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
 }
 
 .ak-bottom-sheet-backdrop {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: auto;
-  height: auto;
-  padding: 0;
-  border: 0;
-  background: rgb(2 6 23 / 0.68);
-  --ak-bottom-sheet-backdrop-blur: 0px;
-  opacity: 0;
-  pointer-events: none;
-  -webkit-backdrop-filter: blur(var(--ak-bottom-sheet-backdrop-blur));
-  backdrop-filter: blur(var(--ak-bottom-sheet-backdrop-blur));
-  will-change: opacity, backdrop-filter;
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: auto;
+	height: auto;
+	padding: 0;
+	border: 0;
+	background: rgb(2 6 23 / 0.68);
+	--ak-bottom-sheet-backdrop-blur: 0px;
+	opacity: 0;
+	pointer-events: none;
+	-webkit-backdrop-filter: blur(var(--ak-bottom-sheet-backdrop-blur));
+	backdrop-filter: blur(var(--ak-bottom-sheet-backdrop-blur));
+	will-change: opacity, backdrop-filter;
 }
 
 .ak-bottom-sheet-panel {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  display: flex;
-  width: var(--ak-sheet-width);
-  max-height: var(--ak-sheet-max-height);
-  min-height: 0;
-  margin-inline: auto;
-  overflow: hidden;
-  border: 1px solid rgb(30 41 59);
-  border-bottom: 0;
-  border-radius: 1rem 1rem 0 0;
-  background: rgb(2 6 23 / 0.985);
-  color: rgb(241 245 249);
-  box-shadow: 0 -1.25rem 3rem rgb(0 0 0 / 0.58);
-  opacity: 0;
-  pointer-events: none;
-  transform: translate3d(0, 100%, 0);
-  will-change: transform, opacity;
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	display: flex;
+	width: var(--ak-sheet-width);
+	max-height: var(--ak-sheet-max-height);
+	min-height: 0;
+	margin-inline: auto;
+	overflow: hidden;
+	border: 1px solid rgb(30 41 59);
+	border-bottom: 0;
+	border-radius: 1rem 1rem 0 0;
+	background: rgb(2 6 23 / 0.985);
+	color: rgb(241 245 249);
+	box-shadow: 0 -1.25rem 3rem rgb(0 0 0 / 0.58);
+	opacity: 0;
+	pointer-events: none;
+	transform: translate3d(0, 100%, 0);
+	will-change: transform, opacity;
 }
 
 .ak-bottom-sheet[data-open="true"] .ak-bottom-sheet-backdrop,
 .ak-bottom-sheet[data-open="true"] .ak-bottom-sheet-panel {
-  pointer-events: auto;
+	pointer-events: auto;
 }
 
 .ak-bottom-sheet-content {
-  min-height: 0;
-  max-height: inherit;
-  width: 100%;
-  padding-bottom: env(safe-area-inset-bottom);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  background: rgb(2 6 23 / 0.985);
+	min-height: 0;
+	max-height: inherit;
+	width: 100%;
+	padding-bottom: env(safe-area-inset-bottom);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	background: rgb(2 6 23 / 0.985);
 }
 
 .ak-bottom-nav {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: var(--ak-bottom-nav-height);
-  padding: 0.55rem max(0.75rem, env(safe-area-inset-left)) calc(0.55rem + env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-right));
-  border-top: 1px solid rgb(51 65 85 / 0.95);
-  background:
-    linear-gradient(180deg, rgb(15 23 42 / 0.98), rgb(2 6 23 / 0.99));
-  box-shadow: 0 -1rem 2rem rgb(0 0 0 / 0.42);
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	height: var(--ak-bottom-nav-height);
+	padding: 0.55rem max(0.75rem, env(safe-area-inset-left))
+		calc(0.55rem + env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-right));
+	border-top: 1px solid rgb(51 65 85 / 0.95);
+	background: linear-gradient(180deg, rgb(15 23 42 / 0.98), rgb(2 6 23 / 0.99));
+	box-shadow: 0 -1rem 2rem rgb(0 0 0 / 0.42);
 }
 
 .ak-bottom-nav-inner {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-  width: 100%;
-  max-width: 430px;
-  height: 100%;
-  margin-inline: auto;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.5rem;
+	width: 100%;
+	max-width: 430px;
+	height: 100%;
+	margin-inline: auto;
 }
 
 .ak-bottom-nav-button {
-  display: flex;
-  min-width: 0;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  border-radius: 0.55rem;
-  border: 1px solid rgb(51 65 85 / 0.95);
-  padding: 0.35rem 0.55rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1;
-  color: rgb(203 213 225);
-  background: rgb(15 23 42 / 0.82);
+	display: flex;
+	min-width: 0;
+	height: 100%;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.2rem;
+	border-radius: 0.55rem;
+	border: 1px solid rgb(51 65 85 / 0.95);
+	padding: 0.35rem 0.55rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	line-height: 1;
+	color: rgb(203 213 225);
+	background: rgb(15 23 42 / 0.82);
 }
 
 .ak-bottom-nav-button:active {
-  transform: translateY(1px);
+	transform: translateY(1px);
 }
 
 .ak-bottom-nav-button[data-tone="inventory"] {
-  border-color: rgb(20 184 166 / 0.45);
-  background: rgb(19 78 74 / 0.24);
+	border-color: rgb(20 184 166 / 0.45);
+	background: rgb(19 78 74 / 0.24);
 }
 
 .ak-bottom-nav-button[data-tone="database"] {
-  border-color: rgb(129 140 248 / 0.42);
-  background: rgb(49 46 129 / 0.23);
+	border-color: rgb(129 140 248 / 0.42);
+	background: rgb(49 46 129 / 0.23);
 }
 
 .ak-bottom-nav-button[data-active="true"][data-tone="inventory"] {
-  border-color: rgb(45 212 191 / 0.95);
-  background: rgb(20 184 166 / 0.22);
-  color: rgb(204 251 241);
+	border-color: rgb(45 212 191 / 0.95);
+	background: rgb(20 184 166 / 0.22);
+	color: rgb(204 251 241);
 }
 
 .ak-bottom-nav-button[data-active="true"][data-tone="database"] {
-  border-color: rgb(165 180 252 / 0.9);
-  background: rgb(99 102 241 / 0.22);
-  color: rgb(224 231 255);
+	border-color: rgb(165 180 252 / 0.9);
+	background: rgb(99 102 241 / 0.22);
+	color: rgb(224 231 255);
 }
 
 .ak-bottom-nav-icon {
-  font-size: 1rem;
-  line-height: 1;
+	font-size: 1rem;
+	line-height: 1;
 }

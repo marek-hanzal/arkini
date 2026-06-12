@@ -3,71 +3,81 @@ import { cn } from "~/shared/cn";
 import { animateBottomSheet } from "~/play/util/animation";
 
 export namespace BottomSheet {
-  export interface Props {
-    /**
-     * The sheet is always mounted. `open` only flips interactivity; GSAP owns the
-     * slide/backdrop timeline so React does not remount the panel mid-gesture.
-     */
-    open: boolean;
-    children: ReactNode;
-    className?: string;
-    containerClassName?: string;
-    contentClassName?: string;
-    "data-drag-node-id"?: string;
-    onClose(): void;
-  }
+	export interface Props {
+		/**
+		 * The sheet is always mounted. `open` only flips interactivity; GSAP owns the
+		 * slide/backdrop timeline so React does not remount the panel mid-gesture.
+		 */
+		open: boolean;
+		children: ReactNode;
+		className?: string;
+		containerClassName?: string;
+		contentClassName?: string;
+		"data-drag-node-id"?: string;
+		onClose(): void;
+	}
 }
 
 export function BottomSheet({
-  open,
-  children,
-  className,
-  containerClassName,
-  contentClassName,
-  onClose,
-  "data-drag-node-id": dragNodeId,
+	open,
+	children,
+	className,
+	containerClassName,
+	contentClassName,
+	onClose,
+	"data-drag-node-id": dragNodeId,
 }: BottomSheet.Props) {
-  const backdropRef = useRef<HTMLButtonElement | null>(null);
-  const panelRef = useRef<HTMLDivElement | null>(null);
+	const backdropRef = useRef<HTMLButtonElement | null>(null);
+	const panelRef = useRef<HTMLDivElement | null>(null);
 
-  useLayoutEffect(() => {
-    const panel = panelRef.current;
-    const backdrop = backdropRef.current;
-    if (!panel || !backdrop) return;
+	useLayoutEffect(() => {
+		const panel = panelRef.current;
+		const backdrop = backdropRef.current;
+		if (!panel || !backdrop) return;
 
-    animateBottomSheet({ panel, backdrop, open });
-  }, [open]);
+		animateBottomSheet({
+			panel,
+			backdrop,
+			open,
+		});
+	}, [
+		open,
+	]);
 
-  useEffect(() => {
-    if (!open) return;
+	useEffect(() => {
+		if (!open) return;
 
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
+		function onKeyDown(event: KeyboardEvent) {
+			if (event.key === "Escape") onClose();
+		}
 
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose, open]);
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [
+		onClose,
+		open,
+	]);
 
-  return (
-    <div className="ak-bottom-sheet" data-open={open ? "true" : "false"}>
-      <button
-        ref={backdropRef}
-        type="button"
-        tabIndex={open ? 0 : -1}
-        className="ak-bottom-sheet-backdrop"
-        onClick={onClose}
-      />
+	return (
+		<div
+			className="ak-bottom-sheet"
+			data-open={open ? "true" : "false"}
+		>
+			<button
+				ref={backdropRef}
+				type="button"
+				tabIndex={open ? 0 : -1}
+				className="ak-bottom-sheet-backdrop"
+				onClick={onClose}
+			/>
 
-      <section
-        ref={panelRef}
-        data-drag-node-id={dragNodeId}
-        className={cn("ak-bottom-sheet-panel", className, containerClassName)}
-      >
-        <div className={cn("ak-bottom-sheet-content", contentClassName)}>
-          {children}
-        </div>
-      </section>
-    </div>
-  );
+			<section
+				ref={panelRef}
+				data-drag-node-id={dragNodeId}
+				className={cn("ak-bottom-sheet-panel", className, containerClassName)}
+			>
+				<div className={cn("ak-bottom-sheet-content", contentClassName)}>{children}</div>
+			</section>
+		</div>
+	);
 }

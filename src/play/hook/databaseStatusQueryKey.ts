@@ -1,1 +1,5 @@
-export const databaseStatusQueryKey = ["arkini", "database", "status"] as const;
+export const databaseStatusQueryKey = [
+	"arkini",
+	"database",
+	"status",
+] as const;

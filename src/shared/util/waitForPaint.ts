@@ -1,7 +1,7 @@
 export function waitForPaint() {
-  return new Promise<void>((resolve) => {
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => resolve());
-    });
-  });
+	return new Promise<void>((resolve) => {
+		window.requestAnimationFrame(() => {
+			window.requestAnimationFrame(() => resolve());
+		});
+	});
 }

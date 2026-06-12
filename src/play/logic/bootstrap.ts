@@ -9,34 +9,36 @@ let migrationState: "pending" | "ready" = "pending";
 let gameConfigHash = "pending";
 
 export async function bootstrapDatabase() {
-  assertBrowserDatabaseSupport();
+	assertBrowserDatabaseSupport();
 
-  bootstrapPromise ??= (async () => {
-    const result = await migrator.migrateToLatest();
+	bootstrapPromise ??= (async () => {
+		const result = await migrator.migrateToLatest();
 
-    if (result.error) {
-      throw result.error;
-    }
+		if (result.error) {
+			throw result.error;
+		}
 
-    const gameConfigSync = await syncGameConfig();
-    gameConfigHash = gameConfigSync.hash;
-    await ensureDefaultSaveGame({ resetExisting: gameConfigSync.changed });
-    migrationState = "ready";
-  })();
+		const gameConfigSync = await syncGameConfig();
+		gameConfigHash = gameConfigSync.hash;
+		await ensureDefaultSaveGame({
+			resetExisting: gameConfigSync.changed,
+		});
+		migrationState = "ready";
+	})();
 
-  return bootstrapPromise;
+	return bootstrapPromise;
 }
 
 export function readMigrationState() {
-  return migrationState;
+	return migrationState;
 }
 
 export function readDatabasePath() {
-  return databasePath;
+	return databasePath;
 }
 
 export function readGameConfigHash() {
-  return gameConfigHash;
+	return gameConfigHash;
 }
 
 // Development-only escape hatch: remove the OPFS SQLite file so the next page
@@ -44,10 +46,10 @@ export function readGameConfigHash() {
 // This project is still pre-release, so we deliberately avoid schema drift
 // repair code and use a hard reset when local prototype data gets stale.
 export async function hardResetDatabaseFile() {
-  bootstrapPromise = undefined;
-  migrationState = "pending";
-  gameConfigHash = "pending";
+	bootstrapPromise = undefined;
+	migrationState = "pending";
+	gameConfigHash = "pending";
 
-  const { sqlite } = await import("~/database/local/client");
-  await sqlite.deleteDatabaseFile(undefined, true);
+	const { sqlite } = await import("~/database/local/client");
+	await sqlite.deleteDatabaseFile(undefined, true);
 }

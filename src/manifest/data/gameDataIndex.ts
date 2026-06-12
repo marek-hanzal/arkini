@@ -4,5 +4,5 @@ import { GameConfig } from "./GameConfig";
 export const gameDataIndex = createGameDataIndex(GameConfig);
 
 export namespace gameDataIndex {
-  export type Value = ReturnType<typeof createGameDataIndex>;
+	export type Value = ReturnType<typeof createGameDataIndex>;
 }

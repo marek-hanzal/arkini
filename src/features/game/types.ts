@@ -10,7 +10,12 @@ export type GameDropTarget =
   | { kind: "inventory-slot"; slotIndex: number }
   | { kind: "inventory-bin" };
 
-export type GameDragData = DraggablePayload<string, GameDragSource, { quantity?: number }>;
+export interface GameVisualMeta {
+  quantity?: number;
+  producer?: BoardViewItem["producer"];
+}
+
+export type GameDragData = DraggablePayload<string, GameDragSource, GameVisualMeta>;
 export type GameDropData = DroppablePayload<GameDropTarget>;
 
 export interface RectLike {
@@ -22,7 +27,7 @@ export interface RectLike {
 
 export type FlyerKind = "move" | "stash" | "place";
 
-export interface FlyerModel {
+export interface FlyerModel extends GameVisualMeta {
   id: string;
   itemId: string;
   from: RectLike;

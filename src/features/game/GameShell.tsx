@@ -66,9 +66,7 @@ export function GameShell() {
       mergeBoard: (input) => mergeBoard.mutateAsync(input),
     },
     feedback: {
-      pulseBoardCell: feedback.pulseBoardCell,
       pulseMergeCell: feedback.pulseMergeCell,
-      pulseInventorySlot: feedback.pulseInventorySlot,
       flashBoardCell: feedback.flashBoardCell,
       flashInventorySlot: feedback.flashInventorySlot,
       showError: feedback.showError,
@@ -181,7 +179,7 @@ export function GameShell() {
       const result = await produce.mutateAsync({ boardItemId: boardItem.id, activation });
       await animateProducerDrops([result], activation === "exhaust" ? 130 : 0);
       await invalidateGameData();
-      feedback.pulseBoardCell(cellKey(boardItem.x, boardItem.y));
+      feedback.pulseMergeCell(cellKey(boardItem.x, boardItem.y));
     } catch (error) {
       feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
       feedback.showError(error);
@@ -208,9 +206,6 @@ export function GameShell() {
 
       await stashBoard.mutateAsync({ boardItemId: boardItem.id });
       pulseBottomNav("inventory");
-      if (game?.firstEmptyInventorySlotIndex !== null && game?.firstEmptyInventorySlotIndex !== undefined) {
-        feedback.pulseInventorySlot(game.firstEmptyInventorySlotIndex);
-      }
       if (from) await wait(flyMs);
     } catch (error) {
       feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
@@ -250,7 +245,6 @@ export function GameShell() {
       }
 
       await placeInventory.mutateAsync({ slotIndex: slot.slotIndex, x: target.x, y: target.y });
-      feedback.pulseBoardCell(cellKey(target.x, target.y));
     } catch (error) {
       feedback.flashInventorySlot(slot.slotIndex, "error");
       feedback.showError(error);
@@ -283,7 +277,6 @@ export function GameShell() {
               activeDrag={drag.activeDrag}
               isSourceHidden={drag.isSourceHidden}
               invalidBoardCellKey={feedback.invalidBoardCellKey}
-              pulsedBoardCellKey={feedback.pulsedBoardCellKey}
               mergedBoardCellKey={feedback.mergedBoardCellKey}
               nowMs={nowMs}
               onEmptyDoubleActivate={openBuild}
@@ -315,7 +308,6 @@ export function GameShell() {
               game={game}
               isSourceHidden={drag.isSourceHidden}
               invalidInventorySlot={feedback.invalidInventorySlot}
-              pulsedInventorySlot={feedback.pulsedInventorySlot}
               onClose={closeSheet}
               onSlotDoubleActivate={(slot) => {
                 void placeInventoryOnBoardWithFly(slot);
@@ -341,7 +333,7 @@ export function GameShell() {
                   { recipeId, x: buildCell.x, y: buildCell.y },
                   {
                     onSuccess: () => {
-                      feedback.pulseBoardCell(cellKey(buildCell.x, buildCell.y));
+                      feedback.pulseMergeCell(cellKey(buildCell.x, buildCell.y));
                       closeSheet();
                     },
                     onError(error) {
@@ -356,14 +348,16 @@ export function GameShell() {
         </div>
       </BottomSheet>
 
-      {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} />)}
+      {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} nowMs={nowMs} />)}
 
       <DragOverlay dropAnimation={null}>
         {drag.activeItem ? (
           <Tile
             item={drag.activeItem}
             dragOverlay
-            quantity={drag.activeDrag?.overlay?.quantity && drag.activeDrag.overlay.quantity > 1 ? 1 : undefined}
+            quantity={drag.activeDrag?.overlay?.quantity}
+            producer={drag.activeDrag?.overlay?.producer ?? undefined}
+            nowMs={nowMs}
             overlaySize={drag.dragPreviewRect}
           />
         ) : null}

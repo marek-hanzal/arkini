@@ -22,7 +22,6 @@ export function Board({
   activeDrag,
   isSourceHidden,
   invalidBoardCellKey,
-  pulsedBoardCellKey,
   mergedBoardCellKey,
   nowMs,
   onEmptyDoubleActivate,
@@ -33,7 +32,6 @@ export function Board({
   activeDrag: GameDragData | null;
   isSourceHidden(sourceId: string): boolean;
   invalidBoardCellKey: string | null;
-  pulsedBoardCellKey: string | null;
   mergedBoardCellKey: string | null;
   nowMs: number;
   onEmptyDoubleActivate(cell: BuildCell): void;
@@ -54,6 +52,7 @@ export function Board({
         const canMerge = activeDrag?.source.kind === "board" && boardItem && boardItem.id !== activeDrag.source.boardItemId
           ? Boolean(resolveMergeRule(activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
           : false;
+        const producerReady = isProducerReady(boardItem?.producer ?? null, nowMs);
 
         return (
           <BoardCell
@@ -63,8 +62,8 @@ export function Board({
             boardItem={boardItem}
             canMerge={canMerge}
             invalid={invalidBoardCellKey === key}
-            pulsed={pulsedBoardCellKey === key}
             merged={mergedBoardCellKey === key}
+            producerReady={producerReady}
             onEmptyDoubleActivate={onEmptyDoubleActivate}
           >
             {boardItem && viewItem ? (
@@ -90,8 +89,8 @@ function BoardCell({
   boardItem,
   canMerge,
   invalid,
-  pulsed,
   merged,
+  producerReady,
   children,
   onEmptyDoubleActivate,
 }: Readonly<{
@@ -100,8 +99,8 @@ function BoardCell({
   boardItem: BoardViewItem | null;
   canMerge: boolean;
   invalid: boolean;
-  pulsed: boolean;
   merged: boolean;
+  producerReady: boolean;
   children: ReactNode;
   onEmptyDoubleActivate(cell: BuildCell): void;
 }>) {
@@ -126,14 +125,27 @@ function BoardCell({
         canMerge && "ak-merge-target transition-none",
         canMerge && isOver && "ak-merge-target-over",
         invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
-        pulsed && !invalid && !merged && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
-        merged && !invalid && "ak-merge-pop bg-emerald-950/35 ring-2 ring-inset ring-emerald-200/80",
+        (merged || producerReady) && !invalid && "ak-cell-success",
       )}
       {...press.pressProps}
     >
       {children}
     </DroppableSurface>
   );
+}
+
+
+function isProducerReady(producer: BoardViewItem["producer"], nowMs: number) {
+  if (!producer || producer.paused) return false;
+
+  if (producer.trigger === "click") {
+    const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
+    const hasCharges = producer.remainingCharges === null || producer.remainingCharges === undefined || producer.remainingCharges > 0;
+    return hasCharges && cooldownUntil <= nowMs;
+  }
+
+  const rechargeUntil = producer.rechargeUntil ? Date.parse(producer.rechargeUntil) : 0;
+  return rechargeUntil <= nowMs && (producer.autoAvailable ?? 0) > 0;
 }
 
 function BoardTile({
@@ -163,6 +175,7 @@ function BoardTile({
         sourceNodeId,
         itemId: boardItem.itemId,
         source: { kind: "board", boardItemId: boardItem.id },
+        overlay: { producer: boardItem.producer },
         hideWhenActive: true,
       } satisfies GameDragData}
       data-board-item-id={boardItem.id}

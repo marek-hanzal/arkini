@@ -10,6 +10,7 @@ export function Tile({
   nowMs,
   dragOverlay,
   overlaySize,
+  fit = "cell",
 }: Readonly<{
   item: ViewItem;
   quantity?: number;
@@ -17,6 +18,7 @@ export function Tile({
   nowMs?: number;
   dragOverlay?: boolean;
   overlaySize?: Pick<RectLike, "width" | "height"> | null;
+  fit?: "cell" | "visual";
 }>) {
   const producerUi = producer ? getProducerUiState(producer, nowMs ?? Date.now()) : null;
 
@@ -24,7 +26,8 @@ export function Tile({
     <div
       data-ak-tile
       className={cn(
-        "relative grid h-full w-full place-items-center p-[10%] text-slate-50 transition-opacity duration-300",
+        "relative grid h-full w-full place-items-center text-slate-50 transition-opacity duration-300",
+        fit === "cell" ? "p-[10%]" : "p-0",
         producerUi?.waiting && "opacity-80",
         producerUi?.paused && "opacity-65",
         dragOverlay && "shadow-2xl shadow-black/50",

@@ -34,7 +34,7 @@ export interface DroppablePayload<Target = unknown> {
   target: Target;
 }
 
-export interface DraggableAnimation<ItemId extends string = string, Kind extends string = string> {
+export interface DraggableAnimation<ItemId extends string = string, Kind extends string = string, Overlay = unknown> {
   itemId: ItemId;
   kind?: Kind;
   fromNodeId?: string;
@@ -43,16 +43,19 @@ export interface DraggableAnimation<ItemId extends string = string, Kind extends
   to?: RectLike;
   /** Resolve the animation start from the final drag overlay rect instead of the original source node. */
   fromDrag?: boolean;
+  /** App-owned visual metadata forwarded to the animation renderer. */
+  overlay?: Overlay;
 }
 
-export interface ResolvedDraggableAnimation<ItemId extends string = string, Kind extends string = string> {
+export interface ResolvedDraggableAnimation<ItemId extends string = string, Kind extends string = string, Overlay = unknown> {
   itemId: ItemId;
   kind?: Kind;
   from: RectLike;
   to: RectLike;
+  overlay?: Overlay;
 }
 
-export type DropPlan<ItemId extends string = string, Kind extends string = string> =
+export type DropPlan<ItemId extends string = string, Kind extends string = string, Overlay = unknown> =
   | { type: "ignore" }
   | { type: "reject"; feedback?(): void | Promise<void>; animateReturn?: boolean }
   | {
@@ -60,7 +63,7 @@ export type DropPlan<ItemId extends string = string, Kind extends string = strin
     /** Source ids hidden while commit/animations are being resolved. */
     hide?: string[];
     /** Generic pre/post move animations. */
-    animations?: DraggableAnimation<ItemId, Kind>[];
+    animations?: DraggableAnimation<ItemId, Kind, Overlay>[];
     animationTiming?: "beforeCommit" | "afterCommit";
     commit(): Promise<unknown> | unknown;
     feedback?(): void | Promise<void>;
@@ -72,8 +75,8 @@ export interface DropContext<ItemId extends string = string, Source = unknown, T
 }
 
 export interface UseDraggableControlOptions<ItemId extends string = string, Source = unknown, Target = unknown, Overlay = unknown, Kind extends string = string> {
-  resolveDrop(context: DropContext<ItemId, Source, Target, Overlay>): DropPlan<ItemId, Kind> | Promise<DropPlan<ItemId, Kind>>;
-  animate(animation: ResolvedDraggableAnimation<ItemId, Kind>): void;
+  resolveDrop(context: DropContext<ItemId, Source, Target, Overlay>): DropPlan<ItemId, Kind, Overlay> | Promise<DropPlan<ItemId, Kind, Overlay>>;
+  animate(animation: ResolvedDraggableAnimation<ItemId, Kind, Overlay>): void;
   onError?(error: unknown, context: DropContext<ItemId, Source, Target, Overlay>): void | Promise<void>;
   getDragBoundaryNodeId?(source: DraggablePayload<ItemId, Source, Overlay>): string | null | undefined;
   animationMs?: number;
@@ -157,7 +160,7 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     }
   }
 
-  async function runPlan(context: DropContext<ItemId, Source, Target, Overlay>, plan: DropPlan<ItemId, Kind>, dragRect: RectLike | null) {
+  async function runPlan(context: DropContext<ItemId, Source, Target, Overlay>, plan: DropPlan<ItemId, Kind, Overlay>, dragRect: RectLike | null) {
     if (plan.type === "ignore") {
       activeDragRef.current = null;
       dragBoundaryRectRef.current = null;
@@ -204,17 +207,17 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     await feedback;
   }
 
-  async function playAnimations(animations: DraggableAnimation<ItemId, Kind>[], dragRect: RectLike | null) {
-    const resolved = animations.map((animation) => resolveAnimation(animation, dragRect)).filter((animation): animation is ResolvedDraggableAnimation<ItemId, Kind> => Boolean(animation));
+  async function playAnimations(animations: DraggableAnimation<ItemId, Kind, Overlay>[], dragRect: RectLike | null) {
+    const resolved = animations.map((animation) => resolveAnimation(animation, dragRect)).filter((animation): animation is ResolvedDraggableAnimation<ItemId, Kind, Overlay> => Boolean(animation));
     for (const animation of resolved) animate(animation);
     if (resolved.length > 0) await wait(animationMs);
   }
 
-  function resolveAnimation(animation: DraggableAnimation<ItemId, Kind>, dragRect: RectLike | null): ResolvedDraggableAnimation<ItemId, Kind> | null {
+  function resolveAnimation(animation: DraggableAnimation<ItemId, Kind, Overlay>, dragRect: RectLike | null): ResolvedDraggableAnimation<ItemId, Kind, Overlay> | null {
     const from = animation.from ?? (animation.fromDrag && dragRect ? tileVisualRect(dragRect) : rectForNode(animation.fromNodeId));
     const to = animation.to ?? rectForNode(animation.toNodeId);
     if (!from || !to) return null;
-    return { itemId: animation.itemId, kind: animation.kind, from, to };
+    return { itemId: animation.itemId, kind: animation.kind, from, to, overlay: animation.overlay };
   }
 
   async function animateReturn(source: DraggablePayload<ItemId, Source, Overlay>, dragRect: RectLike | null) {
@@ -232,7 +235,7 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     activeDragRef.current = null;
     dragBoundaryRectRef.current = null;
     setActiveDrag(null);
-    animate({ itemId: source.itemId, from, to });
+    animate({ itemId: source.itemId, from, to, overlay: source.overlay });
     await wait(animationMs);
     clearHiddenSources();
   }

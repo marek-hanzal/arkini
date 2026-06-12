@@ -39,7 +39,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
   }, [onClose, open]);
 
   return (
-    <div className="ak-bottom-sheet" data-open={open ? "true" : "false"} aria-hidden={!open}>
+    <div className="ak-bottom-sheet" data-open={open ? "true" : "false"}>
       <button
         type="button"
         aria-label="Close bottom sheet"

@@ -321,3 +321,28 @@ button {
   font-size: 1rem;
   line-height: 1;
 }
+
+.ak-bottom-nav-button[data-pulse="true"] {
+  animation: ak-bottom-nav-pulse 560ms ease-out both;
+}
+
+.ak-bottom-nav-button[data-pulse="true"][data-tone="inventory"] {
+  border-color: rgb(94 234 212 / 0.98);
+  background: rgb(20 184 166 / 0.34);
+  color: rgb(240 253 250);
+}
+
+@keyframes ak-bottom-nav-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(45 212 191 / 0.58);
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    box-shadow: 0 0 0 0.45rem rgb(45 212 191 / 0);
+    transform: translateY(-1px) scale(1.035);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(45 212 191 / 0);
+    transform: translateY(0) scale(1);
+  }
+}

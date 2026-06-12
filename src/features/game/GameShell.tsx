@@ -28,6 +28,7 @@ import { useGameDraggableControl } from "./useGameDraggableControl";
 import { useGameFeedback } from "./useGameFeedback";
 
 type ActiveSheet = "inventory" | "database" | "build" | null;
+type BottomNavSheet = "inventory" | "database";
 
 export function GameShell() {
   const gameQuery = useGameView();
@@ -36,6 +37,7 @@ export function GameShell() {
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const [renderedSheet, setRenderedSheet] = useState<Exclude<ActiveSheet, null>>("inventory");
   const [buildCell, setBuildCell] = useState<BuildCell | null>(null);
+  const [pulsedNavSheet, setPulsedNavSheet] = useState<BottomNavSheet | null>(null);
   const { flyers, addFlyer } = useFlyers();
   const [nowMs, setNowMs] = useState(Date.now());
   const feedback = useGameFeedback();
@@ -95,20 +97,35 @@ export function GameShell() {
     return () => window.clearInterval(interval);
   }, [advanceAuto, invalidateGameData]);
 
+  function blurActiveElement() {
+    const element = document.activeElement;
+    if (element instanceof HTMLElement) element.blur();
+  }
+
   function closeSheet() {
+    blurActiveElement();
     setActiveSheet(null);
   }
 
-  function openSheet(sheet: Exclude<ActiveSheet, null>) {
+  function openSheet(sheet: BottomNavSheet) {
+    blurActiveElement();
     setRenderedSheet(sheet);
     setActiveSheet((current) => (current === sheet ? null : sheet));
-    if (sheet !== "build") setBuildCell(null);
+    setBuildCell(null);
   }
 
   function openBuild(cell: BuildCell) {
+    blurActiveElement();
     setBuildCell(cell);
     setRenderedSheet("build");
     setActiveSheet("build");
+  }
+
+  function pulseBottomNav(sheet: BottomNavSheet) {
+    setPulsedNavSheet(sheet);
+    window.setTimeout(() => {
+      setPulsedNavSheet((current) => (current === sheet ? null : current));
+    }, 560);
   }
 
   async function produceFrom(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") {
@@ -138,10 +155,11 @@ export function GameShell() {
     try {
       if (from) {
         drag.hideSources([source.sourceId]);
-        addFlyer(boardItem.itemId, from, inventorySinkRect(from), "stash");
+        addFlyer(boardItem.itemId, from, inventorySinkRect(from, queryRect('[data-bottom-nav-sheet="inventory"]')), "stash");
       }
 
       await stashBoard.mutateAsync({ boardItemId: boardItem.id });
+      pulseBottomNav("inventory");
       if (game?.firstEmptyInventorySlotIndex !== null && game?.firstEmptyInventorySlotIndex !== undefined) {
         feedback.pulseInventorySlot(game.firstEmptyInventorySlotIndex);
       }
@@ -256,12 +274,12 @@ export function GameShell() {
           </div>
         </main>
 
-        <BottomNavigation activeSheet={activeSheet} onOpen={openSheet} />
+        <BottomNavigation activeSheet={activeSheet} pulsedSheet={pulsedNavSheet} onOpen={openSheet} />
       </div>
 
       <BottomSheet open={activeSheet !== null} onClose={closeSheet}>
         <div className="min-h-0">
-          <section className={cn("min-h-0", renderedSheet !== "inventory" && "hidden")} aria-hidden={activeSheet !== "inventory"}>
+          <section className="min-h-0" hidden={renderedSheet !== "inventory"}>
             <InventorySheet
               game={game}
               isSourceHidden={drag.isSourceHidden}
@@ -274,7 +292,7 @@ export function GameShell() {
             />
           </section>
 
-          <section className={cn("max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain p-4", renderedSheet !== "database" && "hidden")} aria-hidden={activeSheet !== "database"}>
+          <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain p-4" hidden={renderedSheet !== "database"}>
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
                 <p className="text-[0.62rem] uppercase tracking-[0.22em] text-emerald-300">System</p>
@@ -285,7 +303,7 @@ export function GameShell() {
             <DbStatusCard />
           </section>
 
-          <section className={cn("max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain", renderedSheet !== "build" && "hidden")} aria-hidden={activeSheet !== "build"}>
+          <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain" hidden={renderedSheet !== "build"}>
             <BuildSheet
               game={game}
               cell={buildCell}
@@ -327,24 +345,26 @@ export function GameShell() {
   );
 }
 
-function BottomNavigation({ activeSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; onOpen(sheet: Exclude<ActiveSheet, null>): void }>) {
+function BottomNavigation({ activeSheet, pulsedSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; pulsedSheet: BottomNavSheet | null; onOpen(sheet: BottomNavSheet): void }>) {
   return (
     <nav className="ak-bottom-nav" aria-label="Game panels">
       <div className="ak-bottom-nav-inner">
-        <BottomNavButton active={activeSheet === "inventory"} label="Inventory" icon="▦" tone="inventory" onClick={() => onOpen("inventory")} />
-        <BottomNavButton active={activeSheet === "database"} label="Database" icon="◈" tone="database" onClick={() => onOpen("database")} />
+        <BottomNavButton active={activeSheet === "inventory"} pulsed={pulsedSheet === "inventory"} label="Inventory" icon="▦" tone="inventory" onClick={() => onOpen("inventory")} />
+        <BottomNavButton active={activeSheet === "database"} pulsed={pulsedSheet === "database"} label="Database" icon="◈" tone="database" onClick={() => onOpen("database")} />
       </div>
     </nav>
   );
 }
 
-function BottomNavButton({ active, label, icon, tone, onClick }: Readonly<{ active: boolean; label: string; icon: string; tone: "inventory" | "database"; onClick(): void }>) {
+function BottomNavButton({ active, pulsed, label, icon, tone, onClick }: Readonly<{ active: boolean; pulsed: boolean; label: string; icon: string; tone: BottomNavSheet; onClick(): void }>) {
   return (
     <button
       type="button"
       className="ak-bottom-nav-button"
       data-active={active ? "true" : "false"}
+      data-pulse={pulsed ? "true" : "false"}
       data-tone={tone}
+      data-bottom-nav-sheet={tone}
       onClick={onClick}
     >
       <span className="ak-bottom-nav-icon">{icon}</span>

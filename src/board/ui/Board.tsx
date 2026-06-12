@@ -50,7 +50,7 @@ export function Board({ drag, feedback, actions }: Board.Props) {
   const board = usePlayBoard().data;
   const items = usePlayItems().data;
   const cells = useMemo(() => Array.from({ length: boardColumns * boardRows }, (_, index) => ({ x: index % boardColumns, y: Math.floor(index / boardColumns) })), []);
-  const showMergeHints = useDelayedMergeHints({ activeDrag: drag.activeDrag });
+  const showDelayedMergeHints = useDelayedMergeHints({ activeDrag: drag.activeDrag });
 
   if (!board || !items) return null;
 
@@ -64,7 +64,7 @@ export function Board({ drag, feedback, actions }: Board.Props) {
         const key = cellKey(cell.x, cell.y);
         const boardItem = board.byCellKey[key] ?? null;
         const viewItem = boardItem ? items[boardItem.itemId] : null;
-        const canMerge = showMergeHints && drag.activeDrag?.source.kind === "board" && boardItem && boardItem.id !== drag.activeDrag.source.boardItemId
+        const canMerge = drag.activeDrag?.source.kind === "board" && boardItem && boardItem.id !== drag.activeDrag.source.boardItemId
           ? Boolean(resolveItemMergeRule(drag.activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
           : false;
         return (
@@ -74,6 +74,7 @@ export function Board({ drag, feedback, actions }: Board.Props) {
             y={cell.y}
             boardItem={boardItem}
             canMerge={canMerge}
+            showDelayedMergeHint={showDelayedMergeHints}
             invalid={feedback.invalidCellKey === key}
             merged={feedback.mergedCellKey === key}
             onEmptyDoubleActivate={actions.emptyDoubleActivate}
@@ -100,6 +101,7 @@ namespace BoardCell {
     y: number;
     boardItem: BoardViewItem | null;
     canMerge: boolean;
+    showDelayedMergeHint: boolean;
     invalid: boolean;
     merged: boolean;
     children: ReactNode;
@@ -112,6 +114,7 @@ function BoardCell({
   y,
   boardItem,
   canMerge,
+  showDelayedMergeHint,
   invalid,
   merged,
   children,
@@ -135,15 +138,19 @@ function BoardCell({
       nodeRef={(node) => { cellRef.current = node; }}
       data-board-cell={`${x}:${y}`}
       data-board-item-id={boardItem?.id}
-      className={(isOver) => cn(
-        "ak-board-cell relative aspect-square touch-none border-b border-r border-slate-800/80 bg-slate-900/55",
-        x === boardColumns - 1 && "border-r-0",
-        y === boardRows - 1 && "border-b-0",
-        isOver && !canMerge && "bg-slate-800/80",
-        canMerge && "ak-merge-target",
-        canMerge && isOver && "ak-merge-target-over",
-        invalid && "ak-cell-error",
-      )}
+      className={(isOver) => {
+        const showMergeHint = canMerge && (showDelayedMergeHint || isOver);
+
+        return cn(
+          "ak-board-cell relative aspect-square touch-none border-b border-r border-slate-800/80 bg-slate-900/55",
+          x === boardColumns - 1 && "border-r-0",
+          y === boardRows - 1 && "border-b-0",
+          isOver && !showMergeHint && "bg-slate-800/80",
+          showMergeHint && "ak-merge-target",
+          showMergeHint && isOver && "ak-merge-target-over",
+          invalid && "ak-cell-error",
+        );
+      }}
       {...press.pressProps}
     >
       {children}

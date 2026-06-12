@@ -40,7 +40,7 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 - Double-click/tap an empty board cell opens the build sheet.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
 - Click producers use cooldowns and optional finite charges.
-- Finite producer exhaust deliberately dumps all remaining charges at once. Crates are meant to vomit loot, not politely ask for a calendar invite.
+- Finite producer exhaust deliberately dumps all remaining charges at once. Crates are meant to vomit loot, not politely ask for a calendar invite. When a finite producer is removed by depletion, the visible producer exits with an animation before board data refreshes.
 
 ## Interaction model
 
@@ -50,9 +50,9 @@ Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows
 
 Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/hook/usePlayDraggableControl.ts` only wires those rules into the generic control. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: when dnd-kit does not report a direct target, it snaps board and inventory drags to the nearest same-surface action within the magnetic threshold. Missing a cell edge by a few pixels should not be treated like a moral failure.
 
-Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
+Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Finite producer depletion uses the same discipline: mutate, play loot and exit animations against the still-visible stale view, then invalidate queries. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
-Board merge hints are delayed by `src/board/hook/useDelayedMergeHints.ts`. They only appear after a short hold while dragging a board item and disappear when the drag context changes. Immediate global highlighting was too noisy, because apparently even tiny tree games can invent UX debt.
+Board merge hints are handled by `src/board/hook/useDelayedMergeHints.ts`. Global mergeable-target hints appear after 1.25 s while dragging a board item and disappear when the drag context changes. The currently hovered mergeable target still highlights instantly, because feedback that waits politely for permission is not feedback, it is bureaucracy.
 
 ## React data subscriptions
 

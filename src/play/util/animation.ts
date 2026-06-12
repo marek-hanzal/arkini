@@ -5,7 +5,7 @@ const flyDurationSeconds = 0.32;
 const stashExitSeconds = 0.08;
 const successDurationSeconds = 0.56;
 const errorDurationSeconds = 0.26;
-const sheetDurationSeconds = 0.22;
+const sheetDurationSeconds = 0.28;
 
 export interface FlyerTimelineProps {
   from: RectLike;
@@ -38,6 +38,12 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
       timeline
         .to(element, { x, y, scale, opacity: 1, duration: flyDurationSeconds - stashExitSeconds, ease: "power3.out" })
         .to(element, { y: exitY, opacity: 0, duration: stashExitSeconds, ease: "power2.in" });
+      return;
+    }
+
+    if (kind === "deplete") {
+      timeline
+        .to(element, { y: -8, scale: 0.72, opacity: 0, duration: 0.26, ease: "power2.in" });
       return;
     }
 
@@ -108,7 +114,7 @@ export function animateBottomSheet({ panel, backdrop, open }: { panel: HTMLEleme
     gsap.set([panel, backdrop], { pointerEvents: "auto" });
     gsap.timeline({ defaults: { duration: sheetDurationSeconds, ease: "power3.out" } })
       .to(backdrop, { opacity: 1, "--ak-bottom-sheet-backdrop-blur": "10px" }, 0)
-      .to(panel, { opacity: 1, y: 0 }, 0);
+      .fromTo(panel, { opacity: 0, yPercent: 100, y: 16 }, { opacity: 1, yPercent: 0, y: 0 }, 0);
     return;
   }
 
@@ -117,7 +123,7 @@ export function animateBottomSheet({ panel, backdrop, open }: { panel: HTMLEleme
     onComplete: () => gsap.set([panel, backdrop], { pointerEvents: "none" }),
   })
     .to(backdrop, { opacity: 0, "--ak-bottom-sheet-backdrop-blur": "0px" }, 0)
-    .to(panel, { opacity: 0, y: "calc(100% + 1rem)" }, 0);
+    .to(panel, { opacity: 0, yPercent: 100, y: 16 }, 0);
 }
 
 function once(fn: () => void) {

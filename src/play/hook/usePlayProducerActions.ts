@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
 import { inventorySinkRect } from "~/inventory/util/inventory";
 import type { BoardViewItem, ProducerDropResult } from "~/play/logic/playTypes";
@@ -15,6 +16,8 @@ export namespace usePlayProducerActions {
     addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
     feedback: GameDragFeedback;
     schedule(label: string, operation: () => Promise<void>): Promise<void>;
+    hideSources(ids: readonly string[]): void;
+    clearHiddenSources(): void;
   }
 }
 
@@ -23,6 +26,8 @@ export function usePlayProducerActions({
   addFlyer,
   feedback,
   schedule,
+  hideSources,
+  clearHiddenSources,
 }: usePlayProducerActions.Props) {
   const invalidatePlayData = usePlayDataInvalidation();
   const produce = usePlayAction(
@@ -58,16 +63,31 @@ export function usePlayProducerActions({
     await Promise.all(animations);
   }, [activeSheet, addFlyer]);
 
+  const animateProducerDepletion = useCallback(async (boardItem: BoardViewItem, result: ProducerDropResult) => {
+    if (result.depletion?.kind !== "remove") return;
+
+    const sourceId = boardSourceId(boardItem.id);
+    const sourceRect = queryRect(`[data-board-item-id="${boardItem.id}"]`)
+      ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
+    if (!sourceRect) return;
+
+    hideSources([sourceId]);
+    await addFlyer(boardItem.itemId, sourceRect, sourceRect, "deplete", { producer: boardItem.producer ?? undefined });
+  }, [addFlyer, hideSources]);
+
   return useCallback(async (boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") => {
     await schedule(`producer ${activation}`, async () => {
       try {
         const result = await produce.mutateAsync({ boardItemId: boardItem.id, activation });
         await animateProducerDrops([result], activation === "exhaust" ? 130 : 0);
+        await animateProducerDepletion(boardItem, result);
         await invalidatePlayData();
       } catch (error) {
         feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
         feedback.showError(error);
+      } finally {
+        clearHiddenSources();
       }
     });
-  }, [animateProducerDrops, feedback, invalidatePlayData, produce, schedule]);
+  }, [animateProducerDepletion, animateProducerDrops, clearHiddenSources, feedback, invalidatePlayData, produce, schedule]);
 }

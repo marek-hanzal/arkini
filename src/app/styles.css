@@ -184,7 +184,7 @@ button {
   box-shadow: 0 -1.25rem 3rem rgb(0 0 0 / 0.58);
   opacity: 0;
   pointer-events: none;
-  transform: translate3d(0, calc(100% + 1rem), 0);
+  transform: translate3d(0, 100%, 0);
   will-change: transform, opacity;
 }
 

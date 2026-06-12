@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { GameDragData } from "~/play/types";
 
-const defaultMergeHintDelayMs = 2000;
+const defaultMergeHintDelayMs = 1250;
 
 export namespace useDelayedMergeHints {
   export interface Props {

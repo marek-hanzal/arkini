@@ -9,7 +9,7 @@ export namespace SheetHeader {
   }
 }
 
-export function SheetHeader({ eyebrow, description, anchor, onClose }: Readonly<SheetHeader.Props>) {
+export function SheetHeader({ eyebrow, description, anchor, onClose }: SheetHeader.Props) {
   return (
     <div
       data-inventory-summary={anchor === "inventory-summary" ? "" : undefined}

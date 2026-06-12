@@ -23,7 +23,7 @@ export function DroppableSurface<Target>({
   children,
   nodeRef,
   ...props
-}: Readonly<DroppableSurface.Props<Target>>) {
+}: DroppableSurface.Props<Target>) {
   const data = { ...payload, targetNodeId: payload.targetNodeId ?? nodeId } satisfies DroppablePayload<Target>;
   const { setNodeRef, isOver } = useDroppable({ id, data: data as unknown as Data });
   const setRefs = useCallback((node: HTMLDivElement | null) => {
@@ -69,7 +69,7 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
   onDoubleActivate,
   children,
   ...props
-}: Readonly<DraggableSurface.Props<ItemId, Source, Overlay>>) {
+}: DraggableSurface.Props<ItemId, Source, Overlay>) {
   const data = { ...payload, sourceNodeId: payload.sourceNodeId ?? nodeId } satisfies DraggablePayload<ItemId, Source, Overlay>;
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data: data as unknown as Data, disabled: dragDisabled });
   const press = usePressActions({

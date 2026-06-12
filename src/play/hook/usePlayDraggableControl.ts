@@ -1,4 +1,4 @@
-import type { GameView } from "~/play/logic/playTypes";
+import { usePlayView } from "~/play/hook/usePlayView";
 import type { FlyerKind, RectLike, GameDragSource, GameDropTarget, GameVisualMeta } from "~/play/types";
 import { useDraggableControl } from "~/drag/hook/useDraggableControl";
 import {
@@ -13,7 +13,6 @@ export type { GameDragActions, GameDragFeedback } from "./playDragRules";
 
 export namespace usePlayDraggableControl {
   export interface Props {
-    game: GameView | null | undefined;
     actions: GameDragActions;
     feedback: GameDragFeedback;
     addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
@@ -22,12 +21,12 @@ export namespace usePlayDraggableControl {
 }
 
 export function usePlayDraggableControl({
-  game,
   actions,
   feedback,
   addFlyer,
   schedule,
-}: Readonly<usePlayDraggableControl.Props>) {
+}: usePlayDraggableControl.Props) {
+  const game = usePlayView().data;
   const control = useDraggableControl<string, GameDragSource, GameDropTarget, GameVisualMeta, FlyerKind>({
     schedule: (operation) => schedule("drag/drop", operation),
     resolveDrop: (context) => resolveGameDrop(context, game, actions, feedback),

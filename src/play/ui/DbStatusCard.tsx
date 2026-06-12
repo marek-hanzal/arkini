@@ -66,7 +66,7 @@ namespace StatusPill {
   }
 }
 
-function StatusPill({ label, value }: Readonly<StatusPill.Props>) {
+function StatusPill({ label, value }: StatusPill.Props) {
   return (
     <div className="min-w-0 rounded-sm bg-slate-950/60 px-3 py-2">
       <div className="text-[0.62rem] uppercase tracking-[0.18em] text-slate-500">{label}</div>

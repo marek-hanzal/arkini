@@ -14,7 +14,7 @@ export namespace Flyer {
   }
 }
 
-export function Flyer({ flyer, item, nowMs, onSettle }: Readonly<Flyer.Props>) {
+export function Flyer({ flyer, item, nowMs, onSettle }: Flyer.Props) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {

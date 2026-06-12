@@ -4,7 +4,7 @@ import { cellKey } from "~/board/util/cell";
 import { inventorySourceId } from "~/inventory/inventoryIdentity";
 import { inventorySinkRect } from "~/inventory/util/inventory";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
-import { usePlayAction } from "~/play/hook/usePlayView";
+import { usePlayAction, usePlayView } from "~/play/hook/usePlayView";
 import type { BoardViewItem, GameView, InventorySlot } from "~/play/logic/playTypes";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { playBottomNavPulse } from "~/play/util/animation";
@@ -13,7 +13,6 @@ import { queryRect } from "~/shared/util/queryRect";
 
 export namespace usePlayManualItemActions {
   export interface Props {
-    game: GameView | null | undefined;
     addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
     feedback: GameDragFeedback;
     schedule(label: string, operation: () => Promise<void>): Promise<void>;
@@ -23,13 +22,13 @@ export namespace usePlayManualItemActions {
 }
 
 export function usePlayManualItemActions({
-  game,
   addFlyer,
   feedback,
   schedule,
   hideSources,
   clearHiddenSources,
-}: Readonly<usePlayManualItemActions.Props>) {
+}: usePlayManualItemActions.Props) {
+  const game = usePlayView().data;
   const placeInventory = usePlayAction((db, input: { slotIndex: number; x: number; y: number }) => db.placeInventoryItem(input.slotIndex, input.x, input.y));
   const stashBoard = usePlayAction((db, input: { boardItemId: string; slotIndex?: number }) => db.stashBoardItem(input.boardItemId, input.slotIndex));
 

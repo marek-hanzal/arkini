@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
-import { usePlayView } from "~/play/hook/usePlayView";
+import { usePlayInventory } from "~/play/hook/usePlayInventory";
+import { usePlayItems } from "~/play/hook/usePlayItems";
 import { cn } from "~/shared/cn";
 import {
   inventoryContainerNodeId,
@@ -29,22 +30,19 @@ export function InventorySheet({
   onClose,
   onSlotDoubleActivate,
 }: InventorySheet.Props) {
-  const gameQuery = usePlayView((game) => ({
-    items: game.items,
-    inventory: game.inventory,
-  }));
-  const game = gameQuery.data;
+  const inventory = usePlayInventory().data;
+  const items = usePlayItems().data;
 
-  if (!game) return null;
+  if (!inventory || !items) return null;
 
-  const inventory = game.inventory;
-  const filled = inventory.filter((slot) => slot.stack).length;
+  const slots = inventory.slots;
+  const filled = slots.filter((slot) => slot.stack).length;
 
   return (
     <div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
       <SheetHeader
         eyebrow="Inventory"
-        description={`${filled}/${inventory.length} slots`}
+        description={`${filled}/${slots.length} slots`}
         anchor="inventory-summary"
         onClose={onClose}
       />
@@ -55,11 +53,11 @@ export function InventorySheet({
           className="ak-game-width mx-auto grid gap-0 overflow-hidden border-l border-t border-slate-800"
           style={{ gridTemplateColumns: `repeat(${inventoryColumns}, minmax(0, 1fr))` }}
         >
-          {inventory.map((slot) => (
+          {slots.map((slot) => (
             <InventoryCell
               key={slot.slotIndex}
               slot={slot}
-              item={slot.stack ? game.items[slot.stack.itemId] : null}
+              item={slot.stack ? items[slot.stack.itemId] : null}
               hidden={isSourceHidden(inventorySourceId(slot.slotIndex))}
               invalid={invalidInventorySlot === slot.slotIndex}
               onDoubleActivate={() => onSlotDoubleActivate(slot)}

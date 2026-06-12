@@ -1,7 +1,9 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import type { BuildRecipeId } from "~/manifest/data/manifestId";
-import { usePlayAction, usePlayView } from "~/play/hook/usePlayView";
+import { usePlayAction } from "~/play/hook/usePlayAction";
+import { usePlaySave } from "~/play/hook/usePlaySave";
+import { usePlayItems } from "~/play/hook/usePlayItems";
 import { Board } from "~/board/ui/Board";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";
 import { BottomSheet } from "~/play/ui/BottomSheet";
@@ -15,17 +17,15 @@ import { useFlyers } from "~/play/hook/useFlyers";
 import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
 import { usePlayFeedback } from "~/play/hook/usePlayFeedback";
 import { usePlayEventQueue } from "~/play/hook/usePlayEventQueue";
-import { usePlayClock } from "~/play/hook/usePlayClock";
 import { usePlaySheets } from "~/play/hook/usePlaySheets";
 import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
 import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
 
 export function PlayShell() {
-  const playQuery = usePlayView();
+  const saveQuery = usePlaySave();
   const sheets = usePlaySheets();
   const { flyers, addFlyer, settleFlyer } = useFlyers();
   const schedulePlayEvent = usePlayEventQueue();
-  const nowMs = usePlayClock();
   const feedback = usePlayFeedback();
 
   const moveBoard = usePlayAction((db, input: { boardItemId: string; x: number; y: number }) => db.moveBoardItem(input.boardItemId, input.x, input.y));
@@ -52,12 +52,12 @@ export function PlayShell() {
     clearHiddenSources: drag.clearHiddenSources,
   });
 
-  if (playQuery.isPending) {
+  if (saveQuery.isPending) {
     return <div className="grid h-dvh w-dvw place-items-center text-sm text-slate-400">Booting SQLite…</div>;
   }
 
-  if (playQuery.isError || !playQuery.data) {
-    return <div className="grid h-dvh w-dvw place-items-center p-4"><div className="rounded-md border border-red-400/30 bg-red-950/30 p-4 text-sm text-red-100">{(playQuery.error as Error)?.message ?? "Game failed to load."}</div></div>;
+  if (saveQuery.isError || !saveQuery.data) {
+    return <div className="grid h-dvh w-dvw place-items-center p-4"><div className="rounded-md border border-red-400/30 bg-red-950/30 p-4 text-sm text-red-100">{(saveQuery.error as Error)?.message ?? "Game failed to load."}</div></div>;
   }
 
   return (
@@ -88,7 +88,6 @@ export function PlayShell() {
                   if (!item.producer) void manualActions.stashBoardWithFly(item);
                 },
               }}
-              nowMs={nowMs}
             />
           </div>
         </main>
@@ -139,7 +138,7 @@ export function PlayShell() {
         </div>
       </BottomSheet>
 
-      <FlyerLayer flyers={flyers} nowMs={nowMs} onSettle={settleFlyer} />
+      <FlyerLayer flyers={flyers} onSettle={settleFlyer} />
 
       <DragOverlay adjustScale={false} dropAnimation={null}>
         {drag.activeItem ? (
@@ -148,7 +147,6 @@ export function PlayShell() {
             dragOverlay
             quantity={drag.activeDrag?.overlay?.quantity}
             producer={drag.activeDrag?.overlay?.producer ?? undefined}
-            nowMs={nowMs}
             overlaySize={drag.dragPreviewRect}
           />
         ) : null}
@@ -161,19 +159,17 @@ export function PlayShell() {
 namespace FlyerLayer {
   export interface Props {
     flyers: ReturnType<typeof useFlyers>["flyers"];
-    nowMs: number;
     onSettle(id: string): void;
   }
 }
 
-function FlyerLayer({ flyers, nowMs, onSettle }: FlyerLayer.Props) {
-  const gameQuery = usePlayView((game) => ({ items: game.items }));
-  const items = gameQuery.data?.items;
+function FlyerLayer({ flyers, onSettle }: FlyerLayer.Props) {
+  const items = usePlayItems().data;
 
   if (!items) return null;
 
   return flyers.map((flyer) => {
     const item = items[flyer.itemId];
-    return item ? <Flyer key={flyer.id} flyer={flyer} item={item} nowMs={nowMs} onSettle={onSettle} /> : null;
+    return item ? <Flyer key={flyer.id} flyer={flyer} item={item} onSettle={onSettle} /> : null;
   });
 }

@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { loadPlayBackend } from "./loadPlayBackend";
-import { databaseStatusQueryKey } from "./databaseStatusQueryKey";
+import { playQueryKeys } from "./playQueryKeys";
 
-export function useArkiniDatabaseStatus() {
+export function usePlaySave() {
   return useQuery({
-    queryKey: databaseStatusQueryKey,
+    queryKey: playQueryKeys.save,
     enabled: typeof window !== "undefined",
     async queryFn() {
       const db = await loadPlayBackend();
-      return db.readDatabaseStatus();
+      return db.readGameSaveView();
     },
   });
 }

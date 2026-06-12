@@ -1,4 +1,5 @@
-import { usePlayView } from "~/play/hook/usePlayView";
+import { usePlayDragView } from "~/play/hook/usePlayDragView";
+import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { FlyerKind, RectLike, GameDragSource, GameDropTarget, GameVisualMeta } from "~/play/types";
 import { useDraggableControl } from "~/drag/hook/useDraggableControl";
 import {
@@ -26,7 +27,8 @@ export function usePlayDraggableControl({
   addFlyer,
   schedule,
 }: usePlayDraggableControl.Props) {
-  const game = usePlayView().data;
+  const game = usePlayDragView();
+  const items = usePlayItems().data;
   const control = useDraggableControl<string, GameDragSource, GameDropTarget, GameVisualMeta, FlyerKind>({
     schedule: (operation) => schedule("drag/drop", operation),
     resolveDrop: (context) => resolveGameDrop(context, game, actions, feedback),
@@ -38,7 +40,7 @@ export function usePlayDraggableControl({
     getDragBoundaryNodeId: getGameDragBoundaryNodeId,
   });
 
-  const activeItem = control.activeDrag && game ? (game.items[control.activeDrag.itemId] ?? null) : null;
+  const activeItem = control.activeDrag && items ? (items[control.activeDrag.itemId] ?? null) : null;
 
   return { ...control, activeItem };
 }

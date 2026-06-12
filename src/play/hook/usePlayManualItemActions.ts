@@ -1,11 +1,12 @@
 import { useCallback } from "react";
-import { boardColumns, boardRows, boardSourceId, type BoardCell } from "~/board/boardIdentity";
+import { boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
 import { inventorySourceId } from "~/inventory/inventoryIdentity";
 import { inventorySinkRect } from "~/inventory/util/inventory";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
-import { usePlayAction, usePlayView } from "~/play/hook/usePlayView";
-import type { BoardViewItem, GameView, InventorySlot } from "~/play/logic/playTypes";
+import { usePlayAction } from "~/play/hook/usePlayAction";
+import { usePlayBoard } from "~/play/hook/usePlayBoard";
+import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { playBottomNavPulse } from "~/play/util/animation";
 import { queryElement } from "~/shared/util/queryElement";
@@ -28,7 +29,7 @@ export function usePlayManualItemActions({
   hideSources,
   clearHiddenSources,
 }: usePlayManualItemActions.Props) {
-  const game = usePlayView().data;
+  const board = usePlayBoard().data;
   const placeInventory = usePlayAction((db, input: { slotIndex: number; x: number; y: number }) => db.placeInventoryItem(input.slotIndex, input.x, input.y));
   const stashBoard = usePlayAction((db, input: { boardItemId: string; slotIndex?: number }) => db.stashBoardItem(input.boardItemId, input.slotIndex));
 
@@ -59,7 +60,7 @@ export function usePlayManualItemActions({
   const placeInventoryOnBoardWithFly = useCallback(async (slot: InventorySlot) => {
     await schedule("place inventory item", async () => {
       const stack = slot.stack;
-      const target = game ? findFirstEmptyBoardCell(game) : null;
+      const target = board?.firstEmptyCell ?? null;
 
       if (!stack || !target) {
         feedback.flashInventorySlot(slot.slotIndex, "error");
@@ -82,7 +83,7 @@ export function usePlayManualItemActions({
         clearHiddenSources();
       }
     });
-  }, [addFlyer, clearHiddenSources, feedback, game, hideSources, placeInventory, schedule]);
+  }, [addFlyer, clearHiddenSources, feedback, board, hideSources, placeInventory, schedule]);
 
   return { stashBoardWithFly, placeInventoryOnBoardWithFly };
 }
@@ -90,14 +91,4 @@ export function usePlayManualItemActions({
 function pulseBottomNav(sheet: "inventory") {
   const element = queryElement(`[data-bottom-nav-sheet="${sheet}"]`);
   if (element) playBottomNavPulse(element);
-}
-
-function findFirstEmptyBoardCell(game: GameView): BoardCell | null {
-  for (let y = 0; y < boardRows; y++) {
-    for (let x = 0; x < boardColumns; x++) {
-      if (!game.boardItemByCellKey[cellKey(x, y)]) return { x, y };
-    }
-  }
-
-  return null;
 }

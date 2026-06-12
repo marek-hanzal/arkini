@@ -1,7 +1,8 @@
 import { useMemo, useRef, type ReactNode } from "react";
 import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
-import { usePlayView } from "~/play/hook/usePlayView";
+import { usePlayBoard } from "~/play/hook/usePlayBoard";
+import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { ItemId } from "~/manifest/data/manifestId";
 import { cn } from "~/shared/cn";
 import { cellKey } from "~/board/util/cell";
@@ -18,6 +19,7 @@ import { usePressActions } from "~/shared/hook/usePressActions";
 import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
 import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
 import { Tile } from "~/item/ui/Tile";
+import { useProducerNow } from "~/producer/hook/useProducerNow";
 
 export namespace Board {
   export interface DragState {
@@ -40,19 +42,15 @@ export namespace Board {
     drag: DragState;
     feedback: FeedbackState;
     actions: Actions;
-    nowMs: number;
   }
 }
 
-export function Board({ drag, feedback, actions, nowMs }: Board.Props) {
-  const gameQuery = usePlayView((game) => ({
-    items: game.items,
-    boardItemByCellKey: game.boardItemByCellKey,
-  }));
-  const game = gameQuery.data;
+export function Board({ drag, feedback, actions }: Board.Props) {
+  const board = usePlayBoard().data;
+  const items = usePlayItems().data;
   const cells = useMemo(() => Array.from({ length: boardColumns * boardRows }, (_, index) => ({ x: index % boardColumns, y: Math.floor(index / boardColumns) })), []);
 
-  if (!game) return null;
+  if (!board || !items) return null;
 
   return (
     <div
@@ -62,13 +60,11 @@ export function Board({ drag, feedback, actions, nowMs }: Board.Props) {
     >
       {cells.map((cell) => {
         const key = cellKey(cell.x, cell.y);
-        const boardItem = game.boardItemByCellKey[key] ?? null;
-        const viewItem = boardItem ? game.items[boardItem.itemId] : null;
+        const boardItem = board.byCellKey[key] ?? null;
+        const viewItem = boardItem ? items[boardItem.itemId] : null;
         const canMerge = drag.activeDrag?.source.kind === "board" && boardItem && boardItem.id !== drag.activeDrag.source.boardItemId
           ? Boolean(resolveItemMergeRule(drag.activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
           : false;
-        const producerReady = isProducerReady(boardItem?.producer ?? null, nowMs);
-
         return (
           <BoardCell
             key={key}
@@ -78,7 +74,6 @@ export function Board({ drag, feedback, actions, nowMs }: Board.Props) {
             canMerge={canMerge}
             invalid={feedback.invalidCellKey === key}
             merged={feedback.mergedCellKey === key}
-            producerReady={producerReady}
             onEmptyDoubleActivate={actions.emptyDoubleActivate}
           >
             {boardItem && viewItem ? (
@@ -86,7 +81,6 @@ export function Board({ drag, feedback, actions, nowMs }: Board.Props) {
                 boardItem={boardItem}
                 item={viewItem}
                 hidden={drag.isSourceHidden(boardSourceId(boardItem.id))}
-                nowMs={nowMs}
                 onSingleActivate={() => actions.tileSingleActivate(boardItem)}
                 onDoubleActivate={() => actions.tileDoubleActivate(boardItem)}
               />
@@ -106,7 +100,6 @@ namespace BoardCell {
     canMerge: boolean;
     invalid: boolean;
     merged: boolean;
-    producerReady: boolean;
     children: ReactNode;
     onEmptyDoubleActivate(cell: BoardCell): void;
   }
@@ -119,12 +112,12 @@ function BoardCell({
   canMerge,
   invalid,
   merged,
-  producerReady,
   children,
   onEmptyDoubleActivate,
 }: BoardCell.Props) {
   const id = boardCellNodeId(x, y);
   const cellRef = useRef<HTMLDivElement | null>(null);
+  const producerReady = useProducerReady(boardItem?.producer ?? null);
   const press = usePressActions({
     onDouble: () => {
       if (!boardItem) onEmptyDoubleActivate({ x, y });
@@ -155,7 +148,8 @@ function BoardCell({
   );
 }
 
-function isProducerReady(producer: BoardViewItem["producer"], nowMs: number) {
+function useProducerReady(producer: BoardViewItem["producer"]) {
+  const nowMs = useProducerNow(producer);
   if (!producer) return false;
 
   const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
@@ -168,7 +162,6 @@ namespace BoardTile {
     boardItem: BoardViewItem;
     item: ViewItem;
     hidden: boolean;
-    nowMs: number;
     onSingleActivate(): void;
     onDoubleActivate(): void;
   }
@@ -178,7 +171,6 @@ function BoardTile({
   boardItem,
   item,
   hidden,
-  nowMs,
   onSingleActivate,
   onDoubleActivate,
 }: BoardTile.Props) {
@@ -204,7 +196,7 @@ function BoardTile({
       delaySingleWhenDouble={boardItem.producer?.doubleClickBehavior === "exhaust"}
       onDoubleActivate={onDoubleActivate}
     >
-      <Tile item={item} producer={boardItem.producer} nowMs={nowMs} />
+      <Tile item={item} producer={boardItem.producer} />
     </DraggableSurface>
   );
 }

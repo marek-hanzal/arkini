@@ -43,14 +43,29 @@ Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/h
 
 Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
+## React data subscriptions
+
+Do not rebuild a giant `GameView` and pass it around. UI subscribes to the smallest practical React Query slice:
+
+```txt
+usePlaySave()          boot/save metadata
+usePlayItems()         static item catalog derived from GameConfig
+usePlayBoard()         board cells and board item lookup
+usePlayInventory()     inventory slots and stack lookup
+usePlayBuildRecipes()  build recipe availability derived from inventory
+usePlayDragView()      tiny drag-only lookup composed from board + inventory
+```
+
+If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
+
 ## Source layout
 
 ```txt
 src/app/                         App entry, router, global styles, cross-origin isolation fallback.
 src/manifest/data/               GameConfig, Zod config schema, validation, derived indexes, SVG assets.
 src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.
-src/play/logic/                  Client-side game backend: bootstrap, save lifecycle, mutations, view projection.
-src/play/hook/                   React Query bridge, event queue, feedback, clock, sheet state, action orchestration.
+src/play/logic/                  Client-side game backend: bootstrap, save lifecycle, mutations, small read projections.
+src/play/hook/                   Granular React Query subscriptions, event queue, feedback, clock, sheet state, action orchestration.
 src/play/ui/                     Main shell, sheets, bottom navigation, flyers, database status UI.
 src/drag/                        Generic DnD lifecycle and draggable/droppable surfaces.
 src/board/                       Board identity, board state logic, board UI, cell feedback.

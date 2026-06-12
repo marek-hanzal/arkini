@@ -1,18 +1,42 @@
+import type { BoardCell } from "~/board/boardIdentity";
 import type { BuildRecipeCost } from "~/manifest/data/build";
 import type { BuildRecipeId, ItemId } from "~/manifest/data/manifestId";
 import type { ProducerMode } from "~/manifest/data/producer";
 
-export interface GameView {
-  save: { id: string; boardWidth: number; boardHeight: number; inventorySlots: number };
-  items: Record<string, ViewItem>;
-  boardItems: BoardViewItem[];
+export interface GameSaveView {
+  id: string;
+  boardWidth: number;
+  boardHeight: number;
+  inventorySlots: number;
+}
+
+export type ItemCatalogView = Record<string, ViewItem>;
+
+export interface BoardView {
+  items: BoardViewItem[];
+  byId: Record<string, BoardViewItem>;
+  byCellKey: Record<string, BoardViewItem>;
+  firstEmptyCell: BoardCell | null;
+}
+
+export interface InventoryView {
+  slots: InventorySlot[];
+  bySlotIndex: Record<number, InventorySlot>;
+  stacksByItemId: Record<string, InventorySlot[]>;
+  firstEmptySlotIndex: number | null;
+}
+
+export interface BuildRecipeView {
+  id: BuildRecipeId;
+  blueprintItemId: ItemId;
+  resultItemId: ItemId;
+  costs: BuildRecipeCost[];
+  canBuild: boolean;
+}
+
+export interface GameDragView {
   boardItemsById: Record<string, BoardViewItem>;
-  boardItemByCellKey: Record<string, BoardViewItem>;
-  inventory: InventorySlot[];
   inventoryBySlotIndex: Record<number, InventorySlot>;
-  inventoryStacksByItemId: Record<string, InventorySlot[]>;
-  firstEmptyInventorySlotIndex: number | null;
-  buildRecipes: BuildRecipeView[];
 }
 
 export interface ViewItem {
@@ -40,14 +64,6 @@ export interface BoardViewItem {
 export interface InventorySlot {
   slotIndex: number;
   stack: { id: string; itemId: string; quantity: number } | null;
-}
-
-export interface BuildRecipeView {
-  id: BuildRecipeId;
-  blueprintItemId: ItemId;
-  resultItemId: ItemId;
-  costs: BuildRecipeCost[];
-  canBuild: boolean;
 }
 
 export interface ProducerView {

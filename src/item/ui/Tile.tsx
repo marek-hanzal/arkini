@@ -1,14 +1,14 @@
-import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem, ProducerView, ViewItem } from "~/play/logic/playTypes";
 import { cn } from "~/shared/cn";
 import { formatMs } from "~/shared/util/format";
-import type { ProducerView, RectLike } from "~/play/types";
+import { useProducerNow } from "~/producer/hook/useProducerNow";
+import type { RectLike } from "~/play/types";
 
 export namespace Tile {
   export interface Props {
     item: ViewItem;
     quantity?: number;
     producer?: BoardViewItem["producer"];
-    nowMs?: number;
     dragOverlay?: boolean;
     overlaySize?: Pick<RectLike, "width" | "height"> | null;
   }
@@ -18,7 +18,6 @@ export function Tile({
   item,
   quantity,
   producer,
-  nowMs,
   dragOverlay,
   overlaySize,
 }: Tile.Props) {
@@ -31,7 +30,7 @@ export function Tile({
       )}
       style={dragOverlay && overlaySize ? { width: overlaySize.width, height: overlaySize.height } : undefined}
     >
-      <TileContent item={item} quantity={quantity} producer={producer} nowMs={nowMs} />
+      <TileContent item={item} quantity={quantity} producer={producer} />
     </div>
   );
 }
@@ -41,12 +40,12 @@ namespace TileContent {
     item: ViewItem;
     quantity?: number;
     producer?: BoardViewItem["producer"];
-    nowMs?: number;
   }
 }
 
-export function TileContent({ item, quantity, producer, nowMs }: TileContent.Props) {
-  const producerUi = producer ? getProducerUiState(producer, nowMs ?? Date.now()) : null;
+export function TileContent({ item, quantity, producer }: TileContent.Props) {
+  const nowMs = useProducerNow(producer);
+  const producerUi = producer ? getProducerUiState(producer, nowMs) : null;
 
   return (
     <div

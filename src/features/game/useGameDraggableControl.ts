@@ -123,9 +123,10 @@ function inventoryToInventory(
 
   const targetStack = game.inventoryBySlotIndex[target.target.slotIndex]?.stack ?? null;
   const animations = targetStack ? inventorySwapAnimations(context, targetStack.itemId) : [];
-  const hide = targetStack
-    ? [source.sourceId, ...(targetStack.itemId === source.itemId ? [] : [inventorySourceId(target.target.slotIndex)])]
-    : hiddenSource(source);
+  const hide = [
+    source.sourceId,
+    ...(targetStack && targetStack.itemId !== source.itemId ? [inventorySourceId(target.target.slotIndex)] : []),
+  ];
 
   return accept({
     hide,
@@ -154,10 +155,7 @@ function boardToCell(
   const targetBoardItemId = target.target.boardItemId;
   const targetItem = game.boardItemsById[targetBoardItemId];
   if (!targetItem || !resolveMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId)) {
-    return reject(() => {
-      feedback.flashBoardCell(cellKey(target.target.x, target.target.y), "error");
-      flashSource(source.source, game, feedback);
-    });
+    return reject(() => feedback.flashBoardCell(cellKey(target.target.x, target.target.y), "error"));
   }
 
   return accept({

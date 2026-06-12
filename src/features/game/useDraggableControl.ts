@@ -133,14 +133,15 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     }
 
     if (plan.type === "reject") {
+      const feedback = runFeedback(plan.feedback);
       if (plan.animateReturn !== false) await animateReturn(context.source, dragRect);
       else setActiveDrag(null);
-      await plan.feedback?.();
+      await feedback;
       return;
     }
 
-    setActiveDrag(null);
     hideSources(plan.hide ?? []);
+    setActiveDrag(null);
 
     if (plan.animations?.length && plan.animationTiming !== "afterCommit") {
       await playAnimations(plan.animations);
@@ -153,13 +154,15 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     }
 
     await plan.feedback?.();
+    await waitForPaint();
     clearHiddenSources();
   }
 
   async function failDrop(error: unknown, context: DropContext<ItemId, Source, Target, Overlay>, dragRect: RectLike | null) {
     clearHiddenSources();
+    const feedback = runFeedback(() => onError?.(error, context));
     await animateReturn(context.source, dragRect);
-    await onError?.(error, context);
+    await feedback;
   }
 
   async function playAnimations(animations: DraggableAnimation<ItemId, Kind>[]) {
@@ -238,4 +241,21 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     showSource,
     clearHiddenSources,
   };
+}
+
+async function runFeedback(feedback: (() => void | Promise<void>) | undefined) {
+  try {
+    await feedback?.();
+  } catch (error) {
+    // Feedback must never turn a clean reject into another drag failure.
+    void error;
+  }
+}
+
+function waitForPaint() {
+  return new Promise<void>((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(resolve);
+    });
+  });
 }

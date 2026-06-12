@@ -112,7 +112,7 @@ function InventoryCell({
       data-inventory-slot={slot.slotIndex}
       className={(isOver) => cn(
         "relative aspect-square border-b border-r border-slate-800 bg-slate-900/70 transition-colors duration-200",
-        isOver && "bg-slate-800 ring-1 ring-emerald-300/70",
+        isOver && "z-10 bg-slate-800 outline outline-2 -outline-offset-2 outline-emerald-300/80",
         invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
         pulsed && !invalid && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
       )}

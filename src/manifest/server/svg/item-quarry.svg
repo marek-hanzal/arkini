@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Quarry">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
   <defs><linearGradient id="q" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="1" stop-color="#475569"/></linearGradient></defs>
   <path d="M16 98 40 32h52l20 66Z" fill="#1e293b"/>
   <path d="M30 90 48 42h35l15 48Z" fill="url(#q)"/>

@@ -2,7 +2,6 @@ import { useRef } from "react";
 import type { InventorySlot, GameView, ViewItem } from "~/play/server/playTypes";
 import { cn } from "~/shared/cn";
 import {
-  inventoryBinNodeId,
   inventoryContainerNodeId,
   inventorySlots,
   inventorySlotNodeId,
@@ -31,12 +30,7 @@ export function InventorySheet({
   const filled = inventory.filter((slot) => slot.stack).length;
 
   return (
-    <DroppableSurface
-      id={inventoryBinNodeId}
-      nodeId={inventoryBinNodeId}
-      payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
-      className={(isOver) => cn("flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col", isOver && "outline outline-2 -outline-offset-2 outline-emerald-300/70")}
-    >
+    <div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
       <SheetHeader
         eyebrow="Inventory"
         description={`${filled}/${inventory.length} slots`}
@@ -61,7 +55,7 @@ export function InventorySheet({
           ))}
         </div>
       </div>
-    </DroppableSurface>
+    </div>
   );
 }
 

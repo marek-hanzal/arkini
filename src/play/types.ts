@@ -7,8 +7,7 @@ export type GameDragSource =
 
 export type GameDropTarget =
   | { kind: "cell"; x: number; y: number; boardItemId: string | null }
-  | { kind: "inventory-slot"; slotIndex: number }
-  | { kind: "inventory-bin" };
+  | { kind: "inventory-slot"; slotIndex: number };
 
 export interface GameVisualMeta {
   quantity?: number;

@@ -4,13 +4,14 @@ import { ItemIdSchema } from "./ItemIdSchema";
 import { NonNegativeIntegerSchema } from "./NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "./PositiveIntegerSchema";
 import { QuantitySchema } from "./QuantitySchema";
+import { GameConfig } from "./gameDataManifest";
 
 export const GameDataManifestSchema = z.object({
   game: z.object({
-    id: z.literal("arkini"),
-    title: z.string().min(1),
-    board: z.object({ width: z.literal(7), height: z.literal(9) }),
-    inventory: z.object({ slots: PositiveIntegerSchema }),
+    id: z.literal(GameConfig.game.id),
+    title: z.literal(GameConfig.game.title),
+    board: z.object({ width: z.literal(GameConfig.game.board.width), height: z.literal(GameConfig.game.board.height) }),
+    inventory: z.object({ slots: z.literal(GameConfig.game.inventory.slots) }),
   }),
   assets: z.array(
     z.object({

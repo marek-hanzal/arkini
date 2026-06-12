@@ -8,12 +8,11 @@ export const defaultSaveGameId = "save:default";
 
 type StartingBoardItem = { itemId: string; x: number; y: number };
 
-export async function ensureDefaultSaveGame() {
+export async function ensureDefaultSaveGame({ resetExisting = false }: { resetExisting?: boolean } = {}) {
+  if (resetExisting) await dropDefaultSaveGame();
+
   const existing = await db.selectFrom(table.saveGame).select("id").where("id", "=", defaultSaveGameId).executeTakeFirst();
-  if (existing) {
-    await syncDefaultSaveShape();
-    return;
-  }
+  if (existing) return;
 
   await db.transaction().execute(async (tx) => {
     await tx
@@ -58,32 +57,6 @@ export async function ensureDefaultSaveGame() {
   });
 }
 
-async function syncDefaultSaveShape() {
-  const boardWidth = gameDataManifest.game.board.width;
-  const boardHeight = gameDataManifest.game.board.height;
-  const inventorySlots = gameDataManifest.game.inventory.slots;
-
-  await db.transaction().execute(async (tx) => {
-    await tx
-      .updateTable(table.saveGame)
-      .set({
-        boardWidth,
-        boardHeight,
-        inventorySlots,
-        updatedAt: new Date().toISOString(),
-      })
-      .where("id", "=", defaultSaveGameId)
-      .execute();
-
-    await tx
-      .deleteFrom(table.inventoryStack)
-      .where("saveGameId", "=", defaultSaveGameId)
-      .where("slotIndex", ">=", inventorySlots)
-      .execute();
-
-    await tx.deleteFrom(table.boardItem).where("saveGameId", "=", defaultSaveGameId).where("x", "<", 0).execute();
-    await tx.deleteFrom(table.boardItem).where("saveGameId", "=", defaultSaveGameId).where("y", "<", 0).execute();
-    await tx.deleteFrom(table.boardItem).where("saveGameId", "=", defaultSaveGameId).where("x", ">=", boardWidth).execute();
-    await tx.deleteFrom(table.boardItem).where("saveGameId", "=", defaultSaveGameId).where("y", ">=", boardHeight).execute();
-  });
+async function dropDefaultSaveGame() {
+  await db.deleteFrom(table.saveGame).where("id", "=", defaultSaveGameId).execute();
 }

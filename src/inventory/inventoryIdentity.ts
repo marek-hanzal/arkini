@@ -1,8 +1,9 @@
-export const inventoryColumns = 7;
-export const inventoryRows = 5;
-export const inventorySlots = inventoryColumns * inventoryRows;
+import { GameConfig } from "~/manifest/server/gameDataManifest";
+
+export const inventoryColumns = GameConfig.game.board.width;
+export const inventorySlots = GameConfig.game.inventory.slots;
+export const inventoryRows = Math.ceil(inventorySlots / inventoryColumns);
 export const inventoryContainerNodeId = "inventory-container";
-export const inventoryBinNodeId = "inventory-bin";
 
 export function inventorySourceId(slotIndex: number) {
   return `inventory:${slotIndex}`;

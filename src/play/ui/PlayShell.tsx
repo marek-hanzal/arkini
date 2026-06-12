@@ -13,12 +13,11 @@ import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { Tile } from "~/item/ui/Tile";
 import { cellKey } from "~/board/util/cell";
-import { boardCellNodeId, boardColumns, type BoardCell, boardRows, boardSourceId } from "~/board/boardIdentity";
-import { inventorySlotNodeId, inventorySourceId } from "~/inventory/inventoryIdentity";
+import { boardColumns, type BoardCell, boardRows, boardSourceId } from "~/board/boardIdentity";
+import { inventorySourceId } from "~/inventory/inventoryIdentity";
 import { playBottomNavPulse } from "~/play/util/animation";
 import { cssEscape, queryElement, queryRect } from "~/shared/util/dom";
 import { inventorySinkRect } from "~/inventory/util/inventory";
-import type { GameDragData } from "~/play/types";
 import { useFlyers } from "~/play/hook/useFlyers";
 import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
 import { usePlayFeedback } from "~/play/hook/usePlayFeedback";
@@ -51,9 +50,7 @@ export function PlayShell() {
   const drag = usePlayDraggableControl({
     game,
     actions: {
-      placeInventory: (input) => placeInventory.mutateAsync(input),
       moveBoard: (input) => moveBoard.mutateAsync(input),
-      stashBoard: (input) => stashBoard.mutateAsync(input),
       swapInventory: (input) => swapInventory.mutateAsync(input),
       mergeBoard: (input) => mergeBoard.mutateAsync(input),
     },
@@ -143,25 +140,18 @@ export function PlayShell() {
 
   async function stashBoardWithFly(boardItem: BoardViewItem) {
     await schedulePlayEvent("stash board item", async () => {
-      const source: GameDragData = {
-        sourceId: boardSourceId(boardItem.id),
-        sourceNodeId: boardCellNodeId(boardItem.x, boardItem.y),
-        itemId: boardItem.itemId,
-        source: { kind: "board", boardItemId: boardItem.id },
-        hideWhenActive: true,
-      };
-      const sourceRect = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`)
+      const sourceId = boardSourceId(boardItem.id);
+      const from = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`)
         ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
-      const from = sourceRect;
 
       try {
-        const animation = from
-          ? addFlyer(boardItem.itemId, from, inventorySinkRect(from, queryRect('[data-bottom-nav-sheet="inventory"]')), "stash")
-          : Promise.resolve();
-
-        if (from) drag.hideSources([source.sourceId]);
         await stashBoard.mutateAsync({ boardItemId: boardItem.id });
-        await animation;
+
+        if (from) {
+          drag.hideSources([sourceId]);
+          await addFlyer(boardItem.itemId, from, inventorySinkRect(from, queryRect('[data-bottom-nav-sheet="inventory"]')), "stash");
+        }
+
         pulseBottomNav("inventory");
       } catch (error) {
         feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
@@ -182,24 +172,15 @@ export function PlayShell() {
         return;
       }
 
-      const source: GameDragData = {
-        sourceId: inventorySourceId(slot.slotIndex),
-        sourceNodeId: inventorySlotNodeId(slot.slotIndex),
-        itemId: stack.itemId,
-        source: { kind: "inventory", slotIndex: slot.slotIndex, quantity: stack.quantity },
-        overlay: { quantity: stack.quantity },
-        hideWhenActive: stack.quantity <= 1,
-      };
-      const sourceRect = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
-      const targetRect = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
-      const from = sourceRect;
-      const to = targetRect;
+      const sourceId = inventorySourceId(slot.slotIndex);
+      const from = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
+      const to = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
 
       try {
-        const animation = from && to ? addFlyer(stack.itemId, from, to, "place", { quantity: stack.quantity }) : Promise.resolve();
-        if (from && to && source.hideWhenActive !== false) drag.hideSources([source.sourceId]);
         await placeInventory.mutateAsync({ slotIndex: slot.slotIndex, x: target.x, y: target.y });
-        await animation;
+
+        if (from && to && stack.quantity <= 1) drag.hideSources([sourceId]);
+        if (from && to) await addFlyer(stack.itemId, from, to, "place", { quantity: stack.quantity });
       } catch (error) {
         feedback.flashInventorySlot(slot.slotIndex, "error");
         feedback.showError(error);
@@ -221,7 +202,7 @@ export function PlayShell() {
   return (
     <DndContext {...drag.contextProps}>
       <div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
-        {feedback.actionErrorKey > 0 ? <span key={feedback.actionErrorKey} className="ak-action-error-pulse" aria-hidden="true" /> : null}
+        {feedback.actionErrorKey > 0 ? <span key={feedback.actionErrorKey} className="ak-action-error-pulse" /> : null}
         <main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
           <div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
             <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Arkini</p>

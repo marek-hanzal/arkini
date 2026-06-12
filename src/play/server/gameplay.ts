@@ -20,6 +20,15 @@ import { table } from "~/database/server/tables";
 import type { BoardItemState, ProducerDropResult } from "./playTypes";
 import { GameActionError } from "./playTypes";
 import {
+  BuildRecipeInputSchema,
+  MergeBoardItemsInputSchema,
+  MoveBoardItemInputSchema,
+  PlaceInventoryItemInputSchema,
+  ProduceBoardItemInputSchema,
+  StashBoardItemInputSchema,
+  SwapInventorySlotsInputSchema,
+} from "./gameActionSchemas";
+import {
   cloneInventory,
   planExactInventorySlotPlacement,
   planInventoryPlacement,
@@ -27,29 +36,31 @@ import {
 } from "~/inventory/server/planning";
 
 export async function placeInventoryItem(slotIndex: number, x: number, y: number) {
+  const input = PlaceInventoryItemInputSchema.parse({ slotIndex, x, y });
   await db.transaction().execute(async (tx) => {
     const { save, boardRows, inventoryRows } = await readMutableSave(tx);
-    assertInsideBoard(save, x, y);
+    assertInsideBoard(save, input.x, input.y);
 
-    const stack = inventoryRows.find((row) => row.slotIndex === slotIndex);
+    const stack = inventoryRows.find((row) => row.slotIndex === input.slotIndex);
     if (!stack) throw new GameActionError("Inventory slot is empty.");
-    if (boardRows.some((row) => row.x === x && row.y === y)) throw new GameActionError("Board cell is occupied.");
+    if (boardRows.some((row) => row.x === input.x && row.y === input.y)) throw new GameActionError("Board cell is occupied.");
 
-    await insertBoardItem(tx, stack.itemDefinitionId, x, y);
+    await insertBoardItem(tx, stack.itemDefinitionId, input.x, input.y);
     await spendInventoryStack(tx, stack, 1);
   });
 }
 
 export async function swapInventorySlots(sourceSlotIndex: number, targetSlotIndex: number) {
-  if (sourceSlotIndex === targetSlotIndex) return;
+  const input = SwapInventorySlotsInputSchema.parse({ sourceSlotIndex, targetSlotIndex });
+  if (input.sourceSlotIndex === input.targetSlotIndex) return;
 
   await db.transaction().execute(async (tx) => {
     const { save, inventoryRows } = await readMutableSave(tx);
-    assertInsideInventory(save, sourceSlotIndex);
-    assertInsideInventory(save, targetSlotIndex);
+    assertInsideInventory(save, input.sourceSlotIndex);
+    assertInsideInventory(save, input.targetSlotIndex);
 
-    const source = inventoryRows.find((row) => row.slotIndex === sourceSlotIndex);
-    const target = inventoryRows.find((row) => row.slotIndex === targetSlotIndex);
+    const source = inventoryRows.find((row) => row.slotIndex === input.sourceSlotIndex);
+    const target = inventoryRows.find((row) => row.slotIndex === input.targetSlotIndex);
     if (!source) throw new GameActionError("Inventory slot is empty.");
 
     // Same item stacks combine before they swap. This keeps inventory as storage,
@@ -64,30 +75,31 @@ export async function swapInventorySlots(sourceSlotIndex: number, targetSlotInde
     }
 
     if (!target) {
-      await tx.updateTable(table.inventoryStack).set({ slotIndex: targetSlotIndex, updatedAt: serverTimestamp() }).where("id", "=", source.id).execute();
+      await tx.updateTable(table.inventoryStack).set({ slotIndex: input.targetSlotIndex, updatedAt: serverTimestamp() }).where("id", "=", source.id).execute();
       return;
     }
 
     await tx.updateTable(table.inventoryStack).set({ slotIndex: -1, updatedAt: serverTimestamp() }).where("id", "=", source.id).execute();
-    await tx.updateTable(table.inventoryStack).set({ slotIndex: sourceSlotIndex, updatedAt: serverTimestamp() }).where("id", "=", target.id).execute();
-    await tx.updateTable(table.inventoryStack).set({ slotIndex: targetSlotIndex, updatedAt: serverTimestamp() }).where("id", "=", source.id).execute();
+    await tx.updateTable(table.inventoryStack).set({ slotIndex: input.sourceSlotIndex, updatedAt: serverTimestamp() }).where("id", "=", target.id).execute();
+    await tx.updateTable(table.inventoryStack).set({ slotIndex: input.targetSlotIndex, updatedAt: serverTimestamp() }).where("id", "=", source.id).execute();
   });
 }
 
 export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
+  const input = StashBoardItemInputSchema.parse({ boardItemId, slotIndex });
   await db.transaction().execute(async (tx) => {
     const { save, boardRows, inventoryRows } = await readMutableSave(tx);
-    const boardItem = boardRows.find((row) => row.id === boardItemId);
+    const boardItem = boardRows.find((row) => row.id === input.boardItemId);
     if (!boardItem) throw new GameActionError("Board item does not exist.");
     if (gameDataIndex.producersByItemId.has(boardItem.itemDefinitionId as ItemId)) {
       throw new GameActionError("Producer lives on the board. Pause it instead of hiding its state in inventory.");
     }
 
     const virtualInventory = cloneInventory(inventoryRows);
-    const plan = slotIndex === undefined
+    const plan = input.slotIndex === undefined
       ? planInventoryPlacement(save, virtualInventory, boardItem.itemDefinitionId as ItemId)
-      : planExactInventorySlotPlacement(save, virtualInventory, boardItem.itemDefinitionId as ItemId, slotIndex);
-    if (!plan) throw new GameActionError(slotIndex === undefined ? "Inventory is full." : "Inventory slot cannot accept this item.");
+      : planExactInventorySlotPlacement(save, virtualInventory, boardItem.itemDefinitionId as ItemId, input.slotIndex);
+    if (!plan) throw new GameActionError(input.slotIndex === undefined ? "Inventory is full." : "Inventory slot cannot accept this item.");
 
     await applyInventoryPlacementPlan(tx, plan);
     await tx.deleteFrom(table.boardItem).where("id", "=", boardItem.id).execute();
@@ -95,26 +107,28 @@ export async function stashBoardItem(boardItemId: string, slotIndex?: number) {
 }
 
 export async function moveBoardItem(boardItemId: string, x: number, y: number) {
+  const input = MoveBoardItemInputSchema.parse({ boardItemId, x, y });
   await db.transaction().execute(async (tx) => {
     const { save, boardRows } = await readMutableSave(tx);
-    assertInsideBoard(save, x, y);
+    assertInsideBoard(save, input.x, input.y);
 
-    const boardItem = boardRows.find((row) => row.id === boardItemId);
+    const boardItem = boardRows.find((row) => row.id === input.boardItemId);
     if (!boardItem) throw new GameActionError("Board item does not exist.");
-    const occupied = boardRows.find((row) => row.x === x && row.y === y && row.id !== boardItem.id);
+    const occupied = boardRows.find((row) => row.x === input.x && row.y === input.y && row.id !== boardItem.id);
     if (occupied) throw new GameActionError("Drop on an empty board cell or merge a valid recipe.");
 
-    await tx.updateTable(table.boardItem).set({ x, y, updatedAt: serverTimestamp() }).where("id", "=", boardItem.id).execute();
+    await tx.updateTable(table.boardItem).set({ x: input.x, y: input.y, updatedAt: serverTimestamp() }).where("id", "=", boardItem.id).execute();
   });
 }
 
 export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItemId: string) {
-  if (sourceBoardItemId === targetBoardItemId) throw new GameActionError("Pick two different board items to merge.");
+  const input = MergeBoardItemsInputSchema.parse({ sourceBoardItemId, targetBoardItemId });
+  if (input.sourceBoardItemId === input.targetBoardItemId) throw new GameActionError("Pick two different board items to merge.");
 
   await db.transaction().execute(async (tx) => {
     const { boardRows } = await readMutableSave(tx);
-    const source = boardRows.find((row) => row.id === sourceBoardItemId);
-    const target = boardRows.find((row) => row.id === targetBoardItemId);
+    const source = boardRows.find((row) => row.id === input.sourceBoardItemId);
+    const target = boardRows.find((row) => row.id === input.targetBoardItemId);
     if (!source || !target) throw new GameActionError("Both board items must exist.");
 
     const rule = resolveItemMergeRule(source.itemDefinitionId as ItemId, target.itemDefinitionId as ItemId);
@@ -134,9 +148,10 @@ export async function mergeBoardItems(sourceBoardItemId: string, targetBoardItem
 }
 
 export async function produceBoardItem(boardItemId: string, activation: "single" | "exhaust" = "single"): Promise<ProducerDropResult> {
+  const input = ProduceBoardItemInputSchema.parse({ boardItemId, activation });
   return db.transaction().execute(async (tx) => {
     const mutable = await readMutableSave(tx);
-    const producerRow = mutable.boardRows.find((row) => row.id === boardItemId);
+    const producerRow = mutable.boardRows.find((row) => row.id === input.boardItemId);
     if (!producerRow) throw new GameActionError("Producer does not exist.");
 
     const producer = getProducer(producerRow.itemDefinitionId);
@@ -147,7 +162,7 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
     const producerState = { ...(createInitialBoardState(producerRow.itemDefinitionId).producer ?? {}), ...(state.producer ?? {}) };
 
     const mode = producer.mode ?? { type: "infinite" as const };
-    const isFiniteExhaust = activation === "exhaust" && mode.type === "finite";
+    const isFiniteExhaust = input.activation === "exhaust" && mode.type === "finite";
 
     if (!isFiniteExhaust && producerState.cooldownUntil && Date.parse(producerState.cooldownUntil) > timestamp) {
       throw new GameActionError("Producer is still cooling down.");
@@ -198,12 +213,13 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
 }
 
 export async function buildRecipe(recipeId: string, x: number, y: number) {
+  const input = BuildRecipeInputSchema.parse({ recipeId, x, y });
   await db.transaction().execute(async (tx) => {
     const { save, boardRows, inventoryRows } = await readMutableSave(tx);
-    assertInsideBoard(save, x, y);
-    if (boardRows.some((row) => row.x === x && row.y === y)) throw new GameActionError("Build target is occupied.");
+    assertInsideBoard(save, input.x, input.y);
+    if (boardRows.some((row) => row.x === input.x && row.y === input.y)) throw new GameActionError("Build target is occupied.");
 
-    const recipe = gameDataIndex.buildRecipesById.get(recipeId as BuildRecipeId);
+    const recipe = gameDataIndex.buildRecipesById.get(input.recipeId as BuildRecipeId);
     if (!recipe) throw new GameActionError("Unknown build recipe.");
 
     const costs = [{ itemId: recipe.blueprintItemId, quantity: 1 }, ...recipe.costs];
@@ -214,6 +230,6 @@ export async function buildRecipe(recipeId: string, x: number, y: number) {
       await removeInventoryItems(tx, cost.itemId, cost.quantity);
     }
 
-    await insertBoardItem(tx, recipe.resultItemId, x, y);
+    await insertBoardItem(tx, recipe.resultItemId, input.x, input.y);
   });
 }

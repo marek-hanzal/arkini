@@ -18,8 +18,9 @@ export async function bootstrapDatabase() {
       throw result.error;
     }
 
-    gameDataHash = await syncGameDataManifest();
-    await ensureDefaultSaveGame();
+    const gameDataSync = await syncGameDataManifest();
+    gameDataHash = gameDataSync.hash;
+    await ensureDefaultSaveGame({ resetExisting: gameDataSync.changed });
     migrationState = "ready";
   })();
 

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
 import { inventorySourceId } from "~/inventory/inventoryIdentity";
@@ -9,6 +9,8 @@ import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import type { ActiveSheet } from "~/play/ui/BottomNavigation";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
+import { playBottomNavHold } from "~/play/util/animation";
+import { queryElement } from "~/shared/util/queryElement";
 import { queryRect } from "~/shared/util/queryRect";
 import { waitForPaint } from "~/shared/util/waitForPaint";
 
@@ -37,6 +39,15 @@ export function usePlayProducerActions({
 	hideSources,
 	clearHiddenSources,
 }: usePlayProducerActions.Props) {
+	const [busyProducerIds, setBusyProducerIds] = useState(() => new Set<string>());
+	const setProducerBusy = useCallback((boardItemId: string, busy: boolean) => {
+		setBusyProducerIds((current) => {
+			const next = new Set(current);
+			if (busy) next.add(boardItemId);
+			else next.delete(boardItemId);
+			return next;
+		});
+	}, []);
 	const invalidatePlayData = usePlayDataInvalidation();
 	const produce = usePlayAction(
 		(
@@ -120,8 +131,9 @@ export function usePlayProducerActions({
 		],
 	);
 
-	return useCallback(
+	const produceFrom = useCallback(
 		async (boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") => {
+			setProducerBusy(boardItem.id, true);
 			await schedule(`producer ${activation}`, async () => {
 				try {
 					const result = await produce.mutateAsync({
@@ -135,6 +147,10 @@ export function usePlayProducerActions({
 						],
 						activation === "exhaust" ? 130 : 0,
 					);
+					if (result.placements.some((placement) => placement.kind === "inventory")) {
+						highlightInventoryNav();
+					}
+
 					const depletion = startProducerDepletion(boardItem, result);
 					await waitForPaint();
 					await invalidatePlayData();
@@ -146,6 +162,7 @@ export function usePlayProducerActions({
 					feedback.showError(error);
 				} finally {
 					clearHiddenSources();
+					setProducerBusy(boardItem.id, false);
 				}
 			});
 		},
@@ -156,8 +173,20 @@ export function usePlayProducerActions({
 			hideSources,
 			invalidatePlayData,
 			produce,
+			setProducerBusy,
 			startProducerDepletion,
 			schedule,
+		],
+	);
+
+	return useMemo(
+		() => ({
+			busyProducerIds,
+			produceFrom,
+		}),
+		[
+			busyProducerIds,
+			produceFrom,
 		],
 	);
 }
@@ -178,4 +207,9 @@ function producerPlacementSourceIds(placements: readonly ProducerPlacement[]) {
 
 		return [];
 	});
+}
+
+function highlightInventoryNav() {
+	const element = queryElement('[data-bottom-nav-sheet="inventory"]');
+	if (element) playBottomNavHold(element);
 }

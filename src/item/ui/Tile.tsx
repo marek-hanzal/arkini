@@ -107,7 +107,7 @@ function ProducerBadge({ ui }: ProducerBadge.Props) {
 				"absolute left-0.5 top-0.5 min-w-5 rounded-sm px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-black",
 				ui.waiting
 					? "bg-slate-950/85 text-emerald-200"
-					: "bg-emerald-300 text-slate-950 shadow-[0_0_0.55rem_rgb(110_231_183_/_0.72)]",
+					: "border border-emerald-300/45 bg-slate-950/82 text-emerald-200",
 			)}
 		>
 			<span>{ui.label}</span>

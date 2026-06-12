@@ -6,6 +6,8 @@ const stashExitSeconds = 0.08;
 const successDurationSeconds = 0.56;
 const errorDurationSeconds = 0.26;
 const sheetDurationSeconds = 0.28;
+const bottomNavHoldMs = 900;
+const bottomNavHoldTimers = new WeakMap<HTMLElement, number>();
 
 export interface FlyerTimelineProps {
 	from: RectLike;
@@ -32,7 +34,7 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 			x: 0,
 			y: 0,
 			scale: 1,
-			opacity: kind === "place" ? 0.95 : 1,
+			opacity: 1,
 			transformOrigin: "top left",
 			force3D: true,
 		});
@@ -109,7 +111,7 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 			x,
 			y,
 			scale,
-			opacity: kind === "place" ? 0 : 1,
+			opacity: 1,
 			duration: flyDurationSeconds,
 			ease: "power3.out",
 		});
@@ -166,33 +168,43 @@ export function playCellError(element: HTMLElement) {
 }
 
 export function playBottomNavPulse(element: HTMLElement) {
+	playBottomNavHold(element);
+}
+
+export function playBottomNavHold(element: HTMLElement, holdMs = bottomNavHoldMs) {
+	window.clearTimeout(bottomNavHoldTimers.get(element));
+
 	gsap.killTweensOf(element);
-	gsap.timeline({
-		defaults: {
+	gsap.set(element, {
+		boxShadow: "0 0 0 0.22rem rgb(45 212 191 / 0.18)",
+		borderColor: "rgb(94 234 212 / 0.92)",
+		backgroundColor: "rgb(20 184 166 / 0.28)",
+		color: "rgb(240 253 250)",
+	});
+	gsap.fromTo(
+		element,
+		{
+			y: -1,
+			scale: 1.025,
+		},
+		{
+			y: 0,
+			scale: 1,
+			duration: 0.24,
 			ease: "power2.out",
 		},
-	})
-		.set(element, {
-			boxShadow: "0 0 0 0 rgb(45 212 191 / 0.58)",
-			borderColor: "rgb(94 234 212 / 0.98)",
-			backgroundColor: "rgb(20 184 166 / 0.34)",
-			color: "rgb(240 253 250)",
-			y: 0,
-			scale: 1,
-		})
-		.to(element, {
-			boxShadow: "0 0 0 0.45rem rgb(45 212 191 / 0)",
-			y: -1,
-			scale: 1.035,
-			duration: 0.22,
-		})
-		.to(element, {
+	);
+
+	const timer = window.setTimeout(() => {
+		bottomNavHoldTimers.delete(element);
+		gsap.to(element, {
 			boxShadow: "0 0 0 0 rgb(45 212 191 / 0)",
-			y: 0,
-			scale: 1,
-			duration: 0.34,
+			duration: 0.22,
+			ease: "power2.out",
 			clearProps: "boxShadow,transform,borderColor,backgroundColor,color",
 		});
+	}, holdMs);
+	bottomNavHoldTimers.set(element, timer);
 }
 
 export function animateBottomSheet({

@@ -89,25 +89,14 @@ src/shared/                      Small UI/util hooks and helpers.
 
 ## Local run
 
-```bash
-bun install
-bun run dev
-```
-
-Fallback when Bun is not available:
+Arkini uses npm without a committed lockfile for now. Do not add `package-lock.json`, `bun.lockb`, or other package-manager lockfiles unless the dependency policy changes deliberately. Yes, this is slightly less reproducible; no, pretending the current stale lock is useful would not make it true.
 
 ```bash
-npm install
+npm install --no-package-lock
 npm run dev
 ```
 
 ## Build
-
-```bash
-bun run build
-```
-
-Fallback:
 
 ```bash
 npm run build

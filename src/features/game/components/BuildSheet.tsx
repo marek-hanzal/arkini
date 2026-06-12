@@ -5,7 +5,7 @@ import { BottomSheet } from "./BottomSheet";
 
 export function BuildSheet({ game, cell, onClose, onBuild }: Readonly<{ game: GameView; cell: BuildCell | null; onClose(): void; onBuild(recipeId: BuildRecipeId): void }>) {
   return (
-    <BottomSheet open={Boolean(cell)} backdropClassName="z-40 bg-slate-950/50" sheetClassName="z-50" onClose={onClose}>
+    <BottomSheet open={Boolean(cell)} onClose={onClose}>
       {cell ? (
         <div className="p-4">
           <div className="mb-3 flex items-center justify-between">

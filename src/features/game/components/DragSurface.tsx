@@ -3,7 +3,7 @@ import type { HTMLAttributes, PointerEvent as ReactPointerEvent, ReactNode } fro
 import { cn } from "~/lib/cn";
 import type { DraggablePayload, DroppablePayload } from "../useDraggableControl";
 import { usePressActions } from "../usePressActions";
-import { BottomSheet, type BottomSheetProps } from "./BottomSheet";
+import { PeekBottomSheet, type PeekBottomSheetProps } from "./PeekBottomSheet";
 
 export function DroppableSurface<Target>({
   id,
@@ -48,18 +48,18 @@ export function DroppableBottomSheet<Target>({
   const { setNodeRef, isOver } = useDroppable({ id, data: data as unknown as Data });
 
   return (
-    <BottomSheet
+    <PeekBottomSheet
       ref={setNodeRef}
       data-drag-node-id={nodeId}
       className={typeof className === "function" ? className(isOver) : className}
       {...props}
     >
       {children}
-    </BottomSheet>
+    </PeekBottomSheet>
   );
 }
 
-export interface DroppableBottomSheetProps<Target> extends Omit<BottomSheetProps, "className" | "children"> {
+export interface DroppableBottomSheetProps<Target> extends Omit<PeekBottomSheetProps, "className" | "children"> {
   id: string;
   nodeId?: string;
   payload: DroppablePayload<Target>;

@@ -30,7 +30,9 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 - Auto producers persist pause state, available capacity, next drop time, and recharge time in `boardItem.stateJson`.
 - Auto producers tick from the client and save progress into SQLite, so reloads do not reset their timers like a cheap casino machine.
 - Double-click board items to animate them into the inventory bottom area. Single click on producers still produces immediately; no delayed click timer is used.
-- Double-click/tap an empty board cell to open the build bottom sheet.
+- Double-click/tap an empty board cell to open the build bottom sheet. Build/config sheets use `react-modal-sheet`; the inventory keeps a custom peek sheet because it must show only its header while collapsed.
+- Dragging a board item lightly highlights known merge targets for accessibility. Rejected drops flash the target while the item flies back.
+- Inventory-to-board placement fades the travelling item out under the inventory sheet and fades the target tile in after the commit.
 
 ## Dragging model
 
@@ -45,6 +47,8 @@ src/domains/game-data/index.ts   Single source of truth for item identity and it
 src/domains/game-data/schema.ts  Zod structural validation for the manifest.
 src/domains/database/            OPFS SQLite bootstrap, schema, gameplay mutations, view projection.
 src/features/game/GameShell.tsx  Mobile-first board, bottom-sheet inventory, producer actions, build sheet.
+src/features/game/components/BottomSheet.tsx  Modal sheet wrapper over react-modal-sheet for build/config panels.
+src/features/game/components/PeekBottomSheet.tsx  Header-peeking inventory sheet; not used for modal build panels.
 src/features/game/useDraggableControl.ts  Generic DnD lifecycle/control engine.
 src/features/game/useGameDraggableControl.ts  Arkini-specific accept/reject rules over the generic DnD engine.
 src/hooks/useGameView.ts         TanStack Query bridge over the local SQLite backend.

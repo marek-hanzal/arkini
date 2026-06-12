@@ -202,8 +202,18 @@ function boardToCell(
 		hide: [
 			source.sourceId,
 		],
+		animationTiming: "beforeCommit",
 		animations: [
-			dragToTargetAnimation(source, target),
+			dragToTargetAnimation(source, target, "merge-source"),
+			{
+				itemId: targetItem.itemId,
+				fromNodeId: target.targetNodeId,
+				toNodeId: target.targetNodeId,
+				kind: "merge-target",
+				overlay: {
+					producer: targetItem.producer ?? undefined,
+				},
+			},
 		],
 		commit: () =>
 			actions.mergeBoard({

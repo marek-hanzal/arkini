@@ -103,7 +103,12 @@ function ProducerBadge({ ui }: ProducerBadge.Props) {
 	return (
 		<span
 			title={ui.title}
-			className="absolute left-0.5 top-0.5 min-w-5 rounded-sm bg-slate-950/85 px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-bold text-emerald-200"
+			className={cn(
+				"absolute left-0.5 top-0.5 min-w-5 rounded-sm px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-black",
+				ui.waiting
+					? "bg-slate-950/85 text-emerald-200"
+					: "bg-emerald-300 text-slate-950 shadow-[0_0_0.55rem_rgb(110_231_183_/_0.72)]",
+			)}
 		>
 			<span>{ui.label}</span>
 			{ui.progress !== null ? (

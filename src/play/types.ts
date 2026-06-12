@@ -39,7 +39,7 @@ export interface RectLike {
 	height: number;
 }
 
-export type FlyerKind = "move" | "stash" | "place" | "deplete";
+export type FlyerKind = "move" | "stash" | "place" | "deplete" | "merge-source" | "merge-target";
 
 export interface FlyerModel extends GameVisualMeta {
 	id: string;

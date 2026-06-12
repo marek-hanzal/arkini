@@ -4,9 +4,9 @@ import { ItemIdSchema } from "./ItemIdSchema";
 import { NonNegativeIntegerSchema } from "./NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "./PositiveIntegerSchema";
 import { QuantitySchema } from "./QuantitySchema";
-import { GameConfig } from "./gameDataManifest";
+import { GameConfig } from "./GameConfig";
 
-export const GameDataManifestSchema = z.object({
+export const GameConfigSchema = z.object({
   game: z.object({
     id: z.literal(GameConfig.game.id),
     title: z.literal(GameConfig.game.title),

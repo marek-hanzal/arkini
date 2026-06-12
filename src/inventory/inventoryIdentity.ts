@@ -1,4 +1,4 @@
-import { GameConfig } from "~/manifest/data/gameDataManifest";
+import { GameConfig } from "~/manifest/data/GameConfig";
 
 export const inventoryColumns = GameConfig.game.board.width;
 export const inventorySlots = GameConfig.game.inventory.slots;

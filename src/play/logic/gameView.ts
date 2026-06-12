@@ -1,5 +1,5 @@
 import { gameDataIndex } from "~/manifest/data/gameDataIndex";
-import { gameDataManifest } from "~/manifest/data/gameDataManifest";
+import { GameConfig } from "~/manifest/data/GameConfig";
 import type { ItemId } from "~/manifest/data/manifestId";
 import { readProducerView } from "~/board/logic/boardState";
 import { json, parseJson } from "~/shared/json";
@@ -80,7 +80,7 @@ export function canPayCosts(inventory: readonly InventorySlot[], costs: readonly
 
 function createViewItemMap() {
   return Object.fromEntries(
-    gameDataManifest.items.map((item) => {
+    GameConfig.items.map((item) => {
       const asset = gameDataIndex.assetsById.get(item.assetId);
       if (!asset) throw new Error(`Missing asset for ${item.id}`);
       const producer = gameDataIndex.producersByItemId.get(item.id);

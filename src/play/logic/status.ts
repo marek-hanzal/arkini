@@ -1,5 +1,5 @@
-import { gameDataManifest } from "~/manifest/data/gameDataManifest";
-import { readDatabasePath, readGameDataHash, readMigrationState } from "./bootstrap";
+import { GameConfig } from "~/manifest/data/GameConfig";
+import { readDatabasePath, readGameConfigHash, readMigrationState } from "./bootstrap";
 import { db } from "~/database/local/db";
 import type { Database } from "~/database/local/schema";
 import { table } from "~/database/local/tables";
@@ -7,7 +7,7 @@ import { table } from "~/database/local/tables";
 export interface DatabaseStatus {
   databasePath: string;
   migrationState: "pending" | "ready";
-  gameDataHash: string;
+  gameConfigHash: string;
   assetCount: number;
   itemCount: number;
   mergeCount: number;
@@ -31,12 +31,12 @@ export async function readDatabaseStatus(): Promise<DatabaseStatus> {
   return {
     databasePath: readDatabasePath(),
     migrationState: readMigrationState(),
-    gameDataHash: readGameDataHash(),
-    assetCount: gameDataManifest.assets.length,
-    itemCount: gameDataManifest.items.length,
-    mergeCount: gameDataManifest.items.reduce((sum, item) => sum + (item.merge?.length ?? 0), 0),
-    producerCount: gameDataManifest.items.filter((item) => item.producer).length,
-    buildRecipeCount: gameDataManifest.items.filter((item) => item.build).length,
+    gameConfigHash: readGameConfigHash(),
+    assetCount: GameConfig.assets.length,
+    itemCount: GameConfig.items.length,
+    mergeCount: GameConfig.items.reduce((sum, item) => sum + (item.merge?.length ?? 0), 0),
+    producerCount: GameConfig.items.filter((item) => item.producer).length,
+    buildRecipeCount: GameConfig.items.filter((item) => item.build).length,
     dropTableCount: 0,
     ...Object.fromEntries(counts),
   } as DatabaseStatus;

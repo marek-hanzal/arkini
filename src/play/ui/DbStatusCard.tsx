@@ -38,7 +38,7 @@ export function DbStatusCard() {
 
         <div className="grid min-w-64 flex-1 grid-cols-2 gap-2">
           <StatusPill label="DB" value={status.isSuccess ? status.data.databasePath : "arkini.sqlite3"} />
-          <StatusPill label="Sync" value={status.isSuccess ? status.data.gameDataHash.slice(0, 10) : "pending"} />
+          <StatusPill label="Sync" value={status.isSuccess ? status.data.gameConfigHash.slice(0, 10) : "pending"} />
           <StatusPill label="Items" value={status.isSuccess ? String(status.data.itemCount) : "…"} />
           <StatusPill label="Prod" value={status.isSuccess ? String(status.data.producerCount) : "…"} />
         </div>

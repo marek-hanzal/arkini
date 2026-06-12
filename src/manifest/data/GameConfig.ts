@@ -7,7 +7,7 @@ import type { ProducerDefinition, ProducerDrop, ProducerMode, Quantity } from ".
 
 const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
 
-// One manifest owns the gameplay shape. Items are not passive rows anymore:
+// One config owns the gameplay shape. Items are not passive rows anymore:
 // optional item behavior defines merges, producers, and build recipes in the
 // same place as the visual identity. Data first, glue code second. Miracles.
 export const GameConfig = {
@@ -182,8 +182,6 @@ export const GameConfig = {
 } satisfies GameConfig.Shape;
 
 export type GameConfig = typeof GameConfig;
-export const gameDataManifest = GameConfig;
-export type GameDataManifest = GameConfig;
 
 export namespace GameConfig {
   export interface Shape {

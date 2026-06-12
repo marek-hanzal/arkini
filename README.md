@@ -6,7 +6,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, build, and local database/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
-The game has one gameplay source of truth: `GameConfig` in `src/manifest/data/gameDataManifest.ts`. It carries the game shape, board size, inventory size, assets, item definitions, item behavior, and starting state. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins.
+The game has one gameplay source of truth: `GameConfig` in `src/manifest/data/GameConfig.ts`. It carries the game shape, board size, inventory size, assets, item definitions, item behavior, and starting state. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins.
 
 Item definitions drive behavior. An item may define:
 
@@ -47,7 +47,7 @@ Accepted drag animations run after commit by default. Manual double-tap actions 
 
 ```txt
 src/app/                         App entry, router, global styles, cross-origin isolation fallback.
-src/manifest/data/               GameConfig, Zod manifest schema, validation, derived indexes, SVG assets.
+src/manifest/data/               GameConfig, Zod config schema, validation, derived indexes, SVG assets.
 src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.
 src/play/logic/                  Client-side game backend: bootstrap, save lifecycle, mutations, view projection.
 src/play/hook/                   React Query bridge, event queue, feedback, clock, sheet state, action orchestration.
@@ -123,7 +123,7 @@ On boot:
 
 1. Browser capability checks run.
 2. Kysely migrations run.
-3. `syncGameDataManifest()` validates and hashes `GameConfig`.
+3. `syncGameConfig()` validates and hashes `GameConfig`.
 4. If the stored hash differs from the current hash, the default save is deleted.
 5. `ensureDefaultSaveGame()` creates the default save from the current starting state when missing.
 

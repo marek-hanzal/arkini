@@ -20,7 +20,7 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 ## Gameplay model
 
 - Board is a 7×9 grid.
-- Inventory is 36 slots shown in a mobile-first bottom sheet.
+- Inventory is 36 slots shown from the bottom navigation. Database/debug controls live in the same sheet system.
 - Board and inventory use zero-gap square cells to avoid DnD blind spots.
 - Merging happens on the board only.
 - Inventory stores stacks and can combine compatible stacks.
@@ -30,7 +30,7 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 - Auto producers persist pause state, available capacity, next drop time, and recharge time in `boardItem.stateJson`.
 - Auto producers tick from the client and save progress into SQLite, so reloads do not reset their timers like a cheap casino machine.
 - Double-click board items to animate them into the inventory bottom area. Single click on producers still produces immediately; no delayed click timer is used.
-- Double-click/tap an empty board cell to open the build bottom sheet. Build/config sheets and the peeking inventory both use `react-modal-sheet`; inventory uses snap points so the collapsed state shows only its header.
+- Double-click/tap an empty board cell to open the build sheet. Build, inventory, and database panels all share one always-mounted `react-modal-sheet` wrapper with snap points; the closed detent stays hidden under the bottom nav so panel animations remain stable.
 - Dragging a board item lightly highlights known merge targets for accessibility. Rejected drops flash the target while the item flies back.
 - Inventory-to-board placement fades the travelling item out under the inventory sheet and fades the target tile in after the commit.
 
@@ -46,8 +46,8 @@ Game-specific policy lives in `src/features/game/useGameDraggableControl.ts`. Th
 src/domains/game-data/index.ts   Single source of truth for item identity and item behavior.
 src/domains/game-data/schema.ts  Zod structural validation for the manifest.
 src/domains/database/            OPFS SQLite bootstrap, schema, gameplay mutations, view projection.
-src/features/game/GameShell.tsx  Mobile-first board, bottom-sheet inventory, producer actions, build sheet.
-src/features/game/components/BottomSheet.tsx  Shared react-modal-sheet wrapper for modal panels and header-peeking snap sheets.
+src/features/game/GameShell.tsx  Fixed-viewport board, bottom navigation, shared bottom sheet orchestration, producer actions.
+src/features/game/components/BottomSheet.tsx  Shared always-mounted react-modal-sheet wrapper with snap-point control.
 src/features/game/useDraggableControl.ts  Generic DnD lifecycle/control engine.
 src/features/game/useGameDraggableControl.ts  Arkini-specific accept/reject rules over the generic DnD engine.
 src/hooks/useGameView.ts         TanStack Query bridge over the local SQLite backend.

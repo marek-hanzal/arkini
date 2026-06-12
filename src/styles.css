@@ -3,7 +3,11 @@
 html,
 body,
 #root {
-  min-height: 100%;
+  width: 100dvw;
+  height: 100dvh;
+  min-width: 100dvw;
+  min-height: 100dvh;
+  overflow: hidden;
 }
 
 body {
@@ -22,6 +26,10 @@ body {
 
 button {
   touch-action: manipulation;
+}
+
+.ak-game-width {
+  width: min(calc(100dvw - 1.5rem), 430px);
 }
 
 .ak-fly {
@@ -125,7 +133,6 @@ button {
 }
 
 .ak-merge-pop {
-  z-index: 2;
   will-change: transform, filter;
   animation: ak-merge-pop 520ms cubic-bezier(0.2, 0.9, 0.2, 1.1) both;
 }
@@ -170,35 +177,32 @@ button {
   }
 }
 
-/* react-modal-sheet ships sane mechanics but iOS-ish visuals. Arkini needs the
-   sheet to look like part of the board UI, not like a rental settings panel. */
-.ak-bottom-sheet-container.react-modal-sheet-container,
-.ak-bottom-sheet-container {
-  width: min(calc(100vw - 1.5rem), 430px) !important;
-  margin-right: auto !important;
-  margin-left: auto !important;
-  overflow: hidden !important;
-  border: 1px solid rgb(30 41 59 / 1) !important;
-  border-radius: 0.5rem 0.5rem 0 0 !important;
-  background: rgb(2 6 23 / 0.96) !important;
-  color: rgb(241 245 249 / 1) !important;
-  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.6) !important;
+.react-modal-sheet-container.ak-bottom-sheet-container {
+  width: min(calc(100dvw - 1.5rem), 430px);
+  max-width: min(calc(100dvw - 1.5rem), 430px);
+  height: min(72dvh, 34rem);
+  margin-right: auto;
+  margin-left: auto;
+  overflow: hidden;
+  border: 1px solid rgb(30 41 59);
+  border-bottom: 0;
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: rgb(2 6 23 / 0.98);
+  color: rgb(241 245 249);
+  box-shadow: 0 -1.25rem 3rem rgb(0 0 0 / 0.55);
 }
 
-.ak-bottom-sheet-header.react-modal-sheet-header,
-.ak-bottom-sheet-header {
-  height: 5rem !important;
-  border-bottom: 1px solid rgb(30 41 59 / 0.8) !important;
-  background: linear-gradient(180deg, rgb(15 23 42 / 0.96), rgb(2 6 23 / 0.96)) !important;
+.react-modal-sheet-content.ak-bottom-sheet-content {
+  min-height: 0;
+  background: rgb(2 6 23 / 0.98);
+  overscroll-behavior: contain;
 }
 
-.ak-bottom-sheet-content.react-modal-sheet-content,
-.ak-bottom-sheet-content {
-  overscroll-behavior: contain !important;
-  background: rgb(2 6 23 / 0.96) !important;
+.react-modal-sheet-content-scroller {
+  height: 100%;
+  overscroll-behavior: contain;
 }
 
-.ak-bottom-sheet-backdrop.react-modal-sheet-backdrop,
-.ak-bottom-sheet-backdrop {
-  background: rgb(2 6 23 / 0.55) !important;
+.react-modal-sheet-backdrop.ak-bottom-sheet-backdrop {
+  background: rgb(2 6 23 / 0.55);
 }

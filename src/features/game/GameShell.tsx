@@ -1,9 +1,12 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
+import { DbStatusCard } from "~/components/DbStatusCard";
 import type { BuildRecipeId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, InventorySlot, ProducerDropResult } from "~/domains/database";
 import { useGameAction, useGameDataInvalidation, useGameView } from "~/hooks/useGameView";
+import { cn } from "~/lib/cn";
 import { Board } from "./components/Board";
+import { BottomSheet } from "./components/BottomSheet";
 import { BuildSheet } from "./components/BuildSheet";
 import { Flyer } from "./components/Flyer";
 import { InventorySheet } from "./components/InventorySheet";
@@ -20,15 +23,17 @@ import {
   type BuildCell,
   type GameDragData,
 } from "./types";
-import { useGameDraggableControl } from "./useGameDraggableControl";
 import { useFlyers } from "./useFlyers";
+import { useGameDraggableControl } from "./useGameDraggableControl";
 import { useGameFeedback } from "./useGameFeedback";
+
+type ActiveSheet = "inventory" | "database" | "build" | null;
 
 export function GameShell() {
   const gameQuery = useGameView();
   const game = gameQuery.data;
   const invalidateGameData = useGameDataInvalidation();
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const [buildCell, setBuildCell] = useState<BuildCell | null>(null);
   const { flyers, addFlyer } = useFlyers();
   const [nowMs, setNowMs] = useState(Date.now());
@@ -88,6 +93,21 @@ export function GameShell() {
     }, 1000);
     return () => window.clearInterval(interval);
   }, [advanceAuto, invalidateGameData]);
+
+  function closeSheet() {
+    setActiveSheet(null);
+    setBuildCell(null);
+  }
+
+  function openSheet(sheet: Exclude<ActiveSheet, null>) {
+    setActiveSheet((current) => (current === sheet ? null : sheet));
+    if (sheet !== "build") setBuildCell(null);
+  }
+
+  function openBuild(cell: BuildCell) {
+    setBuildCell(cell);
+    setActiveSheet("build");
+  }
 
   async function produceFrom(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") {
     try {
@@ -180,7 +200,7 @@ export function GameShell() {
       for (const placement of result.placements) {
         const targetRect = placement.kind === "board"
           ? queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`)
-          : sheetOpen ? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`) : null;
+          : activeSheet === "inventory" ? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`) : null;
 
         if (placement.kind === "board") {
           if (!targetRect) continue;
@@ -197,73 +217,97 @@ export function GameShell() {
   }
 
   if (gameQuery.isPending) {
-    return <div className="grid h-[70vh] w-[min(100vw-1.5rem,430px)] place-items-center text-sm text-slate-400">Booting SQLite…</div>;
+    return <div className="grid h-dvh w-dvw place-items-center text-sm text-slate-400">Booting SQLite…</div>;
   }
 
   if (gameQuery.isError || !game) {
-    return <div className="rounded-md border border-red-400/30 bg-red-950/30 p-4 text-sm text-red-100">{(gameQuery.error as Error)?.message ?? "Game failed to load."}</div>;
+    return <div className="grid h-dvh w-dvw place-items-center p-4"><div className="rounded-md border border-red-400/30 bg-red-950/30 p-4 text-sm text-red-100">{(gameQuery.error as Error)?.message ?? "Game failed to load."}</div></div>;
   }
 
   return (
     <DndContext {...drag.contextProps}>
-      <section className="relative flex w-[min(100vw-1.5rem,430px)] flex-col gap-3 pb-3">
-        <div className="rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
-          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Arkini</p>
-          <h1 className="text-lg font-semibold text-slate-50">Merge board</h1>
+      <div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
+        <main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
+          <div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
+            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Arkini</p>
+            <h1 className="text-lg font-semibold text-slate-50">Merge board</h1>
+          </div>
+
+          <div className="min-h-0 shrink-0">
+            <Board
+              game={game}
+              activeDrag={drag.activeDrag}
+              isSourceHidden={drag.isSourceHidden}
+              invalidBoardCellKey={feedback.invalidBoardCellKey}
+              pulsedBoardCellKey={feedback.pulsedBoardCellKey}
+              mergedBoardCellKey={feedback.mergedBoardCellKey}
+              nowMs={nowMs}
+              onEmptyDoubleActivate={openBuild}
+              onTileSingleActivate={(item) => {
+                if (!item.producer) return;
+                void produceFrom(item, "single");
+              }}
+              onTileDoubleActivate={(item) => {
+                void stashBoardWithFly(item);
+              }}
+            />
+          </div>
+        </main>
+
+        <BottomNavigation activeSheet={activeSheet} onOpen={openSheet} />
+      </div>
+
+      <BottomSheet open={activeSheet !== null} onClose={closeSheet}>
+        <div className="h-full min-h-0">
+          <section className={cn("h-full min-h-0", activeSheet !== "inventory" && "hidden")} aria-hidden={activeSheet !== "inventory"}>
+            <InventorySheet
+              game={game}
+              isSourceHidden={drag.isSourceHidden}
+              invalidInventorySlot={feedback.invalidInventorySlot}
+              pulsedInventorySlot={feedback.pulsedInventorySlot}
+              onClose={closeSheet}
+              onSlotDoubleActivate={(slot) => {
+                void placeInventoryOnBoardWithFly(slot);
+              }}
+            />
+          </section>
+
+          <section className={cn("h-full min-h-0 overflow-y-auto overscroll-contain p-4", activeSheet !== "database" && "hidden")} aria-hidden={activeSheet !== "database"}>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[0.62rem] uppercase tracking-[0.22em] text-emerald-300">System</p>
+                <p className="text-sm text-slate-300">Local database</p>
+              </div>
+              <button type="button" className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300" onClick={closeSheet}>Close</button>
+            </div>
+            <DbStatusCard />
+          </section>
+
+          <section className={cn("h-full min-h-0 overflow-y-auto overscroll-contain", activeSheet !== "build" && "hidden")} aria-hidden={activeSheet !== "build"}>
+            <BuildSheet
+              game={game}
+              cell={buildCell}
+              onClose={closeSheet}
+              onBuild={(recipeId) => {
+                if (!buildCell) return;
+                build.mutate(
+                  { recipeId, x: buildCell.x, y: buildCell.y },
+                  {
+                    onSuccess: () => {
+                      feedback.pulseBoardCell(cellKey(buildCell.x, buildCell.y));
+                      closeSheet();
+                    },
+                    onError(error) {
+                      feedback.flashBoardCell(cellKey(buildCell.x, buildCell.y), "error");
+                      feedback.showError(error);
+                    },
+                  },
+                );
+              }}
+            />
+          </section>
         </div>
-
-        <Board
-          game={game}
-          activeDrag={drag.activeDrag}
-          isSourceHidden={drag.isSourceHidden}
-          invalidBoardCellKey={feedback.invalidBoardCellKey}
-          pulsedBoardCellKey={feedback.pulsedBoardCellKey}
-          mergedBoardCellKey={feedback.mergedBoardCellKey}
-          nowMs={nowMs}
-          onEmptyDoubleActivate={setBuildCell}
-          onTileSingleActivate={(item) => {
-            if (!item.producer) return;
-            void produceFrom(item, "single");
-          }}
-          onTileDoubleActivate={(item) => {
-            void stashBoardWithFly(item);
-          }}
-        />
-
-        <BuildSheet
-          game={game}
-          cell={buildCell}
-          onClose={() => setBuildCell(null)}
-          onBuild={(recipeId) => {
-            if (!buildCell) return;
-            build.mutate(
-              { recipeId, x: buildCell.x, y: buildCell.y },
-              {
-                onSuccess: () => {
-                  feedback.pulseBoardCell(cellKey(buildCell.x, buildCell.y));
-                  setBuildCell(null);
-                },
-                onError(error) {
-                  feedback.flashBoardCell(cellKey(buildCell.x, buildCell.y), "error");
-                  feedback.showError(error);
-                },
-              },
-            );
-          }}
-        />
-      </section>
-
-      <InventorySheet
-        game={game}
-        open={sheetOpen}
-        isSourceHidden={drag.isSourceHidden}
-        invalidInventorySlot={feedback.invalidInventorySlot}
-        pulsedInventorySlot={feedback.pulsedInventorySlot}
-        onOpenChange={setSheetOpen}
-        onSlotDoubleActivate={(slot) => {
-          void placeInventoryOnBoardWithFly(slot);
-        }}
-      />
+      </BottomSheet>
 
       {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} />)}
 
@@ -278,6 +322,31 @@ export function GameShell() {
         ) : null}
       </DragOverlay>
     </DndContext>
+  );
+}
+
+function BottomNavigation({ activeSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; onOpen(sheet: Exclude<ActiveSheet, null>): void }>) {
+  return (
+    <nav className="absolute inset-x-3 bottom-0 mx-auto flex h-[calc(4rem+env(safe-area-inset-bottom))] ak-game-width items-start justify-center gap-2 border-t border-slate-800 bg-slate-950/95 px-3 pt-2 shadow-2xl shadow-black/60">
+      <BottomNavButton active={activeSheet === "inventory"} label="Inventory" icon="▦" onClick={() => onOpen("inventory")} />
+      <BottomNavButton active={activeSheet === "database"} label="Database" icon="◈" onClick={() => onOpen("database")} />
+    </nav>
+  );
+}
+
+function BottomNavButton({ active, label, icon, onClick }: Readonly<{ active: boolean; label: string; icon: string; onClick(): void }>) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "flex min-w-24 flex-col items-center gap-1 rounded-sm border px-3 py-1.5 text-xs font-semibold transition",
+        active ? "border-emerald-300/70 bg-emerald-400/10 text-emerald-100" : "border-slate-800 bg-slate-900/70 text-slate-300 hover:border-slate-600",
+      )}
+      onClick={onClick}
+    >
+      <span className="text-base leading-none">{icon}</span>
+      <span>{label}</span>
+    </button>
   );
 }
 

@@ -1,9 +1,8 @@
 import { useDraggable, useDroppable, type Data } from "@dnd-kit/core";
-import type { HTMLAttributes, PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { cn } from "~/lib/cn";
 import type { DraggablePayload, DroppablePayload } from "../useDraggableControl";
 import { usePressActions } from "../usePressActions";
-import { BottomSheet, type BottomSheetProps } from "./BottomSheet";
 
 export function DroppableSurface<Target>({
   id,
@@ -29,38 +28,6 @@ export function DroppableSurface<Target>({
 }
 
 export interface DroppableSurfaceProps<Target> extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "children"> {
-  id: string;
-  nodeId?: string;
-  payload: DroppablePayload<Target>;
-  className?: string | ((isOver: boolean) => string);
-  children: ReactNode;
-}
-
-export function DroppableBottomSheet<Target>({
-  id,
-  nodeId = id,
-  payload,
-  className,
-  children,
-  ...props
-}: Readonly<DroppableBottomSheetProps<Target>>) {
-  const data = { ...payload, targetNodeId: payload.targetNodeId ?? nodeId } satisfies DroppablePayload<Target>;
-  const { setNodeRef, isOver } = useDroppable({ id, data: data as unknown as Data });
-
-  return (
-    <BottomSheet
-      ref={setNodeRef}
-      variant="peek"
-      data-drag-node-id={nodeId}
-      className={typeof className === "function" ? className(isOver) : className}
-      {...props}
-    >
-      {children}
-    </BottomSheet>
-  );
-}
-
-export interface DroppableBottomSheetProps<Target> extends Omit<BottomSheetProps, "variant" | "className" | "children"> {
   id: string;
   nodeId?: string;
   payload: DroppablePayload<Target>;
@@ -101,6 +68,10 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
     press.onPointerCancel();
   }
 
+  function keyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    listeners?.onKeyDown?.(event);
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -109,7 +80,7 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
       {...props}
       className={cn(className, (hidden || isDragging) && "opacity-0")}
       onClick={press.onClick}
-      onKeyDown={listeners?.onKeyDown}
+      onKeyDown={keyDown}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}

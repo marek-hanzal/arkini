@@ -255,7 +255,7 @@ async function runFeedback(feedback: (() => void | Promise<void>) | undefined) {
 function waitForPaint() {
   return new Promise<void>((resolve) => {
     window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(resolve);
+      window.requestAnimationFrame(() => resolve());
     });
   });
 }

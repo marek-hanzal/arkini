@@ -1,5 +1,4 @@
-import type { ReactNode } from "react";
-import type { GameView, InventorySlot, ViewItem } from "~/domains/database";
+import type { InventorySlot, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import {
   inventoryBinNodeId,
@@ -8,48 +7,43 @@ import {
   type GameDragData,
   type GameDropData,
 } from "../types";
-import { DraggableSurface, DroppableBottomSheet, DroppableSurface } from "./DragSurface";
+import { DraggableSurface, DroppableSurface } from "./DragSurface";
 import { Tile } from "./Tile";
 
 export function InventorySheet({
   game,
-  open,
   isSourceHidden,
   invalidInventorySlot,
   pulsedInventorySlot,
-  onOpenChange,
+  onClose,
   onSlotDoubleActivate,
 }: Readonly<{
   game: GameView;
-  open: boolean;
   isSourceHidden(sourceId: string): boolean;
   invalidInventorySlot: number | null;
   pulsedInventorySlot: number | null;
-  onOpenChange(open: boolean): void;
+  onClose(): void;
   onSlotDoubleActivate(slot: InventorySlot): void;
 }>) {
   const filled = game.inventory.filter((slot) => slot.stack).length;
 
-  const header = (
-    <div data-inventory-summary className="flex h-full items-center justify-between gap-3">
-      <div>
-        <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">Inventory</p>
-        <p className="text-sm text-slate-300">{filled}/{game.inventory.length} slots</p>
-      </div>
-      <button
-        type="button"
-        className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300"
-        onClick={() => onOpenChange(!open)}
-      >
-        {open ? "Close" : "Open"}
-      </button>
-    </div>
-  );
-
   return (
-    <InventoryDropBin open={open} header={header} overClassName="outline outline-2 -outline-offset-2 outline-emerald-300/70" onOpenChange={onOpenChange} onClose={() => onOpenChange(false)}>
-      <div className="max-h-[60vh] overflow-y-auto overscroll-contain pb-4">
-        <div className="grid grid-cols-4 gap-0 overflow-hidden border-x border-slate-800">
+    <DroppableSurface
+      id={inventoryBinNodeId}
+      nodeId={inventoryBinNodeId}
+      payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
+      className={(isOver) => cn("flex h-full min-h-0 flex-col", isOver && "outline outline-2 -outline-offset-2 outline-emerald-300/70")}
+    >
+      <div data-inventory-summary className="flex items-center justify-between gap-3 border-b border-slate-800/80 p-4">
+        <div>
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">Inventory</p>
+          <p className="text-sm text-slate-300">{filled}/{game.inventory.length} slots</p>
+        </div>
+        <button type="button" className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300" onClick={onClose}>Close</button>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
+        <div className="grid grid-cols-4 gap-0 overflow-hidden border-l border-t border-slate-800">
           {game.inventory.map((slot) => (
             <InventoryCell
               key={slot.slotIndex}
@@ -63,26 +57,7 @@ export function InventorySheet({
           ))}
         </div>
       </div>
-    </InventoryDropBin>
-  );
-}
-
-function InventoryDropBin({ children, open, header, overClassName, onOpenChange, onClose }: Readonly<{ children: ReactNode; open: boolean; header: ReactNode; overClassName: string; onOpenChange(open: boolean): void; onClose(): void }>) {
-  return (
-    <DroppableBottomSheet
-      id={inventoryBinNodeId}
-      nodeId={inventoryBinNodeId}
-      payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
-      open={open}
-      header={header}
-      peekHeight={80}
-      className={(isOver) => cn("z-30", isOver && overClassName)}
-      contentClassName="max-h-none overflow-visible"
-      onOpenChange={onOpenChange}
-      onClose={onClose}
-    >
-      {children}
-    </DroppableBottomSheet>
+    </DroppableSurface>
   );
 }
 
@@ -112,7 +87,7 @@ function InventoryCell({
       data-inventory-slot={slot.slotIndex}
       className={(isOver) => cn(
         "relative aspect-square border-b border-r border-slate-800 bg-slate-900/70 transition-colors duration-200",
-        isOver && "z-10 bg-slate-800 outline outline-2 -outline-offset-2 outline-emerald-300/80",
+        isOver && "bg-slate-800 outline outline-2 -outline-offset-2 outline-emerald-300/80",
         invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
         pulsed && !invalid && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
       )}

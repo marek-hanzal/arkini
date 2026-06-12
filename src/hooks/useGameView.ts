@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { GameView } from "~/domains/database";
 
 export const gameQueryKey = ["arkini", "game"] as const;
 export const databaseStatusQueryKey = ["arkini", "database", "status"] as const;
@@ -9,7 +10,7 @@ async function loadDb() {
   return db;
 }
 
-export function useGameView() {
+export function useGameView<TData = GameView>(select?: (game: GameView) => TData) {
   return useQuery({
     queryKey: gameQueryKey,
     enabled: typeof window !== "undefined",
@@ -17,7 +18,12 @@ export function useGameView() {
       const db = await loadDb();
       return db.readGameView();
     },
+    select,
   });
+}
+
+export namespace useGameView {
+  export type Select<TData> = (game: GameView) => TData;
 }
 
 export function useGameDataInvalidation() {
@@ -33,7 +39,7 @@ export function useGameDataInvalidation() {
 
 export function useGameAction<TVariables, TResult = void>(
   action: (db: typeof import("~/domains/database"), variables: TVariables) => Promise<TResult>,
-  options: { invalidateOnSuccess?: boolean } = {},
+  options: useGameAction.Options = {},
 ) {
   const invalidateGameData = useGameDataInvalidation();
 
@@ -47,4 +53,10 @@ export function useGameAction<TVariables, TResult = void>(
       await invalidateGameData();
     },
   });
+}
+
+export namespace useGameAction {
+  export interface Options {
+    invalidateOnSuccess?: boolean;
+  }
 }

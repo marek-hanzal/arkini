@@ -2,9 +2,9 @@ import { assertGameDataManifest, gameDataManifest, type GameDataManifest } from 
 import { db } from "./db";
 import { table } from "./tables";
 
-// Runtime game definitions live in the versioned TypeScript manifest. OPFS only
-// stores mutable save state plus a manifest hash, so static definition data does
-// not get duplicated into SQLite like some ceremonial enterprise sacrifice.
+// Runtime game definitions live in the TypeScript manifest. OPFS stores
+// mutable save state plus a manifest hash for debugging; prototype save
+// compatibility is handled by the reset button, not by sneaky state surgery.
 export async function syncGameDataManifest(manifest: GameDataManifest = gameDataManifest) {
   assertGameDataManifest(manifest);
 
@@ -16,12 +16,6 @@ export async function syncGameDataManifest(manifest: GameDataManifest = gameData
       .insertInto(table.metadata)
       .values({ key: "gameDataHash", value: manifestHash, updatedAt: timestamp })
       .onConflict((oc) => oc.column("key").doUpdateSet({ value: manifestHash, updatedAt: timestamp }))
-      .execute();
-
-    await tx
-      .insertInto(table.metadata)
-      .values({ key: "gameDataVersion", value: String(manifest.game.dataVersion), updatedAt: timestamp })
-      .onConflict((oc) => oc.column("key").doUpdateSet({ value: String(manifest.game.dataVersion), updatedAt: timestamp }))
       .execute();
   });
 

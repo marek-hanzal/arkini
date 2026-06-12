@@ -3,7 +3,6 @@ import { parseGameDataManifest } from "./schema";
 
 export type AssetId = `asset:${string}`;
 export type ItemId = `item:${string}`;
-export type DropTableId = `drop:${string}`;
 export type BuildRecipeId = `build:${string}`;
 export type MergeDefinitionId = `merge:${string}`;
 
@@ -23,53 +22,50 @@ export interface ItemDefinition {
   tier: number;
   maxStackSize: number;
   description: string;
+  label?: string;
   tags: readonly string[];
   sort: number;
+  merge?: readonly ItemMergeRule[];
+  producer?: ProducerDefinition;
+  build?: ItemBuildRecipe;
 }
 
-export interface MergeDefinition {
+export interface ItemMergeRule {
   id: MergeDefinitionId;
-  inputItemId: ItemId;
-  inputCount: number;
-  outputItemId: ItemId;
+  withItemId: ItemId;
+  resultItemId: ItemId;
+  inputCount?: 2;
+  secret?: boolean;
 }
-
-export interface DropTableDefinition {
-  id: DropTableId;
-  label: string;
-  entries: readonly DropTableEntry[];
-}
-
-export type DropTableEntry =
-  | { itemId: ItemId; weight: number; quantity: number | { min: number; max: number } }
-  | { itemId: null; weight: number; quantity?: never };
 
 export interface ProducerDefinition {
-  itemId: ItemId;
-  cooldownMs: number;
-  mode: ProducerMode;
-  spawn: ProducerSpawn;
-  rolls: readonly ProducerRoll[];
+  trigger: "click" | "auto";
+  placement: "board_then_inventory";
+  drops: readonly ProducerDrop[];
+  cooldownMs?: number;
+  mode?: ProducerMode;
+  doubleClickBehavior?: "exhaust";
 }
 
 export type ProducerMode =
   | { type: "infinite" }
-  | { type: "finite"; charges: number; onDepleted: "remove" | { replaceWithItemId: ItemId } };
+  | { type: "finite"; charges: number; onDepleted: "remove" | { replaceWithItemId: ItemId } }
+  | {
+      type: "auto";
+      tickMs: number;
+      capacity: number;
+      rechargeMs: number;
+      enabledByDefault: boolean;
+    };
 
-export interface ProducerSpawn {
-  type: "around_self";
-  radius: 1;
-  placement: "all_or_nothing";
-}
+export type ProducerDrop =
+  | { itemId: ItemId; weight: number; quantity?: Quantity }
+  | { itemId: null; weight: number; quantity?: never };
 
-export interface ProducerRoll {
-  dropTableId: DropTableId;
-  count: number | { min: number; max: number };
-}
+export type Quantity = number | { min: number; max: number };
 
-export interface BuildRecipeDefinition {
+export interface ItemBuildRecipe {
   id: BuildRecipeId;
-  blueprintItemId: ItemId;
   resultItemId: ItemId;
   costs: readonly BuildRecipeCost[];
 }
@@ -83,16 +79,11 @@ export interface GameDataManifest {
   game: {
     id: "arkini";
     title: "Arkini";
-    dataVersion: number;
     board: { width: 7; height: 9 };
     inventory: { slots: number };
   };
   assets: readonly AssetDefinition[];
   items: readonly ItemDefinition[];
-  merges: readonly MergeDefinition[];
-  dropTables: readonly DropTableDefinition[];
-  producers: readonly ProducerDefinition[];
-  buildRecipes: readonly BuildRecipeDefinition[];
   startingState: {
     inventory: readonly { itemId: ItemId; quantity: number }[];
     board: readonly { itemId: ItemId; x: number; y: number }[];
@@ -101,13 +92,13 @@ export interface GameDataManifest {
 
 const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
 
-// Single source of truth for static gameplay data. Migrations create storage;
-// this manifest defines the current game rules and is synced on every boot.
+// One manifest owns the gameplay shape. Items are not passive rows anymore:
+// optional item behavior defines merges, producers, and build recipes in the
+// same place as the visual identity. Data first, glue code second. Miracles.
 export const gameDataManifest = {
   game: {
     id: "arkini",
     title: "Arkini",
-    dataVersion: 3,
     board: { width: 7, height: 9 },
     inventory: { slots: 36 },
   },
@@ -132,317 +123,267 @@ export const gameDataManifest = {
     { id: "asset:ui-slot", kind: "ui", label: "Board Slot", src: svg("ui-slot"), sort: 1000 },
   ],
   items: [
-    item("item:seed", "asset:item-seed", "seed", "Seed", 1, 50, "Tiny start of something suspiciously grindy.", ["material", "plant"], 10),
-    item("item:sprout", "asset:item-sprout", "sprout", "Sprout", 2, 50, "A plant pretending it has a future.", ["material", "plant"], 20),
+    item("item:seed", "asset:item-seed", "seed", "Seed", 1, 50, "Tiny start of something suspiciously grindy.", ["material", "plant"], 10, {
+      merge: [same("merge:seed-seed-sprout", "item:seed", "item:sprout")],
+    }),
+    item("item:sprout", "asset:item-sprout", "sprout", "Sprout", 2, 50, "A plant pretending it has a future.", ["material", "plant"], 20, {
+      merge: [same("merge:sprout-sprout-leaf", "item:sprout", "item:leaf")],
+    }),
     item("item:leaf", "asset:item-leaf", "leaf", "Leaf", 3, 50, "Photosynthesis, but make it collectible.", ["material", "plant"], 30),
-    item("item:twig", "asset:item-twig", "twig", "Twig", 1, 50, "Nature's disposable stick.", ["material", "wood"], 40),
-    item("item:branch", "asset:item-branch", "branch", "Branch", 2, 50, "Bigger stick. Humanity is saved.", ["material", "wood"], 50),
+    item("item:twig", "asset:item-twig", "twig", "Twig", 1, 50, "Nature's disposable stick.", ["material", "wood"], 40, {
+      merge: [
+        same("merge:twig-twig-branch", "item:twig", "item:branch"),
+        combo("merge:twig-water-sprout", "item:water", "item:sprout", true),
+      ],
+    }),
+    item("item:branch", "asset:item-branch", "branch", "Branch", 2, 50, "Bigger stick. Humanity is saved.", ["material", "wood"], 50, {
+      merge: [same("merge:branch-branch-log", "item:branch", "item:log")],
+    }),
     item("item:log", "asset:item-log", "log", "Log", 3, 50, "A tree with fewer opinions.", ["material", "wood"], 60),
-    item("item:pebble", "asset:item-pebble", "pebble", "Pebble", 1, 50, "Small rock. Big destiny. Apparently.", ["material", "stone"], 70),
-    item("item:stone", "asset:item-stone", "stone", "Stone", 2, 50, "Rock with self-esteem.", ["material", "stone"], 80),
+    item("item:pebble", "asset:item-pebble", "pebble", "Pebble", 1, 50, "Small rock. Big destiny. Apparently.", ["material", "stone"], 70, {
+      merge: [same("merge:pebble-pebble-stone", "item:pebble", "item:stone")],
+    }),
+    item("item:stone", "asset:item-stone", "stone", "Stone", 2, 50, "Rock with self-esteem.", ["material", "stone"], 80, {
+      merge: [
+        same("merge:stone-stone-crystal", "item:stone", "item:crystal"),
+        combo("merge:stone-water-crystal", "item:water", "item:crystal", true),
+      ],
+    }),
     item("item:crystal", "asset:item-crystal", "crystal", "Crystal", 3, 25, "Shiny enough to justify bad decisions.", ["material", "stone", "rare"], 90),
     item("item:water", "asset:item-water", "water", "Water", 1, 50, "Liquid logistics. Somehow still your problem.", ["material", "water"], 100),
 
-    item("item:blueprint-townhall", "asset:item-blueprint", "blueprint-townhall", "Town Hall Blueprint", 1, 5, "Consumable plan for one town hall.", ["blueprint"], 200),
-    item("item:blueprint-lumber-camp", "asset:item-blueprint", "blueprint-lumber-camp", "Lumber Camp Blueprint", 1, 5, "Consumable plan for a wood producer.", ["blueprint"], 210),
-    item("item:blueprint-quarry", "asset:item-blueprint", "blueprint-quarry", "Quarry Blueprint", 1, 5, "Consumable plan for a stone producer.", ["blueprint"], 220),
+    item("item:blueprint-townhall", "asset:item-blueprint", "blueprint-townhall", "Town Hall Blueprint", 1, 5, "Consumable plan for one town hall.", ["blueprint"], 200, {
+      build: build("build:townhall", "item:townhall-1", [cost("item:twig", 2), cost("item:pebble", 2)]),
+    }),
+    item("item:blueprint-lumber-camp", "asset:item-blueprint", "blueprint-lumber-camp", "Lumber Camp Blueprint", 1, 5, "Consumable plan for a wood producer.", ["blueprint"], 210, {
+      build: build("build:lumber-camp", "item:lumber-camp-1", [cost("item:twig", 4), cost("item:branch", 1)]),
+    }),
+    item("item:blueprint-quarry", "asset:item-blueprint", "blueprint-quarry", "Quarry Blueprint", 1, 5, "Consumable plan for a stone producer.", ["blueprint"], 220, {
+      build: build("build:quarry", "item:quarry-1", [cost("item:pebble", 4), cost("item:stone", 1)]),
+    }),
 
-    item("item:townhall-1", "asset:item-townhall", "townhall-1", "Town Hall I", 1, 1, "A tiny bureaucracy that spits out progress.", ["producer", "building", "townhall"], 300),
-    item("item:townhall-2", "asset:item-townhall", "townhall-2", "Town Hall II", 2, 1, "Same bureaucracy, slightly shinier clipboard.", ["producer", "building", "townhall"], 310),
-    item("item:townhall-3", "asset:item-townhall", "townhall-3", "Town Hall III", 3, 1, "Municipal paperwork with actual momentum.", ["producer", "building", "townhall"], 320),
+    item("item:townhall-1", "asset:item-townhall", "townhall-1", "Town Hall I", 1, 1, "A tiny bureaucracy that spits out progress.", ["producer", "building", "townhall"], 300, {
+      label: "1",
+      merge: [same("merge:townhall-1-townhall-2", "item:townhall-1", "item:townhall-2")],
+      producer: clickProducer(3500, drops([
+        drop("item:blueprint-lumber-camp", 28),
+        drop("item:blueprint-quarry", 28),
+        drop("item:blueprint-townhall", 18),
+        drop("item:water", 18),
+        drop("item:crate-1", 8),
+      ])),
+    }),
+    item("item:townhall-2", "asset:item-townhall", "townhall-2", "Town Hall II", 2, 1, "Same bureaucracy, slightly shinier clipboard.", ["producer", "building", "townhall"], 310, {
+      label: "2",
+      merge: [same("merge:townhall-2-townhall-3", "item:townhall-2", "item:townhall-3")],
+      producer: clickProducer(3000, drops([
+        drop("item:blueprint-lumber-camp", 18),
+        drop("item:blueprint-quarry", 18),
+        drop("item:blueprint-townhall", 12),
+        drop("item:water", 18),
+        drop("item:crate-1", 24),
+        drop("item:crate-2", 10),
+      ])),
+    }),
+    item("item:townhall-3", "asset:item-townhall", "townhall-3", "Town Hall III", 3, 1, "Municipal paperwork with actual momentum.", ["producer", "building", "townhall"], 320, {
+      label: "3",
+      producer: clickProducer(2500, drops([
+        drop("item:blueprint-lumber-camp", 12),
+        drop("item:blueprint-quarry", 12),
+        drop("item:blueprint-townhall", 10),
+        drop("item:water", 18),
+        drop("item:crate-1", 16),
+        drop("item:crate-2", 24),
+        drop("item:crate-3", 8),
+      ])),
+    }),
 
-    item("item:lumber-camp-1", "asset:item-lumber-camp", "lumber-camp-1", "Lumber Camp I", 1, 1, "A polite machine for turning time into sticks.", ["producer", "building", "wood"], 330),
-    item("item:lumber-camp-2", "asset:item-lumber-camp", "lumber-camp-2", "Lumber Camp II", 2, 1, "Still wood, but now with ambition.", ["producer", "building", "wood"], 340),
-    item("item:lumber-camp-3", "asset:item-lumber-camp", "lumber-camp-3", "Lumber Camp III", 3, 1, "A compact shrine to deforestation.", ["producer", "building", "wood"], 350),
+    item("item:lumber-camp-1", "asset:item-lumber-camp", "lumber-camp-1", "Lumber Camp I", 1, 1, "A polite machine for turning time into sticks.", ["producer", "building", "wood"], 330, {
+      label: "1",
+      merge: [same("merge:lumber-camp-1-lumber-camp-2", "item:lumber-camp-1", "item:lumber-camp-2")],
+      producer: clickProducer(5000, drops([drop("item:twig", 70), drop("item:branch", 25), empty(5)])),
+    }),
+    item("item:lumber-camp-2", "asset:item-lumber-camp", "lumber-camp-2", "Lumber Camp II", 2, 1, "Still wood, but now with ambition.", ["producer", "building", "wood"], 340, {
+      label: "2",
+      merge: [same("merge:lumber-camp-2-lumber-camp-3", "item:lumber-camp-2", "item:lumber-camp-3")],
+      producer: clickProducer(4500, drops([drop("item:twig", 30), drop("item:branch", 55), drop("item:log", 15)])),
+    }),
+    item("item:lumber-camp-3", "asset:item-lumber-camp", "lumber-camp-3", "Lumber Camp III", 3, 1, "A compact shrine to deforestation.", ["producer", "building", "wood"], 350, {
+      label: "3",
+      producer: clickProducer(4000, drops([drop("item:branch", 40), drop("item:log", 55), empty(5)])),
+    }),
 
-    item("item:quarry-1", "asset:item-quarry", "quarry-1", "Quarry I", 1, 1, "A hole in the ground with a business model.", ["producer", "building", "stone"], 360),
-    item("item:quarry-2", "asset:item-quarry", "quarry-2", "Quarry II", 2, 1, "A deeper hole, because progress is weird.", ["producer", "building", "stone"], 370),
-    item("item:quarry-3", "asset:item-quarry", "quarry-3", "Quarry III", 3, 1, "Rocks leaving the earth at startup velocity.", ["producer", "building", "stone"], 380),
+    item("item:quarry-1", "asset:item-quarry", "quarry-1", "Quarry I", 1, 1, "A hole in the ground with a business model.", ["producer", "building", "stone"], 360, {
+      label: "1",
+      merge: [same("merge:quarry-1-quarry-2", "item:quarry-1", "item:quarry-2")],
+      producer: clickProducer(5500, drops([drop("item:pebble", 72), drop("item:stone", 23), empty(5)])),
+    }),
+    item("item:quarry-2", "asset:item-quarry", "quarry-2", "Quarry II", 2, 1, "A deeper hole, because progress is weird.", ["producer", "building", "stone"], 370, {
+      label: "2",
+      merge: [same("merge:quarry-2-quarry-3", "item:quarry-2", "item:quarry-3")],
+      producer: clickProducer(5000, drops([drop("item:pebble", 30), drop("item:stone", 55), drop("item:crystal", 15)])),
+    }),
+    item("item:quarry-3", "asset:item-quarry", "quarry-3", "Quarry III", 3, 1, "Rocks leaving the earth at startup velocity.", ["producer", "building", "stone"], 380, {
+      label: "3",
+      producer: clickProducer(4500, drops([drop("item:stone", 44), drop("item:crystal", 51), empty(5)])),
+    }),
 
-    item("item:crate-1", "asset:item-crate", "crate-1", "Common Crate", 1, 1, "A finite producer with suspicious contents.", ["producer", "container"], 400),
-    item("item:crate-2", "asset:item-crate-sturdy", "crate-2", "Sturdy Crate", 2, 1, "Same box, fewer disappointments.", ["producer", "container"], 410),
-    item("item:crate-3", "asset:item-crate-rare", "crate-3", "Rare Crate", 3, 1, "A tiny treasure economy in a box.", ["producer", "container", "rare"], 420),
-  ],
-  merges: [
-    merge("merge:seed-sprout", "item:seed", "item:sprout"),
-    merge("merge:sprout-leaf", "item:sprout", "item:leaf"),
-    merge("merge:twig-branch", "item:twig", "item:branch"),
-    merge("merge:branch-log", "item:branch", "item:log"),
-    merge("merge:pebble-stone", "item:pebble", "item:stone"),
-    merge("merge:stone-crystal", "item:stone", "item:crystal"),
-    merge("merge:townhall-1-townhall-2", "item:townhall-1", "item:townhall-2"),
-    merge("merge:townhall-2-townhall-3", "item:townhall-2", "item:townhall-3"),
-    merge("merge:lumber-camp-1-lumber-camp-2", "item:lumber-camp-1", "item:lumber-camp-2"),
-    merge("merge:lumber-camp-2-lumber-camp-3", "item:lumber-camp-2", "item:lumber-camp-3"),
-    merge("merge:quarry-1-quarry-2", "item:quarry-1", "item:quarry-2"),
-    merge("merge:quarry-2-quarry-3", "item:quarry-2", "item:quarry-3"),
-    merge("merge:crate-1-crate-2", "item:crate-1", "item:crate-2"),
-    merge("merge:crate-2-crate-3", "item:crate-2", "item:crate-3"),
-  ],
-  dropTables: [
-    drop("drop:townhall-1", "Town Hall I drops", [
-      entry("item:blueprint-lumber-camp", 18),
-      entry("item:blueprint-quarry", 18),
-      entry("item:blueprint-townhall", 8),
-      entry("item:twig", 22),
-      entry("item:pebble", 22),
-      entry("item:crate-1", 12),
-    ]),
-    drop("drop:townhall-2", "Town Hall II drops", [
-      entry("item:blueprint-lumber-camp", 12),
-      entry("item:blueprint-quarry", 12),
-      entry("item:blueprint-townhall", 6),
-      entry("item:branch", 20),
-      entry("item:stone", 18),
-      entry("item:twig", 12),
-      entry("item:pebble", 12),
-      entry("item:crate-1", 6),
-      entry("item:crate-2", 2),
-    ]),
-    drop("drop:townhall-3", "Town Hall III drops", [
-      entry("item:blueprint-lumber-camp", 10),
-      entry("item:blueprint-quarry", 10),
-      entry("item:blueprint-townhall", 7),
-      entry("item:log", 18),
-      entry("item:crystal", 15),
-      entry("item:branch", 12),
-      entry("item:stone", 12),
-      entry("item:twig", 6),
-      entry("item:pebble", 6),
-      entry("item:crate-2", 3),
-      entry("item:crate-3", 1),
-    ]),
-    drop("drop:lumber-camp-1", "Lumber Camp I drops", [
-      entry("item:twig", 70),
-      entry("item:seed", 18),
-      entry("item:branch", 12),
-    ]),
-    drop("drop:lumber-camp-2", "Lumber Camp II drops", [
-      entry("item:branch", 54),
-      entry("item:twig", 22),
-      entry("item:leaf", 14),
-      entry("item:log", 8),
-      entry("item:crate-1", 2),
-    ]),
-    drop("drop:lumber-camp-3", "Lumber Camp III drops", [
-      entry("item:log", 48),
-      entry("item:branch", 26),
-      entry("item:twig", 14),
-      entry("item:leaf", 8),
-      entry("item:crate-2", 4),
-    ]),
-    drop("drop:quarry-1", "Quarry I drops", [
-      entry("item:pebble", 72),
-      entry("item:stone", 18),
-      entry("item:crystal", 2),
-      entry("item:crate-1", 8),
-    ]),
-    drop("drop:quarry-2", "Quarry II drops", [
-      entry("item:stone", 56),
-      entry("item:pebble", 22),
-      entry("item:crystal", 14),
-      entry("item:crate-1", 6),
-      entry("item:crate-2", 2),
-    ]),
-    drop("drop:quarry-3", "Quarry III drops", [
-      entry("item:crystal", 44),
-      entry("item:stone", 30),
-      entry("item:pebble", 16),
-      entry("item:crate-2", 8),
-      entry("item:crate-3", 2),
-    ]),
-    drop("drop:crate-1", "Common crate drops", [
-      entry("item:seed", 25, { min: 1, max: 2 }),
-      entry("item:twig", 24, { min: 1, max: 2 }),
-      entry("item:pebble", 24, { min: 1, max: 2 }),
-      entry("item:water", 12, { min: 1, max: 2 }),
-      entry("item:blueprint-lumber-camp", 6),
-      entry("item:blueprint-quarry", 6),
-      entry("item:blueprint-townhall", 3),
-    ]),
-    drop("drop:crate-2", "Sturdy crate drops", [
-      entry("item:branch", 24, { min: 1, max: 2 }),
-      entry("item:stone", 24, { min: 1, max: 2 }),
-      entry("item:leaf", 16, { min: 1, max: 2 }),
-      entry("item:water", 12, { min: 2, max: 3 }),
-      entry("item:blueprint-lumber-camp", 8),
-      entry("item:blueprint-quarry", 8),
-      entry("item:blueprint-townhall", 6),
-      entry("item:crate-1", 2),
-    ]),
-    drop("drop:crate-3", "Rare crate drops", [
-      entry("item:log", 26, { min: 1, max: 2 }),
-      entry("item:crystal", 24, { min: 1, max: 2 }),
-      entry("item:water", 18, { min: 2, max: 4 }),
-      entry("item:blueprint-lumber-camp", 10),
-      entry("item:blueprint-quarry", 10),
-      entry("item:blueprint-townhall", 10),
-      entry("item:crate-2", 2),
-    ]),
-  ],
-  producers: [
-    producer("item:townhall-1", 2_500, "drop:townhall-1", 1, { type: "infinite" }),
-    producer("item:townhall-2", 1_800, "drop:townhall-2", 1, { type: "infinite" }),
-    producer("item:townhall-3", 1_300, "drop:townhall-3", 1, { type: "infinite" }),
-    producer("item:lumber-camp-1", 1_800, "drop:lumber-camp-1", 1, { type: "infinite" }),
-    producer("item:lumber-camp-2", 1_400, "drop:lumber-camp-2", 1, { type: "infinite" }),
-    producer("item:lumber-camp-3", 1_100, "drop:lumber-camp-3", 1, { type: "infinite" }),
-    producer("item:quarry-1", 1_800, "drop:quarry-1", 1, { type: "infinite" }),
-    producer("item:quarry-2", 1_400, "drop:quarry-2", 1, { type: "infinite" }),
-    producer("item:quarry-3", 1_100, "drop:quarry-3", 1, { type: "infinite" }),
-    producer("item:crate-1", 1_100, "drop:crate-1", { min: 2, max: 4 }, { type: "finite", charges: 1, onDepleted: "remove" }),
-    producer("item:crate-2", 950, "drop:crate-2", { min: 3, max: 5 }, { type: "finite", charges: 1, onDepleted: "remove" }),
-    producer("item:crate-3", 800, "drop:crate-3", { min: 4, max: 6 }, { type: "finite", charges: 1, onDepleted: "remove" }),
-  ],
-  buildRecipes: [
-    build("build:townhall-1", "item:blueprint-townhall", "item:townhall-1", [
-      { itemId: "item:twig", quantity: 4 },
-      { itemId: "item:pebble", quantity: 3 },
-    ]),
-    build("build:lumber-camp-1", "item:blueprint-lumber-camp", "item:lumber-camp-1", [
-      { itemId: "item:twig", quantity: 4 },
-      { itemId: "item:leaf", quantity: 2 },
-    ]),
-    build("build:quarry-1", "item:blueprint-quarry", "item:quarry-1", [
-      { itemId: "item:pebble", quantity: 4 },
-      { itemId: "item:twig", quantity: 2 },
-    ]),
+    item("item:crate-1", "asset:item-crate", "crate-1", "Common Crate", 1, 1, "A finite producer with suspicious contents.", ["producer", "container"], 400, {
+      merge: [same("merge:crate-1-crate-2", "item:crate-1", "item:crate-2")],
+      producer: {
+        ...clickProducer(900, drops([drop("item:twig", 35), drop("item:pebble", 35), drop("item:water", 15), drop("item:seed", 15)]), { type: "finite", charges: 3, onDepleted: "remove" }),
+        doubleClickBehavior: "exhaust",
+      },
+    }),
+    item("item:crate-2", "asset:item-crate-sturdy", "crate-2", "Sturdy Crate", 2, 1, "Same box, fewer disappointments.", ["producer", "container"], 410, {
+      merge: [same("merge:crate-2-crate-3", "item:crate-2", "item:crate-3")],
+      producer: {
+        ...clickProducer(900, drops([drop("item:branch", 35), drop("item:stone", 35), drop("item:water", 15), drop("item:crate-1", 15)]), { type: "finite", charges: 4, onDepleted: "remove" }),
+        doubleClickBehavior: "exhaust",
+      },
+    }),
+    item("item:crate-3", "asset:item-crate-rare", "crate-3", "Rare Crate", 3, 1, "A tiny treasure economy in a box.", ["producer", "container", "rare"], 420, {
+      producer: {
+        ...clickProducer(900, drops([drop("item:log", 30), drop("item:crystal", 30), drop("item:crate-2", 20), drop("item:water", 20)]), { type: "finite", charges: 5, onDepleted: "remove" }),
+        doubleClickBehavior: "exhaust",
+      },
+    }),
   ],
   startingState: {
     inventory: [
       { itemId: "item:blueprint-townhall", quantity: 1 },
       { itemId: "item:blueprint-lumber-camp", quantity: 1 },
       { itemId: "item:blueprint-quarry", quantity: 1 },
-      { itemId: "item:twig", quantity: 12 },
-      { itemId: "item:pebble", quantity: 12 },
-      { itemId: "item:leaf", quantity: 4 },
-      { itemId: "item:seed", quantity: 4 },
-      { itemId: "item:crate-1", quantity: 2 },
+      { itemId: "item:twig", quantity: 8 },
+      { itemId: "item:pebble", quantity: 8 },
+      { itemId: "item:water", quantity: 4 },
     ],
-    board: [],
+    board: [
+      { itemId: "item:townhall-1", x: 3, y: 4 },
+      { itemId: "item:lumber-camp-1", x: 1, y: 4 },
+      { itemId: "item:quarry-1", x: 5, y: 4 },
+    ],
   },
-} as const satisfies GameDataManifest;
-
-export type GameData = typeof gameDataManifest;
-
-export interface GameDataIndex {
-  assetsById: ReadonlyMap<AssetId, AssetDefinition>;
-  itemsById: ReadonlyMap<ItemId, ItemDefinition>;
-  producersByItemId: ReadonlyMap<ItemId, ProducerDefinition>;
-  mergesByInputItemId: ReadonlyMap<ItemId, MergeDefinition>;
-  dropTablesById: ReadonlyMap<DropTableId, DropTableDefinition>;
-  buildRecipesById: ReadonlyMap<BuildRecipeId, BuildRecipeDefinition>;
-  buildRecipesByBlueprintItemId: ReadonlyMap<ItemId, readonly BuildRecipeDefinition[]>;
-  mergeableItemIds: ReadonlySet<ItemId>;
-}
-
-export function createGameDataIndex(manifest: GameDataManifest): GameDataIndex {
-  const buildRecipesByBlueprintItemId = new Map<ItemId, BuildRecipeDefinition[]>();
-
-  for (const recipe of manifest.buildRecipes) {
-    const recipes = buildRecipesByBlueprintItemId.get(recipe.blueprintItemId) ?? [];
-    recipes.push(recipe);
-    buildRecipesByBlueprintItemId.set(recipe.blueprintItemId, recipes);
-  }
-
-  return {
-    assetsById: new Map(manifest.assets.map((asset) => [asset.id, asset])),
-    itemsById: new Map(manifest.items.map((item) => [item.id, item])),
-    producersByItemId: new Map(manifest.producers.map((producer) => [producer.itemId, producer])),
-    mergesByInputItemId: new Map(manifest.merges.map((mergeDefinition) => [mergeDefinition.inputItemId, mergeDefinition])),
-    dropTablesById: new Map(manifest.dropTables.map((dropTable) => [dropTable.id, dropTable])),
-    buildRecipesById: new Map(manifest.buildRecipes.map((recipe) => [recipe.id, recipe])),
-    buildRecipesByBlueprintItemId,
-    mergeableItemIds: new Set(manifest.merges.map((mergeDefinition) => mergeDefinition.inputItemId)),
-  };
-}
+} satisfies GameDataManifest;
 
 export const gameDataIndex = createGameDataIndex(gameDataManifest);
 
-export function requireGameItem(itemId: string): ItemDefinition {
-  const item = gameDataIndex.itemsById.get(itemId as ItemId);
-  if (!item) throw new Error(`Unknown item definition: ${itemId}`);
-  return item;
-}
-
-export function assertGameDataManifest(manifest: GameDataManifest = gameDataManifest) {
+export function assertGameDataManifest(manifest: GameDataManifest) {
   parseGameDataManifest(manifest);
-  const assetIds = new Set(manifest.assets.map((asset) => asset.id));
-  const itemIds = new Set(manifest.items.map((manifestItem) => manifestItem.id));
-  const dropTableIds = new Set(manifest.dropTables.map((dropTable) => dropTable.id));
 
-  assertUnique(manifest.assets.map((asset) => asset.id), "asset ids");
-  assertUnique(manifest.items.map((manifestItem) => manifestItem.id), "item ids");
-  assertUnique(manifest.items.map((manifestItem) => manifestItem.code), "item codes");
-  assertUnique(manifest.merges.map((mergeDefinition) => mergeDefinition.id), "merge ids");
-  assertUnique(manifest.dropTables.map((dropTable) => dropTable.id), "drop table ids");
-  assertUnique(manifest.producers.map((producerDefinition) => producerDefinition.itemId), "producer item ids");
-  assertUnique(manifest.buildRecipes.map((recipe) => recipe.id), "build recipe ids");
+  const assetIds = new Set<AssetId>();
+  const itemIds = new Set<ItemId>();
+  const mergeIds = new Set<MergeDefinitionId>();
+  const buildIds = new Set<BuildRecipeId>();
+  const mergePairs = new Set<string>();
 
-  for (const manifestItem of manifest.items) {
-    assert(assetIds.has(manifestItem.assetId), `${manifestItem.id} references missing asset ${manifestItem.assetId}`);
-    assert(manifestItem.maxStackSize >= 1, `${manifestItem.id} must have maxStackSize >= 1`);
+  for (const assetDefinition of manifest.assets) {
+    assertUnique(assetIds, assetDefinition.id, "asset");
   }
 
-  for (const mergeDefinition of manifest.merges) {
-    assert(itemIds.has(mergeDefinition.inputItemId), `${mergeDefinition.id} references missing input ${mergeDefinition.inputItemId}`);
-    assert(itemIds.has(mergeDefinition.outputItemId), `${mergeDefinition.id} references missing output ${mergeDefinition.outputItemId}`);
-    assert(mergeDefinition.inputCount >= 2, `${mergeDefinition.id} must require at least two items`);
+  for (const itemDefinition of manifest.items) {
+    assertUnique(itemIds, itemDefinition.id, "item");
+    assert(assetIds.has(itemDefinition.assetId), `${itemDefinition.id} references missing asset ${itemDefinition.assetId}`);
   }
 
-  for (const dropTable of manifest.dropTables) {
-    assert(dropTable.entries.length > 0, `${dropTable.id} must have entries`);
-    for (const [index, entry] of dropTable.entries.entries()) {
-      assert(entry.weight > 0, `${dropTable.id}[${index}] weight must be positive`);
-      if (entry.itemId) {
-        assert(itemIds.has(entry.itemId), `${dropTable.id}[${index}] references missing item ${entry.itemId}`);
-        assertRange(entry.quantity, `${dropTable.id}[${index}] quantity`);
+  for (const itemDefinition of manifest.items) {
+    for (const rule of itemDefinition.merge ?? []) {
+      assertUnique(mergeIds, rule.id, "merge");
+      assert(itemIds.has(rule.withItemId), `${rule.id} references missing merge input ${rule.withItemId}`);
+      assert(itemIds.has(rule.resultItemId), `${rule.id} references missing merge output ${rule.resultItemId}`);
+      assertUnique(mergePairs, pairKey(itemDefinition.id, rule.withItemId), "merge pair");
+    }
+
+    if (itemDefinition.build) {
+      assertUnique(buildIds, itemDefinition.build.id, "build recipe");
+      assert(itemIds.has(itemDefinition.build.resultItemId), `${itemDefinition.build.id} references missing build result`);
+      for (const costDefinition of itemDefinition.build.costs) {
+        assert(itemIds.has(costDefinition.itemId), `${itemDefinition.build.id} references missing cost ${costDefinition.itemId}`);
       }
     }
-  }
 
-  for (const producerDefinition of manifest.producers) {
-    assert(itemIds.has(producerDefinition.itemId), `Producer references missing item ${producerDefinition.itemId}`);
-    assert(producerDefinition.cooldownMs > 0, `${producerDefinition.itemId} cooldown must be positive`);
-    for (const roll of producerDefinition.rolls) {
-      assert(dropTableIds.has(roll.dropTableId), `${producerDefinition.itemId} references missing drop table ${roll.dropTableId}`);
-      assertRange(roll.count, `${producerDefinition.itemId} roll count`);
+    const producer = itemDefinition.producer;
+    if (!producer) continue;
+    assert(producer.trigger !== "click" || Boolean(producer.cooldownMs), `${itemDefinition.id} click producer must define cooldownMs`);
+    assert(producer.trigger !== "auto" || producer.mode?.type === "auto", `${itemDefinition.id} auto producer must define auto mode`);
+    assert(producer.drops.length > 0, `${itemDefinition.id} producer must have drops`);
+    for (const entry of producer.drops) {
+      assert(entry.weight > 0, `${itemDefinition.id} producer drop weight must be positive`);
+      if (entry.itemId) {
+        assert(itemIds.has(entry.itemId), `${itemDefinition.id} drops missing item ${entry.itemId}`);
+      }
+      if (entry.quantity !== undefined) assertQuantity(entry.quantity, `${itemDefinition.id} drop quantity`);
     }
 
-    match(producerDefinition.mode)
+    match(producer.mode ?? { type: "infinite" as const })
       .with({ type: "infinite" }, () => undefined)
       .with({ type: "finite" }, (mode) => {
-        assert(mode.charges > 0, `${producerDefinition.itemId} finite charges must be positive`);
+        assert(mode.charges > 0, `${itemDefinition.id} finite charges must be positive`);
         if (typeof mode.onDepleted !== "string") {
-          assert(itemIds.has(mode.onDepleted.replaceWithItemId), `${producerDefinition.itemId} replacement item is missing`);
+          assert(itemIds.has(mode.onDepleted.replaceWithItemId), `${itemDefinition.id} replacement item is missing`);
         }
+      })
+      .with({ type: "auto" }, (mode) => {
+        assert(producer.trigger === "auto", `${itemDefinition.id} auto mode requires auto trigger`);
+        assert(mode.tickMs > 0, `${itemDefinition.id} auto tick must be positive`);
+        assert(mode.capacity > 0, `${itemDefinition.id} auto capacity must be positive`);
+        assert(mode.rechargeMs > 0, `${itemDefinition.id} auto recharge must be positive`);
       })
       .exhaustive();
   }
 
-  for (const recipe of manifest.buildRecipes) {
-    assert(itemIds.has(recipe.blueprintItemId), `${recipe.id} references missing blueprint ${recipe.blueprintItemId}`);
-    assert(itemIds.has(recipe.resultItemId), `${recipe.id} references missing result ${recipe.resultItemId}`);
-    for (const cost of recipe.costs) {
-      assert(itemIds.has(cost.itemId), `${recipe.id} references missing cost ${cost.itemId}`);
-      assert(cost.quantity > 0, `${recipe.id} cost quantity must be positive`);
-    }
-  }
-
-  for (const inventoryStack of manifest.startingState.inventory) {
-    assert(itemIds.has(inventoryStack.itemId), `Starting inventory references missing item ${inventoryStack.itemId}`);
-    assert(inventoryStack.quantity > 0, "Starting inventory quantity must be positive");
+  for (const stack of manifest.startingState.inventory) {
+    assert(itemIds.has(stack.itemId), `Starting inventory references missing ${stack.itemId}`);
   }
 
   for (const boardItem of manifest.startingState.board) {
-    assert(itemIds.has(boardItem.itemId), `Starting board references missing item ${boardItem.itemId}`);
-    assert(boardItem.x >= 0 && boardItem.x < manifest.game.board.width, "Starting board x is out of bounds");
-    assert(boardItem.y >= 0 && boardItem.y < manifest.game.board.height, "Starting board y is out of bounds");
+    assert(itemIds.has(boardItem.itemId), `Starting board references missing ${boardItem.itemId}`);
+    assert(boardItem.x < manifest.game.board.width && boardItem.y < manifest.game.board.height, `Starting board item ${boardItem.itemId} is outside the board`);
   }
 }
 
-function asset(id: AssetId, label: string, file: string, sort: number): AssetDefinition {
-  return { id, kind: "item", label, src: svg(file), sort };
+function createGameDataIndex(manifest: GameDataManifest) {
+  const assetsById = new Map(manifest.assets.map((assetDefinition) => [assetDefinition.id, assetDefinition]));
+  const itemsById = new Map(manifest.items.map((itemDefinition) => [itemDefinition.id, itemDefinition]));
+  const mergeRulesByPair = new Map<string, ItemMergeRule & { sourceItemId: ItemId }>();
+  const merges = manifest.items.flatMap((itemDefinition) =>
+    (itemDefinition.merge ?? []).map((rule) => ({ ...rule, sourceItemId: itemDefinition.id })),
+  );
+
+  for (const rule of merges) {
+    mergeRulesByPair.set(pairKey(rule.sourceItemId, rule.withItemId), rule);
+  }
+
+  const buildRecipes = manifest.items.flatMap((itemDefinition) =>
+    itemDefinition.build ? [{ ...itemDefinition.build, blueprintItemId: itemDefinition.id }] : [],
+  );
+  const buildRecipesById = new Map(buildRecipes.map((recipe) => [recipe.id, recipe]));
+  const producersByItemId = new Map(
+    manifest.items.flatMap((itemDefinition) => itemDefinition.producer ? [[itemDefinition.id, itemDefinition.producer] as const] : []),
+  );
+
+  return {
+    assetsById,
+    itemsById,
+    merges,
+    mergeRulesByPair,
+    mergeableItemIds: new Set(merges.flatMap((rule) => [rule.sourceItemId, rule.withItemId])),
+    buildRecipes,
+    buildRecipesById,
+    producersByItemId,
+  };
+}
+
+export function resolveMergeRule(sourceItemId: ItemId, targetItemId: ItemId) {
+  return gameDataIndex.mergeRulesByPair.get(pairKey(sourceItemId, targetItemId)) ?? null;
+}
+
+export function pairKey(first: ItemId | string, second: ItemId | string) {
+  return [first, second].sort().join("+");
+}
+
+function asset(id: AssetId, label: string, fileName: string, sort: number): AssetDefinition {
+  return { id, kind: "item", label, src: svg(fileName), sort };
 }
 
 function item(
@@ -455,63 +396,65 @@ function item(
   description: string,
   tags: readonly string[],
   sort: number,
+  behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "build"> = {},
 ): ItemDefinition {
-  return { id, assetId, code, name, tier, maxStackSize, description, tags, sort };
+  return { id, assetId, code, name, tier, maxStackSize, description, tags, sort, ...behavior };
 }
 
-function merge(id: MergeDefinitionId, inputItemId: ItemId, outputItemId: ItemId): MergeDefinition {
-  return { id, inputItemId, inputCount: 2, outputItemId };
+function same(id: MergeDefinitionId, selfItemId: ItemId, resultItemId: ItemId): ItemMergeRule {
+  return { id, withItemId: selfItemId, resultItemId };
 }
 
-function drop(id: DropTableId, label: string, entries: readonly DropTableEntry[]): DropTableDefinition {
-  return { id, label, entries };
+function combo(id: MergeDefinitionId, withItemId: ItemId, resultItemId: ItemId, secret = false): ItemMergeRule {
+  return { id, withItemId, resultItemId, secret };
 }
 
-function entry(itemId: ItemId, weight: number, quantity: DropTableEntry["quantity"] = 1): DropTableEntry {
-  return { itemId, weight, quantity };
+function build(id: BuildRecipeId, resultItemId: ItemId, costs: readonly BuildRecipeCost[]): ItemBuildRecipe {
+  return { id, resultItemId, costs };
 }
 
-function build(
-  id: BuildRecipeId,
-  blueprintItemId: ItemId,
-  resultItemId: ItemId,
-  costs: readonly BuildRecipeCost[],
-): BuildRecipeDefinition {
-  return { id, blueprintItemId, resultItemId, costs };
+function cost(itemId: ItemId, quantity: number): BuildRecipeCost {
+  return { itemId, quantity };
 }
 
-function producer(
-  itemId: ItemId,
-  cooldownMs: number,
-  dropTableId: DropTableId,
-  count: ProducerRoll["count"],
-  mode: ProducerMode,
-): ProducerDefinition {
+function clickProducer(cooldownMs: number, drops: readonly ProducerDrop[], mode: ProducerMode = { type: "infinite" }): ProducerDefinition {
+  return { trigger: "click", placement: "board_then_inventory", drops, cooldownMs, mode };
+}
+
+function autoProducer(tickMs: number, capacity: number, rechargeMs: number, drops: readonly ProducerDrop[]): ProducerDefinition {
   return {
-    itemId,
-    cooldownMs,
-    mode,
-    spawn: { type: "around_self", radius: 1, placement: "all_or_nothing" },
-    rolls: [{ dropTableId, count }],
+    trigger: "auto",
+    placement: "board_then_inventory",
+    drops,
+    mode: { type: "auto", tickMs, capacity, rechargeMs, enabledByDefault: true },
   };
 }
 
-function assertUnique(values: readonly string[], label: string) {
-  assert(new Set(values).size === values.length, `Duplicate ${label}.`);
+function drops(entries: readonly ProducerDrop[]) {
+  return entries;
 }
 
-function assertRange(value: number | { min: number; max: number }, label: string) {
-  if (typeof value === "number") {
-    assert(value > 0, `${label} must be positive`);
+function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ProducerDrop {
+  return { itemId, weight, quantity };
+}
+
+function empty(weight: number): ProducerDrop {
+  return { itemId: null, weight };
+}
+
+function assertUnique<T>(set: Set<T>, value: T, label: string) {
+  assert(!set.has(value), `Duplicate ${label}: ${String(value)}`);
+  set.add(value);
+}
+
+function assertQuantity(quantity: Quantity, label: string) {
+  if (typeof quantity === "number") {
+    assert(quantity > 0, `${label} must be positive`);
     return;
   }
-
-  assert(value.min > 0, `${label}.min must be positive`);
-  assert(value.max >= value.min, `${label}.max must be >= min`);
+  assert(quantity.min > 0 && quantity.max >= quantity.min, `${label} range is invalid`);
 }
 
 function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) {
-    throw new Error(`Invalid Arkini game data: ${message}`);
-  }
+  if (!condition) throw new Error(message);
 }

@@ -1,24 +1,15 @@
 import { gameDataManifest } from "~/domains/game-data";
+import { createInitialBoardState, json } from "./boardState";
 import { db } from "./db";
 import { table } from "./tables";
 
 export const defaultSaveGameId = "save:default";
 
-// Definitions are forcibly synced every boot; player progress is not. This only
-// creates the first save once, then leaves future gameplay state alone like a
-// civilized little database.
 type StartingBoardItem = { itemId: string; x: number; y: number };
 
 export async function ensureDefaultSaveGame() {
-  const existing = await db
-    .selectFrom(table.saveGame)
-    .select("id")
-    .where("id", "=", defaultSaveGameId)
-    .executeTakeFirst();
-
-  if (existing) {
-    return;
-  }
+  const existing = await db.selectFrom(table.saveGame).select("id").where("id", "=", defaultSaveGameId).executeTakeFirst();
+  if (existing) return;
 
   await db.transaction().execute(async (tx) => {
     await tx
@@ -54,15 +45,11 @@ export async function ensureDefaultSaveGame() {
           itemDefinitionId: boardItem.itemId,
           x: boardItem.x,
           y: boardItem.y,
-          stateJson: "{}",
+          stateJson: json(createInitialBoardState(boardItem.itemId)),
         })
         .execute();
     }
 
-    await tx
-      .updateTable(table.saveGame)
-      .set({ updatedAt: new Date().toISOString() })
-      .where("id", "=", defaultSaveGameId)
-      .execute();
+    await tx.updateTable(table.saveGame).set({ updatedAt: new Date().toISOString() }).where("id", "=", defaultSaveGameId).execute();
   });
 }

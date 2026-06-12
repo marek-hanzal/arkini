@@ -192,6 +192,7 @@ function BoardCell({
 					isOver && !showMergeHint && "bg-slate-800/80",
 					showMergeHint && "ak-merge-target",
 					showMergeHint && isOver && "ak-merge-target-over",
+					producerReady && "ak-producer-ready",
 					invalid && "ak-cell-error",
 				);
 			}}

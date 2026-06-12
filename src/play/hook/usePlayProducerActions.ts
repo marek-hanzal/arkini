@@ -72,10 +72,15 @@ export function usePlayProducerActions({
 
 					if (placement.kind === "board") {
 						if (!targetRect) continue;
-						animations.push(addFlyer(placement.itemId, from, targetRect));
+						animations.push(addFlyer(placement.itemId, from, targetRect, "place"));
 					} else {
 						animations.push(
-							addFlyer(placement.itemId, from, targetRect ?? inventorySinkRect(from)),
+							addFlyer(
+								placement.itemId,
+								from,
+								targetRect ?? inventorySinkRect(from),
+								"place",
+							),
 						);
 					}
 

@@ -128,6 +128,10 @@ export interface UseDraggableControlOptions<
 		error: unknown,
 		context: DropContext<ItemId, Source, Target, Overlay>,
 	): void | Promise<void>;
+	/**
+	 * Optional semantic target resolver. When present, its result wins over dnd-kit `over`,
+	 * so apps can implement magnetic edge/corner snapping consistently across surfaces.
+	 */
 	resolveMagneticDropTarget?(
 		context: MagneticDropContext<ItemId, Source, Overlay>,
 	): DroppablePayload<Target> | null;
@@ -247,17 +251,15 @@ export function useDraggableControl<
 			| undefined;
 		const directTarget =
 			(event.over?.data.current as DroppablePayload<Target> | undefined) ?? null;
-		const dragRect = (event.active.rect.current.translated ??
-			event.active.rect.current.initial) as RectLike | null;
-		const target =
+		const dragRect = resolveDragEndRect(event);
+		const magneticTarget =
 			source && dragRect
-				? (directTarget ??
-					resolveMagneticDropTarget?.({
+				? (resolveMagneticDropTarget?.({
 						source,
 						dragRect,
-					}) ??
-					null)
-				: directTarget;
+					}) ?? null)
+				: null;
+		const target = magneticTarget ?? directTarget;
 		const context = source
 			? {
 					source,
@@ -470,6 +472,21 @@ async function runFeedback(feedback: (() => void | Promise<void>) | undefined) {
 		// Feedback must never turn a clean reject into another drag failure.
 		void error;
 	}
+}
+
+function resolveDragEndRect(event: DragEndEvent): RectLike | null {
+	const translated = event.active.rect.current.translated as RectLike | null;
+	if (translated) return translated;
+
+	const initial = event.active.rect.current.initial as RectLike | null;
+	if (!initial) return null;
+
+	return {
+		left: initial.left + event.delta.x,
+		top: initial.top + event.delta.y,
+		width: initial.width,
+		height: initial.height,
+	};
 }
 
 function clamp(value: number, min: number, max: number) {

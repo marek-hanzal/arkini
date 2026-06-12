@@ -67,6 +67,44 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 			return;
 		}
 
+		if (kind === "merge-source") {
+			timeline
+				.to(element, {
+					x,
+					y,
+					scale: scale * 0.74,
+					opacity: 0.86,
+					duration: 0.22,
+					ease: "power3.out",
+				})
+				.to(element, {
+					scale: scale * 0.52,
+					opacity: 0,
+					duration: 0.12,
+					ease: "power2.in",
+				});
+			return;
+		}
+
+		if (kind === "merge-target") {
+			timeline
+				.to(element, {
+					x,
+					y,
+					scale: 1.13,
+					opacity: 0.92,
+					duration: 0.15,
+					ease: "power2.out",
+				})
+				.to(element, {
+					scale: 0.9,
+					opacity: 0,
+					duration: 0.18,
+					ease: "power2.in",
+				});
+			return;
+		}
+
 		timeline.to(element, {
 			x,
 			y,

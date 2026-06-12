@@ -9,12 +9,11 @@ export namespace Flyer {
   export interface Props {
     flyer: FlyerModel;
     item: ViewItem;
-    nowMs: number;
     onSettle(id: string): void;
   }
 }
 
-export function Flyer({ flyer, item, nowMs, onSettle }: Flyer.Props) {
+export function Flyer({ flyer, item, onSettle }: Flyer.Props) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -37,7 +36,7 @@ export function Flyer({ flyer, item, nowMs, onSettle }: Flyer.Props) {
         height: flyer.from.height,
       }}
     >
-      <Tile item={item} quantity={flyer.quantity} producer={flyer.producer ?? undefined} nowMs={nowMs} />
+      <Tile item={item} quantity={flyer.quantity} producer={flyer.producer ?? undefined} />
     </div>
   );
 }

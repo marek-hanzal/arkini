@@ -14,7 +14,7 @@ import { readMutableSave } from "./readMutableSave";
 import { removeInventoryItems, spendInventoryStack } from "~/inventory/logic/inventoryStackStore";
 import { rollProducerDrops } from "~/producer/logic/rollProducerDrops";
 import { localTimestamp } from "./localTimestamp";
-import { canPayCosts } from "./gameView";
+import { canPayCosts } from "./canPayCosts";
 import { db } from "~/database/local/db";
 import { table } from "~/database/local/tables";
 import type { BoardItemState, ProducerDropResult } from "./playTypes";

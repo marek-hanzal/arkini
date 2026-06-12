@@ -3,7 +3,7 @@ import { cellKey } from "~/board/util/cell";
 import { inventoryContainerNodeId, inventorySlotNodeId, inventorySourceId } from "~/inventory/inventoryIdentity";
 import type { ItemId } from "~/manifest/data/manifestId";
 import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
-import type { GameView } from "~/play/logic/playTypes";
+import type { GameDragView } from "~/play/logic/playTypes";
 import type { FlyerKind, GameDragSource, GameDropTarget, GameVisualMeta } from "~/play/types";
 import type {
   DraggableAnimation,
@@ -28,7 +28,7 @@ export interface GameDragFeedback {
 
 export function resolveGameDrop(
   context: DropContext<string, GameDragSource, GameDropTarget, GameVisualMeta>,
-  game: GameView | null | undefined,
+  game: GameDragView | null | undefined,
   actions: GameDragActions,
   feedback: GameDragFeedback,
 ): DropPlan<string, FlyerKind, GameVisualMeta> {
@@ -50,7 +50,7 @@ export function resolveGameDrop(
 
 export function flashGameDrop(
   context: DropContext<string, GameDragSource, GameDropTarget, GameVisualMeta>,
-  game: GameView | null | undefined,
+  game: GameDragView | null | undefined,
   feedback: GameDragFeedback,
 ) {
   flashSource(context.source.source, game, feedback);
@@ -74,7 +74,7 @@ type GameDropContext<Source extends SourceKind, Target extends TargetKind> = {
 
 function inventoryToInventory(
   context: GameDropContext<"inventory", "inventory-slot">,
-  game: GameView,
+  game: GameDragView,
   actions: GameDragActions,
 ): DropPlan<string, FlyerKind, GameVisualMeta> {
   const { source, target } = context;
@@ -96,7 +96,7 @@ function inventoryToInventory(
 
 function boardToCell(
   { source, target }: GameDropContext<"board", "cell">,
-  game: GameView,
+  game: GameDragView,
   actions: GameDragActions,
   feedback: GameDragFeedback,
 ): DropPlan<string, FlyerKind, GameVisualMeta> {
@@ -167,7 +167,7 @@ function reject(feedback?: () => void): DropPlan<string, FlyerKind, GameVisualMe
   return { type: "reject", feedback };
 }
 
-function flashSource(source: GameDragSource, game: GameView | null | undefined, feedback: GameDragFeedback) {
+function flashSource(source: GameDragSource, game: GameDragView | null | undefined, feedback: GameDragFeedback) {
   if (source.kind === "inventory") {
     feedback.flashInventorySlot(source.slotIndex, "error");
     return;

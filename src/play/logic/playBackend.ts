@@ -8,7 +8,23 @@ export {
   stashBoardItem,
   swapInventorySlots,
 } from "./gameplay";
-export { readGameView } from "./gameView";
+export { readBoardView } from "./readBoardView";
+export { readBuildRecipeViews } from "./readBuildRecipeViews";
+export { readGameSaveView } from "./readGameSaveView";
+export { readInventoryView } from "./readInventoryView";
+export { readItemCatalogView } from "./readItemCatalogView";
 export { readDatabaseStatus } from "./status";
+export { canPayCosts } from "./canPayCosts";
 export type { DatabaseStatus } from "./status";
-export type { BoardViewItem, GameView, InventorySlot, ProducerDropResult, ViewItem } from "./playTypes";
+export type {
+  BoardView,
+  BoardViewItem,
+  BuildRecipeView,
+  GameDragView,
+  GameSaveView,
+  InventorySlot,
+  InventoryView,
+  ItemCatalogView,
+  ProducerDropResult,
+  ViewItem,
+} from "./playTypes";

@@ -6,45 +6,67 @@ import { parseJson } from "~/shared/json";
 import type { BoardItemState, ProducerView } from "~/play/logic/playTypes";
 
 export function createInitialBoardState(itemId: string): BoardItemState {
-  const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
-  if (!producer) return {};
+	const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
+	if (!producer) return {};
 
-  const mode = producer.mode ?? { type: "infinite" as const };
+	const mode = producer.mode ?? {
+		type: "infinite" as const,
+	};
 
-  return match(mode as ProducerMode)
-    .with({ type: "finite" }, (finite) => ({
-      producer: {
-        remainingCharges: finite.charges,
-        cooldownUntil: null,
-      },
-    }))
-    .with({ type: "infinite" }, () => ({ producer: { remainingCharges: null, cooldownUntil: null } }))
-    .exhaustive();
+	return match(mode as ProducerMode)
+		.with(
+			{
+				type: "finite",
+			},
+			(finite) => ({
+				producer: {
+					remainingCharges: finite.charges,
+					cooldownUntil: null,
+				},
+			}),
+		)
+		.with(
+			{
+				type: "infinite",
+			},
+			() => ({
+				producer: {
+					remainingCharges: null,
+					cooldownUntil: null,
+				},
+			}),
+		)
+		.exhaustive();
 }
 
 export function readProducerView(itemId: string, state: BoardItemState): ProducerView | null {
-  const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
-  if (!producer) return null;
+	const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
+	if (!producer) return null;
 
-  const initial = createInitialBoardState(itemId).producer ?? {};
-  const producerState = { ...initial, ...(state.producer ?? {}) };
+	const initial = createInitialBoardState(itemId).producer ?? {};
+	const producerState = {
+		...initial,
+		...(state.producer ?? {}),
+	};
 
-  return {
-    trigger: producer.trigger,
-    mode: producer.mode ?? { type: "infinite" },
-    cooldownMs: producer.cooldownMs ?? null,
-    doubleClickBehavior: producer.doubleClickBehavior ?? null,
-    cooldownUntil: producerState.cooldownUntil ?? null,
-    remainingCharges: producerState.remainingCharges ?? null,
-  };
+	return {
+		trigger: producer.trigger,
+		mode: producer.mode ?? {
+			type: "infinite",
+		},
+		cooldownMs: producer.cooldownMs ?? null,
+		doubleClickBehavior: producer.doubleClickBehavior ?? null,
+		cooldownUntil: producerState.cooldownUntil ?? null,
+		remainingCharges: producerState.remainingCharges ?? null,
+	};
 }
 
 export function readBoardState(row: Pick<readBoardState.Row, "stateJson">) {
-  return parseJson<BoardItemState>(row.stateJson || "{}");
+	return parseJson<BoardItemState>(row.stateJson || "{}");
 }
 
 export namespace readBoardState {
-  export interface Row {
-    stateJson: string;
-  }
+	export interface Row {
+		stateJson: string;
+	}
 }

@@ -1,8 +1,8 @@
 export namespace manifestId {
-  export type Asset = `asset:${string}`;
-  export type Item = `item:${string}`;
-  export type BuildRecipe = `build:${string}`;
-  export type MergeDefinition = `merge:${string}`;
+	export type Asset = `asset:${string}`;
+	export type Item = `item:${string}`;
+	export type BuildRecipe = `build:${string}`;
+	export type MergeDefinition = `merge:${string}`;
 }
 
 export type AssetId = manifestId.Asset;

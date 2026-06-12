@@ -4,27 +4,32 @@ import type { GameDragData } from "~/play/types";
 const defaultMergeHintDelayMs = 1250;
 
 export namespace useDelayedMergeHints {
-  export interface Props {
-    activeDrag: GameDragData | null;
-    delayMs?: number;
-  }
+	export interface Props {
+		activeDrag: GameDragData | null;
+		delayMs?: number;
+	}
 }
 
 export function useDelayedMergeHints({
-  activeDrag,
-  delayMs = defaultMergeHintDelayMs,
+	activeDrag,
+	delayMs = defaultMergeHintDelayMs,
 }: useDelayedMergeHints.Props) {
-  const [visible, setVisible] = useState(false);
-  const activeBoardItemId = activeDrag?.source.kind === "board" ? activeDrag.source.boardItemId : null;
-  const activeItemId = activeDrag?.source.kind === "board" ? activeDrag.itemId : null;
+	const [visible, setVisible] = useState(false);
+	const activeBoardItemId =
+		activeDrag?.source.kind === "board" ? activeDrag.source.boardItemId : null;
+	const activeItemId = activeDrag?.source.kind === "board" ? activeDrag.itemId : null;
 
-  useEffect(() => {
-    setVisible(false);
-    if (!activeBoardItemId || !activeItemId) return;
+	useEffect(() => {
+		setVisible(false);
+		if (!activeBoardItemId || !activeItemId) return;
 
-    const timeout = window.setTimeout(() => setVisible(true), delayMs);
-    return () => window.clearTimeout(timeout);
-  }, [activeBoardItemId, activeItemId, delayMs]);
+		const timeout = window.setTimeout(() => setVisible(true), delayMs);
+		return () => window.clearTimeout(timeout);
+	}, [
+		activeBoardItemId,
+		activeItemId,
+		delayMs,
+	]);
 
-  return visible;
+	return visible;
 }

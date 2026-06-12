@@ -96,6 +96,15 @@ npm install --no-package-lock
 npm run dev
 ```
 
+## Formatting
+
+Code formatting is owned by Biome. The config is intentionally formatter-only: `biome format` is allowed to rewrite code shape, but Biome linting and assist actions are disabled. Do not sneak lint rules into `biome.json`; lint creep is how a formatter becomes a tiny annoying government.
+
+```bash
+npm run format
+npm run format:check
+```
+
 ## Build
 
 ```bash
@@ -112,7 +121,7 @@ The router uses hash history, so static hosts do not need SPA rewrite rules.
 
 ## GitHub Pages deploy
 
-The workflow uses Node + `npm ci` against the committed `package-lock.json`. Bun is still fine locally, but CI must be boring and reproducible, because deploy pipelines with floating runtimes are just slot machines with YAML.
+The workflow uses Node + `npm install --no-package-lock`, then `npm run build`. This matches the local dependency policy: npm only, no committed lockfile, no Bun runtime, no CI pretending a missing lockfile exists because YAML apparently enjoys lying for sport.
 
 ## OPFS and cross-origin isolation
 

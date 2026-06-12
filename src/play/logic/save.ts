@@ -6,57 +6,77 @@ import { table } from "~/database/local/tables";
 
 export const defaultSaveGameId = "save:default";
 
-type StartingBoardItem = { itemId: string; x: number; y: number };
+type StartingBoardItem = {
+	itemId: string;
+	x: number;
+	y: number;
+};
 
-export async function ensureDefaultSaveGame({ resetExisting = false }: { resetExisting?: boolean } = {}) {
-  if (resetExisting) await dropDefaultSaveGame();
+export async function ensureDefaultSaveGame({
+	resetExisting = false,
+}: {
+	resetExisting?: boolean;
+} = {}) {
+	if (resetExisting) await dropDefaultSaveGame();
 
-  const existing = await db.selectFrom(table.saveGame).select("id").where("id", "=", defaultSaveGameId).executeTakeFirst();
-  if (existing) return;
+	const existing = await db
+		.selectFrom(table.saveGame)
+		.select("id")
+		.where("id", "=", defaultSaveGameId)
+		.executeTakeFirst();
+	if (existing) return;
 
-  await db.transaction().execute(async (tx) => {
-    await tx
-      .insertInto(table.saveGame)
-      .values({
-        id: defaultSaveGameId,
-        name: "Default save",
-        boardWidth: GameConfig.game.board.width,
-        boardHeight: GameConfig.game.board.height,
-        inventorySlots: GameConfig.game.inventory.slots,
-      })
-      .execute();
+	await db.transaction().execute(async (tx) => {
+		await tx
+			.insertInto(table.saveGame)
+			.values({
+				id: defaultSaveGameId,
+				name: "Default save",
+				boardWidth: GameConfig.game.board.width,
+				boardHeight: GameConfig.game.board.height,
+				inventorySlots: GameConfig.game.inventory.slots,
+			})
+			.execute();
 
-    for (const [slotIndex, stack] of GameConfig.startingState.inventory.entries()) {
-      await tx
-        .insertInto(table.inventoryStack)
-        .values({
-          id: `${defaultSaveGameId}:inventory:${slotIndex}`,
-          saveGameId: defaultSaveGameId,
-          slotIndex,
-          itemDefinitionId: stack.itemId,
-          quantity: stack.quantity,
-        })
-        .execute();
-    }
+		for (const [slotIndex, stack] of GameConfig.startingState.inventory.entries()) {
+			await tx
+				.insertInto(table.inventoryStack)
+				.values({
+					id: `${defaultSaveGameId}:inventory:${slotIndex}`,
+					saveGameId: defaultSaveGameId,
+					slotIndex,
+					itemDefinitionId: stack.itemId,
+					quantity: stack.quantity,
+				})
+				.execute();
+		}
 
-    for (const [index, boardItem] of (GameConfig.startingState.board as readonly StartingBoardItem[]).entries()) {
-      await tx
-        .insertInto(table.boardItem)
-        .values({
-          id: `${defaultSaveGameId}:board:${index}`,
-          saveGameId: defaultSaveGameId,
-          itemDefinitionId: boardItem.itemId,
-          x: boardItem.x,
-          y: boardItem.y,
-          stateJson: json(createInitialBoardState(boardItem.itemId)),
-        })
-        .execute();
-    }
+		for (const [index, boardItem] of (
+			GameConfig.startingState.board as readonly StartingBoardItem[]
+		).entries()) {
+			await tx
+				.insertInto(table.boardItem)
+				.values({
+					id: `${defaultSaveGameId}:board:${index}`,
+					saveGameId: defaultSaveGameId,
+					itemDefinitionId: boardItem.itemId,
+					x: boardItem.x,
+					y: boardItem.y,
+					stateJson: json(createInitialBoardState(boardItem.itemId)),
+				})
+				.execute();
+		}
 
-    await tx.updateTable(table.saveGame).set({ updatedAt: new Date().toISOString() }).where("id", "=", defaultSaveGameId).execute();
-  });
+		await tx
+			.updateTable(table.saveGame)
+			.set({
+				updatedAt: new Date().toISOString(),
+			})
+			.where("id", "=", defaultSaveGameId)
+			.execute();
+	});
 }
 
 async function dropDefaultSaveGame() {
-  await db.deleteFrom(table.saveGame).where("id", "=", defaultSaveGameId).execute();
+	await db.deleteFrom(table.saveGame).where("id", "=", defaultSaveGameId).execute();
 }

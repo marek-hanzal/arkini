@@ -11,83 +11,140 @@ import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { queryRect } from "~/shared/util/queryRect";
 
 export namespace usePlayProducerActions {
-  export interface Props {
-    activeSheet: ActiveSheet;
-    addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
-    feedback: GameDragFeedback;
-    schedule(label: string, operation: () => Promise<void>): Promise<void>;
-    hideSources(ids: readonly string[]): void;
-    clearHiddenSources(): void;
-  }
+	export interface Props {
+		activeSheet: ActiveSheet;
+		addFlyer(
+			itemId: string,
+			from: RectLike,
+			to: RectLike,
+			kind?: FlyerKind,
+			meta?: GameVisualMeta,
+		): Promise<void>;
+		feedback: GameDragFeedback;
+		schedule(label: string, operation: () => Promise<void>): Promise<void>;
+		hideSources(ids: readonly string[]): void;
+		clearHiddenSources(): void;
+	}
 }
 
 export function usePlayProducerActions({
-  activeSheet,
-  addFlyer,
-  feedback,
-  schedule,
-  hideSources,
-  clearHiddenSources,
+	activeSheet,
+	addFlyer,
+	feedback,
+	schedule,
+	hideSources,
+	clearHiddenSources,
 }: usePlayProducerActions.Props) {
-  const invalidatePlayData = usePlayDataInvalidation();
-  const produce = usePlayAction(
-    (db, input: { boardItemId: string; activation?: "single" | "exhaust" }) =>
-      db.produceBoardItem(input.boardItemId, input.activation),
-    { invalidateOnSuccess: false },
-  );
+	const invalidatePlayData = usePlayDataInvalidation();
+	const produce = usePlayAction(
+		(
+			db,
+			input: {
+				boardItemId: string;
+				activation?: "single" | "exhaust";
+			},
+		) => db.produceBoardItem(input.boardItemId, input.activation),
+		{
+			invalidateOnSuccess: false,
+		},
+	);
 
-  const animateProducerDrops = useCallback(async (results: ProducerDropResult[], stepDelayMs = 0) => {
-    const animations: Promise<void>[] = [];
+	const animateProducerDrops = useCallback(
+		async (results: ProducerDropResult[], stepDelayMs = 0) => {
+			const animations: Promise<void>[] = [];
 
-    for (const result of results) {
-      const sourceRect = queryRect(`[data-board-item-id="${result.producerBoardItemId}"]`);
-      if (!sourceRect) continue;
-      const from = sourceRect;
+			for (const result of results) {
+				const sourceRect = queryRect(
+					`[data-board-item-id="${result.producerBoardItemId}"]`,
+				);
+				if (!sourceRect) continue;
+				const from = sourceRect;
 
-      for (const placement of result.placements) {
-        const targetRect = placement.kind === "board"
-          ? queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`)
-          : activeSheet === "inventory" ? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`) : null;
+				for (const placement of result.placements) {
+					const targetRect =
+						placement.kind === "board"
+							? queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`)
+							: activeSheet === "inventory"
+								? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`)
+								: null;
 
-        if (placement.kind === "board") {
-          if (!targetRect) continue;
-          animations.push(addFlyer(placement.itemId, from, targetRect));
-        } else {
-          animations.push(addFlyer(placement.itemId, from, targetRect ?? inventorySinkRect(from)));
-        }
+					if (placement.kind === "board") {
+						if (!targetRect) continue;
+						animations.push(addFlyer(placement.itemId, from, targetRect));
+					} else {
+						animations.push(
+							addFlyer(placement.itemId, from, targetRect ?? inventorySinkRect(from)),
+						);
+					}
 
-        if (stepDelayMs > 0) await new Promise((resolve) => window.setTimeout(resolve, stepDelayMs));
-      }
-    }
+					if (stepDelayMs > 0)
+						await new Promise((resolve) => window.setTimeout(resolve, stepDelayMs));
+				}
+			}
 
-    await Promise.all(animations);
-  }, [activeSheet, addFlyer]);
+			await Promise.all(animations);
+		},
+		[
+			activeSheet,
+			addFlyer,
+		],
+	);
 
-  const animateProducerDepletion = useCallback(async (boardItem: BoardViewItem, result: ProducerDropResult) => {
-    if (result.depletion?.kind !== "remove") return;
+	const animateProducerDepletion = useCallback(
+		async (boardItem: BoardViewItem, result: ProducerDropResult) => {
+			if (result.depletion?.kind !== "remove") return;
 
-    const sourceId = boardSourceId(boardItem.id);
-    const sourceRect = queryRect(`[data-board-item-id="${boardItem.id}"]`)
-      ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
-    if (!sourceRect) return;
+			const sourceId = boardSourceId(boardItem.id);
+			const sourceRect =
+				queryRect(`[data-board-item-id="${boardItem.id}"]`) ??
+				queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
+			if (!sourceRect) return;
 
-    hideSources([sourceId]);
-    await addFlyer(boardItem.itemId, sourceRect, sourceRect, "deplete", { producer: boardItem.producer ?? undefined });
-  }, [addFlyer, hideSources]);
+			hideSources([
+				sourceId,
+			]);
+			await addFlyer(boardItem.itemId, sourceRect, sourceRect, "deplete", {
+				producer: boardItem.producer ?? undefined,
+			});
+		},
+		[
+			addFlyer,
+			hideSources,
+		],
+	);
 
-  return useCallback(async (boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") => {
-    await schedule(`producer ${activation}`, async () => {
-      try {
-        const result = await produce.mutateAsync({ boardItemId: boardItem.id, activation });
-        await animateProducerDrops([result], activation === "exhaust" ? 130 : 0);
-        await animateProducerDepletion(boardItem, result);
-        await invalidatePlayData();
-      } catch (error) {
-        feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-        feedback.showError(error);
-      } finally {
-        clearHiddenSources();
-      }
-    });
-  }, [animateProducerDepletion, animateProducerDrops, clearHiddenSources, feedback, invalidatePlayData, produce, schedule]);
+	return useCallback(
+		async (boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") => {
+			await schedule(`producer ${activation}`, async () => {
+				try {
+					const result = await produce.mutateAsync({
+						boardItemId: boardItem.id,
+						activation,
+					});
+					await animateProducerDrops(
+						[
+							result,
+						],
+						activation === "exhaust" ? 130 : 0,
+					);
+					await animateProducerDepletion(boardItem, result);
+					await invalidatePlayData();
+				} catch (error) {
+					feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
+					feedback.showError(error);
+				} finally {
+					clearHiddenSources();
+				}
+			});
+		},
+		[
+			animateProducerDepletion,
+			animateProducerDrops,
+			clearHiddenSources,
+			feedback,
+			invalidatePlayData,
+			produce,
+			schedule,
+		],
+	);
 }

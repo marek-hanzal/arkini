@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GameConfig } from "~/manifest/data/gameDataManifest";
+import { GameConfig } from "~/manifest/data/GameConfig";
 import { ItemIdSchema } from "~/manifest/data/ItemIdSchema";
 import { PositiveIntegerSchema } from "~/manifest/data/PositiveIntegerSchema";
 

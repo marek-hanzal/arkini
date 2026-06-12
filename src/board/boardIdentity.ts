@@ -1,4 +1,4 @@
-import { GameConfig } from "~/manifest/data/gameDataManifest";
+import { GameConfig } from "~/manifest/data/GameConfig";
 
 export interface BoardCell {
   x: number;

@@ -1,4 +1,4 @@
-import { gameDataManifest } from "~/manifest/data/gameDataManifest";
+import { GameConfig } from "~/manifest/data/GameConfig";
 import { createInitialBoardState } from "~/board/logic/boardState";
 import { json } from "~/shared/json";
 import { db } from "~/database/local/db";
@@ -20,13 +20,13 @@ export async function ensureDefaultSaveGame({ resetExisting = false }: { resetEx
       .values({
         id: defaultSaveGameId,
         name: "Default save",
-        boardWidth: gameDataManifest.game.board.width,
-        boardHeight: gameDataManifest.game.board.height,
-        inventorySlots: gameDataManifest.game.inventory.slots,
+        boardWidth: GameConfig.game.board.width,
+        boardHeight: GameConfig.game.board.height,
+        inventorySlots: GameConfig.game.inventory.slots,
       })
       .execute();
 
-    for (const [slotIndex, stack] of gameDataManifest.startingState.inventory.entries()) {
+    for (const [slotIndex, stack] of GameConfig.startingState.inventory.entries()) {
       await tx
         .insertInto(table.inventoryStack)
         .values({
@@ -39,7 +39,7 @@ export async function ensureDefaultSaveGame({ resetExisting = false }: { resetEx
         .execute();
     }
 
-    for (const [index, boardItem] of (gameDataManifest.startingState.board as readonly StartingBoardItem[]).entries()) {
+    for (const [index, boardItem] of (GameConfig.startingState.board as readonly StartingBoardItem[]).entries()) {
       await tx
         .insertInto(table.boardItem)
         .values({

@@ -1,13 +1,13 @@
-import type { GameDataManifest } from "./gameDataManifest";
+import type { GameConfig } from "./GameConfig";
 import type { ItemId } from "./manifestId";
 import type { ItemMergeRule } from "./itemMergeRule";
 import { itemMergePairKey } from "./itemMergePairKey";
 
-export function createGameDataIndex(manifest: GameDataManifest) {
-  const assetsById = new Map(manifest.assets.map((asset) => [asset.id, asset]));
-  const itemsById = new Map(manifest.items.map((item) => [item.id, item]));
+export function createGameDataIndex(config: GameConfig) {
+  const assetsById = new Map(config.assets.map((asset) => [asset.id, asset]));
+  const itemsById = new Map(config.items.map((item) => [item.id, item]));
   const mergeRulesByPair = new Map<string, ItemMergeRule & { sourceItemId: ItemId }>();
-  const merges = manifest.items.flatMap((item) =>
+  const merges = config.items.flatMap((item) =>
     (item.merge ?? []).map((rule) => ({ ...rule, sourceItemId: item.id })),
   );
 
@@ -15,7 +15,7 @@ export function createGameDataIndex(manifest: GameDataManifest) {
     mergeRulesByPair.set(itemMergePairKey(rule.sourceItemId, rule.withItemId), rule);
   }
 
-  const buildRecipes = manifest.items.flatMap((item) =>
+  const buildRecipes = config.items.flatMap((item) =>
     item.build ? [{ ...item.build, blueprintItemId: item.id }] : [],
   );
 
@@ -27,6 +27,6 @@ export function createGameDataIndex(manifest: GameDataManifest) {
     mergeableItemIds: new Set(merges.flatMap((rule) => [rule.sourceItemId, rule.withItemId])),
     buildRecipes,
     buildRecipesById: new Map(buildRecipes.map((recipe) => [recipe.id, recipe])),
-    producersByItemId: new Map(manifest.items.flatMap((item) => item.producer ? [[item.id, item.producer] as const] : [])),
+    producersByItemId: new Map(config.items.flatMap((item) => item.producer ? [[item.id, item.producer] as const] : [])),
   };
 }

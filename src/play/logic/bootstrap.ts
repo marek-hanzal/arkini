@@ -2,11 +2,11 @@ import { databasePath } from "~/database/local/client";
 import { assertBrowserDatabaseSupport } from "~/database/local/capabilities";
 import { migrator } from "~/database/local/migrator";
 import { ensureDefaultSaveGame } from "./save";
-import { syncGameDataManifest } from "./syncGameData";
+import { syncGameConfig } from "./syncGameConfig";
 
 let bootstrapPromise: Promise<void> | undefined;
 let migrationState: "pending" | "ready" = "pending";
-let gameDataHash = "pending";
+let gameConfigHash = "pending";
 
 export async function bootstrapDatabase() {
   assertBrowserDatabaseSupport();
@@ -18,9 +18,9 @@ export async function bootstrapDatabase() {
       throw result.error;
     }
 
-    const gameDataSync = await syncGameDataManifest();
-    gameDataHash = gameDataSync.hash;
-    await ensureDefaultSaveGame({ resetExisting: gameDataSync.changed });
+    const gameConfigSync = await syncGameConfig();
+    gameConfigHash = gameConfigSync.hash;
+    await ensureDefaultSaveGame({ resetExisting: gameConfigSync.changed });
     migrationState = "ready";
   })();
 
@@ -35,18 +35,18 @@ export function readDatabasePath() {
   return databasePath;
 }
 
-export function readGameDataHash() {
-  return gameDataHash;
+export function readGameConfigHash() {
+  return gameConfigHash;
 }
 
 // Development-only escape hatch: remove the OPFS SQLite file so the next page
-// load starts from empty storage, runs every migration, then syncs the manifest.
+// load starts from empty storage, runs every migration, then syncs the config.
 // This project is still pre-release, so we deliberately avoid schema drift
 // repair code and use a hard reset when local prototype data gets stale.
 export async function hardResetDatabaseFile() {
   bootstrapPromise = undefined;
   migrationState = "pending";
-  gameDataHash = "pending";
+  gameConfigHash = "pending";
 
   const { sqlite } = await import("~/database/local/client");
   await sqlite.deleteDatabaseFile(undefined, true);

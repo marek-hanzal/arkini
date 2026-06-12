@@ -1,4 +1,4 @@
-export { bootstrapDatabase, hardResetDatabaseFile, readDatabasePath, readGameDataHash, readMigrationState } from "./bootstrap";
+export { bootstrapDatabase, hardResetDatabaseFile, readDatabasePath, readGameConfigHash, readMigrationState } from "./bootstrap";
 export {
   buildRecipe,
   mergeBoardItems,

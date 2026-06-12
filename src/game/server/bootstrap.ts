@@ -1,6 +1,6 @@
-import { databasePath } from "./client";
-import { assertBrowserDatabaseSupport } from "./capabilities";
-import { migrator } from "./migrator";
+import { databasePath } from "~/database/server/client";
+import { assertBrowserDatabaseSupport } from "~/database/server/capabilities";
+import { migrator } from "~/database/server/migrator";
 import { ensureDefaultSaveGame } from "./save";
 import { syncGameDataManifest } from "./syncGameData";
 
@@ -47,6 +47,6 @@ export async function hardResetDatabaseFile() {
   migrationState = "pending";
   gameDataHash = "pending";
 
-  const { sqlite } = await import("./client");
+  const { sqlite } = await import("~/database/server/client");
   await sqlite.deleteDatabaseFile(undefined, true);
 }

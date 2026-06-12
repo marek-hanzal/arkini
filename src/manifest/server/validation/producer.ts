@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import type { ItemId } from "../ids";
+import type { ItemId } from "../manifestId";
 import type { ItemDefinition } from "../item";
 import { assert } from "./assert";
 import { assertQuantity } from "./quantity";

@@ -1,4 +1,4 @@
-import type { AssetId } from "./ids";
+import type { AssetId } from "./manifestId";
 
 export interface AssetDefinition {
   id: AssetId;

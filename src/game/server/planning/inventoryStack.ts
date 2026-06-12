@@ -1,4 +1,4 @@
-import type { ItemId } from "~/manifest/server";
+import type { ItemId } from "~/manifest/server/manifestId";
 import { getPlanItem } from "./itemLookup";
 import type { InventoryPlacementPlan, InventoryRow } from "./types";
 

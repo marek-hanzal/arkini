@@ -1,6 +1,6 @@
-import type { AssetId, ItemId } from "./ids";
+import type { AssetId, ItemId } from "./manifestId";
 import type { ItemBuildRecipe } from "./build";
-import type { ItemMergeRule } from "./merge";
+import type { ItemMergeRule } from "./itemMergeRule";
 import type { ProducerDefinition } from "./producer";
 
 export interface ItemDefinition {

@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { GameView } from "~/database/server";
+import type { GameView } from "~/game/server/gameplayTypes";
 
 export const gameQueryKey = ["arkini", "game"] as const;
 export const databaseStatusQueryKey = ["arkini", "database", "status"] as const;
 
 async function loadDb() {
-  const db = await import("~/database/server");
+  const db = await import("~/game/server/gameServer");
   await db.bootstrapDatabase();
   return db;
 }
@@ -39,7 +39,7 @@ export function useGameDataInvalidation() {
 }
 
 export function useGameAction<TVariables, TResult = void>(
-  action: (db: typeof import("~/database/server"), variables: TVariables) => Promise<TResult>,
+  action: (db: typeof import("~/game/server/gameServer"), variables: TVariables) => Promise<TResult>,
   options: useGameAction.Options = {},
 ) {
   const invalidateGameData = useGameDataInvalidation();

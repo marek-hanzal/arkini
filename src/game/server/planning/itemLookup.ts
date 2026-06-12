@@ -1,4 +1,5 @@
-import { gameDataIndex, type ItemId } from "~/manifest/server";
+import { gameDataIndex } from "~/manifest/server/gameDataIndex";
+import type { ItemId } from "~/manifest/server/manifestId";
 import { GameActionError } from "../gameplayTypes";
 
 export function getPlanItem(itemId: string) {

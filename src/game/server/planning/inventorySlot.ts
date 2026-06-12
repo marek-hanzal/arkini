@@ -1,4 +1,4 @@
-import type { ItemId } from "~/manifest/server";
+import type { ItemId } from "~/manifest/server/manifestId";
 import { createVirtualId } from "./virtualId";
 import type { InventoryPlacementPlan, InventoryRow, SaveShape } from "./types";
 

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { InventorySlot, GameView, ViewItem } from "~/database/server";
+import type { InventorySlot, GameView, ViewItem } from "~/game/server/gameplayTypes";
 import { cn } from "~/shared/cn";
 import {
   inventoryBinNodeId,

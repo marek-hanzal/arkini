@@ -1,8 +1,8 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { useCallback, useEffect, useState } from "react";
 import { DbStatusCard } from "~/game/ui/DbStatusCard";
-import type { BuildRecipeId } from "~/manifest/server";
-import type { BoardViewItem, GameView, InventorySlot, ProducerDropResult } from "~/database/server";
+import type { BoardViewItem, GameView, InventorySlot, ProducerDropResult } from "~/game/server/gameplayTypes";
+import type { BuildRecipeId } from "~/manifest/server/manifestId";
 import { useGameAction, useGameDataInvalidation, useGameView } from "~/game/hook/useGameView";
 import { Board } from "./Board";
 import { BottomNavigation, type ActiveSheet, type BottomNavSheet } from "./BottomNavigation";

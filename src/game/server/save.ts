@@ -1,8 +1,8 @@
-import { gameDataManifest } from "~/manifest/server";
+import { gameDataManifest } from "~/manifest/server/gameDataManifest";
 import { createInitialBoardState } from "./boardState";
-import { json } from "./utils/json";
-import { db } from "./db";
-import { table } from "./tables";
+import { json } from "~/shared/json";
+import { db } from "~/database/server/db";
+import { table } from "~/database/server/tables";
 
 export const defaultSaveGameId = "save:default";
 

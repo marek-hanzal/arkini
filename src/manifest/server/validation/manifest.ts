@@ -1,7 +1,7 @@
-import { parseGameDataManifest } from "../schema";
-import { pairKey } from "../merge";
-import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId } from "../ids";
-import type { GameDataManifest } from "../manifestTypes";
+import { parseGameDataManifest } from "../parseGameDataManifest";
+import { itemMergePairKey } from "../itemMergePairKey";
+import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId } from "../manifestId";
+import type { GameDataManifest } from "../gameDataManifest";
 import { assert, assertUnique } from "./assert";
 import { assertProducerDefinition } from "./producer";
 import { assertStartingState } from "./startingState";
@@ -27,7 +27,7 @@ export function assertGameDataManifest(manifest: GameDataManifest) {
       assertUnique(mergeIds, rule.id, "merge");
       assert(itemIds.has(rule.withItemId), `${rule.id} references missing merge input ${rule.withItemId}`);
       assert(itemIds.has(rule.resultItemId), `${rule.id} references missing merge output ${rule.resultItemId}`);
-      assertUnique(mergePairs, pairKey(item.id, rule.withItemId), "merge pair");
+      assertUnique(mergePairs, itemMergePairKey(item.id, rule.withItemId), "merge pair");
     }
 
     if (item.build) {

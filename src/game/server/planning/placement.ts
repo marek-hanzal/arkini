@@ -1,4 +1,4 @@
-import type { ItemId } from "~/manifest/server";
+import type { ItemId } from "~/manifest/server/manifestId";
 import { findFreeBoardCells } from "./boardCells";
 import { cloneInventory, planInventoryPlacement } from "./inventoryPlacement";
 import type { BoardRow, InventoryRow, PlacementPlan, SaveShape } from "./types";

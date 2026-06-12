@@ -1,9 +1,8 @@
 import type { AssetDefinition } from "./asset";
 import type { BuildRecipeCost, ItemBuildRecipe } from "./build";
-import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId } from "./ids";
+import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId } from "./manifestId";
 import type { ItemDefinition } from "./item";
-import type { GameDataManifest } from "./manifestTypes";
-import type { ItemMergeRule } from "./merge";
+import type { ItemMergeRule } from "./itemMergeRule";
 import type { ProducerDefinition, ProducerDrop, ProducerMode, Quantity } from "./producer";
 
 const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
@@ -180,7 +179,26 @@ export const gameDataManifest = {
       { itemId: "item:quarry-1", x: 5, y: 4 },
     ],
   },
-} satisfies GameDataManifest;
+} satisfies gameDataManifest.Shape;
+
+export namespace gameDataManifest {
+  export interface Shape {
+    game: {
+      id: "arkini";
+      title: "Arkini";
+      board: { width: 7; height: 9 };
+      inventory: { slots: number };
+    };
+    assets: readonly AssetDefinition[];
+    items: readonly ItemDefinition[];
+    startingState: {
+      inventory: readonly { itemId: ItemId; quantity: number }[];
+      board: readonly { itemId: ItemId; x: number; y: number }[];
+    };
+  }
+}
+
+export type GameDataManifest = gameDataManifest.Shape;
 
 function asset(id: AssetId, label: string, fileName: string, sort: number): AssetDefinition {
   return { id, kind: "item", label, src: svg(fileName), sort };

@@ -1,4 +1,4 @@
-import type { BoardViewItem } from "~/database/server";
+import type { BoardViewItem } from "~/game/server/gameplayTypes";
 import type { DraggablePayload, DroppablePayload } from "./hook/useDraggableControl";
 
 export type GameDragSource =

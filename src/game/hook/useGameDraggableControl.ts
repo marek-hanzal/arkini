@@ -1,5 +1,6 @@
-import { resolveMergeRule, type ItemId } from "~/manifest/server";
-import type { GameView } from "~/database/server";
+import { resolveItemMergeRule } from "~/manifest/server/resolveItemMergeRule";
+import type { GameView } from "~/game/server/gameplayTypes";
+import type { ItemId } from "~/manifest/server/manifestId";
 import { cellKey } from "../util/cell";
 import {
   boardContainerNodeId,
@@ -156,7 +157,7 @@ function boardToCell(
 
   const targetBoardItemId = target.target.boardItemId;
   const targetItem = game.boardItemsById[targetBoardItemId];
-  if (!targetItem || !resolveMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId)) {
+  if (!targetItem || !resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId)) {
     return reject(() => feedback.flashBoardCell(cellKey(target.target.x, target.target.y), "error"));
   }
 

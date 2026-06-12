@@ -11,7 +11,7 @@ export function DbStatusCard() {
     setResetState("pending");
 
     try {
-      const db = await import("~/database/server");
+      const db = await import("~/game/server/gameServer");
       await db.hardResetDatabaseFile();
       window.location.reload();
     } catch (error) {

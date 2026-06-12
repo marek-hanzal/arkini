@@ -1,4 +1,4 @@
-import type { BuildRecipeId, ItemId } from "./ids";
+import type { BuildRecipeId, ItemId } from "./manifestId";
 
 export interface ItemBuildRecipe {
   id: BuildRecipeId;

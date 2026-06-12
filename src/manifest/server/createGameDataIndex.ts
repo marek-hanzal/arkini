@@ -1,7 +1,7 @@
-import type { GameDataManifest } from "./manifestTypes";
-import type { ItemId } from "./ids";
-import type { ItemMergeRule } from "./merge";
-import { pairKey } from "./merge";
+import type { GameDataManifest } from "./gameDataManifest";
+import type { ItemId } from "./manifestId";
+import type { ItemMergeRule } from "./itemMergeRule";
+import { itemMergePairKey } from "./itemMergePairKey";
 
 export function createGameDataIndex(manifest: GameDataManifest) {
   const assetsById = new Map(manifest.assets.map((asset) => [asset.id, asset]));
@@ -12,7 +12,7 @@ export function createGameDataIndex(manifest: GameDataManifest) {
   );
 
   for (const rule of merges) {
-    mergeRulesByPair.set(pairKey(rule.sourceItemId, rule.withItemId), rule);
+    mergeRulesByPair.set(itemMergePairKey(rule.sourceItemId, rule.withItemId), rule);
   }
 
   const buildRecipes = manifest.items.flatMap((item) =>

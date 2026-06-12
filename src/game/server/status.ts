@@ -1,8 +1,8 @@
-import { gameDataManifest } from "~/manifest/server";
+import { gameDataManifest } from "~/manifest/server/gameDataManifest";
 import { readDatabasePath, readGameDataHash, readMigrationState } from "./bootstrap";
-import { db } from "./db";
-import type { Database } from "./schema";
-import { table } from "./tables";
+import { db } from "~/database/server/db";
+import type { Database } from "~/database/server/schema";
+import { table } from "~/database/server/tables";
 
 export interface DatabaseStatus {
   databasePath: string;

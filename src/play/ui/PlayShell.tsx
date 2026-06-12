@@ -87,7 +87,7 @@ export function PlayShell() {
 		addFlyer,
 		schedule: schedulePlayEvent,
 	});
-	const produceFrom = usePlayProducerActions({
+	const producerActions = usePlayProducerActions({
 		activeSheet: sheets.activeSheet,
 		addFlyer,
 		feedback,
@@ -147,15 +147,17 @@ export function PlayShell() {
 							feedback={{
 								invalidCellKey: feedback.invalidBoardCellKey,
 								mergedCellKey: feedback.mergedBoardCellKey,
+								busyProducerIds: producerActions.busyProducerIds,
 							}}
 							actions={{
 								emptyDoubleActivate: sheets.openBuild,
 								tileSingleActivate: (item) => {
-									if (item.producer) void produceFrom(item, "single");
+									if (item.producer)
+										void producerActions.produceFrom(item, "single");
 								},
 								tileDoubleActivate: (item) => {
 									if (item.producer?.doubleClickBehavior === "exhaust") {
-										void produceFrom(item, "exhaust");
+										void producerActions.produceFrom(item, "exhaust");
 										return;
 									}
 

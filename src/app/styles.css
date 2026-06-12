@@ -107,35 +107,11 @@ button {
 }
 
 .ak-producer-ready {
-	background: rgb(5 150 105 / 0.28);
+	background: rgb(5 150 105 / 0.16);
 	box-shadow:
-		inset 0 0 0 2px rgb(110 231 183 / 0.86),
-		inset 0 0 1.3rem rgb(16 185 129 / 0.28),
-		0 0 1.4rem rgb(16 185 129 / 0.2);
-}
-
-.ak-producer-ready::before {
-	content: "";
-	position: absolute;
-	inset: 0.22rem;
-	z-index: 1;
-	pointer-events: none;
-	border-radius: 0.7rem;
-	box-shadow: inset 0 0 0 1px rgb(209 250 229 / 0.52);
-	animation: ak-producer-ready-breathe 1.35s ease-in-out infinite;
-}
-
-@keyframes ak-producer-ready-breathe {
-	0%,
-	100% {
-		opacity: 0.42;
-		transform: scale(0.985);
-	}
-
-	50% {
-		opacity: 0.88;
-		transform: scale(1.015);
-	}
+		inset 0 0 0 1px rgb(110 231 183 / 0.68),
+		inset 0 0 0.9rem rgb(16 185 129 / 0.16),
+		0 0 0.55rem rgb(16 185 129 / 0.12);
 }
 
 .ak-cell-error {

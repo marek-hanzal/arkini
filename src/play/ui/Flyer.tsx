@@ -31,11 +31,7 @@ export function Flyer({ flyer, item, onSettle }: Flyer.Props) {
 	return (
 		<div
 			ref={ref}
-			className={cn(
-				"ak-fly pointer-events-none fixed",
-				flyer.kind === "place" ? "z-10" : "z-50",
-				`ak-fly--${flyer.kind}`,
-			)}
+			className={cn("ak-fly pointer-events-none fixed z-50", `ak-fly--${flyer.kind}`)}
 			style={{
 				left: flyer.from.left,
 				top: flyer.from.top,

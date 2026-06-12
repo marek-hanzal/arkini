@@ -31,6 +31,7 @@ export namespace Board {
 	export interface FeedbackState {
 		invalidCellKey: string | null;
 		mergedCellKey: string | null;
+		busyProducerIds: Set<string>;
 	}
 
 	export interface Actions {
@@ -99,6 +100,9 @@ export function Board({ drag, feedback, actions }: Board.Props) {
 						boardItem={boardItem}
 						canMerge={canMerge}
 						showDelayedMergeHint={showDelayedMergeHints}
+						producerBusy={
+							boardItem ? feedback.busyProducerIds.has(boardItem.id) : false
+						}
 						invalid={feedback.invalidCellKey === key}
 						merged={feedback.mergedCellKey === key}
 						onEmptyDoubleActivate={actions.emptyDoubleActivate}
@@ -126,6 +130,7 @@ namespace BoardCell {
 		boardItem: BoardViewItem | null;
 		canMerge: boolean;
 		showDelayedMergeHint: boolean;
+		producerBusy: boolean;
 		invalid: boolean;
 		merged: boolean;
 		children: ReactNode;
@@ -139,6 +144,7 @@ function BoardCell({
 	boardItem,
 	canMerge,
 	showDelayedMergeHint,
+	producerBusy,
 	invalid,
 	merged,
 	children,
@@ -146,7 +152,7 @@ function BoardCell({
 }: BoardCell.Props) {
 	const id = boardCellNodeId(x, y);
 	const cellRef = useRef<HTMLDivElement | null>(null);
-	const producerReady = useProducerReady(boardItem?.producer ?? null);
+	const producerReady = useProducerReady(boardItem?.producer ?? null, producerBusy);
 	const press = usePressActions({
 		onDouble: () => {
 			if (!boardItem)
@@ -158,7 +164,7 @@ function BoardCell({
 	});
 	useGsapCellFeedback(cellRef, {
 		invalid,
-		success: merged || producerReady,
+		success: merged,
 	});
 
 	return (
@@ -203,9 +209,9 @@ function BoardCell({
 	);
 }
 
-function useProducerReady(producer: BoardViewItem["producer"]) {
+function useProducerReady(producer: BoardViewItem["producer"], producerBusy: boolean) {
 	const nowMs = useProducerNow(producer);
-	if (!producer) return false;
+	if (!producer || producerBusy) return false;
 
 	const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
 	const hasCharges =

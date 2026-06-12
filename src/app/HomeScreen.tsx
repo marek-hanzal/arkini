@@ -1,5 +1,5 @@
-import { GameShell } from "~/game/ui/GameShell";
+import { PlayShell } from "~/play/ui/PlayShell";
 
 export function HomeScreen() {
-  return <GameShell />;
+  return <PlayShell />;
 }

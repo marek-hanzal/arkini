@@ -7,8 +7,8 @@ import {
   type Modifier,
 } from "@dnd-kit/core";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { cssEscape, queryRect, tileVisualRect, wait, without } from "./helpers";
-import type { RectLike } from "./types";
+import { cssEscape, queryRect, wait, without } from "./helpers";
+import { flyHoldMs, type RectLike } from "./types";
 
 export interface DraggablePayload<ItemId extends string = string, Source = unknown, Overlay = unknown> {
   /** Stable key of the visual source. Used only for hiding/showing DOM during committed state. */
@@ -195,8 +195,8 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
       await playAnimations(plan.animations, dragRect);
     }
 
-    await plan.feedback?.();
     await waitForPaint();
+    await plan.feedback?.();
     clearHiddenSources();
   }
 
@@ -210,18 +210,18 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
   async function playAnimations(animations: DraggableAnimation<ItemId, Kind, Overlay>[], dragRect: RectLike | null) {
     const resolved = animations.map((animation) => resolveAnimation(animation, dragRect)).filter((animation): animation is ResolvedDraggableAnimation<ItemId, Kind, Overlay> => Boolean(animation));
     for (const animation of resolved) animate(animation);
-    if (resolved.length > 0) await wait(animationMs);
+    if (resolved.length > 0) await wait(animationMs + flyHoldMs);
   }
 
   function resolveAnimation(animation: DraggableAnimation<ItemId, Kind, Overlay>, dragRect: RectLike | null): ResolvedDraggableAnimation<ItemId, Kind, Overlay> | null {
-    const from = animation.from ?? (animation.fromDrag && dragRect ? tileVisualRect(dragRect) : rectForNode(animation.fromNodeId));
+    const from = animation.from ?? (animation.fromDrag && dragRect ? dragRect : rectForNode(animation.fromNodeId));
     const to = animation.to ?? rectForNode(animation.toNodeId);
     if (!from || !to) return null;
     return { itemId: animation.itemId, kind: animation.kind, from, to, overlay: animation.overlay };
   }
 
   async function animateReturn(source: DraggablePayload<ItemId, Source, Overlay>, dragRect: RectLike | null) {
-    const from = dragRect ? tileVisualRect(dragRect) : null;
+    const from = dragRect;
     const to = rectForNode(source.sourceNodeId);
 
     if (!from || !to) {
@@ -236,14 +236,14 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     dragBoundaryRectRef.current = null;
     setActiveDrag(null);
     animate({ itemId: source.itemId, from, to, overlay: source.overlay });
-    await wait(animationMs);
+    await wait(animationMs + flyHoldMs);
     clearHiddenSources();
   }
 
   function rectForNode(nodeId: string | undefined) {
     if (!nodeId) return null;
     const rect = queryRect(`[data-drag-node-id="${cssEscape(nodeId)}"]`);
-    return rect ? tileVisualRect(rect) : null;
+    return rect;
   }
 
   function rectForBoundaryNode(nodeId: string | null | undefined) {

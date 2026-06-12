@@ -10,7 +10,6 @@ export function Tile({
   nowMs,
   dragOverlay,
   overlaySize,
-  fit = "cell",
 }: Readonly<{
   item: ViewItem;
   quantity?: number;
@@ -18,21 +17,42 @@ export function Tile({
   nowMs?: number;
   dragOverlay?: boolean;
   overlaySize?: Pick<RectLike, "width" | "height"> | null;
-  fit?: "cell" | "visual";
+}>) {
+  return (
+    <div
+      data-ak-tile
+      className={cn(
+        "relative h-full w-full p-[10%]",
+        dragOverlay && "shadow-2xl shadow-black/50",
+      )}
+      style={dragOverlay && overlaySize ? { width: overlaySize.width, height: overlaySize.height } : undefined}
+    >
+      <TileContent item={item} quantity={quantity} producer={producer} nowMs={nowMs} />
+    </div>
+  );
+}
+
+export function TileContent({
+  item,
+  quantity,
+  producer,
+  nowMs,
+}: Readonly<{
+  item: ViewItem;
+  quantity?: number;
+  producer?: BoardViewItem["producer"];
+  nowMs?: number;
 }>) {
   const producerUi = producer ? getProducerUiState(producer, nowMs ?? Date.now()) : null;
 
   return (
     <div
-      data-ak-tile
+      data-ak-tile-content
       className={cn(
         "relative grid h-full w-full place-items-center text-slate-50 transition-opacity duration-300",
-        fit === "cell" ? "p-[10%]" : "p-0",
         producerUi?.waiting && "opacity-80",
         producerUi?.paused && "opacity-65",
-        dragOverlay && "shadow-2xl shadow-black/50",
       )}
-      style={dragOverlay && overlaySize ? { width: overlaySize.width, height: overlaySize.height } : undefined}
     >
       <img src={item.assetSrc} alt="" draggable={false} className="h-full w-full object-contain" />
       {quantity && quantity > 1 ? (

@@ -1,9 +1,8 @@
 import { resolveMergeRule, type ItemId } from "~/domains/game-data";
 import type { GameView } from "~/domains/database";
-import { cellKey } from "./helpers";
+import { cellKey } from "./utils/cell";
 import {
   boardContainerNodeId,
-  flyMs,
   inventoryContainerNodeId,
   inventorySlotNodeId,
   inventorySourceId,
@@ -43,14 +42,16 @@ export function useGameDraggableControl({
   actions,
   feedback,
   addFlyer,
+  schedule,
 }: Readonly<{
   game: GameView | null | undefined;
   actions: GameDragActions;
   feedback: GameDragFeedback;
-  addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): void;
+  addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
+  schedule(label: string, operation: () => Promise<void>): Promise<void>;
 }>) {
   const control = useDraggableControl<string, GameDragSource, GameDropTarget, GameVisualMeta, FlyerKind>({
-    animationMs: flyMs,
+    schedule: (operation) => schedule("drag/drop", operation),
     resolveDrop: (context) => resolveGameDrop(context, game, actions, feedback),
     animate: (animation) => addFlyer(animation.itemId, animation.from, animation.to, animation.kind, animation.overlay),
     onError(error, context) {

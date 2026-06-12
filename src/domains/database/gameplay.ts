@@ -9,7 +9,8 @@ import {
   type ProducerMode,
   type Quantity,
 } from "~/domains/game-data";
-import { createInitialBoardState, json, parseJson } from "./boardState";
+import { createInitialBoardState } from "./boardState";
+import { json, parseJson } from "./utils/json";
 import { canPayCosts } from "./gameView";
 import { db, type ArkiniTransaction } from "./db";
 import { defaultSaveGameId } from "./save";

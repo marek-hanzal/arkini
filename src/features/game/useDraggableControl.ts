@@ -7,8 +7,10 @@ import {
   type Modifier,
 } from "@dnd-kit/core";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { cssEscape, queryRect, wait, without } from "./helpers";
-import { flyHoldMs, type RectLike } from "./types";
+import { waitForPaint } from "./utils/async";
+import { without } from "./utils/collection";
+import { cssEscape, queryRect } from "./utils/dom";
+import type { RectLike } from "./types";
 
 export interface DraggablePayload<ItemId extends string = string, Source = unknown, Overlay = unknown> {
   /** Stable key of the visual source. Used only for hiding/showing DOM during committed state. */
@@ -76,10 +78,10 @@ export interface DropContext<ItemId extends string = string, Source = unknown, T
 
 export interface UseDraggableControlOptions<ItemId extends string = string, Source = unknown, Target = unknown, Overlay = unknown, Kind extends string = string> {
   resolveDrop(context: DropContext<ItemId, Source, Target, Overlay>): DropPlan<ItemId, Kind, Overlay> | Promise<DropPlan<ItemId, Kind, Overlay>>;
-  animate(animation: ResolvedDraggableAnimation<ItemId, Kind, Overlay>): void;
+  animate(animation: ResolvedDraggableAnimation<ItemId, Kind, Overlay>): Promise<void> | void;
+  schedule?(operation: () => Promise<void>): Promise<void>;
   onError?(error: unknown, context: DropContext<ItemId, Source, Target, Overlay>): void | Promise<void>;
   getDragBoundaryNodeId?(source: DraggablePayload<ItemId, Source, Overlay>): string | null | undefined;
-  animationMs?: number;
   activationDistance?: number;
 }
 
@@ -95,8 +97,8 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
   resolveDrop,
   animate,
   onError,
+  schedule,
   getDragBoundaryNodeId,
-  animationMs = 320,
   activationDistance = 5,
 }: UseDraggableControlOptions<ItemId, Source, Target, Overlay, Kind>) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: activationDistance } }));
@@ -153,11 +155,16 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
       return;
     }
 
-    try {
-      await runPlan(context, await resolveDrop(context), dragRect);
-    } catch (error) {
-      await failDrop(error, context, dragRect);
-    }
+    const operation = async () => {
+      try {
+        await runPlan(context, await resolveDrop(context), dragRect);
+      } catch (error) {
+        await failDrop(error, context, dragRect);
+      }
+    };
+
+    if (schedule) await schedule(operation);
+    else await operation();
   }
 
   async function runPlan(context: DropContext<ItemId, Source, Target, Overlay>, plan: DropPlan<ItemId, Kind, Overlay>, dragRect: RectLike | null) {
@@ -209,8 +216,7 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
 
   async function playAnimations(animations: DraggableAnimation<ItemId, Kind, Overlay>[], dragRect: RectLike | null) {
     const resolved = animations.map((animation) => resolveAnimation(animation, dragRect)).filter((animation): animation is ResolvedDraggableAnimation<ItemId, Kind, Overlay> => Boolean(animation));
-    for (const animation of resolved) animate(animation);
-    if (resolved.length > 0) await wait(animationMs + flyHoldMs);
+    await Promise.all(resolved.map((animation) => animate(animation)));
   }
 
   function resolveAnimation(animation: DraggableAnimation<ItemId, Kind, Overlay>, dragRect: RectLike | null): ResolvedDraggableAnimation<ItemId, Kind, Overlay> | null {
@@ -235,8 +241,7 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     activeDragRef.current = null;
     dragBoundaryRectRef.current = null;
     setActiveDrag(null);
-    animate({ itemId: source.itemId, from, to, overlay: source.overlay });
-    await wait(animationMs + flyHoldMs);
+    await animate({ itemId: source.itemId, from, to, overlay: source.overlay });
     clearHiddenSources();
   }
 
@@ -304,14 +309,6 @@ async function runFeedback(feedback: (() => void | Promise<void>) | undefined) {
     // Feedback must never turn a clean reject into another drag failure.
     void error;
   }
-}
-
-function waitForPaint() {
-  return new Promise<void>((resolve) => {
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => resolve());
-    });
-  });
 }
 
 function clamp(value: number, min: number, max: number) {

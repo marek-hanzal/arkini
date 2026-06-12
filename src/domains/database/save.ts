@@ -1,5 +1,6 @@
 import { gameDataManifest } from "~/domains/game-data";
-import { createInitialBoardState, json } from "./boardState";
+import { createInitialBoardState } from "./boardState";
+import { json } from "./utils/json";
 import { db } from "./db";
 import { table } from "./tables";
 

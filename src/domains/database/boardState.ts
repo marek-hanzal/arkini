@@ -2,9 +2,6 @@ import { match } from "ts-pattern";
 import { gameDataIndex, type ItemId, type ProducerMode } from "~/domains/game-data";
 import type { BoardItemState, ProducerView } from "./gameplayTypes";
 
-export const parseJson = <T>(value: string): T => JSON.parse(value) as T;
-export const json = (value: unknown) => JSON.stringify(value);
-
 export function createInitialBoardState(itemId: string, timestamp = Date.now()): BoardItemState {
   const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
   if (!producer) return {};

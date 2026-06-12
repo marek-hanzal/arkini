@@ -1,6 +1,6 @@
 import type { BoardViewItem, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
-import { formatMs } from "../helpers";
+import { formatMs } from "../utils/format";
 import type { ProducerView, RectLike } from "../types";
 
 export function Tile({
@@ -49,7 +49,7 @@ export function TileContent({
     <div
       data-ak-tile-content
       className={cn(
-        "relative grid h-full w-full place-items-center text-slate-50 transition-opacity duration-300",
+        "relative grid h-full w-full place-items-center text-slate-50",
         producerUi?.waiting && "opacity-80",
         producerUi?.paused && "opacity-65",
       )}
@@ -81,7 +81,7 @@ function ProducerBadge({ ui }: Readonly<{ producer: ProducerView; ui: ProducerUi
       <span>{ui.label}</span>
       {ui.progress !== null ? (
         <span className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden rounded-b-sm bg-slate-700/80">
-          <span className="block h-full bg-emerald-300/80 transition-[width] duration-300" style={{ width: `${ui.progress * 100}%` }} />
+          <span className="block h-full bg-emerald-300/80" style={{ width: `${ui.progress * 100}%` }} />
         </span>
       ) : null}
     </span>

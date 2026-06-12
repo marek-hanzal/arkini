@@ -1,8 +1,8 @@
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useRef, type ReactNode } from "react";
 import { resolveMergeRule, type ItemId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
-import { cellKey } from "../helpers";
+import { cellKey } from "../utils/cell";
 import {
   boardCellNodeId,
   boardContainerNodeId,
@@ -14,6 +14,7 @@ import {
   type GameDropData,
 } from "../types";
 import { usePressActions } from "../usePressActions";
+import { useGsapCellFeedback } from "../useGsapCellFeedback";
 import { DraggableSurface, DroppableSurface } from "./DragSurface";
 import { Tile } from "./Tile";
 
@@ -105,27 +106,29 @@ function BoardCell({
   onEmptyDoubleActivate(cell: BuildCell): void;
 }>) {
   const id = boardCellNodeId(x, y);
+  const cellRef = useRef<HTMLDivElement | null>(null);
   const press = usePressActions({
     onDouble: () => {
       if (!boardItem) onEmptyDoubleActivate({ x, y });
     },
   });
+  useGsapCellFeedback(cellRef, { invalid, success: merged || producerReady });
 
   return (
     <DroppableSurface
       id={id}
       nodeId={id}
       payload={{ targetId: id, targetNodeId: id, target: { kind: "cell", x, y, boardItemId: boardItem?.id ?? null } } satisfies GameDropData}
+      nodeRef={(node) => { cellRef.current = node; }}
       data-board-cell={`${x}:${y}`}
       className={(isOver) => cn(
-        "relative aspect-square touch-none border-b border-r border-slate-800/80 bg-slate-900/55 transition-colors duration-200",
+        "relative aspect-square touch-none border-b border-r border-slate-800/80 bg-slate-900/55",
         x === columns - 1 && "border-r-0",
         y === rows - 1 && "border-b-0",
         isOver && !canMerge && "bg-slate-800/80",
-        canMerge && "ak-merge-target transition-none",
+        canMerge && "ak-merge-target",
         canMerge && isOver && "ak-merge-target-over",
-        invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
-        (merged || producerReady) && !invalid && "ak-cell-success",
+        invalid && "ak-cell-error",
       )}
       {...press.pressProps}
     >

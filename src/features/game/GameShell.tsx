@@ -4,7 +4,6 @@ import { DbStatusCard } from "~/components/DbStatusCard";
 import type { BuildRecipeId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, InventorySlot, ProducerDropResult } from "~/domains/database";
 import { useGameAction, useGameDataInvalidation, useGameView } from "~/hooks/useGameView";
-import { cn } from "~/lib/cn";
 import { Board } from "./components/Board";
 import { BottomSheet } from "./components/BottomSheet";
 import { BuildSheet } from "./components/BuildSheet";
@@ -12,13 +11,14 @@ import { Flyer } from "./components/Flyer";
 import { InventorySheet } from "./components/InventorySheet";
 import { SheetHeader } from "./components/SheetHeader";
 import { Tile } from "./components/Tile";
-import { cellKey, cssEscape, inventorySinkRect, queryRect, wait } from "./helpers";
+import { cellKey } from "./utils/cell";
+import { playBottomNavPulse } from "./utils/animation";
+import { cssEscape, queryElement, queryRect } from "./utils/dom";
+import { inventorySinkRect } from "./utils/inventory";
 import {
   boardCellNodeId,
   boardSourceId,
   columns,
-  flyHoldMs,
-  flyMs,
   inventorySlotNodeId,
   inventorySourceId,
   rows,
@@ -28,6 +28,7 @@ import {
 import { useFlyers } from "./useFlyers";
 import { useGameDraggableControl } from "./useGameDraggableControl";
 import { useGameFeedback } from "./useGameFeedback";
+import { useGameEventQueue } from "./useGameEventQueue";
 
 type ActiveSheet = "inventory" | "database" | "build" | null;
 type BottomNavSheet = "inventory" | "database";
@@ -39,8 +40,8 @@ export function GameShell() {
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const [renderedSheet, setRenderedSheet] = useState<Exclude<ActiveSheet, null>>("inventory");
   const [buildCell, setBuildCell] = useState<BuildCell | null>(null);
-  const [pulsedNavSheet, setPulsedNavSheet] = useState<BottomNavSheet | null>(null);
-  const { flyers, addFlyer } = useFlyers();
+  const { flyers, addFlyer, completeFlyer } = useFlyers();
+  const scheduleGameEvent = useGameEventQueue();
   const [nowMs, setNowMs] = useState(Date.now());
   const feedback = useGameFeedback();
 
@@ -73,6 +74,7 @@ export function GameShell() {
       showError: feedback.showError,
     },
     addFlyer,
+    schedule: scheduleGameEvent,
   });
 
   useEffect(() => {
@@ -105,13 +107,13 @@ export function GameShell() {
   }
 
   function pulseBottomNav(sheet: BottomNavSheet) {
-    setPulsedNavSheet(sheet);
-    window.setTimeout(() => {
-      setPulsedNavSheet((current) => (current === sheet ? null : current));
-    }, 560);
+    const element = queryElement(`[data-bottom-nav-sheet="${sheet}"]`);
+    if (element) playBottomNavPulse(element);
   }
 
   const animateProducerDrops = useCallback(async (results: ProducerDropResult[], stepDelayMs = 0) => {
+    const animations: Promise<void>[] = [];
+
     for (const result of results) {
       const sourceRect = queryRect(`[data-board-item-id="${cssEscape(result.producerBoardItemId)}"]`);
       if (!sourceRect) continue;
@@ -124,16 +126,16 @@ export function GameShell() {
 
         if (placement.kind === "board") {
           if (!targetRect) continue;
-          addFlyer(placement.itemId, from, targetRect);
+          animations.push(addFlyer(placement.itemId, from, targetRect));
         } else {
-          addFlyer(placement.itemId, from, targetRect ?? inventorySinkRect(from));
+          animations.push(addFlyer(placement.itemId, from, targetRect ?? inventorySinkRect(from)));
         }
 
-        if (stepDelayMs > 0) await wait(stepDelayMs);
+        if (stepDelayMs > 0) await new Promise((resolve) => window.setTimeout(resolve, stepDelayMs));
       }
     }
 
-    await wait(flyMs + flyHoldMs);
+    await Promise.all(animations);
   }, [activeSheet, addFlyer]);
 
   const autoProducerTickRef = useLatestValue({
@@ -143,114 +145,121 @@ export function GameShell() {
     showError: feedback.showError,
   });
 
+  const autoTickQueuedRef = useRef(false);
+
   useEffect(() => {
     let disposed = false;
-    let running = false;
 
-    async function tickAutoProducers() {
-      if (running) return;
-      running = true;
+    function tickAutoProducers() {
+      if (autoTickQueuedRef.current) return;
+      autoTickQueuedRef.current = true;
 
-      try {
-        const { advance, animate, invalidate } = autoProducerTickRef.current;
-        const results = await advance(undefined);
-        if (disposed || results.length === 0) return;
+      void scheduleGameEvent("auto producers", async () => {
+        try {
+          const { advance, animate, invalidate } = autoProducerTickRef.current;
+          const results = await advance(undefined);
+          if (disposed || results.length === 0) return;
 
-        await animate(results);
-        if (!disposed) await invalidate();
-      } catch (error) {
+          await animate(results);
+          if (!disposed) await invalidate();
+        } catch (error) {
+          if (!disposed) autoProducerTickRef.current.showError(error);
+        } finally {
+          autoTickQueuedRef.current = false;
+        }
+      }).catch((error) => {
+        autoTickQueuedRef.current = false;
         if (!disposed) autoProducerTickRef.current.showError(error);
-      } finally {
-        running = false;
-      }
+      });
     }
 
-    const interval = window.setInterval(() => {
-      void tickAutoProducers();
-    }, 1000);
+    const interval = window.setInterval(tickAutoProducers, 1000);
 
     return () => {
       disposed = true;
       window.clearInterval(interval);
     };
-  }, [autoProducerTickRef]);
+  }, [autoProducerTickRef, scheduleGameEvent]);
 
   async function produceFrom(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") {
-    try {
-      const result = await produce.mutateAsync({ boardItemId: boardItem.id, activation });
-      await animateProducerDrops([result], activation === "exhaust" ? 130 : 0);
-      await invalidateGameData();
-    } catch (error) {
-      feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-      feedback.showError(error);
-    }
+    await scheduleGameEvent(`producer ${activation}`, async () => {
+      try {
+        const result = await produce.mutateAsync({ boardItemId: boardItem.id, activation });
+        await animateProducerDrops([result], activation === "exhaust" ? 130 : 0);
+        await invalidateGameData();
+      } catch (error) {
+        feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
+        feedback.showError(error);
+      }
+    });
   }
 
   async function stashBoardWithFly(boardItem: BoardViewItem) {
-    const source: GameDragData = {
-      sourceId: boardSourceId(boardItem.id),
-      sourceNodeId: boardCellNodeId(boardItem.x, boardItem.y),
-      itemId: boardItem.itemId,
-      source: { kind: "board", boardItemId: boardItem.id },
-      hideWhenActive: true,
-    };
-    const sourceRect = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`)
-      ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
-    const from = sourceRect;
+    await scheduleGameEvent("stash board item", async () => {
+      const source: GameDragData = {
+        sourceId: boardSourceId(boardItem.id),
+        sourceNodeId: boardCellNodeId(boardItem.x, boardItem.y),
+        itemId: boardItem.itemId,
+        source: { kind: "board", boardItemId: boardItem.id },
+        hideWhenActive: true,
+      };
+      const sourceRect = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`)
+        ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
+      const from = sourceRect;
 
-    try {
-      if (from) {
-        drag.hideSources([source.sourceId]);
-        addFlyer(boardItem.itemId, from, inventorySinkRect(from, queryRect('[data-bottom-nav-sheet="inventory"]')), "stash");
+      try {
+        const animation = from
+          ? addFlyer(boardItem.itemId, from, inventorySinkRect(from, queryRect('[data-bottom-nav-sheet="inventory"]')), "stash")
+          : Promise.resolve();
+
+        if (from) drag.hideSources([source.sourceId]);
+        await stashBoard.mutateAsync({ boardItemId: boardItem.id });
+        await animation;
+        pulseBottomNav("inventory");
+      } catch (error) {
+        feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
+        feedback.showError(error);
+      } finally {
+        drag.clearHiddenSources();
       }
-
-      await stashBoard.mutateAsync({ boardItemId: boardItem.id });
-      pulseBottomNav("inventory");
-      if (from) await wait(flyMs);
-    } catch (error) {
-      feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-      feedback.showError(error);
-    } finally {
-      drag.clearHiddenSources();
-    }
+    });
   }
 
   async function placeInventoryOnBoardWithFly(slot: InventorySlot) {
-    const stack = slot.stack;
-    const target = game ? findFirstEmptyBoardCell(game) : null;
+    await scheduleGameEvent("place inventory item", async () => {
+      const stack = slot.stack;
+      const target = game ? findFirstEmptyBoardCell(game) : null;
 
-    if (!stack || !target) {
-      feedback.flashInventorySlot(slot.slotIndex, "error");
-      return;
-    }
-
-    const source: GameDragData = {
-      sourceId: inventorySourceId(slot.slotIndex),
-      sourceNodeId: inventorySlotNodeId(slot.slotIndex),
-      itemId: stack.itemId,
-      source: { kind: "inventory", slotIndex: slot.slotIndex, quantity: stack.quantity },
-      overlay: { quantity: stack.quantity },
-      hideWhenActive: stack.quantity <= 1,
-    };
-    const sourceRect = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
-    const targetRect = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
-    const from = sourceRect;
-    const to = targetRect;
-
-    try {
-      if (from && to) {
-        if (source.hideWhenActive !== false) drag.hideSources([source.sourceId]);
-        addFlyer(stack.itemId, from, to, "place");
-        await wait(flyMs);
+      if (!stack || !target) {
+        feedback.flashInventorySlot(slot.slotIndex, "error");
+        return;
       }
 
-      await placeInventory.mutateAsync({ slotIndex: slot.slotIndex, x: target.x, y: target.y });
-    } catch (error) {
-      feedback.flashInventorySlot(slot.slotIndex, "error");
-      feedback.showError(error);
-    } finally {
-      drag.clearHiddenSources();
-    }
+      const source: GameDragData = {
+        sourceId: inventorySourceId(slot.slotIndex),
+        sourceNodeId: inventorySlotNodeId(slot.slotIndex),
+        itemId: stack.itemId,
+        source: { kind: "inventory", slotIndex: slot.slotIndex, quantity: stack.quantity },
+        overlay: { quantity: stack.quantity },
+        hideWhenActive: stack.quantity <= 1,
+      };
+      const sourceRect = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
+      const targetRect = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
+      const from = sourceRect;
+      const to = targetRect;
+
+      try {
+        const animation = from && to ? addFlyer(stack.itemId, from, to, "place", { quantity: stack.quantity }) : Promise.resolve();
+        if (from && to && source.hideWhenActive !== false) drag.hideSources([source.sourceId]);
+        await placeInventory.mutateAsync({ slotIndex: slot.slotIndex, x: target.x, y: target.y });
+        await animation;
+      } catch (error) {
+        feedback.flashInventorySlot(slot.slotIndex, "error");
+        feedback.showError(error);
+      } finally {
+        drag.clearHiddenSources();
+      }
+    });
   }
 
 
@@ -298,7 +307,7 @@ export function GameShell() {
           </div>
         </main>
 
-        <BottomNavigation activeSheet={activeSheet} pulsedSheet={pulsedNavSheet} onOpen={openSheet} />
+        <BottomNavigation activeSheet={activeSheet} onOpen={openSheet} />
       </div>
 
       <BottomSheet open={activeSheet !== null} onClose={closeSheet}>
@@ -329,26 +338,24 @@ export function GameShell() {
               onClose={closeSheet}
               onBuild={(recipeId) => {
                 if (!buildCell) return;
-                build.mutate(
-                  { recipeId, x: buildCell.x, y: buildCell.y },
-                  {
-                    onSuccess: () => {
-                      feedback.pulseMergeCell(cellKey(buildCell.x, buildCell.y));
-                      closeSheet();
-                    },
-                    onError(error) {
-                      feedback.flashBoardCell(cellKey(buildCell.x, buildCell.y), "error");
-                      feedback.showError(error);
-                    },
-                  },
-                );
+                const cell = buildCell;
+                void scheduleGameEvent("build recipe", async () => {
+                  try {
+                    await build.mutateAsync({ recipeId, x: cell.x, y: cell.y });
+                    feedback.pulseMergeCell(cellKey(cell.x, cell.y));
+                    closeSheet();
+                  } catch (error) {
+                    feedback.flashBoardCell(cellKey(cell.x, cell.y), "error");
+                    feedback.showError(error);
+                  }
+                });
               }}
             />
           </section>
         </div>
       </BottomSheet>
 
-      {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} nowMs={nowMs} />)}
+      {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} nowMs={nowMs} onComplete={completeFlyer} />)}
 
       <DragOverlay adjustScale={false} dropAnimation={null}>
         {drag.activeItem ? (
@@ -366,24 +373,23 @@ export function GameShell() {
   );
 }
 
-function BottomNavigation({ activeSheet, pulsedSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; pulsedSheet: BottomNavSheet | null; onOpen(sheet: BottomNavSheet): void }>) {
+function BottomNavigation({ activeSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; onOpen(sheet: BottomNavSheet): void }>) {
   return (
     <nav className="ak-bottom-nav" aria-label="Game panels">
       <div className="ak-bottom-nav-inner">
-        <BottomNavButton active={activeSheet === "inventory"} pulsed={pulsedSheet === "inventory"} label="Inventory" icon="▦" tone="inventory" onClick={() => onOpen("inventory")} />
-        <BottomNavButton active={activeSheet === "database"} pulsed={pulsedSheet === "database"} label="Database" icon="◈" tone="database" onClick={() => onOpen("database")} />
+        <BottomNavButton active={activeSheet === "inventory"} label="Inventory" icon="▦" tone="inventory" onClick={() => onOpen("inventory")} />
+        <BottomNavButton active={activeSheet === "database"} label="Database" icon="◈" tone="database" onClick={() => onOpen("database")} />
       </div>
     </nav>
   );
 }
 
-function BottomNavButton({ active, pulsed, label, icon, tone, onClick }: Readonly<{ active: boolean; pulsed: boolean; label: string; icon: string; tone: BottomNavSheet; onClick(): void }>) {
+function BottomNavButton({ active, label, icon, tone, onClick }: Readonly<{ active: boolean; label: string; icon: string; tone: BottomNavSheet; onClick(): void }>) {
   return (
     <button
       type="button"
       className="ak-bottom-nav-button"
       data-active={active ? "true" : "false"}
-      data-pulse={pulsed ? "true" : "false"}
       data-tone={tone}
       data-bottom-nav-sheet={tone}
       onClick={onClick}

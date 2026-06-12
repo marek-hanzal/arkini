@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { cn } from "~/shared/cn";
-import type { ViewItem } from "~/play/server/playTypes";
+import type { ViewItem } from "~/play/logic/playTypes";
 import type { FlyerModel } from "~/play/types";
 import { playFlyerTimeline } from "~/play/util/animation";
 import { Tile } from "~/item/ui/Tile";

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { InventorySlot, GameView, ViewItem } from "~/play/server/playTypes";
+import type { InventorySlot, GameView, ViewItem } from "~/play/logic/playTypes";
 import { cn } from "~/shared/cn";
 import {
   inventoryContainerNodeId,

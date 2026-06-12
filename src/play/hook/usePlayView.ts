@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { GameView } from "~/play/server/playTypes";
+import type { GameView } from "~/play/logic/playTypes";
 
 export const playQueryKey = ["arkini", "game"] as const;
 export const databaseStatusQueryKey = ["arkini", "database", "status"] as const;
 
 async function loadDb() {
-  const db = await import("~/play/server/playServer");
+  const db = await import("~/play/logic/playBackend");
   await db.bootstrapDatabase();
   return db;
 }
@@ -39,7 +39,7 @@ export function usePlayDataInvalidation() {
 }
 
 export function usePlayAction<TVariables, TResult = void>(
-  action: (db: typeof import("~/play/server/playServer"), variables: TVariables) => Promise<TResult>,
+  action: (db: typeof import("~/play/logic/playBackend"), variables: TVariables) => Promise<TResult>,
   options: usePlayAction.Options = {},
 ) {
   const invalidatePlayData = usePlayDataInvalidation();

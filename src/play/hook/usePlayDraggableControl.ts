@@ -1,4 +1,4 @@
-import type { GameView } from "~/play/server/playTypes";
+import type { GameView } from "~/play/logic/playTypes";
 import type { FlyerKind, RectLike, GameDragSource, GameDropTarget, GameVisualMeta } from "~/play/types";
 import { useDraggableControl } from "~/drag/hook/useDraggableControl";
 import {

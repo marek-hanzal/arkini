@@ -1,9 +1,9 @@
 import { boardContainerNodeId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
 import { inventoryContainerNodeId, inventorySlotNodeId, inventorySourceId } from "~/inventory/inventoryIdentity";
-import type { ItemId } from "~/manifest/server/manifestId";
-import { resolveItemMergeRule } from "~/manifest/server/resolveItemMergeRule";
-import type { GameView } from "~/play/server/playTypes";
+import type { ItemId } from "~/manifest/data/manifestId";
+import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
+import type { GameView } from "~/play/logic/playTypes";
 import type { FlyerKind, GameDragSource, GameDropTarget, GameVisualMeta } from "~/play/types";
 import type {
   DraggableAnimation,

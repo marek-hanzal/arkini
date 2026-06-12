@@ -11,7 +11,7 @@ export function DbStatusCard() {
     setResetState("pending");
 
     try {
-      const db = await import("~/play/server/playServer");
+      const db = await import("~/play/logic/playBackend");
       await db.hardResetDatabaseFile();
       window.location.reload();
     } catch (error) {

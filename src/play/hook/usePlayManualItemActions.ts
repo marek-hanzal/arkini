@@ -5,7 +5,7 @@ import { inventorySourceId } from "~/inventory/inventoryIdentity";
 import { inventorySinkRect } from "~/inventory/util/inventory";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import { usePlayAction } from "~/play/hook/usePlayView";
-import type { BoardViewItem, GameView, InventorySlot } from "~/play/server/playTypes";
+import type { BoardViewItem, GameView, InventorySlot } from "~/play/logic/playTypes";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { playBottomNavPulse } from "~/play/util/animation";
 import { cssEscape, queryElement, queryRect } from "~/shared/util/dom";

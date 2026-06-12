@@ -1,10 +1,12 @@
-import { forwardRef, useEffect, type ReactNode } from "react";
+import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { cn } from "~/lib/cn";
+import { animateBottomSheet } from "../utils/animation";
+import { assignRef } from "../utils/refs";
 
 export interface BottomSheetProps {
   /**
-   * The sheet is always mounted. `open` only flips a data attribute so CSS owns
-   * the slide/backdrop animation and React does not remount the panel mid-gesture.
+   * The sheet is always mounted. `open` only flips interactivity; GSAP owns the
+   * slide/backdrop timeline so React does not remount the panel mid-gesture.
    */
   open: boolean;
   children: ReactNode;
@@ -25,8 +27,23 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
     onClose,
     "data-drag-node-id": dragNodeId,
   },
-  ref,
+  forwardedRef,
 ) {
+  const backdropRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const setPanelRef = useCallback((node: HTMLDivElement | null) => {
+    panelRef.current = node;
+    assignRef(forwardedRef, node);
+  }, [forwardedRef]);
+
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const backdrop = backdropRef.current;
+    if (!panel || !backdrop) return;
+
+    animateBottomSheet({ panel, backdrop, open });
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -41,6 +58,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
   return (
     <div className="ak-bottom-sheet" data-open={open ? "true" : "false"}>
       <button
+        ref={backdropRef}
         type="button"
         aria-label="Close bottom sheet"
         tabIndex={open ? 0 : -1}
@@ -49,7 +67,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
       />
 
       <section
-        ref={ref}
+        ref={setPanelRef}
         role="dialog"
         aria-modal="true"
         data-drag-node-id={dragNodeId}

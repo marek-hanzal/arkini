@@ -47,7 +47,7 @@ export function DbStatusCard() {
           type="button"
           disabled={resetState === "pending"}
           onClick={resetDb}
-          className="rounded-sm border border-red-400/30 bg-red-950/30 px-6 py-3 text-sm font-semibold text-red-100 transition hover:border-red-300 hover:bg-red-950/50 disabled:cursor-wait disabled:opacity-60"
+          className="rounded-sm border border-red-400/30 bg-red-950/30 px-6 py-3 text-sm font-semibold text-red-100 hover:border-red-300 hover:bg-red-950/50 disabled:cursor-wait disabled:opacity-60"
         >
           {resetState === "pending" ? "Dropping DB…" : "Hard reset DB"}
         </button>

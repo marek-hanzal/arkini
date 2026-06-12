@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { InventorySlot, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import {
@@ -8,6 +9,7 @@ import {
   type GameDragData,
   type GameDropData,
 } from "../types";
+import { useGsapCellFeedback } from "../useGsapCellFeedback";
 import { DraggableSurface, DroppableSurface } from "./DragSurface";
 import { SheetHeader } from "./SheetHeader";
 import { Tile } from "./Tile";
@@ -74,17 +76,20 @@ function InventoryCell({
 }>) {
   const stack = slot.stack;
   const nodeId = inventorySlotNodeId(slot.slotIndex);
+  const cellRef = useRef<HTMLDivElement | null>(null);
+  useGsapCellFeedback(cellRef, { invalid, success: false });
 
   return (
     <DroppableSurface
       id={nodeId}
       nodeId={nodeId}
       payload={{ targetId: nodeId, targetNodeId: nodeId, target: { kind: "inventory-slot", slotIndex: slot.slotIndex } } satisfies GameDropData}
+      nodeRef={(node) => { cellRef.current = node; }}
       data-inventory-slot={slot.slotIndex}
       className={(isOver) => cn(
-        "relative aspect-square border-b border-r border-slate-800 bg-slate-900/70 transition-colors duration-200",
+        "relative aspect-square border-b border-r border-slate-800 bg-slate-900/70",
         isOver && "bg-slate-800 outline outline-2 -outline-offset-2 outline-emerald-300/80",
-        invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
+        invalid && "ak-cell-error",
       )}
     >
       {stack && item ? <InventoryTile slot={slot} item={item} hidden={hidden} onDoubleActivate={onDoubleActivate} /> : null}

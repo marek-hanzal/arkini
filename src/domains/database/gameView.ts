@@ -1,5 +1,6 @@
 import { gameDataIndex, gameDataManifest, type ItemId } from "~/domains/game-data";
-import { json, parseJson, readProducerView } from "./boardState";
+import { readProducerView } from "./boardState";
+import { json, parseJson } from "./utils/json";
 import { db } from "./db";
 import { defaultSaveGameId } from "./save";
 import { table } from "./tables";

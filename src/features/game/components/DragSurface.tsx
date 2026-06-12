@@ -1,5 +1,5 @@
 import { useDraggable, useDroppable, type Data } from "@dnd-kit/core";
-import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import { useCallback, type HTMLAttributes, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { cn } from "~/lib/cn";
 import type { DraggablePayload, DroppablePayload } from "../useDraggableControl";
 import { usePressActions } from "../usePressActions";
@@ -10,14 +10,19 @@ export function DroppableSurface<Target>({
   payload,
   className,
   children,
+  nodeRef,
   ...props
 }: Readonly<DroppableSurfaceProps<Target>>) {
   const data = { ...payload, targetNodeId: payload.targetNodeId ?? nodeId } satisfies DroppablePayload<Target>;
   const { setNodeRef, isOver } = useDroppable({ id, data: data as unknown as Data });
+  const setRefs = useCallback((node: HTMLDivElement | null) => {
+    setNodeRef(node);
+    nodeRef?.(node);
+  }, [nodeRef, setNodeRef]);
 
   return (
     <div
-      ref={setNodeRef}
+      ref={setRefs}
       data-drag-node-id={nodeId}
       className={typeof className === "function" ? className(isOver) : className}
       {...props}
@@ -32,6 +37,7 @@ export interface DroppableSurfaceProps<Target> extends Omit<HTMLAttributes<HTMLD
   nodeId?: string;
   payload: DroppablePayload<Target>;
   className?: string | ((isOver: boolean) => string);
+  nodeRef?(node: HTMLDivElement | null): void;
   children: ReactNode;
 }
 

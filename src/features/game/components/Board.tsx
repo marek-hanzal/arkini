@@ -4,6 +4,7 @@ import type { BoardViewItem, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import { cellKey } from "../helpers";
 import { columns, rows, type BuildCell, type CommittedDrag, type DragData, type DropData } from "../types";
+import { usePressActions } from "../usePressActions";
 import { DraggableTileShell, DroppableCell } from "./DragSurface";
 import { Tile } from "./Tile";
 
@@ -18,6 +19,7 @@ export function Board({
   nowMs,
   onEmptyDoubleActivate,
   onTileSingleActivate,
+  onTileDoubleActivate,
 }: Readonly<{
   game: GameView;
   activeDrag: DragData | null;
@@ -29,6 +31,7 @@ export function Board({
   nowMs: number;
   onEmptyDoubleActivate(cell: BuildCell): void;
   onTileSingleActivate(item: BoardViewItem): void;
+  onTileDoubleActivate(item: BoardViewItem): void;
 }>) {
   const cells = useMemo(() => Array.from({ length: columns * rows }, (_, index) => ({ x: index % columns, y: Math.floor(index / columns) })), []);
 
@@ -65,6 +68,7 @@ export function Board({
                 }
                 nowMs={nowMs}
                 onSingleActivate={() => onTileSingleActivate(boardItem)}
+                onDoubleActivate={() => onTileDoubleActivate(boardItem)}
               />
             ) : null}
           </BoardCell>
@@ -96,6 +100,11 @@ function BoardCell({
   onEmptyDoubleActivate(cell: BuildCell): void;
 }>) {
   const id = `cell:${x}:${y}`;
+  const press = usePressActions({
+    onDouble: () => {
+      if (!boardItem) onEmptyDoubleActivate({ x, y });
+    },
+  });
 
   return (
     <DroppableCell
@@ -112,10 +121,11 @@ function BoardCell({
         pulsed && !invalid && !merged && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
         merged && !invalid && "ak-merge-pop bg-emerald-950/35 ring-2 ring-inset ring-emerald-200/80",
       )}
-      onDoubleClick={(event) => {
-        event.stopPropagation();
-        if (!boardItem) onEmptyDoubleActivate({ x, y });
-      }}
+      onClick={press.onClick}
+      onPointerDown={press.onPointerDown}
+      onPointerMove={press.onPointerMove}
+      onPointerUp={press.onPointerUp}
+      onPointerCancel={press.onPointerCancel}
     >
       {children}
     </DroppableCell>
@@ -128,12 +138,14 @@ function BoardTile({
   hidden,
   nowMs,
   onSingleActivate,
+  onDoubleActivate,
 }: Readonly<{
   boardItem: BoardViewItem;
   item: ViewItem;
   hidden: boolean;
   nowMs: number;
   onSingleActivate(): void;
+  onDoubleActivate(): void;
 }>) {
   return (
     <DraggableTileShell
@@ -143,6 +155,7 @@ function BoardTile({
       hidden={hidden}
       className="absolute inset-0 touch-none"
       onSingleActivate={onSingleActivate}
+      onDoubleActivate={onDoubleActivate}
     >
       <Tile item={item} producer={boardItem.producer} nowMs={nowMs} />
     </DraggableTileShell>

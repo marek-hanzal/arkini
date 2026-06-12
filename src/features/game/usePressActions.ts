@@ -1,17 +1,22 @@
 import { useRef, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
 
 const moveTolerancePx = 3;
+const doubleTapMs = 320;
+const doubleTapDistancePx = 24;
 
 export interface PressActions {
   onSingle?(): void;
+  onDouble?(): void;
 }
 
-// Click activation is intentionally immediate. Drag detection only suppresses the
-// click that browsers emit after a real drag; no delayed double-click timer is
-// allowed here because haunted delayed clicks were moving tiles on later taps.
-export function usePressActions({ onSingle }: PressActions) {
+// Click activation stays immediate. Double activation is detected on pointer-up
+// without delaying the single click, so producer clicks cannot become haunted
+// timer events that move a tile later. Computers needed supervision again.
+export function usePressActions({ onSingle, onDouble }: PressActions) {
   const movedRef = useRef(false);
+  const doubleActivatedRef = useRef(false);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
 
   function markMove(clientX: number, clientY: number) {
     const start = pointerStartRef.current;
@@ -21,9 +26,34 @@ export function usePressActions({ onSingle }: PressActions) {
     }
   }
 
+  function maybeDoubleActivate(clientX: number, clientY: number) {
+    if (!onDouble || movedRef.current) return;
+
+    const now = Date.now();
+    const previous = lastTapRef.current;
+    const closeEnough = previous
+      && now - previous.time <= doubleTapMs
+      && Math.abs(clientX - previous.x) <= doubleTapDistancePx
+      && Math.abs(clientY - previous.y) <= doubleTapDistancePx;
+
+    if (!closeEnough) {
+      lastTapRef.current = { time: now, x: clientX, y: clientY };
+      return;
+    }
+
+    lastTapRef.current = null;
+    doubleActivatedRef.current = true;
+    onDouble();
+  }
+
   return {
     onClick(event: ReactMouseEvent<HTMLElement>) {
       event.stopPropagation();
+      if (event.detail > 1 || doubleActivatedRef.current) {
+        doubleActivatedRef.current = false;
+        movedRef.current = false;
+        return;
+      }
       if (movedRef.current) {
         movedRef.current = false;
         return;
@@ -39,11 +69,13 @@ export function usePressActions({ onSingle }: PressActions) {
     },
     onPointerUp(event: ReactPointerEvent<HTMLElement>) {
       markMove(event.clientX, event.clientY);
+      maybeDoubleActivate(event.clientX, event.clientY);
       pointerStartRef.current = null;
     },
     onPointerCancel() {
       movedRef.current = true;
       pointerStartRef.current = null;
+      lastTapRef.current = null;
     },
   };
 }

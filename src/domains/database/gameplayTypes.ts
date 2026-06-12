@@ -17,6 +17,7 @@ export interface ViewItem {
   id: string;
   name: string;
   description: string;
+  label?: string;
   assetSrc: string;
   maxStackSize: number;
   tags: string[];

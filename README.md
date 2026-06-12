@@ -4,13 +4,14 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 ## Current rewrite direction
 
-This branch intentionally rewrites the gameplay slice from the ground up while keeping the existing stack: Vite, React, TanStack Router/Query, DnD Kit, Zustand dependency available but not required, Tailwind v4, Kysely, SQLocal, Zod, ts-pattern, Sonner.
+This branch intentionally rewrites the gameplay slice from the ground up while keeping the existing stack: Vite, React, TanStack Router/Query, DnD Kit, Zustand dependency available but not required, Tailwind v4, Kysely, SQLocal, Zod, ts-pattern.
 
 The core rule is simple: **item definitions drive gameplay shape**. An item may define:
 
 - normal merge rules, for example `seed + seed -> sprout`
 - mixed/secret merge rules, for example `twig + water -> sprout`
-- click producers, which produce only when the player double-clicks/taps them
+- click producers, which produce on a plain single click/tap
+- optional item display labels, for example tiny level numbers over reused building art
 - auto producers, which run by themselves, can be paused, have capacity, tick timing, and recharge timing
 - blueprint build recipes
 
@@ -28,9 +29,12 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 - Click producers use cooldowns and optional finite charges.
 - Auto producers persist pause state, available capacity, next drop time, and recharge time in `boardItem.stateJson`.
 - Auto producers tick from the client and save progress into SQLite, so reloads do not reset their timers like a cheap casino machine.
-- Double-click/tap non-producer board items to animate them into the inventory bottom area.
-- Double-click/tap an inventory stack to place one item into the first free board cell with a small fly animation.
+- Double-click board items to animate them into the inventory bottom area. Single click on producers still produces immediately; no delayed click timer is used.
 - Double-click/tap an empty board cell to open the build bottom sheet.
+
+## Dragging model
+
+Board and inventory use the same drag/drop control hook, `useDraggableControl`, so active drag state, committed-source hiding, rejected-drop return animation, and swap/move animation policy live in one place. It is still a game-level control, not a domain-agnostic drag library: it knows about board cells, inventory slots, stash targets, and merge rules. The reusable low-level pieces are `DragSurface` and `usePressActions`; do not fork board/inventory behavior back into separate physics engines unless you miss teleporting rocks for some reason.
 
 ## Source layout
 
@@ -38,7 +42,8 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 src/domains/game-data/index.ts   Single source of truth for item identity and item behavior.
 src/domains/game-data/schema.ts  Zod structural validation for the manifest.
 src/domains/database/            OPFS SQLite bootstrap, schema, gameplay mutations, view projection.
-src/features/game/GameShell.tsx  Mobile-first board, bottom-sheet inventory, DnD, producer actions, build sheet.
+src/features/game/GameShell.tsx  Mobile-first board, bottom-sheet inventory, producer actions, build sheet.
+src/features/game/useDraggableControl.ts  Shared DnD workflow for board and inventory grids.
 src/hooks/useGameView.ts         TanStack Query bridge over the local SQLite backend.
 ```
 

@@ -65,11 +65,12 @@ export function DraggableTileShell({
   className,
   dragDisabled = false,
   onSingleActivate,
+  onDoubleActivate,
   children,
   ...props
 }: Readonly<DraggableTileShellProps>) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data, disabled: dragDisabled });
-  const press = usePressActions({ onSingle: onSingleActivate });
+  const press = usePressActions({ onSingle: onSingleActivate, onDouble: onDoubleActivate });
 
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     press.onPointerDown(event);
@@ -112,5 +113,6 @@ export interface DraggableTileShellProps extends Omit<HTMLAttributes<HTMLDivElem
   hidden: boolean;
   dragDisabled?: boolean;
   onSingleActivate?(): void;
+  onDoubleActivate?(): void;
   children: ReactNode;
 }

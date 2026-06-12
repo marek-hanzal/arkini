@@ -31,7 +31,13 @@ export function Tile({
       style={dragOverlay && overlaySize ? { width: overlaySize.width, height: overlaySize.height } : undefined}
     >
       <img src={item.assetSrc} alt="" draggable={false} className="h-full w-full object-contain" />
-      {quantity && quantity > 1 ? <span className="absolute bottom-0.5 right-0.5 rounded-sm bg-slate-950/80 px-1 text-[0.62rem] font-bold text-slate-100">{quantity}</span> : null}
+      {quantity && quantity > 1 ? (
+        <span className={cn(
+          "absolute bottom-0.5 rounded-sm bg-slate-950/80 px-1 text-[0.62rem] font-bold text-slate-100",
+          item.label ? "left-0.5" : "right-0.5",
+        )}>{quantity}</span>
+      ) : null}
+      {item.label ? <span className="absolute bottom-0.5 right-0.5 min-w-4 rounded-sm bg-slate-950/85 px-1 text-center text-[0.62rem] font-black text-amber-200">{item.label}</span> : null}
       {producer && producerUi ? <ProducerBadge producer={producer} ui={producerUi} /> : null}
     </div>
   );

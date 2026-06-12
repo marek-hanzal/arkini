@@ -36,6 +36,7 @@ export const gameDataManifestSchema = z.object({
       tier: positiveInteger,
       maxStackSize: positiveInteger,
       description: z.string(),
+      label: z.string().min(1).optional(),
       tags: z.array(z.string().min(1)),
       sort: nonNegativeInteger,
       merge: z.array(

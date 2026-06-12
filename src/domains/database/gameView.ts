@@ -88,6 +88,7 @@ function createViewItemMap() {
           id: item.id,
           name: item.name,
           description: item.description,
+          label: item.label,
           assetSrc: asset.src,
           maxStackSize: item.maxStackSize,
           tags: [...item.tags],

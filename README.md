@@ -30,7 +30,7 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 - Auto producers persist pause state, available capacity, next drop time, and recharge time in `boardItem.stateJson`.
 - Auto producers tick from the client and save progress into SQLite, so reloads do not reset their timers like a cheap casino machine.
 - Double-click board items to animate them into the inventory bottom area. Single click on producers still produces immediately; no delayed click timer is used.
-- Double-click/tap an empty board cell to open the build sheet. Build, inventory, and database panels all share one always-mounted `react-modal-sheet` wrapper with snap points; the closed detent stays hidden under the bottom nav so panel animations remain stable.
+- Double-click/tap an empty board cell to open the build sheet. Build, inventory, and database panels all share one always-mounted custom bottom sheet. The sheet never unmounts; `data-open` only lets CSS slide it and dim the locked background.
 - Dragging a board item lightly highlights known merge targets for accessibility. Rejected drops flash the target while the item flies back.
 - Inventory-to-board placement fades the travelling item out under the inventory sheet and fades the target tile in after the commit.
 
@@ -47,7 +47,7 @@ src/domains/game-data/index.ts   Single source of truth for item identity and it
 src/domains/game-data/schema.ts  Zod structural validation for the manifest.
 src/domains/database/            OPFS SQLite bootstrap, schema, gameplay mutations, view projection.
 src/features/game/GameShell.tsx  Fixed-viewport board, bottom navigation, shared bottom sheet orchestration, producer actions.
-src/features/game/components/BottomSheet.tsx  Shared always-mounted react-modal-sheet wrapper with snap-point control.
+src/features/game/components/BottomSheet.tsx  Shared always-mounted custom sheet; CSS drives backdrop and open/close transforms through `data-open`.
 src/features/game/useDraggableControl.ts  Generic DnD lifecycle/control engine.
 src/features/game/useGameDraggableControl.ts  Arkini-specific accept/reject rules over the generic DnD engine.
 src/hooks/useGameView.ts         TanStack Query bridge over the local SQLite backend.

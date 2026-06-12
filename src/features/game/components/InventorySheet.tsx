@@ -32,7 +32,7 @@ export function InventorySheet({
       id={inventoryBinNodeId}
       nodeId={inventoryBinNodeId}
       payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
-      className={(isOver) => cn("flex h-full min-h-0 flex-col", isOver && "outline outline-2 -outline-offset-2 outline-emerald-300/70")}
+      className={(isOver) => cn("flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col", isOver && "outline outline-2 -outline-offset-2 outline-emerald-300/70")}
     >
       <div data-inventory-summary className="flex items-center justify-between gap-3 border-b border-slate-800/80 p-4">
         <div>

@@ -1,16 +1,10 @@
-import { Sheet, type SheetRef } from "react-modal-sheet";
-import { forwardRef, useEffect, useRef, type ComponentProps, type ReactNode } from "react";
+import { forwardRef, useEffect, type ReactNode } from "react";
 import { cn } from "~/lib/cn";
 
-const closedSnap = 1;
-const openSnap = 2;
-const sheetSnapPoints = [0, 2, 0.72, 1];
-
-export interface BottomSheetProps extends Omit<ComponentProps<typeof Sheet>, "children" | "isOpen" | "onClose" | "ref" | "snapPoints" | "initialSnap" | "detent"> {
+export interface BottomSheetProps {
   /**
-   * The sheet stays mounted for the whole game session. `open` only snaps it
-   * between a hidden detent and the gameplay detent, which keeps react-modal-sheet
-   * animations stable instead of remounting a tiny portal goblin every click.
+   * The sheet is always mounted. `open` only flips a data attribute so CSS owns
+   * the slide/backdrop animation and React does not remount the panel mid-gesture.
    */
   open: boolean;
   children: ReactNode;
@@ -29,41 +23,42 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
     containerClassName,
     contentClassName,
     onClose,
-    disableDismiss,
-    disableScrollLocking,
-    ...props
+    "data-drag-node-id": dragNodeId,
   },
   ref,
 ) {
-  const sheetRef = useRef<SheetRef>(null);
-  const { ["data-drag-node-id"]: dragNodeId, ...sheetProps } = props;
-
   useEffect(() => {
-    sheetRef.current?.snapTo(open ? openSnap : closedSnap);
-  }, [open]);
+    if (!open) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose, open]);
 
   return (
-    <Sheet
-      ref={sheetRef}
-      isOpen
-      onClose={onClose}
-      detent="default"
-      disableDismiss={disableDismiss ?? true}
-      disableScrollLocking={disableScrollLocking ?? false}
-      initialSnap={open ? openSnap : closedSnap}
-      snapPoints={sheetSnapPoints}
-      tweenConfig={{ ease: "easeOut", duration: 0.2 }}
-      {...sheetProps}
-    >
-      <Sheet.Container
+    <div className="ak-bottom-sheet" data-open={open ? "true" : "false"} aria-hidden={!open}>
+      <button
+        type="button"
+        aria-label="Close bottom sheet"
+        tabIndex={open ? 0 : -1}
+        className="ak-bottom-sheet-backdrop"
+        onClick={onClose}
+      />
+
+      <section
         ref={ref}
+        role="dialog"
+        aria-modal="true"
         data-drag-node-id={dragNodeId}
-        className={cn("ak-bottom-sheet-container", className, containerClassName)}
+        className={cn("ak-bottom-sheet-panel", className, containerClassName)}
       >
-        <Sheet.Content className={cn("ak-bottom-sheet-content", contentClassName)}>
+        <div className={cn("ak-bottom-sheet-content", contentClassName)}>
           {children}
-        </Sheet.Content>
-      </Sheet.Container>
-    </Sheet>
+        </div>
+      </section>
+    </div>
   );
 });

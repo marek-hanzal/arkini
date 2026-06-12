@@ -34,6 +34,7 @@ export function GameShell() {
   const game = gameQuery.data;
   const invalidateGameData = useGameDataInvalidation();
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
+  const [renderedSheet, setRenderedSheet] = useState<Exclude<ActiveSheet, null>>("inventory");
   const [buildCell, setBuildCell] = useState<BuildCell | null>(null);
   const { flyers, addFlyer } = useFlyers();
   const [nowMs, setNowMs] = useState(Date.now());
@@ -96,16 +97,17 @@ export function GameShell() {
 
   function closeSheet() {
     setActiveSheet(null);
-    setBuildCell(null);
   }
 
   function openSheet(sheet: Exclude<ActiveSheet, null>) {
+    setRenderedSheet(sheet);
     setActiveSheet((current) => (current === sheet ? null : sheet));
     if (sheet !== "build") setBuildCell(null);
   }
 
   function openBuild(cell: BuildCell) {
     setBuildCell(cell);
+    setRenderedSheet("build");
     setActiveSheet("build");
   }
 
@@ -258,8 +260,8 @@ export function GameShell() {
       </div>
 
       <BottomSheet open={activeSheet !== null} onClose={closeSheet}>
-        <div className="h-full min-h-0">
-          <section className={cn("h-full min-h-0", activeSheet !== "inventory" && "hidden")} aria-hidden={activeSheet !== "inventory"}>
+        <div className="min-h-0">
+          <section className={cn("min-h-0", renderedSheet !== "inventory" && "hidden")} aria-hidden={activeSheet !== "inventory"}>
             <InventorySheet
               game={game}
               isSourceHidden={drag.isSourceHidden}
@@ -272,7 +274,7 @@ export function GameShell() {
             />
           </section>
 
-          <section className={cn("h-full min-h-0 overflow-y-auto overscroll-contain p-4", activeSheet !== "database" && "hidden")} aria-hidden={activeSheet !== "database"}>
+          <section className={cn("max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain p-4", renderedSheet !== "database" && "hidden")} aria-hidden={activeSheet !== "database"}>
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
                 <p className="text-[0.62rem] uppercase tracking-[0.22em] text-emerald-300">System</p>
@@ -283,7 +285,7 @@ export function GameShell() {
             <DbStatusCard />
           </section>
 
-          <section className={cn("h-full min-h-0 overflow-y-auto overscroll-contain", activeSheet !== "build" && "hidden")} aria-hidden={activeSheet !== "build"}>
+          <section className={cn("max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain", renderedSheet !== "build" && "hidden")} aria-hidden={activeSheet !== "build"}>
             <BuildSheet
               game={game}
               cell={buildCell}
@@ -327,7 +329,7 @@ export function GameShell() {
 
 function BottomNavigation({ activeSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; onOpen(sheet: Exclude<ActiveSheet, null>): void }>) {
   return (
-    <nav className="absolute inset-x-3 bottom-0 mx-auto flex h-[calc(4rem+env(safe-area-inset-bottom))] ak-game-width items-start justify-center gap-2 border-t border-slate-800 bg-slate-950/95 px-3 pt-2 shadow-2xl shadow-black/60">
+    <nav className="absolute inset-x-3 bottom-0 mx-auto flex h-[var(--ak-bottom-nav-height)] ak-game-width items-start justify-center gap-2 border-t border-slate-800 bg-slate-950/95 px-3 pt-2 shadow-2xl shadow-black/60">
       <BottomNavButton active={activeSheet === "inventory"} label="Inventory" icon="▦" onClick={() => onOpen("inventory")} />
       <BottomNavButton active={activeSheet === "database"} label="Database" icon="◈" onClick={() => onOpen("database")} />
     </nav>

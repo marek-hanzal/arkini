@@ -3,6 +3,7 @@ import type { InventorySlot, GameView, ViewItem } from "~/play/logic/playTypes";
 import { cn } from "~/shared/cn";
 import {
   inventoryContainerNodeId,
+  inventoryColumns,
   inventorySlots,
   inventorySlotNodeId,
   inventorySourceId,
@@ -41,7 +42,8 @@ export function InventorySheet({
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
         <div
           data-drag-boundary-id={inventoryContainerNodeId}
-          className="ak-game-width mx-auto grid grid-cols-7 gap-0 overflow-hidden border-l border-t border-slate-800"
+          className="ak-game-width mx-auto grid gap-0 overflow-hidden border-l border-t border-slate-800"
+          style={{ gridTemplateColumns: `repeat(${inventoryColumns}, minmax(0, 1fr))` }}
         >
           {inventory.map((slot) => (
             <InventoryCell

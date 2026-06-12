@@ -12,6 +12,7 @@ export {
 	placeInventoryItem,
 	produceBoardItem,
 	stashBoardItem,
+	swapBoardItems,
 	swapInventorySlots,
 } from "./gameplay";
 export { readBoardView } from "./readBoardView";

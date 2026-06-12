@@ -56,6 +56,15 @@ export function PlayShell() {
 			},
 		) => db.mergeBoardItems(input.sourceBoardItemId, input.targetBoardItemId),
 	);
+	const swapBoard = usePlayAction(
+		(
+			db,
+			input: {
+				sourceBoardItemId: string;
+				targetBoardItemId: string;
+			},
+		) => db.swapBoardItems(input.sourceBoardItemId, input.targetBoardItemId),
+	);
 	const build = usePlayAction(
 		(
 			db,
@@ -72,6 +81,7 @@ export function PlayShell() {
 			moveBoard: (input) => moveBoard.mutateAsync(input),
 			swapInventory: (input) => swapInventory.mutateAsync(input),
 			mergeBoard: (input) => mergeBoard.mutateAsync(input),
+			swapBoard: (input) => swapBoard.mutateAsync(input),
 		},
 		feedback,
 		addFlyer,

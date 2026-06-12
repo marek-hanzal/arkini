@@ -1,14 +1,16 @@
 import { useCallback } from "react";
 import { boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
+import { inventorySourceId } from "~/inventory/inventoryIdentity";
 import { inventorySinkRect } from "~/inventory/util/inventory";
-import type { BoardViewItem, ProducerDropResult } from "~/play/logic/playTypes";
+import type { BoardViewItem, ProducerDropResult, ProducerPlacement } from "~/play/logic/playTypes";
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import type { ActiveSheet } from "~/play/ui/BottomNavigation";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { queryRect } from "~/shared/util/queryRect";
+import { waitForPaint } from "~/shared/util/waitForPaint";
 
 export namespace usePlayProducerActions {
 	export interface Props {
@@ -90,20 +92,20 @@ export function usePlayProducerActions({
 		],
 	);
 
-	const animateProducerDepletion = useCallback(
-		async (boardItem: BoardViewItem, result: ProducerDropResult) => {
-			if (result.depletion?.kind !== "remove") return;
+	const startProducerDepletion = useCallback(
+		(boardItem: BoardViewItem, result: ProducerDropResult) => {
+			if (result.depletion?.kind !== "remove") return null;
 
 			const sourceId = boardSourceId(boardItem.id);
 			const sourceRect =
 				queryRect(`[data-board-item-id="${boardItem.id}"]`) ??
 				queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
-			if (!sourceRect) return;
+			if (!sourceRect) return null;
 
 			hideSources([
 				sourceId,
 			]);
-			await addFlyer(boardItem.itemId, sourceRect, sourceRect, "deplete", {
+			return addFlyer(boardItem.itemId, sourceRect, sourceRect, "deplete", {
 				producer: boardItem.producer ?? undefined,
 			});
 		},
@@ -121,14 +123,19 @@ export function usePlayProducerActions({
 						boardItemId: boardItem.id,
 						activation,
 					});
+					hideSources(producerPlacementSourceIds(result.placements));
 					await animateProducerDrops(
 						[
 							result,
 						],
 						activation === "exhaust" ? 130 : 0,
 					);
-					await animateProducerDepletion(boardItem, result);
+					const depletion = startProducerDepletion(boardItem, result);
+					await waitForPaint();
 					await invalidatePlayData();
+					await waitForPaint();
+					clearHiddenSources();
+					await depletion;
 				} catch (error) {
 					feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
 					feedback.showError(error);
@@ -138,13 +145,32 @@ export function usePlayProducerActions({
 			});
 		},
 		[
-			animateProducerDepletion,
 			animateProducerDrops,
 			clearHiddenSources,
 			feedback,
+			hideSources,
 			invalidatePlayData,
 			produce,
+			startProducerDepletion,
 			schedule,
 		],
 	);
+}
+
+function producerPlacementSourceIds(placements: readonly ProducerPlacement[]) {
+	return placements.flatMap((placement) => {
+		if (placement.kind === "board" && placement.boardItemId) {
+			return [
+				boardSourceId(placement.boardItemId),
+			];
+		}
+
+		if (placement.kind === "inventory" && placement.slotIndex !== undefined) {
+			return [
+				inventorySourceId(placement.slotIndex),
+			];
+		}
+
+		return [];
+	});
 }

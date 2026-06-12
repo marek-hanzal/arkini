@@ -32,7 +32,7 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 - Board size comes from `GameConfig.game.board`, currently 7×9.
 - Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.
 - Board and inventory use zero-gap square cells to avoid DnD blind spots.
-- Merging happens on the board only.
+- Merging happens on the board only. Dropping onto a non-mergeable occupied board cell swaps the two board items instead of rejecting the action.
 - Inventory stores stacks and can combine compatible stacks.
 - Drag is intentionally local to a surface now: board item to board cell, inventory slot to inventory slot. Board↔inventory drag is obsolete.
 - Board items go into inventory by double-click/tap on the board item.
@@ -48,9 +48,9 @@ Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts` and
 
 Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle.
 
-Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/hook/usePlayDraggableControl.ts` only wires those rules into the generic control. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: when dnd-kit does not report a direct target, it snaps board and inventory drags to the nearest same-surface action within the magnetic threshold. Missing a cell edge by a few pixels should not be treated like a moral failure.
+Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/hook/usePlayDraggableControl.ts` only wires those rules into the generic control. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: when dnd-kit does not report a direct target, it snaps board and inventory drags to the nearest same-surface action within the magnetic threshold. The fallback scores real rectangle overlap first and distance second, so grid edges and cross-points are not treated like a moral failure.
 
-Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Finite producer depletion uses the same discipline: mutate, play loot and exit animations against the still-visible stale view, then invalidate queries. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
+Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Finite producer depletion uses the same discipline: mutate, play loot against the still-visible stale view, mask the newly committed placements during the query refresh, then reveal them under the flyer layer while the depleted producer exits. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
 Board merge hints are handled by `src/board/hook/useDelayedMergeHints.ts`. Global mergeable-target hints appear after 1.25 s while dragging a board item and disappear when the drag context changes. The currently hovered mergeable target still highlights instantly, because feedback that waits politely for permission is not feedback, it is bureaucracy.
 

@@ -66,6 +66,10 @@ export const MoveBoardItemInputSchema = z.object({
 	boardItemId: BoardItemIdSchema,
 	...BoardCellSchema.shape,
 });
+export const SwapBoardItemsInputSchema = z.object({
+	sourceBoardItemId: BoardItemIdSchema,
+	targetBoardItemId: BoardItemIdSchema,
+});
 export const MergeBoardItemsInputSchema = z.object({
 	sourceBoardItemId: BoardItemIdSchema,
 	targetBoardItemId: BoardItemIdSchema,

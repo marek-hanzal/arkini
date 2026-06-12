@@ -1,4 +1,4 @@
-import { boardContainerNodeId } from "~/board/boardIdentity";
+import { boardContainerNodeId, boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
 import {
 	inventoryContainerNodeId,
@@ -21,6 +21,7 @@ export interface GameDragActions {
 	moveBoard(input: { boardItemId: string; x: number; y: number }): Promise<unknown>;
 	swapInventory(input: { sourceSlotIndex: number; targetSlotIndex: number }): Promise<unknown>;
 	mergeBoard(input: { sourceBoardItemId: string; targetBoardItemId: string }): Promise<unknown>;
+	swapBoard(input: { sourceBoardItemId: string; targetBoardItemId: string }): Promise<unknown>;
 }
 
 export interface GameDragFeedback {
@@ -166,13 +167,35 @@ function boardToCell(
 
 	const targetBoardItemId = target.target.boardItemId;
 	const targetItem = game.boardItemsById[targetBoardItemId];
-	if (
-		!targetItem ||
-		!resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId)
-	) {
+	if (!targetItem) {
 		return reject(() =>
 			feedback.flashBoardCell(cellKey(target.target.x, target.target.y), "error"),
 		);
+	}
+
+	if (!resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId)) {
+		return accept({
+			hide: [
+				source.sourceId,
+				boardSourceId(targetBoardItemId),
+			],
+			animations: [
+				dragToTargetAnimation(source, target),
+				{
+					itemId: targetItem.itemId,
+					fromNodeId: target.targetNodeId,
+					toNodeId: source.sourceNodeId,
+					overlay: {
+						producer: targetItem.producer ?? undefined,
+					},
+				},
+			],
+			commit: () =>
+				actions.swapBoard({
+					sourceBoardItemId: source.source.boardItemId,
+					targetBoardItemId,
+				}),
+		});
 	}
 
 	return accept({

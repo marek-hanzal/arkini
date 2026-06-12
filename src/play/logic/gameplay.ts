@@ -26,6 +26,7 @@ import {
 	PlaceInventoryItemInputSchema,
 	ProduceBoardItemInputSchema,
 	StashBoardItemInputSchema,
+	SwapBoardItemsInputSchema,
 	SwapInventorySlotsInputSchema,
 } from "./gameActionSchemas";
 import {
@@ -195,6 +196,49 @@ export async function moveBoardItem(boardItemId: string, x: number, y: number) {
 				updatedAt: localTimestamp(),
 			})
 			.where("id", "=", boardItem.id)
+			.execute();
+	});
+}
+
+export async function swapBoardItems(sourceBoardItemId: string, targetBoardItemId: string) {
+	const input = SwapBoardItemsInputSchema.parse({
+		sourceBoardItemId,
+		targetBoardItemId,
+	});
+	if (input.sourceBoardItemId === input.targetBoardItemId) return;
+
+	await db.transaction().execute(async (tx) => {
+		const { boardRows } = await readMutableSave(tx);
+		const source = boardRows.find((row) => row.id === input.sourceBoardItemId);
+		const target = boardRows.find((row) => row.id === input.targetBoardItemId);
+		if (!source || !target) throw new GameActionError("Both board items must exist.");
+
+		await tx
+			.updateTable(table.boardItem)
+			.set({
+				x: -1,
+				y: -1,
+				updatedAt: localTimestamp(),
+			})
+			.where("id", "=", source.id)
+			.execute();
+		await tx
+			.updateTable(table.boardItem)
+			.set({
+				x: source.x,
+				y: source.y,
+				updatedAt: localTimestamp(),
+			})
+			.where("id", "=", target.id)
+			.execute();
+		await tx
+			.updateTable(table.boardItem)
+			.set({
+				x: target.x,
+				y: target.y,
+				updatedAt: localTimestamp(),
+			})
+			.where("id", "=", source.id)
 			.execute();
 	});
 }

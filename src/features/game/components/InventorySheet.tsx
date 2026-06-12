@@ -30,24 +30,24 @@ export function InventorySheet({
 }>) {
   const filled = game.inventory.filter((slot) => slot.stack).length;
 
-  return (
-    <InventoryDropBin open={open} overClassName="ring-2 ring-emerald-300/70" onClose={() => onOpenChange(false)}>
-      <div data-inventory-summary className="h-20 border-b border-slate-800/80 px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">Inventory</p>
-            <p className="text-sm text-slate-300">{filled}/{game.inventory.length} slots</p>
-          </div>
-          <button
-            type="button"
-            className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300"
-            onClick={() => onOpenChange(!open)}
-          >
-            {open ? "Close" : "Open"}
-          </button>
-        </div>
+  const header = (
+    <div data-inventory-summary className="flex h-full items-center justify-between gap-3">
+      <div>
+        <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">Inventory</p>
+        <p className="text-sm text-slate-300">{filled}/{game.inventory.length} slots</p>
       </div>
+      <button
+        type="button"
+        className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300"
+        onClick={() => onOpenChange(!open)}
+      >
+        {open ? "Close" : "Open"}
+      </button>
+    </div>
+  );
 
+  return (
+    <InventoryDropBin open={open} header={header} overClassName="outline outline-2 -outline-offset-2 outline-emerald-300/70" onOpenChange={onOpenChange} onClose={() => onOpenChange(false)}>
       <div className="max-h-[60vh] overflow-y-auto overscroll-contain pb-4">
         <div className="grid grid-cols-4 gap-0 overflow-hidden border-x border-slate-800">
           {game.inventory.map((slot) => (
@@ -67,18 +67,18 @@ export function InventorySheet({
   );
 }
 
-function InventoryDropBin({ children, open, overClassName, onClose }: Readonly<{ children: ReactNode; open: boolean; overClassName: string; onClose(): void }>) {
+function InventoryDropBin({ children, open, header, overClassName, onOpenChange, onClose }: Readonly<{ children: ReactNode; open: boolean; header: ReactNode; overClassName: string; onOpenChange(open: boolean): void; onClose(): void }>) {
   return (
     <DroppableBottomSheet
       id={inventoryBinNodeId}
       nodeId={inventoryBinNodeId}
       payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
       open={open}
-      keepMounted
-      closedClassName="translate-y-[calc(100%-5rem)]"
-      backdropClassName="z-20 bg-slate-950/50"
-      sheetClassName="z-30"
-      className={(isOver) => cn(isOver && overClassName)}
+      header={header}
+      peekHeight={80}
+      className={(isOver) => cn("z-30", isOver && overClassName)}
+      contentClassName="max-h-none overflow-visible"
+      onOpenChange={onOpenChange}
       onClose={onClose}
     >
       {children}

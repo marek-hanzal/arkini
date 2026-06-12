@@ -43,7 +43,14 @@ export function PlayShell() {
     addFlyer,
     schedule: schedulePlayEvent,
   });
-  const produceFrom = usePlayProducerActions({ activeSheet: sheets.activeSheet, addFlyer, feedback, schedule: schedulePlayEvent });
+  const produceFrom = usePlayProducerActions({
+    activeSheet: sheets.activeSheet,
+    addFlyer,
+    feedback,
+    schedule: schedulePlayEvent,
+    hideSources: drag.hideSources,
+    clearHiddenSources: drag.clearHiddenSources,
+  });
   const manualActions = usePlayManualItemActions({
     addFlyer,
     feedback,

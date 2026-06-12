@@ -84,9 +84,14 @@ export interface ProducerPlacement {
   slotIndex?: number;
 }
 
+export type ProducerDepletion =
+  | { kind: "remove" }
+  | { kind: "replace"; itemId: ItemId };
+
 export interface ProducerDropResult {
   producerBoardItemId: string;
   placements: ProducerPlacement[];
+  depletion: ProducerDepletion | null;
 }
 
 export interface BoardItemState {

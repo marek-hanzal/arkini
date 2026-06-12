@@ -188,8 +188,8 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
 
     const shouldDeplete = nextRemainingCharges !== null && nextRemainingCharges <= 0;
     if (shouldDeplete) {
-      await depleteProducer(tx, producerRow, mode);
-      return { producerBoardItemId: producerRow.id, placements };
+      const depletion = await depleteProducer(tx, producerRow, mode);
+      return { producerBoardItemId: producerRow.id, placements, depletion };
     }
 
     await tx
@@ -208,7 +208,7 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
       .where("id", "=", producerRow.id)
       .execute();
 
-    return { producerBoardItemId: producerRow.id, placements };
+    return { producerBoardItemId: producerRow.id, placements, depletion: null };
   });
 }
 

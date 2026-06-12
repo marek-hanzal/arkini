@@ -54,4 +54,6 @@ export function inventorySlotNodeId(slotIndex: number) {
   return `inventory-slot:${slotIndex}`;
 }
 
+export const boardContainerNodeId = "board-container";
+export const inventoryContainerNodeId = "inventory-container";
 export const inventoryBinNodeId = "inventory-bin";

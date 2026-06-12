@@ -2,7 +2,9 @@ import { resolveMergeRule, type ItemId } from "~/domains/game-data";
 import type { GameView } from "~/domains/database";
 import { cellKey } from "./helpers";
 import {
+  boardContainerNodeId,
   flyMs,
+  inventoryContainerNodeId,
   inventorySlotNodeId,
   inventorySourceId,
   type FlyerKind,
@@ -56,6 +58,7 @@ export function useGameDraggableControl({
       flashGameDrop(context, game, feedback);
       feedback.showError(error);
     },
+    getDragBoundaryNodeId: getGameDragBoundaryNodeId,
   });
 
   const activeItem = control.activeDrag && game ? (game.items[control.activeDrag.itemId] ?? null) : null;
@@ -109,9 +112,9 @@ function inventoryToCell(
     hide: hiddenSource(source),
     animations: [{
       itemId: source.itemId,
-      fromNodeId: source.sourceNodeId,
+      fromDrag: true,
       toNodeId: target.targetNodeId,
-      kind: "place",
+      kind: "move",
     }],
     commit: () => actions.placeInventory({ slotIndex: source.source.slotIndex, x: target.target.x, y: target.target.y }),
     feedback: () => feedback.pulseBoardCell(cellKey(target.target.x, target.target.y)),
@@ -128,7 +131,7 @@ function inventoryToInventory(
   if (source.source.slotIndex === target.target.slotIndex) return { type: "ignore" };
 
   const targetStack = game.inventoryBySlotIndex[target.target.slotIndex]?.stack ?? null;
-  const animations = targetStack ? inventorySwapAnimations(context, targetStack.itemId) : [];
+  const animations = inventoryMoveAnimations(context, targetStack?.itemId ?? null);
   const hide = [
     source.sourceId,
     ...(targetStack && targetStack.itemId !== source.itemId ? [inventorySourceId(target.target.slotIndex)] : []),
@@ -153,6 +156,7 @@ function boardToCell(
   if (!target.target.boardItemId) {
     return accept({
       hide: [source.sourceId],
+      animations: [dragToTargetAnimation(source, target)],
       commit: () => actions.moveBoard({ boardItemId: source.source.boardItemId, x: target.target.x, y: target.target.y }),
       feedback: () => feedback.pulseBoardCell(cellKey(target.target.x, target.target.y)),
     });
@@ -166,6 +170,7 @@ function boardToCell(
 
   return accept({
     hide: [source.sourceId],
+    animations: [dragToTargetAnimation(source, target)],
     commit: () => actions.mergeBoard({ sourceBoardItemId: source.source.boardItemId, targetBoardItemId }),
     feedback: () => feedback.pulseMergeCell(cellKey(target.target.x, target.target.y)),
   });
@@ -187,6 +192,7 @@ function boardToInventorySlot(
 
   return accept({
     hide: [source.sourceId],
+    animations: [dragToTargetAnimation(source, target)],
     commit: () => actions.stashBoard({ boardItemId: source.source.boardItemId, slotIndex: target.target.slotIndex }),
     feedback: () => feedback.pulseInventorySlot(target.target.slotIndex),
   });
@@ -202,18 +208,14 @@ function boardToInventoryBin(
   });
 }
 
-function inventorySwapAnimations(
+function inventoryMoveAnimations(
   context: GameDropContext<"inventory", "inventory-slot">,
-  targetItemId: string,
+  targetItemId: string | null,
 ): DraggableAnimation<string, FlyerKind>[] {
   const { source, target } = context;
-  const animations: DraggableAnimation<string, FlyerKind>[] = [{
-    itemId: source.itemId,
-    fromNodeId: source.sourceNodeId,
-    toNodeId: target.targetNodeId,
-  }];
+  const animations: DraggableAnimation<string, FlyerKind>[] = [dragToTargetAnimation(source, target)];
 
-  if (targetItemId !== source.itemId) {
+  if (targetItemId && targetItemId !== source.itemId) {
     animations.push({
       itemId: targetItemId,
       fromNodeId: target.targetNodeId,
@@ -222,6 +224,23 @@ function inventorySwapAnimations(
   }
 
   return animations;
+}
+
+function dragToTargetAnimation(
+  source: DraggablePayload<string, GameDragSource, { quantity?: number }>,
+  target: DroppablePayload<GameDropTarget>,
+  kind: FlyerKind = "move",
+): DraggableAnimation<string, FlyerKind> {
+  return {
+    itemId: source.itemId,
+    fromDrag: true,
+    toNodeId: target.targetNodeId,
+    kind,
+  };
+}
+
+function getGameDragBoundaryNodeId(source: DraggablePayload<string, GameDragSource, { quantity?: number }>) {
+  return source.source.kind === "board" ? boardContainerNodeId : inventoryContainerNodeId;
 }
 
 type AcceptPlan = Omit<Extract<DropPlan<string, FlyerKind>, { type: "accept" }>, "type">;

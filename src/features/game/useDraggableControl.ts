@@ -4,8 +4,9 @@ import {
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
+  type Modifier,
 } from "@dnd-kit/core";
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { cssEscape, queryRect, tileVisualRect, wait, without } from "./helpers";
 import type { RectLike } from "./types";
 
@@ -40,6 +41,8 @@ export interface DraggableAnimation<ItemId extends string = string, Kind extends
   toNodeId?: string;
   from?: RectLike;
   to?: RectLike;
+  /** Resolve the animation start from the final drag overlay rect instead of the original source node. */
+  fromDrag?: boolean;
 }
 
 export interface ResolvedDraggableAnimation<ItemId extends string = string, Kind extends string = string> {
@@ -72,6 +75,7 @@ export interface UseDraggableControlOptions<ItemId extends string = string, Sour
   resolveDrop(context: DropContext<ItemId, Source, Target, Overlay>): DropPlan<ItemId, Kind> | Promise<DropPlan<ItemId, Kind>>;
   animate(animation: ResolvedDraggableAnimation<ItemId, Kind>): void;
   onError?(error: unknown, context: DropContext<ItemId, Source, Target, Overlay>): void | Promise<void>;
+  getDragBoundaryNodeId?(source: DraggablePayload<ItemId, Source, Overlay>): string | null | undefined;
   animationMs?: number;
   activationDistance?: number;
 }
@@ -88,17 +92,42 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
   resolveDrop,
   animate,
   onError,
+  getDragBoundaryNodeId,
   animationMs = 320,
   activationDistance = 5,
 }: UseDraggableControlOptions<ItemId, Source, Target, Overlay, Kind>) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: activationDistance } }));
+  const activeDragRef = useRef<DraggablePayload<ItemId, Source, Overlay> | null>(null);
+  const dragBoundaryRectRef = useRef<RectLike | null>(null);
   const [activeDrag, setActiveDrag] = useState<DraggablePayload<ItemId, Source, Overlay> | null>(null);
   const [hiddenSourceIds, setHiddenSourceIds] = useState(() => new Set<string>());
   const [dragPreviewRect, setDragPreviewRect] = useState<Pick<RectLike, "width" | "height"> | null>(null);
 
+  const restrictToDragBoundary = useCallback<Modifier>(({ transform, draggingNodeRect, activeNodeRect }) => {
+    const draggingRect = draggingNodeRect ?? activeNodeRect;
+    const boundaryRect = dragBoundaryRectRef.current;
+
+    if (!draggingRect || !boundaryRect) return transform;
+
+    const minX = boundaryRect.left - draggingRect.left;
+    const maxX = boundaryRect.left + boundaryRect.width - draggingRect.left - draggingRect.width;
+    const minY = boundaryRect.top - draggingRect.top;
+    const maxY = boundaryRect.top + boundaryRect.height - draggingRect.top - draggingRect.height;
+
+    return {
+      ...transform,
+      x: clamp(transform.x, minX, maxX),
+      y: clamp(transform.y, minY, maxY),
+    };
+  }, []);
+  const modifiers = useMemo(() => getDragBoundaryNodeId ? [restrictToDragBoundary] : [], [getDragBoundaryNodeId, restrictToDragBoundary]);
+
   function handleDragStart(event: DragStartEvent) {
     clearHiddenSources();
-    setActiveDrag(event.active.data.current as DraggablePayload<ItemId, Source, Overlay> | null);
+    const source = event.active.data.current as DraggablePayload<ItemId, Source, Overlay> | null;
+    activeDragRef.current = source;
+    dragBoundaryRectRef.current = source ? rectForBoundaryNode(getDragBoundaryNodeId?.(source)) : null;
+    setActiveDrag(source);
     const rect = (event.active.rect.current.initial ?? event.active.rect.current.translated) as RectLike | null;
     setDragPreviewRect(rect ? { width: rect.width, height: rect.height } : null);
   }
@@ -115,6 +144,8 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     setDragPreviewRect(null);
 
     if (!source || !context) {
+      activeDragRef.current = null;
+      dragBoundaryRectRef.current = null;
       setActiveDrag(null);
       return;
     }
@@ -128,6 +159,8 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
 
   async function runPlan(context: DropContext<ItemId, Source, Target, Overlay>, plan: DropPlan<ItemId, Kind>, dragRect: RectLike | null) {
     if (plan.type === "ignore") {
+      activeDragRef.current = null;
+      dragBoundaryRectRef.current = null;
       setActiveDrag(null);
       return;
     }
@@ -135,22 +168,28 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     if (plan.type === "reject") {
       const feedback = runFeedback(plan.feedback);
       if (plan.animateReturn !== false) await animateReturn(context.source, dragRect);
-      else setActiveDrag(null);
+      else {
+        activeDragRef.current = null;
+        dragBoundaryRectRef.current = null;
+        setActiveDrag(null);
+      }
       await feedback;
       return;
     }
 
     hideSources(plan.hide ?? []);
+    activeDragRef.current = null;
+    dragBoundaryRectRef.current = null;
     setActiveDrag(null);
 
     if (plan.animations?.length && plan.animationTiming !== "afterCommit") {
-      await playAnimations(plan.animations);
+      await playAnimations(plan.animations, dragRect);
     }
 
     await plan.commit();
 
     if (plan.animations?.length && plan.animationTiming === "afterCommit") {
-      await playAnimations(plan.animations);
+      await playAnimations(plan.animations, dragRect);
     }
 
     await plan.feedback?.();
@@ -165,14 +204,14 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     await feedback;
   }
 
-  async function playAnimations(animations: DraggableAnimation<ItemId, Kind>[]) {
-    const resolved = animations.map(resolveAnimation).filter((animation): animation is ResolvedDraggableAnimation<ItemId, Kind> => Boolean(animation));
+  async function playAnimations(animations: DraggableAnimation<ItemId, Kind>[], dragRect: RectLike | null) {
+    const resolved = animations.map((animation) => resolveAnimation(animation, dragRect)).filter((animation): animation is ResolvedDraggableAnimation<ItemId, Kind> => Boolean(animation));
     for (const animation of resolved) animate(animation);
     if (resolved.length > 0) await wait(animationMs);
   }
 
-  function resolveAnimation(animation: DraggableAnimation<ItemId, Kind>): ResolvedDraggableAnimation<ItemId, Kind> | null {
-    const from = animation.from ?? rectForNode(animation.fromNodeId);
+  function resolveAnimation(animation: DraggableAnimation<ItemId, Kind>, dragRect: RectLike | null): ResolvedDraggableAnimation<ItemId, Kind> | null {
+    const from = animation.from ?? (animation.fromDrag && dragRect ? tileVisualRect(dragRect) : rectForNode(animation.fromNodeId));
     const to = animation.to ?? rectForNode(animation.toNodeId);
     if (!from || !to) return null;
     return { itemId: animation.itemId, kind: animation.kind, from, to };
@@ -183,11 +222,15 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     const to = rectForNode(source.sourceNodeId);
 
     if (!from || !to) {
+      activeDragRef.current = null;
+      dragBoundaryRectRef.current = null;
       setActiveDrag(null);
       return;
     }
 
     if (source.hideWhenActive !== false) hideSources([source.sourceId]);
+    activeDragRef.current = null;
+    dragBoundaryRectRef.current = null;
     setActiveDrag(null);
     animate({ itemId: source.itemId, from, to });
     await wait(animationMs);
@@ -198,6 +241,11 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
     if (!nodeId) return null;
     const rect = queryRect(`[data-drag-node-id="${cssEscape(nodeId)}"]`);
     return rect ? tileVisualRect(rect) : null;
+  }
+
+  function rectForBoundaryNode(nodeId: string | null | undefined) {
+    if (!nodeId) return null;
+    return queryRect(`[data-drag-boundary-id="${cssEscape(nodeId)}"]`) ?? queryRect(`[data-drag-node-id="${cssEscape(nodeId)}"]`);
   }
 
   function hideSources(ids: readonly string[]) {
@@ -217,6 +265,8 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
   }
 
   function clearTransientState() {
+    activeDragRef.current = null;
+    dragBoundaryRectRef.current = null;
     setActiveDrag(null);
     setDragPreviewRect(null);
     clearHiddenSources();
@@ -232,6 +282,7 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
       onDragStart: handleDragStart,
       onDragEnd: handleDragEnd,
       onDragCancel: handleDragCancel,
+      modifiers,
     },
     activeDrag,
     hiddenSourceIds,
@@ -258,4 +309,9 @@ function waitForPaint() {
       window.requestAnimationFrame(() => resolve());
     });
   });
+}
+
+function clamp(value: number, min: number, max: number) {
+  if (min > max) return min + (max - min) / 2;
+  return Math.min(Math.max(value, min), max);
 }

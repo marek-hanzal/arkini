@@ -85,6 +85,33 @@ button {
   }
 }
 
+.ak-merge-target {
+  position: relative;
+  background: rgb(6 78 59 / 0.42);
+  box-shadow:
+    inset 0 0 0 2px rgb(110 231 183 / 0.82),
+    inset 0 0 1.2rem rgb(16 185 129 / 0.24),
+    0 0 1rem rgb(16 185 129 / 0.2);
+}
+
+.ak-merge-target::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  pointer-events: none;
+  border: 1px solid rgb(167 243 208 / 0.78);
+  border-radius: 0.45rem;
+  background: radial-gradient(circle, rgb(110 231 183 / 0.18), transparent 68%);
+}
+
+.ak-merge-target-over {
+  background: rgb(6 95 70 / 0.58);
+  box-shadow:
+    inset 0 0 0 3px rgb(167 243 208 / 0.95),
+    inset 0 0 1.45rem rgb(52 211 153 / 0.34),
+    0 0 1.35rem rgb(52 211 153 / 0.32);
+}
+
 .ak-shake {
   animation: ak-shake 260ms ease-out both;
 }

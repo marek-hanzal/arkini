@@ -2,6 +2,7 @@ import type { InventorySlot, GameView, ViewItem } from "~/domains/database";
 import { cn } from "~/lib/cn";
 import {
   inventoryBinNodeId,
+  inventoryContainerNodeId,
   inventorySlotNodeId,
   inventorySourceId,
   type GameDragData,
@@ -33,6 +34,7 @@ export function InventorySheet({
       id={inventoryBinNodeId}
       nodeId={inventoryBinNodeId}
       payload={{ targetId: inventoryBinNodeId, targetNodeId: inventoryBinNodeId, target: { kind: "inventory-bin" } } satisfies GameDropData}
+      data-drag-boundary-id={inventoryContainerNodeId}
       className={(isOver) => cn("flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col", isOver && "outline outline-2 -outline-offset-2 outline-emerald-300/70")}
     >
       <SheetHeader

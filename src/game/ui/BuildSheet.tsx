@@ -1,5 +1,5 @@
-import type { BuildRecipeId } from "~/manifest/server";
-import type { GameView } from "~/database/server";
+import type { GameView } from "~/game/server/gameplayTypes";
+import type { BuildRecipeId } from "~/manifest/server/manifestId";
 import type { BuildCell } from "../types";
 import { SheetHeader } from "./SheetHeader";
 

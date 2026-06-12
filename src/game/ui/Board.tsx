@@ -1,6 +1,7 @@
 import { useMemo, useRef, type ReactNode } from "react";
-import { resolveMergeRule, type ItemId } from "~/manifest/server";
-import type { BoardViewItem, GameView, ViewItem } from "~/database/server";
+import { resolveItemMergeRule } from "~/manifest/server/resolveItemMergeRule";
+import type { BoardViewItem, GameView, ViewItem } from "~/game/server/gameplayTypes";
+import type { ItemId } from "~/manifest/server/manifestId";
 import { cn } from "~/shared/cn";
 import { cellKey } from "../util/cell";
 import {
@@ -51,7 +52,7 @@ export function Board({
         const boardItem = game.boardItemByCellKey[key] ?? null;
         const viewItem = boardItem ? game.items[boardItem.itemId] : null;
         const canMerge = activeDrag?.source.kind === "board" && boardItem && boardItem.id !== activeDrag.source.boardItemId
-          ? Boolean(resolveMergeRule(activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
+          ? Boolean(resolveItemMergeRule(activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
           : false;
         const producerReady = isProducerReady(boardItem?.producer ?? null, nowMs);
 

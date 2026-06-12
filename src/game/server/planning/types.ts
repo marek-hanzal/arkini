@@ -1,4 +1,4 @@
-import type { ItemId } from "~/manifest/server";
+import type { ItemId } from "~/manifest/server/manifestId";
 
 export interface SaveShape {
   boardWidth: number;

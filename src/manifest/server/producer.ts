@@ -1,4 +1,4 @@
-import type { ItemId } from "./ids";
+import type { ItemId } from "./manifestId";
 
 export interface ProducerDefinition {
   trigger: "click";

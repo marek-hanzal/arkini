@@ -1,4 +1,4 @@
-import type { BoardViewItem, ViewItem } from "~/database/server";
+import type { BoardViewItem, ViewItem } from "~/game/server/gameplayTypes";
 import { cn } from "~/shared/cn";
 import { formatMs } from "../util/format";
 import type { ProducerView, RectLike } from "../types";

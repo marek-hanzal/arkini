@@ -1,4 +1,6 @@
-import type { BuildRecipeCost, BuildRecipeId, ItemId, ProducerMode } from "~/manifest/server";
+import type { BuildRecipeCost } from "~/manifest/server/build";
+import type { BuildRecipeId, ItemId } from "~/manifest/server/manifestId";
+import type { ProducerMode } from "~/manifest/server/producer";
 
 export interface GameView {
   save: { id: string; boardWidth: number; boardHeight: number; inventorySlots: number };

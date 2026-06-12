@@ -1,5 +1,5 @@
-import type { GameDataManifest } from "../manifestTypes";
-import type { ItemId } from "../ids";
+import type { GameDataManifest } from "../gameDataManifest";
+import type { ItemId } from "../manifestId";
 import { assert, assertUnique } from "./assert";
 
 export function assertStartingState(manifest: GameDataManifest, itemIds: Set<ItemId>) {

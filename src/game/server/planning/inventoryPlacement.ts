@@ -1,4 +1,4 @@
-import type { ItemId } from "~/manifest/server";
+import type { ItemId } from "~/manifest/server/manifestId";
 import { assertInsideInventory } from "./inventoryBounds";
 import { planEmptySlotPlacement } from "./inventorySlot";
 import { planStackPlacement } from "./inventoryStack";

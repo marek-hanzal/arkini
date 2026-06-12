@@ -1,5 +1,8 @@
 import { match } from "ts-pattern";
-import { gameDataIndex, type ItemId, type ProducerMode } from "~/manifest/server";
+import { gameDataIndex } from "~/manifest/server/gameDataIndex";
+import type { ItemId } from "~/manifest/server/manifestId";
+import type { ProducerMode } from "~/manifest/server/producer";
+import { parseJson } from "~/shared/json";
 import type { BoardItemState, ProducerView } from "./gameplayTypes";
 
 export function createInitialBoardState(itemId: string): BoardItemState {
@@ -34,4 +37,14 @@ export function readProducerView(itemId: string, state: BoardItemState): Produce
     cooldownUntil: producerState.cooldownUntil ?? null,
     remainingCharges: producerState.remainingCharges ?? null,
   };
+}
+
+export function readBoardState(row: Pick<readBoardState.Row, "stateJson">) {
+  return parseJson<BoardItemState>(row.stateJson || "{}");
+}
+
+export namespace readBoardState {
+  export interface Row {
+    stateJson: string;
+  }
 }

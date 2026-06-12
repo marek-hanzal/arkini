@@ -1,9 +1,11 @@
-import { gameDataIndex, gameDataManifest, type ItemId } from "~/manifest/server";
+import { gameDataIndex } from "~/manifest/server/gameDataIndex";
+import { gameDataManifest } from "~/manifest/server/gameDataManifest";
+import type { ItemId } from "~/manifest/server/manifestId";
 import { readProducerView } from "./boardState";
-import { json, parseJson } from "./utils/json";
-import { db } from "./db";
+import { json, parseJson } from "~/shared/json";
+import { db } from "~/database/server/db";
 import { defaultSaveGameId } from "./save";
-import { table } from "./tables";
+import { table } from "~/database/server/tables";
 import type { BoardItemState, GameView, InventorySlot, ViewItem } from "./gameplayTypes";
 
 const viewItems = createViewItemMap();

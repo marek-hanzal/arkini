@@ -1,9 +1,4 @@
 export { bootstrapDatabase, hardResetDatabaseFile, readDatabasePath, readGameDataHash, readMigrationState } from "./bootstrap";
-export { kysely, sqlite } from "./client";
-export type { Database } from "./schema";
-export { readDatabaseStatus, type DatabaseStatus } from "./status";
-export { syncGameDataManifest } from "./syncGameData";
-
 export {
   buildRecipe,
   mergeBoardItems,
@@ -13,6 +8,7 @@ export {
   stashBoardItem,
   swapInventorySlots,
 } from "./gameplay";
-
 export { readGameView } from "./gameView";
+export { readDatabaseStatus } from "./status";
+export type { DatabaseStatus } from "./status";
 export type { BoardViewItem, GameView, InventorySlot, ProducerDropResult, ViewItem } from "./gameplayTypes";

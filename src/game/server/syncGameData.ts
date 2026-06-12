@@ -1,6 +1,7 @@
-import { assertGameDataManifest, gameDataManifest, type GameDataManifest } from "~/manifest/server";
-import { db } from "./db";
-import { table } from "./tables";
+import { gameDataManifest, type GameDataManifest } from "~/manifest/server/gameDataManifest";
+import { assertGameDataManifest } from "~/manifest/server/validation/manifest";
+import { db } from "~/database/server/db";
+import { table } from "~/database/server/tables";
 
 // Runtime game definitions live in the TypeScript manifest. OPFS stores
 // mutable save state plus a manifest hash for debugging; prototype save

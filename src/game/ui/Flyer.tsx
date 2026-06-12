@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { cn } from "~/shared/cn";
-import type { ViewItem } from "~/database/server";
+import type { ViewItem } from "~/game/server/gameplayTypes";
 import type { FlyerModel } from "../types";
 import { playFlyerTimeline } from "../util/animation";
 import { Tile } from "./Tile";

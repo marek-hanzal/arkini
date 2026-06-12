@@ -40,7 +40,7 @@ export function GameShell() {
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const [renderedSheet, setRenderedSheet] = useState<Exclude<ActiveSheet, null>>("inventory");
   const [buildCell, setBuildCell] = useState<BuildCell | null>(null);
-  const { flyers, addFlyer, completeFlyer } = useFlyers();
+  const { flyers, addFlyer, settleFlyer } = useFlyers();
   const scheduleGameEvent = useGameEventQueue();
   const [nowMs, setNowMs] = useState(Date.now());
   const feedback = useGameFeedback();
@@ -355,7 +355,7 @@ export function GameShell() {
         </div>
       </BottomSheet>
 
-      {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} nowMs={nowMs} onComplete={completeFlyer} />)}
+      {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} nowMs={nowMs} onSettle={settleFlyer} />)}
 
       <DragOverlay adjustScale={false} dropAnimation={null}>
         {drag.activeItem ? (

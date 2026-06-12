@@ -4,6 +4,7 @@ import { cn } from "~/lib/cn";
 import {
   inventoryBinNodeId,
   inventoryContainerNodeId,
+  inventorySlots,
   inventorySlotNodeId,
   inventorySourceId,
   type GameDragData,
@@ -27,7 +28,8 @@ export function InventorySheet({
   onClose(): void;
   onSlotDoubleActivate(slot: InventorySlot): void;
 }>) {
-  const filled = game.inventory.filter((slot) => slot.stack).length;
+  const inventory = game.inventory.slice(0, inventorySlots);
+  const filled = inventory.filter((slot) => slot.stack).length;
 
   return (
     <DroppableSurface
@@ -38,14 +40,17 @@ export function InventorySheet({
     >
       <SheetHeader
         eyebrow="Inventory"
-        description={`${filled}/${game.inventory.length} slots`}
+        description={`${filled}/${inventory.length} slots`}
         anchor="inventory-summary"
         onClose={onClose}
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
-        <div data-drag-boundary-id={inventoryContainerNodeId} className="grid grid-cols-4 gap-0 overflow-hidden border-l border-t border-slate-800">
-          {game.inventory.map((slot) => (
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
+        <div
+          data-drag-boundary-id={inventoryContainerNodeId}
+          className="ak-game-width mx-auto grid grid-cols-7 gap-0 overflow-hidden border-l border-t border-slate-800"
+        >
+          {inventory.map((slot) => (
             <InventoryCell
               key={slot.slotIndex}
               slot={slot}

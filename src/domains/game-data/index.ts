@@ -100,7 +100,7 @@ export const gameDataManifest = {
     id: "arkini",
     title: "Arkini",
     board: { width: 7, height: 9 },
-    inventory: { slots: 36 },
+    inventory: { slots: 35 },
   },
   assets: [
     asset("asset:item-seed", "Seed", "item-seed", 10),

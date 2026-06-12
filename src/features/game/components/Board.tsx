@@ -115,7 +115,7 @@ function BoardCell({
       payload={{ targetId: id, targetNodeId: id, target: { kind: "cell", x, y, boardItemId: boardItem?.id ?? null } } satisfies GameDropData}
       data-board-cell={`${x}:${y}`}
       className={(isOver) => cn(
-        "relative aspect-square border-b border-r border-slate-800/80 bg-slate-900/55 transition-colors duration-200",
+        "relative aspect-square touch-none border-b border-r border-slate-800/80 bg-slate-900/55 transition-colors duration-200",
         x === columns - 1 && "border-r-0",
         y === rows - 1 && "border-b-0",
         isOver && "bg-slate-800/80",
@@ -125,11 +125,7 @@ function BoardCell({
         pulsed && !invalid && !merged && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
         merged && !invalid && "ak-merge-pop bg-emerald-950/35 ring-2 ring-inset ring-emerald-200/80",
       )}
-      onClick={press.onClick}
-      onPointerDown={press.onPointerDown}
-      onPointerMove={press.onPointerMove}
-      onPointerUp={press.onPointerUp}
-      onPointerCancel={press.onPointerCancel}
+      {...press.pressProps}
     >
       {children}
     </DroppableSurface>

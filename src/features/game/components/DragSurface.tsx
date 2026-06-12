@@ -49,26 +49,16 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
 }: Readonly<DraggableSurfaceProps<ItemId, Source, Overlay>>) {
   const data = { ...payload, sourceNodeId: payload.sourceNodeId ?? nodeId } satisfies DraggablePayload<ItemId, Source, Overlay>;
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, data: data as unknown as Data, disabled: dragDisabled });
-  const press = usePressActions({ onSingle: onSingleActivate, onDouble: onDoubleActivate });
+  const press = usePressActions({ onSingle: onSingleActivate, onDouble: onDoubleActivate, isDisabled: dragDisabled });
+  const pressProps = press.pressProps as HTMLAttributes<HTMLDivElement>;
 
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    press.onPointerDown(event);
+    pressProps.onPointerDown?.(event);
     listeners?.onPointerDown?.(event);
   }
 
-  function pointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    press.onPointerMove(event);
-  }
-
-  function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    press.onPointerUp(event);
-  }
-
-  function pointerCancel() {
-    press.onPointerCancel();
-  }
-
   function keyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    pressProps.onKeyDown?.(event);
     listeners?.onKeyDown?.(event);
   }
 
@@ -78,13 +68,10 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
       data-drag-node-id={nodeId}
       {...attributes}
       {...props}
+      {...pressProps}
       className={cn(className, (hidden || isDragging) && "opacity-0")}
-      onClick={press.onClick}
       onKeyDown={keyDown}
       onPointerDown={pointerDown}
-      onPointerMove={pointerMove}
-      onPointerUp={pointerUp}
-      onPointerCancel={pointerCancel}
     >
       {children}
     </div>

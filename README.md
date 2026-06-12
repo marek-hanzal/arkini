@@ -4,7 +4,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 ## Current rewrite direction
 
-This branch intentionally rewrites the gameplay slice from the ground up while keeping the existing stack: Vite, React, TanStack Router/Query, DnD Kit, Zustand dependency available but not required, Tailwind v4, Kysely, SQLocal, Zod, ts-pattern.
+This branch intentionally rewrites the gameplay slice from the ground up while keeping the existing stack: Vite, React, TanStack Router/Query, DnD Kit, React Aria Interactions for press/tap recognition, Zustand dependency available but not required, Tailwind v4, Kysely, SQLocal, Zod, ts-pattern.
 
 The core rule is simple: **item definitions drive gameplay shape**. An item may define:
 
@@ -29,8 +29,8 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 - Click producers use cooldowns and optional finite charges.
 - Auto producers persist pause state, available capacity, next drop time, and recharge time in `boardItem.stateJson`.
 - Auto producers tick from the client and save progress into SQLite, so reloads do not reset their timers like a cheap casino machine.
-- Double-click board items to animate them into the inventory bottom area. Single click on producers still produces immediately; no delayed click timer is used.
-- Double-click/tap an empty board cell to open the build sheet. Build, inventory, and database panels all share one always-mounted custom bottom sheet. The sheet never unmounts; `data-open` only lets CSS slide it and dim the locked background.
+- Double-click/tap board items to animate them into the inventory bottom area. Single press on producers still produces immediately; no delayed click timer is used.
+- Double-click/tap an empty board cell to open the build sheet. Tap/press recognition is centralized in `src/features/game/usePressActions.ts` and built on React Aria `usePress`; keep raw touch/pointer plumbing out of board/tile components unless you enjoy browser archaeology. Build, inventory, and database panels all share one always-mounted custom bottom sheet. The sheet never unmounts; `data-open` only lets CSS slide it and dim the locked background.
 - Dragging a board item lightly highlights known merge targets for accessibility. Rejected drops flash the target while the item flies back.
 - Inventory-to-board placement fades the travelling item out under the inventory sheet and fades the target tile in after the commit.
 

@@ -52,7 +52,8 @@ export function Board({
   return (
     <div
       data-drag-boundary-id={boardContainerNodeId}
-      className="grid w-full grid-cols-7 overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
+      className="grid w-full overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
+      style={{ gridTemplateColumns: `repeat(${boardColumns}, minmax(0, 1fr))` }}
     >
       {cells.map((cell) => {
         const key = cellKey(cell.x, cell.y);

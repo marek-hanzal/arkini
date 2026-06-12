@@ -1,81 +1,63 @@
-import { useRef, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
+import { useRef } from "react";
+import { usePress, type PressEvent, type PressResult } from "@react-aria/interactions";
 
-const moveTolerancePx = 3;
-const doubleTapMs = 320;
-const doubleTapDistancePx = 24;
+const doublePressMs = 320;
+const doublePressDistancePx = 24;
+
+type LastPress = {
+  time: number;
+  x: number;
+  y: number;
+  pointerType: PressEvent["pointerType"];
+};
 
 export interface PressActions {
   onSingle?(): void;
   onDouble?(): void;
+  isDisabled?: boolean;
 }
 
-// Click activation stays immediate. Double activation is detected on pointer-up
-// without delaying the single click, so producer clicks cannot become haunted
-// timer events that move a tile later. Computers needed supervision again.
-export function usePressActions({ onSingle, onDouble }: PressActions) {
-  const movedRef = useRef(false);
-  const doubleActivatedRef = useRef(false);
-  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
-  const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
+export interface PressActionResult extends PressResult {}
 
-  function markMove(clientX: number, clientY: number) {
-    const start = pointerStartRef.current;
-    if (!start) return;
-    if (Math.abs(clientX - start.x) > moveTolerancePx || Math.abs(clientY - start.y) > moveTolerancePx) {
-      movedRef.current = true;
-    }
-  }
+// React Aria owns the ugly cross-browser press recognition. We only keep the
+// tiny game rule on top: two nearby presses on the same target mean double press.
+export function usePressActions({ onSingle, onDouble, isDisabled = false }: PressActions): PressActionResult {
+  const lastPressRef = useRef<LastPress | null>(null);
 
-  function maybeDoubleActivate(clientX: number, clientY: number) {
-    if (!onDouble || movedRef.current) return;
+  const press = usePress({
+    isDisabled,
+    preventFocusOnPress: true,
+    shouldCancelOnPointerExit: true,
+    onPress(event) {
+      const now = Date.now();
+      const previous = lastPressRef.current;
+      const isNearbyDouble = Boolean(
+        previous
+          && onDouble
+          && previous.pointerType === event.pointerType
+          && now - previous.time <= doublePressMs
+          && Math.abs(event.x - previous.x) <= doublePressDistancePx
+          && Math.abs(event.y - previous.y) <= doublePressDistancePx,
+      );
 
-    const now = Date.now();
-    const previous = lastTapRef.current;
-    const closeEnough = previous
-      && now - previous.time <= doubleTapMs
-      && Math.abs(clientX - previous.x) <= doubleTapDistancePx
-      && Math.abs(clientY - previous.y) <= doubleTapDistancePx;
-
-    if (!closeEnough) {
-      lastTapRef.current = { time: now, x: clientX, y: clientY };
-      return;
-    }
-
-    lastTapRef.current = null;
-    doubleActivatedRef.current = true;
-    onDouble();
-  }
-
-  return {
-    onClick(event: ReactMouseEvent<HTMLElement>) {
-      event.stopPropagation();
-      if (event.detail > 1 || doubleActivatedRef.current) {
-        doubleActivatedRef.current = false;
-        movedRef.current = false;
+      if (isNearbyDouble) {
+        lastPressRef.current = null;
+        onDouble?.();
         return;
       }
-      if (movedRef.current) {
-        movedRef.current = false;
-        return;
+
+      if (onDouble) {
+        lastPressRef.current = {
+          time: now,
+          x: event.x,
+          y: event.y,
+          pointerType: event.pointerType,
+        };
       }
+
       onSingle?.();
     },
-    onPointerDown(event: ReactPointerEvent<HTMLElement>) {
-      movedRef.current = false;
-      pointerStartRef.current = { x: event.clientX, y: event.clientY };
-    },
-    onPointerMove(event: ReactPointerEvent<HTMLElement>) {
-      markMove(event.clientX, event.clientY);
-    },
-    onPointerUp(event: ReactPointerEvent<HTMLElement>) {
-      markMove(event.clientX, event.clientY);
-      maybeDoubleActivate(event.clientX, event.clientY);
-      pointerStartRef.current = null;
-    },
-    onPointerCancel() {
-      movedRef.current = true;
-      pointerStartRef.current = null;
-      lastTapRef.current = null;
-    },
-  };
+  });
+
+  return press;
 }

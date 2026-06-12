@@ -5,7 +5,16 @@ import type { FlyerModel } from "~/play/types";
 import { playFlyerTimeline } from "~/play/util/animation";
 import { Tile } from "~/item/ui/Tile";
 
-export function Flyer({ flyer, item, nowMs, onSettle }: Readonly<{ flyer: FlyerModel; item: ViewItem; nowMs: number; onSettle(id: string): void }>) {
+export namespace Flyer {
+  export interface Props {
+    flyer: FlyerModel;
+    item: ViewItem;
+    nowMs: number;
+    onSettle(id: string): void;
+  }
+}
+
+export function Flyer({ flyer, item, nowMs, onSettle }: Readonly<Flyer.Props>) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {

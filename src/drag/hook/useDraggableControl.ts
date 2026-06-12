@@ -7,9 +7,9 @@ import {
   type Modifier,
 } from "@dnd-kit/core";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { waitForPaint } from "~/shared/util/async";
+import { waitForPaint } from "~/shared/util/waitForPaint";
 import { without } from "~/shared/util/collection";
-import { cssEscape, queryRect } from "~/shared/util/dom";
+import { queryRect } from "~/shared/util/queryRect";
 import type { RectLike } from "~/play/types";
 
 export interface DraggablePayload<ItemId extends string = string, Source = unknown, Overlay = unknown> {
@@ -247,13 +247,13 @@ export function useDraggableControl<ItemId extends string = string, Source = unk
 
   function rectForNode(nodeId: string | undefined) {
     if (!nodeId) return null;
-    const rect = queryRect(`[data-drag-node-id="${cssEscape(nodeId)}"]`);
+    const rect = queryRect(`[data-drag-node-id="${nodeId}"]`);
     return rect;
   }
 
   function rectForBoundaryNode(nodeId: string | null | undefined) {
     if (!nodeId) return null;
-    return queryRect(`[data-drag-boundary-id="${cssEscape(nodeId)}"]`) ?? queryRect(`[data-drag-node-id="${cssEscape(nodeId)}"]`);
+    return queryRect(`[data-drag-boundary-id="${nodeId}"]`) ?? queryRect(`[data-drag-node-id="${nodeId}"]`);
   }
 
   function hideSources(ids: readonly string[]) {

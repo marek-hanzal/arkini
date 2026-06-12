@@ -8,7 +8,19 @@ import { usePlayAction } from "~/play/hook/usePlayView";
 import type { BoardViewItem, GameView, InventorySlot } from "~/play/logic/playTypes";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { playBottomNavPulse } from "~/play/util/animation";
-import { cssEscape, queryElement, queryRect } from "~/shared/util/dom";
+import { queryElement } from "~/shared/util/queryElement";
+import { queryRect } from "~/shared/util/queryRect";
+
+export namespace usePlayManualItemActions {
+  export interface Props {
+    game: GameView | null | undefined;
+    addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
+    feedback: GameDragFeedback;
+    schedule(label: string, operation: () => Promise<void>): Promise<void>;
+    hideSources(ids: readonly string[]): void;
+    clearHiddenSources(): void;
+  }
+}
 
 export function usePlayManualItemActions({
   game,
@@ -17,21 +29,14 @@ export function usePlayManualItemActions({
   schedule,
   hideSources,
   clearHiddenSources,
-}: Readonly<{
-  game: GameView | null | undefined;
-  addFlyer(itemId: string, from: RectLike, to: RectLike, kind?: FlyerKind, meta?: GameVisualMeta): Promise<void>;
-  feedback: GameDragFeedback;
-  schedule(label: string, operation: () => Promise<void>): Promise<void>;
-  hideSources(ids: readonly string[]): void;
-  clearHiddenSources(): void;
-}>) {
+}: Readonly<usePlayManualItemActions.Props>) {
   const placeInventory = usePlayAction((db, input: { slotIndex: number; x: number; y: number }) => db.placeInventoryItem(input.slotIndex, input.x, input.y));
   const stashBoard = usePlayAction((db, input: { boardItemId: string; slotIndex?: number }) => db.stashBoardItem(input.boardItemId, input.slotIndex));
 
   const stashBoardWithFly = useCallback(async (boardItem: BoardViewItem) => {
     await schedule("stash board item", async () => {
       const sourceId = boardSourceId(boardItem.id);
-      const from = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`)
+      const from = queryRect(`[data-board-item-id="${boardItem.id}"]`)
         ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
 
       try {

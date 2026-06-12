@@ -1,16 +1,15 @@
 import type { ReactNode } from "react";
 
-export function SheetHeader({
-  eyebrow,
-  description,
-  anchor,
-  onClose,
-}: Readonly<{
-  eyebrow: string;
-  description: ReactNode;
-  anchor?: "inventory-summary";
-  onClose(): void;
-}>) {
+export namespace SheetHeader {
+  export interface Props {
+    eyebrow: string;
+    description: ReactNode;
+    anchor?: "inventory-summary";
+    onClose(): void;
+  }
+}
+
+export function SheetHeader({ eyebrow, description, anchor, onClose }: Readonly<SheetHeader.Props>) {
   return (
     <div
       data-inventory-summary={anchor === "inventory-summary" ? "" : undefined}

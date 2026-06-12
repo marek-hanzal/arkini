@@ -3,6 +3,17 @@ import { cn } from "~/shared/cn";
 import { formatMs } from "~/shared/util/format";
 import type { ProducerView, RectLike } from "~/play/types";
 
+export namespace Tile {
+  export interface Props {
+    item: ViewItem;
+    quantity?: number;
+    producer?: BoardViewItem["producer"];
+    nowMs?: number;
+    dragOverlay?: boolean;
+    overlaySize?: Pick<RectLike, "width" | "height"> | null;
+  }
+}
+
 export function Tile({
   item,
   quantity,
@@ -10,14 +21,7 @@ export function Tile({
   nowMs,
   dragOverlay,
   overlaySize,
-}: Readonly<{
-  item: ViewItem;
-  quantity?: number;
-  producer?: BoardViewItem["producer"];
-  nowMs?: number;
-  dragOverlay?: boolean;
-  overlaySize?: Pick<RectLike, "width" | "height"> | null;
-}>) {
+}: Readonly<Tile.Props>) {
   return (
     <div
       data-ak-tile
@@ -32,17 +36,16 @@ export function Tile({
   );
 }
 
-export function TileContent({
-  item,
-  quantity,
-  producer,
-  nowMs,
-}: Readonly<{
-  item: ViewItem;
-  quantity?: number;
-  producer?: BoardViewItem["producer"];
-  nowMs?: number;
-}>) {
+namespace TileContent {
+  export interface Props {
+    item: ViewItem;
+    quantity?: number;
+    producer?: BoardViewItem["producer"];
+    nowMs?: number;
+  }
+}
+
+export function TileContent({ item, quantity, producer, nowMs }: Readonly<TileContent.Props>) {
   const producerUi = producer ? getProducerUiState(producer, nowMs ?? Date.now()) : null;
 
   return (
@@ -73,7 +76,13 @@ interface ProducerUiState {
   waiting: boolean;
 }
 
-function ProducerBadge({ ui }: Readonly<{ ui: ProducerUiState }>) {
+namespace ProducerBadge {
+  export interface Props {
+    ui: ProducerUiState;
+  }
+}
+
+function ProducerBadge({ ui }: Readonly<ProducerBadge.Props>) {
   return (
     <span title={ui.title} className="absolute left-0.5 top-0.5 min-w-5 rounded-sm bg-slate-950/85 px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-bold text-emerald-200">
       <span>{ui.label}</span>

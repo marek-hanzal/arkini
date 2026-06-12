@@ -6,8 +6,8 @@ import { cn } from "~/shared/cn";
 import { cellKey } from "~/board/util/cell";
 import {
   boardCellNodeId,
-  boardContainerNodeId,
   boardColumns,
+  boardContainerNodeId,
   type BoardCell,
   boardRows,
   boardSourceId,
@@ -18,26 +18,34 @@ import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
 import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
 import { Tile } from "~/item/ui/Tile";
 
-export function Board({
-  game,
-  activeDrag,
-  isSourceHidden,
-  invalidBoardCellKey,
-  mergedBoardCellKey,
-  nowMs,
-  onEmptyDoubleActivate,
-  onTileSingleActivate,
-  onTileDoubleActivate,
-}: Readonly<{
-  game: GameView;
+export interface BoardDragState {
   activeDrag: GameDragData | null;
   isSourceHidden(sourceId: string): boolean;
-  invalidBoardCellKey: string | null;
-  mergedBoardCellKey: string | null;
+}
+
+export interface BoardFeedbackState {
+  invalidCellKey: string | null;
+  mergedCellKey: string | null;
+}
+
+export interface BoardActions {
+  emptyDoubleActivate(cell: BoardCell): void;
+  tileSingleActivate(item: BoardViewItem): void;
+  tileDoubleActivate(item: BoardViewItem): void;
+}
+
+export function Board({
+  game,
+  drag,
+  feedback,
+  actions,
+  nowMs,
+}: Readonly<{
+  game: GameView;
+  drag: BoardDragState;
+  feedback: BoardFeedbackState;
+  actions: BoardActions;
   nowMs: number;
-  onEmptyDoubleActivate(cell: BoardCell): void;
-  onTileSingleActivate(item: BoardViewItem): void;
-  onTileDoubleActivate(item: BoardViewItem): void;
 }>) {
   const cells = useMemo(() => Array.from({ length: boardColumns * boardRows }, (_, index) => ({ x: index % boardColumns, y: Math.floor(index / boardColumns) })), []);
 
@@ -50,8 +58,8 @@ export function Board({
         const key = cellKey(cell.x, cell.y);
         const boardItem = game.boardItemByCellKey[key] ?? null;
         const viewItem = boardItem ? game.items[boardItem.itemId] : null;
-        const canMerge = activeDrag?.source.kind === "board" && boardItem && boardItem.id !== activeDrag.source.boardItemId
-          ? Boolean(resolveItemMergeRule(activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
+        const canMerge = drag.activeDrag?.source.kind === "board" && boardItem && boardItem.id !== drag.activeDrag.source.boardItemId
+          ? Boolean(resolveItemMergeRule(drag.activeDrag.itemId as ItemId, boardItem.itemId as ItemId))
           : false;
         const producerReady = isProducerReady(boardItem?.producer ?? null, nowMs);
 
@@ -62,19 +70,19 @@ export function Board({
             y={cell.y}
             boardItem={boardItem}
             canMerge={canMerge}
-            invalid={invalidBoardCellKey === key}
-            merged={mergedBoardCellKey === key}
+            invalid={feedback.invalidCellKey === key}
+            merged={feedback.mergedCellKey === key}
             producerReady={producerReady}
-            onEmptyDoubleActivate={onEmptyDoubleActivate}
+            onEmptyDoubleActivate={actions.emptyDoubleActivate}
           >
             {boardItem && viewItem ? (
               <BoardTile
                 boardItem={boardItem}
                 item={viewItem}
-                hidden={isSourceHidden(boardSourceId(boardItem.id))}
+                hidden={drag.isSourceHidden(boardSourceId(boardItem.id))}
                 nowMs={nowMs}
-                onSingleActivate={() => onTileSingleActivate(boardItem)}
-                onDoubleActivate={() => onTileDoubleActivate(boardItem)}
+                onSingleActivate={() => actions.tileSingleActivate(boardItem)}
+                onDoubleActivate={() => actions.tileDoubleActivate(boardItem)}
               />
             ) : null}
           </BoardCell>
@@ -136,7 +144,6 @@ function BoardCell({
     </DroppableSurface>
   );
 }
-
 
 function isProducerReady(producer: BoardViewItem["producer"], nowMs: number) {
   if (!producer) return false;

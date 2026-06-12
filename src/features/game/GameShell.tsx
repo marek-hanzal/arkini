@@ -228,7 +228,7 @@ export function GameShell() {
 
   return (
     <DndContext {...drag.contextProps}>
-      <div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
+      <div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
         <main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
           <div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
             <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Arkini</p>
@@ -329,24 +329,25 @@ export function GameShell() {
 
 function BottomNavigation({ activeSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; onOpen(sheet: Exclude<ActiveSheet, null>): void }>) {
   return (
-    <nav className="absolute inset-x-3 bottom-0 mx-auto flex h-[var(--ak-bottom-nav-height)] ak-game-width items-start justify-center gap-2 border-t border-slate-800 bg-slate-950/95 px-3 pt-2 shadow-2xl shadow-black/60">
-      <BottomNavButton active={activeSheet === "inventory"} label="Inventory" icon="▦" onClick={() => onOpen("inventory")} />
-      <BottomNavButton active={activeSheet === "database"} label="Database" icon="◈" onClick={() => onOpen("database")} />
+    <nav className="ak-bottom-nav" aria-label="Game panels">
+      <div className="ak-bottom-nav-inner">
+        <BottomNavButton active={activeSheet === "inventory"} label="Inventory" icon="▦" tone="inventory" onClick={() => onOpen("inventory")} />
+        <BottomNavButton active={activeSheet === "database"} label="Database" icon="◈" tone="database" onClick={() => onOpen("database")} />
+      </div>
     </nav>
   );
 }
 
-function BottomNavButton({ active, label, icon, onClick }: Readonly<{ active: boolean; label: string; icon: string; onClick(): void }>) {
+function BottomNavButton({ active, label, icon, tone, onClick }: Readonly<{ active: boolean; label: string; icon: string; tone: "inventory" | "database"; onClick(): void }>) {
   return (
     <button
       type="button"
-      className={cn(
-        "flex min-w-24 flex-col items-center gap-1 rounded-sm border px-3 py-1.5 text-xs font-semibold transition",
-        active ? "border-emerald-300/70 bg-emerald-400/10 text-emerald-100" : "border-slate-800 bg-slate-900/70 text-slate-300 hover:border-slate-600",
-      )}
+      className="ak-bottom-nav-button"
+      data-active={active ? "true" : "false"}
+      data-tone={tone}
       onClick={onClick}
     >
-      <span className="text-base leading-none">{icon}</span>
+      <span className="ak-bottom-nav-icon">{icon}</span>
       <span>{label}</span>
     </button>
   );

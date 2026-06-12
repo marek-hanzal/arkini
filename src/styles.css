@@ -179,9 +179,9 @@ button {
 
 
 :root {
-  --ak-bottom-nav-height: calc(4rem + env(safe-area-inset-bottom));
-  --ak-sheet-width: min(calc(100dvw - 1.5rem), 430px);
-  --ak-sheet-max-height: min(85dvh, calc(100dvh - var(--ak-bottom-nav-height) - 1rem));
+  --ak-bottom-nav-height: calc(5rem + env(safe-area-inset-bottom));
+  --ak-sheet-width: 100dvw;
+  --ak-sheet-max-height: 85dvh;
 }
 
 .ak-bottom-sheet {
@@ -192,13 +192,13 @@ button {
 
 .ak-bottom-sheet-backdrop {
   position: absolute;
-  inset: 0 0 var(--ak-bottom-nav-height) 0;
+  inset: 0;
   display: block;
   width: auto;
   height: auto;
   padding: 0;
   border: 0;
-  background: rgb(2 6 23 / 0.64);
+  background: rgb(2 6 23 / 0.68);
   opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease-out;
@@ -206,22 +206,23 @@ button {
 
 .ak-bottom-sheet-panel {
   position: absolute;
-  left: 50%;
-  bottom: var(--ak-bottom-nav-height);
+  inset-inline: 0;
+  bottom: 0;
   display: flex;
   width: var(--ak-sheet-width);
   max-height: var(--ak-sheet-max-height);
   min-height: 0;
+  margin-inline: auto;
   overflow: hidden;
   border: 1px solid rgb(30 41 59);
   border-bottom: 0;
-  border-radius: 0.75rem 0.75rem 0 0;
+  border-radius: 1rem 1rem 0 0;
   background: rgb(2 6 23 / 0.985);
   color: rgb(241 245 249);
-  box-shadow: 0 -1.25rem 3rem rgb(0 0 0 / 0.55);
+  box-shadow: 0 -1.25rem 3rem rgb(0 0 0 / 0.58);
   opacity: 0;
   pointer-events: none;
-  transform: translate3d(-50%, calc(100% + 1rem), 0);
+  transform: translate3d(0, calc(100% + 1rem), 0);
   transition:
     opacity 160ms ease-out,
     transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -236,14 +237,87 @@ button {
 .ak-bottom-sheet[data-open="true"] .ak-bottom-sheet-panel {
   opacity: 1;
   pointer-events: auto;
-  transform: translate3d(-50%, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 
 .ak-bottom-sheet-content {
   min-height: 0;
   max-height: inherit;
   width: 100%;
+  padding-bottom: env(safe-area-inset-bottom);
   overflow-y: auto;
   overscroll-behavior: contain;
   background: rgb(2 6 23 / 0.985);
+}
+
+.ak-bottom-nav {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: var(--ak-bottom-nav-height);
+  padding: 0.55rem max(0.75rem, env(safe-area-inset-left)) calc(0.55rem + env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-right));
+  border-top: 1px solid rgb(51 65 85 / 0.95);
+  background:
+    linear-gradient(180deg, rgb(15 23 42 / 0.98), rgb(2 6 23 / 0.99));
+  box-shadow: 0 -1rem 2rem rgb(0 0 0 / 0.42);
+}
+
+.ak-bottom-nav-inner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 430px;
+  height: 100%;
+  margin-inline: auto;
+}
+
+.ak-bottom-nav-button {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgb(51 65 85 / 0.95);
+  padding: 0.35rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: rgb(203 213 225);
+  background: rgb(15 23 42 / 0.82);
+  transition: border-color 140ms ease-out, background-color 140ms ease-out, color 140ms ease-out, transform 140ms ease-out;
+}
+
+.ak-bottom-nav-button:active {
+  transform: translateY(1px);
+}
+
+.ak-bottom-nav-button[data-tone="inventory"] {
+  border-color: rgb(20 184 166 / 0.45);
+  background: rgb(19 78 74 / 0.24);
+}
+
+.ak-bottom-nav-button[data-tone="database"] {
+  border-color: rgb(129 140 248 / 0.42);
+  background: rgb(49 46 129 / 0.23);
+}
+
+.ak-bottom-nav-button[data-active="true"][data-tone="inventory"] {
+  border-color: rgb(45 212 191 / 0.95);
+  background: rgb(20 184 166 / 0.22);
+  color: rgb(204 251 241);
+}
+
+.ak-bottom-nav-button[data-active="true"][data-tone="database"] {
+  border-color: rgb(165 180 252 / 0.9);
+  background: rgb(99 102 241 / 0.22);
+  color: rgb(224 231 255);
+}
+
+.ak-bottom-nav-icon {
+  font-size: 1rem;
+  line-height: 1;
 }

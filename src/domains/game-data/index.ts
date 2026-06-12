@@ -39,7 +39,7 @@ export interface ItemMergeRule {
 }
 
 export interface ProducerDefinition {
-  trigger: "click" | "auto";
+  trigger: "click";
   placement: "board_then_inventory";
   drops: readonly ProducerDrop[];
   cooldownMs?: number;
@@ -49,14 +49,7 @@ export interface ProducerDefinition {
 
 export type ProducerMode =
   | { type: "infinite" }
-  | { type: "finite"; charges: number; onDepleted: "remove" | { replaceWithItemId: ItemId } }
-  | {
-      type: "auto";
-      tickMs: number;
-      capacity: number;
-      rechargeMs: number;
-      enabledByDefault: boolean;
-    };
+  | { type: "finite"; charges: number; onDepleted: "remove" | { replaceWithItemId: ItemId } };
 
 export type ProducerDrop =
   | { itemId: ItemId; weight: number; quantity?: Quantity }
@@ -304,8 +297,7 @@ export function assertGameDataManifest(manifest: GameDataManifest) {
 
     const producer = itemDefinition.producer;
     if (!producer) continue;
-    assert(producer.trigger !== "click" || Boolean(producer.cooldownMs), `${itemDefinition.id} click producer must define cooldownMs`);
-    assert(producer.trigger !== "auto" || producer.mode?.type === "auto", `${itemDefinition.id} auto producer must define auto mode`);
+    assert(Boolean(producer.cooldownMs), `${itemDefinition.id} click producer must define cooldownMs`);
     assert(producer.drops.length > 0, `${itemDefinition.id} producer must have drops`);
     for (const entry of producer.drops) {
       assert(entry.weight > 0, `${itemDefinition.id} producer drop weight must be positive`);
@@ -323,22 +315,22 @@ export function assertGameDataManifest(manifest: GameDataManifest) {
           assert(itemIds.has(mode.onDepleted.replaceWithItemId), `${itemDefinition.id} replacement item is missing`);
         }
       })
-      .with({ type: "auto" }, (mode) => {
-        assert(producer.trigger === "auto", `${itemDefinition.id} auto mode requires auto trigger`);
-        assert(mode.tickMs > 0, `${itemDefinition.id} auto tick must be positive`);
-        assert(mode.capacity > 0, `${itemDefinition.id} auto capacity must be positive`);
-        assert(mode.rechargeMs > 0, `${itemDefinition.id} auto recharge must be positive`);
-      })
       .exhaustive();
   }
 
+  assert(manifest.startingState.inventory.length <= manifest.game.inventory.slots, "Starting inventory has more stacks than available slots");
   for (const stack of manifest.startingState.inventory) {
     assert(itemIds.has(stack.itemId), `Starting inventory references missing ${stack.itemId}`);
+    const itemDefinition = itemsByIdOrThrow(itemIds, manifest, stack.itemId);
+    assert(stack.quantity > 0, `Starting inventory ${stack.itemId} quantity must be positive`);
+    assert(stack.quantity <= itemDefinition.maxStackSize, `Starting inventory ${stack.itemId} exceeds max stack size`);
   }
 
+  const occupiedStartingCells = new Set<string>();
   for (const boardItem of manifest.startingState.board) {
     assert(itemIds.has(boardItem.itemId), `Starting board references missing ${boardItem.itemId}`);
-    assert(boardItem.x < manifest.game.board.width && boardItem.y < manifest.game.board.height, `Starting board item ${boardItem.itemId} is outside the board`);
+    assert(boardItem.x >= 0 && boardItem.y >= 0 && boardItem.x < manifest.game.board.width && boardItem.y < manifest.game.board.height, `Starting board item ${boardItem.itemId} is outside the board`);
+    assertUnique(occupiedStartingCells, `${boardItem.x}:${boardItem.y}`, "starting board cell");
   }
 }
 
@@ -421,15 +413,6 @@ function clickProducer(cooldownMs: number, drops: readonly ProducerDrop[], mode:
   return { trigger: "click", placement: "board_then_inventory", drops, cooldownMs, mode };
 }
 
-function autoProducer(tickMs: number, capacity: number, rechargeMs: number, drops: readonly ProducerDrop[]): ProducerDefinition {
-  return {
-    trigger: "auto",
-    placement: "board_then_inventory",
-    drops,
-    mode: { type: "auto", tickMs, capacity, rechargeMs, enabledByDefault: true },
-  };
-}
-
 function drops(entries: readonly ProducerDrop[]) {
   return entries;
 }
@@ -457,4 +440,11 @@ function assertQuantity(quantity: Quantity, label: string) {
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+function itemsByIdOrThrow(itemIds: Set<ItemId>, manifest: GameDataManifest, itemId: ItemId) {
+  assert(itemIds.has(itemId), `Unknown item ${itemId}`);
+  const itemDefinition = manifest.items.find((item) => item.id === itemId);
+  assert(itemDefinition, `Unknown item ${itemId}`);
+  return itemDefinition;
 }

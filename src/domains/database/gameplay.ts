@@ -4,7 +4,6 @@ import {
   resolveMergeRule,
   type BuildRecipeId,
   type ItemId,
-  type ProducerDefinition,
   type ProducerDrop,
   type ProducerMode,
   type Quantity,
@@ -15,7 +14,7 @@ import { canPayCosts } from "./gameView";
 import { db, type ArkiniTransaction } from "./db";
 import { defaultSaveGameId } from "./save";
 import { table } from "./tables";
-import type { BoardItemState, InventorySlot, ProducerDropResult, ProducerPlacement } from "./gameplayTypes";
+import type { BoardItemState, ProducerDropResult, ProducerPlacement } from "./gameplayTypes";
 import { GameActionError } from "./gameplayTypes";
 
 interface SaveShape {
@@ -145,7 +144,7 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
 
     const timestamp = Date.now();
     const state = readBoardState(producerRow);
-    const producerState = { ...(createInitialBoardState(producerRow.itemDefinitionId, timestamp).producer ?? {}), ...(state.producer ?? {}) };
+    const producerState = { ...(createInitialBoardState(producerRow.itemDefinitionId).producer ?? {}), ...(state.producer ?? {}) };
 
     const mode = producer.mode ?? { type: "infinite" as const };
     const isFiniteExhaust = activation === "exhaust" && mode.type === "finite";
@@ -170,7 +169,6 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
     const nextRemainingCharges = match(mode as ProducerMode)
       .with({ type: "infinite" }, () => null)
       .with({ type: "finite" }, (finiteMode) => Math.max(0, (producerState.remainingCharges ?? finiteMode.charges) - steps))
-      .with({ type: "auto" }, () => null)
       .exhaustive();
 
     const shouldDeplete = nextRemainingCharges !== null && nextRemainingCharges <= 0;
@@ -196,102 +194,6 @@ export async function produceBoardItem(boardItemId: string, activation: "single"
       .execute();
 
     return { producerBoardItemId: producerRow.id, placements };
-  });
-}
-
-export async function advanceAutoProducers(): Promise<ProducerDropResult[]> {
-  return db.transaction().execute(async (tx) => {
-    const mutable = await readMutableSave(tx);
-    const results: ProducerDropResult[] = [];
-    const timestamp = Date.now();
-
-    for (const row of [...mutable.boardRows]) {
-      const producer = gameDataIndex.producersByItemId.get(row.itemDefinitionId as ItemId);
-      if (!producer || producer.trigger !== "auto") continue;
-      const mode = producer.mode;
-      if (!mode || mode.type !== "auto") continue;
-
-      const state = readBoardState(row);
-      const initial = createInitialBoardState(row.itemDefinitionId, timestamp).producer ?? {};
-      const producerState = { ...initial, ...(state.producer ?? {}) };
-      if (producerState.paused) continue;
-
-      let autoAvailable = producerState.autoAvailable ?? mode.capacity;
-      let nextDropAt = producerState.nextDropAt ? Date.parse(producerState.nextDropAt) : timestamp + mode.tickMs;
-      let rechargeUntil = producerState.rechargeUntil ? Date.parse(producerState.rechargeUntil) : null;
-
-      if (rechargeUntil !== null && rechargeUntil <= timestamp) {
-        autoAvailable = mode.capacity;
-        rechargeUntil = null;
-        nextDropAt = timestamp + mode.tickMs;
-      }
-
-      if (autoAvailable <= 0) {
-        rechargeUntil ??= timestamp + mode.rechargeMs;
-        await saveProducerState(tx, row.id, state, { ...producerState, autoAvailable, rechargeUntil: new Date(rechargeUntil).toISOString() });
-        continue;
-      }
-
-      let changed = false;
-      let guard = 0;
-      while (autoAvailable > 0 && nextDropAt <= timestamp && guard < mode.capacity) {
-        guard += 1;
-        const drops = rollProducerDrops(producer.drops);
-        const plan = planPlacements(mutable.save, mutable.boardRows, mutable.inventoryRows, drops, row);
-
-        if (!plan) {
-          // Full storage should not eat capacity. Push the next retry a little so
-          // we do not hot-loop the DB because a human made a hoarding simulator.
-          nextDropAt = timestamp + 1000;
-          changed = true;
-          break;
-        }
-
-        const placements = await applyPlacementPlan(tx, plan);
-        commitVirtualPlacements(mutable.boardRows, mutable.inventoryRows, placements);
-        results.push({ producerBoardItemId: row.id, placements });
-        autoAvailable -= 1;
-        nextDropAt += mode.tickMs;
-        changed = true;
-      }
-
-      if (autoAvailable <= 0) {
-        rechargeUntil = timestamp + mode.rechargeMs;
-      }
-
-      if (changed || rechargeUntil !== null) {
-        await saveProducerState(tx, row.id, state, {
-          ...producerState,
-          autoAvailable,
-          nextDropAt: new Date(nextDropAt).toISOString(),
-          rechargeUntil: rechargeUntil === null ? null : new Date(rechargeUntil).toISOString(),
-        });
-      }
-    }
-
-    return results;
-  });
-}
-
-export async function toggleProducerPause(boardItemId: string) {
-  await db.transaction().execute(async (tx) => {
-    const row = await tx.selectFrom(table.boardItem).selectAll().where("id", "=", boardItemId).where("saveGameId", "=", defaultSaveGameId).executeTakeFirst();
-    if (!row) throw new GameActionError("Producer does not exist.");
-
-    const producer = getProducer(row.itemDefinitionId);
-    if (producer.trigger !== "auto") throw new GameActionError("Only auto producers can be paused.");
-    const mode = producer.mode;
-    if (!mode || mode.type !== "auto") throw new GameActionError("Producer has no auto schedule.");
-
-    const state = readBoardState(row);
-    const producerState = { ...(createInitialBoardState(row.itemDefinitionId).producer ?? {}), ...(state.producer ?? {}) };
-    const paused = !(producerState.paused ?? false);
-
-    await saveProducerState(tx, row.id, state, {
-      ...producerState,
-      paused,
-      nextDropAt: paused ? producerState.nextDropAt : new Date(Date.now() + mode.tickMs).toISOString(),
-    });
   });
 }
 
@@ -479,29 +381,6 @@ async function applyInventoryPlacementPlan(tx: ArkiniTransaction, plan: readonly
   await applyPlacementPlan(tx, { board: [], inventory: [...plan] });
 }
 
-function commitVirtualPlacements(boardRows: BoardRow[], inventoryRows: InventoryRow[], placements: readonly ProducerPlacement[]) {
-  for (const placement of placements) {
-    if (placement.kind === "board") {
-      boardRows.push({
-        id: placement.boardItemId ?? createId("board:virtual"),
-        itemDefinitionId: placement.itemId,
-        x: placement.x ?? 0,
-        y: placement.y ?? 0,
-        stateJson: json(createInitialBoardState(placement.itemId)),
-      });
-      continue;
-    }
-
-    const slotIndex = placement.slotIndex ?? 0;
-    const stack = inventoryRows.find((row) => row.slotIndex === slotIndex);
-    if (stack && stack.itemDefinitionId === placement.itemId) {
-      stack.quantity += 1;
-    } else {
-      inventoryRows.push({ id: createId("inventory:virtual"), itemDefinitionId: placement.itemId, slotIndex, quantity: 1 });
-    }
-  }
-}
-
 function cloneInventory(rows: readonly InventoryRow[]) {
   return rows.map((row) => ({ ...row }));
 }
@@ -576,14 +455,6 @@ async function removeInventoryItems(tx: ArkiniTransaction, itemId: string, quant
   }
 
   throw new GameActionError("Inventory is missing required items.");
-}
-
-async function saveProducerState(tx: ArkiniTransaction, boardItemId: string, state: BoardItemState, producerState: NonNullable<BoardItemState["producer"]>) {
-  await tx
-    .updateTable(table.boardItem)
-    .set({ stateJson: json({ ...state, producer: producerState } satisfies BoardItemState), updatedAt: now() })
-    .where("id", "=", boardItemId)
-    .execute();
 }
 
 async function depleteProducer(tx: ArkiniTransaction, row: BoardRow, mode: ProducerMode) {

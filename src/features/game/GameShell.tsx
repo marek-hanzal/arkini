@@ -1,5 +1,5 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DbStatusCard } from "~/components/DbStatusCard";
 import type { BuildRecipeId } from "~/domains/game-data";
 import type { BoardViewItem, GameView, InventorySlot, ProducerDropResult } from "~/domains/database";
@@ -55,7 +55,6 @@ export function GameShell() {
       db.produceBoardItem(input.boardItemId, input.activation),
     { invalidateOnSuccess: false },
   );
-  const advanceAuto = useGameAction((db) => db.advanceAutoProducers(), { invalidateOnSuccess: false });
   const build = useGameAction((db, input: { recipeId: BuildRecipeId; x: number; y: number }) => db.buildRecipe(input.recipeId, input.x, input.y));
 
   const drag = useGameDraggableControl({
@@ -137,49 +136,6 @@ export function GameShell() {
 
     await Promise.all(animations);
   }, [activeSheet, addFlyer]);
-
-  const autoProducerTickRef = useLatestValue({
-    advance: advanceAuto.mutateAsync,
-    animate: animateProducerDrops,
-    invalidate: invalidateGameData,
-    showError: feedback.showError,
-  });
-
-  const autoTickQueuedRef = useRef(false);
-
-  useEffect(() => {
-    let disposed = false;
-
-    function tickAutoProducers() {
-      if (autoTickQueuedRef.current) return;
-      autoTickQueuedRef.current = true;
-
-      void scheduleGameEvent("auto producers", async () => {
-        try {
-          const { advance, animate, invalidate } = autoProducerTickRef.current;
-          const results = await advance(undefined);
-          if (disposed || results.length === 0) return;
-
-          await animate(results);
-          if (!disposed) await invalidate();
-        } catch (error) {
-          if (!disposed) autoProducerTickRef.current.showError(error);
-        } finally {
-          autoTickQueuedRef.current = false;
-        }
-      }).catch((error) => {
-        autoTickQueuedRef.current = false;
-        if (!disposed) autoProducerTickRef.current.showError(error);
-      });
-    }
-
-    const interval = window.setInterval(tickAutoProducers, 1000);
-
-    return () => {
-      disposed = true;
-      window.clearInterval(interval);
-    };
-  }, [autoProducerTickRef, scheduleGameEvent]);
 
   async function produceFrom(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") {
     await scheduleGameEvent(`producer ${activation}`, async () => {
@@ -274,6 +230,7 @@ export function GameShell() {
   return (
     <DndContext {...drag.contextProps}>
       <div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
+        {feedback.actionErrorKey > 0 ? <span key={feedback.actionErrorKey} className="ak-action-error-pulse" aria-hidden="true" /> : null}
         <main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
           <div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
             <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">Arkini</p>
@@ -408,10 +365,4 @@ function findFirstEmptyBoardCell(game: GameView): BuildCell | null {
   }
 
   return null;
-}
-
-function useLatestValue<T>(value: T) {
-  const ref = useRef(value);
-  ref.current = value;
-  return ref;
 }

@@ -5,6 +5,7 @@ import { cn } from "~/lib/cn";
 import { cellKey } from "../helpers";
 import {
   boardCellNodeId,
+  boardContainerNodeId,
   boardSourceId,
   columns,
   rows,
@@ -42,7 +43,10 @@ export function Board({
   const cells = useMemo(() => Array.from({ length: columns * rows }, (_, index) => ({ x: index % columns, y: Math.floor(index / columns) })), []);
 
   return (
-    <div className="grid w-full grid-cols-7 overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40">
+    <div
+      data-drag-boundary-id={boardContainerNodeId}
+      className="grid w-full grid-cols-7 overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
+    >
       {cells.map((cell) => {
         const key = cellKey(cell.x, cell.y);
         const boardItem = game.boardItemByCellKey[key] ?? null;
@@ -118,9 +122,9 @@ function BoardCell({
         "relative aspect-square touch-none border-b border-r border-slate-800/80 bg-slate-900/55 transition-colors duration-200",
         x === columns - 1 && "border-r-0",
         y === rows - 1 && "border-b-0",
-        isOver && "bg-slate-800/80",
-        canMerge && !isOver && "bg-emerald-950/15 outline outline-1 -outline-offset-2 outline-emerald-300/25",
-        canMerge && isOver && "ring-2 ring-inset ring-emerald-300/80",
+        isOver && !canMerge && "bg-slate-800/80",
+        canMerge && "ak-merge-target transition-none",
+        canMerge && isOver && "ak-merge-target-over",
         invalid && "ak-shake bg-red-950/40 ring-2 ring-inset ring-red-300/70",
         pulsed && !invalid && !merged && "ak-cell-pulse bg-sky-950/35 ring-2 ring-inset ring-sky-300/60",
         merged && !invalid && "ak-merge-pop bg-emerald-950/35 ring-2 ring-inset ring-emerald-200/80",

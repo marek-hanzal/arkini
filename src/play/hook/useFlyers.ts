@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FlyerKind, FlyerModel, GameVisualMeta, RectLike } from "~/play/types";
 import { flyerRenderSettleMs } from "~/play/types";
 
@@ -14,7 +14,10 @@ export function useFlyers() {
   }), []);
 
   const settleFlyer = useCallback((id: string) => {
-    resolversRef.current.get(id)?.();
+    const resolve = resolversRef.current.get(id);
+    if (!resolve) return;
+
+    resolve();
     resolversRef.current.delete(id);
 
     window.clearTimeout(removalTimersRef.current.get(id));
@@ -23,6 +26,14 @@ export function useFlyers() {
       setFlyers((current) => current.filter((flyer) => flyer.id !== id));
     }, flyerRenderSettleMs);
     removalTimersRef.current.set(id, timer);
+  }, []);
+
+  useEffect(() => () => {
+    for (const resolve of resolversRef.current.values()) resolve();
+    resolversRef.current.clear();
+
+    for (const timer of removalTimersRef.current.values()) window.clearTimeout(timer);
+    removalTimersRef.current.clear();
   }, []);
 
   return { flyers, addFlyer, settleFlyer };

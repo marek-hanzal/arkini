@@ -10,16 +10,11 @@ export function Flyer({ flyer, item, nowMs, onSettle }: Readonly<{ flyer: FlyerM
 
   useEffect(() => {
     const element = ref.current;
-    if (!element) return;
+    if (!element) return () => onSettle(flyer.id);
 
-    let disposed = false;
-    void playFlyerTimeline(element, flyer).then(() => {
-      if (!disposed) onSettle(flyer.id);
-    });
+    void playFlyerTimeline(element, flyer).finally(() => onSettle(flyer.id));
 
-    return () => {
-      disposed = true;
-    };
+    return () => onSettle(flyer.id);
   }, [flyer, onSettle]);
 
   return (

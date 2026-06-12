@@ -81,7 +81,7 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
       {...attributes}
       {...props}
       {...pressProps}
-      className={cn(className, (hidden || (isDragging && data.hideWhenActive !== false)) && "opacity-0")}
+      className={cn(className, (hidden || (isDragging && data.hideWhenActive !== false)) && "pointer-events-none opacity-0")}
       onKeyDown={keyDown}
       onPointerDown={pointerDown}
     >

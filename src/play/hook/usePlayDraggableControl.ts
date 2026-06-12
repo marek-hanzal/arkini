@@ -22,9 +22,7 @@ import {
 } from "~/drag/hook/useDraggableControl";
 
 export interface GameDragActions {
-  placeInventory(input: { slotIndex: number; x: number; y: number }): Promise<unknown>;
   moveBoard(input: { boardItemId: string; x: number; y: number }): Promise<unknown>;
-  stashBoard(input: { boardItemId: string; slotIndex?: number }): Promise<unknown>;
   swapInventory(input: { sourceSlotIndex: number; targetSlotIndex: number }): Promise<unknown>;
   mergeBoard(input: { sourceBoardItemId: string; targetBoardItemId: string }): Promise<unknown>;
 }
@@ -78,16 +76,10 @@ function resolveGameDrop(
   const route = `${source.kind}->${target.kind}`;
 
   switch (route) {
-    case "inventory->cell":
-      return inventoryToCell(context as GameDropContext<"inventory", "cell">, actions, feedback);
     case "inventory->inventory-slot":
-      return inventoryToInventory(context as GameDropContext<"inventory", "inventory-slot">, game, actions, feedback);
+      return inventoryToInventory(context as GameDropContext<"inventory", "inventory-slot">, game, actions);
     case "board->cell":
       return boardToCell(context as GameDropContext<"board", "cell">, game, actions, feedback);
-    case "board->inventory-slot":
-      return boardToInventorySlot(context as GameDropContext<"board", "inventory-slot">, game, actions, feedback);
-    case "board->inventory-bin":
-      return boardToInventoryBin(context as GameDropContext<"board", "inventory-bin">, actions);
     default:
       return reject(() => flashGameDrop(context, game, feedback));
   }
@@ -100,25 +92,10 @@ type GameDropContext<Source extends SourceKind, Target extends TargetKind> = {
   target: DroppablePayload<Extract<GameDropTarget, { kind: Target }>>;
 };
 
-function inventoryToCell(
-  { source, target }: GameDropContext<"inventory", "cell">,
-  actions: GameDragActions,
-  feedback: GameDragFeedback,
-): DropPlan<string, FlyerKind, GameVisualMeta> {
-  if (target.target.boardItemId) return reject(() => feedback.flashBoardCell(cellKey(target.target.x, target.target.y), "error"));
-
-  return accept({
-    hide: hiddenSource(source),
-    animations: [dragToTargetAnimation(source, target)],
-    commit: () => actions.placeInventory({ slotIndex: source.source.slotIndex, x: target.target.x, y: target.target.y }),
-  });
-}
-
 function inventoryToInventory(
   context: GameDropContext<"inventory", "inventory-slot">,
   game: GameView,
   actions: GameDragActions,
-  feedback: GameDragFeedback,
 ): DropPlan<string, FlyerKind, GameVisualMeta> {
   const { source, target } = context;
   if (source.source.slotIndex === target.target.slotIndex) return { type: "ignore" };
@@ -167,37 +144,6 @@ function boardToCell(
   });
 }
 
-function boardToInventorySlot(
-  { source, target }: GameDropContext<"board", "inventory-slot">,
-  game: GameView,
-  actions: GameDragActions,
-  feedback: GameDragFeedback,
-): DropPlan<string, FlyerKind, GameVisualMeta> {
-  const targetStack = game.inventoryBySlotIndex[target.target.slotIndex]?.stack ?? null;
-  const targetItem = targetStack ? game.items[targetStack.itemId] : null;
-  const cannotStack = targetStack && (targetStack.itemId !== source.itemId || !targetItem || targetStack.quantity >= targetItem.maxStackSize);
-
-  if (cannotStack) {
-    return reject(() => feedback.flashInventorySlot(target.target.slotIndex, "error"));
-  }
-
-  return accept({
-    hide: [source.sourceId],
-    animations: [dragToTargetAnimation(source, target)],
-    commit: () => actions.stashBoard({ boardItemId: source.source.boardItemId, slotIndex: target.target.slotIndex }),
-  });
-}
-
-function boardToInventoryBin(
-  { source }: GameDropContext<"board", "inventory-bin">,
-  actions: GameDragActions,
-): DropPlan<string, FlyerKind, GameVisualMeta> {
-  return accept({
-    hide: [source.sourceId],
-    commit: () => actions.stashBoard({ boardItemId: source.source.boardItemId }),
-  });
-}
-
 function inventoryMoveAnimations(
   context: GameDropContext<"inventory", "inventory-slot">,
   targetStack: { itemId: string; quantity: number } | null,
@@ -243,10 +189,6 @@ function accept(plan: AcceptPlan): DropPlan<string, FlyerKind, GameVisualMeta> {
 
 function reject(feedback?: () => void): DropPlan<string, FlyerKind, GameVisualMeta> {
   return { type: "reject", feedback };
-}
-
-function hiddenSource(source: GameDragData) {
-  return source.hideWhenActive === false ? [] : [source.sourceId];
 }
 
 function flashGameDrop(

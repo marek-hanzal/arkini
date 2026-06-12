@@ -60,7 +60,6 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
       <button
         ref={backdropRef}
         type="button"
-        aria-label="Close bottom sheet"
         tabIndex={open ? 0 : -1}
         className="ak-bottom-sheet-backdrop"
         onClick={onClose}
@@ -68,8 +67,6 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
 
       <section
         ref={setPanelRef}
-        role="dialog"
-        aria-modal="true"
         data-drag-node-id={dragNodeId}
         className={cn("ak-bottom-sheet-panel", className, containerClassName)}
       >

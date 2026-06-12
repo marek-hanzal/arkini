@@ -3,7 +3,7 @@ export type BottomNavSheet = "inventory" | "database";
 
 export function BottomNavigation({ activeSheet, onOpen }: Readonly<{ activeSheet: ActiveSheet; onOpen(sheet: BottomNavSheet): void }>) {
   return (
-    <nav className="ak-bottom-nav" aria-label="Game panels">
+    <nav className="ak-bottom-nav">
       <div className="ak-bottom-nav-inner">
         <BottomNavButton active={activeSheet === "inventory"} label="Inventory" icon="▦" tone="inventory" onClick={() => onOpen("inventory")} />
         <BottomNavButton active={activeSheet === "database"} label="Database" icon="◈" tone="database" onClick={() => onOpen("database")} />

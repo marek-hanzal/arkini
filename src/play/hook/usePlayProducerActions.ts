@@ -22,7 +22,7 @@ export function usePlayProducerActions({
   addFlyer,
   feedback,
   schedule,
-}: Readonly<usePlayProducerActions.Props>) {
+}: usePlayProducerActions.Props) {
   const invalidatePlayData = usePlayDataInvalidation();
   const produce = usePlayAction(
     (db, input: { boardItemId: string; activation?: "single" | "exhaust" }) =>

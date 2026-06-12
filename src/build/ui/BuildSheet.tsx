@@ -1,18 +1,24 @@
-import type { GameView } from "~/play/logic/playTypes";
+import { usePlayView } from "~/play/hook/usePlayView";
 import type { BuildRecipeId } from "~/manifest/data/manifestId";
 import type { BoardCell } from "~/board/boardIdentity";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 
 export namespace BuildSheet {
   export interface Props {
-    game: GameView;
     cell: BoardCell | null;
     onClose(): void;
     onBuild(recipeId: BuildRecipeId): void;
   }
 }
 
-export function BuildSheet({ game, cell, onClose, onBuild }: Readonly<BuildSheet.Props>) {
+export function BuildSheet({ cell, onClose, onBuild }: BuildSheet.Props) {
+  const gameQuery = usePlayView((game) => ({
+    items: game.items,
+    buildRecipes: game.buildRecipes,
+  }));
+  const game = gameQuery.data;
+
+  if (!game) return null;
   return (
     <div>
       <SheetHeader

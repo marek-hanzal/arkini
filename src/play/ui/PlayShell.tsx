@@ -22,7 +22,6 @@ import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
 
 export function PlayShell() {
   const playQuery = usePlayView();
-  const game = playQuery.data;
   const sheets = usePlaySheets();
   const { flyers, addFlyer, settleFlyer } = useFlyers();
   const schedulePlayEvent = usePlayEventQueue();
@@ -35,7 +34,6 @@ export function PlayShell() {
   const build = usePlayAction((db, input: { recipeId: BuildRecipeId; x: number; y: number }) => db.buildRecipe(input.recipeId, input.x, input.y));
 
   const drag = usePlayDraggableControl({
-    game,
     actions: {
       moveBoard: (input) => moveBoard.mutateAsync(input),
       swapInventory: (input) => swapInventory.mutateAsync(input),
@@ -47,7 +45,6 @@ export function PlayShell() {
   });
   const produceFrom = usePlayProducerActions({ activeSheet: sheets.activeSheet, addFlyer, feedback, schedule: schedulePlayEvent });
   const manualActions = usePlayManualItemActions({
-    game,
     addFlyer,
     feedback,
     schedule: schedulePlayEvent,
@@ -59,7 +56,7 @@ export function PlayShell() {
     return <div className="grid h-dvh w-dvw place-items-center text-sm text-slate-400">Booting SQLite…</div>;
   }
 
-  if (playQuery.isError || !game) {
+  if (playQuery.isError || !playQuery.data) {
     return <div className="grid h-dvh w-dvw place-items-center p-4"><div className="rounded-md border border-red-400/30 bg-red-950/30 p-4 text-sm text-red-100">{(playQuery.error as Error)?.message ?? "Game failed to load."}</div></div>;
   }
 
@@ -75,7 +72,6 @@ export function PlayShell() {
 
           <div className="min-h-0 shrink-0">
             <Board
-              game={game}
               drag={{ activeDrag: drag.activeDrag, isSourceHidden: drag.isSourceHidden }}
               feedback={{ invalidCellKey: feedback.invalidBoardCellKey, mergedCellKey: feedback.mergedBoardCellKey }}
               actions={{
@@ -104,7 +100,6 @@ export function PlayShell() {
         <div className="min-h-0">
           <section className="min-h-0" hidden={sheets.renderedSheet !== "inventory"}>
             <InventorySheet
-              game={game}
               isSourceHidden={drag.isSourceHidden}
               invalidInventorySlot={feedback.invalidInventorySlot}
               onClose={sheets.closeSheet}
@@ -123,7 +118,6 @@ export function PlayShell() {
 
           <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain" hidden={sheets.renderedSheet !== "build"}>
             <BuildSheet
-              game={game}
               cell={sheets.buildCell}
               onClose={sheets.closeSheet}
               onBuild={(recipeId) => {
@@ -145,7 +139,7 @@ export function PlayShell() {
         </div>
       </BottomSheet>
 
-      {flyers.map((flyer) => <Flyer key={flyer.id} flyer={flyer} item={game.items[flyer.itemId]} nowMs={nowMs} onSettle={settleFlyer} />)}
+      <FlyerLayer flyers={flyers} nowMs={nowMs} onSettle={settleFlyer} />
 
       <DragOverlay adjustScale={false} dropAnimation={null}>
         {drag.activeItem ? (
@@ -161,4 +155,25 @@ export function PlayShell() {
       </DragOverlay>
     </DndContext>
   );
+}
+
+
+namespace FlyerLayer {
+  export interface Props {
+    flyers: ReturnType<typeof useFlyers>["flyers"];
+    nowMs: number;
+    onSettle(id: string): void;
+  }
+}
+
+function FlyerLayer({ flyers, nowMs, onSettle }: FlyerLayer.Props) {
+  const gameQuery = usePlayView((game) => ({ items: game.items }));
+  const items = gameQuery.data?.items;
+
+  if (!items) return null;
+
+  return flyers.map((flyer) => {
+    const item = items[flyer.itemId];
+    return item ? <Flyer key={flyer.id} flyer={flyer} item={item} nowMs={nowMs} onSettle={onSettle} /> : null;
+  });
 }

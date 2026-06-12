@@ -26,7 +26,7 @@ export function BottomSheet({
   contentClassName,
   onClose,
   "data-drag-node-id": dragNodeId,
-}: Readonly<BottomSheet.Props>) {
+}: BottomSheet.Props) {
   const backdropRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
 

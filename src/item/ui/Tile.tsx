@@ -21,7 +21,7 @@ export function Tile({
   nowMs,
   dragOverlay,
   overlaySize,
-}: Readonly<Tile.Props>) {
+}: Tile.Props) {
   return (
     <div
       data-ak-tile
@@ -45,7 +45,7 @@ namespace TileContent {
   }
 }
 
-export function TileContent({ item, quantity, producer, nowMs }: Readonly<TileContent.Props>) {
+export function TileContent({ item, quantity, producer, nowMs }: TileContent.Props) {
   const producerUi = producer ? getProducerUiState(producer, nowMs ?? Date.now()) : null;
 
   return (
@@ -82,7 +82,7 @@ namespace ProducerBadge {
   }
 }
 
-function ProducerBadge({ ui }: Readonly<ProducerBadge.Props>) {
+function ProducerBadge({ ui }: ProducerBadge.Props) {
   return (
     <span title={ui.title} className="absolute left-0.5 top-0.5 min-w-5 rounded-sm bg-slate-950/85 px-1 pb-0.5 pt-0.5 text-center text-[0.56rem] font-bold text-emerald-200">
       <span>{ui.label}</span>

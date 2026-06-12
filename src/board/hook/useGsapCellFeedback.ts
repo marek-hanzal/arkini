@@ -8,7 +8,7 @@ export namespace useGsapCellFeedback {
   }
 }
 
-export function useGsapCellFeedback<TElement extends HTMLElement>(ref: RefObject<TElement | null>, { invalid, success }: Readonly<useGsapCellFeedback.Props>) {
+export function useGsapCellFeedback<TElement extends HTMLElement>(ref: RefObject<TElement | null>, { invalid, success }: useGsapCellFeedback.Props) {
   const wasInvalidRef = useRef(false);
   const wasSuccessRef = useRef(success);
   const didMountSuccessRef = useRef(false);

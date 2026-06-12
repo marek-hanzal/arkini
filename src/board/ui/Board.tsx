@@ -1,6 +1,7 @@
 import { useMemo, useRef, type ReactNode } from "react";
 import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
-import type { BoardViewItem, GameView, ViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
+import { usePlayView } from "~/play/hook/usePlayView";
 import type { ItemId } from "~/manifest/data/manifestId";
 import { cn } from "~/shared/cn";
 import { cellKey } from "~/board/util/cell";
@@ -36,7 +37,6 @@ export namespace Board {
   }
 
   export interface Props {
-    game: GameView;
     drag: DragState;
     feedback: FeedbackState;
     actions: Actions;
@@ -44,8 +44,15 @@ export namespace Board {
   }
 }
 
-export function Board({ game, drag, feedback, actions, nowMs }: Readonly<Board.Props>) {
+export function Board({ drag, feedback, actions, nowMs }: Board.Props) {
+  const gameQuery = usePlayView((game) => ({
+    items: game.items,
+    boardItemByCellKey: game.boardItemByCellKey,
+  }));
+  const game = gameQuery.data;
   const cells = useMemo(() => Array.from({ length: boardColumns * boardRows }, (_, index) => ({ x: index % boardColumns, y: Math.floor(index / boardColumns) })), []);
+
+  if (!game) return null;
 
   return (
     <div
@@ -115,7 +122,7 @@ function BoardCell({
   producerReady,
   children,
   onEmptyDoubleActivate,
-}: Readonly<BoardCell.Props>) {
+}: BoardCell.Props) {
   const id = boardCellNodeId(x, y);
   const cellRef = useRef<HTMLDivElement | null>(null);
   const press = usePressActions({
@@ -174,7 +181,7 @@ function BoardTile({
   nowMs,
   onSingleActivate,
   onDoubleActivate,
-}: Readonly<BoardTile.Props>) {
+}: BoardTile.Props) {
   const sourceId = boardSourceId(boardItem.id);
   const sourceNodeId = boardCellNodeId(boardItem.x, boardItem.y);
 

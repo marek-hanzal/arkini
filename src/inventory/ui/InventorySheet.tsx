@@ -1,10 +1,10 @@
 import { useRef } from "react";
-import type { InventorySlot, GameView, ViewItem } from "~/play/logic/playTypes";
+import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
+import { usePlayView } from "~/play/hook/usePlayView";
 import { cn } from "~/shared/cn";
 import {
   inventoryContainerNodeId,
   inventoryColumns,
-  inventorySlots,
   inventorySlotNodeId,
   inventorySourceId,
 } from "~/inventory/inventoryIdentity";
@@ -16,7 +16,6 @@ import { Tile } from "~/item/ui/Tile";
 
 export namespace InventorySheet {
   export interface Props {
-    game: GameView;
     isSourceHidden(sourceId: string): boolean;
     invalidInventorySlot: number | null;
     onClose(): void;
@@ -25,13 +24,20 @@ export namespace InventorySheet {
 }
 
 export function InventorySheet({
-  game,
   isSourceHidden,
   invalidInventorySlot,
   onClose,
   onSlotDoubleActivate,
-}: Readonly<InventorySheet.Props>) {
-  const inventory = game.inventory.slice(0, inventorySlots);
+}: InventorySheet.Props) {
+  const gameQuery = usePlayView((game) => ({
+    items: game.items,
+    inventory: game.inventory,
+  }));
+  const game = gameQuery.data;
+
+  if (!game) return null;
+
+  const inventory = game.inventory;
   const filled = inventory.filter((slot) => slot.stack).length;
 
   return (
@@ -75,7 +81,7 @@ namespace InventoryCell {
   }
 }
 
-function InventoryCell({ slot, item, hidden, invalid, onDoubleActivate }: Readonly<InventoryCell.Props>) {
+function InventoryCell({ slot, item, hidden, invalid, onDoubleActivate }: InventoryCell.Props) {
   const stack = slot.stack;
   const nodeId = inventorySlotNodeId(slot.slotIndex);
   const cellRef = useRef<HTMLDivElement | null>(null);
@@ -108,7 +114,7 @@ namespace InventoryTile {
   }
 }
 
-function InventoryTile({ slot, item, hidden, onDoubleActivate }: Readonly<InventoryTile.Props>) {
+function InventoryTile({ slot, item, hidden, onDoubleActivate }: InventoryTile.Props) {
   const stack = slot.stack;
 
   if (!stack) return null;

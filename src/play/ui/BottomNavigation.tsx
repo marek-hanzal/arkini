@@ -8,7 +8,7 @@ export namespace BottomNavigation {
   }
 }
 
-export function BottomNavigation({ activeSheet, onOpen }: Readonly<BottomNavigation.Props>) {
+export function BottomNavigation({ activeSheet, onOpen }: BottomNavigation.Props) {
   return (
     <nav className="ak-bottom-nav">
       <div className="ak-bottom-nav-inner">
@@ -29,7 +29,7 @@ namespace BottomNavButton {
   }
 }
 
-function BottomNavButton({ active, label, icon, tone, onClick }: Readonly<BottomNavButton.Props>) {
+function BottomNavButton({ active, label, icon, tone, onClick }: BottomNavButton.Props) {
   return (
     <button
       type="button"

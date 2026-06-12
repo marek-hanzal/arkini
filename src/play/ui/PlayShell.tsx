@@ -1,11 +1,9 @@
 import { DndContext, DragOverlay } from "@dnd-kit/core";
-import { useCallback, useEffect, useState } from "react";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
-import type { BoardViewItem, GameView, InventorySlot, ProducerDropResult } from "~/play/server/playTypes";
 import type { BuildRecipeId } from "~/manifest/server/manifestId";
-import { usePlayAction, usePlayDataInvalidation, usePlayView } from "~/play/hook/usePlayView";
+import { usePlayAction, usePlayView } from "~/play/hook/usePlayView";
 import { Board } from "~/board/ui/Board";
-import { BottomNavigation, type ActiveSheet, type BottomNavSheet } from "~/play/ui/BottomNavigation";
+import { BottomNavigation } from "~/play/ui/BottomNavigation";
 import { BottomSheet } from "~/play/ui/BottomSheet";
 import { BuildSheet } from "~/build/ui/BuildSheet";
 import { Flyer } from "~/play/ui/Flyer";
@@ -13,38 +11,27 @@ import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { Tile } from "~/item/ui/Tile";
 import { cellKey } from "~/board/util/cell";
-import { boardColumns, type BoardCell, boardRows, boardSourceId } from "~/board/boardIdentity";
-import { inventorySourceId } from "~/inventory/inventoryIdentity";
-import { playBottomNavPulse } from "~/play/util/animation";
-import { cssEscape, queryElement, queryRect } from "~/shared/util/dom";
-import { inventorySinkRect } from "~/inventory/util/inventory";
 import { useFlyers } from "~/play/hook/useFlyers";
 import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
 import { usePlayFeedback } from "~/play/hook/usePlayFeedback";
 import { usePlayEventQueue } from "~/play/hook/usePlayEventQueue";
+import { usePlayClock } from "~/play/hook/usePlayClock";
+import { usePlaySheets } from "~/play/hook/usePlaySheets";
+import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
+import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
 
 export function PlayShell() {
   const playQuery = usePlayView();
   const game = playQuery.data;
-  const invalidatePlayData = usePlayDataInvalidation();
-  const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
-  const [renderedSheet, setRenderedSheet] = useState<Exclude<ActiveSheet, null>>("inventory");
-  const [buildCell, setBuildCell] = useState<BoardCell | null>(null);
+  const sheets = usePlaySheets();
   const { flyers, addFlyer, settleFlyer } = useFlyers();
   const schedulePlayEvent = usePlayEventQueue();
-  const [nowMs, setNowMs] = useState(Date.now());
+  const nowMs = usePlayClock();
   const feedback = usePlayFeedback();
 
-  const placeInventory = usePlayAction((db, input: { slotIndex: number; x: number; y: number }) => db.placeInventoryItem(input.slotIndex, input.x, input.y));
   const moveBoard = usePlayAction((db, input: { boardItemId: string; x: number; y: number }) => db.moveBoardItem(input.boardItemId, input.x, input.y));
-  const stashBoard = usePlayAction((db, input: { boardItemId: string; slotIndex?: number }) => db.stashBoardItem(input.boardItemId, input.slotIndex));
   const swapInventory = usePlayAction((db, input: { sourceSlotIndex: number; targetSlotIndex: number }) => db.swapInventorySlots(input.sourceSlotIndex, input.targetSlotIndex));
   const mergeBoard = usePlayAction((db, input: { sourceBoardItemId: string; targetBoardItemId: string }) => db.mergeBoardItems(input.sourceBoardItemId, input.targetBoardItemId));
-  const produce = usePlayAction(
-    (db, input: { boardItemId: string; activation?: "single" | "exhaust" }) =>
-      db.produceBoardItem(input.boardItemId, input.activation),
-    { invalidateOnSuccess: false },
-  );
   const build = usePlayAction((db, input: { recipeId: BuildRecipeId; x: number; y: number }) => db.buildRecipe(input.recipeId, input.x, input.y));
 
   const drag = usePlayDraggableControl({
@@ -54,142 +41,19 @@ export function PlayShell() {
       swapInventory: (input) => swapInventory.mutateAsync(input),
       mergeBoard: (input) => mergeBoard.mutateAsync(input),
     },
-    feedback: {
-      pulseMergeCell: feedback.pulseMergeCell,
-      flashBoardCell: feedback.flashBoardCell,
-      flashInventorySlot: feedback.flashInventorySlot,
-      showError: feedback.showError,
-    },
+    feedback,
     addFlyer,
     schedule: schedulePlayEvent,
   });
-
-  useEffect(() => {
-    const interval = window.setInterval(() => setNowMs(Date.now()), 250);
-    return () => window.clearInterval(interval);
-  }, []);
-
-  function blurActiveElement() {
-    const element = document.activeElement;
-    if (element instanceof HTMLElement) element.blur();
-  }
-
-  function closeSheet() {
-    blurActiveElement();
-    setActiveSheet(null);
-  }
-
-  function openSheet(sheet: BottomNavSheet) {
-    blurActiveElement();
-    setRenderedSheet(sheet);
-    setActiveSheet((current) => (current === sheet ? null : sheet));
-    setBuildCell(null);
-  }
-
-  function openBuild(cell: BoardCell) {
-    blurActiveElement();
-    setBuildCell(cell);
-    setRenderedSheet("build");
-    setActiveSheet("build");
-  }
-
-  function pulseBottomNav(sheet: BottomNavSheet) {
-    const element = queryElement(`[data-bottom-nav-sheet="${sheet}"]`);
-    if (element) playBottomNavPulse(element);
-  }
-
-  const animateProducerDrops = useCallback(async (results: ProducerDropResult[], stepDelayMs = 0) => {
-    const animations: Promise<void>[] = [];
-
-    for (const result of results) {
-      const sourceRect = queryRect(`[data-board-item-id="${cssEscape(result.producerBoardItemId)}"]`);
-      if (!sourceRect) continue;
-      const from = sourceRect;
-
-      for (const placement of result.placements) {
-        const targetRect = placement.kind === "board"
-          ? queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`)
-          : activeSheet === "inventory" ? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`) : null;
-
-        if (placement.kind === "board") {
-          if (!targetRect) continue;
-          animations.push(addFlyer(placement.itemId, from, targetRect));
-        } else {
-          animations.push(addFlyer(placement.itemId, from, targetRect ?? inventorySinkRect(from)));
-        }
-
-        if (stepDelayMs > 0) await new Promise((resolve) => window.setTimeout(resolve, stepDelayMs));
-      }
-    }
-
-    await Promise.all(animations);
-  }, [activeSheet, addFlyer]);
-
-  async function produceFrom(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") {
-    await schedulePlayEvent(`producer ${activation}`, async () => {
-      try {
-        const result = await produce.mutateAsync({ boardItemId: boardItem.id, activation });
-        await animateProducerDrops([result], activation === "exhaust" ? 130 : 0);
-        await invalidatePlayData();
-      } catch (error) {
-        feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-        feedback.showError(error);
-      }
-    });
-  }
-
-  async function stashBoardWithFly(boardItem: BoardViewItem) {
-    await schedulePlayEvent("stash board item", async () => {
-      const sourceId = boardSourceId(boardItem.id);
-      const from = queryRect(`[data-board-item-id="${cssEscape(boardItem.id)}"]`)
-        ?? queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
-
-      try {
-        await stashBoard.mutateAsync({ boardItemId: boardItem.id });
-
-        if (from) {
-          drag.hideSources([sourceId]);
-          await addFlyer(boardItem.itemId, from, inventorySinkRect(from, queryRect('[data-bottom-nav-sheet="inventory"]')), "stash");
-        }
-
-        pulseBottomNav("inventory");
-      } catch (error) {
-        feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-        feedback.showError(error);
-      } finally {
-        drag.clearHiddenSources();
-      }
-    });
-  }
-
-  async function placeInventoryOnBoardWithFly(slot: InventorySlot) {
-    await schedulePlayEvent("place inventory item", async () => {
-      const stack = slot.stack;
-      const target = game ? findFirstEmptyBoardCell(game) : null;
-
-      if (!stack || !target) {
-        feedback.flashInventorySlot(slot.slotIndex, "error");
-        return;
-      }
-
-      const sourceId = inventorySourceId(slot.slotIndex);
-      const from = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
-      const to = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
-
-      try {
-        await placeInventory.mutateAsync({ slotIndex: slot.slotIndex, x: target.x, y: target.y });
-
-        if (from && to && stack.quantity <= 1) drag.hideSources([sourceId]);
-        if (from && to) await addFlyer(stack.itemId, from, to, "place", { quantity: stack.quantity });
-      } catch (error) {
-        feedback.flashInventorySlot(slot.slotIndex, "error");
-        feedback.showError(error);
-      } finally {
-        drag.clearHiddenSources();
-      }
-    });
-  }
-
+  const produceFrom = usePlayProducerActions({ activeSheet: sheets.activeSheet, addFlyer, feedback, schedule: schedulePlayEvent });
+  const manualActions = usePlayManualItemActions({
+    game,
+    addFlyer,
+    feedback,
+    schedule: schedulePlayEvent,
+    hideSources: drag.hideSources,
+    clearHiddenSources: drag.clearHiddenSources,
+  });
 
   if (playQuery.isPending) {
     return <div className="grid h-dvh w-dvw place-items-center text-sm text-slate-400">Booting SQLite…</div>;
@@ -212,67 +76,64 @@ export function PlayShell() {
           <div className="min-h-0 shrink-0">
             <Board
               game={game}
-              activeDrag={drag.activeDrag}
-              isSourceHidden={drag.isSourceHidden}
-              invalidBoardCellKey={feedback.invalidBoardCellKey}
-              mergedBoardCellKey={feedback.mergedBoardCellKey}
+              drag={{ activeDrag: drag.activeDrag, isSourceHidden: drag.isSourceHidden }}
+              feedback={{ invalidCellKey: feedback.invalidBoardCellKey, mergedCellKey: feedback.mergedBoardCellKey }}
+              actions={{
+                emptyDoubleActivate: sheets.openBuild,
+                tileSingleActivate: (item) => {
+                  if (item.producer) void produceFrom(item, "single");
+                },
+                tileDoubleActivate: (item) => {
+                  if (item.producer?.doubleClickBehavior === "exhaust") {
+                    void produceFrom(item, "exhaust");
+                    return;
+                  }
+
+                  if (!item.producer) void manualActions.stashBoardWithFly(item);
+                },
+              }}
               nowMs={nowMs}
-              onEmptyDoubleActivate={openBuild}
-              onTileSingleActivate={(item) => {
-                if (!item.producer) return;
-                void produceFrom(item, "single");
-              }}
-              onTileDoubleActivate={(item) => {
-                if (item.producer?.doubleClickBehavior === "exhaust") {
-                  void produceFrom(item, "exhaust");
-                  return;
-                }
-
-                if (item.producer) return;
-
-                void stashBoardWithFly(item);
-              }}
             />
           </div>
         </main>
 
-        <BottomNavigation activeSheet={activeSheet} onOpen={openSheet} />
+        <BottomNavigation activeSheet={sheets.activeSheet} onOpen={sheets.openSheet} />
       </div>
 
-      <BottomSheet open={activeSheet !== null} onClose={closeSheet}>
+      <BottomSheet open={sheets.activeSheet !== null} onClose={sheets.closeSheet}>
         <div className="min-h-0">
-          <section className="min-h-0" hidden={renderedSheet !== "inventory"}>
+          <section className="min-h-0" hidden={sheets.renderedSheet !== "inventory"}>
             <InventorySheet
               game={game}
               isSourceHidden={drag.isSourceHidden}
               invalidInventorySlot={feedback.invalidInventorySlot}
-              onClose={closeSheet}
+              onClose={sheets.closeSheet}
               onSlotDoubleActivate={(slot) => {
-                void placeInventoryOnBoardWithFly(slot);
+                void manualActions.placeInventoryOnBoardWithFly(slot);
               }}
             />
           </section>
 
-          <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain" hidden={renderedSheet !== "database"}>
-            <SheetHeader eyebrow="System" description="Local database" onClose={closeSheet} />
+          <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain" hidden={sheets.renderedSheet !== "database"}>
+            <SheetHeader eyebrow="System" description="Local database" onClose={sheets.closeSheet} />
             <div className="p-4 pt-1">
               <DbStatusCard />
             </div>
           </section>
 
-          <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain" hidden={renderedSheet !== "build"}>
+          <section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain" hidden={sheets.renderedSheet !== "build"}>
             <BuildSheet
               game={game}
-              cell={buildCell}
-              onClose={closeSheet}
+              cell={sheets.buildCell}
+              onClose={sheets.closeSheet}
               onBuild={(recipeId) => {
-                if (!buildCell) return;
-                const cell = buildCell;
+                if (!sheets.buildCell) return;
+                const cell = sheets.buildCell;
                 void schedulePlayEvent("build recipe", async () => {
                   try {
                     await build.mutateAsync({ recipeId, x: cell.x, y: cell.y });
                     feedback.pulseMergeCell(cellKey(cell.x, cell.y));
-                    closeSheet();
+                    sheets.closeSheet();
                   } catch (error) {
                     feedback.flashBoardCell(cellKey(cell.x, cell.y), "error");
                     feedback.showError(error);
@@ -300,14 +161,4 @@ export function PlayShell() {
       </DragOverlay>
     </DndContext>
   );
-}
-
-function findFirstEmptyBoardCell(game: GameView): BoardCell | null {
-  for (let y = 0; y < boardRows; y++) {
-    for (let x = 0; x < boardColumns; x++) {
-      if (!game.boardItemByCellKey[cellKey(x, y)]) return { x, y };
-    }
-  }
-
-  return null;
 }

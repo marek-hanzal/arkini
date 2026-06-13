@@ -1,6 +1,5 @@
 import type { BoardViewItem, ProducerView, ViewItem } from "~/play/logic/playTypes";
 import type { RectLike } from "~/play/types";
-import { useProducerNow } from "~/producer/hook/useProducerNow";
 import { cn } from "~/shared/cn";
 import { formatMs } from "~/shared/util/format";
 
@@ -13,6 +12,7 @@ export namespace GameItemView {
 		quantity?: number;
 		producer?: BoardViewItem["producer"];
 		overlaySize?: Pick<RectLike, "width" | "height"> | null;
+		producerNowMs?: number;
 	}
 }
 
@@ -22,6 +22,7 @@ export function GameItemView({
 	quantity,
 	producer,
 	overlaySize,
+	producerNowMs,
 }: GameItemView.Props) {
 	return (
 		<div
@@ -31,8 +32,8 @@ export function GameItemView({
 				"relative h-full w-full select-none",
 				variant === "board" && "p-[13%]",
 				variant === "inventory" && "p-[12%]",
-				variant === "drag" && "p-[10%] drop-shadow-2xl",
-				variant === "flyer" && "p-[10%] drop-shadow-xl",
+				variant === "drag" && "p-[10%]",
+				variant === "flyer" && "p-[10%]",
 			)}
 			style={
 				variant === "drag" && overlaySize
@@ -47,6 +48,7 @@ export function GameItemView({
 				item={item}
 				quantity={quantity}
 				producer={producer}
+				producerNowMs={producerNowMs}
 			/>
 		</div>
 	);
@@ -57,11 +59,12 @@ namespace GameItemContent {
 		item: ViewItem;
 		quantity?: number;
 		producer?: BoardViewItem["producer"];
+		producerNowMs?: number;
 	}
 }
 
-function GameItemContent({ item, quantity, producer }: GameItemContent.Props) {
-	const nowMs = useProducerNow(producer);
+function GameItemContent({ item, quantity, producer, producerNowMs }: GameItemContent.Props) {
+	const nowMs = producerNowMs ?? Date.now();
 	const producerUi = producer ? getProducerUiState(producer, nowMs) : null;
 
 	return (
@@ -148,7 +151,7 @@ function ProducerBadge({ ui }: ProducerBadge.Props) {
 }
 
 function getProducerUiState(producer: ProducerView, nowMs: number): ProducerUiState {
-	const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
+	const cooldownUntil = producer.cooldownUntilMs ?? 0;
 	const cooldownLeft = Math.max(0, cooldownUntil - nowMs);
 	const max = producer.cooldownMs ?? cooldownLeft;
 

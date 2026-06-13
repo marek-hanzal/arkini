@@ -33,7 +33,6 @@ export namespace Board {
 	export interface FeedbackState {
 		invalidCellKey: string | null;
 		mergedCellKey: string | null;
-		busyProducerIds: Set<string>;
 	}
 
 	export interface Actions {
@@ -115,6 +114,7 @@ export function Board({ drag, feedback, actions }: Board.Props) {
 							<BoardTile
 								boardItem={boardItem}
 								item={viewItem}
+								nowMs={nowMs}
 								hidden={drag.isSourceHidden(boardSourceId(boardItem.id))}
 								onSingleActivate={() => actions.tileSingleActivate(boardItem)}
 								onDoubleActivate={() => actions.tileDoubleActivate(boardItem)}
@@ -216,6 +216,7 @@ namespace BoardTile {
 	export interface Props {
 		boardItem: BoardViewItem;
 		item: ViewItem;
+		nowMs: number;
 		hidden: boolean;
 		onSingleActivate(): void;
 		onDoubleActivate(): void;
@@ -225,6 +226,7 @@ namespace BoardTile {
 function BoardTile({
 	boardItem,
 	item,
+	nowMs,
 	hidden,
 	onSingleActivate,
 	onDoubleActivate,
@@ -262,6 +264,7 @@ function BoardTile({
 				item={item}
 				variant="board"
 				producer={boardItem.producer}
+				producerNowMs={nowMs}
 			/>
 		</DraggableSurface>
 	);

@@ -7,9 +7,9 @@ export function useProducerClock(items: readonly BoardViewItem[]) {
 	const cooldownKey = useMemo(
 		() =>
 			items
-				.map((item) => item.producer?.cooldownUntil ?? "")
+				.map((item) => item.producer?.cooldownUntilMs ?? 0)
 				.filter(Boolean)
-				.sort()
+				.sort((left, right) => left - right)
 				.join("|"),
 		[
 			items,
@@ -21,7 +21,7 @@ export function useProducerClock(items: readonly BoardViewItem[]) {
 		const cooldowns = cooldownKey
 			.split("|")
 			.filter(Boolean)
-			.map((value) => Date.parse(value))
+			.map(Number)
 			.filter((value) => Number.isFinite(value));
 
 		if (!cooldowns.length) {

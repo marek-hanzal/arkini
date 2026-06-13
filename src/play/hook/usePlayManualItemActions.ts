@@ -6,11 +6,13 @@ import { inventorySinkRect } from "~/inventory/util/inventory";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
+import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { playBottomNavPulse } from "~/play/util/animation";
 import { queryElement } from "~/shared/util/queryElement";
 import { queryRect } from "~/shared/util/queryRect";
+import { waitForPaint } from "~/shared/util/waitForPaint";
 
 export namespace usePlayManualItemActions {
 	export interface Props {
@@ -36,6 +38,7 @@ export function usePlayManualItemActions({
 	clearHiddenSources,
 }: usePlayManualItemActions.Props) {
 	const board = usePlayBoard().data;
+	const invalidatePlayData = usePlayDataInvalidation();
 	const placeInventory = usePlayAction(
 		(
 			db,
@@ -46,12 +49,7 @@ export function usePlayManualItemActions({
 			},
 		) => db.placeInventoryItem(input.slotIndex, input.x, input.y),
 		{
-			invalidateTargets: [
-				"board",
-				"inventory",
-				"buildRecipes",
-				"databaseStatus",
-			],
+			invalidateOnSuccess: false,
 		},
 	);
 	const stashBoard = usePlayAction(
@@ -63,12 +61,7 @@ export function usePlayManualItemActions({
 			},
 		) => db.stashBoardItem(input.boardItemId, input.slotIndex),
 		{
-			invalidateTargets: [
-				"board",
-				"inventory",
-				"buildRecipes",
-				"databaseStatus",
-			],
+			invalidateOnSuccess: false,
 		},
 	);
 
@@ -81,14 +74,18 @@ export function usePlayManualItemActions({
 					queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
 
 				try {
+					if (from) {
+						hideSources([
+							sourceId,
+						]);
+						await waitForPaint();
+					}
+
 					await stashBoard.mutateAsync({
 						boardItemId: boardItem.id,
 					});
 
 					if (from) {
-						hideSources([
-							sourceId,
-						]);
 						await addFlyer(
 							boardItem.itemId,
 							from,
@@ -100,6 +97,12 @@ export function usePlayManualItemActions({
 						);
 					}
 
+					await invalidatePlayData([
+						"board",
+						"inventory",
+						"buildRecipes",
+						"databaseStatus",
+					]);
 					pulseBottomNav("inventory");
 				} catch (error) {
 					feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
@@ -114,6 +117,7 @@ export function usePlayManualItemActions({
 			clearHiddenSources,
 			feedback,
 			hideSources,
+			invalidatePlayData,
 			schedule,
 			stashBoard,
 		],
@@ -135,20 +139,30 @@ export function usePlayManualItemActions({
 				const to = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
 
 				try {
+					if (from && to && stack.quantity <= 1) {
+						hideSources([
+							sourceId,
+						]);
+						await waitForPaint();
+					}
+
 					await placeInventory.mutateAsync({
 						slotIndex: slot.slotIndex,
 						x: target.x,
 						y: target.y,
 					});
 
-					if (from && to && stack.quantity <= 1)
-						hideSources([
-							sourceId,
-						]);
 					if (from && to)
 						await addFlyer(stack.itemId, from, to, "place", {
 							quantity: stack.quantity,
 						});
+
+					await invalidatePlayData([
+						"board",
+						"inventory",
+						"buildRecipes",
+						"databaseStatus",
+					]);
 				} catch (error) {
 					feedback.flashInventorySlot(slot.slotIndex, "error");
 					feedback.showError(error);
@@ -163,6 +177,7 @@ export function usePlayManualItemActions({
 			feedback,
 			board,
 			hideSources,
+			invalidatePlayData,
 			placeInventory,
 			schedule,
 		],

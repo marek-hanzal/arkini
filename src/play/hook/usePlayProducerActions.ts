@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
 import { inventorySourceId } from "~/inventory/inventoryIdentity";
@@ -10,7 +10,6 @@ import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import type { ActiveSheet } from "~/play/ui/BottomNavigation";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { playBottomNavHold } from "~/play/util/animation";
-import { usePlayProducerUiStore } from "~/play/store/usePlayProducerUiStore";
 import { queryElement } from "~/shared/util/queryElement";
 import { queryRect } from "~/shared/util/queryRect";
 import { waitForPaint } from "~/shared/util/waitForPaint";
@@ -40,8 +39,6 @@ export function usePlayProducerActions({
 	hideSources,
 	clearHiddenSources,
 }: usePlayProducerActions.Props) {
-	const busyProducerIds = usePlayProducerUiStore((state) => state.busyProducerIds);
-	const setProducerBusy = usePlayProducerUiStore((state) => state.setProducerBusy);
 	const invalidatePlayData = usePlayDataInvalidation();
 	const produce = usePlayAction(
 		(
@@ -127,7 +124,6 @@ export function usePlayProducerActions({
 
 	const produceFrom = useCallback(
 		async (boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") => {
-			setProducerBusy(boardItem.id, true);
 			await schedule(`producer ${activation}`, async () => {
 				try {
 					const result = await produce.mutateAsync({
@@ -161,7 +157,6 @@ export function usePlayProducerActions({
 					feedback.showError(error);
 				} finally {
 					clearHiddenSources();
-					setProducerBusy(boardItem.id, false);
 				}
 			});
 		},
@@ -172,22 +167,14 @@ export function usePlayProducerActions({
 			hideSources,
 			invalidatePlayData,
 			produce,
-			setProducerBusy,
 			startProducerDepletion,
 			schedule,
 		],
 	);
 
-	return useMemo(
-		() => ({
-			busyProducerIds,
-			produceFrom,
-		}),
-		[
-			busyProducerIds,
-			produceFrom,
-		],
-	);
+	return {
+		produceFrom,
+	};
 }
 
 function producerPlacementSourceIds(placements: readonly ProducerPlacement[]) {

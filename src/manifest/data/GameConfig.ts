@@ -1,14 +1,6 @@
 import type { AssetDefinition } from "./asset";
-import type { BuildRecipeCost, ItemBuildRecipe } from "./build";
 import type { CraftRecipeInput, ItemCraftRecipe } from "./craft";
-import type {
-	AssetId,
-	BuildRecipeId,
-	CraftRecipeId,
-	ItemId,
-	MergeDefinitionId,
-	ResourceId,
-} from "./manifestId";
+import type { AssetId, CraftRecipeId, ItemId, MergeDefinitionId, ResourceId } from "./manifestId";
 import type { ItemDefinition } from "./item";
 import type { ItemMergeRule } from "./itemMergeRule";
 import type {
@@ -1502,7 +1494,7 @@ function item(
 	description: string,
 	tags: readonly string[],
 	sort: number,
-	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "build" | "craft"> = {},
+	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "craft"> = {},
 ): ItemDefinition {
 	return {
 		id,
@@ -1537,25 +1529,6 @@ function combo(
 		withItemId,
 		resultItemId,
 		secret,
-	};
-}
-
-function build(
-	id: BuildRecipeId,
-	resultItemId: ItemId,
-	costs: readonly BuildRecipeCost[],
-): ItemBuildRecipe {
-	return {
-		id,
-		resultItemId,
-		costs,
-	};
-}
-
-function cost(itemId: ItemId, quantity: number): BuildRecipeCost {
-	return {
-		itemId,
-		quantity,
 	};
 }
 

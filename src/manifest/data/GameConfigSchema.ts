@@ -129,18 +129,6 @@ export const GameConfigSchema = z.object({
 						.optional(),
 				})
 				.optional(),
-			build: z
-				.object({
-					id: z.string().startsWith("build:"),
-					resultItemId: ItemIdSchema,
-					costs: z.array(
-						z.object({
-							itemId: ItemIdSchema,
-							quantity: PositiveIntegerSchema,
-						}),
-					),
-				})
-				.optional(),
 			craft: z
 				.object({
 					id: z.string().startsWith("craft:"),

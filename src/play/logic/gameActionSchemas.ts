@@ -80,7 +80,3 @@ export const ProduceBoardItemInputSchema = z.object({
 	boardItemId: BoardItemIdSchema,
 	activation: GameActionActivationSchema.default("single"),
 });
-export const BuildRecipeInputSchema = z.object({
-	recipeId: z.string().startsWith("build:"),
-	...BoardCellSchema.shape,
-});

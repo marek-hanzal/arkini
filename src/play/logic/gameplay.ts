@@ -1,7 +1,6 @@
 import { mergeFx as boardMergeFx } from "~/board/fx/mergeFx";
 import { moveFx as boardMoveFx } from "~/board/fx/moveFx";
 import { swapFx as boardSwapFx } from "~/board/fx/swapFx";
-import { buildFx } from "~/build/fx/buildFx";
 import { placeFx as inventoryPlaceFx } from "~/inventory/fx/placeFx";
 import { stashFx as inventoryStashFx } from "~/inventory/fx/stashFx";
 import { swapFx as inventorySwapFx } from "~/inventory/fx/swapFx";
@@ -69,16 +68,6 @@ export function produceBoardItem(boardItemId: string, activation: "single" | "ex
 		produceFx({
 			boardItemId,
 			activation,
-		}),
-	);
-}
-
-export function buildRecipe(recipeId: string, x: number, y: number) {
-	return runEffect(
-		buildFx({
-			recipeId,
-			x,
-			y,
 		}),
 	);
 }

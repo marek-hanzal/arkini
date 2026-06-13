@@ -100,7 +100,6 @@ export function usePlayManualItemActions({
 					await invalidatePlayData([
 						"board",
 						"inventory",
-						"buildRecipes",
 						"databaseStatus",
 					]);
 					pulseBottomNav("inventory");
@@ -160,7 +159,6 @@ export function usePlayManualItemActions({
 					await invalidatePlayData([
 						"board",
 						"inventory",
-						"buildRecipes",
 						"databaseStatus",
 					]);
 				} catch (error) {

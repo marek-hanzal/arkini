@@ -58,17 +58,38 @@ export const GameConfigSchema = z.object({
 					trigger: z.literal("click"),
 					placement: z.literal("board_then_inventory"),
 					cooldownMs: PositiveIntegerSchema,
-					drops: z
+					output: z
 						.array(
-							z.union([
+							z.discriminatedUnion("type", [
 								z.object({
+									type: z.literal("guaranteed"),
 									itemId: ItemIdSchema,
-									weight: PositiveIntegerSchema,
 									quantity: QuantitySchema.optional(),
 								}),
 								z.object({
-									itemId: z.null(),
-									weight: PositiveIntegerSchema,
+									type: z.literal("chance"),
+									itemId: ItemIdSchema,
+									probability: z.number().min(0).max(1),
+									quantity: QuantitySchema.optional(),
+								}),
+								z.object({
+									type: z.literal("weighted"),
+									rolls: QuantitySchema.optional(),
+									entries: z
+										.array(
+											z.union([
+												z.object({
+													itemId: ItemIdSchema,
+													weight: PositiveIntegerSchema,
+													quantity: QuantitySchema.optional(),
+												}),
+												z.object({
+													itemId: z.null(),
+													weight: PositiveIntegerSchema,
+												}),
+											]),
+										)
+										.min(1),
 								}),
 							]),
 						)

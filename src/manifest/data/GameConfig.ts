@@ -3,7 +3,13 @@ import type { BuildRecipeCost, ItemBuildRecipe } from "./build";
 import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId } from "./manifestId";
 import type { ItemDefinition } from "./item";
 import type { ItemMergeRule } from "./itemMergeRule";
-import type { ProducerDefinition, ProducerDrop, ProducerMode, Quantity } from "./producer";
+import type {
+	ProducerDefinition,
+	ProducerMode,
+	ProducerOutput,
+	ProducerWeightedEntry,
+	Quantity,
+} from "./producer";
 
 const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
 
@@ -817,7 +823,7 @@ function cost(itemId: ItemId, quantity: number): BuildRecipeCost {
 
 function clickProducer(
 	cooldownMs: number,
-	drops: readonly ProducerDrop[],
+	output: readonly ProducerOutput[],
 	mode: ProducerMode = {
 		type: "infinite",
 	},
@@ -825,17 +831,22 @@ function clickProducer(
 	return {
 		trigger: "click",
 		placement: "board_then_inventory",
-		drops,
+		output,
 		cooldownMs,
 		mode,
 	};
 }
 
-function drops(entries: readonly ProducerDrop[]) {
-	return entries;
+function drops(entries: readonly ProducerWeightedEntry[]): ProducerOutput[] {
+	return [
+		{
+			type: "weighted",
+			entries,
+		},
+	];
 }
 
-function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ProducerDrop {
+function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ProducerWeightedEntry {
 	return {
 		itemId,
 		weight,
@@ -843,7 +854,7 @@ function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ProducerD
 	};
 }
 
-function empty(weight: number): ProducerDrop {
+function empty(weight: number): ProducerWeightedEntry {
 	return {
 		itemId: null,
 		weight,

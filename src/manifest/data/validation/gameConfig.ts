@@ -1,6 +1,14 @@
 import { parseGameConfig } from "../parseGameConfig";
 import { itemMergePairKey } from "../itemMergePairKey";
-import type { AssetId, CraftRecipeId, ItemId, MergeDefinitionId, ResourceId } from "../manifestId";
+import type {
+	AssetId,
+	CraftRecipeId,
+	ItemId,
+	LootTableId,
+	MergeDefinitionId,
+	ResourceId,
+	UpgradeId,
+} from "../manifestId";
 import type { GameConfig } from "../GameConfig";
 import { assert, assertUnique } from "./assert";
 import { assertProducerDefinition } from "./producer";
@@ -13,6 +21,8 @@ export function assertGameConfig(config: GameConfig) {
 	const itemIds = new Set<ItemId>();
 	const mergeIds = new Set<MergeDefinitionId>();
 	const resourceIds = new Set<ResourceId>();
+	const lootTableIds = new Set<LootTableId>();
+	const upgradeIds = new Set<UpgradeId>();
 	const craftIds = new Set<CraftRecipeId>();
 	const mergePairs = new Set<string>();
 
@@ -26,6 +36,9 @@ export function assertGameConfig(config: GameConfig) {
 			`starting resource references missing ${entry.resourceId}`,
 		);
 	}
+
+	for (const table of config.lootTables) assertUnique(lootTableIds, table.id, "loot table");
+	for (const upgrade of config.upgrades) assertUnique(upgradeIds, upgrade.id, "upgrade");
 
 	for (const item of config.items) {
 		assertUnique(itemIds, item.id, "item");
@@ -46,6 +59,13 @@ export function assertGameConfig(config: GameConfig) {
 			assertUnique(mergePairs, itemMergePairKey(item.id, rule.withItemId), "merge pair");
 		}
 
+		if (item.collect?.itemId) {
+			assert(
+				itemIds.has(item.collect.itemId),
+				`${item.id} collect references missing item ${item.collect.itemId}`,
+			);
+		}
+
 		if (item.craft) {
 			assertUnique(craftIds, item.craft.id, "craft recipe");
 			assert(
@@ -60,6 +80,45 @@ export function assertGameConfig(config: GameConfig) {
 		}
 
 		assertProducerDefinition(item, itemIds);
+		if (item.producer?.outputTableId) {
+			assert(
+				lootTableIds.has(item.producer.outputTableId),
+				`${item.id} producer references missing loot table ${item.producer.outputTableId}`,
+			);
+		}
+	}
+
+	for (const table of config.lootTables) {
+		assert(table.output.length > 0, `${table.id} loot table must define output`);
+	}
+
+	for (const upgrade of config.upgrades) {
+		for (const tier of upgrade.tiers) {
+			for (const cost of tier.cost) {
+				assert(
+					itemIds.has(cost.itemId),
+					`${upgrade.id} cost references missing item ${cost.itemId}`,
+				);
+			}
+			for (const effect of tier.effects) {
+				if (effect.type === "producer.cooldown.add") {
+					assert(
+						itemIds.has(effect.itemId),
+						`${upgrade.id} cooldown effect references missing item ${effect.itemId}`,
+					);
+				}
+				if (effect.type === "producer.outputTable.set") {
+					assert(
+						itemIds.has(effect.itemId),
+						`${upgrade.id} loot effect references missing item ${effect.itemId}`,
+					);
+					assert(
+						lootTableIds.has(effect.tableId),
+						`${upgrade.id} loot effect references missing table ${effect.tableId}`,
+					);
+				}
+			}
+		}
 	}
 
 	assertStartingState(config, itemIds);

@@ -18,6 +18,9 @@ export const GameConfigSchema = z.object({
 		inventory: z.object({
 			slots: z.literal(GameConfig.game.inventory.slots),
 		}),
+		playerInventory: z.object({
+			slots: z.literal(GameConfig.game.playerInventory.slots),
+		}),
 	}),
 	assets: z.array(
 		z.object({
@@ -39,6 +42,56 @@ export const GameConfigSchema = z.object({
 			description: z.string(),
 			symbol: z.string().min(1),
 			sort: NonNegativeIntegerSchema,
+		}),
+	),
+	lootTables: z.array(
+		z.object({
+			id: z.string().startsWith("loot:"),
+			name: z.string().min(1),
+			output: z.array(z.any()).min(1),
+		}),
+	),
+	upgrades: z.array(
+		z.object({
+			id: z.string().startsWith("upgrade:"),
+			code: z.string().min(1),
+			name: z.string().min(1),
+			description: z.string(),
+			sort: NonNegativeIntegerSchema,
+			tiers: z
+				.array(
+					z.object({
+						cost: z.array(
+							z.object({
+								itemId: ItemIdSchema,
+								quantity: PositiveIntegerSchema,
+							}),
+						),
+						effects: z.array(
+							z.discriminatedUnion("type", [
+								z.object({
+									type: z.literal("producer.cooldown.add"),
+									itemId: ItemIdSchema,
+									ms: z.number().int(),
+								}),
+								z.object({
+									type: z.literal("producer.outputTable.set"),
+									itemId: ItemIdSchema,
+									tableId: z.string().startsWith("loot:"),
+								}),
+								z.object({
+									type: z.literal("inventory.capacity.add"),
+									inventory: z.enum([
+										"board",
+										"player",
+									]),
+									slots: PositiveIntegerSchema,
+								}),
+							]),
+						),
+					}),
+				)
+				.min(1),
 		}),
 	),
 	items: z.array(
@@ -64,11 +117,19 @@ export const GameConfigSchema = z.object({
 					}),
 				)
 				.optional(),
+			collect: z
+				.object({
+					inventory: z.literal("player"),
+					itemId: ItemIdSchema.optional(),
+					quantity: PositiveIntegerSchema.optional(),
+				})
+				.optional(),
 			producer: z
 				.object({
 					trigger: z.literal("click"),
 					placement: z.literal("board_then_inventory"),
 					cooldownMs: PositiveIntegerSchema,
+					outputTableId: z.string().startsWith("loot:").optional(),
 					output: z
 						.array(
 							z.discriminatedUnion("type", [
@@ -146,6 +207,12 @@ export const GameConfigSchema = z.object({
 		}),
 	),
 	startingState: z.object({
+		playerInventory: z.array(
+			z.object({
+				itemId: ItemIdSchema,
+				quantity: PositiveIntegerSchema,
+			}),
+		),
 		resources: z.array(
 			z.object({
 				resourceId: ResourceIdSchema,

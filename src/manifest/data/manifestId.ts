@@ -11,3 +11,5 @@ export type ItemId = manifestId.Item;
 export type CraftRecipeId = manifestId.CraftRecipe;
 export type MergeDefinitionId = manifestId.MergeDefinition;
 export type ResourceId = manifestId.Resource;
+export type LootTableId = `loot:${string}`;
+export type UpgradeId = `upgrade:${string}`;

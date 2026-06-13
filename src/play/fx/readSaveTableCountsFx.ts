@@ -3,7 +3,13 @@ import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 
 export const readSaveTableCountsFx = Effect.fn("readSaveTableCountsFx")(function* () {
-	const [saveGameRows, boardItemRows, inventoryStackRows] = yield* dbFx((db) =>
+	const [
+		saveGameRows,
+		boardItemRows,
+		inventoryStackRows,
+		playerInventoryStackRows,
+		playerUpgradeRows,
+	] = yield* dbFx((db) =>
 		Promise.all([
 			db
 				.selectFrom(table.saveGame)
@@ -17,6 +23,14 @@ export const readSaveTableCountsFx = Effect.fn("readSaveTableCountsFx")(function
 				.selectFrom(table.inventoryStack)
 				.select((eb) => eb.fn.countAll<number>().as("count"))
 				.executeTakeFirstOrThrow(),
+			db
+				.selectFrom(table.playerInventoryStack)
+				.select((eb) => eb.fn.countAll<number>().as("count"))
+				.executeTakeFirstOrThrow(),
+			db
+				.selectFrom(table.playerUpgrade)
+				.select((eb) => eb.fn.countAll<number>().as("count"))
+				.executeTakeFirstOrThrow(),
 		]),
 	);
 
@@ -24,5 +38,7 @@ export const readSaveTableCountsFx = Effect.fn("readSaveTableCountsFx")(function
 		saveGameCount: Number(saveGameRows.count),
 		boardItemCount: Number(boardItemRows.count),
 		inventoryStackCount: Number(inventoryStackRows.count),
+		playerInventoryStackCount: Number(playerInventoryStackRows.count),
+		playerUpgradeCount: Number(playerUpgradeRows.count),
 	};
 });

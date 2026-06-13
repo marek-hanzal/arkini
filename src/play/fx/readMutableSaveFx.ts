@@ -5,34 +5,52 @@ import { defaultSaveGameId } from "~/play/logic/save";
 import {
 	BoardItemRowSchema,
 	InventoryStackRowSchema,
+	PlayerInventoryStackRowSchema,
+	PlayerUpgradeRowSchema,
 	SaveRowSchema,
 } from "~/play/logic/gameActionSchemas";
 
 export const readMutableSaveFx = Effect.fn("readMutableSaveFx")(function* () {
-	const [saveRow, boardRows, inventoryRows] = yield* dbFx((db) =>
-		Promise.all([
-			db
-				.selectFrom(table.saveGame)
-				.selectAll()
-				.where("id", "=", defaultSaveGameId)
-				.executeTakeFirstOrThrow(),
-			db
-				.selectFrom(table.boardItem)
-				.selectAll()
-				.where("saveGameId", "=", defaultSaveGameId)
-				.execute(),
-			db
-				.selectFrom(table.inventoryStack)
-				.selectAll()
-				.where("saveGameId", "=", defaultSaveGameId)
-				.orderBy("slotIndex")
-				.execute(),
-		]),
+	const [saveRow, boardRows, inventoryRows, playerInventoryRows, upgradeRows] = yield* dbFx(
+		(db) =>
+			Promise.all([
+				db
+					.selectFrom(table.saveGame)
+					.selectAll()
+					.where("id", "=", defaultSaveGameId)
+					.executeTakeFirstOrThrow(),
+				db
+					.selectFrom(table.boardItem)
+					.selectAll()
+					.where("saveGameId", "=", defaultSaveGameId)
+					.execute(),
+				db
+					.selectFrom(table.inventoryStack)
+					.selectAll()
+					.where("saveGameId", "=", defaultSaveGameId)
+					.orderBy("slotIndex")
+					.execute(),
+				db
+					.selectFrom(table.playerInventoryStack)
+					.selectAll()
+					.where("saveGameId", "=", defaultSaveGameId)
+					.orderBy("slotIndex")
+					.execute(),
+				db
+					.selectFrom(table.playerUpgrade)
+					.selectAll()
+					.where("saveGameId", "=", defaultSaveGameId)
+					.execute(),
+			]),
 	);
 
 	return {
 		save: SaveRowSchema.parse(saveRow),
 		boardRows: boardRows.map((row) => BoardItemRowSchema.parse(row)),
 		inventoryRows: inventoryRows.map((row) => InventoryStackRowSchema.parse(row)),
+		playerInventoryRows: playerInventoryRows.map((row) =>
+			PlayerInventoryStackRowSchema.parse(row),
+		),
+		upgradeRows: upgradeRows.map((row) => PlayerUpgradeRowSchema.parse(row)),
 	};
 });

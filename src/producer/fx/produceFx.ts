@@ -11,6 +11,7 @@ import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/data/manifestId";
 import type { ProducerMode } from "~/manifest/data/producer";
 import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
+import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { ProduceBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
 import type { BoardItemState, ProducerDropResult } from "~/play/logic/playTypes";
@@ -52,10 +53,16 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				return yield* Effect.fail(new GameActionError("Producer does not exist."));
 			}
 
-			const producer = gameConfig.getProducer(producerRow.itemDefinitionId);
-			if (!producer) {
+			const baseProducer = gameConfig.getProducer(producerRow.itemDefinitionId);
+			if (!baseProducer) {
 				return yield* Effect.fail(new GameActionError("This item is not a producer."));
 			}
+			const producer = applyProducerUpgradeEffects({
+				gameConfig,
+				producerItemId: producerRow.itemDefinitionId,
+				producer: baseProducer,
+				upgradeRows: mutable.upgradeRows,
+			});
 			if (producer.trigger !== "click") {
 				return yield* Effect.fail(new GameActionError("This producer runs by itself."));
 			}

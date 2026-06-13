@@ -41,6 +41,7 @@ export function createItemCatalogView({
 					],
 					canProduce: Boolean(producer),
 					producerTrigger: producer?.trigger,
+					collectible: Boolean(item.collect),
 					canMerge: gameConfig.isMergeableItem(item.id as ItemId),
 					mergeResults,
 					usedInCrafts,

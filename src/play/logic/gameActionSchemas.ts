@@ -15,6 +15,11 @@ export const InventorySlotIndexSchema = z
 	.int()
 	.min(0)
 	.max(GameConfig.game.inventory.slots - 1);
+export const PlayerInventorySlotIndexSchema = z
+	.number()
+	.int()
+	.min(0)
+	.max(GameConfig.game.playerInventory.slots + 64);
 export const BoardItemIdSchema = z.string().min(1);
 export const GameActionActivationSchema = z.enum([
 	"single",
@@ -27,6 +32,7 @@ export const SaveRowSchema = z.object({
 	boardWidth: z.literal(GameConfig.game.board.width),
 	boardHeight: z.literal(GameConfig.game.board.height),
 	inventorySlots: z.literal(GameConfig.game.inventory.slots),
+	playerInventorySlots: z.number().int().min(GameConfig.game.playerInventory.slots),
 	createdAt: z.string().min(1),
 	updatedAt: z.string().min(1),
 });
@@ -48,6 +54,25 @@ export const InventoryStackRowSchema = z.object({
 	slotIndex: InventorySlotIndexSchema,
 	itemDefinitionId: ItemIdSchema,
 	quantity: PositiveIntegerSchema,
+	createdAt: z.string().min(1),
+	updatedAt: z.string().min(1),
+});
+
+export const PlayerInventoryStackRowSchema = z.object({
+	id: z.string().min(1),
+	saveGameId: z.string().min(1),
+	slotIndex: PlayerInventorySlotIndexSchema,
+	itemDefinitionId: ItemIdSchema,
+	quantity: PositiveIntegerSchema,
+	createdAt: z.string().min(1),
+	updatedAt: z.string().min(1),
+});
+
+export const PlayerUpgradeRowSchema = z.object({
+	id: z.string().min(1),
+	saveGameId: z.string().min(1),
+	upgradeDefinitionId: z.string().startsWith("upgrade:"),
+	level: z.number().int().min(0),
 	createdAt: z.string().min(1),
 	updatedAt: z.string().min(1),
 });
@@ -79,4 +104,12 @@ export const MergeBoardItemsInputSchema = z.object({
 export const ProduceBoardItemInputSchema = z.object({
 	boardItemId: BoardItemIdSchema,
 	activation: GameActionActivationSchema.default("single"),
+});
+
+export const CollectBoardItemInputSchema = z.object({
+	boardItemId: BoardItemIdSchema,
+});
+
+export const BuyUpgradeInputSchema = z.object({
+	upgradeId: z.string().startsWith("upgrade:"),
 });

@@ -1,9 +1,10 @@
-import type { ItemId } from "./manifestId";
+import type { ItemId, LootTableId } from "./manifestId";
 
 export interface ProducerDefinition {
 	trigger: "click";
 	placement: "board_then_inventory";
 	output: readonly ProducerOutput[];
+	outputTableId?: LootTableId;
 	cooldownMs?: number;
 	mode?: ProducerMode;
 	doubleClickBehavior?: "exhaust";

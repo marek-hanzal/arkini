@@ -1,6 +1,15 @@
 import type { AssetDefinition } from "./asset";
 import type { CraftRecipeInput, ItemCraftRecipe } from "./craft";
-import type { AssetId, CraftRecipeId, ItemId, MergeDefinitionId, ResourceId } from "./manifestId";
+import type { LootTableDefinition } from "./lootTable";
+import type {
+	AssetId,
+	CraftRecipeId,
+	ItemId,
+	LootTableId,
+	MergeDefinitionId,
+	ResourceId,
+	UpgradeId,
+} from "./manifestId";
 import type { ItemDefinition } from "./item";
 import type { ItemMergeRule } from "./itemMergeRule";
 import type {
@@ -11,6 +20,7 @@ import type {
 	Quantity,
 } from "./producer";
 import type { ResourceDefinition } from "./resource";
+import type { UpgradeDefinition, UpgradeEffectDefinition, UpgradeTierDefinition } from "./upgrade";
 
 const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
 
@@ -27,6 +37,9 @@ export const GameConfig = {
 		},
 		inventory: {
 			slots: 35,
+		},
+		playerInventory: {
+			slots: 12,
 		},
 	},
 	assets: [
@@ -49,6 +62,10 @@ export const GameConfig = {
 		asset("asset:item-crystal", "Crystal", "item-crystal", 90),
 		asset("asset:item-gem", "Gem", "item-gem", 94),
 		asset("asset:item-water", "Water", "item-water", 100),
+		asset("asset:item-coin", "Coin", "item-coin", 101),
+		asset("asset:item-coin-pair", "Coin Pair", "item-coin-pair", 102),
+		asset("asset:item-coin-stack", "Coin Stack", "item-coin-stack", 103),
+		asset("asset:item-coin-chest", "Coin Chest", "item-coin-chest", 104),
 		asset("asset:item-blueprint-scrap", "Blueprint Scrap", "item-blueprint-scrap", 106),
 		asset(
 			"asset:item-blueprint-fragment",
@@ -89,6 +106,157 @@ export const GameConfig = {
 			"Premium sparkle for future bad ideas.",
 			"◆",
 			20,
+		),
+	],
+	lootTables: [
+		lootTable(
+			"loot:lumber-camp-1:better-1",
+			"Lumber Camp I Better Finds I",
+			outputs(
+				guaranteed("item:twig", 2),
+				chance("item:branch", 0.55),
+				chance("item:coin", 0.1),
+			),
+		),
+		lootTable(
+			"loot:lumber-camp-1:better-2",
+			"Lumber Camp I Better Finds II",
+			outputs(
+				guaranteed("item:branch"),
+				chance("item:twig", 0.85, {
+					min: 1,
+					max: 2,
+				}),
+				chance("item:log", 0.24),
+				chance("item:coin-pair", 0.08),
+			),
+		),
+		lootTable(
+			"loot:quarry-1:better-1",
+			"Quarry I Better Finds I",
+			outputs(
+				guaranteed("item:pebble", 2),
+				chance("item:stone", 0.5),
+				chance("item:coin", 0.1),
+			),
+		),
+		lootTable(
+			"loot:quarry-1:better-2",
+			"Quarry I Better Finds II",
+			outputs(
+				guaranteed("item:stone"),
+				chance("item:pebble", 0.85, {
+					min: 1,
+					max: 2,
+				}),
+				chance("item:ore", 0.18),
+				chance("item:coin-pair", 0.08),
+			),
+		),
+	],
+	upgrades: [
+		upgrade(
+			"upgrade:lumber-camp-1-speed",
+			"lumber-camp-1-speed",
+			"Lumber Camp I Speed",
+			"Shaves a little time off first-tier lumber production.",
+			10,
+			speedTiers("item:lumber-camp-1", [
+				cost("item:coin-stack", 1),
+				cost("item:coin-stack", 2),
+				cost("item:coin-chest", 1),
+				cost("item:coin-chest", 2),
+				cost("item:coin-chest", 3),
+			]),
+		),
+		upgrade(
+			"upgrade:quarry-1-speed",
+			"quarry-1-speed",
+			"Quarry I Speed",
+			"Makes the first quarry slightly less geological about deadlines.",
+			20,
+			speedTiers("item:quarry-1", [
+				cost("item:coin-stack", 1),
+				cost("item:coin-stack", 2),
+				cost("item:coin-chest", 1),
+				cost("item:coin-chest", 2),
+				cost("item:coin-chest", 3),
+			]),
+		),
+		upgrade(
+			"upgrade:lumber-camp-1-loot",
+			"lumber-camp-1-loot",
+			"Lumber Camp I Better Finds",
+			"Upgrades the first lumber camp loot table instead of poking random percentages with a stick.",
+			30,
+			[
+				tier(
+					[
+						cost("item:coin-stack", 2),
+					],
+					[
+						setLootTable("item:lumber-camp-1", "loot:lumber-camp-1:better-1"),
+					],
+				),
+				tier(
+					[
+						cost("item:coin-chest", 2),
+					],
+					[
+						setLootTable("item:lumber-camp-1", "loot:lumber-camp-1:better-2"),
+					],
+				),
+			],
+		),
+		upgrade(
+			"upgrade:quarry-1-loot",
+			"quarry-1-loot",
+			"Quarry I Better Finds",
+			"Lets the first quarry find better rocks, because apparently holes need career growth.",
+			40,
+			[
+				tier(
+					[
+						cost("item:coin-stack", 2),
+					],
+					[
+						setLootTable("item:quarry-1", "loot:quarry-1:better-1"),
+					],
+				),
+				tier(
+					[
+						cost("item:coin-chest", 2),
+					],
+					[
+						setLootTable("item:quarry-1", "loot:quarry-1:better-2"),
+					],
+				),
+			],
+		),
+		upgrade(
+			"upgrade:player-inventory-capacity",
+			"player-inventory-capacity",
+			"Bigger Player Pouch",
+			"Adds room for more collected valuables, because shiny clutter scales horizontally.",
+			50,
+			[
+				tier(
+					[
+						cost("item:coin-chest", 1),
+					],
+					[
+						capacity("player", 4),
+					],
+				),
+				tier(
+					[
+						cost("item:coin-chest", 2),
+					],
+					[
+						capacity("player", 4),
+					],
+				),
+			],
 		),
 	],
 	items: [
@@ -210,7 +378,11 @@ export const GameConfig = {
 			{
 				producer: clickProducer(
 					6200,
-					outputs(guaranteed("item:twig", 2), chance("item:branch", 0.35)),
+					outputs(
+						guaranteed("item:twig", 2),
+						chance("item:branch", 0.35),
+						chance("item:coin", 0.08),
+					),
 				),
 			},
 		),
@@ -451,6 +623,84 @@ export const GameConfig = {
 				"water",
 			],
 			100,
+		),
+
+		item(
+			"item:coin",
+			"asset:item-coin",
+			"coin",
+			"Coin",
+			1,
+			50,
+			"A small metal excuse for progression.",
+			[
+				"collectible",
+				"currency",
+			],
+			180,
+			{
+				merge: [
+					same("merge:coin-coin-pair", "item:coin", "item:coin-pair"),
+				],
+				collect: collectible(),
+			},
+		),
+		item(
+			"item:coin-pair",
+			"asset:item-coin-pair",
+			"coin-pair",
+			"Coin Pair",
+			2,
+			40,
+			"Two coins. Somehow this already feels like accounting.",
+			[
+				"collectible",
+				"currency",
+			],
+			182,
+			{
+				merge: [
+					same("merge:coin-pair-stack", "item:coin-pair", "item:coin-stack"),
+				],
+				collect: collectible(),
+			},
+		),
+		item(
+			"item:coin-stack",
+			"asset:item-coin-stack",
+			"coin-stack",
+			"Coin Stack",
+			3,
+			30,
+			"A stack of little reasons to open the upgrades sheet.",
+			[
+				"collectible",
+				"currency",
+			],
+			184,
+			{
+				merge: [
+					same("merge:coin-stack-chest", "item:coin-stack", "item:coin-chest"),
+				],
+				collect: collectible(),
+			},
+		),
+		item(
+			"item:coin-chest",
+			"asset:item-coin-chest",
+			"coin-chest",
+			"Coin Chest",
+			4,
+			20,
+			"A boxed-up upgrade fund. Finally, clutter with ambition.",
+			[
+				"collectible",
+				"currency",
+			],
+			186,
+			{
+				collect: collectible(),
+			},
 		),
 
 		item(
@@ -932,7 +1182,11 @@ export const GameConfig = {
 				],
 				producer: clickProducer(
 					5000,
-					outputs(guaranteed("item:twig", 2), chance("item:branch", 0.35)),
+					outputs(
+						guaranteed("item:twig", 2),
+						chance("item:branch", 0.35),
+						chance("item:coin", 0.08),
+					),
 				),
 			},
 		),
@@ -1086,7 +1340,11 @@ export const GameConfig = {
 				],
 				producer: clickProducer(
 					5500,
-					outputs(guaranteed("item:pebble", 2), chance("item:stone", 0.32)),
+					outputs(
+						guaranteed("item:pebble", 2),
+						chance("item:stone", 0.32),
+						chance("item:coin", 0.08),
+					),
 				),
 			},
 		),
@@ -1230,7 +1488,8 @@ export const GameConfig = {
 								drop("item:twig", 35),
 								drop("item:pebble", 35),
 								drop("item:water", 15),
-								drop("item:seed", 15),
+								drop("item:seed", 12),
+								drop("item:coin", 8),
 							]),
 							chance("item:twig", 0.18),
 						),
@@ -1269,7 +1528,8 @@ export const GameConfig = {
 								drop("item:branch", 35),
 								drop("item:stone", 35),
 								drop("item:water", 15),
-								drop("item:crate-1", 15),
+								drop("item:crate-1", 12),
+								drop("item:coin-pair", 8),
 							]),
 							chance("item:pebble", 0.22),
 						),
@@ -1309,7 +1569,8 @@ export const GameConfig = {
 								drop("item:log", 30),
 								drop("item:crystal", 30),
 								drop("item:crate-2", 20),
-								drop("item:water", 20),
+								drop("item:water", 16),
+								drop("item:coin-stack", 8),
 							]),
 							chance("item:branch", 0.24),
 						),
@@ -1348,7 +1609,8 @@ export const GameConfig = {
 								drop("item:beam", 15),
 								drop("item:crystal", 25),
 								drop("item:gem", 15),
-								drop("item:water", 20),
+								drop("item:water", 16),
+								drop("item:coin-stack", 8),
 							]),
 							chance("item:crate-3", 0.2),
 						),
@@ -1364,6 +1626,12 @@ export const GameConfig = {
 		),
 	],
 	startingState: {
+		playerInventory: [
+			{
+				itemId: "item:coin-stack",
+				quantity: 1,
+			},
+		],
 		resources: [
 			{
 				resourceId: "resource:coin",
@@ -1434,11 +1702,20 @@ export namespace GameConfig {
 			inventory: {
 				slots: number;
 			};
+			playerInventory: {
+				slots: number;
+			};
 		};
 		assets: readonly AssetDefinition[];
 		resources: readonly ResourceDefinition[];
+		lootTables: readonly LootTableDefinition[];
+		upgrades: readonly UpgradeDefinition[];
 		items: readonly ItemDefinition[];
 		startingState: {
+			playerInventory: readonly {
+				itemId: ItemId;
+				quantity: number;
+			}[];
 			resources: readonly {
 				resourceId: ResourceId;
 				quantity: number;
@@ -1494,7 +1771,7 @@ function item(
 	description: string,
 	tags: readonly string[],
 	sort: number,
-	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "craft"> = {},
+	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "craft" | "collect"> = {},
 ): ItemDefinition {
 	return {
 		id,
@@ -1548,6 +1825,105 @@ function input(itemId: ItemId, quantity: number): CraftRecipeInput {
 	return {
 		itemId,
 		quantity,
+	};
+}
+
+function collectible(itemId?: ItemId, quantity = 1): NonNullable<ItemDefinition["collect"]> {
+	return {
+		inventory: "player",
+		itemId,
+		quantity,
+	};
+}
+
+function lootTable(
+	id: LootTableId,
+	name: string,
+	output: readonly ProducerOutput[],
+): LootTableDefinition {
+	return {
+		id,
+		name,
+		output,
+	};
+}
+
+function upgrade(
+	id: UpgradeId,
+	code: string,
+	name: string,
+	description: string,
+	sort: number,
+	tiers: readonly UpgradeTierDefinition[],
+): UpgradeDefinition {
+	return {
+		id,
+		code,
+		name,
+		description,
+		sort,
+		tiers,
+	};
+}
+
+function tier(
+	cost: readonly UpgradeTierDefinition["cost"][number][],
+	effects: readonly UpgradeEffectDefinition[],
+): UpgradeTierDefinition {
+	return {
+		cost,
+		effects,
+	};
+}
+
+function cost(itemId: ItemId, quantity: number): UpgradeTierDefinition["cost"][number] {
+	return {
+		itemId,
+		quantity,
+	};
+}
+
+function speedTiers(
+	itemId: ItemId,
+	costs: readonly UpgradeTierDefinition["cost"][number][],
+): UpgradeTierDefinition[] {
+	return costs.map((entry) =>
+		tier(
+			[
+				entry,
+			],
+			[
+				{
+					type: "producer.cooldown.add",
+					itemId,
+					ms: -100,
+				},
+			],
+		),
+	);
+}
+
+function setLootTable(itemId: ItemId, tableId: LootTableId): UpgradeEffectDefinition {
+	return {
+		type: "producer.outputTable.set",
+		itemId,
+		tableId,
+	};
+}
+
+function capacity(
+	inventory: Extract<
+		UpgradeEffectDefinition,
+		{
+			type: "inventory.capacity.add";
+		}
+	>["inventory"],
+	slots: number,
+): UpgradeEffectDefinition {
+	return {
+		type: "inventory.capacity.add",
+		inventory,
+		slots,
 	};
 }
 

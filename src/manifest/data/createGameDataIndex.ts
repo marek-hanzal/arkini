@@ -18,6 +18,18 @@ export function createGameDataIndex(config: GameConfig) {
 			resource,
 		]),
 	);
+	const lootTablesById = new Map(
+		config.lootTables.map((table) => [
+			table.id,
+			table,
+		]),
+	);
+	const upgradesById = new Map(
+		config.upgrades.map((upgrade) => [
+			upgrade.id,
+			upgrade,
+		]),
+	);
 	const itemsById = new Map(
 		config.items.map((item) => [
 			item.id,
@@ -65,6 +77,8 @@ export function createGameDataIndex(config: GameConfig) {
 	return {
 		assetsById,
 		resourcesById,
+		lootTablesById,
+		upgradesById,
 		itemsById,
 		merges,
 		mergeRulesByPair,

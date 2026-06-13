@@ -11,6 +11,7 @@ import { BottomSheet } from "~/play/ui/BottomSheet";
 import { FlyerLayer } from "~/play/ui/FlyerLayer";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { PlayerInventorySheet } from "~/player/ui/PlayerInventorySheet";
+import { UpgradesSheet } from "~/upgrade/ui/UpgradesSheet";
 import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { GameItemView } from "~/item/ui/GameItemView";
@@ -170,6 +171,10 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 										void producerActions.produceFrom(item, "single");
 										return;
 									}
+									if (manualActions.canCollect(item)) {
+										void manualActions.collectBoardWithFly(item);
+										return;
+									}
 									sheets.openItem(item.id);
 								},
 								tileDoubleActivate: (item) => {
@@ -178,7 +183,13 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 										return;
 									}
 
-									if (!item.producer) void manualActions.stashBoardWithFly(item);
+									if (!item.producer) {
+										if (manualActions.canCollect(item)) {
+											void manualActions.collectBoardWithFly(item);
+											return;
+										}
+										void manualActions.stashBoardWithFly(item);
+									}
 								},
 							}}
 						/>
@@ -215,6 +226,13 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 						hidden={sheets.renderedSheet !== "player"}
 					>
 						<PlayerInventorySheet onClose={sheets.closeSheet} />
+					</section>
+
+					<section
+						className="min-h-0"
+						hidden={sheets.renderedSheet !== "upgrades"}
+					>
+						<UpgradesSheet onClose={sheets.closeSheet} />
 					</section>
 
 					<section

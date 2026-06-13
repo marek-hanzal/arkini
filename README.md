@@ -21,8 +21,10 @@ Item definitions drive behavior. An item may define:
 
 - normal merge rules, for example `seed + seed -> sprout`
 - mixed/secret merge rules, for example `twig + water -> sprout`
-- click producers, including finite crates that exhaust all charges on double tap
+- click producers with batch output: guaranteed drops, chance drops, and weighted rolls
+- finite crates that exhaust all charges on double tap
 - optional item display labels, for reused building art with tiny level numbers
+- player resources such as coins and diamonds, kept separate from the item-grid inventory
 - blueprint build recipes
 
 There are no separate static `merges`, `dropTables`, `producers`, and `buildRecipes` arrays. Those are derived indexes over the config.
@@ -38,8 +40,9 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 - Board items go into inventory by double-click/tap on the board item.
 - Inventory items go to the first empty board cell by double-click/tap inside inventory.
 - Double-click/tap an empty board cell opens the build sheet.
+- Producers can produce multiple outputs in one cycle. Guaranteed outputs, probability outputs, and weighted rolls are resolved into one batch.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
-- Click producers use cooldowns and optional finite charges.
+- Click producers use cooldowns and optional finite charges. Producer ready feedback is emitted only on a real `not-ready -> ready` transition, never on first mount, move, query refresh, or React deciding to reincarnate a node for no noble reason.
 - Finite producer exhaust deliberately dumps all remaining charges at once. Crates are meant to vomit loot, not politely ask for a calendar invite. When a finite producer is removed by depletion, the visible producer exits with an animation before board data refreshes.
 
 ## Interaction model
@@ -52,7 +55,7 @@ Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/h
 
 Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Board merge is the deliberate exception: source and target play a short pre-commit merge animation, then the mutation replaces them with the merged item. Finite producer depletion uses the same discipline: mutate, play loot against the still-visible stale view, mask the newly committed placements during the query refresh, then reveal them under the flyer layer while the depleted producer exits. Place flyers stay fully opaque while travelling; fade-to-ghost animations are banned because watching loot become transparent mid-flight is apparently how UI joins a paranormal society. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
-Inventory stash feedback holds the inventory bottom-nav highlight briefly and extends that hold when more items arrive quickly, so bursty item stashing does not flicker like a broken nightclub sign. Producer ready highlighting is CSS-only and deliberately muted; do not drive it through the GSAP cell-success animation, or the whole board starts flashing like it has unpaid emotional debt.
+Inventory stash feedback holds the inventory bottom-nav highlight briefly and extends that hold when more items arrive quickly, so bursty item stashing does not flicker like a broken nightclub sign. Producer ready feedback is tracked by producer instance id and played through GSAP only on real readiness transitions. Mounting a producer or moving it across the board must not pulse it; React mounts are not gameplay events, despite React’s best efforts to feel important.
 
 Board merge hints are handled by `src/board/hook/useDelayedMergeHints.ts`. Global mergeable-target hints appear after 750 ms while dragging a board item and disappear when the drag context changes. The currently hovered mergeable target still highlights instantly, because feedback that waits politely for permission is not feedback, it is bureaucracy.
 
@@ -66,6 +69,7 @@ usePlayItems()         static item catalog derived from GameConfig
 usePlayBoard()         board cells and board item lookup
 usePlayInventory()     inventory slots and stack lookup
 usePlayBuildRecipes()  build recipe availability derived from inventory
+usePlayPlayerInventory() player resource quantities such as coins and diamonds
 usePlayDragView()      tiny drag-only lookup composed from board + inventory
 ```
 
@@ -78,14 +82,16 @@ src/app/                         App entry, router, global styles, cross-origin 
 src/manifest/data/               GameConfig, Zod config schema, validation, derived indexes, SVG assets.
 src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.
 src/play/logic/                  Client-side game backend: bootstrap, save lifecycle, mutations, small read projections.
-src/play/hook/                   Granular React Query subscriptions, event queue, feedback, clock, sheet state, action orchestration.
+src/play/hook/                   Granular React Query subscriptions, event queue, action orchestration.
+src/play/store/                  Small Zustand stores for transient sheet, feedback, and producer UI state.
 src/play/ui/                     Main shell, sheets, bottom navigation, flyers, database status UI.
 src/drag/                        Generic DnD lifecycle and draggable/droppable surfaces.
 src/board/                       Board identity, board state logic, board UI, cell feedback.
 src/inventory/                   Inventory identity, stack planning/storage logic, inventory sheet UI.
-src/producer/                    Producer drop rolling and depletion logic.
+src/producer/                    Producer output rolling, readiness tracking, and depletion logic.
 src/build/                       Build sheet UI.
-src/item/                        Shared item tile UI.
+src/item/                        Shared item visual renderer used by board, inventory, drag overlay, and flyers.
+src/player/                      Player resource inventory UI.
 src/shared/                      Small UI/util hooks and helpers.
 ```
 
@@ -161,4 +167,4 @@ SQLite is local storage, not the final game authority. Gameplay inputs and loade
 
 ## Minimal-code philosophy
 
-Prefer direct data and small operations. Avoid class hierarchies, hidden frameworks, and helper confetti. When behavior can live on an item definition, put it in `GameConfig`. When UI state is transient, keep it in a small hook. When state must survive reloads, store it in SQLite. Everything else is probably just code wearing a fake mustache.
+Prefer direct data and small operations. Avoid class hierarchies, hidden frameworks, and helper confetti. When behavior can live on an item definition, put it in `GameConfig`. When UI state is transient, keep it in a small Zustand store or focused hook. When state must survive reloads, store it in SQLite. Everything else is probably just code wearing a fake mustache.

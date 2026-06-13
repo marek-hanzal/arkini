@@ -53,7 +53,7 @@ export const GameConfig = {
 		asset("asset:item-twig", "Twig", "item-twig", 40, "png"),
 		asset("asset:item-branch", "Branch", "item-branch", 50, "png"),
 		asset("asset:item-log", "Log", "item-log", 60, "png"),
-		asset("asset:item-wood-bundle", "Wood Bundle", "item-wood-bundle", 64),
+		asset("asset:item-wood-bundle", "Wood Bundle", "item-wood-bundle", 64, "png"),
 		asset("asset:item-plank", "Plank", "item-plank", 66),
 		asset("asset:item-beam", "Beam", "item-beam", 68),
 		asset("asset:item-pebble", "Pebble", "item-pebble", 70, "png"),
@@ -159,13 +159,6 @@ export const GameConfig = {
 		asset("asset:item-crate-sturdy", "Sturdy Crate", "item-crate-sturdy", 160),
 		asset("asset:item-crate-rare", "Rare Crate", "item-crate-rare", 170),
 		asset("asset:item-crate-epic", "Epic Crate", "item-crate-epic", 180),
-		{
-			id: "asset:ui-slot",
-			kind: "ui",
-			label: "Board Slot",
-			src: svg("ui-slot"),
-			sort: 1000,
-		},
 	],
 	resources: [] as readonly ResourceDefinition[],
 	lootTables: [

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { BoardViewItem } from "~/play/logic/playTypes";
-import { playProducerReady } from "~/play/util/animation";
+import { playProducerCooldown } from "~/play/util/animation";
 import { queryElement } from "~/shared/util/queryElement";
 import { isProducerReady } from "~/producer/logic/isProducerReady";
 
@@ -18,9 +18,9 @@ export function useProducerReadySignals(items: readonly BoardViewItem[], nowMs: 
 			const previous = previousReady.get(item.id);
 			nextReady.set(item.id, ready);
 
-			if (previous === false && ready) {
+			if (previous === true && !ready) {
 				const element = queryElement(`[data-board-cell="${item.x}:${item.y}"]`);
-				if (element) playProducerReady(element);
+				if (element) playProducerCooldown(element);
 			}
 		}
 

@@ -2,7 +2,6 @@ import type { FC } from "react";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { HardResetButton } from "~/play/ui/HardResetButton";
-import { ActionErrorPulse } from "~/play/ui/ActionErrorPulse";
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlaySave } from "~/play/hook/usePlaySave";
 import { usePlayItems } from "~/play/hook/usePlayItems";
@@ -149,7 +148,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 	return (
 		<DndContext {...drag.contextProps}>
 			<div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
-				<ActionErrorPulse pulseKey={feedback.actionErrorKey} />
 				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
 					<div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
 						<p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">

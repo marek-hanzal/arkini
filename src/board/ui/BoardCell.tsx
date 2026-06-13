@@ -89,6 +89,7 @@ export const BoardCell: FC<BoardCell.Props> = ({
 					x === boardColumns - 1 && "border-r-0",
 					y === boardRows - 1 && "border-b-0",
 					isOver && !showMergeHint && "bg-slate-800/80",
+					producerReady && !showMergeHint && !invalid && "ak-producer-ready",
 					showMergeHint && "ak-merge-target",
 					showMergeHint && isOver && "ak-merge-target-over",
 					invalid && "ak-cell-error",

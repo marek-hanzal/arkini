@@ -19,7 +19,7 @@ export function useProducerReadySignals(items: readonly BoardViewItem[], nowMs: 
 			nextReady.set(item.id, ready);
 
 			if (previous === false && ready) {
-				const element = queryElement(`[data-board-item-id="${item.id}"]`);
+				const element = queryElement(`[data-board-cell="${item.x}:${item.y}"]`);
 				if (element) playProducerReady(element);
 			}
 		}

@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { createInitialBoardState } from "~/board/logic/boardState";
 import { dbFx } from "~/database/fx/dbFx";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { GameConfig } from "~/manifest/data/GameConfig";
@@ -18,6 +19,9 @@ export namespace ensureDefaultSaveFx {
 export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 	resetExisting = false,
 }: ensureDefaultSaveFx.Props = {}) {
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
+
 	if (resetExisting) yield* dropDefaultSaveFx();
 
 	const existing = yield* dbFx((db) =>
@@ -95,7 +99,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 				db
 					.updateTable(table.saveGame)
 					.set({
-						updatedAt: new Date().toISOString(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", defaultSaveGameId)
 					.execute(),

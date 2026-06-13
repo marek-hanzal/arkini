@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { DateTime } from "luxon";
 import { usePress, type PressEvent, type PressResult } from "@react-aria/interactions";
 
 const doublePressMs = 320;
@@ -40,7 +41,7 @@ export function usePressActions({
 		preventFocusOnPress: true,
 		shouldCancelOnPointerExit: true,
 		onPress(event) {
-			const now = Date.now();
+			const now = DateTime.now().toMillis();
 			const previous = lastPressRef.current;
 			const isNearbyDouble = Boolean(
 				previous &&

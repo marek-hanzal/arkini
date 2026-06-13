@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { GameConfig } from "~/manifest/data/GameConfig";
@@ -21,7 +22,8 @@ export const syncConfigFx = Effect.fn("syncConfigFx")(function* ({
 	const hash = yield* hashConfigFx({
 		config,
 	});
-	const timestamp = new Date().toISOString();
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
 
 	return yield* withTransactionFx(
 		Effect.gen(function* () {

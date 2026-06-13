@@ -7,7 +7,7 @@ import type { ItemId } from "~/manifest/data/manifestId";
 import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MergeBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
-import { localTimestamp } from "~/play/logic/localTimestamp";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
@@ -20,6 +20,9 @@ export namespace mergeFx {
 }
 
 export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
+
 	const input = yield* Effect.try({
 		try: () => MergeBoardItemsInputSchema.parse(props),
 		catch: toGameActionError,
@@ -54,7 +57,7 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 					.set({
 						itemDefinitionId: rule.resultItemId,
 						stateJson: json(createInitialBoardState(rule.resultItemId)),
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", target.id)
 					.execute(),

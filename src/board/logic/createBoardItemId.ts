@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 export function createBoardItemId() {
-	return `board:${Date.now().toString(36)}:${crypto.randomUUID()}`;
+	return `board:${DateTime.now().toMillis().toString(36)}:${crypto.randomUUID()}`;
 }

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import type { InventoryPlacementPlan } from "~/inventory/logic/planning";
-import { localTimestamp } from "~/play/logic/localTimestamp";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 
 export namespace applyInventoryPlacementPlanFx {
@@ -14,6 +14,9 @@ export namespace applyInventoryPlacementPlanFx {
 export const applyInventoryPlacementPlanFx = Effect.fn("applyInventoryPlacementPlanFx")(function* ({
 	plan,
 }: applyInventoryPlacementPlanFx.Props) {
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
+
 	for (const placement of plan) {
 		if (placement.type === "update") {
 			yield* dbFx((db) =>
@@ -21,7 +24,7 @@ export const applyInventoryPlacementPlanFx = Effect.fn("applyInventoryPlacementP
 					.updateTable(table.inventoryStack)
 					.set({
 						quantity: placement.quantity,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", placement.stackId)
 					.execute(),

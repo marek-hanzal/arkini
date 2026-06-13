@@ -148,7 +148,7 @@ export const GameConfig = {
 			"item-blueprint-townhall-blueprint",
 			124,
 		),
-		asset("asset:item-townhall", "Town Hall", "item-townhall", 125),
+		asset("asset:item-townhall", "Town Hall", "item-townhall", 125, "png"),
 		asset("asset:item-lumber-camp", "Lumber Camp", "item-lumber-camp", 130, "png"),
 		asset("asset:item-coal", "Coal", "item-coal", 132),
 		asset("asset:item-sausage", "Sausage", "item-sausage", 134),

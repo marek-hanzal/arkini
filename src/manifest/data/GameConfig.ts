@@ -57,7 +57,7 @@ export const GameConfig = {
 		asset("asset:item-plank", "Plank", "item-plank", 66),
 		asset("asset:item-beam", "Beam", "item-beam", 68),
 		asset("asset:item-pebble", "Pebble", "item-pebble", 70, "png"),
-		asset("asset:item-stone", "Stone", "item-stone", 80),
+		asset("asset:item-stone", "Stone", "item-stone", 80, "png"),
 		asset("asset:item-stone-block", "Stone Block", "item-stone-block", 82),
 		asset("asset:item-ore", "Ore", "item-ore", 84),
 		asset("asset:item-crystal", "Crystal", "item-crystal", 90),

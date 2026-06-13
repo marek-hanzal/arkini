@@ -11,7 +11,7 @@ import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { getProducer } from "~/play/logic/gameDefinitionLookup";
 import { ProduceBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
-import { localTimestamp } from "~/play/logic/localTimestamp";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { BoardItemState, ProducerDropResult } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
@@ -38,6 +38,11 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 
 	return yield* withTransactionFx(
 		Effect.gen(function* () {
+			const date = yield* DateServiceFx;
+			const now = date.now();
+			const timestamp = now.toMillis();
+			const updatedAt = date.toTimestamp(now);
+
 			const mutable = yield* readMutableSaveFx();
 			const producerRow = mutable.boardRows.find((row) => row.id === input.boardItemId);
 			if (!producerRow) {
@@ -49,7 +54,6 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				return yield* Effect.fail(new GameActionError("This producer runs by itself."));
 			}
 
-			const timestamp = Date.now();
 			const state = readBoardState(producerRow);
 			const producerState = {
 				...(createInitialBoardState(producerRow.itemDefinitionId).producer ?? {}),
@@ -64,7 +68,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			if (
 				!isFiniteExhaust &&
 				producerState.cooldownUntil &&
-				Date.parse(producerState.cooldownUntil) > timestamp
+				(date.parseTimestampMs(producerState.cooldownUntil) ?? 0) > timestamp
 			) {
 				return yield* Effect.fail(new GameActionError("Producer is still cooling down."));
 			}
@@ -140,13 +144,15 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 							...state,
 							producer: {
 								...producerState,
-								cooldownUntil: new Date(
-									timestamp + (producer.cooldownMs ?? 0),
-								).toISOString(),
+								cooldownUntil: date.toTimestamp(
+									now.plus({
+										milliseconds: producer.cooldownMs ?? 0,
+									}),
+								),
 								remainingCharges: nextRemainingCharges,
 							},
 						} satisfies BoardItemState),
-						updatedAt: localTimestamp(),
+						updatedAt,
 					})
 					.where("id", "=", producerRow.id)
 					.execute(),

@@ -38,7 +38,7 @@ Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. E
 
 Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, producer output rolling, and save mutation pipelines. Files inside `src/**/fx/` are reserved for root `Effect.fn(...)` operations only. Pure helpers, runner helpers, cached state, context tags, service implementations, and domain types stay outside `fx/`, mostly in `logic/` or `context/`. UI feedback still happens from action results/hooks; effects do not know DOM nodes, GSAP timelines, React state, or pointer events.
 
-Database access is provided through `KyselyContextFx`; domain effects call `dbFx(...)` and wrap multi-step mutations with `withTransactionFx(...)` instead of passing `tx` through props like some cursed little dependency relay race. Randomness is provided through `RandomServiceFx`; producer rolls do not call `Math.random()` directly. The only live random implementation is `RandomServiceLive`, so deterministic/test random can be swapped in later from one place.
+Database access is provided through `KyselyContextFx`; domain effects call `dbFx(...)` and wrap multi-step mutations with `withTransactionFx(...)` instead of passing `tx` through props like some cursed little dependency relay race. Time is provided through `DateServiceFx` and represented with Luxon; domain effects use the service for timestamps, cooldown math, and timestamp parsing instead of poking global `Date` everywhere. Randomness is provided through `RandomServiceFx`; producer rolls do not call `Math.random()` directly. The random service is not a dumb wrapper: it exposes common game-random helpers such as `number(max)`, `chance(probability)`, `integerInclusive(min, max)`, and typed `weighted(entries, fallback)` picking. The only live random implementation is `RandomServiceLive`, so deterministic/test random can be swapped in later from one place.
 
 ## Gameplay model
 
@@ -95,7 +95,9 @@ src/database/local/              OPFS SQLite client, Kysely schema, migrations, 
 src/database/context/            Effect database context tags.
 src/database/fx/                 Database Effect helpers such as dbFx and withTransactionFx.
 src/database/logic/              Non-root database Effect providers/helpers.
-src/random/context/              Effect random service context tag.
+src/date/context/                Effect date/time service context tag.
+src/date/logic/                  Live Luxon date service and timestamp helpers.
+src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
 src/play/logic/                  Promise backend façade plus shared backend types/helpers.
 src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.

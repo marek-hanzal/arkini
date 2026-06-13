@@ -3,7 +3,7 @@ import { insertFx } from "~/board/fx/insertFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import type { PlacementPlan } from "~/inventory/logic/planning";
-import { localTimestamp } from "~/play/logic/localTimestamp";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { ProducerPlacement } from "~/play/logic/playTypes";
 import { defaultSaveGameId } from "~/play/logic/save";
 
@@ -16,6 +16,9 @@ export namespace applyPlacementPlanFx {
 export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* ({
 	plan,
 }: applyPlacementPlanFx.Props) {
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
+
 	const placements: ProducerPlacement[] = [];
 
 	for (const placement of plan.board) {
@@ -40,7 +43,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 					.updateTable(table.inventoryStack)
 					.set({
 						quantity: placement.quantity,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", placement.stackId)
 					.execute(),

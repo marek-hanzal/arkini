@@ -6,7 +6,7 @@ import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { getItem } from "~/play/logic/gameDefinitionLookup";
 import { SwapInventorySlotsInputSchema } from "~/play/logic/gameActionSchemas";
-import { localTimestamp } from "~/play/logic/localTimestamp";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { spendStackFx } from "./spendStackFx";
@@ -19,6 +19,9 @@ export namespace swapFx {
 }
 
 export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
+
 	const input = yield* Effect.try({
 		try: () => SwapInventorySlotsInputSchema.parse(props),
 		catch: toGameActionError,
@@ -46,7 +49,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 						.updateTable(table.inventoryStack)
 						.set({
 							quantity: target.quantity + movable,
-							updatedAt: localTimestamp(),
+							updatedAt: timestamp,
 						})
 						.where("id", "=", target.id)
 						.execute(),
@@ -64,7 +67,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 						.updateTable(table.inventoryStack)
 						.set({
 							slotIndex: input.targetSlotIndex,
-							updatedAt: localTimestamp(),
+							updatedAt: timestamp,
 						})
 						.where("id", "=", source.id)
 						.execute(),
@@ -77,7 +80,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 					.updateTable(table.inventoryStack)
 					.set({
 						slotIndex: -1,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", source.id)
 					.execute(),
@@ -87,7 +90,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 					.updateTable(table.inventoryStack)
 					.set({
 						slotIndex: input.sourceSlotIndex,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", target.id)
 					.execute(),
@@ -97,7 +100,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 					.updateTable(table.inventoryStack)
 					.set({
 						slotIndex: input.targetSlotIndex,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", source.id)
 					.execute(),

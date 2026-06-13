@@ -5,7 +5,7 @@ import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import type { BoardRow } from "~/inventory/logic/planning";
 import type { ProducerMode } from "~/manifest/data/producer";
-import { localTimestamp } from "~/play/logic/localTimestamp";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { ProducerDepletion } from "~/play/logic/playTypes";
 import { json } from "~/shared/json";
 
@@ -17,6 +17,9 @@ export namespace depleteFx {
 }
 
 export const depleteFx = Effect.fn("depleteFx")(function* ({ row, mode }: depleteFx.Props) {
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
+
 	return yield* match(mode)
 		.with(
 			{
@@ -45,7 +48,7 @@ export const depleteFx = Effect.fn("depleteFx")(function* ({ row, mode }: deplet
 						.set({
 							itemDefinitionId: onDepleted.replaceWithItemId,
 							stateJson: json(createInitialBoardState(onDepleted.replaceWithItemId)),
-							updatedAt: localTimestamp(),
+							updatedAt: timestamp,
 						})
 						.where("id", "=", row.id)
 						.execute();

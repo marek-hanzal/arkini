@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { match } from "ts-pattern";
 import { gameDataIndex } from "~/manifest/data/gameDataIndex";
 import type { ItemId } from "~/manifest/data/manifestId";
@@ -61,8 +62,8 @@ export function readProducerView(itemId: string, state: BoardItemState): Produce
 }
 
 function parseTimestampMs(value: string) {
-	const parsed = Date.parse(value);
-	return Number.isFinite(parsed) ? parsed : undefined;
+	const parsed = DateTime.fromISO(value);
+	return parsed.isValid ? parsed.toMillis() : undefined;
 }
 
 export function readBoardState(row: Pick<readBoardState.Row, "stateJson">) {

@@ -5,7 +5,7 @@ import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MoveBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
-import { localTimestamp } from "~/play/logic/localTimestamp";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 
@@ -18,6 +18,9 @@ export namespace moveFx {
 }
 
 export const moveFx = Effect.fn("moveFx")(function* (props: moveFx.Props) {
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
+
 	const input = yield* Effect.try({
 		try: () => MoveBoardItemInputSchema.parse(props),
 		catch: toGameActionError,
@@ -47,7 +50,7 @@ export const moveFx = Effect.fn("moveFx")(function* (props: moveFx.Props) {
 					.set({
 						x: input.x,
 						y: input.y,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", boardItem.id)
 					.execute(),

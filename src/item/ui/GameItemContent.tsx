@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import { DateTime } from "luxon";
 import { getProducerUiState } from "~/item/logic/getProducerUiState";
 import { ItemLevelBadge } from "~/item/ui/ItemLevelBadge";
 import { ProducerBadge } from "~/item/ui/ProducerBadge";
@@ -20,7 +21,7 @@ export const GameItemContent: FC<GameItemContent.Props> = ({
 	producer,
 	producerNowMs,
 }) => {
-	const nowMs = producerNowMs ?? Date.now();
+	const nowMs = producerNowMs ?? DateTime.now().toMillis();
 	const producerUi = producer ? getProducerUiState(producer, nowMs) : undefined;
 
 	return (

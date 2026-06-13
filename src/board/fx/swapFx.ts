@@ -4,7 +4,7 @@ import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { SwapBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
-import { localTimestamp } from "~/play/logic/localTimestamp";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 
@@ -16,6 +16,9 @@ export namespace swapFx {
 }
 
 export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
+	const date = yield* DateServiceFx;
+	const timestamp = date.timestamp();
+
 	const input = yield* Effect.try({
 		try: () => SwapBoardItemsInputSchema.parse(props),
 		catch: toGameActionError,
@@ -37,7 +40,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 					.set({
 						x: -1,
 						y: -1,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", source.id)
 					.execute(),
@@ -48,7 +51,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 					.set({
 						x: source.x,
 						y: source.y,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", target.id)
 					.execute(),
@@ -59,7 +62,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 					.set({
 						x: target.x,
 						y: target.y,
-						updatedAt: localTimestamp(),
+						updatedAt: timestamp,
 					})
 					.where("id", "=", source.id)
 					.execute(),

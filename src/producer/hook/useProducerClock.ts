@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { DateTime } from "luxon";
 import type { BoardViewItem } from "~/play/logic/playTypes";
 
 const producerClockTickMs = 250;
@@ -15,7 +16,7 @@ export function useProducerClock(items: readonly BoardViewItem[]) {
 			items,
 		],
 	);
-	const [nowMs, setNowMs] = useState(Date.now);
+	const [nowMs, setNowMs] = useState(() => DateTime.now().toMillis());
 
 	useEffect(() => {
 		const cooldowns = cooldownKey
@@ -25,16 +26,17 @@ export function useProducerClock(items: readonly BoardViewItem[]) {
 			.filter((value) => Number.isFinite(value));
 
 		if (!cooldowns.length) {
-			setNowMs(Date.now());
+			setNowMs(DateTime.now().toMillis());
 			return;
 		}
 
 		const tick = () => {
-			const nextNowMs = Date.now();
+			const nextNowMs = DateTime.now().toMillis();
 			setNowMs(nextNowMs);
 			return nextNowMs;
 		};
-		const hasFutureCooldown = () => cooldowns.some((untilMs) => untilMs > Date.now());
+		const hasFutureCooldown = () =>
+			cooldowns.some((untilMs) => untilMs > DateTime.now().toMillis());
 
 		if (!hasFutureCooldown()) {
 			tick();

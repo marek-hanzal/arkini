@@ -1,24 +1,6 @@
-import { gameDataIndex } from "~/manifest/data/gameDataIndex";
-import { canPayCosts } from "./canPayCosts";
-import { readInventoryView } from "./readInventoryView";
-import type { BuildRecipeView } from "./playTypes";
+import { readRecipesFx } from "~/build/logic/fx/readRecipesFx";
+import { runFx } from "./fx/runFx";
 
-export async function readBuildRecipeViews(): Promise<BuildRecipeView[]> {
-	const inventory = await readInventoryView();
-
-	return gameDataIndex.buildRecipes.map((recipe) => ({
-		id: recipe.id,
-		blueprintItemId: recipe.blueprintItemId,
-		resultItemId: recipe.resultItemId,
-		costs: [
-			...recipe.costs,
-		],
-		canBuild: canPayCosts(inventory.slots, [
-			{
-				itemId: recipe.blueprintItemId,
-				quantity: 1,
-			},
-			...recipe.costs,
-		]),
-	}));
+export function readBuildRecipeViews() {
+	return runFx(readRecipesFx());
 }

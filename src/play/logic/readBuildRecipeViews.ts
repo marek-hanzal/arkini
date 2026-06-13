@@ -1,6 +1,6 @@
-import { readRecipesFx } from "~/build/logic/fx/readRecipesFx";
-import { runFx } from "./fx/runFx";
+import { readRecipesFx } from "~/build/fx/readRecipesFx";
+import { runEffect } from "./runEffect";
 
 export function readBuildRecipeViews() {
-	return runFx(readRecipesFx());
+	return runEffect(readRecipesFx());
 }

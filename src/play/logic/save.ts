@@ -1,8 +1,8 @@
-import { ensureDefaultSaveFx } from "./fx/ensureDefaultSaveFx";
-import { runFx } from "./fx/runFx";
+import { ensureDefaultSaveFx } from "../fx/ensureDefaultSaveFx";
+import { runEffect } from "./runEffect";
 
 export const defaultSaveGameId = "save:default";
 
 export function ensureDefaultSaveGame(props: ensureDefaultSaveFx.Props = {}) {
-	return runFx(ensureDefaultSaveFx(props));
+	return runEffect(ensureDefaultSaveFx(props));
 }

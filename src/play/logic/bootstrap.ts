@@ -1,13 +1,13 @@
 import { Effect } from "effect";
-import { bootstrapFx } from "./fx/bootstrapFx";
-import { hardResetFx } from "./fx/hardResetFx";
-import { readDatabasePathFx } from "./fx/readDatabasePathFx";
-import { readGameConfigHashFx } from "./fx/readGameConfigHashFx";
-import { readMigrationStateFx } from "./fx/readMigrationStateFx";
-import { runFx } from "./fx/runFx";
+import { bootstrapFx } from "../fx/bootstrapFx";
+import { hardResetFx } from "../fx/hardResetFx";
+import { readDatabasePathFx } from "../fx/readDatabasePathFx";
+import { readGameConfigHashFx } from "../fx/readGameConfigHashFx";
+import { readMigrationStateFx } from "../fx/readMigrationStateFx";
+import { runEffect } from "./runEffect";
 
 export function bootstrapDatabase() {
-	return runFx(bootstrapFx());
+	return runEffect(bootstrapFx());
 }
 
 export function readMigrationState() {
@@ -23,5 +23,5 @@ export function readGameConfigHash() {
 }
 
 export function hardResetDatabaseFile() {
-	return runFx(hardResetFx());
+	return runEffect(hardResetFx());
 }

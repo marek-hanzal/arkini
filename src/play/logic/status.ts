@@ -1,8 +1,9 @@
-import { readStatusFx, type DatabaseStatus } from "./fx/readStatusFx";
-import { runFx } from "./fx/runFx";
+import { readStatusFx } from "../fx/readStatusFx";
+import type { DatabaseStatus } from "./DatabaseStatus";
+import { runEffect } from "./runEffect";
 
 export type { DatabaseStatus };
 
 export function readDatabaseStatus(): Promise<DatabaseStatus> {
-	return runFx(readStatusFx());
+	return runEffect(readStatusFx());
 }

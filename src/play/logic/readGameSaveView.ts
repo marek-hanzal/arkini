@@ -1,6 +1,6 @@
-import { readSaveFx } from "./fx/readSaveFx";
-import { runFx } from "./fx/runFx";
+import { readSaveFx } from "../fx/readSaveFx";
+import { runEffect } from "./runEffect";
 
 export function readGameSaveView() {
-	return runFx(readSaveFx());
+	return runEffect(readSaveFx());
 }

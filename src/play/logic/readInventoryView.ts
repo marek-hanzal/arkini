@@ -1,6 +1,6 @@
-import { readViewFx } from "~/inventory/logic/fx/readViewFx";
-import { runFx } from "./fx/runFx";
+import { readViewFx } from "~/inventory/fx/readViewFx";
+import { runEffect } from "./runEffect";
 
 export function readInventoryView() {
-	return runFx(readViewFx());
+	return runEffect(readViewFx());
 }

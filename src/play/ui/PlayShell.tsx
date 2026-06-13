@@ -156,6 +156,8 @@ export function PlayShell() {
 		);
 	}
 
+	const dragSizeVariant = drag.activeDrag?.source.kind === "inventory" ? "inventory" : "board";
+
 	return (
 		<DndContext {...drag.contextProps}>
 			<div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
@@ -286,6 +288,7 @@ export function PlayShell() {
 					<GameItemView
 						item={drag.activeItem}
 						variant="drag"
+						sizeVariant={dragSizeVariant}
 						quantity={drag.activeDrag?.overlay?.quantity}
 						producer={drag.activeDrag?.overlay?.producer ?? undefined}
 						overlaySize={drag.dragPreviewRect}

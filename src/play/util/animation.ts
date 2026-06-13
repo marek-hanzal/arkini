@@ -118,6 +118,28 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 	});
 }
 
+export function playActionErrorPulse(element: HTMLElement) {
+	gsap.killTweensOf(element);
+	gsap.timeline()
+		.set(element, {
+			opacity: 0,
+			boxShadow: "inset 0 0 0 0 rgb(248 113 113 / 0)",
+		})
+		.to(element, {
+			opacity: 1,
+			boxShadow: "inset 0 0 0 0.14rem rgb(248 113 113 / 0.56)",
+			duration: 0.12,
+			ease: "power2.out",
+		})
+		.to(element, {
+			opacity: 0,
+			boxShadow: "inset 0 0 0 0.62rem rgb(248 113 113 / 0)",
+			duration: 0.24,
+			ease: "power2.out",
+			clearProps: "opacity,boxShadow",
+		});
+}
+
 export function playCellSuccess(element: HTMLElement) {
 	gsap.killTweensOf(element);
 	gsap.timeline()

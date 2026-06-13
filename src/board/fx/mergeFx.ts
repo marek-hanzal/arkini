@@ -48,16 +48,18 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 			if (craft && craftInput) {
 				const targetState = {
 					...createInitialBoardState(target.itemDefinitionId, gameConfig),
-					...createInitialBoardState(target.itemDefinitionId, gameConfig),
-					...jsonParseTarget(target.stateJson),
+					...readStoredBoardState(target.stateJson),
 				};
 				const delivered = {
 					...(targetState.craft?.delivered ?? {}),
 				};
-				delivered[source.itemDefinitionId] = Math.min(
-					craftInput.quantity,
-					(delivered[source.itemDefinitionId] ?? 0) + 1,
-				);
+				const alreadyDelivered = delivered[source.itemDefinitionId] ?? 0;
+				if (alreadyDelivered >= craftInput.quantity) {
+					return yield* Effect.fail(
+						new GameActionError("This craft input is already complete."),
+					);
+				}
+				delivered[source.itemDefinitionId] = alreadyDelivered + 1;
 				const complete = craft.inputs.every(
 					(input) => (delivered[input.itemId] ?? 0) >= input.quantity,
 				);
@@ -118,6 +120,6 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 	);
 });
 
-function jsonParseTarget(stateJson: string) {
+function readStoredBoardState(stateJson: string) {
 	return parseJson<ReturnType<typeof createInitialBoardState>>(stateJson || "{}");
 }

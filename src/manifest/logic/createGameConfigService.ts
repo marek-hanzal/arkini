@@ -48,6 +48,7 @@ export function createGameConfigService(config: GameConfig): GameConfigService {
 				itemCount: config.items.length,
 				mergeCount: index.merges.length,
 				producerCount: index.producersByItemId.size,
+				craftRecipeCount: index.craftRecipes.length,
 				dropTableCount: 0,
 			};
 		},

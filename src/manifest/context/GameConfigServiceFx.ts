@@ -13,6 +13,7 @@ export interface GameConfigSummary {
 	itemCount: number;
 	mergeCount: number;
 	producerCount: number;
+	craftRecipeCount: number;
 	dropTableCount: number;
 }
 

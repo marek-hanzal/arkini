@@ -68,7 +68,7 @@ function GameItemContent({ item, quantity, producer }: GameItemContent.Props) {
 		<div
 			data-ak-item-content
 			className={cn(
-				"relative grid h-full w-full place-items-center rounded-md text-slate-50",
+				"relative grid h-full w-full place-items-center text-slate-50",
 				producerUi?.waiting && "opacity-82",
 			)}
 		>

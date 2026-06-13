@@ -196,7 +196,7 @@ function BoardCell({
 				const showMergeHint = canMerge && (showDelayedMergeHint || isOver);
 
 				return cn(
-					"ak-board-cell relative aspect-square touch-none border-b border-r border-slate-800/80 bg-slate-900/55",
+					"relative aspect-square touch-none border-b border-r border-slate-800/65 bg-slate-900/45",
 					x === boardColumns - 1 && "border-r-0",
 					y === boardRows - 1 && "border-b-0",
 					isOver && !showMergeHint && "bg-slate-800/80",

@@ -20,6 +20,7 @@ export namespace DraggableSurface {
 		delaySingleWhenDouble?: boolean;
 		onSingleActivate?(): void;
 		onDoubleActivate?(): void;
+		onLongActivate?(): void;
 		children: ReactNode;
 	}
 }
@@ -34,6 +35,7 @@ export const DraggableSurface: FC<DraggableSurface.Props> = ({
 	delaySingleWhenDouble = false,
 	onSingleActivate,
 	onDoubleActivate,
+	onLongActivate,
 	children,
 	...props
 }) => {
@@ -49,6 +51,7 @@ export const DraggableSurface: FC<DraggableSurface.Props> = ({
 	const press = usePressActions({
 		onSingle: onSingleActivate,
 		onDouble: onDoubleActivate,
+		onLong: onLongActivate,
 		delaySingleWhenDouble,
 		isDisabled: dragDisabled,
 	});

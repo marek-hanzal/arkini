@@ -13,7 +13,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 ## Direction
 
-Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, build, and local database/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
+Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player resources, and local database/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
 The game has one gameplay source of truth: `GameConfig` in `src/manifest/data/GameConfig.ts`. It carries the game shape, board size, inventory size, assets, item definitions, item behavior, and starting state. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins.
 
@@ -25,9 +25,9 @@ Item definitions drive behavior. An item may define:
 - finite crates that exhaust all charges on double tap
 - optional item display labels, for reused building art with tiny level numbers
 - player resources such as coins and diamonds, kept separate from the item-grid inventory
-- blueprint build recipes
+- craft recipes with visible board progress, used by blueprints, growth, and any future item that wants continual construction
 
-There are no separate static `merges`, `dropTables`, `producers`, and `buildRecipes` arrays. Those are derived indexes over the config.
+There are no separate static `merges`, `dropTables`, `producers`, and `craftRecipes` arrays. Those are derived indexes over the config.
 
 
 ## Logic and Effect boundary
@@ -40,13 +40,15 @@ Effect roots own validation, typed gameplay failures, SQLite transactions, confi
 
 Database access is provided through `KyselyContextFx`; domain effects call `dbFx(...)` and wrap multi-step mutations with `withTransactionFx(...)` instead of passing `tx` through props like some cursed little dependency relay race. Browser database bootstrapping is isolated behind `BrowserDatabaseServiceFx`, so OPFS support checks, database path, and migrations do not leak into gameplay effects.
 
-Time is provided through `DateServiceFx` and represented with Luxon; domain effects use the service for timestamps, cooldown math, and timestamp parsing instead of poking global `Date` everywhere. ID generation is provided through `IdServiceFx`, so board ids and virtual inventory ids use one timestamp/UUID policy instead of scattered `crypto.randomUUID()` improv jazz.
+Time is provided through `DateServiceFx` and represented with Luxon; domain effects use the service for timestamps, cooldown math, and timestamp parsing instead of poking global `Date` everywhere. ID generation is provided through `IdServiceFx`, backed by `@paralleldrive/cuid2` through `genId`, so board ids and virtual inventory ids come from one service instead of scattered `crypto.randomUUID()` improv jazz.
 
-Static gameplay data is provided through `GameConfigServiceFx`. Effects use it for config access, derived indexes, producer/item/build lookup, merge resolution, and status summaries instead of importing `GameConfig`/`gameDataIndex` everywhere like globals are a personality. Config hashing is isolated behind `HashServiceFx`, with WebCrypto living in one live service implementation.
+Static gameplay data is provided through `GameConfigServiceFx`. Effects use it for config access, derived indexes, producer/item/craft lookup, merge resolution, and status summaries instead of importing `GameConfig`/`gameDataIndex` everywhere like globals are a personality. Config hashing is isolated behind `HashServiceFx`, with WebCrypto living in one live service implementation.
 
 Randomness is provided through `RandomServiceFx`; producer rolls do not call `Math.random()` directly. The random service is not a dumb wrapper: it exposes common game-random helpers such as `number(max)`, `chance(probability)`, `integerInclusive(min, max)`, and typed `weighted(entries, fallback)` picking. The only live random implementation is `RandomServiceLive`, so deterministic/test random can be swapped in later from one place.
 
 ## Gameplay model
+
+The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint fragments are just one content family inside that system: scraps merge into fragments, fragments into drafts, drafts into finished blueprints, and finished blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
 
 - Board size comes from `GameConfig.game.board`, currently 7×9.
 - Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.
@@ -56,7 +58,8 @@ Randomness is provided through `RandomServiceFx`; producer rolls do not call `Ma
 - Drag is intentionally local to a surface now: board item to board cell, inventory slot to inventory slot. Board↔inventory drag is obsolete.
 - Board items go into inventory by double-click/tap on the board item.
 - Inventory items go to the first empty board cell by double-click/tap inside inventory.
-- Double-click/tap an empty board cell opens the build sheet.
+- Build menu is gone. Buildings and other advanced outputs are created through board craft: merge input items into a craft target, fill its progress, then transform it into the result.
+- Craft progress lives on the board item instance and is rendered as a bottom-up fill on the tile. Blueprint construction, seed growth, and future production chains all use the same generic `craft` data model.
 - Producers can produce multiple outputs in one cycle. Guaranteed outputs, probability outputs, and weighted rolls are resolved into one batch.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
 - Click producers use cooldowns and optional finite charges. Producer ready feedback is emitted only on a real `not-ready -> ready` transition, never on first mount, move, query refresh, or React deciding to reincarnate a node for no noble reason.
@@ -85,7 +88,6 @@ usePlaySave()          boot/save metadata
 usePlayItems()         static item catalog derived from GameConfig
 usePlayBoard()         board cells and board item lookup
 usePlayInventory()     inventory slots and stack lookup
-usePlayBuildRecipes()  build recipe availability derived from inventory
 usePlayPlayerInventory() player resource quantities such as coins and diamonds
 usePlayDragView()      tiny drag-only lookup composed from board + inventory
 ```
@@ -96,7 +98,7 @@ If a component needs board data, it subscribes to board data. If it needs invent
 
 ```txt
 src/app/                         App entry, router, global styles, cross-origin isolation fallback.
-src/manifest/data/               GameConfig, Zod config schema, validation, derived indexes, SVG assets.
+src/manifest/data/               GameConfig, craft/merge/producer definitions, Zod config schema, validation, derived indexes, SVG assets.
 src/manifest/context/            Effect game config service context tag.
 src/manifest/logic/              Live config service, derived lookup helpers, and provider helper.
 src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.
@@ -120,7 +122,6 @@ src/drag/                        Generic DnD lifecycle and draggable/droppable s
 src/board/                       Board identity, board state logic, board UI, cell feedback.
 src/inventory/                   Inventory identity, stack planning/storage logic, inventory sheet UI.
 src/producer/                    Producer output rolling, readiness tracking, and depletion logic.
-src/build/                       Build sheet UI.
 src/item/                        Shared item visual renderer used by board, inventory, drag overlay, and flyers.
 src/player/                      Player resource inventory UI.
 src/shared/                      Small UI/util hooks and helpers.

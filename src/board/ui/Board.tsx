@@ -19,7 +19,7 @@ import { usePressActions } from "~/shared/hook/usePressActions";
 import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
 import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
 import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
-import { Tile } from "~/item/ui/Tile";
+import { GameItemView } from "~/item/ui/GameItemView";
 import { useProducerNow } from "~/producer/hook/useProducerNow";
 
 export namespace Board {
@@ -267,8 +267,9 @@ function BoardTile({
 			delaySingleWhenDouble={boardItem.producer?.doubleClickBehavior === "exhaust"}
 			onDoubleActivate={onDoubleActivate}
 		>
-			<Tile
+			<GameItemView
 				item={item}
+				variant="board"
 				producer={boardItem.producer}
 			/>
 		</DraggableSurface>

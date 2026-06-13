@@ -3,7 +3,7 @@ import { cn } from "~/shared/cn";
 import type { ViewItem } from "~/play/logic/playTypes";
 import type { FlyerModel } from "~/play/types";
 import { playFlyerTimeline } from "~/play/util/animation";
-import { Tile } from "~/item/ui/Tile";
+import { GameItemView } from "~/item/ui/GameItemView";
 
 export namespace Flyer {
 	export interface Props {
@@ -39,8 +39,9 @@ export function Flyer({ flyer, item, onSettle }: Flyer.Props) {
 				height: flyer.from.height,
 			}}
 		>
-			<Tile
+			<GameItemView
 				item={item}
+				variant="flyer"
 				quantity={flyer.quantity}
 				producer={flyer.producer ?? undefined}
 			/>

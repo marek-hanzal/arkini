@@ -1,6 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { loadPlayBackend } from "./loadPlayBackend";
-import { usePlayDataInvalidation } from "./usePlayDataInvalidation";
+import {
+	type PlayDataInvalidationTarget,
+	usePlayDataInvalidation,
+} from "./usePlayDataInvalidation";
 
 export function usePlayAction<TVariables, TResult = void>(
 	action: (
@@ -18,7 +21,7 @@ export function usePlayAction<TVariables, TResult = void>(
 		},
 		async onSuccess() {
 			if (options.invalidateOnSuccess === false) return;
-			await invalidatePlayData();
+			await invalidatePlayData(options.invalidateTargets);
 		},
 	});
 }
@@ -26,5 +29,6 @@ export function usePlayAction<TVariables, TResult = void>(
 export namespace usePlayAction {
 	export interface Options {
 		invalidateOnSuccess?: boolean;
+		invalidateTargets?: readonly PlayDataInvalidationTarget[];
 	}
 }

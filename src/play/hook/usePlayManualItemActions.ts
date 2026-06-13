@@ -45,6 +45,14 @@ export function usePlayManualItemActions({
 				y: number;
 			},
 		) => db.placeInventoryItem(input.slotIndex, input.x, input.y),
+		{
+			invalidateTargets: [
+				"board",
+				"inventory",
+				"buildRecipes",
+				"databaseStatus",
+			],
+		},
 	);
 	const stashBoard = usePlayAction(
 		(
@@ -54,6 +62,14 @@ export function usePlayManualItemActions({
 				slotIndex?: number;
 			},
 		) => db.stashBoardItem(input.boardItemId, input.slotIndex),
+		{
+			invalidateTargets: [
+				"board",
+				"inventory",
+				"buildRecipes",
+				"databaseStatus",
+			],
+		},
 	);
 
 	const stashBoardWithFly = useCallback(

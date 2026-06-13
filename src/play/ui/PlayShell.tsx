@@ -38,6 +38,12 @@ export function PlayShell() {
 				y: number;
 			},
 		) => db.moveBoardItem(input.boardItemId, input.x, input.y),
+		{
+			invalidateTargets: [
+				"board",
+				"databaseStatus",
+			],
+		},
 	);
 	const swapInventory = usePlayAction(
 		(
@@ -47,6 +53,13 @@ export function PlayShell() {
 				targetSlotIndex: number;
 			},
 		) => db.swapInventorySlots(input.sourceSlotIndex, input.targetSlotIndex),
+		{
+			invalidateTargets: [
+				"inventory",
+				"buildRecipes",
+				"databaseStatus",
+			],
+		},
 	);
 	const mergeBoard = usePlayAction(
 		(
@@ -56,6 +69,12 @@ export function PlayShell() {
 				targetBoardItemId: string;
 			},
 		) => db.mergeBoardItems(input.sourceBoardItemId, input.targetBoardItemId),
+		{
+			invalidateTargets: [
+				"board",
+				"databaseStatus",
+			],
+		},
 	);
 	const swapBoard = usePlayAction(
 		(
@@ -65,6 +84,12 @@ export function PlayShell() {
 				targetBoardItemId: string;
 			},
 		) => db.swapBoardItems(input.sourceBoardItemId, input.targetBoardItemId),
+		{
+			invalidateTargets: [
+				"board",
+				"databaseStatus",
+			],
+		},
 	);
 	const build = usePlayAction(
 		(
@@ -75,6 +100,14 @@ export function PlayShell() {
 				y: number;
 			},
 		) => db.buildRecipe(input.recipeId, input.x, input.y),
+		{
+			invalidateTargets: [
+				"board",
+				"inventory",
+				"buildRecipes",
+				"databaseStatus",
+			],
+		},
 	);
 
 	const drag = usePlayDraggableControl({

@@ -147,7 +147,12 @@ export function usePlayProducerActions({
 
 					const depletion = startProducerDepletion(boardItem, result);
 					await waitForPaint();
-					await invalidatePlayData();
+					await invalidatePlayData([
+						"board",
+						"inventory",
+						"buildRecipes",
+						"databaseStatus",
+					]);
 					await waitForPaint();
 					clearHiddenSources();
 					await depletion;

@@ -90,24 +90,7 @@ export const GameConfig = {
 			sort: 1000,
 		},
 	],
-	resources: [
-		resource(
-			"resource:coin",
-			"coin",
-			"Coins",
-			"Plain currency. Somehow civilization keeps trying this nonsense.",
-			"●",
-			10,
-		),
-		resource(
-			"resource:diamond",
-			"diamond",
-			"Diamonds",
-			"Premium sparkle for future bad ideas.",
-			"◆",
-			20,
-		),
-	],
+	resources: [] as readonly ResourceDefinition[],
 	lootTables: [
 		lootTable(
 			"loot:lumber-camp-1:better-1",
@@ -1632,16 +1615,10 @@ export const GameConfig = {
 				quantity: 1,
 			},
 		],
-		resources: [
-			{
-				resourceId: "resource:coin",
-				quantity: 120,
-			},
-			{
-				resourceId: "resource:diamond",
-				quantity: 8,
-			},
-		],
+		resources: [] as readonly {
+			resourceId: ResourceId;
+			quantity: number;
+		}[],
 		inventory: [
 			{
 				itemId: "item:blueprint-lumber-camp-scrap",

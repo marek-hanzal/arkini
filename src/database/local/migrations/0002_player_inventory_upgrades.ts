@@ -1,7 +1,7 @@
 import { sql, type Kysely } from "kysely";
 import type { Migration } from "kysely/migration";
 
-export const migration0003PlayerInventoryUpgrades: Migration = {
+export const migration0002PlayerInventoryUpgrades: Migration = {
 	async up(db: Kysely<unknown>) {
 		await db.schema
 			.alterTable("saveGame")

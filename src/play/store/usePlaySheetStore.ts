@@ -1,15 +1,14 @@
 import { create } from "zustand";
-import type { BoardCell } from "~/board/boardIdentity";
 import type { ActiveSheet, BottomNavSheet } from "~/play/ui/BottomNavigation";
 
 export namespace usePlaySheetStore {
 	export interface State {
 		activeSheet?: ActiveSheet;
 		renderedSheet: ActiveSheet;
-		buildCell?: BoardCell;
+		selectedBoardItemId?: string;
 		closeSheet(): void;
 		openSheet(sheet: BottomNavSheet): void;
-		openBuild(cell: BoardCell): void;
+		openItem(boardItemId: string): void;
 	}
 }
 
@@ -26,15 +25,15 @@ export const usePlaySheetStore = create<usePlaySheetStore.State>((set) => ({
 		set((state) => ({
 			renderedSheet: sheet,
 			activeSheet: state.activeSheet === sheet ? undefined : sheet,
-			buildCell: undefined,
+			selectedBoardItemId: undefined,
 		}));
 	},
-	openBuild(cell) {
+	openItem(boardItemId) {
 		blurActiveElement();
 		set({
-			buildCell: cell,
-			renderedSheet: "build",
-			activeSheet: "build",
+			selectedBoardItemId: boardItemId,
+			renderedSheet: "item",
+			activeSheet: "item",
 		});
 	},
 }));

@@ -17,6 +17,15 @@ export function createItemCatalogView({
 			const asset = gameConfig.getAsset(item.assetId);
 			if (!asset) throw new GameActionError(`Missing asset for ${item.id}`);
 			const producer = gameConfig.getProducer(item.id);
+			const mergeResults = (item.merge ?? []).map((rule) => ({
+				withItemId: rule.withItemId,
+				resultItemId: rule.resultItemId,
+				secret: rule.secret,
+			}));
+			const usedInCrafts = gameConfig.getCraftRecipesForInput(item.id).map((craft) => ({
+				targetItemId: craft.targetItemId,
+				resultItemId: craft.resultItemId,
+			}));
 
 			return [
 				item.id,
@@ -33,6 +42,8 @@ export function createItemCatalogView({
 					canProduce: Boolean(producer),
 					producerTrigger: producer?.trigger,
 					canMerge: gameConfig.isMergeableItem(item.id as ItemId),
+					mergeResults,
+					usedInCrafts,
 				} satisfies ViewItem,
 			];
 		}),

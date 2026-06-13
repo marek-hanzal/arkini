@@ -89,6 +89,11 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 									drag.activeDrag.itemId as ItemId,
 									boardItem.itemId as ItemId,
 								),
+							) ||
+							Boolean(
+								boardItem.craft?.acceptedInputItemIds.includes(
+									drag.activeDrag.itemId,
+								),
 							)
 						: false;
 				return (
@@ -100,6 +105,7 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 						canMerge={canMerge}
 						showDelayedMergeHint={showDelayedMergeHints}
 						producerReady={isProducerReady(boardItem?.producer, nowMs)}
+						craftProgress={boardItem?.craft?.progress}
 						invalid={feedback.invalidCellKey === key}
 						merged={feedback.mergedCellKey === key}
 						onEmptyDoubleActivate={actions.emptyDoubleActivate}

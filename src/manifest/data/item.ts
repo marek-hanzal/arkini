@@ -1,5 +1,6 @@
 import type { AssetId, ItemId } from "./manifestId";
 import type { ItemBuildRecipe } from "./build";
+import type { ItemCraftRecipe } from "./craft";
 import type { ItemMergeRule } from "./itemMergeRule";
 import type { ProducerDefinition } from "./producer";
 
@@ -17,4 +18,5 @@ export interface ItemDefinition {
 	merge?: readonly ItemMergeRule[];
 	producer?: ProducerDefinition;
 	build?: ItemBuildRecipe;
+	craft?: ItemCraftRecipe;
 }

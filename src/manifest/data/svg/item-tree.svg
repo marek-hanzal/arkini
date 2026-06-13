@@ -4,11 +4,11 @@
   </defs>
   <rect width="128" height="128" rx="26" fill="#0f172a" opacity="0"/>
   <g filter="url(#s)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M26 50 L96 82" stroke="#8b5a2b" stroke-width="13"/>
-    <path d="M31 70 L102 42" stroke="#a16207" stroke-width="13"/>
-    <path d="M30 84 L92 33" stroke="#7c4a21" stroke-width="12"/>
-    <path d="M50 44 C61 60 67 73 75 91" fill="none" stroke="#eab308" stroke-width="7"/>
-    <path d="M45 47 C62 43 75 42 90 45" fill="none" stroke="#facc15" stroke-width="5"/>
+    <path d="M62 103 V63" stroke="#7c4a21" stroke-width="15"/>
+    <path d="M39 101 H86" stroke="#365314" stroke-width="7"/>
+    <circle cx="50" cy="50" r="23" fill="#22c55e" stroke="#166534" stroke-width="5"/>
+    <circle cx="76" cy="46" r="25" fill="#16a34a" stroke="#166534" stroke-width="5"/>
+    <circle cx="65" cy="28" r="23" fill="#4ade80" stroke="#166534" stroke-width="5"/>
 
   </g>
 </svg>

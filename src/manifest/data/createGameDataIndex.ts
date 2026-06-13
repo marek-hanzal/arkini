@@ -51,6 +51,26 @@ export function createGameDataIndex(config: GameConfig) {
 				]
 			: [],
 	);
+	const craftRecipes = config.items.flatMap((item) =>
+		item.craft
+			? [
+					{
+						...item.craft,
+						targetItemId: item.id,
+					},
+				]
+			: [],
+	);
+	const craftRecipesByInputItemId = new Map<ItemId, typeof craftRecipes>();
+	for (const recipe of craftRecipes) {
+		for (const input of recipe.inputs) {
+			const list = craftRecipesByInputItemId.get(input.itemId) ?? [];
+			craftRecipesByInputItemId.set(input.itemId, [
+				...list,
+				recipe,
+			]);
+		}
+	}
 
 	return {
 		assetsById,
@@ -71,6 +91,20 @@ export function createGameDataIndex(config: GameConfig) {
 				recipe,
 			]),
 		),
+		craftRecipes,
+		craftRecipesById: new Map(
+			craftRecipes.map((recipe) => [
+				recipe.id,
+				recipe,
+			]),
+		),
+		craftRecipesByTargetItemId: new Map(
+			craftRecipes.map((recipe) => [
+				recipe.targetItemId,
+				recipe,
+			]),
+		),
+		craftRecipesByInputItemId,
 		producersByItemId: new Map(
 			config.items.flatMap((item) =>
 				item.producer

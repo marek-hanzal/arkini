@@ -25,6 +25,9 @@ export interface GameConfigService {
 	getItem(itemId: string): ItemDefinition | undefined;
 	getProducer(itemId: string): ProducerDefinition | undefined;
 	getBuildRecipe(recipeId: string): GameDataIndex["buildRecipes"][number] | undefined;
+	getCraftRecipe(recipeId: string): GameDataIndex["craftRecipes"][number] | undefined;
+	getCraftRecipeForTarget(itemId: string): GameDataIndex["craftRecipes"][number] | undefined;
+	getCraftRecipesForInput(itemId: string): GameDataIndex["craftRecipes"];
 	isProducer(itemId: string): boolean;
 	isMergeableItem(itemId: string): boolean;
 	resolveMergeRule(

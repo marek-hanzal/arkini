@@ -1,5 +1,6 @@
 import type { BoardCell } from "~/board/boardIdentity";
 import type { BuildRecipeCost } from "~/manifest/data/build";
+import type { CraftRecipeInput } from "~/manifest/data/craft";
 import type { BuildRecipeId, ItemId } from "~/manifest/data/manifestId";
 import type { ProducerMode } from "~/manifest/data/producer";
 
@@ -64,6 +65,15 @@ export interface ViewItem {
 	canProduce: boolean;
 	producerTrigger?: "click";
 	canMerge: boolean;
+	mergeResults?: {
+		withItemId: string;
+		resultItemId: string;
+		secret?: boolean;
+	}[];
+	usedInCrafts?: {
+		targetItemId: string;
+		resultItemId: string;
+	}[];
 }
 
 export interface BoardViewItem {
@@ -73,6 +83,7 @@ export interface BoardViewItem {
 	y: number;
 	state: BoardItemState;
 	producer?: ProducerView;
+	craft?: CraftProgressView;
 }
 
 export interface InventorySlot {
@@ -82,6 +93,30 @@ export interface InventorySlot {
 		itemId: string;
 		quantity: number;
 	};
+}
+
+export interface CraftProgressView {
+	id: string;
+	resultItemId: string;
+	inputs: CraftRecipeInput[];
+	delivered: Record<string, number>;
+	progress: number;
+	complete: boolean;
+	acceptedInputItemIds: string[];
+}
+
+export interface ItemDetailView {
+	boardItem?: BoardViewItem;
+	item: ViewItem;
+	mergeResults: {
+		withItemId: string;
+		resultItemId: string;
+		secret?: boolean;
+	}[];
+	usedInCrafts: {
+		targetItemId: string;
+		resultItemId: string;
+	}[];
 }
 
 export interface ProducerView {
@@ -122,6 +157,9 @@ export interface BoardItemState {
 	producer?: {
 		cooldownUntil?: string;
 		remainingCharges?: number;
+	};
+	craft?: {
+		delivered?: Record<string, number>;
 	};
 }
 

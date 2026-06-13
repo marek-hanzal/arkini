@@ -141,6 +141,20 @@ export const GameConfigSchema = z.object({
 					),
 				})
 				.optional(),
+			craft: z
+				.object({
+					id: z.string().startsWith("craft:"),
+					resultItemId: ItemIdSchema,
+					inputs: z
+						.array(
+							z.object({
+								itemId: ItemIdSchema,
+								quantity: PositiveIntegerSchema,
+							}),
+						)
+						.min(1),
+				})
+				.optional(),
 		}),
 	),
 	startingState: z.object({

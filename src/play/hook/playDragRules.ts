@@ -173,7 +173,12 @@ function boardToCell(
 		);
 	}
 
-	if (!resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId)) {
+	const canMerge = Boolean(
+		resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId),
+	);
+	const canCraft = Boolean(targetItem.craft?.acceptedInputItemIds.includes(source.itemId));
+
+	if (!canMerge && !canCraft) {
 		return accept({
 			hide: [
 				source.sourceId,

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { readProducerView } from "~/board/logic/boardState";
+import { readCraftView, readProducerView } from "~/board/logic/boardState";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { cellKey } from "~/board/util/cell";
@@ -35,6 +35,11 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				itemId: item.itemDefinitionId,
 				state,
 				date,
+				gameConfig,
+			}),
+			craft: readCraftView({
+				itemId: item.itemDefinitionId,
+				state,
 				gameConfig,
 			}),
 		};

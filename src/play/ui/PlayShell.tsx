@@ -2,20 +2,18 @@ import type { FC } from "react";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { ActionErrorPulse } from "~/play/ui/ActionErrorPulse";
-import type { BuildRecipeId } from "~/manifest/data/manifestId";
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlaySave } from "~/play/hook/usePlaySave";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { Board } from "~/board/ui/Board";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";
 import { BottomSheet } from "~/play/ui/BottomSheet";
-import { BuildSheet } from "~/build/ui/BuildSheet";
 import { FlyerLayer } from "~/play/ui/FlyerLayer";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { PlayerInventorySheet } from "~/player/ui/PlayerInventorySheet";
+import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { GameItemView } from "~/item/ui/GameItemView";
-import { cellKey } from "~/board/util/cell";
 import { useFlyers } from "~/play/hook/useFlyers";
 import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
 import { usePlayFeedback } from "~/play/hook/usePlayFeedback";
@@ -97,25 +95,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 			],
 		},
 	);
-	const build = usePlayAction(
-		(
-			db,
-			input: {
-				recipeId: BuildRecipeId;
-				x: number;
-				y: number;
-			},
-		) => db.buildRecipe(input.recipeId, input.x, input.y),
-		{
-			invalidateTargets: [
-				"board",
-				"inventory",
-				"buildRecipes",
-				"databaseStatus",
-			],
-		},
-	);
-
 	const drag = usePlayDraggableControl({
 		actions: {
 			moveBoard: (input) => moveBoard.mutateAsync(input),
@@ -186,10 +165,13 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 								mergedCellKey: feedback.mergedBoardCellKey,
 							}}
 							actions={{
-								emptyDoubleActivate: sheets.openBuild,
+								emptyDoubleActivate: () => undefined,
 								tileSingleActivate: (item) => {
-									if (item.producer)
+									if (item.producer) {
 										void producerActions.produceFrom(item, "single");
+										return;
+									}
+									sheets.openItem(item.id);
 								},
 								tileDoubleActivate: (item) => {
 									if (item.producer?.doubleClickBehavior === "exhaust") {
@@ -252,29 +234,11 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 
 					<section
 						className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
-						hidden={sheets.renderedSheet !== "build"}
+						hidden={sheets.renderedSheet !== "item"}
 					>
-						<BuildSheet
-							cell={sheets.buildCell}
+						<ItemDetailSheet
+							boardItemId={sheets.selectedBoardItemId}
 							onClose={sheets.closeSheet}
-							onBuild={(recipeId) => {
-								if (!sheets.buildCell) return;
-								const cell = sheets.buildCell;
-								void schedulePlayEvent("build recipe", async () => {
-									try {
-										await build.mutateAsync({
-											recipeId,
-											x: cell.x,
-											y: cell.y,
-										});
-										feedback.pulseMergeCell(cellKey(cell.x, cell.y));
-										sheets.closeSheet();
-									} catch (error) {
-										feedback.flashBoardCell(cellKey(cell.x, cell.y), "error");
-										feedback.showError(error);
-									}
-								});
-							}}
 						/>
 					</section>
 				</div>

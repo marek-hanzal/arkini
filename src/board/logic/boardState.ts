@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 import type { DateService } from "~/date/context/DateServiceFx";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 import type { ProducerMode } from "~/manifest/data/producer";
-import type { BoardItemState, ProducerView } from "~/play/logic/playTypes";
+import type { BoardItemState, CraftProgressView, ProducerView } from "~/play/logic/playTypes";
 import { parseJson } from "~/shared/json";
 
 export function createInitialBoardState(
@@ -74,6 +74,42 @@ export function readProducerView({
 		cooldownUntil,
 		cooldownUntilMs: cooldownUntil ? date.parseTimestampMs(cooldownUntil) : undefined,
 		remainingCharges: producerState.remainingCharges,
+	};
+}
+
+export namespace readCraftView {
+	export interface Props {
+		itemId: string;
+		state: BoardItemState;
+		gameConfig: GameConfigService;
+	}
+}
+
+export function readCraftView({
+	itemId,
+	state,
+	gameConfig,
+}: readCraftView.Props): CraftProgressView | undefined {
+	const recipe = gameConfig.getCraftRecipeForTarget(itemId);
+	if (!recipe) return undefined;
+
+	const delivered = state.craft?.delivered ?? {};
+	const required = recipe.inputs.reduce((sum, input) => sum + input.quantity, 0);
+	const current = recipe.inputs.reduce((sum, input) => {
+		return sum + Math.min(delivered[input.itemId] ?? 0, input.quantity);
+	}, 0);
+	const progress = required <= 0 ? 0 : Math.min(1, current / required);
+
+	return {
+		id: recipe.id,
+		resultItemId: recipe.resultItemId,
+		inputs: [
+			...recipe.inputs,
+		],
+		delivered,
+		progress,
+		complete: progress >= 1,
+		acceptedInputItemIds: recipe.inputs.map((input) => input.itemId),
 	};
 }
 

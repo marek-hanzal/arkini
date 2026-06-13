@@ -1,7 +1,13 @@
 import { createGameDataIndex } from "~/manifest/data/createGameDataIndex";
 import type { GameConfig } from "~/manifest/data/GameConfig";
 import { itemMergePairKey } from "~/manifest/data/itemMergePairKey";
-import type { AssetId, BuildRecipeId, ItemId, ResourceId } from "~/manifest/data/manifestId";
+import type {
+	AssetId,
+	BuildRecipeId,
+	CraftRecipeId,
+	ItemId,
+	ResourceId,
+} from "~/manifest/data/manifestId";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 
 export function createGameConfigService(config: GameConfig): GameConfigService {
@@ -24,6 +30,15 @@ export function createGameConfigService(config: GameConfig): GameConfigService {
 		},
 		getBuildRecipe(recipeId) {
 			return index.buildRecipesById.get(recipeId as BuildRecipeId);
+		},
+		getCraftRecipe(recipeId) {
+			return index.craftRecipesById.get(recipeId as CraftRecipeId);
+		},
+		getCraftRecipeForTarget(itemId) {
+			return index.craftRecipesByTargetItemId.get(itemId as ItemId);
+		},
+		getCraftRecipesForInput(itemId) {
+			return index.craftRecipesByInputItemId.get(itemId as ItemId) ?? [];
 		},
 		isProducer(itemId) {
 			return index.producersByItemId.has(itemId as ItemId);

@@ -1,6 +1,14 @@
 import type { AssetDefinition } from "./asset";
 import type { BuildRecipeCost, ItemBuildRecipe } from "./build";
-import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId, ResourceId } from "./manifestId";
+import type { CraftRecipeInput, ItemCraftRecipe } from "./craft";
+import type {
+	AssetId,
+	BuildRecipeId,
+	CraftRecipeId,
+	ItemId,
+	MergeDefinitionId,
+	ResourceId,
+} from "./manifestId";
 import type { ItemDefinition } from "./item";
 import type { ItemMergeRule } from "./itemMergeRule";
 import type {
@@ -35,18 +43,29 @@ export const GameConfig = {
 		asset("asset:item-leaf", "Leaf", "item-leaf", 30),
 		asset("asset:item-bush", "Bush", "item-bush", 34),
 		asset("asset:item-sapling", "Sapling", "item-sapling", 38),
+		asset("asset:item-tree", "Tree", "item-tree", 39),
 		asset("asset:item-twig", "Twig", "item-twig", 40),
 		asset("asset:item-branch", "Branch", "item-branch", 50),
 		asset("asset:item-log", "Log", "item-log", 60),
 		asset("asset:item-wood-bundle", "Wood Bundle", "item-wood-bundle", 64),
+		asset("asset:item-plank", "Plank", "item-plank", 66),
 		asset("asset:item-beam", "Beam", "item-beam", 68),
 		asset("asset:item-pebble", "Pebble", "item-pebble", 70),
 		asset("asset:item-stone", "Stone", "item-stone", 80),
+		asset("asset:item-stone-block", "Stone Block", "item-stone-block", 82),
 		asset("asset:item-ore", "Ore", "item-ore", 84),
 		asset("asset:item-crystal", "Crystal", "item-crystal", 90),
 		asset("asset:item-gem", "Gem", "item-gem", 94),
 		asset("asset:item-water", "Water", "item-water", 100),
-		asset("asset:item-blueprint", "Blueprint", "item-blueprint", 110),
+		asset("asset:item-blueprint-scrap", "Blueprint Scrap", "item-blueprint-scrap", 106),
+		asset(
+			"asset:item-blueprint-fragment",
+			"Blueprint Fragment",
+			"item-blueprint-fragment",
+			108,
+		),
+		asset("asset:item-blueprint-draft", "Blueprint Draft", "item-blueprint-draft", 110),
+		asset("asset:item-blueprint", "Finished Blueprint", "item-blueprint", 112),
 		asset("asset:item-townhall", "Town Hall", "item-townhall", 120),
 		asset("asset:item-lumber-camp", "Lumber Camp", "item-lumber-camp", 130),
 		asset("asset:item-quarry", "Quarry", "item-quarry", 140),
@@ -98,6 +117,9 @@ export const GameConfig = {
 				merge: [
 					same("merge:seed-seed-sprout", "item:seed", "item:sprout"),
 				],
+				craft: craft("craft:seed-water-sprout", "item:sprout", [
+					input("item:water", 1),
+				]),
 			},
 		),
 		item(
@@ -117,6 +139,9 @@ export const GameConfig = {
 				merge: [
 					same("merge:sprout-sprout-leaf", "item:sprout", "item:leaf"),
 				],
+				craft: craft("craft:sprout-water-sapling", "item:sapling", [
+					input("item:water", 1),
+				]),
 			},
 		),
 		item(
@@ -170,6 +195,32 @@ export const GameConfig = {
 				"plant",
 			],
 			38,
+			{
+				craft: craft("craft:sapling-water-tree", "item:tree", [
+					input("item:water", 2),
+				]),
+			},
+		),
+		item(
+			"item:tree",
+			"asset:item-tree",
+			"tree",
+			"Tree",
+			6,
+			1,
+			"A tiny forest economy waiting to happen.",
+			[
+				"producer",
+				"plant",
+				"wood",
+			],
+			39,
+			{
+				producer: clickProducer(
+					6200,
+					outputs(guaranteed("item:twig", 2), chance("item:branch", 0.35)),
+				),
+			},
 		),
 		item(
 			"item:twig",
@@ -244,10 +295,30 @@ export const GameConfig = {
 			64,
 			{
 				merge: [
-					same("merge:wood-bundle-wood-bundle-beam", "item:wood-bundle", "item:beam"),
+					same("merge:wood-bundle-wood-bundle-plank", "item:wood-bundle", "item:plank"),
 				],
 			},
 		),
+		item(
+			"item:plank",
+			"asset:item-plank",
+			"plank",
+			"Plank",
+			5,
+			20,
+			"Wood with straight edges. Humanity briefly improves.",
+			[
+				"material",
+				"wood",
+			],
+			66,
+			{
+				merge: [
+					same("merge:plank-plank-beam", "item:plank", "item:beam"),
+				],
+			},
+		),
+
 		item(
 			"item:beam",
 			"asset:item-beam",
@@ -296,11 +367,31 @@ export const GameConfig = {
 			80,
 			{
 				merge: [
-					same("merge:stone-stone-ore", "item:stone", "item:ore"),
+					same("merge:stone-stone-stone-block", "item:stone", "item:stone-block"),
 					combo("merge:stone-water-crystal", "item:water", "item:crystal", true),
 				],
 			},
 		),
+		item(
+			"item:stone-block",
+			"asset:item-stone-block",
+			"stone-block",
+			"Stone Block",
+			3,
+			30,
+			"Stone that finally agreed to geometry.",
+			[
+				"material",
+				"stone",
+			],
+			82,
+			{
+				merge: [
+					same("merge:stone-block-stone-block-ore", "item:stone-block", "item:ore"),
+				],
+			},
+		),
+
 		item(
 			"item:ore",
 			"asset:item-ore",
@@ -371,22 +462,72 @@ export const GameConfig = {
 		),
 
 		item(
-			"item:blueprint-townhall",
-			"asset:item-blueprint",
-			"blueprint-townhall",
-			"Town Hall Blueprint",
+			"item:blueprint-lumber-camp-scrap",
+			"asset:item-blueprint-scrap",
+			"blueprint-lumber-camp-scrap",
+			"Lumber Camp Blueprint Scrap",
 			1,
-			5,
-			"Consumable plan for one town hall.",
+			20,
+			"A torn clue for future construction.",
 			[
 				"blueprint",
+				"fragment",
 			],
 			200,
 			{
-				build: build("build:townhall", "item:townhall-1", [
-					cost("item:twig", 2),
-					cost("item:pebble", 2),
-				]),
+				merge: [
+					same(
+						"merge:blueprint-lumber-camp-scrap-fragment",
+						"item:blueprint-lumber-camp-scrap",
+						"item:blueprint-lumber-camp-fragment",
+					),
+				],
+			},
+		),
+		item(
+			"item:blueprint-lumber-camp-fragment",
+			"asset:item-blueprint-fragment",
+			"blueprint-lumber-camp-fragment",
+			"Lumber Camp Blueprint Fragment",
+			2,
+			15,
+			"A bigger piece of the plan. Still not enough, naturally.",
+			[
+				"blueprint",
+				"fragment",
+			],
+			201,
+			{
+				merge: [
+					same(
+						"merge:blueprint-lumber-camp-fragment-draft",
+						"item:blueprint-lumber-camp-fragment",
+						"item:blueprint-lumber-camp-draft",
+					),
+				],
+			},
+		),
+		item(
+			"item:blueprint-lumber-camp-draft",
+			"asset:item-blueprint-draft",
+			"blueprint-lumber-camp-draft",
+			"Lumber Camp Blueprint Draft",
+			3,
+			10,
+			"Almost a full plan, which is how projects become dangerous.",
+			[
+				"blueprint",
+				"fragment",
+			],
+			202,
+			{
+				merge: [
+					same(
+						"merge:blueprint-lumber-camp-draft-final",
+						"item:blueprint-lumber-camp-draft",
+						"item:blueprint-lumber-camp",
+					),
+				],
 			},
 		),
 		item(
@@ -394,18 +535,89 @@ export const GameConfig = {
 			"asset:item-blueprint",
 			"blueprint-lumber-camp",
 			"Lumber Camp Blueprint",
-			1,
+			4,
 			5,
-			"Consumable plan for a wood producer.",
+			"Finished plan. Now feed it materials until civilization happens.",
 			[
 				"blueprint",
+				"craft-target",
 			],
-			210,
+			203,
 			{
-				build: build("build:lumber-camp", "item:lumber-camp-1", [
-					cost("item:twig", 4),
-					cost("item:branch", 1),
+				craft: craft("craft:lumber-camp", "item:lumber-camp-1", [
+					input("item:plank", 1),
+					input("item:stone-block", 1),
 				]),
+			},
+		),
+
+		item(
+			"item:blueprint-quarry-scrap",
+			"asset:item-blueprint-scrap",
+			"blueprint-quarry-scrap",
+			"Quarry Blueprint Scrap",
+			1,
+			20,
+			"A torn clue for future construction.",
+			[
+				"blueprint",
+				"fragment",
+			],
+			220,
+			{
+				merge: [
+					same(
+						"merge:blueprint-quarry-scrap-fragment",
+						"item:blueprint-quarry-scrap",
+						"item:blueprint-quarry-fragment",
+					),
+				],
+			},
+		),
+		item(
+			"item:blueprint-quarry-fragment",
+			"asset:item-blueprint-fragment",
+			"blueprint-quarry-fragment",
+			"Quarry Blueprint Fragment",
+			2,
+			15,
+			"A bigger piece of the plan. Still not enough, naturally.",
+			[
+				"blueprint",
+				"fragment",
+			],
+			221,
+			{
+				merge: [
+					same(
+						"merge:blueprint-quarry-fragment-draft",
+						"item:blueprint-quarry-fragment",
+						"item:blueprint-quarry-draft",
+					),
+				],
+			},
+		),
+		item(
+			"item:blueprint-quarry-draft",
+			"asset:item-blueprint-draft",
+			"blueprint-quarry-draft",
+			"Quarry Blueprint Draft",
+			3,
+			10,
+			"Almost a full plan, which is how projects become dangerous.",
+			[
+				"blueprint",
+				"fragment",
+			],
+			222,
+			{
+				merge: [
+					same(
+						"merge:blueprint-quarry-draft-final",
+						"item:blueprint-quarry-draft",
+						"item:blueprint-quarry",
+					),
+				],
 			},
 		),
 		item(
@@ -413,17 +625,109 @@ export const GameConfig = {
 			"asset:item-blueprint",
 			"blueprint-quarry",
 			"Quarry Blueprint",
-			1,
+			4,
 			5,
-			"Consumable plan for a stone producer.",
+			"Finished plan. Now feed it materials until civilization happens.",
 			[
 				"blueprint",
+				"craft-target",
 			],
-			220,
+			223,
 			{
-				build: build("build:quarry", "item:quarry-1", [
-					cost("item:pebble", 4),
-					cost("item:stone", 1),
+				craft: craft("craft:quarry", "item:quarry-1", [
+					input("item:beam", 1),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-townhall-scrap",
+			"asset:item-blueprint-scrap",
+			"blueprint-townhall-scrap",
+			"Town Hall Blueprint Scrap",
+			1,
+			20,
+			"A torn clue for future construction.",
+			[
+				"blueprint",
+				"fragment",
+			],
+			240,
+			{
+				merge: [
+					same(
+						"merge:blueprint-townhall-scrap-fragment",
+						"item:blueprint-townhall-scrap",
+						"item:blueprint-townhall-fragment",
+					),
+				],
+			},
+		),
+		item(
+			"item:blueprint-townhall-fragment",
+			"asset:item-blueprint-fragment",
+			"blueprint-townhall-fragment",
+			"Town Hall Blueprint Fragment",
+			2,
+			15,
+			"A bigger piece of the plan. Still not enough, naturally.",
+			[
+				"blueprint",
+				"fragment",
+			],
+			241,
+			{
+				merge: [
+					same(
+						"merge:blueprint-townhall-fragment-draft",
+						"item:blueprint-townhall-fragment",
+						"item:blueprint-townhall-draft",
+					),
+				],
+			},
+		),
+		item(
+			"item:blueprint-townhall-draft",
+			"asset:item-blueprint-draft",
+			"blueprint-townhall-draft",
+			"Town Hall Blueprint Draft",
+			3,
+			10,
+			"Almost a full plan, which is how projects become dangerous.",
+			[
+				"blueprint",
+				"fragment",
+			],
+			242,
+			{
+				merge: [
+					same(
+						"merge:blueprint-townhall-draft-final",
+						"item:blueprint-townhall-draft",
+						"item:blueprint-townhall",
+					),
+				],
+			},
+		),
+		item(
+			"item:blueprint-townhall",
+			"asset:item-blueprint",
+			"blueprint-townhall",
+			"Town Hall Blueprint",
+			4,
+			5,
+			"Finished plan. Now feed it materials until civilization happens.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			243,
+			{
+				craft: craft("craft:townhall", "item:townhall-1", [
+					input("item:beam", 1),
+					input("item:stone-block", 2),
+					input("item:gem", 1),
 				]),
 			},
 		),
@@ -451,9 +755,9 @@ export const GameConfig = {
 					3500,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp", 34),
-							drop("item:blueprint-quarry", 34),
-							drop("item:blueprint-townhall", 22),
+							drop("item:blueprint-lumber-camp-scrap", 34),
+							drop("item:blueprint-quarry-scrap", 34),
+							drop("item:blueprint-townhall-scrap", 22),
 							drop("item:crate-1", 10),
 						]),
 						chance("item:water", 0.32),
@@ -484,9 +788,9 @@ export const GameConfig = {
 					3000,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp", 22),
-							drop("item:blueprint-quarry", 22),
-							drop("item:blueprint-townhall", 16),
+							drop("item:blueprint-lumber-camp-scrap", 22),
+							drop("item:blueprint-quarry-scrap", 22),
+							drop("item:blueprint-townhall-scrap", 16),
 							drop("item:crate-1", 28),
 							drop("item:crate-2", 12),
 						]),
@@ -521,9 +825,9 @@ export const GameConfig = {
 					2500,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp", 14),
-							drop("item:blueprint-quarry", 14),
-							drop("item:blueprint-townhall", 12),
+							drop("item:blueprint-lumber-camp-scrap", 14),
+							drop("item:blueprint-quarry-scrap", 14),
+							drop("item:blueprint-townhall-scrap", 12),
 							drop("item:crate-1", 18),
 							drop("item:crate-2", 30),
 							drop("item:crate-3", 12),
@@ -560,9 +864,9 @@ export const GameConfig = {
 					2200,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp", 12),
-							drop("item:blueprint-quarry", 12),
-							drop("item:blueprint-townhall", 12),
+							drop("item:blueprint-lumber-camp-scrap", 12),
+							drop("item:blueprint-quarry-scrap", 12),
+							drop("item:blueprint-townhall-scrap", 12),
 							drop("item:crate-2", 34),
 							drop("item:crate-3", 22),
 							drop("item:crate-4", 8),
@@ -595,9 +899,9 @@ export const GameConfig = {
 					1900,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp", 10),
-							drop("item:blueprint-quarry", 10),
-							drop("item:blueprint-townhall", 10),
+							drop("item:blueprint-lumber-camp-scrap", 10),
+							drop("item:blueprint-quarry-scrap", 10),
+							drop("item:blueprint-townhall-scrap", 10),
 							drop("item:crate-2", 28),
 							drop("item:crate-3", 30),
 							drop("item:crate-4", 12),
@@ -1080,16 +1384,16 @@ export const GameConfig = {
 		],
 		inventory: [
 			{
-				itemId: "item:blueprint-townhall",
-				quantity: 1,
+				itemId: "item:blueprint-lumber-camp-scrap",
+				quantity: 4,
 			},
 			{
-				itemId: "item:blueprint-lumber-camp",
-				quantity: 1,
+				itemId: "item:blueprint-quarry-scrap",
+				quantity: 4,
 			},
 			{
-				itemId: "item:blueprint-quarry",
-				quantity: 1,
+				itemId: "item:blueprint-townhall-scrap",
+				quantity: 2,
 			},
 			{
 				itemId: "item:twig",
@@ -1198,7 +1502,7 @@ function item(
 	description: string,
 	tags: readonly string[],
 	sort: number,
-	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "build"> = {},
+	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "build" | "craft"> = {},
 ): ItemDefinition {
 	return {
 		id,
@@ -1249,6 +1553,25 @@ function build(
 }
 
 function cost(itemId: ItemId, quantity: number): BuildRecipeCost {
+	return {
+		itemId,
+		quantity,
+	};
+}
+
+function craft(
+	id: CraftRecipeId,
+	resultItemId: ItemId,
+	inputs: readonly CraftRecipeInput[],
+): ItemCraftRecipe {
+	return {
+		id,
+		resultItemId,
+		inputs,
+	};
+}
+
+function input(itemId: ItemId, quantity: number): CraftRecipeInput {
 	return {
 		itemId,
 		quantity,

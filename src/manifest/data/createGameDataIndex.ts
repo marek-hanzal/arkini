@@ -41,16 +41,6 @@ export function createGameDataIndex(config: GameConfig) {
 		mergeRulesByPair.set(itemMergePairKey(rule.sourceItemId, rule.withItemId), rule);
 	}
 
-	const buildRecipes = config.items.flatMap((item) =>
-		item.build
-			? [
-					{
-						...item.build,
-						blueprintItemId: item.id,
-					},
-				]
-			: [],
-	);
 	const craftRecipes = config.items.flatMap((item) =>
 		item.craft
 			? [
@@ -82,13 +72,6 @@ export function createGameDataIndex(config: GameConfig) {
 			merges.flatMap((rule) => [
 				rule.sourceItemId,
 				rule.withItemId,
-			]),
-		),
-		buildRecipes,
-		buildRecipesById: new Map(
-			buildRecipes.map((recipe) => [
-				recipe.id,
-				recipe,
 			]),
 		),
 		craftRecipes,

@@ -23,11 +23,6 @@ export const playQueryKeys = {
 		"game",
 		"inventory",
 	] as const,
-	buildRecipes: [
-		"arkini",
-		"game",
-		"build-recipes",
-	] as const,
 	playerInventory: [
 		"arkini",
 		"game",

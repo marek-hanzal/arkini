@@ -1,7 +1,6 @@
 import type { BoardCell } from "~/board/boardIdentity";
-import type { BuildRecipeCost } from "~/manifest/data/build";
 import type { CraftRecipeInput } from "~/manifest/data/craft";
-import type { BuildRecipeId, ItemId } from "~/manifest/data/manifestId";
+import type { ItemId } from "~/manifest/data/manifestId";
 import type { ProducerMode } from "~/manifest/data/producer";
 
 export interface GameSaveView {
@@ -39,14 +38,6 @@ export interface PlayerResourceView {
 	description: string;
 	symbol: string;
 	quantity: number;
-}
-
-export interface BuildRecipeView {
-	id: BuildRecipeId;
-	blueprintItemId: ItemId;
-	resultItemId: ItemId;
-	costs: BuildRecipeCost[];
-	canBuild: boolean;
 }
 
 export interface GameDragView {

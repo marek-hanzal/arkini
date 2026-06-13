@@ -146,7 +146,6 @@ export function usePlayProducerActions({
 					await invalidatePlayData([
 						"board",
 						"inventory",
-						"buildRecipes",
 						"databaseStatus",
 					]);
 					await waitForPaint();

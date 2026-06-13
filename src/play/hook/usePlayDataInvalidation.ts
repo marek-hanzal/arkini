@@ -9,7 +9,6 @@ export type PlayDataInvalidationTarget =
 	| "items"
 	| "board"
 	| "inventory"
-	| "buildRecipes"
 	| "playerInventory"
 	| "databaseStatus";
 
@@ -49,8 +48,6 @@ function queryKeyForTarget(target: PlayDataInvalidationTarget) {
 			return playQueryKeys.board;
 		case "inventory":
 			return playQueryKeys.inventory;
-		case "buildRecipes":
-			return playQueryKeys.buildRecipes;
 		case "playerInventory":
 			return playQueryKeys.playerInventory;
 		case "databaseStatus":

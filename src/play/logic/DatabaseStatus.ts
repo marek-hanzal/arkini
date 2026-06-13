@@ -6,7 +6,6 @@ export interface DatabaseStatus {
 	itemCount: number;
 	mergeCount: number;
 	producerCount: number;
-	buildRecipeCount: number;
 	dropTableCount: number;
 	saveGameCount: number;
 	boardItemCount: number;

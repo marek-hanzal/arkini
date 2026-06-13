@@ -60,7 +60,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 		{
 			invalidateTargets: [
 				"inventory",
-				"buildRecipes",
 				"databaseStatus",
 			],
 		},

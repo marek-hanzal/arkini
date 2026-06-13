@@ -329,7 +329,7 @@ export async function produceBoardItem(
 			{
 				length: steps,
 			},
-			() => rollProducerDrops(producer.drops),
+			() => rollProducerDrops(producer.output),
 		).flat();
 		const plan = planPlacements(
 			mutable.save,

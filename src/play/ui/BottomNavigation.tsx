@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { BottomNavButton } from "~/play/ui/BottomNavButton";
 
-export type ActiveSheet = "inventory" | "player" | "database" | "build";
+export type ActiveSheet = "inventory" | "player" | "database" | "item";
 export type BottomNavSheet = "inventory" | "player" | "database";
 
 export namespace BottomNavigation {

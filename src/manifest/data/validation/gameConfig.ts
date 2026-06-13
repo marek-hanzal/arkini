@@ -1,6 +1,13 @@
 import { parseGameConfig } from "../parseGameConfig";
 import { itemMergePairKey } from "../itemMergePairKey";
-import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId, ResourceId } from "../manifestId";
+import type {
+	AssetId,
+	BuildRecipeId,
+	CraftRecipeId,
+	ItemId,
+	MergeDefinitionId,
+	ResourceId,
+} from "../manifestId";
 import type { GameConfig } from "../GameConfig";
 import { assert, assertUnique } from "./assert";
 import { assertProducerDefinition } from "./producer";
@@ -14,6 +21,7 @@ export function assertGameConfig(config: GameConfig) {
 	const mergeIds = new Set<MergeDefinitionId>();
 	const resourceIds = new Set<ResourceId>();
 	const buildIds = new Set<BuildRecipeId>();
+	const craftIds = new Set<CraftRecipeId>();
 	const mergePairs = new Set<string>();
 
 	for (const asset of config.assets) assertUnique(assetIds, asset.id, "asset");
@@ -56,6 +64,19 @@ export function assertGameConfig(config: GameConfig) {
 				assert(
 					itemIds.has(cost.itemId),
 					`${item.build.id} references missing cost ${cost.itemId}`,
+				);
+		}
+
+		if (item.craft) {
+			assertUnique(craftIds, item.craft.id, "craft recipe");
+			assert(
+				itemIds.has(item.craft.resultItemId),
+				`${item.craft.id} references missing craft result`,
+			);
+			for (const input of item.craft.inputs)
+				assert(
+					itemIds.has(input.itemId),
+					`${item.craft.id} references missing craft input ${input.itemId}`,
 				);
 		}
 

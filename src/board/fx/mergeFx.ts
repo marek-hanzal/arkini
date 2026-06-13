@@ -9,7 +9,7 @@ import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MergeBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { json } from "~/shared/json";
+import { json, parseJson } from "~/shared/json";
 
 export namespace mergeFx {
 	export interface Props {
@@ -40,12 +40,64 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				return yield* Effect.fail(new GameActionError("Both board items must exist."));
 			}
 
+			const craft = gameConfig.getCraftRecipeForTarget(target.itemDefinitionId);
+			const craftInput = craft?.inputs.find(
+				(input) => input.itemId === source.itemDefinitionId,
+			);
+
+			if (craft && craftInput) {
+				const targetState = {
+					...createInitialBoardState(target.itemDefinitionId, gameConfig),
+					...createInitialBoardState(target.itemDefinitionId, gameConfig),
+					...jsonParseTarget(target.stateJson),
+				};
+				const delivered = {
+					...(targetState.craft?.delivered ?? {}),
+				};
+				delivered[source.itemDefinitionId] = Math.min(
+					craftInput.quantity,
+					(delivered[source.itemDefinitionId] ?? 0) + 1,
+				);
+				const complete = craft.inputs.every(
+					(input) => (delivered[input.itemId] ?? 0) >= input.quantity,
+				);
+
+				yield* dbFx((db) =>
+					db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
+				);
+				yield* dbFx((db) =>
+					db
+						.updateTable(table.boardItem)
+						.set({
+							itemDefinitionId: complete
+								? craft.resultItemId
+								: target.itemDefinitionId,
+							stateJson: json(
+								complete
+									? createInitialBoardState(craft.resultItemId, gameConfig)
+									: {
+											...targetState,
+											craft: {
+												delivered,
+											},
+										},
+							),
+							updatedAt: timestamp,
+						})
+						.where("id", "=", target.id)
+						.execute(),
+				);
+				return;
+			}
+
 			const rule = gameConfig.resolveMergeRule(
 				source.itemDefinitionId,
 				target.itemDefinitionId,
 			);
 			if (!rule) {
-				return yield* Effect.fail(new GameActionError("No merge recipe discovered here."));
+				return yield* Effect.fail(
+					new GameActionError("No merge or craft recipe discovered here."),
+				);
 			}
 
 			yield* dbFx((db) =>
@@ -65,3 +117,7 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 		}),
 	);
 });
+
+function jsonParseTarget(stateJson: string) {
+	return parseJson<ReturnType<typeof createInitialBoardState>>(stateJson || "{}");
+}

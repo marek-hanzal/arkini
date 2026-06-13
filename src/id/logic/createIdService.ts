@@ -1,14 +1,12 @@
-import type { DateService } from "~/date/context/DateServiceFx";
 import type { IdService } from "~/id/context/IdServiceFx";
+import { genId } from "~/shared/genId";
 
-export function createIdService(date: DateService): IdService {
-	const prefixed = (prefix: string) => {
-		return `${prefix}:${date.nowMs().toString(36)}:${crypto.randomUUID()}`;
-	};
+export function createIdService(): IdService {
+	const prefixed = (prefix: string) => `${prefix}:${genId()}`;
 
 	return {
 		uuid() {
-			return crypto.randomUUID();
+			return genId();
 		},
 		prefixed,
 		boardItem() {

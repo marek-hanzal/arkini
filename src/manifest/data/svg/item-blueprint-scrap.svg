@@ -4,9 +4,9 @@
   </defs>
   <rect width="128" height="128" rx="26" fill="#0b1222" opacity="0"/>
   <g filter="url(#s)" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="28" y="24" width="72" height="82" rx="8" fill="#60a5fa" stroke="#1d4ed8" stroke-width="6"/>
-    <path d="M43 43 H86 M43 87 H86 M50 54 V80 M78 54 V80 M50 54 H78 M50 80 H78" stroke="#dbeafe" stroke-width="5" fill="none"/>
-    <circle cx="43" cy="43" r="4" fill="#dbeafe"/><circle cx="86" cy="87" r="4" fill="#dbeafe"/>
+    <path d="M38 35 L78 28 L88 67 L49 82 L33 62 Z" fill="#60a5fa" stroke="#1d4ed8" stroke-width="5"/>
+    <path d="M50 50 H72 M54 62 L77 56" stroke="#dbeafe" stroke-width="5"/>
+    <path d="M39 36 L33 62 L49 58" fill="#93c5fd" opacity="0.55"/>
 
   </g>
 </svg>

@@ -7,6 +7,7 @@ import {
 } from "~/board/boardIdentity";
 import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
 import { DroppableSurface } from "~/drag/ui/DragSurface";
+import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
 import type { BoardViewItem } from "~/play/logic/playTypes";
 import type { GameDropData } from "~/play/types";
 import { cn } from "~/shared/cn";
@@ -20,6 +21,7 @@ export namespace BoardCell {
 		canMerge: boolean;
 		showDelayedMergeHint: boolean;
 		producerReady: boolean;
+		craftProgress?: number;
 		invalid: boolean;
 		merged: boolean;
 		children: ReactNode;
@@ -34,6 +36,7 @@ export const BoardCell: FC<BoardCell.Props> = ({
 	canMerge,
 	showDelayedMergeHint,
 	producerReady,
+	craftProgress,
 	invalid,
 	merged,
 	children,
@@ -93,6 +96,7 @@ export const BoardCell: FC<BoardCell.Props> = ({
 			}}
 			{...press.pressProps}
 		>
+			<BoardCellProgress progress={craftProgress} />
 			{children}
 		</DroppableSurface>
 	);

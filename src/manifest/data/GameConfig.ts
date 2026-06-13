@@ -33,12 +33,18 @@ export const GameConfig = {
 		asset("asset:item-seed", "Seed", "item-seed", 10),
 		asset("asset:item-sprout", "Sprout", "item-sprout", 20),
 		asset("asset:item-leaf", "Leaf", "item-leaf", 30),
+		asset("asset:item-bush", "Bush", "item-bush", 34),
+		asset("asset:item-sapling", "Sapling", "item-sapling", 38),
 		asset("asset:item-twig", "Twig", "item-twig", 40),
 		asset("asset:item-branch", "Branch", "item-branch", 50),
 		asset("asset:item-log", "Log", "item-log", 60),
+		asset("asset:item-wood-bundle", "Wood Bundle", "item-wood-bundle", 64),
+		asset("asset:item-beam", "Beam", "item-beam", 68),
 		asset("asset:item-pebble", "Pebble", "item-pebble", 70),
 		asset("asset:item-stone", "Stone", "item-stone", 80),
+		asset("asset:item-ore", "Ore", "item-ore", 84),
 		asset("asset:item-crystal", "Crystal", "item-crystal", 90),
+		asset("asset:item-gem", "Gem", "item-gem", 94),
 		asset("asset:item-water", "Water", "item-water", 100),
 		asset("asset:item-blueprint", "Blueprint", "item-blueprint", 110),
 		asset("asset:item-townhall", "Town Hall", "item-townhall", 120),
@@ -47,6 +53,7 @@ export const GameConfig = {
 		asset("asset:item-crate", "Common Crate", "item-crate", 150),
 		asset("asset:item-crate-sturdy", "Sturdy Crate", "item-crate-sturdy", 160),
 		asset("asset:item-crate-rare", "Rare Crate", "item-crate-rare", 170),
+		asset("asset:item-crate-epic", "Epic Crate", "item-crate-epic", 180),
 		{
 			id: "asset:ui-slot",
 			kind: "ui",
@@ -125,6 +132,44 @@ export const GameConfig = {
 				"plant",
 			],
 			30,
+			{
+				merge: [
+					same("merge:leaf-leaf-bush", "item:leaf", "item:bush"),
+				],
+			},
+		),
+		item(
+			"item:bush",
+			"asset:item-bush",
+			"bush",
+			"Bush",
+			4,
+			25,
+			"A leaf committee with roots.",
+			[
+				"material",
+				"plant",
+			],
+			34,
+			{
+				merge: [
+					same("merge:bush-bush-sapling", "item:bush", "item:sapling"),
+				],
+			},
+		),
+		item(
+			"item:sapling",
+			"asset:item-sapling",
+			"sapling",
+			"Sapling",
+			5,
+			15,
+			"Future tree, current storage problem.",
+			[
+				"material",
+				"plant",
+			],
+			38,
 		),
 		item(
 			"item:twig",
@@ -178,6 +223,44 @@ export const GameConfig = {
 				"wood",
 			],
 			60,
+			{
+				merge: [
+					same("merge:log-log-wood-bundle", "item:log", "item:wood-bundle"),
+				],
+			},
+		),
+		item(
+			"item:wood-bundle",
+			"asset:item-wood-bundle",
+			"wood-bundle",
+			"Wood Bundle",
+			4,
+			25,
+			"Several logs tied together, because one headache was not enough.",
+			[
+				"material",
+				"wood",
+			],
+			64,
+			{
+				merge: [
+					same("merge:wood-bundle-wood-bundle-beam", "item:wood-bundle", "item:beam"),
+				],
+			},
+		),
+		item(
+			"item:beam",
+			"asset:item-beam",
+			"beam",
+			"Beam",
+			5,
+			15,
+			"Wood that finally looks employable.",
+			[
+				"material",
+				"wood",
+			],
+			68,
 		),
 		item(
 			"item:pebble",
@@ -213,8 +296,27 @@ export const GameConfig = {
 			80,
 			{
 				merge: [
-					same("merge:stone-stone-crystal", "item:stone", "item:crystal"),
+					same("merge:stone-stone-ore", "item:stone", "item:ore"),
 					combo("merge:stone-water-crystal", "item:water", "item:crystal", true),
+				],
+			},
+		),
+		item(
+			"item:ore",
+			"asset:item-ore",
+			"ore",
+			"Ore",
+			3,
+			40,
+			"Stone with ambition and questionable impurities.",
+			[
+				"material",
+				"stone",
+			],
+			84,
+			{
+				merge: [
+					same("merge:ore-ore-crystal", "item:ore", "item:crystal"),
 				],
 			},
 		),
@@ -223,7 +325,7 @@ export const GameConfig = {
 			"asset:item-crystal",
 			"crystal",
 			"Crystal",
-			3,
+			4,
 			25,
 			"Shiny enough to justify bad decisions.",
 			[
@@ -232,6 +334,26 @@ export const GameConfig = {
 				"rare",
 			],
 			90,
+			{
+				merge: [
+					same("merge:crystal-crystal-gem", "item:crystal", "item:gem"),
+				],
+			},
+		),
+		item(
+			"item:gem",
+			"asset:item-gem",
+			"gem",
+			"Gem",
+			5,
+			15,
+			"A crystal with marketing budget.",
+			[
+				"material",
+				"stone",
+				"rare",
+			],
+			94,
 		),
 		item(
 			"item:water",
@@ -392,6 +514,9 @@ export const GameConfig = {
 			320,
 			{
 				label: "3",
+				merge: [
+					same("merge:townhall-3-townhall-4", "item:townhall-3", "item:townhall-4"),
+				],
 				producer: clickProducer(
 					2500,
 					outputs(
@@ -406,6 +531,80 @@ export const GameConfig = {
 						chance("item:water", 0.55, {
 							min: 1,
 							max: 2,
+						}),
+					),
+				),
+			},
+		),
+
+		item(
+			"item:townhall-4",
+			"asset:item-townhall",
+			"townhall-4",
+			"Town Hall IV",
+			4,
+			1,
+			"Bureaucracy with sparkles. Humanity had options.",
+			[
+				"producer",
+				"building",
+				"townhall",
+			],
+			324,
+			{
+				label: "4",
+				merge: [
+					same("merge:townhall-4-townhall-5", "item:townhall-4", "item:townhall-5"),
+				],
+				producer: clickProducer(
+					2200,
+					outputs(
+						weighted([
+							drop("item:blueprint-lumber-camp", 12),
+							drop("item:blueprint-quarry", 12),
+							drop("item:blueprint-townhall", 12),
+							drop("item:crate-2", 34),
+							drop("item:crate-3", 22),
+							drop("item:crate-4", 8),
+						]),
+						chance("item:water", 0.62, {
+							min: 1,
+							max: 2,
+						}),
+					),
+				),
+			},
+		),
+		item(
+			"item:townhall-5",
+			"asset:item-townhall",
+			"townhall-5",
+			"Town Hall V",
+			5,
+			1,
+			"A municipal beast with alarming confidence.",
+			[
+				"producer",
+				"building",
+				"townhall",
+			],
+			328,
+			{
+				label: "5",
+				producer: clickProducer(
+					1900,
+					outputs(
+						weighted([
+							drop("item:blueprint-lumber-camp", 10),
+							drop("item:blueprint-quarry", 10),
+							drop("item:blueprint-townhall", 10),
+							drop("item:crate-2", 28),
+							drop("item:crate-3", 30),
+							drop("item:crate-4", 12),
+						]),
+						chance("item:water", 0.72, {
+							min: 1,
+							max: 3,
 						}),
 					),
 				),
@@ -493,9 +692,79 @@ export const GameConfig = {
 			350,
 			{
 				label: "3",
+				merge: [
+					same(
+						"merge:lumber-camp-3-lumber-camp-4",
+						"item:lumber-camp-3",
+						"item:lumber-camp-4",
+					),
+				],
 				producer: clickProducer(
 					4000,
 					outputs(guaranteed("item:branch", 2), chance("item:log", 0.7)),
+				),
+			},
+		),
+
+		item(
+			"item:lumber-camp-4",
+			"asset:item-lumber-camp",
+			"lumber-camp-4",
+			"Lumber Camp IV",
+			4,
+			1,
+			"Deforestation, now with workflows.",
+			[
+				"producer",
+				"building",
+				"wood",
+			],
+			354,
+			{
+				label: "4",
+				merge: [
+					same(
+						"merge:lumber-camp-4-lumber-camp-5",
+						"item:lumber-camp-4",
+						"item:lumber-camp-5",
+					),
+				],
+				producer: clickProducer(
+					3600,
+					outputs(
+						guaranteed("item:log", 1),
+						chance("item:branch", 0.75, {
+							min: 1,
+							max: 2,
+						}),
+						chance("item:wood-bundle", 0.3),
+					),
+				),
+			},
+		),
+		item(
+			"item:lumber-camp-5",
+			"asset:item-lumber-camp",
+			"lumber-camp-5",
+			"Lumber Camp V",
+			5,
+			1,
+			"At this point the forest has filed a complaint.",
+			[
+				"producer",
+				"building",
+				"wood",
+			],
+			358,
+			{
+				label: "5",
+				producer: clickProducer(
+					3200,
+					outputs(
+						guaranteed("item:log", 2),
+						chance("item:wood-bundle", 0.55),
+						chance("item:beam", 0.18),
+					),
 				),
 			},
 		),
@@ -573,9 +842,69 @@ export const GameConfig = {
 			380,
 			{
 				label: "3",
+				merge: [
+					same("merge:quarry-3-quarry-4", "item:quarry-3", "item:quarry-4"),
+				],
 				producer: clickProducer(
 					4500,
 					outputs(guaranteed("item:stone", 2), chance("item:crystal", 0.72)),
+				),
+			},
+		),
+
+		item(
+			"item:quarry-4",
+			"asset:item-quarry",
+			"quarry-4",
+			"Quarry IV",
+			4,
+			1,
+			"A sophisticated hole. Still a hole.",
+			[
+				"producer",
+				"building",
+				"stone",
+			],
+			384,
+			{
+				label: "4",
+				merge: [
+					same("merge:quarry-4-quarry-5", "item:quarry-4", "item:quarry-5"),
+				],
+				producer: clickProducer(
+					4100,
+					outputs(
+						guaranteed("item:stone", 2),
+						chance("item:ore", 0.48),
+						chance("item:crystal", 0.28),
+					),
+				),
+			},
+		),
+		item(
+			"item:quarry-5",
+			"asset:item-quarry",
+			"quarry-5",
+			"Quarry V",
+			5,
+			1,
+			"Rocks surrender before the tap lands.",
+			[
+				"producer",
+				"building",
+				"stone",
+			],
+			388,
+			{
+				label: "5",
+				producer: clickProducer(
+					3700,
+					outputs(
+						guaranteed("item:stone", 2),
+						chance("item:ore", 0.7),
+						chance("item:crystal", 0.42),
+						chance("item:gem", 0.12),
+					),
 				),
 			},
 		),
@@ -673,6 +1002,9 @@ export const GameConfig = {
 			],
 			420,
 			{
+				merge: [
+					same("merge:crate-3-crate-4", "item:crate-3", "item:crate-4"),
+				],
 				producer: {
 					...clickProducer(
 						900,
@@ -688,6 +1020,45 @@ export const GameConfig = {
 						{
 							type: "finite",
 							charges: 5,
+							onDepleted: "remove",
+						},
+					),
+					doubleClickBehavior: "exhaust",
+				},
+			},
+		),
+
+		item(
+			"item:crate-4",
+			"asset:item-crate-epic",
+			"crate-4",
+			"Epic Crate",
+			4,
+			1,
+			"Purple box. The economy is doomed.",
+			[
+				"producer",
+				"container",
+				"rare",
+			],
+			430,
+			{
+				producer: {
+					...clickProducer(
+						900,
+						outputs(
+							weighted([
+								drop("item:wood-bundle", 25),
+								drop("item:beam", 15),
+								drop("item:crystal", 25),
+								drop("item:gem", 15),
+								drop("item:water", 20),
+							]),
+							chance("item:crate-3", 0.2),
+						),
+						{
+							type: "finite",
+							charges: 6,
 							onDepleted: "remove",
 						},
 					),

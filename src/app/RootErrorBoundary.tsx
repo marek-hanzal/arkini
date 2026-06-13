@@ -1,5 +1,4 @@
-import type { FC } from "react";
-import { HardResetButton } from "~/play/ui/HardResetButton";
+import { type FC, useState } from "react";
 
 export namespace RootErrorBoundary {
 	export interface Props {
@@ -8,7 +7,26 @@ export namespace RootErrorBoundary {
 }
 
 export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
+	const [resetState, setResetState] = useState<"idle" | "pending" | "failed">("idle");
 	const message = error instanceof Error ? error.message : String(error);
+
+	async function hardResetBrowserStorage() {
+		setResetState("pending");
+
+		try {
+			await (
+				(await navigator.storage.getDirectory()) as FileSystemDirectoryHandle & {
+					remove(options: { recursive: boolean }): Promise<void>;
+				}
+			).remove({
+				recursive: true,
+			});
+			window.location.reload();
+		} catch (error) {
+			console.error(error);
+			setResetState("failed");
+		}
+	}
 
 	return (
 		<main className="grid h-dvh w-dvw place-items-center bg-slate-950 p-4 text-slate-100">
@@ -25,7 +43,21 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 					{message}
 				</pre>
 				<div className="mt-4">
-					<HardResetButton />
+					<button
+						type="button"
+						disabled={resetState === "pending"}
+						onClick={hardResetBrowserStorage}
+						className="w-full rounded-md border border-red-300/45 bg-red-300 px-4 py-3 text-sm font-black text-slate-950 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
+					>
+						{resetState === "pending"
+							? "Dropping browser storage…"
+							: "Hard reset browser storage"}
+					</button>
+					{resetState === "failed" ? (
+						<p className="mt-3 text-sm text-red-100">
+							Reset failed. Check the console.
+						</p>
+					) : null}
 				</div>
 			</section>
 		</main>

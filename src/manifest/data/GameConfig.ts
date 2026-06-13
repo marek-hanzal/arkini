@@ -154,7 +154,7 @@ export const GameConfig = {
 		asset("asset:item-sausage", "Sausage", "item-sausage", 134),
 		asset("asset:item-beer", "Beer", "item-beer", 136),
 		asset("asset:item-coal-mine", "Coal Mine", "item-coal-mine", 138),
-		asset("asset:item-quarry", "Quarry", "item-quarry", 140),
+		asset("asset:item-quarry", "Quarry", "item-quarry", 140, "png"),
 		asset("asset:item-crate", "Common Crate", "item-crate", 150),
 		asset("asset:item-crate-sturdy", "Sturdy Crate", "item-crate-sturdy", 160),
 		asset("asset:item-crate-rare", "Rare Crate", "item-crate-rare", 170),

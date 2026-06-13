@@ -19,6 +19,7 @@ export { readBoardView } from "./readBoardView";
 export { readBuildRecipeViews } from "./readBuildRecipeViews";
 export { readGameSaveView } from "./readGameSaveView";
 export { readInventoryView } from "./readInventoryView";
+export { readPlayerInventoryView } from "./readPlayerInventoryView";
 export { readItemCatalogView } from "./readItemCatalogView";
 export { readDatabaseStatus } from "./status";
 export { canPayCosts } from "./canPayCosts";
@@ -31,6 +32,8 @@ export type {
 	GameSaveView,
 	InventorySlot,
 	InventoryView,
+	PlayerInventoryView,
+	PlayerResourceView,
 	ItemCatalogView,
 	ProducerDropResult,
 	ViewItem,

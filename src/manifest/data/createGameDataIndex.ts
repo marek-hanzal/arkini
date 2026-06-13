@@ -10,6 +10,12 @@ export function createGameDataIndex(config: GameConfig) {
 			asset,
 		]),
 	);
+	const resourcesById = new Map(
+		config.resources.map((resource) => [
+			resource.id,
+			resource,
+		]),
+	);
 	const itemsById = new Map(
 		config.items.map((item) => [
 			item.id,
@@ -46,6 +52,7 @@ export function createGameDataIndex(config: GameConfig) {
 
 	return {
 		assetsById,
+		resourcesById,
 		itemsById,
 		merges,
 		mergeRulesByPair,

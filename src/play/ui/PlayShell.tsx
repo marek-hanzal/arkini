@@ -10,6 +10,7 @@ import { BottomSheet } from "~/play/ui/BottomSheet";
 import { BuildSheet } from "~/build/ui/BuildSheet";
 import { Flyer } from "~/play/ui/Flyer";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
+import { PlayerInventorySheet } from "~/player/ui/PlayerInventorySheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { GameItemView } from "~/item/ui/GameItemView";
 import { cellKey } from "~/board/util/cell";
@@ -191,6 +192,13 @@ export function PlayShell() {
 								void manualActions.placeInventoryOnBoardWithFly(slot);
 							}}
 						/>
+					</section>
+
+					<section
+						className="min-h-0"
+						hidden={sheets.renderedSheet !== "player"}
+					>
+						<PlayerInventorySheet onClose={sheets.closeSheet} />
 					</section>
 
 					<section

@@ -1,6 +1,6 @@
 import type { AssetDefinition } from "./asset";
 import type { BuildRecipeCost, ItemBuildRecipe } from "./build";
-import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId } from "./manifestId";
+import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId, ResourceId } from "./manifestId";
 import type { ItemDefinition } from "./item";
 import type { ItemMergeRule } from "./itemMergeRule";
 import type {
@@ -10,6 +10,7 @@ import type {
 	ProducerWeightedEntry,
 	Quantity,
 } from "./producer";
+import type { ResourceDefinition } from "./resource";
 
 const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
 
@@ -53,6 +54,24 @@ export const GameConfig = {
 			src: svg("ui-slot"),
 			sort: 1000,
 		},
+	],
+	resources: [
+		resource(
+			"resource:coin",
+			"coin",
+			"Coins",
+			"Plain currency. Somehow civilization keeps trying this nonsense.",
+			"●",
+			10,
+		),
+		resource(
+			"resource:diamond",
+			"diamond",
+			"Diamonds",
+			"Premium sparkle for future bad ideas.",
+			"◆",
+			20,
+		),
 	],
 	items: [
 		item(
@@ -678,6 +697,16 @@ export const GameConfig = {
 		),
 	],
 	startingState: {
+		resources: [
+			{
+				resourceId: "resource:coin",
+				quantity: 120,
+			},
+			{
+				resourceId: "resource:diamond",
+				quantity: 8,
+			},
+		],
 		inventory: [
 			{
 				itemId: "item:blueprint-townhall",
@@ -740,8 +769,13 @@ export namespace GameConfig {
 			};
 		};
 		assets: readonly AssetDefinition[];
+		resources: readonly ResourceDefinition[];
 		items: readonly ItemDefinition[];
 		startingState: {
+			resources: readonly {
+				resourceId: ResourceId;
+				quantity: number;
+			}[];
 			inventory: readonly {
 				itemId: ItemId;
 				quantity: number;
@@ -753,6 +787,24 @@ export namespace GameConfig {
 			}[];
 		};
 	}
+}
+
+function resource(
+	id: ResourceId,
+	code: string,
+	name: string,
+	description: string,
+	symbol: string,
+	sort: number,
+): ResourceDefinition {
+	return {
+		id,
+		code,
+		name,
+		description,
+		symbol,
+		sort,
+	};
 }
 
 function asset(id: AssetId, label: string, fileName: string, sort: number): AssetDefinition {

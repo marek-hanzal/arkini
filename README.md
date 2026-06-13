@@ -13,7 +13,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 ## Direction
 
-Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player resources, and local database/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
+Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, upgrades, and local database/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
 The game has one gameplay source of truth: `GameConfig` in `src/manifest/data/GameConfig.ts`. It carries the game shape, board size, inventory size, assets, item definitions, item behavior, and starting state. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins.
 
@@ -24,17 +24,18 @@ Item definitions drive behavior. An item may define:
 - click producers with batch output: guaranteed drops, chance drops, and weighted rolls
 - finite crates that exhaust all charges on double tap
 - optional item display labels, for reused building art with tiny level numbers
-- player resources such as coins and diamonds, kept separate from the item-grid inventory
+- collectible board items that can be tapped into a limited player inventory
+- tiered global upgrades with item costs and effects such as producer speed or loot-table swaps
 - craft recipes with visible board progress, used by blueprints, growth, and any future item that wants continual construction
 
-There are no separate static `merges`, `dropTables`, `producers`, and `craftRecipes` arrays. Those are derived indexes over the config.
+There are no separate static `merges`, `producers`, and `craftRecipes` arrays. Loot tables and upgrades are top-level config sections because they are reusable game-wide progression data; everything else is derived into indexes over the config.
 
 
 ## Logic and Effect boundary
 
 Effect belongs to the server-like game backend, not the UI. React components, Zustand stores, React Query hooks, drag surfaces, and GSAP animation code stay normal UI code. The boundary is `src/play/logic/playBackend.ts`: UI calls Promise-returning backend functions, while those wrappers run domain Effect roots underneath.
 
-Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. Names are short inside their domain: `board/fx/moveFx.ts`, `inventory/fx/swapFx.ts`, `producer/fx/produceFx.ts`, `build/fx/buildFx.ts`. If a callsite needs multiple same-name domain effects, import aliases are allowed. Repeating the domain in every function name is banned, because `producerProduceProducerFx` would be a cry for help, not architecture.
+Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. Names are short inside their domain: `board/fx/moveFx.ts`, `inventory/fx/swapFx.ts`, `producer/fx/produceFx.ts`, `player/fx/collectFx.ts`, `upgrade/fx/buyFx.ts`. If a callsite needs multiple same-name domain effects, import aliases are allowed. Repeating the domain in every function name is banned, because `producerProduceProducerFx` would be a cry for help, not architecture.
 
 Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, producer output rolling, and save mutation pipelines. Files inside `src/**/fx/` are reserved for root `Effect.fn(...)` operations only. Pure helpers, runner helpers, cached state, context tags, service implementations, and domain types stay outside `fx/`, mostly in `logic/` or `context/`. UI feedback still happens from action results/hooks; effects do not know DOM nodes, GSAP timelines, React state, or pointer events.
 
@@ -60,6 +61,10 @@ The current content direction is Settlers-like: small producers create raw goods
 - Inventory items go to the first empty board cell by double-click/tap inside inventory.
 - Build menu is gone. Buildings and other advanced outputs are created through board craft: merge input items into a craft target, fill its progress, then transform it into the result.
 - Craft progress lives on the board item instance and is rendered as a bottom-up fill on the tile. Blueprint construction, seed growth, and future production chains all use the same generic `craft` data model.
+- Collectible valuables are real board items first. Coins merge through `Coin -> Coin Pair -> Coin Stack -> Coin Chest`, then tap into the limited player inventory instead of the material inventory.
+- Player inventory is slot-based and stack-limited like the material inventory. It is the sink for special progression items such as coins and future hard-gems, not a scalar wallet pretending to be design.
+- Upgrades are tiered definitions in `GameConfig`. A save stores only the owned level per upgrade; costs are paid from player inventory stacks and owned tier effects are applied to effective runtime rules.
+- Producer speed upgrades add cooldown deltas. Better-loot upgrades swap the effective producer loot table rather than mutating random weights in place, because percentage soup is how balance turns into swamp gas.
 - Producers can produce multiple outputs in one cycle. Guaranteed outputs, probability outputs, and weighted rolls are resolved into one batch.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
 - Click producers use cooldowns and optional finite charges. Producer ready feedback is emitted only on a real `not-ready -> ready` transition, never on first mount, move, query refresh, or React deciding to reincarnate a node for no noble reason.
@@ -88,7 +93,8 @@ usePlaySave()          boot/save metadata
 usePlayItems()         static item catalog derived from GameConfig
 usePlayBoard()         board cells and board item lookup
 usePlayInventory()     inventory slots and stack lookup
-usePlayPlayerInventory() player resource quantities such as coins and diamonds
+usePlayPlayerInventory() limited slot inventory for collected valuables such as coin stacks
+usePlayUpgrades()        tiered upgrade cards with next costs and effects
 usePlayDragView()      tiny drag-only lookup composed from board + inventory
 ```
 
@@ -110,7 +116,7 @@ src/date/logic/                  Live Luxon date service and timestamp helpers.
 src/hash/context/                Effect hash service context tag.
 src/hash/logic/                  Live WebCrypto hashing service and provider helper.
 src/id/context/                  Effect id service context tag.
-src/id/logic/                    Timestamp/UUID id service and provider helper.
+src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
 src/play/logic/                  Promise backend façade plus shared backend types/helpers.
@@ -121,9 +127,10 @@ src/play/ui/                     Main shell, sheets, bottom navigation, flyers, 
 src/drag/                        Generic DnD lifecycle and draggable/droppable surfaces.
 src/board/                       Board identity, board state logic, board UI, cell feedback.
 src/inventory/                   Inventory identity, stack planning/storage logic, inventory sheet UI.
-src/producer/                    Producer output rolling, readiness tracking, and depletion logic.
+src/producer/                    Producer output rolling, readiness tracking, upgrade-adjusted output, and depletion logic.
+src/upgrade/                     Tiered global upgrades, purchase effects, producer modifiers, and upgrade sheet UI.
 src/item/                        Shared item visual renderer used by board, inventory, drag overlay, and flyers.
-src/player/                      Player resource inventory UI.
+src/player/                      Slot-based player inventory, collectible placement logic, and collection effects.
 src/shared/                      Small UI/util hooks and helpers.
 ```
 

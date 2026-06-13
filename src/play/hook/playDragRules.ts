@@ -25,15 +25,15 @@ export interface GameDragActions {
 }
 
 export interface GameDragFeedback {
-	pulseMergeCell(key: string | null): void;
-	flashBoardCell(key: string | null, tone: "error"): void;
-	flashInventorySlot(slotIndex: number | null, tone: "error"): void;
+	pulseMergeCell(key: string | undefined): void;
+	flashBoardCell(key: string | undefined, tone: "error"): void;
+	flashInventorySlot(slotIndex: number | undefined, tone: "error"): void;
 	showError(error: unknown): void;
 }
 
 export function resolveGameDrop(
 	context: DropContext<string, GameDragSource, GameDropTarget, GameVisualMeta>,
-	game: GameDragView | null | undefined,
+	game: GameDragView | undefined,
 	actions: GameDragActions,
 	feedback: GameDragFeedback,
 ): DropPlan<string, FlyerKind, GameVisualMeta> {
@@ -64,7 +64,7 @@ export function resolveGameDrop(
 
 export function flashGameDrop(
 	context: DropContext<string, GameDragSource, GameDropTarget, GameVisualMeta>,
-	game: GameDragView | null | undefined,
+	game: GameDragView | undefined,
 	feedback: GameDragFeedback,
 ) {
 	flashSource(context.source.source, game, feedback);
@@ -115,7 +115,7 @@ function inventoryToInventory(
 			type: "ignore",
 		};
 
-	const targetStack = game.inventoryBySlotIndex[target.target.slotIndex]?.stack ?? null;
+	const targetStack = game.inventoryBySlotIndex[target.target.slotIndex]?.stack;
 	const animations = inventoryMoveAnimations(context, targetStack);
 	const hide = [
 		source.sourceId,
@@ -226,10 +226,12 @@ function boardToCell(
 
 function inventoryMoveAnimations(
 	context: GameDropContext<"inventory", "inventory-slot">,
-	targetStack: {
-		itemId: string;
-		quantity: number;
-	} | null,
+	targetStack:
+		| {
+				itemId: string;
+				quantity: number;
+		  }
+		| undefined,
 ): DraggableAnimation<string, FlyerKind, GameVisualMeta>[] {
 	const { source, target } = context;
 	const animations: DraggableAnimation<string, FlyerKind, GameVisualMeta>[] = [
@@ -292,7 +294,7 @@ function reject(feedback?: () => void): DropPlan<string, FlyerKind, GameVisualMe
 
 function flashSource(
 	source: GameDragSource,
-	game: GameDragView | null | undefined,
+	game: GameDragView | undefined,
 	feedback: GameDragFeedback,
 ) {
 	if (source.kind === "inventory") {
@@ -301,5 +303,5 @@ function flashSource(
 	}
 
 	const boardItem = game?.boardItemsById[source.boardItemId];
-	feedback.flashBoardCell(boardItem ? cellKey(boardItem.x, boardItem.y) : null, "error");
+	feedback.flashBoardCell(boardItem ? cellKey(boardItem.x, boardItem.y) : undefined, "error");
 }

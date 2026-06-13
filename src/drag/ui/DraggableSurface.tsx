@@ -1,73 +1,20 @@
-import { useDraggable, useDroppable, type Data } from "@dnd-kit/core";
+import { useDraggable, type Data } from "@dnd-kit/core";
 import {
-	useCallback,
+	type FC,
 	type HTMLAttributes,
 	type KeyboardEvent as ReactKeyboardEvent,
 	type PointerEvent as ReactPointerEvent,
 	type ReactNode,
 } from "react";
+import type { DraggablePayload } from "~/drag/hook/useDraggableControl";
 import { cn } from "~/shared/cn";
-import type { DraggablePayload, DroppablePayload } from "~/drag/hook/useDraggableControl";
 import { usePressActions } from "~/shared/hook/usePressActions";
 
-export namespace DroppableSurface {
-	export interface Props<Target>
-		extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "children"> {
-		id: string;
-		nodeId?: string;
-		payload: DroppablePayload<Target>;
-		className?: string | ((isOver: boolean) => string);
-		nodeRef?(node: HTMLDivElement | null): void;
-		children: ReactNode;
-	}
-}
-
-export function DroppableSurface<Target>({
-	id,
-	nodeId = id,
-	payload,
-	className,
-	children,
-	nodeRef,
-	...props
-}: DroppableSurface.Props<Target>) {
-	const data = {
-		...payload,
-		targetNodeId: payload.targetNodeId ?? nodeId,
-	} satisfies DroppablePayload<Target>;
-	const { setNodeRef, isOver } = useDroppable({
-		id,
-		data: data as unknown as Data,
-	});
-	const setRefs = useCallback(
-		(node: HTMLDivElement | null) => {
-			setNodeRef(node);
-			nodeRef?.(node);
-		},
-		[
-			nodeRef,
-			setNodeRef,
-		],
-	);
-
-	return (
-		<div
-			ref={setRefs}
-			data-drag-node-id={nodeId}
-			className={typeof className === "function" ? className(isOver) : className}
-			{...props}
-		>
-			{children}
-		</div>
-	);
-}
-
 export namespace DraggableSurface {
-	export interface Props<ItemId extends string, Source, Overlay = unknown>
-		extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+	export interface Props extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
 		id: string;
 		nodeId?: string;
-		payload: DraggablePayload<ItemId, Source, Overlay>;
+		payload: DraggablePayload<string, unknown, unknown>;
 		hidden: boolean;
 		dragDisabled?: boolean;
 		delaySingleWhenDouble?: boolean;
@@ -77,7 +24,7 @@ export namespace DraggableSurface {
 	}
 }
 
-export function DraggableSurface<ItemId extends string, Source, Overlay = unknown>({
+export const DraggableSurface: FC<DraggableSurface.Props> = ({
 	id,
 	nodeId = id,
 	payload,
@@ -89,11 +36,11 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
 	onDoubleActivate,
 	children,
 	...props
-}: DraggableSurface.Props<ItemId, Source, Overlay>) {
+}) => {
 	const data = {
 		...payload,
 		sourceNodeId: payload.sourceNodeId ?? nodeId,
-	} satisfies DraggablePayload<ItemId, Source, Overlay>;
+	} satisfies DraggablePayload<string, unknown, unknown>;
 	const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
 		id,
 		data: data as unknown as Data,
@@ -135,4 +82,4 @@ export function DraggableSurface<ItemId extends string, Source, Overlay = unknow
 			{children}
 		</div>
 	);
-}
+};

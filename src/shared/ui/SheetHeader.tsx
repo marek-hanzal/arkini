@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { FC, ReactNode } from "react";
 
 export namespace SheetHeader {
 	export interface Props {
@@ -9,7 +9,7 @@ export namespace SheetHeader {
 	}
 }
 
-export function SheetHeader({ eyebrow, description, anchor, onClose }: SheetHeader.Props) {
+export const SheetHeader: FC<SheetHeader.Props> = ({ eyebrow, description, anchor, onClose }) => {
 	return (
 		<div
 			data-inventory-summary={anchor === "inventory-summary" ? "" : undefined}
@@ -30,4 +30,4 @@ export function SheetHeader({ eyebrow, description, anchor, onClose }: SheetHead
 			</button>
 		</div>
 	);
-}
+};

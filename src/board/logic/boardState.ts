@@ -21,7 +21,6 @@ export function createInitialBoardState(itemId: string): BoardItemState {
 			(finite) => ({
 				producer: {
 					remainingCharges: finite.charges,
-					cooldownUntil: null,
 				},
 			}),
 		)
@@ -30,18 +29,15 @@ export function createInitialBoardState(itemId: string): BoardItemState {
 				type: "infinite",
 			},
 			() => ({
-				producer: {
-					remainingCharges: null,
-					cooldownUntil: null,
-				},
+				producer: {},
 			}),
 		)
 		.exhaustive();
 }
 
-export function readProducerView(itemId: string, state: BoardItemState): ProducerView | null {
+export function readProducerView(itemId: string, state: BoardItemState): ProducerView | undefined {
 	const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
-	if (!producer) return null;
+	if (!producer) return undefined;
 
 	const initial = createInitialBoardState(itemId).producer ?? {};
 	const producerState = {
@@ -49,24 +45,24 @@ export function readProducerView(itemId: string, state: BoardItemState): Produce
 		...(state.producer ?? {}),
 	};
 
-	const cooldownUntil = producerState.cooldownUntil ?? null;
+	const cooldownUntil = producerState.cooldownUntil;
 
 	return {
 		trigger: producer.trigger,
 		mode: producer.mode ?? {
 			type: "infinite",
 		},
-		cooldownMs: producer.cooldownMs ?? null,
-		doubleClickBehavior: producer.doubleClickBehavior ?? null,
+		cooldownMs: producer.cooldownMs,
+		doubleClickBehavior: producer.doubleClickBehavior,
 		cooldownUntil,
-		cooldownUntilMs: cooldownUntil ? parseTimestampMs(cooldownUntil) : null,
-		remainingCharges: producerState.remainingCharges ?? null,
+		cooldownUntilMs: cooldownUntil ? parseTimestampMs(cooldownUntil) : undefined,
+		remainingCharges: producerState.remainingCharges,
 	};
 }
 
 function parseTimestampMs(value: string) {
 	const parsed = Date.parse(value);
-	return Number.isFinite(parsed) ? parsed : null;
+	return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 export function readBoardState(row: Pick<readBoardState.Row, "stateJson">) {

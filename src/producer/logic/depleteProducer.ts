@@ -12,7 +12,7 @@ export async function depleteProducer(
 	tx: ArkiniTransaction,
 	row: BoardRow,
 	mode: ProducerMode,
-): Promise<ProducerDepletion | null> {
+): Promise<ProducerDepletion | undefined> {
 	return match(mode)
 		.with(
 			{
@@ -49,5 +49,5 @@ export async function depleteProducer(
 				} satisfies ProducerDepletion;
 			},
 		)
-		.otherwise(async () => null);
+		.otherwise(async () => undefined);
 }

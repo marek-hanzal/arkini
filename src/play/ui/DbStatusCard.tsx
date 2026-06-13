@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { type FC, useState } from "react";
 import { cn } from "~/shared/cn";
 import { useArkiniDatabaseStatus } from "~/play/hook/useArkiniDatabaseStatus";
+import { StatusPill } from "~/play/ui/StatusPill";
 
-export function DbStatusCard() {
+export namespace DbStatusCard {
+	export interface Props {}
+}
+
+export const DbStatusCard: FC<DbStatusCard.Props> = () => {
 	const status = useArkiniDatabaseStatus();
 	const [resetState, setResetState] = useState<"idle" | "pending" | "failed">("idle");
 	const isolated = typeof window !== "undefined" && window.crossOriginIsolated === true;
@@ -81,20 +86,4 @@ export function DbStatusCard() {
 			) : null}
 		</section>
 	);
-}
-
-namespace StatusPill {
-	export interface Props {
-		label: string;
-		value: string;
-	}
-}
-
-function StatusPill({ label, value }: StatusPill.Props) {
-	return (
-		<div className="min-w-0 rounded-sm bg-slate-950/60 px-3 py-2">
-			<div className="text-[0.62rem] uppercase tracking-[0.18em] text-slate-500">{label}</div>
-			<div className="truncate text-sm font-medium text-slate-100">{value}</div>
-		</div>
-	);
-}
+};

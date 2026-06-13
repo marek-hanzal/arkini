@@ -4,9 +4,9 @@ import type { ActiveSheet, BottomNavSheet } from "~/play/ui/BottomNavigation";
 
 export namespace usePlaySheetStore {
 	export interface State {
-		activeSheet: ActiveSheet;
-		renderedSheet: Exclude<ActiveSheet, null>;
-		buildCell: BoardCell | null;
+		activeSheet?: ActiveSheet;
+		renderedSheet: ActiveSheet;
+		buildCell?: BoardCell;
 		closeSheet(): void;
 		openSheet(sheet: BottomNavSheet): void;
 		openBuild(cell: BoardCell): void;
@@ -14,21 +14,19 @@ export namespace usePlaySheetStore {
 }
 
 export const usePlaySheetStore = create<usePlaySheetStore.State>((set) => ({
-	activeSheet: null,
 	renderedSheet: "inventory",
-	buildCell: null,
 	closeSheet() {
 		blurActiveElement();
 		set({
-			activeSheet: null,
+			activeSheet: undefined,
 		});
 	},
 	openSheet(sheet) {
 		blurActiveElement();
 		set((state) => ({
 			renderedSheet: sheet,
-			activeSheet: state.activeSheet === sheet ? null : sheet,
-			buildCell: null,
+			activeSheet: state.activeSheet === sheet ? undefined : sheet,
+			buildCell: undefined,
 		}));
 	},
 	openBuild(cell) {

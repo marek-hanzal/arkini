@@ -1,35 +1,30 @@
-import { useRef } from "react";
-import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
-import { usePlayInventory } from "~/play/hook/usePlayInventory";
-import { usePlayItems } from "~/play/hook/usePlayItems";
-import { cn } from "~/shared/cn";
+import type { FC } from "react";
 import {
 	inventoryContainerNodeId,
 	inventoryColumns,
-	inventorySlotNodeId,
 	inventorySourceId,
 } from "~/inventory/inventoryIdentity";
-import type { GameDragData, GameDropData } from "~/play/types";
-import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
-import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
+import { InventoryCell } from "~/inventory/ui/InventoryCell";
+import { usePlayInventory } from "~/play/hook/usePlayInventory";
+import { usePlayItems } from "~/play/hook/usePlayItems";
+import type { InventorySlot } from "~/play/logic/playTypes";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { GameItemView } from "~/item/ui/GameItemView";
 
 export namespace InventorySheet {
 	export interface Props {
 		isSourceHidden(sourceId: string): boolean;
-		invalidInventorySlot: number | null;
+		invalidInventorySlot?: number;
 		onClose(): void;
 		onSlotDoubleActivate(slot: InventorySlot): void;
 	}
 }
 
-export function InventorySheet({
+export const InventorySheet: FC<InventorySheet.Props> = ({
 	isSourceHidden,
 	invalidInventorySlot,
 	onClose,
 	onSlotDoubleActivate,
-}: InventorySheet.Props) {
+}) => {
 	const inventory = usePlayInventory().data;
 	const items = usePlayItems().data;
 
@@ -59,7 +54,7 @@ export function InventorySheet({
 						<InventoryCell
 							key={slot.slotIndex}
 							slot={slot}
-							item={slot.stack ? items[slot.stack.itemId] : null}
+							item={slot.stack ? items[slot.stack.itemId] : undefined}
 							hidden={isSourceHidden(inventorySourceId(slot.slotIndex))}
 							invalid={invalidInventorySlot === slot.slotIndex}
 							onDoubleActivate={() => onSlotDoubleActivate(slot)}
@@ -69,112 +64,4 @@ export function InventorySheet({
 			</div>
 		</div>
 	);
-}
-
-namespace InventoryCell {
-	export interface Props {
-		slot: InventorySlot;
-		item: ViewItem | null;
-		hidden: boolean;
-		invalid: boolean;
-		onDoubleActivate(): void;
-	}
-}
-
-function InventoryCell({ slot, item, hidden, invalid, onDoubleActivate }: InventoryCell.Props) {
-	const stack = slot.stack;
-	const nodeId = inventorySlotNodeId(slot.slotIndex);
-	const cellRef = useRef<HTMLDivElement | null>(null);
-	useGsapCellFeedback(cellRef, {
-		invalid,
-		success: false,
-	});
-
-	return (
-		<DroppableSurface
-			id={nodeId}
-			nodeId={nodeId}
-			payload={
-				{
-					targetId: nodeId,
-					targetNodeId: nodeId,
-					target: {
-						kind: "inventory-slot",
-						slotIndex: slot.slotIndex,
-					},
-				} satisfies GameDropData
-			}
-			nodeRef={(node) => {
-				cellRef.current = node;
-			}}
-			data-inventory-slot={slot.slotIndex}
-			className={(isOver) =>
-				cn(
-					"relative aspect-square border-b border-r border-slate-800 bg-slate-900/70",
-					isOver &&
-						"bg-slate-800 outline outline-2 -outline-offset-2 outline-emerald-300/80",
-					invalid && "ak-cell-error",
-				)
-			}
-		>
-			{stack && item ? (
-				<InventoryTile
-					slot={slot}
-					item={item}
-					hidden={hidden}
-					onDoubleActivate={onDoubleActivate}
-				/>
-			) : null}
-		</DroppableSurface>
-	);
-}
-
-namespace InventoryTile {
-	export interface Props {
-		slot: InventorySlot;
-		item: ViewItem;
-		hidden: boolean;
-		onDoubleActivate(): void;
-	}
-}
-
-function InventoryTile({ slot, item, hidden, onDoubleActivate }: InventoryTile.Props) {
-	const stack = slot.stack;
-
-	if (!stack) return null;
-
-	const sourceId = inventorySourceId(slot.slotIndex);
-	const sourceNodeId = inventorySlotNodeId(slot.slotIndex);
-
-	return (
-		<DraggableSurface
-			id={`${sourceId}:drag`}
-			nodeId={`${sourceId}:drag-node`}
-			payload={
-				{
-					sourceId,
-					sourceNodeId,
-					itemId: stack.itemId,
-					source: {
-						kind: "inventory",
-						slotIndex: slot.slotIndex,
-						quantity: stack.quantity,
-					},
-					overlay: {
-						quantity: stack.quantity,
-					},
-					hideWhenActive: stack.quantity <= 1,
-				} satisfies GameDragData
-			}
-			hidden={hidden}
-			className="absolute inset-0 touch-none"
-			onDoubleActivate={onDoubleActivate}
-		>
-			<GameItemView
-				item={item}
-				variant="inventory"
-				quantity={stack.quantity}
-			/>
-		</DraggableSurface>
-	);
-}
+};

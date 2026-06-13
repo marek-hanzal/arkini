@@ -1,12 +1,12 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import {
-	Outlet,
 	createHashHistory,
 	createRootRouteWithContext,
 	createRoute,
 	createRouter,
 } from "@tanstack/react-router";
 import { HomeScreen } from "~/app/HomeScreen";
+import { RootShell } from "~/app/RootShell";
 
 export interface RouterContext {
 	queryClient: QueryClient;
@@ -29,7 +29,7 @@ export function createArkiniQueryClient() {
 const queryClient = createArkiniQueryClient();
 const history = createHashHistory();
 
-const rootRoute = createRootRouteWithContext<RouterContext>()({
+export const rootRoute = createRootRouteWithContext<RouterContext>()({
 	component: RootShell,
 });
 
@@ -52,16 +52,6 @@ export const router = createRouter({
 	defaultPreload: "intent",
 	scrollRestoration: true,
 });
-
-function RootShell() {
-	const { queryClient } = rootRoute.useRouteContext();
-
-	return (
-		<QueryClientProvider client={queryClient}>
-			<Outlet />
-		</QueryClientProvider>
-	);
-}
 
 declare module "@tanstack/react-router" {
 	interface Register {

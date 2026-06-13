@@ -17,7 +17,7 @@ export type GameDropTarget =
 			kind: "cell";
 			x: number;
 			y: number;
-			boardItemId: string | null;
+			boardItemId?: string;
 	  }
 	| {
 			kind: "inventory-slot";

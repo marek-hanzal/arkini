@@ -5,7 +5,7 @@ const defaultMergeHintDelayMs = 750;
 
 export namespace useDelayedMergeHints {
 	export interface Props {
-		activeDrag: GameDragData | null;
+		activeDrag?: GameDragData;
 		delayMs?: number;
 	}
 }
@@ -16,8 +16,8 @@ export function useDelayedMergeHints({
 }: useDelayedMergeHints.Props) {
 	const [visible, setVisible] = useState(false);
 	const activeBoardItemId =
-		activeDrag?.source.kind === "board" ? activeDrag.source.boardItemId : null;
-	const activeItemId = activeDrag?.source.kind === "board" ? activeDrag.itemId : null;
+		activeDrag?.source.kind === "board" ? activeDrag.source.boardItemId : undefined;
+	const activeItemId = activeDrag?.source.kind === "board" ? activeDrag.itemId : undefined;
 
 	useEffect(() => {
 		setVisible(false);

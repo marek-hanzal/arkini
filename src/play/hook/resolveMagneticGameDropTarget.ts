@@ -30,7 +30,7 @@ export function resolveMagneticGameDropTarget({
 				kind: "cell",
 				x,
 				y,
-				boardItemId: cell.element.getAttribute("data-board-item-id") || null,
+				boardItemId: cell.element.getAttribute("data-board-item-id") || undefined,
 			},
 		} satisfies GameDropData;
 	}

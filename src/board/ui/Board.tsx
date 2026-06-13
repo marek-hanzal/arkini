@@ -1,42 +1,38 @@
-import { useMemo, useRef, type ReactNode } from "react";
-import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
-import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
-import { usePlayBoard } from "~/play/hook/usePlayBoard";
-import { usePlayItems } from "~/play/hook/usePlayItems";
-import type { ItemId } from "~/manifest/data/manifestId";
-import { cn } from "~/shared/cn";
-import { cellKey } from "~/board/util/cell";
+import { type FC, useMemo } from "react";
 import {
-	boardCellNodeId,
 	boardColumns,
 	boardContainerNodeId,
-	type BoardCell,
+	type BoardCell as BoardCellModel,
 	boardRows,
 	boardSourceId,
 } from "~/board/boardIdentity";
-import type { GameDragData, GameDropData } from "~/play/types";
-import { usePressActions } from "~/shared/hook/usePressActions";
-import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
 import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
-import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
-import { GameItemView } from "~/item/ui/GameItemView";
+import { BoardCell } from "~/board/ui/BoardCell";
+import { BoardTile } from "~/board/ui/BoardTile";
+import { cellKey } from "~/board/util/cell";
+import type { ItemId } from "~/manifest/data/manifestId";
+import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
+import { usePlayBoard } from "~/play/hook/usePlayBoard";
+import { usePlayItems } from "~/play/hook/usePlayItems";
+import type { BoardViewItem } from "~/play/logic/playTypes";
+import type { GameDragData } from "~/play/types";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals";
 import { isProducerReady } from "~/producer/logic/isProducerReady";
 
 export namespace Board {
 	export interface DragState {
-		activeDrag: GameDragData | null;
+		activeDrag?: GameDragData;
 		isSourceHidden(sourceId: string): boolean;
 	}
 
 	export interface FeedbackState {
-		invalidCellKey: string | null;
-		mergedCellKey: string | null;
+		invalidCellKey?: string;
+		mergedCellKey?: string;
 	}
 
 	export interface Actions {
-		emptyDoubleActivate(cell: BoardCell): void;
+		emptyDoubleActivate(cell: BoardCellModel): void;
 		tileSingleActivate(item: BoardViewItem): void;
 		tileDoubleActivate(item: BoardViewItem): void;
 	}
@@ -48,7 +44,7 @@ export namespace Board {
 	}
 }
 
-export function Board({ drag, feedback, actions }: Board.Props) {
+export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 	const board = usePlayBoard().data;
 	const items = usePlayItems().data;
 	const cells = useMemo(
@@ -65,7 +61,7 @@ export function Board({ drag, feedback, actions }: Board.Props) {
 		[],
 	);
 	const showDelayedMergeHints = useDelayedMergeHints({
-		activeDrag: drag.activeDrag,
+		activeDrag: drag.activeDrag ?? undefined,
 	});
 	const nowMs = useProducerClock(board?.items ?? []);
 	useProducerReadySignals(board?.items ?? [], nowMs);
@@ -82,11 +78,11 @@ export function Board({ drag, feedback, actions }: Board.Props) {
 		>
 			{cells.map((cell) => {
 				const key = cellKey(cell.x, cell.y);
-				const boardItem = board.byCellKey[key] ?? null;
-				const viewItem = boardItem ? items[boardItem.itemId] : null;
+				const boardItem = board.byCellKey[key];
+				const viewItem = boardItem ? items[boardItem.itemId] : undefined;
 				const canMerge =
 					drag.activeDrag?.source.kind === "board" &&
-					boardItem &&
+					boardItem !== undefined &&
 					boardItem.id !== drag.activeDrag.source.boardItemId
 						? Boolean(
 								resolveItemMergeRule(
@@ -103,9 +99,7 @@ export function Board({ drag, feedback, actions }: Board.Props) {
 						boardItem={boardItem}
 						canMerge={canMerge}
 						showDelayedMergeHint={showDelayedMergeHints}
-						producerReady={
-							boardItem ? isProducerReady(boardItem.producer, nowMs) : false
-						}
+						producerReady={isProducerReady(boardItem?.producer, nowMs)}
 						invalid={feedback.invalidCellKey === key}
 						merged={feedback.mergedCellKey === key}
 						onEmptyDoubleActivate={actions.emptyDoubleActivate}
@@ -125,147 +119,4 @@ export function Board({ drag, feedback, actions }: Board.Props) {
 			})}
 		</div>
 	);
-}
-
-namespace BoardCell {
-	export interface Props {
-		x: number;
-		y: number;
-		boardItem: BoardViewItem | null;
-		canMerge: boolean;
-		showDelayedMergeHint: boolean;
-		producerReady: boolean;
-		invalid: boolean;
-		merged: boolean;
-		children: ReactNode;
-		onEmptyDoubleActivate(cell: BoardCell): void;
-	}
-}
-
-function BoardCell({
-	x,
-	y,
-	boardItem,
-	canMerge,
-	showDelayedMergeHint,
-	producerReady,
-	invalid,
-	merged,
-	children,
-	onEmptyDoubleActivate,
-}: BoardCell.Props) {
-	const id = boardCellNodeId(x, y);
-	const cellRef = useRef<HTMLDivElement | null>(null);
-	const press = usePressActions({
-		onDouble: () => {
-			if (!boardItem)
-				onEmptyDoubleActivate({
-					x,
-					y,
-				});
-		},
-	});
-	useGsapCellFeedback(cellRef, {
-		invalid,
-		success: merged,
-	});
-
-	return (
-		<DroppableSurface
-			id={id}
-			nodeId={id}
-			payload={
-				{
-					targetId: id,
-					targetNodeId: id,
-					target: {
-						kind: "cell",
-						x,
-						y,
-						boardItemId: boardItem?.id ?? null,
-					},
-				} satisfies GameDropData
-			}
-			nodeRef={(node) => {
-				cellRef.current = node;
-			}}
-			data-board-cell={`${x}:${y}`}
-			data-board-item-id={boardItem?.id}
-			data-producer-ready={producerReady ? "true" : undefined}
-			className={(isOver) => {
-				const showMergeHint = canMerge && (showDelayedMergeHint || isOver);
-
-				return cn(
-					"relative aspect-square touch-none border-b border-r border-slate-800/65 bg-slate-900/45",
-					x === boardColumns - 1 && "border-r-0",
-					y === boardRows - 1 && "border-b-0",
-					isOver && !showMergeHint && "bg-slate-800/80",
-					showMergeHint && "ak-merge-target",
-					showMergeHint && isOver && "ak-merge-target-over",
-					invalid && "ak-cell-error",
-				);
-			}}
-			{...press.pressProps}
-		>
-			{children}
-		</DroppableSurface>
-	);
-}
-
-namespace BoardTile {
-	export interface Props {
-		boardItem: BoardViewItem;
-		item: ViewItem;
-		nowMs: number;
-		hidden: boolean;
-		onSingleActivate(): void;
-		onDoubleActivate(): void;
-	}
-}
-
-function BoardTile({
-	boardItem,
-	item,
-	nowMs,
-	hidden,
-	onSingleActivate,
-	onDoubleActivate,
-}: BoardTile.Props) {
-	const sourceId = boardSourceId(boardItem.id);
-	const sourceNodeId = boardCellNodeId(boardItem.x, boardItem.y);
-
-	return (
-		<DraggableSurface
-			id={sourceId}
-			nodeId={`${sourceId}:drag`}
-			payload={
-				{
-					sourceId,
-					sourceNodeId,
-					itemId: boardItem.itemId,
-					source: {
-						kind: "board",
-						boardItemId: boardItem.id,
-					},
-					overlay: {
-						producer: boardItem.producer,
-					},
-					hideWhenActive: true,
-				} satisfies GameDragData
-			}
-			data-board-item-id={boardItem.id}
-			hidden={hidden}
-			className="absolute inset-0 touch-none"
-			onSingleActivate={onSingleActivate}
-			delaySingleWhenDouble={boardItem.producer?.doubleClickBehavior === "exhaust"}
-			onDoubleActivate={onDoubleActivate}
-		>
-			<GameItemView
-				item={item}
-				variant="board"
-				producer={boardItem.producer}
-				producerNowMs={nowMs}
-			/>
-		</DraggableSurface>
-	);
-}
+};

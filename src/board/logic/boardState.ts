@@ -2,6 +2,8 @@ import { match } from "ts-pattern";
 import type { DateService } from "~/date/context/DateServiceFx";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 import type { ProducerMode } from "~/manifest/data/producer";
+import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
+import type { OwnedUpgradeRow } from "~/upgrade/logic/readOwnedUpgradeEffects";
 import type { BoardItemState, CraftProgressView, ProducerView } from "~/play/logic/playTypes";
 import { parseJson } from "~/shared/json";
 
@@ -44,6 +46,7 @@ export namespace readProducerView {
 		state: BoardItemState;
 		date: DateService;
 		gameConfig: GameConfigService;
+		upgradeRows?: readonly OwnedUpgradeRow[];
 	}
 }
 
@@ -52,9 +55,16 @@ export function readProducerView({
 	state,
 	date,
 	gameConfig,
+	upgradeRows = [],
 }: readProducerView.Props): ProducerView | undefined {
-	const producer = gameConfig.getProducer(itemId);
-	if (!producer) return undefined;
+	const baseProducer = gameConfig.getProducer(itemId);
+	if (!baseProducer) return undefined;
+	const producer = applyProducerUpgradeEffects({
+		gameConfig,
+		producerItemId: itemId,
+		producer: baseProducer,
+		upgradeRows,
+	});
 
 	const initial = createInitialBoardState(itemId, gameConfig).producer ?? {};
 	const producerState = {

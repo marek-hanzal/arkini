@@ -1,8 +1,8 @@
 import type { FC } from "react";
 import { BottomNavButton } from "~/play/ui/BottomNavButton";
 
-export type ActiveSheet = "inventory" | "player" | "database" | "item";
-export type BottomNavSheet = "inventory" | "player" | "database";
+export type ActiveSheet = "inventory" | "player" | "upgrades" | "database" | "item";
+export type BottomNavSheet = "inventory" | "player" | "upgrades" | "database";
 
 export namespace BottomNavigation {
 	export interface Props {
@@ -28,6 +28,13 @@ export const BottomNavigation: FC<BottomNavigation.Props> = ({ activeSheet, onOp
 					icon="◆"
 					tone="player"
 					onClick={() => onOpen("player")}
+				/>
+				<BottomNavButton
+					active={activeSheet === "upgrades"}
+					label="Upgrades"
+					icon="▲"
+					tone="upgrades"
+					onClick={() => onOpen("upgrades")}
 				/>
 				<BottomNavButton
 					active={activeSheet === "database"}

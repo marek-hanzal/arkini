@@ -15,5 +15,8 @@ export function createIdService(): IdService {
 		inventoryVirtual() {
 			return prefixed("inventory:virtual");
 		},
+		playerInventoryVirtual() {
+			return prefixed("player-inventory:virtual");
+		},
 	};
 }

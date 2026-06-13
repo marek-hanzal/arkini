@@ -14,6 +14,7 @@ export interface SaveGameTable {
 	boardWidth: number;
 	boardHeight: number;
 	inventorySlots: number;
+	playerInventorySlots: number;
 	createdAt: Timestamp;
 	updatedAt: Timestamp;
 }
@@ -38,6 +39,25 @@ export interface PlayerResourceTable {
 	updatedAt: Timestamp;
 }
 
+export interface PlayerInventoryStackTable {
+	id: string;
+	saveGameId: string;
+	slotIndex: number;
+	itemDefinitionId: string;
+	quantity: number;
+	createdAt: Timestamp;
+	updatedAt: Timestamp;
+}
+
+export interface PlayerUpgradeTable {
+	id: string;
+	saveGameId: string;
+	upgradeDefinitionId: string;
+	level: number;
+	createdAt: Timestamp;
+	updatedAt: Timestamp;
+}
+
 export interface InventoryStackTable {
 	id: string;
 	saveGameId: string;
@@ -54,4 +74,6 @@ export interface Database {
 	boardItem: BoardItemTable;
 	inventoryStack: InventoryStackTable;
 	playerResource: PlayerResourceTable;
+	playerInventoryStack: PlayerInventoryStackTable;
+	playerUpgrade: PlayerUpgradeTable;
 }

@@ -5,6 +5,7 @@ export interface IdService {
 	prefixed(prefix: string): string;
 	boardItem(): string;
 	inventoryVirtual(): string;
+	playerInventoryVirtual(): string;
 }
 
 export class IdServiceFx extends Context.Tag("IdServiceFx")<IdServiceFx, IdService>() {

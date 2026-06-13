@@ -13,14 +13,21 @@ import { json, parseJson } from "~/shared/json";
 export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
-	const rows = yield* dbFx((db) =>
-		db
-			.selectFrom(table.boardItem)
-			.selectAll()
-			.where("saveGameId", "=", defaultSaveGameId)
-			.orderBy("y")
-			.orderBy("x")
-			.execute(),
+	const [rows, upgradeRows] = yield* dbFx((db) =>
+		Promise.all([
+			db
+				.selectFrom(table.boardItem)
+				.selectAll()
+				.where("saveGameId", "=", defaultSaveGameId)
+				.orderBy("y")
+				.orderBy("x")
+				.execute(),
+			db
+				.selectFrom(table.playerUpgrade)
+				.selectAll()
+				.where("saveGameId", "=", defaultSaveGameId)
+				.execute(),
+		]),
 	);
 
 	const items = rows.map((item): BoardViewItem => {
@@ -36,6 +43,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				state,
 				date,
 				gameConfig,
+				upgradeRows,
 			}),
 			craft: readCraftView({
 				itemId: item.itemDefinitionId,

@@ -10,6 +10,7 @@ export type PlayDataInvalidationTarget =
 	| "board"
 	| "inventory"
 	| "playerInventory"
+	| "upgrades"
 	| "databaseStatus";
 
 export function usePlayDataInvalidation() {
@@ -50,6 +51,8 @@ function queryKeyForTarget(target: PlayDataInvalidationTarget) {
 			return playQueryKeys.inventory;
 		case "playerInventory":
 			return playQueryKeys.playerInventory;
+		case "upgrades":
+			return playQueryKeys.upgrades;
 		case "databaseStatus":
 			return databaseStatusQueryKey;
 	}

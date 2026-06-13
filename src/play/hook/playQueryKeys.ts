@@ -28,4 +28,9 @@ export const playQueryKeys = {
 		"game",
 		"player-inventory",
 	] as const,
+	upgrades: [
+		"arkini",
+		"game",
+		"upgrades",
+	] as const,
 };

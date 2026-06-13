@@ -167,6 +167,26 @@ export function playCellError(element: HTMLElement) {
 		});
 }
 
+export function playProducerReady(element: HTMLElement) {
+	gsap.killTweensOf(element, "scale,filter,y");
+	gsap.timeline()
+		.to(element, {
+			y: -1,
+			scale: 1.055,
+			filter: "drop-shadow(0 0 0.55rem rgb(110 231 183 / 0.72))",
+			duration: 0.18,
+			ease: "power2.out",
+		})
+		.to(element, {
+			y: 0,
+			scale: 1,
+			filter: "drop-shadow(0 0 0 rgb(110 231 183 / 0))",
+			duration: 0.28,
+			ease: "power2.out",
+			clearProps: "filter,transform",
+		});
+}
+
 export function playBottomNavPulse(element: HTMLElement) {
 	playBottomNavHold(element);
 }

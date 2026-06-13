@@ -73,6 +73,9 @@ export const PlayerUpgradeRowSchema = z.object({
 	saveGameId: z.string().min(1),
 	upgradeDefinitionId: z.string().startsWith("upgrade:"),
 	level: z.number().int().min(0),
+	targetLevel: z.number().int().min(0).nullable(),
+	startedAt: z.string().min(1).nullable(),
+	readyAt: z.string().min(1).nullable(),
 	createdAt: z.string().min(1),
 	updatedAt: z.string().min(1),
 });
@@ -108,6 +111,11 @@ export const ProduceBoardItemInputSchema = z.object({
 
 export const CollectBoardItemInputSchema = z.object({
 	boardItemId: BoardItemIdSchema,
+});
+
+export const WithdrawProducerInputSchema = z.object({
+	boardItemId: BoardItemIdSchema,
+	itemId: ItemIdSchema,
 });
 
 export const BuyUpgradeInputSchema = z.object({

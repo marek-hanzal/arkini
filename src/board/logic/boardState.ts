@@ -74,6 +74,8 @@ export function readProducerView({
 
 	const cooldownUntil = producerState.cooldownUntil;
 
+	const inventory = producerState.inventory ?? {};
+
 	return {
 		trigger: producer.trigger,
 		mode: producer.mode ?? {
@@ -84,6 +86,12 @@ export function readProducerView({
 		cooldownUntil,
 		cooldownUntilMs: cooldownUntil ? date.parseTimestampMs(cooldownUntil) : undefined,
 		remainingCharges: producerState.remainingCharges,
+		inputs: (producer.inputs ?? []).map((input) => ({
+			itemId: input.itemId,
+			quantity: input.quantity,
+			capacity: input.capacity,
+			stored: inventory[input.itemId] ?? 0,
+		})),
 	};
 }
 

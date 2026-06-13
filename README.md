@@ -22,10 +22,11 @@ Item definitions drive behavior. An item may define:
 - normal merge rules, for example `seed + seed -> sprout`
 - mixed/secret merge rules, for example `twig + water -> sprout`
 - click producers with batch output: guaranteed drops, chance drops, and weighted rolls
+- optional producer input inventories; producers can require stored consumables before they work
 - finite crates that exhaust all charges on double tap
 - optional item display labels, for reused building art with tiny level numbers
 - collectible board items that can be tapped into a limited player inventory
-- tiered global upgrades with item costs and effects such as producer speed or loot-table swaps
+- tiered global upgrades with item costs, timed upgrade jobs, and effects such as producer speed or loot-table swaps
 - craft recipes with visible board progress, used by blueprints, growth, and any future item that wants continual construction
 
 There are no separate static `merges`, `producers`, and `craftRecipes` arrays. Loot tables and upgrades are top-level config sections because they are reusable game-wide progression data; everything else is derived into indexes over the config.
@@ -57,14 +58,15 @@ The current content direction is Settlers-like: small producers create raw goods
 - Merging happens on the board only. Dropping onto a non-mergeable occupied board cell swaps the two board items instead of rejecting the action.
 - Inventory stores stacks and can combine compatible stacks.
 - Drag is intentionally local to a surface now: board item to board cell, inventory slot to inventory slot. Board↔inventory drag is obsolete.
-- Board items go into inventory by double-click/tap on the board item.
+- Board items go into inventory by double-click/tap on the board item. Idle producers can be stashed too, but busy producers and producers holding input inventory reject the action.
 - Inventory items go to the first empty board cell by double-click/tap inside inventory.
 - Build menu is gone. Buildings and other advanced outputs are created through board craft: merge input items into a craft target, fill its progress, then transform it into the result.
 - Craft progress lives on the board item instance and is rendered as a bottom-up fill on the tile. Blueprint construction, seed growth, and future production chains all use the same generic `craft` data model.
 - Collectible valuables are real board items first. Coins merge through `Coin -> Coin Pair -> Coin Stack -> Coin Chest`, then tap into the limited player inventory instead of the material inventory.
 - Player inventory is slot-based and stack-limited like the material inventory. It is the sink for special progression items such as coins and future hard-gems, not a scalar wallet pretending to be design.
-- Upgrades are tiered definitions in `GameConfig`. A save stores only the owned level per upgrade; costs are paid from player inventory stacks and owned tier effects are applied to effective runtime rules.
-- Producer speed upgrades add cooldown deltas. Better-loot upgrades swap the effective producer loot table rather than mutating random weights in place, because percentage soup is how balance turns into swamp gas.
+- Upgrades are tiered definitions in `GameConfig`. Buying an upgrade spends player inventory items immediately, starts a persisted timed job, and applies the tier only after the timer finishes. A save stores owned level plus pending target/ready timestamps.
+- Producer speed upgrades add cooldown deltas. Better-loot upgrades swap the effective producer loot table rather than mutating random weights in place, because percentage soup is how balance turns into swamp gas. Building level upgrades no longer happen by merging two buildings directly; higher-level buildings are crafted through upgrade blueprints that consume materials plus at least two previous-level buildings.
+- Producers can hold input inventory. Dropping an accepted item onto a producer stores it there up to the configured capacity; producer detail shows stored/needed inputs and can withdraw them back to material inventory. Production consumes configured inputs before rolling output.
 - Producers can produce multiple outputs in one cycle. Guaranteed outputs, probability outputs, and weighted rolls are resolved into one batch.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
 - Click producers use cooldowns and optional finite charges. Producer ready feedback is emitted only on a real `not-ready -> ready` transition, never on first mount, move, query refresh, or React deciding to reincarnate a node for no noble reason.
@@ -193,7 +195,7 @@ Migrations only create or change storage shape. They do not preserve old gamepla
 On boot:
 
 1. Browser capability checks run.
-2. Kysely migrations run.
+2. Kysely migrations run. If Kysely reports corrupted/missing historical migrations, the local OPFS database is dropped and migrated fresh. The root error boundary and database sheet also expose a hard reset button, because a prototype save is not worth an infinite broken boot loop.
 3. `syncGameConfig()` validates and hashes `GameConfig`.
 4. If the stored hash differs from the current hash, the default save is deleted.
 5. `ensureDefaultSaveGame()` creates the default save from the current starting state when missing.

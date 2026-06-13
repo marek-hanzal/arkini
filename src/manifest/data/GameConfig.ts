@@ -75,8 +75,84 @@ export const GameConfig = {
 		),
 		asset("asset:item-blueprint-draft", "Blueprint Draft", "item-blueprint-draft", 110),
 		asset("asset:item-blueprint", "Finished Blueprint", "item-blueprint", 112),
-		asset("asset:item-townhall", "Town Hall", "item-townhall", 120),
+		asset(
+			"asset:item-blueprint-lumber-camp-scrap",
+			"Lumber Camp Blueprint Scrap",
+			"item-blueprint-lumber-camp-scrap",
+			113,
+		),
+		asset(
+			"asset:item-blueprint-lumber-camp-fragment",
+			"Lumber Camp Blueprint Fragment",
+			"item-blueprint-lumber-camp-fragment",
+			114,
+		),
+		asset(
+			"asset:item-blueprint-lumber-camp-draft",
+			"Lumber Camp Blueprint Draft",
+			"item-blueprint-lumber-camp-draft",
+			115,
+		),
+		asset(
+			"asset:item-blueprint-lumber-camp",
+			"Lumber Camp Blueprint",
+			"item-blueprint-lumber-camp-blueprint",
+			116,
+		),
+		asset(
+			"asset:item-blueprint-quarry-scrap",
+			"Quarry Blueprint Scrap",
+			"item-blueprint-quarry-scrap",
+			117,
+		),
+		asset(
+			"asset:item-blueprint-quarry-fragment",
+			"Quarry Blueprint Fragment",
+			"item-blueprint-quarry-fragment",
+			118,
+		),
+		asset(
+			"asset:item-blueprint-quarry-draft",
+			"Quarry Blueprint Draft",
+			"item-blueprint-quarry-draft",
+			119,
+		),
+		asset(
+			"asset:item-blueprint-quarry",
+			"Quarry Blueprint",
+			"item-blueprint-quarry-blueprint",
+			120,
+		),
+		asset(
+			"asset:item-blueprint-townhall-scrap",
+			"Town Hall Blueprint Scrap",
+			"item-blueprint-townhall-scrap",
+			121,
+		),
+		asset(
+			"asset:item-blueprint-townhall-fragment",
+			"Town Hall Blueprint Fragment",
+			"item-blueprint-townhall-fragment",
+			122,
+		),
+		asset(
+			"asset:item-blueprint-townhall-draft",
+			"Town Hall Blueprint Draft",
+			"item-blueprint-townhall-draft",
+			123,
+		),
+		asset(
+			"asset:item-blueprint-townhall",
+			"Town Hall Blueprint",
+			"item-blueprint-townhall-blueprint",
+			124,
+		),
+		asset("asset:item-townhall", "Town Hall", "item-townhall", 125),
 		asset("asset:item-lumber-camp", "Lumber Camp", "item-lumber-camp", 130),
+		asset("asset:item-coal", "Coal", "item-coal", 132),
+		asset("asset:item-sausage", "Sausage", "item-sausage", 134),
+		asset("asset:item-beer", "Beer", "item-beer", 136),
+		asset("asset:item-coal-mine", "Coal Mine", "item-coal-mine", 138),
 		asset("asset:item-quarry", "Quarry", "item-quarry", 140),
 		asset("asset:item-crate", "Common Crate", "item-crate", 150),
 		asset("asset:item-crate-sturdy", "Sturdy Crate", "item-crate-sturdy", 160),
@@ -609,6 +685,49 @@ export const GameConfig = {
 		),
 
 		item(
+			"item:coal",
+			"asset:item-coal",
+			"coal",
+			"Coal",
+			2,
+			40,
+			"Black fuel for machines that apparently need motivation.",
+			[
+				"material",
+				"fuel",
+			],
+			105,
+		),
+		item(
+			"item:sausage",
+			"asset:item-sausage",
+			"sausage",
+			"Sausage",
+			1,
+			30,
+			"Producer fuel, because workers are tragically organic.",
+			[
+				"material",
+				"food",
+			],
+			106,
+		),
+		item(
+			"item:beer",
+			"asset:item-beer",
+			"beer",
+			"Beer",
+			1,
+			30,
+			"Liquid morale. The economy is clearly fine.",
+			[
+				"material",
+				"drink",
+			],
+			107,
+		),
+
+		item(
 			"item:coin",
 			"asset:item-coin",
 			"coin",
@@ -688,7 +807,7 @@ export const GameConfig = {
 
 		item(
 			"item:blueprint-lumber-camp-scrap",
-			"asset:item-blueprint-scrap",
+			"asset:item-blueprint-lumber-camp-scrap",
 			"blueprint-lumber-camp-scrap",
 			"Lumber Camp Blueprint Scrap",
 			1,
@@ -711,7 +830,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-lumber-camp-fragment",
-			"asset:item-blueprint-fragment",
+			"asset:item-blueprint-lumber-camp-fragment",
 			"blueprint-lumber-camp-fragment",
 			"Lumber Camp Blueprint Fragment",
 			2,
@@ -734,7 +853,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-lumber-camp-draft",
-			"asset:item-blueprint-draft",
+			"asset:item-blueprint-lumber-camp-draft",
 			"blueprint-lumber-camp-draft",
 			"Lumber Camp Blueprint Draft",
 			3,
@@ -757,7 +876,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-lumber-camp",
-			"asset:item-blueprint",
+			"asset:item-blueprint-lumber-camp",
 			"blueprint-lumber-camp",
 			"Lumber Camp Blueprint",
 			4,
@@ -778,7 +897,7 @@ export const GameConfig = {
 
 		item(
 			"item:blueprint-quarry-scrap",
-			"asset:item-blueprint-scrap",
+			"asset:item-blueprint-quarry-scrap",
 			"blueprint-quarry-scrap",
 			"Quarry Blueprint Scrap",
 			1,
@@ -801,7 +920,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-quarry-fragment",
-			"asset:item-blueprint-fragment",
+			"asset:item-blueprint-quarry-fragment",
 			"blueprint-quarry-fragment",
 			"Quarry Blueprint Fragment",
 			2,
@@ -824,7 +943,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-quarry-draft",
-			"asset:item-blueprint-draft",
+			"asset:item-blueprint-quarry-draft",
 			"blueprint-quarry-draft",
 			"Quarry Blueprint Draft",
 			3,
@@ -847,7 +966,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-quarry",
-			"asset:item-blueprint",
+			"asset:item-blueprint-quarry",
 			"blueprint-quarry",
 			"Quarry Blueprint",
 			4,
@@ -868,7 +987,7 @@ export const GameConfig = {
 
 		item(
 			"item:blueprint-townhall-scrap",
-			"asset:item-blueprint-scrap",
+			"asset:item-blueprint-townhall-scrap",
 			"blueprint-townhall-scrap",
 			"Town Hall Blueprint Scrap",
 			1,
@@ -891,7 +1010,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-townhall-fragment",
-			"asset:item-blueprint-fragment",
+			"asset:item-blueprint-townhall-fragment",
 			"blueprint-townhall-fragment",
 			"Town Hall Blueprint Fragment",
 			2,
@@ -914,7 +1033,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-townhall-draft",
-			"asset:item-blueprint-draft",
+			"asset:item-blueprint-townhall-draft",
 			"blueprint-townhall-draft",
 			"Town Hall Blueprint Draft",
 			3,
@@ -937,7 +1056,7 @@ export const GameConfig = {
 		),
 		item(
 			"item:blueprint-townhall",
-			"asset:item-blueprint",
+			"asset:item-blueprint-townhall",
 			"blueprint-townhall",
 			"Town Hall Blueprint",
 			4,
@@ -958,6 +1077,281 @@ export const GameConfig = {
 		),
 
 		item(
+			"item:blueprint-lumber-camp-2",
+			"asset:item-blueprint-lumber-camp",
+			"blueprint-lumber-camp-2",
+			"Lumber Camp 2 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			206,
+			{
+				label: "2",
+				craft: craft("craft:lumber-camp-2", "item:lumber-camp-2", [
+					input("item:lumber-camp-1", 2),
+					input("item:plank", 1),
+					input("item:stone-block", 1),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-lumber-camp-3",
+			"asset:item-blueprint-lumber-camp",
+			"blueprint-lumber-camp-3",
+			"Lumber Camp 3 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			207,
+			{
+				label: "3",
+				craft: craft("craft:lumber-camp-3", "item:lumber-camp-3", [
+					input("item:lumber-camp-2", 2),
+					input("item:plank", 1),
+					input("item:stone-block", 1),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-lumber-camp-4",
+			"asset:item-blueprint-lumber-camp",
+			"blueprint-lumber-camp-4",
+			"Lumber Camp 4 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			208,
+			{
+				label: "4",
+				craft: craft("craft:lumber-camp-4", "item:lumber-camp-4", [
+					input("item:lumber-camp-3", 2),
+					input("item:plank", 1),
+					input("item:stone-block", 1),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-lumber-camp-5",
+			"asset:item-blueprint-lumber-camp",
+			"blueprint-lumber-camp-5",
+			"Lumber Camp 5 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			209,
+			{
+				label: "5",
+				craft: craft("craft:lumber-camp-5", "item:lumber-camp-5", [
+					input("item:lumber-camp-4", 2),
+					input("item:plank", 1),
+					input("item:stone-block", 1),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-quarry-2",
+			"asset:item-blueprint-quarry",
+			"blueprint-quarry-2",
+			"Quarry 2 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			226,
+			{
+				label: "2",
+				craft: craft("craft:quarry-2", "item:quarry-2", [
+					input("item:quarry-1", 2),
+					input("item:beam", 1),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-quarry-3",
+			"asset:item-blueprint-quarry",
+			"blueprint-quarry-3",
+			"Quarry 3 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			227,
+			{
+				label: "3",
+				craft: craft("craft:quarry-3", "item:quarry-3", [
+					input("item:quarry-2", 2),
+					input("item:beam", 1),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-quarry-4",
+			"asset:item-blueprint-quarry",
+			"blueprint-quarry-4",
+			"Quarry 4 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			228,
+			{
+				label: "4",
+				craft: craft("craft:quarry-4", "item:quarry-4", [
+					input("item:quarry-3", 2),
+					input("item:beam", 1),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-quarry-5",
+			"asset:item-blueprint-quarry",
+			"blueprint-quarry-5",
+			"Quarry 5 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			229,
+			{
+				label: "5",
+				craft: craft("craft:quarry-5", "item:quarry-5", [
+					input("item:quarry-4", 2),
+					input("item:beam", 1),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-townhall-2",
+			"asset:item-blueprint-townhall",
+			"blueprint-townhall-2",
+			"Town Hall 2 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			246,
+			{
+				label: "2",
+				craft: craft("craft:townhall-2", "item:townhall-2", [
+					input("item:townhall-1", 2),
+					input("item:beam", 2),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-townhall-3",
+			"asset:item-blueprint-townhall",
+			"blueprint-townhall-3",
+			"Town Hall 3 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			247,
+			{
+				label: "3",
+				craft: craft("craft:townhall-3", "item:townhall-3", [
+					input("item:townhall-2", 2),
+					input("item:beam", 2),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-townhall-4",
+			"asset:item-blueprint-townhall",
+			"blueprint-townhall-4",
+			"Town Hall 4 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			248,
+			{
+				label: "4",
+				craft: craft("craft:townhall-4", "item:townhall-4", [
+					input("item:townhall-3", 2),
+					input("item:beam", 2),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+
+		item(
+			"item:blueprint-townhall-5",
+			"asset:item-blueprint-townhall",
+			"blueprint-townhall-5",
+			"Town Hall 5 Blueprint",
+			4,
+			4,
+			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			[
+				"blueprint",
+				"craft-target",
+			],
+			249,
+			{
+				label: "5",
+				craft: craft("craft:townhall-5", "item:townhall-5", [
+					input("item:townhall-4", 2),
+					input("item:beam", 2),
+					input("item:stone-block", 2),
+				]),
+			},
+		),
+		item(
 			"item:townhall-1",
 			"asset:item-townhall",
 			"townhall-1",
@@ -973,9 +1367,6 @@ export const GameConfig = {
 			300,
 			{
 				label: "1",
-				merge: [
-					same("merge:townhall-1-townhall-2", "item:townhall-1", "item:townhall-2"),
-				],
 				producer: clickProducer(
 					3500,
 					outputs(
@@ -1006,9 +1397,6 @@ export const GameConfig = {
 			310,
 			{
 				label: "2",
-				merge: [
-					same("merge:townhall-2-townhall-3", "item:townhall-2", "item:townhall-3"),
-				],
 				producer: clickProducer(
 					3000,
 					outputs(
@@ -1018,6 +1406,8 @@ export const GameConfig = {
 							drop("item:blueprint-townhall-scrap", 16),
 							drop("item:crate-1", 28),
 							drop("item:crate-2", 12),
+							drop("item:blueprint-lumber-camp-2", 6),
+							drop("item:blueprint-quarry-2", 6),
 						]),
 						chance("item:water", 0.4, {
 							min: 1,
@@ -1043,9 +1433,6 @@ export const GameConfig = {
 			320,
 			{
 				label: "3",
-				merge: [
-					same("merge:townhall-3-townhall-4", "item:townhall-3", "item:townhall-4"),
-				],
 				producer: clickProducer(
 					2500,
 					outputs(
@@ -1056,6 +1443,8 @@ export const GameConfig = {
 							drop("item:crate-1", 18),
 							drop("item:crate-2", 30),
 							drop("item:crate-3", 12),
+							drop("item:blueprint-lumber-camp-3", 5),
+							drop("item:blueprint-quarry-3", 5),
 						]),
 						chance("item:water", 0.55, {
 							min: 1,
@@ -1082,9 +1471,6 @@ export const GameConfig = {
 			324,
 			{
 				label: "4",
-				merge: [
-					same("merge:townhall-4-townhall-5", "item:townhall-4", "item:townhall-5"),
-				],
 				producer: clickProducer(
 					2200,
 					outputs(
@@ -1095,6 +1481,8 @@ export const GameConfig = {
 							drop("item:crate-2", 34),
 							drop("item:crate-3", 22),
 							drop("item:crate-4", 8),
+							drop("item:blueprint-lumber-camp-4", 4),
+							drop("item:blueprint-quarry-4", 4),
 						]),
 						chance("item:water", 0.62, {
 							min: 1,
@@ -1130,6 +1518,8 @@ export const GameConfig = {
 							drop("item:crate-2", 28),
 							drop("item:crate-3", 30),
 							drop("item:crate-4", 12),
+							drop("item:blueprint-lumber-camp-5", 3),
+							drop("item:blueprint-quarry-5", 3),
 						]),
 						chance("item:water", 0.72, {
 							min: 1,
@@ -1156,13 +1546,6 @@ export const GameConfig = {
 			330,
 			{
 				label: "1",
-				merge: [
-					same(
-						"merge:lumber-camp-1-lumber-camp-2",
-						"item:lumber-camp-1",
-						"item:lumber-camp-2",
-					),
-				],
 				producer: clickProducer(
 					5000,
 					outputs(
@@ -1189,13 +1572,6 @@ export const GameConfig = {
 			340,
 			{
 				label: "2",
-				merge: [
-					same(
-						"merge:lumber-camp-2-lumber-camp-3",
-						"item:lumber-camp-2",
-						"item:lumber-camp-3",
-					),
-				],
 				producer: clickProducer(
 					4500,
 					outputs(
@@ -1225,13 +1601,6 @@ export const GameConfig = {
 			350,
 			{
 				label: "3",
-				merge: [
-					same(
-						"merge:lumber-camp-3-lumber-camp-4",
-						"item:lumber-camp-3",
-						"item:lumber-camp-4",
-					),
-				],
 				producer: clickProducer(
 					4000,
 					outputs(guaranteed("item:branch", 2), chance("item:log", 0.7)),
@@ -1255,13 +1624,6 @@ export const GameConfig = {
 			354,
 			{
 				label: "4",
-				merge: [
-					same(
-						"merge:lumber-camp-4-lumber-camp-5",
-						"item:lumber-camp-4",
-						"item:lumber-camp-5",
-					),
-				],
 				producer: clickProducer(
 					3600,
 					outputs(
@@ -1318,9 +1680,6 @@ export const GameConfig = {
 			360,
 			{
 				label: "1",
-				merge: [
-					same("merge:quarry-1-quarry-2", "item:quarry-1", "item:quarry-2"),
-				],
 				producer: clickProducer(
 					5500,
 					outputs(
@@ -1347,9 +1706,6 @@ export const GameConfig = {
 			370,
 			{
 				label: "2",
-				merge: [
-					same("merge:quarry-2-quarry-3", "item:quarry-2", "item:quarry-3"),
-				],
 				producer: clickProducer(
 					5000,
 					outputs(
@@ -1379,9 +1735,6 @@ export const GameConfig = {
 			380,
 			{
 				label: "3",
-				merge: [
-					same("merge:quarry-3-quarry-4", "item:quarry-3", "item:quarry-4"),
-				],
 				producer: clickProducer(
 					4500,
 					outputs(guaranteed("item:stone", 2), chance("item:crystal", 0.72)),
@@ -1405,9 +1758,6 @@ export const GameConfig = {
 			384,
 			{
 				label: "4",
-				merge: [
-					same("merge:quarry-4-quarry-5", "item:quarry-4", "item:quarry-5"),
-				],
 				producer: clickProducer(
 					4100,
 					outputs(
@@ -1442,6 +1792,36 @@ export const GameConfig = {
 						chance("item:crystal", 0.42),
 						chance("item:gem", 0.12),
 					),
+				),
+			},
+		),
+
+		item(
+			"item:coal-mine-1",
+			"asset:item-coal-mine",
+			"coal-mine-1",
+			"Coal Mine I",
+			1,
+			1,
+			"Produces coal only after it receives sausage and beer. Labor relations remain advanced nonsense.",
+			[
+				"producer",
+				"building",
+				"fuel",
+			],
+			392,
+			{
+				label: "1",
+				producer: clickProducer(
+					5200,
+					outputs(guaranteed("item:coal"), chance("item:coin", 0.12)),
+					{
+						type: "infinite",
+					},
+					[
+						producerInput("item:sausage", 1, 4),
+						producerInput("item:beer", 1, 4),
+					],
 				),
 			},
 		),
@@ -1644,6 +2024,14 @@ export const GameConfig = {
 				itemId: "item:water",
 				quantity: 4,
 			},
+			{
+				itemId: "item:sausage",
+				quantity: 3,
+			},
+			{
+				itemId: "item:beer",
+				quantity: 3,
+			},
 		],
 		board: [
 			{
@@ -1660,6 +2048,11 @@ export const GameConfig = {
 				itemId: "item:quarry-1",
 				x: 5,
 				y: 4,
+			},
+			{
+				itemId: "item:coal-mine-1",
+				x: 3,
+				y: 6,
 			},
 		],
 	},
@@ -1846,10 +2239,12 @@ function upgrade(
 function tier(
 	cost: readonly UpgradeTierDefinition["cost"][number][],
 	effects: readonly UpgradeEffectDefinition[],
+	durationMs = 6000,
 ): UpgradeTierDefinition {
 	return {
 		cost,
 		effects,
+		durationMs,
 	};
 }
 
@@ -1910,6 +2305,7 @@ function clickProducer(
 	mode: ProducerMode = {
 		type: "infinite",
 	},
+	inputs: readonly NonNullable<ProducerDefinition["inputs"]>[number][] = [],
 ): ProducerDefinition {
 	return {
 		trigger: "click",
@@ -1917,6 +2313,19 @@ function clickProducer(
 		output,
 		cooldownMs,
 		mode,
+		inputs,
+	};
+}
+
+function producerInput(
+	itemId: ItemId,
+	quantity: number,
+	capacity = Math.max(quantity * 3, quantity),
+): NonNullable<ProducerDefinition["inputs"]>[number] {
+	return {
+		itemId,
+		quantity,
+		capacity,
 	};
 }
 

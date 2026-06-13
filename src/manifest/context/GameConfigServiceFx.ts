@@ -29,6 +29,7 @@ export interface GameConfigService {
 	getCraftRecipe(recipeId: string): GameDataIndex["craftRecipes"][number] | undefined;
 	getCraftRecipeForTarget(itemId: string): GameDataIndex["craftRecipes"][number] | undefined;
 	getCraftRecipesForInput(itemId: string): GameDataIndex["craftRecipes"];
+	getMergeRulesForInput(itemId: string): GameDataIndex["merges"];
 	getLootTable(tableId: string | LootTableId): LootTableDefinition | undefined;
 	getUpgrade(upgradeId: string | UpgradeId): UpgradeDefinition | undefined;
 	isProducer(itemId: string): boolean;

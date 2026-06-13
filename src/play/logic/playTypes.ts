@@ -56,7 +56,11 @@ export interface UpgradeView {
 	level: number;
 	maxLevel: number;
 	maxed: boolean;
+	inProgress: boolean;
 	canBuy: boolean;
+	startedAtMs?: number;
+	readyAtMs?: number;
+	progress?: number;
 	nextCost: UpgradeCostView[];
 	currentEffects: string[];
 	nextEffects: string[];
@@ -93,6 +97,11 @@ export interface ViewItem {
 	usedInCrafts?: {
 		targetItemId: string;
 		resultItemId: string;
+	}[];
+	usedInMerges?: {
+		targetItemId: string;
+		resultItemId: string;
+		secret?: boolean;
 	}[];
 }
 
@@ -147,6 +156,14 @@ export interface ProducerView {
 	cooldownUntil?: string;
 	cooldownUntilMs?: number;
 	remainingCharges?: number;
+	inputs: ProducerInputView[];
+}
+
+export interface ProducerInputView {
+	itemId: string;
+	quantity: number;
+	capacity: number;
+	stored: number;
 }
 
 export interface ProducerPlacement {
@@ -177,6 +194,7 @@ export interface BoardItemState {
 	producer?: {
 		cooldownUntil?: string;
 		remainingCharges?: number;
+		inventory?: Record<string, number>;
 	};
 	craft?: {
 		delivered?: Record<string, number>;

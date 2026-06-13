@@ -53,6 +53,15 @@ export function createGameDataIndex(config: GameConfig) {
 		mergeRulesByPair.set(itemMergePairKey(rule.sourceItemId, rule.withItemId), rule);
 	}
 
+	const mergeRulesByInputItemId = new Map<ItemId, typeof merges>();
+	for (const rule of merges) {
+		const list = mergeRulesByInputItemId.get(rule.withItemId) ?? [];
+		mergeRulesByInputItemId.set(rule.withItemId, [
+			...list,
+			rule,
+		]);
+	}
+
 	const craftRecipes = config.items.flatMap((item) =>
 		item.craft
 			? [
@@ -82,6 +91,7 @@ export function createGameDataIndex(config: GameConfig) {
 		itemsById,
 		merges,
 		mergeRulesByPair,
+		mergeRulesByInputItemId,
 		mergeableItemIds: new Set(
 			merges.flatMap((rule) => [
 				rule.sourceItemId,

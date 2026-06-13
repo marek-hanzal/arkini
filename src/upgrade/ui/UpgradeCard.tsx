@@ -56,6 +56,23 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 				</div>
 			) : null}
 
+			{upgrade.inProgress ? (
+				<div className="mt-3 rounded-sm border border-amber-300/25 bg-amber-950/22 p-2">
+					<div className="flex items-center justify-between text-xs font-bold text-amber-100">
+						<span>Upgrade in progress</span>
+						<span>{Math.round((upgrade.progress ?? 0) * 100)}%</span>
+					</div>
+					<div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-950/70">
+						<div
+							className="h-full rounded-full bg-amber-300/80"
+							style={{
+								width: `${Math.round((upgrade.progress ?? 0) * 100)}%`,
+							}}
+						/>
+					</div>
+				</div>
+			) : null}
+
 			<div className="mt-3 flex flex-wrap items-center gap-2">
 				{upgrade.maxed ? (
 					<span className="rounded-sm bg-emerald-400/15 px-2 py-1 text-xs font-bold text-emerald-200">
@@ -85,15 +102,15 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 			<button
 				className={cn(
 					"mt-3 w-full rounded-md px-3 py-2 text-sm font-black transition",
-					upgrade.canBuy && !pending
+					upgrade.canBuy && !pending && !upgrade.inProgress
 						? "bg-emerald-300 text-slate-950 active:scale-[0.99]"
 						: "bg-slate-800 text-slate-500",
 				)}
-				disabled={!upgrade.canBuy || upgrade.maxed || pending}
+				disabled={!upgrade.canBuy || upgrade.maxed || pending || upgrade.inProgress}
 				type="button"
 				onClick={() => onBuy(upgrade.id)}
 			>
-				{upgrade.maxed ? "Maxed" : "Upgrade"}
+				{upgrade.maxed ? "Maxed" : upgrade.inProgress ? "In progress" : "Upgrade"}
 			</button>
 		</div>
 	);

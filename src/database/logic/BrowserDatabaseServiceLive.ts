@@ -1,6 +1,6 @@
 import type { BrowserDatabaseService } from "~/database/context/BrowserDatabaseServiceFx";
 import { assertBrowserDatabaseSupport } from "~/database/local/capabilities";
-import { databasePath } from "~/database/local/client";
+import { databasePath, sqlite } from "~/database/local/client";
 import { migrator } from "~/database/local/migrator";
 
 export const BrowserDatabaseServiceLive: BrowserDatabaseService = {
@@ -8,5 +8,8 @@ export const BrowserDatabaseServiceLive: BrowserDatabaseService = {
 	assertSupported: assertBrowserDatabaseSupport,
 	migrateToLatest() {
 		return migrator.migrateToLatest();
+	},
+	async deleteDatabaseFile() {
+		await sqlite.deleteDatabaseFile(undefined, true);
 	},
 };

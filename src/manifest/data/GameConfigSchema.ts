@@ -67,6 +67,7 @@ export const GameConfigSchema = z.object({
 								quantity: PositiveIntegerSchema,
 							}),
 						),
+						durationMs: NonNegativeIntegerSchema,
 						effects: z.array(
 							z.discriminatedUnion("type", [
 								z.object({
@@ -170,6 +171,15 @@ export const GameConfigSchema = z.object({
 						.enum([
 							"exhaust",
 						])
+						.optional(),
+					inputs: z
+						.array(
+							z.object({
+								itemId: ItemIdSchema,
+								quantity: PositiveIntegerSchema,
+								capacity: PositiveIntegerSchema,
+							}),
+						)
 						.optional(),
 					mode: z
 						.discriminatedUnion("type", [

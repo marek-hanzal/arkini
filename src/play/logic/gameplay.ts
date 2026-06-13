@@ -8,6 +8,7 @@ import { collectFx as playerCollectFx } from "~/player/fx/collectFx";
 import { runEffect } from "~/play/logic/runEffect";
 import { buyFx as upgradeBuyFx } from "~/upgrade/fx/buyFx";
 import { produceFx } from "~/producer/fx/produceFx";
+import { withdrawInputFx as producerWithdrawInputFx } from "~/producer/fx/withdrawInputFx";
 
 export function placeInventoryItem(slotIndex: number, x: number, y: number) {
 	return runEffect(
@@ -86,6 +87,15 @@ export function buyUpgrade(upgradeId: string) {
 	return runEffect(
 		upgradeBuyFx({
 			upgradeId,
+		}),
+	);
+}
+
+export function withdrawProducerInput(boardItemId: string, itemId: string) {
+	return runEffect(
+		producerWithdrawInputFx({
+			boardItemId,
+			itemId,
 		}),
 	);
 }

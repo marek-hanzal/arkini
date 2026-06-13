@@ -26,6 +26,11 @@ export function createItemCatalogView({
 				targetItemId: craft.targetItemId,
 				resultItemId: craft.resultItemId,
 			}));
+			const usedInMerges = gameConfig.getMergeRulesForInput(item.id).map((rule) => ({
+				targetItemId: rule.sourceItemId,
+				resultItemId: rule.resultItemId,
+				secret: rule.secret,
+			}));
 
 			return [
 				item.id,
@@ -45,6 +50,7 @@ export function createItemCatalogView({
 					canMerge: gameConfig.isMergeableItem(item.id as ItemId),
 					mergeResults,
 					usedInCrafts,
+					usedInMerges,
 				} satisfies ViewItem,
 			];
 		}),

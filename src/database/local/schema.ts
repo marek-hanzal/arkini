@@ -45,6 +45,9 @@ export interface PlayerUpgradeTable {
 	saveGameId: string;
 	upgradeDefinitionId: string;
 	level: number;
+	targetLevel: number | null;
+	startedAt: string | null;
+	readyAt: string | null;
 	createdAt: Timestamp;
 	updatedAt: Timestamp;
 }

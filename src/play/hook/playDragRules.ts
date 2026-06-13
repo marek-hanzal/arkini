@@ -177,8 +177,13 @@ function boardToCell(
 		resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId),
 	);
 	const canCraft = Boolean(targetItem.craft?.acceptedInputItemIds.includes(source.itemId));
+	const canSupplyProducer = Boolean(
+		targetItem.producer?.inputs.some(
+			(input) => input.itemId === source.itemId && input.stored < input.capacity,
+		),
+	);
 
-	if (!canMerge && !canCraft) {
+	if (!canMerge && !canCraft && !canSupplyProducer) {
 		return accept({
 			hide: [
 				source.sourceId,

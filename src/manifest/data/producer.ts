@@ -8,6 +8,13 @@ export interface ProducerDefinition {
 	cooldownMs?: number;
 	mode?: ProducerMode;
 	doubleClickBehavior?: "exhaust";
+	inputs?: readonly ProducerInputDefinition[];
+}
+
+export interface ProducerInputDefinition {
+	itemId: ItemId;
+	quantity: number;
+	capacity: number;
 }
 
 export type ProducerMode =

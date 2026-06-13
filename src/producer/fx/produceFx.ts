@@ -97,6 +97,21 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			const steps = isFiniteExhaust
 				? Math.max(1, producerState.remainingCharges ?? mode.charges)
 				: 1;
+			const producerInventory = {
+				...(producerState.inventory ?? {}),
+			};
+
+			for (const required of producer.inputs ?? []) {
+				const needed = required.quantity * steps;
+				const stored = producerInventory[required.itemId] ?? 0;
+				if (stored < needed) {
+					const name = gameConfig.getItem(required.itemId)?.name ?? required.itemId;
+					return yield* Effect.fail(new GameActionError(`Producer needs ${name}.`));
+				}
+				producerInventory[required.itemId] = stored - needed;
+				if (producerInventory[required.itemId] <= 0)
+					delete producerInventory[required.itemId];
+			}
 
 			const allDrops: ItemId[] = [];
 			for (let step = 0; step < steps; step++) {
@@ -162,6 +177,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 							...state,
 							producer: {
 								...producerState,
+								inventory: producerInventory,
 								cooldownUntil: date.toTimestamp(
 									now.plus({
 										milliseconds: producer.cooldownMs ?? 0,

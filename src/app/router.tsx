@@ -6,6 +6,7 @@ import {
 	createRouter,
 } from "@tanstack/react-router";
 import { HomeScreen } from "~/app/HomeScreen";
+import { RootErrorBoundary } from "~/app/RootErrorBoundary";
 import { RootShell } from "~/app/RootShell";
 
 export interface RouterContext {
@@ -31,6 +32,7 @@ const history = createHashHistory();
 
 export const rootRoute = createRootRouteWithContext<RouterContext>()({
 	component: RootShell,
+	errorComponent: ({ error }) => <RootErrorBoundary error={error} />,
 });
 
 const indexRoute = createRoute({

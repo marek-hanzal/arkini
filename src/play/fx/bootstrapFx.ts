@@ -32,7 +32,13 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 	const random = yield* RandomServiceFx;
 	const next = Effect.runPromise(
 		Effect.gen(function* () {
-			const result = yield* tryGameAction(() => browserDatabase.migrateToLatest());
+			let result = yield* tryGameAction(() => browserDatabase.migrateToLatest());
+
+			if (result.error && isRecoverableMigrationError(result.error)) {
+				bootstrapState.reset();
+				yield* tryGameAction(() => browserDatabase.deleteDatabaseFile());
+				result = yield* tryGameAction(() => browserDatabase.migrateToLatest());
+			}
 
 			if (result.error) return yield* Effect.fail(result.error);
 
@@ -55,3 +61,12 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 
 	return yield* tryGameAction(() => next);
 });
+
+function isRecoverableMigrationError(error: unknown) {
+	const message = error instanceof Error ? error.message : String(error);
+	return (
+		message.includes("corrupted migrations") ||
+		message.includes("previously executed migration") ||
+		message.includes("is missing")
+	);
+}

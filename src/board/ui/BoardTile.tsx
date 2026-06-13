@@ -50,7 +50,7 @@ export const BoardTile: FC<BoardTile.Props> = ({
 			hidden={hidden}
 			className="absolute inset-0 touch-none"
 			onSingleActivate={onSingleActivate}
-			delaySingleWhenDouble={boardItem.producer?.doubleClickBehavior === "exhaust"}
+			delaySingleWhenDouble
 			onDoubleActivate={onDoubleActivate}
 		>
 			<GameItemView

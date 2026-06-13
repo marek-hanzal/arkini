@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
+import { HardResetButton } from "~/play/ui/HardResetButton";
 import { ActionErrorPulse } from "~/play/ui/ActionErrorPulse";
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlaySave } from "~/play/hook/usePlaySave";
@@ -133,8 +134,11 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 	if (saveQuery.isError || !saveQuery.data) {
 		return (
 			<div className="grid h-dvh w-dvw place-items-center p-4">
-				<div className="rounded-md border border-red-400/30 bg-red-950/30 p-4 text-sm text-red-100">
-					{(saveQuery.error as Error)?.message ?? "Game failed to load."}
+				<div className="w-full max-w-xl rounded-md border border-red-400/30 bg-red-950/30 p-4 text-sm text-red-100">
+					<p>{(saveQuery.error as Error)?.message ?? "Game failed to load."}</p>
+					<div className="mt-4">
+						<HardResetButton />
+					</div>
 				</div>
 			</div>
 		);
@@ -183,13 +187,11 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 										return;
 									}
 
-									if (!item.producer) {
-										if (manualActions.canCollect(item)) {
-											void manualActions.collectBoardWithFly(item);
-											return;
-										}
-										void manualActions.stashBoardWithFly(item);
+									if (manualActions.canCollect(item)) {
+										void manualActions.collectBoardWithFly(item);
+										return;
 									}
+									void manualActions.stashBoardWithFly(item);
 								},
 							}}
 						/>

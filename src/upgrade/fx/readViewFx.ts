@@ -1,12 +1,17 @@
 import { Effect } from "effect";
+import { completeReadyFx } from "~/upgrade/fx/completeReadyFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { UpgradeListView, UpgradeView } from "~/play/logic/playTypes";
 import { defaultSaveGameId } from "~/play/logic/save";
 import { describeUpgradeEffect } from "~/upgrade/logic/describeUpgradeEffect";
 
 export const readViewFx = Effect.fn("readViewFx")(function* () {
+	yield* completeReadyFx();
+
+	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
 	const [upgradeRows, playerInventoryRows] = yield* dbFx((db) =>
 		Promise.all([
@@ -22,12 +27,6 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				.execute(),
 		]),
 	);
-	const levelByUpgradeId = new Map(
-		upgradeRows.map((row) => [
-			row.upgradeDefinitionId,
-			row.level,
-		]),
-	);
 	const availableByItemId = new Map<string, number>();
 	for (const row of playerInventoryRows) {
 		availableByItemId.set(
@@ -40,8 +39,23 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 		.slice()
 		.sort((left, right) => left.sort - right.sort)
 		.map((upgrade): UpgradeView => {
-			const level = levelByUpgradeId.get(upgrade.id) ?? 0;
+			const row = upgradeRows.find((row) => row.upgradeDefinitionId === upgrade.id);
+			const level = row?.level ?? 0;
 			const nextTier = upgrade.tiers[level];
+			const startedAtMs = row?.startedAt ? date.parseTimestampMs(row.startedAt) : undefined;
+			const readyAtMs = row?.readyAt ? date.parseTimestampMs(row.readyAt) : undefined;
+			const nowMs = date.now().toMillis();
+			const inProgress = row?.targetLevel !== null && row?.targetLevel !== undefined;
+			const progress =
+				inProgress && startedAtMs !== undefined && readyAtMs !== undefined
+					? Math.max(
+							0,
+							Math.min(
+								1,
+								(nowMs - startedAtMs) / Math.max(1, readyAtMs - startedAtMs),
+							),
+						)
+					: undefined;
 			const nextCost = (nextTier?.cost ?? []).map((entry) => ({
 				itemId: entry.itemId,
 				quantity: entry.quantity,
@@ -58,7 +72,11 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				level,
 				maxLevel: upgrade.tiers.length,
 				maxed: level >= upgrade.tiers.length,
-				canBuy,
+				inProgress,
+				canBuy: canBuy && !inProgress,
+				startedAtMs,
+				readyAtMs,
+				progress,
 				nextCost,
 				currentEffects: upgrade.tiers
 					.slice(0, level)

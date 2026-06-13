@@ -5,6 +5,7 @@ export interface BrowserDatabaseService {
 	databasePath: string;
 	assertSupported(): void;
 	migrateToLatest(): ReturnType<typeof migrator.migrateToLatest>;
+	deleteDatabaseFile(): Promise<void>;
 }
 
 export class BrowserDatabaseServiceFx extends Context.Tag("BrowserDatabaseServiceFx")<

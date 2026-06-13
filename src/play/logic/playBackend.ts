@@ -15,6 +15,7 @@ export {
 	stashBoardItem,
 	swapBoardItems,
 	swapInventorySlots,
+	withdrawProducerInput,
 } from "./gameplay";
 export { readBoardView } from "./readBoardView";
 export { readGameSaveView } from "./readGameSaveView";

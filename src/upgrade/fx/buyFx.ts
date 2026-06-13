@@ -36,6 +36,9 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 				(row) => row.upgradeDefinitionId === upgrade.id,
 			);
 			const level = existing?.level ?? 0;
+			if (existing?.targetLevel !== null && existing?.targetLevel !== undefined) {
+				return yield* Effect.fail(new GameActionError("Upgrade is already in progress."));
+			}
 			const nextTier = upgrade.tiers[level];
 			if (!nextTier) return yield* Effect.fail(new GameActionError("Upgrade is maxed."));
 
@@ -69,12 +72,22 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 				);
 			}
 
+			const targetLevel = level + 1;
+			const startedAt = timestamp;
+			const readyAt = date.toTimestamp(
+				date.now().plus({
+					milliseconds: nextTier.durationMs,
+				}),
+			);
+
 			if (existing) {
 				yield* dbFx((db) =>
 					db
 						.updateTable(table.playerUpgrade)
 						.set({
-							level: level + 1,
+							targetLevel,
+							startedAt,
+							readyAt,
 							updatedAt: timestamp,
 						})
 						.where("id", "=", existing.id)
@@ -88,7 +101,10 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 							id: id.prefixed("upgrade"),
 							saveGameId: mutable.save.id,
 							upgradeDefinitionId: upgrade.id,
-							level: 1,
+							level,
+							targetLevel,
+							startedAt,
+							readyAt,
 						})
 						.execute(),
 				);

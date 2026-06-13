@@ -94,6 +94,13 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 								boardItem.craft?.acceptedInputItemIds.includes(
 									drag.activeDrag.itemId,
 								),
+							) ||
+							Boolean(
+								boardItem.producer?.inputs.some(
+									(input) =>
+										input.itemId === drag.activeDrag?.itemId &&
+										input.stored < input.capacity,
+								),
 							)
 						: false;
 				return (

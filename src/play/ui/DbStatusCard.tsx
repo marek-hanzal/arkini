@@ -1,7 +1,8 @@
-import { type FC, useState } from "react";
+import type { FC } from "react";
 import { cn } from "~/shared/cn";
 import { useArkiniDatabaseStatus } from "~/play/hook/useArkiniDatabaseStatus";
 import { StatusPill } from "~/play/ui/StatusPill";
+import { HardResetButton } from "~/play/ui/HardResetButton";
 
 export namespace DbStatusCard {
 	export interface Props {}
@@ -9,21 +10,7 @@ export namespace DbStatusCard {
 
 export const DbStatusCard: FC<DbStatusCard.Props> = () => {
 	const status = useArkiniDatabaseStatus();
-	const [resetState, setResetState] = useState<"idle" | "pending" | "failed">("idle");
 	const isolated = typeof window !== "undefined" && window.crossOriginIsolated === true;
-
-	async function resetDb() {
-		setResetState("pending");
-
-		try {
-			const db = await import("~/play/logic/playBackend");
-			await db.hardResetDatabaseFile();
-			window.location.reload();
-		} catch (error) {
-			console.error(error);
-			setResetState("failed");
-		}
-	}
 
 	return (
 		<section className="w-full rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-lg shadow-slate-950/25">
@@ -66,23 +53,13 @@ export const DbStatusCard: FC<DbStatusCard.Props> = () => {
 					/>
 				</div>
 
-				<button
-					type="button"
-					disabled={resetState === "pending"}
-					onClick={resetDb}
-					className="rounded-sm border border-red-400/30 bg-red-950/30 px-6 py-3 text-sm font-semibold text-red-100 hover:border-red-300 hover:bg-red-950/50 disabled:cursor-wait disabled:opacity-60"
-				>
-					{resetState === "pending" ? "Dropping DB…" : "Hard reset DB"}
-				</button>
+				<div className="min-w-40">
+					<HardResetButton label="Hard reset DB" />
+				</div>
 			</div>
 
 			{status.isError ? (
 				<p className="mt-3 text-sm text-red-100">{(status.error as Error).message}</p>
-			) : null}
-			{resetState === "failed" ? (
-				<p className="mt-3 text-sm text-red-100">
-					Hard reset failed. Check the browser console.
-				</p>
 			) : null}
 		</section>
 	);

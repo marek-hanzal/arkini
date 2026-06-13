@@ -60,7 +60,7 @@ button {
 }
 
 :root {
-	--ak-bottom-nav-height: calc(5rem + env(safe-area-inset-bottom));
+	--ak-bottom-nav-height: calc(5.4rem + env(safe-area-inset-bottom));
 	--ak-sheet-width: 100dvw;
 	--ak-sheet-max-height: 85dvh;
 }
@@ -136,10 +136,10 @@ button {
 
 .ak-bottom-nav-inner {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 0.5rem;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.4rem;
 	width: 100%;
-	max-width: 430px;
+	max-width: min(100%, 540px);
 	height: 100%;
 	margin-inline: auto;
 }
@@ -154,8 +154,8 @@ button {
 	gap: 0.2rem;
 	border-radius: 0.55rem;
 	border: 1px solid rgb(51 65 85 / 0.95);
-	padding: 0.35rem 0.55rem;
-	font-size: 0.75rem;
+	padding: 0.3rem 0.25rem;
+	font-size: clamp(0.62rem, 2.6vw, 0.75rem);
 	font-weight: 700;
 	line-height: 1;
 	color: rgb(203 213 225);
@@ -176,6 +176,11 @@ button {
 	background: rgb(120 53 15 / 0.22);
 }
 
+.ak-bottom-nav-button[data-tone="upgrades"] {
+	border-color: rgb(148 163 184 / 0.42);
+	background: rgb(30 41 59 / 0.28);
+}
+
 .ak-bottom-nav-button[data-tone="database"] {
 	border-color: rgb(129 140 248 / 0.42);
 	background: rgb(49 46 129 / 0.23);
@@ -193,6 +198,12 @@ button {
 	color: rgb(254 243 199);
 }
 
+.ak-bottom-nav-button[data-active="true"][data-tone="upgrades"] {
+	border-color: rgb(226 232 240 / 0.88);
+	background: rgb(148 163 184 / 0.18);
+	color: rgb(241 245 249);
+}
+
 .ak-bottom-nav-button[data-active="true"][data-tone="database"] {
 	border-color: rgb(165 180 252 / 0.9);
 	background: rgb(99 102 241 / 0.22);
@@ -200,6 +211,6 @@ button {
 }
 
 .ak-bottom-nav-icon {
-	font-size: 1rem;
+	font-size: clamp(0.82rem, 3vw, 1rem);
 	line-height: 1;
 }

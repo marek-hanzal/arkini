@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { completeReadyFx } from "~/upgrade/fx/completeReadyFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import { defaultSaveGameId } from "~/play/logic/save";
@@ -11,6 +12,8 @@ import {
 } from "~/play/logic/gameActionSchemas";
 
 export const readMutableSaveFx = Effect.fn("readMutableSaveFx")(function* () {
+	yield* completeReadyFx();
+
 	const [saveRow, boardRows, inventoryRows, playerInventoryRows, upgradeRows] = yield* dbFx(
 		(db) =>
 			Promise.all([

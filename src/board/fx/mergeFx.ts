@@ -40,6 +40,50 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				return yield* Effect.fail(new GameActionError("Both board items must exist."));
 			}
 
+			const targetProducer = gameConfig.getProducer(target.itemDefinitionId);
+			const producerInput = targetProducer?.inputs?.find(
+				(input) => input.itemId === source.itemDefinitionId,
+			);
+
+			if (targetProducer && producerInput) {
+				const targetState = {
+					...createInitialBoardState(target.itemDefinitionId, gameConfig),
+					...readStoredBoardState(target.stateJson),
+				};
+				const producerState = targetState.producer ?? {};
+				const inventory = {
+					...(producerState.inventory ?? {}),
+				};
+				const stored = inventory[source.itemDefinitionId] ?? 0;
+				if (stored >= producerInput.capacity) {
+					return yield* Effect.fail(
+						new GameActionError("Producer input storage is full."),
+					);
+				}
+				inventory[source.itemDefinitionId] = stored + 1;
+
+				yield* dbFx((db) =>
+					db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
+				);
+				yield* dbFx((db) =>
+					db
+						.updateTable(table.boardItem)
+						.set({
+							stateJson: json({
+								...targetState,
+								producer: {
+									...producerState,
+									inventory,
+								},
+							}),
+							updatedAt: timestamp,
+						})
+						.where("id", "=", target.id)
+						.execute(),
+				);
+				return;
+			}
+
 			const craft = gameConfig.getCraftRecipeForTarget(target.itemDefinitionId);
 			const craftInput = craft?.inputs.find(
 				(input) => input.itemId === source.itemDefinitionId,

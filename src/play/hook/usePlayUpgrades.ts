@@ -6,6 +6,9 @@ export function usePlayUpgrades() {
 	return useQuery({
 		queryKey: playQueryKeys.upgrades,
 		enabled: typeof window !== "undefined",
+		refetchInterval(query) {
+			return query.state.data?.upgrades.some((upgrade) => upgrade.inProgress) ? 500 : false;
+		},
 		async queryFn() {
 			const db = await loadPlayBackend();
 			return db.readUpgradeListView();

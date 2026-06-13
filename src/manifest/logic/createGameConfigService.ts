@@ -38,6 +38,9 @@ export function createGameConfigService(config: GameConfig): GameConfigService {
 		getCraftRecipesForInput(itemId) {
 			return index.craftRecipesByInputItemId.get(itemId as ItemId) ?? [];
 		},
+		getMergeRulesForInput(itemId) {
+			return index.mergeRulesByInputItemId.get(itemId as ItemId) ?? [];
+		},
 		getLootTable(tableId) {
 			return index.lootTablesById.get(tableId as LootTableId);
 		},

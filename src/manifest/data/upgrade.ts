@@ -12,6 +12,7 @@ export interface UpgradeDefinition {
 export interface UpgradeTierDefinition {
 	cost: readonly UpgradeCostDefinition[];
 	effects: readonly UpgradeEffectDefinition[];
+	durationMs: number;
 }
 
 export interface UpgradeCostDefinition {

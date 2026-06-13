@@ -1,6 +1,7 @@
 import { Effect } from "effect";
-import { databasePath } from "~/database/local/client";
+import { BrowserDatabaseServiceFx } from "~/database/context/BrowserDatabaseServiceFx";
 
 export const readDatabasePathFx = Effect.fn("readDatabasePathFx")(function* () {
-	return databasePath;
+	const browserDatabase = yield* BrowserDatabaseServiceFx;
+	return browserDatabase.databasePath;
 });

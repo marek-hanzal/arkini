@@ -38,7 +38,13 @@ Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. E
 
 Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, producer output rolling, and save mutation pipelines. Files inside `src/**/fx/` are reserved for root `Effect.fn(...)` operations only. Pure helpers, runner helpers, cached state, context tags, service implementations, and domain types stay outside `fx/`, mostly in `logic/` or `context/`. UI feedback still happens from action results/hooks; effects do not know DOM nodes, GSAP timelines, React state, or pointer events.
 
-Database access is provided through `KyselyContextFx`; domain effects call `dbFx(...)` and wrap multi-step mutations with `withTransactionFx(...)` instead of passing `tx` through props like some cursed little dependency relay race. Time is provided through `DateServiceFx` and represented with Luxon; domain effects use the service for timestamps, cooldown math, and timestamp parsing instead of poking global `Date` everywhere. Randomness is provided through `RandomServiceFx`; producer rolls do not call `Math.random()` directly. The random service is not a dumb wrapper: it exposes common game-random helpers such as `number(max)`, `chance(probability)`, `integerInclusive(min, max)`, and typed `weighted(entries, fallback)` picking. The only live random implementation is `RandomServiceLive`, so deterministic/test random can be swapped in later from one place.
+Database access is provided through `KyselyContextFx`; domain effects call `dbFx(...)` and wrap multi-step mutations with `withTransactionFx(...)` instead of passing `tx` through props like some cursed little dependency relay race. Browser database bootstrapping is isolated behind `BrowserDatabaseServiceFx`, so OPFS support checks, database path, and migrations do not leak into gameplay effects.
+
+Time is provided through `DateServiceFx` and represented with Luxon; domain effects use the service for timestamps, cooldown math, and timestamp parsing instead of poking global `Date` everywhere. ID generation is provided through `IdServiceFx`, so board ids and virtual inventory ids use one timestamp/UUID policy instead of scattered `crypto.randomUUID()` improv jazz.
+
+Static gameplay data is provided through `GameConfigServiceFx`. Effects use it for config access, derived indexes, producer/item/build lookup, merge resolution, and status summaries instead of importing `GameConfig`/`gameDataIndex` everywhere like globals are a personality. Config hashing is isolated behind `HashServiceFx`, with WebCrypto living in one live service implementation.
+
+Randomness is provided through `RandomServiceFx`; producer rolls do not call `Math.random()` directly. The random service is not a dumb wrapper: it exposes common game-random helpers such as `number(max)`, `chance(probability)`, `integerInclusive(min, max)`, and typed `weighted(entries, fallback)` picking. The only live random implementation is `RandomServiceLive`, so deterministic/test random can be swapped in later from one place.
 
 ## Gameplay model
 
@@ -91,12 +97,18 @@ If a component needs board data, it subscribes to board data. If it needs invent
 ```txt
 src/app/                         App entry, router, global styles, cross-origin isolation fallback.
 src/manifest/data/               GameConfig, Zod config schema, validation, derived indexes, SVG assets.
+src/manifest/context/            Effect game config service context tag.
+src/manifest/logic/              Live config service, derived lookup helpers, and provider helper.
 src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.
 src/database/context/            Effect database context tags.
 src/database/fx/                 Database Effect helpers such as dbFx and withTransactionFx.
-src/database/logic/              Non-root database Effect providers/helpers.
+src/database/logic/              Non-root database Effect providers/helpers and browser database service.
 src/date/context/                Effect date/time service context tag.
 src/date/logic/                  Live Luxon date service and timestamp helpers.
+src/hash/context/                Effect hash service context tag.
+src/hash/logic/                  Live WebCrypto hashing service and provider helper.
+src/id/context/                  Effect id service context tag.
+src/id/logic/                    Timestamp/UUID id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
 src/play/logic/                  Promise backend façade plus shared backend types/helpers.

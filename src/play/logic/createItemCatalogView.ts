@@ -1,14 +1,22 @@
-import { GameConfig } from "~/manifest/data/GameConfig";
-import { gameDataIndex } from "~/manifest/data/gameDataIndex";
+import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/data/manifestId";
 import type { ItemCatalogView, ViewItem } from "~/play/logic/playTypes";
+import { GameActionError } from "~/play/logic/playTypes";
 
-export function createItemCatalogView(): ItemCatalogView {
+export namespace createItemCatalogView {
+	export interface Props {
+		gameConfig: GameConfigService;
+	}
+}
+
+export function createItemCatalogView({
+	gameConfig,
+}: createItemCatalogView.Props): ItemCatalogView {
 	return Object.fromEntries(
-		GameConfig.items.map((item) => {
-			const asset = gameDataIndex.assetsById.get(item.assetId);
-			if (!asset) throw new Error(`Missing asset for ${item.id}`);
-			const producer = gameDataIndex.producersByItemId.get(item.id);
+		gameConfig.config.items.map((item) => {
+			const asset = gameConfig.getAsset(item.assetId);
+			if (!asset) throw new GameActionError(`Missing asset for ${item.id}`);
+			const producer = gameConfig.getProducer(item.id);
 
 			return [
 				item.id,
@@ -24,7 +32,7 @@ export function createItemCatalogView(): ItemCatalogView {
 					],
 					canProduce: Boolean(producer),
 					producerTrigger: producer?.trigger,
-					canMerge: gameDataIndex.mergeableItemIds.has(item.id as ItemId),
+					canMerge: gameConfig.isMergeableItem(item.id as ItemId),
 				} satisfies ViewItem,
 			];
 		}),

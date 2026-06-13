@@ -1,5 +1,7 @@
 import { z } from "zod";
-import { GameConfig } from "~/manifest/data/GameConfig";
+import { GameConfigServiceLive } from "~/manifest/logic/GameConfigServiceLive";
+
+const GameConfig = GameConfigServiceLive.config;
 import { ItemIdSchema } from "~/manifest/data/ItemIdSchema";
 import { PositiveIntegerSchema } from "~/manifest/data/PositiveIntegerSchema";
 

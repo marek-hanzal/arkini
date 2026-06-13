@@ -1,9 +1,10 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
-import { GameConfig } from "~/manifest/data/GameConfig";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import type { GameConfig } from "~/manifest/data/GameConfig";
 import { assertGameConfig } from "~/manifest/data/validation/gameConfig";
 import type { GameConfigSyncResult } from "~/play/logic/GameConfigSyncResult";
 import { hashConfigFx } from "./hashConfigFx";
@@ -15,12 +16,14 @@ export namespace syncConfigFx {
 }
 
 export const syncConfigFx = Effect.fn("syncConfigFx")(function* ({
-	config = GameConfig,
+	config,
 }: syncConfigFx.Props = {}) {
-	assertGameConfig(config);
+	const gameConfig = yield* GameConfigServiceFx;
+	const effectiveConfig = config ?? gameConfig.config;
+	assertGameConfig(effectiveConfig);
 
 	const hash = yield* hashConfigFx({
-		config,
+		config: effectiveConfig,
 	});
 	const date = yield* DateServiceFx;
 	const timestamp = date.timestamp();

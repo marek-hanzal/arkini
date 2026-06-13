@@ -3,8 +3,8 @@ import { assertInsideInventory } from "~/board/logic/gameBounds";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { getItem } from "~/play/logic/gameDefinitionLookup";
 import { SwapInventorySlotsInputSchema } from "~/play/logic/gameActionSchemas";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
@@ -30,6 +30,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 
 	yield* withTransactionFx(
 		Effect.gen(function* () {
+			const gameConfig = yield* GameConfigServiceFx;
 			const { save, inventoryRows } = yield* readMutableSaveFx();
 			assertInsideInventory(save, input.sourceSlotIndex);
 			assertInsideInventory(save, input.targetSlotIndex);
@@ -41,7 +42,12 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			}
 
 			if (target && target.itemDefinitionId === source.itemDefinitionId) {
-				const item = getItem(source.itemDefinitionId);
+				const item = gameConfig.getItem(source.itemDefinitionId);
+				if (!item) {
+					return yield* Effect.fail(
+						new GameActionError(`Unknown item definition ${source.itemDefinitionId}.`),
+					);
+				}
 				const movable = Math.min(source.quantity, item.maxStackSize - target.quantity);
 				if (movable <= 0) return;
 				yield* dbFx((db) =>

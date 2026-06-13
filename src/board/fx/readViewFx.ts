@@ -1,6 +1,7 @@
 import { Effect } from "effect";
-import { boardColumns, boardRows } from "~/board/boardIdentity";
 import { readProducerView } from "~/board/logic/boardState";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { cellKey } from "~/board/util/cell";
 import { dbFx } from "~/database/fx/dbFx";
 import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
@@ -10,6 +11,8 @@ import type { BoardItemState, BoardView, BoardViewItem } from "~/play/logic/play
 import { json, parseJson } from "~/shared/json";
 
 export const readViewFx = Effect.fn("readViewFx")(function* () {
+	const date = yield* DateServiceFx;
+	const gameConfig = yield* GameConfigServiceFx;
 	const rows = yield* dbFx((db) =>
 		db
 			.selectFrom(table.boardItem)
@@ -28,7 +31,12 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 			x: item.x,
 			y: item.y,
 			state,
-			producer: readProducerView(item.itemDefinitionId, state),
+			producer: readProducerView({
+				itemId: item.itemDefinitionId,
+				state,
+				date,
+				gameConfig,
+			}),
 		};
 	});
 	const byId = Object.fromEntries(

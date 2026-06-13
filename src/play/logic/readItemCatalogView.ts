@@ -1,6 +1,6 @@
-import { Effect } from "effect";
 import { readItemCatalogFx } from "../fx/readItemCatalogFx";
+import { runEffect } from "./runEffect";
 
 export function readItemCatalogView() {
-	return Effect.runSync(readItemCatalogFx());
+	return runEffect(readItemCatalogFx());
 }

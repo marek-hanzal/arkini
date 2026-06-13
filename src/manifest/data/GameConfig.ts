@@ -158,7 +158,7 @@ export const GameConfig = {
 		asset("asset:item-crate", "Common Crate", "item-crate", 150, "png"),
 		asset("asset:item-crate-sturdy", "Sturdy Crate", "item-crate-sturdy", 160, "png"),
 		asset("asset:item-crate-rare", "Rare Crate", "item-crate-rare", 170, "png"),
-		asset("asset:item-crate-epic", "Epic Crate", "item-crate-epic", 180),
+		asset("asset:item-crate-epic", "Epic Crate", "item-crate-epic", 180, "png"),
 	],
 	resources: [] as readonly ResourceDefinition[],
 	lootTables: [

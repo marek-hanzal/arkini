@@ -52,7 +52,7 @@ export const GameConfig = {
 		asset("asset:item-tree", "Tree", "item-tree", 39),
 		asset("asset:item-twig", "Twig", "item-twig", 40, "png"),
 		asset("asset:item-branch", "Branch", "item-branch", 50, "png"),
-		asset("asset:item-log", "Log", "item-log", 60),
+		asset("asset:item-log", "Log", "item-log", 60, "png"),
 		asset("asset:item-wood-bundle", "Wood Bundle", "item-wood-bundle", 64),
 		asset("asset:item-plank", "Plank", "item-plank", 66),
 		asset("asset:item-beam", "Beam", "item-beam", 68),

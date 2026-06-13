@@ -190,22 +190,22 @@ export function playCellError(element: HTMLElement) {
 }
 
 export function playProducerReady(element: HTMLElement) {
-	gsap.killTweensOf(element, "scale,filter,y");
+	gsap.killTweensOf(element, "scale,boxShadow,y");
 	gsap.timeline()
 		.to(element, {
 			y: -1,
-			scale: 1.055,
-			filter: "drop-shadow(0 0 0.55rem rgb(110 231 183 / 0.72))",
-			duration: 0.18,
+			scale: 1.045,
+			boxShadow: "0 0 0 0.12rem rgb(110 231 183 / 0.36), 0 0 0.72rem rgb(110 231 183 / 0.24)",
+			duration: 0.16,
 			ease: "power2.out",
 		})
 		.to(element, {
 			y: 0,
 			scale: 1,
-			filter: "drop-shadow(0 0 0 rgb(110 231 183 / 0))",
-			duration: 0.28,
+			boxShadow: "0 0 0 0 rgb(110 231 183 / 0)",
+			duration: 0.24,
 			ease: "power2.out",
-			clearProps: "filter,transform",
+			clearProps: "boxShadow,transform",
 		});
 }
 
@@ -283,7 +283,6 @@ export function animateBottomSheet({
 				backdrop,
 				{
 					opacity: 1,
-					"--ak-bottom-sheet-backdrop-blur": "10px",
 				},
 				0,
 			)
@@ -324,7 +323,6 @@ export function animateBottomSheet({
 			backdrop,
 			{
 				opacity: 0,
-				"--ak-bottom-sheet-backdrop-blur": "0px",
 			},
 			0,
 		)

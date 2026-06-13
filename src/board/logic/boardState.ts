@@ -49,6 +49,8 @@ export function readProducerView(itemId: string, state: BoardItemState): Produce
 		...(state.producer ?? {}),
 	};
 
+	const cooldownUntil = producerState.cooldownUntil ?? null;
+
 	return {
 		trigger: producer.trigger,
 		mode: producer.mode ?? {
@@ -56,9 +58,15 @@ export function readProducerView(itemId: string, state: BoardItemState): Produce
 		},
 		cooldownMs: producer.cooldownMs ?? null,
 		doubleClickBehavior: producer.doubleClickBehavior ?? null,
-		cooldownUntil: producerState.cooldownUntil ?? null,
+		cooldownUntil,
+		cooldownUntilMs: cooldownUntil ? parseTimestampMs(cooldownUntil) : null,
 		remainingCharges: producerState.remainingCharges ?? null,
 	};
+}
+
+function parseTimestampMs(value: string) {
+	const parsed = Date.parse(value);
+	return Number.isFinite(parsed) ? parsed : null;
 }
 
 export function readBoardState(row: Pick<readBoardState.Row, "stateJson">) {

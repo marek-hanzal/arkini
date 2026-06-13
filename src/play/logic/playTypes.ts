@@ -90,6 +90,7 @@ export interface ProducerView {
 	cooldownMs: number | null;
 	doubleClickBehavior: "exhaust" | null;
 	cooldownUntil: string | null;
+	cooldownUntilMs: number | null;
 	remainingCharges: number | null;
 }
 

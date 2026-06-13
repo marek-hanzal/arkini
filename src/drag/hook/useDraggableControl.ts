@@ -417,19 +417,28 @@ export function useDraggableControl<
 	}
 
 	function hideSources(ids: readonly string[]) {
+		if (!ids.length) return;
+
 		setHiddenSourceIds((current) => {
 			const next = new Set(current);
-			for (const id of ids) next.add(id);
-			return next;
+			let changed = false;
+
+			for (const id of ids) {
+				if (next.has(id)) continue;
+				next.add(id);
+				changed = true;
+			}
+
+			return changed ? next : current;
 		});
 	}
 
 	function showSource(id: string) {
-		setHiddenSourceIds((current) => without(current, id));
+		setHiddenSourceIds((current) => (current.has(id) ? without(current, id) : current));
 	}
 
 	function clearHiddenSources() {
-		setHiddenSourceIds(new Set());
+		setHiddenSourceIds((current) => (current.size ? new Set() : current));
 	}
 
 	function clearTransientState() {

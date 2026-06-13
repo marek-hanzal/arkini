@@ -177,7 +177,6 @@ export function PlayShell() {
 							feedback={{
 								invalidCellKey: feedback.invalidBoardCellKey,
 								mergedCellKey: feedback.mergedBoardCellKey,
-								busyProducerIds: producerActions.busyProducerIds,
 							}}
 							actions={{
 								emptyDoubleActivate: sheets.openBuild,

@@ -34,9 +34,9 @@ There are no separate static `merges`, `dropTables`, `producers`, and `buildReci
 
 Effect belongs to the server-like game backend, not the UI. React components, Zustand stores, React Query hooks, drag surfaces, and GSAP animation code stay normal UI code. The boundary is `src/play/logic/playBackend.ts`: UI calls Promise-returning backend functions, while those wrappers run domain Effect roots underneath.
 
-Domain effects live in `*/logic/fx/*Fx.ts`. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. Names are short inside their domain: `board/logic/fx/moveFx.ts`, `inventory/logic/fx/swapFx.ts`, `producer/logic/fx/produceFx.ts`, `build/logic/fx/buildFx.ts`. If a callsite needs multiple same-name domain effects, import aliases are allowed. Repeating the domain in every function name is banned, because `producerProduceProducerFx` would be a cry for help, not architecture.
+Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. Names are short inside their domain: `board/fx/moveFx.ts`, `inventory/fx/swapFx.ts`, `producer/fx/produceFx.ts`, `build/fx/buildFx.ts`. If a callsite needs multiple same-name domain effects, import aliases are allowed. Repeating the domain in every function name is banned, because `producerProduceProducerFx` would be a cry for help, not architecture.
 
-Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, producer output rolling, and save mutation pipelines. UI feedback still happens from action results/hooks; effects do not know DOM nodes, GSAP timelines, React state, or pointer events.
+Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, producer output rolling, and save mutation pipelines. Files inside `src/**/fx/` are reserved for root `Effect.fn(...)` operations only. Pure helpers, runner helpers, cached state, and domain types stay outside `fx/`, mostly in `logic/`. UI feedback still happens from action results/hooks; effects do not know DOM nodes, GSAP timelines, React state, or pointer events.
 
 ## Gameplay model
 
@@ -91,7 +91,7 @@ src/app/                         App entry, router, global styles, cross-origin 
 src/manifest/data/               GameConfig, Zod config schema, validation, derived indexes, SVG assets.
 src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.
 src/play/logic/                  Promise backend façade plus shared backend types/helpers.
-src/**/logic/fx/                 Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
+src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
 src/play/hook/                   Granular React Query subscriptions, event queue, action orchestration.
 src/play/store/                  Small Zustand stores for transient sheet, feedback, and producer UI state.
 src/play/ui/                     Main shell, sheets, bottom navigation, flyers, database status UI.

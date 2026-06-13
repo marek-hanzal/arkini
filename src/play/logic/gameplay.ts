@@ -1,15 +1,15 @@
-import { mergeFx as boardMergeFx } from "~/board/logic/fx/mergeFx";
-import { moveFx as boardMoveFx } from "~/board/logic/fx/moveFx";
-import { swapFx as boardSwapFx } from "~/board/logic/fx/swapFx";
-import { buildFx } from "~/build/logic/fx/buildFx";
-import { placeFx as inventoryPlaceFx } from "~/inventory/logic/fx/placeFx";
-import { stashFx as inventoryStashFx } from "~/inventory/logic/fx/stashFx";
-import { swapFx as inventorySwapFx } from "~/inventory/logic/fx/swapFx";
-import { runFx } from "~/play/logic/fx/runFx";
-import { produceFx } from "~/producer/logic/fx/produceFx";
+import { mergeFx as boardMergeFx } from "~/board/fx/mergeFx";
+import { moveFx as boardMoveFx } from "~/board/fx/moveFx";
+import { swapFx as boardSwapFx } from "~/board/fx/swapFx";
+import { buildFx } from "~/build/fx/buildFx";
+import { placeFx as inventoryPlaceFx } from "~/inventory/fx/placeFx";
+import { stashFx as inventoryStashFx } from "~/inventory/fx/stashFx";
+import { swapFx as inventorySwapFx } from "~/inventory/fx/swapFx";
+import { runEffect } from "~/play/logic/runEffect";
+import { produceFx } from "~/producer/fx/produceFx";
 
 export function placeInventoryItem(slotIndex: number, x: number, y: number) {
-	return runFx(
+	return runEffect(
 		inventoryPlaceFx({
 			slotIndex,
 			x,
@@ -19,7 +19,7 @@ export function placeInventoryItem(slotIndex: number, x: number, y: number) {
 }
 
 export function swapInventorySlots(sourceSlotIndex: number, targetSlotIndex: number) {
-	return runFx(
+	return runEffect(
 		inventorySwapFx({
 			sourceSlotIndex,
 			targetSlotIndex,
@@ -28,7 +28,7 @@ export function swapInventorySlots(sourceSlotIndex: number, targetSlotIndex: num
 }
 
 export function stashBoardItem(boardItemId: string, slotIndex?: number) {
-	return runFx(
+	return runEffect(
 		inventoryStashFx({
 			boardItemId,
 			slotIndex,
@@ -37,7 +37,7 @@ export function stashBoardItem(boardItemId: string, slotIndex?: number) {
 }
 
 export function moveBoardItem(boardItemId: string, x: number, y: number) {
-	return runFx(
+	return runEffect(
 		boardMoveFx({
 			boardItemId,
 			x,
@@ -47,7 +47,7 @@ export function moveBoardItem(boardItemId: string, x: number, y: number) {
 }
 
 export function swapBoardItems(sourceBoardItemId: string, targetBoardItemId: string) {
-	return runFx(
+	return runEffect(
 		boardSwapFx({
 			sourceBoardItemId,
 			targetBoardItemId,
@@ -56,7 +56,7 @@ export function swapBoardItems(sourceBoardItemId: string, targetBoardItemId: str
 }
 
 export function mergeBoardItems(sourceBoardItemId: string, targetBoardItemId: string) {
-	return runFx(
+	return runEffect(
 		boardMergeFx({
 			sourceBoardItemId,
 			targetBoardItemId,
@@ -65,7 +65,7 @@ export function mergeBoardItems(sourceBoardItemId: string, targetBoardItemId: st
 }
 
 export function produceBoardItem(boardItemId: string, activation: "single" | "exhaust" = "single") {
-	return runFx(
+	return runEffect(
 		produceFx({
 			boardItemId,
 			activation,
@@ -74,7 +74,7 @@ export function produceBoardItem(boardItemId: string, activation: "single" | "ex
 }
 
 export function buildRecipe(recipeId: string, x: number, y: number) {
-	return runFx(
+	return runEffect(
 		buildFx({
 			recipeId,
 			x,

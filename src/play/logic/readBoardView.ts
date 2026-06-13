@@ -1,6 +1,6 @@
-import { readViewFx } from "~/board/logic/fx/readViewFx";
-import { runFx } from "./fx/runFx";
+import { readViewFx } from "~/board/fx/readViewFx";
+import { runEffect } from "./runEffect";
 
 export function readBoardView() {
-	return runFx(readViewFx());
+	return runEffect(readViewFx());
 }

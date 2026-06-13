@@ -1,1 +1,1 @@
-export { insertFx } from "./fx/insertFx";
+export { insertFx } from "../fx/insertFx";

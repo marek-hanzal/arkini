@@ -1,10 +1,14 @@
 import { Effect } from "effect";
+import { KyselyContextFx } from "~/database/context/KyselyContextFx";
+import { withKysely } from "~/database/logic/withKysely";
 import { assertBrowserDatabaseSupport } from "~/database/local/capabilities";
 import { migrator } from "~/database/local/migrator";
-import { ensureDefaultSaveFx } from "./ensureDefaultSaveFx";
+import { RandomServiceFx } from "~/random/context/RandomServiceFx";
+import { withRandomService } from "~/random/logic/withRandomService";
 import { bootstrapState } from "../logic/bootstrapState";
-import { syncConfigFx } from "./syncConfigFx";
 import { tryGameAction } from "../logic/tryGameAction";
+import { ensureDefaultSaveFx } from "./ensureDefaultSaveFx";
+import { syncConfigFx } from "./syncConfigFx";
 
 export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 	assertBrowserDatabaseSupport();
@@ -12,6 +16,8 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 	const existing = bootstrapState.promise;
 	if (existing) return yield* tryGameAction(() => existing);
 
+	const kysely = yield* KyselyContextFx;
+	const random = yield* RandomServiceFx;
 	const next = Effect.runPromise(
 		Effect.gen(function* () {
 			const result = yield* tryGameAction(() => migrator.migrateToLatest());
@@ -24,7 +30,7 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 				resetExisting: gameConfigSync.changed,
 			});
 			bootstrapState.migration = "ready";
-		}),
+		}).pipe(withKysely(kysely), withRandomService(random)),
 	);
 	bootstrapState.promise = next;
 

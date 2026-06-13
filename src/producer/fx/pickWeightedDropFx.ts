@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { ProducerWeightedEntry } from "~/manifest/data/producer";
 import { GameActionError } from "~/play/logic/playTypes";
+import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 
 export namespace pickWeightedDropFx {
 	export interface Props {
@@ -12,7 +13,8 @@ export const pickWeightedDropFx = Effect.fn("pickWeightedDropFx")(function* ({
 	entries,
 }: pickWeightedDropFx.Props) {
 	const total = entries.reduce((sum, entry) => sum + entry.weight, 0);
-	let roll = Math.random() * total;
+	const random = yield* RandomServiceFx;
+	let roll = random.float() * total;
 
 	for (const entry of entries) {
 		roll -= entry.weight;

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { ArkiniTransaction } from "~/database/local/db";
+import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import { defaultSaveGameId } from "~/play/logic/save";
 import {
@@ -7,30 +7,21 @@ import {
 	InventoryStackRowSchema,
 	SaveRowSchema,
 } from "~/play/logic/gameActionSchemas";
-import { tryGameAction } from "../logic/tryGameAction";
 
-export namespace readMutableSaveFx {
-	export interface Props {
-		tx: ArkiniTransaction;
-	}
-}
-
-export const readMutableSaveFx = Effect.fn("readMutableSaveFx")(function* ({
-	tx,
-}: readMutableSaveFx.Props) {
-	const [saveRow, boardRows, inventoryRows] = yield* tryGameAction(() =>
+export const readMutableSaveFx = Effect.fn("readMutableSaveFx")(function* () {
+	const [saveRow, boardRows, inventoryRows] = yield* dbFx((db) =>
 		Promise.all([
-			tx
+			db
 				.selectFrom(table.saveGame)
 				.selectAll()
 				.where("id", "=", defaultSaveGameId)
 				.executeTakeFirstOrThrow(),
-			tx
+			db
 				.selectFrom(table.boardItem)
 				.selectAll()
 				.where("saveGameId", "=", defaultSaveGameId)
 				.execute(),
-			tx
+			db
 				.selectFrom(table.inventoryStack)
 				.selectAll()
 				.where("saveGameId", "=", defaultSaveGameId)

@@ -1,27 +1,24 @@
 import { Effect } from "effect";
-import type { ArkiniTransaction } from "~/database/local/db";
+import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import { defaultSaveGameId } from "~/play/logic/save";
 import { GameActionError } from "~/play/logic/playTypes";
-import { tryGameAction } from "~/play/logic/tryGameAction";
 import { spendStackFx } from "./spendStackFx";
 
 export namespace removeItemsFx {
 	export interface Props {
-		tx: ArkiniTransaction;
 		itemId: string;
 		quantity: number;
 	}
 }
 
 export const removeItemsFx = Effect.fn("removeItemsFx")(function* ({
-	tx,
 	itemId,
 	quantity,
 }: removeItemsFx.Props) {
 	let remaining = quantity;
-	const stacks = yield* tryGameAction(() =>
-		tx
+	const stacks = yield* dbFx((db) =>
+		db
 			.selectFrom(table.inventoryStack)
 			.selectAll()
 			.where("saveGameId", "=", defaultSaveGameId)
@@ -33,7 +30,6 @@ export const removeItemsFx = Effect.fn("removeItemsFx")(function* ({
 	for (const stack of stacks) {
 		const removed = Math.min(remaining, stack.quantity);
 		yield* spendStackFx({
-			tx,
 			stack,
 			quantity: removed,
 		});

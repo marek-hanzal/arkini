@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 import type { ItemId } from "~/manifest/data/manifestId";
-import { repeatItem } from "~/producer/logic/repeatItem";
 import type { ProducerOutput } from "~/manifest/data/producer";
+import { repeatItem } from "~/producer/logic/repeatItem";
+import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 import { resolveQuantityFx } from "./resolveQuantityFx";
 import { rollWeightedDropsFx } from "./rollWeightedDropsFx";
 
@@ -13,6 +14,7 @@ export namespace rollOutputFx {
 
 export const rollOutputFx = Effect.fn("rollOutputFx")(function* ({ outputs }: rollOutputFx.Props) {
 	const drops: ItemId[] = [];
+	const random = yield* RandomServiceFx;
 
 	for (const output of outputs) {
 		switch (output.type) {
@@ -24,7 +26,7 @@ export const rollOutputFx = Effect.fn("rollOutputFx")(function* ({ outputs }: ro
 				break;
 			}
 			case "chance": {
-				if (Math.random() > output.probability) break;
+				if (!random.chance(output.probability)) break;
 				const quantity = yield* resolveQuantityFx({
 					quantity: output.quantity ?? 1,
 				});

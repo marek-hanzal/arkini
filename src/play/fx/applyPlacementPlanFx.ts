@@ -1,29 +1,25 @@
 import { Effect } from "effect";
 import { insertFx } from "~/board/fx/insertFx";
-import type { ArkiniTransaction } from "~/database/local/db";
+import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import type { PlacementPlan } from "~/inventory/logic/planning";
 import { localTimestamp } from "~/play/logic/localTimestamp";
 import type { ProducerPlacement } from "~/play/logic/playTypes";
 import { defaultSaveGameId } from "~/play/logic/save";
-import { tryGameAction } from "../logic/tryGameAction";
 
 export namespace applyPlacementPlanFx {
 	export interface Props {
-		tx: ArkiniTransaction;
 		plan: PlacementPlan;
 	}
 }
 
 export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* ({
-	tx,
 	plan,
 }: applyPlacementPlanFx.Props) {
 	const placements: ProducerPlacement[] = [];
 
 	for (const placement of plan.board) {
 		const boardItemId = yield* insertFx({
-			tx,
 			itemId: placement.itemId,
 			x: placement.x,
 			y: placement.y,
@@ -39,8 +35,8 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 
 	for (const placement of plan.inventory) {
 		if (placement.type === "update") {
-			yield* tryGameAction(() =>
-				tx
+			yield* dbFx((db) =>
+				db
 					.updateTable(table.inventoryStack)
 					.set({
 						quantity: placement.quantity,
@@ -50,8 +46,8 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 					.execute(),
 			);
 		} else {
-			yield* tryGameAction(() =>
-				tx
+			yield* dbFx((db) =>
+				db
 					.insertInto(table.inventoryStack)
 					.values({
 						id: placement.stackId,

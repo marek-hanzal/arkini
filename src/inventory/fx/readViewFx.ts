@@ -1,15 +1,14 @@
 import { Effect } from "effect";
-import { db } from "~/database/local/db";
+import { dbFx } from "~/database/fx/dbFx";
 import { groupSlotsByItemId } from "~/inventory/logic/groupSlotsByItemId";
 import { table } from "~/database/local/tables";
 import type { InventorySlot, InventoryView } from "~/play/logic/playTypes";
 import { defaultSaveGameId } from "~/play/logic/save";
 import { readSaveFx } from "~/play/fx/readSaveFx";
-import { tryGameAction } from "~/play/logic/tryGameAction";
 
 export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const save = yield* readSaveFx();
-	const rows = yield* tryGameAction(() =>
+	const rows = yield* dbFx((db) =>
 		db
 			.selectFrom(table.inventoryStack)
 			.selectAll()

@@ -1,24 +1,22 @@
 import { Effect } from "effect";
 import { P, match } from "ts-pattern";
 import { createInitialBoardState } from "~/board/logic/boardState";
-import type { ArkiniTransaction } from "~/database/local/db";
+import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import type { BoardRow } from "~/inventory/logic/planning";
 import type { ProducerMode } from "~/manifest/data/producer";
 import { localTimestamp } from "~/play/logic/localTimestamp";
 import type { ProducerDepletion } from "~/play/logic/playTypes";
-import { tryGameAction } from "~/play/logic/tryGameAction";
 import { json } from "~/shared/json";
 
 export namespace depleteFx {
 	export interface Props {
-		tx: ArkiniTransaction;
 		row: BoardRow;
 		mode: ProducerMode;
 	}
 }
 
-export const depleteFx = Effect.fn("depleteFx")(function* ({ tx, row, mode }: depleteFx.Props) {
+export const depleteFx = Effect.fn("depleteFx")(function* ({ row, mode }: depleteFx.Props) {
 	return yield* match(mode)
 		.with(
 			{
@@ -26,8 +24,8 @@ export const depleteFx = Effect.fn("depleteFx")(function* ({ tx, row, mode }: de
 				onDepleted: "remove",
 			},
 			() =>
-				tryGameAction(async () => {
-					await tx.deleteFrom(table.boardItem).where("id", "=", row.id).execute();
+				dbFx(async (db) => {
+					await db.deleteFrom(table.boardItem).where("id", "=", row.id).execute();
 					return {
 						kind: "remove",
 					} satisfies ProducerDepletion;
@@ -41,8 +39,8 @@ export const depleteFx = Effect.fn("depleteFx")(function* ({ tx, row, mode }: de
 				},
 			},
 			({ onDepleted }) =>
-				tryGameAction(async () => {
-					await tx
+				dbFx(async (db) => {
+					await db
 						.updateTable(table.boardItem)
 						.set({
 							itemDefinitionId: onDepleted.replaceWithItemId,

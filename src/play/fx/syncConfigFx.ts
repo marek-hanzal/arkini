@@ -1,11 +1,11 @@
 import { Effect } from "effect";
-import { db } from "~/database/local/db";
+import { dbFx } from "~/database/fx/dbFx";
+import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { GameConfig } from "~/manifest/data/GameConfig";
-import type { GameConfigSyncResult } from "~/play/logic/GameConfigSyncResult";
 import { assertGameConfig } from "~/manifest/data/validation/gameConfig";
+import type { GameConfigSyncResult } from "~/play/logic/GameConfigSyncResult";
 import { hashConfigFx } from "./hashConfigFx";
-import { tryGameAction } from "../logic/tryGameAction";
 
 export namespace syncConfigFx {
 	export interface Props {
@@ -23,28 +23,32 @@ export const syncConfigFx = Effect.fn("syncConfigFx")(function* ({
 	});
 	const timestamp = new Date().toISOString();
 
-	return yield* tryGameAction(() =>
-		db.transaction().execute(async (tx) => {
-			const previous = await tx
-				.selectFrom(table.metadata)
-				.select("value")
-				.where("key", "=", "gameConfigHash")
-				.executeTakeFirst();
+	return yield* withTransactionFx(
+		Effect.gen(function* () {
+			const previous = yield* dbFx((db) =>
+				db
+					.selectFrom(table.metadata)
+					.select("value")
+					.where("key", "=", "gameConfigHash")
+					.executeTakeFirst(),
+			);
 
-			await tx
-				.insertInto(table.metadata)
-				.values({
-					key: "gameConfigHash",
-					value: hash,
-					updatedAt: timestamp,
-				})
-				.onConflict((oc) =>
-					oc.column("key").doUpdateSet({
+			yield* dbFx((db) =>
+				db
+					.insertInto(table.metadata)
+					.values({
+						key: "gameConfigHash",
 						value: hash,
 						updatedAt: timestamp,
-					}),
-				)
-				.execute();
+					})
+					.onConflict((oc) =>
+						oc.column("key").doUpdateSet({
+							value: hash,
+							updatedAt: timestamp,
+						}),
+					)
+					.execute(),
+			);
 
 			return {
 				hash,

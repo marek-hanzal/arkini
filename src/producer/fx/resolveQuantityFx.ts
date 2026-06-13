@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { Quantity } from "~/manifest/data/producer";
+import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 
 export namespace resolveQuantityFx {
 	export interface Props {
@@ -10,7 +11,7 @@ export namespace resolveQuantityFx {
 export const resolveQuantityFx = Effect.fn("resolveQuantityFx")(function* ({
 	quantity,
 }: resolveQuantityFx.Props) {
-	return typeof quantity === "number"
-		? quantity
-		: quantity.min + Math.floor(Math.random() * (quantity.max - quantity.min + 1));
+	if (typeof quantity === "number") return quantity;
+	const random = yield* RandomServiceFx;
+	return random.integerInclusive(quantity.min, quantity.max);
 });

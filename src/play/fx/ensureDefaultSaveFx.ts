@@ -50,20 +50,6 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 					.execute(),
 			);
 
-			for (const resource of gameConfig.config.startingState.resources) {
-				yield* dbFx((db) =>
-					db
-						.insertInto(table.playerResource)
-						.values({
-							id: `${defaultSaveGameId}:resource:${resource.resourceId}`,
-							saveGameId: defaultSaveGameId,
-							resourceDefinitionId: resource.resourceId,
-							quantity: resource.quantity,
-						})
-						.execute(),
-				);
-			}
-
 			for (const [slotIndex, stack] of gameConfig.config.startingState.inventory.entries()) {
 				yield* dbFx((db) =>
 					db

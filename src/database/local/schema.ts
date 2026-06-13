@@ -30,15 +30,6 @@ export interface BoardItemTable {
 	updatedAt: Timestamp;
 }
 
-export interface PlayerResourceTable {
-	id: string;
-	saveGameId: string;
-	resourceDefinitionId: string;
-	quantity: number;
-	createdAt: Timestamp;
-	updatedAt: Timestamp;
-}
-
 export interface PlayerInventoryStackTable {
 	id: string;
 	saveGameId: string;
@@ -73,7 +64,6 @@ export interface Database {
 	saveGame: SaveGameTable;
 	boardItem: BoardItemTable;
 	inventoryStack: InventoryStackTable;
-	playerResource: PlayerResourceTable;
 	playerInventoryStack: PlayerInventoryStackTable;
 	playerUpgrade: PlayerUpgradeTable;
 }

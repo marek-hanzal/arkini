@@ -20,7 +20,9 @@ import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
 import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
 import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
 import { GameItemView } from "~/item/ui/GameItemView";
-import { useProducerNow } from "~/producer/hook/useProducerNow";
+import { useProducerClock } from "~/producer/hook/useProducerClock";
+import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals";
+import { isProducerReady } from "~/producer/logic/isProducerReady";
 
 export namespace Board {
 	export interface DragState {
@@ -66,6 +68,8 @@ export function Board({ drag, feedback, actions }: Board.Props) {
 	const showDelayedMergeHints = useDelayedMergeHints({
 		activeDrag: drag.activeDrag,
 	});
+	const nowMs = useProducerClock(board?.items ?? []);
+	useProducerReadySignals(board?.items ?? [], nowMs);
 
 	if (!board || !items) return null;
 
@@ -100,8 +104,8 @@ export function Board({ drag, feedback, actions }: Board.Props) {
 						boardItem={boardItem}
 						canMerge={canMerge}
 						showDelayedMergeHint={showDelayedMergeHints}
-						producerBusy={
-							boardItem ? feedback.busyProducerIds.has(boardItem.id) : false
+						producerReady={
+							boardItem ? isProducerReady(boardItem.producer, nowMs) : false
 						}
 						invalid={feedback.invalidCellKey === key}
 						merged={feedback.mergedCellKey === key}
@@ -130,7 +134,7 @@ namespace BoardCell {
 		boardItem: BoardViewItem | null;
 		canMerge: boolean;
 		showDelayedMergeHint: boolean;
-		producerBusy: boolean;
+		producerReady: boolean;
 		invalid: boolean;
 		merged: boolean;
 		children: ReactNode;
@@ -144,7 +148,7 @@ function BoardCell({
 	boardItem,
 	canMerge,
 	showDelayedMergeHint,
-	producerBusy,
+	producerReady,
 	invalid,
 	merged,
 	children,
@@ -152,7 +156,6 @@ function BoardCell({
 }: BoardCell.Props) {
 	const id = boardCellNodeId(x, y);
 	const cellRef = useRef<HTMLDivElement | null>(null);
-	const producerReady = useProducerReady(boardItem?.producer ?? null, producerBusy);
 	const press = usePressActions({
 		onDouble: () => {
 			if (!boardItem)
@@ -188,6 +191,7 @@ function BoardCell({
 			}}
 			data-board-cell={`${x}:${y}`}
 			data-board-item-id={boardItem?.id}
+			data-producer-ready={producerReady ? "true" : undefined}
 			className={(isOver) => {
 				const showMergeHint = canMerge && (showDelayedMergeHint || isOver);
 
@@ -198,7 +202,6 @@ function BoardCell({
 					isOver && !showMergeHint && "bg-slate-800/80",
 					showMergeHint && "ak-merge-target",
 					showMergeHint && isOver && "ak-merge-target-over",
-					producerReady && "ak-producer-ready",
 					invalid && "ak-cell-error",
 				);
 			}}
@@ -207,18 +210,6 @@ function BoardCell({
 			{children}
 		</DroppableSurface>
 	);
-}
-
-function useProducerReady(producer: BoardViewItem["producer"], producerBusy: boolean) {
-	const nowMs = useProducerNow(producer);
-	if (!producer || producerBusy) return false;
-
-	const cooldownUntil = producer.cooldownUntil ? Date.parse(producer.cooldownUntil) : 0;
-	const hasCharges =
-		producer.remainingCharges === null ||
-		producer.remainingCharges === undefined ||
-		producer.remainingCharges > 0;
-	return hasCharges && cooldownUntil <= nowMs;
 }
 
 namespace BoardTile {

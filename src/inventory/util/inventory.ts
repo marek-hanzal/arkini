@@ -3,7 +3,7 @@ import { queryRect } from "~/shared/util/queryRect";
 
 export function inventorySinkRect(
 	source: RectLike,
-	anchor: RectLike | null = queryRect("[data-inventory-summary]"),
+	anchor: RectLike | undefined = queryRect("[data-inventory-summary]"),
 ): RectLike {
 	const size = Math.max(22, Math.min(42, Math.min(source.width, source.height) * 0.55));
 	const left = anchor

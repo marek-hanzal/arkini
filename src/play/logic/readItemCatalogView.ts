@@ -29,7 +29,7 @@ function createItemCatalogView(): ItemCatalogView {
 						...item.tags,
 					],
 					canProduce: Boolean(producer),
-					producerTrigger: producer?.trigger ?? null,
+					producerTrigger: producer?.trigger,
 					canMerge: gameDataIndex.mergeableItemIds.has(item.id as ItemId),
 				} satisfies ViewItem,
 			];

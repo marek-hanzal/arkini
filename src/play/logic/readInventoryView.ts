@@ -35,7 +35,7 @@ export async function readInventoryView(): Promise<InventoryView> {
 							itemId: stack.itemDefinitionId,
 							quantity: stack.quantity,
 						}
-					: null,
+					: undefined,
 			};
 		},
 	);
@@ -49,7 +49,7 @@ export async function readInventoryView(): Promise<InventoryView> {
 			]),
 		),
 		stacksByItemId: groupSlotsByItemId(slots),
-		firstEmptySlotIndex: slots.find((slot) => !slot.stack)?.slotIndex ?? null,
+		firstEmptySlotIndex: slots.find((slot) => !slot.stack)?.slotIndex,
 	};
 }
 

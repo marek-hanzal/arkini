@@ -16,7 +16,7 @@ import { waitForPaint } from "~/shared/util/waitForPaint";
 
 export namespace usePlayProducerActions {
 	export interface Props {
-		activeSheet: ActiveSheet;
+		activeSheet?: ActiveSheet;
 		addFlyer(
 			itemId: string,
 			from: RectLike,

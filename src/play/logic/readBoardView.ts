@@ -60,5 +60,5 @@ function findFirstEmptyBoardCell(byCellKey: BoardView["byCellKey"]): BoardView["
 		}
 	}
 
-	return null;
+	return undefined;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { type FC, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { cn } from "~/shared/cn";
 import { animateBottomSheet } from "~/play/util/animation";
 
@@ -18,7 +18,7 @@ export namespace BottomSheet {
 	}
 }
 
-export function BottomSheet({
+export const BottomSheet: FC<BottomSheet.Props> = ({
 	open,
 	children,
 	className,
@@ -26,7 +26,7 @@ export function BottomSheet({
 	contentClassName,
 	onClose,
 	"data-drag-node-id": dragNodeId,
-}: BottomSheet.Props) {
+}) => {
 	const backdropRef = useRef<HTMLButtonElement | null>(null);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -80,4 +80,4 @@ export function BottomSheet({
 			</section>
 		</div>
 	);
-}
+};

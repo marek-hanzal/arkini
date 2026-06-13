@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import { GameItemView } from "~/item/ui/GameItemView";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
 import type { RectLike } from "~/play/types";
@@ -8,11 +9,11 @@ export namespace Tile {
 		quantity?: number;
 		producer?: BoardViewItem["producer"];
 		dragOverlay?: boolean;
-		overlaySize?: Pick<RectLike, "width" | "height"> | null;
+		overlaySize?: Pick<RectLike, "width" | "height">;
 	}
 }
 
-export function Tile({ item, quantity, producer, dragOverlay, overlaySize }: Tile.Props) {
+export const Tile: FC<Tile.Props> = ({ item, quantity, producer, dragOverlay, overlaySize }) => {
 	return (
 		<GameItemView
 			item={item}
@@ -22,4 +23,4 @@ export function Tile({ item, quantity, producer, dragOverlay, overlaySize }: Til
 			overlaySize={overlaySize}
 		/>
 	);
-}
+};

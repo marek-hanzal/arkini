@@ -313,11 +313,7 @@ export async function produceBoardItem(
 			throw new GameActionError("Producer is still cooling down.");
 		}
 
-		if (
-			producerState.remainingCharges !== null &&
-			producerState.remainingCharges !== undefined &&
-			producerState.remainingCharges <= 0
-		) {
+		if (producerState.remainingCharges !== undefined && producerState.remainingCharges <= 0) {
 			throw new GameActionError("Producer is empty.");
 		}
 
@@ -346,7 +342,7 @@ export async function produceBoardItem(
 				{
 					type: "infinite",
 				},
-				() => null,
+				() => undefined,
 			)
 			.with(
 				{
@@ -357,7 +353,7 @@ export async function produceBoardItem(
 			)
 			.exhaustive();
 
-		const shouldDeplete = nextRemainingCharges !== null && nextRemainingCharges <= 0;
+		const shouldDeplete = nextRemainingCharges !== undefined && nextRemainingCharges <= 0;
 		if (shouldDeplete) {
 			const depletion = await depleteProducer(tx, producerRow, mode);
 			return {
@@ -388,7 +384,6 @@ export async function produceBoardItem(
 		return {
 			producerBoardItemId: producerRow.id,
 			placements,
-			depletion: null,
 		};
 	});
 }

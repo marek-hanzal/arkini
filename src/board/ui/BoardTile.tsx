@@ -1,0 +1,64 @@
+import type { FC } from "react";
+import { boardCellNodeId, boardSourceId } from "~/board/boardIdentity";
+import { DraggableSurface } from "~/drag/ui/DragSurface";
+import { GameItemView } from "~/item/ui/GameItemView";
+import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
+import type { GameDragData } from "~/play/types";
+
+export namespace BoardTile {
+	export interface Props {
+		boardItem: BoardViewItem;
+		item: ViewItem;
+		nowMs: number;
+		hidden: boolean;
+		onSingleActivate(): void;
+		onDoubleActivate(): void;
+	}
+}
+
+export const BoardTile: FC<BoardTile.Props> = ({
+	boardItem,
+	item,
+	nowMs,
+	hidden,
+	onSingleActivate,
+	onDoubleActivate,
+}) => {
+	const sourceId = boardSourceId(boardItem.id);
+	const sourceNodeId = boardCellNodeId(boardItem.x, boardItem.y);
+
+	return (
+		<DraggableSurface
+			id={sourceId}
+			nodeId={`${sourceId}:drag`}
+			payload={
+				{
+					sourceId,
+					sourceNodeId,
+					itemId: boardItem.itemId,
+					source: {
+						kind: "board",
+						boardItemId: boardItem.id,
+					},
+					overlay: {
+						producer: boardItem.producer,
+					},
+					hideWhenActive: true,
+				} satisfies GameDragData
+			}
+			data-board-item-id={boardItem.id}
+			hidden={hidden}
+			className="absolute inset-0 touch-none"
+			onSingleActivate={onSingleActivate}
+			delaySingleWhenDouble={boardItem.producer?.doubleClickBehavior === "exhaust"}
+			onDoubleActivate={onDoubleActivate}
+		>
+			<GameItemView
+				item={item}
+				variant="board"
+				producer={boardItem.producer}
+				producerNowMs={nowMs}
+			/>
+		</DraggableSurface>
+	);
+};

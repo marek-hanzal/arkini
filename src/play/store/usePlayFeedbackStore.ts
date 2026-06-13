@@ -3,21 +3,18 @@ import { flashMs } from "~/play/types";
 
 export namespace usePlayFeedbackStore {
 	export interface State {
-		invalidBoardCellKey: string | null;
-		mergedBoardCellKey: string | null;
-		invalidInventorySlot: number | null;
+		invalidBoardCellKey?: string;
+		mergedBoardCellKey?: string;
+		invalidInventorySlot?: number;
 		actionErrorKey: number;
-		flashBoardCell(key: string | null, tone: "error"): void;
-		pulseMergeCell(key: string | null): void;
-		flashInventorySlot(slotIndex: number | null, tone: "error"): void;
+		flashBoardCell(key: string | undefined, tone: "error"): void;
+		pulseMergeCell(key: string | undefined): void;
+		flashInventorySlot(slotIndex: number | undefined, tone: "error"): void;
 		showError(error: unknown): void;
 	}
 }
 
 export const usePlayFeedbackStore = create<usePlayFeedbackStore.State>((set, get) => ({
-	invalidBoardCellKey: null,
-	mergedBoardCellKey: null,
-	invalidInventorySlot: null,
 	actionErrorKey: 0,
 	flashBoardCell(key, tone) {
 		if (!key || tone !== "error") return;
@@ -28,7 +25,7 @@ export const usePlayFeedbackStore = create<usePlayFeedbackStore.State>((set, get
 		window.setTimeout(() => {
 			if (get().invalidBoardCellKey === key)
 				set({
-					invalidBoardCellKey: null,
+					invalidBoardCellKey: undefined,
 				});
 		}, flashMs);
 	},
@@ -36,7 +33,7 @@ export const usePlayFeedbackStore = create<usePlayFeedbackStore.State>((set, get
 		if (!key) return;
 
 		set({
-			mergedBoardCellKey: null,
+			mergedBoardCellKey: undefined,
 		});
 		window.requestAnimationFrame(() => {
 			set({
@@ -45,13 +42,13 @@ export const usePlayFeedbackStore = create<usePlayFeedbackStore.State>((set, get
 			window.setTimeout(() => {
 				if (get().mergedBoardCellKey === key)
 					set({
-						mergedBoardCellKey: null,
+						mergedBoardCellKey: undefined,
 					});
 			}, 560);
 		});
 	},
 	flashInventorySlot(slotIndex, tone) {
-		if (slotIndex === null || slotIndex === undefined || tone !== "error") return;
+		if (slotIndex === undefined || tone !== "error") return;
 
 		set({
 			invalidInventorySlot: slotIndex,
@@ -59,7 +56,7 @@ export const usePlayFeedbackStore = create<usePlayFeedbackStore.State>((set, get
 		window.setTimeout(() => {
 			if (get().invalidInventorySlot === slotIndex)
 				set({
-					invalidInventorySlot: null,
+					invalidInventorySlot: undefined,
 				});
 		}, flashMs);
 	},

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { type FC, useEffect, useRef } from "react";
 import { cn } from "~/shared/cn";
 import type { ViewItem } from "~/play/logic/playTypes";
 import type { FlyerModel } from "~/play/types";
@@ -13,7 +13,7 @@ export namespace Flyer {
 	}
 }
 
-export function Flyer({ flyer, item, onSettle }: Flyer.Props) {
+export const Flyer: FC<Flyer.Props> = ({ flyer, item, onSettle }) => {
 	const ref = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
@@ -47,4 +47,4 @@ export function Flyer({ flyer, item, onSettle }: Flyer.Props) {
 			/>
 		</div>
 	);
-}
+};

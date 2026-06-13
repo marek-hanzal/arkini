@@ -1,14 +1,17 @@
-export type ActiveSheet = "inventory" | "player" | "database" | "build" | null;
+import type { FC } from "react";
+import { BottomNavButton } from "~/play/ui/BottomNavButton";
+
+export type ActiveSheet = "inventory" | "player" | "database" | "build";
 export type BottomNavSheet = "inventory" | "player" | "database";
 
 export namespace BottomNavigation {
 	export interface Props {
-		activeSheet: ActiveSheet;
+		activeSheet?: ActiveSheet;
 		onOpen(sheet: BottomNavSheet): void;
 	}
 }
 
-export function BottomNavigation({ activeSheet, onOpen }: BottomNavigation.Props) {
+export const BottomNavigation: FC<BottomNavigation.Props> = ({ activeSheet, onOpen }) => {
 	return (
 		<nav className="ak-bottom-nav">
 			<div className="ak-bottom-nav-inner">
@@ -36,30 +39,4 @@ export function BottomNavigation({ activeSheet, onOpen }: BottomNavigation.Props
 			</div>
 		</nav>
 	);
-}
-
-namespace BottomNavButton {
-	export interface Props {
-		active: boolean;
-		label: string;
-		icon: string;
-		tone: BottomNavSheet;
-		onClick(): void;
-	}
-}
-
-function BottomNavButton({ active, label, icon, tone, onClick }: BottomNavButton.Props) {
-	return (
-		<button
-			type="button"
-			className="ak-bottom-nav-button"
-			data-active={active ? "true" : "false"}
-			data-tone={tone}
-			data-bottom-nav-sheet={tone}
-			onClick={onClick}
-		>
-			<span className="ak-bottom-nav-icon">{icon}</span>
-			<span>{label}</span>
-		</button>
-	);
-}
+};

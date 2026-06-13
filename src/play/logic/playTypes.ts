@@ -16,14 +16,14 @@ export interface BoardView {
 	items: BoardViewItem[];
 	byId: Record<string, BoardViewItem>;
 	byCellKey: Record<string, BoardViewItem>;
-	firstEmptyCell: BoardCell | null;
+	firstEmptyCell?: BoardCell;
 }
 
 export interface InventoryView {
 	slots: InventorySlot[];
 	bySlotIndex: Record<number, InventorySlot>;
 	stacksByItemId: Record<string, InventorySlot[]>;
-	firstEmptySlotIndex: number | null;
+	firstEmptySlotIndex?: number;
 }
 
 export interface PlayerInventoryView {
@@ -62,7 +62,7 @@ export interface ViewItem {
 	maxStackSize: number;
 	tags: string[];
 	canProduce: boolean;
-	producerTrigger: "click" | null;
+	producerTrigger?: "click";
 	canMerge: boolean;
 }
 
@@ -72,26 +72,26 @@ export interface BoardViewItem {
 	x: number;
 	y: number;
 	state: BoardItemState;
-	producer: ProducerView | null;
+	producer?: ProducerView;
 }
 
 export interface InventorySlot {
 	slotIndex: number;
-	stack: {
+	stack?: {
 		id: string;
 		itemId: string;
 		quantity: number;
-	} | null;
+	};
 }
 
 export interface ProducerView {
 	trigger: "click";
 	mode: ProducerMode;
-	cooldownMs: number | null;
-	doubleClickBehavior: "exhaust" | null;
-	cooldownUntil: string | null;
-	cooldownUntilMs: number | null;
-	remainingCharges: number | null;
+	cooldownMs?: number;
+	doubleClickBehavior?: "exhaust";
+	cooldownUntil?: string;
+	cooldownUntilMs?: number;
+	remainingCharges?: number;
 }
 
 export interface ProducerPlacement {
@@ -115,13 +115,13 @@ export type ProducerDepletion =
 export interface ProducerDropResult {
 	producerBoardItemId: string;
 	placements: ProducerPlacement[];
-	depletion: ProducerDepletion | null;
+	depletion?: ProducerDepletion;
 }
 
 export interface BoardItemState {
 	producer?: {
-		cooldownUntil?: string | null;
-		remainingCharges?: number | null;
+		cooldownUntil?: string;
+		remainingCharges?: number;
 	};
 }
 

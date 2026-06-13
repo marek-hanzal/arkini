@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import { usePlayBuildRecipes } from "~/play/hook/usePlayBuildRecipes";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { BuildRecipeId } from "~/manifest/data/manifestId";
@@ -6,13 +7,13 @@ import { SheetHeader } from "~/shared/ui/SheetHeader";
 
 export namespace BuildSheet {
 	export interface Props {
-		cell: BoardCell | null;
+		cell?: BoardCell;
 		onClose(): void;
 		onBuild(recipeId: BuildRecipeId): void;
 	}
 }
 
-export function BuildSheet({ cell, onClose, onBuild }: BuildSheet.Props) {
+export const BuildSheet: FC<BuildSheet.Props> = ({ cell, onClose, onBuild }) => {
 	const buildRecipes = usePlayBuildRecipes().data;
 	const items = usePlayItems().data;
 
@@ -69,4 +70,4 @@ export function BuildSheet({ cell, onClose, onBuild }: BuildSheet.Props) {
 			)}
 		</div>
 	);
-}
+};

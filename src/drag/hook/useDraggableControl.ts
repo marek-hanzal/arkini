@@ -8,7 +8,7 @@ import {
 } from "@dnd-kit/core";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { waitForPaint } from "~/shared/util/waitForPaint";
-import { without } from "~/shared/util/collection";
+import { without } from "~/shared/util/without";
 import { queryRect } from "~/shared/util/queryRect";
 import type { RectLike } from "~/play/types";
 
@@ -405,14 +405,15 @@ export function useDraggableControl<
 	function rectForNode(nodeId: string | undefined) {
 		if (!nodeId) return null;
 		const rect = queryRect(`[data-drag-node-id="${nodeId}"]`);
-		return rect;
+		return rect ?? null;
 	}
 
 	function rectForBoundaryNode(nodeId: string | null | undefined) {
 		if (!nodeId) return null;
 		return (
 			queryRect(`[data-drag-boundary-id="${nodeId}"]`) ??
-			queryRect(`[data-drag-node-id="${nodeId}"]`)
+			queryRect(`[data-drag-node-id="${nodeId}"]`) ??
+			null
 		);
 	}
 

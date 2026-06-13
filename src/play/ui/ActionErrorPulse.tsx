@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { type FC, useEffect, useRef } from "react";
 import { playActionErrorPulse } from "~/play/util/animation";
 
 export namespace ActionErrorPulse {
@@ -7,7 +7,7 @@ export namespace ActionErrorPulse {
 	}
 }
 
-export function ActionErrorPulse({ pulseKey }: ActionErrorPulse.Props) {
+export const ActionErrorPulse: FC<ActionErrorPulse.Props> = ({ pulseKey }) => {
 	const ref = useRef<HTMLSpanElement | null>(null);
 
 	useEffect(() => {
@@ -25,4 +25,4 @@ export function ActionErrorPulse({ pulseKey }: ActionErrorPulse.Props) {
 			className="pointer-events-none absolute inset-2 z-20 rounded-xl"
 		/>
 	);
-}
+};

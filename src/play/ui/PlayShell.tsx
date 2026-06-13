@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { ActionErrorPulse } from "~/play/ui/ActionErrorPulse";
@@ -9,7 +10,7 @@ import { Board } from "~/board/ui/Board";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";
 import { BottomSheet } from "~/play/ui/BottomSheet";
 import { BuildSheet } from "~/build/ui/BuildSheet";
-import { Flyer } from "~/play/ui/Flyer";
+import { FlyerLayer } from "~/play/ui/FlyerLayer";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { PlayerInventorySheet } from "~/player/ui/PlayerInventorySheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
@@ -23,7 +24,11 @@ import { usePlaySheets } from "~/play/hook/usePlaySheets";
 import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
 import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
 
-export function PlayShell() {
+export namespace PlayShell {
+	export interface Props {}
+}
+
+export const PlayShell: FC<PlayShell.Props> = () => {
 	const saveQuery = usePlaySave();
 	const sheets = usePlaySheets();
 	const { flyers, addFlyer, settleFlyer } = useFlyers();
@@ -173,7 +178,7 @@ export function PlayShell() {
 					<div className="min-h-0 shrink-0">
 						<Board
 							drag={{
-								activeDrag: drag.activeDrag,
+								activeDrag: drag.activeDrag ?? undefined,
 								isSourceHidden: drag.isSourceHidden,
 							}}
 							feedback={{
@@ -206,7 +211,7 @@ export function PlayShell() {
 			</div>
 
 			<BottomSheet
-				open={sheets.activeSheet !== null}
+				open={sheets.activeSheet !== undefined}
 				onClose={sheets.closeSheet}
 			>
 				<div className="min-h-0">
@@ -291,35 +296,10 @@ export function PlayShell() {
 						sizeVariant={dragSizeVariant}
 						quantity={drag.activeDrag?.overlay?.quantity}
 						producer={drag.activeDrag?.overlay?.producer ?? undefined}
-						overlaySize={drag.dragPreviewRect}
+						overlaySize={drag.dragPreviewRect ?? undefined}
 					/>
 				) : null}
 			</DragOverlay>
 		</DndContext>
 	);
-}
-
-namespace FlyerLayer {
-	export interface Props {
-		flyers: ReturnType<typeof useFlyers>["flyers"];
-		onSettle(id: string): void;
-	}
-}
-
-function FlyerLayer({ flyers, onSettle }: FlyerLayer.Props) {
-	const items = usePlayItems().data;
-
-	if (!items) return null;
-
-	return flyers.map((flyer) => {
-		const item = items[flyer.itemId];
-		return item ? (
-			<Flyer
-				key={flyer.id}
-				flyer={flyer}
-				item={item}
-				onSettle={onSettle}
-			/>
-		) : null;
-	});
-}
+};

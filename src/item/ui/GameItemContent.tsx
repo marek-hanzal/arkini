@@ -1,8 +1,5 @@
 import type { FC } from "react";
-import { DateTime } from "luxon";
-import { getProducerUiState } from "~/item/logic/getProducerUiState";
 import { ItemLevelBadge } from "~/item/ui/ItemLevelBadge";
-import { ProducerBadge } from "~/item/ui/ProducerBadge";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
 import { cn } from "~/shared/cn";
 
@@ -21,15 +18,16 @@ export const GameItemContent: FC<GameItemContent.Props> = ({
 	producer,
 	producerNowMs,
 }) => {
-	const nowMs = producerNowMs ?? DateTime.now().toMillis();
-	const producerUi = producer ? getProducerUiState(producer, nowMs) : undefined;
+	const producerWaiting = producer
+		? (producer.cooldownUntilMs ?? 0) > (producerNowMs ?? Date.now())
+		: false;
 
 	return (
 		<div
 			data-ak-item-content
 			className={cn(
 				"relative grid h-full w-full place-items-center text-slate-50",
-				producerUi?.waiting && "opacity-82",
+				producerWaiting && "opacity-[0.82]",
 			)}
 		>
 			<img
@@ -49,7 +47,6 @@ export const GameItemContent: FC<GameItemContent.Props> = ({
 				</span>
 			) : null}
 			{item.label ? <ItemLevelBadge label={item.label} /> : null}
-			{producerUi ? <ProducerBadge ui={producerUi} /> : null}
 		</div>
 	);
 };

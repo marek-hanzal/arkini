@@ -118,28 +118,6 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 	});
 }
 
-export function playActionErrorPulse(element: HTMLElement) {
-	gsap.killTweensOf(element);
-	gsap.timeline()
-		.set(element, {
-			opacity: 0,
-			boxShadow: "inset 0 0 0 0 rgb(248 113 113 / 0)",
-		})
-		.to(element, {
-			opacity: 1,
-			boxShadow: "inset 0 0 0 0.14rem rgb(248 113 113 / 0.56)",
-			duration: 0.12,
-			ease: "power2.out",
-		})
-		.to(element, {
-			opacity: 0,
-			boxShadow: "inset 0 0 0 0.62rem rgb(248 113 113 / 0)",
-			duration: 0.24,
-			ease: "power2.out",
-			clearProps: "opacity,boxShadow",
-		});
-}
-
 export function playCellSuccess(element: HTMLElement) {
 	gsap.killTweensOf(element);
 	gsap.timeline()
@@ -190,22 +168,21 @@ export function playCellError(element: HTMLElement) {
 }
 
 export function playProducerReady(element: HTMLElement) {
-	gsap.killTweensOf(element, "scale,boxShadow,y");
+	gsap.killTweensOf(element, "backgroundColor,boxShadow");
 	gsap.timeline()
 		.to(element, {
-			y: -1,
-			scale: 1.045,
-			boxShadow: "0 0 0 0.12rem rgb(110 231 183 / 0.36), 0 0 0.72rem rgb(110 231 183 / 0.24)",
+			backgroundColor: "rgb(6 95 70 / 0.42)",
+			boxShadow:
+				"inset 0 0 0 0.16rem rgb(110 231 183 / 0.64), inset 0 0 1.1rem rgb(52 211 153 / 0.24)",
 			duration: 0.16,
 			ease: "power2.out",
 		})
 		.to(element, {
-			y: 0,
-			scale: 1,
-			boxShadow: "0 0 0 0 rgb(110 231 183 / 0)",
+			backgroundColor: "rgb(6 78 59 / 0.24)",
+			boxShadow: "inset 0 0 0 0.06rem rgb(52 211 153 / 0.18)",
 			duration: 0.24,
 			ease: "power2.out",
-			clearProps: "boxShadow,transform",
+			clearProps: "backgroundColor,boxShadow",
 		});
 }
 

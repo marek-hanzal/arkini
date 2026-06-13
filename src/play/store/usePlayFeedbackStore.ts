@@ -6,7 +6,6 @@ export namespace usePlayFeedbackStore {
 		invalidBoardCellKey?: string;
 		mergedBoardCellKey?: string;
 		invalidInventorySlot?: number;
-		actionErrorKey: number;
 		flashBoardCell(key: string | undefined, tone: "error"): void;
 		pulseMergeCell(key: string | undefined): void;
 		flashInventorySlot(slotIndex: number | undefined, tone: "error"): void;
@@ -15,7 +14,6 @@ export namespace usePlayFeedbackStore {
 }
 
 export const usePlayFeedbackStore = create<usePlayFeedbackStore.State>((set, get) => ({
-	actionErrorKey: 0,
 	flashBoardCell(key, tone) {
 		if (!key || tone !== "error") return;
 
@@ -61,10 +59,6 @@ export const usePlayFeedbackStore = create<usePlayFeedbackStore.State>((set, get
 		}, flashMs);
 	},
 	showError(error) {
-		set((state) => ({
-			actionErrorKey: state.actionErrorKey + 1,
-		}));
-
 		if (import.meta.env.DEV) {
 			console.debug("Game action rejected", error);
 		}

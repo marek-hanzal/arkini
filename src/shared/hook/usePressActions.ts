@@ -4,11 +4,13 @@ import { usePress, type PressEvent, type PressResult } from "@react-aria/interac
 
 const doublePressMs = 320;
 const doublePressDistancePx = 24;
+const longPressMs = 520;
 
 export namespace usePressActions {
 	export interface Props {
 		onSingle?(): void;
 		onDouble?(): void;
+		onLong?(): void;
 		delaySingleWhenDouble?: boolean;
 		isDisabled?: boolean;
 	}
@@ -28,19 +30,49 @@ export namespace usePressActions {
 export function usePressActions({
 	onSingle,
 	onDouble,
+	onLong,
 	delaySingleWhenDouble = false,
 	isDisabled = false,
 }: usePressActions.Props): usePressActions.Result {
 	const lastPressRef = useRef<usePressActions.LastPress | null>(null);
 	const singlePressTimeoutRef = useRef<number | null>(null);
+	const longPressTimeoutRef = useRef<number | null>(null);
+	const longPressTriggeredRef = useRef(false);
 
-	useEffect(() => () => clearSinglePressTimeout(), []);
+	useEffect(
+		() => () => {
+			clearSinglePressTimeout();
+			clearLongPressTimeout();
+		},
+		[],
+	);
 
 	const press = usePress({
 		isDisabled,
 		preventFocusOnPress: true,
 		shouldCancelOnPointerExit: true,
+		onPressStart() {
+			if (!onLong) return;
+
+			clearLongPressTimeout();
+			longPressTriggeredRef.current = false;
+			longPressTimeoutRef.current = window.setTimeout(() => {
+				longPressTimeoutRef.current = null;
+				longPressTriggeredRef.current = true;
+				lastPressRef.current = null;
+				clearSinglePressTimeout();
+				onLong();
+			}, longPressMs);
+		},
+		onPressEnd() {
+			clearLongPressTimeout();
+		},
 		onPress(event) {
+			clearLongPressTimeout();
+			if (longPressTriggeredRef.current) {
+				longPressTriggeredRef.current = false;
+				return;
+			}
 			const now = DateTime.now().toMillis();
 			const previous = lastPressRef.current;
 			const isNearbyDouble = Boolean(
@@ -90,5 +122,11 @@ export function usePressActions({
 		if (singlePressTimeoutRef.current === null) return;
 		window.clearTimeout(singlePressTimeoutRef.current);
 		singlePressTimeoutRef.current = null;
+	}
+
+	function clearLongPressTimeout() {
+		if (longPressTimeoutRef.current === null) return;
+		window.clearTimeout(longPressTimeoutRef.current);
+		longPressTimeoutRef.current = null;
 	}
 }

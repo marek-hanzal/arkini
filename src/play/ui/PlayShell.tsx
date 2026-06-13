@@ -175,11 +175,10 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 										void producerActions.produceFrom(item, "single");
 										return;
 									}
+
 									if (manualActions.canCollect(item)) {
 										void manualActions.collectBoardWithFly(item);
-										return;
 									}
-									sheets.openItem(item.id);
 								},
 								tileDoubleActivate: (item) => {
 									if (item.producer?.doubleClickBehavior === "exhaust") {
@@ -192,6 +191,9 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 										return;
 									}
 									void manualActions.stashBoardWithFly(item);
+								},
+								tileLongActivate: (item) => {
+									sheets.openItem(item.id);
 								},
 							}}
 						/>

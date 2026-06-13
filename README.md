@@ -58,11 +58,11 @@ The current content direction is Settlers-like: small producers create raw goods
 - Merging happens on the board only. Dropping onto a non-mergeable occupied board cell swaps the two board items instead of rejecting the action.
 - Inventory stores stacks and can combine compatible stacks.
 - Drag is intentionally local to a surface now: board item to board cell, inventory slot to inventory slot. Board↔inventory drag is obsolete.
-- Board items go into inventory by double-click/tap on the board item. Idle producers can be stashed too, but busy producers and producers holding input inventory reject the action.
+- Board item gestures are normalized: single tap runs the primary action, long press opens item detail, and double-click/tap stashes to inventory. Idle producers can be stashed too, but busy producers and producers holding input inventory reject the action.
 - Inventory items go to the first empty board cell by double-click/tap inside inventory.
 - Build menu is gone. Buildings and other advanced outputs are created through board craft: merge input items into a craft target, fill its progress, then transform it into the result.
 - Craft progress lives on the board item instance and is rendered as a bottom-up fill on the tile. Blueprint construction, seed growth, and future production chains all use the same generic `craft` data model.
-- Collectible valuables are real board items first. Coins merge through `Coin -> Coin Pair -> Coin Stack -> Coin Chest`, then tap into the limited player inventory instead of the material inventory.
+- Collectible valuables are real board items first. Coins merge through `Coin -> Coin Pair -> Coin Stack -> Coin Chest`, then single tap into the limited player inventory instead of the material inventory. Long press still opens their detail.
 - Player inventory is slot-based and stack-limited like the material inventory. It is the sink for special progression items such as coins and future hard-gems, not a scalar wallet pretending to be design.
 - Upgrades are tiered definitions in `GameConfig`. Buying an upgrade spends player inventory items immediately, starts a persisted timed job, and applies the tier only after the timer finishes. A save stores owned level plus pending target/ready timestamps.
 - Producer speed upgrades add cooldown deltas. Better-loot upgrades swap the effective producer loot table rather than mutating random weights in place, because percentage soup is how balance turns into swamp gas. Building level upgrades no longer happen by merging two buildings directly; higher-level buildings are crafted through upgrade blueprints that consume materials plus at least two previous-level buildings.
@@ -74,7 +74,7 @@ The current content direction is Settlers-like: small producers create raw goods
 
 ## Interaction model
 
-Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts` and built on `@react-aria/interactions`. Keep raw touch/pointer timing out of board/tile components unless you enjoy debugging mobile browsers like some kind of punishment enthusiast.
+Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts` and built on `@react-aria/interactions`. Board item detail opens through long press, including producers whose single tap is reserved for production. Keep raw touch/pointer timing out of board/tile components unless you enjoy debugging mobile browsers like some kind of punishment enthusiast.
 
 Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle.
 

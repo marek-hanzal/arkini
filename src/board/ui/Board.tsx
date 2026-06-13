@@ -35,6 +35,7 @@ export namespace Board {
 		emptyDoubleActivate(cell: BoardCellModel): void;
 		tileSingleActivate(item: BoardViewItem): void;
 		tileDoubleActivate(item: BoardViewItem): void;
+		tileLongActivate(item: BoardViewItem): void;
 	}
 
 	export interface Props {
@@ -125,6 +126,7 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 								hidden={drag.isSourceHidden(boardSourceId(boardItem.id))}
 								onSingleActivate={() => actions.tileSingleActivate(boardItem)}
 								onDoubleActivate={() => actions.tileDoubleActivate(boardItem)}
+								onLongActivate={() => actions.tileLongActivate(boardItem)}
 							/>
 						) : null}
 					</BoardCell>

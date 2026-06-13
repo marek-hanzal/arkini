@@ -13,6 +13,7 @@ export namespace BoardTile {
 		hidden: boolean;
 		onSingleActivate(): void;
 		onDoubleActivate(): void;
+		onLongActivate(): void;
 	}
 }
 
@@ -23,6 +24,7 @@ export const BoardTile: FC<BoardTile.Props> = ({
 	hidden,
 	onSingleActivate,
 	onDoubleActivate,
+	onLongActivate,
 }) => {
 	const sourceId = boardSourceId(boardItem.id);
 	const sourceNodeId = boardCellNodeId(boardItem.x, boardItem.y);
@@ -52,6 +54,7 @@ export const BoardTile: FC<BoardTile.Props> = ({
 			onSingleActivate={onSingleActivate}
 			delaySingleWhenDouble
 			onDoubleActivate={onDoubleActivate}
+			onLongActivate={onLongActivate}
 		>
 			<GameItemView
 				item={item}

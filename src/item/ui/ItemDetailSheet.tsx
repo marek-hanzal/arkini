@@ -5,6 +5,11 @@ import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { GameItemView } from "~/item/ui/GameItemView";
+import { useProducerClock } from "~/producer/hook/useProducerClock";
+import { isProducerReady } from "~/producer/logic/isProducerReady";
+import { isProducerStocked } from "~/producer/logic/isProducerStocked";
+import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
+import { formatMs } from "~/shared/util/formatMs";
 
 export namespace ItemDetailSheet {
 	export interface Props {
@@ -17,6 +22,7 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 	const board = usePlayBoard().data;
 	const items = usePlayItems().data;
 	const invalidatePlayData = usePlayDataInvalidation();
+	const nowMs = useProducerClock(board?.items ?? []);
 	const withdrawInput = usePlayAction(
 		(
 			db,
@@ -38,7 +44,28 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 	const craft = boardItem.craft;
 	const usedInCrafts = item.usedInCrafts ?? [];
 	const usedInMerges = item.usedInMerges ?? [];
-	const producerInputs = boardItem.producer?.inputs ?? [];
+	const producer = boardItem.producer;
+	const producerInputs = producer?.inputs ?? [];
+	const producerCooldown = readProducerCooldown({
+		producer,
+		nowMs,
+	});
+	const producerReady = isProducerReady(producer, nowMs);
+	const producerHasCharges = producer
+		? producer.remainingCharges === undefined || producer.remainingCharges > 0
+		: false;
+	const producerHasInputs = isProducerStocked(producer);
+	const producerStatusLabel = producerReady
+		? "Ready"
+		: !producerHasCharges
+			? "Empty"
+			: producerCooldown
+				? producerHasInputs
+					? `Ready in ${formatMs(producerCooldown.remainingMs)}`
+					: `Cooldown ${formatMs(producerCooldown.remainingMs)}`
+				: producerHasInputs
+					? "Not ready"
+					: "Needs inputs";
 
 	return (
 		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
@@ -105,6 +132,32 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 								);
 							})}
 						</div>
+					</div>
+				) : null}
+
+				{producer ? (
+					<div className="rounded-md border border-cyan-400/20 bg-cyan-950/18 p-3">
+						<div className="flex items-center justify-between gap-3">
+							<p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+								Producer status
+							</p>
+							<p className="text-xs text-cyan-100">{producerStatusLabel}</p>
+						</div>
+						{producerCooldown ? (
+							<div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-950/80">
+								<div
+									className="h-full rounded-full bg-cyan-300/75 transition-[width] duration-200 ease-linear"
+									style={{
+										width: `${Math.round(producerCooldown.progress * 100)}%`,
+									}}
+								/>
+							</div>
+						) : null}
+						{producer.remainingCharges !== undefined ? (
+							<p className="mt-3 text-xs text-slate-300">
+								Charges left: <strong>{producer.remainingCharges}</strong>
+							</p>
+						) : null}
 					</div>
 				) : null}
 

@@ -19,6 +19,7 @@ import type { GameDragData } from "~/play/types";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals";
 import { isProducerReady } from "~/producer/logic/isProducerReady";
+import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 
 export namespace Board {
 	export interface DragState {
@@ -104,6 +105,11 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 								),
 							)
 						: false;
+				const producerCooldown = readProducerCooldown({
+					producer: boardItem?.producer,
+					nowMs,
+				});
+
 				return (
 					<BoardCell
 						key={key}
@@ -113,6 +119,7 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 						canMerge={canMerge}
 						showDelayedMergeHint={showDelayedMergeHints}
 						producerReady={isProducerReady(boardItem?.producer, nowMs)}
+						producerCooldownProgress={producerCooldown?.progress}
 						craftProgress={boardItem?.craft?.progress}
 						invalid={feedback.invalidCellKey === key}
 						merged={feedback.mergedCellKey === key}

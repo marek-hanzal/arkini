@@ -18,7 +18,8 @@ export function useProducerReadySignals(items: readonly BoardViewItem[], nowMs: 
 			const previous = previousReady.get(item.id);
 			nextReady.set(item.id, ready);
 
-			if (previous === true && !ready) {
+			const coolingDown = (item.producer.cooldownUntilMs ?? 0) > nowMs;
+			if (previous === true && !ready && coolingDown) {
 				const element = queryElement(`[data-board-cell="${item.x}:${item.y}"]`);
 				if (element) playProducerCooldown(element);
 			}

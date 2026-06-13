@@ -11,7 +11,7 @@ import { BuildSheet } from "~/build/ui/BuildSheet";
 import { Flyer } from "~/play/ui/Flyer";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { Tile } from "~/item/ui/Tile";
+import { GameItemView } from "~/item/ui/GameItemView";
 import { cellKey } from "~/board/util/cell";
 import { useFlyers } from "~/play/hook/useFlyers";
 import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
@@ -247,9 +247,9 @@ export function PlayShell() {
 				dropAnimation={null}
 			>
 				{drag.activeItem ? (
-					<Tile
+					<GameItemView
 						item={drag.activeItem}
-						dragOverlay
+						variant="drag"
 						quantity={drag.activeDrag?.overlay?.quantity}
 						producer={drag.activeDrag?.overlay?.producer ?? undefined}
 						overlaySize={drag.dragPreviewRect}

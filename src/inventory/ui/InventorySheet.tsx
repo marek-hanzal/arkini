@@ -13,7 +13,7 @@ import type { GameDragData, GameDropData } from "~/play/types";
 import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
 import { DraggableSurface, DroppableSurface } from "~/drag/ui/DragSurface";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { Tile } from "~/item/ui/Tile";
+import { GameItemView } from "~/item/ui/GameItemView";
 
 export namespace InventorySheet {
 	export interface Props {
@@ -170,8 +170,9 @@ function InventoryTile({ slot, item, hidden, onDoubleActivate }: InventoryTile.P
 			className="absolute inset-0 touch-none"
 			onDoubleActivate={onDoubleActivate}
 		>
-			<Tile
+			<GameItemView
 				item={item}
+				variant="inventory"
 				quantity={stack.quantity}
 			/>
 		</DraggableSurface>

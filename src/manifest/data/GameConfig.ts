@@ -308,13 +308,15 @@ export const GameConfig = {
 				],
 				producer: clickProducer(
 					3500,
-					drops([
-						drop("item:blueprint-lumber-camp", 28),
-						drop("item:blueprint-quarry", 28),
-						drop("item:blueprint-townhall", 18),
-						drop("item:water", 18),
-						drop("item:crate-1", 8),
-					]),
+					outputs(
+						weighted([
+							drop("item:blueprint-lumber-camp", 34),
+							drop("item:blueprint-quarry", 34),
+							drop("item:blueprint-townhall", 22),
+							drop("item:crate-1", 10),
+						]),
+						chance("item:water", 0.32),
+					),
 				),
 			},
 		),
@@ -339,14 +341,19 @@ export const GameConfig = {
 				],
 				producer: clickProducer(
 					3000,
-					drops([
-						drop("item:blueprint-lumber-camp", 18),
-						drop("item:blueprint-quarry", 18),
-						drop("item:blueprint-townhall", 12),
-						drop("item:water", 18),
-						drop("item:crate-1", 24),
-						drop("item:crate-2", 10),
-					]),
+					outputs(
+						weighted([
+							drop("item:blueprint-lumber-camp", 22),
+							drop("item:blueprint-quarry", 22),
+							drop("item:blueprint-townhall", 16),
+							drop("item:crate-1", 28),
+							drop("item:crate-2", 12),
+						]),
+						chance("item:water", 0.4, {
+							min: 1,
+							max: 2,
+						}),
+					),
 				),
 			},
 		),
@@ -368,15 +375,20 @@ export const GameConfig = {
 				label: "3",
 				producer: clickProducer(
 					2500,
-					drops([
-						drop("item:blueprint-lumber-camp", 12),
-						drop("item:blueprint-quarry", 12),
-						drop("item:blueprint-townhall", 10),
-						drop("item:water", 18),
-						drop("item:crate-1", 16),
-						drop("item:crate-2", 24),
-						drop("item:crate-3", 8),
-					]),
+					outputs(
+						weighted([
+							drop("item:blueprint-lumber-camp", 14),
+							drop("item:blueprint-quarry", 14),
+							drop("item:blueprint-townhall", 12),
+							drop("item:crate-1", 18),
+							drop("item:crate-2", 30),
+							drop("item:crate-3", 12),
+						]),
+						chance("item:water", 0.55, {
+							min: 1,
+							max: 2,
+						}),
+					),
 				),
 			},
 		),
@@ -406,11 +418,7 @@ export const GameConfig = {
 				],
 				producer: clickProducer(
 					5000,
-					drops([
-						drop("item:twig", 70),
-						drop("item:branch", 25),
-						empty(5),
-					]),
+					outputs(guaranteed("item:twig", 2), chance("item:branch", 0.35)),
 				),
 			},
 		),
@@ -439,11 +447,14 @@ export const GameConfig = {
 				],
 				producer: clickProducer(
 					4500,
-					drops([
-						drop("item:twig", 30),
-						drop("item:branch", 55),
-						drop("item:log", 15),
-					]),
+					outputs(
+						guaranteed("item:branch"),
+						chance("item:twig", 0.5, {
+							min: 1,
+							max: 2,
+						}),
+						chance("item:log", 0.35),
+					),
 				),
 			},
 		),
@@ -465,11 +476,7 @@ export const GameConfig = {
 				label: "3",
 				producer: clickProducer(
 					4000,
-					drops([
-						drop("item:branch", 40),
-						drop("item:log", 55),
-						empty(5),
-					]),
+					outputs(guaranteed("item:branch", 2), chance("item:log", 0.7)),
 				),
 			},
 		),
@@ -495,11 +502,7 @@ export const GameConfig = {
 				],
 				producer: clickProducer(
 					5500,
-					drops([
-						drop("item:pebble", 72),
-						drop("item:stone", 23),
-						empty(5),
-					]),
+					outputs(guaranteed("item:pebble", 2), chance("item:stone", 0.32)),
 				),
 			},
 		),
@@ -524,11 +527,14 @@ export const GameConfig = {
 				],
 				producer: clickProducer(
 					5000,
-					drops([
-						drop("item:pebble", 30),
-						drop("item:stone", 55),
-						drop("item:crystal", 15),
-					]),
+					outputs(
+						guaranteed("item:stone"),
+						chance("item:pebble", 0.5, {
+							min: 1,
+							max: 2,
+						}),
+						chance("item:crystal", 0.28),
+					),
 				),
 			},
 		),
@@ -550,11 +556,7 @@ export const GameConfig = {
 				label: "3",
 				producer: clickProducer(
 					4500,
-					drops([
-						drop("item:stone", 44),
-						drop("item:crystal", 51),
-						empty(5),
-					]),
+					outputs(guaranteed("item:stone", 2), chance("item:crystal", 0.72)),
 				),
 			},
 		),
@@ -579,12 +581,15 @@ export const GameConfig = {
 				producer: {
 					...clickProducer(
 						900,
-						drops([
-							drop("item:twig", 35),
-							drop("item:pebble", 35),
-							drop("item:water", 15),
-							drop("item:seed", 15),
-						]),
+						outputs(
+							weighted([
+								drop("item:twig", 35),
+								drop("item:pebble", 35),
+								drop("item:water", 15),
+								drop("item:seed", 15),
+							]),
+							chance("item:twig", 0.18),
+						),
 						{
 							type: "finite",
 							charges: 3,
@@ -615,12 +620,15 @@ export const GameConfig = {
 				producer: {
 					...clickProducer(
 						900,
-						drops([
-							drop("item:branch", 35),
-							drop("item:stone", 35),
-							drop("item:water", 15),
-							drop("item:crate-1", 15),
-						]),
+						outputs(
+							weighted([
+								drop("item:branch", 35),
+								drop("item:stone", 35),
+								drop("item:water", 15),
+								drop("item:crate-1", 15),
+							]),
+							chance("item:pebble", 0.22),
+						),
 						{
 							type: "finite",
 							charges: 4,
@@ -649,12 +657,15 @@ export const GameConfig = {
 				producer: {
 					...clickProducer(
 						900,
-						drops([
-							drop("item:log", 30),
-							drop("item:crystal", 30),
-							drop("item:crate-2", 20),
-							drop("item:water", 20),
-						]),
+						outputs(
+							weighted([
+								drop("item:log", 30),
+								drop("item:crystal", 30),
+								drop("item:crate-2", 20),
+								drop("item:water", 20),
+							]),
+							chance("item:branch", 0.24),
+						),
 						{
 							type: "finite",
 							charges: 5,
@@ -834,6 +845,37 @@ function clickProducer(
 		output,
 		cooldownMs,
 		mode,
+	};
+}
+
+function outputs(...entries: readonly ProducerOutput[]): ProducerOutput[] {
+	return [
+		...entries,
+	];
+}
+
+function guaranteed(itemId: ItemId, quantity: Quantity = 1): ProducerOutput {
+	return {
+		type: "guaranteed",
+		itemId,
+		quantity,
+	};
+}
+
+function chance(itemId: ItemId, probability: number, quantity: Quantity = 1): ProducerOutput {
+	return {
+		type: "chance",
+		itemId,
+		probability,
+		quantity,
+	};
+}
+
+function weighted(entries: readonly ProducerWeightedEntry[], rolls: Quantity = 1): ProducerOutput {
+	return {
+		type: "weighted",
+		entries,
+		rolls,
 	};
 }
 

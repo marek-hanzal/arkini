@@ -6,9 +6,12 @@ import { formatMs } from "~/shared/util/format";
 export namespace GameItemView {
 	export type Variant = "board" | "inventory" | "drag" | "flyer";
 
+	export type SizeVariant = Exclude<Variant, "drag">;
+
 	export interface Props {
 		item: ViewItem;
 		variant: Variant;
+		sizeVariant?: SizeVariant;
 		quantity?: number;
 		producer?: BoardViewItem["producer"];
 		overlaySize?: Pick<RectLike, "width" | "height"> | null;
@@ -19,21 +22,24 @@ export namespace GameItemView {
 export function GameItemView({
 	item,
 	variant,
+	sizeVariant,
 	quantity,
 	producer,
 	overlaySize,
 	producerNowMs,
 }: GameItemView.Props) {
+	const resolvedSizeVariant = sizeVariant ?? (variant === "drag" ? "board" : variant);
+
 	return (
 		<div
 			data-ak-item-view
 			data-ak-item-variant={variant}
+			data-ak-item-size-variant={resolvedSizeVariant}
 			className={cn(
 				"relative h-full w-full select-none",
-				variant === "board" && "p-[13%]",
-				variant === "inventory" && "p-[12%]",
-				variant === "drag" && "p-[10%]",
-				variant === "flyer" && "p-[10%]",
+				resolvedSizeVariant === "board" && "p-[13%]",
+				resolvedSizeVariant === "inventory" && "p-[12%]",
+				resolvedSizeVariant === "flyer" && "p-[10%]",
 			)}
 			style={
 				variant === "drag" && overlaySize

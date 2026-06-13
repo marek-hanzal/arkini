@@ -1,8 +1,7 @@
 import { Effect } from "effect";
 import { GameConfig } from "~/manifest/data/GameConfig";
 import type { DatabaseStatus } from "~/play/logic/DatabaseStatus";
-import { readSaveTableCounts } from "~/play/logic/readSaveTableCounts";
-import { tryGameAction } from "~/play/logic/tryGameAction";
+import { readSaveTableCountsFx } from "./readSaveTableCountsFx";
 import { readDatabasePathFx } from "./readDatabasePathFx";
 import { readGameConfigHashFx } from "./readGameConfigHashFx";
 import { readMigrationStateFx } from "./readMigrationStateFx";
@@ -18,6 +17,6 @@ export const readStatusFx = Effect.fn("readStatusFx")(function* () {
 		producerCount: GameConfig.items.filter((item) => item.producer).length,
 		buildRecipeCount: GameConfig.items.filter((item) => item.build).length,
 		dropTableCount: 0,
-		...(yield* tryGameAction(readSaveTableCounts)),
+		...(yield* readSaveTableCountsFx()),
 	} satisfies DatabaseStatus;
 });

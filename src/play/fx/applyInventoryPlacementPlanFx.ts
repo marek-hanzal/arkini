@@ -1,26 +1,45 @@
 import { Effect } from "effect";
-import type { ArkiniTransaction } from "~/database/local/db";
+import { dbFx } from "~/database/fx/dbFx";
+import { table } from "~/database/local/tables";
 import type { InventoryPlacementPlan } from "~/inventory/logic/planning";
-import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
+import { localTimestamp } from "~/play/logic/localTimestamp";
+import { defaultSaveGameId } from "~/play/logic/save";
 
 export namespace applyInventoryPlacementPlanFx {
 	export interface Props {
-		tx: ArkiniTransaction;
-		plan: readonly InventoryPlacementPlan[];
+		plan: InventoryPlacementPlan[];
 	}
 }
 
 export const applyInventoryPlacementPlanFx = Effect.fn("applyInventoryPlacementPlanFx")(function* ({
-	tx,
 	plan,
 }: applyInventoryPlacementPlanFx.Props) {
-	yield* applyPlacementPlanFx({
-		tx,
-		plan: {
-			board: [],
-			inventory: [
-				...plan,
-			],
-		},
-	});
+	for (const placement of plan) {
+		if (placement.type === "update") {
+			yield* dbFx((db) =>
+				db
+					.updateTable(table.inventoryStack)
+					.set({
+						quantity: placement.quantity,
+						updatedAt: localTimestamp(),
+					})
+					.where("id", "=", placement.stackId)
+					.execute(),
+			);
+			continue;
+		}
+
+		yield* dbFx((db) =>
+			db
+				.insertInto(table.inventoryStack)
+				.values({
+					id: placement.stackId,
+					saveGameId: defaultSaveGameId,
+					slotIndex: placement.slotIndex,
+					itemDefinitionId: placement.itemId,
+					quantity: placement.quantity,
+				})
+				.execute(),
+		);
+	}
 });

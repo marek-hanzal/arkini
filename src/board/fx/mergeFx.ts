@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 import { createInitialBoardState } from "~/board/logic/boardState";
-import { db } from "~/database/local/db";
+import { dbFx } from "~/database/fx/dbFx";
+import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import type { ItemId } from "~/manifest/data/manifestId";
 import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
-import { MergeBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { toGameActionError } from "~/play/logic/toGameActionError";
-import { tryGameAction } from "~/play/logic/tryGameAction";
+import { MergeBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
 import { localTimestamp } from "~/play/logic/localTimestamp";
 import { GameActionError } from "~/play/logic/playTypes";
+import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
 
 export namespace mergeFx {
@@ -28,46 +28,37 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 		return yield* Effect.fail(new GameActionError("Pick two different board items to merge."));
 	}
 
-	yield* tryGameAction(() =>
-		db.transaction().execute((tx) =>
-			Effect.runPromise(
-				Effect.gen(function* () {
-					const { boardRows } = yield* readMutableSaveFx({
-						tx,
-					});
-					const source = boardRows.find((row) => row.id === input.sourceBoardItemId);
-					const target = boardRows.find((row) => row.id === input.targetBoardItemId);
-					if (!source || !target) {
-						return yield* Effect.fail(
-							new GameActionError("Both board items must exist."),
-						);
-					}
+	yield* withTransactionFx(
+		Effect.gen(function* () {
+			const { boardRows } = yield* readMutableSaveFx();
+			const source = boardRows.find((row) => row.id === input.sourceBoardItemId);
+			const target = boardRows.find((row) => row.id === input.targetBoardItemId);
+			if (!source || !target) {
+				return yield* Effect.fail(new GameActionError("Both board items must exist."));
+			}
 
-					const rule = resolveItemMergeRule(
-						source.itemDefinitionId as ItemId,
-						target.itemDefinitionId as ItemId,
-					);
-					if (!rule)
-						return yield* Effect.fail(
-							new GameActionError("No merge recipe discovered here."),
-						);
+			const rule = resolveItemMergeRule(
+				source.itemDefinitionId as ItemId,
+				target.itemDefinitionId as ItemId,
+			);
+			if (!rule) {
+				return yield* Effect.fail(new GameActionError("No merge recipe discovered here."));
+			}
 
-					yield* tryGameAction(() =>
-						tx.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
-					);
-					yield* tryGameAction(() =>
-						tx
-							.updateTable(table.boardItem)
-							.set({
-								itemDefinitionId: rule.resultItemId,
-								stateJson: json(createInitialBoardState(rule.resultItemId)),
-								updatedAt: localTimestamp(),
-							})
-							.where("id", "=", target.id)
-							.execute(),
-					);
-				}),
-			),
-		),
+			yield* dbFx((db) =>
+				db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
+			);
+			yield* dbFx((db) =>
+				db
+					.updateTable(table.boardItem)
+					.set({
+						itemDefinitionId: rule.resultItemId,
+						stateJson: json(createInitialBoardState(rule.resultItemId)),
+						updatedAt: localTimestamp(),
+					})
+					.where("id", "=", target.id)
+					.execute(),
+			);
+		}),
 	);
 });

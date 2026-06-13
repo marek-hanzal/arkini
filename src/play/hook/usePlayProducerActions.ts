@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
 import { inventorySourceId } from "~/inventory/inventoryIdentity";
@@ -10,6 +10,7 @@ import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import type { ActiveSheet } from "~/play/ui/BottomNavigation";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { playBottomNavHold } from "~/play/util/animation";
+import { usePlayProducerUiStore } from "~/play/store/usePlayProducerUiStore";
 import { queryElement } from "~/shared/util/queryElement";
 import { queryRect } from "~/shared/util/queryRect";
 import { waitForPaint } from "~/shared/util/waitForPaint";
@@ -39,15 +40,8 @@ export function usePlayProducerActions({
 	hideSources,
 	clearHiddenSources,
 }: usePlayProducerActions.Props) {
-	const [busyProducerIds, setBusyProducerIds] = useState(() => new Set<string>());
-	const setProducerBusy = useCallback((boardItemId: string, busy: boolean) => {
-		setBusyProducerIds((current) => {
-			const next = new Set(current);
-			if (busy) next.add(boardItemId);
-			else next.delete(boardItemId);
-			return next;
-		});
-	}, []);
+	const busyProducerIds = usePlayProducerUiStore((state) => state.busyProducerIds);
+	const setProducerBusy = usePlayProducerUiStore((state) => state.setProducerBusy);
 	const invalidatePlayData = usePlayDataInvalidation();
 	const produce = usePlayAction(
 		(

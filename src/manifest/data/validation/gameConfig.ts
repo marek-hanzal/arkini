@@ -1,6 +1,6 @@
 import { parseGameConfig } from "../parseGameConfig";
 import { itemMergePairKey } from "../itemMergePairKey";
-import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId } from "../manifestId";
+import type { AssetId, BuildRecipeId, ItemId, MergeDefinitionId, ResourceId } from "../manifestId";
 import type { GameConfig } from "../GameConfig";
 import { assert, assertUnique } from "./assert";
 import { assertProducerDefinition } from "./producer";
@@ -12,10 +12,20 @@ export function assertGameConfig(config: GameConfig) {
 	const assetIds = new Set<AssetId>();
 	const itemIds = new Set<ItemId>();
 	const mergeIds = new Set<MergeDefinitionId>();
+	const resourceIds = new Set<ResourceId>();
 	const buildIds = new Set<BuildRecipeId>();
 	const mergePairs = new Set<string>();
 
 	for (const asset of config.assets) assertUnique(assetIds, asset.id, "asset");
+	for (const resource of config.resources) {
+		assertUnique(resourceIds, resource.id, "resource");
+	}
+	for (const entry of config.startingState.resources) {
+		assert(
+			resourceIds.has(entry.resourceId),
+			`starting resource references missing ${entry.resourceId}`,
+		);
+	}
 
 	for (const item of config.items) {
 		assertUnique(itemIds, item.id, "item");

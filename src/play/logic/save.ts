@@ -38,6 +38,18 @@ export async function ensureDefaultSaveGame({
 			})
 			.execute();
 
+		for (const resource of GameConfig.startingState.resources) {
+			await tx
+				.insertInto(table.playerResource)
+				.values({
+					id: `${defaultSaveGameId}:resource:${resource.resourceId}`,
+					saveGameId: defaultSaveGameId,
+					resourceDefinitionId: resource.resourceId,
+					quantity: resource.quantity,
+				})
+				.execute();
+		}
+
 		for (const [slotIndex, stack] of GameConfig.startingState.inventory.entries()) {
 			await tx
 				.insertInto(table.inventoryStack)

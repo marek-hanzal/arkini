@@ -4,6 +4,7 @@ import { ItemIdSchema } from "./ItemIdSchema";
 import { NonNegativeIntegerSchema } from "./NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "./PositiveIntegerSchema";
 import { QuantitySchema } from "./QuantitySchema";
+import { ResourceIdSchema } from "./ResourceIdSchema";
 import { GameConfig } from "./GameConfig";
 
 export const GameConfigSchema = z.object({
@@ -27,6 +28,16 @@ export const GameConfigSchema = z.object({
 			]),
 			label: z.string().min(1),
 			src: z.string().min(1),
+			sort: NonNegativeIntegerSchema,
+		}),
+	),
+	resources: z.array(
+		z.object({
+			id: ResourceIdSchema,
+			code: z.string().min(1),
+			name: z.string().min(1),
+			description: z.string(),
+			symbol: z.string().min(1),
 			sort: NonNegativeIntegerSchema,
 		}),
 	),
@@ -133,6 +144,12 @@ export const GameConfigSchema = z.object({
 		}),
 	),
 	startingState: z.object({
+		resources: z.array(
+			z.object({
+				resourceId: ResourceIdSchema,
+				quantity: NonNegativeIntegerSchema,
+			}),
+		),
 		inventory: z.array(
 			z.object({
 				itemId: ItemIdSchema,

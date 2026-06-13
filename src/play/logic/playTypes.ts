@@ -26,6 +26,20 @@ export interface InventoryView {
 	firstEmptySlotIndex: number | null;
 }
 
+export interface PlayerInventoryView {
+	resources: PlayerResourceView[];
+	byId: Record<string, PlayerResourceView>;
+}
+
+export interface PlayerResourceView {
+	id: string;
+	code: string;
+	name: string;
+	description: string;
+	symbol: string;
+	quantity: number;
+}
+
 export interface BuildRecipeView {
 	id: BuildRecipeId;
 	blueprintItemId: ItemId;

@@ -217,7 +217,7 @@ button {
 
 .ak-bottom-nav-inner {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 0.5rem;
 	width: 100%;
 	max-width: 430px;
@@ -252,6 +252,11 @@ button {
 	background: rgb(19 78 74 / 0.24);
 }
 
+.ak-bottom-nav-button[data-tone="player"] {
+	border-color: rgb(251 191 36 / 0.42);
+	background: rgb(120 53 15 / 0.22);
+}
+
 .ak-bottom-nav-button[data-tone="database"] {
 	border-color: rgb(129 140 248 / 0.42);
 	background: rgb(49 46 129 / 0.23);
@@ -261,6 +266,12 @@ button {
 	border-color: rgb(45 212 191 / 0.95);
 	background: rgb(20 184 166 / 0.22);
 	color: rgb(204 251 241);
+}
+
+.ak-bottom-nav-button[data-active="true"][data-tone="player"] {
+	border-color: rgb(252 211 77 / 0.9);
+	background: rgb(217 119 6 / 0.2);
+	color: rgb(254 243 199);
 }
 
 .ak-bottom-nav-button[data-active="true"][data-tone="database"] {

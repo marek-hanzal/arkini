@@ -1,5 +1,5 @@
-export type ActiveSheet = "inventory" | "database" | "build" | null;
-export type BottomNavSheet = "inventory" | "database";
+export type ActiveSheet = "inventory" | "player" | "database" | "build" | null;
+export type BottomNavSheet = "inventory" | "player" | "database";
 
 export namespace BottomNavigation {
 	export interface Props {
@@ -18,6 +18,13 @@ export function BottomNavigation({ activeSheet, onOpen }: BottomNavigation.Props
 					icon="▦"
 					tone="inventory"
 					onClick={() => onOpen("inventory")}
+				/>
+				<BottomNavButton
+					active={activeSheet === "player"}
+					label="Player"
+					icon="◆"
+					tone="player"
+					onClick={() => onOpen("player")}
 				/>
 				<BottomNavButton
 					active={activeSheet === "database"}

@@ -1,13 +1,15 @@
-import { DateTime } from "luxon";
 import { match } from "ts-pattern";
-import { gameDataIndex } from "~/manifest/data/gameDataIndex";
-import type { ItemId } from "~/manifest/data/manifestId";
+import type { DateService } from "~/date/context/DateServiceFx";
+import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 import type { ProducerMode } from "~/manifest/data/producer";
-import { parseJson } from "~/shared/json";
 import type { BoardItemState, ProducerView } from "~/play/logic/playTypes";
+import { parseJson } from "~/shared/json";
 
-export function createInitialBoardState(itemId: string): BoardItemState {
-	const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
+export function createInitialBoardState(
+	itemId: string,
+	gameConfig: GameConfigService,
+): BoardItemState {
+	const producer = gameConfig.getProducer(itemId);
 	if (!producer) return {};
 
 	const mode = producer.mode ?? {
@@ -36,11 +38,25 @@ export function createInitialBoardState(itemId: string): BoardItemState {
 		.exhaustive();
 }
 
-export function readProducerView(itemId: string, state: BoardItemState): ProducerView | undefined {
-	const producer = gameDataIndex.producersByItemId.get(itemId as ItemId);
+export namespace readProducerView {
+	export interface Props {
+		itemId: string;
+		state: BoardItemState;
+		date: DateService;
+		gameConfig: GameConfigService;
+	}
+}
+
+export function readProducerView({
+	itemId,
+	state,
+	date,
+	gameConfig,
+}: readProducerView.Props): ProducerView | undefined {
+	const producer = gameConfig.getProducer(itemId);
 	if (!producer) return undefined;
 
-	const initial = createInitialBoardState(itemId).producer ?? {};
+	const initial = createInitialBoardState(itemId, gameConfig).producer ?? {};
 	const producerState = {
 		...initial,
 		...(state.producer ?? {}),
@@ -56,14 +72,9 @@ export function readProducerView(itemId: string, state: BoardItemState): Produce
 		cooldownMs: producer.cooldownMs,
 		doubleClickBehavior: producer.doubleClickBehavior,
 		cooldownUntil,
-		cooldownUntilMs: cooldownUntil ? parseTimestampMs(cooldownUntil) : undefined,
+		cooldownUntilMs: cooldownUntil ? date.parseTimestampMs(cooldownUntil) : undefined,
 		remainingCharges: producerState.remainingCharges,
 	};
-}
-
-function parseTimestampMs(value: string) {
-	const parsed = DateTime.fromISO(value);
-	return parsed.isValid ? parsed.toMillis() : undefined;
 }
 
 export function readBoardState(row: Pick<readBoardState.Row, "stateJson">) {

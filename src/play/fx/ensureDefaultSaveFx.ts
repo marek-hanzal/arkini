@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { createInitialBoardState } from "~/board/logic/boardState";
 import { dbFx } from "~/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
-import { GameConfig } from "~/manifest/data/GameConfig";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { StartingBoardItem } from "~/play/logic/StartingBoardItem";
 import { defaultSaveGameId } from "~/play/logic/save";
 import { json } from "~/shared/json";
@@ -20,6 +20,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 	resetExisting = false,
 }: ensureDefaultSaveFx.Props = {}) {
 	const date = yield* DateServiceFx;
+	const gameConfig = yield* GameConfigServiceFx;
 	const timestamp = date.timestamp();
 
 	if (resetExisting) yield* dropDefaultSaveFx();
@@ -41,14 +42,14 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 					.values({
 						id: defaultSaveGameId,
 						name: "Default save",
-						boardWidth: GameConfig.game.board.width,
-						boardHeight: GameConfig.game.board.height,
-						inventorySlots: GameConfig.game.inventory.slots,
+						boardWidth: gameConfig.config.game.board.width,
+						boardHeight: gameConfig.config.game.board.height,
+						inventorySlots: gameConfig.config.game.inventory.slots,
 					})
 					.execute(),
 			);
 
-			for (const resource of GameConfig.startingState.resources) {
+			for (const resource of gameConfig.config.startingState.resources) {
 				yield* dbFx((db) =>
 					db
 						.insertInto(table.playerResource)
@@ -62,7 +63,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 				);
 			}
 
-			for (const [slotIndex, stack] of GameConfig.startingState.inventory.entries()) {
+			for (const [slotIndex, stack] of gameConfig.config.startingState.inventory.entries()) {
 				yield* dbFx((db) =>
 					db
 						.insertInto(table.inventoryStack)
@@ -78,7 +79,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 			}
 
 			for (const [index, boardItem] of (
-				GameConfig.startingState.board as readonly StartingBoardItem[]
+				gameConfig.config.startingState.board as readonly StartingBoardItem[]
 			).entries()) {
 				yield* dbFx((db) =>
 					db
@@ -89,7 +90,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 							itemDefinitionId: boardItem.itemId,
 							x: boardItem.x,
 							y: boardItem.y,
-							stateJson: json(createInitialBoardState(boardItem.itemId)),
+							stateJson: json(createInitialBoardState(boardItem.itemId, gameConfig)),
 						})
 						.execute(),
 				);

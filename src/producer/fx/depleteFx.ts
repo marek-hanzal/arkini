@@ -3,9 +3,10 @@ import { P, match } from "ts-pattern";
 import { createInitialBoardState } from "~/board/logic/boardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
-import type { BoardRow } from "~/inventory/logic/planning";
-import type { ProducerMode } from "~/manifest/data/producer";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
+import type { BoardRow } from "~/inventory/logic/planning";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import type { ProducerMode } from "~/manifest/data/producer";
 import type { ProducerDepletion } from "~/play/logic/playTypes";
 import { json } from "~/shared/json";
 
@@ -18,6 +19,7 @@ export namespace depleteFx {
 
 export const depleteFx = Effect.fn("depleteFx")(function* ({ row, mode }: depleteFx.Props) {
 	const date = yield* DateServiceFx;
+	const gameConfig = yield* GameConfigServiceFx;
 	const timestamp = date.timestamp();
 
 	return yield* match(mode)
@@ -47,7 +49,9 @@ export const depleteFx = Effect.fn("depleteFx")(function* ({ row, mode }: deplet
 						.updateTable(table.boardItem)
 						.set({
 							itemDefinitionId: onDepleted.replaceWithItemId,
-							stateJson: json(createInitialBoardState(onDepleted.replaceWithItemId)),
+							stateJson: json(
+								createInitialBoardState(onDepleted.replaceWithItemId, gameConfig),
+							),
 							updatedAt: timestamp,
 						})
 						.where("id", "=", row.id)

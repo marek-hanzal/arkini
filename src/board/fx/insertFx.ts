@@ -1,8 +1,9 @@
 import { Effect } from "effect";
 import { createInitialBoardState } from "~/board/logic/boardState";
-import { createBoardItemId } from "~/board/logic/createBoardItemId";
 import { dbFx } from "~/database/fx/dbFx";
+import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { table } from "~/database/local/tables";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 import { json } from "~/shared/json";
 
@@ -15,19 +16,21 @@ export namespace insertFx {
 }
 
 export const insertFx = Effect.fn("insertFx")(function* ({ itemId, x, y }: insertFx.Props) {
-	const id = createBoardItemId();
+	const gameConfig = yield* GameConfigServiceFx;
+	const id = yield* IdServiceFx;
+	const boardItemId = id.boardItem();
 	yield* dbFx((db) =>
 		db
 			.insertInto(table.boardItem)
 			.values({
-				id,
+				id: boardItemId,
 				saveGameId: defaultSaveGameId,
 				itemDefinitionId: itemId,
 				x,
 				y,
-				stateJson: json(createInitialBoardState(itemId)),
+				stateJson: json(createInitialBoardState(itemId, gameConfig)),
 			})
 			.execute(),
 	);
-	return id;
+	return boardItemId;
 });

@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { HashServiceFx } from "~/hash/context/HashServiceFx";
 import type { GameConfig } from "~/manifest/data/GameConfig";
 import { tryGameAction } from "../logic/tryGameAction";
 
@@ -9,19 +10,6 @@ export namespace hashConfigFx {
 }
 
 export const hashConfigFx = Effect.fn("hashConfigFx")(function* ({ config }: hashConfigFx.Props) {
-	return yield* tryGameAction(async () => {
-		const encoded = new TextEncoder().encode(
-			JSON.stringify(config, (_key, value: unknown) => {
-				if (typeof value === "string" && value.startsWith("blob:")) return "[blob-url]";
-				return value;
-			}),
-		);
-		const digest = await crypto.subtle.digest("SHA-256", encoded);
-
-		return [
-			...new Uint8Array(digest),
-		]
-			.map((byte) => byte.toString(16).padStart(2, "0"))
-			.join("");
-	});
+	const hash = yield* HashServiceFx;
+	return yield* tryGameAction(() => hash.gameConfig(config));
 });

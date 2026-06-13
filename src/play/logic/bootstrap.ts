@@ -15,7 +15,7 @@ export function readMigrationState() {
 }
 
 export function readDatabasePath() {
-	return Effect.runSync(readDatabasePathFx());
+	return runEffect(readDatabasePathFx());
 }
 
 export function readGameConfigHash() {

@@ -3,11 +3,10 @@ import { createInitialBoardState } from "~/board/logic/boardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
-import type { ItemId } from "~/manifest/data/manifestId";
-import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MergeBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
@@ -21,6 +20,7 @@ export namespace mergeFx {
 
 export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 	const date = yield* DateServiceFx;
+	const gameConfig = yield* GameConfigServiceFx;
 	const timestamp = date.timestamp();
 
 	const input = yield* Effect.try({
@@ -40,9 +40,9 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				return yield* Effect.fail(new GameActionError("Both board items must exist."));
 			}
 
-			const rule = resolveItemMergeRule(
-				source.itemDefinitionId as ItemId,
-				target.itemDefinitionId as ItemId,
+			const rule = gameConfig.resolveMergeRule(
+				source.itemDefinitionId,
+				target.itemDefinitionId,
 			);
 			if (!rule) {
 				return yield* Effect.fail(new GameActionError("No merge recipe discovered here."));
@@ -56,7 +56,7 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 					.updateTable(table.boardItem)
 					.set({
 						itemDefinitionId: rule.resultItemId,
-						stateJson: json(createInitialBoardState(rule.resultItemId)),
+						stateJson: json(createInitialBoardState(rule.resultItemId, gameConfig)),
 						updatedAt: timestamp,
 					})
 					.where("id", "=", target.id)

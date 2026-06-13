@@ -1,11 +1,12 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
-import { gameDataIndex } from "~/manifest/data/gameDataIndex";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 import type { PlayerInventoryView, PlayerResourceView } from "~/play/logic/playTypes";
 
 export const readInventoryFx = Effect.fn("readInventoryFx")(function* () {
+	const gameConfig = yield* GameConfigServiceFx;
 	const rows = yield* dbFx((db) =>
 		db
 			.selectFrom(table.playerResource)
@@ -20,7 +21,7 @@ export const readInventoryFx = Effect.fn("readInventoryFx")(function* () {
 		]),
 	);
 	const resources = [
-		...gameDataIndex.resourcesById.values(),
+		...gameConfig.index.resourcesById.values(),
 	]
 		.sort((left, right) => left.sort - right.sort)
 		.map(

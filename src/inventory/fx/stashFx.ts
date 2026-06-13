@@ -2,13 +2,13 @@ import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
+import { IdServiceFx } from "~/id/context/IdServiceFx";
 import {
 	cloneInventory,
 	planExactInventorySlotPlacement,
 	planInventoryPlacement,
 } from "~/inventory/logic/planning";
-import { gameDataIndex } from "~/manifest/data/gameDataIndex";
-import type { ItemId } from "~/manifest/data/manifestId";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { StashBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
@@ -30,12 +30,14 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 
 	yield* withTransactionFx(
 		Effect.gen(function* () {
+			const gameConfig = yield* GameConfigServiceFx;
+			const id = yield* IdServiceFx;
 			const { save, boardRows, inventoryRows } = yield* readMutableSaveFx();
 			const boardItem = boardRows.find((row) => row.id === input.boardItemId);
 			if (!boardItem) {
 				return yield* Effect.fail(new GameActionError("Board item does not exist."));
 			}
-			if (gameDataIndex.producersByItemId.has(boardItem.itemDefinitionId as ItemId)) {
+			if (gameConfig.isProducer(boardItem.itemDefinitionId)) {
 				return yield* Effect.fail(
 					new GameActionError(
 						"Producer lives on the board. Pause it instead of hiding its state in inventory.",
@@ -43,19 +45,25 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 				);
 			}
 
+			const options = {
+				gameConfig,
+				id,
+			};
 			const virtualInventory = cloneInventory(inventoryRows);
 			const plan =
 				input.slotIndex === undefined
 					? planInventoryPlacement(
 							save,
 							virtualInventory,
-							boardItem.itemDefinitionId as ItemId,
+							boardItem.itemDefinitionId,
+							options,
 						)
 					: planExactInventorySlotPlacement(
 							save,
 							virtualInventory,
-							boardItem.itemDefinitionId as ItemId,
+							boardItem.itemDefinitionId,
 							input.slotIndex,
+							options,
 						);
 			if (!plan) {
 				return yield* Effect.fail(

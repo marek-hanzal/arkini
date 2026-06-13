@@ -4,14 +4,15 @@ import { createInitialBoardState, readBoardState } from "~/board/logic/boardStat
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { planPlacements } from "~/inventory/logic/planning";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/data/manifestId";
 import type { ProducerMode } from "~/manifest/data/producer";
 import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { getProducer } from "~/play/logic/gameDefinitionLookup";
 import { ProduceBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { BoardItemState, ProducerDropResult } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
@@ -39,6 +40,8 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const date = yield* DateServiceFx;
+			const gameConfig = yield* GameConfigServiceFx;
+			const id = yield* IdServiceFx;
 			const now = date.now();
 			const timestamp = now.toMillis();
 			const updatedAt = date.toTimestamp(now);
@@ -49,14 +52,18 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				return yield* Effect.fail(new GameActionError("Producer does not exist."));
 			}
 
-			const producer = getProducer(producerRow.itemDefinitionId);
+			const producer = gameConfig.getProducer(producerRow.itemDefinitionId);
+			if (!producer) {
+				return yield* Effect.fail(new GameActionError("This item is not a producer."));
+			}
 			if (producer.trigger !== "click") {
 				return yield* Effect.fail(new GameActionError("This producer runs by itself."));
 			}
 
 			const state = readBoardState(producerRow);
 			const producerState = {
-				...(createInitialBoardState(producerRow.itemDefinitionId).producer ?? {}),
+				...(createInitialBoardState(producerRow.itemDefinitionId, gameConfig).producer ??
+					{}),
 				...(state.producer ?? {}),
 			};
 
@@ -98,7 +105,11 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				mutable.boardRows,
 				mutable.inventoryRows,
 				allDrops,
-				producerRow,
+				{
+					gameConfig,
+					id,
+					origin: producerRow,
+				},
 			);
 			if (!plan) {
 				return yield* Effect.fail(new GameActionError("Board and inventory are full."));

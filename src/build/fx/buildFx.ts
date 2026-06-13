@@ -3,8 +3,7 @@ import { insertFx } from "~/board/fx/insertFx";
 import { assertInsideBoard } from "~/board/logic/gameBounds";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { removeItemsFx } from "~/inventory/fx/removeItemsFx";
-import { gameDataIndex } from "~/manifest/data/gameDataIndex";
-import type { BuildRecipeId } from "~/manifest/data/manifestId";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { canPayCosts } from "~/play/logic/canPayCosts";
 import { BuildRecipeInputSchema } from "~/play/logic/gameActionSchemas";
@@ -27,13 +26,14 @@ export const buildFx = Effect.fn("buildFx")(function* (props: buildFx.Props) {
 
 	yield* withTransactionFx(
 		Effect.gen(function* () {
+			const gameConfig = yield* GameConfigServiceFx;
 			const { save, boardRows, inventoryRows } = yield* readMutableSaveFx();
 			assertInsideBoard(save, input.x, input.y);
 			if (boardRows.some((row) => row.x === input.x && row.y === input.y)) {
 				return yield* Effect.fail(new GameActionError("Build target is occupied."));
 			}
 
-			const recipe = gameDataIndex.buildRecipesById.get(input.recipeId as BuildRecipeId);
+			const recipe = gameConfig.getBuildRecipe(input.recipeId);
 			if (!recipe) {
 				return yield* Effect.fail(new GameActionError("Unknown build recipe."));
 			}

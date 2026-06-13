@@ -6,7 +6,7 @@ import {
 	inventorySourceId,
 } from "~/inventory/inventoryIdentity";
 import type { ItemId } from "~/manifest/data/manifestId";
-import { resolveItemMergeRule } from "~/manifest/data/resolveItemMergeRule";
+import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
 import type { GameDragView } from "~/play/logic/playTypes";
 import type { FlyerKind, GameDragSource, GameDropTarget, GameVisualMeta } from "~/play/types";
 import type {

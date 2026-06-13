@@ -3,6 +3,8 @@ import type { ItemId } from "./manifestId";
 import type { ItemMergeRule } from "./itemMergeRule";
 import { itemMergePairKey } from "./itemMergePairKey";
 
+export type GameDataIndex = ReturnType<typeof createGameDataIndex>;
+
 export function createGameDataIndex(config: GameConfig) {
 	const assetsById = new Map(
 		config.assets.map((asset) => [

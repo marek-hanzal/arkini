@@ -1,7 +1,7 @@
-import { GameConfig } from "~/manifest/data/GameConfig";
+import { GameConfigServiceLive } from "~/manifest/logic/GameConfigServiceLive";
 
-export const inventoryColumns = GameConfig.game.board.width;
-export const inventorySlots = GameConfig.game.inventory.slots;
+export const inventoryColumns = GameConfigServiceLive.config.game.board.width;
+export const inventorySlots = GameConfigServiceLive.config.game.inventory.slots;
 export const inventoryRows = Math.ceil(inventorySlots / inventoryColumns);
 export const inventoryContainerNodeId = "inventory-container";
 

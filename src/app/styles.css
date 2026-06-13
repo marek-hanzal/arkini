@@ -46,27 +46,12 @@ button {
 		0 0 1rem rgb(16 185 129 / 0.2);
 }
 
-.ak-merge-target::after {
-	content: "";
-	position: absolute;
-	inset: 0.28rem;
-	z-index: 1;
-	pointer-events: none;
-	border-radius: 0.65rem;
-	box-shadow: inset 0 0 0 1px rgb(209 250 229 / 0.44);
-	opacity: 0.5;
-}
-
 .ak-merge-target-over {
 	background: rgb(6 95 70 / 0.58);
 	box-shadow:
 		inset 0 0 0 3px rgb(167 243 208 / 0.95),
 		inset 0 0 1.45rem rgb(52 211 153 / 0.34),
 		0 0 1.35rem rgb(52 211 153 / 0.32);
-}
-
-.ak-merge-target-over::after {
-	opacity: 0.78;
 }
 
 .ak-cell-error {

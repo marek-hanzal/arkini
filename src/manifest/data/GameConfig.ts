@@ -23,6 +23,7 @@ import type { ResourceDefinition } from "./resource";
 import type { UpgradeDefinition, UpgradeEffectDefinition, UpgradeTierDefinition } from "./upgrade";
 
 const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
+const png = (name: string) => new URL(`./png/${name}.png`, import.meta.url).href;
 
 // One config owns the gameplay shape. Items are not passive rows anymore:
 // optional item behavior defines merges, producers, and build recipes in the
@@ -49,8 +50,8 @@ export const GameConfig = {
 		asset("asset:item-bush", "Bush", "item-bush", 34),
 		asset("asset:item-sapling", "Sapling", "item-sapling", 38),
 		asset("asset:item-tree", "Tree", "item-tree", 39),
-		asset("asset:item-twig", "Twig", "item-twig", 40),
-		asset("asset:item-branch", "Branch", "item-branch", 50),
+		asset("asset:item-twig", "Twig", "item-twig", 40, "png"),
+		asset("asset:item-branch", "Branch", "item-branch", 50, "png"),
 		asset("asset:item-log", "Log", "item-log", 60),
 		asset("asset:item-wood-bundle", "Wood Bundle", "item-wood-bundle", 64),
 		asset("asset:item-plank", "Plank", "item-plank", 66),
@@ -2121,12 +2122,18 @@ function resource(
 	};
 }
 
-function asset(id: AssetId, label: string, fileName: string, sort: number): AssetDefinition {
+function asset(
+	id: AssetId,
+	label: string,
+	fileName: string,
+	sort: number,
+	format: "svg" | "png" = "svg",
+): AssetDefinition {
 	return {
 		id,
 		kind: "item",
 		label,
-		src: svg(fileName),
+		src: format === "png" ? png(fileName) : svg(fileName),
 		sort,
 	};
 }

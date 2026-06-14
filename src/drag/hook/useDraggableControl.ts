@@ -73,7 +73,7 @@ export const useDraggableControl = <
 	schedule,
 	resolveMagneticDropTarget,
 	getDragBoundaryNodeId,
-	activationDistance = 5,
+	activationDistance = 2,
 }: useDraggableControl.Props<ItemId, Source, Target, Overlay, Kind>) => {
 	const sensors = useSensors(
 		useSensor(PointerSensor, {

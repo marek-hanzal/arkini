@@ -15,6 +15,18 @@ export namespace resolveBoardDrop {
 	}
 }
 
+const consumeSourceAnimation = (props: {
+	itemId: string;
+	boardItemId: string;
+	targetNodeId: string;
+}) => ({
+	itemId: props.itemId,
+	actorKey: visualBoardItemKey(props.boardItemId),
+	fromDrag: true,
+	toNodeId: props.targetNodeId,
+	kind: "consume" as const,
+});
+
 export const resolveBoardDrop = ({
 	context: { source, target },
 	runtime,
@@ -105,6 +117,14 @@ export const resolveBoardDrop = ({
 	}
 
 	return accept({
+		animationTiming: "beforeCommit",
+		animations: [
+			consumeSourceAnimation({
+				itemId: source.itemId,
+				boardItemId: source.source.boardItemId,
+				targetNodeId: target.targetNodeId,
+			}),
+		],
 		commit: () =>
 			runtime.run({
 				type: "board.merge",

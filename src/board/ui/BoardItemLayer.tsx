@@ -1,47 +1,33 @@
 import { AnimatePresence, motion } from "motion/react";
-import { memo, type CSSProperties, type FC } from "react";
+import { memo, type CSSProperties, type FC, useCallback, useRef } from "react";
 import { boardColumns } from "~/board/boardColumns";
 import { boardRows } from "~/board/boardRows";
 import { boardSourceId } from "~/board/boardSourceId";
 import { BoardTile } from "~/board/ui/BoardTile";
+import { useVisualItemMotionAnimation } from "~/animation/useVisualItemMotionAnimation";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
 import type { VisualItemMotion } from "~/play/logic/visualItemMotionMachine";
 
-const layoutTransition = {
-	duration: 0.26,
+const exitTransition = {
+	duration: 0.18,
 	ease: [
-		0.22,
-		1,
-		0.36,
+		0.65,
+		0,
+		0.35,
 		1,
 	],
 } as const;
 
-const boardItemSlotStyle = (
-	item: BoardViewItem,
-	motion: VisualItemMotion | undefined,
-): CSSProperties => ({
+const boardItemSlotStyle = (item: BoardViewItem): CSSProperties => ({
 	left: `${(item.x * 100) / boardColumns}%`,
 	top: `${(item.y * 100) / boardRows}%`,
 	width: `${100 / boardColumns}%`,
 	height: `${100 / boardRows}%`,
 	paddingRight: item.x === boardColumns - 1 ? 0 : 1,
 	paddingBottom: item.y === boardRows - 1 ? 0 : 1,
-	zIndex: motion?.priority === "raised" ? 30 : 0,
 });
-
-const initialFromMotion = (motion: VisualItemMotion | undefined) =>
-	motion
-		? {
-				x: motion.from.left - motion.to.left,
-				y: motion.from.top - motion.to.top,
-				scaleX: motion.to.width > 0 ? motion.from.width / motion.to.width : 1,
-				scaleY: motion.to.height > 0 ? motion.from.height / motion.to.height : 1,
-				opacity: 1,
-			}
-		: false;
 
 export namespace BoardItemLayer {
 	export interface Actions {
@@ -58,19 +44,82 @@ export namespace BoardItemLayer {
 	}
 }
 
+namespace BoardItemActor {
+	export interface Props {
+		boardItem: BoardViewItem;
+		item: ViewItem;
+		activationNowMs?: number;
+		hidden: boolean;
+		motionKey: string;
+		visualMotion?: VisualItemMotion;
+		settleMotion: useVisualItemMotions.State["settle"];
+		actions: BoardItemLayer.Actions;
+	}
+}
+
+const BoardItemActor: FC<BoardItemActor.Props> = memo(
+	({
+		boardItem,
+		item,
+		activationNowMs,
+		hidden,
+		motionKey,
+		visualMotion,
+		settleMotion,
+		actions,
+	}) => {
+		const ref = useRef<HTMLDivElement | null>(null);
+		const settle = useCallback(() => {
+			if (visualMotion) settleMotion(motionKey, visualMotion.nonce);
+		}, [
+			motionKey,
+			visualMotion,
+			settleMotion,
+		]);
+		useVisualItemMotionAnimation({
+			ref,
+			motion: visualMotion,
+			onSettle: settle,
+		});
+
+		return (
+			<motion.div
+				ref={ref}
+				exit={{
+					opacity: 0,
+					y: 26,
+					scale: 0.9,
+				}}
+				transition={exitTransition}
+				className="pointer-events-auto absolute box-border origin-top-left"
+				style={boardItemSlotStyle(boardItem)}
+			>
+				<BoardTile
+					boardItem={boardItem}
+					item={item}
+					activationNowMs={activationNowMs}
+					hidden={hidden}
+					onSingleActivate={actions.tileSingleActivate}
+					onLongActivate={actions.tileLongActivate}
+				/>
+			</motion.div>
+		);
+	},
+);
+
 /**
  * Renders board item tiles as stable actors above the board-cell grid.
  *
- * Cells own droppable geometry and feedback only. Item DOM nodes no longer jump
- * between cell parents; they keep their identity and Motion animates their slot
- * coordinates when the engine state changes.
+ * Cells own droppable geometry and feedback only. Item DOM nodes do not jump
+ * between cell parents; explicit visual motions are staged only for actors that
+ * are actually affected by a game action.
  */
 export const BoardItemLayer: FC<BoardItemLayer.Props> = memo(
 	({ boardItems, items, isSourceHidden, visualMotions, actions }) => {
 		const nowMs = useProducerClock(boardItems);
 
 		return (
-			<div className="pointer-events-none absolute inset-0 z-10">
+			<div className="pointer-events-none absolute inset-0">
 				<AnimatePresence initial={false}>
 					{boardItems.map((boardItem) => {
 						const item = items[boardItem.itemId];
@@ -80,38 +129,17 @@ export const BoardItemLayer: FC<BoardItemLayer.Props> = memo(
 						const visualMotion = visualMotions.motions[motionKey];
 
 						return (
-							<motion.div
+							<BoardItemActor
 								key={boardItem.id}
-								layout={visualMotion ? false : "position"}
-								initial={initialFromMotion(visualMotion)}
-								animate={{
-									x: 0,
-									y: 0,
-									scaleX: 1,
-									scaleY: 1,
-									opacity: 1,
-								}}
-								exit={{
-									opacity: 0,
-									scale: 0.84,
-								}}
-								transition={layoutTransition}
-								className="pointer-events-auto absolute box-border origin-top-left"
-								style={boardItemSlotStyle(boardItem, visualMotion)}
-								onAnimationComplete={() => {
-									if (visualMotion)
-										visualMotions.settle(motionKey, visualMotion.nonce);
-								}}
-							>
-								<BoardTile
-									boardItem={boardItem}
-									item={item}
-									activationNowMs={boardItem.activation ? nowMs : undefined}
-									hidden={isSourceHidden(boardSourceId(boardItem.id))}
-									onSingleActivate={actions.tileSingleActivate}
-									onLongActivate={actions.tileLongActivate}
-								/>
-							</motion.div>
+								boardItem={boardItem}
+								item={item}
+								activationNowMs={boardItem.activation ? nowMs : undefined}
+								hidden={isSourceHidden(boardSourceId(boardItem.id))}
+								motionKey={motionKey}
+								visualMotion={visualMotion}
+								settleMotion={visualMotions.settle}
+								actions={actions}
+							/>
 						);
 					})}
 				</AnimatePresence>

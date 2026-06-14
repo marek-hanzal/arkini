@@ -13,6 +13,8 @@ Non-responsibilities:
 - do not own React state; hooks own the render lifecycle and call these functions.
 
 Current board merge/feed rules:
-- same-item merge is pre-commit and uses only in-place cross-fade flyers for both source and target,
-- consumed dragged sources use an in-place scale-down + fade-out flyer,
+- same-item merge is pre-commit, but the domain commit runs in parallel after the first paint so the result is ready under the flyer,
+- same-item merge renders only one result cross-fade at the target cell; the dragged source only fades out at its drop position,
+- consumed dragged sources use an in-place scale-down + fade-out flyer with no target pulse,
+- flyers unmount as soon as their timeline completes; do not keep finished flyers over committed state,
 - animation helpers must not decide validity; `src/interaction` chooses the visual plan from merge intent.

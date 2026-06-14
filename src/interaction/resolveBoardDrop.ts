@@ -122,10 +122,6 @@ export const resolveBoardDrop = ({
 	}
 
 	if (intent.type === "merge" && intent.resultItemId && source.itemId === targetItem.itemId) {
-		const crossFadeMeta = {
-			crossFadeItemId: intent.resultItemId,
-		};
-
 		return accept({
 			hide: [
 				source.sourceId,
@@ -137,11 +133,8 @@ export const resolveBoardDrop = ({
 					itemId: source.itemId,
 					fromDrag: true,
 					toDrag: true,
-					kind: "merge-crossfade",
-					overlay: {
-						...source.overlay,
-						...crossFadeMeta,
-					},
+					kind: "fade-out",
+					overlay: source.overlay,
 				},
 				{
 					itemId: targetItem.itemId,
@@ -150,7 +143,7 @@ export const resolveBoardDrop = ({
 					kind: "merge-crossfade",
 					overlay: {
 						activation: targetItem.activation ?? undefined,
-						...crossFadeMeta,
+						crossFadeItemId: intent.resultItemId,
 					},
 				},
 			],
@@ -160,8 +153,6 @@ export const resolveBoardDrop = ({
 					sourceBoardItemId: source.source.boardItemId,
 					targetBoardItemId,
 				}),
-			feedback: () =>
-				runtime.feedback.pulseMergeCell(cellKey(target.target.x, target.target.y)),
 		});
 	}
 
@@ -187,9 +178,5 @@ export const resolveBoardDrop = ({
 				sourceBoardItemId: source.source.boardItemId,
 				targetBoardItemId,
 			}),
-		feedback:
-			intent.type === "merge"
-				? () => runtime.feedback.pulseMergeCell(cellKey(target.target.x, target.target.y))
-				: undefined,
 	});
 };

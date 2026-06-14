@@ -41,35 +41,45 @@ export const runAcceptPlan = async <
 		runtime.sendWorkflow({
 			type: "ANIMATION_STARTED",
 		});
-		await playAnimations({
+		const animations = playAnimations({
 			animations: plan.animations,
 			dragRect,
 			animate: runtime.animate,
 		});
-	}
 
-	runtime.sendWorkflow({
-		type: "COMMIT_STARTED",
-	});
-	await plan.commit();
-
-	if (plan.animations?.length && plan.animationTiming === "afterCommit") {
+		await waitForPaint();
 		runtime.sendWorkflow({
-			type: "ANIMATION_STARTED",
+			type: "COMMIT_STARTED",
 		});
-		await playAnimations({
-			animations: plan.animations,
-			dragRect,
-			animate: runtime.animate,
+		const commit = plan.commit();
+		await Promise.all([
+			animations,
+			commit,
+		]);
+	} else {
+		runtime.sendWorkflow({
+			type: "COMMIT_STARTED",
 		});
+		await plan.commit();
+
+		if (plan.animations?.length && plan.animationTiming === "afterCommit") {
+			runtime.sendWorkflow({
+				type: "ANIMATION_STARTED",
+			});
+			await playAnimations({
+				animations: plan.animations,
+				dragRect,
+				animate: runtime.animate,
+			});
+		}
 	}
 
+	runtime.clearHiddenSources();
 	await waitForPaint();
 	runtime.sendWorkflow({
 		type: "FEEDBACK_STARTED",
 	});
 	await plan.feedback?.();
-	runtime.clearHiddenSources();
 	settleWorkflow({
 		send: runtime.sendWorkflow,
 	});

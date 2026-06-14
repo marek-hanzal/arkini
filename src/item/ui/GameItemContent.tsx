@@ -30,12 +30,29 @@ export const GameItemContent: FC<GameItemContent.Props> = ({
 				producerWaiting && "opacity-[0.82]",
 			)}
 		>
-			<img
-				src={item.assetSrc}
-				alt=""
-				draggable={false}
-				className="h-full w-full object-contain"
-			/>
+			{item.assetRender === "blueprint" && item.assetOverlaySrc ? (
+				<div className="relative h-full w-full">
+					<img
+						src={item.assetSrc}
+						alt=""
+						draggable={false}
+						className="absolute left-0 top-0 h-[68%] w-[68%] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
+					/>
+					<img
+						src={item.assetOverlaySrc}
+						alt=""
+						draggable={false}
+						className="absolute bottom-0 right-0 h-[72%] w-[72%] object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,0.45)]"
+					/>
+				</div>
+			) : (
+				<img
+					src={item.assetSrc}
+					alt=""
+					draggable={false}
+					className="h-full w-full object-contain"
+				/>
+			)}
 			{quantity && quantity > 1 ? (
 				<span
 					className={cn(

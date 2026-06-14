@@ -5,5 +5,7 @@ export interface AssetDefinition {
 	kind: "item" | "ui";
 	label: string;
 	src: string;
+	overlayAssetId?: AssetId;
+	render?: "plain" | "blueprint";
 	sort: number;
 }

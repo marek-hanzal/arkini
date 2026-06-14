@@ -17,11 +17,16 @@ export const FlyerLayer: FC<FlyerLayer.Props> = ({ flyers, onSettle }) => {
 
 	return flyers.map((flyer) => {
 		const item = items[flyer.itemId];
+		const crossFadeItem = flyer.crossFadeItemId
+			? items[flyer.crossFadeItemId]
+			: undefined;
+
 		return item ? (
 			<Flyer
 				key={flyer.id}
 				flyer={flyer}
 				item={item}
+				crossFadeItem={crossFadeItem}
 				onSettle={onSettle}
 			/>
 		) : null;

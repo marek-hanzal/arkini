@@ -9,11 +9,12 @@ export namespace Flyer {
 	export interface Props {
 		flyer: FlyerModel;
 		item: ViewItem;
+		crossFadeItem?: ViewItem;
 		onSettle(id: string): void;
 	}
 }
 
-export const Flyer: FC<Flyer.Props> = ({ flyer, item, onSettle }) => {
+export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle }) => {
 	const ref = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
@@ -39,12 +40,28 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, onSettle }) => {
 				height: flyer.from.height,
 			}}
 		>
-			<GameItemView
-				item={item}
-				variant="flyer"
-				quantity={flyer.quantity}
-				producer={flyer.producer ?? undefined}
-			/>
+			<div
+				data-ak-fly-crossfade-from
+				className={cn(crossFadeItem && "absolute inset-0")}
+			>
+				<GameItemView
+					item={item}
+					variant="flyer"
+					quantity={flyer.quantity}
+					producer={flyer.producer ?? undefined}
+				/>
+			</div>
+			{crossFadeItem ? (
+				<div
+					data-ak-fly-crossfade-to
+					className="absolute inset-0 opacity-0"
+				>
+					<GameItemView
+						item={crossFadeItem}
+						variant="flyer"
+					/>
+				</div>
+			) : null}
 		</div>
 	);
 };

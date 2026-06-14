@@ -244,13 +244,20 @@ function boardToCell(
 		});
 	}
 
+	const mergeResultItemId = canMerge ? mergeRule?.resultItemId : undefined;
+	const mergeCrossFadeMeta = mergeResultItemId
+		? {
+				crossFadeItemId: mergeResultItemId,
+			}
+		: undefined;
+
 	return accept({
 		hide: [
 			source.sourceId,
 		],
 		animationTiming: "beforeCommit",
 		animations: [
-			dragToTargetAnimation(source, target, "merge-source"),
+			dragToTargetAnimation(source, target, "merge-source", mergeCrossFadeMeta),
 			{
 				itemId: targetItem.itemId,
 				fromNodeId: target.targetNodeId,
@@ -258,6 +265,7 @@ function boardToCell(
 				kind: "merge-target",
 				overlay: {
 					producer: targetItem.producer ?? undefined,
+					...mergeCrossFadeMeta,
 				},
 			},
 		],
@@ -302,13 +310,17 @@ function dragToTargetAnimation(
 	source: DraggablePayload<string, GameDragSource, GameVisualMeta>,
 	target: DroppablePayload<GameDropTarget>,
 	kind: FlyerKind = "move",
+	overlay?: GameVisualMeta,
 ): DraggableAnimation<string, FlyerKind, GameVisualMeta> {
 	return {
 		itemId: source.itemId,
 		fromDrag: true,
 		toNodeId: target.targetNodeId,
 		kind,
-		overlay: source.overlay,
+		overlay: {
+			...source.overlay,
+			...overlay,
+		},
 	};
 }
 

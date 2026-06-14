@@ -27,6 +27,8 @@ export type GameDropTarget =
 export interface GameVisualMeta {
 	quantity?: number;
 	producer?: BoardViewItem["producer"];
+	/** Optional item rendered above the flyer so merge flyers can cross-fade into their result. */
+	crossFadeItemId?: string;
 }
 
 export type GameDragData = DraggablePayload<string, GameDragSource, GameVisualMeta>;

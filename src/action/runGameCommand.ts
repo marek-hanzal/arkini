@@ -1,11 +1,11 @@
-import { moveBoardItem, mergeBoardItems, swapBoardItems } from "~/game/board/boardEngine";
+import { moveBoardItem, mergeBoardItems, swapBoardItems } from "~/board/boardEngine";
 import {
 	placeInventoryItem,
 	stashBoardItem,
 	swapInventorySlots,
-} from "~/game/inventory/inventoryEngine";
-import { activateProducer, withdrawProducerInput } from "~/game/producer/producerEngine";
-import { buyUpgrade } from "~/game/upgrade/upgradeEngine";
+} from "~/inventory/inventoryEngine";
+import { activateProducer, withdrawProducerInput } from "~/producer/producerEngine";
+import { buyUpgrade } from "~/upgrade/upgradeEngine";
 import { bootstrapDatabase } from "~/play/logic/bootstrap";
 import type { GameCommand, GameCommandResult } from "./GameCommand";
 

@@ -5,8 +5,8 @@ import {
 	highlightInventoryNav,
 	producerPlacementSourceIds,
 	startProducerDepletionFlyer,
-} from "~/game/animation/producerActivationVisuals";
-import type { GameCommand } from "~/game/action/GameCommand";
+} from "~/animation/producerActivationVisuals";
+import type { GameCommand } from "~/action/GameCommand";
 import { useGameCommand } from "~/play/hook/useGameCommand";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";

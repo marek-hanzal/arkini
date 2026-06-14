@@ -52,7 +52,7 @@ Randomness is provided through `RandomServiceFx`; producer rolls do not call `Ma
 
 ## Game engine boundary
 
-Gameplay mutations go through typed `GameCommand` values in `src/game/action/`. React UI and XState workflows do not import individual Effect roots directly. Command execution is routed through small functional engine facades: board, inventory, producer, and upgrade. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
+Gameplay mutations go through typed `GameCommand` values in `src/action/`. React UI and XState workflows do not import individual Effect roots directly. Command execution is routed through small functional engine facades: board, inventory, producer, and upgrade. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
 
 Rules for this layer:
 
@@ -91,7 +91,7 @@ Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts`, bu
 
 Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle. The transient drag phase is modeled by `src/drag/logic/draggableWorkflowMachine.ts` through XState; do not put board, inventory, or item data into that machine just because the context field exists and humanity cannot be trusted with containers.
 
-Game-specific drag policy lives in `src/game/interaction/dragDropEngine.ts` and delegates merge/craft/producer-input eligibility to `src/game/merge/resolveBoardItemDropIntent.ts`. `src/play/hook/usePlayDraggableControl.ts` is only the thin React wiring that connects the generic drag control, the interaction engine, and the `GameCommand` runner. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: board and inventory drags resolve the nearest same-surface action by real rectangle overlap first, then distance. The magnetic resolver wins over dnd-kit `over`, so grid edges and cross-points do not get punished just because a pointer landed on UI grout.
+Game-specific drag policy lives in `src/interaction/dragDropEngine.ts` and delegates merge/craft/producer-input eligibility to `src/merge/resolveBoardItemDropIntent.ts`. `src/play/hook/usePlayDraggableControl.ts` is only the thin React wiring that connects the generic drag control, the interaction engine, and the `GameCommand` runner. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: board and inventory drags resolve the nearest same-surface action by real rectangle overlap first, then distance. The magnetic resolver wins over dnd-kit `over`, so grid edges and cross-points do not get punished just because a pointer landed on UI grout.
 
 Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Board merge is the deliberate exception: source and target play a short pre-commit merge animation, then the mutation replaces them with the merged item. Blueprint imprint merges are the other deliberate exception: the dragged known building is hidden during the drop, the blank blueprint commits into a specific blueprint, then the original building pops on its own cell so the player can see it was not consumed. Finite producer depletion uses the same discipline: mutate, play loot against the still-visible stale view, mask the newly committed placements during the query refresh, then reveal them under the flyer layer while the depleted producer exits. Place flyers stay fully opaque while travelling; fade-to-ghost animations are banned because watching loot become transparent mid-flight is apparently how UI joins a paranormal society. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
@@ -137,7 +137,10 @@ src/id/context/                  Effect id service context tag.
 src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
-src/game/                       Functional game engines: action command router, board/inventory/producer/upgrade facades, merge intent, interaction plans, animation helpers.
+src/action/                     Game command router and mutation invalidation.
+src/animation/                  Visual planning helpers for game events.
+src/interaction/                UI gesture/drop intent translation.
+src/merge/                      Merge, craft-input, and producer-input intent resolution.
 src/play/logic/                  Promise backend façade for read/bootstrap flows, XState workflow machines, and shared backend types/helpers.
 src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
 src/play/hook/                   Granular React Query subscriptions, XState event queue, and thin command/interaction wiring.

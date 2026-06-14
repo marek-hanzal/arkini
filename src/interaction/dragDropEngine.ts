@@ -1,7 +1,7 @@
 import { boardContainerNodeId, boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
-import type { GameCommand } from "~/game/action/GameCommand";
-import { resolveBoardItemDropIntent } from "~/game/merge/resolveBoardItemDropIntent";
+import type { GameCommand } from "~/action/GameCommand";
+import { resolveBoardItemDropIntent } from "~/merge/resolveBoardItemDropIntent";
 import {
 	inventoryContainerNodeId,
 	inventorySlotNodeId,

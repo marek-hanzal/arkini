@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import type { GameCommand, GameCommandResult } from "~/game/action/GameCommand";
-import { gameCommandInvalidation } from "~/game/action/gameCommandInvalidation";
-import { runGameCommand } from "~/game/action/runGameCommand";
+import type { GameCommand, GameCommandResult } from "~/action/GameCommand";
+import { gameCommandInvalidation } from "~/action/gameCommandInvalidation";
+import { runGameCommand } from "~/action/runGameCommand";
 import { usePlayDataInvalidation } from "./usePlayDataInvalidation";
 
 export namespace useGameCommand {

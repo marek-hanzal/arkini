@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useMachine } from "@xstate/react";
+import { useEffect } from "react";
+import { delayedMergeHintMachine } from "~/board/logic/delayedMergeHintMachine";
 import type { GameDragData } from "~/play/types";
 
 const defaultMergeHintDelayMs = 750;
@@ -14,22 +16,29 @@ export function useDelayedMergeHints({
 	activeDrag,
 	delayMs = defaultMergeHintDelayMs,
 }: useDelayedMergeHints.Props) {
-	const [visible, setVisible] = useState(false);
+	const [hint, sendHint] = useMachine(delayedMergeHintMachine);
 	const activeBoardItemId =
 		activeDrag?.source.kind === "board" ? activeDrag.source.boardItemId : undefined;
 	const activeItemId = activeDrag?.source.kind === "board" ? activeDrag.itemId : undefined;
 
 	useEffect(() => {
-		setVisible(false);
-		if (!activeBoardItemId || !activeItemId) return;
+		if (!activeBoardItemId || !activeItemId) {
+			sendHint({
+				type: "STOP",
+			});
+			return;
+		}
 
-		const timeout = window.setTimeout(() => setVisible(true), delayMs);
-		return () => window.clearTimeout(timeout);
+		sendHint({
+			type: "START",
+			delayMs,
+		});
 	}, [
 		activeBoardItemId,
 		activeItemId,
 		delayMs,
+		sendHint,
 	]);
 
-	return visible;
+	return hint.matches("visible");
 }

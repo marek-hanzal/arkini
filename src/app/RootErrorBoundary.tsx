@@ -1,4 +1,6 @@
-import { type FC, useState } from "react";
+import { useMachine } from "@xstate/react";
+import type { FC } from "react";
+import { resetWorkflowMachine } from "~/shared/logic/resetWorkflowMachine";
 
 export namespace RootErrorBoundary {
 	export interface Props {
@@ -7,11 +9,15 @@ export namespace RootErrorBoundary {
 }
 
 export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
-	const [resetState, setResetState] = useState<"idle" | "pending" | "failed">("idle");
+	const [resetState, sendReset] = useMachine(resetWorkflowMachine);
+	const pending = resetState.matches("pending");
+	const failed = resetState.matches("failed");
 	const message = error instanceof Error ? error.message : String(error);
 
 	async function hardResetBrowserStorage() {
-		setResetState("pending");
+		sendReset({
+			type: "START",
+		});
 
 		try {
 			await (
@@ -24,7 +30,9 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 			window.location.reload();
 		} catch (error) {
 			console.error(error);
-			setResetState("failed");
+			sendReset({
+				type: "FAIL",
+			});
 		}
 	}
 
@@ -45,15 +53,13 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 				<div className="mt-4">
 					<button
 						type="button"
-						disabled={resetState === "pending"}
+						disabled={pending}
 						onClick={hardResetBrowserStorage}
 						className="w-full rounded-md border border-red-300/45 bg-red-300 px-4 py-3 text-sm font-black text-slate-950 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
 					>
-						{resetState === "pending"
-							? "Dropping browser storage…"
-							: "Hard reset browser storage"}
+						{pending ? "Dropping browser storage…" : "Hard reset browser storage"}
 					</button>
-					{resetState === "failed" ? (
+					{failed ? (
 						<p className="mt-3 text-sm text-red-100">
 							Reset failed. Check the console.
 						</p>

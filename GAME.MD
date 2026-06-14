@@ -1021,6 +1021,14 @@ For each interaction, the spec should eventually define:
 
 Until a concrete animation spec exists, implementation should choose minimal local feedback over ambiguous visual polish.
 
+### 16.4 Current merge/feed animation rules
+
+Same-item board merge is a pre-commit visual transform. Both the dragged source visual and the occupied target visual are hidden from the board layer and rendered as flyers in place. Each flyer performs only an opacity cross-fade from the old item into the result item. No travel, bump, shrink, or target wobble is part of this interaction. After the cross-fade completes, the durable merge mutation runs and the board refresh reveals the result item.
+
+Any accepted source consumption that is not a same-item merge uses a consume animation for the dragged item only. The dragged visual remains at its drop position, scales down around its center, fades out, and only then runs the durable mutation. The target item does not play a fake merge transform for craft input deposits, producer input deposits, or mixed consumes. If a target changes as a result of the mutation, that change is revealed by the data refresh rather than by pretending the target ate a ghost with jazz hands.
+
+Blueprint binding remains separate from consumption. It commits the blueprint binding first and then pops the non-consumed dragged building back on its own cell so the player can see that the building survived.
+
 ## 17. Economy validation rules
 
 The economy should be validated using these rules:

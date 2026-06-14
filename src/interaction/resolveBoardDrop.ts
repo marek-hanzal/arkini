@@ -1,5 +1,6 @@
 import { boardSourceId } from "~/board/boardSourceId";
 import { cellKey } from "~/board/util/cell";
+import type { DraggableAnimation } from "~/drag/DraggableAnimation";
 import type { DropPlan } from "~/drag/DropPlan";
 import type { ItemId } from "~/manifest/manifestId";
 import { resolveDropIntent } from "~/merge/resolveDropIntent";
@@ -120,12 +121,57 @@ export const resolveBoardDrop = ({
 		});
 	}
 
-	const mergeCrossFadeMeta =
-		intent.type === "merge" && intent.resultItemId
-			? {
-					crossFadeItemId: intent.resultItemId,
-				}
-			: undefined;
+	if (intent.type === "merge" && intent.resultItemId && source.itemId === targetItem.itemId) {
+		const crossFadeMeta = {
+			crossFadeItemId: intent.resultItemId,
+		};
+
+		return accept({
+			hide: [
+				source.sourceId,
+				boardSourceId(targetBoardItemId),
+			],
+			animationTiming: "beforeCommit",
+			animations: [
+				{
+					itemId: source.itemId,
+					fromDrag: true,
+					toDrag: true,
+					kind: "merge-crossfade",
+					overlay: {
+						...source.overlay,
+						...crossFadeMeta,
+					},
+				},
+				{
+					itemId: targetItem.itemId,
+					fromNodeId: target.targetNodeId,
+					toNodeId: target.targetNodeId,
+					kind: "merge-crossfade",
+					overlay: {
+						activation: targetItem.activation ?? undefined,
+						...crossFadeMeta,
+					},
+				},
+			],
+			commit: () =>
+				runtime.run({
+					type: "board.merge",
+					sourceBoardItemId: source.source.boardItemId,
+					targetBoardItemId,
+				}),
+			feedback: () =>
+				runtime.feedback.pulseMergeCell(cellKey(target.target.x, target.target.y)),
+		});
+	}
+
+	const consumeAnimation: DraggableAnimation<string, FlyerKind, VisualMeta> = {
+		itemId: source.itemId,
+		fromDrag: true,
+		toDrag: true,
+		kind: "consume",
+		overlay: source.overlay,
+	};
 
 	return accept({
 		hide: [
@@ -133,22 +179,7 @@ export const resolveBoardDrop = ({
 		],
 		animationTiming: "beforeCommit",
 		animations: [
-			dragToTargetAnimation({
-				source,
-				target,
-				kind: "merge-source",
-				overlay: mergeCrossFadeMeta,
-			}),
-			{
-				itemId: targetItem.itemId,
-				fromNodeId: target.targetNodeId,
-				toNodeId: target.targetNodeId,
-				kind: "merge-target",
-				overlay: {
-					activation: targetItem.activation ?? undefined,
-					...mergeCrossFadeMeta,
-				},
-			},
+			consumeAnimation,
 		],
 		commit: () =>
 			runtime.run({
@@ -156,6 +187,9 @@ export const resolveBoardDrop = ({
 				sourceBoardItemId: source.source.boardItemId,
 				targetBoardItemId,
 			}),
-		feedback: () => runtime.feedback.pulseMergeCell(cellKey(target.target.x, target.target.y)),
+		feedback:
+			intent.type === "merge"
+				? () => runtime.feedback.pulseMergeCell(cellKey(target.target.x, target.target.y))
+				: undefined,
 	});
 };

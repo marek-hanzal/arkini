@@ -31,7 +31,7 @@ export type DropTarget =
 export interface VisualMeta {
 	quantity?: number;
 	activation?: BoardViewItem["activation"];
-	/** Optional item rendered above the flyer so merge flyers can cross-fade into their result. */
+	/** Optional item rendered above the flyer so in-place replacement flyers can cross-fade into their result. */
 	crossFadeItemId?: string;
 }
 
@@ -51,6 +51,7 @@ export type FlyerKind =
 	| "place"
 	| "deplete"
 	| "merge-crossfade"
+	| "fade-out"
 	| "consume"
 	| "imprint-source";
 
@@ -63,4 +64,3 @@ export interface FlyerModel extends VisualMeta {
 }
 
 export const flashMs = 650;
-export const flyerRenderSettleMs = 180;

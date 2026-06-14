@@ -61,7 +61,8 @@ export const produceFrom = async ({
 				placements: result.placements,
 			}),
 		);
-		await animateProducerDrops({
+
+		const drops = animateProducerDrops({
 			results: [
 				result,
 			],
@@ -69,25 +70,30 @@ export const produceFrom = async ({
 			stepDelayMs: activation === "exhaust" ? 130 : 0,
 			addFlyer,
 		});
-		if (result.placements.some((placement) => placement.kind === "inventory")) {
-			highlightInventoryNav();
-		}
-
 		const depletion = startProducerDepletionFlyer({
 			boardItem,
 			result,
 			hideSources,
 			addFlyer,
 		});
+
 		await waitForPaint();
-		await invalidatePlayData([
+		const invalidation = invalidatePlayData([
 			"board",
 			"inventory",
 			"databaseStatus",
 		]);
-		await waitForPaint();
+		await Promise.all([
+			drops,
+			depletion ?? Promise.resolve(),
+			invalidation,
+		]);
+
+		if (result.placements.some((placement) => placement.kind === "inventory")) {
+			highlightInventoryNav();
+		}
+
 		clearHiddenSources();
-		await depletion;
 	} catch (error) {
 		feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
 		feedback.showError(error);

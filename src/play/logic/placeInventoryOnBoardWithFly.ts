@@ -68,15 +68,21 @@ export const placeInventoryOnBoardWithFly = async ({
 			y: target.y,
 		});
 
-		if (from && to)
-			await addFlyer(stack.itemId, from, to, "place", {
-				quantity: stack.quantity,
-			});
-
-		await invalidatePlayData([
+		const flyer =
+			from && to
+				? addFlyer(stack.itemId, from, to, "place", {
+						quantity: stack.quantity,
+					})
+				: Promise.resolve();
+		await waitForPaint();
+		const invalidation = invalidatePlayData([
 			"board",
 			"inventory",
 			"databaseStatus",
+		]);
+		await Promise.all([
+			flyer,
+			invalidation,
 		]);
 	} catch (error) {
 		feedback.flashInventorySlot(slot.slotIndex, "error");

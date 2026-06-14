@@ -1,5 +1,7 @@
 import type { gsap } from "gsap";
 
+const mergeCrossFadeSeconds = 0.16;
+
 export namespace playMergeCrossFade {
 	export interface Props {
 		timeline: gsap.core.Timeline;
@@ -16,19 +18,18 @@ export const playMergeCrossFade = ({ timeline, from, to }: playMergeCrossFade.Pr
 			from,
 			{
 				opacity: 0,
-				duration: 0.18,
-				ease: "power1.out",
+				duration: mergeCrossFadeSeconds,
+				ease: "none",
 			},
-			0.06,
+			0,
 		)
 		.to(
 			to,
 			{
 				opacity: 1,
-				scale: 1,
-				duration: 0.2,
-				ease: "power2.out",
+				duration: mergeCrossFadeSeconds,
+				ease: "none",
 			},
-			0.06,
+			0,
 		);
 };

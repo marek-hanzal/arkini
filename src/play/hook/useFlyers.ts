@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FlyerKind, FlyerModel, VisualMeta, RectLike } from "~/play/types";
-import { flyerRenderSettleMs } from "~/play/types";
 
 export function useFlyers() {
 	const [flyers, setFlyers] = useState<FlyerModel[]>([]);
 	const resolversRef = useRef(new Map<string, () => void>());
-	const removalTimersRef = useRef(new Map<string, number>());
 
 	const addFlyer = useCallback(
 		(
@@ -39,22 +37,13 @@ export function useFlyers() {
 
 		resolve();
 		resolversRef.current.delete(id);
-
-		window.clearTimeout(removalTimersRef.current.get(id));
-		const timer = window.setTimeout(() => {
-			removalTimersRef.current.delete(id);
-			setFlyers((current) => current.filter((flyer) => flyer.id !== id));
-		}, flyerRenderSettleMs);
-		removalTimersRef.current.set(id, timer);
+		setFlyers((current) => current.filter((flyer) => flyer.id !== id));
 	}, []);
 
 	useEffect(
 		() => () => {
 			for (const resolve of resolversRef.current.values()) resolve();
 			resolversRef.current.clear();
-
-			for (const timer of removalTimersRef.current.values()) window.clearTimeout(timer);
-			removalTimersRef.current.clear();
 		},
 		[],
 	);

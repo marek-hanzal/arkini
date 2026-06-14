@@ -3,9 +3,10 @@ import type { FlyerKind, RectLike } from "~/play/types";
 import { once } from "./once";
 import { playMergeCrossFade } from "./playMergeCrossFade";
 
-const flyDurationSeconds = 0.32;
-const stashExitSeconds = 0.08;
-const consumeDurationSeconds = 0.18;
+const flyDurationSeconds = 0.28;
+const stashExitSeconds = 0.07;
+const fadeOutSeconds = 0.12;
+const consumeDurationSeconds = 0.16;
 
 export namespace playFlyerTimeline {
 	export interface Props {
@@ -50,11 +51,13 @@ export const playFlyerTimeline = (
 				.set(crossFadeFrom, {
 					opacity: 1,
 					transformOrigin: "center",
+					willChange: "opacity",
 				})
 				.set(crossFadeTo, {
 					opacity: 0,
-					scale: kind === "merge-crossfade" ? 1 : 0.92,
+					scale: 1,
 					transformOrigin: "center",
+					willChange: "opacity",
 				});
 		}
 
@@ -82,7 +85,7 @@ export const playFlyerTimeline = (
 				y: -8,
 				scale: 0.72,
 				opacity: 0,
-				duration: 0.26,
+				duration: 0.22,
 				ease: "power2.in",
 			});
 			return;
@@ -97,12 +100,21 @@ export const playFlyerTimeline = (
 			return;
 		}
 
+		if (kind === "fade-out") {
+			timeline.to(element, {
+				opacity: 0,
+				duration: fadeOutSeconds,
+				ease: "none",
+			});
+			return;
+		}
+
 		if (kind === "consume") {
 			timeline.set(element, {
 				transformOrigin: "center",
 			});
 			timeline.to(element, {
-				scale: 0.36,
+				scale: 0.34,
 				opacity: 0,
 				duration: consumeDurationSeconds,
 				ease: "power2.in",
@@ -121,12 +133,12 @@ export const playFlyerTimeline = (
 				.to(element, {
 					scale: 1.18,
 					opacity: 1,
-					duration: 0.18,
+					duration: 0.16,
 					ease: "back.out(2.8)",
 				})
 				.to(element, {
 					scale: 1,
-					duration: 0.22,
+					duration: 0.18,
 					ease: "power2.out",
 				});
 			return;

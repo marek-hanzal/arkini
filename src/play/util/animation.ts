@@ -23,6 +23,11 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 
 	gsap.killTweensOf(element);
 
+	const crossFadeFrom = element.querySelector<HTMLElement>(
+		"[data-ak-fly-crossfade-from]",
+	);
+	const crossFadeTo = element.querySelector<HTMLElement>("[data-ak-fly-crossfade-to]");
+
 	return new Promise<void>((resolve) => {
 		const done = once(resolve);
 		const timeline = gsap.timeline({
@@ -38,6 +43,19 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 			transformOrigin: "top left",
 			force3D: true,
 		});
+
+		if (crossFadeFrom && crossFadeTo) {
+			timeline
+				.set(crossFadeFrom, {
+					opacity: 1,
+					transformOrigin: "center",
+				})
+				.set(crossFadeTo, {
+					opacity: 0,
+					scale: 0.92,
+					transformOrigin: "center",
+				});
+		}
 
 		if (kind === "stash") {
 			timeline
@@ -70,15 +88,20 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 		}
 
 		if (kind === "merge-source") {
+			playMergeCrossFade(timeline, crossFadeFrom, crossFadeTo);
 			timeline
-				.to(element, {
-					x,
-					y,
-					scale: scale * 0.74,
-					opacity: 0.86,
-					duration: 0.22,
-					ease: "power3.out",
-				})
+				.to(
+					element,
+					{
+						x,
+						y,
+						scale: scale * 0.74,
+						opacity: 0.86,
+						duration: 0.22,
+						ease: "power3.out",
+					},
+					0,
+				)
 				.to(element, {
 					scale: scale * 0.52,
 					opacity: 0,
@@ -89,15 +112,20 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 		}
 
 		if (kind === "merge-target") {
+			playMergeCrossFade(timeline, crossFadeFrom, crossFadeTo);
 			timeline
-				.to(element, {
-					x,
-					y,
-					scale: 1.13,
-					opacity: 0.92,
-					duration: 0.15,
-					ease: "power2.out",
-				})
+				.to(
+					element,
+					{
+						x,
+						y,
+						scale: 1.13,
+						opacity: 0.92,
+						duration: 0.15,
+						ease: "power2.out",
+					},
+					0,
+				)
 				.to(element, {
 					scale: 0.9,
 					opacity: 0,
@@ -138,6 +166,35 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 			ease: "power3.out",
 		});
 	});
+}
+
+function playMergeCrossFade(
+	timeline: gsap.core.Timeline,
+	from: HTMLElement | null,
+	to: HTMLElement | null,
+) {
+	if (!from || !to) return;
+
+	timeline
+		.to(
+			from,
+			{
+				opacity: 0,
+				duration: 0.18,
+				ease: "power1.out",
+			},
+			0.06,
+		)
+		.to(
+			to,
+			{
+				opacity: 1,
+				scale: 1,
+				duration: 0.2,
+				ease: "power2.out",
+			},
+			0.06,
+		);
 }
 
 export function playCellImprint(element: HTMLElement) {

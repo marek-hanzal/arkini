@@ -93,6 +93,8 @@ Each inventory slot can hold either:
 
 A slot cannot contain multiple different item IDs.
 
+Inventory stacking is automatic. When an item enters inventory, the inventory first fills compatible existing stacks up to `maxStackSize`, then creates the next stack only when needed. The player should not be responsible for manually combining split stacks, because apparently we are building a game, not a spreadsheet punishment device.
+
 ### 4.4 Item
 
 An item is any gameplay entity that can exist on the board or in inventory.
@@ -227,7 +229,7 @@ Input storage defines:
 
 Example:
 
-A coal mine may require `1 sausage` and `1 beer` per production cycle and may store up to `4 sausage` and `4 beer` in advance. The player can later withdraw stored inputs back into normal inventory when rules allow it.
+A coal mine may require `1 sausage` and `1 beer` per production cycle and may store up to `4 sausage` and `4 beer` in advance. The player can later withdraw stored inputs through item detail when rules allow it. Withdrawal places items onto the board first, then falls back to normal inventory.
 
 ### 4.13 Loot table
 
@@ -345,6 +347,15 @@ Buildings currently use `maxStackSize = 1` unless a future design explicitly say
 
 A pure stateless producer may stack only if its item definition allows it. A producer with cooldown, stored inputs, or any other state cannot stack.
 
+When an item enters inventory from board, withdrawal, production overflow, stash output, upgrade refund, or any future source, the inventory must normalize placement automatically:
+
+1. fill existing compatible stacks first
+2. create a new stack only after compatible stacks are full
+3. store stateful/non-stackable items as single-slot item instances
+4. fail only when no valid inventory slot exists
+
+The game should not create avoidable split stacks of the same stateless item under `maxStackSize`. If split stacks exist after an operation, either the operation is wrong or the inventory normalizer is drunk.
+
 ### 6.3 Board to inventory
 
 Double-clicking an item on the board attempts to move that item into the normal inventory.
@@ -380,6 +391,16 @@ If a running timer item is moved into inventory:
 
 This applies to every active timer in the game: craft timers, construction timers, growth timers, producer cooldowns, stash timers, and future active mechanics.
 
+### 6.6 Inventory drag/swap
+
+Inventory drag/drop is an organization action only.
+
+Dragging an inventory slot onto another inventory slot swaps their contents.
+
+Inventory drag/drop must not trigger merge, craft input deposit, producer input deposit, stash input deposit, production, stash opening, upgrade payment, or any other active gameplay behavior.
+
+Inventory does not need a manual stack-combine interaction because stack normalization is automatic whenever items enter inventory.
+
 ## 7. Interaction rules
 
 ### 7.1 Single-click
@@ -389,8 +410,10 @@ Single-click is the default active interaction.
 Single-click may:
 
 - collect from a ready producer
-- open/collect from a ready stash
+- open/collect/exhaust from a ready stash
 - activate another explicit item action, if later defined
+
+Single-click is allowed to produce output, consume producer/stash inputs, advance stash depletion, or otherwise perform active gameplay.
 
 ### 7.2 Double-click
 
@@ -403,14 +426,80 @@ Double-click may:
 
 Double-click must not have hidden production, stash opening, exhaust, or special collect behavior.
 
-### 7.3 Consistency rule
+### 7.3 Board drag/drop
+
+Board drag/drop is the default direct manipulation interaction on the board.
+
+Dragging a board item to an empty valid board cell moves the item.
+
+Dragging a board item to an occupied board cell attempts the first valid behavior in this order:
+
+1. merge or blueprint binding
+2. feed craft/construction/growth progress
+3. feed producer input storage
+4. feed stash input storage
+5. swap board item positions
+
+Feed means the dragged item is deposited into the target entity's state according to that entity's accepted input rules. Producer and stash feeding are both supported. A locked chest requiring a key is a stash input, not a special-case UI hack wearing a tiny hat.
+
+If none of merge, binding, craft feed, producer feed, or stash feed is valid, occupied-cell drag/drop swaps the two board items.
+
+### 7.4 Inventory drag/drop
+
+Inventory drag/drop swaps inventory slots and does nothing else.
+
+Inventory is passive. Dragging inside inventory must not merge items, feed craft, feed producer, feed stash, start timers, collect output, or pay upgrades.
+
+Stacking is handled automatically by inventory normalization when items enter inventory, so the player does not need a manual stack-combine action.
+
+### 7.5 Long press / item detail
+
+Long press on a board item opens the item detail for that item instance.
+
+The item detail must show every gameplay-relevant piece of information available for that item, including when relevant:
+
+- item identity, kind, tags, and description
+- merge chain participation
+- valid merge outputs
+- blueprint binding rules
+- craft/construction/growth requirements
+- deposited inputs
+- remaining inputs
+- active, ready, or paused timers
+- producer cooldown and readiness
+- producer input storage
+- stash input storage
+- stash remaining charges or depletion state
+- active loot table ID
+- possible loot drops and their rules/probabilities, when known to the player
+- upgrade effects that currently affect the item
+- explicit actions available from the detail
+
+Item detail is gameplay UI, not decorative lore fluff. If a mechanic exists and the player can reasonably inspect it, the detail is the canonical place to expose it.
+
+### 7.6 Withdrawal from producer/stash input storage
+
+Stored producer/stash inputs may be withdrawn only through item detail.
+
+Withdrawal placement rule:
+
+1. try to place withdrawn items onto board cells near the source item
+2. if board placement cannot fit them, place the remaining items into normal inventory using inventory normalization
+3. if neither board nor inventory can fit them, keep the remaining items stored in the producer/stash and show clear feedback
+
+Withdrawal must not silently destroy items. The player should see items appear near the entity first, because pulling a sausage out of a coal mine and having it teleport into a hidden stack is the sort of UI crime that starts forum threads.
+
+### 7.7 Consistency rule
 
 If an interaction behaves differently for one item type, that difference must come from a clear mechanic and must use the correct interaction channel.
 
-Example:
+Examples:
 
 - producer collection belongs to single-click
+- stash opening/exhaust belongs to single-click
 - inventory storage belongs to double-click
+- feeding belongs to board drag/drop
+- withdrawal belongs to item detail
 
 Do not add item-specific double-click exceptions for convenience. Convenience exceptions turn into gameplay debt, then architecture debt, then someone has to debug it at midnight like a gremlin with a keyboard.
 
@@ -527,11 +616,13 @@ Default producer output placement is `board_then_inventory`.
 
 This means:
 
-1. try to place generated items onto valid board cells
-2. if board placement cannot fit all output, try to place remaining output into normal inventory
-3. if neither board nor inventory can fit the output, the producer must not silently destroy generated items unless an explicit overflow rule says so
+1. try to place produced items onto valid board cells near the producer origin
+2. if board placement cannot fit all produced items, place remaining produced items into normal inventory using inventory normalization
+3. if neither board nor inventory can fit everything, produce only what can be placed and keep the remaining production opportunity inside the producer
 
-Exact placement ordering must be deterministic and testable.
+Producer output is allowed to be partial. Items that cannot be placed are not destroyed. For random output, the unplaced remainder represents the right to roll/produce again later, not a pre-rolled item that must be remembered forever.
+
+Board placement must use a deterministic nearest-free-cell policy based on the producer origin. Exact tie-breaking must be deterministic and testable.
 
 ### 9.6 Producer input requirements
 
@@ -555,7 +646,7 @@ Producer input storage is item-instance state. It makes that producer instance s
 
 A producer may contain more input items than one production cycle requires, up to configured capacity.
 
-The player may withdraw stored producer input items back into normal inventory when rules allow it.
+The player may withdraw stored producer input items only through item detail. Withdrawal places items onto the board first, then falls back to normal inventory.
 
 ### 9.8 Producer readiness
 
@@ -563,9 +654,9 @@ A producer is ready when:
 
 1. its cooldown has completed
 2. every required input item is present in the producer input storage
-3. output placement is possible, or output overflow handling is explicitly defined
+3. at least one output item can be placed, or the active loot/production rule explicitly allows zero output
 
-Production consumes configured input quantities from producer input storage.
+Production consumes configured input quantities only for the amount of production that actually happens. Unplaced production remains available for a later activation according to the producer definition.
 
 ## 10. Stashes
 
@@ -604,6 +695,14 @@ Example:
 An epic chest may require a key.
 
 Stash input storage follows the same storage principles as producer input storage, but stash remains a separate entity type.
+
+### 10.5 Stash output placement
+
+Default stash output placement is `board_then_inventory`, using the same deterministic nearest-free-cell policy based on the stash origin.
+
+If the whole stash output cannot be placed, the stash outputs what can be placed and keeps the rest available inside the stash.
+
+For random stash output, unplaced output represents remaining roll/opening opportunity according to the stash definition. It should not silently disappear, and it does not need to be pre-rolled unless a specific stash behavior requires fixed contents.
 
 ## 11. Loot tables
 
@@ -823,7 +922,61 @@ Upgrades cost explicit item stacks or item instances.
 
 Currency items such as coins are normal items stored in normal inventory and may be used as upgrade costs.
 
-## 15. Economy validation rules
+## 15. Feedback and animation specification
+
+This document must eventually describe animation and interaction feedback rules with enough precision that implementation can wire GSAP, CSS transitions, or another animation system without inventing gameplay meaning from vibes.
+
+Animation specs should define behavior, not final art direction. Exact colors, particle assets, easing constants, and polish values can live in UI/theme files unless they affect gameplay readability.
+
+### 15.1 Feedback principles
+
+Every active interaction should provide clear feedback for success, failure, blocked state, progress, and readiness.
+
+Feedback should be local to the affected board item or inventory slot whenever possible. Global toasts should be reserved for cases where local feedback cannot explain the state.
+
+### 15.2 Required feedback categories
+
+The game should define feedback/animation rules for at least:
+
+- board item movement
+- board item swap
+- inventory slot swap
+- board -> inventory storage
+- inventory -> board placement
+- successful merge/binding
+- invalid merge/feed attempt
+- craft/construction/growth input deposit
+- craft/construction/growth timer start
+- craft/construction/growth timer pause/resume
+- craft/construction/growth completion
+- producer ready state
+- producer cooldown progress
+- producer activation
+- partial producer output
+- stash ready state
+- stash opening/exhaust
+- partial stash output
+- input withdrawal
+- inventory full / board full failure
+- upgrade start and completion
+
+### 15.3 Animation data shape
+
+For each interaction, the spec should eventually define:
+
+- trigger
+- source element
+- target element or target cell
+- visual state before animation
+- visual state after animation
+- movement path, if any
+- scale/opacity/position changes, if any
+- whether gameplay state changes before, during, or after animation
+- what happens when animation is interrupted by another action
+
+Until a concrete animation spec exists, implementation should choose minimal local feedback over flashy ambiguity. The player needs clarity first; circus lights can wait their turn.
+
+## 16. Economy validation rules
 
 The economy should be validated using these rules:
 
@@ -840,11 +993,11 @@ The economy should be validated using these rules:
 11. No important economy behavior should live only in UI interaction code.
 12. Existing `GameConfig` economy data is inspiration until a dedicated economy pass rewrites it to match this document.
 
-## 16. Data model expectations
+## 17. Data model expectations
 
 The central game configuration should be able to express at least these concepts.
 
-### 16.1 Item definition
+### 17.1 Item definition
 
 Expected fields:
 
@@ -862,7 +1015,7 @@ Expected fields:
 - optional craft/construction definition reference
 - optional blueprint binding rules
 
-### 16.2 Item instance state
+### 17.2 Item instance state
 
 Expected fields:
 
@@ -883,17 +1036,30 @@ Runtime state must be able to represent:
 - producer input storage
 - stash charges/contents/depletion state
 
-### 16.3 Inventory definition
+### 17.3 Inventory definition
 
 Expected fields:
 
 - slot count: `35`
 - slot placement rules
-- stack merge rules
+- automatic stack normalization rules
+- inventory slot swap rules
 - max stack handling
 - stateful item handling
 
-### 16.4 Merge chain definition
+### 17.4 Interaction definition
+
+Expected fields or equivalent rule definitions:
+
+- single-click action mapping
+- double-click action mapping
+- board drag/drop action priority
+- inventory drag/drop action behavior
+- long press item detail behavior
+- withdrawal placement rules
+- failure feedback rules
+
+### 17.5 Merge chain definition
 
 Expected fields:
 
@@ -905,7 +1071,7 @@ Expected fields:
 - `result`
 - `specialRules`, if needed
 
-### 16.5 Producer definition
+### 17.6 Producer definition
 
 Expected fields:
 
@@ -917,9 +1083,10 @@ Expected fields:
 - input requirements
 - input storage capacities
 - output placement rules
+- partial output/retry behavior
 - upgrade targets
 
-### 16.6 Stash definition
+### 17.7 Stash definition
 
 Expected fields:
 
@@ -932,8 +1099,9 @@ Expected fields:
 - input requirements, if any
 - depletion behavior
 - output placement rules
+- partial output/retry behavior
 
-### 16.7 Loot table definition
+### 17.8 Loot table definition
 
 Expected fields:
 
@@ -947,7 +1115,7 @@ Expected fields:
 - `allowDuplicateResults`
 - zero-output behavior
 
-### 16.8 Blueprint definition
+### 17.9 Blueprint definition
 
 Expected fields:
 
@@ -957,7 +1125,7 @@ Expected fields:
 - craft/construction reference
 - completion result
 
-### 16.9 Craft/construction/growth definition
+### 17.10 Craft/construction/growth definition
 
 Expected fields:
 
@@ -970,7 +1138,7 @@ Expected fields:
 - allowed locations
 - timer pause/resume behavior
 
-### 16.10 Upgrade definition
+### 17.11 Upgrade definition
 
 Expected fields:
 
@@ -984,11 +1152,11 @@ Expected fields:
 - `effect`
 - `nextUpgradeId`, if linear
 
-## 17. Current example chains and entities
+## 18. Current example chains and entities
 
 These examples are canonical directionally, but exact item IDs and tiers will be finalized during economy design.
 
-### 17.1 Wood chain
+### 18.1 Wood chain
 
 A wood chain starts from small natural wood items and ends in useful wood material.
 
@@ -1003,7 +1171,7 @@ Example direction:
 
 The chain must not become stone, ore, coins, diamonds, or food.
 
-### 17.2 Stone chain
+### 18.2 Stone chain
 
 A stone chain starts from small stones and ends in useful construction stone material.
 
@@ -1015,25 +1183,25 @@ Example direction:
 
 The chain must not become gem/diamond unless a separate geology/refining mechanic explicitly supports it.
 
-### 17.3 Producer examples
+### 18.3 Producer examples
 
 - lumber camp: wood material source
 - quarry: stone material source
 - coal mine: coal/fuel source
 - iron mine: ore/metal source
 
-### 17.4 Producer feed examples
+### 18.4 Producer feed examples
 
 - coal mine may consume sausage and beer
 - producer may store more feed items than one production cycle requires
-- stored feed items may be withdrawn back to normal inventory
+- stored feed items may be withdrawn through item detail, board first and inventory fallback
 
-### 17.5 Stash examples
+### 18.5 Stash examples
 
 - basic crate: finite output, removed or emptied after depletion
 - epic chest: finite output, requires key input before opening
 
-## 18. Open design questions
+## 19. Open design questions
 
 These are intentionally not finalized yet.
 
@@ -1048,30 +1216,52 @@ These are intentionally not finalized yet.
 9. Are upgrade tiers strictly linear, or can some branches exist?
 10. Can merge chains require more than two input items?
 11. Can special merges use non-consuming participants besides blueprint binding?
-12. What exact deterministic placement order is used for board/inventory overflow?
+12. What exact tie-break order should the nearest-free-cell placement use when multiple cells are equally valid?
 
 Until these questions are answered, implementation should choose the simplest explicit behavior and document it here before coding.
 
-## 19. Implementation migration notes
+## 20. Implementation migration notes
 
 These notes describe known differences from the current implementation that must be fixed.
 
-1. Remove the separate `playerInventory` gameplay concept.
-2. Move all starting `playerInventory` items into normal inventory.
-3. Remove or migrate `playerInventoryStack` storage.
-4. Remove collectible behavior that stores items into a separate player inventory.
-5. Currency items must go into normal inventory.
-6. Remove the current player-inventory capacity upgrade from gameplay.
-7. Keep normal inventory size fixed at `7 x 5`.
-8. Inventory must support stateful item instances, not only stateless stacks.
-9. Stateful inventory items must be non-stackable.
-10. Double-click on board must store the item. It must not exhaust producers or stashes.
-11. Producer/stash activation belongs to single-click.
-12. Split infinite producers and finite stashes into separate entity types.
-13. Move producer/stash outputs to named loot table entities and reference them by ID.
-14. Current `GameConfig` economy chains may be replaced during the economy design pass.
+### 20.1 Required migration work
 
-## 20. Implementation testing checklist
+1. Inventory must support stateful item instances, not only stateless stacks.
+2. Stateful inventory items must be non-stackable.
+3. Board -> inventory storage must preserve item runtime state.
+4. Inventory -> board placement must restore item runtime state.
+5. Producer/stash cooldowns, timers, stored inputs, charges, and craft progress must pause in inventory and resume on board.
+6. Split infinite producers and finite stashes into separate entity types.
+7. Move producer/stash outputs to named loot table entities and reference them by ID.
+8. Producer/stash activation must support partial output: place what fits, keep the rest/opportunity in the source entity.
+9. Withdrawal from producer/stash input storage must be available only through item detail and must place to board first, then inventory.
+10. Add item detail coverage for merge, craft, timers, producer state, stash state, loot drops, inputs, upgrades, and explicit actions.
+11. Add or document animation/feedback rules before implementing polished interactions.
+12. Current `GameConfig` economy chains may be replaced during the economy design pass.
+
+### 20.2 Obsolete implementation concepts to remove
+
+These concepts are not part of canonical gameplay and should be removed during cleanup unless this document later reintroduces them explicitly.
+
+1. Separate `playerInventory` gameplay concept.
+2. `playerInventoryStack` storage/table/state slice.
+3. `playerInventorySlots` save/config capacity.
+4. Player inventory UI/sheet as a second storage surface.
+5. Starting state that puts currency into `playerInventory`. Currency belongs in normal inventory.
+6. Collectible behavior that stores items into a separate player inventory.
+7. `collect` as a special item behavior for currency.
+8. Double-click exhaust/open/collect behavior. Double-click stores or places only.
+9. `doubleClickBehavior: "exhaust"`. It is replaced by single-click stash exhaust/open.
+10. Mixed `producer.mode` finite/infinite model. Finite entities are `stash`; infinite/long-lived entities are `producer`.
+11. Player-inventory capacity upgrade.
+12. Inventory capacity upgrade as current gameplay. Inventory size is fixed at `7 x 5`.
+13. Any upgrade, UI, schema, or copy that implies a wallet/currency layer separate from normal inventory.
+14. Resource/currency storage outside item inventory unless a future mechanic explicitly reintroduces it here.
+15. Inline base producer output definitions once named loot tables are introduced for all producer/stash outputs.
+
+Obsolete means “delete or migrate,” not “leave it around because maybe archaeology becomes fashionable.”
+
+## 21. Implementation testing checklist
 
 A gameplay implementation should provide tests or validation for:
 
@@ -1083,37 +1273,58 @@ A gameplay implementation should provide tests or validation for:
 6. single-click triggers ready stash
 7. inventory full failure behavior
 8. board full failure behavior
-9. stackable stateless item stacking up to `maxStackSize`
-10. non-stackable building occupying one slot
-11. stateful item occupying one slot and not stacking
-12. stateful item state preserved through board -> inventory -> board
-13. inventory pauses craft/construction/growth timers
-14. inventory pauses producer cooldowns
-15. inventory item cannot receive craft/construction inputs
-16. ordinary merge chain success
-17. invalid merge rejection
-18. thematic merge chain validation from data
-19. stateful item merge rejection unless explicit rule exists
-20. producer cooldown timing on board
-21. producer cooldown paused in inventory
-22. producer loot table rolls from named table ID
-23. producer generating multiple items
-24. producer generating duplicate item outputs when allowed
-25. producer input deposit
-26. producer input withdrawal
-27. producer production blocked by missing inputs
-28. producer production consumes required inputs
-29. stash finite depletion
-30. stash input requirement, for keyed/locked stashes
-31. blank blueprint completion
-32. blank blueprint binding to target entity
-33. target entity not consumed by blueprint binding
-34. bound blueprint receiving construction inputs
-35. craft/construction timer starts after required inputs are deposited
-36. craft/construction timer pauses in inventory
-37. craft/construction completion on board
-38. upgrade cost payment from normal inventory
-39. upgrade timer lifecycle
-40. upgrade reducing producer cooldown
-41. upgrade switching producer loot table ID
-42. save compatibility behavior when game definition version changes
+9. automatic inventory normalization fills compatible stacks before creating new stacks
+10. stackable stateless item stacking up to `maxStackSize`
+11. non-stackable building occupying one slot
+12. stateful item occupying one slot and not stacking
+13. inventory slot drag swaps slot contents
+14. inventory drag never triggers merge/feed/production
+15. board drag moves item to empty cell
+16. board drag swaps incompatible occupied cells
+17. board drag performs valid merge/binding before swap
+18. board drag feeds craft/construction/growth before swap
+19. board drag feeds producer input storage before swap
+20. board drag feeds stash input storage before swap
+21. stateful item state preserved through board -> inventory -> board
+22. inventory pauses craft/construction/growth timers
+23. inventory pauses producer cooldowns
+24. inventory item cannot receive craft/construction inputs
+25. ordinary merge chain success
+26. invalid merge rejection
+27. thematic merge chain validation from data
+28. stateful item merge rejection unless explicit rule exists
+29. producer cooldown timing on board
+30. producer cooldown paused in inventory
+31. producer loot table rolls from named table ID
+32. producer generating multiple items
+33. producer generating duplicate item outputs when allowed
+34. producer input deposit
+35. producer input withdrawal from item detail
+36. withdrawal places to board first, then inventory
+37. withdrawal keeps remaining stored items when board and inventory cannot fit them
+38. producer production blocked by missing inputs
+39. producer production consumes required inputs only for production that actually happens
+40. producer partial output places what fits and keeps remaining opportunity/source state
+41. producer output uses deterministic nearest-free-cell placement from producer origin
+42. stash finite depletion
+43. stash input requirement, for keyed/locked stashes
+44. stash partial output places what fits and keeps remaining opportunity/source state
+45. stash output uses deterministic nearest-free-cell placement from stash origin
+46. blank blueprint completion
+47. blank blueprint binding to target entity
+48. target entity not consumed by blueprint binding
+49. bound blueprint receiving construction inputs
+50. craft/construction timer starts after required inputs are deposited
+51. craft/construction timer pauses in inventory
+52. craft/construction completion on board
+53. item detail shows merge information
+54. item detail shows craft/construction/growth progress and timers
+55. item detail shows producer/stash state, inputs, charges, and loot information
+56. upgrade cost payment from normal inventory
+57. upgrade timer lifecycle
+58. upgrade reducing producer cooldown
+59. upgrade switching producer loot table ID
+60. obsolete `playerInventory` concepts are absent from gameplay logic
+61. obsolete `collect` behavior is absent from gameplay logic
+62. obsolete double-click exhaust behavior is absent from gameplay logic
+63. save compatibility behavior when game definition version changes

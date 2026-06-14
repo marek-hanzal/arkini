@@ -35,7 +35,8 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 		const run = async () => {
 			const x = flyer.to.left - flyer.from.left;
 			const y = flyer.to.top - flyer.from.top;
-			const scale = flyer.from.width > 0 ? flyer.to.width / flyer.from.width : 1;
+			const scaleX = flyer.from.width > 0 ? flyer.to.width / flyer.from.width : 1;
+			const scaleY = flyer.from.height > 0 ? flyer.to.height / flyer.from.height : 1;
 			const exitY = y + 34;
 			const crossFadeFrom = element.querySelector<HTMLElement>(
 				"[data-ak-fly-crossfade-from]",
@@ -53,7 +54,8 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 					{
 						x,
 						y,
-						scale,
+						scaleX,
+						scaleY,
 						opacity: 1,
 					},
 					{
@@ -91,7 +93,8 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 					element,
 					{
 						y: -8,
-						scale: 0.72,
+						scaleX: 0.72,
+						scaleY: 0.72,
 						opacity: 0,
 					},
 					{
@@ -156,7 +159,8 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 				await animate(
 					element,
 					{
-						scale: 0.34,
+						scaleX: 0.34,
+						scaleY: 0.34,
 						opacity: 0,
 					},
 					{
@@ -179,7 +183,8 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 					{
 						x,
 						y,
-						scale: 0.82,
+						scaleX: scaleX * 0.82,
+						scaleY: scaleY * 0.82,
 						opacity: 0,
 					},
 					{
@@ -189,7 +194,8 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 				await animate(
 					element,
 					{
-						scale: 1.18,
+						scaleX: scaleX * 1.18,
+						scaleY: scaleY * 1.18,
 						opacity: 1,
 					},
 					{
@@ -205,7 +211,8 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 				await animate(
 					element,
 					{
-						scale: 1,
+						scaleX,
+						scaleY,
 					},
 					{
 						duration: 0.18,
@@ -220,7 +227,8 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 				{
 					x,
 					y,
-					scale,
+					scaleX,
+					scaleY,
 					opacity: 1,
 				},
 				{

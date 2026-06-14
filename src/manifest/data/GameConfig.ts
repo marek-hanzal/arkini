@@ -77,70 +77,16 @@ export const GameConfig = {
 		asset("asset:item-blueprint-draft", "Blueprint Draft", "item-blueprint-draft", 110),
 		asset("asset:item-blueprint", "Finished Blueprint", "item-blueprint", 112),
 		asset(
-			"asset:item-blueprint-lumber-camp-scrap",
-			"Lumber Camp Blueprint Scrap",
-			"item-blueprint-lumber-camp-scrap",
-			113,
-		),
-		asset(
-			"asset:item-blueprint-lumber-camp-fragment",
-			"Lumber Camp Blueprint Fragment",
-			"item-blueprint-lumber-camp-fragment",
-			114,
-		),
-		asset(
-			"asset:item-blueprint-lumber-camp-draft",
-			"Lumber Camp Blueprint Draft",
-			"item-blueprint-lumber-camp-draft",
-			115,
-		),
-		asset(
 			"asset:item-blueprint-lumber-camp",
 			"Lumber Camp Blueprint",
 			"item-blueprint-lumber-camp-blueprint",
 			116,
 		),
 		asset(
-			"asset:item-blueprint-quarry-scrap",
-			"Quarry Blueprint Scrap",
-			"item-blueprint-quarry-scrap",
-			117,
-		),
-		asset(
-			"asset:item-blueprint-quarry-fragment",
-			"Quarry Blueprint Fragment",
-			"item-blueprint-quarry-fragment",
-			118,
-		),
-		asset(
-			"asset:item-blueprint-quarry-draft",
-			"Quarry Blueprint Draft",
-			"item-blueprint-quarry-draft",
-			119,
-		),
-		asset(
 			"asset:item-blueprint-quarry",
 			"Quarry Blueprint",
 			"item-blueprint-quarry-blueprint",
 			120,
-		),
-		asset(
-			"asset:item-blueprint-townhall-scrap",
-			"Town Hall Blueprint Scrap",
-			"item-blueprint-townhall-scrap",
-			121,
-		),
-		asset(
-			"asset:item-blueprint-townhall-fragment",
-			"Town Hall Blueprint Fragment",
-			"item-blueprint-townhall-fragment",
-			122,
-		),
-		asset(
-			"asset:item-blueprint-townhall-draft",
-			"Town Hall Blueprint Draft",
-			"item-blueprint-townhall-draft",
-			123,
 		),
 		asset(
 			"asset:item-blueprint-townhall",
@@ -800,13 +746,13 @@ export const GameConfig = {
 		),
 
 		item(
-			"item:blueprint-lumber-camp-scrap",
-			"asset:item-blueprint-lumber-camp-scrap",
-			"blueprint-lumber-camp-scrap",
-			"Lumber Camp Blueprint Scrap",
+			"item:blueprint-scrap",
+			"asset:item-blueprint-scrap",
+			"blueprint-scrap",
+			"Blueprint Scrap",
 			1,
 			20,
-			"A torn clue for future construction.",
+			"A torn blank construction note. Inspiring, in the way paperwork can be.",
 			[
 				"blueprint",
 				"fragment",
@@ -815,21 +761,21 @@ export const GameConfig = {
 			{
 				merge: [
 					same(
-						"merge:blueprint-lumber-camp-scrap-fragment",
-						"item:blueprint-lumber-camp-scrap",
-						"item:blueprint-lumber-camp-fragment",
+						"merge:blueprint-scrap-fragment",
+						"item:blueprint-scrap",
+						"item:blueprint-fragment",
 					),
 				],
 			},
 		),
 		item(
-			"item:blueprint-lumber-camp-fragment",
-			"asset:item-blueprint-lumber-camp-fragment",
-			"blueprint-lumber-camp-fragment",
-			"Lumber Camp Blueprint Fragment",
+			"item:blueprint-fragment",
+			"asset:item-blueprint-fragment",
+			"blueprint-fragment",
+			"Blueprint Fragment",
 			2,
 			15,
-			"A bigger piece of the plan. Still not enough, naturally.",
+			"A bigger blank plan piece. Still technically a mess, but taller.",
 			[
 				"blueprint",
 				"fragment",
@@ -838,21 +784,21 @@ export const GameConfig = {
 			{
 				merge: [
 					same(
-						"merge:blueprint-lumber-camp-fragment-draft",
-						"item:blueprint-lumber-camp-fragment",
-						"item:blueprint-lumber-camp-draft",
+						"merge:blueprint-fragment-draft",
+						"item:blueprint-fragment",
+						"item:blueprint-draft",
 					),
 				],
 			},
 		),
 		item(
-			"item:blueprint-lumber-camp-draft",
-			"asset:item-blueprint-lumber-camp-draft",
-			"blueprint-lumber-camp-draft",
-			"Lumber Camp Blueprint Draft",
+			"item:blueprint-draft",
+			"asset:item-blueprint-draft",
+			"blueprint-draft",
+			"Blueprint Draft",
 			3,
 			10,
-			"Almost a full plan, which is how projects become dangerous.",
+			"A nearly usable blank plan. Construction bureaucracy is blooming.",
 			[
 				"blueprint",
 				"fragment",
@@ -861,13 +807,28 @@ export const GameConfig = {
 			{
 				merge: [
 					same(
-						"merge:blueprint-lumber-camp-draft-final",
-						"item:blueprint-lumber-camp-draft",
-						"item:blueprint-lumber-camp",
+						"merge:blueprint-draft-final",
+						"item:blueprint-draft",
+						"item:blueprint",
 					),
 				],
 			},
 		),
+		item(
+			"item:blueprint",
+			"asset:item-blueprint",
+			"blueprint",
+			"Blank Blueprint",
+			4,
+			5,
+			"A finished blank plan. Drag a known build target onto it to burn in the idea without sacrificing the original.",
+			[
+				"blueprint",
+				"blank",
+			],
+			203,
+		),
+
 		item(
 			"item:blueprint-lumber-camp",
 			"asset:item-blueprint-lumber-camp",
@@ -880,7 +841,7 @@ export const GameConfig = {
 				"blueprint",
 				"craft-target",
 			],
-			203,
+			204,
 			{
 				craft: craft("craft:lumber-camp", "item:lumber-camp-1", [
 					input("item:plank", 1),
@@ -889,75 +850,6 @@ export const GameConfig = {
 			},
 		),
 
-		item(
-			"item:blueprint-quarry-scrap",
-			"asset:item-blueprint-quarry-scrap",
-			"blueprint-quarry-scrap",
-			"Quarry Blueprint Scrap",
-			1,
-			20,
-			"A torn clue for future construction.",
-			[
-				"blueprint",
-				"fragment",
-			],
-			220,
-			{
-				merge: [
-					same(
-						"merge:blueprint-quarry-scrap-fragment",
-						"item:blueprint-quarry-scrap",
-						"item:blueprint-quarry-fragment",
-					),
-				],
-			},
-		),
-		item(
-			"item:blueprint-quarry-fragment",
-			"asset:item-blueprint-quarry-fragment",
-			"blueprint-quarry-fragment",
-			"Quarry Blueprint Fragment",
-			2,
-			15,
-			"A bigger piece of the plan. Still not enough, naturally.",
-			[
-				"blueprint",
-				"fragment",
-			],
-			221,
-			{
-				merge: [
-					same(
-						"merge:blueprint-quarry-fragment-draft",
-						"item:blueprint-quarry-fragment",
-						"item:blueprint-quarry-draft",
-					),
-				],
-			},
-		),
-		item(
-			"item:blueprint-quarry-draft",
-			"asset:item-blueprint-quarry-draft",
-			"blueprint-quarry-draft",
-			"Quarry Blueprint Draft",
-			3,
-			10,
-			"Almost a full plan, which is how projects become dangerous.",
-			[
-				"blueprint",
-				"fragment",
-			],
-			222,
-			{
-				merge: [
-					same(
-						"merge:blueprint-quarry-draft-final",
-						"item:blueprint-quarry-draft",
-						"item:blueprint-quarry",
-					),
-				],
-			},
-		),
 		item(
 			"item:blueprint-quarry",
 			"asset:item-blueprint-quarry",
@@ -970,7 +862,7 @@ export const GameConfig = {
 				"blueprint",
 				"craft-target",
 			],
-			223,
+			224,
 			{
 				craft: craft("craft:quarry", "item:quarry-1", [
 					input("item:beam", 1),
@@ -979,75 +871,6 @@ export const GameConfig = {
 			},
 		),
 
-		item(
-			"item:blueprint-townhall-scrap",
-			"asset:item-blueprint-townhall-scrap",
-			"blueprint-townhall-scrap",
-			"Town Hall Blueprint Scrap",
-			1,
-			20,
-			"A torn clue for future construction.",
-			[
-				"blueprint",
-				"fragment",
-			],
-			240,
-			{
-				merge: [
-					same(
-						"merge:blueprint-townhall-scrap-fragment",
-						"item:blueprint-townhall-scrap",
-						"item:blueprint-townhall-fragment",
-					),
-				],
-			},
-		),
-		item(
-			"item:blueprint-townhall-fragment",
-			"asset:item-blueprint-townhall-fragment",
-			"blueprint-townhall-fragment",
-			"Town Hall Blueprint Fragment",
-			2,
-			15,
-			"A bigger piece of the plan. Still not enough, naturally.",
-			[
-				"blueprint",
-				"fragment",
-			],
-			241,
-			{
-				merge: [
-					same(
-						"merge:blueprint-townhall-fragment-draft",
-						"item:blueprint-townhall-fragment",
-						"item:blueprint-townhall-draft",
-					),
-				],
-			},
-		),
-		item(
-			"item:blueprint-townhall-draft",
-			"asset:item-blueprint-townhall-draft",
-			"blueprint-townhall-draft",
-			"Town Hall Blueprint Draft",
-			3,
-			10,
-			"Almost a full plan, which is how projects become dangerous.",
-			[
-				"blueprint",
-				"fragment",
-			],
-			242,
-			{
-				merge: [
-					same(
-						"merge:blueprint-townhall-draft-final",
-						"item:blueprint-townhall-draft",
-						"item:blueprint-townhall",
-					),
-				],
-			},
-		),
 		item(
 			"item:blueprint-townhall",
 			"asset:item-blueprint-townhall",
@@ -1060,7 +883,7 @@ export const GameConfig = {
 				"blueprint",
 				"craft-target",
 			],
-			243,
+			244,
 			{
 				craft: craft("craft:townhall", "item:townhall-1", [
 					input("item:beam", 1),
@@ -1360,14 +1183,15 @@ export const GameConfig = {
 			],
 			300,
 			{
+				merge: [
+					imprint("merge:townhall-1-blueprint", "item:blueprint", "item:blueprint-townhall"),
+				],
 				label: "1",
 				producer: clickProducer(
 					3500,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp-scrap", 34),
-							drop("item:blueprint-quarry-scrap", 34),
-							drop("item:blueprint-townhall-scrap", 22),
+							drop("item:blueprint-scrap", 90),
 							drop("item:crate-1", 10),
 						]),
 						chance("item:water", 0.32),
@@ -1390,14 +1214,15 @@ export const GameConfig = {
 			],
 			310,
 			{
+				merge: [
+					imprint("merge:townhall-2-blueprint", "item:blueprint", "item:blueprint-townhall-2"),
+				],
 				label: "2",
 				producer: clickProducer(
 					3000,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp-scrap", 22),
-							drop("item:blueprint-quarry-scrap", 22),
-							drop("item:blueprint-townhall-scrap", 16),
+							drop("item:blueprint-scrap", 60),
 							drop("item:crate-1", 28),
 							drop("item:crate-2", 12),
 							drop("item:blueprint-lumber-camp-2", 6),
@@ -1426,14 +1251,15 @@ export const GameConfig = {
 			],
 			320,
 			{
+				merge: [
+					imprint("merge:townhall-3-blueprint", "item:blueprint", "item:blueprint-townhall-3"),
+				],
 				label: "3",
 				producer: clickProducer(
 					2500,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp-scrap", 14),
-							drop("item:blueprint-quarry-scrap", 14),
-							drop("item:blueprint-townhall-scrap", 12),
+							drop("item:blueprint-scrap", 40),
 							drop("item:crate-1", 18),
 							drop("item:crate-2", 30),
 							drop("item:crate-3", 12),
@@ -1464,14 +1290,15 @@ export const GameConfig = {
 			],
 			324,
 			{
+				merge: [
+					imprint("merge:townhall-4-blueprint", "item:blueprint", "item:blueprint-townhall-4"),
+				],
 				label: "4",
 				producer: clickProducer(
 					2200,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp-scrap", 12),
-							drop("item:blueprint-quarry-scrap", 12),
-							drop("item:blueprint-townhall-scrap", 12),
+							drop("item:blueprint-scrap", 36),
 							drop("item:crate-2", 34),
 							drop("item:crate-3", 22),
 							drop("item:crate-4", 8),
@@ -1501,14 +1328,15 @@ export const GameConfig = {
 			],
 			328,
 			{
+				merge: [
+					imprint("merge:townhall-5-blueprint", "item:blueprint", "item:blueprint-townhall-5"),
+				],
 				label: "5",
 				producer: clickProducer(
 					1900,
 					outputs(
 						weighted([
-							drop("item:blueprint-lumber-camp-scrap", 10),
-							drop("item:blueprint-quarry-scrap", 10),
-							drop("item:blueprint-townhall-scrap", 10),
+							drop("item:blueprint-scrap", 30),
 							drop("item:crate-2", 28),
 							drop("item:crate-3", 30),
 							drop("item:crate-4", 12),
@@ -1539,6 +1367,9 @@ export const GameConfig = {
 			],
 			330,
 			{
+				merge: [
+					imprint("merge:lumber-camp-1-blueprint", "item:blueprint", "item:blueprint-lumber-camp"),
+				],
 				label: "1",
 				producer: clickProducer(
 					5000,
@@ -1565,6 +1396,9 @@ export const GameConfig = {
 			],
 			340,
 			{
+				merge: [
+					imprint("merge:lumber-camp-2-blueprint", "item:blueprint", "item:blueprint-lumber-camp-2"),
+				],
 				label: "2",
 				producer: clickProducer(
 					4500,
@@ -1594,6 +1428,9 @@ export const GameConfig = {
 			],
 			350,
 			{
+				merge: [
+					imprint("merge:lumber-camp-3-blueprint", "item:blueprint", "item:blueprint-lumber-camp-3"),
+				],
 				label: "3",
 				producer: clickProducer(
 					4000,
@@ -1617,6 +1454,9 @@ export const GameConfig = {
 			],
 			354,
 			{
+				merge: [
+					imprint("merge:lumber-camp-4-blueprint", "item:blueprint", "item:blueprint-lumber-camp-4"),
+				],
 				label: "4",
 				producer: clickProducer(
 					3600,
@@ -1646,6 +1486,9 @@ export const GameConfig = {
 			],
 			358,
 			{
+				merge: [
+					imprint("merge:lumber-camp-5-blueprint", "item:blueprint", "item:blueprint-lumber-camp-5"),
+				],
 				label: "5",
 				producer: clickProducer(
 					3200,
@@ -1673,6 +1516,9 @@ export const GameConfig = {
 			],
 			360,
 			{
+				merge: [
+					imprint("merge:quarry-1-blueprint", "item:blueprint", "item:blueprint-quarry"),
+				],
 				label: "1",
 				producer: clickProducer(
 					5500,
@@ -1699,6 +1545,9 @@ export const GameConfig = {
 			],
 			370,
 			{
+				merge: [
+					imprint("merge:quarry-2-blueprint", "item:blueprint", "item:blueprint-quarry-2"),
+				],
 				label: "2",
 				producer: clickProducer(
 					5000,
@@ -1728,6 +1577,9 @@ export const GameConfig = {
 			],
 			380,
 			{
+				merge: [
+					imprint("merge:quarry-3-blueprint", "item:blueprint", "item:blueprint-quarry-3"),
+				],
 				label: "3",
 				producer: clickProducer(
 					4500,
@@ -1751,6 +1603,9 @@ export const GameConfig = {
 			],
 			384,
 			{
+				merge: [
+					imprint("merge:quarry-4-blueprint", "item:blueprint", "item:blueprint-quarry-4"),
+				],
 				label: "4",
 				producer: clickProducer(
 					4100,
@@ -1777,6 +1632,9 @@ export const GameConfig = {
 			],
 			388,
 			{
+				merge: [
+					imprint("merge:quarry-5-blueprint", "item:blueprint", "item:blueprint-quarry-5"),
+				],
 				label: "5",
 				producer: clickProducer(
 					3700,
@@ -1995,16 +1853,8 @@ export const GameConfig = {
 		}[],
 		inventory: [
 			{
-				itemId: "item:blueprint-lumber-camp-scrap",
-				quantity: 4,
-			},
-			{
-				itemId: "item:blueprint-quarry-scrap",
-				quantity: 4,
-			},
-			{
-				itemId: "item:blueprint-townhall-scrap",
-				quantity: 2,
+				itemId: "item:blueprint-scrap",
+				quantity: 10,
 			},
 			{
 				itemId: "item:twig",
@@ -2176,6 +2026,20 @@ function combo(
 		withItemId,
 		resultItemId,
 		secret,
+	};
+}
+
+function imprint(
+	id: MergeDefinitionId,
+	withItemId: ItemId,
+	resultItemId: ItemId,
+): ItemMergeRule {
+	return {
+		id,
+		withItemId,
+		resultItemId,
+		consumeSource: false,
+		secret: true,
 	};
 }
 

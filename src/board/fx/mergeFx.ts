@@ -146,9 +146,21 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				);
 			}
 
-			yield* dbFx((db) =>
-				db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
-			);
+			if (
+				rule.consumeSource === false &&
+				(source.itemDefinitionId !== rule.sourceItemId ||
+					target.itemDefinitionId !== rule.withItemId)
+			) {
+				return yield* Effect.fail(
+					new GameActionError("This merge must be applied in the defined direction."),
+				);
+			}
+
+			if (rule.consumeSource !== false) {
+				yield* dbFx((db) =>
+					db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
+				);
+			}
 			yield* dbFx((db) =>
 				db
 					.updateTable(table.boardItem)

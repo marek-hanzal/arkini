@@ -5,9 +5,11 @@ export namespace usePlayFeedbackStore {
 	export interface State {
 		invalidBoardCellKey?: string;
 		mergedBoardCellKey?: string;
+		imprintedBoardCellKey?: string;
 		invalidInventorySlot?: number;
 		flashBoardCell(key: string | undefined, tone: "error"): void;
 		pulseMergeCell(key: string | undefined): void;
+		pulseImprintCell(key: string | undefined): void;
 		flashInventorySlot(slotIndex: number | undefined, tone: "error"): void;
 		showError(error: unknown): void;
 	}
@@ -43,6 +45,24 @@ export const usePlayFeedbackStore = create<usePlayFeedbackStore.State>((set, get
 						mergedBoardCellKey: undefined,
 					});
 			}, 560);
+		});
+	},
+	pulseImprintCell(key) {
+		if (!key) return;
+
+		set({
+			imprintedBoardCellKey: undefined,
+		});
+		window.requestAnimationFrame(() => {
+			set({
+				imprintedBoardCellKey: key,
+			});
+			window.setTimeout(() => {
+				if (get().imprintedBoardCellKey === key)
+					set({
+						imprintedBoardCellKey: undefined,
+					});
+			}, 640);
 		});
 	},
 	flashInventorySlot(slotIndex, tone) {

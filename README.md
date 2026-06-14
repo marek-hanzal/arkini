@@ -21,6 +21,7 @@ Item definitions drive behavior. An item may define:
 
 - normal merge rules, for example `seed + seed -> sprout`
 - mixed/secret merge rules, for example `twig + water -> sprout`
+- non-consuming source merge rules, used when a known building imprints a blank blueprint without deleting the original
 - click producers with batch output: guaranteed drops, chance drops, and weighted rolls
 - optional producer input inventories; producers can require stored consumables before they work
 - finite crates that exhaust all charges on double tap
@@ -50,7 +51,7 @@ Randomness is provided through `RandomServiceFx`; producer rolls do not call `Ma
 
 ## Gameplay model
 
-The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint fragments are just one content family inside that system: scraps merge into fragments, fragments into drafts, drafts into finished blueprints, and finished blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
+The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint scraps are generic now: scraps merge into fragments, fragments into drafts, drafts into a blank blueprint. A known building can then be dragged onto that blank blueprint to create a specific build blueprint without consuming the original building. Finished specific blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
 
 - Board size comes from `GameConfig.game.board`, currently 7×9.
 - Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.
@@ -80,7 +81,7 @@ Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows
 
 Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/hook/usePlayDraggableControl.ts` only wires those rules into the generic control. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: board and inventory drags resolve the nearest same-surface action by real rectangle overlap first, then distance. The magnetic resolver wins over dnd-kit `over`, so grid edges and cross-points do not get punished just because a pointer landed on UI grout.
 
-Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Board merge is the deliberate exception: source and target play a short pre-commit merge animation, then the mutation replaces them with the merged item. Finite producer depletion uses the same discipline: mutate, play loot against the still-visible stale view, mask the newly committed placements during the query refresh, then reveal them under the flyer layer while the depleted producer exits. Place flyers stay fully opaque while travelling; fade-to-ghost animations are banned because watching loot become transparent mid-flight is apparently how UI joins a paranormal society. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
+Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Board merge is the deliberate exception: source and target play a short pre-commit merge animation, then the mutation replaces them with the merged item. Blueprint imprint merges are the other deliberate exception: the dragged known building is hidden during the drop, the blank blueprint commits into a specific blueprint, then the original building pops on its own cell so the player can see it was not consumed. Finite producer depletion uses the same discipline: mutate, play loot against the still-visible stale view, mask the newly committed placements during the query refresh, then reveal them under the flyer layer while the depleted producer exits. Place flyers stay fully opaque while travelling; fade-to-ghost animations are banned because watching loot become transparent mid-flight is apparently how UI joins a paranormal society. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
 Inventory stash feedback holds the inventory bottom-nav highlight briefly and extends that hold when more items arrive quickly, so bursty item stashing does not flicker like a broken nightclub sign. Producer ready feedback is tracked by producer instance id and played through GSAP only on real readiness transitions. Mounting a producer or moving it across the board must not pulse it; React mounts are not gameplay events, despite React’s best efforts to feel important.
 

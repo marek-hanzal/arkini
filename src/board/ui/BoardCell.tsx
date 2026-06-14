@@ -26,6 +26,7 @@ export namespace BoardCell {
 		craftProgress?: number;
 		invalid: boolean;
 		merged: boolean;
+		imprinted: boolean;
 		children: ReactNode;
 		onEmptyDoubleActivate(cell: BoardCellModel): void;
 	}
@@ -42,6 +43,7 @@ export const BoardCell: FC<BoardCell.Props> = ({
 	craftProgress,
 	invalid,
 	merged,
+	imprinted,
 	children,
 	onEmptyDoubleActivate,
 }) => {
@@ -60,6 +62,7 @@ export const BoardCell: FC<BoardCell.Props> = ({
 	useGsapCellFeedback(cellRef, {
 		invalid,
 		success: merged,
+		imprint: imprinted,
 	});
 
 	return (

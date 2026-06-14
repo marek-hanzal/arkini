@@ -128,7 +128,7 @@ export const BoardCell: FC<BoardCell.Props> = memo(
 				payload={payload}
 				nodeRef={setCellNode}
 				data-board-cell={`${x}:${y}`}
-				data-board-item-id={boardItem?.id}
+				data-board-cell-item-id={boardItem?.id}
 				data-producer-ready={producerReady ? "true" : undefined}
 				className={className}
 			>

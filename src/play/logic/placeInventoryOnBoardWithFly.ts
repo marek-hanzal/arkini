@@ -2,7 +2,7 @@ import { inventorySourceId } from "~/inventory/inventorySourceId";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import type { BoardView, InventorySlot } from "~/play/logic/playTypes";
 import type { FlyerKind, RectLike, VisualMeta } from "~/play/types";
-import { queryRect } from "~/shared/util/queryRect";
+import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 import { waitForPaint } from "~/shared/util/waitForPaint";
 
 export namespace placeInventoryOnBoardWithFly {
@@ -50,8 +50,10 @@ export const placeInventoryOnBoardWithFly = async ({
 	}
 
 	const sourceId = inventorySourceId(slot.slotIndex);
-	const from = queryRect(`[data-inventory-slot="${slot.slotIndex}"]`);
-	const to = queryRect(`[data-board-cell="${target.x}:${target.y}"]`);
+	const from =
+		queryPaddingBoxRect(`[data-inventory-slot-tile="${slot.slotIndex}"]`) ??
+		queryPaddingBoxRect(`[data-inventory-slot="${slot.slotIndex}"]`);
+	const to = queryPaddingBoxRect(`[data-board-cell="${target.x}:${target.y}"]`);
 
 	try {
 		if (from && to && stack.quantity <= 1) {

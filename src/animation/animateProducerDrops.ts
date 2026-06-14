@@ -2,7 +2,7 @@ import { inventorySinkRect } from "~/inventory/util/inventory";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { ProducerDropResult } from "~/play/logic/playTypes";
 import type { FlyerKind, VisualMeta, RectLike } from "~/play/types";
-import { queryRect } from "~/shared/util/queryRect";
+import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 import { placementTargetRect } from "./placementTargetRect";
 
 export namespace animateProducerDrops {
@@ -29,7 +29,9 @@ export const animateProducerDrops = async ({
 	const animations: Promise<void>[] = [];
 
 	for (const result of results) {
-		const sourceRect = queryRect(`[data-board-item-id="${result.producerBoardItemId}"]`);
+		const sourceRect =
+			queryPaddingBoxRect(`[data-board-item-tile-id="${result.producerBoardItemId}"]`) ??
+			queryPaddingBoxRect(`[data-board-item-id="${result.producerBoardItemId}"]`);
 		if (!sourceRect) continue;
 		const from = sourceRect;
 

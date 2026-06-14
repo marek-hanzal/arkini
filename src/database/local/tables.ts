@@ -5,6 +5,5 @@ export const table = {
 	saveGame: "saveGame",
 	boardItem: "boardItem",
 	inventoryStack: "inventoryStack",
-	playerInventoryStack: "playerInventoryStack",
 	playerUpgrade: "playerUpgrade",
 } as const satisfies { [Name in keyof Database]: Name };

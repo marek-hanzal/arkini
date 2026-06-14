@@ -8,7 +8,6 @@ export interface GameSaveView {
 	boardWidth: number;
 	boardHeight: number;
 	inventorySlots: number;
-	playerInventorySlots: number;
 }
 
 export type ItemCatalogView = Record<string, ViewItem>;
@@ -25,23 +24,6 @@ export interface InventoryView {
 	bySlotIndex: Record<number, InventorySlot>;
 	stacksByItemId: Record<string, InventorySlot[]>;
 	firstEmptySlotIndex?: number;
-}
-
-export interface PlayerInventoryView {
-	slots: PlayerInventorySlot[];
-	bySlotIndex: Record<number, PlayerInventorySlot>;
-	stacksByItemId: Record<string, PlayerInventorySlot[]>;
-	capacity: number;
-	firstEmptySlotIndex?: number;
-}
-
-export interface PlayerInventorySlot {
-	slotIndex: number;
-	stack?: {
-		id: string;
-		itemId: string;
-		quantity: number;
-	};
 }
 
 export interface UpgradeListView {
@@ -89,7 +71,6 @@ export interface ViewItem {
 	tags: string[];
 	canProduce: boolean;
 	producerTrigger?: "click";
-	collectible?: boolean;
 	canMerge: boolean;
 	mergeResults?: {
 		withItemId: string;
@@ -123,6 +104,9 @@ export interface InventorySlot {
 		id: string;
 		itemId: string;
 		quantity: number;
+		state: BoardItemState;
+		stateJson: string;
+		stateful: boolean;
 	};
 }
 
@@ -154,7 +138,6 @@ export interface ProducerView {
 	trigger: "click";
 	mode: ProducerMode;
 	cooldownMs?: number;
-	doubleClickBehavior?: "exhaust";
 	cooldownUntil?: string;
 	cooldownUntilMs?: number;
 	remainingCharges?: number;

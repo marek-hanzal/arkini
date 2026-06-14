@@ -12,10 +12,16 @@ export namespace insertFx {
 		itemId: string;
 		x: number;
 		y: number;
+		stateJson?: string;
 	}
 }
 
-export const insertFx = Effect.fn("insertFx")(function* ({ itemId, x, y }: insertFx.Props) {
+export const insertFx = Effect.fn("insertFx")(function* ({
+	itemId,
+	x,
+	y,
+	stateJson,
+}: insertFx.Props) {
 	const gameConfig = yield* GameConfigServiceFx;
 	const id = yield* IdServiceFx;
 	const boardItemId = id.boardItem();
@@ -28,7 +34,7 @@ export const insertFx = Effect.fn("insertFx")(function* ({ itemId, x, y }: inser
 				itemDefinitionId: itemId,
 				x,
 				y,
-				stateJson: json(createInitialBoardState(itemId, gameConfig)),
+				stateJson: stateJson ?? json(createInitialBoardState(itemId, gameConfig)),
 			})
 			.execute(),
 	);

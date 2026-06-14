@@ -29,6 +29,7 @@ export const InventoryCell: FC<InventoryCell.Props> = ({
 	const cellRef = useRef<HTMLDivElement | null>(null);
 	useGsapCellFeedback(cellRef, {
 		invalid,
+		imprint: false,
 		success: false,
 	});
 

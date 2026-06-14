@@ -18,8 +18,7 @@ export function readProducerCooldown({
 }: readProducerCooldown.Props): readProducerCooldown.Result | undefined {
 	if (!producer) return undefined;
 
-	const hasCharges =
-		producer.remainingCharges === undefined || producer.remainingCharges > 0;
+	const hasCharges = producer.remainingCharges === undefined || producer.remainingCharges > 0;
 	const cooldownUntilMs = producer.cooldownUntilMs ?? 0;
 	const remainingMs = Math.max(0, cooldownUntilMs - nowMs);
 

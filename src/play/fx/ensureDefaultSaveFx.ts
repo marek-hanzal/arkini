@@ -4,6 +4,7 @@ import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { emptyInventoryStateJson } from "~/inventory/logic/inventoryState";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { StartingBoardItem } from "~/play/logic/StartingBoardItem";
 import { defaultSaveGameId } from "~/play/logic/save";
@@ -45,7 +46,6 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 						boardWidth: gameConfig.config.game.board.width,
 						boardHeight: gameConfig.config.game.board.height,
 						inventorySlots: gameConfig.config.game.inventory.slots,
-						playerInventorySlots: gameConfig.config.game.playerInventory.slots,
 					})
 					.execute(),
 			);
@@ -60,24 +60,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 							slotIndex,
 							itemDefinitionId: stack.itemId,
 							quantity: stack.quantity,
-						})
-						.execute(),
-				);
-			}
-
-			for (const [
-				slotIndex,
-				stack,
-			] of gameConfig.config.startingState.playerInventory.entries()) {
-				yield* dbFx((db) =>
-					db
-						.insertInto(table.playerInventoryStack)
-						.values({
-							id: `${defaultSaveGameId}:player-inventory:${slotIndex}`,
-							saveGameId: defaultSaveGameId,
-							slotIndex,
-							itemDefinitionId: stack.itemId,
-							quantity: stack.quantity,
+							stateJson: emptyInventoryStateJson,
 						})
 						.execute(),
 				);

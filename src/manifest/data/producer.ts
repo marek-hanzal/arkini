@@ -7,7 +7,6 @@ export interface ProducerDefinition {
 	outputTableId?: LootTableId;
 	cooldownMs?: number;
 	mode?: ProducerMode;
-	doubleClickBehavior?: "exhaust";
 	inputs?: readonly ProducerInputDefinition[];
 }
 

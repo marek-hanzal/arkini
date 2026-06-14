@@ -67,13 +67,6 @@ export function assertGameConfig(config: GameConfig) {
 			assertUnique(mergePairs, itemMergePairKey(item.id, rule.withItemId), "merge pair");
 		}
 
-		if (item.collect?.itemId) {
-			assert(
-				itemIds.has(item.collect.itemId),
-				`${item.id} collect references missing item ${item.collect.itemId}`,
-			);
-		}
-
 		if (item.craft) {
 			assertUnique(craftIds, item.craft.id, "craft recipe");
 			assert(

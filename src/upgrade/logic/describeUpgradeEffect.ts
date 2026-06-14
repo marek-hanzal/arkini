@@ -16,7 +16,5 @@ export function describeUpgradeEffect(
 			const table = gameConfig.getLootTable(effect.tableId);
 			return `${item?.name ?? effect.itemId}: ${table?.name ?? effect.tableId}`;
 		}
-		case "inventory.capacity.add":
-			return `${effect.inventory === "player" ? "Player" : "Board"} inventory: +${effect.slots} slots`;
 	}
 }

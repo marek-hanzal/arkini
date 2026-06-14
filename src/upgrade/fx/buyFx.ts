@@ -5,7 +5,7 @@ import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import { spendPlayerInventoryItems } from "~/player/logic/planning";
+import { spendInventoryItems } from "~/inventory/logic/planning";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { BuyUpgradeInputSchema } from "~/play/logic/gameActionSchemas";
 import { GameActionError } from "~/play/logic/playTypes";
@@ -42,9 +42,9 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 			const nextTier = upgrade.tiers[level];
 			if (!nextTier) return yield* Effect.fail(new GameActionError("Upgrade is maxed."));
 
-			const spendPlan = spendPlayerInventoryItems(
+			const spendPlan = spendInventoryItems(
 				[
-					...mutable.playerInventoryRows,
+					...mutable.inventoryRows,
 				],
 				nextTier.cost,
 			);
@@ -54,7 +54,7 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 				if (step.type === "delete") {
 					yield* dbFx((db) =>
 						db
-							.deleteFrom(table.playerInventoryStack)
+							.deleteFrom(table.inventoryStack)
 							.where("id", "=", step.stackId)
 							.execute(),
 					);
@@ -62,7 +62,7 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 				}
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.playerInventoryStack)
+						.updateTable(table.inventoryStack)
 						.set({
 							quantity: step.quantity,
 							updatedAt: timestamp,

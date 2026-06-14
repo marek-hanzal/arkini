@@ -39,9 +39,6 @@ export const GameConfig = {
 		inventory: {
 			slots: 35,
 		},
-		playerInventory: {
-			slots: 12,
-		},
 	},
 	assets: [
 		asset("asset:item-seed", "Seed", "item-seed", 10, "png"),
@@ -83,12 +80,7 @@ export const GameConfig = {
 			"asset:item-lumber-camp",
 			116,
 		),
-		blueprintAsset(
-			"asset:item-blueprint-quarry",
-			"Quarry Blueprint",
-			"asset:item-quarry",
-			120,
-		),
+		blueprintAsset("asset:item-blueprint-quarry", "Quarry Blueprint", "asset:item-quarry", 120),
 		blueprintAsset(
 			"asset:item-blueprint-townhall",
 			"Town Hall Blueprint",
@@ -233,31 +225,6 @@ export const GameConfig = {
 				),
 			],
 		),
-		upgrade(
-			"upgrade:player-inventory-capacity",
-			"player-inventory-capacity",
-			"Bigger Player Pouch",
-			"Adds room for more collected valuables, because shiny clutter scales horizontally.",
-			50,
-			[
-				tier(
-					[
-						cost("item:coin-chest", 1),
-					],
-					[
-						capacity("player", 4),
-					],
-				),
-				tier(
-					[
-						cost("item:coin-chest", 2),
-					],
-					[
-						capacity("player", 4),
-					],
-				),
-			],
-		),
 	],
 	items: [
 		item(
@@ -311,7 +278,7 @@ export const GameConfig = {
 			"Leaf",
 			3,
 			50,
-			"Photosynthesis, but make it collectible.",
+			"Photosynthesis with storage problems.",
 			[
 				"material",
 				"plant",
@@ -677,7 +644,6 @@ export const GameConfig = {
 			50,
 			"A small metal excuse for progression.",
 			[
-				"collectible",
 				"currency",
 			],
 			180,
@@ -685,7 +651,6 @@ export const GameConfig = {
 				merge: [
 					same("merge:coin-coin-pair", "item:coin", "item:coin-pair"),
 				],
-				collect: collectible(),
 			},
 		),
 		item(
@@ -697,7 +662,6 @@ export const GameConfig = {
 			40,
 			"Two coins. Somehow this already feels like accounting.",
 			[
-				"collectible",
 				"currency",
 			],
 			182,
@@ -705,7 +669,6 @@ export const GameConfig = {
 				merge: [
 					same("merge:coin-pair-stack", "item:coin-pair", "item:coin-stack"),
 				],
-				collect: collectible(),
 			},
 		),
 		item(
@@ -717,7 +680,6 @@ export const GameConfig = {
 			30,
 			"A stack of little reasons to open the upgrades sheet.",
 			[
-				"collectible",
 				"currency",
 			],
 			184,
@@ -725,7 +687,6 @@ export const GameConfig = {
 				merge: [
 					same("merge:coin-stack-chest", "item:coin-stack", "item:coin-chest"),
 				],
-				collect: collectible(),
 			},
 		),
 		item(
@@ -737,13 +698,9 @@ export const GameConfig = {
 			20,
 			"A boxed-up upgrade fund. Finally, clutter with ambition.",
 			[
-				"collectible",
 				"currency",
 			],
 			186,
-			{
-				collect: collectible(),
-			},
 		),
 
 		item(
@@ -807,11 +764,7 @@ export const GameConfig = {
 			202,
 			{
 				merge: [
-					same(
-						"merge:blueprint-draft-final",
-						"item:blueprint-draft",
-						"item:blueprint",
-					),
+					same("merge:blueprint-draft-final", "item:blueprint-draft", "item:blueprint"),
 				],
 			},
 		),
@@ -1185,7 +1138,11 @@ export const GameConfig = {
 			300,
 			{
 				merge: [
-					imprint("merge:townhall-1-blueprint", "item:blueprint", "item:blueprint-townhall"),
+					imprint(
+						"merge:townhall-1-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall",
+					),
 				],
 				label: "1",
 				producer: clickProducer(
@@ -1216,7 +1173,11 @@ export const GameConfig = {
 			310,
 			{
 				merge: [
-					imprint("merge:townhall-2-blueprint", "item:blueprint", "item:blueprint-townhall-2"),
+					imprint(
+						"merge:townhall-2-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall-2",
+					),
 				],
 				label: "2",
 				producer: clickProducer(
@@ -1253,7 +1214,11 @@ export const GameConfig = {
 			320,
 			{
 				merge: [
-					imprint("merge:townhall-3-blueprint", "item:blueprint", "item:blueprint-townhall-3"),
+					imprint(
+						"merge:townhall-3-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall-3",
+					),
 				],
 				label: "3",
 				producer: clickProducer(
@@ -1292,7 +1257,11 @@ export const GameConfig = {
 			324,
 			{
 				merge: [
-					imprint("merge:townhall-4-blueprint", "item:blueprint", "item:blueprint-townhall-4"),
+					imprint(
+						"merge:townhall-4-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall-4",
+					),
 				],
 				label: "4",
 				producer: clickProducer(
@@ -1330,7 +1299,11 @@ export const GameConfig = {
 			328,
 			{
 				merge: [
-					imprint("merge:townhall-5-blueprint", "item:blueprint", "item:blueprint-townhall-5"),
+					imprint(
+						"merge:townhall-5-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall-5",
+					),
 				],
 				label: "5",
 				producer: clickProducer(
@@ -1369,7 +1342,11 @@ export const GameConfig = {
 			330,
 			{
 				merge: [
-					imprint("merge:lumber-camp-1-blueprint", "item:blueprint", "item:blueprint-lumber-camp"),
+					imprint(
+						"merge:lumber-camp-1-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp",
+					),
 				],
 				label: "1",
 				producer: clickProducer(
@@ -1398,7 +1375,11 @@ export const GameConfig = {
 			340,
 			{
 				merge: [
-					imprint("merge:lumber-camp-2-blueprint", "item:blueprint", "item:blueprint-lumber-camp-2"),
+					imprint(
+						"merge:lumber-camp-2-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp-2",
+					),
 				],
 				label: "2",
 				producer: clickProducer(
@@ -1430,7 +1411,11 @@ export const GameConfig = {
 			350,
 			{
 				merge: [
-					imprint("merge:lumber-camp-3-blueprint", "item:blueprint", "item:blueprint-lumber-camp-3"),
+					imprint(
+						"merge:lumber-camp-3-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp-3",
+					),
 				],
 				label: "3",
 				producer: clickProducer(
@@ -1456,7 +1441,11 @@ export const GameConfig = {
 			354,
 			{
 				merge: [
-					imprint("merge:lumber-camp-4-blueprint", "item:blueprint", "item:blueprint-lumber-camp-4"),
+					imprint(
+						"merge:lumber-camp-4-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp-4",
+					),
 				],
 				label: "4",
 				producer: clickProducer(
@@ -1488,7 +1477,11 @@ export const GameConfig = {
 			358,
 			{
 				merge: [
-					imprint("merge:lumber-camp-5-blueprint", "item:blueprint", "item:blueprint-lumber-camp-5"),
+					imprint(
+						"merge:lumber-camp-5-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp-5",
+					),
 				],
 				label: "5",
 				producer: clickProducer(
@@ -1547,7 +1540,11 @@ export const GameConfig = {
 			370,
 			{
 				merge: [
-					imprint("merge:quarry-2-blueprint", "item:blueprint", "item:blueprint-quarry-2"),
+					imprint(
+						"merge:quarry-2-blueprint",
+						"item:blueprint",
+						"item:blueprint-quarry-2",
+					),
 				],
 				label: "2",
 				producer: clickProducer(
@@ -1579,7 +1576,11 @@ export const GameConfig = {
 			380,
 			{
 				merge: [
-					imprint("merge:quarry-3-blueprint", "item:blueprint", "item:blueprint-quarry-3"),
+					imprint(
+						"merge:quarry-3-blueprint",
+						"item:blueprint",
+						"item:blueprint-quarry-3",
+					),
 				],
 				label: "3",
 				producer: clickProducer(
@@ -1605,7 +1606,11 @@ export const GameConfig = {
 			384,
 			{
 				merge: [
-					imprint("merge:quarry-4-blueprint", "item:blueprint", "item:blueprint-quarry-4"),
+					imprint(
+						"merge:quarry-4-blueprint",
+						"item:blueprint",
+						"item:blueprint-quarry-4",
+					),
 				],
 				label: "4",
 				producer: clickProducer(
@@ -1634,7 +1639,11 @@ export const GameConfig = {
 			388,
 			{
 				merge: [
-					imprint("merge:quarry-5-blueprint", "item:blueprint", "item:blueprint-quarry-5"),
+					imprint(
+						"merge:quarry-5-blueprint",
+						"item:blueprint",
+						"item:blueprint-quarry-5",
+					),
 				],
 				label: "5",
 				producer: clickProducer(
@@ -1715,7 +1724,6 @@ export const GameConfig = {
 							onDepleted: "remove",
 						},
 					),
-					doubleClickBehavior: "exhaust",
 				},
 			},
 		),
@@ -1755,7 +1763,6 @@ export const GameConfig = {
 							onDepleted: "remove",
 						},
 					),
-					doubleClickBehavior: "exhaust",
 				},
 			},
 		),
@@ -1796,7 +1803,6 @@ export const GameConfig = {
 							onDepleted: "remove",
 						},
 					),
-					doubleClickBehavior: "exhaust",
 				},
 			},
 		),
@@ -1836,18 +1842,11 @@ export const GameConfig = {
 							onDepleted: "remove",
 						},
 					),
-					doubleClickBehavior: "exhaust",
 				},
 			},
 		),
 	],
 	startingState: {
-		playerInventory: [
-			{
-				itemId: "item:coin-stack",
-				quantity: 1,
-			},
-		],
 		resources: [] as readonly {
 			resourceId: ResourceId;
 			quantity: number;
@@ -1876,6 +1875,10 @@ export const GameConfig = {
 			{
 				itemId: "item:beer",
 				quantity: 3,
+			},
+			{
+				itemId: "item:coin-stack",
+				quantity: 1,
 			},
 		],
 		board: [
@@ -1917,9 +1920,6 @@ export namespace GameConfig {
 			inventory: {
 				slots: number;
 			};
-			playerInventory: {
-				slots: number;
-			};
 		};
 		assets: readonly AssetDefinition[];
 		resources: readonly ResourceDefinition[];
@@ -1927,10 +1927,6 @@ export namespace GameConfig {
 		upgrades: readonly UpgradeDefinition[];
 		items: readonly ItemDefinition[];
 		startingState: {
-			playerInventory: readonly {
-				itemId: ItemId;
-				quantity: number;
-			}[];
 			resources: readonly {
 				resourceId: ResourceId;
 				quantity: number;
@@ -2010,7 +2006,7 @@ function item(
 	description: string,
 	tags: readonly string[],
 	sort: number,
-	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "craft" | "collect"> = {},
+	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "craft"> = {},
 ): ItemDefinition {
 	return {
 		id,
@@ -2048,11 +2044,7 @@ function combo(
 	};
 }
 
-function imprint(
-	id: MergeDefinitionId,
-	withItemId: ItemId,
-	resultItemId: ItemId,
-): ItemMergeRule {
+function imprint(id: MergeDefinitionId, withItemId: ItemId, resultItemId: ItemId): ItemMergeRule {
 	return {
 		id,
 		withItemId,
@@ -2076,14 +2068,6 @@ function craft(
 
 function input(itemId: ItemId, quantity: number): CraftRecipeInput {
 	return {
-		itemId,
-		quantity,
-	};
-}
-
-function collectible(itemId?: ItemId, quantity = 1): NonNullable<ItemDefinition["collect"]> {
-	return {
-		inventory: "player",
 		itemId,
 		quantity,
 	};
@@ -2163,22 +2147,6 @@ function setLootTable(itemId: ItemId, tableId: LootTableId): UpgradeEffectDefini
 		type: "producer.outputTable.set",
 		itemId,
 		tableId,
-	};
-}
-
-function capacity(
-	inventory: Extract<
-		UpgradeEffectDefinition,
-		{
-			type: "inventory.capacity.add";
-		}
-	>["inventory"],
-	slots: number,
-): UpgradeEffectDefinition {
-	return {
-		type: "inventory.capacity.add",
-		inventory,
-		slots,
 	};
 }
 

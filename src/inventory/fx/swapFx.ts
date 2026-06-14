@@ -3,13 +3,11 @@ import { assertInsideInventory } from "~/board/logic/gameBounds";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { SwapInventorySlotsInputSchema } from "~/play/logic/gameActionSchemas";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { spendStackFx } from "./spendStackFx";
 
 export namespace swapFx {
 	export interface Props {
@@ -30,7 +28,6 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 
 	yield* withTransactionFx(
 		Effect.gen(function* () {
-			const gameConfig = yield* GameConfigServiceFx;
 			const { save, inventoryRows } = yield* readMutableSaveFx();
 			assertInsideInventory(save, input.sourceSlotIndex);
 			assertInsideInventory(save, input.targetSlotIndex);
@@ -39,32 +36,6 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			const target = inventoryRows.find((row) => row.slotIndex === input.targetSlotIndex);
 			if (!source) {
 				return yield* Effect.fail(new GameActionError("Inventory slot is empty."));
-			}
-
-			if (target && target.itemDefinitionId === source.itemDefinitionId) {
-				const item = gameConfig.getItem(source.itemDefinitionId);
-				if (!item) {
-					return yield* Effect.fail(
-						new GameActionError(`Unknown item definition ${source.itemDefinitionId}.`),
-					);
-				}
-				const movable = Math.min(source.quantity, item.maxStackSize - target.quantity);
-				if (movable <= 0) return;
-				yield* dbFx((db) =>
-					db
-						.updateTable(table.inventoryStack)
-						.set({
-							quantity: target.quantity + movable,
-							updatedAt: timestamp,
-						})
-						.where("id", "=", target.id)
-						.execute(),
-				);
-				yield* spendStackFx({
-					stack: source,
-					quantity: movable,
-				});
-				return;
 			}
 
 			if (!target) {

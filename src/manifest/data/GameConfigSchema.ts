@@ -18,9 +18,6 @@ export const GameConfigSchema = z.object({
 		inventory: z.object({
 			slots: z.literal(GameConfig.game.inventory.slots),
 		}),
-		playerInventory: z.object({
-			slots: z.literal(GameConfig.game.playerInventory.slots),
-		}),
 	}),
 	assets: z.array(
 		z.object({
@@ -80,14 +77,6 @@ export const GameConfigSchema = z.object({
 									itemId: ItemIdSchema,
 									tableId: z.string().startsWith("loot:"),
 								}),
-								z.object({
-									type: z.literal("inventory.capacity.add"),
-									inventory: z.enum([
-										"board",
-										"player",
-									]),
-									slots: PositiveIntegerSchema,
-								}),
 							]),
 						),
 					}),
@@ -118,13 +107,6 @@ export const GameConfigSchema = z.object({
 						secret: z.boolean().optional(),
 					}),
 				)
-				.optional(),
-			collect: z
-				.object({
-					inventory: z.literal("player"),
-					itemId: ItemIdSchema.optional(),
-					quantity: PositiveIntegerSchema.optional(),
-				})
 				.optional(),
 			producer: z
 				.object({
@@ -168,11 +150,6 @@ export const GameConfigSchema = z.object({
 							]),
 						)
 						.min(1),
-					doubleClickBehavior: z
-						.enum([
-							"exhaust",
-						])
-						.optional(),
 					inputs: z
 						.array(
 							z.object({
@@ -218,12 +195,6 @@ export const GameConfigSchema = z.object({
 		}),
 	),
 	startingState: z.object({
-		playerInventory: z.array(
-			z.object({
-				itemId: ItemIdSchema,
-				quantity: PositiveIntegerSchema,
-			}),
-		),
 		resources: z.array(
 			z.object({
 				resourceId: ResourceIdSchema,

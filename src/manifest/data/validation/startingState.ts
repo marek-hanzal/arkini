@@ -7,25 +7,6 @@ export function assertStartingState(config: GameConfig, itemIds: Set<ItemId>) {
 		config.startingState.inventory.length <= config.game.inventory.slots,
 		"Starting inventory has more stacks than available slots",
 	);
-	assert(
-		config.startingState.playerInventory.length <= config.game.playerInventory.slots,
-		"Starting player inventory has more stacks than available slots",
-	);
-	for (const stack of config.startingState.playerInventory) {
-		assert(
-			itemIds.has(stack.itemId),
-			`Starting player inventory references missing ${stack.itemId}`,
-		);
-		const item = itemByIdOrThrow(itemIds, config, stack.itemId);
-		assert(
-			stack.quantity > 0,
-			`Starting player inventory ${stack.itemId} quantity must be positive`,
-		);
-		assert(
-			stack.quantity <= item.maxStackSize,
-			`Starting player inventory ${stack.itemId} exceeds max stack size`,
-		);
-	}
 
 	for (const stack of config.startingState.inventory) {
 		assert(itemIds.has(stack.itemId), `Starting inventory references missing ${stack.itemId}`);

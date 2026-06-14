@@ -4,7 +4,6 @@ import { swapFx as boardSwapFx } from "~/board/fx/swapFx";
 import { placeFx as inventoryPlaceFx } from "~/inventory/fx/placeFx";
 import { stashFx as inventoryStashFx } from "~/inventory/fx/stashFx";
 import { swapFx as inventorySwapFx } from "~/inventory/fx/swapFx";
-import { collectFx as playerCollectFx } from "~/player/fx/collectFx";
 import { runEffect } from "~/play/logic/runEffect";
 import { buyFx as upgradeBuyFx } from "~/upgrade/fx/buyFx";
 import { produceFx } from "~/producer/fx/produceFx";
@@ -71,14 +70,6 @@ export function produceBoardItem(boardItemId: string, activation: "single" | "ex
 		produceFx({
 			boardItemId,
 			activation,
-		}),
-	);
-}
-
-export function collectBoardItem(boardItemId: string) {
-	return runEffect(
-		playerCollectFx({
-			boardItemId,
 		}),
 	);
 }

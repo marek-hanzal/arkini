@@ -1,15 +1,14 @@
 import { Effect } from "effect";
-import { readBoardState } from "~/board/logic/boardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
 import {
 	cloneInventory,
 	planExactInventorySlotPlacement,
 	planInventoryPlacement,
 } from "~/inventory/logic/planning";
+import { normalizeInventoryStateJson } from "~/inventory/logic/inventoryState";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
@@ -32,7 +31,6 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 
 	yield* withTransactionFx(
 		Effect.gen(function* () {
-			const date = yield* DateServiceFx;
 			const gameConfig = yield* GameConfigServiceFx;
 			const id = yield* IdServiceFx;
 			const { save, boardRows, inventoryRows } = yield* readMutableSaveFx();
@@ -40,29 +38,11 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 			if (!boardItem) {
 				return yield* Effect.fail(new GameActionError("Board item does not exist."));
 			}
-			if (gameConfig.isProducer(boardItem.itemDefinitionId)) {
-				const state = readBoardState(boardItem);
-				const cooldownUntil = state.producer?.cooldownUntil;
-				if (
-					cooldownUntil &&
-					(date.parseTimestampMs(cooldownUntil) ?? 0) > date.now().toMillis()
-				) {
-					return yield* Effect.fail(new GameActionError("Producer is busy."));
-				}
-				const storedInputs = Object.values(state.producer?.inventory ?? {}).reduce(
-					(sum, quantity) => sum + quantity,
-					0,
-				);
-				if (storedInputs > 0) {
-					return yield* Effect.fail(
-						new GameActionError("Empty producer inputs before stashing."),
-					);
-				}
-			}
 
 			const options = {
 				gameConfig,
 				id,
+				stateJson: normalizeInventoryStateJson(boardItem.stateJson),
 			};
 			const virtualInventory = cloneInventory(inventoryRows);
 			const plan =

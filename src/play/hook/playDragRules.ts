@@ -120,7 +120,7 @@ function inventoryToInventory(
 	const animations = inventoryMoveAnimations(context, targetStack);
 	const hide = [
 		source.sourceId,
-		...(targetStack && targetStack.itemId !== source.itemId
+		...(targetStack
 			? [
 					inventorySourceId(target.target.slotIndex),
 				]
@@ -292,7 +292,7 @@ function inventoryMoveAnimations(
 		dragToTargetAnimation(source, target),
 	];
 
-	if (targetStack && targetStack.itemId !== source.itemId) {
+	if (targetStack) {
 		animations.push({
 			itemId: targetStack.itemId,
 			fromNodeId: target.targetNodeId,

@@ -4,242 +4,425 @@ This document is the canonical gameplay specification for Arkini.
 
 It is intentionally written as an LLM-optimized source of truth. When game logic, economy balance, data definitions, migrations, UI behavior, or tests are validated, this document should be checked before reading implementation details.
 
+`GameConfig` is implementation data. It may be older than this document. When `GameConfig` and `GAME.MD` disagree, `GAME.MD` wins and the implementation must be updated.
+
 ## 1. Purpose
 
 Arkini is a client-only offline merge/economy game played on a grid.
 
-The player collects items, merges low-tier items into better items, feeds producers, builds or crafts incomplete objects, stores surplus in inventory, and spends hard currency or resources on upgrades. Progress is mostly driven by producers and craft/construction requirements. Merge is important, but it is not the only core loop.
+The player collects items, merges low-tier items into better items, feeds producers, opens finite stashes, builds or crafts incomplete objects, stores surplus in inventory, and spends currency items on upgrades. Progress is mostly driven by producers, stashes, and craft/construction requirements. Merge is important, but it is not the whole core loop.
 
 ## 2. Canonical design rules
 
 These rules define how the game should be interpreted when implementation details are unclear.
 
-1. GAME.MD is the source of truth for gameplay semantics.
+1. `GAME.MD` is the source of truth for gameplay semantics.
 2. All gameplay entities should be data-driven from a central game configuration.
-3. Game definitions must describe items, merge chains, producers, loot tables, blueprints, craft/construction requirements, upgrades, grid sizes, inventory sizes, and other game rules.
+3. Game definitions must describe items, merge chains, producers, stashes, loot tables, blueprints, craft/construction requirements, upgrades, grid sizes, inventory sizes, starting state, and other game rules.
 4. The game is client-only and must be able to run offline in the browser.
 5. Saved state is not considered backwards-compatible unless a migration explicitly supports it.
 6. If a saved game is incompatible with the active game definition version after migrations, the save may be dropped.
-7. Game mechanics should be simple to reason about. Prefer explicit data over hidden behavior.
-8. Empty values should be stable and predictable. Avoid optional/null gameplay data unless absence is a meaningful game state.
-9. Names and IDs must be stable enough to be referenced by saves, tests, migrations, and this document.
-10. Economy logic should be validated from this document and central game data, not by reverse-engineering UI code.
+7. Game mechanics should be simple, explicit, and consistent. If a rule needs a special exception, the design should be questioned first.
+8. Prefer one clean mechanic over several similar mechanics that behave slightly differently.
+9. Empty values should be stable and predictable. Avoid optional/null gameplay data unless absence is a meaningful game state.
+10. Names and IDs must be stable enough to be referenced by saves, tests, migrations, and this document.
+11. Economy logic should be validated from this document and central game data, not by reverse-engineering UI code.
+12. Inventory is passive storage. Active timers, production, growth, and craft progress do not advance while an item is stored in inventory.
 
-## 3. Vocabulary
+## 3. Current fixed constants
 
-### 3.1 Board / game grid
+| Concept | Value |
+| --- | --- |
+| Board size | `7 x 9` |
+| Board slot count | `63` |
+| Inventory size | `7 x 5` |
+| Inventory slot count | `35` |
+| Inventory model | one canonical player inventory |
+| Inventory capacity upgrades | not part of current gameplay |
+| Merge role | basic mechanic, not complete core loop |
+| Main economy source | click-triggered producers, finite stashes, crafting, construction |
+| Blueprint binding | completed blank blueprint + target entity creates bound blueprint |
+| Blueprint target consumption | target entity is not consumed |
+| Craft/construction location | board or inventory, with active progress only on board |
+| Upgrade targeting | concrete entity-specific targets |
+| Loot table model | named loot table entities referenced by items/producers/upgrades |
 
-The board is the primary visible grid where the player places items and interacts with gameplay entities.
+## 4. Vocabulary
+
+### 4.1 Board / game grid
+
+The board is the primary visible grid where the player places items and interacts with active gameplay entities.
+
+The current board size is `7 x 9` cells.
 
 An item may be on the board when it occupies one board cell. If multi-cell items are introduced later, their footprint must be defined in the central game configuration.
 
-### 3.2 Inventory
+Board is an active location. Producers, stashes, craft timers, construction timers, and growth timers can run only while the relevant item is on the board and its own rules allow it.
 
-The inventory is a secondary storage grid for items the player does not currently need on the board.
+### 4.2 Inventory
 
-The current inventory size is `7 x 5` slots.
+The inventory is the only canonical player storage.
 
-Inventory is not just a temporary UI drawer. It is part of the game state and may contain normal items, unfinished craft/construction entities, blueprint items, producer input items, and hard currency representations when represented as items.
+The current inventory size is `7 x 5` slots, for `35` total slots.
 
-### 3.3 Item
+There is no separate `playerInventory`, wallet inventory, currency inventory, or second player storage layer. Coins, diamonds, and other currency-like objects are normal inventory items unless a future mechanic explicitly introduces a different model.
 
-An item is any placeable gameplay entity that can exist on the board or in inventory.
+Inventory may contain ordinary items, currency items, unfinished craft/construction entities, blueprint items, producers, stashes, and any other item that is allowed to be stored.
+
+Inventory is passive. Nothing active happens inside inventory:
+
+- production cooldowns do not advance
+- stash timers do not advance, if a stash ever has one
+- craft/construction timers do not advance
+- growth timers do not advance
+- items cannot be merged inside inventory
+- items cannot receive craft/construction inputs inside inventory
+- producers cannot produce inside inventory
+- stashes cannot be opened inside inventory
+
+Inventory must preserve item state. Moving a stateful item into inventory must not erase deposited inputs, timers, cooldowns, producer stored inputs, construction progress, or other runtime state. Humanity has invented enough ways to lose state already.
+
+### 4.3 Inventory slot
+
+Inventory is slot-based.
+
+Each inventory slot can hold either:
+
+1. a stack of identical stackable stateless items, or
+2. one non-stackable item instance.
+
+A slot cannot contain multiple different item IDs.
+
+### 4.4 Item
+
+An item is any gameplay entity that can exist on the board or in inventory.
 
 Examples:
 
 - twig
-- wood
+- branch
+- log
+- wood bundle
+- plank
+- beam
 - pebble
+- stone
 - stone block
+- water
 - sausage
 - beer
+- coin
+- coin stack
 - sprout
 - bush
-- blank blueprint
+- completed blank blueprint
 - bound blueprint
-- woodcutter
+- lumber camp
 - quarry
 - coal mine
-- iron mine
+- finite chest/stash
 
-### 3.4 Hard currency
+### 4.5 Currency item
 
-Hard currency is a valuable upgrade currency, for example coins or diamonds.
+A currency item is an item used as upgrade payment or other rare progression payment.
 
-Hard currency is used for upgrades or other premium/rare progression actions. It may be stored or represented in inventory depending on implementation, but its gameplay semantics must be defined as a currency/resource and not accidentally treated as ordinary merge junk.
+Examples:
 
-### 3.5 Merge
+- coin
+- coin pair
+- coin stack
+- coin chest
+- diamond, if introduced later
 
-Merge is the mechanic where compatible items are combined into a better or more advanced item.
+Currency items are stored in the normal inventory and follow normal inventory stack rules. They are not stored in a separate wallet layer.
 
-Merge is a basic mechanic, but it is not the whole core game. The main long-term economy comes from producers, feeding producers, construction/craft progress, and upgrades.
+### 4.6 Stateful item
 
-### 3.6 Merge chain
+A stateful item is an item instance with non-empty runtime state.
+
+Examples of runtime state:
+
+- deposited craft/construction inputs
+- active or paused completion timer
+- producer cooldown state
+- producer stored input items
+- finite stash remaining charges/contents
+- growth progress
+- any other instance-specific value
+
+Any item with non-empty runtime state is automatically non-stackable while that state exists. This preserves state instead of smashing multiple unique items into one cursed blob of ambiguity.
+
+### 4.7 Stateless item
+
+A stateless item is an item instance with no runtime state.
+
+Stateless items may stack only when their item definition allows it through `maxStackSize > 1`.
+
+### 4.8 Merge
+
+Merge is the mechanic where compatible board items are combined into a better or more advanced item.
+
+Merge is a basic mechanic, but it is not the whole core game. The main long-term economy comes from producers, stashes, feeding producers, construction/craft progress, and upgrades.
+
+### 4.9 Merge chain
 
 A merge chain is an ordered sequence of related items where merging lower-tier items produces the next tier.
 
 Merge chains must make thematic and economic sense. A chain must not suddenly turn one material category into an unrelated rare material unless a specific transformation mechanic explains it.
 
-Example of valid chain direction:
+Valid direction examples:
 
-- twig -> branch bundle -> wood
+- twig -> branch -> log -> wood-related material
 - pebble -> stone -> stone block
 
-Example of invalid chain direction:
+Invalid direction example:
 
 - pebble -> diamond
 
-This is invalid because a normal stone chain should not magically become a diamond chain without an explicit geologic/refining/transmutation rule.
+This is invalid because a normal stone chain should not magically become a diamond chain without an explicit geology/refining/transmutation rule.
 
-### 3.7 Producer / generator
+Current concrete economy chains are not finalized in this document yet. Existing `GameConfig` chains may be used as inspiration, but they are not the final source of truth for economy balance.
 
-A producer is a gameplay entity that generates items over time.
+### 4.10 Producer
 
-Producer and generator mean the same mechanic unless future design explicitly splits them.
+A producer is an infinite or long-lived gameplay entity that generates items when activated by the player and when its rules allow production.
+
+A producer is always click-triggered. Producers do not automatically generate or eject items without player activation.
+
+A producer always has a cooldown/refresh time. Upgrades may modify the cooldown.
 
 Examples:
 
-- woodcutter generates wood-related items
+- lumber camp generates wood-related items
 - quarry generates stone-related items
-- coal mine generates coal-related items
-- iron mine generates iron ore-related items
+- coal mine generates coal/fuel-related items
+- iron mine generates ore/metal-related items
 
-### 3.8 Producer inventory
+### 4.11 Stash
 
-A producer may have its own internal inventory for items required by production.
+A stash is a finite producer-like entity.
 
-Producer inventory is separate from the global player inventory. It stores input/feed items that the producer needs for production and may also allow extra capacity beyond the minimum production requirement.
+A stash can output concrete contents or roll from a loot table, but unlike a normal producer it has finite charges, finite stored contents, or another explicit depletion rule.
+
+A stash may require input items before it can be opened or collected.
 
 Example:
 
-A coal mine may require sausage and beer for production. The player can feed it more sausage and beer than one production cycle needs, up to its input capacity. The player can later remove those stored inputs back into the player inventory.
+- a normal chest can be opened for finite loot
+- an epic chest may require a key before it can output loot
 
-### 3.9 Loot table
+Stash and producer are separate entity types even if they share large parts of their implementation. Do not merge finite and infinite production into one vague type just because 80% of the code looks similar. That road leads to the swamp.
 
-A loot table defines possible output items and probabilities for a producer or other generation mechanic.
+### 4.12 Producer/stash input storage
 
-A producer may generate multiple items from its loot table per refresh. It may generate multiple copies of the same item when the loot table and roll rules allow it.
+A producer or stash may have its own internal storage for input items required by its behavior.
 
-### 3.10 Blueprint
+This is not a second player inventory. It is item-instance state belonging to that producer/stash.
+
+Input storage defines:
+
+- which input item is accepted
+- how many units are consumed per activation/cycle
+- how many units can be stored in advance
+
+Example:
+
+A coal mine may require `1 sausage` and `1 beer` per production cycle and may store up to `4 sausage` and `4 beer` in advance. The player can later withdraw stored inputs back into normal inventory when rules allow it.
+
+### 4.13 Loot table
+
+A loot table is a standalone data entity defining possible outputs and probabilities for a producer, stash, or other generation mechanic.
+
+Loot tables should have stable IDs, for example:
+
+- `loot:lumber-camp-1`
+- `loot:lumber-camp-1:better-1`
+- `loot:quarry-1`
+
+A producer/stash references a loot table by ID. Upgrades switch the active loot table by ID instead of mutating probability numbers inside scattered item definitions.
+
+### 4.14 Blueprint
 
 A blueprint is a craft/construction entity used to create or upgrade structures/entities.
 
 A completed blank blueprint is generic. It becomes specific only when it is bound to a target entity.
 
+Binding creates a new item ID.
+
 Example:
 
-A completed blank blueprint is merged with a woodcutter. The result is a woodcutter blueprint. The original woodcutter does not disappear.
+- completed blank blueprint + lumber camp -> lumber camp blueprint
 
-### 3.11 Bound blueprint
+The original lumber camp remains in the game after binding.
+
+### 4.15 Bound blueprint
 
 A bound blueprint is a blueprint that already knows what it constructs or improves.
 
-Example:
+Examples:
 
-- blank completed blueprint + woodcutter -> woodcutter blueprint
+- lumber camp blueprint
+- quarry blueprint
+- townhall blueprint
+- lumber camp level 2 blueprint
 
-The target entity used for binding remains in the game unless an explicit future rule says otherwise.
+A bound blueprint is just a craftable item with a recipe and optional completion timer. The exact recipe is data, not special hardcoded blueprint behavior.
 
-### 3.12 Craft/construction progress
+### 4.16 Craft/construction progress
 
-Craft/construction progress is the state of an incomplete item that requires other resources before becoming complete.
+Craft/construction progress is the state of an incomplete item that requires input items, time, or both before becoming complete.
 
-The incomplete entity may exist on the board or in inventory. Location should not change the meaning of its requirements unless a specific rule says that some progress can only happen on the board.
+This mechanic applies to blueprints, building construction, growth, and similar incomplete entities.
 
 Examples:
 
-- a bound blueprint requiring resources before construction is complete
-- a sprout requiring resources/time before becoming a bush
+- bound blueprint becoming a lumber camp
+- lumber camp level 2 blueprint becoming lumber camp level 2
+- watered sprout becoming a sapling after a timer
 
-### 3.13 Upgrade
+### 4.17 Upgrade
 
 An upgrade is a global progression effect that modifies a specific entity or mechanic.
 
-Upgrades are data-driven and target concrete entities. For example, an upgrade may target `woodcutter_level_1` or another explicit entity definition.
+Upgrades are data-driven and target concrete entities. For example, an upgrade may target `item:lumber-camp-1` and change that producer's cooldown or active loot table.
 
-Upgrade effects may include:
+Global upgrades have a timer. Paying the cost starts the upgrade. The upgrade becomes active only when its timer completes.
 
-- reducing producer refresh time
-- switching a producer to a better loot table
-- improving drop probabilities
-- increasing producer inventory capacity
-- improving output count
-- unlocking new producer tiers
+## 5. Starting state
 
-Loot table upgrades should preferably switch the active loot table by tier rather than mutating probabilities ad hoc in scattered logic.
+The current starting state is based on the existing implementation, with obsolete split inventory merged into the normal inventory.
 
-## 4. Gameplay loop
+### 5.1 Starting board
 
-The intended economy loop is:
+| Item ID | Position |
+| --- | --- |
+| `item:townhall-1` | `x=3, y=4` |
+| `item:lumber-camp-1` | `x=1, y=4` |
+| `item:quarry-1` | `x=5, y=4` |
+| `item:coal-mine-1` | `x=3, y=6` |
 
-1. The player obtains basic items from starting state, board interactions, producers, or other generation systems.
-2. The player merges basic items into better items when a merge chain allows it.
-3. The player feeds producers with required input items.
-4. Producers refresh over time and generate outputs from their loot tables.
-5. Generated outputs are used for more merges, craft/construction progress, producer feeding, or upgrades.
-6. Blueprints and craft/construction items create longer-term goals.
-7. Hard currency and advanced resources are spent on global upgrades.
-8. Upgrades improve producer efficiency, loot quality, or other entity-specific behavior.
-9. Better producers and better loot tables push the player into more advanced materials and construction chains.
+### 5.2 Starting inventory
 
-The long-term progression should rely mainly on producer economy and craft/construction requirements, not only on repeatedly merging low-tier items.
+| Item ID | Quantity |
+| --- | ---: |
+| `item:blueprint-scrap` | `10` |
+| `item:twig` | `8` |
+| `item:pebble` | `8` |
+| `item:water` | `4` |
+| `item:sausage` | `3` |
+| `item:beer` | `3` |
+| `item:coin-stack` | `1` |
 
-## 5. Inventory mechanics
+## 6. Inventory mechanics
 
-### 5.1 Inventory size
+### 6.1 Single inventory rule
 
-Current inventory size is fixed at `7 x 5` slots.
+There is exactly one player inventory.
 
-This equals `35` total inventory slots.
+All player-owned stored items go into this inventory, including currency items. Any implementation table, state slice, UI panel, or upgrade referring to a separate player inventory is obsolete and must be removed or migrated into the normal inventory model.
 
-### 5.2 Moving items from board to inventory
+Producer/stash input storage is allowed because it belongs to the item instance and is not player storage.
 
-Double-clicking an item on the board attempts to move that item into the player inventory.
+### 6.2 Stack rules
 
-The action succeeds when inventory has a valid free slot for the item.
+Inventory respects both item definition and runtime state.
 
-The action fails when inventory has no valid free slot. Failure should produce clear player feedback.
+An item can stack only when all of these are true:
 
-### 5.3 Moving items from inventory to board
+1. the item definition has `maxStackSize > 1`
+2. the item has no runtime state
+3. the target stack contains the same item ID
+4. the target stack has room under `maxStackSize`
+
+An item cannot stack when any of these are true:
+
+1. `maxStackSize = 1`
+2. the item has non-empty runtime state
+3. the item is a building or entity type that is explicitly non-stackable
+4. combining it would lose, merge, or obscure runtime state
+
+Buildings currently use `maxStackSize = 1` unless a future design explicitly says otherwise.
+
+A pure stateless producer may stack only if its item definition allows it. A producer with cooldown, stored inputs, or any other state cannot stack.
+
+### 6.3 Board to inventory
+
+Double-clicking an item on the board attempts to move that item into the normal inventory.
+
+This rule is consistent across item types. Double-click does not produce, exhaust, open, activate, or collect. It stores.
+
+The action succeeds when inventory has a valid slot for the item:
+
+- an existing compatible stack with available capacity, or
+- an empty slot for a new stack/item instance
+
+The action fails when inventory has no valid slot. Failure should produce clear player feedback.
+
+### 6.4 Inventory to board
 
 Double-clicking an item in inventory attempts to move that item onto the board.
 
-The action succeeds when the board has a valid free cell for the item.
+The action succeeds when the board has a valid free cell for the item. If the player does not provide a target cell, the game may choose the first valid free cell using a deterministic placement policy.
 
 The action fails when the board has no valid free cell. Failure should produce clear player feedback.
 
-### 5.4 Inventory storage semantics
+### 6.5 Inventory passivity
 
-Inventory may store items that are not immediately useful.
+Inventory preserves state but does not advance state.
 
-Inventory can also contain entities with active state, such as:
+If a running timer item is moved into inventory:
 
-- incomplete blueprints
-- bound blueprints
-- craft/construction progress items
-- sprouts or other growth/progress entities
-- resources intended for producer feeding
-- hard currency items, if currency is represented as item stacks
+1. its timer pauses immediately
+2. remaining duration is preserved
+3. it cannot receive more input items while stored
+4. it cannot complete while stored
+5. it resumes only after being placed back on the board, if its rules still allow progress
 
-If an item has progress state, moving it between board and inventory must preserve that progress unless a specific rule says otherwise.
+This applies to every active timer in the game: craft timers, construction timers, growth timers, producer cooldowns, stash timers, and future active mechanics.
 
-### 5.5 Inventory and producer inventory
+## 7. Interaction rules
 
-Player inventory and producer inventory are different storage scopes.
+### 7.1 Single-click
 
-Moving an item into a producer inventory is a feed/deposit action, not the same as moving it into player inventory.
+Single-click is the default active interaction.
 
-Producer input items may be removed from producer inventory back into player inventory when allowed by capacity and interaction rules.
+Single-click may:
 
-## 6. Merge mechanics
+- collect from a ready producer
+- open/collect from a ready stash
+- activate another explicit item action, if later defined
 
-### 6.1 Merge purpose
+### 7.2 Double-click
 
-Merge creates a better item from compatible lower-tier items.
+Double-click is the default storage/placement interaction.
 
-Merge provides access to required materials, helps compress low-tier resources, and supports early progression. It is not the only progression system.
+Double-click may:
 
-### 6.2 Merge chain rules
+- move board item to inventory
+- move inventory item to board
+
+Double-click must not have hidden production, stash opening, exhaust, or special collect behavior.
+
+### 7.3 Consistency rule
+
+If an interaction behaves differently for one item type, that difference must come from a clear mechanic and must use the correct interaction channel.
+
+Example:
+
+- producer collection belongs to single-click
+- inventory storage belongs to double-click
+
+Do not add item-specific double-click exceptions for convenience. Convenience exceptions turn into gameplay debt, then architecture debt, then someone has to debug it at midnight like a gremlin with a keyboard.
+
+## 8. Merge mechanics
+
+### 8.1 Merge purpose
+
+Merge creates a better item from compatible lower-tier board items.
+
+Merge provides access to needed materials, helps compress low-tier items, and supports early progression. It is not the only progression system.
+
+### 8.2 Merge chain rules
 
 A merge chain must define:
 
@@ -253,12 +436,13 @@ A merge chain must define:
 
 Default assumption:
 
+- merge happens on the board
 - merge consumes inputs
 - merge produces one output
 - merge requires compatible items from the same chain and tier
 - merge is not reversible
 
-### 6.3 Thematic consistency rule
+### 8.3 Thematic consistency rule
 
 Merge chains must remain semantically consistent.
 
@@ -276,37 +460,57 @@ Bad examples:
 - twig chain ending in iron ore
 - sausage chain ending in beer
 
-### 6.4 Merge and special entities
+The final concrete merge/economy chains will be specified during dedicated economy design. Until then, existing implementation chains are inspiration, not canonical economy truth.
 
-Some merge interactions are not ordinary chain merges.
+### 8.4 Merge and stateful entities
+
+An item with active or paused state must not be merged unless an explicit rule defines how that state is handled.
+
+Default rule:
+
+- stateful items cannot be merged
+- running timer items cannot be merged
+- items waiting for construction/growth/craft completion cannot be merged
+- items with stored producer/stash inputs cannot be merged
+
+### 8.5 Blueprint binding as merge-like interaction
 
 Blueprint binding is a special merge-like interaction:
 
 - completed blank blueprint + target entity -> bound blueprint for target entity
+- binding creates a new item ID
 - target entity is not consumed
-- completed blank blueprint is consumed or transformed into bound blueprint
+- completed blank blueprint is consumed or transformed into the bound blueprint
 
-Special interactions must be explicitly represented in data and tests so they do not get mixed with generic merge-chain behavior.
+This must be explicitly represented in data and tests so it does not get mixed with generic merge-chain behavior.
 
-## 7. Producers / generators
+## 9. Producers
 
-### 7.1 Producer purpose
+### 9.1 Producer purpose
 
-Producers are the main source of economy inputs and advanced items.
+Producers are the main repeatable source of economy inputs and advanced items.
 
 Merge can create needed items, but feeding and upgrading producers should become the main driver of progression.
 
-### 7.2 Producer refresh
+### 9.2 Producer trigger
 
-Each producer has a refresh time.
+A producer is triggered by single-click.
 
-When the producer is ready and production requirements are satisfied, it may generate output items from its active loot table.
+There are no automatic producers in current gameplay. A producer that is ready does nothing until the player activates it.
+
+### 9.3 Producer cooldown
+
+Each producer has a cooldown/refresh time.
+
+When the cooldown is complete, required input items are available, and output placement is possible, a single-click activation may produce output from the active loot table.
 
 Refresh time may be changed by upgrades.
 
-### 7.3 Producer loot output
+Because inventory is passive, producer cooldown does not advance while the producer item is stored in inventory.
 
-A producer uses a loot table to decide generated outputs.
+### 9.4 Producer loot output
+
+A producer uses a named loot table to decide generated outputs.
 
 A producer may generate:
 
@@ -315,65 +519,138 @@ A producer may generate:
 - multiple different items
 - multiple copies of the same item
 
-The output count and probability rules must be encoded in loot table data, not hidden in UI code.
+The output count and probability rules must be encoded in named loot table data, not hidden in UI code or inline in random item definitions.
 
-### 7.4 Producer examples
+### 9.5 Producer output placement
 
-Current conceptual producers:
+Default producer output placement is `board_then_inventory`.
 
-| Producer | Economy role | Example outputs |
-| --- | --- | --- |
-| Woodcutter | wood economy | twigs, branches, wood |
-| Quarry | stone economy | pebbles, stones, stone blocks |
-| Coal mine | fuel economy | coal |
-| Iron mine | metal economy | iron ore |
+This means:
 
-Exact item IDs and loot tables must be defined in central game config.
+1. try to place generated items onto valid board cells
+2. if board placement cannot fit all output, try to place remaining output into normal inventory
+3. if neither board nor inventory can fit the output, the producer must not silently destroy generated items unless an explicit overflow rule says so
 
-### 7.5 Producer input requirements
+Exact placement ordering must be deterministic and testable.
 
-A producer may require input/feed items before producing.
+### 9.6 Producer input requirements
+
+A producer may require input items before producing.
 
 Input requirements define:
 
-- required item ID
-- amount consumed per production cycle
-- whether the input is mandatory or optional
-- producer inventory capacity for that input
+- accepted input item ID
+- quantity consumed per production cycle
+- storage capacity for that input item
 
 Example:
 
-A coal mine may require sausage and beer. It may store more sausage and beer than one production cycle needs. The stored excess remains inside the producer until consumed by production or removed by the player.
+A coal mine may require `1 sausage` and `1 beer` per production cycle. It may also allow up to `4 sausage` and `4 beer` to be stored in advance.
 
-### 7.6 Producer internal inventory
+### 9.7 Producer input storage
 
-Producer inventory exists to store required production inputs.
+Producer input storage exists to store required production input items.
 
-Producer inventory must define capacity. Capacity may be per input item, shared across all input items, or both, but the selected model must be explicit in game data.
+Producer input storage is item-instance state. It makes that producer instance stateful and therefore non-stackable.
 
-Producer inventory may contain more input items than one production cycle requires.
+A producer may contain more input items than one production cycle requires, up to configured capacity.
 
-The player may withdraw producer input items back into player inventory when rules allow it.
+The player may withdraw stored producer input items back into normal inventory when rules allow it.
 
-### 7.7 Producer readiness
+### 9.8 Producer readiness
 
 A producer is ready when:
 
-1. its refresh timer has completed
-2. its required inputs are present in producer inventory, if it has input requirements
-3. output placement is possible, or output overflow handling is defined
+1. its cooldown has completed
+2. every required input item is present in the producer input storage
+3. output placement is possible, or output overflow handling is explicitly defined
 
-If output cannot be placed on the board or inventory, the producer must not silently destroy generated items unless an explicit overflow rule says so.
+Production consumes configured input quantities from producer input storage.
 
-## 8. Blueprint mechanics
+## 10. Stashes
 
-### 8.1 Blueprint purpose
+### 10.1 Stash purpose
+
+A stash is a finite source of items.
+
+Stashes cover chests, crates, finite caches, reward containers, and similar entities.
+
+### 10.2 Stash trigger
+
+A stash is opened/collected by single-click when its requirements are satisfied.
+
+Double-click stores the stash in inventory. It does not open or exhaust the stash.
+
+### 10.3 Stash depletion
+
+A stash must define its finite behavior explicitly.
+
+Possible models:
+
+- fixed number of charges
+- fixed stored contents
+- fixed number of loot table rolls
+- removal on depletion
+- transformation into an empty item on depletion
+
+The selected depletion behavior must be data-driven.
+
+### 10.4 Stash inputs
+
+A stash may require input items before opening or collecting.
+
+Example:
+
+An epic chest may require a key.
+
+Stash input storage follows the same storage principles as producer input storage, but stash remains a separate entity type.
+
+## 11. Loot tables
+
+### 11.1 Loot table as standalone entity
+
+Loot tables are standalone data entities.
+
+A producer or stash references its active loot table by ID.
+
+Preferred ID pattern:
+
+- `loot:<entity-id>` for base table
+- `loot:<entity-id>:better-1` for upgraded table
+- `loot:<entity-id>:better-2` for next upgraded table
+
+Example:
+
+- `item:lumber-camp-1` references `loot:lumber-camp-1`
+- an upgrade switches it to `loot:lumber-camp-1:better-1`
+
+### 11.2 Loot table definition
+
+A loot table must define:
+
+- stable ID
+- roll model
+- possible item outputs
+- probability or weight per output
+- min/max quantity per output
+- duplicate behavior
+- whether zero output is possible
+
+### 11.3 Loot table upgrades
+
+Loot table upgrades switch the active loot table ID.
+
+Do not patch drop rates directly inside upgrade logic. Probability changes belong in named loot tables.
+
+## 12. Blueprint mechanics
+
+### 12.1 Blueprint purpose
 
 Blueprints turn abstract construction progress into concrete target construction.
 
 They allow the player to prepare a generic completed blueprint first, then bind it to a target entity later.
 
-### 8.2 Blank blueprint lifecycle
+### 12.2 Blank blueprint lifecycle
 
 Blueprint lifecycle:
 
@@ -381,165 +658,193 @@ Blueprint lifecycle:
 2. Player completes a blank blueprint through merge, craft, or construction progress.
 3. Completed blank blueprint is generic and has no target.
 4. Player binds the completed blank blueprint to a target entity.
-5. Binding creates a bound blueprint.
-6. Bound blueprint has construction/craft progress requirements.
+5. Binding creates a bound blueprint item ID.
+6. Bound blueprint has craft/construction requirements.
 7. Completing bound blueprint produces, upgrades, or unlocks the target result.
 
-### 8.3 Binding blueprint to entity
+### 12.3 Binding blueprint to entity
 
 Binding rule:
 
 - completed blank blueprint + target entity -> bound blueprint for that target
 - target entity remains and does not disappear
 - blank blueprint becomes target-specific
+- the result is a new item ID
 
 Example:
 
-- completed blank blueprint + woodcutter -> woodcutter blueprint
-- the woodcutter still exists after binding
+- completed blank blueprint + `item:lumber-camp-1` -> `item:blueprint-lumber-camp-1`
+- `item:lumber-camp-1` still exists after binding
 
-### 8.4 Bound blueprint progress
+Implementation details such as `imprint` or `consumeSource: false` are not the mechanic. The mechanic is: bind blueprint, create specific blueprint, keep target entity.
 
-A bound blueprint has construction/craft progress.
+### 12.4 Bound blueprint as craftable item
 
-Progress requirements should define:
+A bound blueprint is a craftable item.
 
-- required item IDs
-- required amounts
-- whether requirements are consumed immediately or deposited over time
-- completion output/result
-- whether completion happens instantly once all requirements are met
-- whether progress can be done while the blueprint is in inventory
+It defines a recipe and optional completion timer. It is not a special hardcoded building-tier system.
 
-Default assumption:
+Example pattern:
 
-- requirements are deposited into the blueprint
-- deposited resources are preserved in the blueprint state
-- completion happens when all requirements are satisfied
-- blueprint may exist on board or in inventory
+- `item:blueprint-lumber-camp-2` may require its own recipe and then complete into `item:lumber-camp-2`
 
-## 9. Craft / construction progress
+The exact recipe belongs to economy design and central data, not to special gameplay branching.
 
-### 9.1 Purpose
+## 13. Craft / construction / growth progress
 
-Craft/construction progress represents incomplete entities that require resources, time, or both.
+### 13.1 Purpose
 
-This mechanic applies to blueprints and may also apply to growth or transformation items.
+Craft/construction/growth progress represents incomplete entities that require input items, time, or both.
+
+This mechanic applies to blueprints, building construction, growth, and similar transformations.
 
 Examples:
 
-- bound blueprint becoming completed construction
-- sprout becoming bush
+- bound blueprint becoming a building
+- watered sprout becoming a sapling
+- sapling becoming a tree
 
-### 9.2 Location independence
+### 13.2 Location behavior
 
-An incomplete craft/construction item may exist on the board or in inventory.
+A craftable/progress item may exist on the board or in inventory.
 
-Unless a mechanic explicitly says otherwise, moving the item between board and inventory must not reset progress.
+Board is active. Inventory is passive.
 
-### 9.3 Requirement model
+When the item is on the board, it may accept input items and advance timers according to its definition.
 
-A craft/construction entity should define:
+When the item is in inventory, it preserves state but does not accept inputs, does not advance timers, and cannot complete.
+
+### 13.3 Requirement model
+
+A craft/construction/growth entity should define:
 
 - entity ID
-- progress state
-- required item IDs
-- required amounts
-- already deposited amounts
-- optional time requirement, if applicable
-- output/result entity
+- accepted input item IDs
+- required quantities
+- already deposited quantities in runtime state
+- optional completion duration, including `0` for instant completion
+- output/result item ID
 - completion behavior
 
-### 9.4 Feeding construction progress
+### 13.4 Feeding progress
 
-Resources can be deposited into an incomplete craft/construction entity.
+Input items can be deposited into an incomplete craft/construction/growth entity only when the entity is on the board and can currently accept input.
 
-Deposited resources are consumed into the progress state and should not remain as separate inventory items.
+Deposited items are consumed into the progress state and should not remain as separate inventory items.
 
-When all required resources and time conditions are satisfied, the entity completes into its result.
+### 13.5 Completion timer
 
-### 9.5 Growth-like craft progress
+A craftable/progress item may define a completion duration.
 
-Growth items, such as sprout -> bush, use the same general progress model unless a dedicated growth system is introduced later.
+Rules:
 
-A sprout may require resources, time, or both before becoming a bush.
+1. If duration is `0`, completion happens instantly once required inputs are deposited.
+2. If duration is greater than `0`, the item enters a running timer once required inputs are deposited.
+3. While the timer is running, the item cannot accept additional inputs.
+4. While the timer is running, the item cannot be merged.
+5. While the timer is running, the item can be moved on the board.
+6. While the timer is running, the item can be moved into inventory.
+7. Moving it into inventory pauses the timer.
+8. Moving it back to the board resumes the timer.
+9. Completion happens only while the item is on the board and the timer finishes.
 
-## 10. Upgrade system
+### 13.6 Stateful progress preservation
 
-### 10.1 Upgrade purpose
+Progress state must survive all allowed movement.
+
+This includes:
+
+- board movement
+- board to inventory movement
+- inventory to board movement
+- app reload
+- save/load
+
+State loss during movement is a gameplay bug.
+
+## 14. Upgrade system
+
+### 14.1 Upgrade purpose
 
 Upgrades are global progression modifiers.
 
 They make specific entities better or unlock more advanced behavior.
 
-### 10.2 Upgrade targeting
+### 14.2 Upgrade targeting
 
 Each upgrade targets a concrete entity or exact mechanic scope.
 
 Examples:
 
-- `woodcutter_level_1.refresh_time`
-- `woodcutter_level_1.loot_table`
-- `coal_mine_level_1.input_capacity`
-- `quarry_level_1.output_count`
+- `item:lumber-camp-1` cooldown
+- `item:lumber-camp-1` loot table
+- `item:coal-mine-1` cooldown
 
 This keeps upgrade data explicit and avoids unclear global magic.
 
-### 10.3 Upgrade effects
+### 14.3 Upgrade lifecycle
 
-Allowed upgrade effect types include:
+Upgrade lifecycle:
 
-- reduce producer refresh time
-- switch producer loot table by tier
-- improve producer output count
-- improve producer input capacity
-- unlock producer/entity level
-- unlock new craft/construction recipes
-- improve hard currency or resource economy rules, if explicitly defined
+1. Player pays explicit item costs.
+2. Upgrade starts.
+3. Upgrade has `durationMs`.
+4. Upgrade is inactive while the timer is running.
+5. Upgrade becomes active when the timer completes.
+6. Active upgrade effects are permanent for the save unless a future rule says otherwise.
 
-### 10.4 Loot table upgrades
+### 14.4 Supported upgrade effect types
+
+Current implementation-supported effect types are:
+
+- `producer.cooldown.add`
+- `producer.outputTable.set`
+- `inventory.capacity.add`
+
+Canonical gameplay currently uses producer cooldown and producer loot table upgrades.
+
+Inventory size is fixed at `7 x 5`. No current upgrade should change normal inventory size. Any existing player-inventory capacity upgrade is obsolete and should be removed with the split inventory system.
+
+### 14.5 Loot table upgrades
 
 Loot table upgrades should switch active loot table IDs by tier.
 
 Preferred model:
 
-- producer starts with `loot_table_tier_1`
-- upgrade changes producer to `loot_table_tier_2`
-- next upgrade changes producer to `loot_table_tier_3`
+- producer starts with `loot:lumber-camp-1`
+- upgrade changes producer to `loot:lumber-camp-1:better-1`
+- next upgrade changes producer to `loot:lumber-camp-1:better-2`
 
 Avoid scattering probability patches throughout logic. Probability changes belong in named loot tables.
 
-### 10.5 Upgrade costs
+### 14.6 Upgrade costs
 
-Upgrades may cost resources, hard currency, or completed construction items.
+Upgrades cost explicit item stacks or item instances.
 
-Costs must be explicit in game data.
+Currency items such as coins are normal items stored in normal inventory and may be used as upgrade costs.
 
-Hard currency examples:
-
-- coins
-- diamonds
-
-## 11. Economy validation rules
+## 15. Economy validation rules
 
 The economy should be validated using these rules:
 
-1. Every required resource must have at least one defined source.
-2. Every producer output must be useful in at least one merge chain, craft requirement, construction requirement, upgrade, or future unlock path.
+1. Every required input item must have at least one defined source.
+2. Every producer/stash output must be useful in at least one merge chain, craft requirement, construction requirement, upgrade, or future unlock path.
 3. Merge chains must not create unrelated materials without an explicit transformation system.
-4. Producer requirements must be satisfiable from existing sources.
-5. Producer inventory capacity must be high enough to support intended production cycles.
+4. Producer/stash input requirements must be satisfiable from existing sources.
+5. Producer/stash input capacity must be high enough to support intended cycles.
 6. Upgrades must target concrete entities and must not rely on implicit string matching or UI assumptions.
-7. Loot table changes must be traceable through upgrade tiers.
-8. Hard currency sources and sinks must be balanced intentionally.
+7. Loot table changes must be traceable through named upgrade tiers.
+8. Currency item sources and sinks must be balanced intentionally.
 9. Inventory capacity must be considered when adding new chains or producers.
-10. No important economy behavior should live only in UI interaction code.
+10. Stateful items must preserve state through all allowed movement.
+11. No important economy behavior should live only in UI interaction code.
+12. Existing `GameConfig` economy data is inspiration until a dedicated economy pass rewrites it to match this document.
 
-## 12. Data model expectations
+## 16. Data model expectations
 
 The central game configuration should be able to express at least these concepts.
 
-### 12.1 Item definition
+### 16.1 Item definition
 
 Expected fields:
 
@@ -548,12 +853,47 @@ Expected fields:
 - `kind`
 - `description`
 - `asset`
-- `stacking`, if supported
+- `maxStackSize`
 - `placeable`
 - `storageRules`
 - `tags`
+- optional producer definition reference
+- optional stash definition reference
+- optional craft/construction definition reference
+- optional blueprint binding rules
 
-### 12.2 Merge chain definition
+### 16.2 Item instance state
+
+Expected fields:
+
+- instance ID, if stored as instance
+- item definition ID
+- location: board, inventory, producer/stash input storage, or other explicit scope
+- board position, if on board
+- inventory slot, if in inventory
+- quantity, if stackable stateless stack
+- runtime state object, if stateful
+
+Runtime state must be able to represent:
+
+- deposited craft/construction/growth inputs
+- remaining or ready-at timer state
+- paused timer state
+- producer cooldown state
+- producer input storage
+- stash charges/contents/depletion state
+
+### 16.3 Inventory definition
+
+Expected fields:
+
+- slot count: `35`
+- slot placement rules
+- stack merge rules
+- max stack handling
+- stateful item handling
+
+### 16.4 Merge chain definition
 
 Expected fields:
 
@@ -565,20 +905,35 @@ Expected fields:
 - `result`
 - `specialRules`, if needed
 
-### 12.3 Producer definition
+### 16.5 Producer definition
 
 Expected fields:
 
 - `id`
 - `name`
-- `refreshTime`
-- `activeLootTableId`
-- `inputRequirements`
-- `inputInventoryCapacity`
-- `outputPlacementRules`
-- `upgradeTargets`
+- trigger: `click`
+- cooldown/refresh time
+- active loot table ID
+- input requirements
+- input storage capacities
+- output placement rules
+- upgrade targets
 
-### 12.4 Loot table definition
+### 16.6 Stash definition
+
+Expected fields:
+
+- `id`
+- `name`
+- trigger: `click`
+- finite behavior model
+- charges/contents/roll count
+- active loot table ID, if table-driven
+- input requirements, if any
+- depletion behavior
+- output placement rules
+
+### 16.7 Loot table definition
 
 Expected fields:
 
@@ -590,31 +945,32 @@ Expected fields:
 - `minCount`
 - `maxCount`
 - `allowDuplicateResults`
+- zero-output behavior
 
-### 12.5 Blueprint definition
+### 16.8 Blueprint definition
 
 Expected fields:
 
 - `id`
-- `state`
 - `targetEntityId`, for bound blueprints
 - `bindingRules`
-- `craftRequirements`
-- `completionResult`
+- craft/construction reference
+- completion result
 
-### 12.6 Craft/construction definition
+### 16.9 Craft/construction/growth definition
 
 Expected fields:
 
 - `id`
-- `targetEntityId`
-- `requirements`
-- `depositedResources`
-- `timeRequirement`, if used
-- `completionResult`
-- `allowedLocations`
+- `targetEntityId`, if any
+- accepted inputs
+- required quantities
+- completion duration, including `0`
+- completion result
+- allowed locations
+- timer pause/resume behavior
 
-### 12.7 Upgrade definition
+### 16.10 Upgrade definition
 
 Expected fields:
 
@@ -624,42 +980,30 @@ Expected fields:
 - `targetProperty`
 - `tier`
 - `cost`
+- `durationMs`
 - `effect`
 - `nextUpgradeId`, if linear
 
-## 13. Current concrete constants
+## 17. Current example chains and entities
 
-These values are currently defined by design:
+These examples are canonical directionally, but exact item IDs and tiers will be finalized during economy design.
 
-| Concept | Value |
-| --- | --- |
-| Player inventory size | `7 x 5` |
-| Inventory slot count | `35` |
-| Merge role | basic mechanic, not complete core loop |
-| Main economy source | producers/generators |
-| Blueprint binding | blank completed blueprint + target entity creates bound blueprint |
-| Blueprint target consumption | target entity is not consumed |
-| Craft/construction location | board or inventory unless restricted by explicit rule |
-| Upgrade targeting | concrete entity-specific targets |
-| Loot table upgrade model | preferably switch named loot table by tier |
-
-## 14. Current example chains and entities
-
-These examples are canonical directionally, but exact item IDs and tiers must be defined in central game config.
-
-### 14.1 Wood chain
+### 17.1 Wood chain
 
 A wood chain starts from small natural wood items and ends in useful wood material.
 
 Example direction:
 
 - twig
-- better twig/branch form
-- wood
+- branch
+- log
+- wood bundle
+- plank
+- beam
 
 The chain must not become stone, ore, coins, diamonds, or food.
 
-### 14.2 Stone chain
+### 17.2 Stone chain
 
 A stone chain starts from small stones and ends in useful construction stone material.
 
@@ -669,70 +1013,107 @@ Example direction:
 - stone
 - stone block
 
-The chain must not become diamond unless a separate gem/ore/geology mechanic explicitly supports it.
+The chain must not become gem/diamond unless a separate geology/refining mechanic explicitly supports it.
 
-### 14.3 Producer examples
+### 17.3 Producer examples
 
-- woodcutter: wood material source
+- lumber camp: wood material source
 - quarry: stone material source
 - coal mine: coal/fuel source
-- iron mine: iron ore source
+- iron mine: ore/metal source
 
-### 14.4 Producer feed examples
+### 17.4 Producer feed examples
 
 - coal mine may consume sausage and beer
 - producer may store more feed items than one production cycle requires
-- stored feed items may be withdrawn back to player inventory
+- stored feed items may be withdrawn back to normal inventory
 
-## 15. Open design questions
+### 17.5 Stash examples
+
+- basic crate: finite output, removed or emptied after depletion
+- epic chest: finite output, requires key input before opening
+
+## 18. Open design questions
 
 These are intentionally not finalized yet.
 
-1. Are ordinary inventory items stackable, or does every item occupy one slot?
-2. Is hard currency stored as item stacks in inventory, as separate numeric currency, or both?
-3. What is the exact board size and board placement policy?
-4. What happens when a producer generates output and no board slot is available?
-5. Can producer outputs go directly to inventory, or only to board?
-6. Do producers produce automatically when ready, or only after player collection?
-7. Are producer inputs consumed at production start or production completion?
-8. Can craft/construction progress require time, or only deposited resources?
-9. Does craft/construction progress continue while the item is in inventory?
-10. Are blueprints consumed on completion?
-11. Can a bound blueprint be rebound to another target?
-12. Are upgrades permanent global account/save effects?
-13. Can upgrade tiers be skipped?
-14. Can merge chains require more than two input items?
-15. Can special merges use non-consuming participants besides blueprint binding?
+1. What are the final concrete economy merge chains?
+2. Which exact producers exist in the first balanced economy pass?
+3. Which exact stashes exist in the first balanced economy pass?
+4. What are the exact named loot tables and their probabilities?
+5. What are the exact blueprint recipes for each building/tier?
+6. Which craft/construction/growth items use timers, and what are their durations?
+7. Are blueprints consumed on completion, or do some blueprint types remain as reusable plans?
+8. Can a bound blueprint ever be rebound to another target?
+9. Are upgrade tiers strictly linear, or can some branches exist?
+10. Can merge chains require more than two input items?
+11. Can special merges use non-consuming participants besides blueprint binding?
+12. What exact deterministic placement order is used for board/inventory overflow?
 
 Until these questions are answered, implementation should choose the simplest explicit behavior and document it here before coding.
 
-## 16. Implementation testing checklist
+## 19. Implementation migration notes
+
+These notes describe known differences from the current implementation that must be fixed.
+
+1. Remove the separate `playerInventory` gameplay concept.
+2. Move all starting `playerInventory` items into normal inventory.
+3. Remove or migrate `playerInventoryStack` storage.
+4. Remove collectible behavior that stores items into a separate player inventory.
+5. Currency items must go into normal inventory.
+6. Remove the current player-inventory capacity upgrade from gameplay.
+7. Keep normal inventory size fixed at `7 x 5`.
+8. Inventory must support stateful item instances, not only stateless stacks.
+9. Stateful inventory items must be non-stackable.
+10. Double-click on board must store the item. It must not exhaust producers or stashes.
+11. Producer/stash activation belongs to single-click.
+12. Split infinite producers and finite stashes into separate entity types.
+13. Move producer/stash outputs to named loot table entities and reference them by ID.
+14. Current `GameConfig` economy chains may be replaced during the economy design pass.
+
+## 20. Implementation testing checklist
 
 A gameplay implementation should provide tests or validation for:
 
-1. moving item from board to inventory by double click
-2. moving item from inventory to board by double click
-3. inventory full failure behavior
-4. board full failure behavior
-5. ordinary merge chain success
-6. invalid merge rejection
-7. thematic merge chain validation from data
-8. producer refresh timing
-9. producer loot table rolls
-10. producer generating multiple items
-11. producer generating duplicate item outputs when allowed
-12. producer input deposit
-13. producer input withdrawal
-14. producer production blocked by missing inputs
-15. producer production consumes required inputs
-16. blank blueprint completion
-17. blank blueprint binding to target entity
-18. target entity not consumed by blueprint binding
-19. bound blueprint receiving construction resources
-20. craft/construction progress preserved when moved between board and inventory
-21. craft/construction completion
-22. upgrade cost payment
-23. upgrade reducing refresh time
-24. upgrade switching loot table tier
-25. save compatibility behavior when game definition version changes
-
+1. moving item from board to inventory by double-click
+2. moving item from inventory to board by double-click
+3. double-click never triggers producer output
+4. double-click never opens/exhausts stash output
+5. single-click triggers ready producer
+6. single-click triggers ready stash
+7. inventory full failure behavior
+8. board full failure behavior
+9. stackable stateless item stacking up to `maxStackSize`
+10. non-stackable building occupying one slot
+11. stateful item occupying one slot and not stacking
+12. stateful item state preserved through board -> inventory -> board
+13. inventory pauses craft/construction/growth timers
+14. inventory pauses producer cooldowns
+15. inventory item cannot receive craft/construction inputs
+16. ordinary merge chain success
+17. invalid merge rejection
+18. thematic merge chain validation from data
+19. stateful item merge rejection unless explicit rule exists
+20. producer cooldown timing on board
+21. producer cooldown paused in inventory
+22. producer loot table rolls from named table ID
+23. producer generating multiple items
+24. producer generating duplicate item outputs when allowed
+25. producer input deposit
+26. producer input withdrawal
+27. producer production blocked by missing inputs
+28. producer production consumes required inputs
+29. stash finite depletion
+30. stash input requirement, for keyed/locked stashes
+31. blank blueprint completion
+32. blank blueprint binding to target entity
+33. target entity not consumed by blueprint binding
+34. bound blueprint receiving construction inputs
+35. craft/construction timer starts after required inputs are deposited
+36. craft/construction timer pauses in inventory
+37. craft/construction completion on board
+38. upgrade cost payment from normal inventory
+39. upgrade timer lifecycle
+40. upgrade reducing producer cooldown
+41. upgrade switching producer loot table ID
+42. save compatibility behavior when game definition version changes

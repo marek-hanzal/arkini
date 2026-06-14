@@ -1,12 +1,10 @@
 import { boardSourceId } from "~/board/boardSourceId";
 import { cellKey } from "~/board/util/cell";
-import type { DraggableAnimation } from "~/drag/DraggableAnimation";
 import type { DropPlan } from "~/drag/DropPlan";
 import type { ItemId } from "~/manifest/manifestId";
 import { resolveDropIntent } from "~/merge/resolveDropIntent";
 import type { FlyerKind, VisualMeta } from "~/play/types";
 import { accept } from "./accept";
-import { dragToTargetAnimation } from "./dragToTargetAnimation";
 import { reject } from "./reject";
 import type { Runtime, TypedDropContext } from "./types";
 
@@ -28,15 +26,6 @@ export const resolveBoardDrop = ({
 
 	if (!target.target.boardItemId) {
 		return accept({
-			hide: [
-				source.sourceId,
-			],
-			animations: [
-				dragToTargetAnimation({
-					source,
-					target,
-				}),
-			],
 			commit: () =>
 				runtime.run({
 					type: "board.move",
@@ -68,24 +57,6 @@ export const resolveBoardDrop = ({
 
 	if (intent.type === "swap") {
 		return accept({
-			hide: [
-				source.sourceId,
-				boardSourceId(targetBoardItemId),
-			],
-			animations: [
-				dragToTargetAnimation({
-					source,
-					target,
-				}),
-				{
-					itemId: targetItem.itemId,
-					fromNodeId: target.targetNodeId,
-					toNodeId: source.sourceNodeId,
-					overlay: {
-						activation: targetItem.activation ?? undefined,
-					},
-				},
-			],
 			commit: () =>
 				runtime.run({
 					type: "board.swap",
@@ -156,21 +127,19 @@ export const resolveBoardDrop = ({
 		});
 	}
 
-	const consumeAnimation: DraggableAnimation<string, FlyerKind, VisualMeta> = {
-		itemId: source.itemId,
-		fromDrag: true,
-		toDrag: true,
-		kind: "consume",
-		overlay: source.overlay,
-	};
-
 	return accept({
 		hide: [
 			source.sourceId,
 		],
 		animationTiming: "beforeCommit",
 		animations: [
-			consumeAnimation,
+			{
+				itemId: source.itemId,
+				fromDrag: true,
+				toDrag: true,
+				kind: "consume",
+				overlay: source.overlay,
+			},
 		],
 		commit: () =>
 			runtime.run({

@@ -181,8 +181,15 @@ function boardToCell(
 			source.itemId === mergeRule?.sourceItemId &&
 			targetItem.itemId === mergeRule?.withItemId,
 	);
-	const canMerge = Boolean(mergeRule && (!isDirectedMerge || isForwardDirectedMerge));
-	const canCraft = Boolean(targetItem.craft?.acceptedInputItemIds.includes(source.itemId));
+	const canMerge = Boolean(
+		mergeRule &&
+			(!targetItem.craft || targetItem.craft.phase === "collecting_inputs") &&
+			(!isDirectedMerge || isForwardDirectedMerge),
+	);
+	const canCraft = Boolean(
+		targetItem.craft?.canAcceptInputs &&
+			targetItem.craft.acceptedInputItemIds.includes(source.itemId),
+	);
 	const canSupplyProducer = Boolean(
 		targetItem.activation?.inputs.some(
 			(input) => input.itemId === source.itemId && input.stored < input.capacity,

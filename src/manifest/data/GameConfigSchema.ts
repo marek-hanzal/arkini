@@ -179,6 +179,7 @@ export const GameConfigSchema = z.object({
 				.object({
 					id: z.string().startsWith("craft:"),
 					resultItemId: ItemIdSchema,
+					durationMs: NonNegativeIntegerSchema,
 					inputs: z
 						.array(
 							z.object({

@@ -7,7 +7,13 @@ export function useProducerClock(items: readonly BoardViewItem[]) {
 	const [nowMs, setNowMs] = useState(() => Date.now());
 
 	const activeUntilMs = useMemo(
-		() => items.map((item) => item.activation?.cooldownUntilMs ?? 0).filter(Boolean),
+		() =>
+			items
+				.flatMap((item) => [
+					item.activation?.cooldownUntilMs ?? 0,
+					item.craft?.readyAtMs ?? 0,
+				])
+				.filter(Boolean),
 		[
 			items,
 		],

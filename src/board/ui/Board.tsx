@@ -94,9 +94,10 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 								),
 							) ||
 							Boolean(
-								boardItem.craft?.acceptedInputItemIds.includes(
-									drag.activeDrag.itemId,
-								),
+								boardItem.craft?.canAcceptInputs &&
+									boardItem.craft.acceptedInputItemIds.includes(
+										drag.activeDrag.itemId,
+									),
 							) ||
 							Boolean(
 								boardItem.activation?.inputs.some(

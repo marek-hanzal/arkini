@@ -109,13 +109,23 @@ export interface InventorySlot {
 	};
 }
 
+export type CraftProgressPhase = "collecting_inputs" | "waiting" | "ready";
+
 export interface CraftProgressView {
 	id: string;
 	resultItemId: string;
+	durationMs: number;
 	inputs: CraftRecipeInput[];
 	delivered: Record<string, number>;
+	inputProgress: number;
+	timeProgress: number;
 	progress: number;
+	phase: CraftProgressPhase;
 	complete: boolean;
+	canAcceptInputs: boolean;
+	startedAtMs?: number;
+	readyAtMs?: number;
+	remainingMs?: number;
 	acceptedInputItemIds: string[];
 }
 
@@ -182,6 +192,9 @@ export interface BoardItemState {
 	};
 	craft?: {
 		delivered?: Record<string, number>;
+		startedAt?: string;
+		readyAt?: string;
+		remainingMs?: number;
 	};
 }
 

@@ -1,11 +1,16 @@
 import { Effect } from "effect";
-import { readActivationView, readCraftView } from "~/board/logic/boardState";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import {
+	createInitialBoardState,
+	readActivationView,
+	readBoardState,
+	readCraftView,
+} from "~/board/logic/boardState";
+import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
 import { cellKey } from "~/board/util/cell";
 import { dbFx } from "~/database/fx/dbFx";
-import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
 import { table } from "~/database/local/tables";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 import type { BoardItemState, BoardView, BoardViewItem } from "~/play/logic/playTypes";
 import { json, parseJson } from "~/shared/json";
@@ -13,8 +18,51 @@ import { json, parseJson } from "~/shared/json";
 export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
-	const [rows, upgradeRows] = yield* dbFx((db) =>
-		Promise.all([
+	const nowMs = date.nowMs();
+	const updatedAt = date.timestamp();
+
+	let rows = yield* dbFx((db) =>
+		db
+			.selectFrom(table.boardItem)
+			.selectAll()
+			.where("saveGameId", "=", defaultSaveGameId)
+			.orderBy("y")
+			.orderBy("x")
+			.execute(),
+	);
+
+	const readyCraftRows = rows.flatMap((row) => {
+		const recipe = gameConfig.getCraftRecipeForTarget(row.itemDefinitionId);
+		if (!recipe) return [];
+		const state = readBoardState(row);
+		const readyAtMs = state.craft?.readyAt
+			? date.parseTimestampMs(state.craft.readyAt)
+			: undefined;
+		if (readyAtMs === undefined || readyAtMs > nowMs) return [];
+		return [
+			{
+				row,
+				recipe,
+			},
+		];
+	});
+
+	if (readyCraftRows.length > 0) {
+		yield* dbFx(async (db) => {
+			for (const { row, recipe } of readyCraftRows) {
+				await db
+					.updateTable(table.boardItem)
+					.set({
+						itemDefinitionId: recipe.resultItemId,
+						stateJson: json(createInitialBoardState(recipe.resultItemId, gameConfig)),
+						updatedAt,
+					})
+					.where("id", "=", row.id)
+					.execute();
+			}
+		});
+
+		rows = yield* dbFx((db) =>
 			db
 				.selectFrom(table.boardItem)
 				.selectAll()
@@ -22,12 +70,15 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				.orderBy("y")
 				.orderBy("x")
 				.execute(),
-			db
-				.selectFrom(table.playerUpgrade)
-				.selectAll()
-				.where("saveGameId", "=", defaultSaveGameId)
-				.execute(),
-		]),
+		);
+	}
+
+	const upgradeRows = yield* dbFx((db) =>
+		db
+			.selectFrom(table.playerUpgrade)
+			.selectAll()
+			.where("saveGameId", "=", defaultSaveGameId)
+			.execute(),
 	);
 
 	const items = rows.map((item): BoardViewItem => {
@@ -48,6 +99,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 			craft: readCraftView({
 				itemId: item.itemDefinitionId,
 				state,
+				date,
 				gameConfig,
 			}),
 		};

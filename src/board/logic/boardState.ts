@@ -78,6 +78,7 @@ export namespace readCraftView {
 	export interface Props {
 		itemId: string;
 		state: BoardItemState;
+		date: DateService;
 		gameConfig: GameConfigService;
 	}
 }
@@ -85,6 +86,7 @@ export namespace readCraftView {
 export function readCraftView({
 	itemId,
 	state,
+	date,
 	gameConfig,
 }: readCraftView.Props): CraftProgressView | undefined {
 	const recipe = gameConfig.getCraftRecipeForTarget(itemId);
@@ -95,18 +97,50 @@ export function readCraftView({
 	const current = recipe.inputs.reduce((sum, input) => {
 		return sum + Math.min(delivered[input.itemId] ?? 0, input.quantity);
 	}, 0);
-	const progress = required <= 0 ? 0 : Math.min(1, current / required);
+	const inputProgress = required <= 0 ? 0 : Math.min(1, current / required);
+	const inputsComplete = inputProgress >= 1;
+	const startedAtMs = state.craft?.startedAt
+		? date.parseTimestampMs(state.craft.startedAt)
+		: undefined;
+	const readyAtMs = state.craft?.readyAt ? date.parseTimestampMs(state.craft.readyAt) : undefined;
+	const nowMs = date.nowMs();
+	const remainingMs =
+		readyAtMs !== undefined ? Math.max(0, readyAtMs - nowMs) : state.craft?.remainingMs;
+	const timeProgress =
+		inputsComplete && startedAtMs !== undefined && readyAtMs !== undefined
+			? Math.max(0, Math.min(1, (nowMs - startedAtMs) / Math.max(1, readyAtMs - startedAtMs)))
+			: inputsComplete && recipe.durationMs === 0
+				? 1
+				: 0;
+	const phase = !inputsComplete
+		? "collecting_inputs"
+		: readyAtMs !== undefined && readyAtMs <= nowMs
+			? "ready"
+			: inputsComplete && (readyAtMs !== undefined || state.craft?.remainingMs !== undefined)
+				? "waiting"
+				: recipe.durationMs === 0
+					? "ready"
+					: "waiting";
 
 	return {
 		id: recipe.id,
 		resultItemId: recipe.resultItemId,
+		durationMs: recipe.durationMs,
 		inputs: [
 			...recipe.inputs,
 		],
 		delivered,
-		progress,
-		complete: progress >= 1,
-		acceptedInputItemIds: recipe.inputs.map((input) => input.itemId),
+		inputProgress,
+		timeProgress,
+		progress: phase === "collecting_inputs" ? inputProgress : timeProgress,
+		phase,
+		complete: phase === "ready",
+		canAcceptInputs: phase === "collecting_inputs",
+		startedAtMs,
+		readyAtMs,
+		remainingMs,
+		acceptedInputItemIds:
+			phase === "collecting_inputs" ? recipe.inputs.map((input) => input.itemId) : [],
 	};
 }
 

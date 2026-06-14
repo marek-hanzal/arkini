@@ -19,8 +19,7 @@ export function applyProducerUpgradeEffects({
 	producer,
 	upgradeRows,
 }: applyProducerUpgradeEffects.Props): ProducerDefinition {
-	let cooldownMs = producer.cooldownMs ?? 0;
-	let output = producer.output;
+	let cooldownMs = producer.cooldownMs;
 	let outputTableId = producer.outputTableId;
 
 	for (const effect of readOwnedUpgradeEffects(gameConfig, upgradeRows)) {
@@ -32,18 +31,12 @@ export function applyProducerUpgradeEffects({
 
 		if (effect.type === "producer.outputTable.set") {
 			outputTableId = effect.tableId;
-			output = gameConfig.getLootTable(effect.tableId)?.output ?? output;
 		}
-	}
-
-	if (outputTableId && output === producer.output) {
-		output = gameConfig.getLootTable(outputTableId)?.output ?? output;
 	}
 
 	return {
 		...producer,
 		cooldownMs,
-		output,
 		outputTableId,
 	};
 }

@@ -103,6 +103,252 @@ export const GameConfig = {
 	resources: [] as readonly ResourceDefinition[],
 	lootTables: [
 		lootTable(
+			"loot:tree",
+			"Tree",
+			outputs(
+				guaranteed("item:twig", 2),
+				chance("item:branch", 0.35),
+				chance("item:coin", 0.08),
+			),
+		),
+		lootTable(
+			"loot:townhall-1",
+			"Town Hall I",
+			outputs(
+				weighted([
+					drop("item:blueprint-scrap", 90),
+					drop("item:crate-1", 10),
+				]),
+				chance("item:water", 0.32),
+			),
+		),
+		lootTable(
+			"loot:townhall-2",
+			"Town Hall II",
+			outputs(
+				weighted([
+					drop("item:blueprint-scrap", 60),
+					drop("item:crate-1", 28),
+					drop("item:crate-2", 12),
+					drop("item:blueprint-lumber-camp-2", 6),
+					drop("item:blueprint-quarry-2", 6),
+				]),
+				chance("item:water", 0.4, {
+					min: 1,
+					max: 2,
+				}),
+			),
+		),
+		lootTable(
+			"loot:townhall-3",
+			"Town Hall III",
+			outputs(
+				weighted([
+					drop("item:blueprint-scrap", 40),
+					drop("item:crate-1", 18),
+					drop("item:crate-2", 30),
+					drop("item:crate-3", 12),
+					drop("item:blueprint-lumber-camp-3", 5),
+					drop("item:blueprint-quarry-3", 5),
+				]),
+				chance("item:water", 0.55, {
+					min: 1,
+					max: 2,
+				}),
+			),
+		),
+		lootTable(
+			"loot:townhall-4",
+			"Town Hall IV",
+			outputs(
+				weighted([
+					drop("item:blueprint-scrap", 36),
+					drop("item:crate-2", 34),
+					drop("item:crate-3", 22),
+					drop("item:crate-4", 8),
+					drop("item:blueprint-lumber-camp-4", 4),
+					drop("item:blueprint-quarry-4", 4),
+				]),
+				chance("item:water", 0.62, {
+					min: 1,
+					max: 2,
+				}),
+			),
+		),
+		lootTable(
+			"loot:townhall-5",
+			"Town Hall V",
+			outputs(
+				weighted([
+					drop("item:blueprint-scrap", 30),
+					drop("item:crate-2", 28),
+					drop("item:crate-3", 30),
+					drop("item:crate-4", 12),
+					drop("item:blueprint-lumber-camp-5", 3),
+					drop("item:blueprint-quarry-5", 3),
+				]),
+				chance("item:water", 0.72, {
+					min: 1,
+					max: 3,
+				}),
+			),
+		),
+		lootTable(
+			"loot:lumber-camp-1",
+			"Lumber Camp I",
+			outputs(
+				guaranteed("item:twig", 2),
+				chance("item:branch", 0.35),
+				chance("item:coin", 0.08),
+			),
+		),
+		lootTable(
+			"loot:lumber-camp-2",
+			"Lumber Camp II",
+			outputs(
+				guaranteed("item:branch"),
+				chance("item:twig", 0.5, {
+					min: 1,
+					max: 2,
+				}),
+				chance("item:log", 0.35),
+			),
+		),
+		lootTable(
+			"loot:lumber-camp-3",
+			"Lumber Camp III",
+			outputs(guaranteed("item:branch", 2), chance("item:log", 0.7)),
+		),
+		lootTable(
+			"loot:lumber-camp-4",
+			"Lumber Camp IV",
+			outputs(
+				guaranteed("item:log", 1),
+				chance("item:branch", 0.75, {
+					min: 1,
+					max: 2,
+				}),
+				chance("item:wood-bundle", 0.3),
+			),
+		),
+		lootTable(
+			"loot:lumber-camp-5",
+			"Lumber Camp V",
+			outputs(
+				guaranteed("item:log", 2),
+				chance("item:wood-bundle", 0.55),
+				chance("item:beam", 0.18),
+			),
+		),
+		lootTable(
+			"loot:quarry-1",
+			"Quarry I",
+			outputs(
+				guaranteed("item:pebble", 2),
+				chance("item:stone", 0.32),
+				chance("item:coin", 0.08),
+			),
+		),
+		lootTable(
+			"loot:quarry-2",
+			"Quarry II",
+			outputs(
+				guaranteed("item:stone"),
+				chance("item:pebble", 0.5, {
+					min: 1,
+					max: 2,
+				}),
+				chance("item:crystal", 0.28),
+			),
+		),
+		lootTable(
+			"loot:quarry-3",
+			"Quarry III",
+			outputs(guaranteed("item:stone", 2), chance("item:crystal", 0.72)),
+		),
+		lootTable(
+			"loot:quarry-4",
+			"Quarry IV",
+			outputs(
+				guaranteed("item:stone", 2),
+				chance("item:ore", 0.48),
+				chance("item:crystal", 0.28),
+			),
+		),
+		lootTable(
+			"loot:quarry-5",
+			"Quarry V",
+			outputs(
+				guaranteed("item:stone", 2),
+				chance("item:ore", 0.7),
+				chance("item:crystal", 0.42),
+				chance("item:gem", 0.12),
+			),
+		),
+		lootTable(
+			"loot:coal-mine-1",
+			"Coal Mine I",
+			outputs(guaranteed("item:coal"), chance("item:coin", 0.12)),
+		),
+		lootTable(
+			"loot:crate-1",
+			"Common Crate",
+			outputs(
+				weighted([
+					drop("item:twig", 35),
+					drop("item:pebble", 35),
+					drop("item:water", 15),
+					drop("item:seed", 12),
+					drop("item:coin", 8),
+				]),
+				chance("item:twig", 0.18),
+			),
+		),
+		lootTable(
+			"loot:crate-2",
+			"Sturdy Crate",
+			outputs(
+				weighted([
+					drop("item:branch", 35),
+					drop("item:stone", 35),
+					drop("item:water", 15),
+					drop("item:crate-1", 12),
+					drop("item:coin-pair", 8),
+				]),
+				chance("item:pebble", 0.22),
+			),
+		),
+		lootTable(
+			"loot:crate-3",
+			"Rare Crate",
+			outputs(
+				weighted([
+					drop("item:log", 30),
+					drop("item:crystal", 30),
+					drop("item:crate-2", 20),
+					drop("item:water", 16),
+					drop("item:coin-stack", 8),
+				]),
+				chance("item:branch", 0.24),
+				chance("item:epic-key", 0.1),
+			),
+		),
+		lootTable(
+			"loot:crate-4",
+			"Epic Crate",
+			outputs(
+				weighted([
+					drop("item:wood-bundle", 25),
+					drop("item:beam", 15),
+					drop("item:crystal", 25),
+					drop("item:gem", 15),
+					drop("item:water", 16),
+					drop("item:coin-stack", 8),
+				]),
+				chance("item:crate-3", 0.2),
+			),
+		),
+		lootTable(
 			"loot:lumber-camp-1:better-1",
 			"Lumber Camp I Better Finds I",
 			outputs(
@@ -344,14 +590,7 @@ export const GameConfig = {
 			],
 			39,
 			{
-				producer: clickProducer(
-					6200,
-					outputs(
-						guaranteed("item:twig", 2),
-						chance("item:branch", 0.35),
-						chance("item:coin", 0.08),
-					),
-				),
+				producer: clickProducer(6200, "loot:tree"),
 			},
 		),
 		item(
@@ -1146,16 +1385,7 @@ export const GameConfig = {
 					),
 				],
 				label: "1",
-				producer: clickProducer(
-					3500,
-					outputs(
-						weighted([
-							drop("item:blueprint-scrap", 90),
-							drop("item:crate-1", 10),
-						]),
-						chance("item:water", 0.32),
-					),
-				),
+				producer: clickProducer(3500, "loot:townhall-1"),
 			},
 		),
 		item(
@@ -1181,22 +1411,7 @@ export const GameConfig = {
 					),
 				],
 				label: "2",
-				producer: clickProducer(
-					3000,
-					outputs(
-						weighted([
-							drop("item:blueprint-scrap", 60),
-							drop("item:crate-1", 28),
-							drop("item:crate-2", 12),
-							drop("item:blueprint-lumber-camp-2", 6),
-							drop("item:blueprint-quarry-2", 6),
-						]),
-						chance("item:water", 0.4, {
-							min: 1,
-							max: 2,
-						}),
-					),
-				),
+				producer: clickProducer(3000, "loot:townhall-2"),
 			},
 		),
 		item(
@@ -1222,23 +1437,7 @@ export const GameConfig = {
 					),
 				],
 				label: "3",
-				producer: clickProducer(
-					2500,
-					outputs(
-						weighted([
-							drop("item:blueprint-scrap", 40),
-							drop("item:crate-1", 18),
-							drop("item:crate-2", 30),
-							drop("item:crate-3", 12),
-							drop("item:blueprint-lumber-camp-3", 5),
-							drop("item:blueprint-quarry-3", 5),
-						]),
-						chance("item:water", 0.55, {
-							min: 1,
-							max: 2,
-						}),
-					),
-				),
+				producer: clickProducer(2500, "loot:townhall-3"),
 			},
 		),
 
@@ -1265,23 +1464,7 @@ export const GameConfig = {
 					),
 				],
 				label: "4",
-				producer: clickProducer(
-					2200,
-					outputs(
-						weighted([
-							drop("item:blueprint-scrap", 36),
-							drop("item:crate-2", 34),
-							drop("item:crate-3", 22),
-							drop("item:crate-4", 8),
-							drop("item:blueprint-lumber-camp-4", 4),
-							drop("item:blueprint-quarry-4", 4),
-						]),
-						chance("item:water", 0.62, {
-							min: 1,
-							max: 2,
-						}),
-					),
-				),
+				producer: clickProducer(2200, "loot:townhall-4"),
 			},
 		),
 		item(
@@ -1307,23 +1490,7 @@ export const GameConfig = {
 					),
 				],
 				label: "5",
-				producer: clickProducer(
-					1900,
-					outputs(
-						weighted([
-							drop("item:blueprint-scrap", 30),
-							drop("item:crate-2", 28),
-							drop("item:crate-3", 30),
-							drop("item:crate-4", 12),
-							drop("item:blueprint-lumber-camp-5", 3),
-							drop("item:blueprint-quarry-5", 3),
-						]),
-						chance("item:water", 0.72, {
-							min: 1,
-							max: 3,
-						}),
-					),
-				),
+				producer: clickProducer(1900, "loot:townhall-5"),
 			},
 		),
 
@@ -1350,14 +1517,7 @@ export const GameConfig = {
 					),
 				],
 				label: "1",
-				producer: clickProducer(
-					5000,
-					outputs(
-						guaranteed("item:twig", 2),
-						chance("item:branch", 0.35),
-						chance("item:coin", 0.08),
-					),
-				),
+				producer: clickProducer(5000, "loot:lumber-camp-1"),
 			},
 		),
 		item(
@@ -1383,17 +1543,7 @@ export const GameConfig = {
 					),
 				],
 				label: "2",
-				producer: clickProducer(
-					4500,
-					outputs(
-						guaranteed("item:branch"),
-						chance("item:twig", 0.5, {
-							min: 1,
-							max: 2,
-						}),
-						chance("item:log", 0.35),
-					),
-				),
+				producer: clickProducer(4500, "loot:lumber-camp-2"),
 			},
 		),
 		item(
@@ -1419,10 +1569,7 @@ export const GameConfig = {
 					),
 				],
 				label: "3",
-				producer: clickProducer(
-					4000,
-					outputs(guaranteed("item:branch", 2), chance("item:log", 0.7)),
-				),
+				producer: clickProducer(4000, "loot:lumber-camp-3"),
 			},
 		),
 
@@ -1449,17 +1596,7 @@ export const GameConfig = {
 					),
 				],
 				label: "4",
-				producer: clickProducer(
-					3600,
-					outputs(
-						guaranteed("item:log", 1),
-						chance("item:branch", 0.75, {
-							min: 1,
-							max: 2,
-						}),
-						chance("item:wood-bundle", 0.3),
-					),
-				),
+				producer: clickProducer(3600, "loot:lumber-camp-4"),
 			},
 		),
 		item(
@@ -1485,14 +1622,7 @@ export const GameConfig = {
 					),
 				],
 				label: "5",
-				producer: clickProducer(
-					3200,
-					outputs(
-						guaranteed("item:log", 2),
-						chance("item:wood-bundle", 0.55),
-						chance("item:beam", 0.18),
-					),
-				),
+				producer: clickProducer(3200, "loot:lumber-camp-5"),
 			},
 		),
 
@@ -1515,14 +1645,7 @@ export const GameConfig = {
 					imprint("merge:quarry-1-blueprint", "item:blueprint", "item:blueprint-quarry"),
 				],
 				label: "1",
-				producer: clickProducer(
-					5500,
-					outputs(
-						guaranteed("item:pebble", 2),
-						chance("item:stone", 0.32),
-						chance("item:coin", 0.08),
-					),
-				),
+				producer: clickProducer(5500, "loot:quarry-1"),
 			},
 		),
 		item(
@@ -1548,17 +1671,7 @@ export const GameConfig = {
 					),
 				],
 				label: "2",
-				producer: clickProducer(
-					5000,
-					outputs(
-						guaranteed("item:stone"),
-						chance("item:pebble", 0.5, {
-							min: 1,
-							max: 2,
-						}),
-						chance("item:crystal", 0.28),
-					),
-				),
+				producer: clickProducer(5000, "loot:quarry-2"),
 			},
 		),
 		item(
@@ -1584,10 +1697,7 @@ export const GameConfig = {
 					),
 				],
 				label: "3",
-				producer: clickProducer(
-					4500,
-					outputs(guaranteed("item:stone", 2), chance("item:crystal", 0.72)),
-				),
+				producer: clickProducer(4500, "loot:quarry-3"),
 			},
 		),
 
@@ -1614,14 +1724,7 @@ export const GameConfig = {
 					),
 				],
 				label: "4",
-				producer: clickProducer(
-					4100,
-					outputs(
-						guaranteed("item:stone", 2),
-						chance("item:ore", 0.48),
-						chance("item:crystal", 0.28),
-					),
-				),
+				producer: clickProducer(4100, "loot:quarry-4"),
 			},
 		),
 		item(
@@ -1647,15 +1750,7 @@ export const GameConfig = {
 					),
 				],
 				label: "5",
-				producer: clickProducer(
-					3700,
-					outputs(
-						guaranteed("item:stone", 2),
-						chance("item:ore", 0.7),
-						chance("item:crystal", 0.42),
-						chance("item:gem", 0.12),
-					),
-				),
+				producer: clickProducer(3700, "loot:quarry-5"),
 			},
 		),
 
@@ -1675,17 +1770,10 @@ export const GameConfig = {
 			392,
 			{
 				label: "1",
-				producer: clickProducer(
-					5200,
-					outputs(guaranteed("item:coal"), chance("item:coin", 0.12)),
-					{
-						type: "infinite",
-					},
-					[
-						producerInput("item:sausage", 1, 4),
-						producerInput("item:beer", 1, 4),
-					],
-				),
+				producer: clickProducer(5200, "loot:coal-mine-1", [
+					producerInput("item:sausage", 1, 4),
+					producerInput("item:beer", 1, 4),
+				]),
 			},
 		),
 
@@ -1706,19 +1794,7 @@ export const GameConfig = {
 				merge: [
 					same("merge:crate-1-crate-2", "item:crate-1", "item:crate-2"),
 				],
-				stash: clickStash(
-					3,
-					outputs(
-						weighted([
-							drop("item:twig", 35),
-							drop("item:pebble", 35),
-							drop("item:water", 15),
-							drop("item:seed", 12),
-							drop("item:coin", 8),
-						]),
-						chance("item:twig", 0.18),
-					),
-				),
+				stash: clickStash(3, "loot:crate-1"),
 			},
 		),
 		item(
@@ -1738,19 +1814,7 @@ export const GameConfig = {
 				merge: [
 					same("merge:crate-2-crate-3", "item:crate-2", "item:crate-3"),
 				],
-				stash: clickStash(
-					4,
-					outputs(
-						weighted([
-							drop("item:branch", 35),
-							drop("item:stone", 35),
-							drop("item:water", 15),
-							drop("item:crate-1", 12),
-							drop("item:coin-pair", 8),
-						]),
-						chance("item:pebble", 0.22),
-					),
-				),
+				stash: clickStash(4, "loot:crate-2"),
 			},
 		),
 		item(
@@ -1771,20 +1835,7 @@ export const GameConfig = {
 				merge: [
 					same("merge:crate-3-crate-4", "item:crate-3", "item:crate-4"),
 				],
-				stash: clickStash(
-					5,
-					outputs(
-						weighted([
-							drop("item:log", 30),
-							drop("item:crystal", 30),
-							drop("item:crate-2", 20),
-							drop("item:water", 16),
-							drop("item:coin-stack", 8),
-						]),
-						chance("item:branch", 0.24),
-						chance("item:epic-key", 0.1),
-					),
-				),
+				stash: clickStash(5, "loot:crate-3"),
 			},
 		),
 
@@ -1819,24 +1870,9 @@ export const GameConfig = {
 			],
 			430,
 			{
-				stash: clickStash(
-					6,
-					outputs(
-						weighted([
-							drop("item:wood-bundle", 25),
-							drop("item:beam", 15),
-							drop("item:crystal", 25),
-							drop("item:gem", 15),
-							drop("item:water", 16),
-							drop("item:coin-stack", 8),
-						]),
-						chance("item:crate-3", 0.2),
-					),
-					"remove",
-					[
-						producerInput("item:epic-key", 1, 1),
-					],
-				),
+				stash: clickStash(6, "loot:crate-4", "remove", [
+					producerInput("item:epic-key", 1, 1),
+				]),
 			},
 		),
 	],
@@ -2146,26 +2182,14 @@ function setLootTable(itemId: ItemId, tableId: LootTableId): UpgradeEffectDefini
 
 function clickProducer(
 	cooldownMs: number,
-	output: readonly ActivationOutput[],
-	inputsOrLegacyMode:
-		| readonly NonNullable<ProducerDefinition["inputs"]>[number][]
-		| {
-				type: "infinite" | "finite";
-				charges?: number;
-				onDepleted?:
-					| "remove"
-					| {
-							replaceWithItemId: ItemId;
-					  };
-		  } = [],
-	legacyInputs: readonly NonNullable<ProducerDefinition["inputs"]>[number][] = [],
+	outputTableId: LootTableId,
+	inputs: readonly NonNullable<ProducerDefinition["inputs"]>[number][] = [],
 ): ProducerDefinition {
-	const inputs = Array.isArray(inputsOrLegacyMode) ? inputsOrLegacyMode : legacyInputs;
 	return {
 		type: "producer",
 		trigger: "click",
 		placement: "board_then_inventory",
-		output,
+		outputTableId,
 		cooldownMs,
 		inputs,
 	};
@@ -2173,7 +2197,7 @@ function clickProducer(
 
 function clickStash(
 	charges: number,
-	output: readonly ActivationOutput[],
+	outputTableId: LootTableId,
 	onDepleted: StashDefinition["onDepleted"] = "remove",
 	inputs: readonly NonNullable<StashDefinition["inputs"]>[number][] = [],
 ): StashDefinition {
@@ -2183,7 +2207,7 @@ function clickStash(
 		placement: "board_then_inventory",
 		charges,
 		onDepleted,
-		output,
+		outputTableId,
 		inputs,
 	};
 }
@@ -2234,26 +2258,10 @@ function weighted(
 	};
 }
 
-function drops(entries: readonly ActivationWeightedEntry[]): ActivationOutput[] {
-	return [
-		{
-			type: "weighted",
-			entries,
-		},
-	];
-}
-
 function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ActivationWeightedEntry {
 	return {
 		itemId,
 		weight,
 		quantity,
-	};
-}
-
-function empty(weight: number): ActivationWeightedEntry {
-	return {
-		itemId: null,
-		weight,
 	};
 }

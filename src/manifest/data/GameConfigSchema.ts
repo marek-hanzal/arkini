@@ -26,17 +26,11 @@ const ActivationOutputSchema = z
 				rolls: QuantitySchema.optional(),
 				entries: z
 					.array(
-						z.union([
-							z.object({
-								itemId: ItemIdSchema,
-								weight: PositiveIntegerSchema,
-								quantity: QuantitySchema.optional(),
-							}),
-							z.object({
-								itemId: z.null(),
-								weight: PositiveIntegerSchema,
-							}),
-						]),
+						z.object({
+							itemId: ItemIdSchema,
+							weight: PositiveIntegerSchema,
+							quantity: QuantitySchema.optional(),
+						}),
 					)
 					.min(1),
 			}),
@@ -92,7 +86,7 @@ export const GameConfigSchema = z.object({
 		z.object({
 			id: z.string().startsWith("loot:"),
 			name: z.string().min(1),
-			output: z.array(z.any()).min(1),
+			output: ActivationOutputSchema,
 		}),
 	),
 	upgrades: z.array(
@@ -161,8 +155,7 @@ export const GameConfigSchema = z.object({
 					trigger: z.literal("click"),
 					placement: z.literal("board_then_inventory"),
 					cooldownMs: PositiveIntegerSchema,
-					outputTableId: z.string().startsWith("loot:").optional(),
-					output: ActivationOutputSchema,
+					outputTableId: z.string().startsWith("loot:"),
 					inputs: ActivationInputSchema,
 				})
 				.optional(),
@@ -178,8 +171,7 @@ export const GameConfigSchema = z.object({
 							replaceWithItemId: ItemIdSchema,
 						}),
 					]),
-					outputTableId: z.string().startsWith("loot:").optional(),
-					output: ActivationOutputSchema,
+					outputTableId: z.string().startsWith("loot:"),
 					inputs: ActivationInputSchema,
 				})
 				.optional(),

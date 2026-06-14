@@ -68,6 +68,13 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				return yield* Effect.fail(new GameActionError("This item cannot be clicked."));
 			}
 
+			const lootTable = gameConfig.getLootTable(activation.outputTableId);
+			if (!lootTable) {
+				return yield* Effect.fail(
+					new GameActionError(`Missing loot table ${activation.outputTableId}.`),
+				);
+			}
+
 			const state = readBoardState(row);
 			const activationState = {
 				...(createInitialBoardState(row.itemDefinitionId, gameConfig).activation ?? {}),
@@ -115,7 +122,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			for (let step = 0; step < steps; step++) {
 				allDrops.push(
 					...(yield* rollOutputFx({
-						outputs: activation.output,
+						outputs: lootTable.output,
 					})),
 				);
 			}

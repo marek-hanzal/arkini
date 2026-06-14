@@ -7,7 +7,7 @@ import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { isEmptyInventoryState } from "~/inventory/logic/isEmptyInventoryState";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { MergeBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
+import { MergeBoardItemsInputSchema } from "~/play/schema/MergeBoardItemsInputSchema";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";

@@ -1,4 +1,4 @@
-import type { DropPlan } from "~/drag/hook/useDraggableControl";
+import type { DropPlan } from "~/drag/DropPlan";
 import { inventorySourceId } from "~/inventory/inventorySourceId";
 import type { FlyerKind, VisualMeta } from "~/play/types";
 import { accept } from "./accept";

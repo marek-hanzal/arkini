@@ -3,7 +3,7 @@ import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { SwapBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
+import { SwapBoardItemsInputSchema } from "~/play/schema/SwapBoardItemsInputSchema";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";

@@ -9,7 +9,7 @@ import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
-import { WithdrawProducerInputSchema } from "~/play/logic/gameActionSchemas";
+import { WithdrawProducerInputSchema } from "~/play/schema/WithdrawProducerInputSchema";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { planInventoryPlacement } from "~/inventory/logic/planning/planInventoryPlacement";

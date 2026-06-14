@@ -1,4 +1,5 @@
-import type { DraggablePayload, DroppablePayload } from "~/drag/hook/useDraggableControl";
+import type { DraggablePayload } from "~/drag/DraggablePayload";
+import type { DroppablePayload } from "~/drag/DroppablePayload";
 import type { BoardViewItem } from "~/play/logic/playTypes";
 
 export type DragSource =

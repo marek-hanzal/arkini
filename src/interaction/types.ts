@@ -1,9 +1,7 @@
 import type { Command } from "~/action/command";
-import type {
-	DraggablePayload,
-	DroppablePayload,
-	DropContext,
-} from "~/drag/hook/useDraggableControl";
+import type { DraggablePayload } from "~/drag/DraggablePayload";
+import type { DropContext } from "~/drag/DropContext";
+import type { DroppablePayload } from "~/drag/DroppablePayload";
 import type { GameDragView } from "~/play/logic/playTypes";
 import type { DragSource, DropTarget, VisualMeta } from "~/play/types";
 

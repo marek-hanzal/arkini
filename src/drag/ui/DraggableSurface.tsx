@@ -6,7 +6,7 @@ import {
 	type PointerEvent as ReactPointerEvent,
 	type ReactNode,
 } from "react";
-import type { DraggablePayload } from "~/drag/hook/useDraggableControl";
+import type { DraggablePayload } from "~/drag/DraggablePayload";
 import { cn } from "~/shared/cn";
 import { usePressActions } from "~/shared/hook/usePressActions";
 

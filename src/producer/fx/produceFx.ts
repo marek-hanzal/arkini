@@ -11,7 +11,7 @@ import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
 import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { ProduceBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
+import { ProduceBoardItemInputSchema } from "~/play/schema/ProduceBoardItemInputSchema";
 import type { BoardItemState, ProducerDropResult } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";

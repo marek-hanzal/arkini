@@ -1,10 +1,8 @@
-export {
-	bootstrapDatabase,
-	hardResetDatabaseFile,
-	readDatabasePath,
-	readGameConfigHash,
-	readMigrationState,
-} from "./bootstrap";
+export { bootstrapDatabase } from "./bootstrapDatabase";
+export { hardResetDatabaseFile } from "./resetDatabaseFile";
+export { readDatabasePath } from "./readDatabasePath";
+export { readGameConfigHash } from "./readGameConfigHash";
+export { readMigrationState } from "./readMigrationState";
 export { readBoardView } from "./readBoardView";
 export { readGameSaveView } from "./readGameSaveView";
 export { readInventoryView } from "./readInventoryView";

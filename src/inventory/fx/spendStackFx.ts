@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
-import type { InventoryRow } from "~/inventory/logic/planning";
+import type { InventoryRow } from "~/inventory/logic/planning/types";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 
 export namespace spendStackFx {

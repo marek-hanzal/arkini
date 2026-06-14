@@ -1,13 +1,13 @@
 import { useMachine } from "@xstate/react";
 import { useEffect } from "react";
 import { delayedMergeHintMachine } from "~/board/logic/delayedMergeHintMachine";
-import type { GameDragData } from "~/play/types";
+import type { DragData } from "~/play/types";
 
 const defaultMergeHintDelayMs = 750;
 
 export namespace useDelayedMergeHints {
 	export interface Props {
-		activeDrag?: GameDragData;
+		activeDrag?: DragData;
 		delayMs?: number;
 	}
 }

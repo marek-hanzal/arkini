@@ -1,10 +1,10 @@
 import { Effect } from "effect";
-import { createInitialBoardState } from "~/board/logic/boardState";
+import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { emptyInventoryStateJson } from "~/inventory/logic/inventoryState";
+import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { StartingBoardItem } from "~/play/logic/StartingBoardItem";
 import { defaultSaveGameId } from "~/play/logic/save";

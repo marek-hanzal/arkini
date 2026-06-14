@@ -1,11 +1,12 @@
 import { Effect } from "effect";
-import { createInitialBoardState, readBoardState } from "~/board/logic/boardState";
+import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
+import { readBoardState } from "~/board/logic/readBoardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
-import { planPlacements } from "~/inventory/logic/planning";
+import { planPlacements } from "~/inventory/logic/planning/placement";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
 import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
@@ -14,6 +15,7 @@ import { ProduceBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
 import type { BoardItemState, ProducerDropResult } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
+import { itemLabel } from "~/producer/logic/itemLabel";
 import { json } from "~/shared/json";
 import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
 import { depleteFx } from "./depleteFx";
@@ -199,7 +201,3 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 		}),
 	);
 });
-
-function itemLabel(type: "producer" | "stash") {
-	return type === "stash" ? "Stash" : "Producer";
-}

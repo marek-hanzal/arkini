@@ -1,29 +1,34 @@
 import { assign, fromPromise, setup } from "xstate";
+import { activeQueuedEvent } from "./activeQueuedEvent";
 
-export interface QueuedGameEvent<T = unknown> {
-	label: string;
-	run(): Promise<T> | T;
-	resolve(value: T): void;
-	reject(error: unknown): void;
+export namespace playEventQueueMachine {
+	export interface QueuedEvent<T = unknown> {
+		label: string;
+		run(): Promise<T> | T;
+		resolve(value: T): void;
+		reject(error: unknown): void;
+	}
+
+	export interface Context {
+		active?: QueuedEvent;
+		queue: QueuedEvent[];
+	}
+
+	export type Event = {
+		type: "ENQUEUE";
+		event: QueuedEvent;
+	};
 }
-
-interface PlayEventQueueContext {
-	active?: QueuedGameEvent;
-	queue: QueuedGameEvent[];
-}
-
-type PlayEventQueueEvent = {
-	type: "ENQUEUE";
-	event: QueuedGameEvent;
-};
 
 export const playEventQueueMachine = setup({
 	types: {
-		context: {} as PlayEventQueueContext,
-		events: {} as PlayEventQueueEvent,
+		context: {} as playEventQueueMachine.Context,
+		events: {} as playEventQueueMachine.Event,
 	},
 	actors: {
-		runEvent: fromPromise(async ({ input }: { input: QueuedGameEvent }) => input.run()),
+		runEvent: fromPromise(async ({ input }: { input: playEventQueueMachine.QueuedEvent }) =>
+			input.run(),
+		),
 	},
 	actions: {
 		startEvent: assign(({ event }) => ({
@@ -87,7 +92,7 @@ export const playEventQueueMachine = setup({
 			invoke: {
 				id: "runCurrentEvent",
 				src: "runEvent",
-				input: ({ context }) => activeEvent(context),
+				input: ({ context }) => activeQueuedEvent(context),
 				onDone: {
 					target: "settling",
 					actions: "resolveActive",
@@ -118,9 +123,3 @@ export const playEventQueueMachine = setup({
 		},
 	},
 });
-
-function activeEvent(context: PlayEventQueueContext) {
-	if (!context.active)
-		throw new Error("Game event queue entered running state without an active event.");
-	return context.active;
-}

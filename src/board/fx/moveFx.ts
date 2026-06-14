@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { assertInsideBoard } from "~/board/logic/gameBounds";
+import { assertInsideBoard } from "~/board/logic/assertInsideBoard";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";

@@ -1,48 +1,50 @@
 import { setup } from "xstate";
 
-type DraggableWorkflowEvent =
-	| {
-			type: "DRAG_STARTED";
-	  }
-	| {
-			type: "DRAG_CANCELLED";
-	  }
-	| {
-			type: "DROP_RESOLVING";
-	  }
-	| {
-			type: "DROP_IGNORED";
-	  }
-	| {
-			type: "DROP_ACCEPTED";
-	  }
-	| {
-			type: "DROP_REJECTED";
-	  }
-	| {
-			type: "DROP_FAILED";
-	  }
-	| {
-			type: "COMMIT_STARTED";
-	  }
-	| {
-			type: "ANIMATION_STARTED";
-	  }
-	| {
-			type: "RETURN_STARTED";
-	  }
-	| {
-			type: "FEEDBACK_STARTED";
-	  }
-	| {
-			type: "SETTLING_STARTED";
-	  }
-	| {
-			type: "DROP_SETTLED";
-	  }
-	| {
-			type: "RESET";
-	  };
+export namespace draggableWorkflowMachine {
+	export type Event =
+		| {
+				type: "DRAG_STARTED";
+		  }
+		| {
+				type: "DRAG_CANCELLED";
+		  }
+		| {
+				type: "DROP_RESOLVING";
+		  }
+		| {
+				type: "DROP_IGNORED";
+		  }
+		| {
+				type: "DROP_ACCEPTED";
+		  }
+		| {
+				type: "DROP_REJECTED";
+		  }
+		| {
+				type: "DROP_FAILED";
+		  }
+		| {
+				type: "COMMIT_STARTED";
+		  }
+		| {
+				type: "ANIMATION_STARTED";
+		  }
+		| {
+				type: "RETURN_STARTED";
+		  }
+		| {
+				type: "FEEDBACK_STARTED";
+		  }
+		| {
+				type: "SETTLING_STARTED";
+		  }
+		| {
+				type: "DROP_SETTLED";
+		  }
+		| {
+				type: "RESET";
+		  };
+}
 
 /**
  * UI-only drag workflow statechart. Domain data stays outside; this actor only
@@ -50,7 +52,7 @@ type DraggableWorkflowEvent =
  */
 export const draggableWorkflowMachine = setup({
 	types: {
-		events: {} as DraggableWorkflowEvent,
+		events: {} as draggableWorkflowMachine.Event,
 	},
 }).createMachine({
 	id: "draggableWorkflow",

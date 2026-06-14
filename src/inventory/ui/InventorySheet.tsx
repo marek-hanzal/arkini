@@ -1,9 +1,7 @@
 import type { FC } from "react";
-import {
-	inventoryContainerNodeId,
-	inventoryColumns,
-	inventorySourceId,
-} from "~/inventory/inventoryIdentity";
+import { inventoryContainerNodeId } from "~/inventory/inventoryContainerNodeId";
+import { inventoryColumns } from "~/inventory/inventoryColumns";
+import { inventorySourceId } from "~/inventory/inventorySourceId";
 import { InventoryCell } from "~/inventory/ui/InventoryCell";
 import { usePlayInventory } from "~/play/hook/usePlayInventory";
 import { usePlayItems } from "~/play/hook/usePlayItems";

@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { GameItemView } from "~/item/ui/GameItemView";
-import { useGameCommand } from "~/play/hook/useGameCommand";
+import { useCommand } from "~/play/hook/useCommand";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import { usePlayItems } from "~/play/hook/usePlayItems";
@@ -24,7 +24,7 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 	const items = usePlayItems().data;
 	const invalidatePlayData = usePlayDataInvalidation();
 	const nowMs = useProducerClock(board?.items ?? []);
-	const withdrawInput = useGameCommand({
+	const withdrawInput = useCommand({
 		invalidateOnSuccess: false,
 	});
 	const boardItem = boardItemId ? board?.byId[boardItemId] : undefined;

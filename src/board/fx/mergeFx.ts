@@ -1,16 +1,17 @@
 import { Effect } from "effect";
-import { createInitialBoardState } from "~/board/logic/boardState";
+import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { isEmptyInventoryState } from "~/inventory/logic/inventoryState";
+import { isEmptyInventoryState } from "~/inventory/logic/isEmptyInventoryState";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MergeBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { json, parseJson } from "~/shared/json";
+import { json } from "~/shared/json";
+import { readStoredBoardState } from "~/board/logic/readStoredBoardState";
 
 export namespace mergeFx {
 	export interface Props {
@@ -206,7 +207,3 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 		}),
 	);
 });
-
-function readStoredBoardState(stateJson: string) {
-	return parseJson<ReturnType<typeof createInitialBoardState>>(stateJson || "{}");
-}

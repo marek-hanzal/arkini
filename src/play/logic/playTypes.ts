@@ -1,4 +1,4 @@
-import type { BoardCell } from "~/board/boardIdentity";
+import type { BoardCell } from "~/board/BoardCell";
 import type { CraftRecipeInput } from "~/manifest/craft";
 import type { ItemId } from "~/manifest/manifestId";
 

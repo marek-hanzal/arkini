@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { insertFx } from "~/board/fx/insertFx";
-import { assertInsideBoard } from "~/board/logic/gameBounds";
-import { resumeCraftTimer } from "~/board/logic/craftTimer";
+import { assertInsideBoard } from "~/board/logic/assertInsideBoard";
+import { resumeCraftTimer } from "~/board/logic/resumeCraftTimer";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { spendStackFx } from "~/inventory/fx/spendStackFx";
@@ -10,7 +10,8 @@ import { PlaceInventoryItemInputSchema } from "~/play/logic/gameActionSchemas";
 import type { BoardItemState } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { json, parseJson } from "~/shared/json";
+import { json } from "~/shared/json";
+import { parseJson } from "~/shared/parseJson";
 
 export namespace placeFx {
 	export interface Props {

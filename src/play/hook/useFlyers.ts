@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { FlyerKind, FlyerModel, GameVisualMeta, RectLike } from "~/play/types";
+import type { FlyerKind, FlyerModel, VisualMeta, RectLike } from "~/play/types";
 import { flyerRenderSettleMs } from "~/play/types";
 
 export function useFlyers() {
@@ -13,7 +13,7 @@ export function useFlyers() {
 			from: RectLike,
 			to: RectLike,
 			kind: FlyerKind = "move",
-			meta?: GameVisualMeta,
+			meta?: VisualMeta,
 		) =>
 			new Promise<void>((resolve) => {
 				const id = crypto.randomUUID();

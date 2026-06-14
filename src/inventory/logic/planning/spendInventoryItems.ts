@@ -1,41 +1,14 @@
-import { isEmptyInventoryStateJson } from "~/inventory/logic/inventoryState";
+import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
 import type { UpgradeCostDefinition } from "~/manifest/upgrade";
+import { canSpendInventoryItems } from "./canSpendInventoryItems";
+import { groupQuantity } from "./groupQuantity";
+import type { InventorySpendPlan } from "./InventorySpendPlan";
 import type { InventoryRow } from "./types";
 
-export type InventorySpendPlan =
-	| {
-			type: "delete";
-			stackId: string;
-	  }
-	| {
-			type: "update";
-			stackId: string;
-			quantity: number;
-	  };
-
-export function canSpendInventoryItems(
-	rows: readonly InventoryRow[],
-	cost: readonly UpgradeCostDefinition[],
-) {
-	const required = groupQuantity(cost);
-
-	for (const [itemId, quantity] of required) {
-		const available = rows
-			.filter(
-				(row) =>
-					row.itemDefinitionId === itemId && isEmptyInventoryStateJson(row.stateJson),
-			)
-			.reduce((sum, row) => sum + row.quantity, 0);
-		if (available < quantity) return false;
-	}
-
-	return true;
-}
-
-export function spendInventoryItems(
+export const spendInventoryItems = (
 	rows: InventoryRow[],
 	cost: readonly UpgradeCostDefinition[],
-): InventorySpendPlan[] | null {
+): InventorySpendPlan[] | null => {
 	if (!canSpendInventoryItems(rows, cost)) return null;
 	const plan: InventorySpendPlan[] = [];
 
@@ -74,12 +47,4 @@ export function spendInventoryItems(
 	}
 
 	return plan;
-}
-
-function groupQuantity(cost: readonly UpgradeCostDefinition[]) {
-	const grouped = new Map<string, number>();
-	for (const entry of cost) {
-		grouped.set(entry.itemId, (grouped.get(entry.itemId) ?? 0) + entry.quantity);
-	}
-	return grouped;
-}
+};

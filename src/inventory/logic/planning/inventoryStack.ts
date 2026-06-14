@@ -1,9 +1,7 @@
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
-import {
-	emptyInventoryStateJson,
-	isEmptyInventoryStateJson,
-} from "~/inventory/logic/inventoryState";
+import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
+import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
 import { getPlanItem } from "./itemLookup";
 import type { InventoryPlacementPlan, InventoryRow } from "./types";
 

@@ -1,6 +1,9 @@
 import { useMachine } from "@xstate/react";
 import type { FC } from "react";
+import { hardResetBrowserStorage } from "~/app/hardResetBrowserStorage";
 import { resetWorkflowMachine } from "~/shared/logic/resetWorkflowMachine";
+import { logResetError } from "~/shared/util/logResetError";
+import { reloadWindow } from "~/shared/util/reloadWindow";
 
 export namespace RootErrorBoundary {
 	export interface Props {
@@ -57,21 +60,3 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 		</main>
 	);
 };
-
-async function hardResetBrowserStorage() {
-	await (
-		(await navigator.storage.getDirectory()) as FileSystemDirectoryHandle & {
-			remove(options: { recursive: boolean }): Promise<void>;
-		}
-	).remove({
-		recursive: true,
-	});
-}
-
-function reloadWindow() {
-	window.location.reload();
-}
-
-function logResetError(error: unknown) {
-	console.error(error);
-}

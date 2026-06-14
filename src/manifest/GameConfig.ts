@@ -4,30 +4,28 @@ import type { LootTableDefinition } from "./lootTable";
 import type { ItemId, ResourceId } from "./manifestId";
 import type { ResourceDefinition } from "./resource";
 import type { UpgradeDefinition } from "./upgrade";
-import {
-	asset,
-	blueprintAsset,
-	chance,
-	clickProducer,
-	clickStash,
-	combo,
-	cost,
-	craft,
-	drop,
-	guaranteed,
-	imprint,
-	input,
-	item,
-	lootTable,
-	outputs,
-	producerInput,
-	same,
-	setLootTable,
-	speedTiers,
-	tier,
-	upgrade,
-	weighted,
-} from "./utils";
+import { asset } from "./utils/asset";
+import { blueprintAsset } from "./utils/blueprintAsset";
+import { chance } from "./utils/chance";
+import { clickProducer } from "./utils/clickProducer";
+import { clickStash } from "./utils/clickStash";
+import { combo } from "./utils/combo";
+import { cost } from "./utils/cost";
+import { craft } from "./utils/craft";
+import { drop } from "./utils/drop";
+import { guaranteed } from "./utils/guaranteed";
+import { imprint } from "./utils/imprint";
+import { input } from "./utils/input";
+import { item } from "./utils/item";
+import { lootTable } from "./utils/lootTable";
+import { outputs } from "./utils/outputs";
+import { producerInput } from "./utils/producerInput";
+import { same } from "./utils/same";
+import { setLootTable } from "./utils/setLootTable";
+import { speedTiers } from "./utils/speedTiers";
+import { tier } from "./utils/tier";
+import { upgrade } from "./utils/upgrade";
+import { weighted } from "./utils/weighted";
 
 // One config owns the gameplay shape. Items are not passive rows anymore:
 // optional item behavior defines merges, producers, and build recipes in the

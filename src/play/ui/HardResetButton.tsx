@@ -1,6 +1,9 @@
 import { useMachine } from "@xstate/react";
 import type { FC } from "react";
+import { hardResetDatabaseFile } from "~/play/logic/resetDatabaseFile";
 import { resetWorkflowMachine } from "~/shared/logic/resetWorkflowMachine";
+import { logResetError } from "~/shared/util/logResetError";
+import { reloadWindow } from "~/shared/util/reloadWindow";
 
 export namespace HardResetButton {
 	export interface Props {
@@ -39,16 +42,3 @@ export const HardResetButton: FC<HardResetButton.Props> = ({ label = "Hard reset
 		</div>
 	);
 };
-
-async function hardResetDatabaseFile() {
-	const db = await import("~/play/logic/playBackend");
-	await db.hardResetDatabaseFile();
-}
-
-function reloadWindow() {
-	window.location.reload();
-}
-
-function logResetError(error: unknown) {
-	console.error(error);
-}

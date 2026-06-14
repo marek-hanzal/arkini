@@ -1,9 +1,10 @@
 import type { FC } from "react";
-import { inventorySlotNodeId, inventorySourceId } from "~/inventory/inventoryIdentity";
-import { DraggableSurface } from "~/drag/ui/DragSurface";
+import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
+import { inventorySourceId } from "~/inventory/inventorySourceId";
+import { DraggableSurface } from "~/drag/ui/DraggableSurface";
 import { GameItemView } from "~/item/ui/GameItemView";
 import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
-import type { GameDragData } from "~/play/types";
+import type { DragData } from "~/play/types";
 
 export namespace InventoryTile {
 	export interface Props {
@@ -45,7 +46,7 @@ export const InventoryTile: FC<InventoryTile.Props> = ({
 						quantity: stack.quantity,
 					},
 					hideWhenActive: stack.quantity <= 1,
-				} satisfies GameDragData
+				} satisfies DragData
 			}
 			hidden={hidden}
 			className="absolute inset-0 touch-none"

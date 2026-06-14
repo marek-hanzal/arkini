@@ -1,16 +1,14 @@
 import { Effect } from "effect";
-import { pauseCraftTimer } from "~/board/logic/craftTimer";
+import { pauseCraftTimer } from "~/board/logic/pauseCraftTimer";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
-import {
-	cloneInventory,
-	planExactInventorySlotPlacement,
-	planInventoryPlacement,
-} from "~/inventory/logic/planning";
-import { normalizeInventoryStateJson } from "~/inventory/logic/inventoryState";
+import { cloneInventory } from "~/inventory/logic/planning/cloneInventory";
+import { planExactInventorySlotPlacement } from "~/inventory/logic/planning/planExactInventorySlotPlacement";
+import { planInventoryPlacement } from "~/inventory/logic/planning/planInventoryPlacement";
+import { normalizeInventoryStateJson } from "~/inventory/logic/normalizeInventoryStateJson";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
@@ -18,7 +16,8 @@ import { StashBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
 import type { BoardItemState } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { json, parseJson } from "~/shared/json";
+import { json } from "~/shared/json";
+import { parseJson } from "~/shared/parseJson";
 
 export namespace stashFx {
 	export interface Props {

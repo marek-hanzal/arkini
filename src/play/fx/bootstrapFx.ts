@@ -13,6 +13,7 @@ import { withGameConfigService } from "~/manifest/logic/withGameConfigService";
 import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 import { withRandomService } from "~/random/logic/withRandomService";
 import { bootstrapState } from "../logic/bootstrapState";
+import { isRecoverableMigrationError } from "../logic/isRecoverableMigrationError";
 import { tryGameAction } from "../logic/tryGameAction";
 import { ensureDefaultSaveFx } from "./ensureDefaultSaveFx";
 import { syncConfigFx } from "./syncConfigFx";
@@ -61,12 +62,3 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 
 	return yield* tryGameAction(() => next);
 });
-
-function isRecoverableMigrationError(error: unknown) {
-	const message = error instanceof Error ? error.message : String(error);
-	return (
-		message.includes("corrupted migrations") ||
-		message.includes("previously executed migration") ||
-		message.includes("is missing")
-	);
-}

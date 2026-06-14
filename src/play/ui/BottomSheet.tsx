@@ -1,6 +1,6 @@
 import { type FC, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { cn } from "~/shared/cn";
-import { animateBottomSheet } from "~/play/util/animation";
+import { animateBottomSheet } from "~/animation/animateBottomSheet";
 
 export namespace BottomSheet {
 	export interface Props {

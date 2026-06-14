@@ -1,16 +1,14 @@
 import { type FC, type ReactNode, useRef } from "react";
-import {
-	boardCellNodeId,
-	boardColumns,
-	type BoardCell as BoardCellModel,
-	boardRows,
-} from "~/board/boardIdentity";
+import type { BoardCell as BoardCellModel } from "~/board/BoardCell";
+import { boardCellNodeId } from "~/board/boardCellNodeId";
+import { boardColumns } from "~/board/boardColumns";
+import { boardRows } from "~/board/boardRows";
 import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
-import { DroppableSurface } from "~/drag/ui/DragSurface";
+import { DroppableSurface } from "~/drag/ui/DroppableSurface";
 import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
 import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
 import type { BoardViewItem } from "~/play/logic/playTypes";
-import type { GameDropData } from "~/play/types";
+import type { DropData } from "~/play/types";
 import { cn } from "~/shared/cn";
 import { usePressActions } from "~/shared/hook/usePressActions";
 
@@ -79,7 +77,7 @@ export const BoardCell: FC<BoardCell.Props> = ({
 						y,
 						boardItemId: boardItem?.id,
 					},
-				} satisfies GameDropData
+				} satisfies DropData
 			}
 			nodeRef={(node) => {
 				cellRef.current = node;

@@ -1,8 +1,10 @@
 import type { GameConfig } from "../GameConfig";
 import type { ItemId } from "../manifestId";
-import { assert, assertUnique } from "./assert";
+import { assert } from "./assert";
+import { assertUnique } from "./assertUnique";
+import { itemByIdOrThrow } from "./itemByIdOrThrow";
 
-export function assertStartingState(config: GameConfig, itemIds: Set<ItemId>) {
+export const assertStartingState = (config: GameConfig, itemIds: Set<ItemId>) => {
 	assert(
 		config.startingState.inventory.length <= config.game.inventory.slots,
 		"Starting inventory has more stacks than available slots",
@@ -33,11 +35,4 @@ export function assertStartingState(config: GameConfig, itemIds: Set<ItemId>) {
 		);
 		assertUnique(occupied, `${boardItem.x}:${boardItem.y}`, "starting board cell");
 	}
-}
-
-function itemByIdOrThrow(itemIds: Set<ItemId>, config: GameConfig, itemId: ItemId) {
-	assert(itemIds.has(itemId), `Unknown item ${itemId}`);
-	const item = config.items.find((candidate) => candidate.id === itemId);
-	assert(item, `Unknown item ${itemId}`);
-	return item;
-}
+};

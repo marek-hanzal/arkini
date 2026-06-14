@@ -37,7 +37,7 @@ There are no separate static `merges`, `producers`, and `craftRecipes` arrays. L
 
 Effect belongs to the server-like game backend, not the UI. React components, React Query hooks, drag surfaces, and GSAP animation code stay normal UI code. The boundary is `src/play/logic/playBackend.ts`: UI calls Promise-returning backend functions, while those wrappers run domain Effect roots underneath.
 
-Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. Names are short inside their domain: `board/fx/moveFx.ts`, `inventory/fx/swapFx.ts`, `producer/fx/produceFx.ts`, `player/fx/collectFx.ts`, `upgrade/fx/buyFx.ts`. If a callsite needs multiple same-name domain effects, import aliases are allowed. Repeating the domain in every function name is banned, because `producerProduceProducerFx` would be a cry for help, not architecture.
+Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. Names are short inside their domain: `board/fx/moveFx.ts`, `inventory/fx/swapFx.ts`, `producer/fx/produceFx.ts`, `upgrade/fx/buyFx.ts`. If a callsite needs multiple same-name domain effects, import aliases are allowed. Repeating the domain in every function name is banned, because `producerProduceProducerFx` would be a cry for help, not architecture.
 
 Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, producer output rolling, and save mutation pipelines. Files inside `src/**/fx/` are reserved for root `Effect.fn(...)` operations only. Pure helpers, runner helpers, cached state, context tags, service implementations, and domain types stay outside `fx/`, mostly in `logic/` or `context/`. UI feedback still happens from action results/hooks; effects do not know DOM nodes, GSAP timelines, React state, or pointer events.
 
@@ -52,7 +52,7 @@ Randomness is provided through `RandomServiceFx`; producer rolls do not call `Ma
 
 ## Game engine boundary
 
-Gameplay mutations go through typed `GameCommand` values in `src/action/`. React UI and XState workflows do not import individual Effect roots directly. Command execution is routed through small functional engine facades: board, inventory, producer, and upgrade. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
+Gameplay mutations go through typed `Command` values in `src/action/`. React UI and XState workflows do not import individual Effect roots directly. Command execution is routed through small functional engine facades: board, inventory, producer, and upgrade. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
 
 Rules for this layer:
 
@@ -91,7 +91,7 @@ Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts`, bu
 
 Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle. The transient drag phase is modeled by `src/drag/logic/draggableWorkflowMachine.ts` through XState; do not put board, inventory, or item data into that machine just because the context field exists and humanity cannot be trusted with containers.
 
-Game-specific drag policy lives in `src/interaction/dragDropEngine.ts` and delegates merge/craft/producer-input eligibility to `src/merge/resolveBoardItemDropIntent.ts`. `src/play/hook/usePlayDraggableControl.ts` is only the thin React wiring that connects the generic drag control, the interaction engine, and the `GameCommand` runner. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: board and inventory drags resolve the nearest same-surface action by real rectangle overlap first, then distance. The magnetic resolver wins over dnd-kit `over`, so grid edges and cross-points do not get punished just because a pointer landed on UI grout.
+Game-specific drag policy lives in `src/interaction/resolveDrop.ts` and delegates merge/craft/producer-input eligibility to `src/merge/resolveDropIntent.ts`. `src/play/hook/usePlayDraggableControl.ts` is only the thin React wiring that connects the generic drag control, the interaction engine, and the `Command` runner. `src/play/hook/resolveMagneticDropTarget.ts` is the same kind of game-specific adapter: board and inventory drags resolve the nearest same-surface action by real rectangle overlap first, then distance. The magnetic resolver wins over dnd-kit `over`, so grid edges and cross-points do not get punished just because a pointer landed on UI grout.
 
 Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Board merge is the deliberate exception: source and target play a short pre-commit merge animation, then the mutation replaces them with the merged item. Blueprint imprint merges are the other deliberate exception: the dragged known building is hidden during the drop, the blank blueprint commits into a specific blueprint, then the original building pops on its own cell so the player can see it was not consumed. Finite producer depletion uses the same discipline: mutate, play loot against the still-visible stale view, mask the newly committed placements during the query refresh, then reveal them under the flyer layer while the depleted producer exits. Place flyers stay fully opaque while travelling; fade-to-ghost animations are banned because watching loot become transparent mid-flight is apparently how UI joins a paranormal society. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
@@ -110,7 +110,6 @@ usePlaySave()          boot/save metadata
 usePlayItems()         static item catalog derived from GameConfig
 usePlayBoard()         board cells and board item lookup
 usePlayInventory()     inventory slots and stack lookup
-usePlayPlayerInventory() limited slot inventory for collected valuables such as coin stacks
 usePlayUpgrades()        tiered upgrade cards with next costs and effects
 usePlayDragView()      tiny drag-only lookup composed from board + inventory
 ```
@@ -151,7 +150,6 @@ src/inventory/                   Inventory identity, stack planning/storage logi
 src/producer/                    Producer output rolling, readiness tracking, upgrade-adjusted output, and depletion logic.
 src/upgrade/                     Tiered global upgrades, purchase effects, producer modifiers, and upgrade sheet UI.
 src/item/                        Shared item visual renderer used by board, inventory, drag overlay, and flyers.
-src/player/                      Slot-based player inventory, collectible placement logic, and collection effects.
 src/shared/                      Small UI/util hooks and helpers.
 ```
 

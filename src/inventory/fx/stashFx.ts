@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+import { pauseCraftTimer } from "~/board/logic/craftTimer";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
@@ -13,8 +15,10 @@ import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { StashBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
+import type { BoardItemState } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
+import { json, parseJson } from "~/shared/json";
 
 export namespace stashFx {
 	export interface Props {
@@ -33,16 +37,22 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 		Effect.gen(function* () {
 			const gameConfig = yield* GameConfigServiceFx;
 			const id = yield* IdServiceFx;
+			const date = yield* DateServiceFx;
 			const { save, boardRows, inventoryRows } = yield* readMutableSaveFx();
 			const boardItem = boardRows.find((row) => row.id === input.boardItemId);
 			if (!boardItem) {
 				return yield* Effect.fail(new GameActionError("Board item does not exist."));
 			}
 
+			const pausedState = pauseCraftTimer(
+				parseJson<BoardItemState>(boardItem.stateJson || "{}"),
+				date,
+			);
+			const stateJson = normalizeInventoryStateJson(json(pausedState));
 			const options = {
 				gameConfig,
 				id,
-				stateJson: normalizeInventoryStateJson(boardItem.stateJson),
+				stateJson,
 			};
 			const virtualInventory = cloneInventory(inventoryRows);
 			const plan =

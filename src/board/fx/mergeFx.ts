@@ -4,6 +4,7 @@ import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { isEmptyInventoryState } from "~/inventory/logic/inventoryState";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MergeBoardItemsInputSchema } from "~/play/logic/gameActionSchemas";
@@ -21,7 +22,8 @@ export namespace mergeFx {
 export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
-	const timestamp = date.timestamp();
+	const now = date.now();
+	const timestamp = date.toTimestamp(now);
 
 	const input = yield* Effect.try({
 		try: () => MergeBoardItemsInputSchema.parse(props),
@@ -39,12 +41,23 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 			if (!source || !target) {
 				return yield* Effect.fail(new GameActionError("Both board items must exist."));
 			}
+			const sourceState = readStoredBoardState(source.stateJson);
+			if (sourceState.craft?.startedAt || sourceState.craft?.readyAt) {
+				return yield* Effect.fail(new GameActionError("Craft is already in progress."));
+			}
+			const targetState = {
+				...createInitialBoardState(target.itemDefinitionId, gameConfig),
+				...readStoredBoardState(target.stateJson),
+			};
 
 			const mergeRule = gameConfig.resolveMergeRule(
 				source.itemDefinitionId,
 				target.itemDefinitionId,
 			);
 			if (mergeRule) {
+				if (targetState.craft?.startedAt || targetState.craft?.readyAt) {
+					return yield* Effect.fail(new GameActionError("Craft is already in progress."));
+				}
 				if (
 					mergeRule.consumeSource === false &&
 					(source.itemDefinitionId !== mergeRule.sourceItemId ||
@@ -81,10 +94,14 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				(entry) => entry.itemId === source.itemDefinitionId,
 			);
 			if (craft && craftInput) {
-				const targetState = {
-					...createInitialBoardState(target.itemDefinitionId, gameConfig),
-					...readStoredBoardState(target.stateJson),
-				};
+				if (!isEmptyInventoryState(sourceState)) {
+					return yield* Effect.fail(
+						new GameActionError("Stateful item cannot be used as input."),
+					);
+				}
+				if (targetState.craft?.startedAt || targetState.craft?.readyAt) {
+					return yield* Effect.fail(new GameActionError("Craft is already in progress."));
+				}
 				const delivered = {
 					...(targetState.craft?.delivered ?? {}),
 				};
@@ -106,12 +123,26 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 					db
 						.updateTable(table.boardItem)
 						.set({
-							itemDefinitionId: complete
-								? craft.resultItemId
-								: target.itemDefinitionId,
+							itemDefinitionId:
+								complete && craft.durationMs === 0
+									? craft.resultItemId
+									: target.itemDefinitionId,
 							stateJson: json(
 								complete
-									? createInitialBoardState(craft.resultItemId, gameConfig)
+									? craft.durationMs === 0
+										? createInitialBoardState(craft.resultItemId, gameConfig)
+										: {
+												...targetState,
+												craft: {
+													delivered,
+													startedAt: timestamp,
+													readyAt: date.toTimestamp(
+														now.plus({
+															milliseconds: craft.durationMs,
+														}),
+													),
+												},
+											}
 									: {
 											...targetState,
 											craft: {
@@ -132,10 +163,11 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				(entry) => entry.itemId === source.itemDefinitionId,
 			);
 			if (targetActivation && activationInput) {
-				const targetState = {
-					...createInitialBoardState(target.itemDefinitionId, gameConfig),
-					...readStoredBoardState(target.stateJson),
-				};
+				if (!isEmptyInventoryState(sourceState)) {
+					return yield* Effect.fail(
+						new GameActionError("Stateful item cannot be used as input."),
+					);
+				}
 				const activationState = targetState.activation ?? {};
 				const inventory = {
 					...(activationState.inventory ?? {}),

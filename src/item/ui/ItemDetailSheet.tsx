@@ -73,6 +73,15 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 			: "Producer status"
 		: undefined;
 	const activationInputTitle = activation?.kind === "stash" ? "Stash inputs" : "Producer inputs";
+	const craftStatusLabel = craft
+		? craft.phase === "collecting_inputs"
+			? "Collecting inputs"
+			: craft.phase === "waiting"
+				? craft.remainingMs !== undefined
+					? `Ready in ${formatMs(craft.remainingMs)}`
+					: "Building"
+				: "Ready"
+		: undefined;
 
 	return (
 		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
@@ -101,9 +110,7 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 							<p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
 								Craft progress
 							</p>
-							<p className="text-xs text-emerald-100">
-								{Math.round(craft.progress * 100)}%
-							</p>
+							<p className="text-xs text-emerald-100">{craftStatusLabel}</p>
 						</div>
 						<div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-950/80">
 							<div
@@ -117,6 +124,11 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 							Creates{" "}
 							<strong>{items[craft.resultItemId]?.name ?? craft.resultItemId}</strong>
 						</p>
+						{craft.durationMs > 0 ? (
+							<p className="mt-1 text-xs text-slate-400">
+								Build time: {formatMs(craft.durationMs)}
+							</p>
+						) : null}
 						<div className="mt-3 space-y-2">
 							{craft.inputs.map((input) => {
 								const delivered = craft.delivered[input.itemId] ?? 0;

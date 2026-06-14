@@ -491,9 +491,14 @@ export const GameConfig = {
 				merge: [
 					same("merge:seed-seed-sprout", "item:seed", "item:sprout"),
 				],
-				craft: craft("craft:seed-water-sprout", "item:sprout", [
-					input("item:water", 1),
-				]),
+				craft: craft(
+					"craft:seed-water-sprout",
+					"item:sprout",
+					[
+						input("item:water", 1),
+					],
+					10_000,
+				),
 			},
 		),
 		item(
@@ -513,9 +518,14 @@ export const GameConfig = {
 				merge: [
 					same("merge:sprout-sprout-leaf", "item:sprout", "item:leaf"),
 				],
-				craft: craft("craft:sprout-water-sapling", "item:sapling", [
-					input("item:water", 1),
-				]),
+				craft: craft(
+					"craft:sprout-water-sapling",
+					"item:sapling",
+					[
+						input("item:water", 1),
+					],
+					15_000,
+				),
 			},
 		),
 		item(
@@ -570,9 +580,14 @@ export const GameConfig = {
 			],
 			38,
 			{
-				craft: craft("craft:sapling-water-tree", "item:tree", [
-					input("item:water", 2),
-				]),
+				craft: craft(
+					"craft:sapling-water-tree",
+					"item:tree",
+					[
+						input("item:water", 2),
+					],
+					30_000,
+				),
 			},
 		),
 		item(
@@ -2088,11 +2103,13 @@ function craft(
 	id: CraftRecipeId,
 	resultItemId: ItemId,
 	inputs: readonly CraftRecipeInput[],
+	durationMs = 0,
 ): ItemCraftRecipe {
 	return {
 		id,
 		resultItemId,
 		inputs,
+		durationMs,
 	};
 }
 

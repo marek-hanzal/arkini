@@ -1,5 +1,5 @@
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/data/manifestId";
+import type { ItemId } from "~/manifest/manifestId";
 import type { ItemCatalogView, ViewItem } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 

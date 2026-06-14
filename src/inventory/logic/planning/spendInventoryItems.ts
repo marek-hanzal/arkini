@@ -1,5 +1,5 @@
 import { isEmptyInventoryStateJson } from "~/inventory/logic/inventoryState";
-import type { UpgradeCostDefinition } from "~/manifest/data/upgrade";
+import type { UpgradeCostDefinition } from "~/manifest/upgrade";
 import type { InventoryRow } from "./types";
 
 export type InventorySpendPlan =

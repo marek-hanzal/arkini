@@ -1,18 +1,18 @@
 import { Context } from "effect";
-import type { AssetDefinition } from "~/manifest/data/asset";
-import type { GameConfig } from "~/manifest/data/GameConfig";
-import type { GameDataIndex } from "~/manifest/data/createGameDataIndex";
-import type { ItemDefinition } from "~/manifest/data/item";
-import type { ItemMergeRule } from "~/manifest/data/itemMergeRule";
-import type { ItemId, LootTableId, UpgradeId } from "~/manifest/data/manifestId";
+import type { AssetDefinition } from "~/manifest/asset";
+import type { GameConfig } from "~/manifest/GameConfig";
+import type { GameDataIndex } from "~/manifest/createGameDataIndex";
+import type { ItemDefinition } from "~/manifest/item";
+import type { ItemMergeRule } from "~/manifest/itemMergeRule";
+import type { ItemId, LootTableId, UpgradeId } from "~/manifest/manifestId";
 import type {
 	ActivationDefinition,
 	ProducerDefinition,
 	StashDefinition,
-} from "~/manifest/data/producer";
-import type { LootTableDefinition } from "~/manifest/data/lootTable";
-import type { UpgradeDefinition } from "~/manifest/data/upgrade";
-import type { ResourceDefinition } from "~/manifest/data/resource";
+} from "~/manifest/producer";
+import type { LootTableDefinition } from "~/manifest/lootTable";
+import type { UpgradeDefinition } from "~/manifest/upgrade";
+import type { ResourceDefinition } from "~/manifest/resource";
 
 export interface GameConfigSummary {
 	assetCount: number;

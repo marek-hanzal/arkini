@@ -1,5 +1,5 @@
 import type { HashService } from "~/hash/context/HashServiceFx";
-import type { GameConfig } from "~/manifest/data/GameConfig";
+import type { GameConfig } from "~/manifest/GameConfig";
 
 function normalizeGameConfig(config: GameConfig) {
 	return JSON.stringify(config, (_key, value: unknown) => {

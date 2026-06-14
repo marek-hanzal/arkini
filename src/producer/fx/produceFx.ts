@@ -7,7 +7,7 @@ import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { planPlacements } from "~/inventory/logic/planning";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/data/manifestId";
+import type { ItemId } from "~/manifest/manifestId";
 import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { ProduceBoardItemInputSchema } from "~/play/logic/gameActionSchemas";

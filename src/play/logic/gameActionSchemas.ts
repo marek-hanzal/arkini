@@ -2,8 +2,8 @@ import { z } from "zod";
 import { GameConfigServiceLive } from "~/manifest/logic/GameConfigServiceLive";
 
 const GameConfig = GameConfigServiceLive.config;
-import { ItemIdSchema } from "~/manifest/data/ItemIdSchema";
-import { PositiveIntegerSchema } from "~/manifest/data/PositiveIntegerSchema";
+import { ItemIdSchema } from "~/manifest/ItemIdSchema";
+import { PositiveIntegerSchema } from "~/manifest/PositiveIntegerSchema";
 
 export const BoardCoordinateSchema = z.number().int().min(0);
 export const BoardCellSchema = z.object({

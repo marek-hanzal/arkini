@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import type { ItemId } from "~/manifest/data/manifestId";
+import type { ItemId } from "~/manifest/manifestId";
 import { repeatItem } from "~/producer/logic/repeatItem";
-import type { ActivationWeightedEntry } from "~/manifest/data/producer";
+import type { ActivationWeightedEntry } from "~/manifest/producer";
 import { pickWeightedDropFx } from "./pickWeightedDropFx";
 import { resolveQuantityFx } from "./resolveQuantityFx";
 

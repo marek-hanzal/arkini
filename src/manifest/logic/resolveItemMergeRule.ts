@@ -1,4 +1,4 @@
-import type { ItemId } from "~/manifest/data/manifestId";
+import type { ItemId } from "~/manifest/manifestId";
 import { GameConfigServiceLive } from "~/manifest/logic/GameConfigServiceLive";
 
 export function resolveItemMergeRule(sourceItemId: ItemId, targetItemId: ItemId) {

@@ -6,7 +6,7 @@ import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { BoardRow } from "~/inventory/logic/planning";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { StashDefinition } from "~/manifest/data/producer";
+import type { StashDefinition } from "~/manifest/producer";
 import type { ProducerDepletion } from "~/play/logic/playTypes";
 import { json } from "~/shared/json";
 

@@ -5,13 +5,12 @@ import { BottomNavButton } from "~/play/ui/BottomNavButton";
 export namespace BottomNavigation {
 	export interface Props {
 		activeSheet?: ActiveSheet;
-		inventoryDropTargetActive?: boolean;
 		onOpen(sheet: BottomNavSheet): void;
 	}
 }
 
 export const BottomNavigation: FC<BottomNavigation.Props> = memo(
-	({ activeSheet, inventoryDropTargetActive = false, onOpen }) => {
+	({ activeSheet, onOpen }) => {
 		return (
 			<nav className="ak-bottom-nav">
 				<div className="ak-bottom-nav-inner">
@@ -20,7 +19,6 @@ export const BottomNavigation: FC<BottomNavigation.Props> = memo(
 						label="Inventory"
 						icon="▦"
 						tone="inventory"
-						dropTargetActive={inventoryDropTargetActive}
 						onOpen={onOpen}
 					/>
 					<BottomNavButton

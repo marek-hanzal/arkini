@@ -1,5 +1,4 @@
-import { type FC, useCallback, useMemo } from "react";
-import { DndContext, DragOverlay } from "@dnd-kit/core";
+import { type FC, useCallback } from "react";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { HardResetButton } from "~/play/ui/HardResetButton";
 import { usePlaySave } from "~/play/hook/usePlaySave";
@@ -10,15 +9,7 @@ import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { UpgradesSheet } from "~/upgrade/ui/UpgradesSheet";
 import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { GameItemView } from "~/item/ui/GameItemView";
-import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
-import { usePlayFeedback } from "~/play/hook/usePlayFeedback";
-import { usePlayEventQueue } from "~/play/hook/usePlayEventQueue";
 import { usePlaySheets } from "~/play/hook/usePlaySheets";
-import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
-import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
-import { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
 
 export namespace PlayShell {
 	export interface Props {}
@@ -27,85 +18,12 @@ export namespace PlayShell {
 export const PlayShell: FC<PlayShell.Props> = () => {
 	const saveQuery = usePlaySave();
 	const sheets = usePlaySheets();
-	const visualMotions = useVisualItemMotions();
-	const schedulePlayEvent = usePlayEventQueue();
-	const feedback = usePlayFeedback();
-
-	const drag = usePlayDraggableControl({
-		feedback,
-		schedule: schedulePlayEvent,
-		visualMotions,
-	});
-	const producerActions = usePlayProducerActions({
-		activeSheet: sheets.activeSheet,
-		visualMotions,
-		feedback,
-		schedule: schedulePlayEvent,
-	});
-	const manualActions = usePlayManualItemActions({
-		visualMotions,
-		feedback,
-		schedule: schedulePlayEvent,
-	});
-	const activateBoardTile = useCallback(
-		(item: BoardViewItem) => {
-			if (!item.activation) return;
-
-			void producerActions.produceFrom(
-				item,
-				item.activation.kind === "stash" ? "exhaust" : "single",
-			);
-		},
-		[
-			producerActions.produceFrom,
-		],
-	);
 	const openBoardTileDetail = useCallback(
-		(item: BoardViewItem) => {
-			sheets.openItem(item.id);
+		(boardItemId: string) => {
+			sheets.openItem(boardItemId);
 		},
 		[
 			sheets.openItem,
-		],
-	);
-	const placeInventorySlot = useCallback(
-		(slot: InventorySlot) => {
-			void manualActions.placeInventoryOnBoardWithFly(slot);
-		},
-		[
-			manualActions.placeInventoryOnBoardWithFly,
-		],
-	);
-	const boardDrag = useMemo(
-		() => ({
-			activeDrag: drag.activeDrag ?? undefined,
-			isSourceHidden: drag.isSourceHidden,
-		}),
-		[
-			drag.activeDrag,
-			drag.isSourceHidden,
-		],
-	);
-	const boardFeedback = useMemo(
-		() => ({
-			invalidCellKey: feedback.invalidBoardCellKey,
-			mergedCellKey: feedback.mergedBoardCellKey,
-			imprintedCellKey: feedback.imprintedBoardCellKey,
-		}),
-		[
-			feedback.imprintedBoardCellKey,
-			feedback.invalidBoardCellKey,
-			feedback.mergedBoardCellKey,
-		],
-	);
-	const boardActions = useMemo(
-		() => ({
-			tileSingleActivate: activateBoardTile,
-			tileLongActivate: openBoardTileDetail,
-		}),
-		[
-			activateBoardTile,
-			openBoardTileDetail,
 		],
 	);
 
@@ -130,10 +48,8 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 		);
 	}
 
-	const dragSizeVariant = drag.activeDrag?.source.kind === "inventory" ? "inventory" : "board";
-
 	return (
-		<DndContext {...drag.contextProps}>
+		<>
 			<div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
 				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
 					<div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
@@ -144,18 +60,12 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 					</div>
 
 					<div className="min-h-0 shrink-0">
-						<Board
-							drag={boardDrag}
-							feedback={boardFeedback}
-							actions={boardActions}
-							visualMotions={visualMotions}
-						/>
+						<Board onOpenItem={openBoardTileDetail} />
 					</div>
 				</main>
 
 				<BottomNavigation
 					activeSheet={sheets.activeSheet}
-					inventoryDropTargetActive={drag.activeDrag?.source.kind === "board"}
 					onOpen={sheets.openSheet}
 				/>
 			</div>
@@ -169,13 +79,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 						className="min-h-0"
 						hidden={sheets.renderedSheet !== "inventory"}
 					>
-						<InventorySheet
-							isSourceHidden={drag.isSourceHidden}
-							invalidInventorySlot={feedback.invalidInventorySlot}
-							onClose={sheets.closeSheet}
-							onSlotDoubleActivate={placeInventorySlot}
-							visualMotions={visualMotions}
-						/>
+						<InventorySheet onClose={sheets.closeSheet} />
 					</section>
 
 					<section
@@ -210,22 +114,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 					</section>
 				</div>
 			</BottomSheet>
-
-			<DragOverlay
-				adjustScale={false}
-				dropAnimation={null}
-			>
-				{drag.activeItem ? (
-					<GameItemView
-						item={drag.activeItem}
-						variant="drag"
-						sizeVariant={dragSizeVariant}
-						quantity={drag.activeDrag?.overlay?.quantity}
-						activation={drag.activeDrag?.overlay?.activation ?? undefined}
-						overlaySize={drag.dragPreviewRect ?? undefined}
-					/>
-				) : null}
-			</DragOverlay>
-		</DndContext>
+		</>
 	);
 };

@@ -1,4 +1,4 @@
-import { useMachine } from "@xstate/react";
+import { useActorRef } from "@xstate/react";
 import { useEffect, useMemo, useRef } from "react";
 import { usePress, type PressEvent, type PressResult } from "@react-aria/interactions";
 import { pressActionsMachine } from "~/shared/logic/pressActionsMachine";
@@ -24,7 +24,9 @@ export namespace usePressActions {
 
 // React Aria owns the ugly cross-browser press recognition. XState owns the
 // small game workflow above it: long press, delayed single press, and nearby
-// double press. Humans invented touchscreens, so somebody has to pay.
+// double press. The hook intentionally does not subscribe to the machine state:
+// the press actor only fires callbacks and timers, so internal transitions must
+// not re-render every board cell like a tiny denial-of-service attack with JSX.
 export function usePressActions({
 	onSingle,
 	onDouble,
@@ -54,22 +56,25 @@ export function usePressActions({
 			}),
 		[],
 	);
-	const [, send] = useMachine(machine);
+	const actor = useActorRef(machine);
+	const hasSingle = Boolean(onSingle);
+	const hasDouble = Boolean(onDouble);
+	const hasLong = Boolean(onLong);
 
 	useEffect(() => {
-		send({
+		actor.send({
 			type: "CONFIG_CHANGED",
-			hasSingle: Boolean(onSingle),
-			hasDouble: Boolean(onDouble),
-			hasLong: Boolean(onLong),
+			hasSingle,
+			hasDouble,
+			hasLong,
 			delaySingleWhenDouble,
 		});
 	}, [
-		onSingle,
-		onDouble,
-		onLong,
+		actor,
+		hasSingle,
+		hasDouble,
+		hasLong,
 		delaySingleWhenDouble,
-		send,
 	]);
 
 	const press = usePress({
@@ -77,17 +82,17 @@ export function usePressActions({
 		preventFocusOnPress: true,
 		shouldCancelOnPointerExit: true,
 		onPressStart() {
-			send({
+			actor.send({
 				type: "PRESS_STARTED",
 			});
 		},
 		onPressEnd() {
-			send({
+			actor.send({
 				type: "PRESS_ENDED",
 			});
 		},
 		onPress(event) {
-			send({
+			actor.send({
 				type: "PRESS",
 				time: Date.now(),
 				x: event.x,

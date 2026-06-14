@@ -1,36 +1,40 @@
 import type { ItemId, LootTableId } from "./manifestId";
 
-export interface ProducerDefinition {
-	trigger: "click";
-	placement: "board_then_inventory";
-	output: readonly ProducerOutput[];
-	outputTableId?: LootTableId;
-	cooldownMs?: number;
-	mode?: ProducerMode;
-	inputs?: readonly ProducerInputDefinition[];
-}
+export type ActivationTrigger = "click";
+export type ActivationPlacement = "board_then_inventory";
 
-export interface ProducerInputDefinition {
+export interface ActivationInputDefinition {
 	itemId: ItemId;
 	quantity: number;
 	capacity: number;
 }
 
-export type ProducerMode =
-	| {
-			type: "infinite";
-	  }
-	| {
-			type: "finite";
-			charges: number;
-			onDepleted:
-				| "remove"
-				| {
-						replaceWithItemId: ItemId;
-				  };
-	  };
+export interface ActivationSharedDefinition {
+	trigger: ActivationTrigger;
+	placement: ActivationPlacement;
+	output: readonly ActivationOutput[];
+	outputTableId?: LootTableId;
+	inputs?: readonly ActivationInputDefinition[];
+}
 
-export type ProducerOutput =
+export interface ProducerDefinition extends ActivationSharedDefinition {
+	type: "producer";
+	cooldownMs: number;
+}
+
+export interface StashDefinition extends ActivationSharedDefinition {
+	type: "stash";
+	charges: number;
+	onDepleted:
+		| "remove"
+		| {
+				replaceWithItemId: ItemId;
+		  };
+}
+
+export type ActivationDefinition = ProducerDefinition | StashDefinition;
+
+export type ActivationOutput =
 	| {
 			type: "guaranteed";
 			itemId: ItemId;
@@ -45,10 +49,10 @@ export type ProducerOutput =
 	| {
 			type: "weighted";
 			rolls?: Quantity;
-			entries: readonly ProducerWeightedEntry[];
+			entries: readonly ActivationWeightedEntry[];
 	  };
 
-export type ProducerWeightedEntry =
+export type ActivationWeightedEntry =
 	| {
 			itemId: ItemId;
 			weight: number;

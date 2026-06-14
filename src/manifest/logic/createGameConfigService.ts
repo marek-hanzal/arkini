@@ -29,6 +29,12 @@ export function createGameConfigService(config: GameConfig): GameConfigService {
 		getProducer(itemId) {
 			return index.producersByItemId.get(itemId as ItemId);
 		},
+		getStash(itemId) {
+			return index.stashesByItemId.get(itemId as ItemId);
+		},
+		getActivation(itemId) {
+			return index.activationsByItemId.get(itemId as ItemId);
+		},
 		getCraftRecipe(recipeId) {
 			return index.craftRecipesById.get(recipeId as CraftRecipeId);
 		},
@@ -50,6 +56,9 @@ export function createGameConfigService(config: GameConfig): GameConfigService {
 		isProducer(itemId) {
 			return index.producersByItemId.has(itemId as ItemId);
 		},
+		isStash(itemId) {
+			return index.stashesByItemId.has(itemId as ItemId);
+		},
 		isMergeableItem(itemId) {
 			return index.mergeableItemIds.has(itemId as ItemId);
 		},
@@ -63,7 +72,7 @@ export function createGameConfigService(config: GameConfig): GameConfigService {
 				assetCount: config.assets.length,
 				itemCount: config.items.length,
 				mergeCount: index.merges.length,
-				producerCount: index.producersByItemId.size,
+				producerCount: index.activationsByItemId.size,
 				craftRecipeCount: index.craftRecipes.length,
 				dropTableCount: 0,
 			};

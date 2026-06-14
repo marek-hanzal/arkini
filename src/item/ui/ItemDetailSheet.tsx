@@ -1,14 +1,15 @@
 import type { FC } from "react";
+import { GameItemView } from "~/item/ui/GameItemView";
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { GameItemView } from "~/item/ui/GameItemView";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { isProducerReady } from "~/producer/logic/isProducerReady";
 import { isProducerStocked } from "~/producer/logic/isProducerStocked";
 import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
+import { cn } from "~/shared/cn";
+import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { formatMs } from "~/shared/util/formatMs";
 
 export namespace ItemDetailSheet {
@@ -44,28 +45,34 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 	const craft = boardItem.craft;
 	const usedInCrafts = item.usedInCrafts ?? [];
 	const usedInMerges = item.usedInMerges ?? [];
-	const producer = boardItem.producer;
-	const producerInputs = producer?.inputs ?? [];
-	const producerCooldown = readProducerCooldown({
-		producer,
+	const activation = boardItem.activation;
+	const activationInputs = activation?.inputs ?? [];
+	const activationCooldown = readProducerCooldown({
+		activation,
 		nowMs,
 	});
-	const producerReady = isProducerReady(producer, nowMs);
-	const producerHasCharges = producer
-		? producer.remainingCharges === undefined || producer.remainingCharges > 0
+	const activationReady = isProducerReady(activation, nowMs);
+	const activationHasCharges = activation
+		? activation.remainingCharges === undefined || activation.remainingCharges > 0
 		: false;
-	const producerHasInputs = isProducerStocked(producer);
-	const producerStatusLabel = producerReady
+	const activationHasInputs = isProducerStocked(activation);
+	const activationStatusLabel = activationReady
 		? "Ready"
-		: !producerHasCharges
+		: !activationHasCharges
 			? "Empty"
-			: producerCooldown
-				? producerHasInputs
-					? `Ready in ${formatMs(producerCooldown.remainingMs)}`
-					: `Cooldown ${formatMs(producerCooldown.remainingMs)}`
-				: producerHasInputs
+			: activationCooldown
+				? activationHasInputs
+					? `Ready in ${formatMs(activationCooldown.remainingMs)}`
+					: `Cooldown ${formatMs(activationCooldown.remainingMs)}`
+				: activationHasInputs
 					? "Not ready"
 					: "Needs inputs";
+	const activationTitle = activation
+		? activation.kind === "stash"
+			? "Stash status"
+			: "Producer status"
+		: undefined;
+	const activationInputTitle = activation?.kind === "stash" ? "Stash inputs" : "Producer inputs";
 
 	return (
 		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
@@ -120,11 +127,11 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 									>
 										<span>{items[input.itemId]?.name ?? input.itemId}</span>
 										<span
-											className={
+											className={cn(
 												delivered >= input.quantity
 													? "text-emerald-200"
-													: "text-slate-400"
-											}
+													: "text-slate-400",
+											)}
 										>
 											{delivered}/{input.quantity}
 										</span>
@@ -135,39 +142,39 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 					</div>
 				) : null}
 
-				{producer ? (
+				{activation && activationTitle ? (
 					<div className="rounded-md border border-cyan-400/20 bg-cyan-950/18 p-3">
 						<div className="flex items-center justify-between gap-3">
 							<p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-								Producer status
+								{activationTitle}
 							</p>
-							<p className="text-xs text-cyan-100">{producerStatusLabel}</p>
+							<p className="text-xs text-cyan-100">{activationStatusLabel}</p>
 						</div>
-						{producerCooldown ? (
+						{activationCooldown ? (
 							<div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-950/80">
 								<div
 									className="h-full rounded-full bg-cyan-300/75 transition-[width] duration-200 ease-linear"
 									style={{
-										width: `${Math.round(producerCooldown.progress * 100)}%`,
+										width: `${Math.round(activationCooldown.progress * 100)}%`,
 									}}
 								/>
 							</div>
 						) : null}
-						{producer.remainingCharges !== undefined ? (
+						{activation.remainingCharges !== undefined ? (
 							<p className="mt-3 text-xs text-slate-300">
-								Charges left: <strong>{producer.remainingCharges}</strong>
+								Charges left: <strong>{activation.remainingCharges}</strong>
 							</p>
 						) : null}
 					</div>
 				) : null}
 
-				{producerInputs.length > 0 ? (
+				{activationInputs.length > 0 ? (
 					<div className="rounded-md border border-amber-400/20 bg-amber-950/18 p-3">
 						<p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">
-							Producer inputs
+							{activationInputTitle}
 						</p>
 						<div className="mt-3 space-y-2">
-							{producerInputs.map((input) => (
+							{activationInputs.map((input) => (
 								<div
 									key={input.itemId}
 									className="flex items-center justify-between gap-3 rounded-sm bg-slate-950/45 px-2 py-1.5 text-xs"
@@ -244,16 +251,16 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 				{usedInCrafts.length > 0 ? (
 					<div className="rounded-md border border-slate-800 bg-slate-950/50 p-3">
 						<p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-							Can be used for
+							Used in crafts
 						</p>
 						<div className="mt-2 space-y-2">
-							{usedInCrafts.map((craft) => (
+							{usedInCrafts.map((recipe) => (
 								<div
-									key={`${craft.targetItemId}:${craft.resultItemId}`}
+									key={`${recipe.targetItemId}:${recipe.resultItemId}`}
 									className="rounded-sm bg-slate-900/70 px-2 py-1.5 text-xs text-slate-300"
 								>
-									{items[craft.targetItemId]?.name ?? craft.targetItemId} →{" "}
-									{items[craft.resultItemId]?.name ?? craft.resultItemId}
+									{items[recipe.targetItemId]?.name ?? recipe.targetItemId} →{" "}
+									{items[recipe.resultItemId]?.name ?? recipe.resultItemId}
 								</div>
 							))}
 						</div>

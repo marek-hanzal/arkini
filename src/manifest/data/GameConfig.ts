@@ -13,11 +13,11 @@ import type {
 import type { ItemDefinition } from "./item";
 import type { ItemMergeRule } from "./itemMergeRule";
 import type {
+	ActivationOutput,
+	ActivationWeightedEntry,
 	ProducerDefinition,
-	ProducerMode,
-	ProducerOutput,
-	ProducerWeightedEntry,
 	Quantity,
+	StashDefinition,
 } from "./producer";
 import type { ResourceDefinition } from "./resource";
 import type { UpgradeDefinition, UpgradeEffectDefinition, UpgradeTierDefinition } from "./upgrade";
@@ -98,6 +98,7 @@ export const GameConfig = {
 		asset("asset:item-crate-sturdy", "Sturdy Crate", "item-crate-sturdy", 160, "png"),
 		asset("asset:item-crate-rare", "Rare Crate", "item-crate-rare", 170, "png"),
 		asset("asset:item-crate-epic", "Epic Crate", "item-crate-epic", 180, "png"),
+		asset("asset:item-epic-key", "Epic Key", "item-epic-key", 182, "png"),
 	],
 	resources: [] as readonly ResourceDefinition[],
 	lootTables: [
@@ -1705,26 +1706,19 @@ export const GameConfig = {
 				merge: [
 					same("merge:crate-1-crate-2", "item:crate-1", "item:crate-2"),
 				],
-				producer: {
-					...clickProducer(
-						900,
-						outputs(
-							weighted([
-								drop("item:twig", 35),
-								drop("item:pebble", 35),
-								drop("item:water", 15),
-								drop("item:seed", 12),
-								drop("item:coin", 8),
-							]),
-							chance("item:twig", 0.18),
-						),
-						{
-							type: "finite",
-							charges: 3,
-							onDepleted: "remove",
-						},
+				stash: clickStash(
+					3,
+					outputs(
+						weighted([
+							drop("item:twig", 35),
+							drop("item:pebble", 35),
+							drop("item:water", 15),
+							drop("item:seed", 12),
+							drop("item:coin", 8),
+						]),
+						chance("item:twig", 0.18),
 					),
-				},
+				),
 			},
 		),
 		item(
@@ -1744,26 +1738,19 @@ export const GameConfig = {
 				merge: [
 					same("merge:crate-2-crate-3", "item:crate-2", "item:crate-3"),
 				],
-				producer: {
-					...clickProducer(
-						900,
-						outputs(
-							weighted([
-								drop("item:branch", 35),
-								drop("item:stone", 35),
-								drop("item:water", 15),
-								drop("item:crate-1", 12),
-								drop("item:coin-pair", 8),
-							]),
-							chance("item:pebble", 0.22),
-						),
-						{
-							type: "finite",
-							charges: 4,
-							onDepleted: "remove",
-						},
+				stash: clickStash(
+					4,
+					outputs(
+						weighted([
+							drop("item:branch", 35),
+							drop("item:stone", 35),
+							drop("item:water", 15),
+							drop("item:crate-1", 12),
+							drop("item:coin-pair", 8),
+						]),
+						chance("item:pebble", 0.22),
 					),
-				},
+				),
 			},
 		),
 		item(
@@ -1784,27 +1771,37 @@ export const GameConfig = {
 				merge: [
 					same("merge:crate-3-crate-4", "item:crate-3", "item:crate-4"),
 				],
-				producer: {
-					...clickProducer(
-						900,
-						outputs(
-							weighted([
-								drop("item:log", 30),
-								drop("item:crystal", 30),
-								drop("item:crate-2", 20),
-								drop("item:water", 16),
-								drop("item:coin-stack", 8),
-							]),
-							chance("item:branch", 0.24),
-						),
-						{
-							type: "finite",
-							charges: 5,
-							onDepleted: "remove",
-						},
+				stash: clickStash(
+					5,
+					outputs(
+						weighted([
+							drop("item:log", 30),
+							drop("item:crystal", 30),
+							drop("item:crate-2", 20),
+							drop("item:water", 16),
+							drop("item:coin-stack", 8),
+						]),
+						chance("item:branch", 0.24),
+						chance("item:epic-key", 0.1),
 					),
-				},
+				),
 			},
+		),
+
+		item(
+			"item:epic-key",
+			"asset:item-epic-key",
+			"epic-key",
+			"Epic Key",
+			4,
+			1,
+			"A diamond-studded key that opens the Epic Crate.",
+			[
+				"key",
+				"rare",
+			],
+			425,
+			{},
 		),
 
 		item(
@@ -1822,27 +1819,24 @@ export const GameConfig = {
 			],
 			430,
 			{
-				producer: {
-					...clickProducer(
-						900,
-						outputs(
-							weighted([
-								drop("item:wood-bundle", 25),
-								drop("item:beam", 15),
-								drop("item:crystal", 25),
-								drop("item:gem", 15),
-								drop("item:water", 16),
-								drop("item:coin-stack", 8),
-							]),
-							chance("item:crate-3", 0.2),
-						),
-						{
-							type: "finite",
-							charges: 6,
-							onDepleted: "remove",
-						},
+				stash: clickStash(
+					6,
+					outputs(
+						weighted([
+							drop("item:wood-bundle", 25),
+							drop("item:beam", 15),
+							drop("item:crystal", 25),
+							drop("item:gem", 15),
+							drop("item:water", 16),
+							drop("item:coin-stack", 8),
+						]),
+						chance("item:crate-3", 0.2),
 					),
-				},
+					"remove",
+					[
+						producerInput("item:epic-key", 1, 1),
+					],
+				),
 			},
 		),
 	],
@@ -2006,7 +2000,7 @@ function item(
 	description: string,
 	tags: readonly string[],
 	sort: number,
-	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "craft"> = {},
+	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "stash" | "craft"> = {},
 ): ItemDefinition {
 	return {
 		id,
@@ -2076,7 +2070,7 @@ function input(itemId: ItemId, quantity: number): CraftRecipeInput {
 function lootTable(
 	id: LootTableId,
 	name: string,
-	output: readonly ProducerOutput[],
+	output: readonly ActivationOutput[],
 ): LootTableDefinition {
 	return {
 		id,
@@ -2152,18 +2146,44 @@ function setLootTable(itemId: ItemId, tableId: LootTableId): UpgradeEffectDefini
 
 function clickProducer(
 	cooldownMs: number,
-	output: readonly ProducerOutput[],
-	mode: ProducerMode = {
-		type: "infinite",
-	},
-	inputs: readonly NonNullable<ProducerDefinition["inputs"]>[number][] = [],
+	output: readonly ActivationOutput[],
+	inputsOrLegacyMode:
+		| readonly NonNullable<ProducerDefinition["inputs"]>[number][]
+		| {
+				type: "infinite" | "finite";
+				charges?: number;
+				onDepleted?:
+					| "remove"
+					| {
+							replaceWithItemId: ItemId;
+					  };
+		  } = [],
+	legacyInputs: readonly NonNullable<ProducerDefinition["inputs"]>[number][] = [],
 ): ProducerDefinition {
+	const inputs = Array.isArray(inputsOrLegacyMode) ? inputsOrLegacyMode : legacyInputs;
 	return {
+		type: "producer",
 		trigger: "click",
 		placement: "board_then_inventory",
 		output,
 		cooldownMs,
-		mode,
+		inputs,
+	};
+}
+
+function clickStash(
+	charges: number,
+	output: readonly ActivationOutput[],
+	onDepleted: StashDefinition["onDepleted"] = "remove",
+	inputs: readonly NonNullable<StashDefinition["inputs"]>[number][] = [],
+): StashDefinition {
+	return {
+		type: "stash",
+		trigger: "click",
+		placement: "board_then_inventory",
+		charges,
+		onDepleted,
+		output,
 		inputs,
 	};
 }
@@ -2180,13 +2200,13 @@ function producerInput(
 	};
 }
 
-function outputs(...entries: readonly ProducerOutput[]): ProducerOutput[] {
+function outputs(...entries: readonly ActivationOutput[]): ActivationOutput[] {
 	return [
 		...entries,
 	];
 }
 
-function guaranteed(itemId: ItemId, quantity: Quantity = 1): ProducerOutput {
+function guaranteed(itemId: ItemId, quantity: Quantity = 1): ActivationOutput {
 	return {
 		type: "guaranteed",
 		itemId,
@@ -2194,7 +2214,7 @@ function guaranteed(itemId: ItemId, quantity: Quantity = 1): ProducerOutput {
 	};
 }
 
-function chance(itemId: ItemId, probability: number, quantity: Quantity = 1): ProducerOutput {
+function chance(itemId: ItemId, probability: number, quantity: Quantity = 1): ActivationOutput {
 	return {
 		type: "chance",
 		itemId,
@@ -2203,7 +2223,10 @@ function chance(itemId: ItemId, probability: number, quantity: Quantity = 1): Pr
 	};
 }
 
-function weighted(entries: readonly ProducerWeightedEntry[], rolls: Quantity = 1): ProducerOutput {
+function weighted(
+	entries: readonly ActivationWeightedEntry[],
+	rolls: Quantity = 1,
+): ActivationOutput {
 	return {
 		type: "weighted",
 		entries,
@@ -2211,7 +2234,7 @@ function weighted(entries: readonly ProducerWeightedEntry[], rolls: Quantity = 1
 	};
 }
 
-function drops(entries: readonly ProducerWeightedEntry[]): ProducerOutput[] {
+function drops(entries: readonly ActivationWeightedEntry[]): ActivationOutput[] {
 	return [
 		{
 			type: "weighted",
@@ -2220,7 +2243,7 @@ function drops(entries: readonly ProducerWeightedEntry[]): ProducerOutput[] {
 	];
 }
 
-function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ProducerWeightedEntry {
+function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ActivationWeightedEntry {
 	return {
 		itemId,
 		weight,
@@ -2228,7 +2251,7 @@ function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ProducerW
 	};
 }
 
-function empty(weight: number): ProducerWeightedEntry {
+function empty(weight: number): ActivationWeightedEntry {
 	return {
 		itemId: null,
 		weight,

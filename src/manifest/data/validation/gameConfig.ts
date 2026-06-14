@@ -87,6 +87,12 @@ export function assertGameConfig(config: GameConfig) {
 				`${item.id} producer references missing loot table ${item.producer.outputTableId}`,
 			);
 		}
+		if (item.stash?.outputTableId) {
+			assert(
+				lootTableIds.has(item.stash.outputTableId),
+				`${item.id} stash references missing loot table ${item.stash.outputTableId}`,
+			);
+		}
 	}
 
 	for (const table of config.lootTables) {

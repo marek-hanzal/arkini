@@ -7,19 +7,19 @@ export namespace GameItemContent {
 	export interface Props {
 		item: ViewItem;
 		quantity?: number;
-		producer?: BoardViewItem["producer"];
-		producerNowMs?: number;
+		activation?: BoardViewItem["activation"];
+		activationNowMs?: number;
 	}
 }
 
 export const GameItemContent: FC<GameItemContent.Props> = ({
 	item,
 	quantity,
-	producer,
-	producerNowMs,
+	activation,
+	activationNowMs,
 }) => {
-	const producerWaiting = producer
-		? (producer.cooldownUntilMs ?? 0) > (producerNowMs ?? Date.now())
+	const activationWaiting = activation
+		? (activation.cooldownUntilMs ?? 0) > (activationNowMs ?? Date.now())
 		: false;
 
 	return (
@@ -27,7 +27,7 @@ export const GameItemContent: FC<GameItemContent.Props> = ({
 			data-ak-item-content
 			className={cn(
 				"relative grid h-full w-full place-items-center text-slate-50",
-				producerWaiting && "opacity-[0.82]",
+				activationWaiting && "opacity-[0.82]",
 			)}
 		>
 			{item.assetRender === "blueprint" && item.assetOverlaySrc ? (

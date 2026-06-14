@@ -1,11 +1,58 @@
 import { z } from "zod";
 import { AssetIdSchema } from "./AssetIdSchema";
+import { GameConfig } from "./GameConfig";
 import { ItemIdSchema } from "./ItemIdSchema";
 import { NonNegativeIntegerSchema } from "./NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "./PositiveIntegerSchema";
 import { QuantitySchema } from "./QuantitySchema";
 import { ResourceIdSchema } from "./ResourceIdSchema";
-import { GameConfig } from "./GameConfig";
+
+const ActivationOutputSchema = z
+	.array(
+		z.discriminatedUnion("type", [
+			z.object({
+				type: z.literal("guaranteed"),
+				itemId: ItemIdSchema,
+				quantity: QuantitySchema.optional(),
+			}),
+			z.object({
+				type: z.literal("chance"),
+				itemId: ItemIdSchema,
+				probability: z.number().min(0).max(1),
+				quantity: QuantitySchema.optional(),
+			}),
+			z.object({
+				type: z.literal("weighted"),
+				rolls: QuantitySchema.optional(),
+				entries: z
+					.array(
+						z.union([
+							z.object({
+								itemId: ItemIdSchema,
+								weight: PositiveIntegerSchema,
+								quantity: QuantitySchema.optional(),
+							}),
+							z.object({
+								itemId: z.null(),
+								weight: PositiveIntegerSchema,
+							}),
+						]),
+					)
+					.min(1),
+			}),
+		]),
+	)
+	.min(1);
+
+const ActivationInputSchema = z
+	.array(
+		z.object({
+			itemId: ItemIdSchema,
+			quantity: PositiveIntegerSchema,
+			capacity: PositiveIntegerSchema,
+		}),
+	)
+	.optional();
 
 export const GameConfigSchema = z.object({
 	game: z.object({
@@ -110,72 +157,30 @@ export const GameConfigSchema = z.object({
 				.optional(),
 			producer: z
 				.object({
+					type: z.literal("producer"),
 					trigger: z.literal("click"),
 					placement: z.literal("board_then_inventory"),
 					cooldownMs: PositiveIntegerSchema,
 					outputTableId: z.string().startsWith("loot:").optional(),
-					output: z
-						.array(
-							z.discriminatedUnion("type", [
-								z.object({
-									type: z.literal("guaranteed"),
-									itemId: ItemIdSchema,
-									quantity: QuantitySchema.optional(),
-								}),
-								z.object({
-									type: z.literal("chance"),
-									itemId: ItemIdSchema,
-									probability: z.number().min(0).max(1),
-									quantity: QuantitySchema.optional(),
-								}),
-								z.object({
-									type: z.literal("weighted"),
-									rolls: QuantitySchema.optional(),
-									entries: z
-										.array(
-											z.union([
-												z.object({
-													itemId: ItemIdSchema,
-													weight: PositiveIntegerSchema,
-													quantity: QuantitySchema.optional(),
-												}),
-												z.object({
-													itemId: z.null(),
-													weight: PositiveIntegerSchema,
-												}),
-											]),
-										)
-										.min(1),
-								}),
-							]),
-						)
-						.min(1),
-					inputs: z
-						.array(
-							z.object({
-								itemId: ItemIdSchema,
-								quantity: PositiveIntegerSchema,
-								capacity: PositiveIntegerSchema,
-							}),
-						)
-						.optional(),
-					mode: z
-						.discriminatedUnion("type", [
-							z.object({
-								type: z.literal("infinite"),
-							}),
-							z.object({
-								type: z.literal("finite"),
-								charges: PositiveIntegerSchema,
-								onDepleted: z.union([
-									z.literal("remove"),
-									z.object({
-										replaceWithItemId: ItemIdSchema,
-									}),
-								]),
-							}),
-						])
-						.optional(),
+					output: ActivationOutputSchema,
+					inputs: ActivationInputSchema,
+				})
+				.optional(),
+			stash: z
+				.object({
+					type: z.literal("stash"),
+					trigger: z.literal("click"),
+					placement: z.literal("board_then_inventory"),
+					charges: PositiveIntegerSchema,
+					onDepleted: z.union([
+						z.literal("remove"),
+						z.object({
+							replaceWithItemId: ItemIdSchema,
+						}),
+					]),
+					outputTableId: z.string().startsWith("loot:").optional(),
+					output: ActivationOutputSchema,
+					inputs: ActivationInputSchema,
 				})
 				.optional(),
 			craft: z

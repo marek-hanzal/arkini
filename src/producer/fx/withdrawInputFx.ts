@@ -5,13 +5,14 @@ import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
-import { cloneInventory, planInventoryPlacement } from "~/inventory/logic/planning";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
+import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
 import { WithdrawProducerInputSchema } from "~/play/logic/gameActionSchemas";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
+import { planInventoryPlacement } from "~/inventory/logic/planning";
+import { normalizeInventoryStateJson } from "~/inventory/logic/inventoryState";
 import { json } from "~/shared/json";
 
 export namespace withdrawInputFx {
@@ -29,39 +30,46 @@ export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 		catch: toGameActionError,
 	});
 
-	yield* withTransactionFx(
+	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const date = yield* DateServiceFx;
 			const gameConfig = yield* GameConfigServiceFx;
 			const id = yield* IdServiceFx;
+			const updatedAt = date.timestamp();
 			const mutable = yield* readMutableSaveFx();
-			const row = mutable.boardRows.find((row) => row.id === input.boardItemId);
-			if (!row) return yield* Effect.fail(new GameActionError("Producer does not exist."));
-			const producer = gameConfig.getProducer(row.itemDefinitionId);
-			if (!producer)
-				return yield* Effect.fail(new GameActionError("This is not a producer."));
+			const row = mutable.boardRows.find((entry) => entry.id === input.boardItemId);
+			if (!row) {
+				return yield* Effect.fail(new GameActionError("Board item does not exist."));
+			}
 
-			const state = {
-				...createInitialBoardState(row.itemDefinitionId, gameConfig),
-				...readBoardState(row),
+			const activation = gameConfig.getActivation(row.itemDefinitionId);
+			if (!activation) {
+				return yield* Effect.fail(new GameActionError("This item cannot store inputs."));
+			}
+
+			const state = readBoardState(row);
+			const activationState = {
+				...(createInitialBoardState(row.itemDefinitionId, gameConfig).activation ?? {}),
+				...(state.activation ?? {}),
 			};
-			const producerState = state.producer ?? {};
 			const inventory = {
-				...(producerState.inventory ?? {}),
+				...(activationState.inventory ?? {}),
 			};
 			const stored = inventory[input.itemId] ?? 0;
-			if (stored <= 0)
-				return yield* Effect.fail(new GameActionError("Producer input is empty."));
-
-			const virtualInventory = cloneInventory(mutable.inventoryRows);
-			const plan = planInventoryPlacement(mutable.save, virtualInventory, input.itemId, {
-				gameConfig,
-				id,
-			});
-			if (!plan) return yield* Effect.fail(new GameActionError("Inventory is full."));
-
+			if (stored <= 0) {
+				return yield* Effect.fail(new GameActionError("No stored input to withdraw."));
+			}
 			inventory[input.itemId] = stored - 1;
 			if (inventory[input.itemId] <= 0) delete inventory[input.itemId];
+
+			const plan = planInventoryPlacement(mutable.save, mutable.inventoryRows, input.itemId, {
+				gameConfig,
+				id,
+				stateJson: normalizeInventoryStateJson("{}"),
+			});
+			if (!plan) {
+				return yield* Effect.fail(new GameActionError("Inventory is full."));
+			}
 
 			yield* applyInventoryPlacementPlanFx({
 				plan,
@@ -72,12 +80,12 @@ export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 					.set({
 						stateJson: json({
 							...state,
-							producer: {
-								...producerState,
+							activation: {
+								...activationState,
 								inventory,
 							},
 						}),
-						updatedAt: date.timestamp(),
+						updatedAt,
 					})
 					.where("id", "=", row.id)
 					.execute(),

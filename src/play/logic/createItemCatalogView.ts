@@ -24,7 +24,7 @@ export function createItemCatalogView({
 					`Missing overlay asset for ${item.id}: ${asset.overlayAssetId}`,
 				);
 			}
-			const producer = gameConfig.getProducer(item.id);
+			const activation = gameConfig.getActivation(item.id);
 			const mergeResults = (item.merge ?? []).map((rule) => ({
 				withItemId: rule.withItemId,
 				resultItemId: rule.resultItemId,
@@ -54,8 +54,8 @@ export function createItemCatalogView({
 					tags: [
 						...item.tags,
 					],
-					canProduce: Boolean(producer),
-					producerTrigger: producer?.trigger,
+					canProduce: Boolean(activation),
+					producerTrigger: activation?.trigger,
 					canMerge: gameConfig.isMergeableItem(item.id as ItemId),
 					mergeResults,
 					usedInCrafts,

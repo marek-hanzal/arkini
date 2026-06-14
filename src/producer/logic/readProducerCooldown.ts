@@ -1,34 +1,23 @@
-import type { ProducerView } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/play/logic/playTypes";
 
 export namespace readProducerCooldown {
 	export interface Props {
-		producer?: ProducerView;
+		activation?: ActivationView;
 		nowMs: number;
-	}
-
-	export interface Result {
-		progress: number;
-		remainingMs: number;
 	}
 }
 
-export function readProducerCooldown({
-	producer,
-	nowMs,
-}: readProducerCooldown.Props): readProducerCooldown.Result | undefined {
-	if (!producer) return undefined;
+export function readProducerCooldown({ activation, nowMs }: readProducerCooldown.Props) {
+	if (!activation) return undefined;
 
-	const hasCharges = producer.remainingCharges === undefined || producer.remainingCharges > 0;
-	const cooldownUntilMs = producer.cooldownUntilMs ?? 0;
+	const hasCharges = activation.remainingCharges === undefined || activation.remainingCharges > 0;
+	const cooldownUntilMs = activation.cooldownUntilMs ?? 0;
 	const remainingMs = Math.max(0, cooldownUntilMs - nowMs);
-
 	if (!hasCharges || remainingMs <= 0) return undefined;
 
-	const cooldownMs = Math.max(1, producer.cooldownMs ?? remainingMs);
-	const progress = Math.min(1, Math.max(0, 1 - remainingMs / cooldownMs));
-
+	const cooldownMs = Math.max(1, activation.cooldownMs ?? remainingMs);
 	return {
-		progress,
 		remainingMs,
+		progress: Math.max(0, Math.min(1, 1 - remainingMs / cooldownMs)),
 	};
 }

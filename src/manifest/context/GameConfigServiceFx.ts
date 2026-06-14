@@ -5,7 +5,11 @@ import type { GameDataIndex } from "~/manifest/data/createGameDataIndex";
 import type { ItemDefinition } from "~/manifest/data/item";
 import type { ItemMergeRule } from "~/manifest/data/itemMergeRule";
 import type { ItemId, LootTableId, UpgradeId } from "~/manifest/data/manifestId";
-import type { ProducerDefinition } from "~/manifest/data/producer";
+import type {
+	ActivationDefinition,
+	ProducerDefinition,
+	StashDefinition,
+} from "~/manifest/data/producer";
 import type { LootTableDefinition } from "~/manifest/data/lootTable";
 import type { UpgradeDefinition } from "~/manifest/data/upgrade";
 import type { ResourceDefinition } from "~/manifest/data/resource";
@@ -26,6 +30,8 @@ export interface GameConfigService {
 	getResource(resourceId: string): ResourceDefinition | undefined;
 	getItem(itemId: string): ItemDefinition | undefined;
 	getProducer(itemId: string): ProducerDefinition | undefined;
+	getStash(itemId: string): StashDefinition | undefined;
+	getActivation(itemId: string): ActivationDefinition | undefined;
 	getCraftRecipe(recipeId: string): GameDataIndex["craftRecipes"][number] | undefined;
 	getCraftRecipeForTarget(itemId: string): GameDataIndex["craftRecipes"][number] | undefined;
 	getCraftRecipesForInput(itemId: string): GameDataIndex["craftRecipes"];
@@ -33,6 +39,7 @@ export interface GameConfigService {
 	getLootTable(tableId: string | LootTableId): LootTableDefinition | undefined;
 	getUpgrade(upgradeId: string | UpgradeId): UpgradeDefinition | undefined;
 	isProducer(itemId: string): boolean;
+	isStash(itemId: string): boolean;
 	isMergeableItem(itemId: string): boolean;
 	resolveMergeRule(
 		sourceItemId: string | ItemId,

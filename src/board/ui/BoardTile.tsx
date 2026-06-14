@@ -43,7 +43,7 @@ export const BoardTile: FC<BoardTile.Props> = ({
 						boardItemId: boardItem.id,
 					},
 					overlay: {
-						producer: boardItem.producer,
+						activation: boardItem.activation,
 					},
 					hideWhenActive: true,
 				} satisfies GameDragData
@@ -59,8 +59,8 @@ export const BoardTile: FC<BoardTile.Props> = ({
 			<GameItemView
 				item={item}
 				variant="board"
-				producer={boardItem.producer}
-				producerNowMs={nowMs}
+				activation={boardItem.activation}
+				activationNowMs={nowMs}
 			/>
 		</DraggableSurface>
 	);

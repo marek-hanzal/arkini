@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { ItemId } from "~/manifest/data/manifestId";
-import type { ProducerOutput } from "~/manifest/data/producer";
+import type { ActivationOutput } from "~/manifest/data/producer";
 import { repeatItem } from "~/producer/logic/repeatItem";
 import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 import { resolveQuantityFx } from "./resolveQuantityFx";
@@ -8,7 +8,7 @@ import { rollWeightedDropsFx } from "./rollWeightedDropsFx";
 
 export namespace rollOutputFx {
 	export interface Props {
-		outputs: readonly ProducerOutput[];
+		outputs: readonly ActivationOutput[];
 	}
 }
 

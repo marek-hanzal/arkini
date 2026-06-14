@@ -14,9 +14,9 @@ export namespace GameItemView {
 		variant: Variant;
 		sizeVariant?: SizeVariant;
 		quantity?: number;
-		producer?: BoardViewItem["producer"];
+		activation?: BoardViewItem["activation"];
 		overlaySize?: Pick<RectLike, "width" | "height">;
-		producerNowMs?: number;
+		activationNowMs?: number;
 	}
 }
 
@@ -25,9 +25,9 @@ export const GameItemView: FC<GameItemView.Props> = ({
 	variant,
 	sizeVariant,
 	quantity,
-	producer,
+	activation,
 	overlaySize,
-	producerNowMs,
+	activationNowMs,
 }) => {
 	const resolvedSizeVariant = sizeVariant ?? (variant === "drag" ? "board" : variant);
 
@@ -54,8 +54,8 @@ export const GameItemView: FC<GameItemView.Props> = ({
 			<GameItemContent
 				item={item}
 				quantity={quantity}
-				producer={producer}
-				producerNowMs={producerNowMs}
+				activation={activation}
+				activationNowMs={activationNowMs}
 			/>
 		</div>
 	);

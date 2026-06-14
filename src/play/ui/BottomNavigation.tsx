@@ -1,8 +1,7 @@
 import type { FC } from "react";
 import { BottomNavButton } from "~/play/ui/BottomNavButton";
 
-export type ActiveSheet = "inventory" | "upgrades" | "database" | "item";
-export type BottomNavSheet = "inventory" | "upgrades" | "database";
+import type { ActiveSheet, BottomNavSheet } from "~/play/logic/playSheetTypes";
 
 export namespace BottomNavigation {
 	export interface Props {

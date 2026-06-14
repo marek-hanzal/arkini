@@ -6,11 +6,13 @@ import {
 	type DragStartEvent,
 	type Modifier,
 } from "@dnd-kit/core";
+import { useMachine } from "@xstate/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { waitForPaint } from "~/shared/util/waitForPaint";
 import { without } from "~/shared/util/without";
 import { queryRect } from "~/shared/util/queryRect";
 import type { RectLike } from "~/play/types";
+import { draggableWorkflowMachine } from "~/drag/logic/draggableWorkflowMachine";
 
 export interface DraggablePayload<
 	ItemId extends string = string,
@@ -181,6 +183,7 @@ export function useDraggableControl<
 		RectLike,
 		"width" | "height"
 	> | null>(null);
+	const [workflow, sendWorkflow] = useMachine(draggableWorkflowMachine);
 
 	const restrictToDragBoundary = useCallback<Modifier>(
 		({ transform, draggingNodeRect, activeNodeRect }) => {
@@ -218,6 +221,9 @@ export function useDraggableControl<
 	);
 
 	function handleDragStart(event: DragStartEvent) {
+		sendWorkflow({
+			type: "DRAG_STARTED",
+		});
 		clearHiddenSources();
 		const source = event.active.data.current as DraggablePayload<
 			ItemId,
@@ -242,6 +248,9 @@ export function useDraggableControl<
 	}
 
 	function handleDragCancel() {
+		sendWorkflow({
+			type: "DRAG_CANCELLED",
+		});
 		clearTransientState();
 	}
 
@@ -269,12 +278,18 @@ export function useDraggableControl<
 		setDragPreviewRect(null);
 
 		if (!source || !context) {
+			sendWorkflow({
+				type: "RESET",
+			});
 			activeDragRef.current = null;
 			dragBoundaryRectRef.current = null;
 			setActiveDrag(null);
 			return;
 		}
 
+		sendWorkflow({
+			type: "DROP_RESOLVING",
+		});
 		const operation = async () => {
 			try {
 				await runPlan(context, await resolveDrop(context), dragRect);
@@ -293,13 +308,20 @@ export function useDraggableControl<
 		dragRect: RectLike | null,
 	) {
 		if (plan.type === "ignore") {
+			sendWorkflow({
+				type: "DROP_IGNORED",
+			});
 			activeDragRef.current = null;
 			dragBoundaryRectRef.current = null;
 			setActiveDrag(null);
+			settleWorkflow();
 			return;
 		}
 
 		if (plan.type === "reject") {
+			sendWorkflow({
+				type: "DROP_REJECTED",
+			});
 			const feedback = runFeedback(plan.feedback);
 			if (plan.animateReturn !== false) await animateReturn(context.source, dragRect);
 			else {
@@ -307,28 +329,48 @@ export function useDraggableControl<
 				dragBoundaryRectRef.current = null;
 				setActiveDrag(null);
 			}
+			sendWorkflow({
+				type: "FEEDBACK_STARTED",
+			});
 			await feedback;
+			settleWorkflow();
 			return;
 		}
 
+		sendWorkflow({
+			type: "DROP_ACCEPTED",
+		});
 		hideSources(plan.hide ?? []);
 		activeDragRef.current = null;
 		dragBoundaryRectRef.current = null;
 		setActiveDrag(null);
 
 		if (plan.animations?.length && plan.animationTiming !== "afterCommit") {
+			sendWorkflow({
+				type: "ANIMATION_STARTED",
+			});
 			await playAnimations(plan.animations, dragRect);
 		}
 
+		sendWorkflow({
+			type: "COMMIT_STARTED",
+		});
 		await plan.commit();
 
 		if (plan.animations?.length && plan.animationTiming === "afterCommit") {
+			sendWorkflow({
+				type: "ANIMATION_STARTED",
+			});
 			await playAnimations(plan.animations, dragRect);
 		}
 
 		await waitForPaint();
+		sendWorkflow({
+			type: "FEEDBACK_STARTED",
+		});
 		await plan.feedback?.();
 		clearHiddenSources();
+		settleWorkflow();
 	}
 
 	async function failDrop(
@@ -336,10 +378,17 @@ export function useDraggableControl<
 		context: DropContext<ItemId, Source, Target, Overlay>,
 		dragRect: RectLike | null,
 	) {
+		sendWorkflow({
+			type: "DROP_FAILED",
+		});
 		clearHiddenSources();
 		const feedback = runFeedback(() => onError?.(error, context));
 		await animateReturn(context.source, dragRect);
+		sendWorkflow({
+			type: "FEEDBACK_STARTED",
+		});
 		await feedback;
+		settleWorkflow();
 	}
 
 	async function playAnimations(
@@ -376,6 +425,9 @@ export function useDraggableControl<
 		source: DraggablePayload<ItemId, Source, Overlay>,
 		dragRect: RectLike | null,
 	) {
+		sendWorkflow({
+			type: "RETURN_STARTED",
+		});
 		const from = dragRect;
 		const to = rectForNode(source.sourceNodeId);
 
@@ -450,6 +502,15 @@ export function useDraggableControl<
 		clearHiddenSources();
 	}
 
+	function settleWorkflow() {
+		sendWorkflow({
+			type: "SETTLING_STARTED",
+		});
+		sendWorkflow({
+			type: "DROP_SETTLED",
+		});
+	}
+
 	function isSourceHidden(sourceId: string) {
 		return (
 			hiddenSourceIds.has(sourceId) ||
@@ -468,6 +529,7 @@ export function useDraggableControl<
 		activeDrag,
 		hiddenSourceIds,
 		dragPreviewRect,
+		workflowState: workflow.value,
 		isSourceHidden,
 		hideSources,
 		showSource,

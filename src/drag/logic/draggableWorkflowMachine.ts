@@ -1,18 +1,5 @@
 import { setup } from "xstate";
 
-export type DraggableWorkflowState =
-	| "idle"
-	| "dragging"
-	| "resolving"
-	| "accepting"
-	| "rejecting"
-	| "committing"
-	| "animating"
-	| "returning"
-	| "feedback"
-	| "settling"
-	| "failing";
-
 type DraggableWorkflowEvent =
 	| {
 			type: "DRAG_STARTED";

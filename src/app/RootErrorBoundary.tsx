@@ -9,32 +9,16 @@ export namespace RootErrorBoundary {
 }
 
 export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
-	const [resetState, sendReset] = useMachine(resetWorkflowMachine);
+	const [resetState, sendReset] = useMachine(resetWorkflowMachine, {
+		input: {
+			reset: hardResetBrowserStorage,
+			onSuccess: reloadWindow,
+			onError: logResetError,
+		},
+	});
 	const pending = resetState.matches("pending");
 	const failed = resetState.matches("failed");
 	const message = error instanceof Error ? error.message : String(error);
-
-	async function hardResetBrowserStorage() {
-		sendReset({
-			type: "START",
-		});
-
-		try {
-			await (
-				(await navigator.storage.getDirectory()) as FileSystemDirectoryHandle & {
-					remove(options: { recursive: boolean }): Promise<void>;
-				}
-			).remove({
-				recursive: true,
-			});
-			window.location.reload();
-		} catch (error) {
-			console.error(error);
-			sendReset({
-				type: "FAIL",
-			});
-		}
-	}
 
 	return (
 		<main className="grid h-dvh w-dvw place-items-center bg-slate-950 p-4 text-slate-100">
@@ -54,7 +38,11 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 					<button
 						type="button"
 						disabled={pending}
-						onClick={hardResetBrowserStorage}
+						onClick={() =>
+							sendReset({
+								type: "START",
+							})
+						}
 						className="w-full rounded-md border border-red-300/45 bg-red-300 px-4 py-3 text-sm font-black text-slate-950 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
 					>
 						{pending ? "Dropping browser storage…" : "Hard reset browser storage"}
@@ -69,3 +57,21 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 		</main>
 	);
 };
+
+async function hardResetBrowserStorage() {
+	await (
+		(await navigator.storage.getDirectory()) as FileSystemDirectoryHandle & {
+			remove(options: { recursive: boolean }): Promise<void>;
+		}
+	).remove({
+		recursive: true,
+	});
+}
+
+function reloadWindow() {
+	window.location.reload();
+}
+
+function logResetError(error: unknown) {
+	console.error(error);
+}

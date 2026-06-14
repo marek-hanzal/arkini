@@ -1989,24 +1989,6 @@ export namespace GameConfig {
 	}
 }
 
-function resource(
-	id: ResourceId,
-	code: string,
-	name: string,
-	description: string,
-	symbol: string,
-	sort: number,
-): ResourceDefinition {
-	return {
-		id,
-		code,
-		name,
-		description,
-		symbol,
-		sort,
-	};
-}
-
 function asset(
 	id: AssetId,
 	label: string,

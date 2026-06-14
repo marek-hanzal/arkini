@@ -129,20 +129,6 @@ export interface CraftProgressView {
 	acceptedInputItemIds: string[];
 }
 
-export interface ItemDetailView {
-	boardItem?: BoardViewItem;
-	item: ViewItem;
-	mergeResults: {
-		withItemId: string;
-		resultItemId: string;
-		secret?: boolean;
-	}[];
-	usedInCrafts: {
-		targetItemId: string;
-		resultItemId: string;
-	}[];
-}
-
 export interface ActivationView {
 	kind: "producer" | "stash";
 	trigger: "click";

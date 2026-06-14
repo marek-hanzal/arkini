@@ -1,5 +1,4 @@
 import { memo, type FC, useCallback, useMemo, useRef } from "react";
-import type { BoardCell as BoardCellModel } from "~/board/BoardCell";
 import { boardCellNodeId } from "~/board/boardCellNodeId";
 import { boardColumns } from "~/board/boardColumns";
 import { boardRows } from "~/board/boardRows";
@@ -15,7 +14,6 @@ import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals
 import { isProducerReady } from "~/producer/logic/isProducerReady";
 import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 import { cn } from "~/shared/cn";
-import { usePressActions } from "~/shared/hook/usePressActions";
 
 const emptyBoardItems: readonly BoardViewItem[] = [];
 
@@ -31,9 +29,7 @@ export namespace BoardCell {
 		invalid: boolean;
 		merged: boolean;
 		imprinted: boolean;
-		onEmptyDoubleActivate(cell: BoardCellModel): void;
 		onTileSingleActivate(item: BoardViewItem): void;
-		onTileDoubleActivate(item: BoardViewItem): void;
 		onTileLongActivate(item: BoardViewItem): void;
 	}
 }
@@ -50,9 +46,7 @@ export const BoardCell: FC<BoardCell.Props> = memo(
 		invalid,
 		merged,
 		imprinted,
-		onEmptyDoubleActivate,
 		onTileSingleActivate,
-		onTileDoubleActivate,
 		onTileLongActivate,
 	}) => {
 		const id = boardCellNodeId(x, y);
@@ -74,16 +68,6 @@ export const BoardCell: FC<BoardCell.Props> = memo(
 		const producerCooldown = readProducerCooldown({
 			activation: boardItem?.activation,
 			nowMs,
-		});
-		const press = usePressActions({
-			onDouble: () => {
-				if (!boardItem) {
-					onEmptyDoubleActivate({
-						x,
-						y,
-					});
-				}
-			},
 		});
 		useGsapCellFeedback(cellRef, {
 			invalid,
@@ -147,7 +131,6 @@ export const BoardCell: FC<BoardCell.Props> = memo(
 				data-board-item-id={boardItem?.id}
 				data-producer-ready={producerReady ? "true" : undefined}
 				className={className}
-				{...press.pressProps}
 			>
 				<BoardCellProgress progress={boardItem?.craft?.progress} />
 				{boardItem && item ? (
@@ -157,7 +140,6 @@ export const BoardCell: FC<BoardCell.Props> = memo(
 						activationNowMs={boardItem.activation ? nowMs : undefined}
 						hidden={tileHidden}
 						onSingleActivate={onTileSingleActivate}
-						onDoubleActivate={onTileDoubleActivate}
 						onLongActivate={onTileLongActivate}
 					/>
 				) : null}

@@ -65,14 +65,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 			producerActions.produceFrom,
 		],
 	);
-	const stashBoardTile = useCallback(
-		(item: BoardViewItem) => {
-			void manualActions.stashBoardWithFly(item);
-		},
-		[
-			manualActions.stashBoardWithFly,
-		],
-	);
 	const openBoardTileDetail = useCallback(
 		(item: BoardViewItem) => {
 			sheets.openItem(item.id);
@@ -81,7 +73,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 			sheets.openItem,
 		],
 	);
-	const noopEmptyActivate = useCallback(() => undefined, []);
 	const placeInventorySlot = useCallback(
 		(slot: InventorySlot) => {
 			void manualActions.placeInventoryOnBoardWithFly(slot);
@@ -114,16 +105,12 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 	);
 	const boardActions = useMemo(
 		() => ({
-			emptyDoubleActivate: noopEmptyActivate,
 			tileSingleActivate: activateBoardTile,
-			tileDoubleActivate: stashBoardTile,
 			tileLongActivate: openBoardTileDetail,
 		}),
 		[
 			activateBoardTile,
-			noopEmptyActivate,
 			openBoardTileDetail,
-			stashBoardTile,
 		],
 	);
 
@@ -172,6 +159,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 
 				<BottomNavigation
 					activeSheet={sheets.activeSheet}
+					inventoryDropTargetActive={drag.activeDrag?.source.kind === "board"}
 					onOpen={sheets.openSheet}
 				/>
 			</div>

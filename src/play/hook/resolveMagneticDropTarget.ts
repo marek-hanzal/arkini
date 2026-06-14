@@ -1,4 +1,5 @@
 import { boardCellNodeId } from "~/board/boardCellNodeId";
+import { inventoryNavDropTargetNodeId } from "~/inventory/inventoryNavDropTargetNodeId";
 import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
 import { nearestMagneticElement } from "~/interaction/magnetic/nearestMagneticElement";
 import type { MagneticDropContext } from "~/drag/MagneticDropContext";
@@ -9,6 +10,20 @@ export const resolveMagneticDropTarget = ({
 	dragRect,
 }: MagneticDropContext<string, DragSource, VisualMeta>): DropData | null => {
 	if (source.source.kind === "board") {
+		const inventory = nearestMagneticElement("[data-inventory-drop-target]", dragRect);
+		if (inventory) {
+			const nodeId =
+				inventory.element.getAttribute("data-drag-node-id") ?? inventoryNavDropTargetNodeId;
+
+			return {
+				targetId: nodeId,
+				targetNodeId: nodeId,
+				target: {
+					kind: "inventory",
+				},
+			} satisfies DropData;
+		}
+
 		const cell = nearestMagneticElement("[data-board-cell]", dragRect);
 		if (!cell) return null;
 

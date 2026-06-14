@@ -3,6 +3,7 @@ import type { FlyerKind, VisualMeta } from "~/play/types";
 import { flashDrop } from "./flashDrop";
 import { reject } from "./reject";
 import { resolveBoardDrop } from "./resolveBoardDrop";
+import { resolveBoardInventoryDrop } from "./resolveBoardInventoryDrop";
 import { resolveInventoryDrop } from "./resolveInventoryDrop";
 import type { AnyDropContext, Feedback, TypedDropContext } from "./types";
 import type { Command } from "~/action/command";
@@ -42,6 +43,11 @@ export const resolveDrop = ({
 	};
 
 	switch (route) {
+		case "board->inventory":
+			return resolveBoardInventoryDrop({
+				context: context as TypedDropContext<"board", "inventory">,
+				runtime,
+			});
 		case "inventory->inventory-slot":
 			return resolveInventoryDrop({
 				context: context as TypedDropContext<"inventory", "inventory-slot">,

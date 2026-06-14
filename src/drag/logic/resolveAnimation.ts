@@ -39,6 +39,7 @@ export const resolveAnimation = <
 	if (!from || !to) return null;
 	return {
 		itemId: animation.itemId,
+		actorKey: animation.actorKey,
 		kind: animation.kind,
 		from,
 		to,

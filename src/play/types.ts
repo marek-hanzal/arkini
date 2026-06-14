@@ -10,6 +10,7 @@ export type DragSource =
 	| {
 			kind: "inventory";
 			slotIndex: number;
+			stackId: string;
 			quantity: number;
 	  };
 
@@ -31,8 +32,6 @@ export type DropTarget =
 export interface VisualMeta {
 	quantity?: number;
 	activation?: BoardViewItem["activation"];
-	/** Optional item rendered above the flyer so in-place replacement flyers can cross-fade into their result. */
-	crossFadeItemId?: string;
 }
 
 export type DragData = DraggablePayload<string, DragSource, VisualMeta>;
@@ -45,22 +44,6 @@ export interface RectLike {
 	height: number;
 }
 
-export type FlyerKind =
-	| "move"
-	| "stash"
-	| "place"
-	| "deplete"
-	| "merge-crossfade"
-	| "fade-out"
-	| "consume"
-	| "imprint-source";
-
-export interface FlyerModel extends VisualMeta {
-	id: string;
-	itemId: string;
-	from: RectLike;
-	to: RectLike;
-	kind: FlyerKind;
-}
+export type VisualTransitionKind = "move" | "stash" | "place" | "consume";
 
 export const flashMs = 650;

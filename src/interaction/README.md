@@ -5,7 +5,7 @@ The interaction engine translates browser/UI gestures into game command plans.
 Responsibilities:
 - resolve drag/drop payloads into `DropPlan` values,
 - choose the `Command` that should be committed for accepted interactions,
-- attach visual hints such as source hiding, flyer animation plans, and feedback callbacks.
+- attach visual hints such as source visibility, visual animation plans, and feedback callbacks.
 
 Non-responsibilities:
 - do not run database mutations directly; use the supplied command runner,

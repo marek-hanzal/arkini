@@ -11,6 +11,7 @@ import type { ItemId } from "~/manifest/manifestId";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { BoardViewItem } from "~/play/logic/playTypes";
+import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { DragData } from "~/play/types";
 
 const boardCells = Array.from(
@@ -47,10 +48,11 @@ export namespace Board {
 		drag: DragState;
 		feedback: FeedbackState;
 		actions: Actions;
+		visualMotions: useVisualItemMotions.State;
 	}
 }
 
-export const Board: FC<Board.Props> = memo(({ drag, feedback, actions }) => {
+export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMotions }) => {
 	const board = usePlayBoard().data;
 	const items = usePlayItems().data;
 	const showDelayedMergeHints = useDelayedMergeHints({
@@ -108,6 +110,7 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions }) => {
 				boardItems={board.items}
 				items={items}
 				isSourceHidden={drag.isSourceHidden}
+				visualMotions={visualMotions}
 				actions={actions}
 			/>
 		</div>

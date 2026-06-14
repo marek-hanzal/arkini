@@ -1,30 +1,21 @@
 import { inventorySourceId } from "~/inventory/inventorySourceId";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
-import type { BoardView, InventorySlot } from "~/play/logic/playTypes";
-import type { FlyerKind, RectLike, VisualMeta } from "~/play/types";
+import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
+import type { BoardView, InventoryPlaceResult, InventorySlot } from "~/play/logic/playTypes";
 import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
-import { waitForPaint } from "~/shared/util/waitForPaint";
 
 export namespace placeInventoryOnBoardWithFly {
 	export interface Props {
 		board: BoardView | undefined;
 		slot: InventorySlot;
-		addFlyer(
-			itemId: string,
-			from: RectLike,
-			to: RectLike,
-			kind?: FlyerKind,
-			meta?: VisualMeta,
-		): Promise<void>;
+		visualMotions: Pick<useVisualItemMotions.State, "stage">;
 		run(command: {
 			type: "inventory.place";
 			slotIndex: number;
 			x: number;
 			y: number;
-		}): Promise<unknown>;
+		}): Promise<InventoryPlaceResult>;
 		feedback: Feedback;
-		hideSources(ids: readonly string[]): void;
-		clearHiddenSources(): void;
 		invalidatePlayData(
 			targets: readonly ("board" | "inventory" | "databaseStatus")[],
 		): Promise<void>;
@@ -34,11 +25,9 @@ export namespace placeInventoryOnBoardWithFly {
 export const placeInventoryOnBoardWithFly = async ({
 	board,
 	slot,
-	addFlyer,
+	visualMotions,
 	run,
 	feedback,
-	hideSources,
-	clearHiddenSources,
 	invalidatePlayData,
 }: placeInventoryOnBoardWithFly.Props) => {
 	const stack = slot.stack;
@@ -49,47 +38,37 @@ export const placeInventoryOnBoardWithFly = async ({
 		return;
 	}
 
-	const sourceId = inventorySourceId(slot.slotIndex);
 	const from =
 		queryPaddingBoxRect(`[data-inventory-slot-tile="${slot.slotIndex}"]`) ??
 		queryPaddingBoxRect(`[data-inventory-slot="${slot.slotIndex}"]`);
 	const to = queryPaddingBoxRect(`[data-board-cell="${target.x}:${target.y}"]`);
 
 	try {
-		if (from && to && stack.quantity <= 1) {
-			hideSources([
-				sourceId,
-			]);
-			await waitForPaint();
-		}
-
-		await run({
+		const result = await run({
 			type: "inventory.place",
 			slotIndex: slot.slotIndex,
 			x: target.x,
 			y: target.y,
 		});
 
-		const flyer =
-			from && to
-				? addFlyer(stack.itemId, from, to, "place", {
-						quantity: stack.quantity,
-					})
-				: Promise.resolve();
-		await waitForPaint();
-		const invalidation = invalidatePlayData([
+		if (from && to) {
+			visualMotions.stage([
+				{
+					key: visualBoardItemKey(result.boardItemId),
+					from,
+					to,
+					priority: "raised",
+				},
+			]);
+		}
+
+		await invalidatePlayData([
 			"board",
 			"inventory",
 			"databaseStatus",
 		]);
-		await Promise.all([
-			flyer,
-			invalidation,
-		]);
 	} catch (error) {
 		feedback.flashInventorySlot(slot.slotIndex, "error");
 		feedback.showError(error);
-	} finally {
-		clearHiddenSources();
 	}
 };

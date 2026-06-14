@@ -1,5 +1,7 @@
 import type { DropPlan } from "~/drag/DropPlan";
-import type { FlyerKind, VisualMeta } from "~/play/types";
+import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
+import { visualInventoryStackKey } from "~/play/hook/useVisualItemMotions";
+import type { VisualTransitionKind, VisualMeta } from "~/play/types";
 import { accept } from "./accept";
 import type { Runtime, TypedDropContext } from "./types";
 
@@ -13,7 +15,7 @@ export namespace resolveInventoryDrop {
 export const resolveInventoryDrop = ({
 	context,
 	runtime,
-}: resolveInventoryDrop.Props): DropPlan<string, FlyerKind, VisualMeta> => {
+}: resolveInventoryDrop.Props): DropPlan<string, VisualTransitionKind, VisualMeta> => {
 	const { source, target } = context;
 	if (source.source.slotIndex === target.target.slotIndex)
 		return {
@@ -21,6 +23,15 @@ export const resolveInventoryDrop = ({
 		};
 
 	return accept({
+		animations: [
+			{
+				itemId: source.itemId,
+				actorKey: visualInventoryStackKey(source.source.stackId),
+				fromDrag: true,
+				toNodeId: inventorySlotNodeId(target.target.slotIndex),
+				kind: "move",
+			},
+		],
 		commit: () =>
 			runtime.run({
 				type: "inventory.swap",

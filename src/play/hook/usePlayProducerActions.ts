@@ -3,35 +3,25 @@ import type { Command } from "~/action/command";
 import { useCommand } from "~/play/hook/useCommand";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
+import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import { produceFrom } from "~/play/logic/produceFrom";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { BoardViewItem } from "~/play/logic/playTypes";
-import type { FlyerKind, VisualMeta, RectLike } from "~/play/types";
 
 export namespace usePlayProducerActions {
 	export interface Props {
 		activeSheet?: ActiveSheet;
-		addFlyer(
-			itemId: string,
-			from: RectLike,
-			to: RectLike,
-			kind?: FlyerKind,
-			meta?: VisualMeta,
-		): Promise<void>;
+		visualMotions: Pick<useVisualItemMotions.State, "stage">;
 		feedback: Feedback;
 		schedule(label: string, operation: () => Promise<void>): Promise<void>;
-		hideSources(ids: readonly string[]): void;
-		clearHiddenSources(): void;
 	}
 }
 
 export const usePlayProducerActions = ({
 	activeSheet,
-	addFlyer,
+	visualMotions,
 	feedback,
 	schedule,
-	hideSources,
-	clearHiddenSources,
 }: usePlayProducerActions.Props) => {
 	const invalidatePlayData = usePlayDataInvalidation();
 	const command = useCommand<
@@ -53,23 +43,19 @@ export const usePlayProducerActions = ({
 					activeSheet,
 					boardItem,
 					activation,
-					addFlyer,
+					visualMotions,
 					run,
 					feedback,
-					hideSources,
-					clearHiddenSources,
 					invalidatePlayData,
 				}),
 			),
 		[
 			activeSheet,
-			addFlyer,
-			clearHiddenSources,
 			feedback,
-			hideSources,
 			invalidatePlayData,
 			run,
 			schedule,
+			visualMotions,
 		],
 	);
 

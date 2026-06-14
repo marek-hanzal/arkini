@@ -1,8 +1,7 @@
 import type { DropPlan } from "~/drag/DropPlan";
 import { pulseBottomNav } from "~/play/hook/pulseBottomNav";
-import type { FlyerKind, VisualMeta } from "~/play/types";
+import type { VisualTransitionKind, VisualMeta } from "~/play/types";
 import { accept } from "./accept";
-import { dragToTargetAnimation } from "./dragToTargetAnimation";
 import type { Runtime, TypedDropContext } from "./types";
 
 export namespace resolveBoardInventoryDrop {
@@ -13,20 +12,10 @@ export namespace resolveBoardInventoryDrop {
 }
 
 export const resolveBoardInventoryDrop = ({
-	context: { source, target },
+	context: { source },
 	runtime,
-}: resolveBoardInventoryDrop.Props): DropPlan<string, FlyerKind, VisualMeta> =>
+}: resolveBoardInventoryDrop.Props): DropPlan<string, VisualTransitionKind, VisualMeta> =>
 	accept({
-		hide: [
-			source.sourceId,
-		],
-		animations: [
-			dragToTargetAnimation({
-				source,
-				target,
-				kind: "stash",
-			}),
-		],
 		commit: () =>
 			runtime.run({
 				type: "inventory.stash",

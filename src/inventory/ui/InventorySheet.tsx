@@ -5,6 +5,7 @@ import { InventoryCell } from "~/inventory/ui/InventoryCell";
 import { InventoryItemLayer } from "~/inventory/ui/InventoryItemLayer";
 import { usePlayInventory } from "~/play/hook/usePlayInventory";
 import { usePlayItems } from "~/play/hook/usePlayItems";
+import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { InventorySlot } from "~/play/logic/playTypes";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 
@@ -18,11 +19,12 @@ export namespace InventorySheet {
 		invalidInventorySlot?: number;
 		onClose(): void;
 		onSlotDoubleActivate(slot: InventorySlot): void;
+		visualMotions: useVisualItemMotions.State;
 	}
 }
 
 export const InventorySheet: FC<InventorySheet.Props> = memo(
-	({ isSourceHidden, invalidInventorySlot, onClose, onSlotDoubleActivate }) => {
+	({ isSourceHidden, invalidInventorySlot, onClose, onSlotDoubleActivate, visualMotions }) => {
 		const inventory = usePlayInventory().data;
 		const items = usePlayItems().data;
 
@@ -57,6 +59,7 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 							slots={slots}
 							items={items}
 							isSourceHidden={isSourceHidden}
+							visualMotions={visualMotions}
 							onSlotDoubleActivate={onSlotDoubleActivate}
 						/>
 					</div>

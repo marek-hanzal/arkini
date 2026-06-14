@@ -1,5 +1,5 @@
 import type { DropPlan } from "~/drag/DropPlan";
-import type { FlyerKind, VisualMeta } from "~/play/types";
+import type { VisualTransitionKind, VisualMeta } from "~/play/types";
 import { flashDrop } from "./flashDrop";
 import { reject } from "./reject";
 import { resolveBoardDrop } from "./resolveBoardDrop";
@@ -23,7 +23,7 @@ export const resolveDrop = ({
 	game,
 	feedback,
 	run,
-}: resolveDrop.Props): DropPlan<string, FlyerKind, VisualMeta> => {
+}: resolveDrop.Props): DropPlan<string, VisualTransitionKind, VisualMeta> => {
 	if (!game || !context.target)
 		return reject(() =>
 			flashDrop({

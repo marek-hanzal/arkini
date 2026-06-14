@@ -164,6 +164,13 @@ export type ProducerDepletion =
 			itemId: ItemId;
 	  };
 
+export interface InventoryPlaceResult {
+	boardItemId: string;
+	itemId: ItemId;
+	x: number;
+	y: number;
+}
+
 export interface ProducerDropResult {
 	producerBoardItemId: string;
 	placements: ProducerPlacement[];

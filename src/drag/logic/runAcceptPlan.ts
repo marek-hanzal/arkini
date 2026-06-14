@@ -37,24 +37,20 @@ export const runAcceptPlan = async <
 	runtime.hideSources(plan.hide ?? []);
 
 	if (plan.animations?.length && plan.animationTiming !== "afterCommit") {
+		runtime.clearActiveDrag();
 		runtime.sendWorkflow({
 			type: "ANIMATION_STARTED",
 		});
-		const animations = playAnimations({
+		await playAnimations({
 			animations: plan.animations,
 			dragRect,
 			animate: runtime.animate,
 		});
 
-		await waitForPaint();
 		runtime.sendWorkflow({
 			type: "COMMIT_STARTED",
 		});
-		const commit = plan.commit();
-		await Promise.all([
-			animations,
-			commit,
-		]);
+		await plan.commit();
 	} else {
 		runtime.sendWorkflow({
 			type: "COMMIT_STARTED",
@@ -62,6 +58,7 @@ export const runAcceptPlan = async <
 		await plan.commit();
 
 		if (plan.animations?.length && plan.animationTiming === "afterCommit") {
+			runtime.clearActiveDrag();
 			runtime.sendWorkflow({
 				type: "ANIMATION_STARTED",
 			});

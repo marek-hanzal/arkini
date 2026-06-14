@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
-import { memo, type CSSProperties, type FC } from "react";
+import { memo, type CSSProperties, type FC, useCallback, useRef } from "react";
+import { useVisualItemMotionAnimation } from "~/animation/useVisualItemMotionAnimation";
 import { inventoryColumns } from "~/inventory/inventoryColumns";
 import { inventorySourceId } from "~/inventory/inventorySourceId";
 import { InventoryTile } from "~/inventory/ui/InventoryTile";
@@ -11,21 +12,17 @@ import {
 import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
 import type { VisualItemMotion } from "~/play/logic/visualItemMotionMachine";
 
-const layoutTransition = {
-	duration: 0.26,
+const exitTransition = {
+	duration: 0.18,
 	ease: [
-		0.22,
-		1,
-		0.36,
+		0.65,
+		0,
+		0.35,
 		1,
 	],
 } as const;
 
-const inventoryItemSlotStyle = (
-	slot: InventorySlot,
-	slotCount: number,
-	motion: VisualItemMotion | undefined,
-): CSSProperties => {
+const inventoryItemSlotStyle = (slot: InventorySlot, slotCount: number): CSSProperties => {
 	const rowCount = Math.ceil(slotCount / inventoryColumns);
 	const column = slot.slotIndex % inventoryColumns;
 	const row = Math.floor(slot.slotIndex / inventoryColumns);
@@ -37,20 +34,8 @@ const inventoryItemSlotStyle = (
 		height: `${100 / rowCount}%`,
 		paddingRight: 1,
 		paddingBottom: 1,
-		zIndex: motion?.priority === "raised" ? 30 : 0,
 	};
 };
-
-const initialFromMotion = (motion: VisualItemMotion | undefined) =>
-	motion
-		? {
-				x: motion.from.left - motion.to.left,
-				y: motion.from.top - motion.to.top,
-				scaleX: motion.to.width > 0 ? motion.from.width / motion.to.width : 1,
-				scaleY: motion.to.height > 0 ? motion.from.height / motion.to.height : 1,
-				opacity: 1,
-			}
-		: false;
 
 export namespace InventoryItemLayer {
 	export interface Props {
@@ -62,16 +47,82 @@ export namespace InventoryItemLayer {
 	}
 }
 
+namespace InventoryItemActor {
+	export interface Props {
+		slot: InventorySlot;
+		item: ViewItem;
+		slotCount: number;
+		stackMotionKey: string;
+		slotMotionKey: string;
+		visualMotion?: VisualItemMotion;
+		settleMotion: useVisualItemMotions.State["settle"];
+		hidden: boolean;
+		onSlotDoubleActivate(slot: InventorySlot): void;
+	}
+}
+
+const InventoryItemActor: FC<InventoryItemActor.Props> = memo(
+	({
+		slot,
+		item,
+		slotCount,
+		stackMotionKey,
+		slotMotionKey,
+		visualMotion,
+		settleMotion,
+		hidden,
+		onSlotDoubleActivate,
+	}) => {
+		const ref = useRef<HTMLDivElement | null>(null);
+		const settle = useCallback(() => {
+			if (!visualMotion) return;
+			settleMotion(stackMotionKey, visualMotion.nonce);
+			settleMotion(slotMotionKey, visualMotion.nonce);
+		}, [
+			settleMotion,
+			slotMotionKey,
+			stackMotionKey,
+			visualMotion,
+		]);
+		useVisualItemMotionAnimation({
+			ref,
+			motion: visualMotion,
+			onSettle: settle,
+		});
+
+		return (
+			<motion.div
+				ref={ref}
+				exit={{
+					opacity: 0,
+					y: 26,
+					scale: 0.9,
+				}}
+				transition={exitTransition}
+				className="pointer-events-auto absolute box-border origin-top-left"
+				style={inventoryItemSlotStyle(slot, slotCount)}
+			>
+				<InventoryTile
+					slot={slot}
+					item={item}
+					hidden={hidden}
+					onDoubleActivate={onSlotDoubleActivate}
+				/>
+			</motion.div>
+		);
+	},
+);
+
 /**
  * Renders inventory stack tiles as stable actors above inventory slots.
  *
  * Inventory cells stay as drop targets. Stack DOM nodes stay in this single layer
- * and only their mathematical slot coordinates change, so slot swaps do not
- * remount or blink through a parallel visual handoff.
+ * and only staged actors receive explicit movement, so unrelated stacks do not
+ * run layout projection when inventory data refreshes.
  */
 export const InventoryItemLayer: FC<InventoryItemLayer.Props> = memo(
 	({ slots, items, isSourceHidden, visualMotions, onSlotDoubleActivate }) => (
-		<div className="pointer-events-none absolute inset-0 z-10">
+		<div className="pointer-events-none absolute inset-0">
 			<AnimatePresence initial={false}>
 				{slots.map((slot) => {
 					const stack = slot.stack;
@@ -87,37 +138,18 @@ export const InventoryItemLayer: FC<InventoryItemLayer.Props> = memo(
 						visualMotions.motions[slotMotionKey];
 
 					return (
-						<motion.div
+						<InventoryItemActor
 							key={stack.id}
-							layout={visualMotion ? false : "position"}
-							initial={initialFromMotion(visualMotion)}
-							animate={{
-								x: 0,
-								y: 0,
-								scaleX: 1,
-								scaleY: 1,
-								opacity: 1,
-							}}
-							exit={{
-								opacity: 0,
-								scale: 0.84,
-							}}
-							transition={layoutTransition}
-							className="pointer-events-auto absolute box-border origin-top-left"
-							style={inventoryItemSlotStyle(slot, slots.length, visualMotion)}
-							onAnimationComplete={() => {
-								if (!visualMotion) return;
-								visualMotions.settle(stackMotionKey, visualMotion.nonce);
-								visualMotions.settle(slotMotionKey, visualMotion.nonce);
-							}}
-						>
-							<InventoryTile
-								slot={slot}
-								item={item}
-								hidden={isSourceHidden(inventorySourceId(slot.slotIndex))}
-								onDoubleActivate={onSlotDoubleActivate}
-							/>
-						</motion.div>
+							slot={slot}
+							item={item}
+							slotCount={slots.length}
+							stackMotionKey={stackMotionKey}
+							slotMotionKey={slotMotionKey}
+							visualMotion={visualMotion}
+							settleMotion={visualMotions.settle}
+							hidden={isSourceHidden(inventorySourceId(slot.slotIndex))}
+							onSlotDoubleActivate={onSlotDoubleActivate}
+						/>
 					);
 				})}
 			</AnimatePresence>

@@ -22,6 +22,8 @@ export const resolveInventoryDrop = ({
 			type: "ignore",
 		};
 
+	const targetStack = runtime.game.inventoryBySlotIndex[target.target.slotIndex]?.stack;
+
 	return accept({
 		animations: [
 			{
@@ -31,6 +33,17 @@ export const resolveInventoryDrop = ({
 				toNodeId: inventorySlotNodeId(target.target.slotIndex),
 				kind: "move",
 			},
+			...(targetStack
+				? [
+						{
+							itemId: targetStack.itemId,
+							actorKey: visualInventoryStackKey(targetStack.id),
+							fromNodeId: inventorySlotNodeId(target.target.slotIndex),
+							toNodeId: source.sourceNodeId,
+							kind: "move" as const,
+						},
+					]
+				: []),
 		],
 		commit: () =>
 			runtime.run({

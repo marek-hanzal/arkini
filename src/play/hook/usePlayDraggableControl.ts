@@ -12,6 +12,8 @@ import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { BoardView, GameDragView, InventoryView } from "~/play/logic/playTypes";
 import type { VisualTransitionKind, DragSource, DropTarget, VisualMeta } from "~/play/types";
+import { visualItemMotionDurationMs } from "~/animation/useVisualItemMotionAnimation";
+import { waitForMs } from "~/shared/util/waitForMs";
 import { resolveMagneticDropTarget } from "./resolveMagneticDropTarget";
 
 export type { Feedback } from "~/interaction/types";
@@ -63,7 +65,7 @@ export function usePlayDraggableControl({
 		],
 	);
 	const animate = useCallback(
-		(animation: {
+		async (animation: {
 			actorKey?: string;
 			from: import("~/play/types").RectLike;
 			to: import("~/play/types").RectLike;
@@ -77,6 +79,7 @@ export function usePlayDraggableControl({
 					priority: "raised",
 				},
 			]);
+			await waitForMs(visualItemMotionDurationMs);
 		},
 		[
 			visualMotions,

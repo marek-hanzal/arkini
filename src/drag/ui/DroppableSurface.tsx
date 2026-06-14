@@ -1,5 +1,5 @@
 import { useDroppable, type Data } from "@dnd-kit/core";
-import { type FC, useCallback, type HTMLAttributes, type ReactNode } from "react";
+import { memo, type FC, useCallback, type HTMLAttributes, useMemo, type ReactNode } from "react";
 import type { DroppablePayload } from "~/drag/DroppablePayload";
 
 export namespace DroppableSurface {
@@ -13,42 +13,43 @@ export namespace DroppableSurface {
 	}
 }
 
-export const DroppableSurface: FC<DroppableSurface.Props> = ({
-	id,
-	nodeId = id,
-	payload,
-	className,
-	children,
-	nodeRef,
-	...props
-}) => {
-	const data = {
-		...payload,
-		targetNodeId: payload.targetNodeId ?? nodeId,
-	} satisfies DroppablePayload<unknown>;
-	const { setNodeRef, isOver } = useDroppable({
-		id,
-		data: data as unknown as Data,
-	});
-	const setRefs = useCallback(
-		(node: HTMLDivElement | null) => {
-			setNodeRef(node);
-			nodeRef?.(node);
-		},
-		[
-			nodeRef,
-			setNodeRef,
-		],
-	);
+export const DroppableSurface: FC<DroppableSurface.Props> = memo(
+	({ id, nodeId = id, payload, className, children, nodeRef, ...props }) => {
+		const data = useMemo(
+			() =>
+				({
+					...payload,
+					targetNodeId: payload.targetNodeId ?? nodeId,
+				}) satisfies DroppablePayload<unknown>,
+			[
+				nodeId,
+				payload,
+			],
+		);
+		const { setNodeRef, isOver } = useDroppable({
+			id,
+			data: data as unknown as Data,
+		});
+		const setRefs = useCallback(
+			(node: HTMLDivElement | null) => {
+				setNodeRef(node);
+				nodeRef?.(node);
+			},
+			[
+				nodeRef,
+				setNodeRef,
+			],
+		);
 
-	return (
-		<div
-			ref={setRefs}
-			data-drag-node-id={nodeId}
-			className={typeof className === "function" ? className(isOver) : className}
-			{...props}
-		>
-			{children}
-		</div>
-	);
-};
+		return (
+			<div
+				ref={setRefs}
+				data-drag-node-id={nodeId}
+				className={typeof className === "function" ? className(isOver) : className}
+				{...props}
+			>
+				{children}
+			</div>
+		);
+	},
+);

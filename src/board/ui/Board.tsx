@@ -1,4 +1,4 @@
-import { type FC, useMemo } from "react";
+import { memo, type FC } from "react";
 import type { BoardCell as BoardCellModel } from "~/board/BoardCell";
 import { boardColumns } from "~/board/boardColumns";
 import { boardContainerNodeId } from "~/board/boardContainerNodeId";
@@ -6,19 +6,27 @@ import { boardRows } from "~/board/boardRows";
 import { boardSourceId } from "~/board/boardSourceId";
 import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
 import { BoardCell } from "~/board/ui/BoardCell";
-import { BoardTile } from "~/board/ui/BoardTile";
 import { cellKey } from "~/board/util/cell";
-import type { ItemId } from "~/manifest/manifestId";
 import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
+import type { ItemId } from "~/manifest/manifestId";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { BoardViewItem } from "~/play/logic/playTypes";
 import type { DragData } from "~/play/types";
-import { useProducerClock } from "~/producer/hook/useProducerClock";
-import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals";
-import { isProducerReady } from "~/producer/logic/isProducerReady";
-import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 
+const boardCells = Array.from(
+	{
+		length: boardColumns * boardRows,
+	},
+	(_, index) => ({
+		x: index % boardColumns,
+		y: Math.floor(index / boardColumns),
+		key: cellKey(index % boardColumns, Math.floor(index / boardColumns)),
+	}),
+);
+const boardGridStyle = {
+	gridTemplateColumns: `repeat(${boardColumns}, minmax(0, 1fr))`,
+};
 export namespace Board {
 	export interface DragState {
 		activeDrag?: DragData;
@@ -45,41 +53,22 @@ export namespace Board {
 	}
 }
 
-export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
+export const Board: FC<Board.Props> = memo(({ drag, feedback, actions }) => {
 	const board = usePlayBoard().data;
 	const items = usePlayItems().data;
-	const cells = useMemo(
-		() =>
-			Array.from(
-				{
-					length: boardColumns * boardRows,
-				},
-				(_, index) => ({
-					x: index % boardColumns,
-					y: Math.floor(index / boardColumns),
-				}),
-			),
-		[],
-	);
 	const showDelayedMergeHints = useDelayedMergeHints({
 		activeDrag: drag.activeDrag ?? undefined,
 	});
-	const nowMs = useProducerClock(board?.items ?? []);
-	useProducerReadySignals(board?.items ?? [], nowMs);
-
 	if (!board || !items) return null;
 
 	return (
 		<div
 			data-drag-boundary-id={boardContainerNodeId}
 			className="grid w-full overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
-			style={{
-				gridTemplateColumns: `repeat(${boardColumns}, minmax(0, 1fr))`,
-			}}
+			style={boardGridStyle}
 		>
-			{cells.map((cell) => {
-				const key = cellKey(cell.x, cell.y);
-				const boardItem = board.byCellKey[key];
+			{boardCells.map((cell) => {
+				const boardItem = board.byCellKey[cell.key];
 				const viewItem = boardItem ? items[boardItem.itemId] : undefined;
 				const canMerge =
 					drag.activeDrag?.source.kind === "board" &&
@@ -105,41 +94,28 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 								),
 							)
 						: false;
-				const producerCooldown = readProducerCooldown({
-					activation: boardItem?.activation,
-					nowMs,
-				});
-
 				return (
 					<BoardCell
-						key={key}
+						key={cell.key}
 						x={cell.x}
 						y={cell.y}
 						boardItem={boardItem}
+						item={viewItem}
+						tileHidden={
+							boardItem ? drag.isSourceHidden(boardSourceId(boardItem.id)) : false
+						}
 						canMerge={canMerge}
 						showDelayedMergeHint={showDelayedMergeHints}
-						producerReady={isProducerReady(boardItem?.activation, nowMs)}
-						producerCooldownProgress={producerCooldown?.progress}
-						craftProgress={boardItem?.craft?.progress}
-						invalid={feedback.invalidCellKey === key}
-						merged={feedback.mergedCellKey === key}
-						imprinted={feedback.imprintedCellKey === key}
+						invalid={feedback.invalidCellKey === cell.key}
+						merged={feedback.mergedCellKey === cell.key}
+						imprinted={feedback.imprintedCellKey === cell.key}
 						onEmptyDoubleActivate={actions.emptyDoubleActivate}
-					>
-						{boardItem && viewItem ? (
-							<BoardTile
-								boardItem={boardItem}
-								item={viewItem}
-								nowMs={nowMs}
-								hidden={drag.isSourceHidden(boardSourceId(boardItem.id))}
-								onSingleActivate={() => actions.tileSingleActivate(boardItem)}
-								onDoubleActivate={() => actions.tileDoubleActivate(boardItem)}
-								onLongActivate={() => actions.tileLongActivate(boardItem)}
-							/>
-						) : null}
-					</BoardCell>
+						onTileSingleActivate={actions.tileSingleActivate}
+						onTileDoubleActivate={actions.tileDoubleActivate}
+						onTileLongActivate={actions.tileLongActivate}
+					/>
 				);
 			})}
 		</div>
 	);
-};
+});

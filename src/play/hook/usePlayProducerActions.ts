@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type { Command } from "~/action/command";
 import { useCommand } from "~/play/hook/useCommand";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
@@ -44,33 +44,41 @@ export const usePlayProducerActions = ({
 	>({
 		invalidateOnSuccess: false,
 	});
+	const run = command.mutateAsync;
 
-	return {
-		produceFrom: useCallback(
-			(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") =>
-				schedule(`producer ${activation}`, () =>
-					produceFrom({
-						activeSheet,
-						boardItem,
-						activation,
-						addFlyer,
-						run: command.mutateAsync,
-						feedback,
-						hideSources,
-						clearHiddenSources,
-						invalidatePlayData,
-					}),
-				),
-			[
-				activeSheet,
-				addFlyer,
-				clearHiddenSources,
-				command.mutateAsync,
-				feedback,
-				hideSources,
-				invalidatePlayData,
-				schedule,
-			],
-		),
-	};
+	const produce = useCallback(
+		(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") =>
+			schedule(`producer ${activation}`, () =>
+				produceFrom({
+					activeSheet,
+					boardItem,
+					activation,
+					addFlyer,
+					run,
+					feedback,
+					hideSources,
+					clearHiddenSources,
+					invalidatePlayData,
+				}),
+			),
+		[
+			activeSheet,
+			addFlyer,
+			clearHiddenSources,
+			feedback,
+			hideSources,
+			invalidatePlayData,
+			run,
+			schedule,
+		],
+	);
+
+	return useMemo(
+		() => ({
+			produceFrom: produce,
+		}),
+		[
+			produce,
+		],
+	);
 };

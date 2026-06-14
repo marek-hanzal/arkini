@@ -1,5 +1,5 @@
 import type { DragStartEvent } from "@dnd-kit/core";
-import { useRef, useState, type RefObject } from "react";
+import { useCallback, useMemo, useRef, useState, type RefObject } from "react";
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import { rectForBoundaryNode } from "~/drag/logic/rectForBoundaryNode";
 import type { RectLike } from "~/play/types";
@@ -43,46 +43,62 @@ export const useDragSession = <
 		"width" | "height"
 	> | null>(null);
 
-	const clear = () => {
+	const clear = useCallback(() => {
 		activeDragRef.current = null;
 		dragBoundaryRectRef.current = null;
 		setActiveDrag(null);
 		setDragPreviewRect(null);
-	};
+	}, []);
 
-	const start = (event: DragStartEvent) => {
-		const source = event.active.data.current as DraggablePayload<
-			ItemId,
-			Source,
-			Overlay
-		> | null;
-		activeDragRef.current = source;
-		dragBoundaryRectRef.current = source
-			? rectForBoundaryNode({
-					nodeId: getDragBoundaryNodeId?.(source),
-				})
-			: null;
-		setActiveDrag(source);
-		const rect = (event.active.rect.current.initial ??
-			event.active.rect.current.translated) as RectLike | null;
-		setDragPreviewRect(
-			rect
-				? {
-						width: rect.width,
-						height: rect.height,
-					}
-				: null,
-		);
-		return source;
-	};
+	const clearPreview = useCallback(() => setDragPreviewRect(null), []);
 
-	return {
-		activeDragRef,
-		dragBoundaryRectRef,
-		activeDrag,
-		dragPreviewRect,
-		start,
-		clear,
-		clearPreview: () => setDragPreviewRect(null),
-	};
+	const start = useCallback(
+		(event: DragStartEvent) => {
+			const source = event.active.data.current as DraggablePayload<
+				ItemId,
+				Source,
+				Overlay
+			> | null;
+			activeDragRef.current = source;
+			dragBoundaryRectRef.current = source
+				? rectForBoundaryNode({
+						nodeId: getDragBoundaryNodeId?.(source),
+					})
+				: null;
+			setActiveDrag(source);
+			const rect = (event.active.rect.current.initial ??
+				event.active.rect.current.translated) as RectLike | null;
+			setDragPreviewRect(
+				rect
+					? {
+							width: rect.width,
+							height: rect.height,
+						}
+					: null,
+			);
+			return source;
+		},
+		[
+			getDragBoundaryNodeId,
+		],
+	);
+
+	return useMemo(
+		() => ({
+			activeDragRef,
+			dragBoundaryRectRef,
+			activeDrag,
+			dragPreviewRect,
+			start,
+			clear,
+			clearPreview,
+		}),
+		[
+			activeDrag,
+			clear,
+			clearPreview,
+			dragPreviewRect,
+			start,
+		],
+	);
 };

@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { memo, type FC } from "react";
 
 export namespace BoardCellProgress {
 	export interface Props {
@@ -6,7 +6,7 @@ export namespace BoardCellProgress {
 	}
 }
 
-export const BoardCellProgress: FC<BoardCellProgress.Props> = ({ progress }) => {
+export const BoardCellProgress: FC<BoardCellProgress.Props> = memo(({ progress }) => {
 	if (!progress || progress <= 0) return null;
 
 	return (
@@ -19,4 +19,4 @@ export const BoardCellProgress: FC<BoardCellProgress.Props> = ({ progress }) => 
 			/>
 		</div>
 	);
-};
+});

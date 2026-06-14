@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { memo, type FC } from "react";
 import { GameItemContent } from "~/item/ui/GameItemContent";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
 import type { RectLike } from "~/play/types";
@@ -20,43 +20,37 @@ export namespace GameItemView {
 	}
 }
 
-export const GameItemView: FC<GameItemView.Props> = ({
-	item,
-	variant,
-	sizeVariant,
-	quantity,
-	activation,
-	overlaySize,
-	activationNowMs,
-}) => {
-	const resolvedSizeVariant = sizeVariant ?? (variant === "drag" ? "board" : variant);
+export const GameItemView: FC<GameItemView.Props> = memo(
+	({ item, variant, sizeVariant, quantity, activation, overlaySize, activationNowMs }) => {
+		const resolvedSizeVariant = sizeVariant ?? (variant === "drag" ? "board" : variant);
 
-	return (
-		<div
-			data-ak-item-view
-			data-ak-item-variant={variant}
-			data-ak-item-size-variant={resolvedSizeVariant}
-			className={cn(
-				"relative h-full w-full select-none",
-				resolvedSizeVariant === "board" && "p-[13%]",
-				resolvedSizeVariant === "inventory" && "p-[12%]",
-				resolvedSizeVariant === "flyer" && "p-[10%]",
-			)}
-			style={
-				variant === "drag" && overlaySize
-					? {
-							width: overlaySize.width,
-							height: overlaySize.height,
-						}
-					: undefined
-			}
-		>
-			<GameItemContent
-				item={item}
-				quantity={quantity}
-				activation={activation}
-				activationNowMs={activationNowMs}
-			/>
-		</div>
-	);
-};
+		return (
+			<div
+				data-ak-item-view
+				data-ak-item-variant={variant}
+				data-ak-item-size-variant={resolvedSizeVariant}
+				className={cn(
+					"relative h-full w-full select-none",
+					resolvedSizeVariant === "board" && "p-[13%]",
+					resolvedSizeVariant === "inventory" && "p-[12%]",
+					resolvedSizeVariant === "flyer" && "p-[10%]",
+				)}
+				style={
+					variant === "drag" && overlaySize
+						? {
+								width: overlaySize.width,
+								height: overlaySize.height,
+							}
+						: undefined
+				}
+			>
+				<GameItemContent
+					item={item}
+					quantity={quantity}
+					activation={activation}
+					activationNowMs={activationNowMs}
+				/>
+			</div>
+		);
+	},
+);

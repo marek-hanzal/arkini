@@ -26,6 +26,7 @@ export interface GameDragActions {
 
 export interface GameDragFeedback {
 	pulseMergeCell(key: string | undefined): void;
+	pulseImprintCell(key: string | undefined): void;
 	flashBoardCell(key: string | undefined, tone: "error"): void;
 	flashInventorySlot(slotIndex: number | undefined, tone: "error"): void;
 	showError(error: unknown): void;
@@ -173,15 +174,26 @@ function boardToCell(
 		);
 	}
 
-	const canMerge = Boolean(
-		resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId),
+	const mergeRule = resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId);
+	const isDirectedMerge = mergeRule?.consumeSource === false;
+	const isForwardDirectedMerge = Boolean(
+		isDirectedMerge &&
+			source.itemId === mergeRule?.sourceItemId &&
+			targetItem.itemId === mergeRule?.withItemId,
 	);
+	const canMerge = Boolean(mergeRule && (!isDirectedMerge || isForwardDirectedMerge));
 	const canCraft = Boolean(targetItem.craft?.acceptedInputItemIds.includes(source.itemId));
 	const canSupplyProducer = Boolean(
 		targetItem.producer?.inputs.some(
 			(input) => input.itemId === source.itemId && input.stored < input.capacity,
 		),
 	);
+
+	if (isDirectedMerge && !isForwardDirectedMerge) {
+		return reject(() =>
+			feedback.flashBoardCell(cellKey(target.target.x, target.target.y), "error"),
+		);
+	}
 
 	if (!canMerge && !canCraft && !canSupplyProducer) {
 		return accept({
@@ -205,6 +217,30 @@ function boardToCell(
 					sourceBoardItemId: source.source.boardItemId,
 					targetBoardItemId,
 				}),
+		});
+	}
+
+	if (isForwardDirectedMerge) {
+		return accept({
+			hide: [
+				source.sourceId,
+			],
+			animationTiming: "afterCommit",
+			animations: [
+				{
+					itemId: source.itemId,
+					fromNodeId: source.sourceNodeId,
+					toNodeId: source.sourceNodeId,
+					kind: "imprint-source",
+					overlay: source.overlay,
+				},
+			],
+			commit: () =>
+				actions.mergeBoard({
+					sourceBoardItemId: source.source.boardItemId,
+					targetBoardItemId,
+				}),
+			feedback: () => feedback.pulseImprintCell(cellKey(target.target.x, target.target.y)),
 		});
 	}
 

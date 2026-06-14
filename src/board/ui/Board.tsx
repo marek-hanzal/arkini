@@ -30,6 +30,7 @@ export namespace Board {
 	export interface FeedbackState {
 		invalidCellKey?: string;
 		mergedCellKey?: string;
+		imprintedCellKey?: string;
 	}
 
 	export interface Actions {
@@ -123,6 +124,7 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 						craftProgress={boardItem?.craft?.progress}
 						invalid={feedback.invalidCellKey === key}
 						merged={feedback.mergedCellKey === key}
+						imprinted={feedback.imprintedCellKey === key}
 						onEmptyDoubleActivate={actions.emptyDoubleActivate}
 					>
 						{boardItem && viewItem ? (

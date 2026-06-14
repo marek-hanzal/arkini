@@ -1,20 +1,23 @@
 import { useEffect, useRef, type RefObject } from "react";
-import { playCellError, playCellSuccess } from "~/play/util/animation";
+import { playCellError, playCellImprint, playCellSuccess } from "~/play/util/animation";
 
 export namespace useGsapCellFeedback {
 	export interface Props {
 		invalid: boolean;
 		success: boolean;
+		imprint: boolean;
 	}
 }
 
 export function useGsapCellFeedback<TElement extends HTMLElement>(
 	ref: RefObject<TElement | null>,
-	{ invalid, success }: useGsapCellFeedback.Props,
+	{ invalid, success, imprint }: useGsapCellFeedback.Props,
 ) {
 	const wasInvalidRef = useRef(false);
 	const wasSuccessRef = useRef(success);
+	const wasImprintRef = useRef(imprint);
 	const didMountSuccessRef = useRef(false);
+	const didMountImprintRef = useRef(false);
 
 	useEffect(() => {
 		const element = ref.current;
@@ -38,6 +41,22 @@ export function useGsapCellFeedback<TElement extends HTMLElement>(
 		wasSuccessRef.current = success;
 	}, [
 		success,
+		ref,
+	]);
+
+	useEffect(() => {
+		const element = ref.current;
+
+		if (!didMountImprintRef.current) {
+			didMountImprintRef.current = true;
+			wasImprintRef.current = imprint;
+			return;
+		}
+
+		if (element && imprint && !wasImprintRef.current) playCellImprint(element);
+		wasImprintRef.current = imprint;
+	}, [
+		imprint,
 		ref,
 	]);
 }

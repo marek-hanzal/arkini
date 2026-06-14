@@ -113,6 +113,7 @@ export const GameConfigSchema = z.object({
 						id: z.string().startsWith("merge:"),
 						withItemId: ItemIdSchema,
 						resultItemId: ItemIdSchema,
+						consumeSource: z.boolean().optional(),
 						inputCount: z.literal(2).optional(),
 						secret: z.boolean().optional(),
 					}),

@@ -165,6 +165,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							feedback={{
 								invalidCellKey: feedback.invalidBoardCellKey,
 								mergedCellKey: feedback.mergedBoardCellKey,
+								imprintedCellKey: feedback.imprintedBoardCellKey,
 							}}
 							actions={{
 								emptyDoubleActivate: () => undefined,

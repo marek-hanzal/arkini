@@ -1,7 +1,7 @@
 import type { IdService } from "~/id/context/IdServiceFx";
 import { findFreeBoardCells } from "~/board/logic/planning/boardCells";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/data/manifestId";
+import type { ItemId } from "~/manifest/manifestId";
 import { cloneInventory, planInventoryPlacement } from "./inventoryPlacement";
 import type { BoardRow, InventoryRow, PlacementPlan, SaveShape } from "./types";
 

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { ItemId } from "~/manifest/data/manifestId";
-import type { ActivationOutput } from "~/manifest/data/producer";
+import type { ItemId } from "~/manifest/manifestId";
+import type { ActivationOutput } from "~/manifest/producer";
 import { repeatItem } from "~/producer/logic/repeatItem";
 import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 import { resolveQuantityFx } from "./resolveQuantityFx";

@@ -10,7 +10,7 @@ import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
 import { BoardCell } from "~/board/ui/BoardCell";
 import { BoardTile } from "~/board/ui/BoardTile";
 import { cellKey } from "~/board/util/cell";
-import type { ItemId } from "~/manifest/data/manifestId";
+import type { ItemId } from "~/manifest/manifestId";
 import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayItems } from "~/play/hook/usePlayItems";

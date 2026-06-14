@@ -4,8 +4,8 @@ import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { GameConfig } from "~/manifest/data/GameConfig";
-import { assertGameConfig } from "~/manifest/data/validation/gameConfig";
+import type { GameConfig } from "~/manifest/GameConfig";
+import { assertGameConfig } from "~/manifest/validation/gameConfig";
 import type { GameConfigSyncResult } from "~/play/logic/GameConfigSyncResult";
 import { hashConfigFx } from "./hashConfigFx";
 

@@ -1,7 +1,7 @@
 import type { AssetDefinition } from "../asset";
 import type { AssetId } from "../manifestId";
 
-const png = (name: string) => new URL(`../png/${name}.png`, import.meta.url).href;
+const png = (name: string) => new URL(`../../assets/${name}.png`, import.meta.url).href;
 
 export namespace blueprintAsset {
 	export interface Props {

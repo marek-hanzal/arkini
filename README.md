@@ -15,7 +15,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, upgrades, and local database/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
-The game has one gameplay source of truth: `GameConfig` in `src/manifest/data/GameConfig.ts`. It carries the game shape, board size, inventory size, assets, item definitions, item behavior, and starting state. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins.
+The game has one gameplay source of truth: `GameConfig` in `src/manifest/GameConfig.ts`. It carries the game shape, board size, inventory size, assets, item definitions, item behavior, and starting state. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins.
 
 Item definitions drive behavior. An item may define:
 
@@ -109,7 +109,8 @@ If a component needs board data, it subscribes to board data. If it needs invent
 
 ```txt
 src/app/                         App entry, router, global styles, cross-origin isolation fallback.
-src/manifest/data/               GameConfig, craft/merge/producer definitions, Zod config schema, validation, derived indexes, SVG assets.
+src/manifest/                    GameConfig, craft/merge/producer definitions, Zod config schema, validation, derived indexes.
+src/assets/                      PNG gameplay assets imported by manifest helper utilities.
 src/manifest/context/            Effect game config service context tag.
 src/manifest/logic/              Live config service, derived lookup helpers, and provider helper.
 src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.

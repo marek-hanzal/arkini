@@ -1,5 +1,5 @@
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
-import type { UpgradeEffectDefinition } from "~/manifest/data/upgrade";
+import type { UpgradeEffectDefinition } from "~/manifest/upgrade";
 
 export function describeUpgradeEffect(
 	gameConfig: GameConfigService,

@@ -1,6 +1,6 @@
 import type { BoardCell } from "~/board/boardIdentity";
-import type { CraftRecipeInput } from "~/manifest/data/craft";
-import type { ItemId } from "~/manifest/data/manifestId";
+import type { CraftRecipeInput } from "~/manifest/craft";
+import type { ItemId } from "~/manifest/manifestId";
 
 export interface GameSaveView {
 	id: string;

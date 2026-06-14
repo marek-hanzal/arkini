@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { ActivationWeightedEntry } from "~/manifest/data/producer";
+import type { ActivationWeightedEntry } from "~/manifest/producer";
 import { GameActionError } from "~/play/logic/playTypes";
 import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 

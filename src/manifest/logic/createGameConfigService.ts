@@ -1,6 +1,6 @@
-import { createGameDataIndex } from "~/manifest/data/createGameDataIndex";
-import type { GameConfig } from "~/manifest/data/GameConfig";
-import { itemMergePairKey } from "~/manifest/data/itemMergePairKey";
+import { createGameDataIndex } from "~/manifest/createGameDataIndex";
+import type { GameConfig } from "~/manifest/GameConfig";
+import { itemMergePairKey } from "~/manifest/itemMergePairKey";
 import type {
 	AssetId,
 	CraftRecipeId,
@@ -8,7 +8,7 @@ import type {
 	LootTableId,
 	ResourceId,
 	UpgradeId,
-} from "~/manifest/data/manifestId";
+} from "~/manifest/manifestId";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 
 export function createGameConfigService(config: GameConfig): GameConfigService {

@@ -1,8 +1,6 @@
 import type { DropPlan } from "~/drag/DropPlan";
-import { inventorySourceId } from "~/inventory/inventorySourceId";
 import type { FlyerKind, VisualMeta } from "~/play/types";
 import { accept } from "./accept";
-import { inventoryMoveAnimations } from "./inventoryMoveAnimations";
 import type { Runtime, TypedDropContext } from "./types";
 
 export namespace resolveInventoryDrop {
@@ -22,23 +20,7 @@ export const resolveInventoryDrop = ({
 			type: "ignore",
 		};
 
-	const targetStack = runtime.game.inventoryBySlotIndex[target.target.slotIndex]?.stack;
-	const animations = inventoryMoveAnimations({
-		context,
-		targetStack,
-	});
-	const hide = [
-		source.sourceId,
-		...(targetStack
-			? [
-					inventorySourceId(target.target.slotIndex),
-				]
-			: []),
-	];
-
 	return accept({
-		hide,
-		animations,
 		commit: () =>
 			runtime.run({
 				type: "inventory.swap",

@@ -1,8 +1,8 @@
 import { memo, type FC } from "react";
 import { inventoryContainerNodeId } from "~/inventory/inventoryContainerNodeId";
 import { inventoryColumns } from "~/inventory/inventoryColumns";
-import { inventorySourceId } from "~/inventory/inventorySourceId";
 import { InventoryCell } from "~/inventory/ui/InventoryCell";
+import { InventoryItemLayer } from "~/inventory/ui/InventoryItemLayer";
 import { usePlayInventory } from "~/play/hook/usePlayInventory";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { InventorySlot } from "~/play/logic/playTypes";
@@ -43,19 +43,22 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 				<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
 					<div
 						data-drag-boundary-id={inventoryContainerNodeId}
-						className="ak-game-width mx-auto grid gap-0 overflow-hidden border-l border-t border-slate-800"
+						className="ak-game-width relative mx-auto grid gap-0 overflow-hidden border-l border-t border-slate-800"
 						style={inventoryGridStyle}
 					>
 						{slots.map((slot) => (
 							<InventoryCell
 								key={slot.slotIndex}
 								slot={slot}
-								item={slot.stack ? items[slot.stack.itemId] : undefined}
-								hidden={isSourceHidden(inventorySourceId(slot.slotIndex))}
 								invalid={invalidInventorySlot === slot.slotIndex}
-								onDoubleActivate={onSlotDoubleActivate}
 							/>
 						))}
+						<InventoryItemLayer
+							slots={slots}
+							items={items}
+							isSourceHidden={isSourceHidden}
+							onSlotDoubleActivate={onSlotDoubleActivate}
+						/>
 					</div>
 				</div>
 			</div>

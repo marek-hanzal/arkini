@@ -5,9 +5,8 @@ import { boardRows } from "~/board/boardRows";
 import { useMotionCellFeedback } from "~/board/hook/useMotionCellFeedback";
 import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
 import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
-import { BoardTile } from "~/board/ui/BoardTile";
 import { DroppableSurface } from "~/drag/ui/DroppableSurface";
-import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/play/logic/playTypes";
 import type { DropData } from "~/play/types";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals";
@@ -22,33 +21,16 @@ export namespace BoardCell {
 		x: number;
 		y: number;
 		boardItem?: BoardViewItem;
-		item?: ViewItem;
-		tileHidden: boolean;
 		canMerge: boolean;
 		showDelayedMergeHint: boolean;
 		invalid: boolean;
 		merged: boolean;
 		imprinted: boolean;
-		onTileSingleActivate(item: BoardViewItem): void;
-		onTileLongActivate(item: BoardViewItem): void;
 	}
 }
 
 export const BoardCell: FC<BoardCell.Props> = memo(
-	({
-		x,
-		y,
-		boardItem,
-		item,
-		tileHidden,
-		canMerge,
-		showDelayedMergeHint,
-		invalid,
-		merged,
-		imprinted,
-		onTileSingleActivate,
-		onTileLongActivate,
-	}) => {
+	({ x, y, boardItem, canMerge, showDelayedMergeHint, invalid, merged, imprinted }) => {
 		const id = boardCellNodeId(x, y);
 		const cellRef = useRef<HTMLDivElement | null>(null);
 		const clockItems = useMemo(
@@ -133,16 +115,6 @@ export const BoardCell: FC<BoardCell.Props> = memo(
 				className={className}
 			>
 				<BoardCellProgress progress={boardItem?.craft?.progress} />
-				{boardItem && item ? (
-					<BoardTile
-						boardItem={boardItem}
-						item={item}
-						activationNowMs={boardItem.activation ? nowMs : undefined}
-						hidden={tileHidden}
-						onSingleActivate={onTileSingleActivate}
-						onLongActivate={onTileLongActivate}
-					/>
-				) : null}
 				<BoardCellCooldownProgress progress={producerCooldown?.progress} />
 			</DroppableSurface>
 		);

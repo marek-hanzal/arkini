@@ -2,9 +2,9 @@ import { memo, type FC } from "react";
 import { boardColumns } from "~/board/boardColumns";
 import { boardContainerNodeId } from "~/board/boardContainerNodeId";
 import { boardRows } from "~/board/boardRows";
-import { boardSourceId } from "~/board/boardSourceId";
 import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
 import { BoardCell } from "~/board/ui/BoardCell";
+import { BoardItemLayer } from "~/board/ui/BoardItemLayer";
 import { cellKey } from "~/board/util/cell";
 import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
 import type { ItemId } from "~/manifest/manifestId";
@@ -61,12 +61,11 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions }) => {
 	return (
 		<div
 			data-drag-boundary-id={boardContainerNodeId}
-			className="grid w-full overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
+			className="relative grid w-full overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
 			style={boardGridStyle}
 		>
 			{boardCells.map((cell) => {
 				const boardItem = board.byCellKey[cell.key];
-				const viewItem = boardItem ? items[boardItem.itemId] : undefined;
 				const canMerge =
 					drag.activeDrag?.source.kind === "board" &&
 					boardItem !== undefined &&
@@ -97,20 +96,20 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions }) => {
 						x={cell.x}
 						y={cell.y}
 						boardItem={boardItem}
-						item={viewItem}
-						tileHidden={
-							boardItem ? drag.isSourceHidden(boardSourceId(boardItem.id)) : false
-						}
 						canMerge={canMerge}
 						showDelayedMergeHint={showDelayedMergeHints}
 						invalid={feedback.invalidCellKey === cell.key}
 						merged={feedback.mergedCellKey === cell.key}
 						imprinted={feedback.imprintedCellKey === cell.key}
-						onTileSingleActivate={actions.tileSingleActivate}
-						onTileLongActivate={actions.tileLongActivate}
 					/>
 				);
 			})}
+			<BoardItemLayer
+				boardItems={board.items}
+				items={items}
+				isSourceHidden={drag.isSourceHidden}
+				actions={actions}
+			/>
 		</div>
 	);
 });

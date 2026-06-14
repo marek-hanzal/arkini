@@ -50,8 +50,8 @@ export type FlyerKind =
 	| "stash"
 	| "place"
 	| "deplete"
-	| "merge-source"
-	| "merge-target"
+	| "merge-crossfade"
+	| "consume"
 	| "imprint-source";
 
 export interface FlyerModel extends VisualMeta {

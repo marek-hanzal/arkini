@@ -31,9 +31,11 @@ export const resolveAnimation = <
 				}));
 	const to =
 		animation.to ??
-		rectForNode({
-			nodeId: animation.toNodeId,
-		});
+		(animation.toDrag && dragRect
+			? dragRect
+			: rectForNode({
+					nodeId: animation.toNodeId,
+				}));
 	if (!from || !to) return null;
 	return {
 		itemId: animation.itemId,

@@ -5,6 +5,7 @@ import { playMergeCrossFade } from "./playMergeCrossFade";
 
 const flyDurationSeconds = 0.32;
 const stashExitSeconds = 0.08;
+const consumeDurationSeconds = 0.18;
 
 export namespace playFlyerTimeline {
 	export interface Props {
@@ -52,7 +53,7 @@ export const playFlyerTimeline = (
 				})
 				.set(crossFadeTo, {
 					opacity: 0,
-					scale: 0.92,
+					scale: kind === "merge-crossfade" ? 1 : 0.92,
 					transformOrigin: "center",
 				});
 		}
@@ -87,59 +88,25 @@ export const playFlyerTimeline = (
 			return;
 		}
 
-		if (kind === "merge-source") {
+		if (kind === "merge-crossfade") {
 			playMergeCrossFade({
 				timeline,
 				from: crossFadeFrom,
 				to: crossFadeTo,
 			});
-			timeline
-				.to(
-					element,
-					{
-						x,
-						y,
-						scale: scale * 0.74,
-						opacity: 0.86,
-						duration: 0.22,
-						ease: "power3.out",
-					},
-					0,
-				)
-				.to(element, {
-					scale: scale * 0.52,
-					opacity: 0,
-					duration: 0.12,
-					ease: "power2.in",
-				});
 			return;
 		}
 
-		if (kind === "merge-target") {
-			playMergeCrossFade({
-				timeline,
-				from: crossFadeFrom,
-				to: crossFadeTo,
+		if (kind === "consume") {
+			timeline.set(element, {
+				transformOrigin: "center",
 			});
-			timeline
-				.to(
-					element,
-					{
-						x,
-						y,
-						scale: 1.13,
-						opacity: 0.92,
-						duration: 0.15,
-						ease: "power2.out",
-					},
-					0,
-				)
-				.to(element, {
-					scale: 0.9,
-					opacity: 0,
-					duration: 0.18,
-					ease: "power2.in",
-				});
+			timeline.to(element, {
+				scale: 0.36,
+				opacity: 0,
+				duration: consumeDurationSeconds,
+				ease: "power2.in",
+			});
 			return;
 		}
 

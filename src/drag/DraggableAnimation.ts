@@ -13,6 +13,8 @@ export interface DraggableAnimation<
 	to?: RectLike;
 	/** Resolve the animation start from the final drag overlay rect instead of the original source node. */
 	fromDrag?: boolean;
+	/** Resolve the animation end from the final drag overlay rect instead of a DOM target node. */
+	toDrag?: boolean;
 	/** App-owned visual metadata forwarded to the animation renderer. */
 	overlay?: Overlay;
 }

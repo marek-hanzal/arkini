@@ -4,7 +4,6 @@ import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { HardResetButton } from "~/play/ui/HardResetButton";
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlaySave } from "~/play/hook/usePlaySave";
-import { usePlayItems } from "~/play/hook/usePlayItems";
 import { Board } from "~/board/ui/Board";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";
 import { BottomSheet } from "~/play/ui/BottomSheet";

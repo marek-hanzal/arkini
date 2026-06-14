@@ -35,7 +35,7 @@ There are no separate static `merges`, `producers`, and `craftRecipes` arrays. L
 
 ## Logic and Effect boundary
 
-Effect belongs to the server-like game backend, not the UI. React components, Zustand stores, React Query hooks, drag surfaces, and GSAP animation code stay normal UI code. The boundary is `src/play/logic/playBackend.ts`: UI calls Promise-returning backend functions, while those wrappers run domain Effect roots underneath.
+Effect belongs to the server-like game backend, not the UI. React components, React Query hooks, drag surfaces, and GSAP animation code stay normal UI code. The boundary is `src/play/logic/playBackend.ts`: UI calls Promise-returning backend functions, while those wrappers run domain Effect roots underneath.
 
 Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. Names are short inside their domain: `board/fx/moveFx.ts`, `inventory/fx/swapFx.ts`, `producer/fx/produceFx.ts`, `player/fx/collectFx.ts`, `upgrade/fx/buyFx.ts`. If a callsite needs multiple same-name domain effects, import aliases are allowed. Repeating the domain in every function name is banned, because `producerProduceProducerFx` would be a cry for help, not architecture.
 
@@ -45,7 +45,7 @@ Database access is provided through `KyselyContextFx`; domain effects call `dbFx
 
 Time is provided through `DateServiceFx` and represented with Luxon; domain effects use the service for timestamps, cooldown math, and timestamp parsing instead of poking global `Date` everywhere. ID generation is provided through `IdServiceFx`, backed by `@paralleldrive/cuid2` through `genId`, so board ids and virtual inventory ids come from one service instead of scattered `crypto.randomUUID()` improv jazz.
 
-Static gameplay data is provided through `GameConfigServiceFx`. Effects use it for config access, derived indexes, producer/item/craft lookup, merge resolution, and status summaries instead of importing `GameConfig`/`gameDataIndex` everywhere like globals are a personality. Config hashing is isolated behind `HashServiceFx`, with WebCrypto living in one live service implementation.
+Static gameplay data is provided through `GameConfigServiceFx`. Effects use it for config access, derived indexes, producer/item/craft lookup, merge resolution, and status summaries instead of importing raw `GameConfig` everywhere like globals are a personality. Config hashing is isolated behind `HashServiceFx`, with WebCrypto living in one live service implementation.
 
 Randomness is provided through `RandomServiceFx`; producer rolls do not call `Math.random()` directly. The random service is not a dumb wrapper: it exposes common game-random helpers such as `number(max)`, `chance(probability)`, `integerInclusive(min, max)`, and typed `weighted(entries, fallback)` picking. The only live random implementation is `RandomServiceLive`, so deterministic/test random can be swapped in later from one place.
 
@@ -198,15 +198,15 @@ On boot:
 
 1. Browser capability checks run.
 2. Kysely migrations run. If Kysely reports corrupted/missing historical migrations, the local OPFS database is dropped and migrated fresh. The root error boundary and database sheet also expose a hard reset button, because a prototype save is not worth an infinite broken boot loop.
-3. `syncGameConfig()` validates and hashes `GameConfig`.
+3. `syncConfigFx()` validates and hashes `GameConfig`.
 4. If the stored hash differs from the current hash, the default save is deleted.
-5. `ensureDefaultSaveGame()` creates the default save from the current starting state when missing.
+5. `ensureDefaultSaveFx()` creates the default save from the current starting state when missing.
 
 There is no gameplay data backward compatibility. Ever. Old saves are disposable prototype state, not sacred museum artifacts.
 
 ## Validation policy
 
-SQLite is local storage, not the final game authority. Gameplay inputs and loaded mutable rows are validated with Zod in `src/play/logic/gameActionSchemas.ts` and `readMutableSave()`. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
+SQLite is local storage, not the final game authority. Gameplay inputs and loaded mutable rows are validated with Zod in `src/play/logic/gameActionSchemas.ts` and `readMutableSaveFx()`. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
 
 ## Minimal-code philosophy
 

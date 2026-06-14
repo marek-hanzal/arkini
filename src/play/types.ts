@@ -58,7 +58,5 @@ export interface FlyerModel extends GameVisualMeta {
 	kind: FlyerKind;
 }
 
-export type ActivationView = NonNullable<BoardViewItem["activation"]>;
-
 export const flashMs = 650;
 export const flyerRenderSettleMs = 180;

@@ -269,25 +269,6 @@ export function playCellError(element: HTMLElement) {
 		});
 }
 
-export function playProducerCooldown(element: HTMLElement) {
-	gsap.killTweensOf(element, "backgroundColor,boxShadow");
-	gsap.timeline()
-		.to(element, {
-			backgroundColor: "rgb(15 23 42 / 0.18)",
-			boxShadow:
-				"inset 0 0 0 0.14rem rgb(45 212 191 / 0.34), inset 0 0 1rem rgb(45 212 191 / 0.16)",
-			duration: 0.12,
-			ease: "power2.out",
-		})
-		.to(element, {
-			backgroundColor: "rgb(15 23 42 / 0)",
-			boxShadow: "inset 0 0 0 0.32rem rgb(45 212 191 / 0)",
-			duration: 0.28,
-			ease: "power2.out",
-			clearProps: "backgroundColor,boxShadow",
-		});
-}
-
 export function playBottomNavPulse(element: HTMLElement) {
 	playBottomNavHold(element);
 }

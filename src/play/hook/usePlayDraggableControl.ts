@@ -14,10 +14,10 @@ import {
 	getGameDragBoundaryNodeId,
 	resolveGameDrop,
 	type GameDragFeedback,
-} from "~/game/interaction/dragDropEngine";
+} from "~/interaction/dragDropEngine";
 import { resolveMagneticGameDropTarget } from "./resolveMagneticGameDropTarget";
 
-export type { GameDragFeedback } from "~/game/interaction/dragDropEngine";
+export type { GameDragFeedback } from "~/interaction/dragDropEngine";
 
 export namespace usePlayDraggableControl {
 	export interface Props {

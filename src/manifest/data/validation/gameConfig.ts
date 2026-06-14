@@ -11,7 +11,7 @@ import type {
 } from "../manifestId";
 import type { GameConfig } from "../GameConfig";
 import { assert, assertUnique } from "./assert";
-import { assertProducerDefinition } from "./producer";
+import { assertActivationOutput, assertProducerDefinition } from "./producer";
 import { assertStartingState } from "./startingState";
 
 export function assertGameConfig(config: GameConfig) {
@@ -97,6 +97,13 @@ export function assertGameConfig(config: GameConfig) {
 
 	for (const table of config.lootTables) {
 		assert(table.output.length > 0, `${table.id} loot table must define output`);
+		assert(
+			table.output.some(
+				(output) => output.type === "guaranteed" || output.type === "weighted",
+			),
+			`${table.id} loot table must guarantee at least one item`,
+		);
+		for (const output of table.output) assertActivationOutput(table.id, output, itemIds);
 	}
 
 	for (const upgrade of config.upgrades) {

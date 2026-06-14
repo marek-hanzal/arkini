@@ -12,8 +12,7 @@ export interface ActivationInputDefinition {
 export interface ActivationSharedDefinition {
 	trigger: ActivationTrigger;
 	placement: ActivationPlacement;
-	output: readonly ActivationOutput[];
-	outputTableId?: LootTableId;
+	outputTableId: LootTableId;
 	inputs?: readonly ActivationInputDefinition[];
 }
 
@@ -52,17 +51,11 @@ export type ActivationOutput =
 			entries: readonly ActivationWeightedEntry[];
 	  };
 
-export type ActivationWeightedEntry =
-	| {
-			itemId: ItemId;
-			weight: number;
-			quantity?: Quantity;
-	  }
-	| {
-			itemId: null;
-			weight: number;
-			quantity?: never;
-	  };
+export interface ActivationWeightedEntry {
+	itemId: ItemId;
+	weight: number;
+	quantity?: Quantity;
+}
 
 export type Quantity =
 	| number

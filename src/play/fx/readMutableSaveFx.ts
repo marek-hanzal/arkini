@@ -3,12 +3,10 @@ import { completeReadyFx } from "~/upgrade/fx/completeReadyFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import { defaultSaveGameId } from "~/play/logic/save";
-import {
-	BoardItemRowSchema,
-	InventoryStackRowSchema,
-	PlayerUpgradeRowSchema,
-	SaveRowSchema,
-} from "~/play/logic/gameActionSchemas";
+import { BoardItemRowSchema } from "~/play/schema/BoardItemRowSchema";
+import { InventoryStackRowSchema } from "~/play/schema/InventoryStackRowSchema";
+import { PlayerUpgradeRowSchema } from "~/play/schema/PlayerUpgradeRowSchema";
+import { SaveRowSchema } from "~/play/schema/SaveRowSchema";
 
 export const readMutableSaveFx = Effect.fn("readMutableSaveFx")(function* () {
 	yield* completeReadyFx();

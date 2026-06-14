@@ -1,6 +1,6 @@
 import { boardSourceId } from "~/board/boardSourceId";
 import { cellKey } from "~/board/util/cell";
-import type { DropPlan } from "~/drag/hook/useDraggableControl";
+import type { DropPlan } from "~/drag/DropPlan";
 import type { ItemId } from "~/manifest/manifestId";
 import { resolveDropIntent } from "~/merge/resolveDropIntent";
 import type { FlyerKind, VisualMeta } from "~/play/types";

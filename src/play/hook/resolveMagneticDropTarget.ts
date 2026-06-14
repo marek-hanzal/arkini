@@ -1,7 +1,7 @@
 import { boardCellNodeId } from "~/board/boardCellNodeId";
 import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
 import { nearestMagneticElement } from "~/interaction/magnetic/nearestMagneticElement";
-import type { MagneticDropContext } from "~/drag/hook/useDraggableControl";
+import type { MagneticDropContext } from "~/drag/MagneticDropContext";
 import type { DragSource, DropData, DropTarget, VisualMeta } from "~/play/types";
 
 export const resolveMagneticDropTarget = ({

@@ -4,7 +4,7 @@ import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { MoveBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
+import { MoveBoardItemInputSchema } from "~/play/schema/MoveBoardItemInputSchema";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";

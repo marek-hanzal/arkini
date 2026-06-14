@@ -1,0 +1,8 @@
+import { z } from "zod";
+import { BoardCoordinateSchema } from "./BoardCoordinateSchema";
+import { gameConfig } from "./gameConfig";
+
+export const BoardCellSchema = z.object({
+	x: BoardCoordinateSchema.max(gameConfig.game.board.width - 1),
+	y: BoardCoordinateSchema.max(gameConfig.game.board.height - 1),
+});

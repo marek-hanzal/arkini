@@ -1,4 +1,4 @@
-import type { DropPlan } from "~/drag/hook/useDraggableControl";
+import type { DropPlan } from "~/drag/DropPlan";
 import type { FlyerKind, VisualMeta } from "~/play/types";
 import { flashDrop } from "./flashDrop";
 import { reject } from "./reject";

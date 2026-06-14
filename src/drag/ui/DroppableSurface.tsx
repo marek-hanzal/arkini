@@ -1,6 +1,6 @@
 import { useDroppable, type Data } from "@dnd-kit/core";
 import { type FC, useCallback, type HTMLAttributes, type ReactNode } from "react";
-import type { DroppablePayload } from "~/drag/hook/useDraggableControl";
+import type { DroppablePayload } from "~/drag/DroppablePayload";
 
 export namespace DroppableSurface {
 	export interface Props extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "children"> {

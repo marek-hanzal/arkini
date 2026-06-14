@@ -1,4 +1,4 @@
-import type { DraggableAnimation } from "~/drag/hook/useDraggableControl";
+import type { DraggableAnimation } from "~/drag/DraggableAnimation";
 import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
 import type { FlyerKind, VisualMeta } from "~/play/types";
 import { dragToTargetAnimation } from "./dragToTargetAnimation";

@@ -1,5 +1,5 @@
 import { boardContainerNodeId } from "~/board/boardContainerNodeId";
-import type { DraggablePayload } from "~/drag/hook/useDraggableControl";
+import type { DraggablePayload } from "~/drag/DraggablePayload";
 import { inventoryContainerNodeId } from "~/inventory/inventoryContainerNodeId";
 import type { DragSource, VisualMeta } from "~/play/types";
 

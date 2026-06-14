@@ -12,7 +12,7 @@ import { normalizeInventoryStateJson } from "~/inventory/logic/normalizeInventor
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { StashBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
+import { StashBoardItemInputSchema } from "~/play/schema/StashBoardItemInputSchema";
 import type { BoardItemState } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";

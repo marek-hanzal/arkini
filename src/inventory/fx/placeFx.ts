@@ -6,7 +6,7 @@ import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { spendStackFx } from "~/inventory/fx/spendStackFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { PlaceInventoryItemInputSchema } from "~/play/logic/gameActionSchemas";
+import { PlaceInventoryItemInputSchema } from "~/play/schema/PlaceInventoryItemInputSchema";
 import type { BoardItemState } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";

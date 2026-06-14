@@ -1,8 +1,6 @@
-import type {
-	DraggableAnimation,
-	DraggablePayload,
-	DroppablePayload,
-} from "~/drag/hook/useDraggableControl";
+import type { DraggableAnimation } from "~/drag/DraggableAnimation";
+import type { DraggablePayload } from "~/drag/DraggablePayload";
+import type { DroppablePayload } from "~/drag/DroppablePayload";
 import type { FlyerKind, DragSource, DropTarget, VisualMeta } from "~/play/types";
 
 export namespace dragToTargetAnimation {

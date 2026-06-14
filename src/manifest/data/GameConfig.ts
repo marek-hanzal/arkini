@@ -1,29 +1,33 @@
 import type { AssetDefinition } from "./asset";
-import type { CraftRecipeInput, ItemCraftRecipe } from "./craft";
-import type { LootTableDefinition } from "./lootTable";
-import type {
-	AssetId,
-	CraftRecipeId,
-	ItemId,
-	LootTableId,
-	MergeDefinitionId,
-	ResourceId,
-	UpgradeId,
-} from "./manifestId";
 import type { ItemDefinition } from "./item";
-import type { ItemMergeRule } from "./itemMergeRule";
-import type {
-	ActivationOutput,
-	ActivationWeightedEntry,
-	ProducerDefinition,
-	Quantity,
-	StashDefinition,
-} from "./producer";
+import type { LootTableDefinition } from "./lootTable";
+import type { ItemId, ResourceId } from "./manifestId";
 import type { ResourceDefinition } from "./resource";
-import type { UpgradeDefinition, UpgradeEffectDefinition, UpgradeTierDefinition } from "./upgrade";
-
-const svg = (name: string) => new URL(`./svg/${name}.svg`, import.meta.url).href;
-const png = (name: string) => new URL(`./png/${name}.png`, import.meta.url).href;
+import type { UpgradeDefinition } from "./upgrade";
+import {
+	asset,
+	blueprintAsset,
+	chance,
+	clickProducer,
+	clickStash,
+	combo,
+	cost,
+	craft,
+	drop,
+	guaranteed,
+	imprint,
+	input,
+	item,
+	lootTable,
+	outputs,
+	producerInput,
+	same,
+	setLootTable,
+	speedTiers,
+	tier,
+	upgrade,
+	weighted,
+} from "./utils";
 
 // One config owns the gameplay shape. Items are not passive rows anymore:
 // optional item behavior defines merges, producers, and build recipes in the
@@ -41,1855 +45,2902 @@ export const GameConfig = {
 		},
 	},
 	assets: [
-		asset("asset:item-seed", "Seed", "item-seed", 10, "png"),
-		asset("asset:item-sprout", "Sprout", "item-sprout", 20, "png"),
-		asset("asset:item-leaf", "Leaf", "item-leaf", 30, "png"),
-		asset("asset:item-bush", "Bush", "item-bush", 34, "png"),
-		asset("asset:item-sapling", "Sapling", "item-sapling", 38, "png"),
-		asset("asset:item-tree", "Tree", "item-tree", 39, "png"),
-		asset("asset:item-twig", "Twig", "item-twig", 40, "png"),
-		asset("asset:item-branch", "Branch", "item-branch", 50, "png"),
-		asset("asset:item-log", "Log", "item-log", 60, "png"),
-		asset("asset:item-wood-bundle", "Wood Bundle", "item-wood-bundle", 64, "png"),
-		asset("asset:item-plank", "Plank", "item-plank", 66, "png"),
-		asset("asset:item-beam", "Beam", "item-beam", 68, "png"),
-		asset("asset:item-pebble", "Pebble", "item-pebble", 70, "png"),
-		asset("asset:item-stone", "Stone", "item-stone", 80, "png"),
-		asset("asset:item-stone-block", "Stone Block", "item-stone-block", 82, "png"),
-		asset("asset:item-ore", "Ore", "item-ore", 84, "png"),
-		asset("asset:item-crystal", "Crystal", "item-crystal", 90, "png"),
-		asset("asset:item-gem", "Gem", "item-gem", 94, "png"),
-		asset("asset:item-water", "Water", "item-water", 100, "png"),
-		asset("asset:item-coin", "Coin", "item-coin", 101, "png"),
-		asset("asset:item-coin-pair", "Coin Pair", "item-coin-pair", 102, "png"),
-		asset("asset:item-coin-stack", "Coin Stack", "item-coin-stack", 103, "png"),
-		asset("asset:item-coin-chest", "Coin Chest", "item-coin-chest", 104, "png"),
-		asset("asset:item-blueprint-scrap", "Blueprint Scrap", "item-blueprint-scrap", 106, "png"),
-		asset(
-			"asset:item-blueprint-fragment",
-			"Blueprint Fragment",
-			"item-blueprint-fragment",
-			108,
-			"png",
-		),
-		asset("asset:item-blueprint-draft", "Blueprint Draft", "item-blueprint-draft", 110, "png"),
-		asset("asset:item-blueprint", "Finished Blueprint", "item-blueprint", 112, "png"),
-		blueprintAsset(
-			"asset:item-blueprint-lumber-camp",
-			"Lumber Camp Blueprint",
-			"asset:item-lumber-camp",
-			116,
-		),
-		blueprintAsset("asset:item-blueprint-quarry", "Quarry Blueprint", "asset:item-quarry", 120),
-		blueprintAsset(
-			"asset:item-blueprint-townhall",
-			"Town Hall Blueprint",
-			"asset:item-townhall",
-			124,
-		),
-		asset("asset:item-townhall", "Town Hall", "item-townhall", 125, "png"),
-		asset("asset:item-lumber-camp", "Lumber Camp", "item-lumber-camp", 130, "png"),
-		asset("asset:item-coal", "Coal", "item-coal", 132, "png"),
-		asset("asset:item-sausage", "Sausage", "item-sausage", 134, "png"),
-		asset("asset:item-beer", "Beer", "item-beer", 136, "png"),
-		asset("asset:item-coal-mine", "Coal Mine", "item-coal-mine", 138, "png"),
-		asset("asset:item-quarry", "Quarry", "item-quarry", 140, "png"),
-		asset("asset:item-crate", "Common Crate", "item-crate", 150, "png"),
-		asset("asset:item-crate-sturdy", "Sturdy Crate", "item-crate-sturdy", 160, "png"),
-		asset("asset:item-crate-rare", "Rare Crate", "item-crate-rare", 170, "png"),
-		asset("asset:item-crate-epic", "Epic Crate", "item-crate-epic", 180, "png"),
-		asset("asset:item-epic-key", "Epic Key", "item-epic-key", 182, "png"),
+		asset({
+			id: "asset:item-seed",
+			label: "Seed",
+			fileName: "item-seed",
+			sort: 10,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-sprout",
+			label: "Sprout",
+			fileName: "item-sprout",
+			sort: 20,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-leaf",
+			label: "Leaf",
+			fileName: "item-leaf",
+			sort: 30,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-bush",
+			label: "Bush",
+			fileName: "item-bush",
+			sort: 34,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-sapling",
+			label: "Sapling",
+			fileName: "item-sapling",
+			sort: 38,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-tree",
+			label: "Tree",
+			fileName: "item-tree",
+			sort: 39,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-twig",
+			label: "Twig",
+			fileName: "item-twig",
+			sort: 40,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-branch",
+			label: "Branch",
+			fileName: "item-branch",
+			sort: 50,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-log",
+			label: "Log",
+			fileName: "item-log",
+			sort: 60,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-wood-bundle",
+			label: "Wood Bundle",
+			fileName: "item-wood-bundle",
+			sort: 64,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-plank",
+			label: "Plank",
+			fileName: "item-plank",
+			sort: 66,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-beam",
+			label: "Beam",
+			fileName: "item-beam",
+			sort: 68,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-pebble",
+			label: "Pebble",
+			fileName: "item-pebble",
+			sort: 70,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-stone",
+			label: "Stone",
+			fileName: "item-stone",
+			sort: 80,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-stone-block",
+			label: "Stone Block",
+			fileName: "item-stone-block",
+			sort: 82,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-ore",
+			label: "Ore",
+			fileName: "item-ore",
+			sort: 84,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-crystal",
+			label: "Crystal",
+			fileName: "item-crystal",
+			sort: 90,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-gem",
+			label: "Gem",
+			fileName: "item-gem",
+			sort: 94,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-water",
+			label: "Water",
+			fileName: "item-water",
+			sort: 100,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-coin",
+			label: "Coin",
+			fileName: "item-coin",
+			sort: 101,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-coin-pair",
+			label: "Coin Pair",
+			fileName: "item-coin-pair",
+			sort: 102,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-coin-stack",
+			label: "Coin Stack",
+			fileName: "item-coin-stack",
+			sort: 103,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-coin-chest",
+			label: "Coin Chest",
+			fileName: "item-coin-chest",
+			sort: 104,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-blueprint-scrap",
+			label: "Blueprint Scrap",
+			fileName: "item-blueprint-scrap",
+			sort: 106,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-blueprint-fragment",
+			label: "Blueprint Fragment",
+			fileName: "item-blueprint-fragment",
+			sort: 108,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-blueprint-draft",
+			label: "Blueprint Draft",
+			fileName: "item-blueprint-draft",
+			sort: 110,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-blueprint",
+			label: "Finished Blueprint",
+			fileName: "item-blueprint",
+			sort: 112,
+			format: "png",
+		}),
+		blueprintAsset({
+			id: "asset:item-blueprint-lumber-camp",
+			label: "Lumber Camp Blueprint",
+			overlayAssetId: "asset:item-lumber-camp",
+			sort: 116,
+		}),
+		blueprintAsset({
+			id: "asset:item-blueprint-quarry",
+			label: "Quarry Blueprint",
+			overlayAssetId: "asset:item-quarry",
+			sort: 120,
+		}),
+		blueprintAsset({
+			id: "asset:item-blueprint-townhall",
+			label: "Town Hall Blueprint",
+			overlayAssetId: "asset:item-townhall",
+			sort: 124,
+		}),
+		asset({
+			id: "asset:item-townhall",
+			label: "Town Hall",
+			fileName: "item-townhall",
+			sort: 125,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-lumber-camp",
+			label: "Lumber Camp",
+			fileName: "item-lumber-camp",
+			sort: 130,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-coal",
+			label: "Coal",
+			fileName: "item-coal",
+			sort: 132,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-sausage",
+			label: "Sausage",
+			fileName: "item-sausage",
+			sort: 134,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-beer",
+			label: "Beer",
+			fileName: "item-beer",
+			sort: 136,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-coal-mine",
+			label: "Coal Mine",
+			fileName: "item-coal-mine",
+			sort: 138,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-quarry",
+			label: "Quarry",
+			fileName: "item-quarry",
+			sort: 140,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-crate",
+			label: "Common Crate",
+			fileName: "item-crate",
+			sort: 150,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-crate-sturdy",
+			label: "Sturdy Crate",
+			fileName: "item-crate-sturdy",
+			sort: 160,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-crate-rare",
+			label: "Rare Crate",
+			fileName: "item-crate-rare",
+			sort: 170,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-crate-epic",
+			label: "Epic Crate",
+			fileName: "item-crate-epic",
+			sort: 180,
+			format: "png",
+		}),
+		asset({
+			id: "asset:item-epic-key",
+			label: "Epic Key",
+			fileName: "item-epic-key",
+			sort: 182,
+			format: "png",
+		}),
 	],
 	resources: [] as readonly ResourceDefinition[],
 	lootTables: [
-		lootTable(
-			"loot:tree",
-			"Tree",
-			outputs(
-				guaranteed("item:twig", 2),
-				chance("item:branch", 0.35),
-				chance("item:coin", 0.08),
-			),
-		),
-		lootTable(
-			"loot:townhall-1",
-			"Town Hall I",
-			outputs(
-				weighted([
-					drop("item:blueprint-scrap", 90),
-					drop("item:crate-1", 10),
-				]),
-				chance("item:water", 0.32),
-			),
-		),
-		lootTable(
-			"loot:townhall-2",
-			"Town Hall II",
-			outputs(
-				weighted([
-					drop("item:blueprint-scrap", 60),
-					drop("item:crate-1", 28),
-					drop("item:crate-2", 12),
-					drop("item:blueprint-lumber-camp-2", 6),
-					drop("item:blueprint-quarry-2", 6),
-				]),
-				chance("item:water", 0.4, {
-					min: 1,
-					max: 2,
-				}),
-			),
-		),
-		lootTable(
-			"loot:townhall-3",
-			"Town Hall III",
-			outputs(
-				weighted([
-					drop("item:blueprint-scrap", 40),
-					drop("item:crate-1", 18),
-					drop("item:crate-2", 30),
-					drop("item:crate-3", 12),
-					drop("item:blueprint-lumber-camp-3", 5),
-					drop("item:blueprint-quarry-3", 5),
-				]),
-				chance("item:water", 0.55, {
-					min: 1,
-					max: 2,
-				}),
-			),
-		),
-		lootTable(
-			"loot:townhall-4",
-			"Town Hall IV",
-			outputs(
-				weighted([
-					drop("item:blueprint-scrap", 36),
-					drop("item:crate-2", 34),
-					drop("item:crate-3", 22),
-					drop("item:crate-4", 8),
-					drop("item:blueprint-lumber-camp-4", 4),
-					drop("item:blueprint-quarry-4", 4),
-				]),
-				chance("item:water", 0.62, {
-					min: 1,
-					max: 2,
-				}),
-			),
-		),
-		lootTable(
-			"loot:townhall-5",
-			"Town Hall V",
-			outputs(
-				weighted([
-					drop("item:blueprint-scrap", 30),
-					drop("item:crate-2", 28),
-					drop("item:crate-3", 30),
-					drop("item:crate-4", 12),
-					drop("item:blueprint-lumber-camp-5", 3),
-					drop("item:blueprint-quarry-5", 3),
-				]),
-				chance("item:water", 0.72, {
-					min: 1,
-					max: 3,
-				}),
-			),
-		),
-		lootTable(
-			"loot:lumber-camp-1",
-			"Lumber Camp I",
-			outputs(
-				guaranteed("item:twig", 2),
-				chance("item:branch", 0.35),
-				chance("item:coin", 0.08),
-			),
-		),
-		lootTable(
-			"loot:lumber-camp-2",
-			"Lumber Camp II",
-			outputs(
-				guaranteed("item:branch"),
-				chance("item:twig", 0.5, {
-					min: 1,
-					max: 2,
-				}),
-				chance("item:log", 0.35),
-			),
-		),
-		lootTable(
-			"loot:lumber-camp-3",
-			"Lumber Camp III",
-			outputs(guaranteed("item:branch", 2), chance("item:log", 0.7)),
-		),
-		lootTable(
-			"loot:lumber-camp-4",
-			"Lumber Camp IV",
-			outputs(
-				guaranteed("item:log", 1),
-				chance("item:branch", 0.75, {
-					min: 1,
-					max: 2,
-				}),
-				chance("item:wood-bundle", 0.3),
-			),
-		),
-		lootTable(
-			"loot:lumber-camp-5",
-			"Lumber Camp V",
-			outputs(
-				guaranteed("item:log", 2),
-				chance("item:wood-bundle", 0.55),
-				chance("item:beam", 0.18),
-			),
-		),
-		lootTable(
-			"loot:quarry-1",
-			"Quarry I",
-			outputs(
-				guaranteed("item:pebble", 2),
-				chance("item:stone", 0.32),
-				chance("item:coin", 0.08),
-			),
-		),
-		lootTable(
-			"loot:quarry-2",
-			"Quarry II",
-			outputs(
-				guaranteed("item:stone"),
-				chance("item:pebble", 0.5, {
-					min: 1,
-					max: 2,
-				}),
-				chance("item:crystal", 0.28),
-			),
-		),
-		lootTable(
-			"loot:quarry-3",
-			"Quarry III",
-			outputs(guaranteed("item:stone", 2), chance("item:crystal", 0.72)),
-		),
-		lootTable(
-			"loot:quarry-4",
-			"Quarry IV",
-			outputs(
-				guaranteed("item:stone", 2),
-				chance("item:ore", 0.48),
-				chance("item:crystal", 0.28),
-			),
-		),
-		lootTable(
-			"loot:quarry-5",
-			"Quarry V",
-			outputs(
-				guaranteed("item:stone", 2),
-				chance("item:ore", 0.7),
-				chance("item:crystal", 0.42),
-				chance("item:gem", 0.12),
-			),
-		),
-		lootTable(
-			"loot:coal-mine-1",
-			"Coal Mine I",
-			outputs(guaranteed("item:coal"), chance("item:coin", 0.12)),
-		),
-		lootTable(
-			"loot:crate-1",
-			"Common Crate",
-			outputs(
-				weighted([
-					drop("item:twig", 35),
-					drop("item:pebble", 35),
-					drop("item:water", 15),
-					drop("item:seed", 12),
-					drop("item:coin", 8),
-				]),
-				chance("item:twig", 0.18),
-			),
-		),
-		lootTable(
-			"loot:crate-2",
-			"Sturdy Crate",
-			outputs(
-				weighted([
-					drop("item:branch", 35),
-					drop("item:stone", 35),
-					drop("item:water", 15),
-					drop("item:crate-1", 12),
-					drop("item:coin-pair", 8),
-				]),
-				chance("item:pebble", 0.22),
-			),
-		),
-		lootTable(
-			"loot:crate-3",
-			"Rare Crate",
-			outputs(
-				weighted([
-					drop("item:log", 30),
-					drop("item:crystal", 30),
-					drop("item:crate-2", 20),
-					drop("item:water", 16),
-					drop("item:coin-stack", 8),
-				]),
-				chance("item:branch", 0.24),
-				chance("item:epic-key", 0.1),
-			),
-		),
-		lootTable(
-			"loot:crate-4",
-			"Epic Crate",
-			outputs(
-				weighted([
-					drop("item:wood-bundle", 25),
-					drop("item:beam", 15),
-					drop("item:crystal", 25),
-					drop("item:gem", 15),
-					drop("item:water", 16),
-					drop("item:coin-stack", 8),
-				]),
-				chance("item:crate-3", 0.2),
-			),
-		),
-		lootTable(
-			"loot:lumber-camp-1:better-1",
-			"Lumber Camp I Better Finds I",
-			outputs(
-				guaranteed("item:twig", 2),
-				chance("item:branch", 0.55),
-				chance("item:coin", 0.1),
-			),
-		),
-		lootTable(
-			"loot:lumber-camp-1:better-2",
-			"Lumber Camp I Better Finds II",
-			outputs(
-				guaranteed("item:branch"),
-				chance("item:twig", 0.85, {
-					min: 1,
-					max: 2,
-				}),
-				chance("item:log", 0.24),
-				chance("item:coin-pair", 0.08),
-			),
-		),
-		lootTable(
-			"loot:quarry-1:better-1",
-			"Quarry I Better Finds I",
-			outputs(
-				guaranteed("item:pebble", 2),
-				chance("item:stone", 0.5),
-				chance("item:coin", 0.1),
-			),
-		),
-		lootTable(
-			"loot:quarry-1:better-2",
-			"Quarry I Better Finds II",
-			outputs(
-				guaranteed("item:stone"),
-				chance("item:pebble", 0.85, {
-					min: 1,
-					max: 2,
-				}),
-				chance("item:ore", 0.18),
-				chance("item:coin-pair", 0.08),
-			),
-		),
+		lootTable({
+			id: "loot:tree",
+			name: "Tree",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:twig",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:branch",
+						probability: 0.35,
+					}),
+					chance({
+						itemId: "item:coin",
+						probability: 0.08,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:townhall-1",
+			name: "Town Hall I",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:blueprint-scrap",
+								weight: 90,
+							}),
+							drop({
+								itemId: "item:crate-1",
+								weight: 10,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:water",
+						probability: 0.32,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:townhall-2",
+			name: "Town Hall II",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:blueprint-scrap",
+								weight: 60,
+							}),
+							drop({
+								itemId: "item:crate-1",
+								weight: 28,
+							}),
+							drop({
+								itemId: "item:crate-2",
+								weight: 12,
+							}),
+							drop({
+								itemId: "item:blueprint-lumber-camp-2",
+								weight: 6,
+							}),
+							drop({
+								itemId: "item:blueprint-quarry-2",
+								weight: 6,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:water",
+						probability: 0.4,
+						quantity: {
+							min: 1,
+							max: 2,
+						},
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:townhall-3",
+			name: "Town Hall III",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:blueprint-scrap",
+								weight: 40,
+							}),
+							drop({
+								itemId: "item:crate-1",
+								weight: 18,
+							}),
+							drop({
+								itemId: "item:crate-2",
+								weight: 30,
+							}),
+							drop({
+								itemId: "item:crate-3",
+								weight: 12,
+							}),
+							drop({
+								itemId: "item:blueprint-lumber-camp-3",
+								weight: 5,
+							}),
+							drop({
+								itemId: "item:blueprint-quarry-3",
+								weight: 5,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:water",
+						probability: 0.55,
+						quantity: {
+							min: 1,
+							max: 2,
+						},
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:townhall-4",
+			name: "Town Hall IV",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:blueprint-scrap",
+								weight: 36,
+							}),
+							drop({
+								itemId: "item:crate-2",
+								weight: 34,
+							}),
+							drop({
+								itemId: "item:crate-3",
+								weight: 22,
+							}),
+							drop({
+								itemId: "item:crate-4",
+								weight: 8,
+							}),
+							drop({
+								itemId: "item:blueprint-lumber-camp-4",
+								weight: 4,
+							}),
+							drop({
+								itemId: "item:blueprint-quarry-4",
+								weight: 4,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:water",
+						probability: 0.62,
+						quantity: {
+							min: 1,
+							max: 2,
+						},
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:townhall-5",
+			name: "Town Hall V",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:blueprint-scrap",
+								weight: 30,
+							}),
+							drop({
+								itemId: "item:crate-2",
+								weight: 28,
+							}),
+							drop({
+								itemId: "item:crate-3",
+								weight: 30,
+							}),
+							drop({
+								itemId: "item:crate-4",
+								weight: 12,
+							}),
+							drop({
+								itemId: "item:blueprint-lumber-camp-5",
+								weight: 3,
+							}),
+							drop({
+								itemId: "item:blueprint-quarry-5",
+								weight: 3,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:water",
+						probability: 0.72,
+						quantity: {
+							min: 1,
+							max: 3,
+						},
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:lumber-camp-1",
+			name: "Lumber Camp I",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:twig",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:branch",
+						probability: 0.35,
+					}),
+					chance({
+						itemId: "item:coin",
+						probability: 0.08,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:lumber-camp-2",
+			name: "Lumber Camp II",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:branch",
+					}),
+					chance({
+						itemId: "item:twig",
+						probability: 0.5,
+						quantity: {
+							min: 1,
+							max: 2,
+						},
+					}),
+					chance({
+						itemId: "item:log",
+						probability: 0.35,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:lumber-camp-3",
+			name: "Lumber Camp III",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:branch",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:log",
+						probability: 0.7,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:lumber-camp-4",
+			name: "Lumber Camp IV",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:log",
+						quantity: 1,
+					}),
+					chance({
+						itemId: "item:branch",
+						probability: 0.75,
+						quantity: {
+							min: 1,
+							max: 2,
+						},
+					}),
+					chance({
+						itemId: "item:wood-bundle",
+						probability: 0.3,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:lumber-camp-5",
+			name: "Lumber Camp V",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:log",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:wood-bundle",
+						probability: 0.55,
+					}),
+					chance({
+						itemId: "item:beam",
+						probability: 0.18,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:quarry-1",
+			name: "Quarry I",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:pebble",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:stone",
+						probability: 0.32,
+					}),
+					chance({
+						itemId: "item:coin",
+						probability: 0.08,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:quarry-2",
+			name: "Quarry II",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:stone",
+					}),
+					chance({
+						itemId: "item:pebble",
+						probability: 0.5,
+						quantity: {
+							min: 1,
+							max: 2,
+						},
+					}),
+					chance({
+						itemId: "item:crystal",
+						probability: 0.28,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:quarry-3",
+			name: "Quarry III",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:stone",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:crystal",
+						probability: 0.72,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:quarry-4",
+			name: "Quarry IV",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:stone",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:ore",
+						probability: 0.48,
+					}),
+					chance({
+						itemId: "item:crystal",
+						probability: 0.28,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:quarry-5",
+			name: "Quarry V",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:stone",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:ore",
+						probability: 0.7,
+					}),
+					chance({
+						itemId: "item:crystal",
+						probability: 0.42,
+					}),
+					chance({
+						itemId: "item:gem",
+						probability: 0.12,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:coal-mine-1",
+			name: "Coal Mine I",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:coal",
+					}),
+					chance({
+						itemId: "item:coin",
+						probability: 0.12,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:crate-1",
+			name: "Common Crate",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:twig",
+								weight: 35,
+							}),
+							drop({
+								itemId: "item:pebble",
+								weight: 35,
+							}),
+							drop({
+								itemId: "item:water",
+								weight: 15,
+							}),
+							drop({
+								itemId: "item:seed",
+								weight: 12,
+							}),
+							drop({
+								itemId: "item:coin",
+								weight: 8,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:twig",
+						probability: 0.18,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:crate-2",
+			name: "Sturdy Crate",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:branch",
+								weight: 35,
+							}),
+							drop({
+								itemId: "item:stone",
+								weight: 35,
+							}),
+							drop({
+								itemId: "item:water",
+								weight: 15,
+							}),
+							drop({
+								itemId: "item:crate-1",
+								weight: 12,
+							}),
+							drop({
+								itemId: "item:coin-pair",
+								weight: 8,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:pebble",
+						probability: 0.22,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:crate-3",
+			name: "Rare Crate",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:log",
+								weight: 30,
+							}),
+							drop({
+								itemId: "item:crystal",
+								weight: 30,
+							}),
+							drop({
+								itemId: "item:crate-2",
+								weight: 20,
+							}),
+							drop({
+								itemId: "item:water",
+								weight: 16,
+							}),
+							drop({
+								itemId: "item:coin-stack",
+								weight: 8,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:branch",
+						probability: 0.24,
+					}),
+					chance({
+						itemId: "item:epic-key",
+						probability: 0.1,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:crate-4",
+			name: "Epic Crate",
+			output: outputs({
+				entries: [
+					weighted({
+						entries: [
+							drop({
+								itemId: "item:wood-bundle",
+								weight: 25,
+							}),
+							drop({
+								itemId: "item:beam",
+								weight: 15,
+							}),
+							drop({
+								itemId: "item:crystal",
+								weight: 25,
+							}),
+							drop({
+								itemId: "item:gem",
+								weight: 15,
+							}),
+							drop({
+								itemId: "item:water",
+								weight: 16,
+							}),
+							drop({
+								itemId: "item:coin-stack",
+								weight: 8,
+							}),
+						],
+					}),
+					chance({
+						itemId: "item:crate-3",
+						probability: 0.2,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:lumber-camp-1:better-1",
+			name: "Lumber Camp I Better Finds I",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:twig",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:branch",
+						probability: 0.55,
+					}),
+					chance({
+						itemId: "item:coin",
+						probability: 0.1,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:lumber-camp-1:better-2",
+			name: "Lumber Camp I Better Finds II",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:branch",
+					}),
+					chance({
+						itemId: "item:twig",
+						probability: 0.85,
+						quantity: {
+							min: 1,
+							max: 2,
+						},
+					}),
+					chance({
+						itemId: "item:log",
+						probability: 0.24,
+					}),
+					chance({
+						itemId: "item:coin-pair",
+						probability: 0.08,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:quarry-1:better-1",
+			name: "Quarry I Better Finds I",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:pebble",
+						quantity: 2,
+					}),
+					chance({
+						itemId: "item:stone",
+						probability: 0.5,
+					}),
+					chance({
+						itemId: "item:coin",
+						probability: 0.1,
+					}),
+				],
+			}),
+		}),
+		lootTable({
+			id: "loot:quarry-1:better-2",
+			name: "Quarry I Better Finds II",
+			output: outputs({
+				entries: [
+					guaranteed({
+						itemId: "item:stone",
+					}),
+					chance({
+						itemId: "item:pebble",
+						probability: 0.85,
+						quantity: {
+							min: 1,
+							max: 2,
+						},
+					}),
+					chance({
+						itemId: "item:ore",
+						probability: 0.18,
+					}),
+					chance({
+						itemId: "item:coin-pair",
+						probability: 0.08,
+					}),
+				],
+			}),
+		}),
 	],
 	upgrades: [
-		upgrade(
-			"upgrade:lumber-camp-1-speed",
-			"lumber-camp-1-speed",
-			"Lumber Camp I Speed",
-			"Shaves a little time off first-tier lumber production.",
-			10,
-			speedTiers("item:lumber-camp-1", [
-				cost("item:coin-stack", 1),
-				cost("item:coin-stack", 2),
-				cost("item:coin-chest", 1),
-				cost("item:coin-chest", 2),
-				cost("item:coin-chest", 3),
-			]),
-		),
-		upgrade(
-			"upgrade:quarry-1-speed",
-			"quarry-1-speed",
-			"Quarry I Speed",
-			"Makes the first quarry slightly less geological about deadlines.",
-			20,
-			speedTiers("item:quarry-1", [
-				cost("item:coin-stack", 1),
-				cost("item:coin-stack", 2),
-				cost("item:coin-chest", 1),
-				cost("item:coin-chest", 2),
-				cost("item:coin-chest", 3),
-			]),
-		),
-		upgrade(
-			"upgrade:lumber-camp-1-loot",
-			"lumber-camp-1-loot",
-			"Lumber Camp I Better Finds",
-			"Upgrades the first lumber camp loot table instead of poking random percentages with a stick.",
-			30,
-			[
-				tier(
-					[
-						cost("item:coin-stack", 2),
+		upgrade({
+			id: "upgrade:lumber-camp-1-speed",
+			code: "lumber-camp-1-speed",
+			name: "Lumber Camp I Speed",
+			description: "Shaves a little time off first-tier lumber production.",
+			sort: 10,
+			tiers: speedTiers({
+				itemId: "item:lumber-camp-1",
+				costs: [
+					cost({
+						itemId: "item:coin-stack",
+						quantity: 1,
+					}),
+					cost({
+						itemId: "item:coin-stack",
+						quantity: 2,
+					}),
+					cost({
+						itemId: "item:coin-chest",
+						quantity: 1,
+					}),
+					cost({
+						itemId: "item:coin-chest",
+						quantity: 2,
+					}),
+					cost({
+						itemId: "item:coin-chest",
+						quantity: 3,
+					}),
+				],
+			}),
+		}),
+		upgrade({
+			id: "upgrade:quarry-1-speed",
+			code: "quarry-1-speed",
+			name: "Quarry I Speed",
+			description: "Makes the first quarry slightly less geological about deadlines.",
+			sort: 20,
+			tiers: speedTiers({
+				itemId: "item:quarry-1",
+				costs: [
+					cost({
+						itemId: "item:coin-stack",
+						quantity: 1,
+					}),
+					cost({
+						itemId: "item:coin-stack",
+						quantity: 2,
+					}),
+					cost({
+						itemId: "item:coin-chest",
+						quantity: 1,
+					}),
+					cost({
+						itemId: "item:coin-chest",
+						quantity: 2,
+					}),
+					cost({
+						itemId: "item:coin-chest",
+						quantity: 3,
+					}),
+				],
+			}),
+		}),
+		upgrade({
+			id: "upgrade:lumber-camp-1-loot",
+			code: "lumber-camp-1-loot",
+			name: "Lumber Camp I Better Finds",
+			description:
+				"Upgrades the first lumber camp loot table instead of poking random percentages with a stick.",
+			sort: 30,
+			tiers: [
+				tier({
+					cost: [
+						cost({
+							itemId: "item:coin-stack",
+							quantity: 2,
+						}),
 					],
-					[
-						setLootTable("item:lumber-camp-1", "loot:lumber-camp-1:better-1"),
+					effects: [
+						setLootTable({
+							itemId: "item:lumber-camp-1",
+							tableId: "loot:lumber-camp-1:better-1",
+						}),
 					],
-				),
-				tier(
-					[
-						cost("item:coin-chest", 2),
+				}),
+				tier({
+					cost: [
+						cost({
+							itemId: "item:coin-chest",
+							quantity: 2,
+						}),
 					],
-					[
-						setLootTable("item:lumber-camp-1", "loot:lumber-camp-1:better-2"),
+					effects: [
+						setLootTable({
+							itemId: "item:lumber-camp-1",
+							tableId: "loot:lumber-camp-1:better-2",
+						}),
 					],
-				),
+				}),
 			],
-		),
-		upgrade(
-			"upgrade:quarry-1-loot",
-			"quarry-1-loot",
-			"Quarry I Better Finds",
-			"Lets the first quarry find better rocks, because apparently holes need career growth.",
-			40,
-			[
-				tier(
-					[
-						cost("item:coin-stack", 2),
+		}),
+		upgrade({
+			id: "upgrade:quarry-1-loot",
+			code: "quarry-1-loot",
+			name: "Quarry I Better Finds",
+			description:
+				"Lets the first quarry find better rocks, because apparently holes need career growth.",
+			sort: 40,
+			tiers: [
+				tier({
+					cost: [
+						cost({
+							itemId: "item:coin-stack",
+							quantity: 2,
+						}),
 					],
-					[
-						setLootTable("item:quarry-1", "loot:quarry-1:better-1"),
+					effects: [
+						setLootTable({
+							itemId: "item:quarry-1",
+							tableId: "loot:quarry-1:better-1",
+						}),
 					],
-				),
-				tier(
-					[
-						cost("item:coin-chest", 2),
+				}),
+				tier({
+					cost: [
+						cost({
+							itemId: "item:coin-chest",
+							quantity: 2,
+						}),
 					],
-					[
-						setLootTable("item:quarry-1", "loot:quarry-1:better-2"),
+					effects: [
+						setLootTable({
+							itemId: "item:quarry-1",
+							tableId: "loot:quarry-1:better-2",
+						}),
 					],
-				),
+				}),
 			],
-		),
+		}),
 	],
 	items: [
-		item(
-			"item:seed",
-			"asset:item-seed",
-			"seed",
-			"Seed",
-			1,
-			50,
-			"Tiny start of something suspiciously grindy.",
-			[
+		item({
+			id: "item:seed",
+			assetId: "asset:item-seed",
+			code: "seed",
+			name: "Seed",
+			tier: 1,
+			maxStackSize: 50,
+			description: "Tiny start of something suspiciously grindy.",
+			tags: [
 				"material",
 				"plant",
 			],
-			10,
-			{
+			sort: 10,
+			behavior: {
 				merge: [
-					same("merge:seed-seed-sprout", "item:seed", "item:sprout"),
+					same({
+						id: "merge:seed-seed-sprout",
+						selfItemId: "item:seed",
+						resultItemId: "item:sprout",
+					}),
 				],
-				craft: craft(
-					"craft:seed-water-sprout",
-					"item:sprout",
-					[
-						input("item:water", 1),
+				craft: craft({
+					id: "craft:seed-water-sprout",
+					resultItemId: "item:sprout",
+					inputs: [
+						input({
+							itemId: "item:water",
+							quantity: 1,
+						}),
 					],
-					10_000,
-				),
+					durationMs: 10000,
+				}),
 			},
-		),
-		item(
-			"item:sprout",
-			"asset:item-sprout",
-			"sprout",
-			"Sprout",
-			2,
-			50,
-			"A plant pretending it has a future.",
-			[
+		}),
+		item({
+			id: "item:sprout",
+			assetId: "asset:item-sprout",
+			code: "sprout",
+			name: "Sprout",
+			tier: 2,
+			maxStackSize: 50,
+			description: "A plant pretending it has a future.",
+			tags: [
 				"material",
 				"plant",
 			],
-			20,
-			{
+			sort: 20,
+			behavior: {
 				merge: [
-					same("merge:sprout-sprout-leaf", "item:sprout", "item:leaf"),
+					same({
+						id: "merge:sprout-sprout-leaf",
+						selfItemId: "item:sprout",
+						resultItemId: "item:leaf",
+					}),
 				],
-				craft: craft(
-					"craft:sprout-water-sapling",
-					"item:sapling",
-					[
-						input("item:water", 1),
+				craft: craft({
+					id: "craft:sprout-water-sapling",
+					resultItemId: "item:sapling",
+					inputs: [
+						input({
+							itemId: "item:water",
+							quantity: 1,
+						}),
 					],
-					15_000,
-				),
+					durationMs: 15000,
+				}),
 			},
-		),
-		item(
-			"item:leaf",
-			"asset:item-leaf",
-			"leaf",
-			"Leaf",
-			3,
-			50,
-			"Photosynthesis with storage problems.",
-			[
+		}),
+		item({
+			id: "item:leaf",
+			assetId: "asset:item-leaf",
+			code: "leaf",
+			name: "Leaf",
+			tier: 3,
+			maxStackSize: 50,
+			description: "Photosynthesis with storage problems.",
+			tags: [
 				"material",
 				"plant",
 			],
-			30,
-			{
+			sort: 30,
+			behavior: {
 				merge: [
-					same("merge:leaf-leaf-bush", "item:leaf", "item:bush"),
+					same({
+						id: "merge:leaf-leaf-bush",
+						selfItemId: "item:leaf",
+						resultItemId: "item:bush",
+					}),
 				],
 			},
-		),
-		item(
-			"item:bush",
-			"asset:item-bush",
-			"bush",
-			"Bush",
-			4,
-			25,
-			"A leaf committee with roots.",
-			[
+		}),
+		item({
+			id: "item:bush",
+			assetId: "asset:item-bush",
+			code: "bush",
+			name: "Bush",
+			tier: 4,
+			maxStackSize: 25,
+			description: "A leaf committee with roots.",
+			tags: [
 				"material",
 				"plant",
 			],
-			34,
-			{
+			sort: 34,
+			behavior: {
 				merge: [
-					same("merge:bush-bush-sapling", "item:bush", "item:sapling"),
+					same({
+						id: "merge:bush-bush-sapling",
+						selfItemId: "item:bush",
+						resultItemId: "item:sapling",
+					}),
 				],
 			},
-		),
-		item(
-			"item:sapling",
-			"asset:item-sapling",
-			"sapling",
-			"Sapling",
-			5,
-			15,
-			"Future tree, current storage problem.",
-			[
+		}),
+		item({
+			id: "item:sapling",
+			assetId: "asset:item-sapling",
+			code: "sapling",
+			name: "Sapling",
+			tier: 5,
+			maxStackSize: 15,
+			description: "Future tree, current storage problem.",
+			tags: [
 				"material",
 				"plant",
 			],
-			38,
-			{
-				craft: craft(
-					"craft:sapling-water-tree",
-					"item:tree",
-					[
-						input("item:water", 2),
+			sort: 38,
+			behavior: {
+				craft: craft({
+					id: "craft:sapling-water-tree",
+					resultItemId: "item:tree",
+					inputs: [
+						input({
+							itemId: "item:water",
+							quantity: 2,
+						}),
 					],
-					30_000,
-				),
+					durationMs: 30000,
+				}),
 			},
-		),
-		item(
-			"item:tree",
-			"asset:item-tree",
-			"tree",
-			"Tree",
-			6,
-			1,
-			"A tiny forest economy waiting to happen.",
-			[
+		}),
+		item({
+			id: "item:tree",
+			assetId: "asset:item-tree",
+			code: "tree",
+			name: "Tree",
+			tier: 6,
+			maxStackSize: 1,
+			description: "A tiny forest economy waiting to happen.",
+			tags: [
 				"producer",
 				"plant",
 				"wood",
 			],
-			39,
-			{
-				producer: clickProducer(6200, "loot:tree"),
+			sort: 39,
+			behavior: {
+				producer: clickProducer({
+					cooldownMs: 6200,
+					outputTableId: "loot:tree",
+				}),
 			},
-		),
-		item(
-			"item:twig",
-			"asset:item-twig",
-			"twig",
-			"Twig",
-			1,
-			50,
-			"Nature's disposable stick.",
-			[
+		}),
+		item({
+			id: "item:twig",
+			assetId: "asset:item-twig",
+			code: "twig",
+			name: "Twig",
+			tier: 1,
+			maxStackSize: 50,
+			description: "Nature's disposable stick.",
+			tags: [
 				"material",
 				"wood",
 			],
-			40,
-			{
+			sort: 40,
+			behavior: {
 				merge: [
-					same("merge:twig-twig-branch", "item:twig", "item:branch"),
-					combo("merge:twig-water-sprout", "item:water", "item:sprout", true),
+					same({
+						id: "merge:twig-twig-branch",
+						selfItemId: "item:twig",
+						resultItemId: "item:branch",
+					}),
+					combo({
+						id: "merge:twig-water-sprout",
+						withItemId: "item:water",
+						resultItemId: "item:sprout",
+						secret: true,
+					}),
 				],
 			},
-		),
-		item(
-			"item:branch",
-			"asset:item-branch",
-			"branch",
-			"Branch",
-			2,
-			50,
-			"Bigger stick. Humanity is saved.",
-			[
+		}),
+		item({
+			id: "item:branch",
+			assetId: "asset:item-branch",
+			code: "branch",
+			name: "Branch",
+			tier: 2,
+			maxStackSize: 50,
+			description: "Bigger stick. Humanity is saved.",
+			tags: [
 				"material",
 				"wood",
 			],
-			50,
-			{
+			sort: 50,
+			behavior: {
 				merge: [
-					same("merge:branch-branch-log", "item:branch", "item:log"),
+					same({
+						id: "merge:branch-branch-log",
+						selfItemId: "item:branch",
+						resultItemId: "item:log",
+					}),
 				],
 			},
-		),
-		item(
-			"item:log",
-			"asset:item-log",
-			"log",
-			"Log",
-			3,
-			50,
-			"A tree with fewer opinions.",
-			[
+		}),
+		item({
+			id: "item:log",
+			assetId: "asset:item-log",
+			code: "log",
+			name: "Log",
+			tier: 3,
+			maxStackSize: 50,
+			description: "A tree with fewer opinions.",
+			tags: [
 				"material",
 				"wood",
 			],
-			60,
-			{
+			sort: 60,
+			behavior: {
 				merge: [
-					same("merge:log-log-wood-bundle", "item:log", "item:wood-bundle"),
+					same({
+						id: "merge:log-log-wood-bundle",
+						selfItemId: "item:log",
+						resultItemId: "item:wood-bundle",
+					}),
 				],
 			},
-		),
-		item(
-			"item:wood-bundle",
-			"asset:item-wood-bundle",
-			"wood-bundle",
-			"Wood Bundle",
-			4,
-			25,
-			"Several logs tied together, because one headache was not enough.",
-			[
+		}),
+		item({
+			id: "item:wood-bundle",
+			assetId: "asset:item-wood-bundle",
+			code: "wood-bundle",
+			name: "Wood Bundle",
+			tier: 4,
+			maxStackSize: 25,
+			description: "Several logs tied together, because one headache was not enough.",
+			tags: [
 				"material",
 				"wood",
 			],
-			64,
-			{
+			sort: 64,
+			behavior: {
 				merge: [
-					same("merge:wood-bundle-wood-bundle-plank", "item:wood-bundle", "item:plank"),
+					same({
+						id: "merge:wood-bundle-wood-bundle-plank",
+						selfItemId: "item:wood-bundle",
+						resultItemId: "item:plank",
+					}),
 				],
 			},
-		),
-		item(
-			"item:plank",
-			"asset:item-plank",
-			"plank",
-			"Plank",
-			5,
-			20,
-			"Wood with straight edges. Humanity briefly improves.",
-			[
+		}),
+		item({
+			id: "item:plank",
+			assetId: "asset:item-plank",
+			code: "plank",
+			name: "Plank",
+			tier: 5,
+			maxStackSize: 20,
+			description: "Wood with straight edges. Humanity briefly improves.",
+			tags: [
 				"material",
 				"wood",
 			],
-			66,
-			{
+			sort: 66,
+			behavior: {
 				merge: [
-					same("merge:plank-plank-beam", "item:plank", "item:beam"),
+					same({
+						id: "merge:plank-plank-beam",
+						selfItemId: "item:plank",
+						resultItemId: "item:beam",
+					}),
 				],
 			},
-		),
-
-		item(
-			"item:beam",
-			"asset:item-beam",
-			"beam",
-			"Beam",
-			5,
-			15,
-			"Wood that finally looks employable.",
-			[
+		}),
+		item({
+			id: "item:beam",
+			assetId: "asset:item-beam",
+			code: "beam",
+			name: "Beam",
+			tier: 5,
+			maxStackSize: 15,
+			description: "Wood that finally looks employable.",
+			tags: [
 				"material",
 				"wood",
 			],
-			68,
-		),
-		item(
-			"item:pebble",
-			"asset:item-pebble",
-			"pebble",
-			"Pebble",
-			1,
-			50,
-			"Small rock. Big destiny. Apparently.",
-			[
+			sort: 68,
+		}),
+		item({
+			id: "item:pebble",
+			assetId: "asset:item-pebble",
+			code: "pebble",
+			name: "Pebble",
+			tier: 1,
+			maxStackSize: 50,
+			description: "Small rock. Big destiny. Apparently.",
+			tags: [
 				"material",
 				"stone",
 			],
-			70,
-			{
+			sort: 70,
+			behavior: {
 				merge: [
-					same("merge:pebble-pebble-stone", "item:pebble", "item:stone"),
+					same({
+						id: "merge:pebble-pebble-stone",
+						selfItemId: "item:pebble",
+						resultItemId: "item:stone",
+					}),
 				],
 			},
-		),
-		item(
-			"item:stone",
-			"asset:item-stone",
-			"stone",
-			"Stone",
-			2,
-			50,
-			"Rock with self-esteem.",
-			[
+		}),
+		item({
+			id: "item:stone",
+			assetId: "asset:item-stone",
+			code: "stone",
+			name: "Stone",
+			tier: 2,
+			maxStackSize: 50,
+			description: "Rock with self-esteem.",
+			tags: [
 				"material",
 				"stone",
 			],
-			80,
-			{
+			sort: 80,
+			behavior: {
 				merge: [
-					same("merge:stone-stone-stone-block", "item:stone", "item:stone-block"),
-					combo("merge:stone-water-crystal", "item:water", "item:crystal", true),
+					same({
+						id: "merge:stone-stone-stone-block",
+						selfItemId: "item:stone",
+						resultItemId: "item:stone-block",
+					}),
+					combo({
+						id: "merge:stone-water-crystal",
+						withItemId: "item:water",
+						resultItemId: "item:crystal",
+						secret: true,
+					}),
 				],
 			},
-		),
-		item(
-			"item:stone-block",
-			"asset:item-stone-block",
-			"stone-block",
-			"Stone Block",
-			3,
-			30,
-			"Stone that finally agreed to geometry.",
-			[
+		}),
+		item({
+			id: "item:stone-block",
+			assetId: "asset:item-stone-block",
+			code: "stone-block",
+			name: "Stone Block",
+			tier: 3,
+			maxStackSize: 30,
+			description: "Stone that finally agreed to geometry.",
+			tags: [
 				"material",
 				"stone",
 			],
-			82,
-			{
+			sort: 82,
+			behavior: {
 				merge: [
-					same("merge:stone-block-stone-block-ore", "item:stone-block", "item:ore"),
+					same({
+						id: "merge:stone-block-stone-block-ore",
+						selfItemId: "item:stone-block",
+						resultItemId: "item:ore",
+					}),
 				],
 			},
-		),
-
-		item(
-			"item:ore",
-			"asset:item-ore",
-			"ore",
-			"Ore",
-			3,
-			40,
-			"Stone with ambition and questionable impurities.",
-			[
+		}),
+		item({
+			id: "item:ore",
+			assetId: "asset:item-ore",
+			code: "ore",
+			name: "Ore",
+			tier: 3,
+			maxStackSize: 40,
+			description: "Stone with ambition and questionable impurities.",
+			tags: [
 				"material",
 				"stone",
 			],
-			84,
-			{
+			sort: 84,
+			behavior: {
 				merge: [
-					same("merge:ore-ore-crystal", "item:ore", "item:crystal"),
+					same({
+						id: "merge:ore-ore-crystal",
+						selfItemId: "item:ore",
+						resultItemId: "item:crystal",
+					}),
 				],
 			},
-		),
-		item(
-			"item:crystal",
-			"asset:item-crystal",
-			"crystal",
-			"Crystal",
-			4,
-			25,
-			"Shiny enough to justify bad decisions.",
-			[
+		}),
+		item({
+			id: "item:crystal",
+			assetId: "asset:item-crystal",
+			code: "crystal",
+			name: "Crystal",
+			tier: 4,
+			maxStackSize: 25,
+			description: "Shiny enough to justify bad decisions.",
+			tags: [
 				"material",
 				"stone",
 				"rare",
 			],
-			90,
-			{
+			sort: 90,
+			behavior: {
 				merge: [
-					same("merge:crystal-crystal-gem", "item:crystal", "item:gem"),
+					same({
+						id: "merge:crystal-crystal-gem",
+						selfItemId: "item:crystal",
+						resultItemId: "item:gem",
+					}),
 				],
 			},
-		),
-		item(
-			"item:gem",
-			"asset:item-gem",
-			"gem",
-			"Gem",
-			5,
-			15,
-			"A crystal with marketing budget.",
-			[
+		}),
+		item({
+			id: "item:gem",
+			assetId: "asset:item-gem",
+			code: "gem",
+			name: "Gem",
+			tier: 5,
+			maxStackSize: 15,
+			description: "A crystal with marketing budget.",
+			tags: [
 				"material",
 				"stone",
 				"rare",
 			],
-			94,
-		),
-		item(
-			"item:water",
-			"asset:item-water",
-			"water",
-			"Water",
-			1,
-			50,
-			"Liquid logistics. Somehow still your problem.",
-			[
+			sort: 94,
+		}),
+		item({
+			id: "item:water",
+			assetId: "asset:item-water",
+			code: "water",
+			name: "Water",
+			tier: 1,
+			maxStackSize: 50,
+			description: "Liquid logistics. Somehow still your problem.",
+			tags: [
 				"material",
 				"water",
 			],
-			100,
-		),
-
-		item(
-			"item:coal",
-			"asset:item-coal",
-			"coal",
-			"Coal",
-			2,
-			40,
-			"Black fuel for machines that apparently need motivation.",
-			[
+			sort: 100,
+		}),
+		item({
+			id: "item:coal",
+			assetId: "asset:item-coal",
+			code: "coal",
+			name: "Coal",
+			tier: 2,
+			maxStackSize: 40,
+			description: "Black fuel for machines that apparently need motivation.",
+			tags: [
 				"material",
 				"fuel",
 			],
-			105,
-		),
-		item(
-			"item:sausage",
-			"asset:item-sausage",
-			"sausage",
-			"Sausage",
-			1,
-			30,
-			"Producer fuel, because workers are tragically organic.",
-			[
+			sort: 105,
+		}),
+		item({
+			id: "item:sausage",
+			assetId: "asset:item-sausage",
+			code: "sausage",
+			name: "Sausage",
+			tier: 1,
+			maxStackSize: 30,
+			description: "Producer fuel, because workers are tragically organic.",
+			tags: [
 				"material",
 				"food",
 			],
-			106,
-		),
-		item(
-			"item:beer",
-			"asset:item-beer",
-			"beer",
-			"Beer",
-			1,
-			30,
-			"Liquid morale. The economy is clearly fine.",
-			[
+			sort: 106,
+		}),
+		item({
+			id: "item:beer",
+			assetId: "asset:item-beer",
+			code: "beer",
+			name: "Beer",
+			tier: 1,
+			maxStackSize: 30,
+			description: "Liquid morale. The economy is clearly fine.",
+			tags: [
 				"material",
 				"drink",
 			],
-			107,
-		),
-
-		item(
-			"item:coin",
-			"asset:item-coin",
-			"coin",
-			"Coin",
-			1,
-			50,
-			"A small metal excuse for progression.",
-			[
+			sort: 107,
+		}),
+		item({
+			id: "item:coin",
+			assetId: "asset:item-coin",
+			code: "coin",
+			name: "Coin",
+			tier: 1,
+			maxStackSize: 50,
+			description: "A small metal excuse for progression.",
+			tags: [
 				"currency",
 			],
-			180,
-			{
+			sort: 180,
+			behavior: {
 				merge: [
-					same("merge:coin-coin-pair", "item:coin", "item:coin-pair"),
+					same({
+						id: "merge:coin-coin-pair",
+						selfItemId: "item:coin",
+						resultItemId: "item:coin-pair",
+					}),
 				],
 			},
-		),
-		item(
-			"item:coin-pair",
-			"asset:item-coin-pair",
-			"coin-pair",
-			"Coin Pair",
-			2,
-			40,
-			"Two coins. Somehow this already feels like accounting.",
-			[
+		}),
+		item({
+			id: "item:coin-pair",
+			assetId: "asset:item-coin-pair",
+			code: "coin-pair",
+			name: "Coin Pair",
+			tier: 2,
+			maxStackSize: 40,
+			description: "Two coins. Somehow this already feels like accounting.",
+			tags: [
 				"currency",
 			],
-			182,
-			{
+			sort: 182,
+			behavior: {
 				merge: [
-					same("merge:coin-pair-stack", "item:coin-pair", "item:coin-stack"),
+					same({
+						id: "merge:coin-pair-stack",
+						selfItemId: "item:coin-pair",
+						resultItemId: "item:coin-stack",
+					}),
 				],
 			},
-		),
-		item(
-			"item:coin-stack",
-			"asset:item-coin-stack",
-			"coin-stack",
-			"Coin Stack",
-			3,
-			30,
-			"A stack of little reasons to open the upgrades sheet.",
-			[
+		}),
+		item({
+			id: "item:coin-stack",
+			assetId: "asset:item-coin-stack",
+			code: "coin-stack",
+			name: "Coin Stack",
+			tier: 3,
+			maxStackSize: 30,
+			description: "A stack of little reasons to open the upgrades sheet.",
+			tags: [
 				"currency",
 			],
-			184,
-			{
+			sort: 184,
+			behavior: {
 				merge: [
-					same("merge:coin-stack-chest", "item:coin-stack", "item:coin-chest"),
+					same({
+						id: "merge:coin-stack-chest",
+						selfItemId: "item:coin-stack",
+						resultItemId: "item:coin-chest",
+					}),
 				],
 			},
-		),
-		item(
-			"item:coin-chest",
-			"asset:item-coin-chest",
-			"coin-chest",
-			"Coin Chest",
-			4,
-			20,
-			"A boxed-up upgrade fund. Finally, clutter with ambition.",
-			[
+		}),
+		item({
+			id: "item:coin-chest",
+			assetId: "asset:item-coin-chest",
+			code: "coin-chest",
+			name: "Coin Chest",
+			tier: 4,
+			maxStackSize: 20,
+			description: "A boxed-up upgrade fund. Finally, clutter with ambition.",
+			tags: [
 				"currency",
 			],
-			186,
-		),
-
-		item(
-			"item:blueprint-scrap",
-			"asset:item-blueprint-scrap",
-			"blueprint-scrap",
-			"Blueprint Scrap",
-			1,
-			20,
-			"A torn blank construction note. Inspiring, in the way paperwork can be.",
-			[
+			sort: 186,
+		}),
+		item({
+			id: "item:blueprint-scrap",
+			assetId: "asset:item-blueprint-scrap",
+			code: "blueprint-scrap",
+			name: "Blueprint Scrap",
+			tier: 1,
+			maxStackSize: 20,
+			description: "A torn blank construction note. Inspiring, in the way paperwork can be.",
+			tags: [
 				"blueprint",
 				"fragment",
 			],
-			200,
-			{
+			sort: 200,
+			behavior: {
 				merge: [
-					same(
-						"merge:blueprint-scrap-fragment",
-						"item:blueprint-scrap",
-						"item:blueprint-fragment",
-					),
+					same({
+						id: "merge:blueprint-scrap-fragment",
+						selfItemId: "item:blueprint-scrap",
+						resultItemId: "item:blueprint-fragment",
+					}),
 				],
 			},
-		),
-		item(
-			"item:blueprint-fragment",
-			"asset:item-blueprint-fragment",
-			"blueprint-fragment",
-			"Blueprint Fragment",
-			2,
-			15,
-			"A bigger blank plan piece. Still technically a mess, but taller.",
-			[
+		}),
+		item({
+			id: "item:blueprint-fragment",
+			assetId: "asset:item-blueprint-fragment",
+			code: "blueprint-fragment",
+			name: "Blueprint Fragment",
+			tier: 2,
+			maxStackSize: 15,
+			description: "A bigger blank plan piece. Still technically a mess, but taller.",
+			tags: [
 				"blueprint",
 				"fragment",
 			],
-			201,
-			{
+			sort: 201,
+			behavior: {
 				merge: [
-					same(
-						"merge:blueprint-fragment-draft",
-						"item:blueprint-fragment",
-						"item:blueprint-draft",
-					),
+					same({
+						id: "merge:blueprint-fragment-draft",
+						selfItemId: "item:blueprint-fragment",
+						resultItemId: "item:blueprint-draft",
+					}),
 				],
 			},
-		),
-		item(
-			"item:blueprint-draft",
-			"asset:item-blueprint-draft",
-			"blueprint-draft",
-			"Blueprint Draft",
-			3,
-			10,
-			"A nearly usable blank plan. Construction bureaucracy is blooming.",
-			[
+		}),
+		item({
+			id: "item:blueprint-draft",
+			assetId: "asset:item-blueprint-draft",
+			code: "blueprint-draft",
+			name: "Blueprint Draft",
+			tier: 3,
+			maxStackSize: 10,
+			description: "A nearly usable blank plan. Construction bureaucracy is blooming.",
+			tags: [
 				"blueprint",
 				"fragment",
 			],
-			202,
-			{
+			sort: 202,
+			behavior: {
 				merge: [
-					same("merge:blueprint-draft-final", "item:blueprint-draft", "item:blueprint"),
+					same({
+						id: "merge:blueprint-draft-final",
+						selfItemId: "item:blueprint-draft",
+						resultItemId: "item:blueprint",
+					}),
 				],
 			},
-		),
-		item(
-			"item:blueprint",
-			"asset:item-blueprint",
-			"blueprint",
-			"Blank Blueprint",
-			4,
-			5,
-			"A finished blank plan. Drag a known build target onto it to burn in the idea without sacrificing the original.",
-			[
+		}),
+		item({
+			id: "item:blueprint",
+			assetId: "asset:item-blueprint",
+			code: "blueprint",
+			name: "Blank Blueprint",
+			tier: 4,
+			maxStackSize: 5,
+			description:
+				"A finished blank plan. Drag a known build target onto it to burn in the idea without sacrificing the original.",
+			tags: [
 				"blueprint",
 				"blank",
 			],
-			203,
-		),
-
-		item(
-			"item:blueprint-lumber-camp",
-			"asset:item-blueprint-lumber-camp",
-			"blueprint-lumber-camp",
-			"Lumber Camp Blueprint",
-			4,
-			5,
-			"Finished plan. Now feed it materials until civilization happens.",
-			[
+			sort: 203,
+		}),
+		item({
+			id: "item:blueprint-lumber-camp",
+			assetId: "asset:item-blueprint-lumber-camp",
+			code: "blueprint-lumber-camp",
+			name: "Lumber Camp Blueprint",
+			tier: 4,
+			maxStackSize: 5,
+			description: "Finished plan. Now feed it materials until civilization happens.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			204,
-			{
-				craft: craft("craft:lumber-camp", "item:lumber-camp-1", [
-					input("item:plank", 1),
-					input("item:stone-block", 1),
-				]),
+			sort: 204,
+			behavior: {
+				craft: craft({
+					id: "craft:lumber-camp",
+					resultItemId: "item:lumber-camp-1",
+					inputs: [
+						input({
+							itemId: "item:plank",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 1,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-quarry",
-			"asset:item-blueprint-quarry",
-			"blueprint-quarry",
-			"Quarry Blueprint",
-			4,
-			5,
-			"Finished plan. Now feed it materials until civilization happens.",
-			[
+		}),
+		item({
+			id: "item:blueprint-quarry",
+			assetId: "asset:item-blueprint-quarry",
+			code: "blueprint-quarry",
+			name: "Quarry Blueprint",
+			tier: 4,
+			maxStackSize: 5,
+			description: "Finished plan. Now feed it materials until civilization happens.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			224,
-			{
-				craft: craft("craft:quarry", "item:quarry-1", [
-					input("item:beam", 1),
-					input("item:stone-block", 2),
-				]),
+			sort: 224,
+			behavior: {
+				craft: craft({
+					id: "craft:quarry",
+					resultItemId: "item:quarry-1",
+					inputs: [
+						input({
+							itemId: "item:beam",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-townhall",
-			"asset:item-blueprint-townhall",
-			"blueprint-townhall",
-			"Town Hall Blueprint",
-			4,
-			5,
-			"Finished plan. Now feed it materials until civilization happens.",
-			[
+		}),
+		item({
+			id: "item:blueprint-townhall",
+			assetId: "asset:item-blueprint-townhall",
+			code: "blueprint-townhall",
+			name: "Town Hall Blueprint",
+			tier: 4,
+			maxStackSize: 5,
+			description: "Finished plan. Now feed it materials until civilization happens.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			244,
-			{
-				craft: craft("craft:townhall", "item:townhall-1", [
-					input("item:beam", 1),
-					input("item:stone-block", 2),
-					input("item:gem", 1),
-				]),
+			sort: 244,
+			behavior: {
+				craft: craft({
+					id: "craft:townhall",
+					resultItemId: "item:townhall-1",
+					inputs: [
+						input({
+							itemId: "item:beam",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:gem",
+							quantity: 1,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-lumber-camp-2",
-			"asset:item-blueprint-lumber-camp",
-			"blueprint-lumber-camp-2",
-			"Lumber Camp 2 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-lumber-camp-2",
+			assetId: "asset:item-blueprint-lumber-camp",
+			code: "blueprint-lumber-camp-2",
+			name: "Lumber Camp 2 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			206,
-			{
+			sort: 206,
+			behavior: {
 				label: "2",
-				craft: craft("craft:lumber-camp-2", "item:lumber-camp-2", [
-					input("item:lumber-camp-1", 2),
-					input("item:plank", 1),
-					input("item:stone-block", 1),
-				]),
+				craft: craft({
+					id: "craft:lumber-camp-2",
+					resultItemId: "item:lumber-camp-2",
+					inputs: [
+						input({
+							itemId: "item:lumber-camp-1",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:plank",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 1,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-lumber-camp-3",
-			"asset:item-blueprint-lumber-camp",
-			"blueprint-lumber-camp-3",
-			"Lumber Camp 3 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-lumber-camp-3",
+			assetId: "asset:item-blueprint-lumber-camp",
+			code: "blueprint-lumber-camp-3",
+			name: "Lumber Camp 3 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			207,
-			{
+			sort: 207,
+			behavior: {
 				label: "3",
-				craft: craft("craft:lumber-camp-3", "item:lumber-camp-3", [
-					input("item:lumber-camp-2", 2),
-					input("item:plank", 1),
-					input("item:stone-block", 1),
-				]),
+				craft: craft({
+					id: "craft:lumber-camp-3",
+					resultItemId: "item:lumber-camp-3",
+					inputs: [
+						input({
+							itemId: "item:lumber-camp-2",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:plank",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 1,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-lumber-camp-4",
-			"asset:item-blueprint-lumber-camp",
-			"blueprint-lumber-camp-4",
-			"Lumber Camp 4 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-lumber-camp-4",
+			assetId: "asset:item-blueprint-lumber-camp",
+			code: "blueprint-lumber-camp-4",
+			name: "Lumber Camp 4 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			208,
-			{
+			sort: 208,
+			behavior: {
 				label: "4",
-				craft: craft("craft:lumber-camp-4", "item:lumber-camp-4", [
-					input("item:lumber-camp-3", 2),
-					input("item:plank", 1),
-					input("item:stone-block", 1),
-				]),
+				craft: craft({
+					id: "craft:lumber-camp-4",
+					resultItemId: "item:lumber-camp-4",
+					inputs: [
+						input({
+							itemId: "item:lumber-camp-3",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:plank",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 1,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-lumber-camp-5",
-			"asset:item-blueprint-lumber-camp",
-			"blueprint-lumber-camp-5",
-			"Lumber Camp 5 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-lumber-camp-5",
+			assetId: "asset:item-blueprint-lumber-camp",
+			code: "blueprint-lumber-camp-5",
+			name: "Lumber Camp 5 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			209,
-			{
+			sort: 209,
+			behavior: {
 				label: "5",
-				craft: craft("craft:lumber-camp-5", "item:lumber-camp-5", [
-					input("item:lumber-camp-4", 2),
-					input("item:plank", 1),
-					input("item:stone-block", 1),
-				]),
+				craft: craft({
+					id: "craft:lumber-camp-5",
+					resultItemId: "item:lumber-camp-5",
+					inputs: [
+						input({
+							itemId: "item:lumber-camp-4",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:plank",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 1,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-quarry-2",
-			"asset:item-blueprint-quarry",
-			"blueprint-quarry-2",
-			"Quarry 2 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-quarry-2",
+			assetId: "asset:item-blueprint-quarry",
+			code: "blueprint-quarry-2",
+			name: "Quarry 2 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			226,
-			{
+			sort: 226,
+			behavior: {
 				label: "2",
-				craft: craft("craft:quarry-2", "item:quarry-2", [
-					input("item:quarry-1", 2),
-					input("item:beam", 1),
-					input("item:stone-block", 2),
-				]),
+				craft: craft({
+					id: "craft:quarry-2",
+					resultItemId: "item:quarry-2",
+					inputs: [
+						input({
+							itemId: "item:quarry-1",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:beam",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-quarry-3",
-			"asset:item-blueprint-quarry",
-			"blueprint-quarry-3",
-			"Quarry 3 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-quarry-3",
+			assetId: "asset:item-blueprint-quarry",
+			code: "blueprint-quarry-3",
+			name: "Quarry 3 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			227,
-			{
+			sort: 227,
+			behavior: {
 				label: "3",
-				craft: craft("craft:quarry-3", "item:quarry-3", [
-					input("item:quarry-2", 2),
-					input("item:beam", 1),
-					input("item:stone-block", 2),
-				]),
+				craft: craft({
+					id: "craft:quarry-3",
+					resultItemId: "item:quarry-3",
+					inputs: [
+						input({
+							itemId: "item:quarry-2",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:beam",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-quarry-4",
-			"asset:item-blueprint-quarry",
-			"blueprint-quarry-4",
-			"Quarry 4 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-quarry-4",
+			assetId: "asset:item-blueprint-quarry",
+			code: "blueprint-quarry-4",
+			name: "Quarry 4 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			228,
-			{
+			sort: 228,
+			behavior: {
 				label: "4",
-				craft: craft("craft:quarry-4", "item:quarry-4", [
-					input("item:quarry-3", 2),
-					input("item:beam", 1),
-					input("item:stone-block", 2),
-				]),
+				craft: craft({
+					id: "craft:quarry-4",
+					resultItemId: "item:quarry-4",
+					inputs: [
+						input({
+							itemId: "item:quarry-3",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:beam",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-quarry-5",
-			"asset:item-blueprint-quarry",
-			"blueprint-quarry-5",
-			"Quarry 5 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-quarry-5",
+			assetId: "asset:item-blueprint-quarry",
+			code: "blueprint-quarry-5",
+			name: "Quarry 5 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			229,
-			{
+			sort: 229,
+			behavior: {
 				label: "5",
-				craft: craft("craft:quarry-5", "item:quarry-5", [
-					input("item:quarry-4", 2),
-					input("item:beam", 1),
-					input("item:stone-block", 2),
-				]),
+				craft: craft({
+					id: "craft:quarry-5",
+					resultItemId: "item:quarry-5",
+					inputs: [
+						input({
+							itemId: "item:quarry-4",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:beam",
+							quantity: 1,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-townhall-2",
-			"asset:item-blueprint-townhall",
-			"blueprint-townhall-2",
-			"Town Hall 2 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-townhall-2",
+			assetId: "asset:item-blueprint-townhall",
+			code: "blueprint-townhall-2",
+			name: "Town Hall 2 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			246,
-			{
+			sort: 246,
+			behavior: {
 				label: "2",
-				craft: craft("craft:townhall-2", "item:townhall-2", [
-					input("item:townhall-1", 2),
-					input("item:beam", 2),
-					input("item:stone-block", 2),
-				]),
+				craft: craft({
+					id: "craft:townhall-2",
+					resultItemId: "item:townhall-2",
+					inputs: [
+						input({
+							itemId: "item:townhall-1",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:beam",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-townhall-3",
-			"asset:item-blueprint-townhall",
-			"blueprint-townhall-3",
-			"Town Hall 3 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-townhall-3",
+			assetId: "asset:item-blueprint-townhall",
+			code: "blueprint-townhall-3",
+			name: "Town Hall 3 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			247,
-			{
+			sort: 247,
+			behavior: {
 				label: "3",
-				craft: craft("craft:townhall-3", "item:townhall-3", [
-					input("item:townhall-2", 2),
-					input("item:beam", 2),
-					input("item:stone-block", 2),
-				]),
+				craft: craft({
+					id: "craft:townhall-3",
+					resultItemId: "item:townhall-3",
+					inputs: [
+						input({
+							itemId: "item:townhall-2",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:beam",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-townhall-4",
-			"asset:item-blueprint-townhall",
-			"blueprint-townhall-4",
-			"Town Hall 4 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-townhall-4",
+			assetId: "asset:item-blueprint-townhall",
+			code: "blueprint-townhall-4",
+			name: "Town Hall 4 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			248,
-			{
+			sort: 248,
+			behavior: {
 				label: "4",
-				craft: craft("craft:townhall-4", "item:townhall-4", [
-					input("item:townhall-3", 2),
-					input("item:beam", 2),
-					input("item:stone-block", 2),
-				]),
+				craft: craft({
+					id: "craft:townhall-4",
+					resultItemId: "item:townhall-4",
+					inputs: [
+						input({
+							itemId: "item:townhall-3",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:beam",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:blueprint-townhall-5",
-			"asset:item-blueprint-townhall",
-			"blueprint-townhall-5",
-			"Town Hall 5 Blueprint",
-			4,
-			4,
-			"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
-			[
+		}),
+		item({
+			id: "item:blueprint-townhall-5",
+			assetId: "asset:item-blueprint-townhall",
+			code: "blueprint-townhall-5",
+			name: "Town Hall 5 Blueprint",
+			tier: 4,
+			maxStackSize: 4,
+			description:
+				"Upgrade plan that wants real materials and two previous buildings. Easy wins are banned, mercifully.",
+			tags: [
 				"blueprint",
 				"craft-target",
 			],
-			249,
-			{
+			sort: 249,
+			behavior: {
 				label: "5",
-				craft: craft("craft:townhall-5", "item:townhall-5", [
-					input("item:townhall-4", 2),
-					input("item:beam", 2),
-					input("item:stone-block", 2),
-				]),
+				craft: craft({
+					id: "craft:townhall-5",
+					resultItemId: "item:townhall-5",
+					inputs: [
+						input({
+							itemId: "item:townhall-4",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:beam",
+							quantity: 2,
+						}),
+						input({
+							itemId: "item:stone-block",
+							quantity: 2,
+						}),
+					],
+				}),
 			},
-		),
-		item(
-			"item:townhall-1",
-			"asset:item-townhall",
-			"townhall-1",
-			"Town Hall I",
-			1,
-			1,
-			"A tiny bureaucracy that spits out progress.",
-			[
+		}),
+		item({
+			id: "item:townhall-1",
+			assetId: "asset:item-townhall",
+			code: "townhall-1",
+			name: "Town Hall I",
+			tier: 1,
+			maxStackSize: 1,
+			description: "A tiny bureaucracy that spits out progress.",
+			tags: [
 				"producer",
 				"building",
 				"townhall",
 			],
-			300,
-			{
+			sort: 300,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:townhall-1-blueprint",
-						"item:blueprint",
-						"item:blueprint-townhall",
-					),
+					imprint({
+						id: "merge:townhall-1-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-townhall",
+					}),
 				],
 				label: "1",
-				producer: clickProducer(3500, "loot:townhall-1"),
+				producer: clickProducer({
+					cooldownMs: 3500,
+					outputTableId: "loot:townhall-1",
+				}),
 			},
-		),
-		item(
-			"item:townhall-2",
-			"asset:item-townhall",
-			"townhall-2",
-			"Town Hall II",
-			2,
-			1,
-			"Same bureaucracy, slightly shinier clipboard.",
-			[
+		}),
+		item({
+			id: "item:townhall-2",
+			assetId: "asset:item-townhall",
+			code: "townhall-2",
+			name: "Town Hall II",
+			tier: 2,
+			maxStackSize: 1,
+			description: "Same bureaucracy, slightly shinier clipboard.",
+			tags: [
 				"producer",
 				"building",
 				"townhall",
 			],
-			310,
-			{
+			sort: 310,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:townhall-2-blueprint",
-						"item:blueprint",
-						"item:blueprint-townhall-2",
-					),
+					imprint({
+						id: "merge:townhall-2-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-townhall-2",
+					}),
 				],
 				label: "2",
-				producer: clickProducer(3000, "loot:townhall-2"),
+				producer: clickProducer({
+					cooldownMs: 3000,
+					outputTableId: "loot:townhall-2",
+				}),
 			},
-		),
-		item(
-			"item:townhall-3",
-			"asset:item-townhall",
-			"townhall-3",
-			"Town Hall III",
-			3,
-			1,
-			"Municipal paperwork with actual momentum.",
-			[
+		}),
+		item({
+			id: "item:townhall-3",
+			assetId: "asset:item-townhall",
+			code: "townhall-3",
+			name: "Town Hall III",
+			tier: 3,
+			maxStackSize: 1,
+			description: "Municipal paperwork with actual momentum.",
+			tags: [
 				"producer",
 				"building",
 				"townhall",
 			],
-			320,
-			{
+			sort: 320,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:townhall-3-blueprint",
-						"item:blueprint",
-						"item:blueprint-townhall-3",
-					),
+					imprint({
+						id: "merge:townhall-3-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-townhall-3",
+					}),
 				],
 				label: "3",
-				producer: clickProducer(2500, "loot:townhall-3"),
+				producer: clickProducer({
+					cooldownMs: 2500,
+					outputTableId: "loot:townhall-3",
+				}),
 			},
-		),
-
-		item(
-			"item:townhall-4",
-			"asset:item-townhall",
-			"townhall-4",
-			"Town Hall IV",
-			4,
-			1,
-			"Bureaucracy with sparkles. Humanity had options.",
-			[
+		}),
+		item({
+			id: "item:townhall-4",
+			assetId: "asset:item-townhall",
+			code: "townhall-4",
+			name: "Town Hall IV",
+			tier: 4,
+			maxStackSize: 1,
+			description: "Bureaucracy with sparkles. Humanity had options.",
+			tags: [
 				"producer",
 				"building",
 				"townhall",
 			],
-			324,
-			{
+			sort: 324,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:townhall-4-blueprint",
-						"item:blueprint",
-						"item:blueprint-townhall-4",
-					),
+					imprint({
+						id: "merge:townhall-4-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-townhall-4",
+					}),
 				],
 				label: "4",
-				producer: clickProducer(2200, "loot:townhall-4"),
+				producer: clickProducer({
+					cooldownMs: 2200,
+					outputTableId: "loot:townhall-4",
+				}),
 			},
-		),
-		item(
-			"item:townhall-5",
-			"asset:item-townhall",
-			"townhall-5",
-			"Town Hall V",
-			5,
-			1,
-			"A municipal beast with alarming confidence.",
-			[
+		}),
+		item({
+			id: "item:townhall-5",
+			assetId: "asset:item-townhall",
+			code: "townhall-5",
+			name: "Town Hall V",
+			tier: 5,
+			maxStackSize: 1,
+			description: "A municipal beast with alarming confidence.",
+			tags: [
 				"producer",
 				"building",
 				"townhall",
 			],
-			328,
-			{
+			sort: 328,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:townhall-5-blueprint",
-						"item:blueprint",
-						"item:blueprint-townhall-5",
-					),
+					imprint({
+						id: "merge:townhall-5-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-townhall-5",
+					}),
 				],
 				label: "5",
-				producer: clickProducer(1900, "loot:townhall-5"),
+				producer: clickProducer({
+					cooldownMs: 1900,
+					outputTableId: "loot:townhall-5",
+				}),
 			},
-		),
-
-		item(
-			"item:lumber-camp-1",
-			"asset:item-lumber-camp",
-			"lumber-camp-1",
-			"Lumber Camp I",
-			1,
-			1,
-			"A polite machine for turning time into sticks.",
-			[
+		}),
+		item({
+			id: "item:lumber-camp-1",
+			assetId: "asset:item-lumber-camp",
+			code: "lumber-camp-1",
+			name: "Lumber Camp I",
+			tier: 1,
+			maxStackSize: 1,
+			description: "A polite machine for turning time into sticks.",
+			tags: [
 				"producer",
 				"building",
 				"wood",
 			],
-			330,
-			{
+			sort: 330,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:lumber-camp-1-blueprint",
-						"item:blueprint",
-						"item:blueprint-lumber-camp",
-					),
+					imprint({
+						id: "merge:lumber-camp-1-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-lumber-camp",
+					}),
 				],
 				label: "1",
-				producer: clickProducer(5000, "loot:lumber-camp-1"),
+				producer: clickProducer({
+					cooldownMs: 5000,
+					outputTableId: "loot:lumber-camp-1",
+				}),
 			},
-		),
-		item(
-			"item:lumber-camp-2",
-			"asset:item-lumber-camp",
-			"lumber-camp-2",
-			"Lumber Camp II",
-			2,
-			1,
-			"Still wood, but now with ambition.",
-			[
+		}),
+		item({
+			id: "item:lumber-camp-2",
+			assetId: "asset:item-lumber-camp",
+			code: "lumber-camp-2",
+			name: "Lumber Camp II",
+			tier: 2,
+			maxStackSize: 1,
+			description: "Still wood, but now with ambition.",
+			tags: [
 				"producer",
 				"building",
 				"wood",
 			],
-			340,
-			{
+			sort: 340,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:lumber-camp-2-blueprint",
-						"item:blueprint",
-						"item:blueprint-lumber-camp-2",
-					),
+					imprint({
+						id: "merge:lumber-camp-2-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-lumber-camp-2",
+					}),
 				],
 				label: "2",
-				producer: clickProducer(4500, "loot:lumber-camp-2"),
+				producer: clickProducer({
+					cooldownMs: 4500,
+					outputTableId: "loot:lumber-camp-2",
+				}),
 			},
-		),
-		item(
-			"item:lumber-camp-3",
-			"asset:item-lumber-camp",
-			"lumber-camp-3",
-			"Lumber Camp III",
-			3,
-			1,
-			"A compact shrine to deforestation.",
-			[
+		}),
+		item({
+			id: "item:lumber-camp-3",
+			assetId: "asset:item-lumber-camp",
+			code: "lumber-camp-3",
+			name: "Lumber Camp III",
+			tier: 3,
+			maxStackSize: 1,
+			description: "A compact shrine to deforestation.",
+			tags: [
 				"producer",
 				"building",
 				"wood",
 			],
-			350,
-			{
+			sort: 350,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:lumber-camp-3-blueprint",
-						"item:blueprint",
-						"item:blueprint-lumber-camp-3",
-					),
+					imprint({
+						id: "merge:lumber-camp-3-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-lumber-camp-3",
+					}),
 				],
 				label: "3",
-				producer: clickProducer(4000, "loot:lumber-camp-3"),
+				producer: clickProducer({
+					cooldownMs: 4000,
+					outputTableId: "loot:lumber-camp-3",
+				}),
 			},
-		),
-
-		item(
-			"item:lumber-camp-4",
-			"asset:item-lumber-camp",
-			"lumber-camp-4",
-			"Lumber Camp IV",
-			4,
-			1,
-			"Deforestation, now with workflows.",
-			[
+		}),
+		item({
+			id: "item:lumber-camp-4",
+			assetId: "asset:item-lumber-camp",
+			code: "lumber-camp-4",
+			name: "Lumber Camp IV",
+			tier: 4,
+			maxStackSize: 1,
+			description: "Deforestation, now with workflows.",
+			tags: [
 				"producer",
 				"building",
 				"wood",
 			],
-			354,
-			{
+			sort: 354,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:lumber-camp-4-blueprint",
-						"item:blueprint",
-						"item:blueprint-lumber-camp-4",
-					),
+					imprint({
+						id: "merge:lumber-camp-4-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-lumber-camp-4",
+					}),
 				],
 				label: "4",
-				producer: clickProducer(3600, "loot:lumber-camp-4"),
+				producer: clickProducer({
+					cooldownMs: 3600,
+					outputTableId: "loot:lumber-camp-4",
+				}),
 			},
-		),
-		item(
-			"item:lumber-camp-5",
-			"asset:item-lumber-camp",
-			"lumber-camp-5",
-			"Lumber Camp V",
-			5,
-			1,
-			"At this point the forest has filed a complaint.",
-			[
+		}),
+		item({
+			id: "item:lumber-camp-5",
+			assetId: "asset:item-lumber-camp",
+			code: "lumber-camp-5",
+			name: "Lumber Camp V",
+			tier: 5,
+			maxStackSize: 1,
+			description: "At this point the forest has filed a complaint.",
+			tags: [
 				"producer",
 				"building",
 				"wood",
 			],
-			358,
-			{
+			sort: 358,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:lumber-camp-5-blueprint",
-						"item:blueprint",
-						"item:blueprint-lumber-camp-5",
-					),
+					imprint({
+						id: "merge:lumber-camp-5-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-lumber-camp-5",
+					}),
 				],
 				label: "5",
-				producer: clickProducer(3200, "loot:lumber-camp-5"),
+				producer: clickProducer({
+					cooldownMs: 3200,
+					outputTableId: "loot:lumber-camp-5",
+				}),
 			},
-		),
-
-		item(
-			"item:quarry-1",
-			"asset:item-quarry",
-			"quarry-1",
-			"Quarry I",
-			1,
-			1,
-			"A hole in the ground with a business model.",
-			[
+		}),
+		item({
+			id: "item:quarry-1",
+			assetId: "asset:item-quarry",
+			code: "quarry-1",
+			name: "Quarry I",
+			tier: 1,
+			maxStackSize: 1,
+			description: "A hole in the ground with a business model.",
+			tags: [
 				"producer",
 				"building",
 				"stone",
 			],
-			360,
-			{
+			sort: 360,
+			behavior: {
 				merge: [
-					imprint("merge:quarry-1-blueprint", "item:blueprint", "item:blueprint-quarry"),
+					imprint({
+						id: "merge:quarry-1-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-quarry",
+					}),
 				],
 				label: "1",
-				producer: clickProducer(5500, "loot:quarry-1"),
+				producer: clickProducer({
+					cooldownMs: 5500,
+					outputTableId: "loot:quarry-1",
+				}),
 			},
-		),
-		item(
-			"item:quarry-2",
-			"asset:item-quarry",
-			"quarry-2",
-			"Quarry II",
-			2,
-			1,
-			"A deeper hole, because progress is weird.",
-			[
+		}),
+		item({
+			id: "item:quarry-2",
+			assetId: "asset:item-quarry",
+			code: "quarry-2",
+			name: "Quarry II",
+			tier: 2,
+			maxStackSize: 1,
+			description: "A deeper hole, because progress is weird.",
+			tags: [
 				"producer",
 				"building",
 				"stone",
 			],
-			370,
-			{
+			sort: 370,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:quarry-2-blueprint",
-						"item:blueprint",
-						"item:blueprint-quarry-2",
-					),
+					imprint({
+						id: "merge:quarry-2-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-quarry-2",
+					}),
 				],
 				label: "2",
-				producer: clickProducer(5000, "loot:quarry-2"),
+				producer: clickProducer({
+					cooldownMs: 5000,
+					outputTableId: "loot:quarry-2",
+				}),
 			},
-		),
-		item(
-			"item:quarry-3",
-			"asset:item-quarry",
-			"quarry-3",
-			"Quarry III",
-			3,
-			1,
-			"Rocks leaving the earth at startup velocity.",
-			[
+		}),
+		item({
+			id: "item:quarry-3",
+			assetId: "asset:item-quarry",
+			code: "quarry-3",
+			name: "Quarry III",
+			tier: 3,
+			maxStackSize: 1,
+			description: "Rocks leaving the earth at startup velocity.",
+			tags: [
 				"producer",
 				"building",
 				"stone",
 			],
-			380,
-			{
+			sort: 380,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:quarry-3-blueprint",
-						"item:blueprint",
-						"item:blueprint-quarry-3",
-					),
+					imprint({
+						id: "merge:quarry-3-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-quarry-3",
+					}),
 				],
 				label: "3",
-				producer: clickProducer(4500, "loot:quarry-3"),
+				producer: clickProducer({
+					cooldownMs: 4500,
+					outputTableId: "loot:quarry-3",
+				}),
 			},
-		),
-
-		item(
-			"item:quarry-4",
-			"asset:item-quarry",
-			"quarry-4",
-			"Quarry IV",
-			4,
-			1,
-			"A sophisticated hole. Still a hole.",
-			[
+		}),
+		item({
+			id: "item:quarry-4",
+			assetId: "asset:item-quarry",
+			code: "quarry-4",
+			name: "Quarry IV",
+			tier: 4,
+			maxStackSize: 1,
+			description: "A sophisticated hole. Still a hole.",
+			tags: [
 				"producer",
 				"building",
 				"stone",
 			],
-			384,
-			{
+			sort: 384,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:quarry-4-blueprint",
-						"item:blueprint",
-						"item:blueprint-quarry-4",
-					),
+					imprint({
+						id: "merge:quarry-4-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-quarry-4",
+					}),
 				],
 				label: "4",
-				producer: clickProducer(4100, "loot:quarry-4"),
+				producer: clickProducer({
+					cooldownMs: 4100,
+					outputTableId: "loot:quarry-4",
+				}),
 			},
-		),
-		item(
-			"item:quarry-5",
-			"asset:item-quarry",
-			"quarry-5",
-			"Quarry V",
-			5,
-			1,
-			"Rocks surrender before the tap lands.",
-			[
+		}),
+		item({
+			id: "item:quarry-5",
+			assetId: "asset:item-quarry",
+			code: "quarry-5",
+			name: "Quarry V",
+			tier: 5,
+			maxStackSize: 1,
+			description: "Rocks surrender before the tap lands.",
+			tags: [
 				"producer",
 				"building",
 				"stone",
 			],
-			388,
-			{
+			sort: 388,
+			behavior: {
 				merge: [
-					imprint(
-						"merge:quarry-5-blueprint",
-						"item:blueprint",
-						"item:blueprint-quarry-5",
-					),
+					imprint({
+						id: "merge:quarry-5-blueprint",
+						withItemId: "item:blueprint",
+						resultItemId: "item:blueprint-quarry-5",
+					}),
 				],
 				label: "5",
-				producer: clickProducer(3700, "loot:quarry-5"),
+				producer: clickProducer({
+					cooldownMs: 3700,
+					outputTableId: "loot:quarry-5",
+				}),
 			},
-		),
-
-		item(
-			"item:coal-mine-1",
-			"asset:item-coal-mine",
-			"coal-mine-1",
-			"Coal Mine I",
-			1,
-			1,
-			"Produces coal only after it receives sausage and beer. Labor relations remain advanced nonsense.",
-			[
+		}),
+		item({
+			id: "item:coal-mine-1",
+			assetId: "asset:item-coal-mine",
+			code: "coal-mine-1",
+			name: "Coal Mine I",
+			tier: 1,
+			maxStackSize: 1,
+			description:
+				"Produces coal only after it receives sausage and beer. Labor relations remain advanced nonsense.",
+			tags: [
 				"producer",
 				"building",
 				"fuel",
 			],
-			392,
-			{
+			sort: 392,
+			behavior: {
 				label: "1",
-				producer: clickProducer(5200, "loot:coal-mine-1", [
-					producerInput("item:sausage", 1, 4),
-					producerInput("item:beer", 1, 4),
-				]),
+				producer: clickProducer({
+					cooldownMs: 5200,
+					outputTableId: "loot:coal-mine-1",
+					inputs: [
+						producerInput({
+							itemId: "item:sausage",
+							quantity: 1,
+							capacity: 4,
+						}),
+						producerInput({
+							itemId: "item:beer",
+							quantity: 1,
+							capacity: 4,
+						}),
+					],
+				}),
 			},
-		),
-
-		item(
-			"item:crate-1",
-			"asset:item-crate",
-			"crate-1",
-			"Common Crate",
-			1,
-			1,
-			"A finite producer with suspicious contents.",
-			[
+		}),
+		item({
+			id: "item:crate-1",
+			assetId: "asset:item-crate",
+			code: "crate-1",
+			name: "Common Crate",
+			tier: 1,
+			maxStackSize: 1,
+			description: "A finite producer with suspicious contents.",
+			tags: [
 				"producer",
 				"container",
 			],
-			400,
-			{
+			sort: 400,
+			behavior: {
 				merge: [
-					same("merge:crate-1-crate-2", "item:crate-1", "item:crate-2"),
+					same({
+						id: "merge:crate-1-crate-2",
+						selfItemId: "item:crate-1",
+						resultItemId: "item:crate-2",
+					}),
 				],
-				stash: clickStash(3, "loot:crate-1"),
+				stash: clickStash({
+					charges: 3,
+					outputTableId: "loot:crate-1",
+				}),
 			},
-		),
-		item(
-			"item:crate-2",
-			"asset:item-crate-sturdy",
-			"crate-2",
-			"Sturdy Crate",
-			2,
-			1,
-			"Same box, fewer disappointments.",
-			[
+		}),
+		item({
+			id: "item:crate-2",
+			assetId: "asset:item-crate-sturdy",
+			code: "crate-2",
+			name: "Sturdy Crate",
+			tier: 2,
+			maxStackSize: 1,
+			description: "Same box, fewer disappointments.",
+			tags: [
 				"producer",
 				"container",
 			],
-			410,
-			{
+			sort: 410,
+			behavior: {
 				merge: [
-					same("merge:crate-2-crate-3", "item:crate-2", "item:crate-3"),
+					same({
+						id: "merge:crate-2-crate-3",
+						selfItemId: "item:crate-2",
+						resultItemId: "item:crate-3",
+					}),
 				],
-				stash: clickStash(4, "loot:crate-2"),
+				stash: clickStash({
+					charges: 4,
+					outputTableId: "loot:crate-2",
+				}),
 			},
-		),
-		item(
-			"item:crate-3",
-			"asset:item-crate-rare",
-			"crate-3",
-			"Rare Crate",
-			3,
-			1,
-			"A tiny treasure economy in a box.",
-			[
+		}),
+		item({
+			id: "item:crate-3",
+			assetId: "asset:item-crate-rare",
+			code: "crate-3",
+			name: "Rare Crate",
+			tier: 3,
+			maxStackSize: 1,
+			description: "A tiny treasure economy in a box.",
+			tags: [
 				"producer",
 				"container",
 				"rare",
 			],
-			420,
-			{
+			sort: 420,
+			behavior: {
 				merge: [
-					same("merge:crate-3-crate-4", "item:crate-3", "item:crate-4"),
+					same({
+						id: "merge:crate-3-crate-4",
+						selfItemId: "item:crate-3",
+						resultItemId: "item:crate-4",
+					}),
 				],
-				stash: clickStash(5, "loot:crate-3"),
+				stash: clickStash({
+					charges: 5,
+					outputTableId: "loot:crate-3",
+				}),
 			},
-		),
-
-		item(
-			"item:epic-key",
-			"asset:item-epic-key",
-			"epic-key",
-			"Epic Key",
-			4,
-			1,
-			"A diamond-studded key that opens the Epic Crate.",
-			[
+		}),
+		item({
+			id: "item:epic-key",
+			assetId: "asset:item-epic-key",
+			code: "epic-key",
+			name: "Epic Key",
+			tier: 4,
+			maxStackSize: 1,
+			description: "A diamond-studded key that opens the Epic Crate.",
+			tags: [
 				"key",
 				"rare",
 			],
-			425,
-			{},
-		),
-
-		item(
-			"item:crate-4",
-			"asset:item-crate-epic",
-			"crate-4",
-			"Epic Crate",
-			4,
-			1,
-			"Purple box. The economy is doomed.",
-			[
+			sort: 425,
+			behavior: {},
+		}),
+		item({
+			id: "item:crate-4",
+			assetId: "asset:item-crate-epic",
+			code: "crate-4",
+			name: "Epic Crate",
+			tier: 4,
+			maxStackSize: 1,
+			description: "Purple box. The economy is doomed.",
+			tags: [
 				"producer",
 				"container",
 				"rare",
 			],
-			430,
-			{
-				stash: clickStash(6, "loot:crate-4", "remove", [
-					producerInput("item:epic-key", 1, 1),
-				]),
+			sort: 430,
+			behavior: {
+				stash: clickStash({
+					charges: 6,
+					outputTableId: "loot:crate-4",
+					onDepleted: "remove",
+					inputs: [
+						producerInput({
+							itemId: "item:epic-key",
+							quantity: 1,
+							capacity: 1,
+						}),
+					],
+				}),
 			},
-		),
+		}),
 	],
 	startingState: {
 		resources: [] as readonly {
@@ -1950,9 +3001,7 @@ export const GameConfig = {
 		],
 	},
 } satisfies GameConfig.Shape;
-
 export type GameConfig = typeof GameConfig;
-
 export namespace GameConfig {
 	export interface Shape {
 		game: {
@@ -1987,280 +3036,4 @@ export namespace GameConfig {
 			}[];
 		};
 	}
-}
-
-function asset(
-	id: AssetId,
-	label: string,
-	fileName: string,
-	sort: number,
-	format: "svg" | "png" = "svg",
-): AssetDefinition {
-	return {
-		id,
-		kind: "item",
-		label,
-		src: format === "png" ? png(fileName) : svg(fileName),
-		render: "plain",
-		sort,
-	};
-}
-
-function blueprintAsset(
-	id: AssetId,
-	label: string,
-	overlayAssetId: AssetId,
-	sort: number,
-): AssetDefinition {
-	return {
-		id,
-		kind: "item",
-		label,
-		src: png("item-blueprint"),
-		overlayAssetId,
-		render: "blueprint",
-		sort,
-	};
-}
-
-function item(
-	id: ItemId,
-	assetId: AssetId,
-	code: string,
-	name: string,
-	tier: number,
-	maxStackSize: number,
-	description: string,
-	tags: readonly string[],
-	sort: number,
-	behavior: Pick<ItemDefinition, "label" | "merge" | "producer" | "stash" | "craft"> = {},
-): ItemDefinition {
-	return {
-		id,
-		assetId,
-		code,
-		name,
-		tier,
-		maxStackSize,
-		description,
-		tags,
-		sort,
-		...behavior,
-	};
-}
-
-function same(id: MergeDefinitionId, selfItemId: ItemId, resultItemId: ItemId): ItemMergeRule {
-	return {
-		id,
-		withItemId: selfItemId,
-		resultItemId,
-	};
-}
-
-function combo(
-	id: MergeDefinitionId,
-	withItemId: ItemId,
-	resultItemId: ItemId,
-	secret = false,
-): ItemMergeRule {
-	return {
-		id,
-		withItemId,
-		resultItemId,
-		secret,
-	};
-}
-
-function imprint(id: MergeDefinitionId, withItemId: ItemId, resultItemId: ItemId): ItemMergeRule {
-	return {
-		id,
-		withItemId,
-		resultItemId,
-		consumeSource: false,
-		secret: true,
-	};
-}
-
-function craft(
-	id: CraftRecipeId,
-	resultItemId: ItemId,
-	inputs: readonly CraftRecipeInput[],
-	durationMs = 0,
-): ItemCraftRecipe {
-	return {
-		id,
-		resultItemId,
-		inputs,
-		durationMs,
-	};
-}
-
-function input(itemId: ItemId, quantity: number): CraftRecipeInput {
-	return {
-		itemId,
-		quantity,
-	};
-}
-
-function lootTable(
-	id: LootTableId,
-	name: string,
-	output: readonly ActivationOutput[],
-): LootTableDefinition {
-	return {
-		id,
-		name,
-		output,
-	};
-}
-
-function upgrade(
-	id: UpgradeId,
-	code: string,
-	name: string,
-	description: string,
-	sort: number,
-	tiers: readonly UpgradeTierDefinition[],
-): UpgradeDefinition {
-	return {
-		id,
-		code,
-		name,
-		description,
-		sort,
-		tiers,
-	};
-}
-
-function tier(
-	cost: readonly UpgradeTierDefinition["cost"][number][],
-	effects: readonly UpgradeEffectDefinition[],
-	durationMs = 6000,
-): UpgradeTierDefinition {
-	return {
-		cost,
-		effects,
-		durationMs,
-	};
-}
-
-function cost(itemId: ItemId, quantity: number): UpgradeTierDefinition["cost"][number] {
-	return {
-		itemId,
-		quantity,
-	};
-}
-
-function speedTiers(
-	itemId: ItemId,
-	costs: readonly UpgradeTierDefinition["cost"][number][],
-): UpgradeTierDefinition[] {
-	return costs.map((entry) =>
-		tier(
-			[
-				entry,
-			],
-			[
-				{
-					type: "producer.cooldown.add",
-					itemId,
-					ms: -100,
-				},
-			],
-		),
-	);
-}
-
-function setLootTable(itemId: ItemId, tableId: LootTableId): UpgradeEffectDefinition {
-	return {
-		type: "producer.outputTable.set",
-		itemId,
-		tableId,
-	};
-}
-
-function clickProducer(
-	cooldownMs: number,
-	outputTableId: LootTableId,
-	inputs: readonly NonNullable<ProducerDefinition["inputs"]>[number][] = [],
-): ProducerDefinition {
-	return {
-		type: "producer",
-		trigger: "click",
-		placement: "board_then_inventory",
-		outputTableId,
-		cooldownMs,
-		inputs,
-	};
-}
-
-function clickStash(
-	charges: number,
-	outputTableId: LootTableId,
-	onDepleted: StashDefinition["onDepleted"] = "remove",
-	inputs: readonly NonNullable<StashDefinition["inputs"]>[number][] = [],
-): StashDefinition {
-	return {
-		type: "stash",
-		trigger: "click",
-		placement: "board_then_inventory",
-		charges,
-		onDepleted,
-		outputTableId,
-		inputs,
-	};
-}
-
-function producerInput(
-	itemId: ItemId,
-	quantity: number,
-	capacity = Math.max(quantity * 3, quantity),
-): NonNullable<ProducerDefinition["inputs"]>[number] {
-	return {
-		itemId,
-		quantity,
-		capacity,
-	};
-}
-
-function outputs(...entries: readonly ActivationOutput[]): ActivationOutput[] {
-	return [
-		...entries,
-	];
-}
-
-function guaranteed(itemId: ItemId, quantity: Quantity = 1): ActivationOutput {
-	return {
-		type: "guaranteed",
-		itemId,
-		quantity,
-	};
-}
-
-function chance(itemId: ItemId, probability: number, quantity: Quantity = 1): ActivationOutput {
-	return {
-		type: "chance",
-		itemId,
-		probability,
-		quantity,
-	};
-}
-
-function weighted(
-	entries: readonly ActivationWeightedEntry[],
-	rolls: Quantity = 1,
-): ActivationOutput {
-	return {
-		type: "weighted",
-		entries,
-		rolls,
-	};
-}
-
-function drop(itemId: ItemId, weight: number, quantity: Quantity = 1): ActivationWeightedEntry {
-	return {
-		itemId,
-		weight,
-		quantity,
-	};
 }

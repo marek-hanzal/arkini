@@ -2,7 +2,7 @@ import { memo, type FC, useCallback, useMemo, useRef } from "react";
 import { boardCellNodeId } from "~/board/boardCellNodeId";
 import { boardColumns } from "~/board/boardColumns";
 import { boardRows } from "~/board/boardRows";
-import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
+import { useMotionCellFeedback } from "~/board/hook/useMotionCellFeedback";
 import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
 import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
 import { BoardTile } from "~/board/ui/BoardTile";
@@ -69,7 +69,7 @@ export const BoardCell: FC<BoardCell.Props> = memo(
 			activation: boardItem?.activation,
 			nowMs,
 		});
-		useGsapCellFeedback(cellRef, {
+		useMotionCellFeedback(cellRef, {
 			invalid,
 			success: merged,
 			imprint: imprinted,

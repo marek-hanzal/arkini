@@ -1,12 +1,26 @@
-import { type FC, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { type FC, useEffect, type ReactNode } from "react";
+import { motion } from "motion/react";
 import { cn } from "~/shared/cn";
-import { animateBottomSheet } from "~/animation/animateBottomSheet";
+
+const sheetDurationSeconds = 0.28;
+const openEase = [
+	0.22,
+	1,
+	0.36,
+	1,
+] as const;
+const closeEase = [
+	0.65,
+	0,
+	0.35,
+	1,
+] as const;
 
 export namespace BottomSheet {
 	export interface Props {
 		/**
-		 * The sheet is always mounted. `open` only flips interactivity; GSAP owns the
-		 * slide/backdrop timeline so React does not remount the panel mid-gesture.
+		 * The sheet stays mounted; Motion owns the visual open/close state so the
+		 * active sheet content does not remount mid-gesture.
 		 */
 		open: boolean;
 		children: ReactNode;
@@ -27,23 +41,6 @@ export const BottomSheet: FC<BottomSheet.Props> = ({
 	onClose,
 	"data-drag-node-id": dragNodeId,
 }) => {
-	const backdropRef = useRef<HTMLButtonElement | null>(null);
-	const panelRef = useRef<HTMLDivElement | null>(null);
-
-	useLayoutEffect(() => {
-		const panel = panelRef.current;
-		const backdrop = backdropRef.current;
-		if (!panel || !backdrop) return;
-
-		animateBottomSheet({
-			panel,
-			backdrop,
-			open,
-		});
-	}, [
-		open,
-	]);
-
 	useEffect(() => {
 		if (!open) return;
 
@@ -63,21 +60,36 @@ export const BottomSheet: FC<BottomSheet.Props> = ({
 			className="ak-bottom-sheet"
 			data-open={open ? "true" : "false"}
 		>
-			<button
-				ref={backdropRef}
+			<motion.button
 				type="button"
 				tabIndex={open ? 0 : -1}
 				className="ak-bottom-sheet-backdrop"
+				initial={false}
+				animate={{
+					opacity: open ? 1 : 0,
+				}}
+				transition={{
+					duration: sheetDurationSeconds,
+					ease: open ? openEase : closeEase,
+				}}
 				onClick={onClose}
 			/>
 
-			<section
-				ref={panelRef}
+			<motion.section
 				data-drag-node-id={dragNodeId}
 				className={cn("ak-bottom-sheet-panel", className, containerClassName)}
+				initial={false}
+				animate={{
+					opacity: open ? 1 : 0,
+					y: open ? 0 : "calc(100% + 16px)",
+				}}
+				transition={{
+					duration: sheetDurationSeconds,
+					ease: open ? openEase : closeEase,
+				}}
 			>
 				<div className={cn("ak-bottom-sheet-content", contentClassName)}>{children}</div>
-			</section>
+			</motion.section>
 		</div>
 	);
 };

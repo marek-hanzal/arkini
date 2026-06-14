@@ -1,10 +1,11 @@
-import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import { useCommand } from "~/play/hook/useCommand";
-import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
+import { playQueryKeys } from "~/play/hook/playQueryKeys";
 import { placeInventoryOnBoardWithFly } from "~/play/logic/placeInventoryOnBoardWithFly";
-import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
+import type { BoardView, BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
 import { stashBoardWithFly } from "~/play/logic/stashBoardWithFly";
 import type { FlyerKind, VisualMeta, RectLike } from "~/play/types";
 
@@ -31,60 +32,76 @@ export const usePlayManualItemActions = ({
 	hideSources,
 	clearHiddenSources,
 }: usePlayManualItemActions.Props) => {
-	const board = usePlayBoard().data;
+	const queryClient = useQueryClient();
 	const invalidatePlayData = usePlayDataInvalidation();
 	const command = useCommand({
 		invalidateOnSuccess: false,
 	});
+	const run = command.mutateAsync;
+	const readBoard = useCallback(
+		() => queryClient.getQueryData<BoardView>(playQueryKeys.board),
+		[
+			queryClient,
+		],
+	);
 
-	return {
-		stashBoardWithFly: useCallback(
-			(boardItem: BoardViewItem) =>
-				schedule("stash board item", () =>
-					stashBoardWithFly({
-						boardItem,
-						addFlyer,
-						run: command.mutateAsync,
-						feedback,
-						hideSources,
-						clearHiddenSources,
-						invalidatePlayData,
-					}),
-				),
-			[
-				addFlyer,
-				clearHiddenSources,
-				command.mutateAsync,
-				feedback,
-				hideSources,
-				invalidatePlayData,
-				schedule,
-			],
-		),
-		placeInventoryOnBoardWithFly: useCallback(
-			(slot: InventorySlot) =>
-				schedule("place inventory item", () =>
-					placeInventoryOnBoardWithFly({
-						board,
-						slot,
-						addFlyer,
-						run: command.mutateAsync,
-						feedback,
-						hideSources,
-						clearHiddenSources,
-						invalidatePlayData,
-					}),
-				),
-			[
-				addFlyer,
-				board,
-				clearHiddenSources,
-				command.mutateAsync,
-				feedback,
-				hideSources,
-				invalidatePlayData,
-				schedule,
-			],
-		),
-	};
+	const stashBoard = useCallback(
+		(boardItem: BoardViewItem) =>
+			schedule("stash board item", () =>
+				stashBoardWithFly({
+					boardItem,
+					addFlyer,
+					run,
+					feedback,
+					hideSources,
+					clearHiddenSources,
+					invalidatePlayData,
+				}),
+			),
+		[
+			addFlyer,
+			clearHiddenSources,
+			feedback,
+			hideSources,
+			invalidatePlayData,
+			run,
+			schedule,
+		],
+	);
+	const placeInventoryOnBoard = useCallback(
+		(slot: InventorySlot) =>
+			schedule("place inventory item", () =>
+				placeInventoryOnBoardWithFly({
+					board: readBoard(),
+					slot,
+					addFlyer,
+					run,
+					feedback,
+					hideSources,
+					clearHiddenSources,
+					invalidatePlayData,
+				}),
+			),
+		[
+			addFlyer,
+			clearHiddenSources,
+			feedback,
+			hideSources,
+			invalidatePlayData,
+			readBoard,
+			run,
+			schedule,
+		],
+	);
+
+	return useMemo(
+		() => ({
+			stashBoardWithFly: stashBoard,
+			placeInventoryOnBoardWithFly: placeInventoryOnBoard,
+		}),
+		[
+			placeInventoryOnBoard,
+			stashBoard,
+		],
+	);
 };

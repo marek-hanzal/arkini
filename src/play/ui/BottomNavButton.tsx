@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { memo, type FC, useCallback } from "react";
 import type { BottomNavSheet } from "~/play/logic/playSheetTypes";
 
 export namespace BottomNavButton {
@@ -7,28 +7,32 @@ export namespace BottomNavButton {
 		label: string;
 		icon: string;
 		tone: BottomNavSheet;
-		onClick(): void;
+		onOpen(sheet: BottomNavSheet): void;
 	}
 }
 
-export const BottomNavButton: FC<BottomNavButton.Props> = ({
-	active,
-	label,
-	icon,
-	tone,
-	onClick,
-}) => {
-	return (
-		<button
-			type="button"
-			className="ak-bottom-nav-button"
-			data-active={active ? "true" : "false"}
-			data-tone={tone}
-			data-bottom-nav-sheet={tone}
-			onClick={onClick}
-		>
-			<span className="ak-bottom-nav-icon">{icon}</span>
-			<span>{label}</span>
-		</button>
-	);
-};
+export const BottomNavButton: FC<BottomNavButton.Props> = memo(
+	({ active, label, icon, tone, onOpen }) => {
+		const handleClick = useCallback(
+			() => onOpen(tone),
+			[
+				onOpen,
+				tone,
+			],
+		);
+
+		return (
+			<button
+				type="button"
+				className="ak-bottom-nav-button"
+				data-active={active ? "true" : "false"}
+				data-tone={tone}
+				data-bottom-nav-sheet={tone}
+				onClick={handleClick}
+			>
+				<span className="ak-bottom-nav-icon">{icon}</span>
+				<span>{label}</span>
+			</button>
+		);
+	},
+);

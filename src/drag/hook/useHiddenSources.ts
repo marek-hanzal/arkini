@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { without } from "~/shared/util/without";
 
 export namespace useHiddenSources {
@@ -13,7 +13,7 @@ export namespace useHiddenSources {
 export const useHiddenSources = (): useHiddenSources.Result => {
 	const [hiddenSourceIds, setHiddenSourceIds] = useState(() => new Set<string>());
 
-	const hideSources = (ids: readonly string[]) => {
+	const hideSources = useCallback((ids: readonly string[]) => {
 		if (!ids.length) return;
 
 		setHiddenSourceIds((current) => {
@@ -28,20 +28,28 @@ export const useHiddenSources = (): useHiddenSources.Result => {
 
 			return changed ? next : current;
 		});
-	};
+	}, []);
 
-	const showSource = (id: string) => {
+	const showSource = useCallback((id: string) => {
 		setHiddenSourceIds((current) => (current.has(id) ? without(current, id) : current));
-	};
+	}, []);
 
-	const clearHiddenSources = () => {
+	const clearHiddenSources = useCallback(() => {
 		setHiddenSourceIds((current) => (current.size ? new Set() : current));
-	};
+	}, []);
 
-	return {
-		hiddenSourceIds,
-		hideSources,
-		showSource,
-		clearHiddenSources,
-	};
+	return useMemo(
+		() => ({
+			hiddenSourceIds,
+			hideSources,
+			showSource,
+			clearHiddenSources,
+		}),
+		[
+			clearHiddenSources,
+			hiddenSourceIds,
+			hideSources,
+			showSource,
+		],
+	);
 };

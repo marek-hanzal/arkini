@@ -1,7 +1,6 @@
-import type { FC } from "react";
-import { BottomNavButton } from "~/play/ui/BottomNavButton";
-
+import { memo, type FC } from "react";
 import type { ActiveSheet, BottomNavSheet } from "~/play/logic/playSheetTypes";
+import { BottomNavButton } from "~/play/ui/BottomNavButton";
 
 export namespace BottomNavigation {
 	export interface Props {
@@ -10,7 +9,7 @@ export namespace BottomNavigation {
 	}
 }
 
-export const BottomNavigation: FC<BottomNavigation.Props> = ({ activeSheet, onOpen }) => {
+export const BottomNavigation: FC<BottomNavigation.Props> = memo(({ activeSheet, onOpen }) => {
 	return (
 		<nav className="ak-bottom-nav">
 			<div className="ak-bottom-nav-inner">
@@ -19,23 +18,23 @@ export const BottomNavigation: FC<BottomNavigation.Props> = ({ activeSheet, onOp
 					label="Inventory"
 					icon="▦"
 					tone="inventory"
-					onClick={() => onOpen("inventory")}
+					onOpen={onOpen}
 				/>
 				<BottomNavButton
 					active={activeSheet === "upgrades"}
 					label="Upgrades"
 					icon="▲"
 					tone="upgrades"
-					onClick={() => onOpen("upgrades")}
+					onOpen={onOpen}
 				/>
 				<BottomNavButton
 					active={activeSheet === "database"}
 					label="Database"
 					icon="◈"
 					tone="database"
-					onClick={() => onOpen("database")}
+					onOpen={onOpen}
 				/>
 			</div>
 		</nav>
 	);
-};
+});

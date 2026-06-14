@@ -1,12 +1,16 @@
-import { useCommand } from "~/play/hook/useCommand";
-import { usePlayDragView } from "~/play/hook/usePlayDragView";
-import { usePlayItems } from "~/play/hook/usePlayItems";
-import type { FlyerKind, RectLike, DragSource, DropTarget, VisualMeta } from "~/play/types";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import type { DraggablePayload } from "~/drag/DraggablePayload";
 import { useDraggableControl } from "~/drag/hook/useDraggableControl";
 import { flashDrop } from "~/interaction/flashDrop";
 import { getDragBoundaryNodeId } from "~/interaction/getDragBoundaryNodeId";
 import { resolveDrop } from "~/interaction/resolveDrop";
-import type { Feedback } from "~/interaction/types";
+import type { AnyDropContext, Feedback } from "~/interaction/types";
+import { useCommand } from "~/play/hook/useCommand";
+import { playQueryKeys } from "~/play/hook/playQueryKeys";
+import { usePlayItems } from "~/play/hook/usePlayItems";
+import type { BoardView, GameDragView, InventoryView } from "~/play/logic/playTypes";
+import type { FlyerKind, RectLike, DragSource, DropTarget, VisualMeta } from "~/play/types";
 import { resolveMagneticDropTarget } from "./resolveMagneticDropTarget";
 
 export type { Feedback } from "~/interaction/types";
@@ -30,22 +34,47 @@ export function usePlayDraggableControl({
 	addFlyer,
 	schedule,
 }: usePlayDraggableControl.Props) {
-	const game = usePlayDragView();
+	const queryClient = useQueryClient();
 	const items = usePlayItems().data;
 	const command = useCommand({
 		invalidateOnSuccess: true,
 	});
-	const control = useDraggableControl<string, DragSource, DropTarget, VisualMeta, FlyerKind>({
-		schedule: (operation) => schedule("drag/drop", operation),
-		resolveDrop: (context) =>
+	const run = command.mutateAsync;
+	const readGame = useCallback((): GameDragView | undefined => {
+		const board = queryClient.getQueryData<BoardView>(playQueryKeys.board);
+		const inventory = queryClient.getQueryData<InventoryView>(playQueryKeys.inventory);
+
+		if (!board || !inventory) return undefined;
+
+		return {
+			boardItemsById: board.byId,
+			inventoryBySlotIndex: inventory.bySlotIndex,
+		};
+	}, [
+		queryClient,
+	]);
+	const resolvePlayDrop = useCallback(
+		(context: AnyDropContext) =>
 			resolveDrop({
 				context,
-				game,
+				game: readGame(),
 				feedback,
-				run: (gameCommand) => command.mutateAsync(gameCommand),
+				run,
 			}),
-		resolveMagneticDropTarget: resolveMagneticDropTarget,
-		animate: (animation) =>
+		[
+			feedback,
+			readGame,
+			run,
+		],
+	);
+	const animate = useCallback(
+		(animation: {
+			itemId: string;
+			from: RectLike;
+			to: RectLike;
+			kind?: FlyerKind;
+			overlay?: VisualMeta;
+		}) =>
 			addFlyer(
 				animation.itemId,
 				animation.from,
@@ -53,25 +82,57 @@ export function usePlayDraggableControl({
 				animation.kind,
 				animation.overlay,
 			),
-		onError(error, context) {
+		[
+			addFlyer,
+		],
+	);
+	const onError = useCallback(
+		(error: unknown, context: AnyDropContext) => {
 			flashDrop({
 				context,
-				game,
+				game: readGame(),
 				feedback,
 			});
 			feedback.showError(error);
 		},
-		getDragBoundaryNodeId: (source) =>
+		[
+			feedback,
+			readGame,
+		],
+	);
+	const scheduleDrop = useCallback(
+		(operation: () => Promise<void>) => schedule("drag/drop", operation),
+		[
+			schedule,
+		],
+	);
+	const resolveBoundaryNodeId = useCallback(
+		(source: DraggablePayload<string, DragSource, VisualMeta>) =>
 			getDragBoundaryNodeId({
 				source,
 			}),
+		[],
+	);
+	const control = useDraggableControl<string, DragSource, DropTarget, VisualMeta, FlyerKind>({
+		schedule: scheduleDrop,
+		resolveDrop: resolvePlayDrop,
+		resolveMagneticDropTarget: resolveMagneticDropTarget,
+		animate,
+		onError,
+		getDragBoundaryNodeId: resolveBoundaryNodeId,
 	});
 
 	const activeItem =
 		control.activeDrag && items ? (items[control.activeDrag.itemId] ?? null) : null;
 
-	return {
-		...control,
-		activeItem,
-	};
+	return useMemo(
+		() => ({
+			...control,
+			activeItem,
+		}),
+		[
+			activeItem,
+			control,
+		],
+	);
 }

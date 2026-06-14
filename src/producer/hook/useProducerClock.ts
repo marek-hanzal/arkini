@@ -20,10 +20,15 @@ export function useProducerClock(items: readonly BoardViewItem[]) {
 	);
 
 	useEffect(() => {
-		if (activeUntilMs.length === 0) return undefined;
+		if (activeUntilMs.every((time) => time <= Date.now())) return undefined;
 
 		const interval = window.setInterval(() => {
-			setNowMs(Date.now());
+			const nextNowMs = Date.now();
+			setNowMs(nextNowMs);
+
+			if (activeUntilMs.every((time) => time <= nextNowMs)) {
+				window.clearInterval(interval);
+			}
 		}, producerClockTickMs);
 
 		return () => window.clearInterval(interval);

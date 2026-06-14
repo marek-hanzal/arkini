@@ -5,7 +5,8 @@ import {
 	type DragEndEvent,
 	type DragStartEvent,
 } from "@dnd-kit/core";
-import { useMachine } from "@xstate/react";
+import { useActorRef } from "@xstate/react";
+import { useCallback, useMemo } from "react";
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DropContext } from "~/drag/DropContext";
 import type { DropPlan } from "~/drag/DropPlan";
@@ -81,7 +82,8 @@ export const useDraggableControl = <
 			},
 		}),
 	);
-	const [workflow, sendWorkflow] = useMachine(draggableWorkflowMachine);
+	const workflow = useActorRef(draggableWorkflowMachine);
+	const sendWorkflow = workflow.send;
 	const session = useDragSession<ItemId, Source, Overlay>({
 		getDragBoundaryNodeId,
 	});
@@ -90,86 +92,150 @@ export const useDraggableControl = <
 		boundaryRectRef: session.dragBoundaryRectRef,
 		enabled: Boolean(getDragBoundaryNodeId),
 	});
-	const runtime: DropPlanRuntime<ItemId, Source, Target, Overlay, Kind> = {
-		animate,
-		onError,
-		sendWorkflow,
-		hideSources: sources.hideSources,
-		clearHiddenSources: sources.clearHiddenSources,
-		clearActiveDrag: session.clear,
-	};
+	const runtime: DropPlanRuntime<ItemId, Source, Target, Overlay, Kind> = useMemo(
+		() => ({
+			animate,
+			onError,
+			sendWorkflow,
+			hideSources: sources.hideSources,
+			clearHiddenSources: sources.clearHiddenSources,
+			clearActiveDrag: session.clear,
+		}),
+		[
+			animate,
+			onError,
+			sendWorkflow,
+			session.clear,
+			sources.clearHiddenSources,
+			sources.hideSources,
+		],
+	);
 
-	const handleDragEnd = async (event: DragEndEvent) => {
-		const { context, dragRect } = resolveDropContext<ItemId, Source, Target, Overlay>({
-			event,
-			resolveMagneticDropTarget,
-		});
-		session.clearPreview();
-
-		if (!context) {
-			sendWorkflow({
-				type: "RESET",
+	const handleDragEnd = useCallback(
+		async (event: DragEndEvent) => {
+			const { context, dragRect } = resolveDropContext<ItemId, Source, Target, Overlay>({
+				event,
+				resolveMagneticDropTarget,
 			});
-			session.clear();
-			return;
-		}
+			session.clearPreview();
 
-		sendWorkflow({
-			type: "DROP_RESOLVING",
-		});
-		const operation = async () => {
-			try {
-				await runDropPlan({
-					context,
-					plan: await resolveDrop(context),
-					dragRect,
-					runtime,
-				});
-			} catch (error) {
-				await failDrop({
-					error,
-					context,
-					dragRect,
-					runtime,
-				});
-			}
-		};
-
-		if (schedule) await schedule(operation);
-		else await operation();
-	};
-
-	const isSourceHidden = (sourceId: string) =>
-		sources.hiddenSourceIds.has(sourceId) ||
-		(session.activeDrag?.hideWhenActive !== false && session.activeDrag?.sourceId === sourceId);
-
-	return {
-		contextProps: {
-			sensors,
-			onDragStart: (event: DragStartEvent) => {
+			if (!context) {
 				sendWorkflow({
-					type: "DRAG_STARTED",
-				});
-				sources.clearHiddenSources();
-				session.start(event);
-			},
-			onDragEnd: handleDragEnd,
-			onDragCancel: () => {
-				sendWorkflow({
-					type: "DRAG_CANCELLED",
+					type: "RESET",
 				});
 				session.clear();
-				sources.clearHiddenSources();
-			},
-			modifiers,
+				return;
+			}
+
+			sendWorkflow({
+				type: "DROP_RESOLVING",
+			});
+			const operation = async () => {
+				try {
+					await runDropPlan({
+						context,
+						plan: await resolveDrop(context),
+						dragRect,
+						runtime,
+					});
+				} catch (error) {
+					await failDrop({
+						error,
+						context,
+						dragRect,
+						runtime,
+					});
+				}
+			};
+
+			if (schedule) await schedule(operation);
+			else await operation();
 		},
-		activeDrag: session.activeDrag,
-		hiddenSourceIds: sources.hiddenSourceIds,
-		dragPreviewRect: session.dragPreviewRect,
-		workflowState: workflow.value,
-		isSourceHidden,
-		hideSources: sources.hideSources,
-		showSource: sources.showSource,
-		clearHiddenSources: sources.clearHiddenSources,
-	};
+		[
+			resolveDrop,
+			resolveMagneticDropTarget,
+			runtime,
+			schedule,
+			sendWorkflow,
+			session,
+		],
+	);
+
+	const handleDragStart = useCallback(
+		(event: DragStartEvent) => {
+			sendWorkflow({
+				type: "DRAG_STARTED",
+			});
+			sources.clearHiddenSources();
+			session.start(event);
+		},
+		[
+			sendWorkflow,
+			session,
+			sources.clearHiddenSources,
+		],
+	);
+
+	const handleDragCancel = useCallback(() => {
+		sendWorkflow({
+			type: "DRAG_CANCELLED",
+		});
+		session.clear();
+		sources.clearHiddenSources();
+	}, [
+		sendWorkflow,
+		session,
+		sources.clearHiddenSources,
+	]);
+
+	const isSourceHidden = useCallback(
+		(sourceId: string) =>
+			sources.hiddenSourceIds.has(sourceId) ||
+			(session.activeDrag?.hideWhenActive !== false &&
+				session.activeDrag?.sourceId === sourceId),
+		[
+			session.activeDrag,
+			sources.hiddenSourceIds,
+		],
+	);
+
+	const contextProps = useMemo(
+		() => ({
+			sensors,
+			onDragStart: handleDragStart,
+			onDragEnd: handleDragEnd,
+			onDragCancel: handleDragCancel,
+			modifiers,
+		}),
+		[
+			handleDragCancel,
+			handleDragEnd,
+			handleDragStart,
+			modifiers,
+			sensors,
+		],
+	);
+
+	return useMemo(
+		() => ({
+			contextProps,
+			activeDrag: session.activeDrag,
+			hiddenSourceIds: sources.hiddenSourceIds,
+			dragPreviewRect: session.dragPreviewRect,
+			isSourceHidden,
+			hideSources: sources.hideSources,
+			showSource: sources.showSource,
+			clearHiddenSources: sources.clearHiddenSources,
+		}),
+		[
+			contextProps,
+			isSourceHidden,
+			session.activeDrag,
+			session.dragPreviewRect,
+			sources.clearHiddenSources,
+			sources.hiddenSourceIds,
+			sources.hideSources,
+			sources.showSource,
+		],
+	);
 };

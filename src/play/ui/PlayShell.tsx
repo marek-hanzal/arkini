@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { type FC, useCallback, useMemo } from "react";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { HardResetButton } from "~/play/ui/HardResetButton";
@@ -19,6 +19,7 @@ import { usePlayEventQueue } from "~/play/hook/usePlayEventQueue";
 import { usePlaySheets } from "~/play/hook/usePlaySheets";
 import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
 import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
+import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
 
 export namespace PlayShell {
 	export interface Props {}
@@ -51,6 +52,80 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 		hideSources: drag.hideSources,
 		clearHiddenSources: drag.clearHiddenSources,
 	});
+	const activateBoardTile = useCallback(
+		(item: BoardViewItem) => {
+			if (!item.activation) return;
+
+			void producerActions.produceFrom(
+				item,
+				item.activation.kind === "stash" ? "exhaust" : "single",
+			);
+		},
+		[
+			producerActions.produceFrom,
+		],
+	);
+	const stashBoardTile = useCallback(
+		(item: BoardViewItem) => {
+			void manualActions.stashBoardWithFly(item);
+		},
+		[
+			manualActions.stashBoardWithFly,
+		],
+	);
+	const openBoardTileDetail = useCallback(
+		(item: BoardViewItem) => {
+			sheets.openItem(item.id);
+		},
+		[
+			sheets.openItem,
+		],
+	);
+	const noopEmptyActivate = useCallback(() => undefined, []);
+	const placeInventorySlot = useCallback(
+		(slot: InventorySlot) => {
+			void manualActions.placeInventoryOnBoardWithFly(slot);
+		},
+		[
+			manualActions.placeInventoryOnBoardWithFly,
+		],
+	);
+	const boardDrag = useMemo(
+		() => ({
+			activeDrag: drag.activeDrag ?? undefined,
+			isSourceHidden: drag.isSourceHidden,
+		}),
+		[
+			drag.activeDrag,
+			drag.isSourceHidden,
+		],
+	);
+	const boardFeedback = useMemo(
+		() => ({
+			invalidCellKey: feedback.invalidBoardCellKey,
+			mergedCellKey: feedback.mergedBoardCellKey,
+			imprintedCellKey: feedback.imprintedBoardCellKey,
+		}),
+		[
+			feedback.imprintedBoardCellKey,
+			feedback.invalidBoardCellKey,
+			feedback.mergedBoardCellKey,
+		],
+	);
+	const boardActions = useMemo(
+		() => ({
+			emptyDoubleActivate: noopEmptyActivate,
+			tileSingleActivate: activateBoardTile,
+			tileDoubleActivate: stashBoardTile,
+			tileLongActivate: openBoardTileDetail,
+		}),
+		[
+			activateBoardTile,
+			noopEmptyActivate,
+			openBoardTileDetail,
+			stashBoardTile,
+		],
+	);
 
 	if (saveQuery.isPending) {
 		return (
@@ -88,32 +163,9 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 
 					<div className="min-h-0 shrink-0">
 						<Board
-							drag={{
-								activeDrag: drag.activeDrag ?? undefined,
-								isSourceHidden: drag.isSourceHidden,
-							}}
-							feedback={{
-								invalidCellKey: feedback.invalidBoardCellKey,
-								mergedCellKey: feedback.mergedBoardCellKey,
-								imprintedCellKey: feedback.imprintedBoardCellKey,
-							}}
-							actions={{
-								emptyDoubleActivate: () => undefined,
-								tileSingleActivate: (item) => {
-									if (item.activation) {
-										void producerActions.produceFrom(
-											item,
-											item.activation.kind === "stash" ? "exhaust" : "single",
-										);
-									}
-								},
-								tileDoubleActivate: (item) => {
-									void manualActions.stashBoardWithFly(item);
-								},
-								tileLongActivate: (item) => {
-									sheets.openItem(item.id);
-								},
-							}}
+							drag={boardDrag}
+							feedback={boardFeedback}
+							actions={boardActions}
 						/>
 					</div>
 				</main>
@@ -137,9 +189,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							isSourceHidden={drag.isSourceHidden}
 							invalidInventorySlot={feedback.invalidInventorySlot}
 							onClose={sheets.closeSheet}
-							onSlotDoubleActivate={(slot) => {
-								void manualActions.placeInventoryOnBoardWithFly(slot);
-							}}
+							onSlotDoubleActivate={placeInventorySlot}
 						/>
 					</section>
 

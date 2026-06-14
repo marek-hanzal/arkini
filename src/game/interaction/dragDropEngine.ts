@@ -1,12 +1,13 @@
 import { boardContainerNodeId, boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
+import type { GameCommand } from "~/game/action/GameCommand";
+import { resolveBoardItemDropIntent } from "~/game/merge/resolveBoardItemDropIntent";
 import {
 	inventoryContainerNodeId,
 	inventorySlotNodeId,
 	inventorySourceId,
 } from "~/inventory/inventoryIdentity";
 import type { ItemId } from "~/manifest/manifestId";
-import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
 import type { GameDragView } from "~/play/logic/playTypes";
 import type { FlyerKind, GameDragSource, GameDropTarget, GameVisualMeta } from "~/play/types";
 import type {
@@ -17,13 +18,6 @@ import type {
 	DropPlan,
 } from "~/drag/hook/useDraggableControl";
 
-export interface GameDragActions {
-	moveBoard(input: { boardItemId: string; x: number; y: number }): Promise<unknown>;
-	swapInventory(input: { sourceSlotIndex: number; targetSlotIndex: number }): Promise<unknown>;
-	mergeBoard(input: { sourceBoardItemId: string; targetBoardItemId: string }): Promise<unknown>;
-	swapBoard(input: { sourceBoardItemId: string; targetBoardItemId: string }): Promise<unknown>;
-}
-
 export interface GameDragFeedback {
 	pulseMergeCell(key: string | undefined): void;
 	pulseImprintCell(key: string | undefined): void;
@@ -32,13 +26,29 @@ export interface GameDragFeedback {
 	showError(error: unknown): void;
 }
 
-export function resolveGameDrop(
-	context: DropContext<string, GameDragSource, GameDropTarget, GameVisualMeta>,
-	game: GameDragView | undefined,
-	actions: GameDragActions,
-	feedback: GameDragFeedback,
-): DropPlan<string, FlyerKind, GameVisualMeta> {
-	if (!game || !context.target) return reject(() => flashGameDrop(context, game, feedback));
+export namespace resolveGameDrop {
+	export interface Props {
+		context: DropContext<string, GameDragSource, GameDropTarget, GameVisualMeta>;
+		game: GameDragView | undefined;
+		feedback: GameDragFeedback;
+		runCommand(command: GameCommand): Promise<unknown>;
+	}
+}
+
+export const resolveGameDrop = ({
+	context,
+	game,
+	feedback,
+	runCommand,
+}: resolveGameDrop.Props): DropPlan<string, FlyerKind, GameVisualMeta> => {
+	if (!game || !context.target)
+		return reject(() =>
+			flashGameDrop({
+				context,
+				game,
+				feedback,
+			}),
+		);
 
 	const source = context.source.source;
 	const target = context.target.target;
@@ -46,41 +56,58 @@ export function resolveGameDrop(
 
 	switch (route) {
 		case "inventory->inventory-slot":
-			return inventoryToInventory(
-				context as GameDropContext<"inventory", "inventory-slot">,
+			return inventoryToInventory({
+				context: context as GameDropContext<"inventory", "inventory-slot">,
 				game,
-				actions,
-			);
+				runCommand,
+			});
 		case "board->cell":
-			return boardToCell(
-				context as GameDropContext<"board", "cell">,
+			return boardToCell({
+				context: context as GameDropContext<"board", "cell">,
 				game,
-				actions,
 				feedback,
-			);
+				runCommand,
+			});
 		default:
-			return reject(() => flashGameDrop(context, game, feedback));
+			return reject(() =>
+				flashGameDrop({
+					context,
+					game,
+					feedback,
+				}),
+			);
+	}
+};
+
+export namespace flashGameDrop {
+	export interface Props {
+		context: DropContext<string, GameDragSource, GameDropTarget, GameVisualMeta>;
+		game: GameDragView | undefined;
+		feedback: GameDragFeedback;
 	}
 }
 
-export function flashGameDrop(
-	context: DropContext<string, GameDragSource, GameDropTarget, GameVisualMeta>,
-	game: GameDragView | undefined,
-	feedback: GameDragFeedback,
-) {
-	flashSource(context.source.source, game, feedback);
+export const flashGameDrop = ({ context, game, feedback }: flashGameDrop.Props) => {
+	flashSource({
+		source: context.source.source,
+		game,
+		feedback,
+	});
 
 	const target = context.target?.target;
 	if (!target) return;
 	if (target.kind === "cell") feedback.flashBoardCell(cellKey(target.x, target.y), "error");
 	if (target.kind === "inventory-slot") feedback.flashInventorySlot(target.slotIndex, "error");
+};
+
+export namespace getGameDragBoundaryNodeId {
+	export interface Props {
+		source: DraggablePayload<string, GameDragSource, GameVisualMeta>;
+	}
 }
 
-export function getGameDragBoundaryNodeId(
-	source: DraggablePayload<string, GameDragSource, GameVisualMeta>,
-) {
-	return source.source.kind === "board" ? boardContainerNodeId : inventoryContainerNodeId;
-}
+export const getGameDragBoundaryNodeId = ({ source }: getGameDragBoundaryNodeId.Props) =>
+	source.source.kind === "board" ? boardContainerNodeId : inventoryContainerNodeId;
 
 type SourceKind = GameDragSource["kind"];
 type TargetKind = GameDropTarget["kind"];
@@ -105,11 +132,19 @@ type GameDropContext<Source extends SourceKind, Target extends TargetKind> = {
 	>;
 };
 
-function inventoryToInventory(
-	context: GameDropContext<"inventory", "inventory-slot">,
-	game: GameDragView,
-	actions: GameDragActions,
-): DropPlan<string, FlyerKind, GameVisualMeta> {
+namespace inventoryToInventory {
+	export interface Props {
+		context: GameDropContext<"inventory", "inventory-slot">;
+		game: GameDragView;
+		runCommand(command: GameCommand): Promise<unknown>;
+	}
+}
+
+const inventoryToInventory = ({
+	context,
+	game,
+	runCommand,
+}: inventoryToInventory.Props): DropPlan<string, FlyerKind, GameVisualMeta> => {
 	const { source, target } = context;
 	if (source.source.slotIndex === target.target.slotIndex)
 		return {
@@ -117,7 +152,10 @@ function inventoryToInventory(
 		};
 
 	const targetStack = game.inventoryBySlotIndex[target.target.slotIndex]?.stack;
-	const animations = inventoryMoveAnimations(context, targetStack);
+	const animations = inventoryMoveAnimations({
+		context,
+		targetStack,
+	});
 	const hide = [
 		source.sourceId,
 		...(targetStack
@@ -131,19 +169,29 @@ function inventoryToInventory(
 		hide,
 		animations,
 		commit: () =>
-			actions.swapInventory({
+			runCommand({
+				type: "inventory.swap",
 				sourceSlotIndex: source.source.slotIndex,
 				targetSlotIndex: target.target.slotIndex,
 			}),
 	});
+};
+
+namespace boardToCell {
+	export interface Props {
+		context: GameDropContext<"board", "cell">;
+		game: GameDragView;
+		feedback: GameDragFeedback;
+		runCommand(command: GameCommand): Promise<unknown>;
+	}
 }
 
-function boardToCell(
-	{ source, target }: GameDropContext<"board", "cell">,
-	game: GameDragView,
-	actions: GameDragActions,
-	feedback: GameDragFeedback,
-): DropPlan<string, FlyerKind, GameVisualMeta> {
+const boardToCell = ({
+	context: { source, target },
+	game,
+	feedback,
+	runCommand,
+}: boardToCell.Props): DropPlan<string, FlyerKind, GameVisualMeta> => {
 	if (target.target.boardItemId === source.source.boardItemId)
 		return {
 			type: "ignore",
@@ -155,10 +203,14 @@ function boardToCell(
 				source.sourceId,
 			],
 			animations: [
-				dragToTargetAnimation(source, target),
+				dragToTargetAnimation({
+					source,
+					target,
+				}),
 			],
 			commit: () =>
-				actions.moveBoard({
+				runCommand({
+					type: "board.move",
 					boardItemId: source.source.boardItemId,
 					x: target.target.x,
 					y: target.target.y,
@@ -174,42 +226,28 @@ function boardToCell(
 		);
 	}
 
-	const mergeRule = resolveItemMergeRule(source.itemId as ItemId, targetItem.itemId as ItemId);
-	const isDirectedMerge = mergeRule?.consumeSource === false;
-	const isForwardDirectedMerge = Boolean(
-		isDirectedMerge &&
-			source.itemId === mergeRule?.sourceItemId &&
-			targetItem.itemId === mergeRule?.withItemId,
-	);
-	const canMerge = Boolean(
-		mergeRule &&
-			(!targetItem.craft || targetItem.craft.phase === "collecting_inputs") &&
-			(!isDirectedMerge || isForwardDirectedMerge),
-	);
-	const canCraft = Boolean(
-		targetItem.craft?.canAcceptInputs &&
-			targetItem.craft.acceptedInputItemIds.includes(source.itemId),
-	);
-	const canSupplyProducer = Boolean(
-		targetItem.activation?.inputs.some(
-			(input) => input.itemId === source.itemId && input.stored < input.capacity,
-		),
-	);
+	const intent = resolveBoardItemDropIntent({
+		sourceItemId: source.itemId as ItemId,
+		targetItem,
+	});
 
-	if (isDirectedMerge && !isForwardDirectedMerge) {
+	if (intent.type === "reject") {
 		return reject(() =>
 			feedback.flashBoardCell(cellKey(target.target.x, target.target.y), "error"),
 		);
 	}
 
-	if (!canMerge && !canCraft && !canSupplyProducer) {
+	if (intent.type === "swap") {
 		return accept({
 			hide: [
 				source.sourceId,
 				boardSourceId(targetBoardItemId),
 			],
 			animations: [
-				dragToTargetAnimation(source, target),
+				dragToTargetAnimation({
+					source,
+					target,
+				}),
 				{
 					itemId: targetItem.itemId,
 					fromNodeId: target.targetNodeId,
@@ -220,14 +258,15 @@ function boardToCell(
 				},
 			],
 			commit: () =>
-				actions.swapBoard({
+				runCommand({
+					type: "board.swap",
 					sourceBoardItemId: source.source.boardItemId,
 					targetBoardItemId,
 				}),
 		});
 	}
 
-	if (isForwardDirectedMerge) {
+	if (intent.type === "merge" && intent.directed) {
 		return accept({
 			hide: [
 				source.sourceId,
@@ -243,7 +282,8 @@ function boardToCell(
 				},
 			],
 			commit: () =>
-				actions.mergeBoard({
+				runCommand({
+					type: "board.merge",
 					sourceBoardItemId: source.source.boardItemId,
 					targetBoardItemId,
 				}),
@@ -251,12 +291,12 @@ function boardToCell(
 		});
 	}
 
-	const mergeResultItemId = canMerge ? mergeRule?.resultItemId : undefined;
-	const mergeCrossFadeMeta = mergeResultItemId
-		? {
-				crossFadeItemId: mergeResultItemId,
-			}
-		: undefined;
+	const mergeCrossFadeMeta =
+		intent.type === "merge" && intent.resultItemId
+			? {
+					crossFadeItemId: intent.resultItemId,
+				}
+			: undefined;
 
 	return accept({
 		hide: [
@@ -264,7 +304,12 @@ function boardToCell(
 		],
 		animationTiming: "beforeCommit",
 		animations: [
-			dragToTargetAnimation(source, target, "merge-source", mergeCrossFadeMeta),
+			dragToTargetAnimation({
+				source,
+				target,
+				kind: "merge-source",
+				overlay: mergeCrossFadeMeta,
+			}),
 			{
 				itemId: targetItem.itemId,
 				fromNodeId: target.targetNodeId,
@@ -277,26 +322,37 @@ function boardToCell(
 			},
 		],
 		commit: () =>
-			actions.mergeBoard({
+			runCommand({
+				type: "board.merge",
 				sourceBoardItemId: source.source.boardItemId,
 				targetBoardItemId,
 			}),
 		feedback: () => feedback.pulseMergeCell(cellKey(target.target.x, target.target.y)),
 	});
+};
+
+namespace inventoryMoveAnimations {
+	export interface Props {
+		context: GameDropContext<"inventory", "inventory-slot">;
+		targetStack:
+			| {
+					itemId: string;
+					quantity: number;
+			  }
+			| undefined;
+	}
 }
 
-function inventoryMoveAnimations(
-	context: GameDropContext<"inventory", "inventory-slot">,
-	targetStack:
-		| {
-				itemId: string;
-				quantity: number;
-		  }
-		| undefined,
-): DraggableAnimation<string, FlyerKind, GameVisualMeta>[] {
+const inventoryMoveAnimations = ({
+	context,
+	targetStack,
+}: inventoryMoveAnimations.Props): DraggableAnimation<string, FlyerKind, GameVisualMeta>[] => {
 	const { source, target } = context;
 	const animations: DraggableAnimation<string, FlyerKind, GameVisualMeta>[] = [
-		dragToTargetAnimation(source, target),
+		dragToTargetAnimation({
+			source,
+			target,
+		}),
 	];
 
 	if (targetStack) {
@@ -311,25 +367,32 @@ function inventoryMoveAnimations(
 	}
 
 	return animations;
+};
+
+namespace dragToTargetAnimation {
+	export interface Props {
+		source: DraggablePayload<string, GameDragSource, GameVisualMeta>;
+		target: DroppablePayload<GameDropTarget>;
+		kind?: FlyerKind;
+		overlay?: GameVisualMeta;
+	}
 }
 
-function dragToTargetAnimation(
-	source: DraggablePayload<string, GameDragSource, GameVisualMeta>,
-	target: DroppablePayload<GameDropTarget>,
-	kind: FlyerKind = "move",
-	overlay?: GameVisualMeta,
-): DraggableAnimation<string, FlyerKind, GameVisualMeta> {
-	return {
-		itemId: source.itemId,
-		fromDrag: true,
-		toNodeId: target.targetNodeId,
-		kind,
-		overlay: {
-			...source.overlay,
-			...overlay,
-		},
-	};
-}
+const dragToTargetAnimation = ({
+	source,
+	target,
+	kind = "move",
+	overlay,
+}: dragToTargetAnimation.Props): DraggableAnimation<string, FlyerKind, GameVisualMeta> => ({
+	itemId: source.itemId,
+	fromDrag: true,
+	toNodeId: target.targetNodeId,
+	kind,
+	overlay: {
+		...source.overlay,
+		...overlay,
+	},
+});
 
 type AcceptPlan = Omit<
 	Extract<
@@ -341,27 +404,27 @@ type AcceptPlan = Omit<
 	"type"
 >;
 
-function accept(plan: AcceptPlan): DropPlan<string, FlyerKind, GameVisualMeta> {
-	return {
-		type: "accept",
-		animationTiming: "afterCommit",
-		...plan,
-		hide: (plan.hide ?? []).filter(Boolean),
-	};
+const accept = (plan: AcceptPlan): DropPlan<string, FlyerKind, GameVisualMeta> => ({
+	type: "accept",
+	animationTiming: "afterCommit",
+	...plan,
+	hide: (plan.hide ?? []).filter(Boolean),
+});
+
+const reject = (feedback?: () => void): DropPlan<string, FlyerKind, GameVisualMeta> => ({
+	type: "reject",
+	feedback,
+});
+
+namespace flashSource {
+	export interface Props {
+		source: GameDragSource;
+		game: GameDragView | undefined;
+		feedback: GameDragFeedback;
+	}
 }
 
-function reject(feedback?: () => void): DropPlan<string, FlyerKind, GameVisualMeta> {
-	return {
-		type: "reject",
-		feedback,
-	};
-}
-
-function flashSource(
-	source: GameDragSource,
-	game: GameDragView | undefined,
-	feedback: GameDragFeedback,
-) {
+const flashSource = ({ source, game, feedback }: flashSource.Props) => {
 	if (source.kind === "inventory") {
 		feedback.flashInventorySlot(source.slotIndex, "error");
 		return;
@@ -369,4 +432,4 @@ function flashSource(
 
 	const boardItem = game?.boardItemsById[source.boardItemId];
 	feedback.flashBoardCell(boardItem ? cellKey(boardItem.x, boardItem.y) : undefined, "error");
-}
+};

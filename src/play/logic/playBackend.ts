@@ -5,17 +5,6 @@ export {
 	readGameConfigHash,
 	readMigrationState,
 } from "./bootstrap";
-export {
-	buyUpgrade,
-	mergeBoardItems,
-	moveBoardItem,
-	placeInventoryItem,
-	produceBoardItem,
-	stashBoardItem,
-	swapBoardItems,
-	swapInventorySlots,
-	withdrawProducerInput,
-} from "./gameplay";
 export { readBoardView } from "./readBoardView";
 export { readGameSaveView } from "./readGameSaveView";
 export { readInventoryView } from "./readInventoryView";

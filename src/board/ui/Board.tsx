@@ -99,7 +99,7 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 								),
 							) ||
 							Boolean(
-								boardItem.producer?.inputs.some(
+								boardItem.activation?.inputs.some(
 									(input) =>
 										input.itemId === drag.activeDrag?.itemId &&
 										input.stored < input.capacity,
@@ -107,7 +107,7 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 							)
 						: false;
 				const producerCooldown = readProducerCooldown({
-					producer: boardItem?.producer,
+					activation: boardItem?.activation,
 					nowMs,
 				});
 
@@ -119,7 +119,7 @@ export const Board: FC<Board.Props> = ({ drag, feedback, actions }) => {
 						boardItem={boardItem}
 						canMerge={canMerge}
 						showDelayedMergeHint={showDelayedMergeHints}
-						producerReady={isProducerReady(boardItem?.producer, nowMs)}
+						producerReady={isProducerReady(boardItem?.activation, nowMs)}
 						producerCooldownProgress={producerCooldown?.progress}
 						craftProgress={boardItem?.craft?.progress}
 						invalid={feedback.invalidCellKey === key}

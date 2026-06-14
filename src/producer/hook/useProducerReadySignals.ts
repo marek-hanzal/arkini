@@ -1,31 +1,27 @@
 import { useEffect, useRef } from "react";
 import type { BoardViewItem } from "~/play/logic/playTypes";
-import { playProducerCooldown } from "~/play/util/animation";
-import { queryElement } from "~/shared/util/queryElement";
 import { isProducerReady } from "~/producer/logic/isProducerReady";
 
 export function useProducerReadySignals(items: readonly BoardViewItem[], nowMs: number) {
-	const previousReadyRef = useRef(new Map<string, boolean>());
+	const previous = useRef<Record<string, boolean>>({});
 
 	useEffect(() => {
-		const previousReady = previousReadyRef.current;
-		const nextReady = new Map<string, boolean>();
+		const next: Record<string, boolean> = {};
 
 		for (const item of items) {
-			if (!item.producer) continue;
+			if (!item.activation) continue;
 
-			const ready = isProducerReady(item.producer, nowMs);
-			const previous = previousReady.get(item.id);
-			nextReady.set(item.id, ready);
+			const ready = isProducerReady(item.activation, nowMs);
+			next[item.id] = ready;
 
-			const coolingDown = (item.producer.cooldownUntilMs ?? 0) > nowMs;
-			if (previous === true && !ready && coolingDown) {
-				const element = queryElement(`[data-board-cell="${item.x}:${item.y}"]`);
-				if (element) playProducerCooldown(element);
+			const wasReady = previous.current[item.id];
+			const coolingDown = (item.activation.cooldownUntilMs ?? 0) > nowMs;
+			if (ready && wasReady === false && coolingDown) {
+				window.navigator.vibrate?.(12);
 			}
 		}
 
-		previousReadyRef.current = nextReady;
+		previous.current = next;
 	}, [
 		items,
 		nowMs,

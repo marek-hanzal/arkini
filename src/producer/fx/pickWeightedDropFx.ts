@@ -1,11 +1,11 @@
 import { Effect } from "effect";
-import type { ProducerWeightedEntry } from "~/manifest/data/producer";
+import type { ActivationWeightedEntry } from "~/manifest/data/producer";
 import { GameActionError } from "~/play/logic/playTypes";
 import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 
 export namespace pickWeightedDropFx {
 	export interface Props {
-		entries: readonly ProducerWeightedEntry[];
+		entries: readonly ActivationWeightedEntry[];
 	}
 }
 

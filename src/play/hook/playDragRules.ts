@@ -184,7 +184,7 @@ function boardToCell(
 	const canMerge = Boolean(mergeRule && (!isDirectedMerge || isForwardDirectedMerge));
 	const canCraft = Boolean(targetItem.craft?.acceptedInputItemIds.includes(source.itemId));
 	const canSupplyProducer = Boolean(
-		targetItem.producer?.inputs.some(
+		targetItem.activation?.inputs.some(
 			(input) => input.itemId === source.itemId && input.stored < input.capacity,
 		),
 	);
@@ -208,7 +208,7 @@ function boardToCell(
 					fromNodeId: target.targetNodeId,
 					toNodeId: source.sourceNodeId,
 					overlay: {
-						producer: targetItem.producer ?? undefined,
+						activation: targetItem.activation ?? undefined,
 					},
 				},
 			],
@@ -264,7 +264,7 @@ function boardToCell(
 				toNodeId: target.targetNodeId,
 				kind: "merge-target",
 				overlay: {
-					producer: targetItem.producer ?? undefined,
+					activation: targetItem.activation ?? undefined,
 					...mergeCrossFadeMeta,
 				},
 			},

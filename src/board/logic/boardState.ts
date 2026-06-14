@@ -1,44 +1,25 @@
-import { match } from "ts-pattern";
 import type { DateService } from "~/date/context/DateServiceFx";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
-import type { ProducerMode } from "~/manifest/data/producer";
 import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
 import type { OwnedUpgradeRow } from "~/upgrade/logic/readOwnedUpgradeEffects";
-import type { BoardItemState, CraftProgressView, ProducerView } from "~/play/logic/playTypes";
+import type { ActivationView, BoardItemState, CraftProgressView } from "~/play/logic/playTypes";
 import { parseJson } from "~/shared/json";
 
 export function createInitialBoardState(
 	itemId: string,
 	gameConfig: GameConfigService,
 ): BoardItemState {
-	const producer = gameConfig.getProducer(itemId);
-	if (!producer) return {};
+	const stash = gameConfig.getStash(itemId);
+	if (!stash) return {};
 
-	const mode = producer.mode ?? {
-		type: "infinite" as const,
+	return {
+		activation: {
+			remainingCharges: stash.charges,
+		},
 	};
-
-	return match(mode as ProducerMode)
-		.with(
-			{
-				type: "finite",
-			},
-			(finite) => ({
-				producer: {
-					remainingCharges: finite.charges,
-				},
-			}),
-		)
-		.with(
-			{
-				type: "infinite",
-			},
-			() => ({}),
-		)
-		.exhaustive();
 }
 
-export namespace readProducerView {
+export namespace readActivationView {
 	export interface Props {
 		itemId: string;
 		state: BoardItemState;
@@ -48,42 +29,43 @@ export namespace readProducerView {
 	}
 }
 
-export function readProducerView({
+export function readActivationView({
 	itemId,
 	state,
 	date,
 	gameConfig,
 	upgradeRows = [],
-}: readProducerView.Props): ProducerView | undefined {
-	const baseProducer = gameConfig.getProducer(itemId);
-	if (!baseProducer) return undefined;
-	const producer = applyProducerUpgradeEffects({
-		gameConfig,
-		producerItemId: itemId,
-		producer: baseProducer,
-		upgradeRows,
-	});
+}: readActivationView.Props): ActivationView | undefined {
+	const baseActivation = gameConfig.getActivation(itemId);
+	if (!baseActivation) return undefined;
 
-	const initial = createInitialBoardState(itemId, gameConfig).producer ?? {};
-	const producerState = {
+	const activation =
+		baseActivation.type === "producer"
+			? applyProducerUpgradeEffects({
+					gameConfig,
+					producerItemId: itemId,
+					producer: baseActivation,
+					upgradeRows,
+				})
+			: baseActivation;
+
+	const initial = createInitialBoardState(itemId, gameConfig).activation ?? {};
+	const activationState = {
 		...initial,
-		...(state.producer ?? {}),
+		...(state.activation ?? {}),
 	};
 
-	const cooldownUntil = producerState.cooldownUntil;
-
-	const inventory = producerState.inventory ?? {};
+	const cooldownUntil = activationState.cooldownUntil;
+	const inventory = activationState.inventory ?? {};
 
 	return {
-		trigger: producer.trigger,
-		mode: producer.mode ?? {
-			type: "infinite",
-		},
-		cooldownMs: producer.cooldownMs,
+		kind: activation.type,
+		trigger: activation.trigger,
+		cooldownMs: activation.type === "producer" ? activation.cooldownMs : undefined,
 		cooldownUntil,
 		cooldownUntilMs: cooldownUntil ? date.parseTimestampMs(cooldownUntil) : undefined,
-		remainingCharges: producerState.remainingCharges,
-		inputs: (producer.inputs ?? []).map((input) => ({
+		remainingCharges: activationState.remainingCharges,
+		inputs: (activation.inputs ?? []).map((input) => ({
 			itemId: input.itemId,
 			quantity: input.quantity,
 			capacity: input.capacity,

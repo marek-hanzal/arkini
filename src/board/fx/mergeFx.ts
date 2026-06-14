@@ -40,42 +40,34 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				return yield* Effect.fail(new GameActionError("Both board items must exist."));
 			}
 
-			const targetProducer = gameConfig.getProducer(target.itemDefinitionId);
-			const producerInput = targetProducer?.inputs?.find(
-				(input) => input.itemId === source.itemDefinitionId,
+			const mergeRule = gameConfig.resolveMergeRule(
+				source.itemDefinitionId,
+				target.itemDefinitionId,
 			);
-
-			if (targetProducer && producerInput) {
-				const targetState = {
-					...createInitialBoardState(target.itemDefinitionId, gameConfig),
-					...readStoredBoardState(target.stateJson),
-				};
-				const producerState = targetState.producer ?? {};
-				const inventory = {
-					...(producerState.inventory ?? {}),
-				};
-				const stored = inventory[source.itemDefinitionId] ?? 0;
-				if (stored >= producerInput.capacity) {
+			if (mergeRule) {
+				if (
+					mergeRule.consumeSource === false &&
+					(source.itemDefinitionId !== mergeRule.sourceItemId ||
+						target.itemDefinitionId !== mergeRule.withItemId)
+				) {
 					return yield* Effect.fail(
-						new GameActionError("Producer input storage is full."),
+						new GameActionError("This merge must be applied in the defined direction."),
 					);
 				}
-				inventory[source.itemDefinitionId] = stored + 1;
 
-				yield* dbFx((db) =>
-					db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
-				);
+				if (mergeRule.consumeSource !== false) {
+					yield* dbFx((db) =>
+						db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
+					);
+				}
 				yield* dbFx((db) =>
 					db
 						.updateTable(table.boardItem)
 						.set({
-							stateJson: json({
-								...targetState,
-								producer: {
-									...producerState,
-									inventory,
-								},
-							}),
+							itemDefinitionId: mergeRule.resultItemId,
+							stateJson: json(
+								createInitialBoardState(mergeRule.resultItemId, gameConfig),
+							),
 							updatedAt: timestamp,
 						})
 						.where("id", "=", target.id)
@@ -86,9 +78,8 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 
 			const craft = gameConfig.getCraftRecipeForTarget(target.itemDefinitionId);
 			const craftInput = craft?.inputs.find(
-				(input) => input.itemId === source.itemDefinitionId,
+				(entry) => entry.itemId === source.itemDefinitionId,
 			);
-
 			if (craft && craftInput) {
 				const targetState = {
 					...createInitialBoardState(target.itemDefinitionId, gameConfig),
@@ -105,7 +96,7 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				}
 				delivered[source.itemDefinitionId] = alreadyDelivered + 1;
 				const complete = craft.inputs.every(
-					(input) => (delivered[input.itemId] ?? 0) >= input.quantity,
+					(entry) => (delivered[entry.itemId] ?? 0) >= entry.quantity,
 				);
 
 				yield* dbFx((db) =>
@@ -136,41 +127,49 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				return;
 			}
 
-			const rule = gameConfig.resolveMergeRule(
-				source.itemDefinitionId,
-				target.itemDefinitionId,
+			const targetActivation = gameConfig.getActivation(target.itemDefinitionId);
+			const activationInput = targetActivation?.inputs?.find(
+				(entry) => entry.itemId === source.itemDefinitionId,
 			);
-			if (!rule) {
-				return yield* Effect.fail(
-					new GameActionError("No merge or craft recipe discovered here."),
-				);
-			}
+			if (targetActivation && activationInput) {
+				const targetState = {
+					...createInitialBoardState(target.itemDefinitionId, gameConfig),
+					...readStoredBoardState(target.stateJson),
+				};
+				const activationState = targetState.activation ?? {};
+				const inventory = {
+					...(activationState.inventory ?? {}),
+				};
+				const stored = inventory[source.itemDefinitionId] ?? 0;
+				if (stored >= activationInput.capacity) {
+					return yield* Effect.fail(new GameActionError("Input storage is full."));
+				}
+				inventory[source.itemDefinitionId] = stored + 1;
 
-			if (
-				rule.consumeSource === false &&
-				(source.itemDefinitionId !== rule.sourceItemId ||
-					target.itemDefinitionId !== rule.withItemId)
-			) {
-				return yield* Effect.fail(
-					new GameActionError("This merge must be applied in the defined direction."),
-				);
-			}
-
-			if (rule.consumeSource !== false) {
 				yield* dbFx((db) =>
 					db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
 				);
+				yield* dbFx((db) =>
+					db
+						.updateTable(table.boardItem)
+						.set({
+							stateJson: json({
+								...targetState,
+								activation: {
+									...activationState,
+									inventory,
+								},
+							}),
+							updatedAt: timestamp,
+						})
+						.where("id", "=", target.id)
+						.execute(),
+				);
+				return;
 			}
-			yield* dbFx((db) =>
-				db
-					.updateTable(table.boardItem)
-					.set({
-						itemDefinitionId: rule.resultItemId,
-						stateJson: json(createInitialBoardState(rule.resultItemId, gameConfig)),
-						updatedAt: timestamp,
-					})
-					.where("id", "=", target.id)
-					.execute(),
+
+			return yield* Effect.fail(
+				new GameActionError("No merge or craft recipe discovered here."),
 			);
 		}),
 	);

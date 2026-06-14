@@ -6,61 +6,51 @@ import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { BoardRow } from "~/inventory/logic/planning";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ProducerMode } from "~/manifest/data/producer";
+import type { StashDefinition } from "~/manifest/data/producer";
 import type { ProducerDepletion } from "~/play/logic/playTypes";
 import { json } from "~/shared/json";
 
 export namespace depleteFx {
 	export interface Props {
 		row: BoardRow;
-		mode: ProducerMode;
+		stash: StashDefinition;
 	}
 }
 
-export const depleteFx = Effect.fn("depleteFx")(function* ({ row, mode }: depleteFx.Props) {
+export const depleteFx = Effect.fn("depleteFx")(function* ({ row, stash }: depleteFx.Props) {
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
 	const timestamp = date.timestamp();
 
-	return yield* match(mode)
-		.with(
-			{
-				type: "finite",
-				onDepleted: "remove",
-			},
-			() =>
-				dbFx(async (db) => {
-					await db.deleteFrom(table.boardItem).where("id", "=", row.id).execute();
-					return {
-						kind: "remove",
-					} satisfies ProducerDepletion;
-				}),
+	return yield* match(stash.onDepleted)
+		.with("remove", () =>
+			dbFx(async (db) => {
+				await db.deleteFrom(table.boardItem).where("id", "=", row.id).execute();
+				return {
+					kind: "remove",
+				} satisfies ProducerDepletion;
+			}),
 		)
 		.with(
 			{
-				type: "finite",
-				onDepleted: {
-					replaceWithItemId: P.string,
-				},
+				replaceWithItemId: P.string,
 			},
-			({ onDepleted }) =>
+			({ replaceWithItemId }) =>
 				dbFx(async (db) => {
 					await db
 						.updateTable(table.boardItem)
 						.set({
-							itemDefinitionId: onDepleted.replaceWithItemId,
-							stateJson: json(
-								createInitialBoardState(onDepleted.replaceWithItemId, gameConfig),
-							),
+							itemDefinitionId: replaceWithItemId,
+							stateJson: json(createInitialBoardState(replaceWithItemId, gameConfig)),
 							updatedAt: timestamp,
 						})
 						.where("id", "=", row.id)
 						.execute();
 					return {
 						kind: "replace",
-						itemId: onDepleted.replaceWithItemId,
+						itemId: replaceWithItemId,
 					} satisfies ProducerDepletion;
 				}),
 		)
-		.otherwise(() => Effect.succeed(undefined));
+		.exhaustive();
 });

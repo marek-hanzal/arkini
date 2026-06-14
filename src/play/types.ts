@@ -1,5 +1,5 @@
-import type { BoardViewItem } from "~/play/logic/playTypes";
 import type { DraggablePayload, DroppablePayload } from "~/drag/hook/useDraggableControl";
+import type { BoardViewItem } from "~/play/logic/playTypes";
 
 export type GameDragSource =
 	| {
@@ -26,7 +26,7 @@ export type GameDropTarget =
 
 export interface GameVisualMeta {
 	quantity?: number;
-	producer?: BoardViewItem["producer"];
+	activation?: BoardViewItem["activation"];
 	/** Optional item rendered above the flyer so merge flyers can cross-fade into their result. */
 	crossFadeItemId?: string;
 }
@@ -58,7 +58,7 @@ export interface FlyerModel extends GameVisualMeta {
 	kind: FlyerKind;
 }
 
-export type ProducerView = NonNullable<BoardViewItem["producer"]>;
+export type ActivationView = NonNullable<BoardViewItem["activation"]>;
 
 export const flashMs = 650;
 export const flyerRenderSettleMs = 180;

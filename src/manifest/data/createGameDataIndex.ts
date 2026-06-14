@@ -1,3 +1,4 @@
+import type { ActivationDefinition, ProducerDefinition, StashDefinition } from "./producer";
 import type { GameConfig } from "./GameConfig";
 import type { ItemId } from "./manifestId";
 import type { ItemMergeRule } from "./itemMergeRule";
@@ -112,7 +113,7 @@ export function createGameDataIndex(config: GameConfig) {
 			]),
 		),
 		craftRecipesByInputItemId,
-		producersByItemId: new Map(
+		producersByItemId: new Map<ItemId, ProducerDefinition>(
 			config.items.flatMap((item) =>
 				item.producer
 					? [
@@ -122,6 +123,48 @@ export function createGameDataIndex(config: GameConfig) {
 							] as const,
 						]
 					: [],
+			),
+		),
+		stashesByItemId: new Map<ItemId, StashDefinition>(
+			config.items.flatMap((item) =>
+				item.stash
+					? [
+							[
+								item.id,
+								item.stash,
+							] as const,
+						]
+					: [],
+			),
+		),
+		activationsByItemId: new Map<ItemId, ActivationDefinition>(
+			config.items.flatMap(
+				(
+					item,
+				): readonly (readonly [
+					ItemId,
+					ActivationDefinition,
+				])[] => {
+					if (item.producer) {
+						return [
+							[
+								item.id,
+								item.producer,
+							] as const,
+						];
+					}
+
+					if (item.stash) {
+						return [
+							[
+								item.id,
+								item.stash,
+							] as const,
+						];
+					}
+
+					return [];
+				},
 			),
 		),
 	};

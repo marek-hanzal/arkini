@@ -169,12 +169,10 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							actions={{
 								emptyDoubleActivate: () => undefined,
 								tileSingleActivate: (item) => {
-									if (item.producer) {
+									if (item.activation) {
 										void producerActions.produceFrom(
 											item,
-											item.producer.mode.type === "finite"
-												? "exhaust"
-												: "single",
+											item.activation.kind === "stash" ? "exhaust" : "single",
 										);
 									}
 								},
@@ -262,7 +260,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 						variant="drag"
 						sizeVariant={dragSizeVariant}
 						quantity={drag.activeDrag?.overlay?.quantity}
-						producer={drag.activeDrag?.overlay?.producer ?? undefined}
+						activation={drag.activeDrag?.overlay?.activation ?? undefined}
 						overlaySize={drag.dragPreviewRect ?? undefined}
 					/>
 				) : null}

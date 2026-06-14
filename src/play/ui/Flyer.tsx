@@ -1,9 +1,9 @@
 import { type FC, useEffect, useRef } from "react";
-import { cn } from "~/shared/cn";
+import { GameItemView } from "~/item/ui/GameItemView";
 import type { ViewItem } from "~/play/logic/playTypes";
 import type { FlyerModel } from "~/play/types";
 import { playFlyerTimeline } from "~/play/util/animation";
-import { GameItemView } from "~/item/ui/GameItemView";
+import { cn } from "~/shared/cn";
 
 export namespace Flyer {
 	export interface Props {
@@ -48,7 +48,7 @@ export const Flyer: FC<Flyer.Props> = ({ flyer, item, crossFadeItem, onSettle })
 					item={item}
 					variant="flyer"
 					quantity={flyer.quantity}
-					producer={flyer.producer ?? undefined}
+					activation={flyer.activation ?? undefined}
 				/>
 			</div>
 			{crossFadeItem ? (

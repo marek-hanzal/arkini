@@ -1,10 +1,9 @@
-import type { ProducerView } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/play/logic/playTypes";
 import { isProducerStocked } from "~/producer/logic/isProducerStocked";
 
-export function isProducerReady(producer: ProducerView | undefined, nowMs: number) {
-	if (!producer) return false;
-
-	const cooldownUntil = producer.cooldownUntilMs ?? 0;
-	const hasCharges = producer.remainingCharges === undefined || producer.remainingCharges > 0;
-	return hasCharges && isProducerStocked(producer) && cooldownUntil <= nowMs;
+export function isProducerReady(activation: ActivationView | undefined, nowMs: number) {
+	if (!activation) return false;
+	const cooldownUntil = activation.cooldownUntilMs ?? 0;
+	const hasCharges = activation.remainingCharges === undefined || activation.remainingCharges > 0;
+	return hasCharges && isProducerStocked(activation) && cooldownUntil <= nowMs;
 }

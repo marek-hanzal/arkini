@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 import { createInitialBoardState, readBoardState } from "~/board/logic/boardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
@@ -9,15 +8,14 @@ import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { planPlacements } from "~/inventory/logic/planning";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/data/manifestId";
-import type { ProducerMode } from "~/manifest/data/producer";
 import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
-import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { ProduceBoardItemInputSchema } from "~/play/logic/gameActionSchemas";
 import type { BoardItemState, ProducerDropResult } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
+import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
 import { depleteFx } from "./depleteFx";
 import { rollOutputFx } from "./rollOutputFx";
 
@@ -48,76 +46,76 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			const updatedAt = date.toTimestamp(now);
 
 			const mutable = yield* readMutableSaveFx();
-			const producerRow = mutable.boardRows.find((row) => row.id === input.boardItemId);
-			if (!producerRow) {
-				return yield* Effect.fail(new GameActionError("Producer does not exist."));
+			const row = mutable.boardRows.find((entry) => entry.id === input.boardItemId);
+			if (!row) {
+				return yield* Effect.fail(new GameActionError("Board item does not exist."));
 			}
 
-			const baseProducer = gameConfig.getProducer(producerRow.itemDefinitionId);
-			if (!baseProducer) {
-				return yield* Effect.fail(new GameActionError("This item is not a producer."));
+			const baseActivation = gameConfig.getActivation(row.itemDefinitionId);
+			if (!baseActivation) {
+				return yield* Effect.fail(new GameActionError("This item cannot be activated."));
 			}
-			const producer = applyProducerUpgradeEffects({
-				gameConfig,
-				producerItemId: producerRow.itemDefinitionId,
-				producer: baseProducer,
-				upgradeRows: mutable.upgradeRows,
-			});
-			if (producer.trigger !== "click") {
-				return yield* Effect.fail(new GameActionError("This producer runs by itself."));
+			const activation =
+				baseActivation.type === "producer"
+					? applyProducerUpgradeEffects({
+							gameConfig,
+							producerItemId: row.itemDefinitionId,
+							producer: baseActivation,
+							upgradeRows: mutable.upgradeRows,
+						})
+					: baseActivation;
+			if (activation.trigger !== "click") {
+				return yield* Effect.fail(new GameActionError("This item cannot be clicked."));
 			}
 
-			const state = readBoardState(producerRow);
-			const producerState = {
-				...(createInitialBoardState(producerRow.itemDefinitionId, gameConfig).producer ??
-					{}),
-				...(state.producer ?? {}),
+			const state = readBoardState(row);
+			const activationState = {
+				...(createInitialBoardState(row.itemDefinitionId, gameConfig).activation ?? {}),
+				...(state.activation ?? {}),
 			};
-
-			const mode = producer.mode ?? {
-				type: "infinite" as const,
-			};
-			const isFiniteExhaust = input.activation === "exhaust" && mode.type === "finite";
+			const isExhaust = input.activation === "exhaust" && activation.type === "stash";
 
 			if (
-				!isFiniteExhaust &&
-				producerState.cooldownUntil &&
-				(date.parseTimestampMs(producerState.cooldownUntil) ?? 0) > timestamp
+				activation.type === "producer" &&
+				!isExhaust &&
+				activationState.cooldownUntil &&
+				(date.parseTimestampMs(activationState.cooldownUntil) ?? 0) > timestamp
 			) {
 				return yield* Effect.fail(new GameActionError("Producer is still cooling down."));
 			}
 
 			if (
-				producerState.remainingCharges !== undefined &&
-				producerState.remainingCharges <= 0
+				activationState.remainingCharges !== undefined &&
+				activationState.remainingCharges <= 0
 			) {
-				return yield* Effect.fail(new GameActionError("Producer is empty."));
+				return yield* Effect.fail(new GameActionError("This stash is empty."));
 			}
 
-			const steps = isFiniteExhaust
-				? Math.max(1, producerState.remainingCharges ?? mode.charges)
+			const steps = isExhaust
+				? Math.max(1, activationState.remainingCharges ?? activation.charges)
 				: 1;
-			const producerInventory = {
-				...(producerState.inventory ?? {}),
+			const storedInventory = {
+				...(activationState.inventory ?? {}),
 			};
 
-			for (const required of producer.inputs ?? []) {
+			for (const required of activation.inputs ?? []) {
 				const needed = required.quantity * steps;
-				const stored = producerInventory[required.itemId] ?? 0;
+				const stored = storedInventory[required.itemId] ?? 0;
 				if (stored < needed) {
 					const name = gameConfig.getItem(required.itemId)?.name ?? required.itemId;
-					return yield* Effect.fail(new GameActionError(`Producer needs ${name}.`));
+					return yield* Effect.fail(
+						new GameActionError(`${itemLabel(activation.type)} needs ${name}.`),
+					);
 				}
-				producerInventory[required.itemId] = stored - needed;
-				if (producerInventory[required.itemId] <= 0)
-					delete producerInventory[required.itemId];
+				storedInventory[required.itemId] = stored - needed;
+				if (storedInventory[required.itemId] <= 0) delete storedInventory[required.itemId];
 			}
 
 			const allDrops: ItemId[] = [];
 			for (let step = 0; step < steps; step++) {
 				allDrops.push(
 					...(yield* rollOutputFx({
-						outputs: producer.output,
+						outputs: activation.output,
 					})),
 				);
 			}
@@ -130,7 +128,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				{
 					gameConfig,
 					id,
-					origin: producerRow,
+					origin: row,
 				},
 			);
 			if (!plan) {
@@ -140,30 +138,22 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			const placements = yield* applyPlacementPlanFx({
 				plan,
 			});
-			const nextRemainingCharges = match(mode as ProducerMode)
-				.with(
-					{
-						type: "infinite",
-					},
-					() => undefined,
-				)
-				.with(
-					{
-						type: "finite",
-					},
-					(finiteMode) =>
-						Math.max(0, (producerState.remainingCharges ?? finiteMode.charges) - steps),
-				)
-				.exhaustive();
+			const nextRemainingCharges =
+				activation.type === "stash"
+					? Math.max(0, (activationState.remainingCharges ?? activation.charges) - steps)
+					: undefined;
+			const shouldDeplete =
+				activation.type === "stash" &&
+				nextRemainingCharges !== undefined &&
+				nextRemainingCharges <= 0;
 
-			const shouldDeplete = nextRemainingCharges !== undefined && nextRemainingCharges <= 0;
 			if (shouldDeplete) {
 				const depletion = yield* depleteFx({
-					row: producerRow,
-					mode,
+					row,
+					stash: activation,
 				});
 				return {
-					producerBoardItemId: producerRow.id,
+					producerBoardItemId: row.id,
 					placements,
 					depletion,
 				} satisfies ProducerDropResult;
@@ -175,27 +165,34 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 					.set({
 						stateJson: json({
 							...state,
-							producer: {
-								...producerState,
-								inventory: producerInventory,
-								cooldownUntil: date.toTimestamp(
-									now.plus({
-										milliseconds: producer.cooldownMs ?? 0,
-									}),
-								),
+							activation: {
+								...activationState,
+								inventory: storedInventory,
+								cooldownUntil:
+									activation.type === "producer"
+										? date.toTimestamp(
+												now.plus({
+													milliseconds: activation.cooldownMs,
+												}),
+											)
+										: undefined,
 								remainingCharges: nextRemainingCharges,
 							},
 						} satisfies BoardItemState),
 						updatedAt,
 					})
-					.where("id", "=", producerRow.id)
+					.where("id", "=", row.id)
 					.execute(),
 			);
 
 			return {
-				producerBoardItemId: producerRow.id,
+				producerBoardItemId: row.id,
 				placements,
 			} satisfies ProducerDropResult;
 		}),
 	);
 });
+
+function itemLabel(type: "producer" | "stash") {
+	return type === "stash" ? "Stash" : "Producer";
+}

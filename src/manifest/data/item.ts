@@ -1,7 +1,7 @@
 import type { AssetId, ItemId } from "./manifestId";
 import type { ItemCraftRecipe } from "./craft";
 import type { ItemMergeRule } from "./itemMergeRule";
-import type { ProducerDefinition } from "./producer";
+import type { ProducerDefinition, StashDefinition } from "./producer";
 
 export interface ItemDefinition {
 	id: ItemId;
@@ -16,5 +16,6 @@ export interface ItemDefinition {
 	sort: number;
 	merge?: readonly ItemMergeRule[];
 	producer?: ProducerDefinition;
+	stash?: StashDefinition;
 	craft?: ItemCraftRecipe;
 }

@@ -1,7 +1,6 @@
 import type { BoardCell } from "~/board/boardIdentity";
 import type { CraftRecipeInput } from "~/manifest/data/craft";
 import type { ItemId } from "~/manifest/data/manifestId";
-import type { ProducerMode } from "~/manifest/data/producer";
 
 export interface GameSaveView {
 	id: string;
@@ -94,7 +93,7 @@ export interface BoardViewItem {
 	x: number;
 	y: number;
 	state: BoardItemState;
-	producer?: ProducerView;
+	activation?: ActivationView;
 	craft?: CraftProgressView;
 }
 
@@ -134,17 +133,17 @@ export interface ItemDetailView {
 	}[];
 }
 
-export interface ProducerView {
+export interface ActivationView {
+	kind: "producer" | "stash";
 	trigger: "click";
-	mode: ProducerMode;
 	cooldownMs?: number;
 	cooldownUntil?: string;
 	cooldownUntilMs?: number;
 	remainingCharges?: number;
-	inputs: ProducerInputView[];
+	inputs: ActivationInputView[];
 }
 
-export interface ProducerInputView {
+export interface ActivationInputView {
 	itemId: string;
 	quantity: number;
 	capacity: number;
@@ -176,7 +175,7 @@ export interface ProducerDropResult {
 }
 
 export interface BoardItemState {
-	producer?: {
+	activation?: {
 		cooldownUntil?: string;
 		remainingCharges?: number;
 		inventory?: Record<string, number>;

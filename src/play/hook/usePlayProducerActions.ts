@@ -113,7 +113,7 @@ export function usePlayProducerActions({
 				sourceId,
 			]);
 			return addFlyer(boardItem.itemId, sourceRect, sourceRect, "deplete", {
-				producer: boardItem.producer ?? undefined,
+				activation: boardItem.activation ?? undefined,
 			});
 		},
 		[

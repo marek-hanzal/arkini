@@ -13,21 +13,12 @@ export namespace BoardTile {
 		activationNowMs?: number;
 		hidden: boolean;
 		onSingleActivate(item: BoardViewItem): void;
-		onDoubleActivate(item: BoardViewItem): void;
 		onLongActivate(item: BoardViewItem): void;
 	}
 }
 
 export const BoardTile: FC<BoardTile.Props> = memo(
-	({
-		boardItem,
-		item,
-		activationNowMs,
-		hidden,
-		onSingleActivate,
-		onDoubleActivate,
-		onLongActivate,
-	}) => {
+	({ boardItem, item, activationNowMs, hidden, onSingleActivate, onLongActivate }) => {
 		const sourceId = boardSourceId(boardItem.id);
 		const sourceNodeId = boardCellNodeId(boardItem.x, boardItem.y);
 		const payload = useMemo(
@@ -60,13 +51,6 @@ export const BoardTile: FC<BoardTile.Props> = memo(
 				onSingleActivate,
 			],
 		);
-		const handleDoubleActivate = useCallback(
-			() => onDoubleActivate(boardItem),
-			[
-				boardItem,
-				onDoubleActivate,
-			],
-		);
 		const handleLongActivate = useCallback(
 			() => onLongActivate(boardItem),
 			[
@@ -84,8 +68,6 @@ export const BoardTile: FC<BoardTile.Props> = memo(
 				hidden={hidden}
 				className="absolute inset-0 touch-none"
 				onSingleActivate={handleSingleActivate}
-				delaySingleWhenDouble
-				onDoubleActivate={handleDoubleActivate}
 				onLongActivate={handleLongActivate}
 			>
 				<GameItemView

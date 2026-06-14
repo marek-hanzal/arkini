@@ -1,5 +1,4 @@
 import { memo, type FC } from "react";
-import type { BoardCell as BoardCellModel } from "~/board/BoardCell";
 import { boardColumns } from "~/board/boardColumns";
 import { boardContainerNodeId } from "~/board/boardContainerNodeId";
 import { boardRows } from "~/board/boardRows";
@@ -40,9 +39,7 @@ export namespace Board {
 	}
 
 	export interface Actions {
-		emptyDoubleActivate(cell: BoardCellModel): void;
 		tileSingleActivate(item: BoardViewItem): void;
-		tileDoubleActivate(item: BoardViewItem): void;
 		tileLongActivate(item: BoardViewItem): void;
 	}
 
@@ -109,9 +106,7 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions }) => {
 						invalid={feedback.invalidCellKey === cell.key}
 						merged={feedback.mergedCellKey === cell.key}
 						imprinted={feedback.imprintedCellKey === cell.key}
-						onEmptyDoubleActivate={actions.emptyDoubleActivate}
 						onTileSingleActivate={actions.tileSingleActivate}
-						onTileDoubleActivate={actions.tileDoubleActivate}
 						onTileLongActivate={actions.tileLongActivate}
 					/>
 				);

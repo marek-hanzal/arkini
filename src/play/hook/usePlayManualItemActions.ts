@@ -5,8 +5,7 @@ import { useCommand } from "~/play/hook/useCommand";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import { playQueryKeys } from "~/play/hook/playQueryKeys";
 import { placeInventoryOnBoardWithFly } from "~/play/logic/placeInventoryOnBoardWithFly";
-import type { BoardView, BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
-import { stashBoardWithFly } from "~/play/logic/stashBoardWithFly";
+import type { BoardView, InventorySlot } from "~/play/logic/playTypes";
 import type { FlyerKind, VisualMeta, RectLike } from "~/play/types";
 
 export namespace usePlayManualItemActions {
@@ -45,29 +44,6 @@ export const usePlayManualItemActions = ({
 		],
 	);
 
-	const stashBoard = useCallback(
-		(boardItem: BoardViewItem) =>
-			schedule("stash board item", () =>
-				stashBoardWithFly({
-					boardItem,
-					addFlyer,
-					run,
-					feedback,
-					hideSources,
-					clearHiddenSources,
-					invalidatePlayData,
-				}),
-			),
-		[
-			addFlyer,
-			clearHiddenSources,
-			feedback,
-			hideSources,
-			invalidatePlayData,
-			run,
-			schedule,
-		],
-	);
 	const placeInventoryOnBoard = useCallback(
 		(slot: InventorySlot) =>
 			schedule("place inventory item", () =>
@@ -96,12 +72,10 @@ export const usePlayManualItemActions = ({
 
 	return useMemo(
 		() => ({
-			stashBoardWithFly: stashBoard,
 			placeInventoryOnBoardWithFly: placeInventoryOnBoard,
 		}),
 		[
 			placeInventoryOnBoard,
-			stashBoard,
 		],
 	);
 };

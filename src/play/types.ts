@@ -23,6 +23,9 @@ export type DropTarget =
 	| {
 			kind: "inventory-slot";
 			slotIndex: number;
+	  }
+	| {
+			kind: "inventory";
 	  };
 
 export interface VisualMeta {

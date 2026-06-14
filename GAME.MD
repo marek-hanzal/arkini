@@ -435,14 +435,15 @@ Single-click is allowed to produce output, consume producer/stash inputs, advanc
 
 ### 8.2 Double-click
 
-Double-click is the default storage/placement interaction.
+Double-click is an inventory-only placement interaction.
 
 Double-click may:
 
-- move board item to inventory
-- move inventory item to board
+- move an inventory item to the board
 
-Double-click must not have hidden production, stash opening, exhaust, or special collect behavior.
+Board double-click is deliberately unused. Board item storage belongs to dragging that board item onto the inventory bottom-nav target.
+
+Double-click must not have hidden production, stash opening, exhaust, special collect behavior, or board storage behavior.
 
 ### 8.3 Board drag/drop
 
@@ -517,7 +518,8 @@ Examples:
 
 - producer collection belongs to single-click
 - stash opening/exhaust belongs to single-click
-- inventory storage belongs to double-click
+- board item storage belongs to dragging onto the inventory bottom-nav target
+- inventory placement belongs to inventory double-click
 - feeding belongs to board drag/drop
 - withdrawal belongs to item detail
 
@@ -703,7 +705,7 @@ Stashes cover chests, crates, finite caches, reward containers, and similar enti
 
 A stash is opened/collected by single-click when its requirements are satisfied.
 
-Double-click stores the stash in inventory. It does not open or exhaust the stash.
+Dragging the stash onto the inventory bottom-nav target stores it in inventory. Double-click does not store, open, or exhaust a board stash.
 
 ### 11.3 Stash depletion
 
@@ -1296,7 +1298,7 @@ These concepts are not part of canonical gameplay and should be removed during c
 5. Starting state that puts currency into `playerInventory`. Currency belongs in normal inventory.
 6. Collectible behavior that stores items into a separate player inventory.
 7. `collect` as a special item behavior for currency.
-8. Double-click exhaust/open/collect behavior. Double-click stores or places only.
+8. Double-click exhaust/open/collect behavior. Double-click is inventory placement only.
 9. `doubleClickBehavior: "exhaust"`. It is replaced by single-click stash exhaust/open.
 10. Mixed `producer.mode` finite/infinite model. Finite entities are `stash`; infinite/long-lived entities are `producer`.
 11. Player-inventory capacity upgrade.
@@ -1311,75 +1313,76 @@ Obsolete means delete or migrate unless this document explicitly reintroduces th
 
 A gameplay implementation should provide tests or validation for:
 
-1. moving item from board to inventory by double-click
+1. moving item from board to inventory by dragging onto the inventory bottom-nav target
 2. moving item from inventory to board by double-click
-3. double-click never triggers producer output
-4. double-click never opens/exhausts stash output
-5. single-click triggers ready producer
-6. single-click triggers ready stash
-7. inventory full failure behavior
-8. board full failure behavior
-9. automatic inventory normalization fills compatible stacks before creating new stacks
-10. stackable stateless item stacking up to `maxStackSize`
-11. non-stackable building occupying one slot
-12. stateful item occupying one slot and not stacking
-13. inventory slot drag swaps slot contents
-14. inventory drag never triggers merge/feed/production
-15. board drag moves item to empty cell
-16. board drag swaps incompatible occupied cells
-17. board drag performs valid merge/binding before swap
-18. board drag feeds craft/construction/growth before swap
-19. board drag feeds producer input storage before swap
-20. board drag feeds stash input storage before swap
-21. stateful item state preserved through board -> inventory -> board
-22. inventory pauses craft/construction/growth timers
-23. inventory pauses producer cooldowns
-24. inventory item cannot receive craft/construction inputs
-25. ordinary merge chain success
-26. invalid merge rejection
-27. thematic merge chain validation from data
-28. stateful item merge rejection unless explicit rule exists
-29. producer cooldown timing on board
-30. producer cooldown paused in inventory
-31. producer loot table rolls from named table ID
-32. producer generating multiple items
-33. producer generating duplicate item outputs when allowed
-34. producer input deposit
-35. producer input withdrawal from item detail
-36. withdrawal places to board first, then inventory
-37. withdrawal keeps remaining stored items when board and inventory cannot fit them
-38. producer production blocked by missing inputs
-39. producer production consumes required inputs only for production that actually happens
-40. producer activation rejects when full generated output cannot fit
-41. producer output uses deterministic nearest-free-cell placement from producer origin
-42. stash finite depletion
-43. stash input requirement, for keyed/locked stashes
-44. stash activation rejects when full generated output cannot fit
-45. stash output uses deterministic nearest-free-cell placement from stash origin
-46. blank blueprint completion
-47. blank blueprint binding to target entity
-48. target entity not consumed by blueprint binding
-49. bound blueprint receiving construction inputs
-50. craft/construction timer starts after required inputs are deposited
-51. craft/construction timer pauses in inventory
-52. craft/construction completion on board
-53. item detail shows merge information
-54. item detail shows craft/construction/growth progress and timers
-55. item detail shows producer/stash state, inputs, charges, and loot information
-56. upgrade cost payment from normal inventory
-57. upgrade timer lifecycle
-58. upgrade reducing producer cooldown
-59. upgrade switching producer loot table ID
-60. obsolete `playerInventory` concepts are absent from gameplay logic
-61. obsolete `collect` behavior is absent from gameplay logic
-62. obsolete double-click exhaust behavior is absent from gameplay logic
-63. save compatibility behavior when game definition version changes
-64. board timers advance while the app is closed
-65. inventory timers do not advance while the app is closed
-66. global upgrade timers advance while the app is closed
-67. zero-output loot tables are rejected as invalid data
-68. ambiguous source-target interaction definitions are rejected as invalid data
-69. blueprint binding replaces the source blueprint and keeps the target entity in place
-70. craft completion replaces the progress item in the same board cell
-71. stateful source items are rejected as inputs unless nested storage is fully ejected first
-72. nested producer/stash storage ejection rejects the input action when board and inventory cannot fit the nested contents
+3. board double-click has no gameplay behavior
+4. double-click never triggers producer output
+5. double-click never opens/exhausts stash output
+6. single-click triggers ready producer
+7. single-click triggers ready stash
+8. inventory full failure behavior
+9. board full failure behavior
+10. automatic inventory normalization fills compatible stacks before creating new stacks
+11. stackable stateless item stacking up to `maxStackSize`
+12. non-stackable building occupying one slot
+13. stateful item occupying one slot and not stacking
+14. inventory slot drag swaps slot contents
+15. inventory drag never triggers merge/feed/production
+16. board drag moves item to empty cell
+17. board drag swaps incompatible occupied cells
+18. board drag performs valid merge/binding before swap
+19. board drag feeds craft/construction/growth before swap
+20. board drag feeds producer input storage before swap
+21. board drag feeds stash input storage before swap
+22. stateful item state preserved through board -> inventory -> board
+23. inventory pauses craft/construction/growth timers
+24. inventory pauses producer cooldowns
+25. inventory item cannot receive craft/construction inputs
+26. ordinary merge chain success
+27. invalid merge rejection
+28. thematic merge chain validation from data
+29. stateful item merge rejection unless explicit rule exists
+30. producer cooldown timing on board
+31. producer cooldown paused in inventory
+32. producer loot table rolls from named table ID
+33. producer generating multiple items
+34. producer generating duplicate item outputs when allowed
+35. producer input deposit
+36. producer input withdrawal from item detail
+37. withdrawal places to board first, then inventory
+38. withdrawal keeps remaining stored items when board and inventory cannot fit them
+39. producer production blocked by missing inputs
+40. producer production consumes required inputs only for production that actually happens
+41. producer activation rejects when full generated output cannot fit
+42. producer output uses deterministic nearest-free-cell placement from producer origin
+43. stash finite depletion
+44. stash input requirement, for keyed/locked stashes
+45. stash activation rejects when full generated output cannot fit
+46. stash output uses deterministic nearest-free-cell placement from stash origin
+47. blank blueprint completion
+48. blank blueprint binding to target entity
+49. target entity not consumed by blueprint binding
+50. bound blueprint receiving construction inputs
+51. craft/construction timer starts after required inputs are deposited
+52. craft/construction timer pauses in inventory
+53. craft/construction completion on board
+54. item detail shows merge information
+55. item detail shows craft/construction/growth progress and timers
+56. item detail shows producer/stash state, inputs, charges, and loot information
+57. upgrade cost payment from normal inventory
+58. upgrade timer lifecycle
+59. upgrade reducing producer cooldown
+60. upgrade switching producer loot table ID
+61. obsolete `playerInventory` concepts are absent from gameplay logic
+62. obsolete `collect` behavior is absent from gameplay logic
+63. obsolete double-click exhaust behavior is absent from gameplay logic
+64. save compatibility behavior when game definition version changes
+65. board timers advance while the app is closed
+66. inventory timers do not advance while the app is closed
+67. global upgrade timers advance while the app is closed
+68. zero-output loot tables are rejected as invalid data
+69. ambiguous source-target interaction definitions are rejected as invalid data
+70. blueprint binding replaces the source blueprint and keeps the target entity in place
+71. craft completion replaces the progress item in the same board cell
+72. stateful source items are rejected as inputs unless nested storage is fully ejected first
+73. nested producer/stash storage ejection rejects the input action when board and inventory cannot fit the nested contents

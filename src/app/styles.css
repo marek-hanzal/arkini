@@ -179,6 +179,12 @@ button {
 	line-height: 1;
 	color: rgb(203 213 225);
 	background: rgb(15 23 42 / 0.82);
+	transition:
+		transform 90ms ease-out,
+		border-color 120ms ease-out,
+		background 120ms ease-out,
+		box-shadow 120ms ease-out,
+		color 120ms ease-out;
 }
 
 .ak-bottom-nav-button:active {
@@ -203,6 +209,25 @@ button {
 .ak-bottom-nav-button[data-tone="database"] {
 	border-color: rgb(129 140 248 / 0.42);
 	background: rgb(49 46 129 / 0.23);
+}
+
+.ak-bottom-nav-button[data-drop-target-active="true"][data-tone="inventory"] {
+	border-color: rgb(45 212 191 / 0.78);
+	background: rgb(20 184 166 / 0.28);
+	color: rgb(204 251 241);
+	box-shadow:
+		inset 0 0 0 1px rgb(94 234 212 / 0.4),
+		0 0 1.15rem rgb(20 184 166 / 0.28);
+}
+
+.ak-bottom-nav-button[data-drop-over="true"][data-tone="inventory"] {
+	border-color: rgb(153 246 228 / 0.98);
+	background: rgb(13 148 136 / 0.36);
+	color: rgb(240 253 250);
+	box-shadow:
+		inset 0 0 0 2px rgb(153 246 228 / 0.7),
+		0 0 1.5rem rgb(20 184 166 / 0.45);
+	transform: translateY(-1px);
 }
 
 .ak-bottom-nav-button[data-active="true"][data-tone="inventory"] {

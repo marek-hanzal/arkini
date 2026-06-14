@@ -2,12 +2,11 @@ import { memo, type FC } from "react";
 import { GameItemContent } from "~/item/ui/GameItemContent";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
 import type { RectLike } from "~/play/types";
-import { cn } from "~/shared/cn";
 
 export namespace GameItemView {
 	export type Variant = "board" | "inventory" | "drag" | "flyer";
 
-	export type SizeVariant = Exclude<Variant, "drag">;
+	export type SizeVariant = "board" | "inventory";
 
 	export interface Props {
 		item: ViewItem;
@@ -22,19 +21,15 @@ export namespace GameItemView {
 
 export const GameItemView: FC<GameItemView.Props> = memo(
 	({ item, variant, sizeVariant, quantity, activation, overlaySize, activationNowMs }) => {
-		const resolvedSizeVariant = sizeVariant ?? (variant === "drag" ? "board" : variant);
+		const resolvedSizeVariant =
+			sizeVariant ?? (variant === "inventory" ? "inventory" : "board");
 
 		return (
 			<div
 				data-ak-item-view
 				data-ak-item-variant={variant}
 				data-ak-item-size-variant={resolvedSizeVariant}
-				className={cn(
-					"relative h-full w-full select-none",
-					resolvedSizeVariant === "board" && "p-[13%]",
-					resolvedSizeVariant === "inventory" && "p-[12%]",
-					resolvedSizeVariant === "flyer" && "p-[10%]",
-				)}
+				className="relative h-full w-full select-none p-[13%]"
 				style={
 					variant === "drag" && overlaySize
 						? {

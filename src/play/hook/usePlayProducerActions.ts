@@ -7,7 +7,7 @@ import type { BoardViewItem, ProducerDropResult, ProducerPlacement } from "~/pla
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
-import type { ActiveSheet } from "~/play/ui/BottomNavigation";
+import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
 import { playBottomNavHold } from "~/play/util/animation";
 import { queryElement } from "~/shared/util/queryElement";

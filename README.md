@@ -77,13 +77,15 @@ The current content direction is Settlers-like: small producers create raw goods
 
 Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts` and built on `@react-aria/interactions`. Board item detail opens through long press, including producers whose single tap is reserved for production. Keep raw touch/pointer timing out of board/tile components unless you enjoy debugging mobile browsers like some kind of punishment enthusiast.
 
-Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle.
+Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle. The transient drag phase is modeled by `src/drag/logic/draggableWorkflowMachine.ts` through XState; do not put board, inventory, or item data into that machine just because the context field exists and humanity cannot be trusted with containers.
 
 Game-specific drag policy lives in `src/play/hook/playDragRules.ts`. `src/play/hook/usePlayDraggableControl.ts` only wires those rules into the generic control. `src/play/hook/resolveMagneticGameDropTarget.ts` is the same kind of game-specific adapter: board and inventory drags resolve the nearest same-surface action by real rectangle overlap first, then distance. The magnetic resolver wins over dnd-kit `over`, so grid edges and cross-points do not get punished just because a pointer landed on UI grout.
 
 Accepted drag animations run after commit by default. Manual double-tap actions follow the same rule: mutate first, then animate. Board merge is the deliberate exception: source and target play a short pre-commit merge animation, then the mutation replaces them with the merged item. Blueprint imprint merges are the other deliberate exception: the dragged known building is hidden during the drop, the blank blueprint commits into a specific blueprint, then the original building pops on its own cell so the player can see it was not consumed. Finite producer depletion uses the same discipline: mutate, play loot against the still-visible stale view, mask the newly committed placements during the query refresh, then reveal them under the flyer layer while the depleted producer exits. Place flyers stay fully opaque while travelling; fade-to-ghost animations are banned because watching loot become transparent mid-flight is apparently how UI joins a paranormal society. No optimistic visual lies unless a future feature explicitly adds rollback. Software has enough trust issues already.
 
 Inventory stash feedback holds the inventory bottom-nav highlight briefly and extends that hold when more items arrive quickly, so bursty item stashing does not flicker like a broken nightclub sign. Producer ready feedback is tracked by producer instance id and played through GSAP only on real readiness transitions. Mounting a producer or moving it across the board must not pulse it; React mounts are not gameplay events, despite React’s best efforts to feel important.
+
+XState is used only for transient workflow orchestration: drag/drop phases, bottom-sheet visibility, and the serialized play event queue. SQLite remains the durable game state, React Query remains the read/cache layer, and Effect remains the persistence/domain runtime. XState machine context may hold tiny workflow metadata only; storing full gameplay rows there is architectural taxidermy.
 
 Board merge hints are handled by `src/board/hook/useDelayedMergeHints.ts`. Global mergeable-target hints appear after 750 ms while dragging a board item and disappear when the drag context changes. The currently hovered mergeable target still highlights instantly, because feedback that waits politely for permission is not feedback, it is bureaucracy.
 
@@ -122,12 +124,12 @@ src/id/context/                  Effect id service context tag.
 src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
-src/play/logic/                  Promise backend façade plus shared backend types/helpers.
+src/play/logic/                  Promise backend façade, XState workflow machines, and shared backend types/helpers.
 src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
-src/play/hook/                   Granular React Query subscriptions, event queue, action orchestration.
-src/play/store/                  Small Zustand stores for transient sheet, feedback, and producer UI state.
+src/play/hook/                   Granular React Query subscriptions, XState event queue, action orchestration.
+src/play/store/                  Small Zustand stores for feedback-style transient UI state.
 src/play/ui/                     Main shell, sheets, bottom navigation, flyers, database status UI.
-src/drag/                        Generic DnD lifecycle and draggable/droppable surfaces.
+src/drag/                        Generic DnD lifecycle, XState drag workflow, and draggable/droppable surfaces.
 src/board/                       Board identity, board state logic, board UI, cell feedback.
 src/inventory/                   Inventory identity, stack planning/storage logic, inventory sheet UI.
 src/producer/                    Producer output rolling, readiness tracking, upgrade-adjusted output, and depletion logic.
@@ -209,4 +211,4 @@ SQLite is local storage, not the final game authority. Gameplay inputs and loade
 
 ## Minimal-code philosophy
 
-Prefer direct data and small operations. Avoid class hierarchies, hidden frameworks, and helper confetti. When behavior can live on an item definition, put it in `GameConfig`. When UI state is transient, keep it in a small Zustand store or focused hook. When state must survive reloads, store it in SQLite. Everything else is probably just code wearing a fake mustache.
+Prefer direct data and small operations. Avoid class hierarchies, hidden frameworks, and helper confetti. When behavior can live on an item definition, put it in `GameConfig`. When UI state is transient and has real phases, model it with a focused XState machine. When it is just a tiny visual pulse, a small Zustand store or focused hook is enough. When state must survive reloads, store it in SQLite. Everything else is probably just code wearing a fake mustache.

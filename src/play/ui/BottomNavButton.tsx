@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import type { BottomNavSheet } from "~/play/ui/BottomNavigation";
+import type { BottomNavSheet } from "~/play/logic/playSheetTypes";
 
 export namespace BottomNavButton {
 	export interface Props {

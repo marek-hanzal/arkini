@@ -23,9 +23,7 @@ export function playFlyerTimeline(element: HTMLElement, { from, to, kind }: Flye
 
 	gsap.killTweensOf(element);
 
-	const crossFadeFrom = element.querySelector<HTMLElement>(
-		"[data-ak-fly-crossfade-from]",
-	);
+	const crossFadeFrom = element.querySelector<HTMLElement>("[data-ak-fly-crossfade-from]");
 	const crossFadeTo = element.querySelector<HTMLElement>("[data-ak-fly-crossfade-to]");
 
 	return new Promise<void>((resolve) => {

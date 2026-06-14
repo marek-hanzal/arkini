@@ -83,12 +83,7 @@ export const GameConfig = {
 			"asset:item-lumber-camp",
 			116,
 		),
-		blueprintAsset(
-			"asset:item-blueprint-quarry",
-			"Quarry Blueprint",
-			"asset:item-quarry",
-			120,
-		),
+		blueprintAsset("asset:item-blueprint-quarry", "Quarry Blueprint", "asset:item-quarry", 120),
 		blueprintAsset(
 			"asset:item-blueprint-townhall",
 			"Town Hall Blueprint",
@@ -807,11 +802,7 @@ export const GameConfig = {
 			202,
 			{
 				merge: [
-					same(
-						"merge:blueprint-draft-final",
-						"item:blueprint-draft",
-						"item:blueprint",
-					),
+					same("merge:blueprint-draft-final", "item:blueprint-draft", "item:blueprint"),
 				],
 			},
 		),
@@ -1185,7 +1176,11 @@ export const GameConfig = {
 			300,
 			{
 				merge: [
-					imprint("merge:townhall-1-blueprint", "item:blueprint", "item:blueprint-townhall"),
+					imprint(
+						"merge:townhall-1-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall",
+					),
 				],
 				label: "1",
 				producer: clickProducer(
@@ -1216,7 +1211,11 @@ export const GameConfig = {
 			310,
 			{
 				merge: [
-					imprint("merge:townhall-2-blueprint", "item:blueprint", "item:blueprint-townhall-2"),
+					imprint(
+						"merge:townhall-2-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall-2",
+					),
 				],
 				label: "2",
 				producer: clickProducer(
@@ -1253,7 +1252,11 @@ export const GameConfig = {
 			320,
 			{
 				merge: [
-					imprint("merge:townhall-3-blueprint", "item:blueprint", "item:blueprint-townhall-3"),
+					imprint(
+						"merge:townhall-3-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall-3",
+					),
 				],
 				label: "3",
 				producer: clickProducer(
@@ -1292,7 +1295,11 @@ export const GameConfig = {
 			324,
 			{
 				merge: [
-					imprint("merge:townhall-4-blueprint", "item:blueprint", "item:blueprint-townhall-4"),
+					imprint(
+						"merge:townhall-4-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall-4",
+					),
 				],
 				label: "4",
 				producer: clickProducer(
@@ -1330,7 +1337,11 @@ export const GameConfig = {
 			328,
 			{
 				merge: [
-					imprint("merge:townhall-5-blueprint", "item:blueprint", "item:blueprint-townhall-5"),
+					imprint(
+						"merge:townhall-5-blueprint",
+						"item:blueprint",
+						"item:blueprint-townhall-5",
+					),
 				],
 				label: "5",
 				producer: clickProducer(
@@ -1369,7 +1380,11 @@ export const GameConfig = {
 			330,
 			{
 				merge: [
-					imprint("merge:lumber-camp-1-blueprint", "item:blueprint", "item:blueprint-lumber-camp"),
+					imprint(
+						"merge:lumber-camp-1-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp",
+					),
 				],
 				label: "1",
 				producer: clickProducer(
@@ -1398,7 +1413,11 @@ export const GameConfig = {
 			340,
 			{
 				merge: [
-					imprint("merge:lumber-camp-2-blueprint", "item:blueprint", "item:blueprint-lumber-camp-2"),
+					imprint(
+						"merge:lumber-camp-2-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp-2",
+					),
 				],
 				label: "2",
 				producer: clickProducer(
@@ -1430,7 +1449,11 @@ export const GameConfig = {
 			350,
 			{
 				merge: [
-					imprint("merge:lumber-camp-3-blueprint", "item:blueprint", "item:blueprint-lumber-camp-3"),
+					imprint(
+						"merge:lumber-camp-3-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp-3",
+					),
 				],
 				label: "3",
 				producer: clickProducer(
@@ -1456,7 +1479,11 @@ export const GameConfig = {
 			354,
 			{
 				merge: [
-					imprint("merge:lumber-camp-4-blueprint", "item:blueprint", "item:blueprint-lumber-camp-4"),
+					imprint(
+						"merge:lumber-camp-4-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp-4",
+					),
 				],
 				label: "4",
 				producer: clickProducer(
@@ -1488,7 +1515,11 @@ export const GameConfig = {
 			358,
 			{
 				merge: [
-					imprint("merge:lumber-camp-5-blueprint", "item:blueprint", "item:blueprint-lumber-camp-5"),
+					imprint(
+						"merge:lumber-camp-5-blueprint",
+						"item:blueprint",
+						"item:blueprint-lumber-camp-5",
+					),
 				],
 				label: "5",
 				producer: clickProducer(
@@ -1547,7 +1578,11 @@ export const GameConfig = {
 			370,
 			{
 				merge: [
-					imprint("merge:quarry-2-blueprint", "item:blueprint", "item:blueprint-quarry-2"),
+					imprint(
+						"merge:quarry-2-blueprint",
+						"item:blueprint",
+						"item:blueprint-quarry-2",
+					),
 				],
 				label: "2",
 				producer: clickProducer(
@@ -1579,7 +1614,11 @@ export const GameConfig = {
 			380,
 			{
 				merge: [
-					imprint("merge:quarry-3-blueprint", "item:blueprint", "item:blueprint-quarry-3"),
+					imprint(
+						"merge:quarry-3-blueprint",
+						"item:blueprint",
+						"item:blueprint-quarry-3",
+					),
 				],
 				label: "3",
 				producer: clickProducer(
@@ -1605,7 +1644,11 @@ export const GameConfig = {
 			384,
 			{
 				merge: [
-					imprint("merge:quarry-4-blueprint", "item:blueprint", "item:blueprint-quarry-4"),
+					imprint(
+						"merge:quarry-4-blueprint",
+						"item:blueprint",
+						"item:blueprint-quarry-4",
+					),
 				],
 				label: "4",
 				producer: clickProducer(
@@ -1634,7 +1677,11 @@ export const GameConfig = {
 			388,
 			{
 				merge: [
-					imprint("merge:quarry-5-blueprint", "item:blueprint", "item:blueprint-quarry-5"),
+					imprint(
+						"merge:quarry-5-blueprint",
+						"item:blueprint",
+						"item:blueprint-quarry-5",
+					),
 				],
 				label: "5",
 				producer: clickProducer(
@@ -2048,11 +2095,7 @@ function combo(
 	};
 }
 
-function imprint(
-	id: MergeDefinitionId,
-	withItemId: ItemId,
-	resultItemId: ItemId,
-): ItemMergeRule {
+function imprint(id: MergeDefinitionId, withItemId: ItemId, resultItemId: ItemId): ItemMergeRule {
 	return {
 		id,
 		withItemId,

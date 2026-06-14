@@ -62,7 +62,7 @@ export const GameConfig = {
 		asset("asset:item-ore", "Ore", "item-ore", 84, "png"),
 		asset("asset:item-crystal", "Crystal", "item-crystal", 90, "png"),
 		asset("asset:item-gem", "Gem", "item-gem", 94, "png"),
-		asset("asset:item-water", "Water", "item-water", 100),
+		asset("asset:item-water", "Water", "item-water", 100, "png"),
 		asset("asset:item-coin", "Coin", "item-coin", 101),
 		asset("asset:item-coin-pair", "Coin Pair", "item-coin-pair", 102),
 		asset("asset:item-coin-stack", "Coin Stack", "item-coin-stack", 103),

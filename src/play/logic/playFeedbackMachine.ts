@@ -1,40 +1,43 @@
 import { assign, fromPromise, setup } from "xstate";
 import { flashMs } from "~/play/types";
+import { waitForAnimationFrame } from "~/shared/util/waitForAnimationFrame";
 
 const mergePulseMs = 560;
 const imprintPulseMs = 640;
 
-interface PlayFeedbackContext {
-	invalidBoardCellKey?: string;
-	mergedBoardCellKey?: string;
-	imprintedBoardCellKey?: string;
-	invalidInventorySlot?: number;
-	pendingMergedBoardCellKey?: string;
-	pendingImprintedBoardCellKey?: string;
-}
+export namespace playFeedbackMachine {
+	export interface Context {
+		invalidBoardCellKey?: string;
+		mergedBoardCellKey?: string;
+		imprintedBoardCellKey?: string;
+		invalidInventorySlot?: number;
+		pendingMergedBoardCellKey?: string;
+		pendingImprintedBoardCellKey?: string;
+	}
 
-type PlayFeedbackEvent =
-	| {
-			type: "FLASH_BOARD_CELL";
-			key: string;
-	  }
-	| {
-			type: "PULSE_MERGE_CELL";
-			key: string;
-	  }
-	| {
-			type: "PULSE_IMPRINT_CELL";
-			key: string;
-	  }
-	| {
-			type: "FLASH_INVENTORY_SLOT";
-			slotIndex: number;
-	  };
+	export type Event =
+		| {
+				type: "FLASH_BOARD_CELL";
+				key: string;
+		  }
+		| {
+				type: "PULSE_MERGE_CELL";
+				key: string;
+		  }
+		| {
+				type: "PULSE_IMPRINT_CELL";
+				key: string;
+		  }
+		| {
+				type: "FLASH_INVENTORY_SLOT";
+				slotIndex: number;
+		  };
+}
 
 export const playFeedbackMachine = setup({
 	types: {
-		context: {} as PlayFeedbackContext,
-		events: {} as PlayFeedbackEvent,
+		context: {} as playFeedbackMachine.Context,
+		events: {} as playFeedbackMachine.Event,
 	},
 	actors: {
 		waitForAnimationFrame: fromPromise(() => waitForAnimationFrame()),
@@ -236,7 +239,3 @@ export const playFeedbackMachine = setup({
 		},
 	},
 });
-
-function waitForAnimationFrame() {
-	return new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
-}

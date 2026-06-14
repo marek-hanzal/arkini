@@ -1,25 +1,22 @@
 import type { RandomService } from "~/random/context/RandomServiceFx";
-
-function float() {
-	return Math.random();
-}
+import { randomFloat } from "./randomFloat";
 
 export const RandomServiceLive: RandomService = {
-	float,
+	float: randomFloat,
 	number(max) {
-		return float() * max;
+		return randomFloat() * max;
 	},
 	integerInclusive(min, max) {
-		return min + Math.floor(float() * (max - min + 1));
+		return min + Math.floor(randomFloat() * (max - min + 1));
 	},
 	chance(probability) {
-		return float() <= probability;
+		return randomFloat() <= probability;
 	},
 	weighted(entries, options) {
 		const total = entries.reduce((sum, entry) => sum + entry.weight, 0);
 		if (total <= 0) return options?.fallback;
 
-		let roll = float() * total;
+		let roll = randomFloat() * total;
 		for (const entry of entries) {
 			roll -= entry.weight;
 			if (roll <= 0) return entry;

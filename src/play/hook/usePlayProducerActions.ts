@@ -1,18 +1,16 @@
 import { useCallback } from "react";
 import { cellKey } from "~/board/util/cell";
-import {
-	animateProducerDrops,
-	highlightInventoryNav,
-	producerPlacementSourceIds,
-	startProducerDepletionFlyer,
-} from "~/animation/producerActivationVisuals";
-import type { GameCommand } from "~/action/GameCommand";
-import { useGameCommand } from "~/play/hook/useGameCommand";
+import { animateProducerDrops } from "~/animation/animateProducerDrops";
+import { highlightInventoryNav } from "~/animation/highlightInventoryNav";
+import { producerPlacementSourceIds } from "~/animation/producerPlacementSourceIds";
+import { startProducerDepletionFlyer } from "~/animation/startProducerDepletionFlyer";
+import type { Command } from "~/action/command";
+import { useCommand } from "~/play/hook/useCommand";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
-import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
+import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { BoardViewItem } from "~/play/logic/playTypes";
-import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
+import type { FlyerKind, VisualMeta, RectLike } from "~/play/types";
 import { waitForPaint } from "~/shared/util/waitForPaint";
 
 export namespace usePlayProducerActions {
@@ -23,9 +21,9 @@ export namespace usePlayProducerActions {
 			from: RectLike,
 			to: RectLike,
 			kind?: FlyerKind,
-			meta?: GameVisualMeta,
+			meta?: VisualMeta,
 		): Promise<void>;
-		feedback: GameDragFeedback;
+		feedback: Feedback;
 		schedule(label: string, operation: () => Promise<void>): Promise<void>;
 		hideSources(ids: readonly string[]): void;
 		clearHiddenSources(): void;
@@ -41,9 +39,9 @@ export function usePlayProducerActions({
 	clearHiddenSources,
 }: usePlayProducerActions.Props) {
 	const invalidatePlayData = usePlayDataInvalidation();
-	const command = useGameCommand<
+	const command = useCommand<
 		Extract<
-			GameCommand,
+			Command,
 			{
 				type: "producer.activate";
 			}

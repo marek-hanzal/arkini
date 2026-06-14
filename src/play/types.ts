@@ -1,7 +1,7 @@
 import type { DraggablePayload, DroppablePayload } from "~/drag/hook/useDraggableControl";
 import type { BoardViewItem } from "~/play/logic/playTypes";
 
-export type GameDragSource =
+export type DragSource =
 	| {
 			kind: "board";
 			boardItemId: string;
@@ -12,7 +12,7 @@ export type GameDragSource =
 			quantity: number;
 	  };
 
-export type GameDropTarget =
+export type DropTarget =
 	| {
 			kind: "cell";
 			x: number;
@@ -24,15 +24,15 @@ export type GameDropTarget =
 			slotIndex: number;
 	  };
 
-export interface GameVisualMeta {
+export interface VisualMeta {
 	quantity?: number;
 	activation?: BoardViewItem["activation"];
 	/** Optional item rendered above the flyer so merge flyers can cross-fade into their result. */
 	crossFadeItemId?: string;
 }
 
-export type GameDragData = DraggablePayload<string, GameDragSource, GameVisualMeta>;
-export type GameDropData = DroppablePayload<GameDropTarget>;
+export type DragData = DraggablePayload<string, DragSource, VisualMeta>;
+export type DropData = DroppablePayload<DropTarget>;
 
 export interface RectLike {
 	left: number;
@@ -50,7 +50,7 @@ export type FlyerKind =
 	| "merge-target"
 	| "imprint-source";
 
-export interface FlyerModel extends GameVisualMeta {
+export interface FlyerModel extends VisualMeta {
 	id: string;
 	itemId: string;
 	from: RectLike;

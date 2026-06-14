@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { P, match } from "ts-pattern";
-import { createInitialBoardState } from "~/board/logic/boardState";
+import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
-import type { BoardRow } from "~/inventory/logic/planning";
+import type { BoardRow } from "~/inventory/logic/planning/types";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { StashDefinition } from "~/manifest/producer";
 import type { ProducerDepletion } from "~/play/logic/playTypes";

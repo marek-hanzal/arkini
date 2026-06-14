@@ -1,27 +1,31 @@
 import { fromPromise, setup } from "xstate";
 
-interface ResetWorkflowContext {
-	reset(): Promise<void>;
-	onSuccess(): void;
-	onError(error: unknown): void;
-}
+export namespace resetWorkflowMachine {
+	export interface Context {
+		reset(): Promise<void>;
+		onSuccess(): void;
+		onError(error: unknown): void;
+	}
 
-type ResetWorkflowEvent =
-	| {
-			type: "START";
-	  }
-	| {
-			type: "RESET";
-	  };
+	export type Event =
+		| {
+				type: "START";
+		  }
+		| {
+				type: "RESET";
+		  };
+}
 
 export const resetWorkflowMachine = setup({
 	types: {
-		context: {} as ResetWorkflowContext,
-		events: {} as ResetWorkflowEvent,
-		input: {} as ResetWorkflowContext,
+		context: {} as resetWorkflowMachine.Context,
+		events: {} as resetWorkflowMachine.Event,
+		input: {} as resetWorkflowMachine.Context,
 	},
 	actors: {
-		runReset: fromPromise(({ input }: { input: ResetWorkflowContext }) => input.reset()),
+		runReset: fromPromise(({ input }: { input: resetWorkflowMachine.Context }) =>
+			input.reset(),
+		),
 	},
 	actions: {
 		notifySuccess: ({ context }) => context.onSuccess(),

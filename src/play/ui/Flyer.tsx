@@ -2,7 +2,7 @@ import { type FC, useEffect, useRef } from "react";
 import { GameItemView } from "~/item/ui/GameItemView";
 import type { ViewItem } from "~/play/logic/playTypes";
 import type { FlyerModel } from "~/play/types";
-import { playFlyerTimeline } from "~/play/util/animation";
+import { playFlyerTimeline } from "~/animation/playFlyerTimeline";
 import { cn } from "~/shared/cn";
 
 export namespace Flyer {

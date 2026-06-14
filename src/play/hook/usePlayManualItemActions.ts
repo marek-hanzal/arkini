@@ -1,18 +1,17 @@
 import { useCallback } from "react";
-import { boardSourceId } from "~/board/boardIdentity";
+import { boardSourceId } from "~/board/boardSourceId";
 import { cellKey } from "~/board/util/cell";
-import { inventorySourceId } from "~/inventory/inventoryIdentity";
+import { inventorySourceId } from "~/inventory/inventorySourceId";
 import { inventorySinkRect } from "~/inventory/util/inventory";
-import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
-import { useGameCommand } from "~/play/hook/useGameCommand";
+import type { Feedback } from "~/play/hook/usePlayDraggableControl";
+import { useCommand } from "~/play/hook/useCommand";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
-import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
-import { playBottomNavPulse } from "~/play/util/animation";
-import { queryElement } from "~/shared/util/queryElement";
+import type { FlyerKind, VisualMeta, RectLike } from "~/play/types";
 import { queryRect } from "~/shared/util/queryRect";
 import { waitForPaint } from "~/shared/util/waitForPaint";
+import { pulseBottomNav } from "./pulseBottomNav";
 
 export namespace usePlayManualItemActions {
 	export interface Props {
@@ -21,9 +20,9 @@ export namespace usePlayManualItemActions {
 			from: RectLike,
 			to: RectLike,
 			kind?: FlyerKind,
-			meta?: GameVisualMeta,
+			meta?: VisualMeta,
 		): Promise<void>;
-		feedback: GameDragFeedback;
+		feedback: Feedback;
 		schedule(label: string, operation: () => Promise<void>): Promise<void>;
 		hideSources(ids: readonly string[]): void;
 		clearHiddenSources(): void;
@@ -39,7 +38,7 @@ export function usePlayManualItemActions({
 }: usePlayManualItemActions.Props) {
 	const board = usePlayBoard().data;
 	const invalidatePlayData = usePlayDataInvalidation();
-	const command = useGameCommand({
+	const command = useCommand({
 		invalidateOnSuccess: false,
 	});
 
@@ -165,9 +164,4 @@ export function usePlayManualItemActions({
 		stashBoardWithFly,
 		placeInventoryOnBoardWithFly,
 	};
-}
-
-function pulseBottomNav(sheet: "inventory") {
-	const element = queryElement(`[data-bottom-nav-sheet="${sheet}"]`);
-	if (element) playBottomNavPulse(element);
 }

@@ -1,10 +1,8 @@
 import { Effect } from "effect";
-import {
-	createInitialBoardState,
-	readActivationView,
-	readBoardState,
-	readCraftView,
-} from "~/board/logic/boardState";
+import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
+import { readActivationView } from "~/board/logic/readActivationView";
+import { readBoardState } from "~/board/logic/readBoardState";
+import { readCraftView } from "~/board/logic/readCraftView";
 import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
 import { cellKey } from "~/board/util/cell";
 import { dbFx } from "~/database/fx/dbFx";
@@ -13,7 +11,8 @@ import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 import type { BoardItemState, BoardView, BoardViewItem } from "~/play/logic/playTypes";
-import { json, parseJson } from "~/shared/json";
+import { json } from "~/shared/json";
+import { parseJson } from "~/shared/parseJson";
 
 export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const date = yield* DateServiceFx;

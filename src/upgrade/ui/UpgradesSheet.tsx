@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useGameCommand } from "~/play/hook/useGameCommand";
+import { useCommand } from "~/play/hook/useCommand";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { usePlayUpgrades } from "~/play/hook/usePlayUpgrades";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
@@ -14,7 +14,7 @@ export namespace UpgradesSheet {
 export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 	const upgrades = usePlayUpgrades().data;
 	const items = usePlayItems().data;
-	const buyUpgrade = useGameCommand();
+	const buyUpgrade = useCommand();
 
 	return (
 		<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">

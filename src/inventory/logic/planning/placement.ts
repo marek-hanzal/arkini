@@ -1,8 +1,9 @@
 import type { IdService } from "~/id/context/IdServiceFx";
-import { findFreeBoardCells } from "~/board/logic/planning/boardCells";
+import { findFreeBoardCells } from "~/board/logic/planning/findFreeBoardCells";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
-import { cloneInventory, planInventoryPlacement } from "./inventoryPlacement";
+import { cloneInventory } from "./cloneInventory";
+import { planInventoryPlacement } from "./planInventoryPlacement";
 import type { BoardRow, InventoryRow, PlacementPlan, SaveShape } from "./types";
 
 export namespace planPlacements {
@@ -16,13 +17,13 @@ export namespace planPlacements {
 	}
 }
 
-export function planPlacements(
+export const planPlacements = (
 	save: SaveShape,
 	boardRows: readonly BoardRow[],
 	inventoryRows: readonly InventoryRow[],
 	drops: readonly ItemId[],
 	options: planPlacements.Options,
-): PlacementPlan | null {
+): PlacementPlan | null => {
 	const freeCells = findFreeBoardCells(save, boardRows, options.origin);
 	const virtualInventory = cloneInventory(inventoryRows);
 	const plan: PlacementPlan = {
@@ -46,4 +47,4 @@ export function planPlacements(
 	}
 
 	return plan;
-}
+};

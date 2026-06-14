@@ -1,7 +1,6 @@
 import type { AssetDefinition } from "../asset";
 import type { AssetId } from "../manifestId";
-
-const png = (name: string) => new URL(`../../assets/${name}.png`, import.meta.url).href;
+import { pngSrc } from "./pngSrc";
 
 export namespace blueprintAsset {
 	export interface Props {
@@ -19,7 +18,7 @@ export const blueprintAsset = (props: blueprintAsset.Props): AssetDefinition => 
 		id,
 		kind: "item",
 		label,
-		src: png("item-blueprint"),
+		src: pngSrc("item-blueprint"),
 		overlayAssetId,
 		render: "blueprint",
 		sort,

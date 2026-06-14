@@ -1,9 +1,10 @@
 import type { FC } from "react";
-import { boardCellNodeId, boardSourceId } from "~/board/boardIdentity";
-import { DraggableSurface } from "~/drag/ui/DragSurface";
+import { boardCellNodeId } from "~/board/boardCellNodeId";
+import { boardSourceId } from "~/board/boardSourceId";
+import { DraggableSurface } from "~/drag/ui/DraggableSurface";
 import { GameItemView } from "~/item/ui/GameItemView";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
-import type { GameDragData } from "~/play/types";
+import type { DragData } from "~/play/types";
 
 export namespace BoardTile {
 	export interface Props {
@@ -46,7 +47,7 @@ export const BoardTile: FC<BoardTile.Props> = ({
 						activation: boardItem.activation,
 					},
 					hideWhenActive: true,
-				} satisfies GameDragData
+				} satisfies DragData
 			}
 			data-board-item-id={boardItem.id}
 			hidden={hidden}

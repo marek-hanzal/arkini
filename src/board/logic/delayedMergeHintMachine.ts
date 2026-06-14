@@ -1,22 +1,24 @@
 import { assign, setup } from "xstate";
 
-interface DelayedMergeHintContext {
-	delayMs: number;
-}
+export namespace delayedMergeHintMachine {
+	export interface Context {
+		delayMs: number;
+	}
 
-type DelayedMergeHintEvent =
-	| {
-			type: "START";
-			delayMs: number;
-	  }
-	| {
-			type: "STOP";
-	  };
+	export type Event =
+		| {
+				type: "START";
+				delayMs: number;
+		  }
+		| {
+				type: "STOP";
+		  };
+}
 
 export const delayedMergeHintMachine = setup({
 	types: {
-		context: {} as DelayedMergeHintContext,
-		events: {} as DelayedMergeHintEvent,
+		context: {} as delayedMergeHintMachine.Context,
+		events: {} as delayedMergeHintMachine.Event,
 	},
 	delays: {
 		revealDelay: ({ context }) => context.delayMs,

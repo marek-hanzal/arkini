@@ -1,5 +1,7 @@
 import { useEffect, useRef, type RefObject } from "react";
-import { playCellError, playCellImprint, playCellSuccess } from "~/play/util/animation";
+import { playCellError } from "~/animation/playCellError";
+import { playCellImprint } from "~/animation/playCellImprint";
+import { playCellSuccess } from "~/animation/playCellSuccess";
 
 export namespace useGsapCellFeedback {
 	export interface Props {

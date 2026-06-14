@@ -1,10 +1,10 @@
 import { type FC, useRef } from "react";
 import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
-import { DroppableSurface } from "~/drag/ui/DragSurface";
-import { inventorySlotNodeId } from "~/inventory/inventoryIdentity";
+import { DroppableSurface } from "~/drag/ui/DroppableSurface";
+import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
 import { InventoryTile } from "~/inventory/ui/InventoryTile";
 import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
-import type { GameDropData } from "~/play/types";
+import type { DropData } from "~/play/types";
 import { cn } from "~/shared/cn";
 
 export namespace InventoryCell {
@@ -45,7 +45,7 @@ export const InventoryCell: FC<InventoryCell.Props> = ({
 						kind: "inventory-slot",
 						slotIndex: slot.slotIndex,
 					},
-				} satisfies GameDropData
+				} satisfies DropData
 			}
 			nodeRef={(node) => {
 				cellRef.current = node;

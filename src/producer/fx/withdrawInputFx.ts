@@ -1,5 +1,6 @@
 import { Effect } from "effect";
-import { createInitialBoardState, readBoardState } from "~/board/logic/boardState";
+import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
+import { readBoardState } from "~/board/logic/readBoardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
@@ -11,8 +12,8 @@ import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacement
 import { WithdrawProducerInputSchema } from "~/play/logic/gameActionSchemas";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { planInventoryPlacement } from "~/inventory/logic/planning";
-import { normalizeInventoryStateJson } from "~/inventory/logic/inventoryState";
+import { planInventoryPlacement } from "~/inventory/logic/planning/planInventoryPlacement";
+import { normalizeInventoryStateJson } from "~/inventory/logic/normalizeInventoryStateJson";
 import { json } from "~/shared/json";
 
 export namespace withdrawInputFx {

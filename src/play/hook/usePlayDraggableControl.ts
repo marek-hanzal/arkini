@@ -1,33 +1,25 @@
-import { useGameCommand } from "~/play/hook/useGameCommand";
+import { useCommand } from "~/play/hook/useCommand";
 import { usePlayDragView } from "~/play/hook/usePlayDragView";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import type {
-	FlyerKind,
-	RectLike,
-	GameDragSource,
-	GameDropTarget,
-	GameVisualMeta,
-} from "~/play/types";
+import type { FlyerKind, RectLike, DragSource, DropTarget, VisualMeta } from "~/play/types";
 import { useDraggableControl } from "~/drag/hook/useDraggableControl";
-import {
-	flashGameDrop,
-	getGameDragBoundaryNodeId,
-	resolveGameDrop,
-	type GameDragFeedback,
-} from "~/interaction/dragDropEngine";
-import { resolveMagneticGameDropTarget } from "./resolveMagneticGameDropTarget";
+import { flashDrop } from "~/interaction/flashDrop";
+import { getDragBoundaryNodeId } from "~/interaction/getDragBoundaryNodeId";
+import { resolveDrop } from "~/interaction/resolveDrop";
+import type { Feedback } from "~/interaction/types";
+import { resolveMagneticDropTarget } from "./resolveMagneticDropTarget";
 
-export type { GameDragFeedback } from "~/interaction/dragDropEngine";
+export type { Feedback } from "~/interaction/types";
 
 export namespace usePlayDraggableControl {
 	export interface Props {
-		feedback: GameDragFeedback;
+		feedback: Feedback;
 		addFlyer(
 			itemId: string,
 			from: RectLike,
 			to: RectLike,
 			kind?: FlyerKind,
-			meta?: GameVisualMeta,
+			meta?: VisualMeta,
 		): Promise<void>;
 		schedule(label: string, operation: () => Promise<void>): Promise<void>;
 	}
@@ -40,25 +32,19 @@ export function usePlayDraggableControl({
 }: usePlayDraggableControl.Props) {
 	const game = usePlayDragView();
 	const items = usePlayItems().data;
-	const command = useGameCommand({
+	const command = useCommand({
 		invalidateOnSuccess: true,
 	});
-	const control = useDraggableControl<
-		string,
-		GameDragSource,
-		GameDropTarget,
-		GameVisualMeta,
-		FlyerKind
-	>({
+	const control = useDraggableControl<string, DragSource, DropTarget, VisualMeta, FlyerKind>({
 		schedule: (operation) => schedule("drag/drop", operation),
 		resolveDrop: (context) =>
-			resolveGameDrop({
+			resolveDrop({
 				context,
 				game,
 				feedback,
-				runCommand: (gameCommand) => command.mutateAsync(gameCommand),
+				run: (gameCommand) => command.mutateAsync(gameCommand),
 			}),
-		resolveMagneticDropTarget: resolveMagneticGameDropTarget,
+		resolveMagneticDropTarget: resolveMagneticDropTarget,
 		animate: (animation) =>
 			addFlyer(
 				animation.itemId,
@@ -68,7 +54,7 @@ export function usePlayDraggableControl({
 				animation.overlay,
 			),
 		onError(error, context) {
-			flashGameDrop({
+			flashDrop({
 				context,
 				game,
 				feedback,
@@ -76,7 +62,7 @@ export function usePlayDraggableControl({
 			feedback.showError(error);
 		},
 		getDragBoundaryNodeId: (source) =>
-			getGameDragBoundaryNodeId({
+			getDragBoundaryNodeId({
 				source,
 			}),
 	});

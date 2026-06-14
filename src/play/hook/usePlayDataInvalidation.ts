@@ -1,18 +1,11 @@
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { databaseStatusQueryKey } from "./databaseStatusQueryKey";
-import { playQueryKeys } from "./playQueryKeys";
+import type { PlayDataInvalidationTarget } from "./PlayDataInvalidationTarget";
+import { queryKeyForTarget } from "./queryKeyForTarget";
 
-export type PlayDataInvalidationTarget =
-	| "all"
-	| "save"
-	| "items"
-	| "board"
-	| "inventory"
-	| "upgrades"
-	| "databaseStatus";
+export type { PlayDataInvalidationTarget } from "./PlayDataInvalidationTarget";
 
-export function usePlayDataInvalidation() {
+export const usePlayDataInvalidation = () => {
 	const queryClient = useQueryClient();
 
 	return useCallback(
@@ -34,23 +27,4 @@ export function usePlayDataInvalidation() {
 			queryClient,
 		],
 	);
-}
-
-function queryKeyForTarget(target: PlayDataInvalidationTarget) {
-	switch (target) {
-		case "all":
-			return playQueryKeys.all;
-		case "save":
-			return playQueryKeys.save;
-		case "items":
-			return playQueryKeys.items;
-		case "board":
-			return playQueryKeys.board;
-		case "inventory":
-			return playQueryKeys.inventory;
-		case "upgrades":
-			return playQueryKeys.upgrades;
-		case "databaseStatus":
-			return databaseStatusQueryKey;
-	}
-}
+};

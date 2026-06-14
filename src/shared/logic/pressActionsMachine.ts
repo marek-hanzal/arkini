@@ -1,50 +1,53 @@
 import { assign, setup } from "xstate";
+import { pressTransitions } from "./pressTransitions";
 
 const doublePressMs = 320;
 const doublePressDistancePx = 24;
 const longPressMs = 520;
 
-interface LastPress {
-	time: number;
-	x: number;
-	y: number;
-	pointerType: string;
-}
+export namespace pressActionsMachine {
+	export interface LastPress {
+		time: number;
+		x: number;
+		y: number;
+		pointerType: string;
+	}
 
-interface PressActionsContext {
-	lastPress?: LastPress;
-	hasSingle: boolean;
-	hasDouble: boolean;
-	hasLong: boolean;
-	delaySingleWhenDouble: boolean;
-}
+	export interface Context {
+		lastPress?: LastPress;
+		hasSingle: boolean;
+		hasDouble: boolean;
+		hasLong: boolean;
+		delaySingleWhenDouble: boolean;
+	}
 
-type PressActionsEvent =
-	| {
-			type: "CONFIG_CHANGED";
-			hasSingle: boolean;
-			hasDouble: boolean;
-			hasLong: boolean;
-			delaySingleWhenDouble: boolean;
-	  }
-	| {
-			type: "PRESS_STARTED";
-	  }
-	| {
-			type: "PRESS_ENDED";
-	  }
-	| {
-			type: "PRESS";
-			time: number;
-			x: number;
-			y: number;
-			pointerType: string;
-	  };
+	export type Event =
+		| {
+				type: "CONFIG_CHANGED";
+				hasSingle: boolean;
+				hasDouble: boolean;
+				hasLong: boolean;
+				delaySingleWhenDouble: boolean;
+		  }
+		| {
+				type: "PRESS_STARTED";
+		  }
+		| {
+				type: "PRESS_ENDED";
+		  }
+		| {
+				type: "PRESS";
+				time: number;
+				x: number;
+				y: number;
+				pointerType: string;
+		  };
+}
 
 export const pressActionsMachine = setup({
 	types: {
-		context: {} as PressActionsContext,
-		events: {} as PressActionsEvent,
+		context: {} as pressActionsMachine.Context,
+		events: {} as pressActionsMachine.Event,
 	},
 	actions: {
 		setConfig: assign(({ event }) => {
@@ -154,39 +157,3 @@ export const pressActionsMachine = setup({
 		},
 	},
 });
-
-function pressTransitions() {
-	return [
-		{
-			guard: "isNearbyDouble",
-			target: "idle",
-			actions: [
-				"clearLastPress",
-				"callDouble",
-			],
-		},
-		{
-			guard: "shouldDelaySingle",
-			target: "singlePending",
-			actions: "setLastPress",
-		},
-		{
-			guard: "shouldCallSingleAndRemember",
-			target: "idle",
-			actions: [
-				"setLastPress",
-				"callSingle",
-			],
-		},
-		{
-			guard: "shouldRememberOnly",
-			target: "idle",
-			actions: "setLastPress",
-		},
-		{
-			guard: "hasSingle",
-			target: "idle",
-			actions: "callSingle",
-		},
-	] as const;
-}

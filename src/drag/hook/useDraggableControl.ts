@@ -9,10 +9,13 @@ import {
 import { useMachine } from "@xstate/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { waitForPaint } from "~/shared/util/waitForPaint";
+import { clamp } from "~/shared/util/clamp";
 import { without } from "~/shared/util/without";
 import { queryRect } from "~/shared/util/queryRect";
 import type { RectLike } from "~/play/types";
 import { draggableWorkflowMachine } from "~/drag/logic/draggableWorkflowMachine";
+import { resolveDragEndRect } from "~/drag/logic/resolveDragEndRect";
+import { runFeedback } from "~/drag/logic/runFeedback";
 
 export interface DraggablePayload<
 	ItemId extends string = string,
@@ -535,33 +538,4 @@ export function useDraggableControl<
 		showSource,
 		clearHiddenSources,
 	};
-}
-
-async function runFeedback(feedback: (() => void | Promise<void>) | undefined) {
-	try {
-		await feedback?.();
-	} catch (error) {
-		// Feedback must never turn a clean reject into another drag failure.
-		void error;
-	}
-}
-
-function resolveDragEndRect(event: DragEndEvent): RectLike | null {
-	const translated = event.active.rect.current.translated as RectLike | null;
-	if (translated) return translated;
-
-	const initial = event.active.rect.current.initial as RectLike | null;
-	if (!initial) return null;
-
-	return {
-		left: initial.left + event.delta.x,
-		top: initial.top + event.delta.y,
-		width: initial.width,
-		height: initial.height,
-	};
-}
-
-function clamp(value: number, min: number, max: number) {
-	if (min > max) return min + (max - min) / 2;
-	return Math.min(Math.max(value, min), max);
 }

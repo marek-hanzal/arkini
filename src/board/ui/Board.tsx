@@ -1,11 +1,9 @@
 import { type FC, useMemo } from "react";
-import {
-	boardColumns,
-	boardContainerNodeId,
-	type BoardCell as BoardCellModel,
-	boardRows,
-	boardSourceId,
-} from "~/board/boardIdentity";
+import type { BoardCell as BoardCellModel } from "~/board/BoardCell";
+import { boardColumns } from "~/board/boardColumns";
+import { boardContainerNodeId } from "~/board/boardContainerNodeId";
+import { boardRows } from "~/board/boardRows";
+import { boardSourceId } from "~/board/boardSourceId";
 import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
 import { BoardCell } from "~/board/ui/BoardCell";
 import { BoardTile } from "~/board/ui/BoardTile";
@@ -15,7 +13,7 @@ import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { BoardViewItem } from "~/play/logic/playTypes";
-import type { GameDragData } from "~/play/types";
+import type { DragData } from "~/play/types";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals";
 import { isProducerReady } from "~/producer/logic/isProducerReady";
@@ -23,7 +21,7 @@ import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 
 export namespace Board {
 	export interface DragState {
-		activeDrag?: GameDragData;
+		activeDrag?: DragData;
 		isSourceHidden(sourceId: string): boolean;
 	}
 

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { createInitialBoardState } from "~/board/logic/boardState";
+import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { table } from "~/database/local/tables";

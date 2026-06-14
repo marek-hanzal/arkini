@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
-import type { InventoryPlacementPlan } from "~/inventory/logic/planning";
+import type { InventoryPlacementPlan } from "~/inventory/logic/planning/types";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 

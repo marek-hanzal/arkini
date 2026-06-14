@@ -10,8 +10,10 @@ import type {
 	UpgradeId,
 } from "../manifestId";
 import type { GameConfig } from "../GameConfig";
-import { assert, assertUnique } from "./assert";
-import { assertActivationOutput, assertProducerDefinition } from "./producer";
+import { assert } from "./assert";
+import { assertUnique } from "./assertUnique";
+import { assertActivationOutput } from "./assertActivationOutput";
+import { assertProducerDefinition } from "./producer";
 import { assertStartingState } from "./startingState";
 
 export function assertGameConfig(config: GameConfig) {

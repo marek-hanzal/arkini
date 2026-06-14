@@ -5,7 +5,7 @@ import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import { spendInventoryItems } from "~/inventory/logic/planning";
+import { spendInventoryItems } from "~/inventory/logic/planning/spendInventoryItems";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { BuyUpgradeInputSchema } from "~/play/logic/gameActionSchemas";
 import { GameActionError } from "~/play/logic/playTypes";

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { insertFx } from "~/board/fx/insertFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
-import type { PlacementPlan } from "~/inventory/logic/planning";
+import type { PlacementPlan } from "~/inventory/logic/planning/types";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { ProducerPlacement } from "~/play/logic/playTypes";
 import { defaultSaveGameId } from "~/play/logic/save";

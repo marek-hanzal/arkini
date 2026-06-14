@@ -14,7 +14,6 @@ export interface SaveGameTable {
 	boardWidth: number;
 	boardHeight: number;
 	inventorySlots: number;
-	playerInventorySlots: number;
 	createdAt: Timestamp;
 	updatedAt: Timestamp;
 }
@@ -26,16 +25,6 @@ export interface BoardItemTable {
 	x: number;
 	y: number;
 	stateJson: string;
-	createdAt: Timestamp;
-	updatedAt: Timestamp;
-}
-
-export interface PlayerInventoryStackTable {
-	id: string;
-	saveGameId: string;
-	slotIndex: number;
-	itemDefinitionId: string;
-	quantity: number;
 	createdAt: Timestamp;
 	updatedAt: Timestamp;
 }
@@ -58,6 +47,7 @@ export interface InventoryStackTable {
 	slotIndex: number;
 	itemDefinitionId: string;
 	quantity: number;
+	stateJson: string;
 	createdAt: Timestamp;
 	updatedAt: Timestamp;
 }
@@ -67,6 +57,5 @@ export interface Database {
 	saveGame: SaveGameTable;
 	boardItem: BoardItemTable;
 	inventoryStack: InventoryStackTable;
-	playerInventoryStack: PlayerInventoryStackTable;
 	playerUpgrade: PlayerUpgradeTable;
 }

@@ -6,9 +6,7 @@ export namespace BoardCellCooldownProgress {
 	}
 }
 
-export const BoardCellCooldownProgress: FC<BoardCellCooldownProgress.Props> = ({
-	progress,
-}) => {
+export const BoardCellCooldownProgress: FC<BoardCellCooldownProgress.Props> = ({ progress }) => {
 	if (progress === undefined || progress <= 0) return null;
 
 	return (

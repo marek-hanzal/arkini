@@ -6,7 +6,6 @@ import { inventorySinkRect } from "~/inventory/util/inventory";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
-import { usePlayItems } from "~/play/hook/usePlayItems";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
@@ -39,7 +38,6 @@ export function usePlayManualItemActions({
 	clearHiddenSources,
 }: usePlayManualItemActions.Props) {
 	const board = usePlayBoard().data;
-	const items = usePlayItems().data;
 	const invalidatePlayData = usePlayDataInvalidation();
 	const placeInventory = usePlayAction(
 		(
@@ -65,79 +63,6 @@ export function usePlayManualItemActions({
 		{
 			invalidateOnSuccess: false,
 		},
-	);
-	const collectBoard = usePlayAction(
-		(
-			db,
-			input: {
-				boardItemId: string;
-			},
-		) => db.collectBoardItem(input.boardItemId),
-		{
-			invalidateOnSuccess: false,
-		},
-	);
-
-	const canCollect = useCallback(
-		(boardItem: BoardViewItem) => Boolean(items?.[boardItem.itemId]?.collectible),
-		[
-			items,
-		],
-	);
-
-	const collectBoardWithFly = useCallback(
-		async (boardItem: BoardViewItem) => {
-			await schedule("collect board item", async () => {
-				const sourceId = boardSourceId(boardItem.id);
-				const from =
-					queryRect(`[data-board-item-id="${boardItem.id}"]`) ??
-					queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
-
-				try {
-					if (from) {
-						hideSources([
-							sourceId,
-						]);
-						await waitForPaint();
-					}
-
-					await collectBoard.mutateAsync({
-						boardItemId: boardItem.id,
-					});
-
-					if (from) {
-						await addFlyer(
-							boardItem.itemId,
-							from,
-							inventorySinkRect(from, queryRect('[data-bottom-nav-sheet="player"]')),
-							"stash",
-						);
-					}
-
-					await invalidatePlayData([
-						"board",
-						"playerInventory",
-						"upgrades",
-						"databaseStatus",
-					]);
-					pulseBottomNav("player");
-				} catch (error) {
-					feedback.flashBoardCell(cellKey(boardItem.x, boardItem.y), "error");
-					feedback.showError(error);
-				} finally {
-					clearHiddenSources();
-				}
-			});
-		},
-		[
-			addFlyer,
-			clearHiddenSources,
-			collectBoard,
-			feedback,
-			hideSources,
-			invalidatePlayData,
-			schedule,
-		],
 	);
 
 	const stashBoardWithFly = useCallback(
@@ -257,14 +182,12 @@ export function usePlayManualItemActions({
 	);
 
 	return {
-		canCollect,
-		collectBoardWithFly,
 		stashBoardWithFly,
 		placeInventoryOnBoardWithFly,
 	};
 }
 
-function pulseBottomNav(sheet: "inventory" | "player") {
+function pulseBottomNav(sheet: "inventory") {
 	const element = queryElement(`[data-bottom-nav-sheet="${sheet}"]`);
 	if (element) playBottomNavPulse(element);
 }

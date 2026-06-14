@@ -10,7 +10,6 @@ import { BottomNavigation } from "~/play/ui/BottomNavigation";
 import { BottomSheet } from "~/play/ui/BottomSheet";
 import { FlyerLayer } from "~/play/ui/FlyerLayer";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
-import { PlayerInventorySheet } from "~/player/ui/PlayerInventorySheet";
 import { UpgradesSheet } from "~/upgrade/ui/UpgradesSheet";
 import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
@@ -171,24 +170,15 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 								emptyDoubleActivate: () => undefined,
 								tileSingleActivate: (item) => {
 									if (item.producer) {
-										void producerActions.produceFrom(item, "single");
-										return;
-									}
-
-									if (manualActions.canCollect(item)) {
-										void manualActions.collectBoardWithFly(item);
+										void producerActions.produceFrom(
+											item,
+											item.producer.mode.type === "finite"
+												? "exhaust"
+												: "single",
+										);
 									}
 								},
 								tileDoubleActivate: (item) => {
-									if (item.producer?.doubleClickBehavior === "exhaust") {
-										void producerActions.produceFrom(item, "exhaust");
-										return;
-									}
-
-									if (manualActions.canCollect(item)) {
-										void manualActions.collectBoardWithFly(item);
-										return;
-									}
 									void manualActions.stashBoardWithFly(item);
 								},
 								tileLongActivate: (item) => {
@@ -222,13 +212,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 								void manualActions.placeInventoryOnBoardWithFly(slot);
 							}}
 						/>
-					</section>
-
-					<section
-						className="min-h-0"
-						hidden={sheets.renderedSheet !== "player"}
-					>
-						<PlayerInventorySheet onClose={sheets.closeSheet} />
 					</section>
 
 					<section

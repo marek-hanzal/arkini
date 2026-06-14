@@ -43,6 +43,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 					.updateTable(table.inventoryStack)
 					.set({
 						quantity: placement.quantity,
+						stateJson: placement.stateJson,
 						updatedAt: timestamp,
 					})
 					.where("id", "=", placement.stackId)
@@ -58,6 +59,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 						slotIndex: placement.slotIndex,
 						itemDefinitionId: placement.itemId,
 						quantity: placement.quantity,
+						stateJson: placement.stateJson,
 					})
 					.execute(),
 			);

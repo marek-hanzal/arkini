@@ -3,6 +3,8 @@ import { completeReadyFx } from "~/upgrade/fx/completeReadyFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { isEmptyInventoryStateJson } from "~/inventory/logic/inventoryState";
+import { canSpendInventoryItems } from "~/inventory/logic/planning";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { UpgradeListView, UpgradeView } from "~/play/logic/playTypes";
 import { defaultSaveGameId } from "~/play/logic/save";
@@ -13,7 +15,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
-	const [upgradeRows, playerInventoryRows] = yield* dbFx((db) =>
+	const [upgradeRows, inventoryRows] = yield* dbFx((db) =>
 		Promise.all([
 			db
 				.selectFrom(table.playerUpgrade)
@@ -21,14 +23,15 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				.where("saveGameId", "=", defaultSaveGameId)
 				.execute(),
 			db
-				.selectFrom(table.playerInventoryStack)
+				.selectFrom(table.inventoryStack)
 				.selectAll()
 				.where("saveGameId", "=", defaultSaveGameId)
 				.execute(),
 		]),
 	);
 	const availableByItemId = new Map<string, number>();
-	for (const row of playerInventoryRows) {
+	for (const row of inventoryRows) {
+		if (!isEmptyInventoryStateJson(row.stateJson)) continue;
 		availableByItemId.set(
 			row.itemDefinitionId,
 			(availableByItemId.get(row.itemDefinitionId) ?? 0) + row.quantity,
@@ -62,7 +65,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				available: availableByItemId.get(entry.itemId) ?? 0,
 			}));
 			const canBuy =
-				Boolean(nextTier) && nextCost.every((entry) => entry.available >= entry.quantity);
+				Boolean(nextTier) && canSpendInventoryItems(inventoryRows, nextTier.cost);
 
 			return {
 				id: upgrade.id,

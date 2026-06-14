@@ -24,7 +24,6 @@ export function applyProducerUpgradeEffects({
 	let outputTableId = producer.outputTableId;
 
 	for (const effect of readOwnedUpgradeEffects(gameConfig, upgradeRows)) {
-		if (effect.type === "inventory.capacity.add") continue;
 		if (effect.itemId !== producerItemId) continue;
 
 		if (effect.type === "producer.cooldown.add") {

@@ -18,6 +18,7 @@ export type InventoryRow = {
 	itemDefinitionId: string;
 	slotIndex: number;
 	quantity: number;
+	stateJson: string;
 };
 
 export interface PlacementPlan {
@@ -36,6 +37,7 @@ export type InventoryPlacementPlan =
 			slotIndex: number;
 			itemId: ItemId;
 			quantity: number;
+			stateJson: string;
 	  }
 	| {
 			type: "insert";
@@ -43,4 +45,5 @@ export type InventoryPlacementPlan =
 			slotIndex: number;
 			itemId: ItemId;
 			quantity: number;
+			stateJson: string;
 	  };

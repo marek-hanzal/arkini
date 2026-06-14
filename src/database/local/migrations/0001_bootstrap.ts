@@ -59,6 +59,7 @@ export const migration0001Bootstrap: Migration = {
 			.addColumn("slotIndex", "integer", (col) => col.notNull())
 			.addColumn("itemDefinitionId", "text", (col) => col.notNull())
 			.addColumn("quantity", "integer", (col) => col.notNull())
+			.addColumn("stateJson", "text", (col) => col.notNull())
 			.addColumn("createdAt", "text", (col) =>
 				col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
 			)

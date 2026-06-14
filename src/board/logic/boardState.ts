@@ -33,9 +33,7 @@ export function createInitialBoardState(
 			{
 				type: "infinite",
 			},
-			() => ({
-				producer: {},
-			}),
+			() => ({}),
 		)
 		.exhaustive();
 }
@@ -82,7 +80,6 @@ export function readProducerView({
 			type: "infinite",
 		},
 		cooldownMs: producer.cooldownMs,
-		doubleClickBehavior: producer.doubleClickBehavior,
 		cooldownUntil,
 		cooldownUntilMs: cooldownUntil ? date.parseTimestampMs(cooldownUntil) : undefined,
 		remainingCharges: producerState.remainingCharges,

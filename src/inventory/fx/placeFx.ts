@@ -39,6 +39,7 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 				itemId: stack.itemDefinitionId,
 				x: input.x,
 				y: input.y,
+				stateJson: stack.stateJson,
 			});
 			yield* spendStackFx({
 				stack,

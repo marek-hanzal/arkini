@@ -12,7 +12,6 @@ export const readSaveFx = Effect.fn("readSaveFx")(function* () {
 				"boardWidth",
 				"boardHeight",
 				"inventorySlots",
-				"playerInventorySlots",
 			])
 			.where("id", "=", defaultSaveGameId)
 			.executeTakeFirstOrThrow(),

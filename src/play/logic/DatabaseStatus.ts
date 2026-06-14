@@ -11,6 +11,5 @@ export interface DatabaseStatus {
 	saveGameCount: number;
 	boardItemCount: number;
 	inventoryStackCount: number;
-	playerInventoryStackCount: number;
 	playerUpgradeCount: number;
 }

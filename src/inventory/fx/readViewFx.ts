@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { groupSlotsByItemId } from "~/inventory/logic/groupSlotsByItemId";
+import { isEmptyInventoryStateJson, readInventoryState } from "~/inventory/logic/inventoryState";
 import { table } from "~/database/local/tables";
 import type { InventorySlot, InventoryView } from "~/play/logic/playTypes";
 import { defaultSaveGameId } from "~/play/logic/save";
@@ -36,6 +37,9 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 							id: stack.id,
 							itemId: stack.itemDefinitionId,
 							quantity: stack.quantity,
+							state: readInventoryState(stack.stateJson),
+							stateJson: stack.stateJson,
+							stateful: !isEmptyInventoryStateJson(stack.stateJson),
 						}
 					: undefined,
 			};

@@ -17,11 +17,4 @@ export interface ItemDefinition {
 	merge?: readonly ItemMergeRule[];
 	producer?: ProducerDefinition;
 	craft?: ItemCraftRecipe;
-	collect?: ItemCollectDefinition;
-}
-
-export interface ItemCollectDefinition {
-	inventory: "player";
-	itemId?: ItemId;
-	quantity?: number;
 }

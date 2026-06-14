@@ -23,6 +23,7 @@ export const removeItemsFx = Effect.fn("removeItemsFx")(function* ({
 			.selectAll()
 			.where("saveGameId", "=", defaultSaveGameId)
 			.where("itemDefinitionId", "=", itemId)
+			.where("stateJson", "=", "{}")
 			.orderBy("slotIndex")
 			.execute(),
 	);

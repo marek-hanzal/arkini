@@ -24,7 +24,7 @@ export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 		{
 			invalidateTargets: [
 				"board",
-				"playerInventory",
+				"inventory",
 				"upgrades",
 				"databaseStatus",
 			],

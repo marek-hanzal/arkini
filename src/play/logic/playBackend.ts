@@ -7,7 +7,6 @@ export {
 } from "./bootstrap";
 export {
 	buyUpgrade,
-	collectBoardItem,
 	mergeBoardItems,
 	moveBoardItem,
 	placeInventoryItem,
@@ -20,7 +19,6 @@ export {
 export { readBoardView } from "./readBoardView";
 export { readGameSaveView } from "./readGameSaveView";
 export { readInventoryView } from "./readInventoryView";
-export { readPlayerInventoryView } from "./readPlayerInventoryView";
 export { readUpgradeListView } from "./readUpgradeListView";
 export { readItemCatalogView } from "./readItemCatalogView";
 export { readDatabaseStatus } from "./status";
@@ -33,8 +31,6 @@ export type {
 	GameSaveView,
 	InventorySlot,
 	InventoryView,
-	PlayerInventoryView,
-	PlayerInventorySlot,
 	ItemCatalogView,
 	ProducerDropResult,
 	UpgradeListView,

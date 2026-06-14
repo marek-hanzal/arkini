@@ -65,6 +65,7 @@ export const BoardTile: FC<BoardTile.Props> = memo(
 				nodeId={`${sourceId}:drag`}
 				payload={payload}
 				data-board-item-id={boardItem.id}
+				data-board-item-tile-id={boardItem.id}
 				hidden={hidden}
 				className="absolute inset-0 touch-none"
 				onSingleActivate={handleSingleActivate}

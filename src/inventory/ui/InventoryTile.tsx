@@ -60,6 +60,7 @@ export const InventoryTile: FC<InventoryTile.Props> = memo(
 				id={`${sourceId}:drag`}
 				nodeId={`${sourceId}:drag-node`}
 				payload={payload}
+				data-inventory-slot-tile={slot.slotIndex}
 				hidden={hidden}
 				className="absolute inset-0 touch-none"
 				onDoubleActivate={handleDoubleActivate}

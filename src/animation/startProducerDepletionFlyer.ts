@@ -1,7 +1,7 @@
 import { boardSourceId } from "~/board/boardSourceId";
 import type { BoardViewItem, ProducerDropResult } from "~/play/logic/playTypes";
 import type { FlyerKind, VisualMeta, RectLike } from "~/play/types";
-import { queryRect } from "~/shared/util/queryRect";
+import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 
 export namespace startProducerDepletionFlyer {
 	export interface Props {
@@ -28,8 +28,8 @@ export const startProducerDepletionFlyer = ({
 
 	const sourceId = boardSourceId(boardItem.id);
 	const sourceRect =
-		queryRect(`[data-board-item-id="${boardItem.id}"]`) ??
-		queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
+		queryPaddingBoxRect(`[data-board-item-tile-id="${boardItem.id}"]`) ??
+		queryPaddingBoxRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
 	if (!sourceRect) return null;
 
 	hideSources([

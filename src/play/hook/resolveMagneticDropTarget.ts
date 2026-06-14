@@ -38,7 +38,7 @@ export const resolveMagneticDropTarget = ({
 				kind: "cell",
 				x,
 				y,
-				boardItemId: cell.element.getAttribute("data-board-item-id") || undefined,
+				boardItemId: cell.element.getAttribute("data-board-cell-item-id") || undefined,
 			},
 		} satisfies DropData;
 	}

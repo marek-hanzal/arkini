@@ -1,6 +1,6 @@
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { ProducerPlacement } from "~/play/logic/playTypes";
-import { queryRect } from "~/shared/util/queryRect";
+import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 
 export namespace placementTargetRect {
 	export interface Props {
@@ -11,7 +11,7 @@ export namespace placementTargetRect {
 
 export const placementTargetRect = ({ placement, activeSheet }: placementTargetRect.Props) => {
 	if (placement.kind === "board")
-		return queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`);
+		return queryPaddingBoxRect(`[data-board-cell="${placement.x}:${placement.y}"]`);
 	if (activeSheet !== "inventory") return null;
-	return queryRect(`[data-inventory-slot="${placement.slotIndex}"]`);
+	return queryPaddingBoxRect(`[data-inventory-slot="${placement.slotIndex}"]`);
 };

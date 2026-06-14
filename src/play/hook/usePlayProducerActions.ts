@@ -1,17 +1,18 @@
 import { useCallback } from "react";
-import { boardSourceId } from "~/board/boardIdentity";
 import { cellKey } from "~/board/util/cell";
-import { inventorySourceId } from "~/inventory/inventoryIdentity";
-import { inventorySinkRect } from "~/inventory/util/inventory";
-import type { BoardViewItem, ProducerDropResult, ProducerPlacement } from "~/play/logic/playTypes";
-import { usePlayAction } from "~/play/hook/usePlayAction";
+import {
+	animateProducerDrops,
+	highlightInventoryNav,
+	producerPlacementSourceIds,
+	startProducerDepletionFlyer,
+} from "~/game/animation/producerActivationVisuals";
+import type { GameCommand } from "~/game/action/GameCommand";
+import { useGameCommand } from "~/play/hook/useGameCommand";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
+import type { BoardViewItem } from "~/play/logic/playTypes";
 import type { FlyerKind, GameVisualMeta, RectLike } from "~/play/types";
-import { playBottomNavHold } from "~/play/util/animation";
-import { queryElement } from "~/shared/util/queryElement";
-import { queryRect } from "~/shared/util/queryRect";
 import { waitForPaint } from "~/shared/util/waitForPaint";
 
 export namespace usePlayProducerActions {
@@ -40,108 +41,49 @@ export function usePlayProducerActions({
 	clearHiddenSources,
 }: usePlayProducerActions.Props) {
 	const invalidatePlayData = usePlayDataInvalidation();
-	const produce = usePlayAction(
-		(
-			db,
-			input: {
-				boardItemId: string;
-				activation?: "single" | "exhaust";
-			},
-		) => db.produceBoardItem(input.boardItemId, input.activation),
-		{
-			invalidateOnSuccess: false,
-		},
-	);
-
-	const animateProducerDrops = useCallback(
-		async (results: ProducerDropResult[], stepDelayMs = 0) => {
-			const animations: Promise<void>[] = [];
-
-			for (const result of results) {
-				const sourceRect = queryRect(
-					`[data-board-item-id="${result.producerBoardItemId}"]`,
-				);
-				if (!sourceRect) continue;
-				const from = sourceRect;
-
-				for (const placement of result.placements) {
-					const targetRect =
-						placement.kind === "board"
-							? queryRect(`[data-board-cell="${placement.x}:${placement.y}"]`)
-							: activeSheet === "inventory"
-								? queryRect(`[data-inventory-slot="${placement.slotIndex}"]`)
-								: null;
-
-					if (placement.kind === "board") {
-						if (!targetRect) continue;
-						animations.push(addFlyer(placement.itemId, from, targetRect, "place"));
-					} else {
-						animations.push(
-							addFlyer(
-								placement.itemId,
-								from,
-								targetRect ?? inventorySinkRect(from),
-								"place",
-							),
-						);
-					}
-
-					if (stepDelayMs > 0)
-						await new Promise((resolve) => window.setTimeout(resolve, stepDelayMs));
-				}
+	const command = useGameCommand<
+		Extract<
+			GameCommand,
+			{
+				type: "producer.activate";
 			}
-
-			await Promise.all(animations);
-		},
-		[
-			activeSheet,
-			addFlyer,
-		],
-	);
-
-	const startProducerDepletion = useCallback(
-		(boardItem: BoardViewItem, result: ProducerDropResult) => {
-			if (result.depletion?.kind !== "remove") return null;
-
-			const sourceId = boardSourceId(boardItem.id);
-			const sourceRect =
-				queryRect(`[data-board-item-id="${boardItem.id}"]`) ??
-				queryRect(`[data-board-cell="${boardItem.x}:${boardItem.y}"]`);
-			if (!sourceRect) return null;
-
-			hideSources([
-				sourceId,
-			]);
-			return addFlyer(boardItem.itemId, sourceRect, sourceRect, "deplete", {
-				activation: boardItem.activation ?? undefined,
-			});
-		},
-		[
-			addFlyer,
-			hideSources,
-		],
-	);
+		>
+	>({
+		invalidateOnSuccess: false,
+	});
 
 	const produceFrom = useCallback(
 		async (boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") => {
 			await schedule(`producer ${activation}`, async () => {
 				try {
-					const result = await produce.mutateAsync({
+					const result = await command.mutateAsync({
+						type: "producer.activate",
 						boardItemId: boardItem.id,
 						activation,
 					});
-					hideSources(producerPlacementSourceIds(result.placements));
-					await animateProducerDrops(
-						[
+					hideSources(
+						producerPlacementSourceIds({
+							placements: result.placements,
+						}),
+					);
+					await animateProducerDrops({
+						results: [
 							result,
 						],
-						activation === "exhaust" ? 130 : 0,
-					);
+						activeSheet,
+						stepDelayMs: activation === "exhaust" ? 130 : 0,
+						addFlyer,
+					});
 					if (result.placements.some((placement) => placement.kind === "inventory")) {
 						highlightInventoryNav();
 					}
 
-					const depletion = startProducerDepletion(boardItem, result);
+					const depletion = startProducerDepletionFlyer({
+						boardItem,
+						result,
+						hideSources,
+						addFlyer,
+					});
 					await waitForPaint();
 					await invalidatePlayData([
 						"board",
@@ -160,13 +102,13 @@ export function usePlayProducerActions({
 			});
 		},
 		[
-			animateProducerDrops,
+			activeSheet,
+			addFlyer,
 			clearHiddenSources,
+			command,
 			feedback,
 			hideSources,
 			invalidatePlayData,
-			produce,
-			startProducerDepletion,
 			schedule,
 		],
 	);
@@ -174,27 +116,4 @@ export function usePlayProducerActions({
 	return {
 		produceFrom,
 	};
-}
-
-function producerPlacementSourceIds(placements: readonly ProducerPlacement[]) {
-	return placements.flatMap((placement) => {
-		if (placement.kind === "board" && placement.boardItemId) {
-			return [
-				boardSourceId(placement.boardItemId),
-			];
-		}
-
-		if (placement.kind === "inventory" && placement.slotIndex !== undefined) {
-			return [
-				inventorySourceId(placement.slotIndex),
-			];
-		}
-
-		return [];
-	});
-}
-
-function highlightInventoryNav() {
-	const element = queryElement('[data-bottom-nav-sheet="inventory"]');
-	if (element) playBottomNavHold(element);
 }

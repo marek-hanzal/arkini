@@ -4,7 +4,7 @@ import { cellKey } from "~/board/util/cell";
 import { inventorySourceId } from "~/inventory/inventoryIdentity";
 import { inventorySinkRect } from "~/inventory/util/inventory";
 import type { GameDragFeedback } from "~/play/hook/usePlayDraggableControl";
-import { usePlayAction } from "~/play/hook/usePlayAction";
+import { useGameCommand } from "~/play/hook/useGameCommand";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
@@ -39,31 +39,9 @@ export function usePlayManualItemActions({
 }: usePlayManualItemActions.Props) {
 	const board = usePlayBoard().data;
 	const invalidatePlayData = usePlayDataInvalidation();
-	const placeInventory = usePlayAction(
-		(
-			db,
-			input: {
-				slotIndex: number;
-				x: number;
-				y: number;
-			},
-		) => db.placeInventoryItem(input.slotIndex, input.x, input.y),
-		{
-			invalidateOnSuccess: false,
-		},
-	);
-	const stashBoard = usePlayAction(
-		(
-			db,
-			input: {
-				boardItemId: string;
-				slotIndex?: number;
-			},
-		) => db.stashBoardItem(input.boardItemId, input.slotIndex),
-		{
-			invalidateOnSuccess: false,
-		},
-	);
+	const command = useGameCommand({
+		invalidateOnSuccess: false,
+	});
 
 	const stashBoardWithFly = useCallback(
 		async (boardItem: BoardViewItem) => {
@@ -81,7 +59,8 @@ export function usePlayManualItemActions({
 						await waitForPaint();
 					}
 
-					await stashBoard.mutateAsync({
+					await command.mutateAsync({
+						type: "inventory.stash",
 						boardItemId: boardItem.id,
 					});
 
@@ -118,7 +97,7 @@ export function usePlayManualItemActions({
 			hideSources,
 			invalidatePlayData,
 			schedule,
-			stashBoard,
+			command,
 		],
 	);
 
@@ -145,7 +124,8 @@ export function usePlayManualItemActions({
 						await waitForPaint();
 					}
 
-					await placeInventory.mutateAsync({
+					await command.mutateAsync({
+						type: "inventory.place",
 						slotIndex: slot.slotIndex,
 						x: target.x,
 						y: target.y,
@@ -176,7 +156,7 @@ export function usePlayManualItemActions({
 			board,
 			hideSources,
 			invalidatePlayData,
-			placeInventory,
+			command,
 			schedule,
 		],
 	);

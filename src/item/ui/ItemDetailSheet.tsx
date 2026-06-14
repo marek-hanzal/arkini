@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { GameItemView } from "~/item/ui/GameItemView";
-import { usePlayAction } from "~/play/hook/usePlayAction";
+import { useGameCommand } from "~/play/hook/useGameCommand";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import { usePlayItems } from "~/play/hook/usePlayItems";
@@ -24,18 +24,9 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 	const items = usePlayItems().data;
 	const invalidatePlayData = usePlayDataInvalidation();
 	const nowMs = useProducerClock(board?.items ?? []);
-	const withdrawInput = usePlayAction(
-		(
-			db,
-			input: {
-				boardItemId: string;
-				itemId: string;
-			},
-		) => db.withdrawProducerInput(input.boardItemId, input.itemId),
-		{
-			invalidateOnSuccess: false,
-		},
-	);
+	const withdrawInput = useGameCommand({
+		invalidateOnSuccess: false,
+	});
 	const boardItem = boardItemId ? board?.byId[boardItemId] : undefined;
 	const item = boardItem ? items?.[boardItem.itemId] : undefined;
 
@@ -201,6 +192,7 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 										onClick={() => {
 											void withdrawInput
 												.mutateAsync({
+													type: "producer.withdrawInput",
 													boardItemId: boardItem.id,
 													itemId: input.itemId,
 												})

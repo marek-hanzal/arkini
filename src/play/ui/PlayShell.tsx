@@ -2,7 +2,6 @@ import type { FC } from "react";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { HardResetButton } from "~/play/ui/HardResetButton";
-import { usePlayAction } from "~/play/hook/usePlayAction";
 import { usePlaySave } from "~/play/hook/usePlaySave";
 import { Board } from "~/board/ui/Board";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";
@@ -32,74 +31,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 	const schedulePlayEvent = usePlayEventQueue();
 	const feedback = usePlayFeedback();
 
-	const moveBoard = usePlayAction(
-		(
-			db,
-			input: {
-				boardItemId: string;
-				x: number;
-				y: number;
-			},
-		) => db.moveBoardItem(input.boardItemId, input.x, input.y),
-		{
-			invalidateTargets: [
-				"board",
-				"databaseStatus",
-			],
-		},
-	);
-	const swapInventory = usePlayAction(
-		(
-			db,
-			input: {
-				sourceSlotIndex: number;
-				targetSlotIndex: number;
-			},
-		) => db.swapInventorySlots(input.sourceSlotIndex, input.targetSlotIndex),
-		{
-			invalidateTargets: [
-				"inventory",
-				"databaseStatus",
-			],
-		},
-	);
-	const mergeBoard = usePlayAction(
-		(
-			db,
-			input: {
-				sourceBoardItemId: string;
-				targetBoardItemId: string;
-			},
-		) => db.mergeBoardItems(input.sourceBoardItemId, input.targetBoardItemId),
-		{
-			invalidateTargets: [
-				"board",
-				"databaseStatus",
-			],
-		},
-	);
-	const swapBoard = usePlayAction(
-		(
-			db,
-			input: {
-				sourceBoardItemId: string;
-				targetBoardItemId: string;
-			},
-		) => db.swapBoardItems(input.sourceBoardItemId, input.targetBoardItemId),
-		{
-			invalidateTargets: [
-				"board",
-				"databaseStatus",
-			],
-		},
-	);
 	const drag = usePlayDraggableControl({
-		actions: {
-			moveBoard: (input) => moveBoard.mutateAsync(input),
-			swapInventory: (input) => swapInventory.mutateAsync(input),
-			mergeBoard: (input) => mergeBoard.mutateAsync(input),
-			swapBoard: (input) => swapBoard.mutateAsync(input),
-		},
 		feedback,
 		addFlyer,
 		schedule: schedulePlayEvent,

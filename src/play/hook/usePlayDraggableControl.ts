@@ -1,3 +1,4 @@
+import { useGameCommand } from "~/play/hook/useGameCommand";
 import { usePlayDragView } from "~/play/hook/usePlayDragView";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type {
@@ -12,16 +13,14 @@ import {
 	flashGameDrop,
 	getGameDragBoundaryNodeId,
 	resolveGameDrop,
-	type GameDragActions,
 	type GameDragFeedback,
-} from "./playDragRules";
+} from "~/game/interaction/dragDropEngine";
 import { resolveMagneticGameDropTarget } from "./resolveMagneticGameDropTarget";
 
-export type { GameDragActions, GameDragFeedback } from "./playDragRules";
+export type { GameDragFeedback } from "~/game/interaction/dragDropEngine";
 
 export namespace usePlayDraggableControl {
 	export interface Props {
-		actions: GameDragActions;
 		feedback: GameDragFeedback;
 		addFlyer(
 			itemId: string,
@@ -35,13 +34,15 @@ export namespace usePlayDraggableControl {
 }
 
 export function usePlayDraggableControl({
-	actions,
 	feedback,
 	addFlyer,
 	schedule,
 }: usePlayDraggableControl.Props) {
 	const game = usePlayDragView();
 	const items = usePlayItems().data;
+	const command = useGameCommand({
+		invalidateOnSuccess: true,
+	});
 	const control = useDraggableControl<
 		string,
 		GameDragSource,
@@ -50,7 +51,13 @@ export function usePlayDraggableControl({
 		FlyerKind
 	>({
 		schedule: (operation) => schedule("drag/drop", operation),
-		resolveDrop: (context) => resolveGameDrop(context, game, actions, feedback),
+		resolveDrop: (context) =>
+			resolveGameDrop({
+				context,
+				game,
+				feedback,
+				runCommand: (gameCommand) => command.mutateAsync(gameCommand),
+			}),
 		resolveMagneticDropTarget: resolveMagneticGameDropTarget,
 		animate: (animation) =>
 			addFlyer(
@@ -61,10 +68,17 @@ export function usePlayDraggableControl({
 				animation.overlay,
 			),
 		onError(error, context) {
-			flashGameDrop(context, game, feedback);
+			flashGameDrop({
+				context,
+				game,
+				feedback,
+			});
 			feedback.showError(error);
 		},
-		getDragBoundaryNodeId: getGameDragBoundaryNodeId,
+		getDragBoundaryNodeId: (source) =>
+			getGameDragBoundaryNodeId({
+				source,
+			}),
 	});
 
 	const activeItem =

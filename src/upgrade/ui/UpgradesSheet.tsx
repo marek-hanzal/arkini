@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { usePlayAction } from "~/play/hook/usePlayAction";
+import { useGameCommand } from "~/play/hook/useGameCommand";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { usePlayUpgrades } from "~/play/hook/usePlayUpgrades";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
@@ -14,22 +14,7 @@ export namespace UpgradesSheet {
 export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 	const upgrades = usePlayUpgrades().data;
 	const items = usePlayItems().data;
-	const buyUpgrade = usePlayAction(
-		(
-			db,
-			input: {
-				upgradeId: string;
-			},
-		) => db.buyUpgrade(input.upgradeId),
-		{
-			invalidateTargets: [
-				"board",
-				"inventory",
-				"upgrades",
-				"databaseStatus",
-			],
-		},
-	);
+	const buyUpgrade = useGameCommand();
 
 	return (
 		<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
@@ -48,6 +33,7 @@ export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 							pending={buyUpgrade.isPending}
 							onBuy={(upgradeId) =>
 								buyUpgrade.mutate({
+									type: "upgrade.buy",
 									upgradeId,
 								})
 							}

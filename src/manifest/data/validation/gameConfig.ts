@@ -27,6 +27,14 @@ export function assertGameConfig(config: GameConfig) {
 	const mergePairs = new Set<string>();
 
 	for (const asset of config.assets) assertUnique(assetIds, asset.id, "asset");
+	for (const asset of config.assets) {
+		if (asset.overlayAssetId) {
+			assert(
+				assetIds.has(asset.overlayAssetId),
+				`${asset.id} references missing overlay asset ${asset.overlayAssetId}`,
+			);
+		}
+	}
 	for (const resource of config.resources) {
 		assertUnique(resourceIds, resource.id, "resource");
 	}

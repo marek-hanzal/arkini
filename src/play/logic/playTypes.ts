@@ -83,6 +83,8 @@ export interface ViewItem {
 	description: string;
 	label?: string;
 	assetSrc: string;
+	assetOverlaySrc?: string;
+	assetRender?: "plain" | "blueprint";
 	maxStackSize: number;
 	tags: string[];
 	canProduce: boolean;

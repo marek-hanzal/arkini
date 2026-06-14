@@ -16,6 +16,10 @@ export function createItemCatalogView({
 		gameConfig.config.items.map((item) => {
 			const asset = gameConfig.getAsset(item.assetId);
 			if (!asset) throw new GameActionError(`Missing asset for ${item.id}`);
+			const overlayAsset = asset.overlayAssetId ? gameConfig.getAsset(asset.overlayAssetId) : undefined;
+			if (asset.overlayAssetId && !overlayAsset) {
+				throw new GameActionError(`Missing overlay asset for ${item.id}: ${asset.overlayAssetId}`);
+			}
 			const producer = gameConfig.getProducer(item.id);
 			const mergeResults = (item.merge ?? []).map((rule) => ({
 				withItemId: rule.withItemId,
@@ -40,6 +44,8 @@ export function createItemCatalogView({
 					description: item.description,
 					label: item.label,
 					assetSrc: asset.src,
+					assetOverlaySrc: overlayAsset?.src,
+					assetRender: asset.render ?? "plain",
 					maxStackSize: item.maxStackSize,
 					tags: [
 						...item.tags,

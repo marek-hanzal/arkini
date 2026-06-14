@@ -77,22 +77,22 @@ export const GameConfig = {
 		),
 		asset("asset:item-blueprint-draft", "Blueprint Draft", "item-blueprint-draft", 110, "png"),
 		asset("asset:item-blueprint", "Finished Blueprint", "item-blueprint", 112, "png"),
-		asset(
+		blueprintAsset(
 			"asset:item-blueprint-lumber-camp",
 			"Lumber Camp Blueprint",
-			"item-blueprint-lumber-camp-blueprint",
+			"asset:item-lumber-camp",
 			116,
 		),
-		asset(
+		blueprintAsset(
 			"asset:item-blueprint-quarry",
 			"Quarry Blueprint",
-			"item-blueprint-quarry-blueprint",
+			"asset:item-quarry",
 			120,
 		),
-		asset(
+		blueprintAsset(
 			"asset:item-blueprint-townhall",
 			"Town Hall Blueprint",
-			"item-blueprint-townhall-blueprint",
+			"asset:item-townhall",
 			124,
 		),
 		asset("asset:item-townhall", "Town Hall", "item-townhall", 125, "png"),
@@ -1978,6 +1978,24 @@ function asset(
 		kind: "item",
 		label,
 		src: format === "png" ? png(fileName) : svg(fileName),
+		render: "plain",
+		sort,
+	};
+}
+
+function blueprintAsset(
+	id: AssetId,
+	label: string,
+	overlayAssetId: AssetId,
+	sort: number,
+): AssetDefinition {
+	return {
+		id,
+		kind: "item",
+		label,
+		src: png("item-blueprint"),
+		overlayAssetId,
+		render: "blueprint",
 		sort,
 	};
 }

@@ -3,7 +3,7 @@ import { playCellError } from "~/animation/playCellError";
 import { playCellImprint } from "~/animation/playCellImprint";
 import { playCellSuccess } from "~/animation/playCellSuccess";
 
-export namespace useGsapCellFeedback {
+export namespace useMotionCellFeedback {
 	export interface Props {
 		invalid: boolean;
 		success: boolean;
@@ -11,9 +11,9 @@ export namespace useGsapCellFeedback {
 	}
 }
 
-export function useGsapCellFeedback<TElement extends HTMLElement>(
+export function useMotionCellFeedback<TElement extends HTMLElement>(
 	ref: RefObject<TElement | null>,
-	{ invalid, success, imprint }: useGsapCellFeedback.Props,
+	{ invalid, success, imprint }: useMotionCellFeedback.Props,
 ) {
 	const wasInvalidRef = useRef(false);
 	const wasSuccessRef = useRef(success);

@@ -969,7 +969,7 @@ Stateful items cannot be used as upgrade payment unless a future mechanic explic
 
 ## 16. Feedback and animation specification
 
-This document must eventually describe animation and interaction feedback rules with enough precision that implementation can wire GSAP, CSS transitions, or another animation system without inventing gameplay meaning outside the specification.
+This document must eventually describe animation and interaction feedback rules with enough precision that implementation can wire Motion, CSS transitions, or another animation system without inventing gameplay meaning outside the specification.
 
 Animation specs should define behavior, not final art direction. Exact colors, particle assets, easing constants, and polish values can live in UI/theme files unless they affect gameplay readability.
 

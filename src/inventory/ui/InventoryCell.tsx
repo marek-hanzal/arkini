@@ -1,5 +1,5 @@
 import { memo, type FC, useCallback, useMemo, useRef } from "react";
-import { useGsapCellFeedback } from "~/board/hook/useGsapCellFeedback";
+import { useMotionCellFeedback } from "~/board/hook/useMotionCellFeedback";
 import { DroppableSurface } from "~/drag/ui/DroppableSurface";
 import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
 import { InventoryTile } from "~/inventory/ui/InventoryTile";
@@ -22,7 +22,7 @@ export const InventoryCell: FC<InventoryCell.Props> = memo(
 		const stack = slot.stack;
 		const nodeId = inventorySlotNodeId(slot.slotIndex);
 		const cellRef = useRef<HTMLDivElement | null>(null);
-		useGsapCellFeedback(cellRef, {
+		useMotionCellFeedback(cellRef, {
 			invalid,
 			imprint: false,
 			success: false,

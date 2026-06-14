@@ -1,118 +1,100 @@
-import { memo, type FC } from "react";
-import { boardColumns } from "~/board/boardColumns";
-import { boardContainerNodeId } from "~/board/boardContainerNodeId";
-import { boardRows } from "~/board/boardRows";
-import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
-import { BoardCell } from "~/board/ui/BoardCell";
-import { BoardItemLayer } from "~/board/ui/BoardItemLayer";
-import { cellKey } from "~/board/util/cell";
-import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
-import type { ItemId } from "~/manifest/manifestId";
+import { useMemo, type FC } from "react";
+import type { Command } from "~/action/command";
+import { pulseBottomNav } from "~/play/hook/pulseBottomNav";
+import { useCommand } from "~/play/hook/useCommand";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
+import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import type { BoardViewItem } from "~/play/logic/playTypes";
-import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import type { DragData } from "~/play/types";
+import { PhaserBoard } from "~/phaser/board/PhaserBoard";
+import type { BoardViewItem, ProducerDropResult } from "~/play/logic/playTypes";
 
-const boardCells = Array.from(
-	{
-		length: boardColumns * boardRows,
-	},
-	(_, index) => ({
-		x: index % boardColumns,
-		y: Math.floor(index / boardColumns),
-		key: cellKey(index % boardColumns, Math.floor(index / boardColumns)),
-	}),
-);
-const boardGridStyle = {
-	gridTemplateColumns: `repeat(${boardColumns}, minmax(0, 1fr))`,
-};
 export namespace Board {
-	export interface DragState {
-		activeDrag?: DragData;
-		isSourceHidden(sourceId: string): boolean;
-	}
-
-	export interface FeedbackState {
-		invalidCellKey?: string;
-		mergedCellKey?: string;
-		imprintedCellKey?: string;
-	}
-
-	export interface Actions {
-		tileSingleActivate(item: BoardViewItem): void;
-		tileLongActivate(item: BoardViewItem): void;
-	}
-
 	export interface Props {
-		drag: DragState;
-		feedback: FeedbackState;
-		actions: Actions;
-		visualMotions: useVisualItemMotions.State;
+		onOpenItem(boardItemId: string): void;
 	}
 }
 
-export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMotions }) => {
+export const Board: FC<Board.Props> = ({ onOpenItem }) => {
 	const board = usePlayBoard().data;
 	const items = usePlayItems().data;
-	const showDelayedMergeHints = useDelayedMergeHints({
-		activeDrag: drag.activeDrag ?? undefined,
+	const invalidatePlayData = usePlayDataInvalidation();
+	const command = useCommand<Command>({
+		invalidateOnSuccess: false,
 	});
+
+	const handlers = useMemo(
+		() =>
+			({
+				async move(item: BoardViewItem, x: number, y: number) {
+					await command.mutateAsync({
+						type: "board.move",
+						boardItemId: item.id,
+						x,
+						y,
+					});
+					await invalidatePlayData([
+						"board",
+						"databaseStatus",
+					]);
+				},
+				async swap(source: BoardViewItem, target: BoardViewItem) {
+					await command.mutateAsync({
+						type: "board.swap",
+						sourceBoardItemId: source.id,
+						targetBoardItemId: target.id,
+					});
+					await invalidatePlayData([
+						"board",
+						"databaseStatus",
+					]);
+				},
+				async merge(source: BoardViewItem, target: BoardViewItem) {
+					await command.mutateAsync({
+						type: "board.merge",
+						sourceBoardItemId: source.id,
+						targetBoardItemId: target.id,
+					});
+					await invalidatePlayData([
+						"board",
+						"databaseStatus",
+					]);
+				},
+				async activate(item: BoardViewItem, activation: "single" | "exhaust") {
+					const result = (await command.mutateAsync({
+						type: "producer.activate",
+						boardItemId: item.id,
+						activation,
+					})) as ProducerDropResult;
+					await invalidatePlayData([
+						"board",
+						"inventory",
+						"databaseStatus",
+					]);
+					if (result.placements.some((placement) => placement.kind === "inventory")) {
+						pulseBottomNav("inventory");
+					}
+					return result;
+				},
+				openDetail(item: BoardViewItem) {
+					onOpenItem(item.id);
+				},
+			}) satisfies PhaserBoard.Handlers,
+		[
+			command,
+			invalidatePlayData,
+			onOpenItem,
+		],
+	);
+
 	if (!board || !items) return null;
 
 	return (
-		<div
-			data-drag-boundary-id={boardContainerNodeId}
-			className="relative grid w-full overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
-			style={boardGridStyle}
-		>
-			{boardCells.map((cell) => {
-				const boardItem = board.byCellKey[cell.key];
-				const canMerge =
-					drag.activeDrag?.source.kind === "board" &&
-					boardItem !== undefined &&
-					boardItem.id !== drag.activeDrag.source.boardItemId
-						? Boolean(
-								resolveItemMergeRule(
-									drag.activeDrag.itemId as ItemId,
-									boardItem.itemId as ItemId,
-								),
-							) ||
-							Boolean(
-								boardItem.craft?.canAcceptInputs &&
-									boardItem.craft.acceptedInputItemIds.includes(
-										drag.activeDrag.itemId,
-									),
-							) ||
-							Boolean(
-								boardItem.activation?.inputs.some(
-									(input) =>
-										input.itemId === drag.activeDrag?.itemId &&
-										input.stored < input.capacity,
-								),
-							)
-						: false;
-				return (
-					<BoardCell
-						key={cell.key}
-						x={cell.x}
-						y={cell.y}
-						boardItem={boardItem}
-						canMerge={canMerge}
-						showDelayedMergeHint={showDelayedMergeHints}
-						invalid={feedback.invalidCellKey === cell.key}
-						merged={feedback.mergedCellKey === cell.key}
-						imprinted={feedback.imprintedCellKey === cell.key}
-					/>
-				);
-			})}
-			<BoardItemLayer
-				boardItems={board.items}
+		<div className="relative aspect-[7/9] w-full overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40">
+			<PhaserBoard
+				board={board}
 				items={items}
-				isSourceHidden={drag.isSourceHidden}
-				visualMotions={visualMotions}
-				actions={actions}
+				handlers={handlers}
 			/>
 		</div>
 	);
-});
+};

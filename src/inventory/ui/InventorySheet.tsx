@@ -1,70 +1,95 @@
-import { memo, type FC } from "react";
-import { inventoryContainerNodeId } from "~/inventory/inventoryContainerNodeId";
+import { useMemo, type FC } from "react";
+import type { Command } from "~/action/command";
 import { inventoryColumns } from "~/inventory/inventoryColumns";
-import { InventoryCell } from "~/inventory/ui/InventoryCell";
-import { InventoryItemLayer } from "~/inventory/ui/InventoryItemLayer";
+import { PhaserInventory } from "~/phaser/inventory/PhaserInventory";
+import { useCommand } from "~/play/hook/useCommand";
+import { usePlayBoard } from "~/play/hook/usePlayBoard";
+import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import { usePlayInventory } from "~/play/hook/usePlayInventory";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { InventorySlot } from "~/play/logic/playTypes";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 
-const inventoryGridStyle = {
-	gridTemplateColumns: `repeat(${inventoryColumns}, minmax(0, 1fr))`,
-};
-
 export namespace InventorySheet {
 	export interface Props {
-		isSourceHidden(sourceId: string): boolean;
-		invalidInventorySlot?: number;
 		onClose(): void;
-		onSlotDoubleActivate(slot: InventorySlot): void;
-		visualMotions: useVisualItemMotions.State;
 	}
 }
 
-export const InventorySheet: FC<InventorySheet.Props> = memo(
-	({ isSourceHidden, invalidInventorySlot, onClose, onSlotDoubleActivate, visualMotions }) => {
-		const inventory = usePlayInventory().data;
-		const items = usePlayItems().data;
+export const InventorySheet: FC<InventorySheet.Props> = ({ onClose }) => {
+	const inventory = usePlayInventory().data;
+	const items = usePlayItems().data;
+	const board = usePlayBoard().data;
+	const invalidatePlayData = usePlayDataInvalidation();
+	const command = useCommand<Command>({
+		invalidateOnSuccess: false,
+	});
 
-		if (!inventory || !items) return null;
+	const handlers = useMemo(
+		() =>
+			({
+				async swap(source: InventorySlot, target: InventorySlot) {
+					await command.mutateAsync({
+						type: "inventory.swap",
+						sourceSlotIndex: source.slotIndex,
+						targetSlotIndex: target.slotIndex,
+					});
+					await invalidatePlayData([
+						"inventory",
+						"databaseStatus",
+					]);
+				},
+				async place(slot: InventorySlot) {
+					const target = board?.firstEmptyCell;
+					if (!slot.stack || !target) throw new Error("No free board cell available.");
+					await command.mutateAsync({
+						type: "inventory.place",
+						slotIndex: slot.slotIndex,
+						x: target.x,
+						y: target.y,
+					});
+					await invalidatePlayData([
+						"board",
+						"inventory",
+						"databaseStatus",
+					]);
+				},
+			}) satisfies PhaserInventory.Handlers,
+		[
+			board?.firstEmptyCell,
+			command,
+			invalidatePlayData,
+		],
+	);
 
-		const slots = inventory.slots;
-		const filled = slots.filter((slot) => slot.stack).length;
+	if (!inventory || !items) return null;
 
-		return (
-			<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
-				<SheetHeader
-					eyebrow="Inventory"
-					description={`${filled}/${slots.length} slots`}
-					anchor="inventory-summary"
-					onClose={onClose}
-				/>
+	const filled = inventory.slots.filter((slot) => slot.stack).length;
+	const rowCount = Math.ceil(inventory.slots.length / inventoryColumns);
 
-				<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-					<div
-						data-drag-boundary-id={inventoryContainerNodeId}
-						className="ak-game-width relative mx-auto grid gap-0 overflow-hidden border-l border-t border-slate-800"
-						style={inventoryGridStyle}
-					>
-						{slots.map((slot) => (
-							<InventoryCell
-								key={slot.slotIndex}
-								slot={slot}
-								invalid={invalidInventorySlot === slot.slotIndex}
-							/>
-						))}
-						<InventoryItemLayer
-							slots={slots}
-							items={items}
-							isSourceHidden={isSourceHidden}
-							visualMotions={visualMotions}
-							onSlotDoubleActivate={onSlotDoubleActivate}
-						/>
-					</div>
+	return (
+		<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
+			<SheetHeader
+				eyebrow="Inventory"
+				description={`${filled}/${inventory.slots.length} slots · drag to reorder, double tap to place`}
+				anchor="inventory-summary"
+				onClose={onClose}
+			/>
+
+			<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
+				<div
+					className="ak-game-width relative mx-auto overflow-hidden rounded-md border border-slate-800 bg-slate-950/80 shadow-xl shadow-slate-950/30"
+					style={{
+						aspectRatio: `${inventoryColumns} / ${rowCount}`,
+					}}
+				>
+					<PhaserInventory
+						inventory={inventory}
+						items={items}
+						handlers={handlers}
+					/>
 				</div>
 			</div>
-		);
-	},
-);
+		</div>
+	);
+};

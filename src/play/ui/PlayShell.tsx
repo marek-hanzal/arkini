@@ -6,19 +6,18 @@ import { usePlaySave } from "~/play/hook/usePlaySave";
 import { Board } from "~/board/ui/Board";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";
 import { BottomSheet } from "~/play/ui/BottomSheet";
-import { FlyerLayer } from "~/play/ui/FlyerLayer";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { UpgradesSheet } from "~/upgrade/ui/UpgradesSheet";
 import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { GameItemView } from "~/item/ui/GameItemView";
-import { useFlyers } from "~/play/hook/useFlyers";
 import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
 import { usePlayFeedback } from "~/play/hook/usePlayFeedback";
 import { usePlayEventQueue } from "~/play/hook/usePlayEventQueue";
 import { usePlaySheets } from "~/play/hook/usePlaySheets";
 import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
 import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
+import { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
 
 export namespace PlayShell {
@@ -28,29 +27,25 @@ export namespace PlayShell {
 export const PlayShell: FC<PlayShell.Props> = () => {
 	const saveQuery = usePlaySave();
 	const sheets = usePlaySheets();
-	const { flyers, addFlyer, settleFlyer } = useFlyers();
+	const visualMotions = useVisualItemMotions();
 	const schedulePlayEvent = usePlayEventQueue();
 	const feedback = usePlayFeedback();
 
 	const drag = usePlayDraggableControl({
 		feedback,
-		addFlyer,
 		schedule: schedulePlayEvent,
+		visualMotions,
 	});
 	const producerActions = usePlayProducerActions({
 		activeSheet: sheets.activeSheet,
-		addFlyer,
+		visualMotions,
 		feedback,
 		schedule: schedulePlayEvent,
-		hideSources: drag.hideSources,
-		clearHiddenSources: drag.clearHiddenSources,
 	});
 	const manualActions = usePlayManualItemActions({
-		addFlyer,
+		visualMotions,
 		feedback,
 		schedule: schedulePlayEvent,
-		hideSources: drag.hideSources,
-		clearHiddenSources: drag.clearHiddenSources,
 	});
 	const activateBoardTile = useCallback(
 		(item: BoardViewItem) => {
@@ -153,6 +148,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							drag={boardDrag}
 							feedback={boardFeedback}
 							actions={boardActions}
+							visualMotions={visualMotions}
 						/>
 					</div>
 				</main>
@@ -178,6 +174,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							invalidInventorySlot={feedback.invalidInventorySlot}
 							onClose={sheets.closeSheet}
 							onSlotDoubleActivate={placeInventorySlot}
+							visualMotions={visualMotions}
 						/>
 					</section>
 
@@ -213,11 +210,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 					</section>
 				</div>
 			</BottomSheet>
-
-			<FlyerLayer
-				flyers={flyers}
-				onSettle={settleFlyer}
-			/>
 
 			<DragOverlay
 				adjustScale={false}

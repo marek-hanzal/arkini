@@ -7,7 +7,8 @@ import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { spendStackFx } from "~/inventory/fx/spendStackFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { PlaceInventoryItemInputSchema } from "~/play/schema/PlaceInventoryItemInputSchema";
-import type { BoardItemState } from "~/play/logic/playTypes";
+import type { ItemId } from "~/manifest/manifestId";
+import type { BoardItemState, InventoryPlaceResult } from "~/play/logic/playTypes";
 import { GameActionError } from "~/play/logic/playTypes";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
@@ -27,7 +28,7 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 		catch: toGameActionError,
 	});
 
-	yield* withTransactionFx(
+	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const date = yield* DateServiceFx;
 			const { save, boardRows, inventoryRows } = yield* readMutableSaveFx();
@@ -46,8 +47,8 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 				date,
 			);
 
-			yield* insertFx({
-				itemId: stack.itemDefinitionId,
+			const boardItemId = yield* insertFx({
+				itemId: stack.itemDefinitionId as ItemId,
 				x: input.x,
 				y: input.y,
 				stateJson: json(resumedState),
@@ -56,6 +57,13 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 				stack,
 				quantity: 1,
 			});
+
+			return {
+				boardItemId,
+				itemId: stack.itemDefinitionId as ItemId,
+				x: input.x,
+				y: input.y,
+			} satisfies InventoryPlaceResult;
 		}),
 	);
 });

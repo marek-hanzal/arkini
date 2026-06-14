@@ -1,9 +1,9 @@
 import type { DropPlan } from "~/drag/DropPlan";
-import type { FlyerKind, VisualMeta } from "~/play/types";
+import type { VisualTransitionKind, VisualMeta } from "~/play/types";
 
 type AcceptPlan = Omit<
 	Extract<
-		DropPlan<string, FlyerKind, VisualMeta>,
+		DropPlan<string, VisualTransitionKind, VisualMeta>,
 		{
 			type: "accept";
 		}
@@ -11,7 +11,7 @@ type AcceptPlan = Omit<
 	"type"
 >;
 
-export const accept = (plan: AcceptPlan): DropPlan<string, FlyerKind, VisualMeta> => ({
+export const accept = (plan: AcceptPlan): DropPlan<string, VisualTransitionKind, VisualMeta> => ({
 	type: "accept",
 	animationTiming: "afterCommit",
 	...plan,

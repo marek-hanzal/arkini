@@ -32,6 +32,7 @@ export const InventoryTile: FC<InventoryTile.Props> = memo(
 					source: {
 						kind: "inventory" as const,
 						slotIndex: slot.slotIndex,
+						stackId: stack.id,
 						quantity: stack.quantity,
 					},
 					overlay: {
@@ -43,6 +44,7 @@ export const InventoryTile: FC<InventoryTile.Props> = memo(
 				slot.slotIndex,
 				sourceId,
 				sourceNodeId,
+				stack.id,
 				stack.itemId,
 				stack.quantity,
 			],

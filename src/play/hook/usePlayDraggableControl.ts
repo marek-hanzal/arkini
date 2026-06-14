@@ -8,9 +8,10 @@ import { resolveDrop } from "~/interaction/resolveDrop";
 import type { AnyDropContext, Feedback } from "~/interaction/types";
 import { useCommand } from "~/play/hook/useCommand";
 import { playQueryKeys } from "~/play/hook/playQueryKeys";
+import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { BoardView, GameDragView, InventoryView } from "~/play/logic/playTypes";
-import type { FlyerKind, RectLike, DragSource, DropTarget, VisualMeta } from "~/play/types";
+import type { VisualTransitionKind, DragSource, DropTarget, VisualMeta } from "~/play/types";
 import { resolveMagneticDropTarget } from "./resolveMagneticDropTarget";
 
 export type { Feedback } from "~/interaction/types";
@@ -18,21 +19,15 @@ export type { Feedback } from "~/interaction/types";
 export namespace usePlayDraggableControl {
 	export interface Props {
 		feedback: Feedback;
-		addFlyer(
-			itemId: string,
-			from: RectLike,
-			to: RectLike,
-			kind?: FlyerKind,
-			meta?: VisualMeta,
-		): Promise<void>;
 		schedule(label: string, operation: () => Promise<void>): Promise<void>;
+		visualMotions: Pick<useVisualItemMotions.State, "stage">;
 	}
 }
 
 export function usePlayDraggableControl({
 	feedback,
-	addFlyer,
 	schedule,
+	visualMotions,
 }: usePlayDraggableControl.Props) {
 	const queryClient = useQueryClient();
 	const items = usePlayItems().data;
@@ -69,21 +64,22 @@ export function usePlayDraggableControl({
 	);
 	const animate = useCallback(
 		(animation: {
-			itemId: string;
-			from: RectLike;
-			to: RectLike;
-			kind?: FlyerKind;
-			overlay?: VisualMeta;
-		}) =>
-			addFlyer(
-				animation.itemId,
-				animation.from,
-				animation.to,
-				animation.kind,
-				animation.overlay,
-			),
+			actorKey?: string;
+			from: import("~/play/types").RectLike;
+			to: import("~/play/types").RectLike;
+		}) => {
+			if (!animation.actorKey) return;
+			visualMotions.stage([
+				{
+					key: animation.actorKey,
+					from: animation.from,
+					to: animation.to,
+					priority: "raised",
+				},
+			]);
+		},
 		[
-			addFlyer,
+			visualMotions,
 		],
 	);
 	const onError = useCallback(
@@ -113,7 +109,13 @@ export function usePlayDraggableControl({
 			}),
 		[],
 	);
-	const control = useDraggableControl<string, DragSource, DropTarget, VisualMeta, FlyerKind>({
+	const control = useDraggableControl<
+		string,
+		DragSource,
+		DropTarget,
+		VisualMeta,
+		VisualTransitionKind
+	>({
 		schedule: scheduleDrop,
 		resolveDrop: resolvePlayDrop,
 		resolveMagneticDropTarget: resolveMagneticDropTarget,

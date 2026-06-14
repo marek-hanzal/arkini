@@ -4,7 +4,7 @@ import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
 import type { RectLike } from "~/play/types";
 
 export namespace GameItemView {
-	export type Variant = "board" | "inventory" | "drag" | "flyer";
+	export type Variant = "board" | "inventory" | "drag";
 
 	export type SizeVariant = "board" | "inventory";
 

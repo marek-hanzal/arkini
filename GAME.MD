@@ -1023,11 +1023,11 @@ Until a concrete animation spec exists, implementation should choose minimal loc
 
 ### 16.4 Current merge/feed animation rules
 
-Same-item board merge is a visual-first transform. The dragged source visual and the occupied target visual are hidden from the board layer. The dragged source only fades out at its drop position. The target cell renders the single result reveal: an in-place opacity cross-fade from the old target item into the result item. No travel, bump, shrink, target wobble, post-merge pulse, or second result ghost is part of this interaction. The durable merge mutation starts after the flyer has painted, runs in parallel with the short cross-fade, and the board refresh reveals the already committed result underneath the flyer.
+Same-item board merge, mixed consumption, blueprint imprinting, producer drops, stash dumps, and inventory placement all use the same visual rule: the final board/inventory item actor is the real actor. There is no separate duplicate overlay representation for the same item. Cells/slots provide geometry and feedback; items live in stable item layers and animate transform/priority there.
 
-Any accepted source consumption that is not a same-item merge uses a consume animation for the dragged item only. The dragged visual remains at its drop position, scales down around its center, and fades out while the durable mutation runs in parallel after the first flyer paint. The target item does not play a fake merge transform or target pulse for craft input deposits, producer input deposits, or mixed consumes. If a target changes as a result of the mutation, that change is revealed by the data refresh rather than by pretending the target ate a ghost with jazz hands.
+Newly committed actors may be staged from a source rectangle through `visualItemMotionMachine`. During that transient phase they can render above their source with raised priority, then settle back to normal priority when Motion completes. Drag/drop keeps the active source hidden until the durable command and query invalidation settle, preventing the source actor from reappearing on its old slot and then animating a second time.
 
-Blueprint binding remains separate from consumption. It commits the blueprint binding first and then pops the non-consumed dragged building back on its own cell so the player can see that the building survived.
+Blueprint binding remains separate from consumption. It commits the blueprint binding first and then keeps the non-consumed dragged building tied to its own item actor so the player can see that the building survived.
 
 ## 17. Economy validation rules
 

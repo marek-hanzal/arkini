@@ -6,6 +6,8 @@ export interface DraggableAnimation<
 	Overlay = unknown,
 > {
 	itemId: ItemId;
+	/** Stable visual actor key affected by this transition. */
+	actorKey?: string;
 	kind?: Kind;
 	fromNodeId?: string;
 	toNodeId?: string;

@@ -1,39 +1,37 @@
 import { useQueryClient } from "@tanstack/react-query";
+import type { Command } from "~/action/command";
 import { useCallback, useMemo } from "react";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import { useCommand } from "~/play/hook/useCommand";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
+import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import { playQueryKeys } from "~/play/hook/playQueryKeys";
 import { placeInventoryOnBoardWithFly } from "~/play/logic/placeInventoryOnBoardWithFly";
 import type { BoardView, InventorySlot } from "~/play/logic/playTypes";
-import type { FlyerKind, VisualMeta, RectLike } from "~/play/types";
 
 export namespace usePlayManualItemActions {
 	export interface Props {
-		addFlyer(
-			itemId: string,
-			from: RectLike,
-			to: RectLike,
-			kind?: FlyerKind,
-			meta?: VisualMeta,
-		): Promise<void>;
+		visualMotions: Pick<useVisualItemMotions.State, "stage">;
 		feedback: Feedback;
 		schedule(label: string, operation: () => Promise<void>): Promise<void>;
-		hideSources(ids: readonly string[]): void;
-		clearHiddenSources(): void;
 	}
 }
 
 export const usePlayManualItemActions = ({
-	addFlyer,
+	visualMotions,
 	feedback,
 	schedule,
-	hideSources,
-	clearHiddenSources,
 }: usePlayManualItemActions.Props) => {
 	const queryClient = useQueryClient();
 	const invalidatePlayData = usePlayDataInvalidation();
-	const command = useCommand({
+	const command = useCommand<
+		Extract<
+			Command,
+			{
+				type: "inventory.place";
+			}
+		>
+	>({
 		invalidateOnSuccess: false,
 	});
 	const run = command.mutateAsync;
@@ -50,23 +48,19 @@ export const usePlayManualItemActions = ({
 				placeInventoryOnBoardWithFly({
 					board: readBoard(),
 					slot,
-					addFlyer,
+					visualMotions,
 					run,
 					feedback,
-					hideSources,
-					clearHiddenSources,
 					invalidatePlayData,
 				}),
 			),
 		[
-			addFlyer,
-			clearHiddenSources,
 			feedback,
-			hideSources,
 			invalidatePlayData,
 			readBoard,
 			run,
 			schedule,
+			visualMotions,
 		],
 	);
 

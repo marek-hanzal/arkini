@@ -6,6 +6,7 @@ export interface ResolvedDraggableAnimation<
 	Overlay = unknown,
 > {
 	itemId: ItemId;
+	actorKey?: string;
 	kind?: Kind;
 	from: RectLike;
 	to: RectLike;

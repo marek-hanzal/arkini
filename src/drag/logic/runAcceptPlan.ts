@@ -35,7 +35,6 @@ export const runAcceptPlan = async <
 		type: "DROP_ACCEPTED",
 	});
 	runtime.hideSources(plan.hide ?? []);
-	runtime.clearActiveDrag();
 
 	if (plan.animations?.length && plan.animationTiming !== "afterCommit") {
 		runtime.sendWorkflow({
@@ -74,6 +73,7 @@ export const runAcceptPlan = async <
 		}
 	}
 
+	runtime.clearActiveDrag();
 	runtime.clearHiddenSources();
 	await waitForPaint();
 	runtime.sendWorkflow({

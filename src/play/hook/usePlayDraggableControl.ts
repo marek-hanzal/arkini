@@ -55,19 +55,21 @@ export function usePlayDraggableControl({
 		): Promise<CommandResult<TCommand>> => {
 			const result = await mutateCommand(command);
 
-			await invalidatePlayData(
-				commandInvalidation({
-					command,
-				}),
-			);
 			await waitForPaint();
-
 			stageCommandVisualEvents({
 				events: result.visualEvents,
 				activeSheet,
 				dragSourceRect: context?.dragRect ?? null,
 				dragSourceActorKey: context?.dragActorKey,
 				visualMotions,
+			});
+
+			void invalidatePlayData(
+				commandInvalidation({
+					command,
+				}),
+			).catch((error: unknown) => {
+				console.error("play data invalidation failed after drag command", error);
 			});
 
 			return result as CommandResult<TCommand>;

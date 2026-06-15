@@ -11,3 +11,6 @@ Real game items should not be mirrored through a second overlay representation. 
 
 
 Command visual events stay app-specific and must not leak into `TileEngine`. The mapping boundary lives here: command events know about board, inventory, activation, and item instances; TileEngine only receives generic actor ids, rects, priorities, and transition kinds. Yes, this extra seam looks boring. Boring seams are how we avoid creating another cursed renderer with a production job title.
+
+
+For drag/drop, TileEngine owns the live handoff from released pointer position into the resolved target slot before the app-level command commits. Command visual events then run from the snapped handoff rect, not from stale query invalidation geometry. Optimistic command data is the source of truth; invalidation is only reconciliation and must not be required for tile motion to look correct.

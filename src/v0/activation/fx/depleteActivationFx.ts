@@ -7,7 +7,7 @@ import type { BoardRow } from "~/v0/inventory/logic/planning/types";
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { StashDefinition } from "~/v0/manifest/producer";
 import type { ActivationDepletionSchema } from "~/v0/activation/type/ActivationDepletionSchema";
-import { json } from "~/v0/style/json";
+import { json } from "~/v0/serialization/json";
 
 export namespace depleteActivationFx {
 	export interface Props {

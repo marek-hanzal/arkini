@@ -5,7 +5,7 @@ import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
 import { SwapBoardItemsInputSchema } from "~/v0/board/schema/SwapBoardItemsInputSchema";
 import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { GameActionError } from "~/v0/play/action/GameActionError";
-import { toGameActionError } from "~/v0/play/fx/toGameActionError";
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 
 export namespace swapBoardItemsFx {

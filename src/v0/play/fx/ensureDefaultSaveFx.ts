@@ -7,7 +7,7 @@ import { emptyInventoryStateJson } from "~/v0/inventory/logic/emptyInventoryStat
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { StartingBoardItem } from "~/v0/play/model/StartingBoardItem";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { json } from "~/v0/style/json";
+import { json } from "~/v0/serialization/json";
 import { dropDefaultSaveFx } from "./dropDefaultSaveFx";
 
 export namespace ensureDefaultSaveFx {

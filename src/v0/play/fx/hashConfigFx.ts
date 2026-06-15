@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { HashServiceFx } from "~/v0/hash/context/HashServiceFx";
 import type { GameConfig } from "~/v0/manifest/GameConfig";
-import { tryGameAction } from "./tryGameAction";
+import { tryGameActionFx } from "~/v0/play/action/tryGameActionFx";
 
 export namespace hashConfigFx {
 	export interface Props {
@@ -11,5 +11,5 @@ export namespace hashConfigFx {
 
 export const hashConfigFx = Effect.fn("hashConfigFx")(function* ({ config }: hashConfigFx.Props) {
 	const hash = yield* HashServiceFx;
-	return yield* tryGameAction(() => hash.gameConfig(config));
+	return yield* tryGameActionFx(() => hash.gameConfig(config));
 });

@@ -12,8 +12,8 @@ import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import { withGameConfigService } from "~/v0/game/logic/withGameConfigService";
 import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 import { withRandomService } from "~/v0/random/logic/withRandomService";
-import { bootstrapState } from "./bootstrapState";
-import { tryGameAction } from "./tryGameAction";
+import { bootstrapState } from "~/v0/play/bootstrap/bootstrapState";
+import { tryGameActionFx } from "~/v0/play/action/tryGameActionFx";
 import { ensureDefaultSaveFx } from "./ensureDefaultSaveFx";
 import { syncConfigFx } from "./syncConfigFx";
 
@@ -22,7 +22,7 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 	browserDatabase.assertSupported();
 
 	const existing = bootstrapState.promise;
-	if (existing) return yield* tryGameAction(() => existing);
+	if (existing) return yield* tryGameActionFx(() => existing);
 
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
@@ -32,7 +32,7 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 	const random = yield* RandomServiceFx;
 	const next = Effect.runPromise(
 		Effect.gen(function* () {
-			const result = yield* tryGameAction(() => browserDatabase.migrateToLatest());
+			const result = yield* tryGameActionFx(() => browserDatabase.migrateToLatest());
 
 			if (result.error) return yield* Effect.fail(result.error);
 
@@ -53,5 +53,5 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 	);
 	bootstrapState.promise = next;
 
-	return yield* tryGameAction(() => next);
+	return yield* tryGameActionFx(() => next);
 });

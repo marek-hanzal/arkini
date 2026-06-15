@@ -14,8 +14,8 @@ import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { json } from "~/v0/style/json";
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
+import { json } from "~/v0/serialization/json";
 import { groupCraftInputRows } from "../logic/groupCraftInputRows";
 
 export namespace claimCraftFx {

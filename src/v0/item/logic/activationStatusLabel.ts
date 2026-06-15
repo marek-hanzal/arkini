@@ -2,7 +2,7 @@ import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { isProducerStocked } from "~/v0/producer/logic/isProducerStocked";
 import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
-import { formatMs } from "~/v0/style/formatMs";
+import { formatMs } from "~/v0/time/formatMs";
 
 export namespace activationStatusLabel {
 	export interface Props {

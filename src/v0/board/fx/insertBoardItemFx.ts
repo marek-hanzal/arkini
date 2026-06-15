@@ -4,7 +4,7 @@ import { dbFx } from "~/v0/database/fx/dbFx";
 import { IdServiceFx } from "~/v0/id/context/IdServiceFx";
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { json } from "~/v0/style/json";
+import { json } from "~/v0/serialization/json";
 
 export namespace insertBoardItemFx {
 	export interface Props {

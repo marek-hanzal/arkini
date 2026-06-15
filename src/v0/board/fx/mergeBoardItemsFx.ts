@@ -18,8 +18,8 @@ import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
 import { MergeBoardItemsInputSchema } from "~/v0/board/schema/MergeBoardItemsInputSchema";
-import { json } from "~/v0/style/json";
-import { toGameActionError } from "~/v0/play/fx/toGameActionError";
+import { json } from "~/v0/serialization/json";
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
 
 export namespace mergeBoardItemsFx {
 	export interface Props {

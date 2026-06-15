@@ -7,7 +7,7 @@ import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
-import { SheetHeader } from "~/v0/sheet/SheetHeader";
+import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { useWithdrawActivationInputMutation } from "~/v0/item/action/useWithdrawActivationInputMutation";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";

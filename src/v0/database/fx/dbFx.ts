@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { KyselyContextFx } from "~/v0/database/context/KyselyContextFx";
-import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import type { DbHandle } from "./DbHandle";
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
+import type { DbHandle } from "../model/DbHandle";
 
 export namespace dbFx {
 	export type Handlers = Partial<Record<string, (error: unknown) => unknown>>;

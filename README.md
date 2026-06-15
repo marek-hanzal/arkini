@@ -119,7 +119,7 @@ Components should stay boring: render props, wire callbacks, and shut up. If a c
 
 The active `src/v0` runtime should remain the template for new code. Do not add generic buckets such as `src/v0/shared`, `src/v0/query`, `src/v0/mutation`, or `src/v0/play/schema`. If something feels shared, name the owning domain first. If no domain owns it, the design is probably still mushy.
 
-Types and schemas live with the domain they describe: board schemas in `board/schema`, inventory schemas in `inventory/schema`, upgrade schemas in `upgrade/schema`, save schemas in `play/save`, and view schemas in the relevant domain `view` folder. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
+Types and schemas live with the domain they describe: board schemas in `board/schema`, inventory schemas in `inventory/schema`, upgrade schemas in `upgrade/schema`, save schemas in `play/save`, manifest definition schemas in `manifest/*DefinitionSchema.ts`, and view schemas in the relevant domain `view` folder. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
 
 Centralized hooks are banned unless the domain is explicitly the runtime, such as `tile-engine`. A hook named after a broad concept like game/session/runtime is guilty until proven tiny. Prefer concrete action hooks, domain query options, and small components over one hook that returns a sack of callbacks like a cursed Santa.
 
@@ -129,14 +129,20 @@ Centralized hooks are banned unless the domain is explicitly the runtime, such a
 src/app/                         App entry, router, global styles, cross-origin isolation fallback.
 src/assets/                      PNG gameplay assets imported by v0 manifest helper utilities.
 src/v0/                         Active client play runtime. v0 should be self-contained except asset imports.
-src/v0/manifest/                Active GameConfig composition, typed IDs, definitions, validation, derived indexes.
+src/v0/manifest/                Active GameConfig composition, typed IDs, standalone definition schemas, validation, derived indexes.
+src/v0/manifest/config/*/       Manifest config split into topical asset/item/loot-table definition chunks.
 src/v0/manifest/dsl/            Manifest-local definition DSL helpers; not a generic utils bucket.
 src/v0/game/                    Active GameConfig Effect service and derived lookup helpers.
 src/v0/database/                Active OPFS SQLite client, Kysely schema, migrations, status UI, dbFx, transactions, hard reset Fx/action.
+src/v0/database/bootstrap/      Browser DB bootstrap helper used by React Query bridge plumbing.
 src/v0/date/                    Active Luxon date Effect service.
 src/v0/hash/                    Active WebCrypto hash Effect service.
 src/v0/id/                      Active CUID2 id Effect service.
 src/v0/random/                  Active random Effect service and weighted helpers.
+src/v0/placement/               Cross-surface placement persistence Fx for activation/craft outputs.
+src/v0/serialization/           JSON serialization helpers used by DB state boundaries.
+src/v0/time/                    Formatting helpers for time labels.
+src/v0/ui/                      Generic UI-only helpers such as class merging.
 src/v0/**/fx/                   Active v0 domain Fx roots for gameplay actions, save lifecycle, reads, persistence, and bootstrap.
 src/v0/**/query/                Suspense query options and keys owned by their data domain.
 src/v0/**/action/               Concrete mutation hooks owned by the action domain.
@@ -146,6 +152,7 @@ src/v0/play/drag/               Arkini-specific drag source/target contracts for
 src/v0/play/drop/               Arkini-specific drop policy over the generic TileEngine.
 src/v0/play/sheet/              Active play sheet state and bottom-sheet shell.
 src/v0/play/feedback/           Local play feedback pulse state and feedback contract.
+src/v0/play/bootstrap/          Tiny bootstrap status holder, not gameplay state.
 src/ancient/                    Snapshot of the pre-v0 runtime kept for archaeology only; do not import ancient UI/runtime code into v0.
 src/command/                    Historical command router for old root runtime only; v0 uses `src/v0/play/action`.
 src/**                          Legacy/root runtime still compiled while migration continues. Do not import legacy code into active v0 code unless the current task is explicitly migrating it.

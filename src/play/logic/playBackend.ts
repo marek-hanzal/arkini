@@ -14,6 +14,7 @@ export type { DatabaseStatus } from "./status";
 export type {
 	BoardView,
 	BoardViewItem,
+	GameDragView,
 	GameSaveView,
 	InventorySlot,
 	InventoryView,

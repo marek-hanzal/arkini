@@ -53,6 +53,11 @@ export interface UpgradeCostView {
 	available: number;
 }
 
+export interface GameDragView {
+	boardItemsById: Record<string, BoardViewItem>;
+	inventoryBySlotIndex: Record<number, InventorySlot>;
+}
+
 export interface ViewItem {
 	id: string;
 	name: string;

@@ -1,9 +1,9 @@
 # Animation
 
-The DOM animation layer is intentionally tiny now:
+The animation layer is now split between:
 
-- Motion may animate app chrome such as bottom-navigation pulses and sheets,
-- Phaser owns board/inventory item movement, merge feedback, ready glow, progress bars, and slot/cell highlights,
-- game items must not be mirrored through a DOM overlay just to fake motion across React commits.
+- local Motion helpers for feedback pulses and bottom navigation,
+- stable board/inventory item actors rendered in their own layers,
+- `visualItemMotionMachine`, an XState registry for transient actor origins and priority.
 
-Real game items should remain real Phaser actors inside their local scene. If a board or inventory animation needs item geometry, solve it in the relevant scene instead of resurrecting the old DOM-rect ritual. The ritual looked clever; it was mostly a bug farm wearing a tie.
+Real game items should not be mirrored through a second overlay representation. Producer, stash, inventory placement, drag moves, swaps, and merge commits all converge on the same rule: the final board/inventory tile is the visual actor, and animation only changes its transform/priority until it settles.

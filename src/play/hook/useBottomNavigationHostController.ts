@@ -6,6 +6,13 @@ export namespace useBottomNavigationHostController {
 	export interface Props {}
 }
 
+/**
+ * GPT:FIX
+ *
+ * This by itself is piece of shit we don't need.
+ *
+ * Why we cannot listen for drag events instead of using this crappy hook?
+ */
 export const useBottomNavigationHostController = (
 	_props?: useBottomNavigationHostController.Props,
 ) => {

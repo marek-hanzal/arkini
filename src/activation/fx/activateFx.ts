@@ -35,9 +35,17 @@ export namespace activateFx {
 	}
 }
 
+/**
+ * GPT:FIX
+ * This is too long, too complicated. Separate individual usecases and make the thing much less magical
+ */
 export const activateFx = Effect.fn("activateFx")(function* (props: activateFx.Props) {
 	const input = yield* Effect.try({
 		try: () =>
+        /**
+         * GPT:FIX
+         * You're in an async func, you can parseAsync - fix this in other places if exists
+         */
 			ActivateItemInputSchema.parse({
 				...props,
 				activation: props.activation ?? "single",

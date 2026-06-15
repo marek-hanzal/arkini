@@ -44,6 +44,11 @@ export const BottomSheet: FC<BottomSheet.Props> = ({
 	useEffect(() => {
 		if (!open) return;
 
+        /**
+         * GPT:FIX
+         *
+         * We're on mobile, nobody cares about keyboard.
+         */
 		function onKeyDown(event: KeyboardEvent) {
 			if (event.key === "Escape") onClose();
 		}
@@ -77,6 +82,11 @@ export const BottomSheet: FC<BottomSheet.Props> = ({
 
 			<motion.section
 				data-drag-node-id={dragNodeId}
+                /**
+                 * GPT:FIX
+                 *
+                 * I'm not sure, we've here custom CSS class (and maybe also custom CSS itself) instead of pure Tailwind?
+                 */
 				className={cn("ak-bottom-sheet-panel", className, containerClassName)}
 				initial={false}
 				animate={{

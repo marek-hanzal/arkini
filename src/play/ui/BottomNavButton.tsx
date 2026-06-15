@@ -21,6 +21,11 @@ export const BottomNavButton: FC<BottomNavButton.Props> = memo(
 		const handleClick = useCallback(
 			() => onOpen(tone),
 			[
+                /**
+                 * GPT:FIX
+                 *
+                 * We've onOpen here - are you sure you're using stable references, so this useCallback makes sense?
+                 */
 				onOpen,
 				tone,
 			],

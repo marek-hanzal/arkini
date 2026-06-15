@@ -35,6 +35,18 @@ export namespace usePlayDraggableControl {
 	}
 }
 
+/**
+ * GPT:FIX
+ *
+ * I see this as a primary drag interaction implementation also causing all the pain we currently have in the game.
+ *
+ * Split it into individual pieces or destroy this stuff entirely as it's now central place at the top of our app maybe
+ * cause a lot of re-render and other problems.
+ *
+ * At lease you shall document everything in this method, so one can understand this shitstorm.
+ *
+ * Dragging should be responsibility of TileEngine, so I don't understand, why it's here. "Public" space should not have such hooks.
+ */
 export function usePlayDraggableControl({
 	activeSheet,
 	feedback,

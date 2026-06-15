@@ -9,6 +9,11 @@ export namespace useDropTargetRegistration {
 	}
 }
 
+/**
+ * GPT:FIX
+ *
+ * Write docs, why this exists and what we're using it for.
+ */
 export const useDropTargetRegistration = <TPayload = unknown>({
 	nodeId,
 	payload,

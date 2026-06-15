@@ -1,3 +1,13 @@
+/**
+ * GPT:FIX
+ *
+ * This whole file is a mess.
+ *
+ * It should be separated into individual functions with namespaces.
+ *
+ * Also docs are missing, so we don't know what that crap does.
+ */
+
 export namespace registerDropTarget {
 	export interface Props<TPayload = unknown> {
 		nodeId: string;
@@ -35,6 +45,11 @@ const targetNodeFrom = (element: Element) => {
 	return element.closest<HTMLElement>("[data-tile-engine-drop-target-id]");
 };
 
+/**
+ * GPT:FIX
+ *
+ * Why we've drag and tile engine stuff here as we're not in tile engine?
+ */
 export const resolveDropTargetAtPoint = <TPayload = unknown>({
 	x,
 	y,

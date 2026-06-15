@@ -13,6 +13,11 @@ export namespace BottomNavigation {
 
 export const BottomNavigation: FC<BottomNavigation.Props> = memo(
 	({ activeSheet, inventoryDropTargetActive = false, activeDropTargetNodeId, onOpen }) => {
+        /**
+         * GPT:FIX
+         *
+         * We've 3 buttons, but they're not aligned (3 columns or 3 same sized flex)
+         */
 		return (
 			<nav className="ak-bottom-nav">
 				<div className="ak-bottom-nav-inner">

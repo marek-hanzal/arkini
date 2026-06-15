@@ -16,6 +16,14 @@ export namespace usePlayFeedback {
 	}
 }
 
+/**
+ * GPT:FIX
+ *
+ * I understand overall idea of this hook, but at the end it's more mess which does not make a lof of sense.
+ *
+ * What about idea to have core (global) EventBus (even wrap native one from browser or steal EventBus impl. from zbav-se.me which is typed),
+ * so we can send typed events instead of messing up with such a crap?
+ */
 export function usePlayFeedback(): usePlayFeedback.State {
 	const [feedback, send] = useMachine(playFeedbackMachine);
 	const flashBoardCell = useCallback(

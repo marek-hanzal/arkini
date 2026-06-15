@@ -49,6 +49,11 @@ const readDestination = (element: HTMLElement, motion: TileEngineExternalMotion)
 const shouldExit = (kind: TileEngineTransitionKind | undefined) =>
 	kind === "consume" || kind === "exit";
 
+const clearAnimatedStyle = (element: HTMLElement) => {
+	element.style.removeProperty("transform");
+	element.style.removeProperty("opacity");
+};
+
 /**
  * Animates one stable tile actor from a viewport rect into its current rendered
  * slot. The destination is read from the final actor itself unless a transition
@@ -69,8 +74,13 @@ export const useTileEngineMotionAnimation = ({
 
 	useLayoutEffect(() => {
 		const element = ref.current;
-		if (!element || !motion) return;
+		if (!element) return;
+		if (!motion) {
+			clearAnimatedStyle(element);
+			return;
+		}
 
+		clearAnimatedStyle(element);
 		const toRect = readDestination(element, motion);
 		const base = element.getBoundingClientRect();
 		const baseWidth = base.width || toRect.width || 1;
@@ -121,13 +131,14 @@ export const useTileEngineMotionAnimation = ({
 
 		void controls.then(() => {
 			settled = true;
-			element.style.transform = "";
-			element.style.opacity = "";
+			clearAnimatedStyle(element);
 			onSettleRef.current?.();
 		});
 
 		return () => {
-			if (!settled) controls.stop();
+			if (settled) return;
+			controls.stop();
+			clearAnimatedStyle(element);
 		};
 	}, [
 		motion,

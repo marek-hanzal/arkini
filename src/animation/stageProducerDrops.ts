@@ -50,6 +50,7 @@ export const stageProducerDrops = ({
 					from: sourceRect,
 					to,
 					priority: "raised",
+					kind: "place",
 				});
 				continue;
 			}
@@ -60,6 +61,7 @@ export const stageProducerDrops = ({
 					from: sourceRect,
 					to,
 					priority: "raised",
+					kind: "place",
 				});
 			}
 		}

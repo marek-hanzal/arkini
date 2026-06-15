@@ -1,8 +1,9 @@
 import { animate, type AnimationPlaybackControlsWithThen } from "motion";
 import { useLayoutEffect, type RefObject } from "react";
 import type { TileEngineMotion, TileEngineRect } from "~/tile-engine/logic/tileEngineMachine";
+import type { VisualTransitionKind } from "~/play/types";
 
-export const tileEngineMotionDurationSeconds = 0.26;
+export const tileEngineMotionDurationSeconds = 0.3;
 export const tileEngineMotionDurationMs = tileEngineMotionDurationSeconds * 1000;
 
 export const tileEngineMotionEase = [
@@ -30,6 +31,7 @@ export interface TileEngineExternalMotion {
 	to?: TileEngineRect;
 	priority?: "normal" | "raised";
 	nonce?: number;
+	kind?: VisualTransitionKind;
 }
 
 const readDestination = (element: HTMLElement, motion: TileEngineExternalMotion) => {
@@ -44,10 +46,13 @@ const readDestination = (element: HTMLElement, motion: TileEngineExternalMotion)
 	};
 };
 
+const shouldExit = (kind: VisualTransitionKind | undefined) =>
+	kind === "consume" || kind === "stash";
+
 /**
  * Animates one stable tile actor from a viewport rect into its current rendered
- * slot. The destination is read from the final actor itself, so parent data can
- * commit first and the visual layer can simply catch up.
+ * slot. The destination is read from the final actor itself unless a transition
+ * explicitly provides an external sink rect.
  */
 export const useTileEngineMotionAnimation = ({
 	ref,
@@ -68,11 +73,12 @@ export const useTileEngineMotionAnimation = ({
 			scaleX: motion.from.width / baseWidth,
 			scaleY: motion.from.height / baseHeight,
 		};
+		const exit = shouldExit(motion.kind);
 		const to = {
 			x: toRect.left - base.left,
 			y: toRect.top - base.top,
-			scaleX: toRect.width / baseWidth,
-			scaleY: toRect.height / baseHeight,
+			scaleX: (toRect.width / baseWidth) * (exit ? 0.82 : 1),
+			scaleY: (toRect.height / baseHeight) * (exit ? 0.82 : 1),
 		};
 
 		let settled = false;
@@ -95,13 +101,20 @@ export const useTileEngineMotionAnimation = ({
 					from.scaleY,
 					to.scaleY,
 				],
-				opacity: 1,
+				opacity: exit
+					? [
+							1,
+							0,
+						]
+					: 1,
 			},
 			tileEngineMotionTransition,
 		);
 
 		void controls.then(() => {
 			settled = true;
+			element.style.transform = "";
+			element.style.opacity = "";
 			onSettle?.();
 		});
 

@@ -1,6 +1,6 @@
 import { memo, type FC, useCallback, useMemo } from "react";
-import { inventoryContainerNodeId } from "~/inventory/inventoryContainerNodeId";
 import { inventoryColumns } from "~/inventory/inventoryColumns";
+import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
 import { inventorySourceId } from "~/inventory/inventorySourceId";
 import { InventoryCell } from "~/inventory/ui/InventoryCell";
 import { InventoryTile } from "~/inventory/ui/InventoryTile";
@@ -12,6 +12,7 @@ import {
 	type useVisualItemMotions,
 } from "~/play/hook/useVisualItemMotions";
 import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
+import type { DragData, DropData } from "~/play/types";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { TileEngine } from "~/tile-engine/ui/TileEngine";
 
@@ -35,11 +36,134 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 		const inventory = usePlayInventory().data;
 		const items = usePlayItems().data;
 
+		const slots = useMemo(
+			() => inventory?.slots ?? [],
+			[
+				inventory?.slots,
+			],
+		);
+		const filled = useMemo(
+			() => slots.filter((slot) => slot.stack).length,
+			[
+				slots,
+			],
+		);
+		const engineSlots = useMemo(
+			() =>
+				slots.map((slot) => ({
+					id: String(slot.slotIndex),
+					data: slot,
+				})),
+			[
+				slots,
+			],
+		);
+		const engineTiles = useMemo(
+			() =>
+				items
+					? slots.flatMap((slot) => {
+							const stack = slot.stack;
+							if (!stack) return [];
+
+							const item = items[stack.itemId];
+							if (!item) return [];
+
+							const stackMotionKey = visualInventoryStackKey(stack.id);
+							const slotMotionKey = visualInventorySlotKey(slot.slotIndex);
+							const visualMotion =
+								visualMotions.motions[stackMotionKey] ??
+								visualMotions.motions[slotMotionKey];
+
+							return [
+								{
+									id: stack.id,
+									slotId: String(slot.slotIndex),
+									hidden: isSourceHidden(inventorySourceId(slot.slotIndex)),
+									motion: visualMotion,
+									onMotionSettle: visualMotion
+										? () => {
+												visualMotions.settle(
+													stackMotionKey,
+													visualMotion.nonce,
+												);
+												visualMotions.settle(
+													slotMotionKey,
+													visualMotion.nonce,
+												);
+											}
+										: undefined,
+									data: {
+										slot,
+										item,
+									} satisfies InventoryTileData,
+								},
+							];
+						})
+					: [],
+			[
+				isSourceHidden,
+				items,
+				slots,
+				visualMotions,
+			],
+		);
+		const dragConfig = useMemo<TileEngine.DragConfig<InventoryTileData, InventorySlot>>(
+			() => ({
+				tile: (tile) => {
+					const stack = tile.data.slot.stack;
+					if (!stack) return undefined;
+					const sourceId = inventorySourceId(tile.data.slot.slotIndex);
+					const nodeId = `${sourceId}:drag-node`;
+					return {
+						id: `${sourceId}:drag`,
+						nodeId,
+						data: {
+							sourceId,
+							sourceNodeId: nodeId,
+							itemId: stack.itemId,
+							source: {
+								kind: "inventory" as const,
+								slotIndex: tile.data.slot.slotIndex,
+								stackId: stack.id,
+								quantity: stack.quantity,
+							},
+							overlay: {
+								quantity: stack.quantity,
+							},
+							hideWhenActive: true,
+						} satisfies DragData,
+						hidden: isSourceHidden(sourceId),
+						hideWhenActive: true,
+						onDoubleActivate: () => onSlotDoubleActivate(tile.data.slot),
+					};
+				},
+				slot: (slot) => {
+					const nodeId = inventorySlotNodeId(slot.data.slotIndex);
+					return {
+						id: nodeId,
+						nodeId,
+						data: {
+							targetId: nodeId,
+							targetNodeId: nodeId,
+							target: {
+								kind: "inventory-slot" as const,
+								slotIndex: slot.data.slotIndex,
+							},
+						} satisfies DropData,
+					};
+				},
+			}),
+			[
+				isSourceHidden,
+				onSlotDoubleActivate,
+			],
+		);
 		const renderSlot = useCallback(
-			({ slot }: TileEngine.RenderSlotProps<InventorySlot>) => (
+			({ slot, isOver }: TileEngine.RenderSlotProps<InventorySlot>) => (
 				<InventoryCell
 					slot={slot.data}
 					invalid={invalidInventorySlot === slot.data.slotIndex}
+					isOver={isOver}
 				/>
 			),
 			[
@@ -51,7 +175,6 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 				<InventoryTile
 					slot={tile.data.slot}
 					item={tile.data.item}
-					hidden={Boolean(tile.hidden)}
 					onDoubleActivate={onSlotDoubleActivate}
 				/>
 			),
@@ -61,44 +184,6 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 		);
 
 		if (!inventory || !items) return null;
-
-		const slots = inventory.slots;
-		const filled = slots.filter((slot) => slot.stack).length;
-		const engineSlots = slots.map((slot) => ({
-			id: String(slot.slotIndex),
-			data: slot,
-		}));
-		const engineTiles = slots.flatMap((slot) => {
-			const stack = slot.stack;
-			if (!stack) return [];
-
-			const item = items[stack.itemId];
-			if (!item) return [];
-
-			const stackMotionKey = visualInventoryStackKey(stack.id);
-			const slotMotionKey = visualInventorySlotKey(slot.slotIndex);
-			const visualMotion =
-				visualMotions.motions[stackMotionKey] ?? visualMotions.motions[slotMotionKey];
-
-			return [
-				{
-					id: stack.id,
-					slotId: String(slot.slotIndex),
-					hidden: isSourceHidden(inventorySourceId(slot.slotIndex)),
-					motion: visualMotion,
-					onMotionSettle: visualMotion
-						? () => {
-								visualMotions.settle(stackMotionKey, visualMotion.nonce);
-								visualMotions.settle(slotMotionKey, visualMotion.nonce);
-							}
-						: undefined,
-					data: {
-						slot,
-						item,
-					} satisfies InventoryTileData,
-				},
-			];
-		});
 
 		return (
 			<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
@@ -118,6 +203,7 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 						gapPx={1}
 						className="ak-game-width mx-auto border-l border-t border-slate-800"
 						itemLayerClassName="pointer-events-none"
+						drag={dragConfig}
 						renderSlot={renderSlot}
 						renderTile={renderTile}
 					/>

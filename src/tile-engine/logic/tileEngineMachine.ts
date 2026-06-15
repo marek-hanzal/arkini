@@ -13,6 +13,7 @@ export interface TileEngineMotion {
 	from: TileEngineRect;
 	priority: TileEnginePriority;
 	nonce: number;
+	kind?: never;
 }
 
 export namespace tileEngineMachine {

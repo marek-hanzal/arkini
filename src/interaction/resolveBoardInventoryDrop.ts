@@ -18,6 +18,9 @@ export const resolveBoardInventoryDrop = ({
 }: resolveBoardInventoryDrop.Props): DropPlan<string, VisualTransitionKind, VisualMeta> =>
 	accept({
 		animationTiming: "beforeCommit",
+		hide: [
+			source.sourceId,
+		],
 		animations: [
 			{
 				itemId: source.itemId,

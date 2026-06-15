@@ -58,15 +58,16 @@ export const runAcceptPlan = async <
 		await plan.commit();
 
 		if (plan.animations?.length && plan.animationTiming === "afterCommit") {
-			runtime.clearActiveDrag();
 			runtime.sendWorkflow({
 				type: "ANIMATION_STARTED",
 			});
-			await playAnimations({
+			const animation = playAnimations({
 				animations: plan.animations,
 				dragRect,
 				animate: runtime.animate,
 			});
+			runtime.clearActiveDrag();
+			await animation;
 		}
 	}
 

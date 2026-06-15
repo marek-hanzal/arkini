@@ -1,5 +1,5 @@
 import { assign, setup } from "xstate";
-import type { RectLike } from "~/play/types";
+import type { RectLike, VisualTransitionKind } from "~/play/types";
 
 export type VisualItemMotionPriority = "normal" | "raised";
 
@@ -8,6 +8,7 @@ export interface VisualItemMotion {
 	to: RectLike;
 	priority: VisualItemMotionPriority;
 	nonce: number;
+	kind?: VisualTransitionKind;
 }
 
 export namespace visualItemMotionMachine {
@@ -19,6 +20,7 @@ export namespace visualItemMotionMachine {
 					from: RectLike;
 					to: RectLike;
 					priority?: VisualItemMotionPriority;
+					kind?: VisualTransitionKind;
 				}[];
 		  }
 		| {
@@ -72,6 +74,7 @@ export const visualItemMotionMachine = setup({
 								to: entry.to,
 								priority: entry.priority ?? "raised",
 								nonce: nextNonce,
+								kind: entry.kind,
 							};
 							nextNonce += 1;
 						}

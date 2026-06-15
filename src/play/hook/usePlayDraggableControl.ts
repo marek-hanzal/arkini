@@ -69,6 +69,7 @@ export function usePlayDraggableControl({
 			actorKey?: string;
 			from: import("~/play/types").RectLike;
 			to: import("~/play/types").RectLike;
+			kind?: VisualTransitionKind;
 		}) => {
 			if (!animation.actorKey) return;
 			visualMotions.stage([
@@ -77,6 +78,7 @@ export function usePlayDraggableControl({
 					from: animation.from,
 					to: animation.to,
 					priority: "raised",
+					kind: animation.kind,
 				},
 			]);
 			await waitForMs(tileEngineMotionDurationMs);

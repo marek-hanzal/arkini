@@ -25,6 +25,9 @@ export const resolveInventoryDrop = ({
 	const targetStack = runtime.game.inventoryBySlotIndex[target.target.slotIndex]?.stack;
 
 	return accept({
+		hide: [
+			source.sourceId,
+		],
 		animations: [
 			{
 				itemId: source.itemId,

@@ -5,7 +5,7 @@ import {
 	type VisualItemMotion,
 	type VisualItemMotionPriority,
 } from "~/play/logic/visualItemMotionMachine";
-import type { RectLike } from "~/play/types";
+import type { RectLike, VisualTransitionKind } from "~/play/types";
 
 export const visualBoardItemKey = (boardItemId: string) => `board:${boardItemId}`;
 export const visualInventoryStackKey = (stackId: string) => `inventory-stack:${stackId}`;
@@ -17,6 +17,7 @@ export namespace useVisualItemMotions {
 		from: RectLike;
 		to: RectLike;
 		priority?: VisualItemMotionPriority;
+		kind?: VisualTransitionKind;
 	}
 
 	export interface State {

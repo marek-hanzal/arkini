@@ -58,6 +58,7 @@ export const placeInventoryOnBoardWithFly = async ({
 					from,
 					to,
 					priority: "raised",
+					kind: "place",
 				},
 			]);
 		}

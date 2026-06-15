@@ -38,6 +38,9 @@ export const resolveBoardDrop = ({
 
 	if (!target.target.boardItemId) {
 		return accept({
+			hide: [
+				source.sourceId,
+			],
 			animations: [
 				{
 					itemId: source.itemId,
@@ -78,6 +81,9 @@ export const resolveBoardDrop = ({
 
 	if (intent.type === "swap") {
 		return accept({
+			hide: [
+				source.sourceId,
+			],
 			animations: [
 				{
 					itemId: source.itemId,
@@ -105,6 +111,17 @@ export const resolveBoardDrop = ({
 
 	if (intent.type === "merge" && intent.directed) {
 		return accept({
+			animationTiming: "beforeCommit",
+			hide: [
+				source.sourceId,
+			],
+			animations: [
+				consumeSourceAnimation({
+					itemId: source.itemId,
+					boardItemId: source.source.boardItemId,
+					targetNodeId: target.targetNodeId,
+				}),
+			],
 			commit: () =>
 				runtime.run({
 					type: "board.merge",
@@ -118,6 +135,9 @@ export const resolveBoardDrop = ({
 
 	return accept({
 		animationTiming: "beforeCommit",
+		hide: [
+			source.sourceId,
+		],
 		animations: [
 			consumeSourceAnimation({
 				itemId: source.itemId,

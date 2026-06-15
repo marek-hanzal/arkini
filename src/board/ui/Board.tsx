@@ -1,6 +1,6 @@
 import { memo, type FC, useCallback, useMemo } from "react";
+import { boardCellNodeId } from "~/board/boardCellNodeId";
 import { boardColumns } from "~/board/boardColumns";
-import { boardContainerNodeId } from "~/board/boardContainerNodeId";
 import { boardRows } from "~/board/boardRows";
 import { boardSourceId } from "~/board/boardSourceId";
 import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
@@ -13,7 +13,7 @@ import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
-import type { DragData } from "~/play/types";
+import type { DragData, DropData } from "~/play/types";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { TileEngine } from "~/tile-engine/ui/TileEngine";
 
@@ -75,36 +75,97 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 		[],
 	);
 
-	const tileActors =
-		board && items
-			? board.items.flatMap((boardItem) => {
-					const item = items[boardItem.itemId];
-					if (!item) return [];
+	const tileActors = useMemo(
+		() =>
+			board && items
+				? board.items.flatMap((boardItem) => {
+						const item = items[boardItem.itemId];
+						if (!item) return [];
 
-					const motionKey = visualBoardItemKey(boardItem.id);
-					const visualMotion = visualMotions.motions[motionKey];
+						const motionKey = visualBoardItemKey(boardItem.id);
+						const visualMotion = visualMotions.motions[motionKey];
 
-					return [
-						{
-							id: boardItem.id,
-							slotId: cellKey(boardItem.x, boardItem.y),
-							hidden: drag.isSourceHidden(boardSourceId(boardItem.id)),
-							motion: visualMotion,
-							onMotionSettle: visualMotion
-								? () => visualMotions.settle(motionKey, visualMotion.nonce)
-								: undefined,
-							data: {
-								boardItem,
-								item,
-								activationNowMs: boardItem.activation ? nowMs : undefined,
-							} satisfies BoardTileData,
+						return [
+							{
+								id: boardItem.id,
+								slotId: cellKey(boardItem.x, boardItem.y),
+								hidden: drag.isSourceHidden(boardSourceId(boardItem.id)),
+								motion: visualMotion,
+								onMotionSettle: visualMotion
+									? () => visualMotions.settle(motionKey, visualMotion.nonce)
+									: undefined,
+								data: {
+									boardItem,
+									item,
+									activationNowMs: boardItem.activation ? nowMs : undefined,
+								} satisfies BoardTileData,
+							},
+						];
+					})
+				: [],
+		[
+			board,
+			drag.isSourceHidden,
+			items,
+			nowMs,
+			visualMotions,
+		],
+	);
+	const dragConfig = useMemo<TileEngine.DragConfig<BoardTileData, (typeof boardCells)[number]>>(
+		() => ({
+			tile: (tile) => {
+				const boardItem = tile.data.boardItem;
+				const sourceId = boardSourceId(boardItem.id);
+				const nodeId = `${sourceId}:drag`;
+				return {
+					id: sourceId,
+					nodeId,
+					data: {
+						sourceId,
+						sourceNodeId: nodeId,
+						itemId: boardItem.itemId,
+						source: {
+							kind: "board" as const,
+							boardItemId: boardItem.id,
 						},
-					];
-				})
-			: [];
+						overlay: {
+							activation: boardItem.activation,
+						},
+						hideWhenActive: true,
+					} satisfies DragData,
+					hidden: drag.isSourceHidden(sourceId),
+					hideWhenActive: true,
+					onSingleActivate: () => actions.tileSingleActivate(boardItem),
+					onLongActivate: () => actions.tileLongActivate(boardItem),
+				};
+			},
+			slot: (slot, targetTile) => {
+				const cell = slot.data;
+				const id = boardCellNodeId(cell.x, cell.y);
+				return {
+					id,
+					nodeId: id,
+					data: {
+						targetId: id,
+						targetNodeId: id,
+						target: {
+							kind: "cell" as const,
+							x: cell.x,
+							y: cell.y,
+							boardItemId: targetTile?.data.boardItem.id,
+						},
+					} satisfies DropData,
+				};
+			},
+		}),
+		[
+			actions,
+			drag.isSourceHidden,
+		],
+	);
 
 	const renderSlot = useCallback(
-		({ slot }: TileEngine.RenderSlotProps<(typeof boardCells)[number]>) => {
+		({ slot, isOver }: TileEngine.RenderSlotProps<(typeof boardCells)[number]>) => {
 			const cell = slot.data;
 			const boardItem = board?.byCellKey[cell.key];
 			const canMerge =
@@ -142,6 +203,7 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 					invalid={feedback.invalidCellKey === cell.key}
 					merged={feedback.mergedCellKey === cell.key}
 					imprinted={feedback.imprintedCellKey === cell.key}
+					isOver={isOver}
 				/>
 			);
 		},
@@ -160,7 +222,6 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 				boardItem={tile.data.boardItem}
 				item={tile.data.item}
 				activationNowMs={tile.data.activationNowMs}
-				hidden={Boolean(tile.hidden)}
 				onSingleActivate={actions.tileSingleActivate}
 				onLongActivate={actions.tileLongActivate}
 			/>
@@ -182,6 +243,7 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 			gapPx={1}
 			className="w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
 			itemLayerClassName="pointer-events-none"
+			drag={dragConfig}
 			renderSlot={renderSlot}
 			renderTile={renderTile}
 		/>

@@ -1,27 +1,18 @@
-import {
-	DndContext,
-	DragOverlay,
-	PointerSensor,
-	useDraggable,
-	useDroppable,
-	useSensor,
-	useSensors,
-	type DragEndEvent,
-	type DragStartEvent,
-	type Data,
-} from "@dnd-kit/core";
+import { useDraggable, useDroppable, type Data } from "@dnd-kit/core";
 import { useMachine } from "@xstate/react";
 import React, {
 	memo,
 	type CSSProperties,
 	type FC,
 	forwardRef,
+	type HTMLAttributes,
+	type KeyboardEvent as ReactKeyboardEvent,
+	type PointerEvent as ReactPointerEvent,
 	type ReactNode,
 	useCallback,
 	useImperativeHandle,
 	useMemo,
 	useRef,
-	useState,
 } from "react";
 import {
 	tileEngineMachine,
@@ -35,6 +26,7 @@ import {
 	type TileEngineExternalMotion,
 } from "~/tile-engine/hook/useTileEngineMotionAnimation";
 import { cn } from "~/shared/cn";
+import { usePressActions } from "~/shared/hook/usePressActions";
 import { waitForMs } from "~/shared/util/waitForMs";
 
 const defaultGapPx = 0;
@@ -58,31 +50,30 @@ export namespace TileEngine {
 		onMotionSettle?(): void;
 	}
 
-	export interface DropContext<TTile = unknown, TSlot = unknown> {
-		tile: Tile<TTile>;
-		fromSlot: Slot<TSlot>;
-		toSlot: Slot<TSlot>;
-		targetTile?: Tile<TTile>;
-		dragRect: TileEngineRect;
+	export interface DragBinding {
+		id: Id;
+		nodeId?: Id;
+		data: Data;
+		hidden?: boolean;
+		disabled?: boolean;
+		hideWhenActive?: boolean;
+		delaySingleWhenDouble?: boolean;
+		onSingleActivate?(): void;
+		onDoubleActivate?(): void;
+		onLongActivate?(): void;
 	}
 
-	export type ActionPlan =
-		| {
-				type: "ignore" | "reject";
-		  }
-		| {
-				type: "move";
-		  }
-		| {
-				type: "swap";
-		  }
-		| {
-				type: "remove";
-		  }
-		| {
-				type: "replace";
-				replaceTileId: Id;
-		  };
+	export interface DropBinding {
+		id: Id;
+		nodeId?: Id;
+		data: Data;
+		disabled?: boolean;
+	}
+
+	export interface DragConfig<TTile = unknown, TSlot = unknown> {
+		tile(tile: Tile<TTile>): DragBinding | undefined;
+		slot(slot: Slot<TSlot>, targetTile: Tile<TTile> | undefined): DropBinding | undefined;
+	}
 
 	export interface SpawnEntry<TTile = unknown> {
 		tileId: Id;
@@ -103,18 +94,6 @@ export namespace TileEngine {
 		spawn(plan: SpawnPlan<TTile>): Promise<void>;
 		stage(entries: readonly SpawnEntry<TTile>[]): void;
 		clearMotions(): void;
-	}
-
-	export interface Actions<TTile = unknown, TSlot = unknown> {
-		resolveDrop?(context: DropContext<TTile, TSlot>): ActionPlan | Promise<ActionPlan>;
-		onMove?(context: DropContext<TTile, TSlot>): Promise<void> | void;
-		onSwap?(context: DropContext<TTile, TSlot>): Promise<void> | void;
-		onRemove?(context: DropContext<TTile, TSlot>): Promise<void> | void;
-		onReplace?(
-			context: DropContext<TTile, TSlot> & {
-				replaceTileId: Id;
-			},
-		): Promise<void> | void;
 	}
 
 	export interface RenderSlotProps<TSlot = unknown> {
@@ -138,30 +117,11 @@ export namespace TileEngine {
 		itemLayerClassName?: string;
 		gapPx?: number;
 		confinement?: HTMLElement | null;
-		actions?: Actions<TTile, TSlot>;
+		drag?: DragConfig<TTile, TSlot>;
 		renderSlot(props: RenderSlotProps<TSlot>): ReactNode;
 		renderTile(props: RenderTileProps<TTile>): ReactNode;
-		renderDragOverlay?(tile: Tile<TTile>): ReactNode;
 	}
 }
-
-const rectFromClientRect = (
-	rect: Pick<DOMRect, "left" | "top" | "width" | "height">,
-): TileEngineRect => ({
-	left: rect.left,
-	top: rect.top,
-	width: rect.width,
-	height: rect.height,
-});
-
-const querySlotRect = (engineId: string, slotId: string): TileEngineRect | undefined => {
-	const element = document.querySelector<HTMLElement>(
-		`[data-tile-engine-id="${CSS.escape(engineId)}"] [data-tile-engine-slot-id="${CSS.escape(slotId)}"]`,
-	);
-	if (!element) return undefined;
-
-	return rectFromClientRect(element.getBoundingClientRect());
-};
 
 const actorStyle = ({
 	columns,
@@ -188,35 +148,43 @@ const actorStyle = ({
 };
 
 namespace TileEngineSlotSurface {
-	export interface Props<TSlot = unknown> {
-		engineId: string;
+	export interface Props<TTile = unknown, TSlot = unknown> {
 		slot: TileEngine.Slot<TSlot>;
 		index: number;
+		targetTile?: TileEngine.Tile<TTile>;
+		className?: string;
+		drag?: TileEngine.DragConfig<TTile, TSlot>;
 		renderSlot(props: TileEngine.RenderSlotProps<TSlot>): ReactNode;
 	}
 }
 
 const TileEngineSlotSurface = memo(
-	<TSlot,>({ engineId, slot, index, renderSlot }: TileEngineSlotSurface.Props<TSlot>) => {
+	<TTile, TSlot>({
+		slot,
+		index,
+		targetTile,
+		className,
+		drag,
+		renderSlot,
+	}: TileEngineSlotSurface.Props<TTile, TSlot>) => {
+		const binding = drag?.slot(slot, targetTile);
 		const { setNodeRef, isOver } = useDroppable({
-			id: `${engineId}:slot:${slot.id}`,
-			data: {
-				kind: "tile-engine-slot",
-				engineId,
-				slotId: slot.id,
-			} satisfies Record<string, unknown> as Data,
-			disabled: slot.disabled,
+			id: binding?.id ?? `tile-engine-disabled-slot:${slot.id}`,
+			data: binding?.data ?? ({} as Data),
+			disabled: !binding || binding.disabled || slot.disabled,
 		});
 
 		return (
 			<div
 				ref={setNodeRef}
+				data-drag-node-id={binding?.nodeId ?? binding?.id}
 				data-tile-engine-slot-id={slot.id}
+				className={className}
 			>
 				{renderSlot({
 					slot,
 					index,
-					isOver,
+					isOver: Boolean(binding && isOver),
 				})}
 			</div>
 		);
@@ -224,45 +192,46 @@ const TileEngineSlotSurface = memo(
 );
 
 namespace TileEngineActor {
-	export interface Props<TTile = unknown> {
-		engineId: string;
+	export interface Props<TTile = unknown, TSlot = unknown> {
 		tile: TileEngine.Tile<TTile>;
 		index: number;
 		columns: number;
 		rowCount: number;
 		gapPx: number;
 		motion?: TileEngineMotion | TileEngineExternalMotion;
-		dndEnabled: boolean;
-		activeTileId: string | null;
+		drag?: TileEngine.DragConfig<TTile, TSlot>;
 		settleMotion(tileId: string, nonce?: number): void;
 		renderTile(props: TileEngine.RenderTileProps<TTile>): ReactNode;
 	}
 }
 
 const TileEngineActor = memo(
-	<TTile,>({
-		engineId,
+	<TTile, TSlot>({
 		tile,
 		index,
 		columns,
 		rowCount,
 		gapPx,
 		motion,
-		dndEnabled,
-		activeTileId,
+		drag,
 		settleMotion,
 		renderTile,
-	}: TileEngineActor.Props<TTile>) => {
+	}: TileEngineActor.Props<TTile, TSlot>) => {
+		const binding = drag?.tile(tile);
 		const ref = useRef<HTMLDivElement | null>(null);
 		const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-			id: `${engineId}:tile:${tile.id}`,
-			data: {
-				kind: "tile-engine-tile",
-				engineId,
-				tileId: tile.id,
-			} satisfies Record<string, unknown> as Data,
-			disabled: !dndEnabled || tile.disabled,
+			id: binding?.id ?? `tile-engine-disabled-tile:${tile.id}`,
+			data: binding?.data ?? ({} as Data),
+			disabled: !binding || binding.disabled || tile.disabled,
 		});
+		const press = usePressActions({
+			onSingle: binding?.onSingleActivate,
+			onDouble: binding?.onDoubleActivate,
+			onLong: binding?.onLongActivate,
+			delaySingleWhenDouble: binding?.delaySingleWhenDouble,
+			isDisabled: !binding || binding.disabled || tile.disabled,
+		});
+		const pressProps = press.pressProps as HTMLAttributes<HTMLDivElement>;
 		const setRefs = useCallback(
 			(node: HTMLDivElement | null) => {
 				ref.current = node;
@@ -270,6 +239,26 @@ const TileEngineActor = memo(
 			},
 			[
 				setNodeRef,
+			],
+		);
+		const handlePointerDown = useCallback(
+			(event: ReactPointerEvent<HTMLDivElement>) => {
+				pressProps.onPointerDown?.(event);
+				listeners?.onPointerDown?.(event);
+			},
+			[
+				listeners,
+				pressProps,
+			],
+		);
+		const handleKeyDown = useCallback(
+			(event: ReactKeyboardEvent<HTMLDivElement>) => {
+				pressProps.onKeyDown?.(event);
+				listeners?.onKeyDown?.(event);
+			},
+			[
+				listeners,
+				pressProps,
 			],
 		);
 		const handleSettle = useCallback(() => {
@@ -280,24 +269,31 @@ const TileEngineActor = memo(
 			settleMotion,
 			tile,
 		]);
+
 		useTileEngineMotionAnimation({
 			ref,
 			motion,
 			onSettle: handleSettle,
 		});
 
+		const hidden = Boolean(
+			!motion &&
+				(tile.hidden ||
+					binding?.hidden ||
+					(isDragging && binding?.hideWhenActive !== false)),
+		);
+
 		return (
 			<div
 				ref={setRefs}
+				data-drag-node-id={binding?.nodeId ?? binding?.id}
 				data-tile-engine-tile-id={tile.id}
 				data-tile-engine-slot-id={tile.slotId}
 				{...attributes}
-				{...listeners}
+				{...pressProps}
 				className={cn(
 					"pointer-events-auto absolute box-border origin-top-left touch-none will-change-transform",
-					(tile.hidden || (dndEnabled && (isDragging || activeTileId === tile.id))) &&
-						"pointer-events-none opacity-0",
-					motion?.priority === "raised" && "pointer-events-auto",
+					hidden && "pointer-events-none opacity-0",
 				)}
 				style={actorStyle({
 					columns,
@@ -305,10 +301,12 @@ const TileEngineActor = memo(
 					index,
 					gapPx,
 				})}
+				onKeyDown={handleKeyDown}
+				onPointerDown={handlePointerDown}
 			>
 				{renderTile({
 					tile,
-					isDragging: dndEnabled && isDragging,
+					isDragging,
 				})}
 			</div>
 		);
@@ -325,22 +323,13 @@ function TileEngineInner<TTile, TSlot>(
 		cellClassName,
 		itemLayerClassName,
 		gapPx = defaultGapPx,
-		actions,
+		drag,
 		renderSlot,
 		renderTile,
-		renderDragOverlay,
 	}: TileEngine.Props<TTile, TSlot>,
 	ref: React.ForwardedRef<TileEngine.Handle<TTile>>,
 ) {
 	const [state, send] = useMachine(tileEngineMachine);
-	const [activeTileId, setActiveTileId] = useState<string | null>(null);
-	const sensors = useSensors(
-		useSensor(PointerSensor, {
-			activationConstraint: {
-				distance: 2,
-			},
-		}),
-	);
 	const rowCount = Math.max(1, Math.ceil(slots.length / columns));
 	const slotIndexById = useMemo(() => {
 		const index = new Map<string, number>();
@@ -349,20 +338,6 @@ function TileEngineInner<TTile, TSlot>(
 	}, [
 		slots,
 	]);
-	const slotById = useMemo(() => {
-		const index = new Map<string, TileEngine.Slot<TSlot>>();
-		for (const slot of slots) index.set(slot.id, slot);
-		return index;
-	}, [
-		slots,
-	]);
-	const tileById = useMemo(() => {
-		const index = new Map<string, TileEngine.Tile<TTile>>();
-		for (const tile of tiles) index.set(tile.id, tile);
-		return index;
-	}, [
-		tiles,
-	]);
 	const tileBySlotId = useMemo(() => {
 		const index = new Map<string, TileEngine.Tile<TTile>>();
 		for (const tile of tiles) index.set(tile.slotId, tile);
@@ -370,7 +345,6 @@ function TileEngineInner<TTile, TSlot>(
 	}, [
 		tiles,
 	]);
-	const activeTile = activeTileId ? tileById.get(activeTileId) : undefined;
 
 	const settleMotion = useCallback(
 		(tileId: string, nonce?: number) => {
@@ -408,18 +382,18 @@ function TileEngineInner<TTile, TSlot>(
 			async spawn(plan) {
 				const mode = plan.mode ?? "instant";
 				if (mode === "instant") {
-					await plan.commit(plan.entries);
 					stage(plan.entries);
+					await plan.commit(plan.entries);
 					await waitForMs(tileEngineMotionDurationMs);
 					return;
 				}
 
 				const gapMs = plan.gapMs ?? 55;
 				for (const entry of plan.entries) {
-					await plan.commit([
+					stage([
 						entry,
 					]);
-					stage([
+					await plan.commit([
 						entry,
 					]);
 					await waitForMs(tileEngineMotionDurationMs + gapMs);
@@ -438,108 +412,7 @@ function TileEngineInner<TTile, TSlot>(
 		],
 	);
 
-	const handleDragStart = useCallback((event: DragStartEvent) => {
-		const data = event.active.data.current as
-			| {
-					tileId?: string;
-			  }
-			| undefined;
-		setActiveTileId(data?.tileId ?? null);
-	}, []);
-	const handleDragEnd = useCallback(
-		async (event: DragEndEvent) => {
-			const activeData = event.active.data.current as
-				| {
-						tileId?: string;
-				  }
-				| undefined;
-			const overData = event.over?.data.current as
-				| {
-						slotId?: string;
-				  }
-				| undefined;
-			const tile = activeData?.tileId ? tileById.get(activeData.tileId) : undefined;
-			const toSlot = overData?.slotId ? slotById.get(overData.slotId) : undefined;
-			const fromSlot = tile ? slotById.get(tile.slotId) : undefined;
-
-			if (!tile || !fromSlot || !toSlot) {
-				setActiveTileId(null);
-				return;
-			}
-
-			const dragRect = rectFromClientRect(
-				event.active.rect.current.translated ??
-					event.active.rect.current.initial ??
-					new DOMRect(),
-			);
-			const targetTile = tileBySlotId.get(toSlot.id);
-			const context: TileEngine.DropContext<TTile, TSlot> = {
-				tile,
-				fromSlot,
-				toSlot,
-				targetTile,
-				dragRect,
-			};
-			const resolved = await actions?.resolveDrop?.(context);
-			const plan =
-				resolved ??
-				(targetTile
-					? {
-							type: "swap" as const,
-						}
-					: {
-							type: "move" as const,
-						});
-
-			if (plan.type === "ignore" || plan.type === "reject") {
-				setActiveTileId(null);
-				return;
-			}
-
-			const stageEntries: TileEngine.SpawnEntry<TTile>[] = [
-				{
-					tileId: tile.id,
-					slotId: toSlot.id,
-					from: dragRect,
-					priority: "raised",
-				},
-			];
-
-			if (plan.type === "swap" && targetTile) {
-				const targetRect = querySlotRect(id, toSlot.id);
-				if (targetRect) {
-					stageEntries.push({
-						tileId: targetTile.id,
-						slotId: fromSlot.id,
-						from: targetRect,
-						priority: "raised",
-					});
-				}
-			}
-
-			if (plan.type === "move") await actions?.onMove?.(context);
-			if (plan.type === "swap") await actions?.onSwap?.(context);
-			if (plan.type === "remove") await actions?.onRemove?.(context);
-			if (plan.type === "replace")
-				await actions?.onReplace?.({
-					...context,
-					replaceTileId: plan.replaceTileId,
-				});
-
-			stage(stageEntries);
-			await waitForMs(tileEngineMotionDurationMs);
-			setActiveTileId(null);
-		},
-		[
-			actions,
-			slotById,
-			stage,
-			tileById,
-			tileBySlotId,
-		],
-	);
-
-	const content = (
+	return (
 		<div
 			data-tile-engine-id={id}
 			className={cn("relative overflow-hidden", className)}
@@ -550,29 +423,17 @@ function TileEngineInner<TTile, TSlot>(
 					gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
 				}}
 			>
-				{slots.map((slot, index) =>
-					actions ? (
-						<div
-							key={slot.id}
-							className={cellClassName}
-						>
-							<TileEngineSlotSurface
-								engineId={id}
-								slot={slot}
-								index={index}
-								renderSlot={renderSlot}
-							/>
-						</div>
-					) : (
-						<React.Fragment key={slot.id}>
-							{renderSlot({
-								slot,
-								index,
-								isOver: false,
-							})}
-						</React.Fragment>
-					),
-				)}
+				{slots.map((slot, index) => (
+					<TileEngineSlotSurface
+						key={slot.id}
+						slot={slot}
+						index={index}
+						targetTile={tileBySlotId.get(slot.id)}
+						className={cellClassName}
+						drag={drag}
+						renderSlot={renderSlot}
+					/>
+				))}
 			</div>
 			<div className={cn("pointer-events-none absolute inset-0", itemLayerClassName)}>
 				{tiles.map((tile) => {
@@ -584,15 +445,13 @@ function TileEngineInner<TTile, TSlot>(
 					return (
 						<TileEngineActor
 							key={tile.id}
-							engineId={id}
 							tile={tile}
 							index={index}
 							columns={columns}
 							rowCount={rowCount}
 							gapPx={gapPx}
 							motion={motion}
-							dndEnabled={Boolean(actions)}
-							activeTileId={activeTileId}
+							drag={drag}
 							settleMotion={settleMotion}
 							renderTile={renderTile}
 						/>
@@ -600,31 +459,6 @@ function TileEngineInner<TTile, TSlot>(
 				})}
 			</div>
 		</div>
-	);
-
-	if (!actions) return content;
-
-	return (
-		<DndContext
-			sensors={sensors}
-			onDragStart={handleDragStart}
-			onDragEnd={handleDragEnd}
-			onDragCancel={() => setActiveTileId(null)}
-		>
-			{content}
-			<DragOverlay
-				adjustScale={false}
-				dropAnimation={null}
-			>
-				{activeTile
-					? (renderDragOverlay?.(activeTile) ??
-						renderTile({
-							tile: activeTile,
-							isDragging: true,
-						}))
-					: null}
-			</DragOverlay>
-		</DndContext>
 	);
 }
 

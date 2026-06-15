@@ -2,8 +2,8 @@ import type { FC } from "react";
 import { craftStatusLabel } from "~/v0/item/logic/craftStatusLabel";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { cn } from "~/v0/style/cn";
-import { formatMs } from "~/v0/style/formatMs";
+import { cn } from "~/v0/ui/cn";
+import { formatMs } from "~/v0/time/formatMs";
 
 export namespace ItemCraftCard {
 	export interface Props {

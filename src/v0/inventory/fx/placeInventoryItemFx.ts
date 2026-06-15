@@ -15,9 +15,9 @@ import type { ItemId } from "~/v0/manifest/manifestId";
 import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
 import type { InventoryPlaceResult } from "~/v0/inventory/view/InventoryPlaceResultSchema";
 import { GameActionError } from "~/v0/play/action/GameActionError";
-import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { json } from "~/v0/style/json";
-import { parseJson } from "~/v0/style/parseJson";
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
+import { json } from "~/v0/serialization/json";
+import { parseJson } from "~/v0/serialization/parseJson";
 
 export namespace placeInventoryItemFx {
 	export interface Props {

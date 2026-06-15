@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { spendActivationInputFx } from "~/v0/activation/fx/spendActivationInputFx";
-import { activationLabel } from "~/v0/activation/logic/activationLabel";
 import { groupActivationInputRows } from "~/v0/activation/logic/groupActivationInputRows";
 import { ActivateItemInputSchema } from "~/v0/activation/type/ActivateItemInputSchema";
 import type { ActivationResultSchema } from "~/v0/activation/type/ActivationResultSchema";
@@ -17,12 +16,13 @@ import { IdServiceFx } from "~/v0/id/context/IdServiceFx";
 import { planPlacements } from "~/v0/inventory/logic/planning/placement";
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
-import { applyPlacementPlanFx } from "~/v0/play/fx/applyPlacementPlanFx";
+import { applyPlacementPlanFx } from "~/v0/placement/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { json } from "~/v0/style/json";
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
+import { json } from "~/v0/serialization/json";
 import { applyProducerUpgradeEffects } from "~/v0/upgrade/logic/applyProducerUpgradeEffects";
-import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
+import { assertActivationStoredInputsFx } from "./assertActivationStoredInputsFx";
+import { createActivationVisualEventsFx } from "./createActivationVisualEventsFx";
 import { depleteActivationFx } from "./depleteActivationFx";
 import { rollActivationOutputFx } from "./rollActivationOutputFx";
 
@@ -127,28 +127,12 @@ export const activateBoardItemFx = Effect.fn("activateBoardItemFx")(function* (
 			const storedInputs =
 				groupActivationInputRows(inputRows).get(row.id) ?? new Map<ItemId, number>();
 
-			for (const requirement of activation.requirements ?? []) {
-				const stored = storedInputs.get(requirement.itemId) ?? 0;
-				if (stored < requirement.quantity) {
-					const name = gameConfig.getItem(requirement.itemId)?.name ?? requirement.itemId;
-					return yield* Effect.fail(
-						new GameActionError(
-							`${activationLabel(activation.type)} requires ${name}.`,
-						),
-					);
-				}
-			}
-
-			for (const required of activation.inputs ?? []) {
-				const needed = required.quantity * steps;
-				const stored = storedInputs.get(required.itemId) ?? 0;
-				if (stored < needed) {
-					const name = gameConfig.getItem(required.itemId)?.name ?? required.itemId;
-					return yield* Effect.fail(
-						new GameActionError(`${activationLabel(activation.type)} needs ${name}.`),
-					);
-				}
-			}
+			yield* assertActivationStoredInputsFx({
+				activation,
+				gameConfig,
+				steps,
+				storedInputs,
+			});
 
 			const allDrops: ItemId[] = [];
 			for (let step = 0; step < steps; step++) {
@@ -194,54 +178,11 @@ export const activateBoardItemFx = Effect.fn("activateBoardItemFx")(function* (
 				nextRemainingCharges !== undefined &&
 				nextRemainingCharges <= 0;
 
-			const visualEvents: ActionVisualEventSchema.Type[] = [
-				{
-					type: "activation.activated",
-					itemInstanceId: row.id,
-					mode: input.activation,
-				},
-				...placements.flatMap((placement): ActionVisualEventSchema.Type[] => {
-					if (placement.kind === "board") {
-						if (
-							!placement.boardItemId ||
-							placement.x === undefined ||
-							placement.y === undefined
-						) {
-							return [];
-						}
-
-						return [
-							{
-								type: "item.spawned",
-								itemInstanceId: placement.boardItemId,
-								itemId: placement.itemId,
-								originItemInstanceId: row.id,
-								to: {
-									kind: "board",
-									x: placement.x,
-									y: placement.y,
-								},
-								reason: "activation-output",
-							},
-						];
-					}
-
-					if (placement.slotIndex === undefined) return [];
-
-					return [
-						{
-							type: "item.spawned",
-							itemId: placement.itemId,
-							originItemInstanceId: row.id,
-							to: {
-								kind: "inventory",
-								slotIndex: placement.slotIndex,
-							},
-							reason: "activation-output",
-						},
-					];
-				}),
-			];
+			const visualEvents = yield* createActivationVisualEventsFx({
+				mode: input.activation,
+				placements,
+				row,
+			});
 
 			if (shouldDeplete) {
 				const depletion = yield* depleteActivationFx({

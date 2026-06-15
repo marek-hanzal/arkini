@@ -1,5 +1,5 @@
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
-import { formatMs } from "~/v0/style/formatMs";
+import { formatMs } from "~/v0/time/formatMs";
 
 export namespace craftStatusLabel {
 	export interface Props {

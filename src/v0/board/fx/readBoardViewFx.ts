@@ -17,7 +17,7 @@ import { readBoardItemRowsFx } from "~/v0/item-instance/fx/readBoardItemRowsFx";
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { parseJson } from "~/v0/style/parseJson";
+import { parseJson } from "~/v0/serialization/parseJson";
 
 export const readBoardViewFx = Effect.fn("readBoardViewFx")(function* () {
 	const date = yield* DateServiceFx;

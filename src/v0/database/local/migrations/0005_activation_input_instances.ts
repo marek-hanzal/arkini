@@ -1,8 +1,8 @@
 import type { Kysely } from "kysely";
 import type { Migration } from "kysely/migration";
 import { emptyInventoryStateJson } from "~/v0/inventory/logic/emptyInventoryStateJson";
-import { json } from "~/v0/style/json";
-import { parseJson } from "~/v0/style/parseJson";
+import { json } from "~/v0/serialization/json";
+import { parseJson } from "~/v0/serialization/parseJson";
 
 interface ItemInstanceMigrationTable {
 	id: string;

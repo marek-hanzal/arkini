@@ -7,7 +7,7 @@ import type { BoardCellView } from "~/v0/board/boardCells";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
-import { cn } from "~/v0/style/cn";
+import { cn } from "~/v0/ui/cn";
 
 export namespace BoardCell {
 	export interface Props {

@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { FC } from "react";
-import { cn } from "~/v0/style/cn";
-import { SheetHeader } from "~/v0/sheet/SheetHeader";
+import { cn } from "~/v0/ui/cn";
+import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { StatusPill } from "~/v0/database/StatusPill";
 import { useHardResetMutation } from "~/v0/database/action/useHardResetMutation";
 import { databaseStatusQueryOptions } from "~/v0/database/query/databaseStatusQueryOptions";

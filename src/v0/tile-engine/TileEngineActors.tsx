@@ -1,5 +1,5 @@
 import { memo, type ReactNode, type RefObject } from "react";
-import { cn } from "~/v0/style/cn";
+import { cn } from "~/v0/ui/cn";
 import { TileEngineActor } from "~/v0/tile-engine/TileEngineActor";
 import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/TileEngineActor.types";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";

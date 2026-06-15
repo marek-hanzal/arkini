@@ -8,7 +8,7 @@ import { dbFx } from "~/v0/database/fx/dbFx";
 import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
-import { json } from "~/v0/style/json";
+import { json } from "~/v0/serialization/json";
 
 export namespace startCraftFx {
 	export interface Props {

@@ -2,7 +2,7 @@ import { memo, type FC } from "react";
 import { ItemLevelBadge } from "~/v0/item/ui/ItemLevelBadge";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
-import { cn } from "~/v0/style/cn";
+import { cn } from "~/v0/ui/cn";
 
 export namespace GameItemContent {
 	export interface Props {

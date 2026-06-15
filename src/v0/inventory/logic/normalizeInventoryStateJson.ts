@@ -1,6 +1,6 @@
 import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
-import { json } from "~/v0/style/json";
-import { parseJson } from "~/v0/style/parseJson";
+import { json } from "~/v0/serialization/json";
+import { parseJson } from "~/v0/serialization/parseJson";
 import { emptyInventoryStateJson } from "./emptyInventoryStateJson";
 import { isEmptyInventoryState } from "./isEmptyInventoryState";
 

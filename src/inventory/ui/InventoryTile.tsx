@@ -7,7 +7,6 @@ export namespace InventoryTile {
 	export interface Props {
 		slot: InventorySlot;
 		item: ViewItem;
-		onDoubleActivate(slot: InventorySlot): void;
 	}
 }
 

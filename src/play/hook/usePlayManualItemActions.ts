@@ -1,30 +1,26 @@
 import { useQueryClient } from "@tanstack/react-query";
 import type { Command } from "~/command/Command";
 import { useCallback, useMemo } from "react";
-import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import { useRunCommandMutation } from "~/command/useRunCommandMutation";
-import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
-import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import { playQueryKeys } from "~/play/hook/playQueryKeys";
-import { placeInventoryOnBoardWithFly } from "~/play/logic/placeInventoryOnBoardWithFly";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
+import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
+import { playQueryKeys } from "~/play/hook/playQueryKeys";
+import { usePlayFeedbackState } from "~/play/hook/usePlayFeedbackState";
+import { usePlaySchedule } from "~/play/hook/usePlaySchedule";
+import { usePlayVisualMotionsState } from "~/play/hook/usePlayVisualMotionsState";
+import { placeInventoryOnBoardWithFly } from "~/play/logic/placeInventoryOnBoardWithFly";
 
 export namespace usePlayManualItemActions {
-	export interface Props {
-		visualMotions: Pick<useVisualItemMotions.State, "stage">;
-		feedback: Feedback;
-		schedule(label: string, operation: () => Promise<void>): Promise<void>;
-	}
+	export interface Props {}
 }
 
-export const usePlayManualItemActions = ({
-	visualMotions,
-	feedback,
-	schedule,
-}: usePlayManualItemActions.Props) => {
+export const usePlayManualItemActions = (_props?: usePlayManualItemActions.Props) => {
 	const queryClient = useQueryClient();
 	const invalidatePlayData = usePlayDataInvalidation();
+	const visualMotions = usePlayVisualMotionsState();
+	const feedback = usePlayFeedbackState();
+	const schedule = usePlaySchedule();
 	const command = useRunCommandMutation<
 		Extract<
 			Command,

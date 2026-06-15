@@ -1,28 +1,20 @@
 import type { FC } from "react";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
+import { usePlaySheetContentController } from "~/play/hook/usePlaySheetContentController";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
-import type { usePlayShellController } from "~/play/hook/usePlayShellController";
 import { UpgradesSheet } from "~/upgrade/ui/UpgradesSheet";
 
 export namespace PlaySheetContent {
-	export interface Props {
-		controller: ReturnType<typeof usePlayShellController>;
-	}
+	export interface Props {}
 }
 
-export const PlaySheetContent: FC<PlaySheetContent.Props> = ({ controller }) => {
+export const PlaySheetContent: FC<PlaySheetContent.Props> = () => {
+	const controller = usePlaySheetContentController();
+
 	if (controller.renderedSheet === "inventory") {
-		return (
-			<InventorySheet
-				drag={controller.drag}
-				invalidInventorySlot={controller.invalidInventorySlot}
-				onClose={controller.closeSheet}
-				onSlotDoubleActivate={controller.placeInventorySlot}
-				visualMotions={controller.visualMotions}
-			/>
-		);
+		return <InventorySheet />;
 	}
 
 	if (controller.renderedSheet === "upgrades") {

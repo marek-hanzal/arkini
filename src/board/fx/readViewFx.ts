@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
 import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
 import { readActivationView } from "~/board/logic/readActivationView";
 import { readBoardState } from "~/board/logic/readBoardState";
@@ -10,7 +9,6 @@ import { cellKey } from "~/board/util/cell";
 import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { BoardViewSchema, type BoardView } from "~/board/view/BoardViewSchema";
-import { deleteCraftInputsFx } from "~/craft/fx/deleteCraftInputsFx";
 import { readCraftInputRowsFx } from "~/craft/fx/readCraftInputRowsFx";
 import { groupCraftInputRows } from "~/craft/logic/groupCraftInputRows";
 import { dbFx } from "~/database/fx/dbFx";
@@ -20,55 +18,12 @@ import { readBoardItemRowsFx } from "~/item-instance/fx/readBoardItemRowsFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
 import { defaultSaveGameId } from "~/play/logic/save";
-import { json } from "~/shared/json";
 import { parseJson } from "~/shared/parseJson";
 
 export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
-	const nowMs = date.nowMs();
-	const updatedAt = date.timestamp();
-
-	let rows = yield* readBoardItemRowsFx();
-
-	const readyCraftRows = rows.flatMap((row) => {
-		const recipe = gameConfig.getCraftRecipeForTarget(row.itemDefinitionId);
-		if (!recipe) return [];
-		const state = readBoardState(row);
-		const readyAtMs = state.craft?.readyAt
-			? date.parseTimestampMs(state.craft.readyAt)
-			: undefined;
-		if (readyAtMs === undefined || readyAtMs > nowMs) return [];
-		return [
-			{
-				row,
-				recipe,
-			},
-		];
-	});
-
-	if (readyCraftRows.length > 0) {
-		yield* dbFx(async (db) => {
-			for (const { row, recipe } of readyCraftRows) {
-				await db
-					.updateTable(table.itemInstance)
-					.set({
-						itemDefinitionId: recipe.resultItemId,
-						stateJson: json(createInitialBoardState(recipe.resultItemId, gameConfig)),
-						updatedAt,
-					})
-					.where("id", "=", row.id)
-					.execute();
-			}
-		});
-		for (const { row } of readyCraftRows) {
-			yield* deleteCraftInputsFx({
-				ownerItemInstanceId: row.id,
-			});
-		}
-
-		rows = yield* readBoardItemRowsFx();
-	}
+	const rows = yield* readBoardItemRowsFx();
 
 	const [upgradeRows, activationInputRows, craftInputRows] = yield* Effect.all([
 		dbFx((db) =>
@@ -89,7 +44,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const craftInputsByOwner = groupCraftInputRows(craftInputRows);
 
 	const items = rows.map((item): BoardViewItem => {
-		const state = parseJson<BoardItemState>(item.stateJson || json({}));
+		const state = parseJson<BoardItemState>(item.stateJson || "{}");
 		return {
 			id: item.id,
 			itemId: item.itemDefinitionId as ItemId,

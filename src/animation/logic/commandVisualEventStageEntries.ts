@@ -1,5 +1,6 @@
 import type { CommandVisualEventSchema } from "~/command/CommandVisualEventSchema";
 import {
+	visualBoardItemKey,
 	visualInventorySlotKey,
 	type useVisualItemMotions,
 } from "~/play/hook/useVisualItemMotions";
@@ -112,6 +113,22 @@ export const commandVisualEventStageEntries = ({
 					to: targetTo,
 					priority: "raised",
 					kind: "move",
+				});
+			}
+			continue;
+		}
+
+		if (event.type === "craft.claimed") {
+			const rect = actorVisualRect({
+				itemInstanceId: event.itemInstanceId,
+			});
+			if (rect) {
+				entries.push({
+					key: visualBoardItemKey(event.itemInstanceId),
+					from: rect,
+					to: rect,
+					priority: "raised",
+					kind: "place",
 				});
 			}
 			continue;

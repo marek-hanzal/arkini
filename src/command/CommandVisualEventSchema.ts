@@ -3,6 +3,7 @@ import { ActivationDepletionSchema } from "~/activation/type/ActivationDepletion
 import { ActivationModeSchema } from "~/activation/type/ActivationModeSchema";
 import { ItemInstanceIdSchema } from "~/item-instance/type/ItemInstanceIdSchema";
 import { ItemLocationSchema } from "~/item-instance/type/ItemLocationSchema";
+import { GameCraftRecipeIdSchema } from "~/manifest/GameCraftRecipeIdSchema";
 import { GameItemIdSchema } from "~/manifest/GameItemIdSchema";
 import { GameUpgradeIdSchema } from "~/manifest/GameUpgradeIdSchema";
 import { PositiveIntegerSchema } from "~/manifest/PositiveIntegerSchema";
@@ -83,6 +84,20 @@ export const CommandVisualEventSchema = z.discriminatedUnion("type", [
 		targetItemInstanceId: ItemInstanceIdSchema,
 		itemId: GameItemIdSchema,
 		quantity: PositiveIntegerSchema,
+	}),
+	z.object({
+		type: z.literal("craft.started"),
+		itemInstanceId: ItemInstanceIdSchema,
+		recipeId: GameCraftRecipeIdSchema,
+		resultItemId: GameItemIdSchema,
+		readyAtMs: z.number().optional(),
+	}),
+	z.object({
+		type: z.literal("craft.claimed"),
+		itemInstanceId: ItemInstanceIdSchema,
+		recipeId: GameCraftRecipeIdSchema,
+		sourceItemId: GameItemIdSchema,
+		resultItemId: GameItemIdSchema,
 	}),
 	z.object({
 		type: z.literal("upgrade.started"),

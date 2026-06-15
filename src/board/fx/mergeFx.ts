@@ -4,12 +4,11 @@ import { storeActivationInputFx } from "~/activation/fx/storeActivationInputFx";
 import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
 import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { readStoredBoardState } from "~/board/logic/readStoredBoardState";
-import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import { CommandResultSchema } from "~/command/CommandResultSchema";
 import { GameActionError } from "~/command/GameActionError";
-import { deleteCraftInputsFx } from "~/craft/fx/deleteCraftInputsFx";
 import { readCraftInputRowsFx } from "~/craft/fx/readCraftInputRowsFx";
 import { storeCraftInputFx } from "~/craft/fx/storeCraftInputFx";
+import { startCraftFx } from "~/craft/fx/startCraftFx";
 import { groupCraftInputRows } from "~/craft/logic/groupCraftInputRows";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
@@ -179,45 +178,15 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 					itemId: source.itemDefinitionId,
 				});
 
-				if (complete && craft.durationMs === 0) {
-					yield* deleteCraftInputsFx({
-						ownerItemInstanceId: target.id,
-					});
-				}
-
-				yield* dbFx((db) =>
-					db
-						.updateTable(table.itemInstance)
-						.set({
-							itemDefinitionId:
-								complete && craft.durationMs === 0
-									? craft.resultItemId
-									: target.itemDefinitionId,
-							stateJson: json(
-								complete
-									? craft.durationMs === 0
-										? createInitialBoardState(craft.resultItemId, gameConfig)
-										: ({
-												...targetState,
-												craft: {
-													startedAt: timestamp,
-													readyAt: date.toTimestamp(
-														now.plus({
-															milliseconds: craft.durationMs,
-														}),
-													),
-												},
-											} satisfies BoardItemState)
-									: ({
-											...targetState,
-											craft: {},
-										} satisfies BoardItemState),
-							),
-							updatedAt: timestamp,
+				const craftEvents = complete
+					? yield* startCraftFx({
+							boardItemId: target.id,
+							itemId: target.itemDefinitionId,
+							state: targetState,
+							storedInputs: delivered,
 						})
-						.where("id", "=", target.id)
-						.execute(),
-				);
+					: [];
+
 				return {
 					visualEvents: [
 						{
@@ -231,6 +200,7 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 							},
 							reason: "craft-input",
 						},
+						...craftEvents,
 					],
 				} satisfies CommandResultSchema.Type;
 			}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CraftRuntimeStateSchema } from "~/craft/type/CraftRuntimeStateSchema";
 
 export const BoardItemStateSchema = z.object({
 	activation: z
@@ -7,13 +8,7 @@ export const BoardItemStateSchema = z.object({
 			remainingCharges: z.number().optional(),
 		})
 		.optional(),
-	craft: z
-		.object({
-			startedAt: z.string().optional(),
-			readyAt: z.string().optional(),
-			remainingMs: z.number().optional(),
-		})
-		.optional(),
+	craft: CraftRuntimeStateSchema.optional(),
 });
 
 type BoardItemStateSchema = typeof BoardItemStateSchema;

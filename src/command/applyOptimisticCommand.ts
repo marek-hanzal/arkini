@@ -109,6 +109,7 @@ export const applyOptimisticCommand = ({
 		case "inventory.stash":
 		case "activation.activate":
 		case "activation.withdrawInput":
+		case "craft.claim":
 		case "upgrade.buy":
 			return snapshot;
 	}

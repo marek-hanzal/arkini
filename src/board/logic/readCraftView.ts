@@ -1,5 +1,6 @@
 import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
+import { resolveCraftProgress } from "~/craft/logic/resolveCraftProgress";
 import type { DateService } from "~/date/context/DateServiceFx";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
@@ -24,18 +25,11 @@ export const readCraftView = ({
 	const recipe = gameConfig.getCraftRecipeForTarget(itemId);
 	if (!recipe) return undefined;
 
-	const delivered = Object.fromEntries(
-		recipe.inputs.map((input) => [
-			input.itemId,
-			storedInputs.get(input.itemId) ?? 0,
-		]),
-	);
-	const required = recipe.inputs.reduce((sum, input) => sum + input.quantity, 0);
-	const current = recipe.inputs.reduce((sum, input) => {
-		return sum + Math.min(delivered[input.itemId] ?? 0, input.quantity);
-	}, 0);
-	const inputProgress = required <= 0 ? 0 : Math.min(1, current / required);
-	const inputsComplete = inputProgress >= 1;
+	const progress = resolveCraftProgress({
+		recipe,
+		storedInputs,
+	});
+	const inputsComplete = progress.inputsComplete;
 	const startedAtMs = state.craft?.startedAt
 		? date.parseTimestampMs(state.craft.startedAt)
 		: undefined;
@@ -66,10 +60,10 @@ export const readCraftView = ({
 		inputs: [
 			...recipe.inputs,
 		],
-		delivered,
-		inputProgress,
+		delivered: progress.delivered,
+		inputProgress: progress.inputProgress,
 		timeProgress,
-		progress: phase === "collecting_inputs" ? inputProgress : timeProgress,
+		progress: phase === "collecting_inputs" ? progress.inputProgress : timeProgress,
 		phase,
 		complete: phase === "ready",
 		canAcceptInputs: phase === "collecting_inputs",

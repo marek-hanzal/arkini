@@ -1,22 +1,25 @@
 import { Effect } from "effect";
+import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
 import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
+import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
 import { readActivationView } from "~/board/logic/readActivationView";
 import { readBoardState } from "~/board/logic/readBoardState";
 import { readCraftView } from "~/board/logic/readCraftView";
-import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
 import { cellKey } from "~/board/util/cell";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import { BoardViewSchema, type BoardView } from "~/board/view/BoardViewSchema";
+import { deleteCraftInputsFx } from "~/craft/fx/deleteCraftInputsFx";
+import { readCraftInputRowsFx } from "~/craft/fx/readCraftInputRowsFx";
+import { groupCraftInputRows } from "~/craft/logic/groupCraftInputRows";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
+import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { readBoardItemRowsFx } from "~/item-instance/fx/readBoardItemRowsFx";
-import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
-import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import type { ItemId } from "~/manifest/manifestId";
 import { defaultSaveGameId } from "~/play/logic/save";
-import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
-import { BoardViewSchema, type BoardView } from "~/board/view/BoardViewSchema";
-import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { json } from "~/shared/json";
 import { parseJson } from "~/shared/parseJson";
 
@@ -58,11 +61,16 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 					.execute();
 			}
 		});
+		for (const { row } of readyCraftRows) {
+			yield* deleteCraftInputsFx({
+				ownerItemInstanceId: row.id,
+			});
+		}
 
 		rows = yield* readBoardItemRowsFx();
 	}
 
-	const [upgradeRows, activationInputRows] = yield* Effect.all([
+	const [upgradeRows, activationInputRows, craftInputRows] = yield* Effect.all([
 		dbFx((db) =>
 			db
 				.selectFrom(table.playerUpgrade)
@@ -73,8 +81,12 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 		readActivationInputRowsFx({
 			ownerItemInstanceIds: rows.map((row) => row.id),
 		}),
+		readCraftInputRowsFx({
+			ownerItemInstanceIds: rows.map((row) => row.id),
+		}),
 	]);
 	const activationInputsByOwner = groupActivationInputRows(activationInputRows);
+	const craftInputsByOwner = groupCraftInputRows(craftInputRows);
 
 	const items = rows.map((item): BoardViewItem => {
 		const state = parseJson<BoardItemState>(item.stateJson || json({}));
@@ -97,6 +109,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				state,
 				date,
 				gameConfig,
+				storedInputs: craftInputsByOwner.get(item.id),
 			}),
 		};
 	});

@@ -4,6 +4,7 @@ import { migration0002PlayerUpgrades } from "./0002_player_upgrades";
 import { migration0003UpgradeJobsAndProducerInputs } from "./0003_upgrade_jobs_and_producer_inputs";
 import { migration0004ItemInstances } from "./0004_item_instances";
 import { migration0005ActivationInputInstances } from "./0005_activation_input_instances";
+import { migration0006CraftInputInstances } from "./0006_craft_input_instances";
 
 export const migrations = {
 	"0001_bootstrap": migration0001Bootstrap,
@@ -11,4 +12,5 @@ export const migrations = {
 	"0003_upgrade_jobs_and_producer_inputs": migration0003UpgradeJobsAndProducerInputs,
 	"0004_item_instances": migration0004ItemInstances,
 	"0005_activation_input_instances": migration0005ActivationInputInstances,
+	"0006_craft_input_instances": migration0006CraftInputInstances,
 } satisfies Record<string, Migration>;

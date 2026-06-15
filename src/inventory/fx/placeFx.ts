@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { insertFx } from "~/board/fx/insertFx";
 import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { readCraftInputRowsFx } from "~/craft/fx/readCraftInputRowsFx";
 import { assertInsideBoard } from "~/board/logic/assertInsideBoard";
 import { resumeCraftTimer } from "~/board/logic/resumeCraftTimer";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
@@ -52,13 +53,24 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 				parseJson<BoardItemState>(stack.stateJson || "{}"),
 				date,
 			);
-			const inputRows = yield* readActivationInputRowsFx({
-				ownerItemInstanceIds: [
-					stack.id,
-				],
-			});
+			const [activationInputRows, craftInputRows] = yield* Effect.all([
+				readActivationInputRowsFx({
+					ownerItemInstanceIds: [
+						stack.id,
+					],
+				}),
+				readCraftInputRowsFx({
+					ownerItemInstanceIds: [
+						stack.id,
+					],
+				}),
+			]);
 
-			if (stack.quantity === 1 || inputRows.length > 0) {
+			if (
+				stack.quantity === 1 ||
+				activationInputRows.length > 0 ||
+				craftInputRows.length > 0
+			) {
 				yield* dbFx((db) =>
 					db
 						.updateTable(table.itemInstance)

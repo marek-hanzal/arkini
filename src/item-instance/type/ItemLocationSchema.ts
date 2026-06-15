@@ -19,6 +19,11 @@ export const ItemLocationSchema = z.discriminatedUnion("kind", [
 		ownerItemInstanceId: z.string().min(1),
 		itemId: GameItemIdSchema,
 	}),
+	z.object({
+		kind: z.literal(ItemLocationKindSchema.enum["craft-input"]),
+		ownerItemInstanceId: z.string().min(1),
+		itemId: GameItemIdSchema,
+	}),
 ]);
 
 type ItemLocationSchema = typeof ItemLocationSchema;

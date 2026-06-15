@@ -1,14 +1,16 @@
-import type { DateService } from "~/date/context/DateServiceFx";
-import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
 import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
+import type { DateService } from "~/date/context/DateServiceFx";
+import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
+import type { ItemId } from "~/manifest/manifestId";
 
 export namespace readCraftView {
 	export interface Props {
-		itemId: string;
+		itemId: ItemId;
 		state: BoardItemState;
 		date: DateService;
 		gameConfig: GameConfigService;
+		storedInputs?: ReadonlyMap<ItemId, number>;
 	}
 }
 
@@ -17,11 +19,17 @@ export const readCraftView = ({
 	state,
 	date,
 	gameConfig,
+	storedInputs = new Map(),
 }: readCraftView.Props): CraftProgressView | undefined => {
 	const recipe = gameConfig.getCraftRecipeForTarget(itemId);
 	if (!recipe) return undefined;
 
-	const delivered = state.craft?.delivered ?? {};
+	const delivered = Object.fromEntries(
+		recipe.inputs.map((input) => [
+			input.itemId,
+			storedInputs.get(input.itemId) ?? 0,
+		]),
+	);
 	const required = recipe.inputs.reduce((sum, input) => sum + input.quantity, 0);
 	const current = recipe.inputs.reduce((sum, input) => {
 		return sum + Math.min(delivered[input.itemId] ?? 0, input.quantity);

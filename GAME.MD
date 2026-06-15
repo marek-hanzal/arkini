@@ -664,19 +664,25 @@ Random output must be rolled as part of activation validation. If the rolled out
 
 Board placement must use a deterministic nearest-free-cell policy based on the producer origin. Exact tie-breaking must be deterministic and testable.
 
-### 10.6 Producer input requirements
+### 10.6 Producer inputs and persistent requirements
 
-A producer may require input items before producing.
+A producer may define both consumable inputs and persistent requirements.
 
-Input requirements define:
+Consumable inputs are items consumed per successful production cycle.
 
-- accepted input item ID
-- quantity consumed per production cycle
-- storage capacity for that input item
+Persistent requirements are items that must be present in the producer's internal storage before production can run, but are not consumed by production.
+
+Both consumable inputs and persistent requirements define:
+
+- accepted item ID
+- required quantity per production cycle or activation check
+- storage capacity for that item
 
 Example:
 
-A coal mine may require `1 sausage` and `1 beer` per production cycle. It may also allow up to `4 sausage` and `4 beer` to be stored in advance.
+A quarry may require `1 worker` as a persistent requirement. The worker remains assigned to that quarry and is not consumed. The same quarry may also consume `1 beer` and `1 sausage` per production cycle as consumable inputs.
+
+Persistent requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
 
 ### 10.7 Producer input storage
 
@@ -693,11 +699,12 @@ The player may withdraw stored producer input items only through item detail. Wi
 A producer is ready when:
 
 1. its cooldown has completed
-2. every required input item is present in the producer input storage
-3. the active loot/production rule can generate a non-empty output
-4. the complete generated output can be placed according to output placement rules
+2. every persistent requirement item is present in producer storage
+3. every consumable input item is present in producer storage
+4. the active loot/production rule can generate a non-empty output
+5. the complete generated output can be placed according to output placement rules
 
-Production consumes configured input quantities only when the complete output can be placed. If validation fails, activation is rejected without consuming inputs or changing cooldown/state.
+Production consumes configured input quantities only when the complete output can be placed. Persistent requirements are never consumed by production. If validation fails, activation is rejected without consuming inputs or changing cooldown/state.
 
 ## 11. Stashes
 
@@ -735,7 +742,7 @@ Example:
 
 An epic chest may require a key.
 
-Stash input storage follows the same storage principles as producer input storage, but stash remains a separate entity type.
+Stash input storage follows the same storage principles as producer input storage, but stash remains a separate entity type. If a stash defines persistent requirements, those requirements must be present but are not consumed when the stash is opened.
 
 ### 11.5 Stash output placement
 
@@ -865,7 +872,7 @@ A craft/construction/growth entity should define:
 - entity ID
 - accepted input item IDs
 - required quantities
-- already deposited quantities in runtime state
+- already deposited quantities in item-instance input storage
 - optional completion duration, including `0` for instant completion
 - output/result item ID
 - completion behavior
@@ -876,7 +883,7 @@ Default completion behavior: the completed result replaces the progress item in 
 
 Input items can be deposited into an incomplete craft/construction/growth entity only when the entity is on the board and can currently accept input.
 
-Deposited items are consumed into the progress state and should not remain as separate inventory items.
+Deposited items are moved into craft/progress input storage owned by the target item instance. They are not kept in normal board or inventory locations and are consumed only as part of successful completion.
 
 Input source state follows the global input source state rule.
 

@@ -1,21 +1,27 @@
 import { Effect } from "effect";
+import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { storeActivationInputFx } from "~/activation/fx/storeActivationInputFx";
+import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
 import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
+import { readStoredBoardState } from "~/board/logic/readStoredBoardState";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
+import { CommandResultSchema } from "~/command/CommandResultSchema";
+import { GameActionError } from "~/command/GameActionError";
+import { deleteCraftInputsFx } from "~/craft/fx/deleteCraftInputsFx";
+import { readCraftInputRowsFx } from "~/craft/fx/readCraftInputRowsFx";
+import { storeCraftInputFx } from "~/craft/fx/storeCraftInputFx";
+import { groupCraftInputRows } from "~/craft/logic/groupCraftInputRows";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { isEmptyInventoryState } from "~/inventory/logic/isEmptyInventoryState";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import type { ItemId } from "~/manifest/manifestId";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MergeBoardItemsInputSchema } from "~/play/schema/MergeBoardItemsInputSchema";
-import { GameActionError } from "~/command/GameActionError";
-import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
-import { readStoredBoardState } from "~/board/logic/readStoredBoardState";
-import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
-import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
-import { storeActivationInputFx } from "~/activation/fx/storeActivationInputFx";
-import type { CommandResultSchema } from "~/command/CommandResultSchema";
+import { toGameActionError } from "~/play/logic/toGameActionError";
 
 export namespace mergeFx {
 	export interface Props {
@@ -46,15 +52,31 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 			if (!source || !target) {
 				return yield* Effect.fail(new GameActionError("Both board items must exist."));
 			}
-			const activationInputRows = yield* readActivationInputRowsFx({
-				ownerItemInstanceIds: [
-					source.id,
-					target.id,
-				],
-			});
+
+			const [activationInputRows, craftInputRows] = yield* Effect.all([
+				readActivationInputRowsFx({
+					ownerItemInstanceIds: [
+						source.id,
+						target.id,
+					],
+				}),
+				readCraftInputRowsFx({
+					ownerItemInstanceIds: [
+						source.id,
+						target.id,
+					],
+				}),
+			]);
 			const activationInputsByOwner = groupActivationInputRows(activationInputRows);
-			const sourceStoredInputs = activationInputsByOwner.get(source.id);
-			const targetStoredInputs = activationInputsByOwner.get(target.id);
+			const craftInputsByOwner = groupCraftInputRows(craftInputRows);
+			const sourceHasNestedStorage =
+				activationInputsByOwner.has(source.id) || craftInputsByOwner.has(source.id);
+			const targetHasNestedStorage =
+				activationInputsByOwner.has(target.id) || craftInputsByOwner.has(target.id);
+			const targetActivationStoredInputs = activationInputsByOwner.get(target.id);
+			const targetCraftStoredInputs =
+				craftInputsByOwner.get(target.id) ?? new Map<ItemId, number>();
+
 			const sourceState = readStoredBoardState(source.stateJson);
 			if (sourceState.craft?.startedAt || sourceState.craft?.readyAt) {
 				return yield* Effect.fail(new GameActionError("Craft is already in progress."));
@@ -69,7 +91,7 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				target.itemDefinitionId,
 			);
 			if (mergeRule) {
-				if (sourceStoredInputs || targetStoredInputs) {
+				if (sourceHasNestedStorage || targetHasNestedStorage) {
 					return yield* Effect.fail(
 						new GameActionError("Items with stored inputs cannot be merged."),
 					);
@@ -125,7 +147,7 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				(entry) => entry.itemId === source.itemDefinitionId,
 			);
 			if (craft && craftInput) {
-				if (sourceStoredInputs) {
+				if (sourceHasNestedStorage) {
 					return yield* Effect.fail(
 						new GameActionError("Item with stored inputs cannot be used as input."),
 					);
@@ -138,23 +160,31 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				if (targetState.craft?.startedAt || targetState.craft?.readyAt) {
 					return yield* Effect.fail(new GameActionError("Craft is already in progress."));
 				}
-				const delivered = {
-					...(targetState.craft?.delivered ?? {}),
-				};
-				const alreadyDelivered = delivered[source.itemDefinitionId] ?? 0;
+				const alreadyDelivered = targetCraftStoredInputs.get(source.itemDefinitionId) ?? 0;
 				if (alreadyDelivered >= craftInput.quantity) {
 					return yield* Effect.fail(
 						new GameActionError("This craft input is already complete."),
 					);
 				}
-				delivered[source.itemDefinitionId] = alreadyDelivered + 1;
+
+				const delivered = new Map(targetCraftStoredInputs);
+				delivered.set(source.itemDefinitionId, alreadyDelivered + 1);
 				const complete = craft.inputs.every(
-					(entry) => (delivered[entry.itemId] ?? 0) >= entry.quantity,
+					(entry) => (delivered.get(entry.itemId) ?? 0) >= entry.quantity,
 				);
 
-				yield* dbFx((db) =>
-					db.deleteFrom(table.itemInstance).where("id", "=", source.id).execute(),
-				);
+				yield* storeCraftInputFx({
+					sourceItemInstanceId: source.id,
+					ownerItemInstanceId: target.id,
+					itemId: source.itemDefinitionId,
+				});
+
+				if (complete && craft.durationMs === 0) {
+					yield* deleteCraftInputsFx({
+						ownerItemInstanceId: target.id,
+					});
+				}
+
 				yield* dbFx((db) =>
 					db
 						.updateTable(table.itemInstance)
@@ -167,10 +197,9 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 								complete
 									? craft.durationMs === 0
 										? createInitialBoardState(craft.resultItemId, gameConfig)
-										: {
+										: ({
 												...targetState,
 												craft: {
-													delivered,
 													startedAt: timestamp,
 													readyAt: date.toTimestamp(
 														now.plus({
@@ -178,13 +207,11 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 														}),
 													),
 												},
-											}
-									: {
+											} satisfies BoardItemState)
+									: ({
 											...targetState,
-											craft: {
-												delivered,
-											},
-										},
+											craft: {},
+										} satisfies BoardItemState),
 							),
 							updatedAt: timestamp,
 						})
@@ -212,8 +239,12 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 			const activationInput = targetActivation?.inputs?.find(
 				(entry) => entry.itemId === source.itemDefinitionId,
 			);
-			if (targetActivation && activationInput) {
-				if (sourceStoredInputs) {
+			const activationRequirement = targetActivation?.requirements?.find(
+				(entry) => entry.itemId === source.itemDefinitionId,
+			);
+			const activationDeposit = activationInput ?? activationRequirement;
+			if (targetActivation && activationDeposit) {
+				if (sourceHasNestedStorage) {
 					return yield* Effect.fail(
 						new GameActionError("Item with stored inputs cannot be used as input."),
 					);
@@ -223,8 +254,8 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 						new GameActionError("Stateful item cannot be used as input."),
 					);
 				}
-				const stored = targetStoredInputs?.get(source.itemDefinitionId) ?? 0;
-				if (stored >= activationInput.capacity) {
+				const stored = targetActivationStoredInputs?.get(source.itemDefinitionId) ?? 0;
+				if (stored >= activationDeposit.capacity) {
 					return yield* Effect.fail(new GameActionError("Input storage is full."));
 				}
 

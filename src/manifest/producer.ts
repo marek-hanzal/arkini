@@ -9,11 +9,18 @@ export interface ActivationInputDefinition {
 	capacity: number;
 }
 
+export interface ActivationRequirementDefinition {
+	itemId: ItemId;
+	quantity: number;
+	capacity: number;
+}
+
 export interface ActivationSharedDefinition {
 	trigger: ActivationTrigger;
 	placement: ActivationPlacement;
 	outputTableId: LootTableId;
 	inputs?: readonly ActivationInputDefinition[];
+	requirements?: readonly ActivationRequirementDefinition[];
 }
 
 export interface ProducerDefinition extends ActivationSharedDefinition {

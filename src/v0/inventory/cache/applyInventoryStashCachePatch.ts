@@ -38,7 +38,15 @@ export const applyInventoryStashCachePatch = ({
 	snapshot.inventory = patchInventoryViewCache({
 		queryClient,
 		patch: (inventory) => {
-			const targetSlotIndex = input.slotIndex ?? inventory.firstEmptySlotIndex;
+			const compatibleStackSlot = inventory.slots.find(
+				(slot) =>
+					input.slotIndex === undefined &&
+					slot.stack?.itemId === item.itemId &&
+					!slot.stack.stateful &&
+					!isStatefulStack(item.state),
+			);
+			const targetSlotIndex =
+				input.slotIndex ?? compatibleStackSlot?.slotIndex ?? inventory.firstEmptySlotIndex;
 			if (targetSlotIndex === undefined) return inventory;
 
 			return patchInventorySlotCache({

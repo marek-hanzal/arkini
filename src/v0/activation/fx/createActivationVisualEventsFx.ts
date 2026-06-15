@@ -51,6 +51,7 @@ export const createActivationVisualEventsFx = Effect.fn("createActivationVisualE
 				return [
 					{
 						type: "item.spawned",
+						itemInstanceId: placement.itemInstanceId,
 						itemId: placement.itemId,
 						originItemInstanceId: row.id,
 						to: {

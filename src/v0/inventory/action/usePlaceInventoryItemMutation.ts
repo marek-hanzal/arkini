@@ -6,7 +6,7 @@ import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { applyInventoryPlaceCachePatch } from "~/v0/inventory/cache/applyInventoryPlaceCachePatch";
 import { restoreCacheSnapshot } from "~/v0/play/cache/restoreCacheSnapshot";
-import { refreshBoardAndInventoryCaches } from "~/v0/play/cache/refreshBoardAndInventoryCaches";
+import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 
 export const usePlaceInventoryItemMutation = () => {
 	const queryClient = useQueryClient();
@@ -34,9 +34,10 @@ export const usePlaceInventoryItemMutation = () => {
 				snapshot,
 			});
 		},
-		async onSuccess() {
-			await refreshBoardAndInventoryCaches({
+		onSuccess(result) {
+			applyActionResultCachePatch({
 				queryClient,
+				result,
 			});
 		},
 	});

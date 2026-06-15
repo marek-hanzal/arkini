@@ -6,8 +6,7 @@ import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { applyInventorySwapCachePatch } from "~/v0/inventory/cache/applyInventorySwapCachePatch";
 import { restoreCacheSnapshot } from "~/v0/play/cache/restoreCacheSnapshot";
-import { refreshDatabaseStatusCache } from "~/v0/database/cache/refreshDatabaseStatusCache";
-import { refreshInventoryViewCache } from "~/v0/inventory/cache/refreshInventoryViewCache";
+import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 
 export const useSwapInventorySlotsMutation = () => {
 	const queryClient = useQueryClient();
@@ -35,15 +34,11 @@ export const useSwapInventorySlotsMutation = () => {
 				snapshot,
 			});
 		},
-		async onSuccess() {
-			await Promise.all([
-				refreshInventoryViewCache({
-					queryClient,
-				}),
-				refreshDatabaseStatusCache({
-					queryClient,
-				}),
-			]);
+		onSuccess(result) {
+			applyActionResultCachePatch({
+				queryClient,
+				result,
+			});
 		},
 	});
 };

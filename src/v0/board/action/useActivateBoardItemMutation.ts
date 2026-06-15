@@ -3,7 +3,7 @@ import { GameActionError } from "~/v0/play/action/GameActionError";
 import { activateBoardItemFx } from "~/v0/activation/fx/activateBoardItemFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import { runGameFx } from "~/v0/fx/runGameFx";
-import { refreshBoardAndInventoryCaches } from "~/v0/play/cache/refreshBoardAndInventoryCaches";
+import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 
 export const useActivateBoardItemMutation = () => {
 	const queryClient = useQueryClient();
@@ -14,9 +14,10 @@ export const useActivateBoardItemMutation = () => {
 				effect: activateBoardItemFx(input),
 			});
 		},
-		async onSuccess() {
-			await refreshBoardAndInventoryCaches({
+		onSuccess(result) {
+			applyActionResultCachePatch({
 				queryClient,
+				result,
 			});
 		},
 	});

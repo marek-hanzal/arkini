@@ -6,8 +6,7 @@ import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { applyBoardMoveCachePatch } from "~/v0/board/cache/applyBoardMoveCachePatch";
 import { restoreCacheSnapshot } from "~/v0/play/cache/restoreCacheSnapshot";
-import { refreshBoardViewCache } from "~/v0/board/cache/refreshBoardViewCache";
-import { refreshDatabaseStatusCache } from "~/v0/database/cache/refreshDatabaseStatusCache";
+import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 
 export const useMoveBoardItemMutation = () => {
 	const queryClient = useQueryClient();
@@ -35,15 +34,11 @@ export const useMoveBoardItemMutation = () => {
 				snapshot,
 			});
 		},
-		async onSuccess() {
-			await Promise.all([
-				refreshBoardViewCache({
-					queryClient,
-				}),
-				refreshDatabaseStatusCache({
-					queryClient,
-				}),
-			]);
+		onSuccess(result) {
+			applyActionResultCachePatch({
+				queryClient,
+				result,
+			});
 		},
 	});
 };

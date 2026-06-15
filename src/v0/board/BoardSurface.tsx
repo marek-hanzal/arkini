@@ -4,9 +4,7 @@ import { boardCells, type BoardCellView } from "~/v0/board/boardCells";
 import { boardColumns } from "~/v0/board/boardColumns";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { cellKey } from "~/v0/board/cellKey";
-import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { inventoryViewQueryOptions } from "~/v0/inventory/query/inventoryViewQueryOptions";
-import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import { useActivateBoardItemMutation } from "~/v0/board/action/useActivateBoardItemMutation";
 import { useClaimCraftMutation } from "~/v0/board/action/useClaimCraftMutation";
@@ -18,6 +16,7 @@ import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { BoardCell } from "~/v0/board/BoardCell";
 import type { BoardSurface as BoardSurfaceType } from "~/v0/board/BoardSurface.types";
+import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { renderBoardTile } from "~/v0/board/renderBoardTile";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { resolveDrop } from "~/v0/play/resolveDrop";
@@ -33,36 +32,23 @@ export const BoardSurface = memo(
 	({ feedback, feedbackFlags, onOpenItem }: BoardSurfaceType.Props) => {
 		const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 		const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
-		const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
 		const activateBoardItemMutation = useActivateBoardItemMutation();
 		const claimCraftMutation = useClaimCraftMutation();
 		const mergeBoardItemsMutation = useMergeBoardItemsMutation();
 		const moveBoardItemMutation = useMoveBoardItemMutation();
 		const stashBoardItemMutation = useStashBoardItemMutation();
 		const swapBoardItemsMutation = useSwapBoardItemsMutation();
-		const nowMs = useProducerClock(board.items);
 		const tiles = useMemo(
 			() =>
-				board.items.flatMap((boardItem) => {
-					const item = items[boardItem.itemId];
-					if (!item) return [];
-
-					return [
-						{
-							id: boardItem.id,
-							slotId: cellKey(boardItem.x, boardItem.y),
-							data: {
-								boardItem,
-								item,
-								activationNowMs: boardItem.activation ? nowMs : undefined,
-							},
-						},
-					] satisfies TileEngineType.Tile<BoardSurfaceType.TileData>[];
-				}),
+				board.items.map((boardItem) => ({
+					id: boardItem.id,
+					slotId: cellKey(boardItem.x, boardItem.y),
+					data: {
+						boardItemId: boardItem.id,
+					},
+				})) satisfies TileEngineType.Tile<BoardSurfaceType.TileData>[],
 			[
 				board.items,
-				items,
-				nowMs,
 			],
 		);
 		const actions = useMemo<DropActions>(
@@ -83,7 +69,11 @@ export const BoardSurface = memo(
 		);
 		const activateBoardItem = useCallback(
 			(boardItem: BoardViewItem) => {
-				if (boardItem.craft?.complete) {
+				const liveCraft = readLiveCraftView({
+					craft: boardItem.craft,
+					nowMs: Date.now(),
+				});
+				if (liveCraft?.complete) {
 					claimCraftMutation.mutate({
 						boardItemId: boardItem.id,
 					});
@@ -111,7 +101,9 @@ export const BoardSurface = memo(
 		>(
 			() => ({
 				tile(tile) {
-					const boardItem = tile.data.boardItem;
+					const boardItem = board.byId[tile.data.boardItemId];
+					if (!boardItem) return undefined;
+
 					return {
 						id: `board:${boardItem.id}`,
 						data: {
@@ -126,13 +118,16 @@ export const BoardSurface = memo(
 				},
 				slot(slot, targetTile) {
 					const cell = slot.data;
+					const targetBoardItemId = targetTile
+						? board.byId[targetTile.data.boardItemId]?.id
+						: undefined;
 					return {
 						id: `board-cell:${cell.key}`,
 						data: {
 							kind: "cell",
 							x: cell.x,
 							y: cell.y,
-							boardItemId: targetTile?.data.boardItem.id,
+							boardItemId: targetBoardItemId,
 						},
 					};
 				},
@@ -165,19 +160,15 @@ export const BoardSurface = memo(
 				return (
 					<BoardCell
 						cell={cell}
-						boardItem={board.byCellKey[key]}
 						invalid={feedbackFlags.has(`board:error:${key}`)}
 						merged={feedbackFlags.has(`board:merge:${key}`)}
 						imprinted={feedbackFlags.has(`board:imprint:${key}`)}
 						isOver={isOver}
-						nowMs={nowMs}
 					/>
 				);
 			},
 			[
-				board.byCellKey,
 				feedbackFlags,
-				nowMs,
 			],
 		);
 

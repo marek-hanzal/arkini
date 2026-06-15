@@ -6,7 +6,7 @@ import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { applyInventoryStashCachePatch } from "~/v0/inventory/cache/applyInventoryStashCachePatch";
 import { restoreCacheSnapshot } from "~/v0/play/cache/restoreCacheSnapshot";
-import { refreshBoardAndInventoryCaches } from "~/v0/play/cache/refreshBoardAndInventoryCaches";
+import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 
 export const useStashBoardItemMutation = () => {
 	const queryClient = useQueryClient();
@@ -34,9 +34,10 @@ export const useStashBoardItemMutation = () => {
 				snapshot,
 			});
 		},
-		async onSuccess() {
-			await refreshBoardAndInventoryCaches({
+		onSuccess(result) {
+			applyActionResultCachePatch({
 				queryClient,
+				result,
 			});
 		},
 	});

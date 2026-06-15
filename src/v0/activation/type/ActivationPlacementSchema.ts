@@ -12,6 +12,7 @@ export const ActivationPlacementSchema = z.discriminatedUnion("kind", [
 	z.object({
 		kind: z.literal("inventory"),
 		itemId: GameItemIdSchema,
+		itemInstanceId: z.string().min(1).optional(),
 		slotIndex: z.number().int().nonnegative().optional(),
 	}),
 ]);

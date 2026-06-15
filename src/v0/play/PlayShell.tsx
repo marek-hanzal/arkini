@@ -8,7 +8,7 @@ import type { Feedback } from "~/v0/play/Feedback";
 import { BottomNav } from "~/v0/play/BottomNav";
 import { BottomSheet } from "~/v0/play/BottomSheet";
 import type { ActiveSheetState, Sheet } from "~/v0/play/Sheet";
-import { useTransientFlags } from "~/v0/shared/useTransientFlags";
+import { useFeedbackFlags } from "~/v0/play/feedback/useFeedbackFlags";
 import { UpgradesSheet } from "~/v0/upgrade/UpgradesSheet";
 
 export namespace PlayShell {
@@ -21,7 +21,7 @@ const messageForError = (error: unknown) =>
 	error instanceof Error ? error.message : typeof error === "string" ? error : "Action failed.";
 
 export const PlayShell: FC<PlayShell.Props> = () => {
-	const feedbackFlags = useTransientFlags();
+	const feedbackFlags = useFeedbackFlags();
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
 	const closeSheet = useCallback(() => setActiveSheet(undefined), []);

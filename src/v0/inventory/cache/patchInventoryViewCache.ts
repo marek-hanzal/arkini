@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
-import { playQueryKeys } from "~/v0/query/playQueryKeys";
+import { inventoryQueryKeys } from "~/v0/inventory/query/inventoryQueryKeys";
 
 export namespace patchInventoryViewCache {
 	export interface Props {
@@ -12,7 +12,7 @@ export namespace patchInventoryViewCache {
 export const patchInventoryViewCache = ({ queryClient, patch }: patchInventoryViewCache.Props) => {
 	let previous: InventoryView | undefined;
 
-	queryClient.setQueryData<InventoryView>(playQueryKeys.inventory, (inventory) => {
+	queryClient.setQueryData<InventoryView>(inventoryQueryKeys.view, (inventory) => {
 		if (!inventory) return inventory;
 		previous = inventory;
 		return patch(inventory);

@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { BoardView } from "~/board/view/BoardViewSchema";
-import { playQueryKeys } from "~/v0/query/playQueryKeys";
+import { boardQueryKeys } from "~/v0/board/query/boardQueryKeys";
 
 export namespace patchBoardViewCache {
 	export interface Props {
@@ -12,7 +12,7 @@ export namespace patchBoardViewCache {
 export const patchBoardViewCache = ({ queryClient, patch }: patchBoardViewCache.Props) => {
 	let previous: BoardView | undefined;
 
-	queryClient.setQueryData<BoardView>(playQueryKeys.board, (board) => {
+	queryClient.setQueryData<BoardView>(boardQueryKeys.view, (board) => {
 		if (!board) return board;
 		previous = board;
 		return patch(board);

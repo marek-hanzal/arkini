@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { upgradeListQueryOptions } from "~/v0/query/upgradeListQueryOptions";
+import { upgradeListQueryOptions } from "~/v0/upgrade/query/upgradeListQueryOptions";
 
 export namespace refreshUpgradeListCache {
 	export interface Props {

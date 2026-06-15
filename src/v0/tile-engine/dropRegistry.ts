@@ -1,19 +1,11 @@
-import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 
-export interface TileEngineDropRegistration<TSlot = unknown, TTile = unknown, TDrop = unknown> {
-	dropId: string;
-	slot: TileEngine.Slot<TSlot> | null;
-	targetTile: TileEngine.Tile<TTile> | undefined;
-	payload: TDrop;
-	element: HTMLElement;
-}
-
-const drops = new Map<string, TileEngineDropRegistration>();
+const drops = new Map<string, TileEngineDrop.Registration>();
 
 export const registerTileEngineDrop = <TSlot = unknown, TTile = unknown, TDrop = unknown>(
-	entry: TileEngineDropRegistration<TSlot, TTile, TDrop>,
+	entry: TileEngineDrop.Registration<TSlot, TTile, TDrop>,
 ) => {
-	drops.set(entry.dropId, entry as TileEngineDropRegistration);
+	drops.set(entry.dropId, entry as TileEngineDrop.Registration);
 
 	return () => {
 		const current = drops.get(entry.dropId);
@@ -21,4 +13,4 @@ export const registerTileEngineDrop = <TSlot = unknown, TTile = unknown, TDrop =
 	};
 };
 
-export const readTileEngineDrops = () => drops as ReadonlyMap<string, TileEngineDropRegistration>;
+export const readTileEngineDrops = () => drops as ReadonlyMap<string, TileEngineDrop.Registration>;

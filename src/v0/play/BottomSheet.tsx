@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import type { FC, ReactNode } from "react";
-import { cn } from "~/shared/cn";
+import { cn } from "~/v0/style/cn";
 
 const sheetDurationSeconds = 0.28;
 const openEase = [

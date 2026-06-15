@@ -1,10 +1,10 @@
 import { Effect } from "effect";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
+import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { IdServiceFx } from "~/id/context/IdServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import { IdServiceFx } from "~/v0/id/context/IdServiceFx";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { json } from "~/shared/json";
+import { json } from "~/v0/style/json";
 
 export namespace insertBoardItemFx {
 	export interface Props {

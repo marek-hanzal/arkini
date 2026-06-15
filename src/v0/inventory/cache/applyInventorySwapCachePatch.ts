@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { swapInventorySlotsFx } from "~/v0/inventory/fx/swapInventorySlotsFx";
-import { rebuildInventoryView } from "~/inventory/view/rebuildInventoryView";
+import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryViewCache";
 

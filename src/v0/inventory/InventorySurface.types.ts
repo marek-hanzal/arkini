@@ -1,5 +1,5 @@
-import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
-import type { ViewItem } from "~/item/view/ViewItemSchema";
+import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
+import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { Feedback } from "~/v0/play/Feedback";
 
 export namespace InventorySurface {

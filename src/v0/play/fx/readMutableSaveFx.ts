@@ -3,8 +3,8 @@ import { dbFx } from "~/v0/database/fx/dbFx";
 import { readBoardItemRowsFx } from "~/v0/item-instance/fx/readBoardItemRowsFx";
 import { readInventoryStackRowsFx } from "~/v0/item-instance/fx/readInventoryStackRowsFx";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { PlayerUpgradeRowSchema } from "~/play/schema/PlayerUpgradeRowSchema";
-import { SaveRowSchema } from "~/play/schema/SaveRowSchema";
+import { PlayerUpgradeRowSchema } from "~/v0/play/schema/PlayerUpgradeRowSchema";
+import { SaveRowSchema } from "~/v0/play/schema/SaveRowSchema";
 import { completeReadyFx } from "~/v0/upgrade/fx/completeReadyFx";
 
 export const readMutableSaveFx = Effect.fn("readMutableSaveFx")(function* () {

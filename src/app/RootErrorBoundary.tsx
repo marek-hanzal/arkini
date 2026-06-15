@@ -1,8 +1,5 @@
 import { useEffect, type FC } from "react";
-import { useHardResetAction } from "~/shared/hook/useHardResetAction";
-import { hardResetBrowserStorage } from "~/shared/util/hardResetBrowserStorage";
-import { logResetError } from "~/shared/util/logResetError";
-import { reloadWindow } from "~/shared/util/reloadWindow";
+import { useRootHardResetAction } from "~/app/useRootHardResetAction";
 
 export namespace RootErrorBoundary {
 	export interface Props {
@@ -11,11 +8,7 @@ export namespace RootErrorBoundary {
 }
 
 export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
-	const reset = useHardResetAction({
-		reset: hardResetBrowserStorage,
-		onSuccess: reloadWindow,
-		onError: logResetError,
-	});
+	const reset = useRootHardResetAction();
 	const message = error instanceof Error ? error.message : String(error);
 
 	useEffect(() => {

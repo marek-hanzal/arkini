@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
-import type { BoardView } from "~/board/view/BoardViewSchema";
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
 import type { Feedback } from "~/v0/play/Feedback";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";

@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { insertBoardItemFx } from "~/v0/board/fx/insertBoardItemFx";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import type { PlacementPlan } from "~/inventory/logic/planning/types";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import type { PlacementPlan } from "~/v0/inventory/logic/planning/types";
 import { defaultSaveGameId } from "~/v0/play/save";
-import type { ActivationPlacementSchema } from "~/activation/type/ActivationPlacementSchema";
+import type { ActivationPlacementSchema } from "~/v0/activation/type/ActivationPlacementSchema";
 
 export namespace applyPlacementPlanFx {
 	export interface Props {

@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
+import { emptyInventoryStateJson } from "~/v0/inventory/logic/emptyInventoryStateJson";
 import { activationInputStorageKey } from "../logic/activationInputStorageKey";
 
 export namespace storeActivationInputFx {

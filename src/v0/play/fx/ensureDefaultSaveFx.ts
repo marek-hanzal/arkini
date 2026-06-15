@@ -1,13 +1,13 @@
 import { Effect } from "effect";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
+import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { emptyInventoryStateJson } from "~/v0/inventory/logic/emptyInventoryStateJson";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { StartingBoardItem } from "~/v0/play/model/StartingBoardItem";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { json } from "~/shared/json";
+import { json } from "~/v0/style/json";
 import { dropDefaultSaveFx } from "./dropDefaultSaveFx";
 
 export namespace ensureDefaultSaveFx {

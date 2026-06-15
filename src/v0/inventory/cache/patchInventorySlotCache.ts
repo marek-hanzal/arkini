@@ -1,5 +1,5 @@
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
-import { rebuildInventoryView } from "~/inventory/view/rebuildInventoryView";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
+import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 
 export namespace patchInventorySlotCache {
 	export interface Props {

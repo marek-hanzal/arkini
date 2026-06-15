@@ -1,5 +1,5 @@
-import type { BoardView } from "~/board/view/BoardViewSchema";
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 
 export namespace CacheSnapshot {
 	export interface Type {

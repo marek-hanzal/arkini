@@ -1,22 +1,22 @@
 import { Effect } from "effect";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { readCraftInputRowsFx } from "~/v0/craft/fx/readCraftInputRowsFx";
-import { pauseCraftTimer } from "~/board/logic/pauseCraftTimer";
-import { GameActionError } from "~/command/GameActionError";
+import { pauseCraftTimer } from "~/v0/board/logic/pauseCraftTimer";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { StashBoardItemInputSchema } from "~/play/schema/StashBoardItemInputSchema";
-import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
-import { parseJson } from "~/shared/parseJson";
-import { json } from "~/shared/json";
-import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
-import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
-import type { CommandResultSchema } from "~/command/CommandResultSchema";
+import { StashBoardItemInputSchema } from "~/v0/play/schema/StashBoardItemInputSchema";
+import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
+import { parseJson } from "~/v0/style/parseJson";
+import { json } from "~/v0/style/json";
+import { emptyInventoryStateJson } from "~/v0/inventory/logic/emptyInventoryStateJson";
+import { isEmptyInventoryStateJson } from "~/v0/inventory/logic/isEmptyInventoryStateJson";
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 
 export namespace stashBoardItemFx {
 	export interface Props {
@@ -105,7 +105,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* (
 								quantity: stack.quantity + 1,
 							},
 						],
-					} satisfies CommandResultSchema.Type;
+					} satisfies ActionResultSchema.Type;
 				}
 
 				const targetStack =
@@ -147,7 +147,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* (
 								quantity: targetStack.quantity + 1,
 							},
 						],
-					} satisfies CommandResultSchema.Type;
+					} satisfies ActionResultSchema.Type;
 				}
 			}
 
@@ -217,7 +217,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* (
 						},
 					},
 				],
-			} satisfies CommandResultSchema.Type;
+			} satisfies ActionResultSchema.Type;
 		}),
 	);
 });

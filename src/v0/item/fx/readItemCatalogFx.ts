@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import { createItemCatalogView } from "~/v0/item/fx/createItemCatalogView";
 
 export const readItemCatalogFx = Effect.fn("readItemCatalogFx")(function* () {

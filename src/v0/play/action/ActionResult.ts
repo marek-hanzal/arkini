@@ -1,5 +1,5 @@
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
+
 export namespace ActionResult {
-	export interface Type {
-		visualEvents: readonly unknown[];
-	}
+	export type Type = ActionResultSchema.Type;
 }

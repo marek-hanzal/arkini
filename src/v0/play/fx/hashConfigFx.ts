@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { HashServiceFx } from "~/hash/context/HashServiceFx";
-import type { GameConfig } from "~/manifest/GameConfig";
+import { HashServiceFx } from "~/v0/hash/context/HashServiceFx";
+import type { GameConfig } from "~/v0/manifest/GameConfig";
 import { tryGameAction } from "./tryGameAction";
 
 export namespace hashConfigFx {

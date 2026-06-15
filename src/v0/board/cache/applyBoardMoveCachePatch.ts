@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { moveBoardItemFx } from "~/v0/board/fx/moveBoardItemFx";
-import { rebuildBoardView } from "~/board/view/rebuildBoardView";
+import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
 

@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { GameConfig } from "~/manifest/GameConfig";
-import { assertGameConfig } from "~/manifest/validation/gameConfig";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import type { GameConfig } from "~/v0/manifest/GameConfig";
+import { assertGameConfig } from "~/v0/manifest/validation/gameConfig";
 import type { GameConfigSyncResult } from "~/v0/play/model/GameConfigSyncResult";
 import { hashConfigFx } from "./hashConfigFx";
 

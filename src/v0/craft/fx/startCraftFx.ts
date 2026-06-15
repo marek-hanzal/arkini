@@ -1,14 +1,14 @@
 import { Effect } from "effect";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
-import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
-import type { CommandVisualEventSchema } from "~/command/CommandVisualEventSchema";
-import { GameActionError } from "~/command/GameActionError";
-import { resolveCraftProgress } from "~/craft/logic/resolveCraftProgress";
+import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
+import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
+import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
+import { GameActionError } from "~/v0/play/action/GameActionError";
+import { resolveCraftProgress } from "~/v0/craft/logic/resolveCraftProgress";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
-import { json } from "~/shared/json";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
+import { json } from "~/v0/style/json";
 
 export namespace startCraftFx {
 	export interface Props {
@@ -40,7 +40,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 		return yield* Effect.fail(new GameActionError("Craft inputs are incomplete."));
 	}
 	if (state.craft?.startedAt || state.craft?.readyAt) {
-		return [] satisfies CommandVisualEventSchema.Type[];
+		return [] satisfies ActionVisualEventSchema.Type[];
 	}
 
 	const now = date.now();
@@ -81,5 +81,5 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 			resultItemId: recipe.resultItemId,
 			readyAtMs: date.parseTimestampMs(readyAt),
 		},
-	] satisfies CommandVisualEventSchema.Type[];
+	] satisfies ActionVisualEventSchema.Type[];
 });

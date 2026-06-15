@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
-import type { ItemId } from "~/manifest/manifestId";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { emptyInventoryStateJson } from "~/v0/inventory/logic/emptyInventoryStateJson";
+import type { ItemId } from "~/v0/manifest/manifestId";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { craftInputStorageKey } from "~/craft/logic/craftInputStorageKey";
+import { craftInputStorageKey } from "~/v0/craft/logic/craftInputStorageKey";
 
 export namespace storeCraftInputFx {
 	export interface Props {

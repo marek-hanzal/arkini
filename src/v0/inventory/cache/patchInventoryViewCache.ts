@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { inventoryQueryKeys } from "~/v0/inventory/query/inventoryQueryKeys";
 
 export namespace patchInventoryViewCache {

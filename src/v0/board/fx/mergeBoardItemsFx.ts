@@ -1,24 +1,24 @@
 import { Effect } from "effect";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { storeActivationInputFx } from "~/v0/activation/fx/storeActivationInputFx";
-import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
-import { readStoredBoardState } from "~/board/logic/readStoredBoardState";
-import { CommandResultSchema } from "~/command/CommandResultSchema";
-import { GameActionError } from "~/command/GameActionError";
+import { groupActivationInputRows } from "~/v0/activation/logic/groupActivationInputRows";
+import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
+import { readStoredBoardState } from "~/v0/board/logic/readStoredBoardState";
+import { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { readCraftInputRowsFx } from "~/v0/craft/fx/readCraftInputRowsFx";
 import { storeCraftInputFx } from "~/v0/craft/fx/storeCraftInputFx";
 import { startCraftFx } from "~/v0/craft/fx/startCraftFx";
-import { groupCraftInputRows } from "~/craft/logic/groupCraftInputRows";
+import { groupCraftInputRows } from "~/v0/craft/logic/groupCraftInputRows";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { isEmptyInventoryState } from "~/inventory/logic/isEmptyInventoryState";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { isEmptyInventoryState } from "~/v0/inventory/logic/isEmptyInventoryState";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { MergeBoardItemsInputSchema } from "~/play/schema/MergeBoardItemsInputSchema";
-import { json } from "~/shared/json";
+import { MergeBoardItemsInputSchema } from "~/v0/play/schema/MergeBoardItemsInputSchema";
+import { json } from "~/v0/style/json";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
 
 export namespace mergeBoardItemsFx {
@@ -139,7 +139,7 @@ export const mergeBoardItemsFx = Effect.fn("mergeBoardItemsFx")(function* (
 							consumeSource: mergeRule.consumeSource !== false,
 						},
 					],
-				} satisfies CommandResultSchema.Type;
+				} satisfies ActionResultSchema.Type;
 			}
 
 			const craft = gameConfig.getCraftRecipeForTarget(target.itemDefinitionId);
@@ -203,7 +203,7 @@ export const mergeBoardItemsFx = Effect.fn("mergeBoardItemsFx")(function* (
 						},
 						...craftEvents,
 					],
-				} satisfies CommandResultSchema.Type;
+				} satisfies ActionResultSchema.Type;
 			}
 
 			const targetActivation = gameConfig.getActivation(target.itemDefinitionId);
@@ -244,7 +244,7 @@ export const mergeBoardItemsFx = Effect.fn("mergeBoardItemsFx")(function* (
 							itemId: source.itemDefinitionId,
 						},
 					],
-				} satisfies CommandResultSchema.Type;
+				} satisfies ActionResultSchema.Type;
 			}
 
 			return yield* Effect.fail(

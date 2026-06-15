@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { placeInventoryItemFx } from "~/v0/inventory/fx/placeInventoryItemFx";
-import { rebuildBoardView } from "~/board/view/rebuildBoardView";
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
+import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { cloneInventoryStack } from "~/v0/inventory/cache/cloneInventoryStack";
 import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";

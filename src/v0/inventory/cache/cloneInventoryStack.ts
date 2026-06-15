@@ -1,4 +1,4 @@
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 
 export namespace cloneInventoryStack {
 	export type Stack = InventoryView["slots"][number]["stack"];

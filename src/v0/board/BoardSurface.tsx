@@ -1,10 +1,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { memo, type ReactNode, useCallback, useMemo } from "react";
-import { boardCells, type BoardCellView } from "~/board/boardCells";
-import { boardColumns } from "~/board/boardColumns";
-import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import { cellKey } from "~/board/util/cell";
-import { useProducerClock } from "~/producer/hook/useProducerClock";
+import { boardCells, type BoardCellView } from "~/v0/board/boardCells";
+import { boardColumns } from "~/v0/board/boardColumns";
+import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { cellKey } from "~/v0/board/util/cell";
+import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { inventoryViewQueryOptions } from "~/v0/inventory/query/inventoryViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";

@@ -1,5 +1,5 @@
-import type { ItemInstanceRowSchema } from "~/item-instance/type/ItemInstanceRowSchema";
-import { InventoryStackRowSchema } from "~/play/schema/InventoryStackRowSchema";
+import type { ItemInstanceRowSchema } from "~/v0/item-instance/type/ItemInstanceRowSchema";
+import { InventoryStackRowSchema } from "~/v0/play/schema/InventoryStackRowSchema";
 
 export const toInventoryStackRow = (row: ItemInstanceRowSchema.Type) => {
 	if (row.locationKind !== "inventory" || row.inventorySlotIndex === null) {

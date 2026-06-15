@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { BoardView } from "~/board/view/BoardViewSchema";
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import { boardQueryKeys } from "~/v0/board/query/boardQueryKeys";
 
 export namespace patchBoardViewCache {

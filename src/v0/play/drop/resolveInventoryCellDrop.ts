@@ -1,5 +1,5 @@
-import { cellKey } from "~/board/util/cell";
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
+import { cellKey } from "~/v0/board/util/cell";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
 import type { Feedback } from "~/v0/play/Feedback";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";

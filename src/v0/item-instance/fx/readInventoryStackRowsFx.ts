@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { ItemInstanceRowSchema } from "~/item-instance/type/ItemInstanceRowSchema";
+import { ItemInstanceRowSchema } from "~/v0/item-instance/type/ItemInstanceRowSchema";
 import { defaultSaveGameId } from "~/v0/play/save";
 import { toInventoryStackRow } from "../logic/toInventoryStackRow";
 

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
-import { GameActionError } from "~/command/GameActionError";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 
 export namespace spendActivationInputFx {
 	export interface Props {

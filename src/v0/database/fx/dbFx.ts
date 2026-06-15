@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { GameActionError } from "~/command/GameActionError";
-import { KyselyContextFx } from "~/database/context/KyselyContextFx";
+import { GameActionError } from "~/v0/play/action/GameActionError";
+import { KyselyContextFx } from "~/v0/database/context/KyselyContextFx";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
 import type { DbHandle } from "./DbHandle";
 

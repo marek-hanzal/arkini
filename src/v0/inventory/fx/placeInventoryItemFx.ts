@@ -1,24 +1,23 @@
 import { Effect } from "effect";
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 import { insertBoardItemFx } from "~/v0/board/fx/insertBoardItemFx";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { readCraftInputRowsFx } from "~/v0/craft/fx/readCraftInputRowsFx";
-import { assertInsideBoard } from "~/board/logic/assertInsideBoard";
-import { resumeCraftTimer } from "~/board/logic/resumeCraftTimer";
+import { assertInsideBoard } from "~/v0/board/logic/assertInsideBoard";
+import { resumeCraftTimer } from "~/v0/board/logic/resumeCraftTimer";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { spendInventoryStackFx } from "~/v0/inventory/fx/spendInventoryStackFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { PlaceInventoryItemInputSchema } from "~/play/schema/PlaceInventoryItemInputSchema";
-import type { ItemId } from "~/manifest/manifestId";
-import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
-import type { InventoryPlaceResult } from "~/inventory/view/InventoryPlaceResultSchema";
-import { GameActionError } from "~/command/GameActionError";
+import { PlaceInventoryItemInputSchema } from "~/v0/play/schema/PlaceInventoryItemInputSchema";
+import type { ItemId } from "~/v0/manifest/manifestId";
+import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
+import type { InventoryPlaceResult } from "~/v0/inventory/view/InventoryPlaceResultSchema";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { json } from "~/shared/json";
-import { parseJson } from "~/shared/parseJson";
-import type { CommandResult } from "~/command/CommandResult";
-import type { Command } from "~/command/Command";
+import { json } from "~/v0/style/json";
+import { parseJson } from "~/v0/style/parseJson";
 
 export namespace placeInventoryItemFx {
 	export interface Props {
@@ -115,14 +114,9 @@ export const placeInventoryItemFx = Effect.fn("placeInventoryItemFx")(function* 
 							},
 						},
 					],
-				} satisfies CommandResult<
-					Extract<
-						Command,
-						{
-							type: "inventory.place";
-						}
-					>
-				>;
+				} satisfies ActionResultSchema.Type & {
+					inventoryPlace: InventoryPlaceResult;
+				};
 			}
 
 			const boardItemId = yield* insertBoardItemFx({
@@ -162,14 +156,9 @@ export const placeInventoryItemFx = Effect.fn("placeInventoryItemFx")(function* 
 						reason: "inventory-placement",
 					},
 				],
-			} satisfies CommandResult<
-				Extract<
-					Command,
-					{
-						type: "inventory.place";
-					}
-				>
-			>;
+			} satisfies ActionResultSchema.Type & {
+				inventoryPlace: InventoryPlaceResult;
+			};
 		}),
 	);
 });

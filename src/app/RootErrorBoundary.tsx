@@ -1,7 +1,7 @@
 import { useMachine } from "@xstate/react";
-import type { FC } from "react";
-import { hardResetBrowserStorage } from "~/app/hardResetBrowserStorage";
+import { useEffect, type FC } from "react";
 import { resetWorkflowMachine } from "~/shared/logic/resetWorkflowMachine";
+import { hardResetBrowserStorage } from "~/shared/util/hardResetBrowserStorage";
 import { logResetError } from "~/shared/util/logResetError";
 import { reloadWindow } from "~/shared/util/reloadWindow";
 
@@ -23,16 +23,25 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 	const failed = resetState.matches("failed");
 	const message = error instanceof Error ? error.message : String(error);
 
+	useEffect(() => {
+		sendReset({
+			type: "START",
+		});
+	}, [
+		sendReset,
+	]);
+
 	return (
 		<main className="grid h-dvh w-dvw place-items-center bg-slate-950 p-4 text-slate-100">
 			<section className="w-full max-w-xl rounded-md border border-red-400/35 bg-red-950/28 p-5 shadow-2xl shadow-red-950/35">
 				<p className="text-[0.65rem] font-black uppercase tracking-[0.24em] text-red-200">
 					Arkini crashed
 				</p>
-				<h1 className="mt-3 text-2xl font-black text-red-50">Database/runtime error</h1>
+				<h1 className="mt-3 text-2xl font-black text-red-50">Hard reset in progress</h1>
 				<p className="mt-3 text-sm leading-6 text-red-100">
-					The local save can be force-dropped if migrations or cached OPFS state got into
-					a broken loop. Elegant? No. Effective? Annoyingly, yes.
+					The game hit a runtime or database error. Arkini now drops OPFS browser storage
+					immediately and reloads, because prototype saves are disposable and startup
+					loops are not a design pillar.
 				</p>
 				<pre className="mt-4 max-h-56 overflow-auto rounded-sm bg-slate-950/70 p-3 text-xs whitespace-pre-wrap text-red-100">
 					{message}
@@ -46,13 +55,13 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 								type: "START",
 							})
 						}
-						className="w-full rounded-md border border-red-300/45 bg-red-300 px-4 py-3 text-sm font-black text-slate-950 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
+						className="w-full rounded-md border border-red-300/45 bg-red-300 px-4 py-3 text-sm font-black text-slate-950 disabled:cursor-wait disabled:opacity-60"
 					>
-						{pending ? "Dropping browser storage…" : "Hard reset browser storage"}
+						{pending ? "Dropping OPFS storage…" : "Retry OPFS hard reset"}
 					</button>
 					{failed ? (
 						<p className="mt-3 text-sm text-red-100">
-							Reset failed. Check the console.
+							Automatic reset failed. Check the console.
 						</p>
 					) : null}
 				</div>

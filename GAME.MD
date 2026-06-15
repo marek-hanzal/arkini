@@ -21,14 +21,15 @@ These rules define how the game should be interpreted when implementation detail
 3. Game definitions must describe items, merge chains, producers, stashes, loot tables, blueprints, craft/construction requirements, upgrades, grid sizes, inventory sizes, starting state, and other game rules.
 4. The game is client-only and must be able to run offline in the browser.
 5. Saved state is not considered backwards-compatible unless a migration explicitly supports it.
-6. If a saved game is incompatible with the active game definition version after migrations, the save may be dropped.
-7. Game mechanics should be simple, explicit, and consistent. If a rule needs a special exception, the design should be questioned first.
-8. Prefer one clean mechanic over several similar mechanics that behave slightly differently.
-9. Empty values should be stable and predictable. Avoid optional/null gameplay data unless absence is a meaningful game state.
-10. Names and IDs must be stable enough to be referenced by saves, tests, migrations, and this document.
-11. Economy logic should be validated from this document and central game data, not by reverse-engineering UI code.
-12. Inventory is passive storage. Active timers, production, growth, and craft progress do not advance while an item is stored in inventory.
-13. Active board timers and global timers use real-world wall-clock time. If the app is closed and later reopened, eligible active timers may already be complete.
+6. If the game crashes during startup or runtime because local storage is corrupt or incompatible, the first recovery action is a full OPFS hard reset followed by reload. Do not build soft recovery mazes for prototype saves.
+7. If a saved game is incompatible with the active game definition version after migrations, the save may be dropped.
+8. Game mechanics should be simple, explicit, and consistent. If a rule needs a special exception, the design should be questioned first.
+9. Prefer one clean mechanic over several similar mechanics that behave slightly differently.
+10. Empty values should be stable and predictable. Avoid optional/null gameplay data unless absence is a meaningful game state.
+11. Names and IDs must be stable enough to be referenced by saves, tests, migrations, and this document.
+12. Economy logic should be validated from this document and central game data, not by reverse-engineering UI code.
+13. Inventory is passive storage. Active timers, production, growth, and craft progress do not advance while an item is stored in inventory.
+14. Active board timers and global timers use real-world wall-clock time. If the app is closed and later reopened, eligible active timers may already be complete.
 
 ## 3. Current fixed constants
 

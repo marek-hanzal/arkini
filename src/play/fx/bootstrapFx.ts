@@ -13,7 +13,6 @@ import { withGameConfigService } from "~/manifest/logic/withGameConfigService";
 import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 import { withRandomService } from "~/random/logic/withRandomService";
 import { bootstrapState } from "../logic/bootstrapState";
-import { isRecoverableMigrationError } from "../logic/isRecoverableMigrationError";
 import { tryGameAction } from "../logic/tryGameAction";
 import { ensureDefaultSaveFx } from "./ensureDefaultSaveFx";
 import { syncConfigFx } from "./syncConfigFx";
@@ -33,13 +32,7 @@ export const bootstrapFx = Effect.fn("bootstrapFx")(function* () {
 	const random = yield* RandomServiceFx;
 	const next = Effect.runPromise(
 		Effect.gen(function* () {
-			let result = yield* tryGameAction(() => browserDatabase.migrateToLatest());
-
-			if (result.error && isRecoverableMigrationError(result.error)) {
-				bootstrapState.reset();
-				yield* tryGameAction(() => browserDatabase.deleteDatabaseFile());
-				result = yield* tryGameAction(() => browserDatabase.migrateToLatest());
-			}
+			const result = yield* tryGameAction(() => browserDatabase.migrateToLatest());
 
 			if (result.error) return yield* Effect.fail(result.error);
 

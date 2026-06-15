@@ -1,12 +1,12 @@
 # Add save/config version reset
 
-Status: TODO
+Status: DONE
 
 ## Goal
 
 Stop old incompatible saves from causing startup loops, broken migrations, or undead runtime states.
 
-The game does not promise backwards compatibility for dev saves. If migrations cannot safely support a save/config version, drop and rebuild the save.
+The game does not promise backwards compatibility for dev saves. If the game crashes from storage/runtime corruption, the first recovery action is full OPFS reset + reload, not a soft schema negotiation layer.
 
 ## Current state
 
@@ -15,25 +15,24 @@ The game does not promise backwards compatibility for dev saves. If migrations c
 - Multiple structural migrations now exist: item instances, activation inputs, craft inputs.
 - There is no final strict config/schema version gate yet.
 
-## Proposed work
+## Completed work
 
-- Add a canonical save/schema/config version constant.
-- Store the version in save metadata or a small local metadata table.
-- On boot:
-  1. run migrations
-  2. compare stored version with active version
-  3. if incompatible, delete current save data and seed a fresh default state
-  4. never loop forever on failed startup
-- Document the policy in README and GAME.MD if needed.
+- Rejected the soft save/schema version gate for this prototype phase.
+- Root error boundary now starts full OPFS hard reset automatically on mount, then reloads.
+- Database sheet hard reset uses the same OPFS reset path instead of SQLocal database-file deletion.
+- Bootstrap no longer tries recoverable migration surgery; migration failure crashes upward and lets the root reset policy handle it.
+- Removed the old database-file reset backend export and helper files.
+- Documented the hard reset policy in README and GAME.MD.
 
 ## Acceptance
 
-- Starting with an incompatible save produces a clean fresh save, not a broken screen.
-- The reset path is explicit and easy to find.
-- Runtime tables do not contain stale old shapes after reset.
+- A root runtime/database crash immediately starts full OPFS reset and reload.
+- Manual database reset uses the same OPFS reset path.
+- No soft save/schema compatibility layer was added.
 - Typecheck and build pass.
 
 ## Watchouts
 
-- Do not attempt heroic backwards compatibility unless explicitly requested.
-- Keep reset scoped to game save data when possible; full OPFS wipe should stay a recovery option, not the normal path.
+- Do not reintroduce database-file-only reset as the primary reset path.
+- Do not add save/schema compatibility negotiations unless the product phase changes.
+- OPFS hard reset is intentionally destructive; PNG/code assets are not touched because they are bundled files, not OPFS storage.

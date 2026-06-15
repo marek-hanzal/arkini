@@ -46,6 +46,7 @@ export const BoardSurface = memo(
 					data: {
 						boardItemId: boardItem.id,
 					},
+					enter: boardItem.motion?.enter,
 				})) satisfies TileEngineType.Tile<BoardSurfaceType.TileData>[],
 			[
 				board.items,

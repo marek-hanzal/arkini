@@ -30,10 +30,14 @@ export const resolveInventorySlotDrop = ({
 }: resolveInventorySlotDrop.Props): TileEngine.DropOutcome => {
 	if (source.slotIndex === target.slotIndex) return ignoreDrop();
 
-	return acceptDrop(() =>
-		actions.swapInventorySlots({
-			sourceSlotIndex: source.slotIndex,
-			targetSlotIndex: target.slotIndex,
-		}),
+	return acceptDrop(
+		() =>
+			actions.swapInventorySlots({
+				sourceSlotIndex: source.slotIndex,
+				targetSlotIndex: target.slotIndex,
+			}),
+		{
+			animation: "parallel-swap",
+		},
 	);
 };

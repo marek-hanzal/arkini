@@ -62,6 +62,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				resolveDrop={drops.resolveDrop}
 				setActiveDropId={setActiveDropId}
 				setHandoff={handoff.setHandoff}
+				setHandoffs={handoff.setHandoffs}
 				consumeHandoff={handoff.consumeHandoff}
 				renderTile={renderTile}
 			/>

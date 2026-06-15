@@ -3,6 +3,7 @@ import { cn } from "~/v0/ui/cn";
 import { actorStyle } from "~/v0/tile-engine/actorStyle";
 import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/TileEngineActor.types";
 import { useTileActorDrag } from "~/v0/tile-engine/useTileActorDrag";
+import { useTileActorEnterMotion } from "~/v0/tile-engine/useTileActorEnterMotion";
 import { useTileActorMotion } from "~/v0/tile-engine/useTileActorMotion";
 import { useTileActorTap } from "~/v0/tile-engine/useTileActorTap";
 import { useTileActorTimers } from "~/v0/tile-engine/useTileActorTimers";
@@ -28,6 +29,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	resolveDrop,
 	setActiveDropId,
 	setHandoff,
+	setHandoffs,
 	consumeHandoff,
 	renderTile,
 }: TileEngineActor.Props<TTile, TSlot, TDrag, TDrop>) => {
@@ -42,6 +44,11 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	const disabledRef = useLatestRef(disabled);
 	const dragRef = useLatestRef(drag);
 	const [dragging, setDragging] = useState(false);
+	useTileActorEnterMotion({
+		actorRef,
+		enter: tile.enter,
+		tileId: tile.id,
+	});
 
 	const tap = useTileActorTap({
 		bindingRef,
@@ -75,6 +82,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		resolveDrop,
 		setActiveDropId,
 		setHandoff,
+		setHandoffs,
 	});
 
 	return (

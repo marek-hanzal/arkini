@@ -1,7 +1,10 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback } from "react";
+import { animateElementToRect } from "~/v0/tile-engine/animateElementToRect";
 import { dragSessionRect } from "~/v0/tile-engine/dragSessionRect";
+import { dropOutcomeAnimation } from "~/v0/tile-engine/dropOutcomeAnimation";
 import { dropOutcomeCommit } from "~/v0/tile-engine/dropOutcomeCommit";
 import { dropOutcomeKind } from "~/v0/tile-engine/dropOutcomeKind";
+import { findTileEngineActorElement } from "~/v0/tile-engine/findTileEngineActorElement";
 import { releasePointerCapture } from "~/v0/tile-engine/releasePointerCapture";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
 import { rectFromElement } from "~/v0/tile-engine/rect";
@@ -23,8 +26,37 @@ export namespace useTilePointerUp {
 		finishDrag(): void;
 		setActiveDropId(dropId: string | null): void;
 		setHandoff(handoff: TileEngineActor.Handoff | null): void;
+		setHandoffs(handoffs: readonly TileEngineActor.Handoff[]): void;
 	}
 }
+
+const createSourceHandoff = ({
+	sourceTile,
+	resolved,
+}: {
+	sourceTile: TileEngine.Tile<unknown>;
+	resolved: TileEngineDrop.Resolved<unknown, unknown, unknown>;
+}): TileEngineActor.Handoff | undefined =>
+	resolved.slot
+		? {
+				tileId: sourceTile.id,
+				targetSlotId: resolved.slot.id,
+			}
+		: undefined;
+
+const createTargetHandoff = ({
+	sourceTile,
+	resolved,
+}: {
+	sourceTile: TileEngine.Tile<unknown>;
+	resolved: TileEngineDrop.Resolved<unknown, unknown, unknown>;
+}): TileEngineActor.Handoff | undefined =>
+	resolved.targetTile
+		? {
+				tileId: resolved.targetTile.id,
+				targetSlotId: sourceTile.slotId,
+			}
+		: undefined;
 
 export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 	actorRef,
@@ -39,6 +71,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 	finishDrag,
 	setActiveDropId,
 	setHandoff,
+	setHandoffs,
 }: useTilePointerUp.Props<TTile, TSlot, TDrag, TDrop>) =>
 	useCallback(
 		(event: ReactPointerEvent<HTMLDivElement>) => {
@@ -74,16 +107,52 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						targetRect: resolved?.element ? rectFromElement(resolved.element) : null,
 					});
 					const kind = dropOutcomeKind(outcome);
+					const animation = dropOutcomeAnimation(outcome);
 					const commit = dropOutcomeCommit(outcome);
 
 					if (kind === "accept" && resolved?.element) {
-						await animateToTarget(rectFromElement(resolved.element));
-						if (resolved.slot) {
-							setHandoff({
-								tileId: sourceTile.id,
-								targetSlotId: resolved.slot.id,
-							});
-						}
+						const sourceHandoff = createSourceHandoff({
+							sourceTile: sourceTile as TileEngine.Tile<unknown>,
+							resolved: resolved as TileEngineDrop.Resolved<
+								unknown,
+								unknown,
+								unknown
+							>,
+						});
+						const targetHandoff = createTargetHandoff({
+							sourceTile: sourceTile as TileEngine.Tile<unknown>,
+							resolved: resolved as TileEngineDrop.Resolved<
+								unknown,
+								unknown,
+								unknown
+							>,
+						});
+						const targetActorElement =
+							animation === "parallel-swap" && element && resolved.targetTile
+								? findTileEngineActorElement({
+										sourceElement: element,
+										tileId: resolved.targetTile.id,
+									})
+								: null;
+
+						await Promise.all([
+							animateToTarget(rectFromElement(resolved.element)),
+							targetActorElement
+								? animateElementToRect({
+										element: targetActorElement,
+										target: session.origin,
+									})
+								: Promise.resolve(),
+						]);
+
+						setHandoffs(
+							[
+								sourceHandoff,
+								targetActorElement ? targetHandoff : undefined,
+							].filter((handoff): handoff is TileEngineActor.Handoff =>
+								Boolean(handoff),
+							),
+						);
 						try {
 							await commit?.();
 							return;
@@ -117,6 +186,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 			resolveDrop,
 			setActiveDropId,
 			setHandoff,
+			setHandoffs,
 			tileRef,
 		],
 	);

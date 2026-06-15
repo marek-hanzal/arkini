@@ -1,13 +1,16 @@
 import type { CSSProperties, ReactNode, RefObject } from "react";
+import type { EnterMotionSchema } from "~/v0/play/motion/EnterMotionSchema";
 
 export namespace TileEngine {
 	export type Id = string;
+	export type DropAnimation = "parallel-swap";
 	export type DropOutcome =
 		| "accept"
 		| "reject"
 		| "ignore"
 		| {
 				type: "accept";
+				animation?: DropAnimation;
 				commit?(): Promise<unknown> | unknown;
 		  }
 		| {
@@ -37,6 +40,7 @@ export namespace TileEngine {
 		hidden?: boolean;
 		disabled?: boolean;
 		style?: CSSProperties;
+		enter?: EnterMotionSchema.Type;
 	}
 
 	export interface DragBinding<TDrag = unknown> {

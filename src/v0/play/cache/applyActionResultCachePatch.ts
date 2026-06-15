@@ -35,6 +35,9 @@ const createBoardItem = (
 		x: event.to.x,
 		y: event.to.y,
 		state: {},
+		motion: {
+			enter: {},
+		},
 	};
 };
 
@@ -362,21 +365,56 @@ const patchInventoryViewCacheValue = (
 	});
 };
 
-export const applyActionResultCachePatch = ({
+const spawnSequenceDelayMs = 135;
+
+const shouldSequenceSpawnEvents = (events: readonly ActionVisualEventSchema.Type[]) =>
+	events.some((event) => event.type === "activation.activated" && event.mode === "exhaust");
+
+const applyVisualEvents = ({
+	events,
 	queryClient,
-	result,
-}: applyActionResultCachePatch.Props) => {
+}: {
+	events: readonly ActionVisualEventSchema.Type[];
+	queryClient: QueryClient;
+}) => {
 	patchBoardViewCache({
 		queryClient,
-		patch: (board) =>
-			result.visualEvents.reduce((current, event) => patchBoardEvent(current, event), board),
+		patch: (board) => events.reduce((current, event) => patchBoardEvent(current, event), board),
 	});
 	patchInventoryViewCache({
 		queryClient,
 		patch: (inventory) =>
-			result.visualEvents.reduce(
-				(current, event) => patchInventoryEvent(current, event),
-				inventory,
-			),
+			events.reduce((current, event) => patchInventoryEvent(current, event), inventory),
+	});
+};
+
+export const applyActionResultCachePatch = ({
+	queryClient,
+	result,
+}: applyActionResultCachePatch.Props) => {
+	if (!shouldSequenceSpawnEvents(result.visualEvents)) {
+		applyVisualEvents({
+			queryClient,
+			events: result.visualEvents,
+		});
+		return;
+	}
+
+	const spawnedEvents = result.visualEvents.filter((event) => event.type === "item.spawned");
+	const immediateEvents = result.visualEvents.filter((event) => event.type !== "item.spawned");
+	applyVisualEvents({
+		queryClient,
+		events: immediateEvents,
+	});
+
+	spawnedEvents.forEach((event, index) => {
+		window.setTimeout(() => {
+			applyVisualEvents({
+				queryClient,
+				events: [
+					event,
+				],
+			});
+		}, index * spawnSequenceDelayMs);
 	});
 };

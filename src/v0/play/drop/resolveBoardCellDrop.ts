@@ -72,11 +72,15 @@ export const resolveBoardCellDrop = ({
 				type: "swap",
 			},
 			() =>
-				acceptDrop(() =>
-					actions.swapBoardItems({
-						sourceBoardItemId: source.boardItemId,
-						targetBoardItemId: targetItem.id,
-					}),
+				acceptDrop(
+					() =>
+						actions.swapBoardItems({
+							sourceBoardItemId: source.boardItemId,
+							targetBoardItemId: targetItem.id,
+						}),
+					{
+						animation: "parallel-swap",
+					},
 				),
 		)
 		.with(

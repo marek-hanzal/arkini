@@ -20,10 +20,9 @@
 		}
 	},
 	"include": [
-		"src",
+		"src/app",
+		"src/v0",
+		"src/vite-env.d.ts",
 		"vite.config.ts"
-	],
-	"exclude": [
-		"src/ancient"
 	]
 }

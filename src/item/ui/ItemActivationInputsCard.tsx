@@ -1,7 +1,8 @@
 import type { FC } from "react";
 import type { ItemId } from "~/manifest/manifestId";
-import type { ActivationView, BoardViewItem } from "~/play/logic/playTypes";
-import type { ItemCatalogView } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/board/view/ActivationViewSchema";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
 
 export namespace ItemActivationInputsCard {
 	export interface Props {

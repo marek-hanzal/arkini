@@ -8,7 +8,7 @@ import { isEmptyInventoryState } from "~/inventory/logic/isEmptyInventoryState";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MergeBoardItemsInputSchema } from "~/play/schema/MergeBoardItemsInputSchema";
-import { GameActionError } from "~/play/logic/playTypes";
+import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
 import { readStoredBoardState } from "~/board/logic/readStoredBoardState";

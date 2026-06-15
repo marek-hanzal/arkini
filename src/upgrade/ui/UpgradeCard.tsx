@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import type { UpgradeId } from "~/manifest/manifestId";
-import type { ItemCatalogView, UpgradeView } from "~/play/logic/playTypes";
+import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
+import type { UpgradeView } from "~/upgrade/view/UpgradeViewSchema";
 import { cn } from "~/shared/cn";
 
 export namespace UpgradeCard {

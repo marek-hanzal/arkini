@@ -16,7 +16,8 @@ import { usePlaySheets } from "~/play/hook/usePlaySheets";
 import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
 import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
 import { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import type { BoardViewItem, InventorySlot } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 
 export namespace PlayShell {
 	export interface Props {}

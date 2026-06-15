@@ -1,7 +1,7 @@
 import { cellKey } from "~/board/util/cell";
 import { flashSource } from "./flashSource";
 import type { AnyDropContext, Feedback } from "./types";
-import type { GameDragView } from "~/play/logic/playTypes";
+import type { GameDragView } from "~/drag/view/GameDragViewSchema";
 
 export namespace flashDrop {
 	export interface Props {

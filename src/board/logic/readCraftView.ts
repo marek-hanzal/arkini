@@ -1,6 +1,7 @@
 import type { DateService } from "~/date/context/DateServiceFx";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
-import type { BoardItemState, CraftProgressView } from "~/play/logic/playTypes";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
+import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
 
 export namespace readCraftView {
 	export interface Props {

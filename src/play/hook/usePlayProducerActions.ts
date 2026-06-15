@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from "react";
 import type { Command } from "~/command/Command";
-import { useCommand } from "~/play/hook/useCommand";
+import { useRunCommandMutation } from "~/command/useRunCommandMutation";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import { produceFrom } from "~/play/logic/produceFrom";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
-import type { BoardViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 
 export namespace usePlayProducerActions {
 	export interface Props {
@@ -24,7 +24,7 @@ export const usePlayProducerActions = ({
 	schedule,
 }: usePlayProducerActions.Props) => {
 	const invalidatePlayData = usePlayDataInvalidation();
-	const command = useCommand<
+	const command = useRunCommandMutation<
 		Extract<
 			Command,
 			{

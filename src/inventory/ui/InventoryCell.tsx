@@ -1,6 +1,6 @@
 import { memo, type FC, useRef } from "react";
 import { useMotionCellFeedback } from "~/board/hook/useMotionCellFeedback";
-import type { InventorySlot } from "~/play/logic/playTypes";
+import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import { cn } from "~/shared/cn";
 
 export namespace InventoryCell {

@@ -10,7 +10,7 @@ import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
 import { WithdrawProducerInputSchema } from "~/play/schema/WithdrawProducerInputSchema";
-import { GameActionError } from "~/play/logic/playTypes";
+import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { planInventoryPlacement } from "~/inventory/logic/planning/planInventoryPlacement";
 import { normalizeInventoryStateJson } from "~/inventory/logic/normalizeInventoryStateJson";

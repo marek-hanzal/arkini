@@ -7,7 +7,7 @@ import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { BoardRow } from "~/inventory/logic/planning/types";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { StashDefinition } from "~/manifest/producer";
-import type { ProducerDepletion } from "~/play/logic/playTypes";
+import type { ProducerDepletion } from "~/producer/type/ProducerDepletionSchema";
 import { json } from "~/shared/json";
 
 export namespace depleteFx {

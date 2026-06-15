@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { activationStatusLabel } from "~/item/logic/activationStatusLabel";
-import type { ActivationView } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/board/view/ActivationViewSchema";
 import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 
 export namespace ItemActivationCard {

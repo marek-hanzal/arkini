@@ -8,7 +8,7 @@ import { resolveBoardInventoryDrop } from "./resolveBoardInventoryDrop";
 import { resolveInventoryDrop } from "./resolveInventoryDrop";
 import type { AnyDropContext, Feedback, TypedDropContext } from "./types";
 import type { Command } from "~/command/Command";
-import type { GameDragView } from "~/play/logic/playTypes";
+import type { GameDragView } from "~/drag/view/GameDragViewSchema";
 
 export namespace resolveDrop {
 	export interface Props {

@@ -1,5 +1,5 @@
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
-import type { ProducerPlacement } from "~/play/logic/playTypes";
+import type { ProducerPlacement } from "~/producer/type/ProducerPlacementSchema";
 import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 
 export namespace placementTargetRect {

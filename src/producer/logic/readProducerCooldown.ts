@@ -1,4 +1,4 @@
-import type { ActivationView } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/board/view/ActivationViewSchema";
 
 export namespace readProducerCooldown {
 	export interface Props {

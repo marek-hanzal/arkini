@@ -1,4 +1,4 @@
-import type { ActivationView } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/board/view/ActivationViewSchema";
 import { isProducerStocked } from "~/producer/logic/isProducerStocked";
 
 export function isProducerReady(activation: ActivationView | undefined, nowMs: number) {

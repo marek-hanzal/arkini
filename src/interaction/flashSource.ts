@@ -1,7 +1,7 @@
 import { cellKey } from "~/board/util/cell";
 import type { DragSource } from "~/play/types";
 import type { Feedback } from "./types";
-import type { GameDragView } from "~/play/logic/playTypes";
+import type { GameDragView } from "~/drag/view/GameDragViewSchema";
 
 export namespace flashSource {
 	export interface Props {

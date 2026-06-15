@@ -1,6 +1,7 @@
 import { memo, type FC } from "react";
 import { ItemLevelBadge } from "~/item/ui/ItemLevelBadge";
-import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import type { ViewItem } from "~/item/view/ViewItemSchema";
 import { cn } from "~/shared/cn";
 
 export namespace GameItemContent {

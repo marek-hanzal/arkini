@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { ActivationWeightedEntry } from "~/manifest/producer";
-import { GameActionError } from "~/play/logic/playTypes";
+import { GameActionError } from "~/command/GameActionError";
 import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 
 export namespace pickWeightedDropFx {

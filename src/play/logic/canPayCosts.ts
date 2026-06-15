@@ -1,4 +1,4 @@
-import type { InventorySlot } from "./playTypes";
+import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 
 export function canPayCosts(
 	inventory: readonly InventorySlot[],

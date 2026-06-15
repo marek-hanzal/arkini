@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { craftStatusLabel } from "~/item/logic/craftStatusLabel";
-import type { CraftProgressView, ItemCatalogView } from "~/play/logic/playTypes";
+import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
+import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
 import { cn } from "~/shared/cn";
 import { formatMs } from "~/shared/util/formatMs";
 

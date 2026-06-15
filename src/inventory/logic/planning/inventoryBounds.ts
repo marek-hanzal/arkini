@@ -1,4 +1,4 @@
-import { GameActionError } from "~/play/logic/playTypes";
+import { GameActionError } from "~/command/GameActionError";
 import type { SaveShape } from "./types";
 
 export function assertInsideInventory(save: SaveShape, slotIndex: number) {

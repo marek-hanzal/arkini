@@ -1,6 +1,7 @@
 import { memo, type FC } from "react";
 import { GameItemContent } from "~/item/ui/GameItemContent";
-import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import type { ViewItem } from "~/item/view/ViewItemSchema";
 import type { RectLike } from "~/play/types";
 
 export namespace GameItemView {

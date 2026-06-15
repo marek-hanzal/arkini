@@ -1,5 +1,5 @@
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
-import type { BoardItemState } from "~/play/logic/playTypes";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 
 export const createInitialBoardState = (
 	itemId: string,

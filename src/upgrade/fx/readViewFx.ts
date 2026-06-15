@@ -6,7 +6,8 @@ import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
 import { canSpendInventoryItems } from "~/inventory/logic/planning/canSpendInventoryItems";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { UpgradeListView, UpgradeView } from "~/play/logic/playTypes";
+import { UpgradeListViewSchema, type UpgradeListView } from "~/upgrade/view/UpgradeListViewSchema";
+import type { UpgradeView } from "~/upgrade/view/UpgradeViewSchema";
 import { defaultSaveGameId } from "~/play/logic/save";
 import { describeUpgradeEffect } from "~/upgrade/logic/describeUpgradeEffect";
 
@@ -92,7 +93,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 			};
 		});
 
-	return {
+	return UpgradeListViewSchema.parse({
 		upgrades,
-	} satisfies UpgradeListView;
+	}) satisfies UpgradeListView;
 });

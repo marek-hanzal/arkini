@@ -4,14 +4,15 @@ import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
 import { inventorySourceId } from "~/inventory/inventorySourceId";
 import { InventoryCell } from "~/inventory/ui/InventoryCell";
 import { InventoryTile } from "~/inventory/ui/InventoryTile";
-import { usePlayInventory } from "~/play/hook/usePlayInventory";
+import { useInventoryView } from "~/inventory/hook/useInventoryView";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import {
 	visualInventorySlotKey,
 	visualInventoryStackKey,
 	type useVisualItemMotions,
 } from "~/play/hook/useVisualItemMotions";
-import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
+import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
+import type { ViewItem } from "~/item/view/ViewItemSchema";
 import type { DragData, DropData, RectLike } from "~/play/types";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { TileEngine } from "~/tile-engine/ui/TileEngine";
@@ -42,7 +43,7 @@ interface InventoryTileData {
 
 export const InventorySheet: FC<InventorySheet.Props> = memo(
 	({ drag, invalidInventorySlot, onClose, onSlotDoubleActivate, visualMotions }) => {
-		const inventory = usePlayInventory().data;
+		const inventory = useInventoryView().data;
 		const items = usePlayItems().data;
 
 		const slots = useMemo(

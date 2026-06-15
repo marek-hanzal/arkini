@@ -8,7 +8,7 @@ import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { spendInventoryItems } from "~/inventory/logic/planning/spendInventoryItems";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { BuyUpgradeInputSchema } from "~/play/schema/BuyUpgradeInputSchema";
-import { GameActionError } from "~/play/logic/playTypes";
+import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 
 export namespace buyFx {

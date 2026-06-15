@@ -3,7 +3,7 @@ import type { ItemId } from "~/manifest/manifestId";
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DropContext } from "~/drag/DropContext";
 import type { DroppablePayload } from "~/drag/DroppablePayload";
-import type { GameDragView } from "~/play/logic/playTypes";
+import type { GameDragView } from "~/drag/view/GameDragViewSchema";
 import type { DragSource, DropTarget, VisualMeta } from "~/play/types";
 
 export interface Feedback {

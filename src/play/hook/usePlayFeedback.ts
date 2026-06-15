@@ -1,6 +1,8 @@
-import { useMachine } from "@xstate/react";
-import { useCallback, useMemo } from "react";
-import { playFeedbackMachine } from "~/play/logic/playFeedbackMachine";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+const flashMs = 360;
+
+type Timer = ReturnType<typeof setTimeout>;
 
 export namespace usePlayFeedback {
 	export interface State {
@@ -16,64 +18,82 @@ export namespace usePlayFeedback {
 	}
 }
 
-/**
- * GPT:FIX
- *
- * I understand overall idea of this hook, but at the end it's more mess which does not make a lof of sense.
- *
- * What about idea to have core (global) EventBus (even wrap native one from browser or steal EventBus impl. from zbav-se.me which is typed),
- * so we can send typed events instead of messing up with such a crap?
- */
 export function usePlayFeedback(): usePlayFeedback.State {
-	const [feedback, send] = useMachine(playFeedbackMachine);
+	const [invalidBoardCellKey, setInvalidBoardCellKey] = useState<string | undefined>();
+	const [mergedBoardCellKey, setMergedBoardCellKey] = useState<string | undefined>();
+	const [imprintedBoardCellKey, setImprintedBoardCellKey] = useState<string | undefined>();
+	const [invalidInventorySlot, setInvalidInventorySlot] = useState<number | undefined>();
+	const invalidBoardTimer = useRef<Timer | undefined>(undefined);
+	const mergeTimer = useRef<Timer | undefined>(undefined);
+	const imprintTimer = useRef<Timer | undefined>(undefined);
+	const inventoryTimer = useRef<Timer | undefined>(undefined);
+
+	const restartTimer = useCallback((timerRef: { current: Timer | undefined }, run: () => void) => {
+		if (timerRef.current) clearTimeout(timerRef.current);
+		timerRef.current = setTimeout(() => {
+			timerRef.current = undefined;
+			run();
+		}, flashMs);
+	}, []);
+
+	useEffect(
+		() => () => {
+			for (const timer of [
+				invalidBoardTimer.current,
+				mergeTimer.current,
+				imprintTimer.current,
+				inventoryTimer.current,
+			]) {
+				if (timer) clearTimeout(timer);
+			}
+		},
+		[],
+	);
+
 	const flashBoardCell = useCallback(
 		(key: string | undefined, tone: "error") => {
 			if (!key || tone !== "error") return;
-			send({
-				type: "FLASH_BOARD_CELL",
-				key,
-			});
+			setInvalidBoardCellKey(key);
+			restartTimer(invalidBoardTimer, () => setInvalidBoardCellKey(undefined));
 		},
 		[
-			send,
+			restartTimer,
 		],
 	);
+
 	const pulseMergeCell = useCallback(
 		(key: string | undefined) => {
 			if (!key) return;
-			send({
-				type: "PULSE_MERGE_CELL",
-				key,
-			});
+			setMergedBoardCellKey(key);
+			restartTimer(mergeTimer, () => setMergedBoardCellKey(undefined));
 		},
 		[
-			send,
+			restartTimer,
 		],
 	);
+
 	const pulseImprintCell = useCallback(
 		(key: string | undefined) => {
 			if (!key) return;
-			send({
-				type: "PULSE_IMPRINT_CELL",
-				key,
-			});
+			setImprintedBoardCellKey(key);
+			restartTimer(imprintTimer, () => setImprintedBoardCellKey(undefined));
 		},
 		[
-			send,
+			restartTimer,
 		],
 	);
+
 	const flashInventorySlot = useCallback(
 		(slotIndex: number | undefined, tone: "error") => {
 			if (slotIndex === undefined || tone !== "error") return;
-			send({
-				type: "FLASH_INVENTORY_SLOT",
-				slotIndex,
-			});
+			setInvalidInventorySlot(slotIndex);
+			restartTimer(inventoryTimer, () => setInvalidInventorySlot(undefined));
 		},
 		[
-			send,
+			restartTimer,
 		],
 	);
+
 	const showError = useCallback((error: unknown) => {
 		if (import.meta.env.DEV) {
 			console.debug("Game action rejected", error);
@@ -82,10 +102,10 @@ export function usePlayFeedback(): usePlayFeedback.State {
 
 	return useMemo(
 		() => ({
-			invalidBoardCellKey: feedback.context.invalidBoardCellKey,
-			mergedBoardCellKey: feedback.context.mergedBoardCellKey,
-			imprintedBoardCellKey: feedback.context.imprintedBoardCellKey,
-			invalidInventorySlot: feedback.context.invalidInventorySlot,
+			invalidBoardCellKey,
+			mergedBoardCellKey,
+			imprintedBoardCellKey,
+			invalidInventorySlot,
 			flashBoardCell,
 			pulseMergeCell,
 			pulseImprintCell,
@@ -93,12 +113,12 @@ export function usePlayFeedback(): usePlayFeedback.State {
 			showError,
 		}),
 		[
-			feedback.context.imprintedBoardCellKey,
-			feedback.context.invalidBoardCellKey,
-			feedback.context.invalidInventorySlot,
-			feedback.context.mergedBoardCellKey,
 			flashBoardCell,
 			flashInventorySlot,
+			imprintedBoardCellKey,
+			invalidBoardCellKey,
+			invalidInventorySlot,
+			mergedBoardCellKey,
 			pulseImprintCell,
 			pulseMergeCell,
 			showError,

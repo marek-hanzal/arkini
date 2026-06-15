@@ -1039,7 +1039,7 @@ Until a concrete animation spec exists, implementation should choose minimal loc
 
 Same-item board merge, mixed consumption, blueprint imprinting, producer drops, stash dumps, and inventory placement all use the same visual rule: the final board/inventory item actor is the real actor. There is no separate duplicate overlay representation for the same item. Cells/slots provide geometry and feedback; items live in stable item layers and animate transform/priority there.
 
-Newly committed actors may be staged from a source rectangle through `visualItemMotionMachine`. During that transient phase they can render above their source with raised priority, then settle back to normal priority when Motion completes. Drag/drop keeps the active source hidden until the durable command and query invalidation settle, preventing the source actor from reappearing on its old slot and then animating a second time.
+Newly committed actors may be staged from a source rectangle through `useVisualItemMotions`. During that transient phase they can render above their source with raised priority, then settle back to normal priority when Motion completes. Drag/drop keeps the active source hidden until the durable command and query invalidation settle, preventing the source actor from reappearing on its old slot and then animating a second time.
 
 Blueprint binding remains separate from consumption. It commits the blueprint binding first and then keeps the non-consumed dragged building tied to its own item actor so the player can see that the building survived.
 

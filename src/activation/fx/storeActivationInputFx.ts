@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
 import { defaultSaveGameId } from "~/play/logic/save";
@@ -26,7 +25,7 @@ export const storeActivationInputFx = Effect.fn("storeActivationInputFx")(functi
 	const updatedAt = date.timestamp();
 	const existing = yield* dbFx((db) =>
 		db
-			.selectFrom(table.itemInstance)
+			.selectFrom("itemInstance")
 			.selectAll()
 			.where("locationKind", "=", "activation-input")
 			.where("ownerItemInstanceId", "=", ownerItemInstanceId)
@@ -37,11 +36,11 @@ export const storeActivationInputFx = Effect.fn("storeActivationInputFx")(functi
 	if (existing) {
 		yield* dbFx(async (db) => {
 			await db
-				.deleteFrom(table.itemInstance)
+				.deleteFrom("itemInstance")
 				.where("id", "=", sourceItemInstanceId)
 				.execute();
 			await db
-				.updateTable(table.itemInstance)
+				.updateTable("itemInstance")
 				.set({
 					quantity: existing.quantity + quantity,
 					updatedAt,
@@ -54,7 +53,7 @@ export const storeActivationInputFx = Effect.fn("storeActivationInputFx")(functi
 
 	yield* dbFx((db) =>
 		db
-			.updateTable(table.itemInstance)
+			.updateTable("itemInstance")
 			.set({
 				id: activationInputStorageKey({
 					ownerItemInstanceId,

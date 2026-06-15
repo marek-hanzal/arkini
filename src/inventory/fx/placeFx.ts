@@ -6,7 +6,6 @@ import { assertInsideBoard } from "~/board/logic/assertInsideBoard";
 import { resumeCraftTimer } from "~/board/logic/resumeCraftTimer";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { spendStackFx } from "~/inventory/fx/spendStackFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
@@ -30,8 +29,8 @@ export namespace placeFx {
 }
 
 export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
-	const input = yield* Effect.try({
-		try: () => PlaceInventoryItemInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => PlaceInventoryItemInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 
@@ -73,7 +72,7 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 			) {
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.itemInstance)
+						.updateTable("itemInstance")
 						.set({
 							quantity: 1,
 							locationKind: "board",

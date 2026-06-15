@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { GameConfig } from "~/manifest/GameConfig";
@@ -32,7 +31,7 @@ export const syncConfigFx = Effect.fn("syncConfigFx")(function* ({
 		Effect.gen(function* () {
 			const previous = yield* dbFx((db) =>
 				db
-					.selectFrom(table.metadata)
+					.selectFrom("metadata")
 					.select("value")
 					.where("key", "=", "gameConfigHash")
 					.executeTakeFirst(),
@@ -40,7 +39,7 @@ export const syncConfigFx = Effect.fn("syncConfigFx")(function* ({
 
 			yield* dbFx((db) =>
 				db
-					.insertInto(table.metadata)
+					.insertInto("metadata")
 					.values({
 						key: "gameConfigHash",
 						value: hash,

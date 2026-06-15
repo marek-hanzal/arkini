@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
@@ -28,7 +27,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 
 	const existing = yield* dbFx((db) =>
 		db
-			.selectFrom(table.saveGame)
+			.selectFrom("saveGame")
 			.select("id")
 			.where("id", "=", defaultSaveGameId)
 			.executeTakeFirst(),
@@ -39,7 +38,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 		Effect.gen(function* () {
 			yield* dbFx((db) =>
 				db
-					.insertInto(table.saveGame)
+					.insertInto("saveGame")
 					.values({
 						id: defaultSaveGameId,
 						name: "Default save",
@@ -53,7 +52,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 			for (const [slotIndex, stack] of gameConfig.config.startingState.inventory.entries()) {
 				yield* dbFx((db) =>
 					db
-						.insertInto(table.itemInstance)
+						.insertInto("itemInstance")
 						.values({
 							id: `${defaultSaveGameId}:inventory:${slotIndex}`,
 							saveGameId: defaultSaveGameId,
@@ -76,7 +75,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 			).entries()) {
 				yield* dbFx((db) =>
 					db
-						.insertInto(table.itemInstance)
+						.insertInto("itemInstance")
 						.values({
 							id: `${defaultSaveGameId}:board:${index}`,
 							saveGameId: defaultSaveGameId,
@@ -96,7 +95,7 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.saveGame)
+					.updateTable("saveGame")
 					.set({
 						updatedAt: timestamp,
 					})

@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useBottomNavigationHostController } from "~/play/hook/useBottomNavigationHostController";
+import { useBottomNavigation } from "~/play/hook/useBottomNavigation";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";
 
 export namespace BottomNavigationHost {
@@ -7,7 +7,7 @@ export namespace BottomNavigationHost {
 }
 
 export const BottomNavigationHost: FC<BottomNavigationHost.Props> = () => {
-	const controller = useBottomNavigationHostController();
+	const controller = useBottomNavigation();
 
 	return (
 		<BottomNavigation

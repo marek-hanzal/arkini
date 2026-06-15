@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { InventoryPlacementPlan } from "~/inventory/logic/planning/types";
 import { defaultSaveGameId } from "~/play/logic/save";
@@ -21,7 +20,7 @@ export const applyInventoryPlacementPlanFx = Effect.fn("applyInventoryPlacementP
 		if (placement.type === "update") {
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						quantity: placement.quantity,
 						stateJson: placement.stateJson,
@@ -35,7 +34,7 @@ export const applyInventoryPlacementPlanFx = Effect.fn("applyInventoryPlacementP
 
 		yield* dbFx((db) =>
 			db
-				.insertInto(table.itemInstance)
+				.insertInto("itemInstance")
 				.values({
 					id: placement.stackId,
 					saveGameId: defaultSaveGameId,

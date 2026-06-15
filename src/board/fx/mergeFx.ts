@@ -12,7 +12,6 @@ import { startCraftFx } from "~/craft/fx/startCraftFx";
 import { groupCraftInputRows } from "~/craft/logic/groupCraftInputRows";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { isEmptyInventoryState } from "~/inventory/logic/isEmptyInventoryState";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
@@ -35,8 +34,8 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 	const now = date.now();
 	const timestamp = date.toTimestamp(now);
 
-	const input = yield* Effect.try({
-		try: () => MergeBoardItemsInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => MergeBoardItemsInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 	if (input.sourceBoardItemId === input.targetBoardItemId) {
@@ -110,12 +109,12 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 
 				if (mergeRule.consumeSource !== false) {
 					yield* dbFx((db) =>
-						db.deleteFrom(table.itemInstance).where("id", "=", source.id).execute(),
+						db.deleteFrom("itemInstance").where("id", "=", source.id).execute(),
 					);
 				}
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.itemInstance)
+						.updateTable("itemInstance")
 						.set({
 							itemDefinitionId: mergeRule.resultItemId,
 							stateJson: json(

@@ -1,58 +1,45 @@
 import type { FC } from "react";
 import { InventorySheet } from "~/inventory/ui/InventorySheet";
-import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
 import { usePlaySheetContentController } from "~/play/hook/usePlaySheetContentController";
-import { DbStatusCard } from "~/play/ui/DbStatusCard";
-import { SheetHeader } from "~/shared/ui/SheetHeader";
+import type { ActiveSheet } from "~/play/logic/playSheetTypes";
+import { DatabaseSheet } from "~/play/ui/DatabaseSheet";
+import { ItemSheet } from "~/play/ui/ItemSheet";
 import { UpgradesSheet } from "~/upgrade/ui/UpgradesSheet";
 
 export namespace PlaySheetContent {
 	export interface Props {}
 }
 
+interface SheetProps {
+	onClose(): void;
+	boardItemId?: string;
+}
+
+const InventoryPlaySheet: FC<SheetProps> = () => <InventorySheet />;
+const UpgradesPlaySheet: FC<SheetProps> = ({ onClose }) => <UpgradesSheet onClose={onClose} />;
+const DatabasePlaySheet: FC<SheetProps> = ({ onClose }) => <DatabaseSheet onClose={onClose} />;
+const ItemPlaySheet: FC<SheetProps> = ({ boardItemId, onClose }) => (
+	<ItemSheet
+		boardItemId={boardItemId}
+		onClose={onClose}
+	/>
+);
+
+const bottomSheetByType = {
+	inventory: InventoryPlaySheet,
+	upgrades: UpgradesPlaySheet,
+	database: DatabasePlaySheet,
+	item: ItemPlaySheet,
+} satisfies Record<ActiveSheet, FC<SheetProps>>;
+
 export const PlaySheetContent: FC<PlaySheetContent.Props> = () => {
 	const controller = usePlaySheetContentController();
-
-    /**
-     * GPT:FIX
-     *
-     * Are you kidding me???
-     *
-     * Really we've here if === sheet?
-     *
-     * Create standalone sheets for every sheet we're using, connect it to it's button.
-     *
-     * This kind of crap is not acceptable.
-    */
-	if (controller.renderedSheet === "inventory") {
-		return <InventorySheet />;
-	}
-
-	if (controller.renderedSheet === "upgrades") {
-		return <UpgradesSheet onClose={controller.closeSheet} />;
-	}
-
-	if (controller.renderedSheet === "database") {
-		return (
-			<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
-				<SheetHeader
-					eyebrow="System"
-					description="Local database"
-					onClose={controller.closeSheet}
-				/>
-				<div className="p-4 pt-1">
-					<DbStatusCard />
-				</div>
-			</section>
-		);
-	}
+	const Sheet = bottomSheetByType[controller.renderedSheet];
 
 	return (
-		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
-			<ItemDetailSheet
-				boardItemId={controller.selectedBoardItemId}
-				onClose={controller.closeSheet}
-			/>
-		</section>
+		<Sheet
+			boardItemId={controller.selectedBoardItemId}
+			onClose={controller.closeSheet}
+		/>
 	);
 };

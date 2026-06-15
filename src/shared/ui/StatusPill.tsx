@@ -7,11 +7,6 @@ export namespace StatusPill {
 	}
 }
 
-/**
- * GPT:FIX
- *
- * We can create something like lib/client where we can put those client side UI stuff.
- */
 export const StatusPill: FC<StatusPill.Props> = ({ label, value }) => {
 	return (
 		<div className="min-w-0 rounded-sm bg-slate-950/60 px-3 py-2">

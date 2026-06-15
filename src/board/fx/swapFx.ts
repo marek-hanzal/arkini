@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { SwapBoardItemsInputSchema } from "~/play/schema/SwapBoardItemsInputSchema";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
@@ -20,8 +19,8 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 	const date = yield* DateServiceFx;
 	const timestamp = date.timestamp();
 
-	const input = yield* Effect.try({
-		try: () => SwapBoardItemsInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => SwapBoardItemsInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 	if (input.sourceBoardItemId === input.targetBoardItemId) {
@@ -41,7 +40,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						boardX: -1,
 						boardY: -1,
@@ -52,7 +51,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			);
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						boardX: source.x,
 						boardY: source.y,
@@ -63,7 +62,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			);
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						boardX: target.x,
 						boardY: target.y,

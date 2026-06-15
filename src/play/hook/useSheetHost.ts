@@ -1,18 +1,11 @@
 import { useMemo } from "react";
 import { usePlaySheetsState } from "~/play/hook/usePlaySheetsState";
 
-export namespace usePlaySheetHostController {
+export namespace useSheetHost {
 	export interface Props {}
 }
 
-/**
- * GPT:FIX
- *
- * Nice and long name. Make it short.
- *
- * Also ensure sheets are stable, so useMemo makes sense.
- */
-export const usePlaySheetHostController = (_props?: usePlaySheetHostController.Props) => {
+export const useSheetHost = (_props?: useSheetHost.Props) => {
 	const sheets = usePlaySheetsState();
 
 	return useMemo(

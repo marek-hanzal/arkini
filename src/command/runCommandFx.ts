@@ -20,8 +20,8 @@ export namespace runCommandFx {
 }
 
 export const runCommandFx = Effect.fn("runCommandFx")(function* ({ command }: runCommandFx.Props) {
-	const input = yield* Effect.try({
-		try: () => CommandSchema.parse(command),
+	const input = yield* Effect.tryPromise({
+		try: () => CommandSchema.parseAsync(command),
 		catch: toGameActionError,
 	});
 

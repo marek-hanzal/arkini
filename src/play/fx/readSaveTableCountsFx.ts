@@ -1,26 +1,25 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 
 export const readSaveTableCountsFx = Effect.fn("readSaveTableCountsFx")(function* () {
 	const [saveGameRows, boardItemRows, inventoryStackRows, playerUpgradeRows] = yield* dbFx((db) =>
 		Promise.all([
 			db
-				.selectFrom(table.saveGame)
+				.selectFrom("saveGame")
 				.select((eb) => eb.fn.countAll<number>().as("count"))
 				.executeTakeFirstOrThrow(),
 			db
-				.selectFrom(table.itemInstance)
+				.selectFrom("itemInstance")
 				.select((eb) => eb.fn.countAll<number>().as("count"))
 				.where("locationKind", "=", "board")
 				.executeTakeFirstOrThrow(),
 			db
-				.selectFrom(table.itemInstance)
+				.selectFrom("itemInstance")
 				.select((eb) => eb.fn.countAll<number>().as("count"))
 				.where("locationKind", "=", "inventory")
 				.executeTakeFirstOrThrow(),
 			db
-				.selectFrom(table.playerUpgrade)
+				.selectFrom("playerUpgrade")
 				.select((eb) => eb.fn.countAll<number>().as("count"))
 				.executeTakeFirstOrThrow(),
 		]),

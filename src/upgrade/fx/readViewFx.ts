@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { completeReadyFx } from "~/upgrade/fx/completeReadyFx";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { readInventoryStackRowsFx } from "~/item-instance/fx/readInventoryStackRowsFx";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
@@ -20,7 +19,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const [upgradeRows, inventoryRows] = yield* Effect.all([
 		dbFx((db) =>
 			db
-				.selectFrom(table.playerUpgrade)
+				.selectFrom("playerUpgrade")
 				.selectAll()
 				.where("saveGameId", "=", defaultSaveGameId)
 				.execute(),

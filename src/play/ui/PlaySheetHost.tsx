@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { usePlaySheetHostController } from "~/play/hook/usePlaySheetHostController";
+import { useSheetHost } from "~/play/hook/useSheetHost";
 import { BottomSheet } from "~/play/ui/BottomSheet";
 import { PlaySheetContent } from "~/play/ui/PlaySheetContent";
 
@@ -8,7 +8,7 @@ export namespace PlaySheetHost {
 }
 
 export const PlaySheetHost: FC<PlaySheetHost.Props> = () => {
-	const controller = usePlaySheetHostController();
+	const controller = useSheetHost();
 
 	return (
 		<BottomSheet

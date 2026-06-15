@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { P, match } from "ts-pattern";
 import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { BoardRow } from "~/inventory/logic/planning/types";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
@@ -29,11 +28,11 @@ export const depleteActivationFx = Effect.fn("depleteActivationFx")(function* ({
 		.with("remove", () =>
 			dbFx(async (db) => {
 				await db
-					.deleteFrom(table.itemInstance)
+					.deleteFrom("itemInstance")
 					.where("locationKind", "=", "activation-input")
 					.where("ownerItemInstanceId", "=", row.id)
 					.execute();
-				await db.deleteFrom(table.itemInstance).where("id", "=", row.id).execute();
+				await db.deleteFrom("itemInstance").where("id", "=", row.id).execute();
 				return {
 					kind: "remove",
 				} satisfies ActivationDepletionSchema.Type;
@@ -46,12 +45,12 @@ export const depleteActivationFx = Effect.fn("depleteActivationFx")(function* ({
 			({ replaceWithItemId }) =>
 				dbFx(async (db) => {
 					await db
-						.deleteFrom(table.itemInstance)
+						.deleteFrom("itemInstance")
 						.where("locationKind", "=", "activation-input")
 						.where("ownerItemInstanceId", "=", row.id)
 						.execute();
 					await db
-						.updateTable(table.itemInstance)
+						.updateTable("itemInstance")
 						.set({
 							itemDefinitionId: replaceWithItemId,
 							stateJson: json(createInitialBoardState(replaceWithItemId, gameConfig)),

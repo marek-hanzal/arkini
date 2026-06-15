@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { registerDropTarget } from "~/drag/logic/dropTargetRegistry";
+import { registerDropTarget } from "~/drag/logic/registerDropTarget";
 
 export namespace useDropTargetRegistration {
 	export interface Props<TPayload = unknown> {
@@ -9,18 +9,14 @@ export namespace useDropTargetRegistration {
 	}
 }
 
-/**
- * GPT:FIX
- *
- * Write docs, why this exists and what we're using it for.
- */
+/** Registers a cross-surface drop target while its DOM node is mounted. */
 export const useDropTargetRegistration = <TPayload = unknown>({
 	nodeId,
 	payload,
 	disabled = false,
 }: useDropTargetRegistration.Props<TPayload>) => {
 	useEffect(() => {
-		if (disabled || !nodeId || !payload) return;
+		if (disabled || !nodeId || payload === undefined) return;
 		return registerDropTarget({
 			nodeId,
 			payload,

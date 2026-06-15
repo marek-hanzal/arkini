@@ -11,7 +11,6 @@ import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import { GameActionError } from "~/command/GameActionError";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { planPlacements } from "~/inventory/logic/planning/placement";
@@ -36,17 +35,17 @@ export namespace activateFx {
 }
 
 /**
- * GPT:FIX
- * This is too long, too complicated. Separate individual usecases and make the thing much less magical
+ * Activates one board item and returns the command result plus visual facts.
+ *
+ * The effect deliberately keeps the mutation in one transaction, but the phases
+ * are ordered as plain gameplay steps: validate target, resolve upgraded
+ * activation definition, validate stored inputs, roll output, plan placements,
+ * spend inputs, then update or deplete the source item.
  */
 export const activateFx = Effect.fn("activateFx")(function* (props: activateFx.Props) {
-	const input = yield* Effect.try({
+	const input = yield* Effect.tryPromise({
 		try: () =>
-        /**
-         * GPT:FIX
-         * You're in an async func, you can parseAsync - fix this in other places if exists
-         */
-			ActivateItemInputSchema.parse({
+			ActivateItemInputSchema.parseAsync({
 				...props,
 				activation: props.activation ?? "single",
 			}),
@@ -276,7 +275,7 @@ export const activateFx = Effect.fn("activateFx")(function* (props: activateFx.P
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						stateJson: json({
 							...state,

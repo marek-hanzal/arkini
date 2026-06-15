@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import type { InventoryRow } from "~/inventory/logic/planning/types";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 
@@ -20,13 +19,13 @@ export const spendStackFx = Effect.fn("spendStackFx")(function* ({
 
 	const nextQuantity = stack.quantity - quantity;
 	if (nextQuantity <= 0) {
-		yield* dbFx((db) => db.deleteFrom(table.itemInstance).where("id", "=", stack.id).execute());
+		yield* dbFx((db) => db.deleteFrom("itemInstance").where("id", "=", stack.id).execute());
 		return;
 	}
 
 	yield* dbFx((db) =>
 		db
-			.updateTable(table.itemInstance)
+			.updateTable("itemInstance")
 			.set({
 				quantity: nextQuantity,
 				updatedAt: timestamp,

@@ -5,7 +5,6 @@ import { pauseCraftTimer } from "~/board/logic/pauseCraftTimer";
 import { GameActionError } from "~/command/GameActionError";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
@@ -27,8 +26,8 @@ export namespace stashFx {
 }
 
 export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
-	const input = yield* Effect.try({
-		try: () => StashBoardItemInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => StashBoardItemInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 
@@ -82,7 +81,7 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 				if (stack && input.slotIndex === undefined) {
 					yield* dbFx(async (db) => {
 						await db
-							.updateTable(table.itemInstance)
+							.updateTable("itemInstance")
 							.set({
 								quantity: stack.quantity + 1,
 								updatedAt,
@@ -90,7 +89,7 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 							.where("id", "=", stack.id)
 							.execute();
 						await db
-							.deleteFrom(table.itemInstance)
+							.deleteFrom("itemInstance")
 							.where("id", "=", boardItem.id)
 							.execute();
 					});
@@ -124,7 +123,7 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 
 					yield* dbFx(async (db) => {
 						await db
-							.updateTable(table.itemInstance)
+							.updateTable("itemInstance")
 							.set({
 								quantity: targetStack.quantity + 1,
 								updatedAt,
@@ -132,7 +131,7 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 							.where("id", "=", targetStack.id)
 							.execute();
 						await db
-							.deleteFrom(table.itemInstance)
+							.deleteFrom("itemInstance")
 							.where("id", "=", boardItem.id)
 							.execute();
 					});
@@ -181,7 +180,7 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						quantity: 1,
 						locationKind: "inventory",

@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { dbFx } from "~/database/fx/dbFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
-import { table } from "~/database/local/tables";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 import { json } from "~/shared/json";
@@ -27,7 +26,7 @@ export const insertFx = Effect.fn("insertFx")(function* ({
 	const boardItemId = id.boardItem();
 	yield* dbFx((db) =>
 		db
-			.insertInto(table.itemInstance)
+			.insertInto("itemInstance")
 			.values({
 				id: boardItemId,
 				saveGameId: defaultSaveGameId,

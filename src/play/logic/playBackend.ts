@@ -9,4 +9,4 @@ export { readUpgradeListView } from "./readUpgradeListView";
 export { readItemCatalogView } from "./readItemCatalogView";
 export { readDatabaseStatus } from "./status";
 export { canPayCosts } from "./canPayCosts";
-export type { DatabaseStatus } from "./status";
+export type { DatabaseStatus } from "./DatabaseStatus";

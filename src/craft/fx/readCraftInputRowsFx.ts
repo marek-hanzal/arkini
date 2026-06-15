@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { ItemInstanceRowSchema } from "~/item-instance/type/ItemInstanceRowSchema";
 import { defaultSaveGameId } from "~/play/logic/save";
 
@@ -15,7 +14,7 @@ export const readCraftInputRowsFx = Effect.fn("readCraftInputRowsFx")(function* 
 }: readCraftInputRowsFx.Props = {}) {
 	const rows = yield* dbFx((db) => {
 		let query = db
-			.selectFrom(table.itemInstance)
+			.selectFrom("itemInstance")
 			.selectAll()
 			.where("saveGameId", "=", defaultSaveGameId)
 			.where("locationKind", "=", "craft-input")

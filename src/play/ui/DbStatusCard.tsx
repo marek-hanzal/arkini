@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { useDbStatusCard } from "~/play/hook/useDbStatusCard";
 import { HardResetButton } from "~/play/ui/HardResetButton";
-import { StatusPill } from "~/play/ui/StatusPill";
+import { StatusPill } from "~/shared/ui/StatusPill";
 import { cn } from "~/shared/cn";
 
 export namespace DbStatusCard {

@@ -1,61 +1,59 @@
-import { useMachine } from "@xstate/react";
-import { useCallback } from "react";
-import { playSheetMachine } from "~/play/logic/playSheetMachine";
+import { useCallback, useMemo, useState } from "react";
 import type { ActiveSheet, BottomNavSheet } from "~/play/logic/playSheetTypes";
+import { blurActiveElement } from "~/shared/util/blurActiveElement";
 
-/**
- * GPT:FIX
- *
- * This is a question: I know we're using machine for managing sheet state, but it's really a clean way how to
- * manage sheets having this piece of crappy effect?
- *
- * Looks like we may implement this in absolutely different way, e.g. by using local state on buttons opening sheets,
- * keep them controlled by sheets itself (e.g. passing down "close" method to the sheet so it can close itself).
- *
- * This shit should be removed.
- */
-export function usePlaySheets() {
-	const [sheet, send] = useMachine(playSheetMachine);
-	const activeSheet = sheet.matches("open") ? sheet.context.renderedSheet : undefined;
-	const selectedBoardItemId =
-		activeSheet === "item" ? sheet.context.selectedBoardItemId : undefined;
+export namespace usePlaySheets {
+	export interface State {
+		activeSheet?: ActiveSheet;
+		renderedSheet: ActiveSheet;
+		selectedBoardItemId?: string;
+		closeSheet(): void;
+		openSheet(sheet: BottomNavSheet): void;
+		openItem(boardItemId: string): void;
+	}
+}
 
-	const closeSheet = useCallback(
-		() =>
-			send({
-				type: "CLOSE",
-			}),
+export function usePlaySheets(): usePlaySheets.State {
+	const [activeSheet, setActiveSheet] = useState<ActiveSheet | undefined>();
+	const [renderedSheet, setRenderedSheet] = useState<ActiveSheet>("inventory");
+	const [selectedBoardItemId, setSelectedBoardItemId] = useState<string | undefined>();
+
+	const closeSheet = useCallback(() => {
+		blurActiveElement();
+		setActiveSheet(undefined);
+		setSelectedBoardItemId(undefined);
+	}, []);
+
+	const openSheet = useCallback((sheet: BottomNavSheet) => {
+		blurActiveElement();
+		setSelectedBoardItemId(undefined);
+		setRenderedSheet(sheet);
+		setActiveSheet((current) => (current === sheet ? undefined : sheet));
+	}, []);
+
+	const openItem = useCallback((boardItemId: string) => {
+		blurActiveElement();
+		setSelectedBoardItemId(boardItemId);
+		setRenderedSheet("item");
+		setActiveSheet("item");
+	}, []);
+
+	return useMemo(
+		() => ({
+			activeSheet,
+			renderedSheet,
+			selectedBoardItemId: activeSheet === "item" ? selectedBoardItemId : undefined,
+			closeSheet,
+			openSheet,
+			openItem,
+		}),
 		[
-			send,
+			activeSheet,
+			closeSheet,
+			openItem,
+			openSheet,
+			renderedSheet,
+			selectedBoardItemId,
 		],
 	);
-	const openSheet = useCallback(
-		(sheet: BottomNavSheet) =>
-			send({
-				type: "OPEN_SHEET",
-				sheet,
-			}),
-		[
-			send,
-		],
-	);
-	const openItem = useCallback(
-		(boardItemId: string) =>
-			send({
-				type: "OPEN_ITEM",
-				boardItemId,
-			}),
-		[
-			send,
-		],
-	);
-
-	return {
-		activeSheet: activeSheet as ActiveSheet | undefined,
-		renderedSheet: sheet.context.renderedSheet,
-		selectedBoardItemId,
-		closeSheet,
-		openSheet,
-		openItem,
-	};
 }

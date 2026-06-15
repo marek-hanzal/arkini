@@ -40,7 +40,7 @@ Decision:
 - Removed manual per-frame pointer delta updates from TileEngineActor.
 - Kept custom pointer handling only for tap, double tap, long press, context-menu suppression, and lifecycle cleanup.
 - Added `dragConstraintsRef` to TileEngine public API.
-- Board passes the full play root element as drag constraint through `PlayRootElementProvider` / `usePlayRootElement`.
+- Board passes the full play root element as drag constraint through the stable `ak-play-root` DOM id exposed by `usePlayRootElement`.
 - Inventory uses the TileEngine root as default drag constraint, so inventory actors stay inside the inventory grid/container.
 - Replaced TileEngine slot drop target registration with an internal generic rect registry.
 - Kept the global drop target registry only as an external fallback for special targets outside a TileEngine surface, such as bottom navigation inventory drop.

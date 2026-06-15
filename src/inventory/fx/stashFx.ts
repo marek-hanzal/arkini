@@ -83,7 +83,7 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 				plan,
 			});
 			yield* dbFx((db) =>
-				db.deleteFrom(table.boardItem).where("id", "=", boardItem.id).execute(),
+				db.deleteFrom(table.itemInstance).where("id", "=", boardItem.id).execute(),
 			);
 		}),
 	);

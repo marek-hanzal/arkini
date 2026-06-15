@@ -46,10 +46,12 @@ export const moveFx = Effect.fn("moveFx")(function* (props: moveFx.Props) {
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.boardItem)
+					.updateTable(table.itemInstance)
 					.set({
-						x: input.x,
-						y: input.y,
+						locationKind: "board",
+						boardX: input.x,
+						boardY: input.y,
+						inventorySlotIndex: null,
 						updatedAt: timestamp,
 					})
 					.where("id", "=", boardItem.id)

@@ -77,7 +77,7 @@ export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 			});
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.boardItem)
+					.updateTable(table.itemInstance)
 					.set({
 						stateJson: json({
 							...state,

@@ -71,12 +71,12 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 
 				if (mergeRule.consumeSource !== false) {
 					yield* dbFx((db) =>
-						db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
+						db.deleteFrom(table.itemInstance).where("id", "=", source.id).execute(),
 					);
 				}
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.boardItem)
+						.updateTable(table.itemInstance)
 						.set({
 							itemDefinitionId: mergeRule.resultItemId,
 							stateJson: json(
@@ -118,11 +118,11 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				);
 
 				yield* dbFx((db) =>
-					db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
+					db.deleteFrom(table.itemInstance).where("id", "=", source.id).execute(),
 				);
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.boardItem)
+						.updateTable(table.itemInstance)
 						.set({
 							itemDefinitionId:
 								complete && craft.durationMs === 0
@@ -180,11 +180,11 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				inventory[source.itemDefinitionId] = stored + 1;
 
 				yield* dbFx((db) =>
-					db.deleteFrom(table.boardItem).where("id", "=", source.id).execute(),
+					db.deleteFrom(table.itemInstance).where("id", "=", source.id).execute(),
 				);
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.boardItem)
+						.updateTable(table.itemInstance)
 						.set({
 							stateJson: json({
 								...targetState,

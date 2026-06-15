@@ -20,15 +20,13 @@ export const spendStackFx = Effect.fn("spendStackFx")(function* ({
 
 	const nextQuantity = stack.quantity - quantity;
 	if (nextQuantity <= 0) {
-		yield* dbFx((db) =>
-			db.deleteFrom(table.inventoryStack).where("id", "=", stack.id).execute(),
-		);
+		yield* dbFx((db) => db.deleteFrom(table.itemInstance).where("id", "=", stack.id).execute());
 		return;
 	}
 
 	yield* dbFx((db) =>
 		db
-			.updateTable(table.inventoryStack)
+			.updateTable(table.itemInstance)
 			.set({
 				quantity: nextQuantity,
 				updatedAt: timestamp,

@@ -5,11 +5,12 @@ import { readBoardState } from "~/board/logic/readBoardState";
 import { readCraftView } from "~/board/logic/readCraftView";
 import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
 import { cellKey } from "~/board/util/cell";
-import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
+import { dbFx } from "~/database/fx/dbFx";
+import { table } from "~/database/local/tables";
+import { readBoardItemRowsFx } from "~/item-instance/fx/readBoardItemRowsFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import { BoardViewSchema, type BoardView } from "~/board/view/BoardViewSchema";
@@ -23,15 +24,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const nowMs = date.nowMs();
 	const updatedAt = date.timestamp();
 
-	let rows = yield* dbFx((db) =>
-		db
-			.selectFrom(table.boardItem)
-			.selectAll()
-			.where("saveGameId", "=", defaultSaveGameId)
-			.orderBy("y")
-			.orderBy("x")
-			.execute(),
-	);
+	let rows = yield* readBoardItemRowsFx();
 
 	const readyCraftRows = rows.flatMap((row) => {
 		const recipe = gameConfig.getCraftRecipeForTarget(row.itemDefinitionId);
@@ -53,7 +46,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 		yield* dbFx(async (db) => {
 			for (const { row, recipe } of readyCraftRows) {
 				await db
-					.updateTable(table.boardItem)
+					.updateTable(table.itemInstance)
 					.set({
 						itemDefinitionId: recipe.resultItemId,
 						stateJson: json(createInitialBoardState(recipe.resultItemId, gameConfig)),
@@ -64,15 +57,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 			}
 		});
 
-		rows = yield* dbFx((db) =>
-			db
-				.selectFrom(table.boardItem)
-				.selectAll()
-				.where("saveGameId", "=", defaultSaveGameId)
-				.orderBy("y")
-				.orderBy("x")
-				.execute(),
-		);
+		rows = yield* readBoardItemRowsFx();
 	}
 
 	const upgradeRows = yield* dbFx((db) =>

@@ -18,12 +18,17 @@ export interface SaveGameTable {
 	updatedAt: Timestamp;
 }
 
-export interface BoardItemTable {
+export interface ItemInstanceTable {
 	id: string;
 	saveGameId: string;
 	itemDefinitionId: string;
-	x: number;
-	y: number;
+	quantity: number;
+	locationKind: string;
+	boardX: number | null;
+	boardY: number | null;
+	inventorySlotIndex: number | null;
+	ownerItemInstanceId: string | null;
+	inputItemDefinitionId: string | null;
 	stateJson: string;
 	createdAt: Timestamp;
 	updatedAt: Timestamp;
@@ -41,21 +46,9 @@ export interface PlayerUpgradeTable {
 	updatedAt: Timestamp;
 }
 
-export interface InventoryStackTable {
-	id: string;
-	saveGameId: string;
-	slotIndex: number;
-	itemDefinitionId: string;
-	quantity: number;
-	stateJson: string;
-	createdAt: Timestamp;
-	updatedAt: Timestamp;
-}
-
 export interface Database {
 	metadata: MetadataTable;
 	saveGame: SaveGameTable;
-	boardItem: BoardItemTable;
-	inventoryStack: InventoryStackTable;
+	itemInstance: ItemInstanceTable;
 	playerUpgrade: PlayerUpgradeTable;
 }

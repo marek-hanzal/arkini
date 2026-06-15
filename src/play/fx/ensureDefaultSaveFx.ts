@@ -53,12 +53,17 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 			for (const [slotIndex, stack] of gameConfig.config.startingState.inventory.entries()) {
 				yield* dbFx((db) =>
 					db
-						.insertInto(table.inventoryStack)
+						.insertInto(table.itemInstance)
 						.values({
 							id: `${defaultSaveGameId}:inventory:${slotIndex}`,
 							saveGameId: defaultSaveGameId,
-							slotIndex,
 							itemDefinitionId: stack.itemId,
+							locationKind: "inventory",
+							boardX: null,
+							boardY: null,
+							inventorySlotIndex: slotIndex,
+							ownerItemInstanceId: null,
+							inputItemDefinitionId: null,
 							quantity: stack.quantity,
 							stateJson: emptyInventoryStateJson,
 						})
@@ -71,13 +76,18 @@ export const ensureDefaultSaveFx = Effect.fn("ensureDefaultSaveFx")(function* ({
 			).entries()) {
 				yield* dbFx((db) =>
 					db
-						.insertInto(table.boardItem)
+						.insertInto(table.itemInstance)
 						.values({
 							id: `${defaultSaveGameId}:board:${index}`,
 							saveGameId: defaultSaveGameId,
 							itemDefinitionId: boardItem.itemId,
-							x: boardItem.x,
-							y: boardItem.y,
+							quantity: 1,
+							locationKind: "board",
+							boardX: boardItem.x,
+							boardY: boardItem.y,
+							inventorySlotIndex: null,
+							ownerItemInstanceId: null,
+							inputItemDefinitionId: null,
 							stateJson: json(createInitialBoardState(boardItem.itemId, gameConfig)),
 						})
 						.execute(),

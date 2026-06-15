@@ -41,9 +41,9 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			if (!target) {
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.inventoryStack)
+						.updateTable(table.itemInstance)
 						.set({
-							slotIndex: input.targetSlotIndex,
+							inventorySlotIndex: input.targetSlotIndex,
 							updatedAt: timestamp,
 						})
 						.where("id", "=", source.id)
@@ -54,9 +54,9 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.inventoryStack)
+					.updateTable(table.itemInstance)
 					.set({
-						slotIndex: -1,
+						inventorySlotIndex: -1,
 						updatedAt: timestamp,
 					})
 					.where("id", "=", source.id)
@@ -64,9 +64,9 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			);
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.inventoryStack)
+					.updateTable(table.itemInstance)
 					.set({
-						slotIndex: input.sourceSlotIndex,
+						inventorySlotIndex: input.sourceSlotIndex,
 						updatedAt: timestamp,
 					})
 					.where("id", "=", target.id)
@@ -74,9 +74,9 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			);
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.inventoryStack)
+					.updateTable(table.itemInstance)
 					.set({
-						slotIndex: input.targetSlotIndex,
+						inventorySlotIndex: input.targetSlotIndex,
 						updatedAt: timestamp,
 					})
 					.where("id", "=", source.id)

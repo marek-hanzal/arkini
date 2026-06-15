@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { GameItemIdSchema } from "~/manifest/GameItemIdSchema";
 
-export const ProducerPlacementSchema = z.discriminatedUnion("kind", [
+export const ActivationPlacementSchema = z.discriminatedUnion("kind", [
 	z.object({
 		kind: z.literal("board"),
 		itemId: GameItemIdSchema,
@@ -16,9 +16,7 @@ export const ProducerPlacementSchema = z.discriminatedUnion("kind", [
 	}),
 ]);
 
-type ProducerPlacementSchema = typeof ProducerPlacementSchema;
-export namespace ProducerPlacementSchema {
-	export type Type = z.infer<ProducerPlacementSchema>;
+type ActivationPlacementSchema = typeof ActivationPlacementSchema;
+export namespace ActivationPlacementSchema {
+	export type Type = z.infer<ActivationPlacementSchema>;
 }
-
-export type ProducerPlacement = ProducerPlacementSchema.Type;

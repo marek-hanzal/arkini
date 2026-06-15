@@ -45,7 +45,7 @@ export const useItemDetailSheetController = ({
 
 			void withdrawInput
 				.mutateAsync({
-					type: "producer.withdrawInput",
+					type: "activation.withdrawInput",
 					boardItemId: boardItem.id,
 					itemId,
 				})

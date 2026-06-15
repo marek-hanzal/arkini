@@ -1,4 +1,4 @@
-import { stageProducerDrops } from "~/animation/stageProducerDrops";
+import { stageActivationDrops } from "~/animation/stageActivationDrops";
 import { highlightInventoryNav } from "~/animation/highlightInventoryNav";
 import type { Command } from "~/command/Command";
 import { cellKey } from "~/board/util/cell";
@@ -6,9 +6,9 @@ import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { ProducerDropResult } from "~/producer/type/ProducerDropResultSchema";
+import type { ActivationResultSchema } from "~/activation/type/ActivationResultSchema";
 
-export namespace produceFrom {
+export namespace activateFrom {
 	export interface Props {
 		activeSheet?: ActiveSheet;
 		boardItem: BoardViewItem;
@@ -18,10 +18,10 @@ export namespace produceFrom {
 			command: Extract<
 				Command,
 				{
-					type: "producer.activate";
+					type: "activation.activate";
 				}
 			>,
-		): Promise<ProducerDropResult>;
+		): Promise<ActivationResultSchema.Type>;
 		feedback: Feedback;
 		invalidatePlayData(
 			targets: readonly ("board" | "inventory" | "databaseStatus")[],
@@ -29,7 +29,7 @@ export namespace produceFrom {
 	}
 }
 
-export const produceFrom = async ({
+export const activateFrom = async ({
 	activeSheet,
 	boardItem,
 	activation,
@@ -37,15 +37,15 @@ export const produceFrom = async ({
 	run,
 	feedback,
 	invalidatePlayData,
-}: produceFrom.Props) => {
+}: activateFrom.Props) => {
 	try {
 		const result = await run({
-			type: "producer.activate",
+			type: "activation.activate",
 			boardItemId: boardItem.id,
 			activation,
 		});
 
-		stageProducerDrops({
+		stageActivationDrops({
 			results: [
 				result,
 			],

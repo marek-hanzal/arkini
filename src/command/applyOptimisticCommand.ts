@@ -107,8 +107,8 @@ export const applyOptimisticCommand = ({
 		case "board.merge":
 		case "inventory.place":
 		case "inventory.stash":
-		case "producer.activate":
-		case "producer.withdrawInput":
+		case "activation.activate":
+		case "activation.withdrawInput":
 		case "upgrade.buy":
 			return snapshot;
 	}

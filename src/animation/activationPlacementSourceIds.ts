@@ -1,14 +1,14 @@
 import { boardSourceId } from "~/board/boardSourceId";
 import { inventorySourceId } from "~/inventory/inventorySourceId";
-import type { ProducerPlacement } from "~/producer/type/ProducerPlacementSchema";
+import type { ActivationPlacementSchema } from "~/activation/type/ActivationPlacementSchema";
 
-export namespace producerPlacementSourceIds {
+export namespace activationPlacementSourceIds {
 	export interface Props {
-		placements: readonly ProducerPlacement[];
+		placements: readonly ActivationPlacementSchema.Type[];
 	}
 }
 
-export const producerPlacementSourceIds = ({ placements }: producerPlacementSourceIds.Props) =>
+export const activationPlacementSourceIds = ({ placements }: activationPlacementSourceIds.Props) =>
 	placements.flatMap((placement) => {
 		if (placement.kind === "board" && placement.boardItemId) {
 			return [

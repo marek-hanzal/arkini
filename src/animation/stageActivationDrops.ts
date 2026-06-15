@@ -5,36 +5,36 @@ import {
 	type useVisualItemMotions,
 } from "~/play/hook/useVisualItemMotions";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
-import type { ProducerDropResult } from "~/producer/type/ProducerDropResultSchema";
+import type { ActivationResultSchema } from "~/activation/type/ActivationResultSchema";
 import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 import { placementTargetRect } from "./placementTargetRect";
 
-export namespace stageProducerDrops {
+export namespace stageActivationDrops {
 	export interface Props {
-		results: readonly ProducerDropResult[];
+		results: readonly ActivationResultSchema.Type[];
 		activeSheet?: ActiveSheet;
 		visualMotions: Pick<useVisualItemMotions.State, "stage">;
 	}
 }
 
 /**
- * Stages real post-commit item actors from the producer/stash rect.
+ * Stages real post-commit item actors from the activation rect.
  *
  * The command already created final board/inventory rows. This only teaches the
  * soon-to-render actors where their visual journey starts, instead of creating a
  * parallel parallel DOM copy and hoping React commits land in the same frame.
  */
-export const stageProducerDrops = ({
+export const stageActivationDrops = ({
 	results,
 	activeSheet,
 	visualMotions,
-}: stageProducerDrops.Props) => {
+}: stageActivationDrops.Props) => {
 	const entries: useVisualItemMotions.StageEntry[] = [];
 
 	for (const result of results) {
 		const sourceRect =
-			queryPaddingBoxRect(`[data-board-item-tile-id="${result.producerBoardItemId}"]`) ??
-			queryPaddingBoxRect(`[data-board-item-id="${result.producerBoardItemId}"]`);
+			queryPaddingBoxRect(`[data-board-item-tile-id="${result.activationBoardItemId}"]`) ??
+			queryPaddingBoxRect(`[data-board-item-id="${result.activationBoardItemId}"]`);
 		if (!sourceRect) continue;
 
 		for (const placement of result.placements) {

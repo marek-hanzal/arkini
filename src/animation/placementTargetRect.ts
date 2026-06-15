@@ -1,10 +1,10 @@
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
-import type { ProducerPlacement } from "~/producer/type/ProducerPlacementSchema";
+import type { ActivationPlacementSchema } from "~/activation/type/ActivationPlacementSchema";
 import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 
 export namespace placementTargetRect {
 	export interface Props {
-		placement: ProducerPlacement;
+		placement: ActivationPlacementSchema.Type;
 		activeSheet?: ActiveSheet;
 	}
 }

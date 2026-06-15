@@ -1,52 +1,16 @@
 import { z } from "zod";
-import { AssetIdSchema } from "./AssetIdSchema";
+import { ActivationInputSchema } from "./ActivationInputSchema";
+import { ActivationOutputSchema } from "./ActivationOutputSchema";
+import { GameAssetIdSchema } from "./GameAssetIdSchema";
 import { GameConfig } from "./GameConfig";
-import { ItemIdSchema } from "./ItemIdSchema";
+import { GameCraftRecipeIdSchema } from "./GameCraftRecipeIdSchema";
+import { GameItemIdSchema } from "./GameItemIdSchema";
+import { GameLootTableIdSchema } from "./GameLootTableIdSchema";
+import { GameMergeDefinitionIdSchema } from "./GameMergeDefinitionIdSchema";
 import { NonNegativeIntegerSchema } from "./NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "./PositiveIntegerSchema";
-import { QuantitySchema } from "./QuantitySchema";
-import { ResourceIdSchema } from "./ResourceIdSchema";
-
-const ActivationOutputSchema = z
-	.array(
-		z.discriminatedUnion("type", [
-			z.object({
-				type: z.literal("guaranteed"),
-				itemId: ItemIdSchema,
-				quantity: QuantitySchema.optional(),
-			}),
-			z.object({
-				type: z.literal("chance"),
-				itemId: ItemIdSchema,
-				probability: z.number().min(0).max(1),
-				quantity: QuantitySchema.optional(),
-			}),
-			z.object({
-				type: z.literal("weighted"),
-				rolls: QuantitySchema.optional(),
-				entries: z
-					.array(
-						z.object({
-							itemId: ItemIdSchema,
-							weight: PositiveIntegerSchema,
-							quantity: QuantitySchema.optional(),
-						}),
-					)
-					.min(1),
-			}),
-		]),
-	)
-	.min(1);
-
-const ActivationInputSchema = z
-	.array(
-		z.object({
-			itemId: ItemIdSchema,
-			quantity: PositiveIntegerSchema,
-			capacity: PositiveIntegerSchema,
-		}),
-	)
-	.optional();
+import { GameResourceIdSchema } from "./GameResourceIdSchema";
+import { GameUpgradeIdSchema } from "./GameUpgradeIdSchema";
 
 export const GameConfigSchema = z.object({
 	game: z.object({
@@ -62,7 +26,7 @@ export const GameConfigSchema = z.object({
 	}),
 	assets: z.array(
 		z.object({
-			id: AssetIdSchema,
+			id: GameAssetIdSchema,
 			kind: z.enum([
 				"item",
 				"ui",
@@ -74,7 +38,7 @@ export const GameConfigSchema = z.object({
 	),
 	resources: z.array(
 		z.object({
-			id: ResourceIdSchema,
+			id: GameResourceIdSchema,
 			code: z.string().min(1),
 			name: z.string().min(1),
 			description: z.string(),
@@ -84,14 +48,14 @@ export const GameConfigSchema = z.object({
 	),
 	lootTables: z.array(
 		z.object({
-			id: z.string().startsWith("loot:"),
+			id: GameLootTableIdSchema,
 			name: z.string().min(1),
 			output: ActivationOutputSchema,
 		}),
 	),
 	upgrades: z.array(
 		z.object({
-			id: z.string().startsWith("upgrade:"),
+			id: GameUpgradeIdSchema,
 			code: z.string().min(1),
 			name: z.string().min(1),
 			description: z.string(),
@@ -101,7 +65,7 @@ export const GameConfigSchema = z.object({
 					z.object({
 						cost: z.array(
 							z.object({
-								itemId: ItemIdSchema,
+								itemId: GameItemIdSchema,
 								quantity: PositiveIntegerSchema,
 							}),
 						),
@@ -110,13 +74,13 @@ export const GameConfigSchema = z.object({
 							z.discriminatedUnion("type", [
 								z.object({
 									type: z.literal("producer.cooldown.add"),
-									itemId: ItemIdSchema,
+									itemId: GameItemIdSchema,
 									ms: z.number().int(),
 								}),
 								z.object({
 									type: z.literal("producer.outputTable.set"),
-									itemId: ItemIdSchema,
-									tableId: z.string().startsWith("loot:"),
+									itemId: GameItemIdSchema,
+									tableId: GameLootTableIdSchema,
 								}),
 							]),
 						),
@@ -127,8 +91,8 @@ export const GameConfigSchema = z.object({
 	),
 	items: z.array(
 		z.object({
-			id: ItemIdSchema,
-			assetId: AssetIdSchema,
+			id: GameItemIdSchema,
+			assetId: GameAssetIdSchema,
 			code: z.string().min(1),
 			name: z.string().min(1),
 			tier: PositiveIntegerSchema,
@@ -140,9 +104,9 @@ export const GameConfigSchema = z.object({
 			merge: z
 				.array(
 					z.object({
-						id: z.string().startsWith("merge:"),
-						withItemId: ItemIdSchema,
-						resultItemId: ItemIdSchema,
+						id: GameMergeDefinitionIdSchema,
+						withItemId: GameItemIdSchema,
+						resultItemId: GameItemIdSchema,
 						consumeSource: z.boolean().optional(),
 						inputCount: z.literal(2).optional(),
 						secret: z.boolean().optional(),
@@ -155,7 +119,7 @@ export const GameConfigSchema = z.object({
 					trigger: z.literal("click"),
 					placement: z.literal("board_then_inventory"),
 					cooldownMs: PositiveIntegerSchema,
-					outputTableId: z.string().startsWith("loot:"),
+					outputTableId: GameLootTableIdSchema,
 					inputs: ActivationInputSchema,
 				})
 				.optional(),
@@ -168,22 +132,22 @@ export const GameConfigSchema = z.object({
 					onDepleted: z.union([
 						z.literal("remove"),
 						z.object({
-							replaceWithItemId: ItemIdSchema,
+							replaceWithItemId: GameItemIdSchema,
 						}),
 					]),
-					outputTableId: z.string().startsWith("loot:"),
+					outputTableId: GameLootTableIdSchema,
 					inputs: ActivationInputSchema,
 				})
 				.optional(),
 			craft: z
 				.object({
-					id: z.string().startsWith("craft:"),
-					resultItemId: ItemIdSchema,
+					id: GameCraftRecipeIdSchema,
+					resultItemId: GameItemIdSchema,
 					durationMs: NonNegativeIntegerSchema,
 					inputs: z
 						.array(
 							z.object({
-								itemId: ItemIdSchema,
+								itemId: GameItemIdSchema,
 								quantity: PositiveIntegerSchema,
 							}),
 						)
@@ -195,22 +159,27 @@ export const GameConfigSchema = z.object({
 	startingState: z.object({
 		resources: z.array(
 			z.object({
-				resourceId: ResourceIdSchema,
+				resourceId: GameResourceIdSchema,
 				quantity: NonNegativeIntegerSchema,
 			}),
 		),
 		inventory: z.array(
 			z.object({
-				itemId: ItemIdSchema,
+				itemId: GameItemIdSchema,
 				quantity: PositiveIntegerSchema,
 			}),
 		),
 		board: z.array(
 			z.object({
-				itemId: ItemIdSchema,
+				itemId: GameItemIdSchema,
 				x: NonNegativeIntegerSchema,
 				y: NonNegativeIntegerSchema,
 			}),
 		),
 	}),
 });
+
+type GameConfigSchema = typeof GameConfigSchema;
+export namespace GameConfigSchema {
+	export type Type = z.infer<GameConfigSchema>;
+}

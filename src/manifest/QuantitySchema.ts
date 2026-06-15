@@ -12,3 +12,8 @@ export const QuantitySchema = z.union([
 			message: "max must be >= min",
 		}),
 ]);
+
+type QuantitySchema = typeof QuantitySchema;
+export namespace QuantitySchema {
+	export type Type = z.infer<QuantitySchema>;
+}

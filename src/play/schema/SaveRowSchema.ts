@@ -10,3 +10,8 @@ export const SaveRowSchema = z.object({
 	createdAt: z.string().min(1),
 	updatedAt: z.string().min(1),
 });
+
+type SaveRowSchema = typeof SaveRowSchema;
+export namespace SaveRowSchema {
+	export type Type = z.infer<SaveRowSchema>;
+}

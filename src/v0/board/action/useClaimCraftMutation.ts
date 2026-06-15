@@ -3,7 +3,7 @@ import { GameActionError } from "~/v0/play/action/GameActionError";
 import { claimCraftFx } from "~/v0/craft/fx/claimCraftFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import { runGameFx } from "~/v0/fx/runGameFx";
-import { refreshBoardAndInventoryCaches } from "~/v0/play/cache/refreshBoardAndInventoryCaches";
+import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 
 export const useClaimCraftMutation = () => {
 	const queryClient = useQueryClient();
@@ -14,9 +14,10 @@ export const useClaimCraftMutation = () => {
 				effect: claimCraftFx(input),
 			});
 		},
-		async onSuccess() {
-			await refreshBoardAndInventoryCaches({
+		onSuccess(result) {
+			applyActionResultCachePatch({
 				queryClient,
+				result,
 			});
 		},
 	});

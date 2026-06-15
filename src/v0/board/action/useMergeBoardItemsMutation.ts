@@ -6,7 +6,7 @@ import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { applyBoardMergeCachePatch } from "~/v0/board/cache/applyBoardMergeCachePatch";
 import { restoreCacheSnapshot } from "~/v0/play/cache/restoreCacheSnapshot";
-import { refreshBoardAndInventoryCaches } from "~/v0/play/cache/refreshBoardAndInventoryCaches";
+import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 
 export const useMergeBoardItemsMutation = () => {
 	const queryClient = useQueryClient();
@@ -34,9 +34,10 @@ export const useMergeBoardItemsMutation = () => {
 				snapshot,
 			});
 		},
-		async onSuccess() {
-			await refreshBoardAndInventoryCaches({
+		onSuccess(result) {
+			applyActionResultCachePatch({
 				queryClient,
+				result,
 			});
 		},
 	});

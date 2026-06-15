@@ -71,6 +71,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 		placements.push({
 			kind: "inventory",
 			itemId: placement.itemId,
+			itemInstanceId: placement.stackId,
 			slotIndex: placement.slotIndex,
 		});
 	}

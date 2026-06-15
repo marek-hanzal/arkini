@@ -113,6 +113,7 @@ export const withdrawActivationInputFx = Effect.fn("withdrawActivationInputFx")(
 					return [
 						{
 							type: "item.spawned",
+							itemInstanceId: placement.itemInstanceId,
 							itemId: placement.itemId,
 							originItemInstanceId: row.id,
 							to: {

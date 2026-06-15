@@ -5,7 +5,6 @@ import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import { inventoryViewQueryOptions } from "~/v0/inventory/query/inventoryViewQueryOptions";
-import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
 import { useMergeBoardItemsMutation } from "~/v0/board/action/useMergeBoardItemsMutation";
 import { useMoveBoardItemMutation } from "~/v0/board/action/useMoveBoardItemMutation";
 import { usePlaceInventoryItemMutation } from "~/v0/inventory/action/usePlaceInventoryItemMutation";
@@ -26,7 +25,6 @@ export const InventorySurface = memo(
 	({ feedback, feedbackFlags, onClose }: InventorySurfaceType.Props) => {
 		const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 		const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
-		const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
 		const mergeBoardItemsMutation = useMergeBoardItemsMutation();
 		const moveBoardItemMutation = useMoveBoardItemMutation();
 		const placeInventoryItemMutation = usePlaceInventoryItemMutation();
@@ -49,23 +47,18 @@ export const InventorySurface = memo(
 					const stack = slot.stack;
 					if (!stack) return [];
 
-					const item = items[stack.itemId];
-					if (!item) return [];
-
 					return [
 						{
 							id: stack.id,
 							slotId: String(slot.slotIndex),
 							data: {
-								slot,
-								item,
+								slotIndex: slot.slotIndex,
 							},
 						},
 					] satisfies TileEngineType.Tile<InventorySurfaceType.TileData>[];
 				}),
 			[
 				inventory.slots,
-				items,
 			],
 		);
 		const placeInventoryOnBoard = useCallback(
@@ -116,18 +109,19 @@ export const InventorySurface = memo(
 		>(
 			() => ({
 				tile(tile) {
-					const stack = tile.data.slot.stack;
-					if (!stack) return undefined;
+					const slot = inventory.bySlotIndex[String(tile.data.slotIndex)];
+					const stack = slot?.stack;
+					if (!slot || !stack) return undefined;
 
 					return {
-						id: `inventory:${tile.data.slot.slotIndex}`,
+						id: `inventory:${slot.slotIndex}`,
 						data: {
 							kind: "inventory",
-							slotIndex: tile.data.slot.slotIndex,
+							slotIndex: slot.slotIndex,
 							itemId: stack.itemId,
-							slot: tile.data.slot,
+							slot,
 						},
-						onDoubleActivate: () => placeInventoryOnBoard(tile.data.slot),
+						onDoubleActivate: () => placeInventoryOnBoard(slot),
 					};
 				},
 				slot(slot) {
@@ -161,7 +155,7 @@ export const InventorySurface = memo(
 		const renderSlot = useCallback(
 			({ slot, isOver }: TileEngineType.RenderSlotProps<InventorySlot>): ReactNode => (
 				<InventoryCell
-					slot={slot.data}
+					slotIndex={slot.data.slotIndex}
 					invalid={feedbackFlags.has(`inventory:error:${slot.data.slotIndex}`)}
 					isOver={isOver}
 				/>

@@ -8,7 +8,7 @@ import { ItemSummaryCard } from "~/item/ui/ItemSummaryCard";
 import type { ItemId } from "~/manifest/manifestId";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { useGameCommandMutation } from "~/v0/mutation/useGameCommandMutation";
+import { useWithdrawActivationInputMutation } from "~/v0/mutation/useWithdrawActivationInputMutation";
 import { boardViewQueryOptions } from "~/v0/query/boardViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
 
@@ -22,7 +22,7 @@ export namespace ItemSheet {
 export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
-	const command = useGameCommandMutation();
+	const withdrawActivationInputMutation = useWithdrawActivationInputMutation();
 	const nowMs = useProducerClock(board.items);
 	const boardItem = boardItemId ? board.byId[boardItemId] : undefined;
 	const item = boardItem ? items[boardItem.itemId] : undefined;
@@ -63,8 +63,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	}
 
 	const withdraw = (itemId: ItemId) => {
-		command.mutate({
-			type: "activation.withdrawInput",
+		withdrawActivationInputMutation.mutate({
 			boardItemId: boardItem.id,
 			itemId,
 		});
@@ -97,7 +96,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						activation={boardItem.activation}
 						boardItem={boardItem}
 						items={items}
-						pending={command.isPending}
+						pending={withdrawActivationInputMutation.isPending}
 						onWithdraw={withdraw}
 					/>
 				) : null}

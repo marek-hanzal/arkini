@@ -5,11 +5,13 @@ import { flashDrop } from "~/interaction/flashDrop";
 import type { ItemId } from "~/manifest/manifestId";
 import { resolveDrop } from "~/interaction/resolveDrop";
 import type { AnyDropContext, Feedback } from "~/interaction/types";
-import { useCommand } from "~/play/hook/useCommand";
+import { useRunCommandMutation } from "~/command/useRunCommandMutation";
 import { playQueryKeys } from "~/play/hook/playQueryKeys";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import type { BoardView, GameDragView, InventoryView } from "~/play/logic/playTypes";
+import type { BoardView } from "~/board/view/BoardViewSchema";
+import type { GameDragView } from "~/drag/view/GameDragViewSchema";
+import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import type { VisualTransitionKind, DragSource, DropTarget, VisualMeta } from "~/play/types";
 import { tileEngineMotionDurationMs } from "~/tile-engine/hook/useTileEngineMotionAnimation";
 import { waitForMs } from "~/shared/util/waitForMs";
@@ -31,7 +33,7 @@ export function usePlayDraggableControl({
 }: usePlayDraggableControl.Props) {
 	const queryClient = useQueryClient();
 	const items = usePlayItems().data;
-	const command = useCommand({
+	const command = useRunCommandMutation({
 		invalidateOnSuccess: true,
 	});
 	const run = command.mutateAsync;

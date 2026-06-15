@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { loadPlayBackend } from "./loadPlayBackend";
-import { playQueryKeys } from "./playQueryKeys";
+import { loadPlayBackend } from "~/play/hook/loadPlayBackend";
+import { playQueryKeys } from "~/play/hook/playQueryKeys";
 
-export function usePlayBoard() {
+export function useBoardView() {
 	return useQuery({
 		queryKey: playQueryKeys.board,
 		enabled: typeof window !== "undefined",

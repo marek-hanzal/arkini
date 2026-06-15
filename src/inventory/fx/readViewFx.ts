@@ -5,7 +5,8 @@ import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventorySta
 import { readInventoryState } from "~/inventory/logic/readInventoryState";
 import { table } from "~/database/local/tables";
 import type { ItemId } from "~/manifest/manifestId";
-import type { InventorySlot, InventoryView } from "~/play/logic/playTypes";
+import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
+import { InventoryViewSchema, type InventoryView } from "~/inventory/view/InventoryViewSchema";
 import { defaultSaveGameId } from "~/play/logic/save";
 import { readSaveFx } from "~/play/fx/readSaveFx";
 
@@ -48,7 +49,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 		},
 	);
 
-	return {
+	return InventoryViewSchema.parse({
 		slots,
 		bySlotIndex: Object.fromEntries(
 			slots.map((slot) => [
@@ -58,5 +59,5 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 		),
 		stacksByItemId: groupSlotsByItemId(slots),
 		firstEmptySlotIndex: slots.find((slot) => !slot.stack)?.slotIndex,
-	} satisfies InventoryView;
+	}) satisfies InventoryView;
 });

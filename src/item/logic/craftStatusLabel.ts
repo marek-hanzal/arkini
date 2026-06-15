@@ -1,4 +1,4 @@
-import type { CraftProgressView } from "~/play/logic/playTypes";
+import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
 import { formatMs } from "~/shared/util/formatMs";
 
 export namespace craftStatusLabel {

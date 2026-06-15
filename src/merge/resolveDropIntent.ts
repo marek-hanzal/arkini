@@ -1,6 +1,6 @@
 import type { ItemId } from "~/manifest/manifestId";
 import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
-import type { BoardViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 
 export type DropIntent =
 	| {

@@ -2,12 +2,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Command } from "~/command/Command";
 import { useCallback, useMemo } from "react";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
-import { useCommand } from "~/play/hook/useCommand";
+import { useRunCommandMutation } from "~/command/useRunCommandMutation";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import { playQueryKeys } from "~/play/hook/playQueryKeys";
 import { placeInventoryOnBoardWithFly } from "~/play/logic/placeInventoryOnBoardWithFly";
-import type { BoardView, InventorySlot } from "~/play/logic/playTypes";
+import type { BoardView } from "~/board/view/BoardViewSchema";
+import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 
 export namespace usePlayManualItemActions {
 	export interface Props {
@@ -24,7 +25,7 @@ export const usePlayManualItemActions = ({
 }: usePlayManualItemActions.Props) => {
 	const queryClient = useQueryClient();
 	const invalidatePlayData = usePlayDataInvalidation();
-	const command = useCommand<
+	const command = useRunCommandMutation<
 		Extract<
 			Command,
 			{

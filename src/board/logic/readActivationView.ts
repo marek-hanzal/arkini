@@ -1,6 +1,7 @@
 import type { DateService } from "~/date/context/DateServiceFx";
 import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
-import type { ActivationView, BoardItemState } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/board/view/ActivationViewSchema";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
 import type { OwnedUpgradeRow } from "~/upgrade/logic/readOwnedUpgradeEffects";
 import { createInitialBoardState } from "./createInitialBoardState";

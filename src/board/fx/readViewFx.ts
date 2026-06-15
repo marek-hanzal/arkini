@@ -11,7 +11,9 @@ import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
 import { defaultSaveGameId } from "~/play/logic/save";
-import type { BoardItemState, BoardView, BoardViewItem } from "~/play/logic/playTypes";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
+import { BoardViewSchema, type BoardView } from "~/board/view/BoardViewSchema";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { json } from "~/shared/json";
 import { parseJson } from "~/shared/parseJson";
 
@@ -117,10 +119,10 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 		]),
 	);
 
-	return {
+	return BoardViewSchema.parse({
 		items,
 		byId,
 		byCellKey,
 		firstEmptyCell: findFirstEmptyCell(byCellKey),
-	} satisfies BoardView;
+	}) satisfies BoardView;
 });

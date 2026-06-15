@@ -1,6 +1,7 @@
 import { memo, type FC } from "react";
 import { GameItemView } from "~/item/ui/GameItemView";
-import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
+import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
+import type { ViewItem } from "~/item/view/ViewItemSchema";
 
 export namespace InventoryTile {
 	export interface Props {

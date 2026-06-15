@@ -52,7 +52,7 @@ Randomness is provided through `RandomServiceFx`; producer rolls do not call `Ma
 
 ## Game engine boundary
 
-Gameplay mutations go through typed `Command` values in `src/command/`. React UI and XState workflows do not import individual domain Effect roots directly. `runCommandFx` validates the discriminated command union and delegates to the owning domain root effect, while `useCommand` is only the React Query bridge and invalidation hook. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
+Gameplay mutations go through typed `Command` values in `src/command/`. React UI and XState workflows do not import individual domain Effect roots directly. `runCommandFx` validates the discriminated command union and delegates to the owning domain root effect, while `useRunCommandMutation` is the React Query bridge for optimistic cache updates, rollback, and invalidation. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
 
 ## Tile engine boundary
 
@@ -114,10 +114,9 @@ Do not rebuild a giant `GameView` and pass it around. UI subscribes to the small
 ```txt
 usePlaySave()          boot/save metadata
 usePlayItems()         static item catalog derived from GameConfig
-usePlayBoard()         board cells and board item lookup
-usePlayInventory()     inventory slots and stack lookup
-usePlayUpgrades()        tiered upgrade cards with next costs and effects
-usePlayDragView()      tiny drag-only lookup composed from board + inventory
+useBoardView()         board cells and board item lookup
+useInventoryView()     inventory slots and stack lookup
+usePlayUpgrades()      tiered upgrade cards with next costs and effects
 ```
 
 If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
@@ -143,20 +142,20 @@ src/id/context/                  Effect id service context tag.
 src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
-src/command/                    Typed command schemas, command Effect router, and mutation invalidation.
+src/command/                    Typed command schemas, command Effect router, optimistic mutation bridge, rollback, and invalidation.
 src/animation/                  Visual planning helpers for game events.
 src/interaction/                UI gesture/drop intent translation.
 src/merge/                      Merge, craft-input, and producer-input intent resolution.
-src/play/logic/                  Promise backend façade for read/bootstrap flows, XState workflow machines, and shared backend types/helpers.
+src/play/logic/                  Promise backend façade for read/bootstrap flows and XState workflow machines that are still play-shell scoped.
 src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
-src/play/hook/                   Granular React Query subscriptions, XState event queue, and thin command/interaction wiring.
+src/play/hook/                   Play-shell scoped React hooks: save metadata, static catalog, event queue, sheets, feedback, and interaction wiring.
 src/play/ui/                     Main shell, sheets, bottom navigation, database status UI.
 src/drag/                        Generic pointer drag lifecycle, XState drag workflow, hidden sources, and drop target registry.
-src/board/                       Board identity, board state logic, board UI, cell feedback.
-src/inventory/                   Inventory identity, stack planning/storage logic, inventory sheet UI.
+src/board/                       Board identity, board state logic, board view model/schema, board UI, cell feedback.
+src/inventory/                   Inventory identity, stack planning/storage logic, inventory view model/schema, inventory sheet UI.
 src/producer/                    Producer output rolling, readiness tracking, upgrade-adjusted output, and depletion logic.
-src/upgrade/                     Tiered global upgrades, purchase effects, producer modifiers, and upgrade sheet UI.
-src/item/                        Shared item visual renderer used by board, inventory, and TileEngine actors.
+src/upgrade/                     Tiered global upgrades, purchase effects, producer modifiers, upgrade view model/schema, and upgrade sheet UI.
+src/item/                        Static item catalog view model/schema and shared item visual renderer used by board, inventory, and TileEngine actors.
 src/shared/                      Small UI/util hooks and helpers.
 ```
 

@@ -1,6 +1,6 @@
 import type { SaveShape } from "~/inventory/logic/planning/types";
 import { BoardCellSchema } from "~/play/schema/BoardCellSchema";
-import { GameActionError } from "~/play/logic/playTypes";
+import { GameActionError } from "~/command/GameActionError";
 
 export const assertInsideBoard = (save: SaveShape, x: number, y: number) => {
 	const result = BoardCellSchema.safeParse({

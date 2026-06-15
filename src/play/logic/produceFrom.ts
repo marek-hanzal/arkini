@@ -5,7 +5,8 @@ import { cellKey } from "~/board/util/cell";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
-import type { BoardViewItem, ProducerDropResult } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import type { ProducerDropResult } from "~/producer/type/ProducerDropResultSchema";
 
 export namespace produceFrom {
 	export interface Props {

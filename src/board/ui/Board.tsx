@@ -9,10 +9,11 @@ import { BoardTile } from "~/board/ui/BoardTile";
 import { cellKey } from "~/board/util/cell";
 import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
 import type { ItemId } from "~/manifest/manifestId";
-import { usePlayBoard } from "~/play/hook/usePlayBoard";
+import { useBoardView } from "~/board/hook/useBoardView";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import type { ViewItem } from "~/item/view/ViewItemSchema";
 import type { DragData, DropData, RectLike } from "~/play/types";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { TileEngine } from "~/tile-engine/ui/TileEngine";
@@ -65,7 +66,7 @@ interface BoardTileData {
 }
 
 export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMotions }) => {
-	const board = usePlayBoard().data;
+	const board = useBoardView().data;
 	const items = usePlayItems().data;
 	const showDelayedMergeHints = useDelayedMergeHints({
 		activeDrag: drag.activeDrag ?? undefined,

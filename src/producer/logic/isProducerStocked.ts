@@ -1,4 +1,4 @@
-import type { ActivationView } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/board/view/ActivationViewSchema";
 
 export function isProducerStocked(activation: ActivationView | undefined) {
 	if (!activation) return false;

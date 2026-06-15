@@ -1,4 +1,4 @@
-import type { ActivationView } from "~/play/logic/playTypes";
+import type { ActivationView } from "~/board/view/ActivationViewSchema";
 import { isProducerReady } from "~/producer/logic/isProducerReady";
 import { isProducerStocked } from "~/producer/logic/isProducerStocked";
 import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";

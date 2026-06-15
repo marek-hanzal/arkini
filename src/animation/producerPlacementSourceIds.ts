@@ -1,6 +1,6 @@
 import { boardSourceId } from "~/board/boardSourceId";
 import { inventorySourceId } from "~/inventory/inventorySourceId";
-import type { ProducerPlacement } from "~/play/logic/playTypes";
+import type { ProducerPlacement } from "~/producer/type/ProducerPlacementSchema";
 
 export namespace producerPlacementSourceIds {
 	export interface Props {

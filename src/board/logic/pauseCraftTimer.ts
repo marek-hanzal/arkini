@@ -1,5 +1,5 @@
 import type { DateService } from "~/date/context/DateServiceFx";
-import type { BoardItemState } from "~/play/logic/playTypes";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 
 export const pauseCraftTimer = (state: BoardItemState, date: DateService): BoardItemState => {
 	const craft = state.craft;

@@ -1,4 +1,4 @@
-import type { BoardItemState } from "~/play/logic/playTypes";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import { parseJson } from "~/shared/parseJson";
 
 export namespace readBoardState {

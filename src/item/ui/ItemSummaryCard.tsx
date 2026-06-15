@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import type { ViewItem } from "~/play/logic/playTypes";
+import type { ViewItem } from "~/item/view/ViewItemSchema";
 import { GameItemView } from "./GameItemView";
 
 export namespace ItemSummaryCard {

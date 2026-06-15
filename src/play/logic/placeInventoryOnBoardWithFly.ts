@@ -1,7 +1,9 @@
 import { inventorySourceId } from "~/inventory/inventorySourceId";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import type { BoardView, InventoryPlaceResult, InventorySlot } from "~/play/logic/playTypes";
+import type { BoardView } from "~/board/view/BoardViewSchema";
+import type { InventoryPlaceResult } from "~/inventory/view/InventoryPlaceResultSchema";
+import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 
 export namespace placeInventoryOnBoardWithFly {

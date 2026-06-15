@@ -1,4 +1,4 @@
-import { GameActionError } from "~/play/logic/playTypes";
+import { GameActionError } from "~/command/GameActionError";
 
 export function toGameActionError(error: unknown) {
 	if (error instanceof GameActionError) return error;

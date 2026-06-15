@@ -1,4 +1,4 @@
-import type { BoardItemState } from "~/play/logic/playTypes";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import { json } from "~/shared/json";
 import { parseJson } from "~/shared/parseJson";
 import { emptyInventoryStateJson } from "./emptyInventoryStateJson";

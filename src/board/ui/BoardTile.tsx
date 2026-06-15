@@ -1,6 +1,7 @@
 import { memo, type FC } from "react";
 import { GameItemView } from "~/item/ui/GameItemView";
-import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import type { ViewItem } from "~/item/view/ViewItemSchema";
 
 export namespace BoardTile {
 	export interface Props {

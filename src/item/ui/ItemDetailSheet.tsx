@@ -4,8 +4,8 @@ import { ItemActivationInputsCard } from "~/item/ui/ItemActivationInputsCard";
 import { ItemCraftCard } from "~/item/ui/ItemCraftCard";
 import { ItemRelationList } from "~/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/item/ui/ItemSummaryCard";
-import { useCommand } from "~/play/hook/useCommand";
-import { usePlayBoard } from "~/play/hook/usePlayBoard";
+import { useRunCommandMutation } from "~/command/useRunCommandMutation";
+import { useBoardView } from "~/board/hook/useBoardView";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
@@ -19,11 +19,11 @@ export namespace ItemDetailSheet {
 }
 
 export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClose }) => {
-	const board = usePlayBoard().data;
+	const board = useBoardView().data;
 	const items = usePlayItems().data;
 	const invalidatePlayData = usePlayDataInvalidation();
 	const nowMs = useProducerClock(board?.items ?? []);
-	const withdrawInput = useCommand({
+	const withdrawInput = useRunCommandMutation({
 		invalidateOnSuccess: false,
 	});
 	const boardItem = boardItemId ? board?.byId[boardItemId] : undefined;

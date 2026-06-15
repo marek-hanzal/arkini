@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { BoardViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { isProducerReady } from "~/producer/logic/isProducerReady";
 
 export function useProducerReadySignals(items: readonly BoardViewItem[], nowMs: number) {

@@ -5,7 +5,7 @@ import {
 	type useVisualItemMotions,
 } from "~/play/hook/useVisualItemMotions";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
-import type { ProducerDropResult } from "~/play/logic/playTypes";
+import type { ProducerDropResult } from "~/producer/type/ProducerDropResultSchema";
 import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
 import { placementTargetRect } from "./placementTargetRect";
 

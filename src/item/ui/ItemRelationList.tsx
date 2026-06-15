@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import type { ItemId } from "~/manifest/manifestId";
-import type { ItemCatalogView } from "~/play/logic/playTypes";
+import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
 
 export namespace ItemRelationList {
 	export interface Relation {

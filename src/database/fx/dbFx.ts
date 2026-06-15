@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 import type { KyselyContextFx } from "~/database/context/KyselyContextFx";
-import type { GameActionError } from "~/play/logic/playTypes";
+import type { GameActionError } from "~/command/GameActionError";
 import type { DbHandle } from "./DbHandle";
 import { dbFxImpl } from "./dbFxImpl";
 

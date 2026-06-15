@@ -6,7 +6,7 @@ import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MoveBoardItemInputSchema } from "~/play/schema/MoveBoardItemInputSchema";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameActionError } from "~/play/logic/playTypes";
+import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 
 export namespace moveFx {

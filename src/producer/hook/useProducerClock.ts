@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { BoardViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 
 const producerClockTickMs = 250;
 

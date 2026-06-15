@@ -4,7 +4,7 @@ import { boardRows } from "~/board/boardRows";
 import { useMotionCellFeedback } from "~/board/hook/useMotionCellFeedback";
 import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
 import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
-import type { BoardViewItem } from "~/play/logic/playTypes";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals";
 import { isProducerReady } from "~/producer/logic/isProducerReady";

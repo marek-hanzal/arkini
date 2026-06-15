@@ -1,4 +1,5 @@
-import type { InventoryPlaceResult, ProducerDropResult } from "~/play/logic/playTypes";
+import type { InventoryPlaceResult } from "~/inventory/view/InventoryPlaceResultSchema";
+import type { ProducerDropResult } from "~/producer/type/ProducerDropResultSchema";
 import type { Command } from "./Command";
 
 export type CommandResult<TCommand extends Command = Command> = TCommand extends {

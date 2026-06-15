@@ -9,6 +9,7 @@ import { toGameActionError } from "~/play/logic/toGameActionError";
 import { activateFx } from "~/activation/fx/activateFx";
 import { withdrawInputFx } from "~/activation/fx/withdrawInputFx";
 import { buyFx } from "~/upgrade/fx/buyFx";
+import { claimCraftFx } from "~/craft/fx/claimCraftFx";
 import type { Command } from "./Command";
 import { CommandSchema } from "./CommandSchema";
 
@@ -70,6 +71,10 @@ export const runCommandFx = Effect.fn("runCommandFx")(function* ({ command }: ru
 		case "upgrade.buy":
 			return yield* buyFx({
 				upgradeId: input.upgradeId,
+			});
+		case "craft.claim":
+			return yield* claimCraftFx({
+				boardItemId: input.boardItemId,
 			});
 	}
 });

@@ -8,6 +8,7 @@ import { InventorySwapCommandSchema } from "./InventorySwapCommandSchema";
 import { ActivationActivateCommandSchema } from "./ActivationActivateCommandSchema";
 import { ActivationWithdrawInputCommandSchema } from "./ActivationWithdrawInputCommandSchema";
 import { UpgradeBuyCommandSchema } from "./UpgradeBuyCommandSchema";
+import { CraftClaimCommandSchema } from "./CraftClaimCommandSchema";
 
 export const CommandSchema = z.discriminatedUnion("type", [
 	BoardMoveCommandSchema,
@@ -19,6 +20,7 @@ export const CommandSchema = z.discriminatedUnion("type", [
 	ActivationActivateCommandSchema,
 	ActivationWithdrawInputCommandSchema,
 	UpgradeBuyCommandSchema,
+	CraftClaimCommandSchema,
 ]);
 
 type CommandSchema = typeof CommandSchema;

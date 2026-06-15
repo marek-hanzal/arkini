@@ -13,6 +13,7 @@ import { usePlayDragState } from "~/play/hook/usePlayDragState";
 import { usePlayFeedbackState } from "~/play/hook/usePlayFeedbackState";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { usePlayActivationActions } from "~/play/hook/usePlayActivationActions";
+import { usePlayCraftActions } from "~/play/hook/usePlayCraftActions";
 import { usePlaySheetsState } from "~/play/hook/usePlaySheetsState";
 import { visualBoardItemKey } from "~/play/hook/useVisualItemMotions";
 import { usePlayVisualMotionsState } from "~/play/hook/usePlayVisualMotionsState";
@@ -49,6 +50,7 @@ export const useBoardTileEngine = (
 	const feedback = usePlayFeedbackState();
 	const visualMotions = usePlayVisualMotionsState();
 	const activationActions = usePlayActivationActions();
+	const craftActions = usePlayCraftActions();
 	const showDelayedMergeHints = useDelayedMergeHints({
 		activeDrag: drag.activeDrag ?? undefined,
 	});
@@ -63,6 +65,11 @@ export const useBoardTileEngine = (
 	);
 	const activateBoardTile = useCallback(
 		(item: BoardViewItem) => {
+			if (item.craft?.complete) {
+				void craftActions.claimFrom(item);
+				return;
+			}
+
 			if (!item.activation) return;
 
 			void activationActions.activateFrom(
@@ -72,6 +79,7 @@ export const useBoardTileEngine = (
 		},
 		[
 			activationActions.activateFrom,
+			craftActions.claimFrom,
 		],
 	);
 	const openBoardTileDetail = useCallback(

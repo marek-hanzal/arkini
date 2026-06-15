@@ -75,37 +75,38 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 		[],
 	);
 
-	if (!board || !items) return null;
+	const tileActors =
+		board && items
+			? board.items.flatMap((boardItem) => {
+					const item = items[boardItem.itemId];
+					if (!item) return [];
 
-	const tileActors = board.items.flatMap((boardItem) => {
-		const item = items[boardItem.itemId];
-		if (!item) return [];
+					const motionKey = visualBoardItemKey(boardItem.id);
+					const visualMotion = visualMotions.motions[motionKey];
 
-		const motionKey = visualBoardItemKey(boardItem.id);
-		const visualMotion = visualMotions.motions[motionKey];
-
-		return [
-			{
-				id: boardItem.id,
-				slotId: cellKey(boardItem.x, boardItem.y),
-				hidden: drag.isSourceHidden(boardSourceId(boardItem.id)),
-				motion: visualMotion,
-				onMotionSettle: visualMotion
-					? () => visualMotions.settle(motionKey, visualMotion.nonce)
-					: undefined,
-				data: {
-					boardItem,
-					item,
-					activationNowMs: boardItem.activation ? nowMs : undefined,
-				} satisfies BoardTileData,
-			},
-		];
-	});
+					return [
+						{
+							id: boardItem.id,
+							slotId: cellKey(boardItem.x, boardItem.y),
+							hidden: drag.isSourceHidden(boardSourceId(boardItem.id)),
+							motion: visualMotion,
+							onMotionSettle: visualMotion
+								? () => visualMotions.settle(motionKey, visualMotion.nonce)
+								: undefined,
+							data: {
+								boardItem,
+								item,
+								activationNowMs: boardItem.activation ? nowMs : undefined,
+							} satisfies BoardTileData,
+						},
+					];
+				})
+			: [];
 
 	const renderSlot = useCallback(
 		({ slot }: TileEngine.RenderSlotProps<(typeof boardCells)[number]>) => {
 			const cell = slot.data;
-			const boardItem = board.byCellKey[cell.key];
+			const boardItem = board?.byCellKey[cell.key];
 			const canMerge =
 				drag.activeDrag?.source.kind === "board" &&
 				boardItem !== undefined &&
@@ -145,7 +146,7 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 			);
 		},
 		[
-			board.byCellKey,
+			board?.byCellKey,
 			drag.activeDrag,
 			feedback.imprintedCellKey,
 			feedback.invalidCellKey,
@@ -169,6 +170,8 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 			actions.tileSingleActivate,
 		],
 	);
+
+	if (!board || !items) return null;
 
 	return (
 		<TileEngine<BoardTileData, (typeof boardCells)[number]>

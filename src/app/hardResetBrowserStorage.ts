@@ -1,9 +1,5 @@
 export const hardResetBrowserStorage = async () => {
-	await (
-		(await navigator.storage.getDirectory()) as FileSystemDirectoryHandle & {
-			remove(options: { recursive: boolean }): Promise<void>;
-		}
-	).remove({
+	await (await navigator.storage.getDirectory()).remove({
 		recursive: true,
 	});
 };

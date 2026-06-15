@@ -4,6 +4,7 @@ import React, {
 	memo,
 	type CSSProperties,
 	forwardRef,
+	type RefObject,
 	type PointerEvent as ReactPointerEvent,
 	type ReactNode,
 	useCallback,
@@ -12,8 +13,7 @@ import React, {
 	useMemo,
 	useRef,
 } from "react";
-import { useDropTargetRegistration } from "~/drag/hook/useDropTargetRegistration";
-import { resolveDropTargetAtPoint } from "~/drag/logic/dropTargetRegistry";
+import { resolveDropTargetAtPoint as resolveExternalDropTargetAtPoint } from "~/drag/logic/dropTargetRegistry";
 import { cn } from "~/shared/cn";
 import { waitForMs } from "~/shared/util/waitForMs";
 import {
@@ -29,7 +29,6 @@ import {
 } from "~/tile-engine/logic/tileEngineMachine";
 
 const defaultGapPx = 0;
-const dragActivationDistancePx = 4;
 const doubleTapWindowMs = 260;
 const longPressMs = 520;
 const longPressMoveTolerancePx = 8;
@@ -136,6 +135,7 @@ export namespace TileEngine {
 		itemLayerClassName?: string;
 		gapPx?: number;
 		drag?: DragConfig<TTile, TSlot, TDrag, TDrop>;
+		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		activeDropTargetNodeId?: string | null;
 		renderSlot(props: RenderSlotProps<TSlot>): ReactNode;
 		renderTile(props: RenderTileProps<TTile>): ReactNode;
@@ -185,6 +185,36 @@ const translatedRect = (rect: TileEngineRect, x: number, y: number): TileEngineR
 
 const distance = (x: number, y: number) => Math.hypot(x, y);
 
+interface TileEngineDropTargetEntry<TDrop = unknown> {
+	element: HTMLElement;
+	payload: TDrop;
+}
+
+interface TileEngineResolvedDropTarget<TDrop = unknown> {
+	nodeId: string;
+	payload: TDrop;
+}
+
+const containsPoint = (rect: DOMRect, x: number, y: number) =>
+	x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+
+const resolveDropTargetFromEntries = <TDrop,>(
+	entries: ReadonlyMap<string, TileEngineDropTargetEntry<TDrop>>,
+	x: number,
+	y: number,
+): TileEngineResolvedDropTarget<TDrop> | null => {
+	for (const [nodeId, entry] of entries) {
+		if (!containsPoint(entry.element.getBoundingClientRect(), x, y)) continue;
+
+		return {
+			nodeId,
+			payload: entry.payload,
+		};
+	}
+
+	return null;
+};
+
 namespace TileEngineSlotSurface {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrop = unknown> {
 		slot: TileEngine.Slot<TSlot>;
@@ -194,6 +224,7 @@ namespace TileEngineSlotSurface {
 		className?: string;
 		drag?: TileEngine.DragConfig<TTile, TSlot, unknown, TDrop>;
 		renderSlot(props: TileEngine.RenderSlotProps<TSlot>): ReactNode;
+		registerDropTarget(nodeId: string, payload: TDrop, element: HTMLElement): () => void;
 	}
 }
 
@@ -206,18 +237,26 @@ const TileEngineSlotSurface = memo(
 		className,
 		drag,
 		renderSlot,
+		registerDropTarget,
 	}: TileEngineSlotSurface.Props<TTile, TSlot, TDrop>) => {
+		const ref = useRef<HTMLDivElement | null>(null);
 		const binding = drag?.slot(slot, targetTile);
 		const nodeId = binding?.nodeId ?? binding?.id;
 		const disabled = !binding || binding.disabled || slot.disabled;
-		useDropTargetRegistration({
-			nodeId,
-			payload: binding?.data,
+		useEffect(() => {
+			if (disabled || !nodeId || !binding?.data || !ref.current) return;
+
+			return registerDropTarget(nodeId, binding.data, ref.current);
+		}, [
+			binding?.data,
 			disabled,
-		});
+			nodeId,
+			registerDropTarget,
+		]);
 
 		return (
 			<div
+				ref={ref}
 				data-drag-node-id={nodeId}
 				data-tile-engine-drop-target-id={disabled ? undefined : nodeId}
 				data-tile-engine-slot-id={slot.id}
@@ -258,6 +297,14 @@ namespace TileEngineActor {
 		gapPx: number;
 		motion?: TileEngineMotion | TileEngineExternalMotion;
 		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
+		dragConstraintsRef: RefObject<HTMLElement | null>;
+		resolveDropTargetAtPoint(
+			x: number,
+			y: number,
+		): {
+			nodeId: string;
+			payload: TDrop;
+		} | null;
 		settleMotion(tileId: string, nonce?: number): void;
 		renderTile(props: TileEngine.RenderTileProps<TTile>): ReactNode;
 	}
@@ -276,6 +323,8 @@ const TileEngineActor = memo(
 		gapPx,
 		motion,
 		drag,
+		dragConstraintsRef,
+		resolveDropTargetAtPoint,
 		settleMotion,
 		renderTile,
 	}: TileEngineActor.Props<TTile, TSlot, TDrag, TDrop>) => {
@@ -287,6 +336,7 @@ const TileEngineActor = memo(
 		const longTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 		const dragX = useMotionValue(0);
 		const dragY = useMotionValue(0);
+		const [isPointerActive, setIsPointerActive] = React.useState(false);
 		const [isDragging, setIsDragging] = React.useState(false);
 
 		const clearSingleTimer = useCallback(() => {
@@ -320,38 +370,19 @@ const TileEngineActor = memo(
 
 		const updateHover = useCallback(
 			(source: TDrag, clientX: number, clientY: number) => {
-				const resolved = resolveDropTargetAtPoint<TDrop>({
-					x: clientX,
-					y: clientY,
-				});
+				const resolved = resolveDropTargetAtPoint(clientX, clientY);
 				drag?.onDragOver?.(source, resolved?.payload ?? null, resolved?.nodeId ?? null);
 				return resolved;
 			},
 			[
 				drag,
-			],
-		);
-
-		const startDrag = useCallback(
-			(session: TileEngineActor.DragSession<TDrag>) => {
-				if (session.started) return;
-				session.started = true;
-				clearLongTimer();
-				setIsDragging(true);
-				dragX.set(0);
-				dragY.set(0);
-				drag?.onDragStart?.(session.source, session.origin);
-			},
-			[
-				clearLongTimer,
-				drag,
-				dragX,
-				dragY,
+				resolveDropTargetAtPoint,
 			],
 		);
 
 		const resetDragVisual = useCallback(() => {
 			setIsDragging(false);
+			setIsPointerActive(false);
 			dragX.set(0);
 			dragY.set(0);
 		}, [
@@ -359,23 +390,11 @@ const TileEngineActor = memo(
 			dragY,
 		]);
 
-		const releasePointerCapture = useCallback((pointerId: number) => {
-			const element = ref.current;
-			if (!element?.hasPointerCapture(pointerId)) return;
-
-			try {
-				element.releasePointerCapture(pointerId);
-			} catch {
-				// Browser capture state can change under us on mobile cancel paths.
-			}
-		}, []);
-
 		const cancelActiveSession = useCallback(() => {
 			const session = dragSessionRef.current;
 			if (!session) return;
 
 			dragSessionRef.current = null;
-			releasePointerCapture(session.pointerId);
 			clearLongTimer();
 			clearSingleTimer();
 			if (session.started) {
@@ -388,12 +407,11 @@ const TileEngineActor = memo(
 			clearSingleTimer,
 			drag,
 			finishHover,
-			releasePointerCapture,
 			resetDragVisual,
 		]);
 
 		const handleTap = useCallback(
-			(event: ReactPointerEvent<HTMLDivElement>) => {
+			(event: Pick<ReactPointerEvent<HTMLDivElement>, "clientX" | "clientY">) => {
 				if (!binding) return;
 				if (!binding.onDoubleActivate) {
 					binding.onSingleActivate?.();
@@ -446,14 +464,10 @@ const TileEngineActor = memo(
 				const element = ref.current;
 				if (!element) return;
 
-				event.preventDefault();
 				clearSingleTimer();
 				clearLongTimer();
-				try {
-					element.setPointerCapture(event.pointerId);
-				} catch {
-					return;
-				}
+				dragX.set(0);
+				dragY.set(0);
 
 				const session: TileEngineActor.DragSession<TDrag> = {
 					pointerId: event.pointerId,
@@ -465,6 +479,7 @@ const TileEngineActor = memo(
 					longFired: false,
 				};
 				dragSessionRef.current = session;
+				setIsPointerActive(true);
 
 				if (binding.onLongActivate) {
 					longTimerRef.current = setTimeout(() => {
@@ -481,6 +496,8 @@ const TileEngineActor = memo(
 				binding,
 				clearLongTimer,
 				clearSingleTimer,
+				dragX,
+				dragY,
 				tile.disabled,
 			],
 		);
@@ -488,50 +505,85 @@ const TileEngineActor = memo(
 		const handlePointerMove = useCallback(
 			(event: ReactPointerEvent<HTMLDivElement>) => {
 				const session = dragSessionRef.current;
-				if (!session || session.pointerId !== event.pointerId) return;
+				if (!session || session.pointerId !== event.pointerId || session.started) return;
 
-				const nextX = event.clientX - session.startX;
-				const nextY = event.clientY - session.startY;
-				const moved = distance(nextX, nextY);
-				if (session.longFired) return;
-				if (!session.started && moved >= dragActivationDistancePx) startDrag(session);
-				if (!session.started) {
-					if (moved > longPressMoveTolerancePx) clearLongTimer();
-					return;
-				}
-
-				event.preventDefault();
-				dragX.set(nextX);
-				dragY.set(nextY);
-				updateHover(session.source, event.clientX, event.clientY);
+				const moved = distance(
+					event.clientX - session.startX,
+					event.clientY - session.startY,
+				);
+				if (moved > longPressMoveTolerancePx) clearLongTimer();
 			},
 			[
 				clearLongTimer,
-				dragX,
-				dragY,
-				startDrag,
-				updateHover,
 			],
 		);
 
 		const handlePointerUp = useCallback(
 			(event: ReactPointerEvent<HTMLDivElement>) => {
 				const session = dragSessionRef.current;
-				if (!session || session.pointerId !== event.pointerId) return;
+				if (!session || session.pointerId !== event.pointerId || session.started) return;
+
 				dragSessionRef.current = null;
-				releasePointerCapture(event.pointerId);
+				clearLongTimer();
+				resetDragVisual();
+				if (!session.longFired) handleTap(event);
+			},
+			[
+				clearLongTimer,
+				handleTap,
+				resetDragVisual,
+			],
+		);
+
+		const handleDragStart = useCallback(() => {
+			const session = dragSessionRef.current;
+			if (!session || session.started) return;
+
+			session.started = true;
+			clearLongTimer();
+			clearSingleTimer();
+			setIsDragging(true);
+			dragX.set(0);
+			dragY.set(0);
+			drag?.onDragStart?.(session.source, session.origin);
+		}, [
+			clearLongTimer,
+			clearSingleTimer,
+			drag,
+			dragX,
+			dragY,
+		]);
+
+		const handleDrag = useCallback(
+			(point: { x: number; y: number }) => {
+				const session = dragSessionRef.current;
+				if (!session || !session.started) return;
+
+				updateHover(session.source, point.x, point.y);
+			},
+			[
+				updateHover,
+			],
+		);
+
+		const handleDragEnd = useCallback(
+			(point: { x: number; y: number }) => {
+				const session = dragSessionRef.current;
+				if (!session) return;
+
+				dragSessionRef.current = null;
 				clearLongTimer();
 
 				if (!session.started) {
-					if (!session.longFired) handleTap(event);
+					resetDragVisual();
 					return;
 				}
 
-				event.preventDefault();
-				const nextX = dragX.get();
-				const nextY = dragY.get();
-				const dragRect = translatedRect(session.origin, nextX, nextY);
-				const resolved = updateHover(session.source, event.clientX, event.clientY);
+				const element = ref.current;
+				const dragRect = element
+					? rectFromElement(element)
+					: translatedRect(session.origin, dragX.get(), dragY.get());
+				const resolved = updateHover(session.source, point.x, point.y);
 				void drag?.onDrop?.(session.source, resolved?.payload ?? null, dragRect);
 				finishHover(session.source);
 				resetDragVisual();
@@ -542,8 +594,6 @@ const TileEngineActor = memo(
 				dragX,
 				dragY,
 				finishHover,
-				handleTap,
-				releasePointerCapture,
 				resetDragVisual,
 				updateHover,
 			],
@@ -612,7 +662,7 @@ const TileEngineActor = memo(
 			onSettle: handleSettle,
 		});
 
-		const hidden = Boolean(!isDragging && !motion && (tile.hidden || binding?.hidden));
+		const hidden = Boolean(!isPointerActive && !motion && (tile.hidden || binding?.hidden));
 		const baseStyle = actorStyle({
 			columns,
 			rowCount,
@@ -633,12 +683,14 @@ const TileEngineActor = memo(
 				}
 			: undefined;
 		const style = {
-			...(isDragging && dragStyle ? dragStyle : baseStyle),
+			...(isPointerActive && dragStyle ? dragStyle : baseStyle),
 			...webkitTouchCalloutNone,
 		} as CSSProperties & {
 			x?: MotionValue<number>;
 			y?: MotionValue<number>;
 		};
+
+		const canDrag = Boolean(binding && !binding.disabled && !tile.disabled);
 
 		return (
 			<motionComponent.div
@@ -653,6 +705,14 @@ const TileEngineActor = memo(
 				)}
 				style={style}
 				onContextMenu={handleContextMenu}
+				drag={canDrag}
+				dragConstraints={dragConstraintsRef}
+				dragElastic={0}
+				dragMomentum={false}
+				dragPropagation={false}
+				onDragStart={handleDragStart}
+				onDrag={(_event, info) => handleDrag(info.point)}
+				onDragEnd={(_event, info) => handleDragEnd(info.point)}
 				onPointerDown={handlePointerDown}
 				onPointerMove={handlePointerMove}
 				onPointerUp={handlePointerUp}
@@ -679,6 +739,7 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 		itemLayerClassName,
 		gapPx = defaultGapPx,
 		drag,
+		dragConstraintsRef,
 		activeDropTargetNodeId,
 		renderSlot,
 		renderTile,
@@ -686,6 +747,10 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 	ref: React.ForwardedRef<TileEngine.Handle<TTile>>,
 ) {
 	const [state, send] = useMachine(tileEngineMachine);
+	const rootRef = useRef<HTMLDivElement | null>(null);
+	const ownDragConstraintsRef = rootRef as RefObject<HTMLElement | null>;
+	const activeDragConstraintsRef = dragConstraintsRef ?? ownDragConstraintsRef;
+	const slotDropTargetsRef = useRef(new Map<string, TileEngineDropTargetEntry<TDrop>>());
 	const rowCount = Math.max(1, Math.ceil(slots.length / columns));
 	const slotIndexById = useMemo(() => {
 		const index = new Map<string, number>();
@@ -701,6 +766,32 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 	}, [
 		tiles,
 	]);
+
+	const registerDropTarget = useCallback(
+		(nodeId: string, payload: TDrop, element: HTMLElement) => {
+			const entry: TileEngineDropTargetEntry<TDrop> = {
+				element,
+				payload,
+			};
+			slotDropTargetsRef.current.set(nodeId, entry);
+
+			return () => {
+				if (slotDropTargetsRef.current.get(nodeId) === entry) {
+					slotDropTargetsRef.current.delete(nodeId);
+				}
+			};
+		},
+		[],
+	);
+	const resolveDropTarget = useCallback((x: number, y: number) => {
+		return (
+			resolveDropTargetFromEntries(slotDropTargetsRef.current, x, y) ??
+			resolveExternalDropTargetAtPoint<TDrop>({
+				x,
+				y,
+			})
+		);
+	}, []);
 
 	const settleMotion = useCallback(
 		(tileId: string, nonce?: number) => {
@@ -770,6 +861,7 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 
 	return (
 		<div
+			ref={rootRef}
 			data-tile-engine-id={id}
 			className={cn("relative overflow-hidden", className)}
 		>
@@ -789,6 +881,7 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 						className={cellClassName}
 						drag={drag}
 						renderSlot={renderSlot}
+						registerDropTarget={registerDropTarget}
 					/>
 				))}
 			</div>
@@ -809,6 +902,8 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 							gapPx={gapPx}
 							motion={motion}
 							drag={drag}
+							dragConstraintsRef={activeDragConstraintsRef}
+							resolveDropTargetAtPoint={resolveDropTarget}
 							settleMotion={settleMotion}
 							renderTile={renderTile}
 						/>

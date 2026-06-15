@@ -26,6 +26,7 @@ export const Board: FC<Board.Props> = memo(() => {
 			itemLayerClassName="pointer-events-none"
 			activeDropTargetNodeId={engine.activeDropTargetNodeId}
 			drag={engine.dragConfig}
+			dragConstraintsRef={engine.dragConstraintsRef}
 			renderSlot={engine.renderSlot}
 			renderTile={engine.renderTile}
 		/>

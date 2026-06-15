@@ -1,4 +1,4 @@
-import { useCallback, useMemo, type ReactNode } from "react";
+import { useCallback, useMemo, type ReactNode, type RefObject } from "react";
 import { boardCellNodeId } from "~/board/boardCellNodeId";
 import { boardCells, type BoardCellView } from "~/board/boardCells";
 import { boardSourceId } from "~/board/boardSourceId";
@@ -12,6 +12,7 @@ import type { ViewItem } from "~/item/view/ViewItemSchema";
 import { usePlayDragState } from "~/play/hook/usePlayDragState";
 import { usePlayFeedbackState } from "~/play/hook/usePlayFeedbackState";
 import { usePlayItems } from "~/play/hook/usePlayItems";
+import { usePlayRootElement } from "~/play/hook/usePlayRootElement";
 import { usePlayActivationActions } from "~/play/hook/usePlayActivationActions";
 import { usePlayCraftActions } from "~/play/hook/usePlayCraftActions";
 import { usePlaySheetsState } from "~/play/hook/usePlaySheetsState";
@@ -35,6 +36,7 @@ export namespace useBoardTileEngine {
 		tiles: readonly TileEngine.Tile<BoardTileData>[];
 		activeDropTargetNodeId: string | null;
 		dragConfig: TileEngine.DragConfig<BoardTileData, BoardCellView, DragData, DropData>;
+		dragConstraintsRef: RefObject<HTMLElement | null> | undefined;
 		renderSlot(props: TileEngine.RenderSlotProps<BoardCellView>): ReactNode;
 		renderTile(props: TileEngine.RenderTileProps<BoardTileData>): ReactNode;
 	}
@@ -45,6 +47,7 @@ export const useBoardTileEngine = (
 ): useBoardTileEngine.Result => {
 	const board = useBoardView();
 	const items = usePlayItems();
+	const playRootElement = usePlayRootElement();
 	const sheets = usePlaySheetsState();
 	const drag = usePlayDragState();
 	const feedback = usePlayFeedbackState();
@@ -254,6 +257,7 @@ export const useBoardTileEngine = (
 		tiles,
 		activeDropTargetNodeId: drag.activeDropTargetNodeId ?? null,
 		dragConfig,
+		dragConstraintsRef: playRootElement ?? undefined,
 		renderSlot,
 		renderTile,
 	};

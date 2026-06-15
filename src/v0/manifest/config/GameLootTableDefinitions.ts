@@ -1,10 +1,10 @@
 import type { LootTableDefinition } from "../lootTable";
-import { chance } from "../utils/chance";
-import { drop } from "../utils/drop";
-import { guaranteed } from "../utils/guaranteed";
-import { lootTable } from "../utils/lootTable";
-import { outputs } from "../utils/outputs";
-import { weighted } from "../utils/weighted";
+import { chance } from "../dsl/chance";
+import { drop } from "../dsl/drop";
+import { guaranteed } from "../dsl/guaranteed";
+import { lootTable } from "../dsl/lootTable";
+import { outputs } from "../dsl/outputs";
+import { weighted } from "../dsl/weighted";
 
 export const GameLootTableDefinitions = [
 	lootTable({

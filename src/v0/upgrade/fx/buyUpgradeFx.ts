@@ -6,7 +6,7 @@ import { IdServiceFx } from "~/v0/id/context/IdServiceFx";
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import { spendInventoryItems } from "~/v0/inventory/logic/planning/spendInventoryItems";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { BuyUpgradeInputSchema } from "~/v0/play/schema/BuyUpgradeInputSchema";
+import { BuyUpgradeInputSchema } from "~/v0/upgrade/schema/BuyUpgradeInputSchema";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
 import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";

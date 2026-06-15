@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BoardCellSchema } from "~/v0/play/schema/BoardCellSchema";
+import { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
 import { BoardViewItemSchema } from "./BoardViewItemSchema";
 
 export const BoardViewSchema = z.object({

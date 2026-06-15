@@ -1,9 +1,9 @@
 import type { UpgradeDefinition } from "../upgrade";
-import { cost } from "../utils/cost";
-import { setLootTable } from "../utils/setLootTable";
-import { speedTiers } from "../utils/speedTiers";
-import { tier } from "../utils/tier";
-import { upgrade } from "../utils/upgrade";
+import { cost } from "../dsl/cost";
+import { setLootTable } from "../dsl/setLootTable";
+import { speedTiers } from "../dsl/speedTiers";
+import { tier } from "../dsl/tier";
+import { upgrade } from "../dsl/upgrade";
 
 export const GameUpgradeDefinitions = [
 	upgrade({

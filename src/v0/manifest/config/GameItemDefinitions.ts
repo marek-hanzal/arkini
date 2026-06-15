@@ -1,13 +1,13 @@
 import type { ItemDefinition } from "../item";
-import { clickProducer } from "../utils/clickProducer";
-import { clickStash } from "../utils/clickStash";
-import { combo } from "../utils/combo";
-import { craft } from "../utils/craft";
-import { imprint } from "../utils/imprint";
-import { input } from "../utils/input";
-import { item } from "../utils/item";
-import { producerInput } from "../utils/producerInput";
-import { same } from "../utils/same";
+import { clickProducer } from "../dsl/clickProducer";
+import { clickStash } from "../dsl/clickStash";
+import { combo } from "../dsl/combo";
+import { craft } from "../dsl/craft";
+import { imprint } from "../dsl/imprint";
+import { input } from "../dsl/input";
+import { item } from "../dsl/item";
+import { producerInput } from "../dsl/producerInput";
+import { same } from "../dsl/same";
 
 export const GameItemDefinitions = [
 	item({

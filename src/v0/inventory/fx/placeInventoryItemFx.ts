@@ -10,7 +10,7 @@ import { dbFx } from "~/v0/database/fx/dbFx";
 import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { spendInventoryStackFx } from "~/v0/inventory/fx/spendInventoryStackFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { PlaceInventoryItemInputSchema } from "~/v0/play/schema/PlaceInventoryItemInputSchema";
+import { PlaceInventoryItemInputSchema } from "~/v0/inventory/schema/PlaceInventoryItemInputSchema";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
 import type { InventoryPlaceResult } from "~/v0/inventory/view/InventoryPlaceResultSchema";

@@ -1,6 +1,6 @@
-import { Effect } from "effect";
 import { useCallback, useRef, useState } from "react";
 import { hardResetBrowserStorageFx } from "~/v0/database/fx/hardResetBrowserStorageFx";
+import { runGameFx } from "~/v0/fx/runGameFx";
 
 export namespace useRootHardResetAction {
 	export type Status = "idle" | "pending" | "failed" | "succeeded";
@@ -17,7 +17,9 @@ export const useRootHardResetAction = () => {
 		setStatus("pending");
 
 		try {
-			await Effect.runPromise(hardResetBrowserStorageFx);
+			await runGameFx({
+				effect: hardResetBrowserStorageFx,
+			});
 			setStatus("succeeded");
 			window.location.reload();
 		} catch (error) {

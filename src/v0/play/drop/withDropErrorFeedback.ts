@@ -1,8 +1,8 @@
-import type { Feedback } from "~/v0/play/Feedback";
+import type { Feedback } from "~/v0/play/feedback/Feedback";
 
 export namespace withDropErrorFeedback {
 	export interface Props {
-		feedback: Feedback;
+		feedback: Feedback.Type;
 		commit(): Promise<unknown>;
 	}
 }

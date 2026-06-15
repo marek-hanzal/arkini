@@ -1,6 +1,6 @@
 import { boardColumns } from "~/v0/board/boardColumns";
 import { boardRows } from "~/v0/board/boardRows";
-import { cellKey } from "~/v0/board/util/cell";
+import { cellKey } from "~/v0/board/cellKey";
 
 export const boardCells = Array.from(
 	{

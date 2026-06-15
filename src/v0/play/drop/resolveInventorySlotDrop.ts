@@ -1,4 +1,5 @@
-import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
+import type { DragSource } from "~/v0/play/drag/DragSource";
+import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import { acceptDrop } from "~/v0/play/drop/acceptDrop";
 import type { DropActions } from "~/v0/play/drop/DropActions";

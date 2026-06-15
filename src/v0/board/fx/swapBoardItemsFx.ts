@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { SwapBoardItemsInputSchema } from "~/v0/play/schema/SwapBoardItemsInputSchema";
+import { SwapBoardItemsInputSchema } from "~/v0/board/schema/SwapBoardItemsInputSchema";
 import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";

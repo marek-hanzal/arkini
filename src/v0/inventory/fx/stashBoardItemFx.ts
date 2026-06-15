@@ -10,7 +10,7 @@ import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { StashBoardItemInputSchema } from "~/v0/play/schema/StashBoardItemInputSchema";
+import { StashBoardItemInputSchema } from "~/v0/inventory/schema/StashBoardItemInputSchema";
 import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
 import { parseJson } from "~/v0/style/parseJson";
 import { json } from "~/v0/style/json";

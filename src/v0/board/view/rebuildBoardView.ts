@@ -1,5 +1,5 @@
 import { findFirstEmptyCell } from "~/v0/board/logic/findFirstEmptyCell";
-import { cellKey } from "~/v0/board/util/cell";
+import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "./BoardViewSchema";
 import type { BoardViewItem } from "./BoardViewItemSchema";
 

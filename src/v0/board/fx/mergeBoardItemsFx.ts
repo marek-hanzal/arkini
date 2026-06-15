@@ -17,7 +17,7 @@ import { isEmptyInventoryState } from "~/v0/inventory/logic/isEmptyInventoryStat
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { MergeBoardItemsInputSchema } from "~/v0/play/schema/MergeBoardItemsInputSchema";
+import { MergeBoardItemsInputSchema } from "~/v0/board/schema/MergeBoardItemsInputSchema";
 import { json } from "~/v0/style/json";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
 

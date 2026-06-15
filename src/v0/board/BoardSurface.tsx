@@ -3,7 +3,7 @@ import { memo, type ReactNode, useCallback, useMemo } from "react";
 import { boardCells, type BoardCellView } from "~/v0/board/boardCells";
 import { boardColumns } from "~/v0/board/boardColumns";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import { cellKey } from "~/v0/board/util/cell";
+import { cellKey } from "~/v0/board/cellKey";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { inventoryViewQueryOptions } from "~/v0/inventory/query/inventoryViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
@@ -14,7 +14,8 @@ import { useMergeBoardItemsMutation } from "~/v0/board/action/useMergeBoardItems
 import { useMoveBoardItemMutation } from "~/v0/board/action/useMoveBoardItemMutation";
 import { useStashBoardItemMutation } from "~/v0/inventory/action/useStashBoardItemMutation";
 import { useSwapBoardItemsMutation } from "~/v0/board/action/useSwapBoardItemsMutation";
-import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
+import type { DragSource } from "~/v0/play/drag/DragSource";
+import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { BoardCell } from "~/v0/board/BoardCell";
 import type { BoardSurface as BoardSurfaceType } from "~/v0/board/BoardSurface.types";
 import { renderBoardTile } from "~/v0/board/renderBoardTile";

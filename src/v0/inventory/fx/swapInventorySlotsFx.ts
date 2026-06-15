@@ -3,7 +3,7 @@ import { assertInsideInventory } from "~/v0/board/logic/assertInsideInventory";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { SwapInventorySlotsInputSchema } from "~/v0/play/schema/SwapInventorySlotsInputSchema";
+import { SwapInventorySlotsInputSchema } from "~/v0/inventory/schema/SwapInventorySlotsInputSchema";
 import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";

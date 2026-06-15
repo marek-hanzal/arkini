@@ -1,5 +1,5 @@
 import type { SaveShape } from "~/v0/inventory/logic/planning/types";
-import { BoardCellSchema } from "~/v0/play/schema/BoardCellSchema";
+import { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 
 export const assertInsideBoard = (save: SaveShape, x: number, y: number) => {

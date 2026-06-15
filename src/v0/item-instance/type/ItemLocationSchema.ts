@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { BoardCellSchema } from "~/v0/play/schema/BoardCellSchema";
-import { InventorySlotIndexSchema } from "~/v0/play/schema/InventorySlotIndexSchema";
+import { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
+import { InventorySlotIndexSchema } from "~/v0/inventory/schema/InventorySlotIndexSchema";
 import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
 import { ItemLocationKindSchema } from "./ItemLocationKindSchema";
 

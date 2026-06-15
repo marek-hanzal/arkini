@@ -1,5 +1,7 @@
 # 015 Drag commit handoff
 
+Status: OBSOLETE - superseded by `016-drag-snap-before-commit.md`.
+
 ## Problem
 
 Board move-to-empty and board swap could still show a visible jump in the dragged actor. The command state was correct, but the animation handoff was staged before React Query invalidation rendered the actor in its committed slot.
@@ -20,3 +22,7 @@ This keeps `TileEngine`'s outer actor placement aligned with durable game state 
 ## Notes
 
 Non-drag command helpers still own their own staging order because they may need pre-commit DOM for producer/stash/activation-style events. This task only changes the drag-drop path in `usePlayDraggableControl`.
+
+## Superseded note
+
+This sequencing still tied the handoff too much to query invalidation. The corrected approach is documented in `016-drag-snap-before-commit.md`: TileEngine snaps the live dragged actor into target geometry before the app commit, then command visual events use that snapped rect while invalidation runs only as background reconciliation.

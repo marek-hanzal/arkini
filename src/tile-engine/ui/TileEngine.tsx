@@ -1,4 +1,5 @@
 import { useMachine } from "@xstate/react";
+import { animate } from "motion";
 import {
 	motion as motionComponent,
 	useDragControls,
@@ -24,6 +25,7 @@ import { cn } from "~/shared/cn";
 import { waitForMs } from "~/shared/util/waitForMs";
 import {
 	tileEngineMotionDurationMs,
+	tileEngineMotionEase,
 	useTileEngineMotionAnimation,
 	type TileEngineExternalMotion,
 } from "~/tile-engine/hook/useTileEngineMotionAnimation";
@@ -39,6 +41,7 @@ type TileEngineDropOutcome = "accept" | "reject" | "ignore";
 const doubleTapWindowMs = 260;
 const longPressMs = 520;
 const longPressMoveTolerancePx = 8;
+const dropSnapDurationSeconds = 0.16;
 
 export namespace TileEngine {
 	export type Id = string;
@@ -205,6 +208,7 @@ interface TileEngineDropTargetEntry<TDrop = unknown> {
 interface TileEngineResolvedDropTarget<TDrop = unknown> {
 	nodeId: string;
 	payload: TDrop;
+	element?: HTMLElement;
 }
 
 const containsPoint = (rect: DOMRect, x: number, y: number) =>
@@ -221,11 +225,36 @@ const resolveDropTargetFromEntries = <TDrop,>(
 		return {
 			nodeId,
 			payload: entry.payload,
+			element: entry.element,
 		};
 	}
 
 	return null;
 };
+
+const elementForDropTargetNodeId = (nodeId: string): HTMLElement | null =>
+	document.querySelector<HTMLElement>(`[data-drag-node-id="${nodeId}"]`) ??
+	document.querySelector<HTMLElement>(`[data-tile-engine-drop-target-id="${nodeId}"]`);
+
+const rectForDropTarget = <TDrop,>(target: TileEngineResolvedDropTarget<TDrop> | null) => {
+	const element = target?.element ?? (target ? elementForDropTargetNodeId(target.nodeId) : null);
+	if (!element) return null;
+
+	return rectFromElement(element);
+};
+
+const centeredActorRectInTarget = ({
+	actorRect,
+	targetRect,
+}: {
+	actorRect: TileEngineRect;
+	targetRect: TileEngineRect;
+}): TileEngineRect => ({
+	left: targetRect.left + (targetRect.width - actorRect.width) / 2,
+	top: targetRect.top + (targetRect.height - actorRect.height) / 2,
+	width: actorRect.width,
+	height: actorRect.height,
+});
 
 namespace TileEngineSlotSurface {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrop = unknown> {
@@ -313,10 +342,7 @@ namespace TileEngineActor {
 		resolveDropTargetAtPoint(
 			x: number,
 			y: number,
-		): {
-			nodeId: string;
-			payload: TDrop;
-		} | null;
+		): TileEngineResolvedDropTarget<TDrop> | null;
 		settleMotion(tileId: string, nonce?: number): void;
 		renderTile(props: TileEngine.RenderTileProps<TTile>): ReactNode;
 	}
@@ -424,6 +450,55 @@ const TileEngineActor = memo(
 			setIsDragging(false);
 			setIsPointerActive(false);
 		}, []);
+
+		const animateDropSnap = useCallback(
+			async ({
+				origin,
+				targetRect,
+			}: {
+				origin: TileEngineRect;
+				targetRect: TileEngineRect | null;
+			}): Promise<TileEngineRect> => {
+				if (!targetRect) {
+					const element = actorRef.current;
+					return element
+						? rectFromElement(element)
+						: translatedRect(origin, dragX.get(), dragY.get());
+				}
+
+				const destination = centeredActorRectInTarget({
+					actorRect: origin,
+					targetRect,
+				});
+				const targetX = destination.left - origin.left;
+				const targetY = destination.top - origin.top;
+
+				dragX.stop();
+				dragY.stop();
+
+				const xControls = animate(dragX, targetX, {
+					duration: dropSnapDurationSeconds,
+					ease: tileEngineMotionEase,
+				});
+				const yControls = animate(dragY, targetY, {
+					duration: dropSnapDurationSeconds,
+					ease: tileEngineMotionEase,
+				});
+
+				await Promise.all([
+					xControls.then(() => undefined),
+					yControls.then(() => undefined),
+				]);
+				dragX.set(targetX);
+				dragY.set(targetY);
+
+				return destination;
+			},
+			[
+				dragX,
+				dragY,
+			],
+		);
 
 		const cancelActiveSession = useCallback(() => {
 			const session = dragSessionRef.current;
@@ -627,19 +702,25 @@ const TileEngineActor = memo(
 				}
 
 				const element = actorRef.current;
-				const dragRect = element
+				const releaseRect = element
 					? rectFromElement(element)
 					: translatedRect(session.origin, dragX.get(), dragY.get());
 				const resolved = element
-					? updateHoverFromActorRect(session.source, dragRect)
+					? updateHoverFromActorRect(session.source, releaseRect)
 					: updateHover(session.source, point.x, point.y);
-				finishHover(session.source);
-				releasePointerVisual();
-				setIsDropHandingOff(true);
 
-				void Promise.resolve(
-					drag?.onDrop?.(session.source, resolved?.payload ?? null, dragRect),
-				)
+				releasePointerVisual();
+
+				void (async () => {
+					const handoffRect = await animateDropSnap({
+						origin: session.origin,
+						targetRect: rectForDropTarget(resolved),
+					});
+
+					finishHover(session.source);
+					setIsDropHandingOff(true);
+					await drag?.onDrop?.(session.source, resolved?.payload ?? null, handoffRect);
+				})()
 					.catch(() => {
 						// The app-level drag controller owns error feedback; TileEngine only restores
 						// the local actor state.
@@ -649,6 +730,7 @@ const TileEngineActor = memo(
 					});
 			},
 			[
+				animateDropSnap,
 				clearLongTimer,
 				drag,
 				dragX,

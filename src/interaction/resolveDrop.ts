@@ -1,15 +1,16 @@
+import { match } from "ts-pattern";
+import type { Command } from "~/command/Command";
+import type { CommandResult } from "~/command/CommandResult";
 import type { DropPlan } from "~/drag/DropPlan";
+import type { GameDragView } from "~/drag/view/GameDragViewSchema";
 import type { ItemId } from "~/manifest/manifestId";
-import type { VisualTransitionKind, VisualMeta } from "~/play/types";
+import type { VisualMeta, VisualTransitionKind } from "~/play/types";
 import { flashDrop } from "./flashDrop";
 import { reject } from "./reject";
 import { resolveBoardDrop } from "./resolveBoardDrop";
 import { resolveBoardInventoryDrop } from "./resolveBoardInventoryDrop";
 import { resolveInventoryDrop } from "./resolveInventoryDrop";
 import type { AnyDropContext, Feedback, TypedDropContext } from "./types";
-import type { Command } from "~/command/Command";
-import type { CommandResult } from "~/command/CommandResult";
-import type { GameDragView } from "~/drag/view/GameDragViewSchema";
 
 export namespace resolveDrop {
 	export interface Props {
@@ -26,7 +27,7 @@ export const resolveDrop = ({
 	feedback,
 	run,
 }: resolveDrop.Props): DropPlan<ItemId, VisualTransitionKind, VisualMeta> => {
-	if (!game || !context.target)
+	if (!game || !context.target) {
 		return reject(() =>
 			flashDrop({
 				context,
@@ -34,39 +35,60 @@ export const resolveDrop = ({
 				feedback,
 			}),
 		);
+	}
 
 	const source = context.source.source;
 	const target = context.target.target;
-	const route = `${source.kind}->${target.kind}`;
 	const runtime = {
 		game,
 		feedback,
 		run,
 	};
 
-	switch (route) {
-		case "board->inventory":
-			return resolveBoardInventoryDrop({
-				context: context as TypedDropContext<"board", "inventory">,
-				runtime,
-			});
-		case "inventory->inventory-slot":
-			return resolveInventoryDrop({
-				context: context as TypedDropContext<"inventory", "inventory-slot">,
-				runtime,
-			});
-		case "board->cell":
-			return resolveBoardDrop({
-				context: context as TypedDropContext<"board", "cell">,
-				runtime,
-			});
-		default:
-			return reject(() =>
+	return match({
+		source: source.kind,
+		target: target.kind,
+	})
+		.with(
+			{
+				source: "board",
+				target: "inventory",
+			},
+			() =>
+				resolveBoardInventoryDrop({
+					context: context as TypedDropContext<"board", "inventory">,
+					runtime,
+				}),
+		)
+		.with(
+			{
+				source: "inventory",
+				target: "inventory-slot",
+			},
+			() =>
+				resolveInventoryDrop({
+					context: context as TypedDropContext<"inventory", "inventory-slot">,
+					runtime,
+				}),
+		)
+		.with(
+			{
+				source: "board",
+				target: "cell",
+			},
+			() =>
+				resolveBoardDrop({
+					context: context as TypedDropContext<"board", "cell">,
+					runtime,
+				}),
+		)
+		.otherwise(() =>
+			reject(() =>
 				flashDrop({
 					context,
 					game,
 					feedback,
 				}),
-			);
-	}
+			),
+		);
 };

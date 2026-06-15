@@ -1,24 +1,20 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameDragView } from "~/drag/view/GameDragViewSchema";
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
-import { playQueryKeys } from "~/play/hook/playQueryKeys";
+import { useBoardView } from "~/board/hook/useBoardView";
+import { useInventoryView } from "~/inventory/hook/useInventoryView";
 
 export const useGameDragViewReader = () => {
-	const queryClient = useQueryClient();
+	const board = useBoardView();
+	const inventory = useInventoryView();
 
-	return useCallback((): GameDragView | undefined => {
-		const board = queryClient.getQueryData<BoardView>(playQueryKeys.board);
-		const inventory = queryClient.getQueryData<InventoryView>(playQueryKeys.inventory);
-
-		if (!board || !inventory) return undefined;
-
-		return {
+	return useCallback(
+		(): GameDragView => ({
 			boardItemsById: board.byId,
 			inventoryBySlotIndex: inventory.bySlotIndex,
-		};
-	}, [
-		queryClient,
-	]);
+		}),
+		[
+			board.byId,
+			inventory.bySlotIndex,
+		],
+	);
 };

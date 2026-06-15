@@ -1,0 +1,123 @@
+import type { CSSProperties, ReactNode, RefObject } from "react";
+
+export namespace TileEngine {
+	export type Id = string;
+	export type DropOutcome =
+		| "accept"
+		| "reject"
+		| "ignore"
+		| {
+				type: "accept";
+				commit?(): Promise<unknown> | unknown;
+		  }
+		| {
+				type: "reject";
+		  }
+		| {
+				type: "ignore";
+		  };
+
+	export interface Rect {
+		left: number;
+		top: number;
+		width: number;
+		height: number;
+	}
+
+	export interface Slot<TSlot = unknown> {
+		id: Id;
+		data: TSlot;
+		disabled?: boolean;
+	}
+
+	export interface Tile<TTile = unknown> {
+		id: Id;
+		slotId: Id;
+		data: TTile;
+		hidden?: boolean;
+		disabled?: boolean;
+		style?: CSSProperties;
+	}
+
+	export interface DragBinding<TDrag = unknown> {
+		id?: Id;
+		data: TDrag;
+		disabled?: boolean;
+		delaySingleWhenDouble?: boolean;
+		onSingleActivate?(): void;
+		onDoubleActivate?(): void;
+		onLongActivate?(): void;
+	}
+
+	export interface DropBinding<TDrop = unknown> {
+		id?: Id;
+		data: TDrop;
+		disabled?: boolean;
+	}
+
+	export interface DropContext<
+		TTile = unknown,
+		TSlot = unknown,
+		TDrag = unknown,
+		TDrop = unknown,
+	> {
+		source: TDrag;
+		target: TDrop | null;
+		sourceTile: Tile<TTile>;
+		targetSlot: Slot<TSlot> | null;
+		targetTile: Tile<TTile> | null;
+		dragRect: Rect;
+		targetRect: Rect | null;
+	}
+
+	export interface DragConfig<
+		TTile = unknown,
+		TSlot = unknown,
+		TDrag = unknown,
+		TDrop = unknown,
+	> {
+		tile(tile: Tile<TTile>): DragBinding<TDrag> | undefined;
+		slot(
+			slot: Slot<TSlot>,
+			targetTile: Tile<TTile> | undefined,
+		): DropBinding<TDrop> | undefined;
+		onDragStart?(context: { source: TDrag; tile: Tile<TTile>; rect: Rect }): void;
+		onDragOver?(context: {
+			source: TDrag;
+			target: TDrop | null;
+			targetSlot: Slot<TSlot> | null;
+			targetTile: Tile<TTile> | null;
+			dropId: string | null;
+		}): void;
+		onDrop?(
+			context: DropContext<TTile, TSlot, TDrag, TDrop>,
+		): DropOutcome | Promise<DropOutcome>;
+		onDragCancel?(context: { source: TDrag; tile: Tile<TTile> }): void;
+	}
+
+	export interface RenderSlotProps<TSlot = unknown> {
+		slot: Slot<TSlot>;
+		index: number;
+		isOver: boolean;
+	}
+
+	export interface RenderTileProps<TTile = unknown> {
+		tile: Tile<TTile>;
+		isDragging: boolean;
+	}
+
+	export interface Props<TTile = unknown, TSlot = unknown, TDrag = unknown, TDrop = unknown> {
+		id: Id;
+		columns: number;
+		slots: readonly Slot<TSlot>[];
+		tiles: readonly Tile<TTile>[];
+		className?: string;
+		cellClassName?: string;
+		itemLayerClassName?: string;
+		gapPx?: number;
+		drag?: DragConfig<TTile, TSlot, TDrag, TDrop>;
+		dragConstraintsRef?: RefObject<HTMLElement | null>;
+		renderSlot(props: RenderSlotProps<TSlot>): ReactNode;
+		renderTile(props: RenderTileProps<TTile>): ReactNode;
+	}
+}

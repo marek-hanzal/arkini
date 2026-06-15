@@ -247,10 +247,7 @@ export const useBoardTileEngine = (
 				activationNowMs={tile.data.activationNowMs}
 			/>
 		),
-		[
-			activateBoardTile,
-			openBoardTileDetail,
-		],
+		[],
 	);
 
 	return {

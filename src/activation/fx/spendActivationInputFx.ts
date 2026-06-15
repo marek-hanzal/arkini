@@ -45,9 +45,7 @@ export const spendActivationInputFx = Effect.fn("spendActivationInputFx")(functi
 		remaining -= spent;
 
 		if (nextQuantity <= 0) {
-			yield* dbFx((db) =>
-				db.deleteFrom("itemInstance").where("id", "=", row.id).execute(),
-			);
+			yield* dbFx((db) => db.deleteFrom("itemInstance").where("id", "=", row.id).execute());
 		} else {
 			yield* dbFx((db) =>
 				db

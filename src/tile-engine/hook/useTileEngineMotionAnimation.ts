@@ -1,7 +1,10 @@
 import { animate, type AnimationPlaybackControlsWithThen } from "motion";
 import { useLayoutEffect, useRef, type RefObject } from "react";
 import type { TileEngineTransitionKind } from "~/tile-engine/type/TileEngineTransitionKind";
-import type { TileEngineMotion, TileEngineRect } from "~/tile-engine/logic/tileEngineMachine";
+import type {
+	TileEngineMotion,
+	TileEngineRect,
+} from "~/tile-engine/logic/tileEngineMotionRegistry";
 
 export const tileEngineMotionDurationSeconds = 0.3;
 export const tileEngineMotionDurationMs = tileEngineMotionDurationSeconds * 1000;

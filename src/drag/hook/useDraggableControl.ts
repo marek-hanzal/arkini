@@ -1,5 +1,4 @@
-import { useActorRef } from "@xstate/react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DropContext } from "~/drag/DropContext";
 import type { DropOutcome } from "~/drag/DropOutcome";
@@ -7,7 +6,6 @@ import type { DropPlan } from "~/drag/DropPlan";
 import type { DroppablePayload } from "~/drag/DroppablePayload";
 import type { ResolvedDraggableAnimation } from "~/drag/ResolvedDraggableAnimation";
 import type { DropPlanRuntime } from "~/drag/DropPlanRuntime";
-import { draggableWorkflowMachine } from "~/drag/logic/draggableWorkflowMachine";
 import { failDrop } from "~/drag/logic/failDrop";
 import { runDropPlan } from "~/drag/logic/runDropPlan";
 import type { RectLike } from "~/play/types";
@@ -56,10 +54,7 @@ export const useDraggableControl = <
 	onError,
 	schedule,
 }: useDraggableControl.Props<ItemId, Source, Target, Overlay, Kind>) => {
-	const workflow = useActorRef(draggableWorkflowMachine);
-	const sendWorkflow = workflow.send;
 	const sources = useHiddenSources();
-	const activeDragRef = useRef<DraggablePayload<ItemId, Source, Overlay> | null>(null);
 	const [activeDrag, setActiveDrag] = useState<DraggablePayload<ItemId, Source, Overlay> | null>(
 		null,
 	);
@@ -70,7 +65,6 @@ export const useDraggableControl = <
 	const [activeDropTargetNodeId, setActiveDropTargetNodeId] = useState<string | null>(null);
 
 	const clearActiveDrag = useCallback(() => {
-		activeDragRef.current = null;
 		setActiveDrag(null);
 		setDragPreviewRect(null);
 		setActiveDropTargetNodeId(null);
@@ -79,7 +73,6 @@ export const useDraggableControl = <
 		() => ({
 			animate,
 			onError,
-			sendWorkflow,
 			hideSources: sources.hideSources,
 			clearHiddenSources: sources.clearHiddenSources,
 			clearActiveDrag,
@@ -88,7 +81,6 @@ export const useDraggableControl = <
 			animate,
 			clearActiveDrag,
 			onError,
-			sendWorkflow,
 			sources.clearHiddenSources,
 			sources.hideSources,
 		],
@@ -96,29 +88,20 @@ export const useDraggableControl = <
 
 	const start = useCallback(
 		({ source, previewRect }: useDraggableControl.StartProps<ItemId, Source, Overlay>) => {
-			sendWorkflow({
-				type: "DRAG_STARTED",
-			});
 			sources.clearHiddenSources();
-			activeDragRef.current = source;
 			setActiveDrag(source);
 			setDragPreviewRect(previewRect);
 		},
 		[
-			sendWorkflow,
 			sources.clearHiddenSources,
 		],
 	);
 
 	const cancel = useCallback(() => {
-		sendWorkflow({
-			type: "DRAG_CANCELLED",
-		});
 		clearActiveDrag();
 		sources.clearHiddenSources();
 	}, [
 		clearActiveDrag,
-		sendWorkflow,
 		sources.clearHiddenSources,
 	]);
 
@@ -127,15 +110,17 @@ export const useDraggableControl = <
 			source,
 			target,
 			dragRect,
-		}: useDraggableControl.DropProps<ItemId, Source, Target, Overlay>): Promise<DropOutcome> => {
+		}: useDraggableControl.DropProps<
+			ItemId,
+			Source,
+			Target,
+			Overlay
+		>): Promise<DropOutcome> => {
 			const context: DropContext<ItemId, Source, Target, Overlay> = {
 				source,
 				target,
 			};
 
-			sendWorkflow({
-				type: "DROP_RESOLVING",
-			});
 			const operation = async () => {
 				try {
 					return await runDropPlan({
@@ -160,7 +145,6 @@ export const useDraggableControl = <
 			resolveDrop,
 			runtime,
 			schedule,
-			sendWorkflow,
 		],
 	);
 

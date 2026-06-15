@@ -35,10 +35,7 @@ export const storeActivationInputFx = Effect.fn("storeActivationInputFx")(functi
 
 	if (existing) {
 		yield* dbFx(async (db) => {
-			await db
-				.deleteFrom("itemInstance")
-				.where("id", "=", sourceItemInstanceId)
-				.execute();
+			await db.deleteFrom("itemInstance").where("id", "=", sourceItemInstanceId).execute();
 			await db
 				.updateTable("itemInstance")
 				.set({

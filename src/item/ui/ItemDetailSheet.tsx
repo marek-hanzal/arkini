@@ -1,14 +1,10 @@
 import type { FC } from "react";
+import { useItemDetailSheetController } from "~/item/hook/useItemDetailSheetController";
 import { ItemActivationCard } from "~/item/ui/ItemActivationCard";
 import { ItemActivationInputsCard } from "~/item/ui/ItemActivationInputsCard";
 import { ItemCraftCard } from "~/item/ui/ItemCraftCard";
 import { ItemRelationList } from "~/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/item/ui/ItemSummaryCard";
-import { useRunCommandMutation } from "~/command/useRunCommandMutation";
-import { useBoardView } from "~/board/hook/useBoardView";
-import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
-import { usePlayItems } from "~/play/hook/usePlayItems";
-import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 
 export namespace ItemDetailSheet {
@@ -19,90 +15,56 @@ export namespace ItemDetailSheet {
 }
 
 export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClose }) => {
-	const board = useBoardView().data;
-	const items = usePlayItems().data;
-	const invalidatePlayData = usePlayDataInvalidation();
-	const nowMs = useProducerClock(board?.items ?? []);
-	const withdrawInput = useRunCommandMutation({
-		invalidateOnSuccess: false,
+	const detail = useItemDetailSheetController({
+		boardItemId,
 	});
-	const boardItem = boardItemId ? board?.byId[boardItemId] : undefined;
-	const item = boardItem ? items?.[boardItem.itemId] : undefined;
 
-	if (!boardItem || !item || !items) return null;
-
-	const activation = boardItem.activation;
+	if (!detail) return null;
 
 	return (
 		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
 			<SheetHeader
 				eyebrow="Item"
-				description={item.name}
+				description={detail.item.name}
 				onClose={onClose}
 			/>
 			<div className="space-y-4 p-4 pt-1 text-sm text-slate-200">
-				<ItemSummaryCard item={item} />
-				{boardItem.craft ? (
+				<ItemSummaryCard item={detail.item} />
+				{detail.boardItem.craft ? (
 					<ItemCraftCard
-						craft={boardItem.craft}
-						items={items}
+						craft={detail.boardItem.craft}
+						items={detail.items}
 					/>
 				) : null}
-				{activation ? (
+				{detail.boardItem.activation ? (
 					<ItemActivationCard
-						activation={activation}
-						nowMs={nowMs}
+						activation={detail.boardItem.activation}
+						nowMs={detail.nowMs}
 					/>
 				) : null}
-				{activation?.inputs.length ? (
+				{detail.boardItem.activation?.inputs.length ? (
 					<ItemActivationInputsCard
-						activation={activation}
-						boardItem={boardItem}
-						items={items}
-						pending={withdrawInput.isPending}
-						onWithdraw={(itemId) => {
-							void withdrawInput
-								.mutateAsync({
-									type: "producer.withdrawInput",
-									boardItemId: boardItem.id,
-									itemId,
-								})
-								.then(() =>
-									invalidatePlayData([
-										"board",
-										"inventory",
-										"databaseStatus",
-									]),
-								);
-						}}
+						activation={detail.boardItem.activation}
+						boardItem={detail.boardItem}
+						items={detail.items}
+						pending={detail.withdrawPending}
+						onWithdraw={detail.onWithdraw}
 					/>
 				) : null}
 				<ItemRelationList
 					title="Can merge into"
-					items={items}
-					relations={(item.mergeResults ?? []).map((rule) => ({
-						key: `${rule.withItemId}:${rule.resultItemId}`,
-						leftItemId: rule.withItemId,
-						resultItemId: rule.resultItemId,
-					}))}
+					items={detail.items}
+					relations={detail.mergeResults}
 				/>
 				<ItemRelationList
 					title="Can be merged with"
-					items={items}
-					relations={(item.usedInMerges ?? []).map((rule) => ({
-						key: `${rule.targetItemId}:${rule.resultItemId}`,
-						leftItemId: rule.targetItemId,
-						resultItemId: rule.resultItemId,
-					}))}
+					items={detail.items}
+					relations={detail.usedInMerges}
 				/>
 				<ItemRelationList
 					title="Used in crafts"
-					items={items}
-					relations={(item.usedInCrafts ?? []).map((recipe) => ({
-						key: `${recipe.targetItemId}:${recipe.resultItemId}`,
-						leftItemId: recipe.targetItemId,
-						resultItemId: recipe.resultItemId,
-					}))}
+					items={detail.items}
+					relations={detail.usedInCrafts}
 				/>
 			</div>
 		</section>

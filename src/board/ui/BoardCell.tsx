@@ -1,17 +1,11 @@
-import { memo, type FC, useMemo, useRef } from "react";
+import { memo, type FC } from "react";
 import { boardColumns } from "~/board/boardColumns";
 import { boardRows } from "~/board/boardRows";
-import { useMotionCellFeedback } from "~/board/hook/useMotionCellFeedback";
+import { useBoardCellController } from "~/board/hook/useBoardCellController";
 import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
 import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import { useProducerClock } from "~/producer/hook/useProducerClock";
-import { useProducerReadySignals } from "~/producer/hook/useProducerReadySignals";
-import { isProducerReady } from "~/producer/logic/isProducerReady";
-import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 import { cn } from "~/shared/cn";
-
-const emptyBoardItems: readonly BoardViewItem[] = [];
 
 export namespace BoardCell {
 	export interface Props {
@@ -27,55 +21,28 @@ export namespace BoardCell {
 	}
 }
 
-export const BoardCell: FC<BoardCell.Props> = memo(
-	({ x, y, boardItem, canMerge, showDelayedMergeHint, invalid, merged, imprinted, isOver }) => {
-		const cellRef = useRef<HTMLDivElement | null>(null);
-		const clockItems = useMemo(
-			() =>
-				boardItem
-					? [
-							boardItem,
-						]
-					: emptyBoardItems,
-			[
-				boardItem,
-			],
-		);
-		const nowMs = useProducerClock(clockItems);
-		useProducerReadySignals(clockItems, nowMs);
-		const producerReady = isProducerReady(boardItem?.activation, nowMs);
-		const producerCooldown = readProducerCooldown({
-			activation: boardItem?.activation,
-			nowMs,
-		});
-		useMotionCellFeedback(cellRef, {
-			invalid,
-			success: merged,
-			imprint: imprinted,
-		});
+export const BoardCell: FC<BoardCell.Props> = memo((props) => {
+	const cell = useBoardCellController(props);
 
-		const showMergeHint = canMerge && (showDelayedMergeHint || isOver);
-
-		return (
-			<div
-				ref={cellRef}
-				data-board-cell={`${x}:${y}`}
-				data-board-cell-item-id={boardItem?.id}
-				data-producer-ready={producerReady ? "true" : undefined}
-				className={cn(
-					"relative aspect-square touch-none border-b border-r border-slate-800/65 bg-slate-900/45",
-					x === boardColumns - 1 && "border-r-0",
-					y === boardRows - 1 && "border-b-0",
-					isOver && !showMergeHint && "bg-slate-800/80",
-					producerReady && !showMergeHint && !invalid && "ak-producer-ready",
-					showMergeHint && "ak-merge-target",
-					showMergeHint && isOver && "ak-merge-target-over",
-					invalid && "ak-cell-error",
-				)}
-			>
-				<BoardCellProgress progress={boardItem?.craft?.progress} />
-				<BoardCellCooldownProgress progress={producerCooldown?.progress} />
-			</div>
-		);
-	},
-);
+	return (
+		<div
+			ref={cell.cellRef}
+			data-board-cell={`${props.x}:${props.y}`}
+			data-board-cell-item-id={props.boardItem?.id}
+			data-producer-ready={cell.producerReady ? "true" : undefined}
+			className={cn(
+				"relative aspect-square touch-none border-b border-r border-slate-800/65 bg-slate-900/45",
+				props.x === boardColumns - 1 && "border-r-0",
+				props.y === boardRows - 1 && "border-b-0",
+				props.isOver && !cell.showMergeHint && "bg-slate-800/80",
+				cell.producerReady && !cell.showMergeHint && !props.invalid && "ak-producer-ready",
+				cell.showMergeHint && "ak-merge-target",
+				cell.showMergeHint && props.isOver && "ak-merge-target-over",
+				props.invalid && "ak-cell-error",
+			)}
+		>
+			<BoardCellProgress progress={props.boardItem?.craft?.progress} />
+			<BoardCellCooldownProgress progress={cell.producerCooldown?.progress} />
+		</div>
+	);
+});

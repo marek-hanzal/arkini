@@ -1,14 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import { loadPlayBackend } from "~/play/hook/loadPlayBackend";
 import { playQueryKeys } from "~/play/hook/playQueryKeys";
 
-export function useInventoryView() {
-	return useQuery({
+export function useInventoryView(): InventoryView {
+	return useSuspenseQuery({
 		queryKey: playQueryKeys.inventory,
-		enabled: typeof window !== "undefined",
 		async queryFn() {
 			const db = await loadPlayBackend();
 			return db.readInventoryView();
 		},
-	});
+	}).data;
 }

@@ -1,143 +1,16 @@
-import { type FC, useCallback, useMemo } from "react";
-import { DbStatusCard } from "~/play/ui/DbStatusCard";
-import { HardResetButton } from "~/play/ui/HardResetButton";
-import { usePlaySave } from "~/play/hook/usePlaySave";
+import type { FC } from "react";
 import { Board } from "~/board/ui/Board";
+import { usePlayShellController } from "~/play/hook/usePlayShellController";
 import { BottomNavigation } from "~/play/ui/BottomNavigation";
 import { BottomSheet } from "~/play/ui/BottomSheet";
-import { InventorySheet } from "~/inventory/ui/InventorySheet";
-import { UpgradesSheet } from "~/upgrade/ui/UpgradesSheet";
-import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
-import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
-import { usePlayFeedback } from "~/play/hook/usePlayFeedback";
-import { usePlayEventQueue } from "~/play/hook/usePlayEventQueue";
-import { usePlaySheets } from "~/play/hook/usePlaySheets";
-import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
-import { usePlayManualItemActions } from "~/play/hook/usePlayManualItemActions";
-import { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
+import { PlaySheetContent } from "~/play/ui/PlaySheetContent";
 
 export namespace PlayShell {
 	export interface Props {}
 }
 
 export const PlayShell: FC<PlayShell.Props> = () => {
-	const saveQuery = usePlaySave();
-	const sheets = usePlaySheets();
-	const visualMotions = useVisualItemMotions();
-	const schedulePlayEvent = usePlayEventQueue();
-	const feedback = usePlayFeedback();
-
-	const drag = usePlayDraggableControl({
-		feedback,
-		schedule: schedulePlayEvent,
-		visualMotions,
-	});
-	const producerActions = usePlayProducerActions({
-		activeSheet: sheets.activeSheet,
-		visualMotions,
-		feedback,
-		schedule: schedulePlayEvent,
-	});
-	const manualActions = usePlayManualItemActions({
-		visualMotions,
-		feedback,
-		schedule: schedulePlayEvent,
-	});
-	const activateBoardTile = useCallback(
-		(item: BoardViewItem) => {
-			if (!item.activation) return;
-
-			void producerActions.produceFrom(
-				item,
-				item.activation.kind === "stash" ? "exhaust" : "single",
-			);
-		},
-		[
-			producerActions.produceFrom,
-		],
-	);
-	const openBoardTileDetail = useCallback(
-		(item: BoardViewItem) => {
-			sheets.openItem(item.id);
-		},
-		[
-			sheets.openItem,
-		],
-	);
-	const placeInventorySlot = useCallback(
-		(slot: InventorySlot) => {
-			void manualActions.placeInventoryOnBoardWithFly(slot);
-		},
-		[
-			manualActions.placeInventoryOnBoardWithFly,
-		],
-	);
-	const boardDrag = useMemo(
-		() => ({
-			activeDrag: drag.activeDrag ?? undefined,
-			activeDropTargetNodeId: drag.activeDropTargetNodeId,
-			isSourceHidden: drag.isSourceHidden,
-			setActiveDropTargetNodeId: drag.setActiveDropTargetNodeId,
-			start: drag.start,
-			drop: drag.drop,
-			cancel: drag.cancel,
-		}),
-		[
-			drag.activeDrag,
-			drag.activeDropTargetNodeId,
-			drag.cancel,
-			drag.drop,
-			drag.isSourceHidden,
-			drag.setActiveDropTargetNodeId,
-			drag.start,
-		],
-	);
-	const boardFeedback = useMemo(
-		() => ({
-			invalidCellKey: feedback.invalidBoardCellKey,
-			mergedCellKey: feedback.mergedBoardCellKey,
-			imprintedCellKey: feedback.imprintedBoardCellKey,
-		}),
-		[
-			feedback.imprintedBoardCellKey,
-			feedback.invalidBoardCellKey,
-			feedback.mergedBoardCellKey,
-		],
-	);
-	const boardActions = useMemo(
-		() => ({
-			tileSingleActivate: activateBoardTile,
-			tileLongActivate: openBoardTileDetail,
-		}),
-		[
-			activateBoardTile,
-			openBoardTileDetail,
-		],
-	);
-
-	if (saveQuery.isPending) {
-		return (
-			<div className="grid h-dvh w-dvw place-items-center text-sm text-slate-400">
-				Booting SQLite…
-			</div>
-		);
-	}
-
-	if (saveQuery.isError || !saveQuery.data) {
-		return (
-			<div className="grid h-dvh w-dvw place-items-center p-4">
-				<div className="w-full max-w-xl rounded-md border border-red-400/30 bg-red-950/30 p-4 text-sm text-red-100">
-					<p>{(saveQuery.error as Error)?.message ?? "Game failed to load."}</p>
-					<div className="mt-4">
-						<HardResetButton />
-					</div>
-				</div>
-			</div>
-		);
-	}
+	const controller = usePlayShellController();
 
 	return (
 		<>
@@ -152,71 +25,27 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 
 					<div className="min-h-0 shrink-0">
 						<Board
-							drag={boardDrag}
-							feedback={boardFeedback}
-							actions={boardActions}
-							visualMotions={visualMotions}
+							drag={controller.boardDrag}
+							feedback={controller.boardFeedback}
+							actions={controller.boardActions}
+							visualMotions={controller.visualMotions}
 						/>
 					</div>
 				</main>
 
 				<BottomNavigation
-					activeSheet={sheets.activeSheet}
-					inventoryDropTargetActive={drag.activeDrag?.source.kind === "board"}
-					activeDropTargetNodeId={drag.activeDropTargetNodeId}
-					onOpen={sheets.openSheet}
+					activeSheet={controller.activeSheet}
+					inventoryDropTargetActive={controller.drag.activeDrag?.source.kind === "board"}
+					activeDropTargetNodeId={controller.drag.activeDropTargetNodeId}
+					onOpen={controller.openSheet}
 				/>
 			</div>
 
 			<BottomSheet
-				open={sheets.activeSheet !== undefined}
-				onClose={sheets.closeSheet}
+				open={controller.activeSheet !== undefined}
+				onClose={controller.closeSheet}
 			>
-				<div className="min-h-0">
-					<section
-						className="min-h-0"
-						hidden={sheets.renderedSheet !== "inventory"}
-					>
-						<InventorySheet
-							drag={drag}
-							invalidInventorySlot={feedback.invalidInventorySlot}
-							onClose={sheets.closeSheet}
-							onSlotDoubleActivate={placeInventorySlot}
-							visualMotions={visualMotions}
-						/>
-					</section>
-
-					<section
-						className="min-h-0"
-						hidden={sheets.renderedSheet !== "upgrades"}
-					>
-						<UpgradesSheet onClose={sheets.closeSheet} />
-					</section>
-
-					<section
-						className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
-						hidden={sheets.renderedSheet !== "database"}
-					>
-						<SheetHeader
-							eyebrow="System"
-							description="Local database"
-							onClose={sheets.closeSheet}
-						/>
-						<div className="p-4 pt-1">
-							<DbStatusCard />
-						</div>
-					</section>
-
-					<section
-						className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
-						hidden={sheets.renderedSheet !== "item"}
-					>
-						<ItemDetailSheet
-							boardItemId={sheets.selectedBoardItemId}
-							onClose={sheets.closeSheet}
-						/>
-					</section>
-				</div>
+				<PlaySheetContent controller={controller} />
 			</BottomSheet>
 		</>
 	);

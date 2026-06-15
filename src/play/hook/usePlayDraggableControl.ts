@@ -32,7 +32,7 @@ export function usePlayDraggableControl({
 	visualMotions,
 }: usePlayDraggableControl.Props) {
 	const queryClient = useQueryClient();
-	const items = usePlayItems().data;
+	const items = usePlayItems();
 	const command = useRunCommandMutation({
 		invalidateOnSuccess: true,
 	});

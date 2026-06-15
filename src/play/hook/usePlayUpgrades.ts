@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import type { UpgradeListView } from "~/upgrade/view/UpgradeListViewSchema";
 import { loadPlayBackend } from "./loadPlayBackend";
 import { playQueryKeys } from "./playQueryKeys";
 
-export function usePlayUpgrades() {
-	return useQuery({
+export function usePlayUpgrades(): UpgradeListView {
+	return useSuspenseQuery({
 		queryKey: playQueryKeys.upgrades,
-		enabled: typeof window !== "undefined",
 		refetchInterval(query) {
 			return query.state.data?.upgrades.some((upgrade) => upgrade.inProgress) ? 500 : false;
 		},
@@ -13,5 +13,5 @@ export function usePlayUpgrades() {
 			const db = await loadPlayBackend();
 			return db.readUpgradeListView();
 		},
-	});
+	}).data;
 }

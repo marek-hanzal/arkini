@@ -1,5 +1,5 @@
-import { memo, type FC, useRef } from "react";
-import { useMotionCellFeedback } from "~/board/hook/useMotionCellFeedback";
+import { memo, type FC } from "react";
+import { useInventoryCellController } from "~/inventory/hook/useInventoryCellController";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import { cn } from "~/shared/cn";
 
@@ -12,16 +12,13 @@ export namespace InventoryCell {
 }
 
 export const InventoryCell: FC<InventoryCell.Props> = memo(({ slot, invalid, isOver }) => {
-	const cellRef = useRef<HTMLDivElement | null>(null);
-	useMotionCellFeedback(cellRef, {
+	const cell = useInventoryCellController({
 		invalid,
-		imprint: false,
-		success: false,
 	});
 
 	return (
 		<div
-			ref={cellRef}
+			ref={cell.cellRef}
 			data-inventory-slot={slot.slotIndex}
 			className={cn(
 				"relative aspect-square border-b border-r border-slate-800 bg-slate-900/70",

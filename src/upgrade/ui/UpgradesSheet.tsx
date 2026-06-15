@@ -1,7 +1,5 @@
 import type { FC } from "react";
-import { useRunCommandMutation } from "~/command/useRunCommandMutation";
-import { usePlayItems } from "~/play/hook/usePlayItems";
-import { usePlayUpgrades } from "~/play/hook/usePlayUpgrades";
+import { useUpgradesSheetController } from "~/upgrade/hook/useUpgradesSheetController";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { UpgradeCard } from "~/upgrade/ui/UpgradeCard";
 
@@ -12,9 +10,7 @@ export namespace UpgradesSheet {
 }
 
 export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
-	const upgrades = usePlayUpgrades().data;
-	const items = usePlayItems().data;
-	const buyUpgrade = useRunCommandMutation();
+	const controller = useUpgradesSheetController();
 
 	return (
 		<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
@@ -25,18 +21,13 @@ export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 			/>
 			<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
 				<div className="ak-game-width mx-auto grid gap-3">
-					{upgrades?.upgrades.map((upgrade) => (
+					{controller.upgrades.map((upgrade) => (
 						<UpgradeCard
 							key={upgrade.id}
 							upgrade={upgrade}
-							items={items}
-							pending={buyUpgrade.isPending}
-							onBuy={(upgradeId) =>
-								buyUpgrade.mutate({
-									type: "upgrade.buy",
-									upgradeId,
-								})
-							}
+							items={controller.items}
+							pending={controller.buyPending}
+							onBuy={controller.buy}
 						/>
 					))}
 				</div>

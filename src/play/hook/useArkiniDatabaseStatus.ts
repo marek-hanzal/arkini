@@ -1,14 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { loadPlayBackend } from "./loadPlayBackend";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import type { DatabaseStatus } from "~/play/logic/DatabaseStatus";
 import { databaseStatusQueryKey } from "./databaseStatusQueryKey";
+import { loadPlayBackend } from "./loadPlayBackend";
 
-export function useArkiniDatabaseStatus() {
-	return useQuery({
+export function useArkiniDatabaseStatus(): DatabaseStatus {
+	return useSuspenseQuery({
 		queryKey: databaseStatusQueryKey,
-		enabled: typeof window !== "undefined",
 		async queryFn() {
 			const db = await loadPlayBackend();
 			return db.readDatabaseStatus();
 		},
-	});
+	}).data;
 }

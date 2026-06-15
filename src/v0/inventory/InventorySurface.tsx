@@ -22,7 +22,7 @@ import { TileEngine } from "~/v0/tile-engine/TileEngine";
 import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.types";
 
 export const InventorySurface = memo(
-	({ feedback, hasFeedback, onClose }: InventorySurfaceType.Props) => {
+	({ feedback, feedbackFlags, onClose }: InventorySurfaceType.Props) => {
 		const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 		const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
 		const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
@@ -161,12 +161,12 @@ export const InventorySurface = memo(
 			({ slot, isOver }: TileEngineType.RenderSlotProps<InventorySlot>): ReactNode => (
 				<InventoryCell
 					slot={slot.data}
-					invalid={hasFeedback(`inventory:error:${slot.data.slotIndex}`)}
+					invalid={feedbackFlags.has(`inventory:error:${slot.data.slotIndex}`)}
 					isOver={isOver}
 				/>
 			),
 			[
-				hasFeedback,
+				feedbackFlags,
 			],
 		);
 

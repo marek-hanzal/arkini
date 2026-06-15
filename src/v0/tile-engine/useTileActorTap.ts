@@ -6,7 +6,7 @@ import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
 export namespace useTileActorTap {
 	export interface Props<TDrag = unknown> {
-		binding: TileEngine.DragBinding<TDrag> | undefined;
+		bindingRef: RefObject<TileEngine.DragBinding<TDrag> | undefined>;
 		lastTapRef: RefObject<TileEngineActor.LastTap | null>;
 		singleTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
 		clearSingleTimer(): void;
@@ -14,13 +14,14 @@ export namespace useTileActorTap {
 }
 
 export const useTileActorTap = <TDrag>({
-	binding,
+	bindingRef,
 	lastTapRef,
 	singleTimerRef,
 	clearSingleTimer,
 }: useTileActorTap.Props<TDrag>) =>
 	useCallback(
 		(event: Pick<ReactPointerEvent<HTMLDivElement>, "clientX" | "clientY">) => {
+			const binding = bindingRef.current;
 			if (!binding) return;
 			if (!binding.onDoubleActivate) {
 				binding.onSingleActivate?.();
@@ -58,11 +59,11 @@ export const useTileActorTap = <TDrag>({
 			clearSingleTimer();
 			singleTimerRef.current = setTimeout(() => {
 				singleTimerRef.current = null;
-				binding.onSingleActivate?.();
+				bindingRef.current?.onSingleActivate?.();
 			}, TileEngineTiming.doubleTapWindowMs);
 		},
 		[
-			binding,
+			bindingRef,
 			clearSingleTimer,
 			lastTapRef,
 			singleTimerRef,

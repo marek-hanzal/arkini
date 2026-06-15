@@ -5,7 +5,7 @@ import type { Feedback } from "~/v0/play/Feedback";
 export namespace InventorySurface {
 	export interface Props {
 		feedback: Feedback;
-		hasFeedback(key: string): boolean;
+		feedbackFlags: ReadonlySet<string>;
 		onClose(): void;
 	}
 

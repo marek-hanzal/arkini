@@ -5,7 +5,7 @@ import type { Feedback } from "~/v0/play/Feedback";
 export namespace BoardSurface {
 	export interface Props {
 		feedback: Feedback;
-		hasFeedback(key: string): boolean;
+		feedbackFlags: ReadonlySet<string>;
 		onOpenItem(boardItemId: string): void;
 	}
 

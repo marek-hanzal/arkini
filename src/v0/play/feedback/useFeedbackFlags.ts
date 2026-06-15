@@ -6,6 +6,8 @@ const defaultDurationMs = 650;
 export function useFeedbackFlags(durationMs = defaultDurationMs): FeedbackFlags.Type {
 	const timersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 	const [flags, setFlags] = useState<ReadonlySet<string>>(() => new Set());
+	const flagsRef = useRef(flags);
+	flagsRef.current = flags;
 
 	useEffect(
 		() => () => {
@@ -41,15 +43,17 @@ export function useFeedbackFlags(durationMs = defaultDurationMs): FeedbackFlags.
 			durationMs,
 		],
 	);
+	const has = useCallback((key: string) => flagsRef.current.has(key), []);
 
 	return useMemo(
 		() => ({
 			flags,
 			pulse,
-			has: (key: string) => flags.has(key),
+			has,
 		}),
 		[
 			flags,
+			has,
 			pulse,
 		],
 	);

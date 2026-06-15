@@ -5,16 +5,16 @@ import { dropOutcomeKind } from "~/v0/tile-engine/dropOutcomeKind";
 import { releasePointerCapture } from "~/v0/tile-engine/releasePointerCapture";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
 import { rectFromElement } from "~/v0/tile-engine/rect";
-import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngineActor } from "~/v0/tile-engine/TileEngineActor.types";
+import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
 export namespace useTilePointerUp {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrag = unknown, TDrop = unknown> {
 		actorRef: RefObject<HTMLDivElement | null>;
 		dragSessionRef: RefObject<TileEngineActor.DragSession<TDrag> | null>;
-		tile: TileEngine.Tile<TTile>;
-		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
+		tileRef: RefObject<TileEngine.Tile<TTile>>;
+		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop> | undefined>;
 		clearLongTimer(): void;
 		handleTap(event: Pick<ReactPointerEvent<HTMLDivElement>, "clientX" | "clientY">): void;
 		animateBack(): Promise<void>;
@@ -29,8 +29,8 @@ export namespace useTilePointerUp {
 export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 	actorRef,
 	dragSessionRef,
-	tile,
-	drag,
+	tileRef,
+	dragRef,
 	clearLongTimer,
 	handleTap,
 	animateBack,
@@ -63,10 +63,11 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 
 			void (async () => {
 				try {
-					const outcome = await drag?.onDrop?.({
+					const sourceTile = tileRef.current;
+					const outcome = await dragRef.current?.onDrop?.({
 						source: session.source,
 						target: resolved?.payload ?? null,
-						sourceTile: tile,
+						sourceTile,
 						targetSlot: resolved?.slot ?? null,
 						targetTile: resolved?.targetTile ?? null,
 						dragRect: releaseRect,
@@ -79,7 +80,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						await animateToTarget(rectFromElement(resolved.element));
 						if (resolved.slot) {
 							setHandoff({
-								tileId: tile.id,
+								tileId: sourceTile.id,
 								targetSlotId: resolved.slot.id,
 							});
 						}
@@ -109,13 +110,13 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 			animateBack,
 			animateToTarget,
 			clearLongTimer,
-			drag,
+			dragRef,
 			dragSessionRef,
 			finishDrag,
 			handleTap,
 			resolveDrop,
 			setActiveDropId,
 			setHandoff,
-			tile,
+			tileRef,
 		],
 	);

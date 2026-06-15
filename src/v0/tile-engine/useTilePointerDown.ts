@@ -8,8 +8,8 @@ import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 export namespace useTilePointerDown {
 	export interface Props<TDrag = unknown> {
 		actorRef: RefObject<HTMLDivElement | null>;
-		binding: TileEngine.DragBinding<TDrag> | undefined;
-		disabled: boolean;
+		bindingRef: RefObject<TileEngine.DragBinding<TDrag> | undefined>;
+		disabledRef: RefObject<boolean>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		dragSessionRef: RefObject<TileEngineActor.DragSession<TDrag> | null>;
 		longTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
@@ -20,8 +20,8 @@ export namespace useTilePointerDown {
 
 export const useTilePointerDown = <TDrag>({
 	actorRef,
-	binding,
-	disabled,
+	bindingRef,
+	disabledRef,
 	dragConstraintsRef,
 	dragSessionRef,
 	longTimerRef,
@@ -30,7 +30,8 @@ export const useTilePointerDown = <TDrag>({
 }: useTilePointerDown.Props<TDrag>) =>
 	useCallback(
 		(event: ReactPointerEvent<HTMLDivElement>) => {
-			if (disabled || event.button !== 0) return;
+			const binding = bindingRef.current;
+			if (disabledRef.current || event.button !== 0) return;
 			const element = actorRef.current;
 			if (!element || !binding) return;
 
@@ -62,15 +63,15 @@ export const useTilePointerDown = <TDrag>({
 					}
 					session.longFired = true;
 					longTimerRef.current = null;
-					binding.onLongActivate?.();
+					bindingRef.current?.onLongActivate?.();
 				}, TileEngineTiming.longPressMs);
 			}
 		},
 		[
 			actorRef,
-			binding,
+			bindingRef,
 			clearTimers,
-			disabled,
+			disabledRef,
 			dragConstraintsRef,
 			dragSessionRef,
 			longTimerRef,

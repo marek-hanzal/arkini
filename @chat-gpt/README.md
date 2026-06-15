@@ -29,6 +29,8 @@ If installed libraries are not enough, explicitly consider whether a small focus
 - Keep TileEngine standalone. Arkini-specific behavior may be injected through props/hooks/adapters, but `src/tile-engine` must not import Arkini domains such as `board`, `inventory`, `activation`, `command`, `manifest`, `item`, or `play`.
 - Components should render only. Data derivation, command creation, Effect execution, view-model shaping, and animation planning belong in hooks, Fx roots, or adapters.
 - Read hooks use `useSuspenseQuery` by default. App-level Suspense handles initial loading.
+- Prefer React Query as the owner for durable read references. Do not rebuild query-owned view data in root components unless the transformation is tiny and stable.
+- Any long-lived pointer, timer, animation, or drag handler must not capture volatile render objects directly. Use a local latest-ref pattern when runtime callbacks need fresh values without changing handler identity.
 - Use `Effect` for domain/persistence roots.
 - Use Zod schemas with the `Schema.Type` namespace pattern.
 - One exported function/component/type/schema per file unless there is a strong local reason not to.

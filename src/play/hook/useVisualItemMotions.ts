@@ -28,6 +28,11 @@ export namespace useVisualItemMotions {
 	}
 }
 
+/**
+ * GPT:FIX
+ *
+ * Write docs, why this crap exists here and what it's used for.
+ */
 export function useVisualItemMotions(): useVisualItemMotions.State {
 	const [state, send] = useMachine(visualItemMotionMachine);
 	const stage = useCallback(

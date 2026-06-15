@@ -46,6 +46,14 @@ export interface PlayerUpgradeTable {
 	updatedAt: Timestamp;
 }
 
+/**
+ * GPT:FIX
+ *
+ * Here should be all the tables present in the game (in the same spirit - FooTable, ...) and those tables then used as types
+ * in target places, so the tyoe at tge first glance tells you you're working with pure table stuff.
+ *
+ * Each table (include those in this file) should live in standalone file.
+ */
 export interface Database {
 	metadata: MetadataTable;
 	saveGame: SaveGameTable;

@@ -5,6 +5,13 @@ export namespace usePlaySheetHostController {
 	export interface Props {}
 }
 
+/**
+ * GPT:FIX
+ *
+ * Nice and long name. Make it short.
+ *
+ * Also ensure sheets are stable, so useMemo makes sense.
+ */
 export const usePlaySheetHostController = (_props?: usePlaySheetHostController.Props) => {
 	const sheets = usePlaySheetsState();
 

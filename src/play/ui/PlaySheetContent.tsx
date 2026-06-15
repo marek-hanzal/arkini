@@ -13,6 +13,17 @@ export namespace PlaySheetContent {
 export const PlaySheetContent: FC<PlaySheetContent.Props> = () => {
 	const controller = usePlaySheetContentController();
 
+    /**
+     * GPT:FIX
+     *
+     * Are you kidding me???
+     *
+     * Really we've here if === sheet?
+     *
+     * Create standalone sheets for every sheet we're using, connect it to it's button.
+     *
+     * This kind of crap is not acceptable.
+    */
 	if (controller.renderedSheet === "inventory") {
 		return <InventorySheet />;
 	}

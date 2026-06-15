@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import type { UpgradeId } from "~/manifest/manifestId";
 import type { ItemCatalogView, UpgradeView } from "~/play/logic/playTypes";
 import { cn } from "~/shared/cn";
 
@@ -7,7 +8,7 @@ export namespace UpgradeCard {
 		upgrade: UpgradeView;
 		items?: ItemCatalogView;
 		pending?: boolean;
-		onBuy(upgradeId: string): void;
+		onBuy(upgradeId: UpgradeId): void;
 	}
 }
 

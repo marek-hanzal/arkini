@@ -1,11 +1,12 @@
 import type { FC } from "react";
+import type { ItemId } from "~/manifest/manifestId";
 import type { ItemCatalogView } from "~/play/logic/playTypes";
 
 export namespace ItemRelationList {
 	export interface Relation {
 		key: string;
-		leftItemId: string;
-		resultItemId: string;
+		leftItemId: ItemId;
+		resultItemId: ItemId;
 	}
 
 	export interface Props {

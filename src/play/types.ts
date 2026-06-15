@@ -1,5 +1,6 @@
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DroppablePayload } from "~/drag/DroppablePayload";
+import type { ItemId } from "~/manifest/manifestId";
 import type { BoardViewItem } from "~/play/logic/playTypes";
 
 export type DragSource =
@@ -34,7 +35,7 @@ export interface VisualMeta {
 	activation?: BoardViewItem["activation"];
 }
 
-export type DragData = DraggablePayload<string, DragSource, VisualMeta>;
+export type DragData = DraggablePayload<ItemId, DragSource, VisualMeta>;
 export type DropData = DroppablePayload<DropTarget>;
 
 export interface RectLike {

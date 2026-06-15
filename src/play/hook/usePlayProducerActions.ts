@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import type { Command } from "~/action/command";
+import type { Command } from "~/command/Command";
 import { useCommand } from "~/play/hook/useCommand";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";

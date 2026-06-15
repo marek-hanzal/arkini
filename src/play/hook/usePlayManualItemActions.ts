@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import type { Command } from "~/action/command";
+import type { Command } from "~/command/Command";
 import { useCallback, useMemo } from "react";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import { useCommand } from "~/play/hook/useCommand";

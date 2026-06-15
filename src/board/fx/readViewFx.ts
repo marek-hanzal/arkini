@@ -11,6 +11,8 @@ import type { ItemId } from "~/manifest/manifestId";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import { readBoardItemRowsFx } from "~/item-instance/fx/readBoardItemRowsFx";
+import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
 import { defaultSaveGameId } from "~/play/logic/save";
 import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
 import { BoardViewSchema, type BoardView } from "~/board/view/BoardViewSchema";
@@ -60,13 +62,19 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 		rows = yield* readBoardItemRowsFx();
 	}
 
-	const upgradeRows = yield* dbFx((db) =>
-		db
-			.selectFrom(table.playerUpgrade)
-			.selectAll()
-			.where("saveGameId", "=", defaultSaveGameId)
-			.execute(),
-	);
+	const [upgradeRows, activationInputRows] = yield* Effect.all([
+		dbFx((db) =>
+			db
+				.selectFrom(table.playerUpgrade)
+				.selectAll()
+				.where("saveGameId", "=", defaultSaveGameId)
+				.execute(),
+		),
+		readActivationInputRowsFx({
+			ownerItemInstanceIds: rows.map((row) => row.id),
+		}),
+	]);
+	const activationInputsByOwner = groupActivationInputRows(activationInputRows);
 
 	const items = rows.map((item): BoardViewItem => {
 		const state = parseJson<BoardItemState>(item.stateJson || json({}));
@@ -82,6 +90,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 				date,
 				gameConfig,
 				upgradeRows,
+				storedInputs: activationInputsByOwner.get(item.id),
 			}),
 			craft: readCraftView({
 				itemId: item.itemDefinitionId as ItemId,

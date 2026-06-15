@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { BoardCellSchema } from "~/play/schema/BoardCellSchema";
 import { InventorySlotIndexSchema } from "~/play/schema/InventorySlotIndexSchema";
+import { GameItemIdSchema } from "~/manifest/GameItemIdSchema";
 import { ItemLocationKindSchema } from "./ItemLocationKindSchema";
 
 export const ItemLocationSchema = z.discriminatedUnion("kind", [
@@ -16,7 +17,7 @@ export const ItemLocationSchema = z.discriminatedUnion("kind", [
 	z.object({
 		kind: z.literal(ItemLocationKindSchema.enum["activation-input"]),
 		ownerItemInstanceId: z.string().min(1),
-		itemId: z.string().min(1),
+		itemId: GameItemIdSchema,
 	}),
 ]);
 

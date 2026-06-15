@@ -5,7 +5,6 @@ export const BoardItemStateSchema = z.object({
 		.object({
 			cooldownUntil: z.string().optional(),
 			remainingCharges: z.number().optional(),
-			inventory: z.record(z.string(), z.number()).optional(),
 		})
 		.optional(),
 	craft: z

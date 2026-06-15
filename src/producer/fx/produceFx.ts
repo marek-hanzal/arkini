@@ -13,6 +13,9 @@ import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { ProduceBoardItemInputSchema } from "~/play/schema/ProduceBoardItemInputSchema";
 import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
+import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
+import { spendActivationInputFx } from "~/activation/fx/spendActivationInputFx";
 import type { ProducerDropResult } from "~/producer/type/ProducerDropResultSchema";
 import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
@@ -104,21 +107,23 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			const steps = isExhaust
 				? Math.max(1, activationState.remainingCharges ?? activation.charges)
 				: 1;
-			const storedInventory = {
-				...(activationState.inventory ?? {}),
-			};
+			const inputRows = yield* readActivationInputRowsFx({
+				ownerItemInstanceIds: [
+					row.id,
+				],
+			});
+			const storedInputs =
+				groupActivationInputRows(inputRows).get(row.id) ?? new Map<ItemId, number>();
 
 			for (const required of activation.inputs ?? []) {
 				const needed = required.quantity * steps;
-				const stored = storedInventory[required.itemId] ?? 0;
+				const stored = storedInputs.get(required.itemId) ?? 0;
 				if (stored < needed) {
 					const name = gameConfig.getItem(required.itemId)?.name ?? required.itemId;
 					return yield* Effect.fail(
 						new GameActionError(`${itemLabel(activation.type)} needs ${name}.`),
 					);
 				}
-				storedInventory[required.itemId] = stored - needed;
-				if (storedInventory[required.itemId] <= 0) delete storedInventory[required.itemId];
 			}
 
 			const allDrops: ItemId[] = [];
@@ -148,6 +153,14 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			const placements = yield* applyPlacementPlanFx({
 				plan,
 			});
+
+			for (const required of activation.inputs ?? []) {
+				yield* spendActivationInputFx({
+					ownerItemInstanceId: row.id,
+					itemId: required.itemId,
+					quantity: required.quantity * steps,
+				});
+			}
 			const nextRemainingCharges =
 				activation.type === "stash"
 					? Math.max(0, (activationState.remainingCharges ?? activation.charges) - steps)
@@ -177,7 +190,6 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 							...state,
 							activation: {
 								...activationState,
-								inventory: storedInventory,
 								cooldownUntil:
 									activation.type === "producer"
 										? date.toTimestamp(

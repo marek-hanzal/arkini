@@ -12,6 +12,9 @@ import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
 import { readStoredBoardState } from "~/board/logic/readStoredBoardState";
+import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
+import { storeActivationInputFx } from "~/activation/fx/storeActivationInputFx";
 
 export namespace mergeFx {
 	export interface Props {
@@ -42,6 +45,15 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 			if (!source || !target) {
 				return yield* Effect.fail(new GameActionError("Both board items must exist."));
 			}
+			const activationInputRows = yield* readActivationInputRowsFx({
+				ownerItemInstanceIds: [
+					source.id,
+					target.id,
+				],
+			});
+			const activationInputsByOwner = groupActivationInputRows(activationInputRows);
+			const sourceStoredInputs = activationInputsByOwner.get(source.id);
+			const targetStoredInputs = activationInputsByOwner.get(target.id);
 			const sourceState = readStoredBoardState(source.stateJson);
 			if (sourceState.craft?.startedAt || sourceState.craft?.readyAt) {
 				return yield* Effect.fail(new GameActionError("Craft is already in progress."));
@@ -56,6 +68,11 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				target.itemDefinitionId,
 			);
 			if (mergeRule) {
+				if (sourceStoredInputs || targetStoredInputs) {
+					return yield* Effect.fail(
+						new GameActionError("Items with stored inputs cannot be merged."),
+					);
+				}
 				if (targetState.craft?.startedAt || targetState.craft?.readyAt) {
 					return yield* Effect.fail(new GameActionError("Craft is already in progress."));
 				}
@@ -95,6 +112,11 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				(entry) => entry.itemId === source.itemDefinitionId,
 			);
 			if (craft && craftInput) {
+				if (sourceStoredInputs) {
+					return yield* Effect.fail(
+						new GameActionError("Item with stored inputs cannot be used as input."),
+					);
+				}
 				if (!isEmptyInventoryState(sourceState)) {
 					return yield* Effect.fail(
 						new GameActionError("Stateful item cannot be used as input."),
@@ -164,40 +186,26 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 				(entry) => entry.itemId === source.itemDefinitionId,
 			);
 			if (targetActivation && activationInput) {
+				if (sourceStoredInputs) {
+					return yield* Effect.fail(
+						new GameActionError("Item with stored inputs cannot be used as input."),
+					);
+				}
 				if (!isEmptyInventoryState(sourceState)) {
 					return yield* Effect.fail(
 						new GameActionError("Stateful item cannot be used as input."),
 					);
 				}
-				const activationState = targetState.activation ?? {};
-				const inventory = {
-					...(activationState.inventory ?? {}),
-				};
-				const stored = inventory[source.itemDefinitionId] ?? 0;
+				const stored = targetStoredInputs?.get(source.itemDefinitionId) ?? 0;
 				if (stored >= activationInput.capacity) {
 					return yield* Effect.fail(new GameActionError("Input storage is full."));
 				}
-				inventory[source.itemDefinitionId] = stored + 1;
 
-				yield* dbFx((db) =>
-					db.deleteFrom(table.itemInstance).where("id", "=", source.id).execute(),
-				);
-				yield* dbFx((db) =>
-					db
-						.updateTable(table.itemInstance)
-						.set({
-							stateJson: json({
-								...targetState,
-								activation: {
-									...activationState,
-									inventory,
-								},
-							}),
-							updatedAt: timestamp,
-						})
-						.where("id", "=", target.id)
-						.execute(),
-				);
+				yield* storeActivationInputFx({
+					sourceItemInstanceId: source.id,
+					ownerItemInstanceId: target.id,
+					itemId: source.itemDefinitionId,
+				});
 				return;
 			}
 

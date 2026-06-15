@@ -1,8 +1,11 @@
 import { Effect } from "effect";
 import { insertFx } from "~/board/fx/insertFx";
+import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
 import { assertInsideBoard } from "~/board/logic/assertInsideBoard";
 import { resumeCraftTimer } from "~/board/logic/resumeCraftTimer";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
+import { dbFx } from "~/database/fx/dbFx";
+import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { spendStackFx } from "~/inventory/fx/spendStackFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
@@ -47,6 +50,38 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 				parseJson<BoardItemState>(stack.stateJson || "{}"),
 				date,
 			);
+			const inputRows = yield* readActivationInputRowsFx({
+				ownerItemInstanceIds: [
+					stack.id,
+				],
+			});
+
+			if (stack.quantity === 1 || inputRows.length > 0) {
+				yield* dbFx((db) =>
+					db
+						.updateTable(table.itemInstance)
+						.set({
+							quantity: 1,
+							locationKind: "board",
+							boardX: input.x,
+							boardY: input.y,
+							inventorySlotIndex: null,
+							ownerItemInstanceId: null,
+							inputItemDefinitionId: null,
+							stateJson: json(resumedState),
+							updatedAt: date.timestamp(),
+						})
+						.where("id", "=", stack.id)
+						.execute(),
+				);
+
+				return {
+					boardItemId: stack.id,
+					itemId: stack.itemDefinitionId as ItemId,
+					x: input.x,
+					y: input.y,
+				} satisfies InventoryPlaceResult;
+			}
 
 			const boardItemId = yield* insertFx({
 				itemId: stack.itemDefinitionId as ItemId,

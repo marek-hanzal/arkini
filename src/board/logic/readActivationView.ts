@@ -13,6 +13,7 @@ export namespace readActivationView {
 		date: DateService;
 		gameConfig: GameConfigService;
 		upgradeRows?: readonly OwnedUpgradeRow[];
+		storedInputs?: ReadonlyMap<string, number>;
 	}
 }
 
@@ -22,6 +23,7 @@ export const readActivationView = ({
 	date,
 	gameConfig,
 	upgradeRows = [],
+	storedInputs = new Map(),
 }: readActivationView.Props): ActivationView | undefined => {
 	const baseActivation = gameConfig.getActivation(itemId);
 	if (!baseActivation) return undefined;
@@ -43,7 +45,6 @@ export const readActivationView = ({
 	};
 
 	const cooldownUntil = activationState.cooldownUntil;
-	const inventory = activationState.inventory ?? {};
 
 	return {
 		kind: activation.type,
@@ -56,7 +57,7 @@ export const readActivationView = ({
 			itemId: input.itemId,
 			quantity: input.quantity,
 			capacity: input.capacity,
-			stored: inventory[input.itemId] ?? 0,
+			stored: storedInputs.get(input.itemId) ?? 0,
 		})),
 	};
 };

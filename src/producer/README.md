@@ -4,7 +4,7 @@ The producer engine is the command-facing boundary for producer and stash activa
 
 Responsibilities:
 - activate producers/stashes for single or exhaust runs,
-- withdraw stored producer inputs back into inventory/board state,
+- withdraw stored producer/stash inputs back into board/inventory state,
 - return placement/depletion results that animation code can visualize.
 
 Non-responsibilities:

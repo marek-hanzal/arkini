@@ -1,20 +1,15 @@
 import { Effect } from "effect";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
-import { readBoardState } from "~/board/logic/readBoardState";
-import { dbFx } from "~/database/fx/dbFx";
-import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { IdServiceFx } from "~/id/context/IdServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { applyInventoryPlacementPlanFx } from "~/play/fx/applyInventoryPlacementPlanFx";
-import { WithdrawProducerInputSchema } from "~/play/schema/WithdrawProducerInputSchema";
+import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { spendActivationInputFx } from "~/activation/fx/spendActivationInputFx";
 import { GameActionError } from "~/command/GameActionError";
+import { withTransactionFx } from "~/database/fx/withTransactionFx";
+import { IdServiceFx } from "~/id/context/IdServiceFx";
+import { planPlacements } from "~/inventory/logic/planning/placement";
+import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
+import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { planInventoryPlacement } from "~/inventory/logic/planning/planInventoryPlacement";
-import { normalizeInventoryStateJson } from "~/inventory/logic/normalizeInventoryStateJson";
-import { json } from "~/shared/json";
+import { WithdrawProducerInputSchema } from "~/play/schema/WithdrawProducerInputSchema";
 
 export namespace withdrawInputFx {
 	export interface Props {
@@ -33,10 +28,8 @@ export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 
 	return yield* withTransactionFx(
 		Effect.gen(function* () {
-			const date = yield* DateServiceFx;
 			const gameConfig = yield* GameConfigServiceFx;
 			const id = yield* IdServiceFx;
-			const updatedAt = date.timestamp();
 			const mutable = yield* readMutableSaveFx();
 			const row = mutable.boardRows.find((entry) => entry.id === input.boardItemId);
 			if (!row) {
@@ -48,49 +41,43 @@ export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 				return yield* Effect.fail(new GameActionError("This item cannot store inputs."));
 			}
 
-			const state = readBoardState(row);
-			const activationState = {
-				...(createInitialBoardState(row.itemDefinitionId, gameConfig).activation ?? {}),
-				...(state.activation ?? {}),
-			};
-			const inventory = {
-				...(activationState.inventory ?? {}),
-			};
-			const stored = inventory[input.itemId] ?? 0;
+			const inputRows = yield* readActivationInputRowsFx({
+				ownerItemInstanceIds: [
+					row.id,
+				],
+			});
+			const stored = inputRows
+				.filter((entry) => entry.itemDefinitionId === input.itemId)
+				.reduce((sum, entry) => sum + entry.quantity, 0);
 			if (stored <= 0) {
 				return yield* Effect.fail(new GameActionError("No stored input to withdraw."));
 			}
-			inventory[input.itemId] = stored - 1;
-			if (inventory[input.itemId] <= 0) delete inventory[input.itemId];
 
-			const plan = planInventoryPlacement(mutable.save, mutable.inventoryRows, input.itemId, {
-				gameConfig,
-				id,
-				stateJson: normalizeInventoryStateJson("{}"),
-			});
+			const plan = planPlacements(
+				mutable.save,
+				mutable.boardRows,
+				mutable.inventoryRows,
+				[
+					input.itemId,
+				],
+				{
+					gameConfig,
+					id,
+					origin: row,
+				},
+			);
 			if (!plan) {
-				return yield* Effect.fail(new GameActionError("Inventory is full."));
+				return yield* Effect.fail(new GameActionError("Board and inventory are full."));
 			}
 
-			yield* applyInventoryPlacementPlanFx({
+			yield* applyPlacementPlanFx({
 				plan,
 			});
-			yield* dbFx((db) =>
-				db
-					.updateTable(table.itemInstance)
-					.set({
-						stateJson: json({
-							...state,
-							activation: {
-								...activationState,
-								inventory,
-							},
-						}),
-						updatedAt,
-					})
-					.where("id", "=", row.id)
-					.execute(),
-			);
+			yield* spendActivationInputFx({
+				ownerItemInstanceId: row.id,
+				itemId: input.itemId,
+				quantity: 1,
+			});
 		}),
 	);
 });

@@ -25,6 +25,11 @@ export const depleteFx = Effect.fn("depleteFx")(function* ({ row, stash }: deple
 	return yield* match(stash.onDepleted)
 		.with("remove", () =>
 			dbFx(async (db) => {
+				await db
+					.deleteFrom(table.itemInstance)
+					.where("locationKind", "=", "activation-input")
+					.where("ownerItemInstanceId", "=", row.id)
+					.execute();
 				await db.deleteFrom(table.itemInstance).where("id", "=", row.id).execute();
 				return {
 					kind: "remove",
@@ -37,6 +42,11 @@ export const depleteFx = Effect.fn("depleteFx")(function* ({ row, stash }: deple
 			},
 			({ replaceWithItemId }) =>
 				dbFx(async (db) => {
+					await db
+						.deleteFrom(table.itemInstance)
+						.where("locationKind", "=", "activation-input")
+						.where("ownerItemInstanceId", "=", row.id)
+						.execute();
 					await db
 						.updateTable(table.itemInstance)
 						.set({

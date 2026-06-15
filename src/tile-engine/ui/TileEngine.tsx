@@ -20,7 +20,7 @@ import React, {
 	useMemo,
 	useRef,
 } from "react";
-import { resolveDropTargetAtPoint as resolveExternalDropTargetAtPoint } from "~/drag/logic/dropTargetRegistry";
+import { resolveDropTargetAtPoint as resolveExternalDropTargetAtPoint } from "~/drag/logic/resolveDropTargetAtPoint";
 import { cn } from "~/shared/cn";
 import { waitForMs } from "~/shared/util/waitForMs";
 import {
@@ -283,13 +283,14 @@ const TileEngineSlotSurface = memo(
 		const ref = useRef<HTMLDivElement | null>(null);
 		const binding = drag?.slot(slot, targetTile);
 		const nodeId = binding?.nodeId ?? binding?.id;
-		const disabled = !binding || binding.disabled || slot.disabled;
+		const dropData = binding?.data;
+		const disabled = !binding || binding.disabled || slot.disabled || dropData === undefined;
 		useEffect(() => {
-			if (disabled || !nodeId || !binding?.data || !ref.current) return;
+			if (disabled || !nodeId || dropData === undefined || !ref.current) return;
 
-			return registerDropTarget(nodeId, binding.data, ref.current);
+			return registerDropTarget(nodeId, dropData, ref.current);
 		}, [
-			binding?.data,
+			dropData,
 			disabled,
 			nodeId,
 			registerDropTarget,

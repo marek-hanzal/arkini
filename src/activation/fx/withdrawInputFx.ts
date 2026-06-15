@@ -23,8 +23,8 @@ export namespace withdrawInputFx {
 export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 	props: withdrawInputFx.Props,
 ) {
-	const input = yield* Effect.try({
-		try: () => WithdrawActivationInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => WithdrawActivationInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 

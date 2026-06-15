@@ -1,30 +1,24 @@
-import { useActorRef } from "@xstate/react";
-import { useCallback } from "react";
-import { playEventQueueMachine } from "~/play/logic/playEventQueueMachine";
+import { useCallback, useRef } from "react";
 
 /**
- * GPT:FIX
+ * Serializes visual gameplay work that must not overlap.
  *
- * Write docs, why it's here and what it's used for.
+ * Drag drops, command commits, and their handoff animations share DOM geometry.
+ * Running two of them at once means both read stale rectangles and the board
+ * starts cosplaying a broken teleporter. This hook keeps those operations in a
+ * small FIFO promise chain without putting queue state into React render.
  */
 export function usePlayEventQueue() {
-	const queue = useActorRef(playEventQueueMachine);
+	const tailRef = useRef<Promise<unknown>>(Promise.resolve());
 
-	return useCallback(
-		<T>(label: string, run: () => Promise<T> | T) =>
-			new Promise<T>((resolve, reject) => {
-				queue.send({
-					type: "ENQUEUE",
-					event: {
-						label,
-						run,
-						resolve: resolve as (value: unknown) => void,
-						reject,
-					},
-				});
-			}),
-		[
-			queue,
-		],
-	);
+	return useCallback(<T>(label: string, run: () => Promise<T> | T) => {
+		const job = tailRef.current.then(() => run());
+		tailRef.current = job.catch((error: unknown) => {
+			if (import.meta.env.DEV) {
+				console.debug(`Queued play event failed: ${label}`, error);
+			}
+		});
+
+		return job;
+	}, []);
 }

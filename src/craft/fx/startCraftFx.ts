@@ -5,7 +5,6 @@ import type { CommandVisualEventSchema } from "~/command/CommandVisualEventSchem
 import { GameActionError } from "~/command/GameActionError";
 import { resolveCraftProgress } from "~/craft/logic/resolveCraftProgress";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
@@ -65,7 +64,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 
 	yield* dbFx((db) =>
 		db
-			.updateTable(table.itemInstance)
+			.updateTable("itemInstance")
 			.set({
 				stateJson: json(nextState),
 				updatedAt: startedAt,

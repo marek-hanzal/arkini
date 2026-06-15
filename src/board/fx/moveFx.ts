@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { assertInsideBoard } from "~/board/logic/assertInsideBoard";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { MoveBoardItemInputSchema } from "~/play/schema/MoveBoardItemInputSchema";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
@@ -22,8 +21,8 @@ export const moveFx = Effect.fn("moveFx")(function* (props: moveFx.Props) {
 	const date = yield* DateServiceFx;
 	const timestamp = date.timestamp();
 
-	const input = yield* Effect.try({
-		try: () => MoveBoardItemInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => MoveBoardItemInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 
@@ -47,7 +46,7 @@ export const moveFx = Effect.fn("moveFx")(function* (props: moveFx.Props) {
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						locationKind: "board",
 						boardX: input.x,

@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
 import type { ItemId } from "~/manifest/manifestId";
@@ -26,7 +25,7 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 	const updatedAt = date.timestamp();
 	const existing = yield* dbFx((db) =>
 		db
-			.selectFrom(table.itemInstance)
+			.selectFrom("itemInstance")
 			.selectAll()
 			.where("locationKind", "=", "craft-input")
 			.where("ownerItemInstanceId", "=", ownerItemInstanceId)
@@ -37,11 +36,11 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 	if (existing) {
 		yield* dbFx(async (db) => {
 			await db
-				.deleteFrom(table.itemInstance)
+				.deleteFrom("itemInstance")
 				.where("id", "=", sourceItemInstanceId)
 				.execute();
 			await db
-				.updateTable(table.itemInstance)
+				.updateTable("itemInstance")
 				.set({
 					quantity: existing.quantity + quantity,
 					updatedAt,
@@ -54,7 +53,7 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 
 	yield* dbFx((db) =>
 		db
-			.updateTable(table.itemInstance)
+			.updateTable("itemInstance")
 			.set({
 				id: craftInputStorageKey({
 					ownerItemInstanceId,

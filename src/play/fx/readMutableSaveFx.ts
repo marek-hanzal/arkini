@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { readBoardItemRowsFx } from "~/item-instance/fx/readBoardItemRowsFx";
 import { readInventoryStackRowsFx } from "~/item-instance/fx/readInventoryStackRowsFx";
 import { defaultSaveGameId } from "~/play/logic/save";
@@ -14,7 +13,7 @@ export const readMutableSaveFx = Effect.fn("readMutableSaveFx")(function* () {
 	const [saveRow, boardRows, inventoryRows, upgradeRows] = yield* Effect.all([
 		dbFx((db) =>
 			db
-				.selectFrom(table.saveGame)
+				.selectFrom("saveGame")
 				.selectAll()
 				.where("id", "=", defaultSaveGameId)
 				.executeTakeFirstOrThrow(),
@@ -23,7 +22,7 @@ export const readMutableSaveFx = Effect.fn("readMutableSaveFx")(function* () {
 		readInventoryStackRowsFx(),
 		dbFx((db) =>
 			db
-				.selectFrom(table.playerUpgrade)
+				.selectFrom("playerUpgrade")
 				.selectAll()
 				.where("saveGameId", "=", defaultSaveGameId)
 				.execute(),

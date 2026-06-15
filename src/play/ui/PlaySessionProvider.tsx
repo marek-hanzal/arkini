@@ -18,15 +18,6 @@ export namespace PlaySessionProvider {
 export const PlaySessionProvider: FC<PlaySessionProvider.Props> = ({ children }) => {
 	usePlaySave();
 
-    /**
-     * GPT:FIX
-     *
-     * I don't see any reason we should have all those providers: we can use React Query to wrap those things, because
-     * we're not getting over the wire, so you can return whatever you want, so you can also subscribe whatever you want
-     * instead of this cascade of falling shits.
-     *
-     * Whole Context piece of crap shall be removed.
-     */
 	const sheets = usePlaySheets();
 	const visualMotions = useVisualItemMotions();
 	const schedule = usePlayEventQueue();

@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { IdServiceFx } from "~/id/context/IdServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
@@ -19,8 +18,8 @@ export namespace buyFx {
 }
 
 export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
-	const input = yield* Effect.try({
-		try: () => BuyUpgradeInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => BuyUpgradeInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 
@@ -60,13 +59,13 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 			for (const step of spendPlan) {
 				if (step.type === "delete") {
 					yield* dbFx((db) =>
-						db.deleteFrom(table.itemInstance).where("id", "=", step.stackId).execute(),
+						db.deleteFrom("itemInstance").where("id", "=", step.stackId).execute(),
 					);
 					continue;
 				}
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.itemInstance)
+						.updateTable("itemInstance")
 						.set({
 							quantity: step.quantity,
 							updatedAt: timestamp,
@@ -87,7 +86,7 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 			if (existing) {
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.playerUpgrade)
+						.updateTable("playerUpgrade")
 						.set({
 							targetLevel,
 							startedAt,
@@ -100,7 +99,7 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 			} else {
 				yield* dbFx((db) =>
 					db
-						.insertInto(table.playerUpgrade)
+						.insertInto("playerUpgrade")
 						.values({
 							id: id.prefixed("upgrade"),
 							saveGameId: mutable.save.id,

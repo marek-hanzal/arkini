@@ -155,7 +155,7 @@ button {
 
 .ak-bottom-nav-inner {
 	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 0.4rem;
 	width: 100%;
 	max-width: min(100%, 540px);

@@ -12,7 +12,6 @@ import { BoardViewSchema, type BoardView } from "~/board/view/BoardViewSchema";
 import { readCraftInputRowsFx } from "~/craft/fx/readCraftInputRowsFx";
 import { groupCraftInputRows } from "~/craft/logic/groupCraftInputRows";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { readBoardItemRowsFx } from "~/item-instance/fx/readBoardItemRowsFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
@@ -28,7 +27,7 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const [upgradeRows, activationInputRows, craftInputRows] = yield* Effect.all([
 		dbFx((db) =>
 			db
-				.selectFrom(table.playerUpgrade)
+				.selectFrom("playerUpgrade")
 				.selectAll()
 				.where("saveGameId", "=", defaultSaveGameId)
 				.execute(),

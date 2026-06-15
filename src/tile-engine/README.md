@@ -9,7 +9,7 @@ It owns the UI problems that used to be smeared across board, inventory, drag wr
 - single/double/long activation timing
 - mobile long-press native menu suppression
 - stable tile actor rendering
-- transient motion staging through an XState registry
+- transient motion staging through a focused TileEngine state machine
 - spawn staging for real final actors
 
 It still does **not** own durable game data. Parents provide:

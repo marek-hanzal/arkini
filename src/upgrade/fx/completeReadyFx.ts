@@ -1,58 +1,37 @@
 import { Effect } from "effect";
+import { sql } from "kysely";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { defaultSaveGameId } from "~/play/logic/save";
 
+/**
+ * Promotes all finished upgrade jobs into owned upgrade levels before any read
+ * projection uses them.
+ *
+ * Upgrade completion is based on real-world time. No timer has to be running in
+ * the browser; every relevant read first folds ready jobs into the durable save.
+ * A single guarded UPDATE keeps this idempotent and avoids the old read rows +
+ * per-row update loop, because SQLite can do its own job without us spoon-feeding
+ * it one sad row at a time.
+ */
 export const completeReadyFx = Effect.fn("completeReadyFx")(function* () {
 	const date = yield* DateServiceFx;
 	const timestamp = date.timestamp();
 
-	const readyRows = yield* dbFx((db) =>
+	yield* dbFx((db) =>
 		db
-        /**
-         * GPT:FIX
-         * Kysely already holds types for tables, there is no need to have separate const holding table names.
-         *
-         * If those are not present, the code at core is broken.
-         */
-			.selectFrom(table.playerUpgrade)
-			.select([
-				"id",
-				"targetLevel",
-			])
+			.updateTable("playerUpgrade")
+			.set({
+				level: sql<number>`targetLevel`,
+				targetLevel: null,
+				startedAt: null,
+				readyAt: null,
+				updatedAt: timestamp,
+			})
 			.where("saveGameId", "=", defaultSaveGameId)
 			.where("targetLevel", "is not", null)
 			.where("readyAt", "is not", null)
 			.where("readyAt", "<=", timestamp)
 			.execute(),
 	);
-
-    /**
-     * GPT:FIX
-     *
-     * Write documentation, why this is here and what it should do, same for the method itself.
-     *
-     * This looks quite magical; also there is a question if it's not possible to do this by the query instead of running 
-     * individual queries in the loop.
-     *
-     * Eventually, whole thing should be wrapped in the transaction instead of pure DB bombardment.
-     */
-	for (const row of readyRows) {
-		const targetLevel = row.targetLevel;
-		if (targetLevel === null) continue;
-		yield* dbFx((db) =>
-			db
-				.updateTable(table.playerUpgrade)
-				.set({
-					level: targetLevel,
-					targetLevel: null,
-					startedAt: null,
-					readyAt: null,
-					updatedAt: timestamp,
-				})
-				.where("id", "=", row.id)
-				.execute(),
-		);
-	}
 });

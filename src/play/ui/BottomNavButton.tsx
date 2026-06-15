@@ -18,18 +18,10 @@ export namespace BottomNavButton {
 
 export const BottomNavButton: FC<BottomNavButton.Props> = memo(
 	({ active, label, icon, tone, dropTargetActive = false, activeDropTargetNodeId, onOpen }) => {
-		const handleClick = useCallback(
-			() => onOpen(tone),
-			[
-                /**
-                 * GPT:FIX
-                 *
-                 * We've onOpen here - are you sure you're using stable references, so this useCallback makes sense?
-                 */
-				onOpen,
-				tone,
-			],
-		);
+		const handleClick = useCallback(() => onOpen(tone), [
+			onOpen,
+			tone,
+		]);
 		const isInventoryTarget = tone === "inventory";
 		const dropId = isInventoryTarget ? inventoryNavDropTargetNodeId : `bottom-nav:${tone}`;
 		const dropData = useMemo(

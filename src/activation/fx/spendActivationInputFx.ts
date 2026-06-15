@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { dbFx } from "~/database/fx/dbFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
 import { GameActionError } from "~/command/GameActionError";
@@ -26,7 +25,7 @@ export const spendActivationInputFx = Effect.fn("spendActivationInputFx")(functi
 
 	const rows = yield* dbFx((db) =>
 		db
-			.selectFrom(table.itemInstance)
+			.selectFrom("itemInstance")
 			.selectAll()
 			.where("locationKind", "=", "activation-input")
 			.where("ownerItemInstanceId", "=", ownerItemInstanceId)
@@ -47,12 +46,12 @@ export const spendActivationInputFx = Effect.fn("spendActivationInputFx")(functi
 
 		if (nextQuantity <= 0) {
 			yield* dbFx((db) =>
-				db.deleteFrom(table.itemInstance).where("id", "=", row.id).execute(),
+				db.deleteFrom("itemInstance").where("id", "=", row.id).execute(),
 			);
 		} else {
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						quantity: nextQuantity,
 						updatedAt,

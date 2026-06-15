@@ -11,7 +11,6 @@ import { ClaimCraftInputSchema } from "~/craft/type/ClaimCraftInputSchema";
 import type { CraftResultSchema } from "~/craft/type/CraftResultSchema";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
@@ -27,8 +26,8 @@ export namespace claimCraftFx {
 }
 
 export const claimCraftFx = Effect.fn("claimCraftFx")(function* (props: claimCraftFx.Props) {
-	const input = yield* Effect.try({
-		try: () => ClaimCraftInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => ClaimCraftInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 
@@ -82,7 +81,7 @@ export const claimCraftFx = Effect.fn("claimCraftFx")(function* (props: claimCra
 			});
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						itemDefinitionId: recipe.resultItemId,
 						stateJson: json(createInitialBoardState(recipe.resultItemId, gameConfig)),

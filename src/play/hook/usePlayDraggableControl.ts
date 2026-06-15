@@ -1,28 +1,17 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { stageCommandVisualEvents } from "~/animation/stageCommandVisualEvents";
-import type { Command } from "~/command/Command";
-import type { DropCommitContext } from "~/drag/DropPlan";
-import { commandInvalidation } from "~/command/commandInvalidation";
-import type { CommandResult } from "~/command/CommandResult";
-import { useRunCommandMutation } from "~/command/useRunCommandMutation";
 import { useDraggableControl } from "~/drag/hook/useDraggableControl";
-import type { GameDragView } from "~/drag/view/GameDragViewSchema";
 import { flashDrop } from "~/interaction/flashDrop";
-import type { AnyDropContext, Feedback } from "~/interaction/types";
 import { resolveDrop } from "~/interaction/resolveDrop";
-import type { BoardView } from "~/board/view/BoardViewSchema";
-import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
+import type { AnyDropContext, Feedback } from "~/interaction/types";
 import type { ItemId } from "~/manifest/manifestId";
-import { playQueryKeys } from "~/play/hook/playQueryKeys";
-import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
+import { useGameDragViewReader } from "~/play/hook/useGameDragViewReader";
+import { usePlayCommandRunner } from "~/play/hook/usePlayCommandRunner";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import type { DragSource, DropTarget, VisualMeta, VisualTransitionKind } from "~/play/types";
-import { tileEngineMotionDurationMs } from "~/tile-engine/hook/useTileEngineMotionAnimation";
+import type { ActiveSheet } from "~/play/logic/playSheetTypes";
+import type { DragSource, DropTarget, RectLike, VisualMeta, VisualTransitionKind } from "~/play/types";
 import { waitForMs } from "~/shared/util/waitForMs";
-import { waitForPaint } from "~/shared/util/waitForPaint";
+import { tileEngineMotionDurationMs } from "~/tile-engine/hook/useTileEngineMotionAnimation";
 
 export type { Feedback } from "~/interaction/types";
 
@@ -35,77 +24,19 @@ export namespace usePlayDraggableControl {
 	}
 }
 
-/**
- * GPT:FIX
- *
- * I see this as a primary drag interaction implementation also causing all the pain we currently have in the game.
- *
- * Split it into individual pieces or destroy this stuff entirely as it's now central place at the top of our app maybe
- * cause a lot of re-render and other problems.
- *
- * At lease you shall document everything in this method, so one can understand this shitstorm.
- *
- * Dragging should be responsibility of TileEngine, so I don't understand, why it's here. "Public" space should not have such hooks.
- */
 export function usePlayDraggableControl({
 	activeSheet,
 	feedback,
 	schedule,
 	visualMotions,
 }: usePlayDraggableControl.Props) {
-	const queryClient = useQueryClient();
-	const invalidatePlayData = usePlayDataInvalidation();
 	const items = usePlayItems();
-	const command = useRunCommandMutation({
-		invalidateOnSuccess: false,
+	const readGame = useGameDragViewReader();
+	const run = usePlayCommandRunner({
+		activeSheet,
+		visualMotions,
 	});
-	const mutateCommand = command.mutateAsync;
-	const run = useCallback(
-		async <TCommand extends Command>(
-			command: TCommand,
-			context?: DropCommitContext,
-		): Promise<CommandResult<TCommand>> => {
-			const result = await mutateCommand(command);
 
-			await waitForPaint();
-			stageCommandVisualEvents({
-				events: result.visualEvents,
-				activeSheet,
-				dragSourceRect: context?.dragRect ?? null,
-				dragSourceActorKey: context?.dragActorKey,
-				visualMotions,
-			});
-
-			void invalidatePlayData(
-				commandInvalidation({
-					command,
-				}),
-			).catch((error: unknown) => {
-				console.error("play data invalidation failed after drag command", error);
-			});
-
-			return result as CommandResult<TCommand>;
-		},
-		[
-			activeSheet,
-			invalidatePlayData,
-			mutateCommand,
-			visualMotions,
-		],
-	);
-	const readGame = useCallback((): GameDragView | undefined => {
-		const board = queryClient.getQueryData<BoardView>(playQueryKeys.board);
-		const inventory = queryClient.getQueryData<InventoryView>(playQueryKeys.inventory);
-
-		if (!board || !inventory) return undefined;
-
-		return {
-			boardItemsById: board.byId,
-			inventoryBySlotIndex: inventory.bySlotIndex,
-		};
-	}, [
-		queryClient,
-	]);
 	const resolvePlayDrop = useCallback(
 		(context: AnyDropContext) =>
 			resolveDrop({
@@ -123,8 +54,8 @@ export function usePlayDraggableControl({
 	const animate = useCallback(
 		async (animation: {
 			actorKey?: string;
-			from: import("~/play/types").RectLike;
-			to: import("~/play/types").RectLike;
+			from: RectLike;
+			to: RectLike;
 			kind?: VisualTransitionKind;
 		}) => {
 			if (!animation.actorKey) return;

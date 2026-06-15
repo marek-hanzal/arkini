@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { assertInsideInventory } from "~/board/logic/assertInsideInventory";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
-import { table } from "~/database/local/tables";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { SwapInventorySlotsInputSchema } from "~/play/schema/SwapInventorySlotsInputSchema";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
@@ -21,8 +20,8 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 	const date = yield* DateServiceFx;
 	const timestamp = date.timestamp();
 
-	const input = yield* Effect.try({
-		try: () => SwapInventorySlotsInputSchema.parse(props),
+	const input = yield* Effect.tryPromise({
+		try: () => SwapInventorySlotsInputSchema.parseAsync(props),
 		catch: toGameActionError,
 	});
 	if (input.sourceSlotIndex === input.targetSlotIndex) {
@@ -46,7 +45,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			if (!target) {
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.itemInstance)
+						.updateTable("itemInstance")
 						.set({
 							inventorySlotIndex: input.targetSlotIndex,
 							updatedAt: timestamp,
@@ -75,7 +74,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						inventorySlotIndex: -1,
 						updatedAt: timestamp,
@@ -85,7 +84,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			);
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						inventorySlotIndex: input.sourceSlotIndex,
 						updatedAt: timestamp,
@@ -95,7 +94,7 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			);
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.itemInstance)
+					.updateTable("itemInstance")
 					.set({
 						inventorySlotIndex: input.targetSlotIndex,
 						updatedAt: timestamp,

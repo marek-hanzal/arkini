@@ -9,7 +9,6 @@ export const BoardItemStateSchema = z.object({
 		.optional(),
 	craft: z
 		.object({
-			delivered: z.record(z.string(), z.number()).optional(),
 			startedAt: z.string().optional(),
 			readyAt: z.string().optional(),
 			remainingMs: z.number().optional(),

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ActivationInputSchema } from "./ActivationInputSchema";
+import { ActivationRequirementSchema } from "./ActivationRequirementSchema";
 import { ActivationOutputSchema } from "./ActivationOutputSchema";
 import { GameAssetIdSchema } from "./GameAssetIdSchema";
 import { GameConfig } from "./GameConfig";
@@ -121,6 +122,7 @@ export const GameConfigSchema = z.object({
 					cooldownMs: PositiveIntegerSchema,
 					outputTableId: GameLootTableIdSchema,
 					inputs: ActivationInputSchema,
+					requirements: ActivationRequirementSchema,
 				})
 				.optional(),
 			stash: z
@@ -137,6 +139,7 @@ export const GameConfigSchema = z.object({
 					]),
 					outputTableId: GameLootTableIdSchema,
 					inputs: ActivationInputSchema,
+					requirements: ActivationRequirementSchema,
 				})
 				.optional(),
 			craft: z

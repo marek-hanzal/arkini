@@ -7,11 +7,12 @@ export namespace clickStash {
 		outputTableId: LootTableId;
 		onDepleted?: StashDefinition["onDepleted"];
 		inputs?: readonly NonNullable<StashDefinition["inputs"]>[number][];
+		requirements?: readonly NonNullable<StashDefinition["requirements"]>[number][];
 	}
 }
 
 export const clickStash = (props: clickStash.Props): StashDefinition => {
-	const { charges, outputTableId, onDepleted = "remove", inputs = [] } = props;
+	const { charges, outputTableId, onDepleted = "remove", inputs = [], requirements = [] } = props;
 
 	return {
 		type: "stash",
@@ -21,5 +22,6 @@ export const clickStash = (props: clickStash.Props): StashDefinition => {
 		onDepleted,
 		outputTableId,
 		inputs,
+		requirements,
 	};
 };

@@ -59,5 +59,11 @@ export const readActivationView = ({
 			capacity: input.capacity,
 			stored: storedInputs.get(input.itemId) ?? 0,
 		})),
+		requirements: (activation.requirements ?? []).map((requirement) => ({
+			itemId: requirement.itemId,
+			quantity: requirement.quantity,
+			capacity: requirement.capacity,
+			stored: storedInputs.get(requirement.itemId) ?? 0,
+		})),
 	};
 };

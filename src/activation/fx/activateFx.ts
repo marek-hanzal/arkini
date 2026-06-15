@@ -119,6 +119,18 @@ export const activateFx = Effect.fn("activateFx")(function* (props: activateFx.P
 			const storedInputs =
 				groupActivationInputRows(inputRows).get(row.id) ?? new Map<ItemId, number>();
 
+			for (const requirement of activation.requirements ?? []) {
+				const stored = storedInputs.get(requirement.itemId) ?? 0;
+				if (stored < requirement.quantity) {
+					const name = gameConfig.getItem(requirement.itemId)?.name ?? requirement.itemId;
+					return yield* Effect.fail(
+						new GameActionError(
+							`${activationLabel(activation.type)} requires ${name}.`,
+						),
+					);
+				}
+			}
+
 			for (const required of activation.inputs ?? []) {
 				const needed = required.quantity * steps;
 				const stored = storedInputs.get(required.itemId) ?? 0;

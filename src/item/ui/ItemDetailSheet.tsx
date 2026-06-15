@@ -42,7 +42,8 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({ boardItemId, onClos
 						nowMs={detail.nowMs}
 					/>
 				) : null}
-				{detail.boardItem.activation?.inputs.length ? (
+				{detail.boardItem.activation?.inputs.length ||
+				detail.boardItem.activation?.requirements.length ? (
 					<ItemActivationInputsCard
 						activation={detail.boardItem.activation}
 						boardItem={detail.boardItem}

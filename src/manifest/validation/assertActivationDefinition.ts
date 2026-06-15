@@ -31,4 +31,15 @@ export const assertActivationDefinition = (
 		);
 		assert(input.capacity >= input.quantity, `${itemId} input capacity must cover quantity`);
 	}
+
+	for (const requirement of activation.requirements ?? []) {
+		assert(
+			itemIds.has(requirement.itemId),
+			`${itemId} requirement references missing item ${requirement.itemId}`,
+		);
+		assert(
+			requirement.capacity >= requirement.quantity,
+			`${itemId} requirement capacity must cover quantity`,
+		);
+	}
 };

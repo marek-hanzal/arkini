@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { readCraftInputRowsFx } from "~/craft/fx/readCraftInputRowsFx";
 import { pauseCraftTimer } from "~/board/logic/pauseCraftTimer";
 import { GameActionError } from "~/command/GameActionError";
 import { dbFx } from "~/database/fx/dbFx";
@@ -42,11 +43,18 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 				return yield* Effect.fail(new GameActionError("Board item does not exist."));
 			}
 
-			const inputRows = yield* readActivationInputRowsFx({
-				ownerItemInstanceIds: [
-					boardItem.id,
-				],
-			});
+			const [activationInputRows, craftInputRows] = yield* Effect.all([
+				readActivationInputRowsFx({
+					ownerItemInstanceIds: [
+						boardItem.id,
+					],
+				}),
+				readCraftInputRowsFx({
+					ownerItemInstanceIds: [
+						boardItem.id,
+					],
+				}),
+			]);
 			const pausedState = pauseCraftTimer(
 				parseJson<BoardItemState>(boardItem.stateJson || "{}"),
 				date,
@@ -59,8 +67,8 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 				);
 			}
 
-			const hasActivationInputs = inputRows.length > 0;
-			const canStack = !hasActivationInputs && isEmptyInventoryStateJson(stateJson);
+			const hasNestedInputs = activationInputRows.length > 0 || craftInputRows.length > 0;
+			const canStack = !hasNestedInputs && isEmptyInventoryStateJson(stateJson);
 			if (canStack) {
 				const stack = inventoryRows
 					.filter(
@@ -182,7 +190,7 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 						inventorySlotIndex: targetSlotIndex,
 						ownerItemInstanceId: null,
 						inputItemDefinitionId: null,
-						stateJson: hasActivationInputs
+						stateJson: hasNestedInputs
 							? stateJson
 							: stateJson || emptyInventoryStateJson,
 						updatedAt,

@@ -51,7 +51,12 @@ export const resolveDropIntent = ({
 	const canSupplyProducer = Boolean(
 		targetItem.activation?.inputs.some(
 			(input) => input.itemId === sourceItemId && input.stored < input.capacity,
-		),
+		) ||
+			targetItem.activation?.requirements.some(
+				(requirement) =>
+					requirement.itemId === sourceItemId &&
+					requirement.stored < requirement.capacity,
+			),
 	);
 
 	if (isDirectedMerge && !isForwardDirectedMerge) {

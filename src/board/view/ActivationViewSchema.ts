@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ActivationInputViewSchema } from "./ActivationInputViewSchema";
+import { ActivationRequirementViewSchema } from "./ActivationRequirementViewSchema";
 
 export const ActivationViewSchema = z.object({
 	kind: z.enum([
@@ -12,6 +13,7 @@ export const ActivationViewSchema = z.object({
 	cooldownUntilMs: z.number().optional(),
 	remainingCharges: z.number().optional(),
 	inputs: z.array(ActivationInputViewSchema),
+	requirements: z.array(ActivationRequirementViewSchema),
 });
 
 type ActivationViewSchema = typeof ActivationViewSchema;

@@ -4,6 +4,7 @@ export const ItemLocationKindSchema = z.enum([
 	"board",
 	"inventory",
 	"activation-input",
+	"craft-input",
 ]);
 
 type ItemLocationKindSchema = typeof ItemLocationKindSchema;

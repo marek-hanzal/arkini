@@ -6,11 +6,12 @@ export namespace clickProducer {
 		cooldownMs: number;
 		outputTableId: LootTableId;
 		inputs?: readonly NonNullable<ProducerDefinition["inputs"]>[number][];
+		requirements?: readonly NonNullable<ProducerDefinition["requirements"]>[number][];
 	}
 }
 
 export const clickProducer = (props: clickProducer.Props): ProducerDefinition => {
-	const { cooldownMs, outputTableId, inputs = [] } = props;
+	const { cooldownMs, outputTableId, inputs = [], requirements = [] } = props;
 
 	return {
 		type: "producer",
@@ -19,5 +20,6 @@ export const clickProducer = (props: clickProducer.Props): ProducerDefinition =>
 		outputTableId,
 		cooldownMs,
 		inputs,
+		requirements,
 	};
 };

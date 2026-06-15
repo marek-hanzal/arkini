@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { stashFx } from "~/inventory/fx/stashFx";
+import { stashBoardItemFx } from "~/v0/inventory/fx/stashBoardItemFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { runGameFx } from "~/v0/fx/runGameFx";
@@ -10,10 +10,10 @@ import { refreshBoardAndInventoryCaches } from "~/v0/play/cache/refreshBoardAndI
 export const useStashBoardItemMutation = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<ActionResult.Type, unknown, stashFx.Props, CacheSnapshot.Type>({
+	return useMutation<ActionResult.Type, unknown, stashBoardItemFx.Props, CacheSnapshot.Type>({
 		mutationFn(input) {
 			return runGameFx({
-				effect: stashFx(input),
+				effect: stashBoardItemFx(input),
 			});
 		},
 		onMutate(input) {

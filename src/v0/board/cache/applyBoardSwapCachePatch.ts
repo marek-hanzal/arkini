@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { swapFx } from "~/board/fx/swapFx";
+import type { swapBoardItemsFx } from "~/v0/board/fx/swapBoardItemsFx";
 import { rebuildBoardView } from "~/board/view/rebuildBoardView";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
@@ -7,7 +7,7 @@ import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
 export namespace applyBoardSwapCachePatch {
 	export interface Props {
 		queryClient: QueryClient;
-		input: swapFx.Props;
+		input: swapBoardItemsFx.Props;
 	}
 }
 

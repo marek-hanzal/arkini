@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { stashFx } from "~/inventory/fx/stashFx";
+import type { stashBoardItemFx } from "~/v0/inventory/fx/stashBoardItemFx";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import { rebuildBoardView } from "~/board/view/rebuildBoardView";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
@@ -11,7 +11,7 @@ import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryView
 export namespace applyInventoryStashCachePatch {
 	export interface Props {
 		queryClient: QueryClient;
-		input: stashFx.Props;
+		input: stashBoardItemFx.Props;
 	}
 }
 

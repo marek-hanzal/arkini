@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { swapFx } from "~/inventory/fx/swapFx";
+import type { swapInventorySlotsFx } from "~/v0/inventory/fx/swapInventorySlotsFx";
 import { rebuildInventoryView } from "~/inventory/view/rebuildInventoryView";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryViewCache";
@@ -7,7 +7,7 @@ import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryView
 export namespace applyInventorySwapCachePatch {
 	export interface Props {
 		queryClient: QueryClient;
-		input: swapFx.Props;
+		input: swapInventorySlotsFx.Props;
 	}
 }
 

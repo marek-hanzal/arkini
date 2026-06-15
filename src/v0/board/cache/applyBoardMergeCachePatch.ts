@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { mergeFx } from "~/board/fx/mergeFx";
+import type { mergeBoardItemsFx } from "~/v0/board/fx/mergeBoardItemsFx";
 import { rebuildBoardView } from "~/board/view/rebuildBoardView";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
@@ -7,7 +7,7 @@ import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
 export namespace applyBoardMergeCachePatch {
 	export interface Props {
 		queryClient: QueryClient;
-		input: mergeFx.Props;
+		input: mergeBoardItemsFx.Props;
 	}
 }
 

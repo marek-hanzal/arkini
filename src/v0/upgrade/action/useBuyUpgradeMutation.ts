@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { buyFx } from "~/upgrade/fx/buyFx";
+import { buyUpgradeFx } from "~/v0/upgrade/fx/buyUpgradeFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { refreshUpgradePurchaseCaches } from "~/v0/play/cache/refreshUpgradePurchaseCaches";
@@ -7,10 +7,10 @@ import { refreshUpgradePurchaseCaches } from "~/v0/play/cache/refreshUpgradePurc
 export const useBuyUpgradeMutation = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<ActionResult.Type, unknown, buyFx.Props>({
+	return useMutation<ActionResult.Type, unknown, buyUpgradeFx.Props>({
 		mutationFn(input) {
 			return runGameFx({
-				effect: buyFx(input),
+				effect: buyUpgradeFx(input),
 			});
 		},
 		async onSuccess() {

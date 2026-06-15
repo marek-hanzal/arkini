@@ -1,6 +1,6 @@
 import type { AssetDefinition } from "../asset";
-import { asset } from "../utils/asset";
-import { blueprintAsset } from "../utils/blueprintAsset";
+import { asset } from "../dsl/asset";
+import { blueprintAsset } from "../dsl/blueprintAsset";
 
 export const GameAssetDefinitions = [
 	asset({

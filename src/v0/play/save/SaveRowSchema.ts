@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { gameConfig } from "./gameConfig";
+import { gameConfig } from "~/v0/game/gameConfig";
 
 export const SaveRowSchema = z.object({
 	id: z.string().min(1),

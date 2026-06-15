@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BoardItemIdSchema } from "./BoardItemIdSchema";
+import { BoardItemIdSchema } from "~/v0/board/schema/BoardItemIdSchema";
 import { InventorySlotIndexSchema } from "./InventorySlotIndexSchema";
 
 export const StashBoardItemInputSchema = z.object({

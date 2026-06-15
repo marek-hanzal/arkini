@@ -1,8 +1,9 @@
 import { match } from "ts-pattern";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
-import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
-import type { Feedback } from "~/v0/play/Feedback";
+import type { DragSource } from "~/v0/play/drag/DragSource";
+import type { DropTarget } from "~/v0/play/drag/DropTarget";
+import type { Feedback } from "~/v0/play/feedback/Feedback";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { rejectDrop } from "~/v0/play/drop/rejectDrop";
@@ -17,7 +18,7 @@ export namespace resolveDrop {
 		context: TileEngine.DropContext<unknown, unknown, DragSource, DropTarget>;
 		board: BoardView;
 		inventory: InventoryView;
-		feedback: Feedback;
+		feedback: Feedback.Type;
 		actions: DropActions;
 	}
 }
@@ -26,7 +27,7 @@ const withSafeCommit = ({
 	feedback,
 	outcome,
 }: {
-	feedback: Feedback;
+	feedback: Feedback.Type;
 	outcome: TileEngine.DropOutcome;
 }): TileEngine.DropOutcome => {
 	if (typeof outcome === "string" || outcome.type !== "accept" || !outcome.commit) {

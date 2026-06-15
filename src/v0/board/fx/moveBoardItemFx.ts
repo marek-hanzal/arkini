@@ -3,7 +3,7 @@ import { assertInsideBoard } from "~/v0/board/logic/assertInsideBoard";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { MoveBoardItemInputSchema } from "~/v0/play/schema/MoveBoardItemInputSchema";
+import { MoveBoardItemInputSchema } from "~/v0/board/schema/MoveBoardItemInputSchema";
 import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";

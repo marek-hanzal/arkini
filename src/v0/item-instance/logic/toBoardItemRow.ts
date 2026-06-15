@@ -1,5 +1,5 @@
 import type { ItemInstanceRowSchema } from "~/v0/item-instance/type/ItemInstanceRowSchema";
-import { BoardItemRowSchema } from "~/v0/play/schema/BoardItemRowSchema";
+import { BoardItemRowSchema } from "~/v0/board/schema/BoardItemRowSchema";
 
 export const toBoardItemRow = (row: ItemInstanceRowSchema.Type) => {
 	if (row.locationKind !== "board" || row.boardX === null || row.boardY === null) {

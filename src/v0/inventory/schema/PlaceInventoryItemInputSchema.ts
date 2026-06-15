@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BoardCellSchema } from "./BoardCellSchema";
+import { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
 import { InventorySlotIndexSchema } from "./InventorySlotIndexSchema";
 
 export const PlaceInventoryItemInputSchema = z.object({

@@ -1,4 +1,4 @@
-export type Sheet = "inventory" | "upgrades" | "database" | "item";
+import type { Sheet } from "~/v0/play/sheet/Sheet";
 
 export interface ActiveSheetState {
 	type: Sheet;

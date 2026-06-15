@@ -1,5 +1,5 @@
 import type { SaveShape } from "~/v0/inventory/logic/planning/types";
-import { InventorySlotIndexSchema } from "~/v0/play/schema/InventorySlotIndexSchema";
+import { InventorySlotIndexSchema } from "~/v0/inventory/schema/InventorySlotIndexSchema";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 
 export const assertInsideInventory = (save: SaveShape, slotIndex: number) => {

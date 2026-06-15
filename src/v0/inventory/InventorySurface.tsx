@@ -12,7 +12,8 @@ import { usePlaceInventoryItemMutation } from "~/v0/inventory/action/usePlaceInv
 import { useStashBoardItemMutation } from "~/v0/inventory/action/useStashBoardItemMutation";
 import { useSwapBoardItemsMutation } from "~/v0/board/action/useSwapBoardItemsMutation";
 import { useSwapInventorySlotsMutation } from "~/v0/inventory/action/useSwapInventorySlotsMutation";
-import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
+import type { DragSource } from "~/v0/play/drag/DragSource";
+import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { InventoryCell } from "~/v0/inventory/InventoryCell";
 import type { InventorySurface as InventorySurfaceType } from "~/v0/inventory/InventorySurface.types";
 import { renderInventoryTile } from "~/v0/inventory/renderInventoryTile";

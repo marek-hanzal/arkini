@@ -1,9 +1,10 @@
 import { match } from "ts-pattern";
-import { cellKey } from "~/v0/board/util/cell";
+import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
-import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
-import type { Feedback } from "~/v0/play/Feedback";
+import type { DragSource } from "~/v0/play/drag/DragSource";
+import type { DropTarget } from "~/v0/play/drag/DropTarget";
+import type { Feedback } from "~/v0/play/feedback/Feedback";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import { acceptDrop } from "~/v0/play/drop/acceptDrop";
 import type { DropActions } from "~/v0/play/drop/DropActions";
@@ -25,7 +26,7 @@ export namespace resolveBoardCellDrop {
 			}
 		>;
 		board: BoardView;
-		feedback: Feedback;
+		feedback: Feedback.Type;
 		actions: DropActions;
 	}
 }

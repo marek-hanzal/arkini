@@ -5,7 +5,7 @@ import { findFirstEmptyCell } from "~/v0/board/logic/findFirstEmptyCell";
 import { readActivationView } from "~/v0/board/logic/readActivationView";
 import { readBoardState } from "~/v0/board/logic/readBoardState";
 import { readCraftView } from "~/v0/board/logic/readCraftView";
-import { cellKey } from "~/v0/board/util/cell";
+import { cellKey } from "~/v0/board/cellKey";
 import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { BoardViewSchema, type BoardView } from "~/v0/board/view/BoardViewSchema";

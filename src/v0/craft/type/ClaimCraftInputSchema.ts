@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BoardItemIdSchema } from "~/v0/play/schema/BoardItemIdSchema";
+import { BoardItemIdSchema } from "~/v0/board/schema/BoardItemIdSchema";
 
 export const ClaimCraftInputSchema = z.object({
 	boardItemId: BoardItemIdSchema,

@@ -4,10 +4,11 @@ import { BoardSurface } from "~/v0/board/BoardSurface";
 import { DatabaseSheet } from "~/v0/database/DatabaseSheet";
 import { InventorySurface } from "~/v0/inventory/InventorySurface";
 import { ItemSheet } from "~/v0/item/ItemSheet";
-import type { Feedback } from "~/v0/play/Feedback";
+import type { Feedback } from "~/v0/play/feedback/Feedback";
 import { BottomNav } from "~/v0/play/BottomNav";
-import { BottomSheet } from "~/v0/play/BottomSheet";
-import type { ActiveSheetState, Sheet } from "~/v0/play/Sheet";
+import { BottomSheet } from "~/v0/play/sheet/BottomSheet";
+import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
+import type { Sheet } from "~/v0/play/sheet/Sheet";
 import { useFeedbackFlags } from "~/v0/play/feedback/useFeedbackFlags";
 import { UpgradesSheet } from "~/v0/upgrade/UpgradesSheet";
 
@@ -40,7 +41,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 			}),
 		[],
 	);
-	const feedback = useMemo<Feedback>(
+	const feedback = useMemo<Feedback.Type>(
 		() => ({
 			pulseMergeCell(key) {
 				if (key) feedbackFlags.pulse(`board:merge:${key}`);

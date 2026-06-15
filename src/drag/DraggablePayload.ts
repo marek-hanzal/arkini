@@ -7,6 +7,8 @@ export interface DraggablePayload<
 	sourceId: string;
 	/** Node measured when a rejected drop flies back. */
 	sourceNodeId: string;
+	/** Generic visual actor key used by app-provided hand-off/return animations. */
+	actorKey?: string;
 	/** Asset/item key used by the app-provided animation renderer. */
 	itemId: ItemId;
 	/** App-owned source data. The control never inspects it. */

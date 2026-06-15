@@ -20,10 +20,13 @@ export const resolveBoardInventoryDrop = ({
 		hide: [
 			source.sourceId,
 		],
-		commit: () =>
-			runtime.run({
-				type: "inventory.stash",
-				boardItemId: source.source.boardItemId,
-			}),
+		commit: (drop) =>
+			runtime.run(
+				{
+					type: "inventory.stash",
+					boardItemId: source.source.boardItemId,
+				},
+				drop,
+			),
 		feedback: () => pulseBottomNav("inventory"),
 	});

@@ -54,6 +54,7 @@ export const animateReturn = async <
 	clearActiveDrag();
 	await animate({
 		itemId: source.itemId,
+		actorKey: source.actorKey,
 		from,
 		to,
 		overlay: source.overlay,

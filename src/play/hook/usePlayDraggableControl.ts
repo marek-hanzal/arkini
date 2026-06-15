@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { stageCommandVisualEvents } from "~/animation/stageCommandVisualEvents";
 import type { Command } from "~/command/Command";
+import type { DropCommitContext } from "~/drag/DropPlan";
 import { commandInvalidation } from "~/command/commandInvalidation";
 import type { CommandResult } from "~/command/CommandResult";
 import { useRunCommandMutation } from "~/command/useRunCommandMutation";
@@ -28,7 +29,7 @@ export namespace usePlayDraggableControl {
 	export interface Props {
 		activeSheet?: ActiveSheet;
 		feedback: Feedback;
-		schedule(label: string, operation: () => Promise<void>): Promise<void>;
+		schedule<T>(label: string, operation: () => Promise<T>): Promise<T>;
 		visualMotions: Pick<useVisualItemMotions.State, "stage">;
 	}
 }
@@ -47,12 +48,17 @@ export function usePlayDraggableControl({
 	});
 	const mutateCommand = command.mutateAsync;
 	const run = useCallback(
-		async <TCommand extends Command>(command: TCommand): Promise<CommandResult<TCommand>> => {
+		async <TCommand extends Command>(
+			command: TCommand,
+			context?: DropCommitContext,
+		): Promise<CommandResult<TCommand>> => {
 			const result = await mutateCommand(command);
 
 			stageCommandVisualEvents({
 				events: result.visualEvents,
 				activeSheet,
+				dragSourceRect: context?.dragRect ?? null,
+				dragSourceActorKey: context?.dragActorKey,
 				visualMotions,
 			});
 
@@ -136,7 +142,7 @@ export function usePlayDraggableControl({
 		],
 	);
 	const scheduleDrop = useCallback(
-		(operation: () => Promise<void>) => schedule("drag/drop", operation),
+		<T,>(operation: () => Promise<T>) => schedule("drag/drop", operation),
 		[
 			schedule,
 		],

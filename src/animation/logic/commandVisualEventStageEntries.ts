@@ -15,6 +15,8 @@ export namespace commandVisualEventStageEntries {
 	export interface Props {
 		events: readonly CommandVisualEventSchema.Type[];
 		activeSheet?: ActiveSheet;
+		dragSourceRect?: RectLike | null;
+		dragSourceActorKey?: string;
 	}
 }
 
@@ -71,12 +73,25 @@ const moveEntry = (props: {
 export const commandVisualEventStageEntries = ({
 	events,
 	activeSheet,
+	dragSourceRect,
+	dragSourceActorKey,
 }: commandVisualEventStageEntries.Props): useVisualItemMotions.StageEntry[] => {
 	const entries: useVisualItemMotions.StageEntry[] = [];
+	const dragRectForActor = (actorKey?: string) =>
+		actorKey && actorKey === dragSourceActorKey ? (dragSourceRect ?? null) : null;
 
 	for (const event of events) {
 		if (event.type === "item.moved") {
-			const from = locationVisualRect({
+			const fromKey = locationVisualActorKey({
+				itemInstanceId: event.itemInstanceId,
+				location: event.from,
+			});
+			const key =
+				locationVisualActorKey({
+					itemInstanceId: event.itemInstanceId,
+					location: event.to,
+				}) ?? fromKey;
+			const from = dragRectForActor(fromKey) ?? locationVisualRect({
 				location: event.from,
 				itemInstanceId: event.itemInstanceId,
 				activeSheet,
@@ -87,15 +102,6 @@ export const commandVisualEventStageEntries = ({
 				activeSheet,
 				fallbackSourceRect: from,
 			});
-			const key =
-				locationVisualActorKey({
-					itemInstanceId: event.itemInstanceId,
-					location: event.to,
-				}) ??
-				locationVisualActorKey({
-					itemInstanceId: event.itemInstanceId,
-					location: event.from,
-				});
 
 			entries.push(
 				...moveEntry({
@@ -112,7 +118,15 @@ export const commandVisualEventStageEntries = ({
 		}
 
 		if (event.type === "item.swapped") {
-			const sourceFrom = locationVisualRect({
+			const sourceFromKey = locationVisualActorKey({
+				itemInstanceId: event.sourceItemInstanceId,
+				location: event.sourceFrom,
+			});
+			const sourceToKey = locationVisualActorKey({
+				itemInstanceId: event.sourceItemInstanceId,
+				location: event.sourceTo,
+			});
+			const sourceFrom = dragRectForActor(sourceFromKey) ?? locationVisualRect({
 				location: event.sourceFrom,
 				itemInstanceId: event.sourceItemInstanceId,
 				activeSheet,
@@ -137,10 +151,7 @@ export const commandVisualEventStageEntries = ({
 
 			entries.push(
 				...moveEntry({
-					key: locationVisualActorKey({
-						itemInstanceId: event.sourceItemInstanceId,
-						location: event.sourceTo,
-					}),
+					key: sourceToKey,
 					from: sourceFrom,
 					to: sourceTo,
 					kind: "move",
@@ -159,7 +170,8 @@ export const commandVisualEventStageEntries = ({
 		}
 
 		if (event.type === "item.merged") {
-			const sourceRect = actorVisualRect({
+			const sourceActorKey = visualBoardItemKey(event.sourceItemInstanceId);
+			const sourceRect = dragRectForActor(sourceActorKey) ?? actorVisualRect({
 				itemInstanceId: event.sourceItemInstanceId,
 			});
 			const targetRect = actorVisualRect({
@@ -169,7 +181,7 @@ export const commandVisualEventStageEntries = ({
 			if (event.consumeSource) {
 				entries.push(
 					...moveEntry({
-						key: visualBoardItemKey(event.sourceItemInstanceId),
+						key: sourceActorKey,
 						from: sourceRect,
 						to: targetRect,
 						kind: "consume",
@@ -187,7 +199,8 @@ export const commandVisualEventStageEntries = ({
 		}
 
 		if (event.type === "item.fed") {
-			const sourceRect = actorVisualRect({
+			const sourceActorKey = visualBoardItemKey(event.sourceItemInstanceId);
+			const sourceRect = dragRectForActor(sourceActorKey) ?? actorVisualRect({
 				itemInstanceId: event.sourceItemInstanceId,
 			});
 			const targetRect = actorVisualRect({
@@ -196,7 +209,7 @@ export const commandVisualEventStageEntries = ({
 
 			entries.push(
 				...moveEntry({
-					key: visualBoardItemKey(event.sourceItemInstanceId),
+					key: sourceActorKey,
 					from: sourceRect,
 					to: targetRect,
 					kind: "consume",
@@ -211,7 +224,13 @@ export const commandVisualEventStageEntries = ({
 		}
 
 		if (event.type === "item.consumed") {
-			const rect = event.from
+			const key = event.from
+				? locationVisualActorKey({
+						itemInstanceId: event.itemInstanceId,
+						location: event.from,
+					})
+				: undefined;
+			const rect = dragRectForActor(key) ?? (event.from
 				? locationVisualRect({
 						location: event.from,
 						itemInstanceId: event.itemInstanceId,
@@ -219,14 +238,7 @@ export const commandVisualEventStageEntries = ({
 					})
 				: actorVisualRect({
 						itemInstanceId: event.itemInstanceId,
-					});
-			const key = event.from
-				? locationVisualActorKey({
-						itemInstanceId: event.itemInstanceId,
-						location: event.from,
-					})
-				: undefined;
-
+					}));
 			entries.push(
 				...sameRectEntry({
 					key: key ?? visualBoardItemKey(event.itemInstanceId),
@@ -238,7 +250,15 @@ export const commandVisualEventStageEntries = ({
 		}
 
 		if (event.type === "item.spawned") {
-			const from = event.from
+			const fromActorKey = event.from
+				? locationVisualActorKey({
+						itemInstanceId: event.itemInstanceId,
+						location: event.from,
+					})
+				: event.originItemInstanceId
+					? visualBoardItemKey(event.originItemInstanceId)
+					: undefined;
+			const from = dragRectForActor(fromActorKey) ?? (event.from
 				? locationVisualRect({
 						location: event.from,
 						itemInstanceId: event.itemInstanceId,
@@ -246,7 +266,7 @@ export const commandVisualEventStageEntries = ({
 					})
 				: actorVisualRect({
 						itemInstanceId: event.originItemInstanceId,
-					});
+					}));
 			const to = locationVisualRect({
 				location: event.to,
 				itemInstanceId: event.itemInstanceId,
@@ -306,7 +326,8 @@ export const commandVisualEventStageEntries = ({
 		}
 
 		if (event.type === "inventory.stacked") {
-			const sourceRect = actorVisualRect({
+			const sourceActorKey = visualBoardItemKey(event.sourceItemInstanceId);
+			const sourceRect = dragRectForActor(sourceActorKey) ?? actorVisualRect({
 				itemInstanceId: event.sourceItemInstanceId,
 			});
 			const targetRect = actorVisualRect({
@@ -315,7 +336,7 @@ export const commandVisualEventStageEntries = ({
 
 			entries.push(
 				...moveEntry({
-					key: visualBoardItemKey(event.sourceItemInstanceId),
+					key: sourceActorKey,
 					from: sourceRect,
 					to: targetRect,
 					kind: "consume",

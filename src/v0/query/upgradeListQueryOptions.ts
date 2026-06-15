@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
-import { loadPlayBackend } from "~/v0/query/loadPlayBackend";
+import { readViewFx } from "~/upgrade/fx/readViewFx";
+import { runGameFx } from "~/v0/fx/runGameFx";
 import { playQueryKeys } from "~/v0/query/playQueryKeys";
 
 export const upgradeListQueryOptions = () =>
@@ -8,8 +9,9 @@ export const upgradeListQueryOptions = () =>
 		refetchInterval(query) {
 			return query.state.data?.upgrades.some((upgrade) => upgrade.inProgress) ? 500 : false;
 		},
-		async queryFn() {
-			const db = await loadPlayBackend();
-			return db.readUpgradeListView();
+		queryFn() {
+			return runGameFx({
+				effect: readViewFx(),
+			});
 		},
 	});

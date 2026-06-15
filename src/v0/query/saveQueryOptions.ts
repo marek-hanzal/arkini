@@ -1,12 +1,14 @@
 import { queryOptions } from "@tanstack/react-query";
-import { loadPlayBackend } from "~/v0/query/loadPlayBackend";
+import { readSaveFx } from "~/play/fx/readSaveFx";
+import { runGameFx } from "~/v0/fx/runGameFx";
 import { playQueryKeys } from "~/v0/query/playQueryKeys";
 
 export const saveQueryOptions = () =>
 	queryOptions({
 		queryKey: playQueryKeys.save,
-		async queryFn() {
-			const db = await loadPlayBackend();
-			return db.readGameSaveView();
+		queryFn() {
+			return runGameFx({
+				effect: readSaveFx(),
+			});
 		},
 	});

@@ -2,7 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import type { FC } from "react";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { UpgradeCard } from "~/upgrade/ui/UpgradeCard";
-import { useBuyUpgradeMutation } from "~/v0/mutation/useBuyUpgradeMutation";
+import { useBuyUpgradeMutation } from "~/v0/upgrade/action/useBuyUpgradeMutation";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
 import { upgradeListQueryOptions } from "~/v0/query/upgradeListQueryOptions";
 

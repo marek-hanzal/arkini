@@ -45,6 +45,7 @@ export const CommandVisualEventSchema = z.discriminatedUnion("type", [
 		type: z.literal("item.spawned"),
 		itemInstanceId: ItemInstanceIdSchema.optional(),
 		itemId: GameItemIdSchema,
+		from: ItemLocationSchema.optional(),
 		originItemInstanceId: ItemInstanceIdSchema.optional(),
 		to: ItemLocationSchema,
 		reason: z.enum([

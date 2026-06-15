@@ -2,6 +2,7 @@ import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DroppablePayload } from "~/drag/DroppablePayload";
 import type { ItemId } from "~/manifest/manifestId";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import type { TileEngineTransitionKind } from "~/tile-engine/type/TileEngineTransitionKind";
 
 export type DragSource =
 	| {
@@ -45,6 +46,6 @@ export interface RectLike {
 	height: number;
 }
 
-export type VisualTransitionKind = "move" | "stash" | "place" | "consume";
+export type VisualTransitionKind = TileEngineTransitionKind;
 
 export const flashMs = 650;

@@ -15,10 +15,16 @@ export const InventoryTile: FC<InventoryTile.Props> = memo(({ slot, item }) => {
 	if (!stack) return null;
 
 	return (
-		<GameItemView
-			item={item}
-			variant="inventory"
-			quantity={stack.quantity}
-		/>
+		<div
+			data-inventory-slot-tile={slot.slotIndex}
+			data-inventory-stack-id={stack.id}
+			className="h-full w-full"
+		>
+			<GameItemView
+				item={item}
+				variant="inventory"
+				quantity={stack.quantity}
+			/>
+		</div>
 	);
 });

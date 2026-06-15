@@ -119,6 +119,10 @@ useInventoryView()     inventory slots and stack lookup
 usePlayUpgrades()      tiered upgrade cards with next costs and effects
 ```
 
+All read hooks use `useSuspenseQuery`, not plain `useQuery`. Initial missing data is handled by the app-level Suspense fallback in `RootShell`, not by sprinkling `if (!data) return null` confetti through render paths like a bug parade. Invalidating an already-populated query key keeps the previous cached data visible while React Query refetches, so normal board/inventory refreshes must not punt the player back into the global loader. Use query keys that stay stable for a view; introduce separate cached views when the data shape actually changes.
+
+Components should stay boring: render props, wire callbacks, and shut up. Anything that derives TileEngine slots/actors, resolves command callbacks, reads query data, maps card relations, computes cooldown feedback, or talks to Effect-backed commands belongs in a hook or an Fx boundary. `PlayShell` is a shell, `Board` is a TileEngine wrapper, and `InventorySheet` is a sheet wrapper; making them clever again is how we earn another refactor ride through hell.
+
 If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
 
 ## Source layout

@@ -1,5 +1,4 @@
 import { type FC, useCallback, useMemo } from "react";
-import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { DbStatusCard } from "~/play/ui/DbStatusCard";
 import { HardResetButton } from "~/play/ui/HardResetButton";
 import { usePlaySave } from "~/play/hook/usePlaySave";
@@ -10,7 +9,6 @@ import { InventorySheet } from "~/inventory/ui/InventorySheet";
 import { UpgradesSheet } from "~/upgrade/ui/UpgradesSheet";
 import { ItemDetailSheet } from "~/item/ui/ItemDetailSheet";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { GameItemView } from "~/item/ui/GameItemView";
 import { usePlayDraggableControl } from "~/play/hook/usePlayDraggableControl";
 import { usePlayFeedback } from "~/play/hook/usePlayFeedback";
 import { usePlayEventQueue } from "~/play/hook/usePlayEventQueue";
@@ -79,11 +77,21 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 	const boardDrag = useMemo(
 		() => ({
 			activeDrag: drag.activeDrag ?? undefined,
+			activeDropTargetNodeId: drag.activeDropTargetNodeId,
 			isSourceHidden: drag.isSourceHidden,
+			setActiveDropTargetNodeId: drag.setActiveDropTargetNodeId,
+			start: drag.start,
+			drop: drag.drop,
+			cancel: drag.cancel,
 		}),
 		[
 			drag.activeDrag,
+			drag.activeDropTargetNodeId,
+			drag.cancel,
+			drag.drop,
 			drag.isSourceHidden,
+			drag.setActiveDropTargetNodeId,
+			drag.start,
 		],
 	);
 	const boardFeedback = useMemo(
@@ -130,10 +138,8 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 		);
 	}
 
-	const dragSizeVariant = drag.activeDrag?.source.kind === "inventory" ? "inventory" : "board";
-
 	return (
-		<DndContext {...drag.contextProps}>
+		<>
 			<div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
 				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
 					<div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
@@ -156,6 +162,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 				<BottomNavigation
 					activeSheet={sheets.activeSheet}
 					inventoryDropTargetActive={drag.activeDrag?.source.kind === "board"}
+					activeDropTargetNodeId={drag.activeDropTargetNodeId}
 					onOpen={sheets.openSheet}
 				/>
 			</div>
@@ -170,7 +177,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 						hidden={sheets.renderedSheet !== "inventory"}
 					>
 						<InventorySheet
-							isSourceHidden={drag.isSourceHidden}
+							drag={drag}
 							invalidInventorySlot={feedback.invalidInventorySlot}
 							onClose={sheets.closeSheet}
 							onSlotDoubleActivate={placeInventorySlot}
@@ -210,22 +217,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 					</section>
 				</div>
 			</BottomSheet>
-
-			<DragOverlay
-				adjustScale={false}
-				dropAnimation={null}
-			>
-				{drag.activeItem ? (
-					<GameItemView
-						item={drag.activeItem}
-						variant="drag"
-						sizeVariant={dragSizeVariant}
-						quantity={drag.activeDrag?.overlay?.quantity}
-						activation={drag.activeDrag?.overlay?.activation ?? undefined}
-						overlaySize={drag.dragPreviewRect ?? undefined}
-					/>
-				) : null}
-			</DragOverlay>
-		</DndContext>
+		</>
 	);
 };

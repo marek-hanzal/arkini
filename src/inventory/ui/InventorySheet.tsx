@@ -12,13 +12,22 @@ import {
 	type useVisualItemMotions,
 } from "~/play/hook/useVisualItemMotions";
 import type { InventorySlot, ViewItem } from "~/play/logic/playTypes";
-import type { DragData, DropData } from "~/play/types";
+import type { DragData, DropData, RectLike } from "~/play/types";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { TileEngine } from "~/tile-engine/ui/TileEngine";
 
 export namespace InventorySheet {
-	export interface Props {
+	export interface DragState {
+		activeDropTargetNodeId?: string | null;
 		isSourceHidden(sourceId: string): boolean;
+		setActiveDropTargetNodeId(nodeId: string | null): void;
+		start(props: { source: DragData; previewRect: Pick<RectLike, "width" | "height"> }): void;
+		drop(props: { source: DragData; target: DropData | null; dragRect: RectLike | null }): void;
+		cancel(): void;
+	}
+
+	export interface Props {
+		drag: DragState;
 		invalidInventorySlot?: number;
 		onClose(): void;
 		onSlotDoubleActivate(slot: InventorySlot): void;
@@ -32,7 +41,7 @@ interface InventoryTileData {
 }
 
 export const InventorySheet: FC<InventorySheet.Props> = memo(
-	({ isSourceHidden, invalidInventorySlot, onClose, onSlotDoubleActivate, visualMotions }) => {
+	({ drag, invalidInventorySlot, onClose, onSlotDoubleActivate, visualMotions }) => {
 		const inventory = usePlayInventory().data;
 		const items = usePlayItems().data;
 
@@ -78,7 +87,7 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 								{
 									id: stack.id,
 									slotId: String(slot.slotIndex),
-									hidden: isSourceHidden(inventorySourceId(slot.slotIndex)),
+									hidden: drag.isSourceHidden(inventorySourceId(slot.slotIndex)),
 									motion: visualMotion,
 									onMotionSettle: visualMotion
 										? () => {
@@ -101,14 +110,35 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 						})
 					: [],
 			[
-				isSourceHidden,
+				drag.isSourceHidden,
 				items,
 				slots,
 				visualMotions,
 			],
 		);
-		const dragConfig = useMemo<TileEngine.DragConfig<InventoryTileData, InventorySlot>>(
+		const dragConfig = useMemo<
+			TileEngine.DragConfig<InventoryTileData, InventorySlot, DragData, DropData>
+		>(
 			() => ({
+				activeDropTargetNodeId: drag.activeDropTargetNodeId ?? null,
+				onDragStart: (source, rect) =>
+					drag.start({
+						source,
+						previewRect: {
+							width: rect.width,
+							height: rect.height,
+						},
+					}),
+				onDragOver: (_source, _target, targetNodeId) => {
+					drag.setActiveDropTargetNodeId(targetNodeId);
+				},
+				onDrop: (source, target, dragRect) =>
+					drag.drop({
+						source,
+						target,
+						dragRect,
+					}),
+				onDragCancel: drag.cancel,
 				tile: (tile) => {
 					const stack = tile.data.slot.stack;
 					if (!stack) return undefined;
@@ -132,7 +162,7 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 							},
 							hideWhenActive: true,
 						} satisfies DragData,
-						hidden: isSourceHidden(sourceId),
+						hidden: drag.isSourceHidden(sourceId),
 						hideWhenActive: true,
 						onDoubleActivate: () => onSlotDoubleActivate(tile.data.slot),
 					};
@@ -154,7 +184,11 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 				},
 			}),
 			[
-				isSourceHidden,
+				drag.cancel,
+				drag.drop,
+				drag.isSourceHidden,
+				drag.setActiveDropTargetNodeId,
+				drag.start,
 				onSlotDoubleActivate,
 			],
 		);
@@ -195,7 +229,7 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 				/>
 
 				<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-					<TileEngine<InventoryTileData, InventorySlot>
+					<TileEngine<InventoryTileData, InventorySlot, DragData, DropData>
 						id="inventory"
 						columns={inventoryColumns}
 						slots={engineSlots}
@@ -203,6 +237,7 @@ export const InventorySheet: FC<InventorySheet.Props> = memo(
 						gapPx={1}
 						className="ak-game-width mx-auto border-l border-t border-slate-800"
 						itemLayerClassName="pointer-events-none"
+						activeDropTargetNodeId={drag.activeDropTargetNodeId ?? null}
 						drag={dragConfig}
 						renderSlot={renderSlot}
 						renderTile={renderTile}

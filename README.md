@@ -67,10 +67,10 @@ The current content direction is Settlers-like: small producers create raw goods
 
 - Board size comes from `GameConfig.game.board`, currently 7×9.
 - Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.
-- Board and inventory render through local Phaser canvases; square-cell geometry is computed inside each scene.
+- Board and inventory use zero-gap square cells to avoid DnD blind spots.
 - Merging happens on the board only. Dropping onto a non-mergeable occupied board cell swaps the two board items instead of rejecting the action.
 - Inventory stores stacks and can combine compatible stacks.
-- Board drag stays local to the board. Board -> inventory drag on the bottom-nav button is gone; stash/producer actions communicate through commands and feedback instead.
+- Board drag supports board cell drops plus one explicit cross-surface escape hatch: drop a board item on the inventory bottom-nav button to stash it. Inventory drag stays local to inventory slots.
 - Board item gestures are normalized: single tap runs the primary action and long press opens item detail. Board double-click/tap is intentionally unused, so producer clicks are not delayed by a double-click window.
 - Inventory items go to the first empty board cell by double-click/tap inside inventory.
 - Build menu is gone. Buildings and other advanced outputs are created through board craft: merge input items into a craft target, fill its progress, then transform it into the result.
@@ -87,15 +87,19 @@ The current content direction is Settlers-like: small producers create raw goods
 
 ## Interaction model
 
-Board and inventory are now local Phaser worlds, not DOM grids pretending to be a game engine. React owns app layout, sheets, bottom navigation, detail panels, and command wiring. Phaser owns the playable surfaces: board cells, inventory slots, item actors, pointer gestures, drag movement, merge hints, progress bars, cooldown bars, ready glow, invalid flashes, and producer/placement animations. If a visual belongs to a game cell or slot, it should live in Phaser instead of being smuggled through CSS and vibes.
+Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts`, built on `@react-aria/interactions`, and modeled by `src/shared/logic/pressActionsMachine.ts` for single/double/long-press timing. Board item detail opens through long press, including producers whose single tap is reserved for production. Keep raw touch/pointer timing out of board/tile components unless you enjoy debugging mobile browsers like some kind of punishment enthusiast.
 
-`src/phaser/board/PhaserBoardScene.ts` is the board runtime. It resolves board-local drags with `src/merge/resolveDropIntent.ts`, animates move/swap/merge/imprint feedback, single-tap activates producers and stashes, and long-press opens item detail. The board scene emits typed handler calls only; it does not own durable game state. SQLite and domain commands remain the source of truth, because two truth sources are how projects become haunted furniture.
+Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle. The transient drag phase is modeled by `src/drag/logic/draggableWorkflowMachine.ts` through XState; do not put board, inventory, or item data into that machine just because the context field exists and humanity cannot be trusted with containers.
 
-`src/phaser/inventory/PhaserInventoryScene.ts` is the inventory runtime. It supports local inventory drag/swap and double-tap placement into the first empty board cell. Cross-surface drag from board to inventory is deliberately removed for now. Board and inventory are separate Phaser islands inside their own DOM containers; communication between them is command/result/snapshot, not a live sprite being dragged through a bottom sheet like some cursed interdimensional luggage.
+Game-specific drag policy lives in `src/interaction/resolveDrop.ts` and delegates merge/craft/producer-input eligibility to `src/merge/resolveDropIntent.ts`. `src/play/hook/usePlayDraggableControl.ts` is only the thin React wiring that connects the generic drag control, the interaction engine, and the `Command` runner. `src/play/hook/resolveMagneticDropTarget.ts` is the same kind of game-specific adapter: board drags prefer the explicit inventory bottom-nav target when reached, otherwise they resolve the nearest board cell by real rectangle overlap first, then distance; inventory drags stay on inventory slots. The magnetic resolver wins over dnd-kit `over`, so grid edges and cross-points do not get punished just because a pointer landed on UI grout.
 
-Accepted game actions animate the real Phaser actor whenever practical. Producer drops move newly committed board actors from the producer origin to their final cells. Inventory placement shrinks/pulses the source stack before the durable command refreshes board and inventory projections. React Query remains the read/cache layer and Effect remains the persistence/domain runtime. Motion is still allowed for normal DOM UI such as sheets and bottom-nav pulses, but it no longer owns board or inventory game-object motion.
+Accepted drag/drop actions now keep the active drag actor alive until the durable command and query invalidation settle. The final board/inventory tile is the only real visual actor; regular moves, swaps, merge consumes, producer drops, stash dumps, and inventory placement must not create a second overlay copy of the same item. New committed actors can receive a transient origin and raised priority through `visualItemMotionMachine`, then settle back to normal priority after Motion completes. If the visual layer and durable cache disagree for a frame, the visual layer wins until the next committed movement syncs it, because blinking tiles are how UI admits defeat.
 
-XState is kept only where it still earns its miserable little keep: sheet visibility, serialized play event queues, and reset workflows. Drag/drop, press timing, delayed merge hints, and cell feedback no longer use XState or dnd-kit. Phaser scenes own those transient visual states locally, where they belong.
+Inventory stash feedback holds the inventory bottom-nav highlight briefly and extends that hold when more items arrive quickly, so bursty item stashing does not flicker like a broken nightclub sign. Producer ready feedback is tracked by producer instance id and played through Motion only on real readiness transitions. Mounting a producer or moving it across the board must not pulse it; React mounts are not gameplay events, despite React’s best efforts to feel important. Board/inventory flash and merge/imprint pulse feedback lives in `src/play/logic/playFeedbackMachine.ts`, because independent timed visual states are exactly where random `setTimeout` soup starts breeding.
+
+XState is used only for transient workflow orchestration: drag/drop phases, bottom-sheet visibility, serialized play event queue, timed feedback pulses, delayed merge hints, and tiny reset workflows. SQLite remains the durable game state, React Query remains the read/cache layer, and Effect remains the persistence/domain runtime. XState machine context may hold tiny workflow metadata only; storing full gameplay rows there is architectural taxidermy.
+
+Board merge hints are handled by `src/board/hook/useDelayedMergeHints.ts` and modeled by `src/board/logic/delayedMergeHintMachine.ts`. Global mergeable-target hints appear after 750 ms while dragging a board item and disappear when the drag context changes. The currently hovered mergeable target still highlights instantly, because feedback that waits politely for permission is not feedback, it is bureaucracy.
 
 ## React data subscriptions
 
@@ -107,6 +111,7 @@ usePlayItems()         static item catalog derived from GameConfig
 usePlayBoard()         board cells and board item lookup
 usePlayInventory()     inventory slots and stack lookup
 usePlayUpgrades()        tiered upgrade cards with next costs and effects
+usePlayDragView()      tiny drag-only lookup composed from board + inventory
 ```
 
 If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
@@ -132,18 +137,19 @@ src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
 src/action/                     Game command router and mutation invalidation.
-src/animation/                  Small DOM-only animation helpers for app chrome, not game objects.
-src/phaser/                     Local Phaser board/inventory worlds and shared item actors.
+src/animation/                  Visual planning helpers for game events.
+src/interaction/                UI gesture/drop intent translation.
 src/merge/                      Merge, craft-input, and producer-input intent resolution.
-src/play/logic/                  Promise backend façade for read/bootstrap flows, remaining XState workflow machines, and shared backend types/helpers.
+src/play/logic/                  Promise backend façade for read/bootstrap flows, XState workflow machines, and shared backend types/helpers.
 src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
-src/play/hook/                   Granular React Query subscriptions, remaining XState event queue, and thin command wiring.
+src/play/hook/                   Granular React Query subscriptions, XState event queue, and thin command/interaction wiring.
 src/play/ui/                     Main shell, sheets, bottom navigation, database status UI.
-src/board/                       Board identity, board state logic, and React wrapper around the Phaser board.
-src/inventory/                   Inventory identity, stack planning/storage logic, and React wrapper around the Phaser inventory.
+src/drag/                        Generic DnD lifecycle, XState drag workflow, and draggable/droppable surfaces.
+src/board/                       Board identity, board state logic, board UI, cell feedback.
+src/inventory/                   Inventory identity, stack planning/storage logic, inventory sheet UI.
 src/producer/                    Producer output rolling, readiness tracking, upgrade-adjusted output, and depletion logic.
 src/upgrade/                     Tiered global upgrades, purchase effects, producer modifiers, and upgrade sheet UI.
-src/item/                        Item detail and non-Phaser item UI.
+src/item/                        Shared item visual renderer used by board, inventory, and drag overlay.
 src/shared/                      Small UI/util hooks and helpers.
 ```
 

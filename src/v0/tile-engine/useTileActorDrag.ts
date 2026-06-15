@@ -29,6 +29,7 @@ export namespace useTileActorDrag {
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		setActiveDropId(dropId: string | null): void;
 		setHandoff(handoff: TileEngineActor.Handoff | null): void;
+		setHandoffs(handoffs: readonly TileEngineActor.Handoff[]): void;
 	}
 }
 
@@ -51,6 +52,7 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 	resolveDrop,
 	setActiveDropId,
 	setHandoff,
+	setHandoffs,
 }: useTileActorDrag.Props<TTile, TSlot, TDrag, TDrop>): TileEngineActor.DragHandlers => {
 	const updateHover = useTileDragHover({
 		actorRef,
@@ -99,6 +101,7 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 		finishDrag: lifecycle.finishDrag,
 		setActiveDropId,
 		setHandoff,
+		setHandoffs,
 	});
 	const handlePointerCancel = useTilePointerCancel({
 		dragSessionRef,

@@ -54,6 +54,7 @@ export const InventorySurface = memo(
 							data: {
 								slotIndex: slot.slotIndex,
 							},
+							enter: stack.motion?.enter,
 						},
 					] satisfies TileEngineType.Tile<InventorySurfaceType.TileData>[];
 				}),

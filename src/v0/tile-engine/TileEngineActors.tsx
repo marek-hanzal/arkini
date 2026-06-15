@@ -18,6 +18,7 @@ export namespace TileEngineActors {
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		setActiveDropId(dropId: string | null): void;
 		setHandoff(handoff: TileEngineActorType.Handoff | null): void;
+		setHandoffs(handoffs: readonly TileEngineActorType.Handoff[]): void;
 		consumeHandoff(tileId: string, slotId: string): boolean;
 		renderTile(props: TileEngine.RenderTileProps<TTile>): ReactNode;
 	}
@@ -35,6 +36,7 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	resolveDrop,
 	setActiveDropId,
 	setHandoff,
+	setHandoffs,
 	consumeHandoff,
 	renderTile,
 }: TileEngineActors.Props<TTile, TSlot, TDrag, TDrop>) => (
@@ -56,6 +58,7 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 					resolveDrop={resolveDrop}
 					setActiveDropId={setActiveDropId}
 					setHandoff={setHandoff}
+					setHandoffs={setHandoffs}
 					consumeHandoff={consumeHandoff}
 					renderTile={renderTile}
 				/>

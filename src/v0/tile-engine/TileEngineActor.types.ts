@@ -37,6 +37,7 @@ export namespace TileEngineActor {
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		setActiveDropId(dropId: string | null): void;
 		setHandoff(handoff: Handoff | null): void;
+		setHandoffs(handoffs: readonly Handoff[]): void;
 		consumeHandoff(tileId: string, slotId: string): boolean;
 		renderTile(props: TileEngine.RenderTileProps<TTile>): ReactNode;
 	}

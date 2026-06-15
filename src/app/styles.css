@@ -87,12 +87,14 @@ button {
 .ak-bottom-sheet {
 	position: fixed;
 	inset: 0;
+	z-index: 90;
 	pointer-events: none;
 }
 
 .ak-bottom-sheet-backdrop {
 	position: absolute;
 	inset: 0;
+	z-index: 0;
 	display: block;
 	width: auto;
 	height: auto;
@@ -107,6 +109,7 @@ button {
 .ak-bottom-sheet-panel {
 	position: absolute;
 	inset-inline: 0;
+	z-index: 1;
 	bottom: 0;
 	display: flex;
 	width: var(--ak-sheet-width);
@@ -143,6 +146,7 @@ button {
 
 .ak-bottom-nav {
 	position: absolute;
+	z-index: 40;
 	inset-inline: 0;
 	bottom: 0;
 	height: var(--ak-bottom-nav-height);

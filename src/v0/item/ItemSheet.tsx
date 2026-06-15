@@ -12,14 +12,14 @@ import { useGameCommandMutation } from "~/v0/mutation/useGameCommandMutation";
 import { boardViewQueryOptions } from "~/v0/query/boardViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
 
-export namespace V0ItemSheet {
+export namespace ItemSheet {
 	export interface Props {
 		boardItemId?: string;
 		onClose(): void;
 	}
 }
 
-export const V0ItemSheet: FC<V0ItemSheet.Props> = ({ boardItemId, onClose }) => {
+export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
 	const command = useGameCommandMutation();

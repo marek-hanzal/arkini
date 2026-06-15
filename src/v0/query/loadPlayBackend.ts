@@ -1,4 +1,4 @@
-export async function loadV0PlayBackend() {
+export async function loadPlayBackend() {
 	const db = await import("~/play/logic/playBackend");
 	await db.bootstrapDatabase();
 	return db;

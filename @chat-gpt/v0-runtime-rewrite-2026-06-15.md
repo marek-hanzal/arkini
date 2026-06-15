@@ -1,6 +1,6 @@
 # v0 runtime rewrite
 
-The active play route now enters `src/v0/play/V0PlayShell` instead of the historical `PlaySessionProvider` runtime.
+The active play route now enters `src/v0/play/PlayShell` instead of the historical `PlaySessionProvider` runtime.
 
 Rules applied in v0:
 

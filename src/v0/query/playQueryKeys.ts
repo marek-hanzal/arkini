@@ -1,4 +1,4 @@
-export const v0PlayQueryKeys = {
+export const playQueryKeys = {
 	all: [
 		"arkini",
 		"v0",

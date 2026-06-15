@@ -16,7 +16,7 @@ const closeEase = [
 	1,
 ] as const;
 
-export namespace V0BottomSheet {
+export namespace BottomSheet {
 	export interface Props {
 		open: boolean;
 		children: ReactNode;
@@ -25,7 +25,7 @@ export namespace V0BottomSheet {
 	}
 }
 
-export const V0BottomSheet: FC<V0BottomSheet.Props> = ({ open, children, className, onClose }) => (
+export const BottomSheet: FC<BottomSheet.Props> = ({ open, children, className, onClose }) => (
 	<div
 		className="ak-bottom-sheet"
 		data-open={open ? "true" : "false"}

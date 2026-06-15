@@ -11,15 +11,15 @@ import { boardViewQueryOptions } from "~/v0/query/boardViewQueryOptions";
 import { inventoryViewQueryOptions } from "~/v0/query/inventoryViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
 import { useGameCommandMutation } from "~/v0/mutation/useGameCommandMutation";
-import type { V0DragSource, V0DropTarget } from "~/v0/play/V0DragTypes";
-import type { V0Feedback } from "~/v0/play/V0Feedback";
-import { resolveV0Drop } from "~/v0/play/resolveV0Drop";
+import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
+import type { Feedback } from "~/v0/play/Feedback";
+import { resolveDrop } from "~/v0/play/resolveDrop";
 import { TileEngine } from "~/v0/tile-engine/TileEngine";
 import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.types";
 
-export namespace V0InventorySurface {
+export namespace InventorySurface {
 	export interface Props {
-		feedback: V0Feedback;
+		feedback: Feedback;
 		hasFeedback(key: string): boolean;
 		onClose(): void;
 	}
@@ -33,7 +33,7 @@ export namespace V0InventorySurface {
 const InventoryCell = memo(
 	({ slot, invalid, isOver }: { slot: InventorySlot; invalid: boolean; isOver: boolean }) => (
 		<div
-			data-v0-inventory-slot={slot.slotIndex}
+			data-ak-inventory-slot={slot.slotIndex}
 			className={cn(
 				"relative aspect-square border-b border-r border-slate-800 bg-slate-900/70",
 				isOver && "bg-slate-800 outline outline-2 -outline-offset-2 outline-emerald-300/80",
@@ -45,13 +45,13 @@ const InventoryCell = memo(
 
 const renderInventoryTile = ({
 	tile,
-}: TileEngineType.RenderTileProps<V0InventorySurface.TileData>) => {
+}: TileEngineType.RenderTileProps<InventorySurface.TileData>) => {
 	const stack = tile.data.slot.stack;
 	if (!stack) return null;
 
 	return (
 		<div
-			data-v0-inventory-stack-id={stack.id}
+			data-ak-inventory-stack-id={stack.id}
 			className="h-full w-full"
 		>
 			<GameItemView
@@ -63,8 +63,8 @@ const renderInventoryTile = ({
 	);
 };
 
-export const V0InventorySurface = memo(
-	({ feedback, hasFeedback, onClose }: V0InventorySurface.Props) => {
+export const InventorySurface = memo(
+	({ feedback, hasFeedback, onClose }: InventorySurface.Props) => {
 		const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 		const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
 		const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
@@ -98,7 +98,7 @@ export const V0InventorySurface = memo(
 								item,
 							},
 						},
-					] satisfies TileEngineType.Tile<V0InventorySurface.TileData>[];
+					] satisfies TileEngineType.Tile<InventorySurface.TileData>[];
 				}),
 			[
 				inventory.slots,
@@ -128,10 +128,10 @@ export const V0InventorySurface = memo(
 		);
 		const drag = useMemo<
 			TileEngineType.DragConfig<
-				V0InventorySurface.TileData,
+				InventorySurface.TileData,
 				InventorySlot,
-				V0DragSource,
-				V0DropTarget
+				DragSource,
+				DropTarget
 			>
 		>(
 			() => ({
@@ -160,7 +160,7 @@ export const V0InventorySurface = memo(
 					};
 				},
 				onDrop(context) {
-					return resolveV0Drop({
+					return resolveDrop({
 						context,
 						board,
 						inventory,
@@ -199,13 +199,8 @@ export const V0InventorySurface = memo(
 					onClose={onClose}
 				/>
 				<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-					<TileEngine<
-						V0InventorySurface.TileData,
-						InventorySlot,
-						V0DragSource,
-						V0DropTarget
-					>
-						id="v0-inventory"
+					<TileEngine<InventorySurface.TileData, InventorySlot, DragSource, DropTarget>
+						id="inventory"
 						columns={inventoryColumns}
 						slots={slots}
 						tiles={tiles}

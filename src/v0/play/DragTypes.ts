@@ -2,7 +2,7 @@ import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import type { ItemId } from "~/manifest/manifestId";
 
-export type V0DragSource =
+export type DragSource =
 	| {
 			kind: "board";
 			boardItemId: string;
@@ -16,7 +16,7 @@ export type V0DragSource =
 			slot: InventorySlot;
 	  };
 
-export type V0DropTarget =
+export type DropTarget =
 	| {
 			kind: "cell";
 			x: number;

@@ -6,13 +6,13 @@ import { useGameCommandMutation } from "~/v0/mutation/useGameCommandMutation";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
 import { upgradeListQueryOptions } from "~/v0/query/upgradeListQueryOptions";
 
-export namespace V0UpgradesSheet {
+export namespace UpgradesSheet {
 	export interface Props {
 		onClose(): void;
 	}
 }
 
-export const V0UpgradesSheet: FC<V0UpgradesSheet.Props> = ({ onClose }) => {
+export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 	const { data: upgrades } = useSuspenseQuery(upgradeListQueryOptions());
 	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
 	const command = useGameCommandMutation();

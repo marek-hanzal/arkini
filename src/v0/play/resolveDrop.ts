@@ -5,15 +5,15 @@ import type { Command } from "~/command/Command";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import { resolveDropIntent } from "~/merge/resolveDropIntent";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
-import type { V0DragSource, V0DropTarget } from "~/v0/play/V0DragTypes";
-import type { V0Feedback } from "~/v0/play/V0Feedback";
+import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
+import type { Feedback } from "~/v0/play/Feedback";
 
-export namespace resolveV0Drop {
+export namespace resolveDrop {
 	export interface Props {
-		context: TileEngine.DropContext<unknown, unknown, V0DragSource, V0DropTarget>;
+		context: TileEngine.DropContext<unknown, unknown, DragSource, DropTarget>;
 		board: BoardView;
 		inventory: InventoryView;
-		feedback: V0Feedback;
+		feedback: Feedback;
 		run(command: Command): Promise<unknown>;
 	}
 }
@@ -30,13 +30,13 @@ const accept = (commit: () => Promise<unknown>): TileEngine.DropOutcome => ({
 	commit,
 });
 
-export const resolveV0Drop = async ({
+export const resolveDrop = async ({
 	context,
 	board,
 	inventory,
 	feedback,
 	run,
-}: resolveV0Drop.Props): Promise<TileEngine.DropOutcome> => {
+}: resolveDrop.Props): Promise<TileEngine.DropOutcome> => {
 	const source = context.source;
 	const target = context.target;
 	const ok = (commit: () => Promise<unknown>) =>

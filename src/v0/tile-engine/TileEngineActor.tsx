@@ -6,6 +6,7 @@ import { useTileActorDrag } from "~/v0/tile-engine/useTileActorDrag";
 import { useTileActorMotion } from "~/v0/tile-engine/useTileActorMotion";
 import { useTileActorTap } from "~/v0/tile-engine/useTileActorTap";
 import { useTileActorTimers } from "~/v0/tile-engine/useTileActorTimers";
+import { useLatestRef } from "~/v0/tile-engine/useLatestRef";
 
 export namespace TileEngineActor {
 	export type Props<
@@ -36,10 +37,14 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	const timers = useTileActorTimers();
 	const binding = drag?.tile(tile);
 	const disabled = tile.disabled || tile.hidden || binding?.disabled || !binding;
+	const tileRef = useLatestRef(tile);
+	const bindingRef = useLatestRef(binding);
+	const disabledRef = useLatestRef(disabled);
+	const dragRef = useLatestRef(drag);
 	const [dragging, setDragging] = useState(false);
 
 	const tap = useTileActorTap({
-		binding,
+		bindingRef,
 		lastTapRef,
 		singleTimerRef: timers.singleTimerRef,
 		clearSingleTimer: timers.clearSingleTimer,
@@ -54,12 +59,12 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	const dragHandlers = useTileActorDrag({
 		actorRef,
 		dragSessionRef,
-		tile,
-		binding,
-		disabled,
+		tileRef,
+		bindingRef,
+		disabledRef,
 		dragging,
 		setDragging,
-		drag,
+		dragRef,
 		dragConstraintsRef,
 		longTimerRef: timers.longTimerRef,
 		clearTimers: timers.clearTimers,

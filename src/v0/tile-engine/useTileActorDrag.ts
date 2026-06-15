@@ -1,6 +1,6 @@
 import { type Dispatch, type RefObject, type SetStateAction } from "react";
-import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngineActor } from "~/v0/tile-engine/TileEngineActor.types";
+import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import { useTileDragHover } from "~/v0/tile-engine/useTileDragHover";
 import { useTileDragLifecycle } from "~/v0/tile-engine/useTileDragLifecycle";
@@ -13,12 +13,12 @@ export namespace useTileActorDrag {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrag = unknown, TDrop = unknown> {
 		actorRef: RefObject<HTMLDivElement | null>;
 		dragSessionRef: RefObject<TileEngineActor.DragSession<TDrag> | null>;
-		tile: TileEngine.Tile<TTile>;
-		binding: TileEngine.DragBinding<TDrag> | undefined;
-		disabled: boolean;
+		tileRef: RefObject<TileEngine.Tile<TTile>>;
+		bindingRef: RefObject<TileEngine.DragBinding<TDrag> | undefined>;
+		disabledRef: RefObject<boolean>;
 		dragging: boolean;
 		setDragging: Dispatch<SetStateAction<boolean>>;
-		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
+		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop> | undefined>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		longTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
 		clearTimers(): void;
@@ -35,12 +35,12 @@ export namespace useTileActorDrag {
 export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 	actorRef,
 	dragSessionRef,
-	tile,
-	binding,
-	disabled,
+	tileRef,
+	bindingRef,
+	disabledRef,
 	dragging,
 	setDragging,
-	drag,
+	dragRef,
 	dragConstraintsRef,
 	longTimerRef,
 	clearTimers,
@@ -55,15 +55,15 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 	const updateHover = useTileDragHover({
 		actorRef,
 		dragSessionRef,
-		drag,
+		dragRef,
 		resolveDrop,
 		setActiveDropId,
 	});
 	const lifecycle = useTileDragLifecycle({
 		actorRef,
 		dragSessionRef,
-		tile,
-		drag,
+		tileRef,
+		dragRef,
 		clearTimers,
 		setActiveDropId,
 		setDragging,
@@ -71,8 +71,8 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 	});
 	const handlePointerDown = useTilePointerDown({
 		actorRef,
-		binding,
-		disabled,
+		bindingRef,
+		disabledRef,
 		dragConstraintsRef,
 		dragSessionRef,
 		longTimerRef,
@@ -89,8 +89,8 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 	const handlePointerUp = useTilePointerUp({
 		actorRef,
 		dragSessionRef,
-		tile,
-		drag,
+		tileRef,
+		dragRef,
 		clearLongTimer,
 		handleTap,
 		animateBack,

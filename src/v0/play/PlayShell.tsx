@@ -60,7 +60,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 			},
 		}),
 		[
-			feedbackFlags,
+			feedbackFlags.pulse,
 		],
 	);
 	const sheetContent = activeSheet
@@ -72,7 +72,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 					() => (
 						<InventorySurface
 							feedback={feedback}
-							hasFeedback={feedbackFlags.has}
+							feedbackFlags={feedbackFlags.flags}
 							onClose={closeSheet}
 						/>
 					),
@@ -117,7 +117,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 					<div className="min-h-0 shrink-0">
 						<BoardSurface
 							feedback={feedback}
-							hasFeedback={feedbackFlags.has}
+							feedbackFlags={feedbackFlags.flags}
 							onOpenItem={openItem}
 						/>
 					</div>

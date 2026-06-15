@@ -29,7 +29,7 @@ const boardSlots = boardCells.map((cell) => ({
 })) satisfies readonly TileEngineType.Slot<BoardCellView>[];
 
 export const BoardSurface = memo(
-	({ feedback, hasFeedback, onOpenItem }: BoardSurfaceType.Props) => {
+	({ feedback, feedbackFlags, onOpenItem }: BoardSurfaceType.Props) => {
 		const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 		const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
 		const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
@@ -165,9 +165,9 @@ export const BoardSurface = memo(
 					<BoardCell
 						cell={cell}
 						boardItem={board.byCellKey[key]}
-						invalid={hasFeedback(`board:error:${key}`)}
-						merged={hasFeedback(`board:merge:${key}`)}
-						imprinted={hasFeedback(`board:imprint:${key}`)}
+						invalid={feedbackFlags.has(`board:error:${key}`)}
+						merged={feedbackFlags.has(`board:merge:${key}`)}
+						imprinted={feedbackFlags.has(`board:imprint:${key}`)}
 						isOver={isOver}
 						nowMs={nowMs}
 					/>
@@ -175,7 +175,7 @@ export const BoardSurface = memo(
 			},
 			[
 				board.byCellKey,
-				hasFeedback,
+				feedbackFlags,
 				nowMs,
 			],
 		);

@@ -7,8 +7,8 @@ export namespace useTileDragLifecycle {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrag = unknown, TDrop = unknown> {
 		actorRef: RefObject<HTMLDivElement | null>;
 		dragSessionRef: RefObject<TileEngineActor.DragSession<TDrag> | null>;
-		tile: TileEngine.Tile<TTile>;
-		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
+		tileRef: RefObject<TileEngine.Tile<TTile>>;
+		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop> | undefined>;
 		clearTimers(): void;
 		setActiveDropId(dropId: string | null): void;
 		setDragging: Dispatch<SetStateAction<boolean>>;
@@ -25,8 +25,8 @@ export namespace useTileDragLifecycle {
 export const useTileDragLifecycle = <TTile, TSlot, TDrag, TDrop>({
 	actorRef,
 	dragSessionRef,
-	tile,
-	drag,
+	tileRef,
+	dragRef,
 	clearTimers,
 	setActiveDropId,
 	setDragging,
@@ -45,9 +45,9 @@ export const useTileDragLifecycle = <TTile, TSlot, TDrag, TDrop>({
 	const cancelDrag = useCallback(() => {
 		const session = dragSessionRef.current;
 		if (session?.started) {
-			drag?.onDragCancel?.({
+			dragRef.current?.onDragCancel?.({
 				source: session.source,
-				tile,
+				tile: tileRef.current,
 			});
 		}
 		clearTimers();
@@ -57,11 +57,11 @@ export const useTileDragLifecycle = <TTile, TSlot, TDrag, TDrop>({
 	}, [
 		actorRef,
 		clearTimers,
-		drag,
+		dragRef,
 		dragSessionRef,
 		finishDrag,
 		setHandoff,
-		tile,
+		tileRef,
 	]);
 
 	const startActualDrag = useCallback(() => {
@@ -70,17 +70,17 @@ export const useTileDragLifecycle = <TTile, TSlot, TDrag, TDrop>({
 		session.started = true;
 		clearTimers();
 		setDragging(true);
-		drag?.onDragStart?.({
+		dragRef.current?.onDragStart?.({
 			source: session.source,
-			tile,
+			tile: tileRef.current,
 			rect: session.origin,
 		});
 	}, [
 		clearTimers,
-		drag,
+		dragRef,
 		dragSessionRef,
 		setDragging,
-		tile,
+		tileRef,
 	]);
 
 	return {

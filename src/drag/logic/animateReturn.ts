@@ -1,6 +1,5 @@
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { ResolvedDraggableAnimation } from "~/drag/ResolvedDraggableAnimation";
-import type { draggableWorkflowMachine } from "~/drag/logic/draggableWorkflowMachine";
 import type { RectLike } from "~/play/types";
 import { rectForNode } from "./rectForNode";
 
@@ -12,7 +11,6 @@ export namespace animateReturn {
 	export interface Props<ItemId extends string, Source, Overlay, Kind extends string> {
 		source: DraggablePayload<ItemId, Source, Overlay>;
 		dragRect: RectLike | null;
-		send(event: draggableWorkflowMachine.Event): void;
 		hideSources(ids: readonly string[]): void;
 		clearActiveDrag(): void;
 		clearHiddenSources(): void;
@@ -28,15 +26,11 @@ export const animateReturn = async <
 >({
 	source,
 	dragRect,
-	send,
 	hideSources,
 	clearActiveDrag,
 	clearHiddenSources,
 	animate,
 }: animateReturn.Props<ItemId, Source, Overlay, Kind>) => {
-	send({
-		type: "RETURN_STARTED",
-	});
 	const from = dragRect;
 	const to = rectForNode({
 		nodeId: source.sourceNodeId,

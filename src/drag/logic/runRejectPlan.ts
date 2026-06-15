@@ -5,7 +5,6 @@ import type { DropPlanRuntime } from "~/drag/DropPlanRuntime";
 import type { RectLike } from "~/play/types";
 import { animateReturn } from "./animateReturn";
 import { runFeedback } from "./runFeedback";
-import { settleWorkflow } from "./settleWorkflow";
 
 export namespace runRejectPlan {
 	export interface Props<ItemId extends string, Source, Target, Overlay, Kind extends string> {
@@ -33,27 +32,17 @@ export const runRejectPlan = async <
 	dragRect,
 	runtime,
 }: runRejectPlan.Props<ItemId, Source, Target, Overlay, Kind>): Promise<DropOutcome> => {
-	runtime.sendWorkflow({
-		type: "DROP_REJECTED",
-	});
 	const feedback = runFeedback(plan.feedback);
 	if (plan.animateReturn !== false)
 		await animateReturn({
 			source: context.source,
 			dragRect,
-			send: runtime.sendWorkflow,
 			hideSources: runtime.hideSources,
 			clearActiveDrag: runtime.clearActiveDrag,
 			clearHiddenSources: runtime.clearHiddenSources,
 			animate: runtime.animate,
 		});
 	else runtime.clearActiveDrag();
-	runtime.sendWorkflow({
-		type: "FEEDBACK_STARTED",
-	});
 	await feedback;
-	settleWorkflow({
-		send: runtime.sendWorkflow,
-	});
 	return "reject";
 };

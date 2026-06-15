@@ -1,6 +1,5 @@
 import type { DropOutcome } from "~/drag/DropOutcome";
 import type { DropPlanRuntime } from "~/drag/DropPlanRuntime";
-import { settleWorkflow } from "./settleWorkflow";
 
 export namespace runIgnorePlan {
 	export interface Props<ItemId extends string, Source, Target, Overlay, Kind extends string> {
@@ -17,12 +16,6 @@ export const runIgnorePlan = <
 >({
 	runtime,
 }: runIgnorePlan.Props<ItemId, Source, Target, Overlay, Kind>): DropOutcome => {
-	runtime.sendWorkflow({
-		type: "DROP_IGNORED",
-	});
 	runtime.clearActiveDrag();
-	settleWorkflow({
-		send: runtime.sendWorkflow,
-	});
 	return "ignore";
 };

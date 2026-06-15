@@ -1,6 +1,5 @@
-import { useMachine } from "@xstate/react";
 import { useEffect, type FC } from "react";
-import { resetWorkflowMachine } from "~/shared/logic/resetWorkflowMachine";
+import { useHardResetAction } from "~/shared/hook/useHardResetAction";
 import { hardResetBrowserStorage } from "~/shared/util/hardResetBrowserStorage";
 import { logResetError } from "~/shared/util/logResetError";
 import { reloadWindow } from "~/shared/util/reloadWindow";
@@ -12,23 +11,17 @@ export namespace RootErrorBoundary {
 }
 
 export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
-	const [resetState, sendReset] = useMachine(resetWorkflowMachine, {
-		input: {
-			reset: hardResetBrowserStorage,
-			onSuccess: reloadWindow,
-			onError: logResetError,
-		},
+	const reset = useHardResetAction({
+		reset: hardResetBrowserStorage,
+		onSuccess: reloadWindow,
+		onError: logResetError,
 	});
-	const pending = resetState.matches("pending");
-	const failed = resetState.matches("failed");
 	const message = error instanceof Error ? error.message : String(error);
 
 	useEffect(() => {
-		sendReset({
-			type: "START",
-		});
+		void reset.run();
 	}, [
-		sendReset,
+		reset.run,
 	]);
 
 	return (
@@ -49,17 +42,13 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 				<div className="mt-4">
 					<button
 						type="button"
-						disabled={pending}
-						onClick={() =>
-							sendReset({
-								type: "START",
-							})
-						}
+						disabled={reset.pending}
+						onClick={() => void reset.run()}
 						className="w-full rounded-md border border-red-300/45 bg-red-300 px-4 py-3 text-sm font-black text-slate-950 disabled:cursor-wait disabled:opacity-60"
 					>
-						{pending ? "Dropping OPFS storage…" : "Retry OPFS hard reset"}
+						{reset.pending ? "Dropping OPFS storage…" : "Retry OPFS hard reset"}
 					</button>
-					{failed ? (
+					{reset.failed ? (
 						<p className="mt-3 text-sm text-red-100">
 							Automatic reset failed. Check the console.
 						</p>

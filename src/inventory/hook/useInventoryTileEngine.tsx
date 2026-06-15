@@ -205,9 +205,7 @@ export const useInventoryTileEngine = (
 				item={tile.data.item}
 			/>
 		),
-		[
-			manualActions.placeInventoryOnBoardWithFly,
-		],
+		[],
 	);
 
 	return {

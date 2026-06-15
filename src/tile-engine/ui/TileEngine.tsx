@@ -1,4 +1,3 @@
-import { useMachine } from "@xstate/react";
 import { animate } from "motion";
 import {
 	motion as motionComponent,
@@ -18,6 +17,7 @@ import React, {
 	useImperativeHandle,
 	useLayoutEffect,
 	useMemo,
+	useReducer,
 	useRef,
 } from "react";
 import { resolveDropTargetAtPoint as resolveExternalDropTargetAtPoint } from "~/drag/logic/resolveDropTargetAtPoint";
@@ -30,11 +30,12 @@ import {
 	type TileEngineExternalMotion,
 } from "~/tile-engine/hook/useTileEngineMotionAnimation";
 import {
-	tileEngineMachine,
+	initialTileEngineMotionRegistryState,
+	tileEngineMotionRegistry,
 	type TileEngineMotion,
 	type TileEnginePriority,
 	type TileEngineRect,
-} from "~/tile-engine/logic/tileEngineMachine";
+} from "~/tile-engine/logic/tileEngineMotionRegistry";
 
 const defaultGapPx = 0;
 type TileEngineDropOutcome = "accept" | "reject" | "ignore";
@@ -340,10 +341,7 @@ namespace TileEngineActor {
 		motion?: TileEngineMotion | TileEngineExternalMotion;
 		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef: RefObject<HTMLElement | null>;
-		resolveDropTargetAtPoint(
-			x: number,
-			y: number,
-		): TileEngineResolvedDropTarget<TDrop> | null;
+		resolveDropTargetAtPoint(x: number, y: number): TileEngineResolvedDropTarget<TDrop> | null;
 		settleMotion(tileId: string, nonce?: number): void;
 		renderTile(props: TileEngine.RenderTileProps<TTile>): ReactNode;
 	}
@@ -820,9 +818,7 @@ const TileEngineActor = memo(
 			onSettle: handleSettle,
 		});
 
-		const hidden = Boolean(
-			!motion && (isDropHandingOff || tile.hidden || binding?.hidden),
-		);
+		const hidden = Boolean(!motion && (isDropHandingOff || tile.hidden || binding?.hidden));
 		const baseStyle = actorStyle({
 			columns,
 			rowCount,
@@ -866,8 +862,16 @@ const TileEngineActor = memo(
 					bounceDamping: 26,
 					bounceStiffness: 640,
 				}}
-				whileTap={canDrag ? { scale: 0.97 } : undefined}
-				whileDrag={{ scale: 1.055 }}
+				whileTap={
+					canDrag
+						? {
+								scale: 0.97,
+							}
+						: undefined
+				}
+				whileDrag={{
+					scale: 1.055,
+				}}
 				onDragStart={handleDragStart}
 				onDrag={(_event, info) => handleDrag(info.point)}
 				onDragEnd={(_event, info) => handleDragEnd(info.point)}
@@ -909,7 +913,10 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 	}: TileEngine.Props<TTile, TSlot, TDrag, TDrop>,
 	ref: React.ForwardedRef<TileEngine.Handle<TTile>>,
 ) {
-	const [state, send] = useMachine(tileEngineMachine);
+	const [motionRegistry, dispatchMotionRegistry] = useReducer(
+		tileEngineMotionRegistry,
+		initialTileEngineMotionRegistryState,
+	);
 	const rootRef = useRef<HTMLDivElement | null>(null);
 	const ownDragConstraintsRef = rootRef as RefObject<HTMLElement | null>;
 	const activeDragConstraintsRef = dragConstraintsRef ?? ownDragConstraintsRef;
@@ -956,35 +963,25 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 		);
 	}, []);
 
-	const settleMotion = useCallback(
-		(tileId: string, nonce?: number) => {
-			if (nonce === undefined) return;
-			send({
-				type: "SETTLED",
-				tileId,
-				nonce,
-			});
-		},
-		[
-			send,
-		],
-	);
-	const stage = useCallback(
-		(entries: readonly TileEngine.SpawnEntry<TTile>[]) => {
-			if (!entries.length) return;
-			send({
-				type: "STAGE",
-				entries: entries.map((entry) => ({
-					tileId: entry.tileId,
-					from: entry.from,
-					priority: entry.priority,
-				})),
-			});
-		},
-		[
-			send,
-		],
-	);
+	const settleMotion = useCallback((tileId: string, nonce?: number) => {
+		if (nonce === undefined) return;
+		dispatchMotionRegistry({
+			type: "settle",
+			tileId,
+			nonce,
+		});
+	}, []);
+	const stage = useCallback((entries: readonly TileEngine.SpawnEntry<TTile>[]) => {
+		if (!entries.length) return;
+		dispatchMotionRegistry({
+			type: "stage",
+			entries: entries.map((entry) => ({
+				tileId: entry.tileId,
+				from: entry.from,
+				priority: entry.priority,
+			})),
+		});
+	}, []);
 
 	useImperativeHandle(
 		ref,
@@ -1011,13 +1008,12 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 			},
 			stage,
 			clearMotions() {
-				send({
-					type: "CLEAR",
+				dispatchMotionRegistry({
+					type: "clear",
 				});
 			},
 		}),
 		[
-			send,
 			stage,
 		],
 	);
@@ -1053,7 +1049,7 @@ function TileEngineInner<TTile, TSlot, TDrag, TDrop>(
 					const index = slotIndexById.get(tile.slotId);
 					if (index === undefined) return null;
 
-					const motion = tile.motion ?? state.context.motions[tile.id];
+					const motion = tile.motion ?? motionRegistry.motions[tile.id];
 
 					return (
 						<TileEngineActor

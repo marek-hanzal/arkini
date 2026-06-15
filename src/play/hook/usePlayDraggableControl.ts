@@ -9,7 +9,13 @@ import { usePlayCommandRunner } from "~/play/hook/usePlayCommandRunner";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
-import type { DragSource, DropTarget, RectLike, VisualMeta, VisualTransitionKind } from "~/play/types";
+import type {
+	DragSource,
+	DropTarget,
+	RectLike,
+	VisualMeta,
+	VisualTransitionKind,
+} from "~/play/types";
 import { waitForMs } from "~/shared/util/waitForMs";
 import { tileEngineMotionDurationMs } from "~/tile-engine/hook/useTileEngineMotionAnimation";
 
@@ -89,7 +95,7 @@ export function usePlayDraggableControl({
 		],
 	);
 	const scheduleDrop = useCallback(
-		<T,>(operation: () => Promise<T>) => schedule("drag/drop", operation),
+		<T>(operation: () => Promise<T>) => schedule("drag/drop", operation),
 		[
 			schedule,
 		],

@@ -18,10 +18,13 @@ export namespace BottomNavButton {
 
 export const BottomNavButton: FC<BottomNavButton.Props> = memo(
 	({ active, label, icon, tone, dropTargetActive = false, activeDropTargetNodeId, onOpen }) => {
-		const handleClick = useCallback(() => onOpen(tone), [
-			onOpen,
-			tone,
-		]);
+		const handleClick = useCallback(
+			() => onOpen(tone),
+			[
+				onOpen,
+				tone,
+			],
+		);
 		const isInventoryTarget = tone === "inventory";
 		const dropId = isInventoryTarget ? inventoryNavDropTargetNodeId : `bottom-nav:${tone}`;
 		const dropData = useMemo(

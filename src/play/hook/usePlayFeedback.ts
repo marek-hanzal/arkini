@@ -28,13 +28,21 @@ export function usePlayFeedback(): usePlayFeedback.State {
 	const imprintTimer = useRef<Timer | undefined>(undefined);
 	const inventoryTimer = useRef<Timer | undefined>(undefined);
 
-	const restartTimer = useCallback((timerRef: { current: Timer | undefined }, run: () => void) => {
-		if (timerRef.current) clearTimeout(timerRef.current);
-		timerRef.current = setTimeout(() => {
-			timerRef.current = undefined;
-			run();
-		}, flashMs);
-	}, []);
+	const restartTimer = useCallback(
+		(
+			timerRef: {
+				current: Timer | undefined;
+			},
+			run: () => void,
+		) => {
+			if (timerRef.current) clearTimeout(timerRef.current);
+			timerRef.current = setTimeout(() => {
+				timerRef.current = undefined;
+				run();
+			}, flashMs);
+		},
+		[],
+	);
 
 	useEffect(
 		() => () => {

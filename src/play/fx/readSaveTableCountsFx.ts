@@ -10,12 +10,14 @@ export const readSaveTableCountsFx = Effect.fn("readSaveTableCountsFx")(function
 				.select((eb) => eb.fn.countAll<number>().as("count"))
 				.executeTakeFirstOrThrow(),
 			db
-				.selectFrom(table.boardItem)
+				.selectFrom(table.itemInstance)
 				.select((eb) => eb.fn.countAll<number>().as("count"))
+				.where("locationKind", "=", "board")
 				.executeTakeFirstOrThrow(),
 			db
-				.selectFrom(table.inventoryStack)
+				.selectFrom(table.itemInstance)
 				.select((eb) => eb.fn.countAll<number>().as("count"))
+				.where("locationKind", "=", "inventory")
 				.executeTakeFirstOrThrow(),
 			db
 				.selectFrom(table.playerUpgrade)

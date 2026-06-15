@@ -171,7 +171,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.boardItem)
+					.updateTable(table.itemInstance)
 					.set({
 						stateJson: json({
 							...state,

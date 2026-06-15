@@ -27,13 +27,18 @@ export const insertFx = Effect.fn("insertFx")(function* ({
 	const boardItemId = id.boardItem();
 	yield* dbFx((db) =>
 		db
-			.insertInto(table.boardItem)
+			.insertInto(table.itemInstance)
 			.values({
 				id: boardItemId,
 				saveGameId: defaultSaveGameId,
 				itemDefinitionId: itemId,
-				x,
-				y,
+				quantity: 1,
+				locationKind: "board",
+				boardX: x,
+				boardY: y,
+				inventorySlotIndex: null,
+				ownerItemInstanceId: null,
+				inputItemDefinitionId: null,
 				stateJson: stateJson ?? json(createInitialBoardState(itemId, gameConfig)),
 			})
 			.execute(),

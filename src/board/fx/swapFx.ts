@@ -36,10 +36,10 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.boardItem)
+					.updateTable(table.itemInstance)
 					.set({
-						x: -1,
-						y: -1,
+						boardX: -1,
+						boardY: -1,
 						updatedAt: timestamp,
 					})
 					.where("id", "=", source.id)
@@ -47,10 +47,10 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			);
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.boardItem)
+					.updateTable(table.itemInstance)
 					.set({
-						x: source.x,
-						y: source.y,
+						boardX: source.x,
+						boardY: source.y,
 						updatedAt: timestamp,
 					})
 					.where("id", "=", target.id)
@@ -58,10 +58,10 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 			);
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.boardItem)
+					.updateTable(table.itemInstance)
 					.set({
-						x: target.x,
-						y: target.y,
+						boardX: target.x,
+						boardY: target.y,
 						updatedAt: timestamp,
 					})
 					.where("id", "=", source.id)

@@ -2,10 +2,10 @@ import { Effect } from "effect";
 import { insertFx } from "~/board/fx/insertFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
-import type { PlacementPlan } from "~/inventory/logic/planning/types";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
-import type { ProducerPlacement } from "~/producer/type/ProducerPlacementSchema";
+import type { PlacementPlan } from "~/inventory/logic/planning/types";
 import { defaultSaveGameId } from "~/play/logic/save";
+import type { ProducerPlacement } from "~/producer/type/ProducerPlacementSchema";
 
 export namespace applyPlacementPlanFx {
 	export interface Props {
@@ -40,7 +40,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 		if (placement.type === "update") {
 			yield* dbFx((db) =>
 				db
-					.updateTable(table.inventoryStack)
+					.updateTable(table.itemInstance)
 					.set({
 						quantity: placement.quantity,
 						stateJson: placement.stateJson,
@@ -52,13 +52,18 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 		} else {
 			yield* dbFx((db) =>
 				db
-					.insertInto(table.inventoryStack)
+					.insertInto(table.itemInstance)
 					.values({
 						id: placement.stackId,
 						saveGameId: defaultSaveGameId,
-						slotIndex: placement.slotIndex,
 						itemDefinitionId: placement.itemId,
 						quantity: placement.quantity,
+						locationKind: "inventory",
+						boardX: null,
+						boardY: null,
+						inventorySlotIndex: placement.slotIndex,
+						ownerItemInstanceId: null,
+						inputItemDefinitionId: null,
 						stateJson: placement.stateJson,
 					})
 					.execute(),

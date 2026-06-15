@@ -53,16 +53,13 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 			for (const step of spendPlan) {
 				if (step.type === "delete") {
 					yield* dbFx((db) =>
-						db
-							.deleteFrom(table.inventoryStack)
-							.where("id", "=", step.stackId)
-							.execute(),
+						db.deleteFrom(table.itemInstance).where("id", "=", step.stackId).execute(),
 					);
 					continue;
 				}
 				yield* dbFx((db) =>
 					db
-						.updateTable(table.inventoryStack)
+						.updateTable(table.itemInstance)
 						.set({
 							quantity: step.quantity,
 							updatedAt: timestamp,

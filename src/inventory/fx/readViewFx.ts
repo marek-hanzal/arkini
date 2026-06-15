@@ -1,25 +1,16 @@
 import { Effect } from "effect";
-import { dbFx } from "~/database/fx/dbFx";
 import { groupSlotsByItemId } from "~/inventory/logic/groupSlotsByItemId";
 import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
 import { readInventoryState } from "~/inventory/logic/readInventoryState";
-import { table } from "~/database/local/tables";
 import type { ItemId } from "~/manifest/manifestId";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import { InventoryViewSchema, type InventoryView } from "~/inventory/view/InventoryViewSchema";
-import { defaultSaveGameId } from "~/play/logic/save";
+import { readInventoryStackRowsFx } from "~/item-instance/fx/readInventoryStackRowsFx";
 import { readSaveFx } from "~/play/fx/readSaveFx";
 
 export const readViewFx = Effect.fn("readViewFx")(function* () {
 	const save = yield* readSaveFx();
-	const rows = yield* dbFx((db) =>
-		db
-			.selectFrom(table.inventoryStack)
-			.selectAll()
-			.where("saveGameId", "=", defaultSaveGameId)
-			.orderBy("slotIndex")
-			.execute(),
-	);
+	const rows = yield* readInventoryStackRowsFx();
 
 	const stackBySlotIndex = new Map(
 		rows.map((stack) => [

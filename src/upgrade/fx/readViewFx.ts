@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { completeReadyFx } from "~/upgrade/fx/completeReadyFx";
 import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
+import { readInventoryStackRowsFx } from "~/item-instance/fx/readInventoryStackRowsFx";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
 import { canSpendInventoryItems } from "~/inventory/logic/planning/canSpendInventoryItems";
@@ -16,20 +17,16 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
-	const [upgradeRows, inventoryRows] = yield* dbFx((db) =>
-		Promise.all([
+	const [upgradeRows, inventoryRows] = yield* Effect.all([
+		dbFx((db) =>
 			db
 				.selectFrom(table.playerUpgrade)
 				.selectAll()
 				.where("saveGameId", "=", defaultSaveGameId)
 				.execute(),
-			db
-				.selectFrom(table.inventoryStack)
-				.selectAll()
-				.where("saveGameId", "=", defaultSaveGameId)
-				.execute(),
-		]),
-	);
+		),
+		readInventoryStackRowsFx(),
+	]);
 	const availableByItemId = new Map<string, number>();
 	for (const row of inventoryRows) {
 		if (!isEmptyInventoryStateJson(row.stateJson)) continue;

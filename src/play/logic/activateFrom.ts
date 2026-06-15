@@ -6,7 +6,7 @@ import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { ActivationResultSchema } from "~/activation/type/ActivationResultSchema";
+import type { CommandResult } from "~/command/CommandResult";
 
 export namespace activateFrom {
 	export interface Props {
@@ -21,7 +21,16 @@ export namespace activateFrom {
 					type: "activation.activate";
 				}
 			>,
-		): Promise<ActivationResultSchema.Type>;
+		): Promise<
+			CommandResult<
+				Extract<
+					Command,
+					{
+						type: "activation.activate";
+					}
+				>
+			>
+		>;
 		feedback: Feedback;
 		invalidatePlayData(
 			targets: readonly ("board" | "inventory" | "databaseStatus")[],
@@ -47,7 +56,7 @@ export const activateFrom = async ({
 
 		stageActivationDrops({
 			results: [
-				result,
+				result.activation,
 			],
 			activeSheet,
 			visualMotions,
@@ -59,7 +68,7 @@ export const activateFrom = async ({
 			"databaseStatus",
 		]);
 
-		if (result.placements.some((placement) => placement.kind === "inventory")) {
+		if (result.activation.placements.some((placement) => placement.kind === "inventory")) {
 			highlightInventoryNav();
 		}
 	} catch (error) {

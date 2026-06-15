@@ -10,6 +10,8 @@ import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { WithdrawActivationInputSchema } from "~/activation/type/WithdrawActivationInputSchema";
+import type { CommandResultSchema } from "~/command/CommandResultSchema";
+import type { CommandVisualEventSchema } from "~/command/CommandVisualEventSchema";
 
 export namespace withdrawInputFx {
 	export interface Props {
@@ -70,7 +72,7 @@ export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 				return yield* Effect.fail(new GameActionError("Board and inventory are full."));
 			}
 
-			yield* applyPlacementPlanFx({
+			const placements = yield* applyPlacementPlanFx({
 				plan,
 			});
 			yield* spendActivationInputFx({
@@ -78,6 +80,50 @@ export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 				itemId: input.itemId,
 				quantity: 1,
 			});
+
+			return {
+				visualEvents: placements.flatMap((placement): CommandVisualEventSchema.Type[] => {
+					if (placement.kind === "board") {
+						if (
+							!placement.boardItemId ||
+							placement.x === undefined ||
+							placement.y === undefined
+						) {
+							return [];
+						}
+
+						return [
+							{
+								type: "item.spawned",
+								itemInstanceId: placement.boardItemId,
+								itemId: placement.itemId,
+								originItemInstanceId: row.id,
+								to: {
+									kind: "board",
+									x: placement.x,
+									y: placement.y,
+								},
+								reason: "activation-withdrawal",
+							},
+						];
+					}
+
+					if (placement.slotIndex === undefined) return [];
+
+					return [
+						{
+							type: "item.spawned",
+							itemId: placement.itemId,
+							originItemInstanceId: row.id,
+							to: {
+								kind: "inventory",
+								slotIndex: placement.slotIndex,
+							},
+							reason: "activation-withdrawal",
+						},
+					];
+				}),
+			} satisfies CommandResultSchema.Type;
 		}),
 	);
 });

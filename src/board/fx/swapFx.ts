@@ -7,6 +7,7 @@ import { SwapBoardItemsInputSchema } from "~/play/schema/SwapBoardItemsInputSche
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
+import type { CommandResultSchema } from "~/command/CommandResultSchema";
 
 export namespace swapFx {
 	export interface Props {
@@ -23,9 +24,13 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 		try: () => SwapBoardItemsInputSchema.parse(props),
 		catch: toGameActionError,
 	});
-	if (input.sourceBoardItemId === input.targetBoardItemId) return;
+	if (input.sourceBoardItemId === input.targetBoardItemId) {
+		return {
+			visualEvents: [],
+		} satisfies CommandResultSchema.Type;
+	}
 
-	yield* withTransactionFx(
+	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const { boardRows } = yield* readMutableSaveFx();
 			const source = boardRows.find((row) => row.id === input.sourceBoardItemId);
@@ -67,6 +72,38 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 					.where("id", "=", source.id)
 					.execute(),
 			);
+
+			return {
+				visualEvents: [
+					{
+						type: "item.swapped",
+						sourceItemInstanceId: source.id,
+						sourceItemId: source.itemDefinitionId,
+						sourceFrom: {
+							kind: "board",
+							x: source.x,
+							y: source.y,
+						},
+						sourceTo: {
+							kind: "board",
+							x: target.x,
+							y: target.y,
+						},
+						targetItemInstanceId: target.id,
+						targetItemId: target.itemDefinitionId,
+						targetFrom: {
+							kind: "board",
+							x: target.x,
+							y: target.y,
+						},
+						targetTo: {
+							kind: "board",
+							x: source.x,
+							y: source.y,
+						},
+					},
+				],
+			} satisfies CommandResultSchema.Type;
 		}),
 	);
 });

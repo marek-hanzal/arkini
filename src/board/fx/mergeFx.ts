@@ -15,6 +15,7 @@ import { readStoredBoardState } from "~/board/logic/readStoredBoardState";
 import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
 import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
 import { storeActivationInputFx } from "~/activation/fx/storeActivationInputFx";
+import type { CommandResultSchema } from "~/command/CommandResultSchema";
 
 export namespace mergeFx {
 	export interface Props {
@@ -37,7 +38,7 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 		return yield* Effect.fail(new GameActionError("Pick two different board items to merge."));
 	}
 
-	yield* withTransactionFx(
+	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const { boardRows } = yield* readMutableSaveFx();
 			const source = boardRows.find((row) => row.id === input.sourceBoardItemId);
@@ -104,7 +105,19 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 						.where("id", "=", target.id)
 						.execute(),
 				);
-				return;
+				return {
+					visualEvents: [
+						{
+							type: "item.merged",
+							sourceItemInstanceId: source.id,
+							sourceItemId: source.itemDefinitionId,
+							targetItemInstanceId: target.id,
+							targetItemId: target.itemDefinitionId,
+							resultItemId: mergeRule.resultItemId,
+							consumeSource: mergeRule.consumeSource !== false,
+						},
+					],
+				} satisfies CommandResultSchema.Type;
 			}
 
 			const craft = gameConfig.getCraftRecipeForTarget(target.itemDefinitionId);
@@ -178,7 +191,21 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 						.where("id", "=", target.id)
 						.execute(),
 				);
-				return;
+				return {
+					visualEvents: [
+						{
+							type: "item.consumed",
+							itemInstanceId: source.id,
+							itemId: source.itemDefinitionId,
+							from: {
+								kind: "board",
+								x: source.x,
+								y: source.y,
+							},
+							reason: "craft-input",
+						},
+					],
+				} satisfies CommandResultSchema.Type;
 			}
 
 			const targetActivation = gameConfig.getActivation(target.itemDefinitionId);
@@ -206,7 +233,16 @@ export const mergeFx = Effect.fn("mergeFx")(function* (props: mergeFx.Props) {
 					ownerItemInstanceId: target.id,
 					itemId: source.itemDefinitionId,
 				});
-				return;
+				return {
+					visualEvents: [
+						{
+							type: "item.fed",
+							sourceItemInstanceId: source.id,
+							targetItemInstanceId: target.id,
+							itemId: source.itemDefinitionId,
+						},
+					],
+				} satisfies CommandResultSchema.Type;
 			}
 
 			return yield* Effect.fail(

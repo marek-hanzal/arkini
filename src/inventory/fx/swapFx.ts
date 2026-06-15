@@ -8,6 +8,7 @@ import { SwapInventorySlotsInputSchema } from "~/play/schema/SwapInventorySlotsI
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
+import type { CommandResultSchema } from "~/command/CommandResultSchema";
 
 export namespace swapFx {
 	export interface Props {
@@ -24,9 +25,13 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 		try: () => SwapInventorySlotsInputSchema.parse(props),
 		catch: toGameActionError,
 	});
-	if (input.sourceSlotIndex === input.targetSlotIndex) return;
+	if (input.sourceSlotIndex === input.targetSlotIndex) {
+		return {
+			visualEvents: [],
+		} satisfies CommandResultSchema.Type;
+	}
 
-	yield* withTransactionFx(
+	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const { save, inventoryRows } = yield* readMutableSaveFx();
 			assertInsideInventory(save, input.sourceSlotIndex);
@@ -49,7 +54,23 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 						.where("id", "=", source.id)
 						.execute(),
 				);
-				return;
+				return {
+					visualEvents: [
+						{
+							type: "item.moved",
+							itemInstanceId: source.id,
+							itemId: source.itemDefinitionId,
+							from: {
+								kind: "inventory",
+								slotIndex: input.sourceSlotIndex,
+							},
+							to: {
+								kind: "inventory",
+								slotIndex: input.targetSlotIndex,
+							},
+						},
+					],
+				} satisfies CommandResultSchema.Type;
 			}
 
 			yield* dbFx((db) =>
@@ -82,6 +103,34 @@ export const swapFx = Effect.fn("swapFx")(function* (props: swapFx.Props) {
 					.where("id", "=", source.id)
 					.execute(),
 			);
+
+			return {
+				visualEvents: [
+					{
+						type: "item.swapped",
+						sourceItemInstanceId: source.id,
+						sourceItemId: source.itemDefinitionId,
+						sourceFrom: {
+							kind: "inventory",
+							slotIndex: input.sourceSlotIndex,
+						},
+						sourceTo: {
+							kind: "inventory",
+							slotIndex: input.targetSlotIndex,
+						},
+						targetItemInstanceId: target.id,
+						targetItemId: target.itemDefinitionId,
+						targetFrom: {
+							kind: "inventory",
+							slotIndex: input.targetSlotIndex,
+						},
+						targetTo: {
+							kind: "inventory",
+							slotIndex: input.sourceSlotIndex,
+						},
+					},
+				],
+			} satisfies CommandResultSchema.Type;
 		}),
 	);
 });

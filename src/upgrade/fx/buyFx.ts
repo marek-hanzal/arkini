@@ -10,6 +10,7 @@ import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { BuyUpgradeInputSchema } from "~/play/schema/BuyUpgradeInputSchema";
 import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
+import type { CommandResultSchema } from "~/command/CommandResultSchema";
 
 export namespace buyFx {
 	export interface Props {
@@ -23,7 +24,7 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 		catch: toGameActionError,
 	});
 
-	yield* withTransactionFx(
+	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const date = yield* DateServiceFx;
 			const id = yield* IdServiceFx;
@@ -49,6 +50,12 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 				nextTier.cost,
 			);
 			if (!spendPlan) return yield* Effect.fail(new GameActionError("Missing upgrade cost."));
+			const inventoryRowsById = new Map(
+				mutable.inventoryRows.map((row) => [
+					row.id,
+					row,
+				]),
+			);
 
 			for (const step of spendPlan) {
 				if (step.type === "delete") {
@@ -106,6 +113,33 @@ export const buyFx = Effect.fn("buyFx")(function* (props: buyFx.Props) {
 						.execute(),
 				);
 			}
+
+			return {
+				visualEvents: [
+					...spendPlan.flatMap((step) => {
+						const row = inventoryRowsById.get(step.stackId);
+						if (!row) return [];
+
+						return [
+							{
+								type: "item.consumed" as const,
+								itemInstanceId: row.id,
+								itemId: row.itemDefinitionId,
+								from: {
+									kind: "inventory" as const,
+									slotIndex: row.slotIndex,
+								},
+								reason: "upgrade-cost" as const,
+							},
+						];
+					}),
+					{
+						type: "upgrade.started",
+						upgradeId: upgrade.id,
+						targetLevel,
+					},
+				],
+			} satisfies CommandResultSchema.Type;
 		}),
 	);
 });

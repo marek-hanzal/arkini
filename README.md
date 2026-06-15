@@ -52,7 +52,7 @@ Randomness is provided through `RandomServiceFx`; activation rolls do not call `
 
 ## Game engine boundary
 
-Gameplay mutations go through typed `Command` values in `src/command/`. React UI and XState workflows do not import individual domain Effect roots directly. `runCommandFx` validates the discriminated command union and delegates to the owning domain root effect, while `useRunCommandMutation` is the React Query bridge for optimistic cache updates, rollback, and invalidation. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
+Gameplay mutations go through typed `Command` values in `src/command/`. React UI and XState workflows do not import individual domain Effect roots directly. `runCommandFx` validates the discriminated command union and delegates to the owning domain root effect, while `useRunCommandMutation` is the React Query bridge for optimistic cache updates, rollback, and invalidation. Command results now carry typed visual events such as `item.moved`, `item.spawned`, `item.fed`, `activation.activated`, and `upgrade.started`; these are domain facts, not DOM animation instructions. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
 
 ## Tile engine boundary
 
@@ -147,7 +147,7 @@ src/id/context/                  Effect id service context tag.
 src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
-src/command/                    Typed command schemas, command Effect router, optimistic mutation bridge, rollback, and invalidation.
+src/command/                    Typed command schemas, command visual events, command Effect router, optimistic mutation bridge, rollback, and invalidation.
 src/animation/                  Visual planning helpers for game events.
 src/interaction/                UI gesture/drop intent translation.
 src/merge/                      Merge, craft-input, and activation-input intent resolution.

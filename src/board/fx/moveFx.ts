@@ -8,6 +8,7 @@ import { MoveBoardItemInputSchema } from "~/play/schema/MoveBoardItemInputSchema
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
+import type { CommandResultSchema } from "~/command/CommandResultSchema";
 
 export namespace moveFx {
 	export interface Props {
@@ -26,7 +27,7 @@ export const moveFx = Effect.fn("moveFx")(function* (props: moveFx.Props) {
 		catch: toGameActionError,
 	});
 
-	yield* withTransactionFx(
+	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const { save, boardRows } = yield* readMutableSaveFx();
 			assertInsideBoard(save, input.x, input.y);
@@ -57,6 +58,26 @@ export const moveFx = Effect.fn("moveFx")(function* (props: moveFx.Props) {
 					.where("id", "=", boardItem.id)
 					.execute(),
 			);
+
+			return {
+				visualEvents: [
+					{
+						type: "item.moved",
+						itemInstanceId: boardItem.id,
+						itemId: boardItem.itemDefinitionId,
+						from: {
+							kind: "board",
+							x: boardItem.x,
+							y: boardItem.y,
+						},
+						to: {
+							kind: "board",
+							x: input.x,
+							y: input.y,
+						},
+					},
+				],
+			} satisfies CommandResultSchema.Type;
 		}),
 	);
 });

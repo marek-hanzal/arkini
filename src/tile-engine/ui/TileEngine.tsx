@@ -190,6 +190,11 @@ const translatedRect = (rect: TileEngineRect, x: number, y: number): TileEngineR
 	height: rect.height,
 });
 
+const rectCenter = (rect: Pick<TileEngineRect, "left" | "top" | "width" | "height">) => ({
+	x: rect.left + rect.width / 2,
+	y: rect.top + rect.height / 2,
+});
+
 const distance = (x: number, y: number) => Math.hypot(x, y);
 
 interface TileEngineDropTargetEntry<TDrop = unknown> {
@@ -336,7 +341,10 @@ const TileEngineActor = memo(
 		renderTile,
 	}: TileEngineActor.Props<TTile, TSlot, TDrag, TDrop>) => {
 		const binding = drag?.tile(tile);
-		const ref = useRef<HTMLDivElement | null>(null);
+		const actorRef = useRef<HTMLDivElement | null>(null);
+		// Motion drag owns the outer actor transform. Drop/move animation owns this
+		// inner wrapper so the two transform systems cannot desync slot placement.
+		const animationRef = useRef<HTMLDivElement | null>(null);
 		const dragSessionRef = useRef<TileEngineActor.DragSession<TDrag> | null>(null);
 		const lastTapRef = useRef<TileEngineActor.LastTap | null>(null);
 		const singleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -389,10 +397,22 @@ const TileEngineActor = memo(
 			],
 		);
 
+		const updateHoverFromActorRect = useCallback(
+			(source: TDrag, actorRect: TileEngineRect) => {
+				const center = rectCenter(actorRect);
+				return updateHover(source, center.x, center.y);
+			},
+			[
+				updateHover,
+			],
+		);
+
 		const resetDragVisual = useCallback(() => {
 			setIsDragging(false);
 			setIsPointerActive(false);
 			setIsDropHandingOff(false);
+			dragX.stop();
+			dragY.stop();
 			dragX.set(0);
 			dragY.set(0);
 		}, [
@@ -476,7 +496,7 @@ const TileEngineActor = memo(
 		const handlePointerDown = useCallback(
 			(event: ReactPointerEvent<HTMLDivElement>) => {
 				if (!binding || binding.disabled || tile.disabled || event.button !== 0) return;
-				const element = ref.current;
+				const element = actorRef.current;
 				if (!element) return;
 
 				clearSingleTimer();
@@ -579,10 +599,17 @@ const TileEngineActor = memo(
 				const session = dragSessionRef.current;
 				if (!session || !session.started) return;
 
+				const element = actorRef.current;
+				if (element) {
+					updateHoverFromActorRect(session.source, rectFromElement(element));
+					return;
+				}
+
 				updateHover(session.source, point.x, point.y);
 			},
 			[
 				updateHover,
+				updateHoverFromActorRect,
 			],
 		);
 
@@ -599,11 +626,13 @@ const TileEngineActor = memo(
 					return;
 				}
 
-				const element = ref.current;
+				const element = actorRef.current;
 				const dragRect = element
 					? rectFromElement(element)
 					: translatedRect(session.origin, dragX.get(), dragY.get());
-				const resolved = updateHover(session.source, point.x, point.y);
+				const resolved = element
+					? updateHoverFromActorRect(session.source, dragRect)
+					: updateHover(session.source, point.x, point.y);
 				finishHover(session.source);
 				releasePointerVisual();
 				setIsDropHandingOff(true);
@@ -628,6 +657,7 @@ const TileEngineActor = memo(
 				releasePointerVisual,
 				resetDragVisual,
 				updateHover,
+				updateHoverFromActorRect,
 			],
 		);
 
@@ -702,7 +732,7 @@ const TileEngineActor = memo(
 		]);
 
 		useTileEngineMotionAnimation({
-			ref,
+			ref: animationRef,
 			motion,
 			onSettle: handleSettle,
 		});
@@ -731,7 +761,7 @@ const TileEngineActor = memo(
 
 		return (
 			<motionComponent.div
-				ref={ref}
+				ref={actorRef}
 				data-drag-node-id={binding?.nodeId ?? binding?.id}
 				data-tile-engine-tile-id={tile.id}
 				data-tile-engine-slot-id={tile.slotId}
@@ -764,10 +794,15 @@ const TileEngineActor = memo(
 				onPointerCancel={handlePointerCancel}
 				onLostPointerCapture={handleLostPointerCapture}
 			>
-				{renderTile({
-					tile,
-					isDragging,
-				})}
+				<div
+					ref={animationRef}
+					className="h-full w-full origin-top-left"
+				>
+					{renderTile({
+						tile,
+						isDragging,
+					})}
+				</div>
 			</motionComponent.div>
 		);
 	},

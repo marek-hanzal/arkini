@@ -1,11 +1,9 @@
-import { useQueryClient } from "@tanstack/react-query";
 import type { Command } from "~/command/Command";
 import { useCallback, useMemo } from "react";
+import { useBoardView } from "~/board/hook/useBoardView";
 import { useRunCommandMutation } from "~/command/useRunCommandMutation";
-import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
-import { playQueryKeys } from "~/play/hook/playQueryKeys";
 import { usePlayFeedbackState } from "~/play/hook/usePlayFeedbackState";
 import { usePlaySchedule } from "~/play/hook/usePlaySchedule";
 import { usePlayVisualMotionsState } from "~/play/hook/usePlayVisualMotionsState";
@@ -16,7 +14,7 @@ export namespace usePlayManualItemActions {
 }
 
 export const usePlayManualItemActions = (_props?: usePlayManualItemActions.Props) => {
-	const queryClient = useQueryClient();
+	const board = useBoardView();
 	const invalidatePlayData = usePlayDataInvalidation();
 	const visualMotions = usePlayVisualMotionsState();
 	const feedback = usePlayFeedbackState();
@@ -32,18 +30,11 @@ export const usePlayManualItemActions = (_props?: usePlayManualItemActions.Props
 		invalidateOnSuccess: false,
 	});
 	const run = command.mutateAsync;
-	const readBoard = useCallback(
-		() => queryClient.getQueryData<BoardView>(playQueryKeys.board),
-		[
-			queryClient,
-		],
-	);
-
 	const placeInventoryOnBoard = useCallback(
 		(slot: InventorySlot) =>
 			schedule("place inventory item", () =>
 				placeInventoryOnBoardWithFly({
-					board: readBoard(),
+					board,
 					slot,
 					visualMotions,
 					run,
@@ -54,7 +45,7 @@ export const usePlayManualItemActions = (_props?: usePlayManualItemActions.Props
 		[
 			feedback,
 			invalidatePlayData,
-			readBoard,
+			board,
 			run,
 			schedule,
 			visualMotions,

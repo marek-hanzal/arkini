@@ -1,9 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import type { DraggablePayload } from "~/drag/DraggablePayload";
 import { useDraggableControl } from "~/drag/hook/useDraggableControl";
 import { flashDrop } from "~/interaction/flashDrop";
-import { getDragBoundaryNodeId } from "~/interaction/getDragBoundaryNodeId";
 import { resolveDrop } from "~/interaction/resolveDrop";
 import type { AnyDropContext, Feedback } from "~/interaction/types";
 import { useCommand } from "~/play/hook/useCommand";
@@ -14,7 +12,6 @@ import type { BoardView, GameDragView, InventoryView } from "~/play/logic/playTy
 import type { VisualTransitionKind, DragSource, DropTarget, VisualMeta } from "~/play/types";
 import { tileEngineMotionDurationMs } from "~/tile-engine/hook/useTileEngineMotionAnimation";
 import { waitForMs } from "~/shared/util/waitForMs";
-import { resolveMagneticDropTarget } from "./resolveMagneticDropTarget";
 
 export type { Feedback } from "~/interaction/types";
 
@@ -107,13 +104,6 @@ export function usePlayDraggableControl({
 			schedule,
 		],
 	);
-	const resolveBoundaryNodeId = useCallback(
-		(source: DraggablePayload<string, DragSource, VisualMeta>) =>
-			getDragBoundaryNodeId({
-				source,
-			}),
-		[],
-	);
 	const control = useDraggableControl<
 		string,
 		DragSource,
@@ -123,10 +113,8 @@ export function usePlayDraggableControl({
 	>({
 		schedule: scheduleDrop,
 		resolveDrop: resolvePlayDrop,
-		resolveMagneticDropTarget: resolveMagneticDropTarget,
 		animate,
 		onError,
-		getDragBoundaryNodeId: resolveBoundaryNodeId,
 	});
 
 	const activeItem =

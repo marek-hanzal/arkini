@@ -13,7 +13,7 @@ import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
-import type { DragData, DropData } from "~/play/types";
+import type { DragData, DropData, RectLike } from "~/play/types";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { TileEngine } from "~/tile-engine/ui/TileEngine";
 
@@ -31,7 +31,12 @@ const boardCells = Array.from(
 export namespace Board {
 	export interface DragState {
 		activeDrag?: DragData;
+		activeDropTargetNodeId?: string | null;
 		isSourceHidden(sourceId: string): boolean;
+		setActiveDropTargetNodeId(nodeId: string | null): void;
+		start(props: { source: DragData; previewRect: Pick<RectLike, "width" | "height"> }): void;
+		drop(props: { source: DragData; target: DropData | null; dragRect: RectLike | null }): void;
+		cancel(): void;
 	}
 
 	export interface FeedbackState {
@@ -111,8 +116,28 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 			visualMotions,
 		],
 	);
-	const dragConfig = useMemo<TileEngine.DragConfig<BoardTileData, (typeof boardCells)[number]>>(
+	const dragConfig = useMemo<
+		TileEngine.DragConfig<BoardTileData, (typeof boardCells)[number], DragData, DropData>
+	>(
 		() => ({
+			onDragStart: (source, rect) =>
+				drag.start({
+					source,
+					previewRect: {
+						width: rect.width,
+						height: rect.height,
+					},
+				}),
+			onDragOver: (_source, _target, targetNodeId) => {
+				drag.setActiveDropTargetNodeId(targetNodeId);
+			},
+			onDrop: (source, target, dragRect) =>
+				drag.drop({
+					source,
+					target,
+					dragRect,
+				}),
+			onDragCancel: drag.cancel,
 			tile: (tile) => {
 				const boardItem = tile.data.boardItem;
 				const sourceId = boardSourceId(boardItem.id);
@@ -160,7 +185,11 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 		}),
 		[
 			actions,
+			drag.cancel,
+			drag.drop,
 			drag.isSourceHidden,
+			drag.setActiveDropTargetNodeId,
+			drag.start,
 		],
 	);
 
@@ -235,7 +264,7 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 	if (!board || !items) return null;
 
 	return (
-		<TileEngine<BoardTileData, (typeof boardCells)[number]>
+		<TileEngine<BoardTileData, (typeof boardCells)[number], DragData, DropData>
 			id="board"
 			columns={boardColumns}
 			slots={tileSlots}
@@ -243,6 +272,7 @@ export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMot
 			gapPx={1}
 			className="w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
 			itemLayerClassName="pointer-events-none"
+			activeDropTargetNodeId={drag.activeDropTargetNodeId ?? null}
 			drag={dragConfig}
 			renderSlot={renderSlot}
 			renderTile={renderTile}

@@ -1,25 +1,15 @@
-import {
-	PointerSensor,
-	useSensor,
-	useSensors,
-	type DragEndEvent,
-	type DragStartEvent,
-} from "@dnd-kit/core";
 import { useActorRef } from "@xstate/react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DropContext } from "~/drag/DropContext";
 import type { DropPlan } from "~/drag/DropPlan";
 import type { DroppablePayload } from "~/drag/DroppablePayload";
-import type { MagneticDropContext } from "~/drag/MagneticDropContext";
 import type { ResolvedDraggableAnimation } from "~/drag/ResolvedDraggableAnimation";
 import type { DropPlanRuntime } from "~/drag/DropPlanRuntime";
 import { draggableWorkflowMachine } from "~/drag/logic/draggableWorkflowMachine";
 import { failDrop } from "~/drag/logic/failDrop";
-import { resolveDropContext } from "~/drag/logic/resolveDropContext";
 import { runDropPlan } from "~/drag/logic/runDropPlan";
-import { useDragBoundaryModifier } from "./useDragBoundaryModifier";
-import { useDragSession } from "./useDragSession";
+import type { RectLike } from "~/play/types";
 import { useHiddenSources } from "./useHiddenSources";
 
 export namespace useDraggableControl {
@@ -39,27 +29,20 @@ export namespace useDraggableControl {
 			error: unknown,
 			context: DropContext<ItemId, Source, Target, Overlay>,
 		): void | Promise<void>;
-		/**
-		 * Optional semantic target resolver. When present, its result wins over dnd-kit `over`,
-		 * so apps can implement magnetic edge/corner snapping consistently across surfaces.
-		 */
-		resolveMagneticDropTarget?(
-			context: MagneticDropContext<ItemId, Source, Overlay>,
-		): DroppablePayload<Target> | null;
-		getDragBoundaryNodeId?(
-			source: DraggablePayload<ItemId, Source, Overlay>,
-		): string | null | undefined;
-		activationDistance?: number;
+	}
+
+	export interface StartProps<ItemId extends string, Source, Overlay> {
+		source: DraggablePayload<ItemId, Source, Overlay>;
+		previewRect: Pick<RectLike, "width" | "height">;
+	}
+
+	export interface DropProps<ItemId extends string, Source, Target, Overlay> {
+		source: DraggablePayload<ItemId, Source, Overlay>;
+		target: DroppablePayload<Target> | null;
+		dragRect: RectLike | null;
 	}
 }
 
-/**
- * Generic drag/drop workflow.
- *
- * This hook deliberately knows nothing about domain rules, surfaces, or
- * persistence. It wires dnd-kit to the XState workflow and delegates source
- * hiding, animations, target resolving, and plan execution to small drag modules.
- */
 export const useDraggableControl = <
 	ItemId extends string = string,
 	Source = unknown,
@@ -71,27 +54,26 @@ export const useDraggableControl = <
 	animate,
 	onError,
 	schedule,
-	resolveMagneticDropTarget,
-	getDragBoundaryNodeId,
-	activationDistance = 2,
 }: useDraggableControl.Props<ItemId, Source, Target, Overlay, Kind>) => {
-	const sensors = useSensors(
-		useSensor(PointerSensor, {
-			activationConstraint: {
-				distance: activationDistance,
-			},
-		}),
-	);
 	const workflow = useActorRef(draggableWorkflowMachine);
 	const sendWorkflow = workflow.send;
-	const session = useDragSession<ItemId, Source, Overlay>({
-		getDragBoundaryNodeId,
-	});
 	const sources = useHiddenSources();
-	const modifiers = useDragBoundaryModifier({
-		boundaryRectRef: session.dragBoundaryRectRef,
-		enabled: Boolean(getDragBoundaryNodeId),
-	});
+	const activeDragRef = useRef<DraggablePayload<ItemId, Source, Overlay> | null>(null);
+	const [activeDrag, setActiveDrag] = useState<DraggablePayload<ItemId, Source, Overlay> | null>(
+		null,
+	);
+	const [dragPreviewRect, setDragPreviewRect] = useState<Pick<
+		RectLike,
+		"width" | "height"
+	> | null>(null);
+	const [activeDropTargetNodeId, setActiveDropTargetNodeId] = useState<string | null>(null);
+
+	const clearActiveDrag = useCallback(() => {
+		activeDragRef.current = null;
+		setActiveDrag(null);
+		setDragPreviewRect(null);
+		setActiveDropTargetNodeId(null);
+	}, []);
 	const runtime: DropPlanRuntime<ItemId, Source, Target, Overlay, Kind> = useMemo(
 		() => ({
 			animate,
@@ -99,33 +81,56 @@ export const useDraggableControl = <
 			sendWorkflow,
 			hideSources: sources.hideSources,
 			clearHiddenSources: sources.clearHiddenSources,
-			clearActiveDrag: session.clear,
+			clearActiveDrag,
 		}),
 		[
 			animate,
+			clearActiveDrag,
 			onError,
 			sendWorkflow,
-			session.clear,
 			sources.clearHiddenSources,
 			sources.hideSources,
 		],
 	);
 
-	const handleDragEnd = useCallback(
-		async (event: DragEndEvent) => {
-			const { context, dragRect } = resolveDropContext<ItemId, Source, Target, Overlay>({
-				event,
-				resolveMagneticDropTarget,
+	const start = useCallback(
+		({ source, previewRect }: useDraggableControl.StartProps<ItemId, Source, Overlay>) => {
+			sendWorkflow({
+				type: "DRAG_STARTED",
 			});
-			session.clearPreview();
+			sources.clearHiddenSources();
+			activeDragRef.current = source;
+			setActiveDrag(source);
+			setDragPreviewRect(previewRect);
+		},
+		[
+			sendWorkflow,
+			sources.clearHiddenSources,
+		],
+	);
 
-			if (!context) {
-				sendWorkflow({
-					type: "RESET",
-				});
-				session.clear();
-				return;
-			}
+	const cancel = useCallback(() => {
+		sendWorkflow({
+			type: "DRAG_CANCELLED",
+		});
+		clearActiveDrag();
+		sources.clearHiddenSources();
+	}, [
+		clearActiveDrag,
+		sendWorkflow,
+		sources.clearHiddenSources,
+	]);
+
+	const drop = useCallback(
+		async ({
+			source,
+			target,
+			dragRect,
+		}: useDraggableControl.DropProps<ItemId, Source, Target, Overlay>) => {
+			const context: DropContext<ItemId, Source, Target, Overlay> = {
+				source,
+				target,
+			};
 
 			sendWorkflow({
 				type: "DROP_RESOLVING",
@@ -153,85 +158,44 @@ export const useDraggableControl = <
 		},
 		[
 			resolveDrop,
-			resolveMagneticDropTarget,
 			runtime,
 			schedule,
 			sendWorkflow,
-			session,
 		],
 	);
-
-	const handleDragStart = useCallback(
-		(event: DragStartEvent) => {
-			sendWorkflow({
-				type: "DRAG_STARTED",
-			});
-			sources.clearHiddenSources();
-			session.start(event);
-		},
-		[
-			sendWorkflow,
-			session,
-			sources.clearHiddenSources,
-		],
-	);
-
-	const handleDragCancel = useCallback(() => {
-		sendWorkflow({
-			type: "DRAG_CANCELLED",
-		});
-		session.clear();
-		sources.clearHiddenSources();
-	}, [
-		sendWorkflow,
-		session,
-		sources.clearHiddenSources,
-	]);
 
 	const isSourceHidden = useCallback(
-		(sourceId: string) =>
-			sources.hiddenSourceIds.has(sourceId) ||
-			(session.activeDrag?.hideWhenActive !== false &&
-				session.activeDrag?.sourceId === sourceId),
+		(sourceId: string) => sources.hiddenSourceIds.has(sourceId),
 		[
-			session.activeDrag,
 			sources.hiddenSourceIds,
-		],
-	);
-
-	const contextProps = useMemo(
-		() => ({
-			sensors,
-			onDragStart: handleDragStart,
-			onDragEnd: handleDragEnd,
-			onDragCancel: handleDragCancel,
-			modifiers,
-		}),
-		[
-			handleDragCancel,
-			handleDragEnd,
-			handleDragStart,
-			modifiers,
-			sensors,
 		],
 	);
 
 	return useMemo(
 		() => ({
-			contextProps,
-			activeDrag: session.activeDrag,
+			activeDrag,
+			activeDropTargetNodeId,
 			hiddenSourceIds: sources.hiddenSourceIds,
-			dragPreviewRect: session.dragPreviewRect,
+			dragPreviewRect,
 			isSourceHidden,
 			hideSources: sources.hideSources,
 			showSource: sources.showSource,
 			clearHiddenSources: sources.clearHiddenSources,
+			clearActiveDrag,
+			setActiveDropTargetNodeId,
+			start,
+			drop,
+			cancel,
 		}),
 		[
-			contextProps,
+			activeDrag,
+			activeDropTargetNodeId,
+			cancel,
+			clearActiveDrag,
+			dragPreviewRect,
+			drop,
 			isSourceHidden,
-			session.activeDrag,
-			session.dragPreviewRect,
+			start,
 			sources.clearHiddenSources,
 			sources.hiddenSourceIds,
 			sources.hideSources,

@@ -6,12 +6,13 @@ export namespace BottomNavigation {
 	export interface Props {
 		activeSheet?: ActiveSheet;
 		inventoryDropTargetActive?: boolean;
+		activeDropTargetNodeId?: string | null;
 		onOpen(sheet: BottomNavSheet): void;
 	}
 }
 
 export const BottomNavigation: FC<BottomNavigation.Props> = memo(
-	({ activeSheet, inventoryDropTargetActive = false, onOpen }) => {
+	({ activeSheet, inventoryDropTargetActive = false, activeDropTargetNodeId, onOpen }) => {
 		return (
 			<nav className="ak-bottom-nav">
 				<div className="ak-bottom-nav-inner">
@@ -21,6 +22,7 @@ export const BottomNavigation: FC<BottomNavigation.Props> = memo(
 						icon="▦"
 						tone="inventory"
 						dropTargetActive={inventoryDropTargetActive}
+						activeDropTargetNodeId={activeDropTargetNodeId}
 						onOpen={onOpen}
 					/>
 					<BottomNavButton

@@ -48,7 +48,7 @@ export namespace draggableWorkflowMachine {
 
 /**
  * UI-only drag workflow statechart. Domain data stays outside; this actor only
- * documents and gates the transient drag/drop lifecycle owned by dnd-kit.
+ * documents and gates the transient pointer drag/drop lifecycle.
  */
 export const draggableWorkflowMachine = setup({
 	types: {

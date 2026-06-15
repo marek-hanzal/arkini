@@ -93,13 +93,13 @@ The current content direction is Settlers-like: small producers create raw goods
 
 ## Interaction model
 
-Tap/press recognition is centralized in `src/shared/hook/usePressActions.ts`, built on `@react-aria/interactions`, and modeled by `src/shared/logic/pressActionsMachine.ts` for single/double/long-press timing. Board item detail opens through long press, including producers whose single tap is reserved for production. Keep raw touch/pointer timing out of board/tile components unless you enjoy debugging mobile browsers like some kind of punishment enthusiast.
+Tap/press recognition is owned by `TileEngine` together with tile dragging. Single, double, long press, drag threshold, pointer cancel, and mobile native context-menu suppression live in the same engine path so touch timing cannot fight the tile animation layer like two raccoons in a bin.
 
 Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle. The transient drag phase is modeled by `src/drag/logic/draggableWorkflowMachine.ts` through XState; do not put board, inventory, or item data into that machine just because the context field exists and humanity cannot be trusted with containers.
 
-Game-specific drag policy lives in `src/interaction/resolveDrop.ts` and delegates merge/craft/producer-input eligibility to `src/merge/resolveDropIntent.ts`. `src/play/hook/usePlayDraggableControl.ts` is only the thin React wiring that connects the generic drag control, the interaction engine, and the `Command` runner. `src/play/hook/resolveMagneticDropTarget.ts` is the same kind of game-specific adapter: board drags prefer the explicit inventory bottom-nav target when reached, otherwise they resolve the nearest board cell by real rectangle overlap first, then distance; inventory drags stay on inventory slots. The magnetic resolver wins over dnd-kit `over`, so grid edges and cross-points do not get punished just because a pointer landed on UI grout.
+Game-specific drag policy lives in `src/interaction/resolveDrop.ts` and delegates merge/craft/producer-input eligibility to `src/merge/resolveDropIntent.ts`. `src/play/hook/usePlayDraggableControl.ts` is only the thin React wiring that connects the generic drag control, the interaction engine, and the `Command` runner. Drop target resolution is DOM-backed but not framework-backed: TileEngine and the bottom nav register stable target ids, then the active pointer resolves the target under the finger/mouse through the tiny registry in `src/drag/logic/dropTargetRegistry.ts`. No external DnD framework gets to touch tile transforms.
 
-Accepted drag/drop actions now keep the active drag actor alive until the durable command and query invalidation settle. The final board/inventory tile is the only real visual actor; regular moves, swaps, merge consumes, producer drops, stash dumps, and inventory placement must not create a second overlay copy of the same item. New committed actors can receive a transient origin and raised priority through `visualItemMotionMachine`, then settle back to normal priority after Motion completes. If the visual layer and durable cache disagree for a frame, the visual layer wins until the next committed movement syncs it, because blinking tiles are how UI admits defeat.
+Accepted drag/drop actions use the TileEngine actor as the live dragged visual, not a framework overlay copy. The final board/inventory tile is the only real visual actor; regular moves, swaps, merge consumes, producer drops, stash dumps, and inventory placement must not create a second overlay copy of the same item. New committed actors can receive a transient origin and raised priority through `visualItemMotionMachine`, then settle back to normal priority after Motion completes. If the visual layer and durable cache disagree for a frame, the visual layer wins until the next committed movement syncs it, because blinking tiles are how UI admits defeat.
 
 Inventory stash feedback holds the inventory bottom-nav highlight briefly and extends that hold when more items arrive quickly, so bursty item stashing does not flicker like a broken nightclub sign. Producer ready feedback is tracked by producer instance id and played through Motion only on real readiness transitions. Mounting a producer or moving it across the board must not pulse it; React mounts are not gameplay events, despite React’s best efforts to feel important. Board/inventory flash and merge/imprint pulse feedback lives in `src/play/logic/playFeedbackMachine.ts`, because independent timed visual states are exactly where random `setTimeout` soup starts breeding.
 
@@ -150,12 +150,12 @@ src/play/logic/                  Promise backend façade for read/bootstrap flow
 src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
 src/play/hook/                   Granular React Query subscriptions, XState event queue, and thin command/interaction wiring.
 src/play/ui/                     Main shell, sheets, bottom navigation, database status UI.
-src/drag/                        Generic DnD lifecycle, XState drag workflow, and draggable/droppable surfaces.
+src/drag/                        Generic pointer drag lifecycle, XState drag workflow, hidden sources, and drop target registry.
 src/board/                       Board identity, board state logic, board UI, cell feedback.
 src/inventory/                   Inventory identity, stack planning/storage logic, inventory sheet UI.
 src/producer/                    Producer output rolling, readiness tracking, upgrade-adjusted output, and depletion logic.
 src/upgrade/                     Tiered global upgrades, purchase effects, producer modifiers, and upgrade sheet UI.
-src/item/                        Shared item visual renderer used by board, inventory, and drag overlay.
+src/item/                        Shared item visual renderer used by board, inventory, and TileEngine actors.
 src/shared/                      Small UI/util hooks and helpers.
 ```
 

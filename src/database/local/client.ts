@@ -17,5 +17,3 @@ const sqlocal = new SQLocalKysely({
 export const kysely = new Kysely<Database>({
 	dialect: sqlocal.dialect,
 });
-
-export const sqlite = sqlocal;

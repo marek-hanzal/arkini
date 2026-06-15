@@ -225,12 +225,12 @@ Migrations only create or change storage shape. They do not preserve old gamepla
 On boot:
 
 1. Browser capability checks run.
-2. Kysely migrations run. If Kysely reports corrupted/missing historical migrations, the local OPFS database is dropped and migrated fresh. The root error boundary and database sheet also expose a hard reset button, because a prototype save is not worth an infinite broken boot loop.
+2. Kysely migrations run. Migration failures are allowed to crash upward. The root error boundary immediately drops the whole OPFS storage and reloads instead of trying to nurse a corrupted local prototype save back to life.
 3. `syncConfigFx()` validates and hashes `GameConfig`.
 4. If the stored hash differs from the current hash, the default save is deleted.
 5. `ensureDefaultSaveFx()` creates the default save from the current starting state when missing.
 
-There is no gameplay data backward compatibility. Ever. Old saves are disposable prototype state, not sacred museum artifacts.
+The database sheet hard reset uses the same full OPFS reset path as the root error boundary. There is no gameplay data backward compatibility. Ever. Old saves are disposable prototype state, not sacred museum artifacts.
 
 ## Validation policy
 

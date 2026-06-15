@@ -3,7 +3,6 @@ import type { DropPlan } from "~/drag/DropPlan";
 import type { DropPlanRuntime } from "~/drag/DropPlanRuntime";
 import type { RectLike } from "~/play/types";
 import { waitForPaint } from "~/shared/util/waitForPaint";
-import { playAnimations } from "./playAnimations";
 import { settleWorkflow } from "./settleWorkflow";
 
 export namespace runAcceptPlan {
@@ -28,48 +27,17 @@ export const runAcceptPlan = async <
 	Kind extends string = string,
 >({
 	plan,
-	dragRect,
 	runtime,
 }: runAcceptPlan.Props<ItemId, Source, Target, Overlay, Kind>) => {
 	runtime.sendWorkflow({
 		type: "DROP_ACCEPTED",
 	});
 	runtime.hideSources(plan.hide ?? []);
+	runtime.sendWorkflow({
+		type: "COMMIT_STARTED",
+	});
 
-	if (plan.animations?.length && plan.animationTiming !== "afterCommit") {
-		runtime.clearActiveDrag();
-		runtime.sendWorkflow({
-			type: "ANIMATION_STARTED",
-		});
-		await playAnimations({
-			animations: plan.animations,
-			dragRect,
-			animate: runtime.animate,
-		});
-
-		runtime.sendWorkflow({
-			type: "COMMIT_STARTED",
-		});
-		await plan.commit();
-	} else {
-		runtime.sendWorkflow({
-			type: "COMMIT_STARTED",
-		});
-		await plan.commit();
-
-		if (plan.animations?.length && plan.animationTiming === "afterCommit") {
-			runtime.sendWorkflow({
-				type: "ANIMATION_STARTED",
-			});
-			const animation = playAnimations({
-				animations: plan.animations,
-				dragRect,
-				animate: runtime.animate,
-			});
-			runtime.clearActiveDrag();
-			await animation;
-		}
-	}
+	await plan.commit();
 
 	runtime.clearActiveDrag();
 	runtime.clearHiddenSources();

@@ -1,9 +1,7 @@
-import type { DraggableAnimation } from "./DraggableAnimation";
-
 export type DropPlan<
 	ItemId extends string = string,
-	Kind extends string = string,
-	Overlay = unknown,
+	_Kind extends string = string,
+	_Overlay = unknown,
 > =
 	| {
 			type: "ignore";
@@ -15,11 +13,8 @@ export type DropPlan<
 	  }
 	| {
 			type: "accept";
-			/** Source ids hidden while commit/animations are being resolved. */
+			/** Source ids hidden while commit/event animations are being resolved. */
 			hide?: string[];
-			/** Generic pre/post move animations. */
-			animations?: DraggableAnimation<ItemId, Kind, Overlay>[];
-			animationTiming?: "beforeCommit" | "afterCommit";
 			commit(): Promise<unknown> | unknown;
 			feedback?(): void | Promise<void>;
 	  };

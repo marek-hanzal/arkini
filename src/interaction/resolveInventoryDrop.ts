@@ -1,7 +1,5 @@
 import type { DropPlan } from "~/drag/DropPlan";
 import type { ItemId } from "~/manifest/manifestId";
-import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
-import { visualInventoryStackKey } from "~/play/hook/useVisualItemMotions";
 import type { VisualTransitionKind, VisualMeta } from "~/play/types";
 import { accept } from "./accept";
 import type { Runtime, TypedDropContext } from "./types";
@@ -9,7 +7,7 @@ import type { Runtime, TypedDropContext } from "./types";
 export namespace resolveInventoryDrop {
 	export interface Props {
 		context: TypedDropContext<"inventory", "inventory-slot">;
-		runtime: Pick<Runtime, "game" | "run">;
+		runtime: Pick<Runtime, "run">;
 	}
 }
 
@@ -23,31 +21,9 @@ export const resolveInventoryDrop = ({
 			type: "ignore",
 		};
 
-	const targetStack = runtime.game.inventoryBySlotIndex[target.target.slotIndex]?.stack;
-
 	return accept({
 		hide: [
 			source.sourceId,
-		],
-		animations: [
-			{
-				itemId: source.itemId,
-				actorKey: visualInventoryStackKey(source.source.stackId),
-				fromDrag: true,
-				toNodeId: inventorySlotNodeId(target.target.slotIndex),
-				kind: "move",
-			},
-			...(targetStack
-				? [
-						{
-							itemId: targetStack.itemId,
-							actorKey: visualInventoryStackKey(targetStack.id),
-							fromNodeId: inventorySlotNodeId(target.target.slotIndex),
-							toNodeId: source.sourceNodeId,
-							kind: "move" as const,
-						},
-					]
-				: []),
 		],
 		commit: () =>
 			runtime.run({

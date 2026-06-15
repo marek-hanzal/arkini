@@ -19,12 +19,14 @@ export const locationVisualRect = ({
 	itemInstanceId,
 	activeSheet,
 	fallbackSourceRect,
-}: locationVisualRect.Props) => {
+}: locationVisualRect.Props): RectLike | null => {
 	if (location.kind === "board") {
 		return (
+			queryPaddingBoxRect(`[data-board-cell="${location.x}:${location.y}"]`) ??
 			actorVisualRect({
 				itemInstanceId,
-			}) ?? queryPaddingBoxRect(`[data-board-cell="${location.x}:${location.y}"]`)
+			}) ??
+			null
 		);
 	}
 
@@ -34,7 +36,7 @@ export const locationVisualRect = ({
 				? (queryPaddingBoxRect(`[data-inventory-slot-tile="${location.slotIndex}"]`) ??
 					queryPaddingBoxRect(`[data-inventory-slot="${location.slotIndex}"]`))
 				: null;
-		return rect ?? (fallbackSourceRect ? inventorySinkRect(fallbackSourceRect) : null);
+		return rect ?? (fallbackSourceRect ? inventorySinkRect(fallbackSourceRect) : null) ?? null;
 	}
 
 	return actorVisualRect({

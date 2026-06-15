@@ -1,6 +1,5 @@
 import type { DropPlan } from "~/drag/DropPlan";
 import type { ItemId } from "~/manifest/manifestId";
-import { visualBoardItemKey } from "~/play/hook/useVisualItemMotions";
 import { pulseBottomNav } from "~/play/hook/pulseBottomNav";
 import type { VisualTransitionKind, VisualMeta } from "~/play/types";
 import { accept } from "./accept";
@@ -14,22 +13,12 @@ export namespace resolveBoardInventoryDrop {
 }
 
 export const resolveBoardInventoryDrop = ({
-	context: { source, target },
+	context: { source },
 	runtime,
 }: resolveBoardInventoryDrop.Props): DropPlan<ItemId, VisualTransitionKind, VisualMeta> =>
 	accept({
-		animationTiming: "beforeCommit",
 		hide: [
 			source.sourceId,
-		],
-		animations: [
-			{
-				itemId: source.itemId,
-				actorKey: visualBoardItemKey(source.source.boardItemId),
-				fromDrag: true,
-				toNodeId: target.targetNodeId,
-				kind: "exit",
-			},
 		],
 		commit: () =>
 			runtime.run({

@@ -5,18 +5,24 @@ import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { InventoryPlaceResult } from "~/inventory/view/InventoryPlaceResultSchema";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
+import type { Command } from "~/command/Command";
+import type { CommandResult } from "~/command/CommandResult";
 
 export namespace placeInventoryOnBoardWithFly {
 	export interface Props {
 		board: BoardView | undefined;
 		slot: InventorySlot;
 		visualMotions: Pick<useVisualItemMotions.State, "stage">;
-		run(command: {
-			type: "inventory.place";
-			slotIndex: number;
-			x: number;
-			y: number;
-		}): Promise<InventoryPlaceResult>;
+		run(command: { type: "inventory.place"; slotIndex: number; x: number; y: number }): Promise<
+			CommandResult<
+				Extract<
+					Command,
+					{
+						type: "inventory.place";
+					}
+				>
+			>
+		>;
 		feedback: Feedback;
 		invalidatePlayData(
 			targets: readonly ("board" | "inventory" | "databaseStatus")[],
@@ -52,11 +58,12 @@ export const placeInventoryOnBoardWithFly = async ({
 			x: target.x,
 			y: target.y,
 		});
+		const { inventoryPlace } = result;
 
 		if (from && to) {
 			visualMotions.stage([
 				{
-					key: visualBoardItemKey(result.boardItemId),
+					key: visualBoardItemKey(inventoryPlace.boardItemId),
 					from,
 					to,
 					priority: "raised",

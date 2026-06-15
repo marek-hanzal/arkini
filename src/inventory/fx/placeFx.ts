@@ -17,6 +17,8 @@ import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
 import { parseJson } from "~/shared/parseJson";
+import type { CommandResult } from "~/command/CommandResult";
+import type { Command } from "~/command/Command";
 
 export namespace placeFx {
 	export interface Props {
@@ -75,12 +77,39 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 						.execute(),
 				);
 
-				return {
+				const inventoryPlace = {
 					boardItemId: stack.id,
 					itemId: stack.itemDefinitionId as ItemId,
 					x: input.x,
 					y: input.y,
 				} satisfies InventoryPlaceResult;
+
+				return {
+					inventoryPlace,
+					visualEvents: [
+						{
+							type: "item.moved",
+							itemInstanceId: inventoryPlace.boardItemId,
+							itemId: stack.itemDefinitionId as ItemId,
+							from: {
+								kind: "inventory",
+								slotIndex: input.slotIndex,
+							},
+							to: {
+								kind: "board",
+								x: input.x,
+								y: input.y,
+							},
+						},
+					],
+				} satisfies CommandResult<
+					Extract<
+						Command,
+						{
+							type: "inventory.place";
+						}
+					>
+				>;
 			}
 
 			const boardItemId = yield* insertFx({
@@ -94,12 +123,36 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 				quantity: 1,
 			});
 
-			return {
+			const inventoryPlace = {
 				boardItemId,
 				itemId: stack.itemDefinitionId as ItemId,
 				x: input.x,
 				y: input.y,
 			} satisfies InventoryPlaceResult;
+
+			return {
+				inventoryPlace,
+				visualEvents: [
+					{
+						type: "item.spawned",
+						itemInstanceId: boardItemId,
+						itemId: stack.itemDefinitionId as ItemId,
+						to: {
+							kind: "board",
+							x: input.x,
+							y: input.y,
+						},
+						reason: "inventory-placement",
+					},
+				],
+			} satisfies CommandResult<
+				Extract<
+					Command,
+					{
+						type: "inventory.place";
+					}
+				>
+			>;
 		}),
 	);
 });

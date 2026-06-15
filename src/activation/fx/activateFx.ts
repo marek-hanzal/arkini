@@ -22,6 +22,9 @@ import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/play/logic/toGameActionError";
 import { json } from "~/shared/json";
 import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
+import type { Command } from "~/command/Command";
+import type { CommandResult } from "~/command/CommandResult";
+import type { CommandVisualEventSchema } from "~/command/CommandVisualEventSchema";
 import { depleteActivationFx } from "./depleteActivationFx";
 import { rollActivationOutputFx } from "./rollActivationOutputFx";
 
@@ -171,16 +174,84 @@ export const activateFx = Effect.fn("activateFx")(function* (props: activateFx.P
 				nextRemainingCharges !== undefined &&
 				nextRemainingCharges <= 0;
 
+			const visualEvents: CommandVisualEventSchema.Type[] = [
+				{
+					type: "activation.activated",
+					itemInstanceId: row.id,
+					mode: input.activation,
+				},
+				...placements.flatMap((placement): CommandVisualEventSchema.Type[] => {
+					if (placement.kind === "board") {
+						if (
+							!placement.boardItemId ||
+							placement.x === undefined ||
+							placement.y === undefined
+						) {
+							return [];
+						}
+
+						return [
+							{
+								type: "item.spawned",
+								itemInstanceId: placement.boardItemId,
+								itemId: placement.itemId,
+								originItemInstanceId: row.id,
+								to: {
+									kind: "board",
+									x: placement.x,
+									y: placement.y,
+								},
+								reason: "activation-output",
+							},
+						];
+					}
+
+					if (placement.slotIndex === undefined) return [];
+
+					return [
+						{
+							type: "item.spawned",
+							itemId: placement.itemId,
+							originItemInstanceId: row.id,
+							to: {
+								kind: "inventory",
+								slotIndex: placement.slotIndex,
+							},
+							reason: "activation-output",
+						},
+					];
+				}),
+			];
+
 			if (shouldDeplete) {
 				const depletion = yield* depleteActivationFx({
 					row,
 					stash: activation,
 				});
-				return {
+				const activationResult = {
 					activationBoardItemId: row.id,
 					placements,
 					depletion,
 				} satisfies ActivationResultSchema.Type;
+
+				return {
+					activation: activationResult,
+					visualEvents: [
+						...visualEvents,
+						{
+							type: "activation.depleted",
+							itemInstanceId: row.id,
+							depletion,
+						},
+					],
+				} satisfies CommandResult<
+					Extract<
+						Command,
+						{
+							type: "activation.activate";
+						}
+					>
+				>;
 			}
 
 			yield* dbFx((db) =>
@@ -208,10 +279,22 @@ export const activateFx = Effect.fn("activateFx")(function* (props: activateFx.P
 					.execute(),
 			);
 
-			return {
+			const activationResult = {
 				activationBoardItemId: row.id,
 				placements,
 			} satisfies ActivationResultSchema.Type;
+
+			return {
+				activation: activationResult,
+				visualEvents,
+			} satisfies CommandResult<
+				Extract<
+					Command,
+					{
+						type: "activation.activate";
+					}
+				>
+			>;
 		}),
 	);
 });

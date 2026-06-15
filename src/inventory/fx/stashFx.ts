@@ -16,6 +16,7 @@ import { parseJson } from "~/shared/parseJson";
 import { json } from "~/shared/json";
 import { emptyInventoryStateJson } from "~/inventory/logic/emptyInventoryStateJson";
 import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
+import type { CommandResultSchema } from "~/command/CommandResultSchema";
 
 export namespace stashFx {
 	export interface Props {
@@ -30,7 +31,7 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 		catch: toGameActionError,
 	});
 
-	yield* withTransactionFx(
+	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const gameConfig = yield* GameConfigServiceFx;
 			const date = yield* DateServiceFx;
@@ -85,7 +86,17 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 							.where("id", "=", boardItem.id)
 							.execute();
 					});
-					return;
+					return {
+						visualEvents: [
+							{
+								type: "inventory.stacked",
+								sourceItemInstanceId: boardItem.id,
+								targetItemInstanceId: stack.id,
+								itemId: boardItem.itemDefinitionId as ItemId,
+								quantity: stack.quantity + 1,
+							},
+						],
+					} satisfies CommandResultSchema.Type;
 				}
 
 				const targetStack =
@@ -117,7 +128,17 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 							.where("id", "=", boardItem.id)
 							.execute();
 					});
-					return;
+					return {
+						visualEvents: [
+							{
+								type: "inventory.stacked",
+								sourceItemInstanceId: boardItem.id,
+								targetItemInstanceId: targetStack.id,
+								itemId: boardItem.itemDefinitionId as ItemId,
+								quantity: targetStack.quantity + 1,
+							},
+						],
+					} satisfies CommandResultSchema.Type;
 				}
 			}
 
@@ -169,6 +190,25 @@ export const stashFx = Effect.fn("stashFx")(function* (props: stashFx.Props) {
 					.where("id", "=", boardItem.id)
 					.execute(),
 			);
+
+			return {
+				visualEvents: [
+					{
+						type: "item.moved",
+						itemInstanceId: boardItem.id,
+						itemId: boardItem.itemDefinitionId as ItemId,
+						from: {
+							kind: "board",
+							x: boardItem.x,
+							y: boardItem.y,
+						},
+						to: {
+							kind: "inventory",
+							slotIndex: targetSlotIndex,
+						},
+					},
+				],
+			} satisfies CommandResultSchema.Type;
 		}),
 	);
 });

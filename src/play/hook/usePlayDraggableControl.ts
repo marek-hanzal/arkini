@@ -22,6 +22,7 @@ import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { DragSource, DropTarget, VisualMeta, VisualTransitionKind } from "~/play/types";
 import { tileEngineMotionDurationMs } from "~/tile-engine/hook/useTileEngineMotionAnimation";
 import { waitForMs } from "~/shared/util/waitForMs";
+import { waitForPaint } from "~/shared/util/waitForPaint";
 
 export type { Feedback } from "~/interaction/types";
 
@@ -54,6 +55,13 @@ export function usePlayDraggableControl({
 		): Promise<CommandResult<TCommand>> => {
 			const result = await mutateCommand(command);
 
+			await invalidatePlayData(
+				commandInvalidation({
+					command,
+				}),
+			);
+			await waitForPaint();
+
 			stageCommandVisualEvents({
 				events: result.visualEvents,
 				activeSheet,
@@ -61,12 +69,6 @@ export function usePlayDraggableControl({
 				dragSourceActorKey: context?.dragActorKey,
 				visualMotions,
 			});
-
-			await invalidatePlayData(
-				commandInvalidation({
-					command,
-				}),
-			);
 
 			return result as CommandResult<TCommand>;
 		},

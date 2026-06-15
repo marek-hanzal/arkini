@@ -94,37 +94,25 @@ The current content direction is Settlers-like: small producers create raw goods
 
 ## Interaction model
 
-Tap/press recognition is owned by `TileEngine` together with tile dragging. Single, double, long press, drag threshold, pointer cancel, and mobile native context-menu suppression live in the same engine path so touch timing cannot fight the tile animation layer like two raccoons in a bin.
+The active play runtime lives in `src/v0`. Old UI/runtime code is quarantined in `src/ancient` and should not be imported back into v0 unless the point is to smuggle the plague into a fresh house.
 
-Generic drag lifecycle lives in `src/drag/hook/useDraggableControl.ts`. It knows only about draggable payloads, droppable payloads, accept/reject plans, hidden source ids, generic return animation, generic app-provided move animations, and the accept/reject/commit lifecycle. There is no separate drag statechart anymore; the phase labels were not read by UI or domain code, so they were ceremonial complexity wearing a fake mustache.
+Tap/press recognition is owned by `src/v0/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions patch React Query optimistically and then reconcile cached views from SQLite without remounting the board like a nervous intern.
 
-Game-specific drag policy lives in `src/interaction/resolveDrop.ts` and delegates merge/craft/activation-input eligibility to `src/merge/resolveDropIntent.ts`. `src/play/hook/usePlayDraggableControl.ts` is only the thin React wiring that connects the generic drag control, the interaction engine, and the `Command` runner. Drop target resolution is DOM-backed but not framework-backed: TileEngine and the bottom nav register stable target ids, then the active pointer resolves the target under the finger/mouse through focused helpers in `src/drag/logic`. No external DnD framework gets to touch tile transforms.
+Game-specific drop policy lives in `src/v0/play/drop`. The top-level `resolveDrop` is only a tiny delegator over focused case resolvers such as `resolveBoardCellDrop`, `resolveInventoryCellDrop`, and `resolveInventorySlotDrop`. Board/inventory mutation calls are provided as concrete `DropActions`, not as a generic `Command` router. The engine stays game-agnostic: it receives slots, tiles, renderers, drag bindings, and a drop resolver; it does not know what a producer, stash, merge recipe, or inventory stack means.
 
-Accepted drag/drop actions use the TileEngine actor as the live dragged visual, not a framework overlay copy. The final board/inventory tile is the only real visual actor; regular moves, swaps, merge consumes, activation drops, stash dumps, and inventory placement must not create a second overlay copy of the same item. New committed actors can receive a transient origin and raised priority through `useVisualItemMotions`, then settle back to normal priority after Motion completes. If the visual layer and durable cache disagree for a frame, the visual layer wins until the next committed movement syncs it, because blinking tiles are how UI admits defeat.
-
-Inventory stash feedback holds the inventory bottom-nav highlight briefly and extends that hold when more items arrive quickly, so bursty item stashing does not flicker like a broken nightclub sign. Producer ready feedback is tracked by producer instance id and played through Motion only on real readiness transitions. Mounting a producer or moving it across the board must not pulse it; React mounts are not gameplay events, despite React’s best efforts to feel important. Board/inventory flash and merge/imprint pulse feedback lives in `usePlayFeedback`, with one restartable timer per feedback channel so repeated pulses do not cut each other short.
-
-XState is no longer part of the runtime. The app has three state buckets: SQLite for durable game state, React Query for stable cached read views and command mutation lifecycle, and small colocated React hooks/reducers for local UI state. If a workflow does not branch across meaningful domain states, it stays as a hook, reducer, or command mutation instead of becoming a statechart shrine.
-
-Board merge hints are handled by `src/board/hook/useDelayedMergeHints.ts`. Global mergeable-target hints appear after 750 ms while dragging a board item and disappear when the drag context changes. The currently hovered mergeable target still highlights instantly, because feedback that waits politely for permission is not feedback, it is bureaucracy.
+XState is no longer part of the runtime. The app has three state buckets: SQLite for durable game state, React Query for stable cached read views and mutation lifecycle, and tiny colocated React state for transient UI such as active sheet and feedback pulses. If a workflow does not branch across meaningful domain states, it stays as a hook, reducer, or concrete mutation instead of becoming a statechart shrine.
 
 ## React data subscriptions
 
-Do not rebuild a giant `GameView` and pass it around. UI subscribes to the smallest practical React Query slice:
+v0 does not use app-owned React context. Vendor providers such as React Query and the router stay at the boundary because apparently even purity needs plumbing. Everything else subscribes where it is used.
 
-```txt
-usePlaySave()          boot/save metadata
-usePlayItems()         static item catalog derived from GameConfig
-useBoardView()         board cells and board item lookup
-useInventoryView()     inventory slots and stack lookup
-usePlayUpgrades()      tiered upgrade cards with next costs and effects
-```
+All read paths use `useSuspenseQuery`, not plain `useQuery`, so rendered components do not get `undefined` data traps. Initial missing data belongs to Suspense/error boundaries, not to `if (!data) return null` confetti scattered through feature components.
 
-All read hooks use `useSuspenseQuery`, not plain `useQuery`. Initial missing data is handled by the app-level Suspense fallback in `RootShell`, not by sprinkling `if (!data) return null` confetti through render paths like a bug parade. Invalidating an already-populated query key keeps the previous cached data visible while React Query refetches, so normal board/inventory refreshes must not punt the player back into the global loader. Use query keys that stay stable for a view; introduce separate cached views when the data shape actually changes.
+Do not read UI flow data with `queryClient.getQueryData`. View/runtime code subscribes through query options. Mutation internals may write with `setQueryData` for optimistic patches and post-success reconciliation, but cache peeking is not a data-access architecture, it is rummaging in a drawer and calling it state management.
 
-Components should stay boring: render props, wire callbacks, and shut up. Anything that derives TileEngine slots/actors, resolves command callbacks, reads query data, maps card relations, computes cooldown feedback, or talks to Effect-backed commands belongs in a hook or an Fx boundary. `PlayShell` only mounts the play runtime provider and layout; `Board`, `InventorySheet`, bottom navigation, and sheet content resolve their own tiny controller hooks instead of receiving one prop-drilled god object.
+Concrete gameplay actions use concrete mutation hooks in `src/v0/mutation`: `useMoveBoardItemMutation`, `useSwapBoardItemsMutation`, `useMergeBoardItemsMutation`, `usePlaceInventoryItemMutation`, `useStashBoardItemMutation`, `useSwapInventorySlotsMutation`, `useActivateBoardItemMutation`, `useClaimCraftMutation`, `useWithdrawActivationInputMutation`, and `useBuyUpgradeMutation`. v0 deliberately does not use a central `useGameCommandMutation`; each hook owns its own Effect call, optimistic patch, rollback, and cache sync.
 
-If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
+Components should stay boring: render props, wire callbacks, and shut up. If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
 
 ## Source layout
 
@@ -147,15 +135,13 @@ src/id/context/                  Effect id service context tag.
 src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
-src/command/                    Typed command schemas, command visual events, command Effect router, optimistic mutation bridge, rollback, and invalidation.
-src/animation/                  Visual planning helpers for game events.
-src/interaction/                UI gesture/drop intent translation.
+src/v0/                        Active client play runtime: query options, concrete mutation hooks, play shell, drop policy, and reusable TileEngine.
+src/ancient/                   Snapshot of the pre-v0 runtime kept for archaeology only; do not import ancient UI/runtime code into v0.
+src/command/                    Historical typed command schemas and command Effect router kept for old runtime/domain compatibility. v0 calls domain Fx roots directly.
+src/animation/                  Historical visual planning helpers for game events.
 src/merge/                      Merge, craft-input, and activation-input intent resolution.
 src/play/logic/                  Promise backend façade for read/bootstrap flows and pure play-shell helpers.
 src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
-src/play/hook/                   Play-shell scoped React hooks: save metadata, static catalog, event queue, sheets, feedback, and interaction wiring.
-src/play/ui/                     Main shell, sheets, bottom navigation, database status UI.
-src/drag/                        Generic pointer drag lifecycle, XState drag workflow, hidden sources, and cross-surface drop target helpers.
 src/board/                       Board identity, board state logic, board view model/schema, board UI, cell feedback.
 src/inventory/                   Inventory identity, stack planning/storage logic, inventory view model/schema, inventory sheet UI.
 src/activation/                 Activatable item runtime: producer/stash activation, output rolling, depletion, consumable inputs, and persistent requirements.

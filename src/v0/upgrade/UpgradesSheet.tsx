@@ -2,7 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import type { FC } from "react";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { UpgradeCard } from "~/upgrade/ui/UpgradeCard";
-import { useGameCommandMutation } from "~/v0/mutation/useGameCommandMutation";
+import { useBuyUpgradeMutation } from "~/v0/mutation/useBuyUpgradeMutation";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
 import { upgradeListQueryOptions } from "~/v0/query/upgradeListQueryOptions";
 
@@ -15,7 +15,7 @@ export namespace UpgradesSheet {
 export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 	const { data: upgrades } = useSuspenseQuery(upgradeListQueryOptions());
 	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
-	const command = useGameCommandMutation();
+	const buyUpgradeMutation = useBuyUpgradeMutation();
 
 	return (
 		<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
@@ -31,10 +31,9 @@ export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 							key={upgrade.id}
 							upgrade={upgrade}
 							items={items}
-							pending={command.isPending}
+							pending={buyUpgradeMutation.isPending}
 							onBuy={(upgradeId) =>
-								command.mutate({
-									type: "upgrade.buy",
+								buyUpgradeMutation.mutate({
 									upgradeId,
 								})
 							}

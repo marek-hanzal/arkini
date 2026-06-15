@@ -2,248 +2,197 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { memo, type ReactNode, useCallback, useMemo } from "react";
 import { boardCells, type BoardCellView } from "~/board/boardCells";
 import { boardColumns } from "~/board/boardColumns";
-import { boardRows } from "~/board/boardRows";
-import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
-import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
-import { cellKey } from "~/board/util/cell";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { Command } from "~/command/Command";
-import { GameItemView } from "~/item/ui/GameItemView";
-import type { ViewItem } from "~/item/view/ViewItemSchema";
-import { isProducerReady } from "~/producer/logic/isProducerReady";
-import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
+import { cellKey } from "~/board/util/cell";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
-import { cn } from "~/shared/cn";
 import { inventoryViewQueryOptions } from "~/v0/query/inventoryViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
 import { boardViewQueryOptions } from "~/v0/query/boardViewQueryOptions";
-import { useGameCommandMutation } from "~/v0/mutation/useGameCommandMutation";
+import { useActivateBoardItemMutation } from "~/v0/mutation/useActivateBoardItemMutation";
+import { useClaimCraftMutation } from "~/v0/mutation/useClaimCraftMutation";
+import { useMergeBoardItemsMutation } from "~/v0/mutation/useMergeBoardItemsMutation";
+import { useMoveBoardItemMutation } from "~/v0/mutation/useMoveBoardItemMutation";
+import { useStashBoardItemMutation } from "~/v0/mutation/useStashBoardItemMutation";
+import { useSwapBoardItemsMutation } from "~/v0/mutation/useSwapBoardItemsMutation";
 import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
-import type { Feedback } from "~/v0/play/Feedback";
+import { BoardCell } from "~/v0/board/BoardCell";
+import type { BoardSurface as BoardSurfaceType } from "~/v0/board/BoardSurface.types";
+import { renderBoardTile } from "~/v0/board/renderBoardTile";
+import type { DropActions } from "~/v0/play/drop/DropActions";
 import { resolveDrop } from "~/v0/play/resolveDrop";
 import { TileEngine } from "~/v0/tile-engine/TileEngine";
 import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.types";
-
-export namespace BoardSurface {
-	export interface Props {
-		feedback: Feedback;
-		hasFeedback(key: string): boolean;
-		onOpenItem(boardItemId: string): void;
-	}
-
-	export interface TileData {
-		boardItem: BoardViewItem;
-		item: ViewItem;
-		activationNowMs?: number;
-	}
-}
 
 const boardSlots = boardCells.map((cell) => ({
 	id: cell.key,
 	data: cell,
 })) satisfies readonly TileEngineType.Slot<BoardCellView>[];
 
-const renderBoardTile = ({ tile }: TileEngineType.RenderTileProps<BoardSurface.TileData>) => (
-	<div
-		data-ak-board-item-id={tile.data.boardItem.id}
-		className="h-full w-full"
-	>
-		<GameItemView
-			item={tile.data.item}
-			variant="board"
-			activation={tile.data.boardItem.activation}
-			activationNowMs={tile.data.activationNowMs}
-		/>
-	</div>
-);
+export const BoardSurface = memo(
+	({ feedback, hasFeedback, onOpenItem }: BoardSurfaceType.Props) => {
+		const { data: board } = useSuspenseQuery(boardViewQueryOptions());
+		const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
+		const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
+		const activateBoardItemMutation = useActivateBoardItemMutation();
+		const claimCraftMutation = useClaimCraftMutation();
+		const mergeBoardItemsMutation = useMergeBoardItemsMutation();
+		const moveBoardItemMutation = useMoveBoardItemMutation();
+		const stashBoardItemMutation = useStashBoardItemMutation();
+		const swapBoardItemsMutation = useSwapBoardItemsMutation();
+		const nowMs = useProducerClock(board.items);
+		const tiles = useMemo(
+			() =>
+				board.items.flatMap((boardItem) => {
+					const item = items[boardItem.itemId];
+					if (!item) return [];
 
-const BoardCell = memo(
-	({
-		cell,
-		boardItem,
-		invalid,
-		merged,
-		imprinted,
-		isOver,
-		nowMs,
-	}: {
-		cell: BoardCellView;
-		boardItem?: BoardViewItem;
-		invalid: boolean;
-		merged: boolean;
-		imprinted: boolean;
-		isOver: boolean;
-		nowMs: number;
-	}) => {
-		const producerReady = isProducerReady(boardItem?.activation, nowMs);
-		const producerCooldown = readProducerCooldown({
-			activation: boardItem?.activation,
-			nowMs,
-		});
+					return [
+						{
+							id: boardItem.id,
+							slotId: cellKey(boardItem.x, boardItem.y),
+							data: {
+								boardItem,
+								item,
+								activationNowMs: boardItem.activation ? nowMs : undefined,
+							},
+						},
+					] satisfies TileEngineType.Tile<BoardSurfaceType.TileData>[];
+				}),
+			[
+				board.items,
+				items,
+				nowMs,
+			],
+		);
+		const actions = useMemo<DropActions>(
+			() => ({
+				mergeBoardItems: mergeBoardItemsMutation.mutateAsync,
+				moveBoardItem: moveBoardItemMutation.mutateAsync,
+				placeInventoryItem: async () => undefined,
+				stashBoardItem: stashBoardItemMutation.mutateAsync,
+				swapBoardItems: swapBoardItemsMutation.mutateAsync,
+				swapInventorySlots: async () => undefined,
+			}),
+			[
+				mergeBoardItemsMutation.mutateAsync,
+				moveBoardItemMutation.mutateAsync,
+				stashBoardItemMutation.mutateAsync,
+				swapBoardItemsMutation.mutateAsync,
+			],
+		);
+		const activateBoardItem = useCallback(
+			(boardItem: BoardViewItem) => {
+				if (boardItem.craft?.complete) {
+					claimCraftMutation.mutate({
+						boardItemId: boardItem.id,
+					});
+					return;
+				}
+
+				if (!boardItem.activation) return;
+				activateBoardItemMutation.mutate({
+					boardItemId: boardItem.id,
+					activation: boardItem.activation.kind === "stash" ? "exhaust" : "single",
+				});
+			},
+			[
+				activateBoardItemMutation.mutate,
+				claimCraftMutation.mutate,
+			],
+		);
+		const drag = useMemo<
+			TileEngineType.DragConfig<
+				BoardSurfaceType.TileData,
+				BoardCellView,
+				DragSource,
+				DropTarget
+			>
+		>(
+			() => ({
+				tile(tile) {
+					const boardItem = tile.data.boardItem;
+					return {
+						id: `board:${boardItem.id}`,
+						data: {
+							kind: "board",
+							boardItemId: boardItem.id,
+							itemId: boardItem.itemId,
+							boardItem,
+						},
+						onSingleActivate: () => activateBoardItem(boardItem),
+						onLongActivate: () => onOpenItem(boardItem.id),
+					};
+				},
+				slot(slot, targetTile) {
+					const cell = slot.data;
+					return {
+						id: `board-cell:${cell.key}`,
+						data: {
+							kind: "cell",
+							x: cell.x,
+							y: cell.y,
+							boardItemId: targetTile?.data.boardItem.id,
+						},
+					};
+				},
+				onDrop(context) {
+					return resolveDrop({
+						context,
+						board,
+						inventory,
+						feedback,
+						actions,
+					});
+				},
+				onDragCancel() {
+					// The engine owns visual rollback. App state remains untouched until commit.
+				},
+			}),
+			[
+				actions,
+				activateBoardItem,
+				board,
+				feedback,
+				inventory,
+				onOpenItem,
+			],
+		);
+		const renderSlot = useCallback(
+			({ slot, isOver }: TileEngineType.RenderSlotProps<BoardCellView>): ReactNode => {
+				const cell = slot.data;
+				const key = cell.key;
+				return (
+					<BoardCell
+						cell={cell}
+						boardItem={board.byCellKey[key]}
+						invalid={hasFeedback(`board:error:${key}`)}
+						merged={hasFeedback(`board:merge:${key}`)}
+						imprinted={hasFeedback(`board:imprint:${key}`)}
+						isOver={isOver}
+						nowMs={nowMs}
+					/>
+				);
+			},
+			[
+				board.byCellKey,
+				hasFeedback,
+				nowMs,
+			],
+		);
 
 		return (
-			<div
-				data-ak-board-cell={`${cell.x}:${cell.y}`}
-				data-ak-board-cell-item-id={boardItem?.id}
-				className={cn(
-					"relative aspect-square touch-none border-b border-r border-slate-800/65 bg-slate-900/45",
-					cell.x === boardColumns - 1 && "border-r-0",
-					cell.y === boardRows - 1 && "border-b-0",
-					isOver &&
-						"bg-slate-800/80 outline outline-2 -outline-offset-2 outline-emerald-300/80",
-					producerReady && !invalid && "ak-producer-ready",
-					invalid && "ak-cell-error",
-					merged && "ak-merge-target-over",
-					imprinted && "ak-merge-target",
-				)}
-			>
-				<BoardCellProgress progress={boardItem?.craft?.progress} />
-				<BoardCellCooldownProgress progress={producerCooldown?.progress} />
-			</div>
+			<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
+				id="board"
+				columns={boardColumns}
+				slots={boardSlots}
+				tiles={tiles}
+				gapPx={1}
+				className="w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
+				itemLayerClassName="pointer-events-none"
+				drag={drag}
+				renderSlot={renderSlot}
+				renderTile={renderBoardTile}
+			/>
 		);
 	},
 );
-
-export const BoardSurface = memo(({ feedback, hasFeedback, onOpenItem }: BoardSurface.Props) => {
-	const { data: board } = useSuspenseQuery(boardViewQueryOptions());
-	const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
-	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
-	const command = useGameCommandMutation();
-	const nowMs = useProducerClock(board.items);
-
-	const run = command.mutateAsync;
-	const tiles = useMemo(
-		() =>
-			board.items.flatMap((boardItem) => {
-				const item = items[boardItem.itemId];
-				if (!item) return [];
-
-				return [
-					{
-						id: boardItem.id,
-						slotId: cellKey(boardItem.x, boardItem.y),
-						data: {
-							boardItem,
-							item,
-							activationNowMs: boardItem.activation ? nowMs : undefined,
-						},
-					},
-				] satisfies TileEngineType.Tile<BoardSurface.TileData>[];
-			}),
-		[
-			board.items,
-			items,
-			nowMs,
-		],
-	);
-	const activateBoardItem = useCallback(
-		(boardItem: BoardViewItem) => {
-			if (boardItem.craft?.complete) {
-				command.mutate({
-					type: "craft.claim",
-					boardItemId: boardItem.id,
-				});
-				return;
-			}
-
-			if (!boardItem.activation) return;
-			command.mutate({
-				type: "activation.activate",
-				boardItemId: boardItem.id,
-				activation: boardItem.activation.kind === "stash" ? "exhaust" : "single",
-			});
-		},
-		[
-			command.mutate,
-		],
-	);
-	const drag = useMemo<
-		TileEngineType.DragConfig<BoardSurface.TileData, BoardCellView, DragSource, DropTarget>
-	>(
-		() => ({
-			tile(tile) {
-				const boardItem = tile.data.boardItem;
-				return {
-					id: `board:${boardItem.id}`,
-					data: {
-						kind: "board",
-						boardItemId: boardItem.id,
-						itemId: boardItem.itemId,
-						boardItem,
-					},
-					onSingleActivate: () => activateBoardItem(boardItem),
-					onLongActivate: () => onOpenItem(boardItem.id),
-				};
-			},
-			slot(slot, targetTile) {
-				const cell = slot.data;
-				return {
-					id: `board-cell:${cell.key}`,
-					data: {
-						kind: "cell",
-						x: cell.x,
-						y: cell.y,
-						boardItemId: targetTile?.data.boardItem.id,
-					},
-				};
-			},
-			onDrop(context) {
-				return resolveDrop({
-					context,
-					board,
-					inventory,
-					feedback,
-					run,
-				});
-			},
-			onDragCancel() {
-				// The engine owns visual rollback. App state remains untouched until commit.
-			},
-		}),
-		[
-			activateBoardItem,
-			board,
-			feedback,
-			inventory,
-			onOpenItem,
-			run,
-		],
-	);
-	const renderSlot = useCallback(
-		({ slot, isOver }: TileEngineType.RenderSlotProps<BoardCellView>): ReactNode => {
-			const cell = slot.data;
-			const key = cell.key;
-			return (
-				<BoardCell
-					cell={cell}
-					boardItem={board.byCellKey[key]}
-					invalid={hasFeedback(`board:error:${key}`)}
-					merged={hasFeedback(`board:merge:${key}`)}
-					imprinted={hasFeedback(`board:imprint:${key}`)}
-					isOver={isOver}
-					nowMs={nowMs}
-				/>
-			);
-		},
-		[
-			board.byCellKey,
-			hasFeedback,
-			nowMs,
-		],
-	);
-
-	return (
-		<TileEngine<BoardSurface.TileData, BoardCellView, DragSource, DropTarget>
-			id="board"
-			columns={boardColumns}
-			slots={boardSlots}
-			tiles={tiles}
-			gapPx={1}
-			className="w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
-			itemLayerClassName="pointer-events-none"
-			drag={drag}
-			renderSlot={renderSlot}
-			renderTile={renderBoardTile}
-		/>
-	);
-});

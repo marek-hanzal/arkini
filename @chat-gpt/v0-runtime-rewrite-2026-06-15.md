@@ -22,3 +22,9 @@ Known follow-up cleanup:
 - remove or quarantine the old root play/drag UI runtime once v0 covers every interaction edge case
 - expand optimistic detail patches for activation/craft/upgrade side effects only if the UX needs immediate derived-state feedback
 - add focused browser/manual regression checks for drag-to-empty, swap, merge, stash, inventory swap, double-tap placement, and long-press detail sheet
+
+## Follow-up cleanup: concrete v0 mutations
+
+The generic `useGameCommandMutation` bridge has been removed from v0. v0 now uses one concrete mutation hook per gameplay action. Each hook owns exactly one Effect root, its optimistic patch if it needs one, rollback, and post-success cache reconciliation.
+
+The drop resolver was split into `src/v0/play/drop/*`. The remaining `resolveDrop` file is intentionally just a small delegator from source/target pair to focused case resolvers. It receives concrete `DropActions` instead of a generic `Command` runner, so board/inventory surfaces expose their actual capabilities instead of piping every action through a mystery router.

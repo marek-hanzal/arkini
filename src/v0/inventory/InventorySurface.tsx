@@ -1,75 +1,37 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { memo, type ReactNode, useCallback, useMemo } from "react";
-import type { Command } from "~/command/Command";
 import { inventoryColumns } from "~/inventory/inventoryColumns";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
-import { GameItemView } from "~/item/ui/GameItemView";
-import type { ViewItem } from "~/item/view/ViewItemSchema";
-import { cn } from "~/shared/cn";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { boardViewQueryOptions } from "~/v0/query/boardViewQueryOptions";
 import { inventoryViewQueryOptions } from "~/v0/query/inventoryViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
-import { useGameCommandMutation } from "~/v0/mutation/useGameCommandMutation";
+import { useMergeBoardItemsMutation } from "~/v0/mutation/useMergeBoardItemsMutation";
+import { useMoveBoardItemMutation } from "~/v0/mutation/useMoveBoardItemMutation";
+import { usePlaceInventoryItemMutation } from "~/v0/mutation/usePlaceInventoryItemMutation";
+import { useStashBoardItemMutation } from "~/v0/mutation/useStashBoardItemMutation";
+import { useSwapBoardItemsMutation } from "~/v0/mutation/useSwapBoardItemsMutation";
+import { useSwapInventorySlotsMutation } from "~/v0/mutation/useSwapInventorySlotsMutation";
 import type { DragSource, DropTarget } from "~/v0/play/DragTypes";
-import type { Feedback } from "~/v0/play/Feedback";
+import { InventoryCell } from "~/v0/inventory/InventoryCell";
+import type { InventorySurface as InventorySurfaceType } from "~/v0/inventory/InventorySurface.types";
+import { renderInventoryTile } from "~/v0/inventory/renderInventoryTile";
+import type { DropActions } from "~/v0/play/drop/DropActions";
 import { resolveDrop } from "~/v0/play/resolveDrop";
 import { TileEngine } from "~/v0/tile-engine/TileEngine";
 import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.types";
 
-export namespace InventorySurface {
-	export interface Props {
-		feedback: Feedback;
-		hasFeedback(key: string): boolean;
-		onClose(): void;
-	}
-
-	export interface TileData {
-		slot: InventorySlot;
-		item: ViewItem;
-	}
-}
-
-const InventoryCell = memo(
-	({ slot, invalid, isOver }: { slot: InventorySlot; invalid: boolean; isOver: boolean }) => (
-		<div
-			data-ak-inventory-slot={slot.slotIndex}
-			className={cn(
-				"relative aspect-square border-b border-r border-slate-800 bg-slate-900/70",
-				isOver && "bg-slate-800 outline outline-2 -outline-offset-2 outline-emerald-300/80",
-				invalid && "ak-cell-error",
-			)}
-		/>
-	),
-);
-
-const renderInventoryTile = ({
-	tile,
-}: TileEngineType.RenderTileProps<InventorySurface.TileData>) => {
-	const stack = tile.data.slot.stack;
-	if (!stack) return null;
-
-	return (
-		<div
-			data-ak-inventory-stack-id={stack.id}
-			className="h-full w-full"
-		>
-			<GameItemView
-				item={tile.data.item}
-				variant="inventory"
-				quantity={stack.quantity}
-			/>
-		</div>
-	);
-};
-
 export const InventorySurface = memo(
-	({ feedback, hasFeedback, onClose }: InventorySurface.Props) => {
+	({ feedback, hasFeedback, onClose }: InventorySurfaceType.Props) => {
 		const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 		const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
 		const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
-		const command = useGameCommandMutation();
-		const run = command.mutateAsync;
+		const mergeBoardItemsMutation = useMergeBoardItemsMutation();
+		const moveBoardItemMutation = useMoveBoardItemMutation();
+		const placeInventoryItemMutation = usePlaceInventoryItemMutation();
+		const stashBoardItemMutation = useStashBoardItemMutation();
+		const swapBoardItemsMutation = useSwapBoardItemsMutation();
+		const swapInventorySlotsMutation = useSwapInventorySlotsMutation();
 		const slots = useMemo(
 			() =>
 				inventory.slots.map((slot) => ({
@@ -98,7 +60,7 @@ export const InventorySurface = memo(
 								item,
 							},
 						},
-					] satisfies TileEngineType.Tile<InventorySurface.TileData>[];
+					] satisfies TileEngineType.Tile<InventorySurfaceType.TileData>[];
 				}),
 			[
 				inventory.slots,
@@ -113,8 +75,7 @@ export const InventorySurface = memo(
 					return;
 				}
 
-				command.mutate({
-					type: "inventory.place",
+				placeInventoryItemMutation.mutate({
 					slotIndex: slot.slotIndex,
 					x: target.x,
 					y: target.y,
@@ -122,13 +83,31 @@ export const InventorySurface = memo(
 			},
 			[
 				board.firstEmptyCell,
-				command.mutate,
 				feedback,
+				placeInventoryItemMutation.mutate,
+			],
+		);
+		const actions = useMemo<DropActions>(
+			() => ({
+				mergeBoardItems: mergeBoardItemsMutation.mutateAsync,
+				moveBoardItem: moveBoardItemMutation.mutateAsync,
+				placeInventoryItem: placeInventoryItemMutation.mutateAsync,
+				stashBoardItem: stashBoardItemMutation.mutateAsync,
+				swapBoardItems: swapBoardItemsMutation.mutateAsync,
+				swapInventorySlots: swapInventorySlotsMutation.mutateAsync,
+			}),
+			[
+				mergeBoardItemsMutation.mutateAsync,
+				moveBoardItemMutation.mutateAsync,
+				placeInventoryItemMutation.mutateAsync,
+				stashBoardItemMutation.mutateAsync,
+				swapBoardItemsMutation.mutateAsync,
+				swapInventorySlotsMutation.mutateAsync,
 			],
 		);
 		const drag = useMemo<
 			TileEngineType.DragConfig<
-				InventorySurface.TileData,
+				InventorySurfaceType.TileData,
 				InventorySlot,
 				DragSource,
 				DropTarget
@@ -165,16 +144,16 @@ export const InventorySurface = memo(
 						board,
 						inventory,
 						feedback,
-						run,
+						actions,
 					});
 				},
 			}),
 			[
+				actions,
 				board,
 				feedback,
 				inventory,
 				placeInventoryOnBoard,
-				run,
 			],
 		);
 		const filled = inventory.slots.filter((slot) => slot.stack).length;
@@ -199,7 +178,12 @@ export const InventorySurface = memo(
 					onClose={onClose}
 				/>
 				<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-					<TileEngine<InventorySurface.TileData, InventorySlot, DragSource, DropTarget>
+					<TileEngine<
+						InventorySurfaceType.TileData,
+						InventorySlot,
+						DragSource,
+						DropTarget
+					>
 						id="inventory"
 						columns={inventoryColumns}
 						slots={slots}

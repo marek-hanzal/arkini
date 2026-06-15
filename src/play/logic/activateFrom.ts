@@ -1,4 +1,4 @@
-import { stageActivationDrops } from "~/animation/stageActivationDrops";
+import { stageCommandVisualEvents } from "~/animation/stageCommandVisualEvents";
 import { highlightInventoryNav } from "~/animation/highlightInventoryNav";
 import type { Command } from "~/command/Command";
 import { cellKey } from "~/board/util/cell";
@@ -54,10 +54,8 @@ export const activateFrom = async ({
 			activation,
 		});
 
-		stageActivationDrops({
-			results: [
-				result.activation,
-			],
+		stageCommandVisualEvents({
+			events: result.visualEvents,
 			activeSheet,
 			visualMotions,
 		});

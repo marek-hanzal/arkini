@@ -137,6 +137,10 @@ export const placeFx = Effect.fn("placeFx")(function* (props: placeFx.Props) {
 						type: "item.spawned",
 						itemInstanceId: boardItemId,
 						itemId: stack.itemDefinitionId as ItemId,
+						from: {
+							kind: "inventory",
+							slotIndex: input.slotIndex,
+						},
 						to: {
 							kind: "board",
 							x: input.x,

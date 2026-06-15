@@ -1,6 +1,6 @@
 import { animate, type AnimationPlaybackControlsWithThen } from "motion";
 import { useLayoutEffect, useRef, type RefObject } from "react";
-import type { VisualTransitionKind } from "~/play/types";
+import type { TileEngineTransitionKind } from "~/tile-engine/type/TileEngineTransitionKind";
 import type { TileEngineMotion, TileEngineRect } from "~/tile-engine/logic/tileEngineMachine";
 
 export const tileEngineMotionDurationSeconds = 0.3;
@@ -31,7 +31,7 @@ export interface TileEngineExternalMotion {
 	to?: TileEngineRect;
 	priority?: "normal" | "raised";
 	nonce?: number;
-	kind?: VisualTransitionKind;
+	kind?: TileEngineTransitionKind;
 }
 
 const readDestination = (element: HTMLElement, motion: TileEngineExternalMotion) => {
@@ -46,8 +46,8 @@ const readDestination = (element: HTMLElement, motion: TileEngineExternalMotion)
 	};
 };
 
-const shouldExit = (kind: VisualTransitionKind | undefined) =>
-	kind === "consume" || kind === "stash";
+const shouldExit = (kind: TileEngineTransitionKind | undefined) =>
+	kind === "consume" || kind === "exit";
 
 /**
  * Animates one stable tile actor from a viewport rect into its current rendered

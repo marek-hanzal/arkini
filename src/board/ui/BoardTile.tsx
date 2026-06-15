@@ -12,10 +12,16 @@ export namespace BoardTile {
 }
 
 export const BoardTile: FC<BoardTile.Props> = memo(({ boardItem, item, activationNowMs }) => (
-	<GameItemView
-		item={item}
-		variant="board"
-		activation={boardItem.activation}
-		activationNowMs={activationNowMs}
-	/>
+	<div
+		data-board-item-id={boardItem.id}
+		data-board-item-tile-id={boardItem.id}
+		className="h-full w-full"
+	>
+		<GameItemView
+			item={item}
+			variant="board"
+			activation={boardItem.activation}
+			activationNowMs={activationNowMs}
+		/>
+	</div>
 ));

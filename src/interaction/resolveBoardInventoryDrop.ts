@@ -28,7 +28,7 @@ export const resolveBoardInventoryDrop = ({
 				actorKey: visualBoardItemKey(source.source.boardItemId),
 				fromDrag: true,
 				toNodeId: target.targetNodeId,
-				kind: "stash",
+				kind: "exit",
 			},
 		],
 		commit: () =>

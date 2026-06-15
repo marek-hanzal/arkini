@@ -22,3 +22,6 @@ It still does **not** own durable game data. Parents provide:
 The important rule: a tile is not rendered inside a cell. Slots are geometry. Tiles are stable absolute actors in the engine item layer. When a game action moves a tile, the same actor identity survives and the engine animates from the staged rect into its committed slot. Motion settle callbacks are held behind refs so parent re-renders do not restart an in-flight tile animation just because React felt chatty.
 
 Board/inventory-specific rules stay outside as data and drop-plan logic. TileEngine only emits generic drag lifecycle events and exposes stable node ids for the existing drag workflow. That gives us one place for tile interaction without infecting the engine with Arkini producer/merge/craft rules, because apparently we are trying not to summon another UI swamp creature.
+
+
+Game visual events are intentionally adapted outside this package. TileEngine can receive hook-produced props and generic staged motions, but it must never import command schemas, item ids, board cells, inventory slots, producers, stashes, or anything else from Arkini gameplay. The engine is a surface and actor runtime, not a tiny game engine wearing someone else's coat.

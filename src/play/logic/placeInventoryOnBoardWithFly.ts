@@ -1,10 +1,9 @@
-import { inventorySourceId } from "~/inventory/inventorySourceId";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
-import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
+import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { InventoryPlaceResult } from "~/inventory/view/InventoryPlaceResultSchema";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
-import { queryPaddingBoxRect } from "~/shared/util/queryPaddingBoxRect";
+import { stageCommandVisualEvents } from "~/animation/stageCommandVisualEvents";
 import type { Command } from "~/command/Command";
 import type { CommandResult } from "~/command/CommandResult";
 
@@ -46,11 +45,6 @@ export const placeInventoryOnBoardWithFly = async ({
 		return;
 	}
 
-	const from =
-		queryPaddingBoxRect(`[data-inventory-slot-tile="${slot.slotIndex}"]`) ??
-		queryPaddingBoxRect(`[data-inventory-slot="${slot.slotIndex}"]`);
-	const to = queryPaddingBoxRect(`[data-board-cell="${target.x}:${target.y}"]`);
-
 	try {
 		const result = await run({
 			type: "inventory.place",
@@ -58,19 +52,12 @@ export const placeInventoryOnBoardWithFly = async ({
 			x: target.x,
 			y: target.y,
 		});
-		const { inventoryPlace } = result;
 
-		if (from && to) {
-			visualMotions.stage([
-				{
-					key: visualBoardItemKey(inventoryPlace.boardItemId),
-					from,
-					to,
-					priority: "raised",
-					kind: "place",
-				},
-			]);
-		}
+		stageCommandVisualEvents({
+			events: result.visualEvents,
+			activeSheet: "inventory",
+			visualMotions,
+		});
 
 		await invalidatePlayData([
 			"board",

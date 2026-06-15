@@ -54,6 +54,12 @@ Randomness is provided through `RandomServiceFx`; producer rolls do not call `Ma
 
 Gameplay mutations go through typed `Command` values in `src/action/`. React UI and XState workflows do not import individual Effect roots directly. Command execution is routed through small functional engine facades: board, inventory, producer, and upgrade. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
 
+## Tile engine boundary
+
+Board and inventory tile visuals are rendered through the generic `TileEngine` in `src/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory data still belongs to the parent game state and SQLite. `TileEngine` only owns transient XState motion state for spawn/move handoff so final actors can animate from external producer/stash/drop rects without creating a second flyer DOM copy.
+
+`TileEngine` is standalone by design: it accepts slots, tiles, render callbacks, optional generic action callbacks for move/swap/remove/replace, an imperative spawn API with `instant` and `stack` modes, and an optional confinement element. It must not import Arkini board/inventory/producers directly. If a future game surface needs tile behavior, it should feed generic slots/tiles into `TileEngine` instead of inventing another tiny haunted renderer.
+
 Rules for this layer:
 
 - no classes, no service objects, no hidden mutable engine instances; use functions and namespace `Props`,

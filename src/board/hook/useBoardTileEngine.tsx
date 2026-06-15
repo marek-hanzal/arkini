@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
 import { boardCellNodeId } from "~/board/boardCellNodeId";
 import { boardCells, type BoardCellView } from "~/board/boardCells";
 import { boardSourceId } from "~/board/boardSourceId";
@@ -9,56 +9,46 @@ import { BoardCell } from "~/board/ui/BoardCell";
 import { BoardTile } from "~/board/ui/BoardTile";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { ViewItem } from "~/item/view/ViewItemSchema";
+import { usePlayDragState } from "~/play/hook/usePlayDragState";
+import { usePlayFeedbackState } from "~/play/hook/usePlayFeedbackState";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import type { DragData, DropData, RectLike } from "~/play/types";
+import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
+import { usePlaySheetsState } from "~/play/hook/usePlaySheetsState";
+import { visualBoardItemKey } from "~/play/hook/useVisualItemMotions";
+import { usePlayVisualMotionsState } from "~/play/hook/usePlayVisualMotionsState";
+import type { DragData, DropData } from "~/play/types";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { TileEngine } from "~/tile-engine/ui/TileEngine";
 
 export namespace useBoardTileEngine {
-	export interface DragState {
-		activeDrag?: DragData;
-		activeDropTargetNodeId?: string | null;
-		isSourceHidden(sourceId: string): boolean;
-		setActiveDropTargetNodeId(nodeId: string | null): void;
-		start(props: { source: DragData; previewRect: Pick<RectLike, "width" | "height"> }): void;
-		drop(props: { source: DragData; target: DropData | null; dragRect: RectLike | null }): void;
-		cancel(): void;
-	}
-
-	export interface FeedbackState {
-		invalidCellKey?: string;
-		mergedCellKey?: string;
-		imprintedCellKey?: string;
-	}
-
-	export interface Actions {
-		tileSingleActivate(item: BoardViewItem): void;
-		tileLongActivate(item: BoardViewItem): void;
-	}
-
-	export interface Props {
-		drag: DragState;
-		feedback: FeedbackState;
-		actions: Actions;
-		visualMotions: useVisualItemMotions.State;
-	}
+	export interface Props {}
 
 	export interface BoardTileData {
 		boardItem: BoardViewItem;
 		item: ViewItem;
 		activationNowMs?: number;
 	}
+
+	export interface Result {
+		slots: readonly TileEngine.Slot<BoardCellView>[];
+		tiles: readonly TileEngine.Tile<BoardTileData>[];
+		activeDropTargetNodeId: string | null;
+		dragConfig: TileEngine.DragConfig<BoardTileData, BoardCellView, DragData, DropData>;
+		renderSlot(props: TileEngine.RenderSlotProps<BoardCellView>): ReactNode;
+		renderTile(props: TileEngine.RenderTileProps<BoardTileData>): ReactNode;
+	}
 }
 
-export const useBoardTileEngine = ({
-	drag,
-	feedback,
-	actions,
-	visualMotions,
-}: useBoardTileEngine.Props) => {
+export const useBoardTileEngine = (
+	_props?: useBoardTileEngine.Props,
+): useBoardTileEngine.Result => {
 	const board = useBoardView();
 	const items = usePlayItems();
+	const sheets = usePlaySheetsState();
+	const drag = usePlayDragState();
+	const feedback = usePlayFeedbackState();
+	const visualMotions = usePlayVisualMotionsState();
+	const producerActions = usePlayProducerActions();
 	const showDelayedMergeHints = useDelayedMergeHints({
 		activeDrag: drag.activeDrag ?? undefined,
 	});
@@ -70,6 +60,27 @@ export const useBoardTileEngine = ({
 				data: cell,
 			})),
 		[],
+	);
+	const activateBoardTile = useCallback(
+		(item: BoardViewItem) => {
+			if (!item.activation) return;
+
+			void producerActions.produceFrom(
+				item,
+				item.activation.kind === "stash" ? "exhaust" : "single",
+			);
+		},
+		[
+			producerActions.produceFrom,
+		],
+	);
+	const openBoardTileDetail = useCallback(
+		(item: BoardViewItem) => {
+			sheets.openItem(item.id);
+		},
+		[
+			sheets.openItem,
+		],
 	);
 	const tiles = useMemo(
 		() =>
@@ -150,8 +161,8 @@ export const useBoardTileEngine = ({
 					} satisfies DragData,
 					hidden: drag.isSourceHidden(sourceId),
 					hideWhenActive: true,
-					onSingleActivate: () => actions.tileSingleActivate(boardItem),
-					onLongActivate: () => actions.tileLongActivate(boardItem),
+					onSingleActivate: () => activateBoardTile(boardItem),
+					onLongActivate: () => openBoardTileDetail(boardItem),
 				};
 			},
 			slot: (slot, targetTile) => {
@@ -175,12 +186,13 @@ export const useBoardTileEngine = ({
 			},
 		}),
 		[
-			actions,
+			activateBoardTile,
 			drag.cancel,
 			drag.drop,
 			drag.isSourceHidden,
 			drag.setActiveDropTargetNodeId,
 			drag.start,
+			openBoardTileDetail,
 		],
 	);
 	const renderSlot = useCallback(
@@ -188,7 +200,7 @@ export const useBoardTileEngine = ({
 			const cell = slot.data;
 			const boardItem = board.byCellKey[cell.key];
 			const canMerge = canBoardCellAcceptDrag({
-				activeDrag: drag.activeDrag,
+				activeDrag: drag.activeDrag ?? undefined,
 				boardItem,
 			});
 
@@ -199,9 +211,9 @@ export const useBoardTileEngine = ({
 					boardItem={boardItem}
 					canMerge={canMerge}
 					showDelayedMergeHint={showDelayedMergeHints}
-					invalid={feedback.invalidCellKey === cell.key}
-					merged={feedback.mergedCellKey === cell.key}
-					imprinted={feedback.imprintedCellKey === cell.key}
+					invalid={feedback.invalidBoardCellKey === cell.key}
+					merged={feedback.mergedBoardCellKey === cell.key}
+					imprinted={feedback.imprintedBoardCellKey === cell.key}
 					isOver={isOver}
 				/>
 			);
@@ -209,9 +221,9 @@ export const useBoardTileEngine = ({
 		[
 			board.byCellKey,
 			drag.activeDrag,
-			feedback.imprintedCellKey,
-			feedback.invalidCellKey,
-			feedback.mergedCellKey,
+			feedback.imprintedBoardCellKey,
+			feedback.invalidBoardCellKey,
+			feedback.mergedBoardCellKey,
 			showDelayedMergeHints,
 		],
 	);
@@ -221,19 +233,18 @@ export const useBoardTileEngine = ({
 				boardItem={tile.data.boardItem}
 				item={tile.data.item}
 				activationNowMs={tile.data.activationNowMs}
-				onSingleActivate={actions.tileSingleActivate}
-				onLongActivate={actions.tileLongActivate}
 			/>
 		),
 		[
-			actions.tileLongActivate,
-			actions.tileSingleActivate,
+			activateBoardTile,
+			openBoardTileDetail,
 		],
 	);
 
 	return {
 		slots,
 		tiles,
+		activeDropTargetNodeId: drag.activeDropTargetNodeId ?? null,
 		dragConfig,
 		renderSlot,
 		renderTile,

@@ -1,28 +1,23 @@
 import { useCallback, useMemo } from "react";
 import type { Command } from "~/command/Command";
 import { useRunCommandMutation } from "~/command/useRunCommandMutation";
-import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
-import type { Feedback } from "~/play/hook/usePlayDraggableControl";
-import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
-import { produceFrom } from "~/play/logic/produceFrom";
-import type { ActiveSheet } from "~/play/logic/playSheetTypes";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import { usePlayDataInvalidation } from "~/play/hook/usePlayDataInvalidation";
+import { usePlayFeedbackState } from "~/play/hook/usePlayFeedbackState";
+import { usePlaySchedule } from "~/play/hook/usePlaySchedule";
+import { usePlaySheetsState } from "~/play/hook/usePlaySheetsState";
+import { usePlayVisualMotionsState } from "~/play/hook/usePlayVisualMotionsState";
+import { produceFrom } from "~/play/logic/produceFrom";
 
 export namespace usePlayProducerActions {
-	export interface Props {
-		activeSheet?: ActiveSheet;
-		visualMotions: Pick<useVisualItemMotions.State, "stage">;
-		feedback: Feedback;
-		schedule(label: string, operation: () => Promise<void>): Promise<void>;
-	}
+	export interface Props {}
 }
 
-export const usePlayProducerActions = ({
-	activeSheet,
-	visualMotions,
-	feedback,
-	schedule,
-}: usePlayProducerActions.Props) => {
+export const usePlayProducerActions = (_props?: usePlayProducerActions.Props) => {
+	const sheets = usePlaySheetsState();
+	const visualMotions = usePlayVisualMotionsState();
+	const feedback = usePlayFeedbackState();
+	const schedule = usePlaySchedule();
 	const invalidatePlayData = usePlayDataInvalidation();
 	const command = useRunCommandMutation<
 		Extract<
@@ -40,7 +35,7 @@ export const usePlayProducerActions = ({
 		(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") =>
 			schedule(`producer ${activation}`, () =>
 				produceFrom({
-					activeSheet,
+					activeSheet: sheets.activeSheet,
 					boardItem,
 					activation,
 					visualMotions,
@@ -50,11 +45,11 @@ export const usePlayProducerActions = ({
 				}),
 			),
 		[
-			activeSheet,
 			feedback,
 			invalidatePlayData,
 			run,
 			schedule,
+			sheets.activeSheet,
 			visualMotions,
 		],
 	);

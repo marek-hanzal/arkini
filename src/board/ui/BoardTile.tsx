@@ -1,6 +1,6 @@
 import { memo, type FC } from "react";
-import { GameItemView } from "~/item/ui/GameItemView";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import { GameItemView } from "~/item/ui/GameItemView";
 import type { ViewItem } from "~/item/view/ViewItemSchema";
 
 export namespace BoardTile {
@@ -8,8 +8,6 @@ export namespace BoardTile {
 		boardItem: BoardViewItem;
 		item: ViewItem;
 		activationNowMs?: number;
-		onSingleActivate(item: BoardViewItem): void;
-		onLongActivate(item: BoardViewItem): void;
 	}
 }
 

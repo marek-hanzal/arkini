@@ -359,6 +359,39 @@ const TileEngineActor = memo(
 			dragY,
 		]);
 
+		const releasePointerCapture = useCallback((pointerId: number) => {
+			const element = ref.current;
+			if (!element?.hasPointerCapture(pointerId)) return;
+
+			try {
+				element.releasePointerCapture(pointerId);
+			} catch {
+				// Browser capture state can change under us on mobile cancel paths.
+			}
+		}, []);
+
+		const cancelActiveSession = useCallback(() => {
+			const session = dragSessionRef.current;
+			if (!session) return;
+
+			dragSessionRef.current = null;
+			releasePointerCapture(session.pointerId);
+			clearLongTimer();
+			clearSingleTimer();
+			if (session.started) {
+				finishHover(session.source);
+				drag?.onDragCancel?.();
+			}
+			resetDragVisual();
+		}, [
+			clearLongTimer,
+			clearSingleTimer,
+			drag,
+			finishHover,
+			releasePointerCapture,
+			resetDragVisual,
+		]);
+
 		const handleTap = useCallback(
 			(event: ReactPointerEvent<HTMLDivElement>) => {
 				if (!binding) return;
@@ -416,7 +449,11 @@ const TileEngineActor = memo(
 				event.preventDefault();
 				clearSingleTimer();
 				clearLongTimer();
-				element.setPointerCapture(event.pointerId);
+				try {
+					element.setPointerCapture(event.pointerId);
+				} catch {
+					return;
+				}
 
 				const session: TileEngineActor.DragSession<TDrag> = {
 					pointerId: event.pointerId,
@@ -431,6 +468,7 @@ const TileEngineActor = memo(
 
 				if (binding.onLongActivate) {
 					longTimerRef.current = setTimeout(() => {
+						longTimerRef.current = null;
 						const current = dragSessionRef.current;
 						if (!current || current.pointerId !== event.pointerId || current.started)
 							return;
@@ -480,11 +518,9 @@ const TileEngineActor = memo(
 			(event: ReactPointerEvent<HTMLDivElement>) => {
 				const session = dragSessionRef.current;
 				if (!session || session.pointerId !== event.pointerId) return;
-				const element = ref.current;
-				if (element?.hasPointerCapture(event.pointerId))
-					element.releasePointerCapture(event.pointerId);
-				clearLongTimer();
 				dragSessionRef.current = null;
+				releasePointerCapture(event.pointerId);
+				clearLongTimer();
 
 				if (!session.started) {
 					if (!session.longFired) handleTap(event);
@@ -507,6 +543,7 @@ const TileEngineActor = memo(
 				dragY,
 				finishHover,
 				handleTap,
+				releasePointerCapture,
 				resetDragVisual,
 				updateHover,
 			],
@@ -516,22 +553,44 @@ const TileEngineActor = memo(
 			(event: ReactPointerEvent<HTMLDivElement>) => {
 				const session = dragSessionRef.current;
 				if (!session || session.pointerId !== event.pointerId) return;
-				const element = ref.current;
-				if (element?.hasPointerCapture(event.pointerId))
-					element.releasePointerCapture(event.pointerId);
-				dragSessionRef.current = null;
-				clearLongTimer();
-				finishHover(session.source);
-				resetDragVisual();
-				drag?.onDragCancel?.();
+				cancelActiveSession();
 			},
 			[
-				clearLongTimer,
-				drag,
-				finishHover,
-				resetDragVisual,
+				cancelActiveSession,
 			],
 		);
+
+		const handleLostPointerCapture = useCallback(
+			(event: ReactPointerEvent<HTMLDivElement>) => {
+				const session = dragSessionRef.current;
+				if (!session || session.pointerId !== event.pointerId) return;
+				cancelActiveSession();
+			},
+			[
+				cancelActiveSession,
+			],
+		);
+
+		useEffect(() => {
+			const cancel = () => cancelActiveSession();
+			const cancelWhenHidden = () => {
+				if (document.visibilityState !== "visible") cancelActiveSession();
+			};
+
+			window.addEventListener("blur", cancel);
+			window.addEventListener("resize", cancel);
+			window.addEventListener("orientationchange", cancel);
+			document.addEventListener("visibilitychange", cancelWhenHidden);
+
+			return () => {
+				window.removeEventListener("blur", cancel);
+				window.removeEventListener("resize", cancel);
+				window.removeEventListener("orientationchange", cancel);
+				document.removeEventListener("visibilitychange", cancelWhenHidden);
+			};
+		}, [
+			cancelActiveSession,
+		]);
 
 		const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
 			event.preventDefault();
@@ -543,7 +602,8 @@ const TileEngineActor = memo(
 		}, [
 			motion,
 			settleMotion,
-			tile,
+			tile.id,
+			tile.onMotionSettle,
 		]);
 
 		useTileEngineMotionAnimation({
@@ -597,6 +657,7 @@ const TileEngineActor = memo(
 				onPointerMove={handlePointerMove}
 				onPointerUp={handlePointerUp}
 				onPointerCancel={handlePointerCancel}
+				onLostPointerCapture={handleLostPointerCapture}
 			>
 				{renderTile({
 					tile,

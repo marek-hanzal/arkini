@@ -1,7 +1,7 @@
 import { animate, type AnimationPlaybackControlsWithThen } from "motion";
-import { useLayoutEffect, type RefObject } from "react";
-import type { TileEngineMotion, TileEngineRect } from "~/tile-engine/logic/tileEngineMachine";
+import { useLayoutEffect, useRef, type RefObject } from "react";
 import type { VisualTransitionKind } from "~/play/types";
+import type { TileEngineMotion, TileEngineRect } from "~/tile-engine/logic/tileEngineMachine";
 
 export const tileEngineMotionDurationSeconds = 0.3;
 export const tileEngineMotionDurationMs = tileEngineMotionDurationSeconds * 1000;
@@ -59,6 +59,14 @@ export const useTileEngineMotionAnimation = ({
 	motion,
 	onSettle,
 }: useTileEngineMotionAnimation.Props) => {
+	const onSettleRef = useRef(onSettle);
+
+	useLayoutEffect(() => {
+		onSettleRef.current = onSettle;
+	}, [
+		onSettle,
+	]);
+
 	useLayoutEffect(() => {
 		const element = ref.current;
 		if (!element || !motion) return;
@@ -115,7 +123,7 @@ export const useTileEngineMotionAnimation = ({
 			settled = true;
 			element.style.transform = "";
 			element.style.opacity = "";
-			onSettle?.();
+			onSettleRef.current?.();
 		});
 
 		return () => {
@@ -123,7 +131,6 @@ export const useTileEngineMotionAnimation = ({
 		};
 	}, [
 		motion,
-		onSettle,
 		ref,
 	]);
 };

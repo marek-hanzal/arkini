@@ -1,8 +1,6 @@
 import { memo, type FC } from "react";
-import {
-	useInventoryTileEngine,
-	type useInventoryTileEngine as useInventoryTileEngineType,
-} from "~/inventory/hook/useInventoryTileEngine";
+import { type useInventoryTileEngine as useInventoryTileEngineType } from "~/inventory/hook/useInventoryTileEngine";
+import { useInventorySheetController } from "~/inventory/hook/useInventorySheetController";
 import { inventoryColumns } from "~/inventory/inventoryColumns";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import type { DragData, DropData } from "~/play/types";
@@ -10,19 +8,12 @@ import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { TileEngine } from "~/tile-engine/ui/TileEngine";
 
 export namespace InventorySheet {
-	export type DragState = useInventoryTileEngineType.DragState;
-
-	export interface Props {
-		drag: DragState;
-		invalidInventorySlot?: number;
-		onClose(): void;
-		onSlotDoubleActivate(slot: InventorySlot): void;
-		visualMotions: useInventoryTileEngineType.Props["visualMotions"];
-	}
+	export interface Props {}
 }
 
-export const InventorySheet: FC<InventorySheet.Props> = memo((props) => {
-	const engine = useInventoryTileEngine(props);
+export const InventorySheet: FC<InventorySheet.Props> = memo(() => {
+	const controller = useInventorySheetController();
+	const engine = controller.engine;
 
 	return (
 		<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
@@ -30,7 +21,7 @@ export const InventorySheet: FC<InventorySheet.Props> = memo((props) => {
 				eyebrow="Inventory"
 				description={`${engine.filled}/${engine.slotCount} slots`}
 				anchor="inventory-summary"
-				onClose={props.onClose}
+				onClose={controller.onClose}
 			/>
 
 			<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
@@ -47,7 +38,7 @@ export const InventorySheet: FC<InventorySheet.Props> = memo((props) => {
 					gapPx={1}
 					className="ak-game-width mx-auto border-l border-t border-slate-800"
 					itemLayerClassName="pointer-events-none"
-					activeDropTargetNodeId={props.drag.activeDropTargetNodeId ?? null}
+					activeDropTargetNodeId={engine.activeDropTargetNodeId}
 					drag={engine.dragConfig}
 					renderSlot={engine.renderSlot}
 					renderTile={engine.renderTile}

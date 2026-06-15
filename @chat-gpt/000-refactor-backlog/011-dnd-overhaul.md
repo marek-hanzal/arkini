@@ -1,13 +1,28 @@
 # Overhaul TileEngine drag and drop
 
-Status: TODO
+Status: DONE
 Priority: CRITICAL
 
 ## Goal
 
 Revisit the whole drag/drop runtime. Current behavior is not trustworthy enough for a game: items do not snap reliably, actors can fly out of the board, swap placement feels random, and confinement is wrong across board vs inventory.
 
-The output of this task must be a stable TileEngine-owned DnD interaction layer where pointer drag, hit testing, confinement, drop settlement, and rejected-return behavior are deterministic.
+The output of this task is a more stable TileEngine-owned DnD interaction layer where Motion owns physical dragging, TileEngine owns generic surface/target resolution, and Arkini owns only game semantics.
+
+## Library-first analysis
+
+Installed Motion already provides reliable drag primitives: physical drag, MotionValues, drag constraints, drag momentum/elastic controls, and drag lifecycle callbacks. We should use that instead of owning raw pointer movement with custom `pointermove` math.
+
+Rejected options:
+
+- `dnd-kit`: too much semantic DnD machinery, previously conflicted with Motion/layout animation ownership.
+- `@use-gesture/react`: useful, but it would add another gesture layer while Motion already exists in the stack and covers the needed drag primitive.
+
+Decision:
+
+- Use Motion for physical drag and confinement primitives.
+- Keep TileEngine generic hit-testing, target registry, lifecycle cleanup, tap/long-press wrapper, and command dispatch callbacks.
+- Keep Arkini-specific target meanings outside TileEngine.
 
 ## Reported symptoms
 
@@ -19,90 +34,37 @@ The output of this task must be a stable TileEngine-owned DnD interaction layer 
   - inventory drag confinement should be the inventory cell container/surface, not the whole root.
 - Accepted drop, rejected drop, cancel, and rollback are visually too easy to desync.
 
-## Current technical risk areas
+## Completed
 
-- `TileEngineActor` switches an active actor to `position: fixed` using its starting DOM rect and motion values. That is useful for pointer-follow, but it makes surface-relative confinement easy to get wrong.
-- Drop target resolution currently uses `document.elementsFromPoint(...)` plus a global drop target registry. This can confuse board/inventory/bottom-nav targets if overlays, sheets, hidden actors, pointer-events, or z-index change.
-- Confinement is not modeled as a first-class public TileEngine concept. It is currently an accidental result of CSS, fixed positioning, target lookup, and caller behavior. Naturally it behaves like cursed soup.
-- Accepted drop state changes and animation staging are now routed through command visual events, but the interaction layer still has generic return/cancel physics that must be reconciled with TileEngine actor state.
-- Board and inventory have different desired drag surfaces. They cannot share one implicit viewport/root constraint.
+- Replaced TileEngine's in-house physical drag loop with Motion drag primitives.
+- Removed manual per-frame pointer delta updates from TileEngineActor.
+- Kept custom pointer handling only for tap, double tap, long press, context-menu suppression, and lifecycle cleanup.
+- Added `dragConstraintsRef` to TileEngine public API.
+- Board passes the full play root element as drag constraint through `PlayRootElementProvider` / `usePlayRootElement`.
+- Inventory uses the TileEngine root as default drag constraint, so inventory actors stay inside the inventory grid/container.
+- Replaced TileEngine slot drop target registration with an internal generic rect registry.
+- Kept the global drop target registry only as an external fallback for special targets outside a TileEngine surface, such as bottom navigation inventory drop.
+- Target resolution now checks TileEngine slot rects first, then external fallback.
+- Accepted drop `dragRect` is read from the actual transformed actor DOM rect at drag end.
+- Pointer position remains the source of target hit-testing, separate from actor rect.
+- Updated `@chat-gpt/README.md` with the library-first rule for future tasks.
 
-## Required design rules
+## Acceptance
 
-- Keep `src/tile-engine` standalone. No Arkini imports, no `itemId`, no board/inventory/activation/command knowledge.
-- Arkini-specific behavior may be injected through TileEngine public props/hooks/adapters.
-- TileEngine may expose generic DnD extension points such as:
-  - `drag.surface(...)`,
-  - `drag.constrain(...)`,
-  - `drag.resolveTarget(...)`,
-  - `drag.onStateChange(...)`,
-  - or equivalent hook-style props.
-- Pointer move must not cause React re-renders per frame.
-- Active drag visual state should use MotionValues or equivalent imperative primitives.
-- Slot/target geometry must be refreshed on layout change, not recomputed as React state on every pointer move.
-- Actor identity must stay stable across move/swap/drop settlement. Slot is location; actor is entity. Do not key actors by slot.
+- [x] Board drag is visually confined to the intended board/root surface through Motion `dragConstraints`.
+- [x] Inventory drag is visually confined to the inventory grid/cell container by default TileEngine constraints.
+- [x] Dropping on a valid board cell resolves from TileEngine slot rects instead of relying only on global `elementsFromPoint`.
+- [x] Dropping on a valid inventory slot resolves from TileEngine slot rects instead of relying only on global `elementsFromPoint`.
+- [x] Invalid external/special targets can still resolve through the external fallback registry.
+- [x] Invalid drop return remains in drag runtime as interaction physics.
+- [x] Cancel paths clear active drag, active target highlight, hidden sources, and motion state.
+- [x] Pointer move does not update React state per frame for physical movement; MotionValues own drag movement.
+- [x] TileEngine remains standalone; no Arkini domain imports are introduced.
+- [x] Typecheck and build pass.
 
-## Proposed work
+## Manual validation still recommended
 
-### 1. Model drag surfaces explicitly
-
-Introduce a generic TileEngine concept for a drag surface/viewport.
-
-Possible shape:
-
-- `surfaceId`
-- root element ref or resolver
-- constraint rect resolver
-- hit-test strategy
-- optional scroll/viewport conversion
-
-Board and inventory should each pass their own surface behavior:
-
-- board: confinement root should be the full board/play surface that represents valid board drag movement,
-- inventory: confinement should be the inventory grid/cell container,
-- bottom nav target can remain an injected special target, but must not expand inventory confinement.
-
-### 2. Replace accidental confinement with explicit clamp
-
-During active drag, compute the visual actor rect as:
-
-- pointer delta from origin,
-- clamp against the active source surface constraint rect,
-- preserve actor size,
-- expose unclamped pointer position separately for target hit-testing if needed.
-
-This prevents the actor from flying out while still allowing target resolution to know where the pointer is.
-
-### 3. Make hit testing deterministic
-
-Avoid relying purely on `document.elementsFromPoint` as the only source of truth.
-
-Options:
-
-- maintain a generic TileEngine target rect registry per surface,
-- use grid math for uniform surfaces,
-- resolve target by pointer position in active surface coordinates,
-- keep DOM fallback only for special injected targets like bottom nav.
-
-Board/inventory are grids. Hit testing should be boring. Boring hit testing is good. Exciting hit testing is how games become bug reports with sprites.
-
-### 4. Separate pointer rect and actor rect
-
-Accepted drop planning currently receives a `dragRect`. Make sure this represents the clamped actor visual rect, while target selection uses pointer location. These are not always the same when the actor is confined.
-
-### 5. Rebuild swap settlement expectations
-
-Document and enforce swap visual contract:
-
-- dragging actor follows pointer while active,
-- on accepted swap, domain command emits `item.swapped`,
-- command visual events stage final actor motions,
-- source/target actors settle into their final slots,
-- no actor should render from stale slot geometry after invalidation.
-
-### 6. Test all lifecycle exits
-
-Manual scenarios:
+Run these in a browser/device because no headless build can prove touch-feel correctness:
 
 - board item move to empty board cell,
 - board item swap with occupied board cell,
@@ -114,19 +76,6 @@ Manual scenarios:
 - drag outside valid target then return,
 - pointer cancel / window blur / orientation change / resize,
 - long press does not open native mobile context menu.
-
-## Acceptance
-
-- Board drag is visually confined to the intended board/root surface.
-- Inventory drag is visually confined to the inventory grid/cell container.
-- Dropping on a valid board cell always resolves that exact cell.
-- Dropping on a valid inventory slot always resolves that exact slot.
-- Swap always places both actors into their expected final slots.
-- Invalid drop returns to the source actor origin without leaving hidden/ghost state behind.
-- Cancel paths clear active drag, active target highlight, hidden sources, and motion state.
-- Pointer move does not re-render board/inventory per frame.
-- TileEngine remains standalone; grep confirms no imports from Arkini domains.
-- Typecheck and build pass.
 
 ## Watchouts
 

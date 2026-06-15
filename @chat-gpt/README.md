@@ -16,6 +16,12 @@ Each task file should describe one coherent piece of work. A task may be a whole
 
 Current baseline commit when this backlog was created: `6b86b70 Normalize craft inputs and activation requirements`.
 
+## Library-first rule
+
+Before starting every implementation task, first do a short library-capability analysis. Check whether already installed libraries can own the boring infrastructure before writing in-house code. Prefer using existing library APIs for gestures, animation primitives, data fetching, state machines, schemas, and persistence boundaries when they fit the task.
+
+If installed libraries are not enough, explicitly consider whether a small focused dependency would be safer than custom code. Only write in-house infrastructure when the task is genuinely game/domain-specific or when library behavior would fight Arkini architecture. Document the decision in the task file when it affects architecture.
+
 ## Working rules
 
 - Keep the repo client-only and offline-first.

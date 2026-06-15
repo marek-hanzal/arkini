@@ -1,4 +1,5 @@
 import type { Command } from "~/command/Command";
+import type { CommandResult } from "~/command/CommandResult";
 import type { ItemId } from "~/manifest/manifestId";
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DropContext } from "~/drag/DropContext";
@@ -17,7 +18,7 @@ export interface Feedback {
 export interface Runtime {
 	game: GameDragView;
 	feedback: Feedback;
-	run(command: Command): Promise<unknown>;
+	run(command: Command): Promise<CommandResult>;
 }
 
 export type SourceKind = DragSource["kind"];

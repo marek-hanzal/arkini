@@ -4,6 +4,10 @@ import type { draggableWorkflowMachine } from "~/drag/logic/draggableWorkflowMac
 import type { RectLike } from "~/play/types";
 import { rectForNode } from "./rectForNode";
 
+/**
+ * Reject/failure return animation is intentionally kept in the generic drag layer.
+ * It is not a game command result, so there is no command visual event to plan from.
+ */
 export namespace animateReturn {
 	export interface Props<ItemId extends string, Source, Overlay, Kind extends string> {
 		source: DraggablePayload<ItemId, Source, Overlay>;

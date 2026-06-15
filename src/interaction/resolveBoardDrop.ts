@@ -1,5 +1,4 @@
 import { cellKey } from "~/board/util/cell";
-import { visualBoardItemKey } from "~/play/hook/useVisualItemMotions";
 import type { DropPlan } from "~/drag/DropPlan";
 import type { ItemId } from "~/manifest/manifestId";
 import { resolveDropIntent } from "~/merge/resolveDropIntent";
@@ -15,18 +14,6 @@ export namespace resolveBoardDrop {
 	}
 }
 
-const consumeSourceAnimation = (props: {
-	itemId: ItemId;
-	boardItemId: string;
-	targetNodeId: string;
-}) => ({
-	itemId: props.itemId,
-	actorKey: visualBoardItemKey(props.boardItemId),
-	fromDrag: true,
-	toNodeId: props.targetNodeId,
-	kind: "consume" as const,
-});
-
 export const resolveBoardDrop = ({
 	context: { source, target },
 	runtime,
@@ -40,15 +27,6 @@ export const resolveBoardDrop = ({
 		return accept({
 			hide: [
 				source.sourceId,
-			],
-			animations: [
-				{
-					itemId: source.itemId,
-					actorKey: visualBoardItemKey(source.source.boardItemId),
-					fromDrag: true,
-					toNodeId: target.targetNodeId,
-					kind: "move",
-				},
 			],
 			commit: () =>
 				runtime.run({
@@ -84,22 +62,6 @@ export const resolveBoardDrop = ({
 			hide: [
 				source.sourceId,
 			],
-			animations: [
-				{
-					itemId: source.itemId,
-					actorKey: visualBoardItemKey(source.source.boardItemId),
-					fromDrag: true,
-					toNodeId: target.targetNodeId,
-					kind: "move",
-				},
-				{
-					itemId: targetItem.itemId,
-					actorKey: visualBoardItemKey(targetBoardItemId),
-					fromNodeId: target.targetNodeId,
-					toNodeId: source.sourceNodeId,
-					kind: "move",
-				},
-			],
 			commit: () =>
 				runtime.run({
 					type: "board.swap",
@@ -109,41 +71,9 @@ export const resolveBoardDrop = ({
 		});
 	}
 
-	if (intent.type === "merge" && intent.directed) {
-		return accept({
-			animationTiming: "beforeCommit",
-			hide: [
-				source.sourceId,
-			],
-			animations: [
-				consumeSourceAnimation({
-					itemId: source.itemId,
-					boardItemId: source.source.boardItemId,
-					targetNodeId: target.targetNodeId,
-				}),
-			],
-			commit: () =>
-				runtime.run({
-					type: "board.merge",
-					sourceBoardItemId: source.source.boardItemId,
-					targetBoardItemId,
-				}),
-			feedback: () =>
-				runtime.feedback.pulseImprintCell(cellKey(target.target.x, target.target.y)),
-		});
-	}
-
 	return accept({
-		animationTiming: "beforeCommit",
 		hide: [
 			source.sourceId,
-		],
-		animations: [
-			consumeSourceAnimation({
-				itemId: source.itemId,
-				boardItemId: source.source.boardItemId,
-				targetNodeId: target.targetNodeId,
-			}),
 		],
 		commit: () =>
 			runtime.run({
@@ -151,6 +81,9 @@ export const resolveBoardDrop = ({
 				sourceBoardItemId: source.source.boardItemId,
 				targetBoardItemId,
 			}),
-		feedback: () => runtime.feedback.pulseMergeCell(cellKey(target.target.x, target.target.y)),
+		feedback: () =>
+			intent.type === "merge" && intent.directed
+				? runtime.feedback.pulseImprintCell(cellKey(target.target.x, target.target.y))
+				: runtime.feedback.pulseMergeCell(cellKey(target.target.x, target.target.y)),
 	});
 };

@@ -23,6 +23,7 @@ export const PlaySessionProvider: FC<PlaySessionProvider.Props> = ({ children })
 	const schedule = usePlayEventQueue();
 	const feedback = usePlayFeedback();
 	const drag = usePlayDraggableControl({
+		activeSheet: sheets.activeSheet,
 		feedback,
 		schedule,
 		visualMotions,

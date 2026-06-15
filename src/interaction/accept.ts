@@ -14,7 +14,6 @@ type AcceptPlan = Omit<
 
 export const accept = (plan: AcceptPlan): DropPlan<ItemId, VisualTransitionKind, VisualMeta> => ({
 	type: "accept",
-	animationTiming: "afterCommit",
 	...plan,
 	hide: (plan.hide ?? []).filter(Boolean),
 });

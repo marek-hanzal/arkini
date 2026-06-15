@@ -8,6 +8,7 @@ import { resolveBoardInventoryDrop } from "./resolveBoardInventoryDrop";
 import { resolveInventoryDrop } from "./resolveInventoryDrop";
 import type { AnyDropContext, Feedback, TypedDropContext } from "./types";
 import type { Command } from "~/command/Command";
+import type { CommandResult } from "~/command/CommandResult";
 import type { GameDragView } from "~/drag/view/GameDragViewSchema";
 
 export namespace resolveDrop {
@@ -15,7 +16,7 @@ export namespace resolveDrop {
 		context: AnyDropContext;
 		game: GameDragView | undefined;
 		feedback: Feedback;
-		run(command: Command): Promise<unknown>;
+		run(command: Command): Promise<CommandResult>;
 	}
 }
 

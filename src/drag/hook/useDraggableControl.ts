@@ -2,6 +2,7 @@ import { useActorRef } from "@xstate/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DropContext } from "~/drag/DropContext";
+import type { DropOutcome } from "~/drag/DropOutcome";
 import type { DropPlan } from "~/drag/DropPlan";
 import type { DroppablePayload } from "~/drag/DroppablePayload";
 import type { ResolvedDraggableAnimation } from "~/drag/ResolvedDraggableAnimation";
@@ -24,7 +25,7 @@ export namespace useDraggableControl {
 			context: DropContext<ItemId, Source, Target, Overlay>,
 		): DropPlan<ItemId, Kind, Overlay> | Promise<DropPlan<ItemId, Kind, Overlay>>;
 		animate(animation: ResolvedDraggableAnimation<ItemId, Kind, Overlay>): Promise<void> | void;
-		schedule?(operation: () => Promise<void>): Promise<void>;
+		schedule?<T>(operation: () => Promise<T>): Promise<T>;
 		onError?(
 			error: unknown,
 			context: DropContext<ItemId, Source, Target, Overlay>,
@@ -126,7 +127,7 @@ export const useDraggableControl = <
 			source,
 			target,
 			dragRect,
-		}: useDraggableControl.DropProps<ItemId, Source, Target, Overlay>) => {
+		}: useDraggableControl.DropProps<ItemId, Source, Target, Overlay>): Promise<DropOutcome> => {
 			const context: DropContext<ItemId, Source, Target, Overlay> = {
 				source,
 				target,
@@ -137,14 +138,14 @@ export const useDraggableControl = <
 			});
 			const operation = async () => {
 				try {
-					await runDropPlan({
+					return await runDropPlan({
 						context,
 						plan: await resolveDrop(context),
 						dragRect,
 						runtime,
 					});
 				} catch (error) {
-					await failDrop({
+					return await failDrop({
 						error,
 						context,
 						dragRect,
@@ -153,8 +154,7 @@ export const useDraggableControl = <
 				}
 			};
 
-			if (schedule) await schedule(operation);
-			else await operation();
+			return schedule ? await schedule(operation) : await operation();
 		},
 		[
 			resolveDrop,

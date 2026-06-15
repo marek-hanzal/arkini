@@ -141,6 +141,7 @@ export const useInventoryTileEngine = (
 					data: {
 						sourceId,
 						sourceNodeId: nodeId,
+						actorKey: visualInventoryStackKey(stack.id),
 						itemId: stack.itemId,
 						source: {
 							kind: "inventory",

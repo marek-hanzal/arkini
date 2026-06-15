@@ -1,5 +1,6 @@
 import type { DropContext } from "~/drag/DropContext";
 import type { DropPlan } from "~/drag/DropPlan";
+import type { DropOutcome } from "~/drag/DropOutcome";
 import type { DropPlanRuntime } from "~/drag/DropPlanRuntime";
 import type { RectLike } from "~/play/types";
 import { waitForPaint } from "~/shared/util/waitForPaint";
@@ -26,9 +27,11 @@ export const runAcceptPlan = async <
 	Overlay = unknown,
 	Kind extends string = string,
 >({
+	context,
 	plan,
+	dragRect,
 	runtime,
-}: runAcceptPlan.Props<ItemId, Source, Target, Overlay, Kind>) => {
+}: runAcceptPlan.Props<ItemId, Source, Target, Overlay, Kind>): Promise<DropOutcome> => {
 	runtime.sendWorkflow({
 		type: "DROP_ACCEPTED",
 	});
@@ -37,7 +40,10 @@ export const runAcceptPlan = async <
 		type: "COMMIT_STARTED",
 	});
 
-	await plan.commit();
+	await plan.commit({
+		dragRect,
+		dragActorKey: context.source.actorKey,
+	});
 
 	runtime.clearActiveDrag();
 	runtime.clearHiddenSources();
@@ -49,4 +55,5 @@ export const runAcceptPlan = async <
 	settleWorkflow({
 		send: runtime.sendWorkflow,
 	});
+	return "accept";
 };

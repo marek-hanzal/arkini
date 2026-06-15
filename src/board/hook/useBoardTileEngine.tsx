@@ -160,6 +160,7 @@ export const useBoardTileEngine = (
 					data: {
 						sourceId,
 						sourceNodeId: nodeId,
+						actorKey: visualBoardItemKey(boardItem.id),
 						itemId: boardItem.itemId,
 						source: {
 							kind: "board",

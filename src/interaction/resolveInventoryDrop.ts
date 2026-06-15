@@ -25,11 +25,14 @@ export const resolveInventoryDrop = ({
 		hide: [
 			source.sourceId,
 		],
-		commit: () =>
-			runtime.run({
-				type: "inventory.swap",
-				sourceSlotIndex: source.source.slotIndex,
-				targetSlotIndex: target.target.slotIndex,
-			}),
+		commit: (drop) =>
+			runtime.run(
+				{
+					type: "inventory.swap",
+					sourceSlotIndex: source.source.slotIndex,
+					targetSlotIndex: target.target.slotIndex,
+				},
+				drop,
+			),
 	});
 };

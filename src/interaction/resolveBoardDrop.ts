@@ -28,13 +28,16 @@ export const resolveBoardDrop = ({
 			hide: [
 				source.sourceId,
 			],
-			commit: () =>
-				runtime.run({
-					type: "board.move",
-					boardItemId: source.source.boardItemId,
-					x: target.target.x,
-					y: target.target.y,
-				}),
+			commit: (drop) =>
+				runtime.run(
+					{
+						type: "board.move",
+						boardItemId: source.source.boardItemId,
+						x: target.target.x,
+						y: target.target.y,
+					},
+					drop,
+				),
 		});
 	}
 
@@ -62,12 +65,15 @@ export const resolveBoardDrop = ({
 			hide: [
 				source.sourceId,
 			],
-			commit: () =>
-				runtime.run({
-					type: "board.swap",
-					sourceBoardItemId: source.source.boardItemId,
-					targetBoardItemId,
-				}),
+			commit: (drop) =>
+				runtime.run(
+					{
+						type: "board.swap",
+						sourceBoardItemId: source.source.boardItemId,
+						targetBoardItemId,
+					},
+					drop,
+				),
 		});
 	}
 
@@ -75,12 +81,15 @@ export const resolveBoardDrop = ({
 		hide: [
 			source.sourceId,
 		],
-		commit: () =>
-			runtime.run({
-				type: "board.merge",
-				sourceBoardItemId: source.source.boardItemId,
-				targetBoardItemId,
-			}),
+		commit: (drop) =>
+			runtime.run(
+				{
+					type: "board.merge",
+					sourceBoardItemId: source.source.boardItemId,
+					targetBoardItemId,
+				},
+				drop,
+			),
 		feedback: () =>
 			intent.type === "merge" && intent.directed
 				? runtime.feedback.pulseImprintCell(cellKey(target.target.x, target.target.y))

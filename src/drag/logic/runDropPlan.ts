@@ -1,4 +1,5 @@
 import type { DropContext } from "~/drag/DropContext";
+import type { DropOutcome } from "~/drag/DropOutcome";
 import type { DropPlan } from "~/drag/DropPlan";
 import type { DropPlanRuntime } from "~/drag/DropPlanRuntime";
 import type { RectLike } from "~/play/types";
@@ -26,7 +27,7 @@ export const runDropPlan = async <
 	plan,
 	dragRect,
 	runtime,
-}: runDropPlan.Props<ItemId, Source, Target, Overlay, Kind>) => {
+}: runDropPlan.Props<ItemId, Source, Target, Overlay, Kind>): Promise<DropOutcome> => {
 	if (plan.type === "ignore")
 		return runIgnorePlan({
 			runtime,

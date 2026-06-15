@@ -1,3 +1,4 @@
+import type { DropOutcome } from "~/drag/DropOutcome";
 import type { DropPlanRuntime } from "~/drag/DropPlanRuntime";
 import { settleWorkflow } from "./settleWorkflow";
 
@@ -15,7 +16,7 @@ export const runIgnorePlan = <
 	Kind extends string = string,
 >({
 	runtime,
-}: runIgnorePlan.Props<ItemId, Source, Target, Overlay, Kind>) => {
+}: runIgnorePlan.Props<ItemId, Source, Target, Overlay, Kind>): DropOutcome => {
 	runtime.sendWorkflow({
 		type: "DROP_IGNORED",
 	});
@@ -23,4 +24,5 @@ export const runIgnorePlan = <
 	settleWorkflow({
 		send: runtime.sendWorkflow,
 	});
+	return "ignore";
 };

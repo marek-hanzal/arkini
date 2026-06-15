@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { readViewFx } from "~/upgrade/fx/readViewFx";
+import { readUpgradeListFx } from "~/v0/upgrade/fx/readUpgradeListFx";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { upgradeQueryKeys } from "~/v0/upgrade/query/upgradeQueryKeys";
 
@@ -11,7 +11,7 @@ export const upgradeListQueryOptions = () =>
 		},
 		queryFn() {
 			return runGameFx({
-				effect: readViewFx(),
+				effect: readUpgradeListFx(),
 			});
 		},
 	});

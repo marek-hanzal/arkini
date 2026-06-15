@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { placeFx } from "~/inventory/fx/placeFx";
+import type { placeInventoryItemFx } from "~/v0/inventory/fx/placeInventoryItemFx";
 import { rebuildBoardView } from "~/board/view/rebuildBoardView";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
@@ -11,7 +11,7 @@ import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryView
 export namespace applyInventoryPlaceCachePatch {
 	export interface Props {
 		queryClient: QueryClient;
-		input: placeFx.Props;
+		input: placeInventoryItemFx.Props;
 	}
 }
 

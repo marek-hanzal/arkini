@@ -35,11 +35,11 @@ There are no separate static `merges`, `producers`, and `craftRecipes` arrays. L
 
 ## Logic and Effect boundary
 
-Effect belongs to the server-like game backend, not the UI. React components, React Query hooks, drag surfaces, and Motion animation code stay normal UI code. The boundary is `src/play/logic/playBackend.ts`: UI calls Promise-returning backend functions, while those wrappers run domain Effect roots underneath.
+Effect belongs to the server-like game backend, not the UI. React components, React Query hooks, drag surfaces, and Motion animation code stay normal UI code. In the active `v0` runtime, React Query options and mutation hooks call domain-local Fx roots through `src/v0/fx/runGameFx.ts`. The old `src/play/logic/playBackend.ts` façade is historical compatibility, not the v0 direction.
 
-Domain effects live directly in `*/fx/*Fx.ts`; there is no `logic/fx` nesting. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. Names are short inside their domain: `board/fx/moveFx.ts`, `inventory/fx/swapFx.ts`, `activation/fx/activateFx.ts`, `upgrade/fx/buyFx.ts`. If a callsite needs multiple same-name domain effects, import aliases are allowed. Repeating the domain in every function name is banned, because `producerProduceProducerFx` would be a cry for help, not architecture.
+Active v0 effects live in the owning domain under `src/v0/**/fx/*Fx.ts`. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. v0 uses explicit names such as `moveBoardItemFx`, `swapInventorySlotsFx`, `readBoardViewFx`, and `readDatabaseStatusFx`, because cache/action callsites should not need detective work or alias gymnastics just to know which domain is moving what.
 
-Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, activation output rolling, and save mutation pipelines. Files inside `src/**/fx/` are reserved for root `Effect.fn(...)` operations only. Pure helpers, runner helpers, cached state, context tags, service implementations, and domain types stay outside `fx/`, mostly in `logic/` or `context/`. UI feedback still happens from action results/hooks; effects do not know DOM nodes, Motion animation sequences, React state, or pointer events.
+Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, activation output rolling, and save mutation pipelines. Files inside `src/v0/**/fx/` are reserved for root `Effect.fn(...)` operations and their private Fx-facing helpers. Pure deterministic helpers may remain pure when they are not an async/domain boundary, but any query/mutation backend operation should be an Fx root instead of a plain Promise helper wearing a fake mustache. UI feedback still happens from action results/hooks; effects do not know DOM nodes, Motion animation sequences, React state, or pointer events.
 
 Database access is provided through `KyselyContextFx`; domain effects call `dbFx(...)` and wrap multi-step mutations with `withTransactionFx(...)` instead of passing `tx` through props like some cursed little dependency relay race. Browser database bootstrapping is isolated behind `BrowserDatabaseServiceFx`, so OPFS support checks, database path, and migrations do not leak into gameplay effects.
 
@@ -52,13 +52,13 @@ Randomness is provided through `RandomServiceFx`; activation rolls do not call `
 
 ## Game engine boundary
 
-Gameplay mutations go through typed `Command` values in `src/command/`. React UI workflows do not import individual domain Effect roots directly. `runCommandFx` validates the discriminated command union and delegates to the owning domain root effect, while `useRunCommandMutation` is the historical React Query bridge for cache updates, rollback, and invalidation. Command results now carry typed visual events such as `item.moved`, `item.spawned`, `item.fed`, `activation.activated`, and `upgrade.started`; these are domain facts, not DOM animation instructions. `src/animation/stageCommandVisualEvents.ts` maps those Arkini-specific facts into generic actor motion entries outside `TileEngine`, so the engine stays reusable instead of learning what an activation, producer, stash, or inventory slot means. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
+The historical runtime still has typed `Command` values in `src/command/`, but v0 does not route user actions through a central command bus. v0 mutations call the owning domain Fx root directly: board actions call board/activation/craft Fx roots, inventory actions call inventory Fx roots, and upgrade actions call upgrade Fx roots. Command schemas/results are still reused as compatibility types while the old runtime is being drained, but the active architecture is concrete action hook → concrete Fx → React Query cache patch/reconcile.
 
 ## Tile engine boundary
 
-Board and inventory tile visuals are rendered through the generic `TileEngine` in `src/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory data still belongs to the parent game state and SQLite. `TileEngine` only owns transient XState motion state for spawn/move handoff so final actors can animate from external activation/drop rects without creating a second flyer DOM copy.
+Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/v0/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory data belongs to SQLite and React Query cached views. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules.
 
-`TileEngine` is standalone by design: it accepts slots, tiles, render callbacks, generic drag bindings, generic motion entries, and an imperative spawn/stage API. It must not import Arkini board/inventory/producers directly. Game-specific stuff can be passed through hook-generated props, but the engine public API must stay expressed as generic slots, actors, payloads, rects, and transition kinds. If a future game surface needs tile behavior, it should feed generic slots/tiles into `TileEngine` instead of inventing another tiny haunted renderer.
+`TileEngine` is standalone by design: it accepts slots, tiles, render callbacks, generic drag bindings, and drop resolution callbacks. It must not import Arkini board/inventory/producers directly. Game-specific stuff lives in `src/v0/play/drop` and the board/inventory surfaces. If a future game surface needs tile behavior, it should feed generic slots/tiles into `TileEngine` instead of inventing another tiny haunted renderer.
 
 Rules for this layer:
 
@@ -135,15 +135,16 @@ src/id/context/                  Effect id service context tag.
 src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
-src/v0/                        Active client play runtime: domain-local query/action/cache files, play shell, drop policy, feedback state, and reusable TileEngine.
+src/v0/                        Active client play runtime: domain-local query/action/cache/Fx files, play shell, drop policy, feedback state, and reusable TileEngine.
+src/v0/**/fx/                    Active v0 domain Fx roots for gameplay actions, save lifecycle, reads, persistence, and bootstrap.
 src/ancient/                   Snapshot of the pre-v0 runtime kept for archaeology only; do not import ancient UI/runtime code into v0.
 src/command/                    Historical typed command schemas and command Effect router kept for old runtime/domain compatibility. v0 calls domain Fx roots directly.
 src/animation/                  Historical visual planning helpers for game events.
 src/merge/                      Merge, craft-input, and activation-input intent resolution.
-src/play/logic/                  Promise backend façade for read/bootstrap flows and pure play-shell helpers.
-src/**/fx/                       Domain Effect roots for gameplay actions, save lifecycle, reads, and persistence.
-src/board/                       Board identity, board state logic, board view model/schema, board UI, cell feedback.
-src/inventory/                   Inventory identity, stack planning/storage logic, inventory view model/schema, inventory sheet UI.
+src/play/logic/                  Historical Promise backend façade and old runtime helpers. Do not route new v0 query/mutation work through it.
+src/**/fx/                       Legacy/root domain Effect roots still compiled while migration continues. Prefer `src/v0/**/fx` for active runtime work.
+src/board/                       Legacy board identity, board state logic, board view model/schema, board UI, cell feedback.
+src/inventory/                   Legacy inventory identity, stack planning/storage logic, inventory view model/schema, inventory sheet UI.
 src/activation/                 Activatable item runtime: producer/stash activation, output rolling, depletion, consumable inputs, and persistent requirements.
 src/craft/                      Craft/progress input storage helpers for nested item instances.
 src/producer/                    Producer readiness tracking and cooldown helpers.

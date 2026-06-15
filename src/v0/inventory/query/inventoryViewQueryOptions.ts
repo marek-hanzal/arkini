@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { readViewFx } from "~/inventory/fx/readViewFx";
+import { readInventoryViewFx } from "~/v0/inventory/fx/readInventoryViewFx";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { inventoryQueryKeys } from "~/v0/inventory/query/inventoryQueryKeys";
 
@@ -8,7 +8,7 @@ export const inventoryViewQueryOptions = () =>
 		queryKey: inventoryQueryKeys.view,
 		queryFn() {
 			return runGameFx({
-				effect: readViewFx(),
+				effect: readInventoryViewFx(),
 			});
 		},
 	});

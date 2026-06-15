@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { repeatActivationItem } from "~/v0/activation/logic/repeatActivationItem";
 import type { ItemId } from "~/v0/manifest/manifestId";
-import type { ActivationOutput } from "~/v0/manifest/producer";
+import type { ActivationOutput } from "~/v0/manifest/activation/ActivationOutput";
 import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 import { resolveActivationQuantityFx } from "./resolveActivationQuantityFx";
 import { rollWeightedActivationDropsFx } from "./rollWeightedActivationDropsFx";

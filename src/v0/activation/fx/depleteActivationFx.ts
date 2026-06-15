@@ -3,9 +3,9 @@ import { P, match } from "ts-pattern";
 import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
-import type { BoardRow } from "~/v0/inventory/logic/planning/types";
+import type { BoardRow } from "~/v0/board/model/BoardRow";
 import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
-import type { StashDefinition } from "~/v0/manifest/producer";
+import type { StashDefinition } from "~/v0/manifest/activation/StashDefinition";
 import type { ActivationDepletionSchema } from "~/v0/activation/type/ActivationDepletionSchema";
 import { json } from "~/v0/serialization/json";
 

@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 import type { ItemId } from "../manifestId";
-import type { ActivationOutput } from "../producer";
+import type { ActivationOutput } from "~/v0/manifest/activation/ActivationOutput";
 import { assert } from "./assert";
 import { assertQuantity } from "./quantity";
 

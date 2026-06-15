@@ -3,14 +3,12 @@ import { bootstrapDatabase } from "~/v0/database/bootstrap/bootstrapDatabase";
 import { type GameRuntimeServiceFx, runEffect } from "~/v0/fx/runEffect";
 
 export namespace runGameFx {
-	export interface Props<T, E, R extends GameRuntimeServiceFx> {
-		effect: Effect.Effect<T, E, R>;
+	export interface Props<T, E> {
+		effect: Effect.Effect<T, E, GameRuntimeServiceFx>;
 	}
 }
 
-export const runGameFx = async <T, E, R extends GameRuntimeServiceFx>({
-	effect,
-}: runGameFx.Props<T, E, R>) => {
+export const runGameFx = async <T, E>({ effect }: runGameFx.Props<T, E>) => {
 	await bootstrapDatabase();
 	return runEffect(effect);
 };

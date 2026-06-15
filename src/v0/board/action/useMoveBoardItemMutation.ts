@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { moveBoardItemFx } from "~/v0/board/fx/moveBoardItemFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
@@ -11,7 +12,12 @@ import { refreshDatabaseStatusCache } from "~/v0/database/cache/refreshDatabaseS
 export const useMoveBoardItemMutation = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<ActionResult.Type, unknown, moveBoardItemFx.Props, CacheSnapshot.Type>({
+	return useMutation<
+		ActionResult.Type,
+		GameActionError,
+		moveBoardItemFx.Props,
+		CacheSnapshot.Type
+	>({
 		mutationFn(input) {
 			return runGameFx({
 				effect: moveBoardItemFx(input),

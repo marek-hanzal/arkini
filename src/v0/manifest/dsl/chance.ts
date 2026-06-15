@@ -1,5 +1,6 @@
 import type { ItemId } from "../manifestId";
-import type { ActivationOutput, Quantity } from "../producer";
+import type { ActivationOutput } from "~/v0/manifest/activation/ActivationOutput";
+import type { Quantity } from "~/v0/manifest/activation/Quantity";
 
 export namespace chance {
 	export interface Props {

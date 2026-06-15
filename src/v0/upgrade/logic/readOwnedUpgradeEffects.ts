@@ -1,5 +1,5 @@
 import type { GameConfigService } from "~/v0/game/context/GameConfigServiceFx";
-import type { UpgradeEffectDefinition } from "~/v0/manifest/upgrade";
+import type { UpgradeEffectDefinition } from "~/v0/manifest/upgrade/UpgradeEffectDefinition";
 
 export interface OwnedUpgradeRow {
 	upgradeDefinitionId: string;

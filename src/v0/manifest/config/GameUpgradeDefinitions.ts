@@ -1,4 +1,4 @@
-import type { UpgradeDefinition } from "../upgrade";
+import type { UpgradeDefinition } from "~/v0/manifest/upgrade/UpgradeDefinition";
 import { cost } from "../dsl/cost";
 import { setLootTable } from "../dsl/setLootTable";
 import { speedTiers } from "../dsl/speedTiers";

@@ -5,13 +5,11 @@ import type { GameDataIndex } from "~/v0/manifest/createGameDataIndex";
 import type { ItemDefinition } from "~/v0/manifest/item";
 import type { ItemMergeRule } from "~/v0/manifest/itemMergeRule";
 import type { ItemId, LootTableId, UpgradeId } from "~/v0/manifest/manifestId";
-import type {
-	ActivationDefinition,
-	ProducerDefinition,
-	StashDefinition,
-} from "~/v0/manifest/producer";
+import type { ActivationDefinition } from "~/v0/manifest/activation/ActivationDefinition";
+import type { ProducerDefinition } from "~/v0/manifest/activation/ProducerDefinition";
+import type { StashDefinition } from "~/v0/manifest/activation/StashDefinition";
 import type { LootTableDefinition } from "~/v0/manifest/lootTable";
-import type { UpgradeDefinition } from "~/v0/manifest/upgrade";
+import type { UpgradeDefinition } from "~/v0/manifest/upgrade/UpgradeDefinition";
 import type { ResourceDefinition } from "~/v0/manifest/resource";
 
 export interface GameConfigSummary {

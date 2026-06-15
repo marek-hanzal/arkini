@@ -1,7 +1,8 @@
 import type { AssetId, ItemId } from "./manifestId";
 import type { ItemCraftRecipe } from "./craft";
 import type { ItemMergeRule } from "./itemMergeRule";
-import type { ProducerDefinition, StashDefinition } from "./producer";
+import type { ProducerDefinition } from "~/v0/manifest/activation/ProducerDefinition";
+import type { StashDefinition } from "~/v0/manifest/activation/StashDefinition";
 
 export interface ItemDefinition {
 	id: ItemId;

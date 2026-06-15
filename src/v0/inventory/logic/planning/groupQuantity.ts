@@ -1,4 +1,4 @@
-import type { UpgradeCostDefinition } from "~/v0/manifest/upgrade";
+import type { UpgradeCostDefinition } from "~/v0/manifest/upgrade/UpgradeCostDefinition";
 
 export const groupQuantity = (cost: readonly UpgradeCostDefinition[]) => {
 	const grouped = new Map<string, number>();

@@ -1,4 +1,4 @@
-import type { ActivationOutput } from "../producer";
+import type { ActivationOutput } from "~/v0/manifest/activation/ActivationOutput";
 
 export namespace outputs {
 	export interface Props {

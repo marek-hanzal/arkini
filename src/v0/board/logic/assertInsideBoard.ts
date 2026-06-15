@@ -1,4 +1,4 @@
-import type { SaveShape } from "~/v0/inventory/logic/planning/types";
+import type { SaveShape } from "~/v0/play/save/model/SaveShape";
 import { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 

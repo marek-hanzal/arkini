@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 import type { GameConfigService } from "~/v0/game/context/GameConfigServiceFx";
-import type { UpgradeEffectDefinition } from "~/v0/manifest/upgrade";
+import type { UpgradeEffectDefinition } from "~/v0/manifest/upgrade/UpgradeEffectDefinition";
 
 export function describeUpgradeEffect(
 	gameConfig: GameConfigService,

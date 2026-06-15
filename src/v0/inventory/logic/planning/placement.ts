@@ -4,7 +4,10 @@ import type { GameConfigService } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { cloneInventory } from "./cloneInventory";
 import { planInventoryPlacement } from "./planInventoryPlacement";
-import type { BoardRow, InventoryRow, PlacementPlan, SaveShape } from "./types";
+import type { BoardRow } from "~/v0/board/model/BoardRow";
+import type { InventoryRow } from "~/v0/inventory/model/InventoryRow";
+import type { PlacementPlan } from "~/v0/placement/model/PlacementPlan";
+import type { SaveShape } from "~/v0/play/save/model/SaveShape";
 
 export namespace planPlacements {
 	export interface Options {

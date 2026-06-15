@@ -1,4 +1,6 @@
-import type { ActivationOutput, ActivationWeightedEntry, Quantity } from "../producer";
+import type { ActivationOutput } from "~/v0/manifest/activation/ActivationOutput";
+import type { ActivationWeightedEntry } from "~/v0/manifest/activation/ActivationWeightedEntry";
+import type { Quantity } from "~/v0/manifest/activation/Quantity";
 
 export namespace weighted {
 	export interface Props {

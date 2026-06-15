@@ -1,6 +1,6 @@
 import type { LootTableDefinition } from "../lootTable";
 import type { LootTableId } from "../manifestId";
-import type { ActivationOutput } from "../producer";
+import type { ActivationOutput } from "~/v0/manifest/activation/ActivationOutput";
 
 export namespace lootTable {
 	export interface Props {

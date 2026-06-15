@@ -1,4 +1,6 @@
-import type { ActivationDefinition, ProducerDefinition, StashDefinition } from "./producer";
+import type { ActivationDefinition } from "~/v0/manifest/activation/ActivationDefinition";
+import type { ProducerDefinition } from "~/v0/manifest/activation/ProducerDefinition";
+import type { StashDefinition } from "~/v0/manifest/activation/StashDefinition";
 import type { GameConfig } from "./GameConfig";
 import type { ItemId } from "./manifestId";
 import type { ItemMergeRule } from "./itemMergeRule";

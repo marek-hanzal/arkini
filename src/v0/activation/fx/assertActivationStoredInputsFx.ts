@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { activationLabel } from "~/v0/activation/logic/activationLabel";
 import type { GameConfigService } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
-import type { ActivationDefinition } from "~/v0/manifest/producer";
+import type { ActivationDefinition } from "~/v0/manifest/activation/ActivationDefinition";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 
 export namespace assertActivationStoredInputsFx {

@@ -3,7 +3,8 @@ import type { ItemId } from "~/v0/manifest/manifestId";
 import { emptyInventoryStateJson } from "~/v0/inventory/logic/emptyInventoryStateJson";
 import { isEmptyInventoryStateJson } from "~/v0/inventory/logic/isEmptyInventoryStateJson";
 import { getPlanItem } from "./itemLookup";
-import type { InventoryPlacementPlan, InventoryRow } from "./types";
+import type { InventoryRow } from "~/v0/inventory/model/InventoryRow";
+import type { InventoryPlacementPlan } from "~/v0/placement/model/InventoryPlacementPlan";
 
 export function planStackPlacement(
 	inventory: InventoryRow[],

@@ -1,4 +1,4 @@
-import type { SaveShape } from "~/v0/inventory/logic/planning/types";
+import type { SaveShape } from "~/v0/play/save/model/SaveShape";
 import { InventorySlotIndexSchema } from "~/v0/inventory/schema/InventorySlotIndexSchema";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 

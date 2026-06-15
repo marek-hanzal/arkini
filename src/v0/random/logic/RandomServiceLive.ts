@@ -1,4 +1,4 @@
-import type { RandomService } from "~/v0/random/context/RandomServiceFx";
+import type { RandomService } from "~/v0/random/context/RandomService";
 import { randomFloat } from "./randomFloat";
 
 export const RandomServiceLive: RandomService = {

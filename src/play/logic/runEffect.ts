@@ -30,22 +30,21 @@ export type GameRuntimeServiceFx =
 	| KyselyContextFx
 	| RandomServiceFx;
 
-export function runEffect<T, E>(effect: Effect.Effect<T, E, GameRuntimeServiceFx>) {
+export function runEffect<T, E, R extends GameRuntimeServiceFx>(effect: Effect.Effect<T, E, R>) {
 	const date = DateServiceLive;
 	const id = IdServiceLive;
+	const runnable = effect.pipe(
+		withBrowserDatabaseService(BrowserDatabaseServiceLive),
+		withDateService(date),
+		withGameConfigService(GameConfigServiceLive),
+		withHashService(HashServiceLive),
+		withIdService(id),
+		withKysely({
+			kysely: db,
+			isTransaction: false,
+		}),
+		withRandomService(RandomServiceLive),
+	) as Effect.Effect<T, E, never>;
 
-	return Effect.runPromise(
-		effect.pipe(
-			withBrowserDatabaseService(BrowserDatabaseServiceLive),
-			withDateService(date),
-			withGameConfigService(GameConfigServiceLive),
-			withHashService(HashServiceLive),
-			withIdService(id),
-			withKysely({
-				kysely: db,
-				isTransaction: false,
-			}),
-			withRandomService(RandomServiceLive),
-		),
-	);
+	return Effect.runPromise(runnable);
 }

@@ -8,7 +8,7 @@ import { ItemSummaryCard } from "~/item/ui/ItemSummaryCard";
 import type { ItemId } from "~/manifest/manifestId";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { useWithdrawActivationInputMutation } from "~/v0/mutation/useWithdrawActivationInputMutation";
+import { useWithdrawActivationInputMutation } from "~/v0/item/action/useWithdrawActivationInputMutation";
 import { boardViewQueryOptions } from "~/v0/query/boardViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
 

@@ -1,12 +1,12 @@
 import { memo, type FC, type RefObject } from "react";
-import type { V0Sheet } from "~/v0/play/V0Sheet";
-import type { V0DropTarget } from "~/v0/play/V0DragTypes";
+import type { Sheet } from "~/v0/play/Sheet";
+import type { DropTarget } from "~/v0/play/DragTypes";
 import { TileEngineDropTarget } from "~/v0/tile-engine/TileEngineDropTarget";
 
-export namespace V0BottomNav {
+export namespace BottomNav {
 	export interface Props {
-		activeSheet?: V0Sheet;
-		onOpen(sheet: V0Sheet): void;
+		activeSheet?: Sheet;
+		onOpen(sheet: Sheet): void;
 	}
 }
 
@@ -14,8 +14,8 @@ interface ButtonProps {
 	active: boolean;
 	label: string;
 	icon: string;
-	tone: V0Sheet;
-	onOpen(sheet: V0Sheet): void;
+	tone: Sheet;
+	onOpen(sheet: Sheet): void;
 }
 
 const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) => {
@@ -37,8 +37,8 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 	if (tone !== "inventory") return button();
 
 	return (
-		<TileEngineDropTarget<V0DropTarget>
-			id="v0-bottom-nav:inventory"
+		<TileEngineDropTarget<DropTarget>
+			id="bottom-nav:inventory"
 			data={{
 				kind: "inventory",
 			}}
@@ -48,7 +48,7 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 	);
 });
 
-export const V0BottomNav: FC<V0BottomNav.Props> = memo(({ activeSheet, onOpen }) => (
+export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => (
 	<nav className="ak-bottom-nav">
 		<div className="ak-bottom-nav-inner">
 			<NavButton

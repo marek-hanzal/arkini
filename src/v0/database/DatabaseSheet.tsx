@@ -9,13 +9,13 @@ import { logResetError } from "~/shared/util/logResetError";
 import { reloadWindow } from "~/shared/util/reloadWindow";
 import { databaseStatusQueryOptions } from "~/v0/query/databaseStatusQueryOptions";
 
-export namespace V0DatabaseSheet {
+export namespace DatabaseSheet {
 	export interface Props {
 		onClose(): void;
 	}
 }
 
-export const V0DatabaseSheet: FC<V0DatabaseSheet.Props> = ({ onClose }) => {
+export const DatabaseSheet: FC<DatabaseSheet.Props> = ({ onClose }) => {
 	const { data: status } = useSuspenseQuery(databaseStatusQueryOptions());
 	const reset = useHardResetAction({
 		reset: hardResetBrowserStorage,

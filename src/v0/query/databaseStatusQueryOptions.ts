@@ -1,12 +1,12 @@
 import { queryOptions } from "@tanstack/react-query";
-import { loadV0PlayBackend } from "~/v0/query/loadPlayBackend";
-import { v0PlayQueryKeys } from "~/v0/query/playQueryKeys";
+import { loadPlayBackend } from "~/v0/query/loadPlayBackend";
+import { playQueryKeys } from "~/v0/query/playQueryKeys";
 
 export const databaseStatusQueryOptions = () =>
 	queryOptions({
-		queryKey: v0PlayQueryKeys.databaseStatus,
+		queryKey: playQueryKeys.databaseStatus,
 		async queryFn() {
-			const db = await loadV0PlayBackend();
+			const db = await loadPlayBackend();
 			return db.readDatabaseStatus();
 		},
 	});

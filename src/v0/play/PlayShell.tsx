@@ -1,17 +1,17 @@
 import { match } from "ts-pattern";
 import { type FC, Suspense, useCallback, useMemo, useState } from "react";
-import { V0BoardSurface } from "~/v0/board/V0BoardSurface";
-import { V0DatabaseSheet } from "~/v0/database/V0DatabaseSheet";
-import { V0InventorySurface } from "~/v0/inventory/V0InventorySurface";
-import { V0ItemSheet } from "~/v0/item/V0ItemSheet";
-import type { V0Feedback } from "~/v0/play/V0Feedback";
-import { V0BottomNav } from "~/v0/play/V0BottomNav";
-import { V0BottomSheet } from "~/v0/play/V0BottomSheet";
-import type { V0ActiveSheetState, V0Sheet } from "~/v0/play/V0Sheet";
+import { BoardSurface } from "~/v0/board/BoardSurface";
+import { DatabaseSheet } from "~/v0/database/DatabaseSheet";
+import { InventorySurface } from "~/v0/inventory/InventorySurface";
+import { ItemSheet } from "~/v0/item/ItemSheet";
+import type { Feedback } from "~/v0/play/Feedback";
+import { BottomNav } from "~/v0/play/BottomNav";
+import { BottomSheet } from "~/v0/play/BottomSheet";
+import type { ActiveSheetState, Sheet } from "~/v0/play/Sheet";
 import { useTransientFlags } from "~/v0/shared/useTransientFlags";
-import { V0UpgradesSheet } from "~/v0/upgrade/V0UpgradesSheet";
+import { UpgradesSheet } from "~/v0/upgrade/UpgradesSheet";
 
-export namespace V0PlayShell {
+export namespace PlayShell {
 	export interface Props {}
 }
 
@@ -20,13 +20,13 @@ const SheetFallback: FC = () => <div className="p-4 text-sm text-slate-300">Load
 const messageForError = (error: unknown) =>
 	error instanceof Error ? error.message : typeof error === "string" ? error : "Action failed.";
 
-export const V0PlayShell: FC<V0PlayShell.Props> = () => {
+export const PlayShell: FC<PlayShell.Props> = () => {
 	const feedbackFlags = useTransientFlags();
-	const [activeSheet, setActiveSheet] = useState<V0ActiveSheetState | undefined>();
+	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
 	const closeSheet = useCallback(() => setActiveSheet(undefined), []);
 	const openSheet = useCallback(
-		(sheet: V0Sheet) =>
+		(sheet: Sheet) =>
 			setActiveSheet({
 				type: sheet,
 			}),
@@ -40,7 +40,7 @@ export const V0PlayShell: FC<V0PlayShell.Props> = () => {
 			}),
 		[],
 	);
-	const feedback = useMemo<V0Feedback>(
+	const feedback = useMemo<Feedback>(
 		() => ({
 			pulseMergeCell(key) {
 				if (key) feedbackFlags.pulse(`board:merge:${key}`);
@@ -70,7 +70,7 @@ export const V0PlayShell: FC<V0PlayShell.Props> = () => {
 						type: "inventory",
 					},
 					() => (
-						<V0InventorySurface
+						<InventorySurface
 							feedback={feedback}
 							hasFeedback={feedbackFlags.has}
 							onClose={closeSheet}
@@ -81,20 +81,20 @@ export const V0PlayShell: FC<V0PlayShell.Props> = () => {
 					{
 						type: "upgrades",
 					},
-					() => <V0UpgradesSheet onClose={closeSheet} />,
+					() => <UpgradesSheet onClose={closeSheet} />,
 				)
 				.with(
 					{
 						type: "database",
 					},
-					() => <V0DatabaseSheet onClose={closeSheet} />,
+					() => <DatabaseSheet onClose={closeSheet} />,
 				)
 				.with(
 					{
 						type: "item",
 					},
 					(sheet) => (
-						<V0ItemSheet
+						<ItemSheet
 							boardItemId={sheet.boardItemId}
 							onClose={closeSheet}
 						/>
@@ -109,13 +109,13 @@ export const V0PlayShell: FC<V0PlayShell.Props> = () => {
 				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
 					<div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
 						<p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">
-							Arkini / v0
+							Arkini
 						</p>
 						<h1 className="text-lg font-semibold text-slate-50">Merge board</h1>
 					</div>
 
 					<div className="min-h-0 shrink-0">
-						<V0BoardSurface
+						<BoardSurface
 							feedback={feedback}
 							hasFeedback={feedbackFlags.has}
 							onOpenItem={openItem}
@@ -129,18 +129,18 @@ export const V0PlayShell: FC<V0PlayShell.Props> = () => {
 					</div>
 				) : null}
 
-				<V0BottomNav
+				<BottomNav
 					activeSheet={activeSheet?.type}
 					onOpen={openSheet}
 				/>
 			</div>
 
-			<V0BottomSheet
+			<BottomSheet
 				open={Boolean(activeSheet)}
 				onClose={closeSheet}
 			>
 				<Suspense fallback={<SheetFallback />}>{sheetContent}</Suspense>
-			</V0BottomSheet>
+			</BottomSheet>
 		</>
 	);
 };

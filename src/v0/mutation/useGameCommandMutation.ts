@@ -7,8 +7,8 @@ import type { CommandResult } from "~/command/CommandResult";
 import { runCommand } from "~/command/runCommand";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import { rebuildInventoryView } from "~/inventory/view/rebuildInventoryView";
-import { loadV0PlayBackend } from "~/v0/query/loadPlayBackend";
-import { v0PlayQueryKeys } from "~/v0/query/playQueryKeys";
+import { loadPlayBackend } from "~/v0/query/loadPlayBackend";
+import { playQueryKeys } from "~/v0/query/playQueryKeys";
 
 interface Snapshot {
 	board?: BoardView;
@@ -17,7 +17,7 @@ interface Snapshot {
 
 const patchBoard = (queryClient: QueryClient, patch: (board: BoardView) => BoardView) => {
 	let previous: BoardView | undefined;
-	queryClient.setQueryData<BoardView>(v0PlayQueryKeys.board, (board) => {
+	queryClient.setQueryData<BoardView>(playQueryKeys.board, (board) => {
 		if (!board) return board;
 		previous = board;
 		return patch(board);
@@ -30,7 +30,7 @@ const patchInventory = (
 	patch: (inventory: InventoryView) => InventoryView,
 ) => {
 	let previous: InventoryView | undefined;
-	queryClient.setQueryData<InventoryView>(v0PlayQueryKeys.inventory, (inventory) => {
+	queryClient.setQueryData<InventoryView>(playQueryKeys.inventory, (inventory) => {
 		if (!inventory) return inventory;
 		previous = inventory;
 		return patch(inventory);
@@ -268,9 +268,8 @@ const applyOptimisticCommand = ({
 };
 
 const rollback = ({ queryClient, snapshot }: { queryClient: QueryClient; snapshot?: Snapshot }) => {
-	if (snapshot?.board) queryClient.setQueryData(v0PlayQueryKeys.board, snapshot.board);
-	if (snapshot?.inventory)
-		queryClient.setQueryData(v0PlayQueryKeys.inventory, snapshot.inventory);
+	if (snapshot?.board) queryClient.setQueryData(playQueryKeys.board, snapshot.board);
+	if (snapshot?.inventory) queryClient.setQueryData(playQueryKeys.inventory, snapshot.inventory);
 };
 
 const syncCommandViews = async ({
@@ -280,7 +279,7 @@ const syncCommandViews = async ({
 	queryClient: QueryClient;
 	command: Command;
 }) => {
-	const db = await loadV0PlayBackend();
+	const db = await loadPlayBackend();
 
 	await match(command)
 		.with(
@@ -312,10 +311,10 @@ const syncCommandViews = async ({
 				type: "craft.claim",
 			},
 			async () => {
-				queryClient.setQueryData(v0PlayQueryKeys.board, await db.readBoardView());
-				queryClient.setQueryData(v0PlayQueryKeys.inventory, await db.readInventoryView());
+				queryClient.setQueryData(playQueryKeys.board, await db.readBoardView());
+				queryClient.setQueryData(playQueryKeys.inventory, await db.readInventoryView());
 				queryClient.setQueryData(
-					v0PlayQueryKeys.databaseStatus,
+					playQueryKeys.databaseStatus,
 					await db.readDatabaseStatus(),
 				);
 			},
@@ -325,11 +324,11 @@ const syncCommandViews = async ({
 				type: "upgrade.buy",
 			},
 			async () => {
-				queryClient.setQueryData(v0PlayQueryKeys.board, await db.readBoardView());
-				queryClient.setQueryData(v0PlayQueryKeys.inventory, await db.readInventoryView());
-				queryClient.setQueryData(v0PlayQueryKeys.upgrades, await db.readUpgradeListView());
+				queryClient.setQueryData(playQueryKeys.board, await db.readBoardView());
+				queryClient.setQueryData(playQueryKeys.inventory, await db.readInventoryView());
+				queryClient.setQueryData(playQueryKeys.upgrades, await db.readUpgradeListView());
 				queryClient.setQueryData(
-					v0PlayQueryKeys.databaseStatus,
+					playQueryKeys.databaseStatus,
 					await db.readDatabaseStatus(),
 				);
 			},

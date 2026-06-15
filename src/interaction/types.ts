@@ -1,4 +1,5 @@
-import type { Command } from "~/action/command";
+import type { Command } from "~/command/Command";
+import type { ItemId } from "~/manifest/manifestId";
 import type { DraggablePayload } from "~/drag/DraggablePayload";
 import type { DropContext } from "~/drag/DropContext";
 import type { DroppablePayload } from "~/drag/DroppablePayload";
@@ -24,7 +25,7 @@ export type TargetKind = DropTarget["kind"];
 
 export type TypedDropContext<Source extends SourceKind, Target extends TargetKind> = {
 	source: DraggablePayload<
-		string,
+		ItemId,
 		Extract<
 			DragSource,
 			{
@@ -43,4 +44,4 @@ export type TypedDropContext<Source extends SourceKind, Target extends TargetKin
 	>;
 };
 
-export type AnyDropContext = DropContext<string, DragSource, DropTarget, VisualMeta>;
+export type AnyDropContext = DropContext<ItemId, DragSource, DropTarget, VisualMeta>;

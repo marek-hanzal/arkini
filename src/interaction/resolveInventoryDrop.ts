@@ -1,4 +1,5 @@
 import type { DropPlan } from "~/drag/DropPlan";
+import type { ItemId } from "~/manifest/manifestId";
 import { inventorySlotNodeId } from "~/inventory/inventorySlotNodeId";
 import { visualInventoryStackKey } from "~/play/hook/useVisualItemMotions";
 import type { VisualTransitionKind, VisualMeta } from "~/play/types";
@@ -15,7 +16,7 @@ export namespace resolveInventoryDrop {
 export const resolveInventoryDrop = ({
 	context,
 	runtime,
-}: resolveInventoryDrop.Props): DropPlan<string, VisualTransitionKind, VisualMeta> => {
+}: resolveInventoryDrop.Props): DropPlan<ItemId, VisualTransitionKind, VisualMeta> => {
 	const { source, target } = context;
 	if (source.source.slotIndex === target.target.slotIndex)
 		return {

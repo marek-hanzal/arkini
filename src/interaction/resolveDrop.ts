@@ -1,4 +1,5 @@
 import type { DropPlan } from "~/drag/DropPlan";
+import type { ItemId } from "~/manifest/manifestId";
 import type { VisualTransitionKind, VisualMeta } from "~/play/types";
 import { flashDrop } from "./flashDrop";
 import { reject } from "./reject";
@@ -6,7 +7,7 @@ import { resolveBoardDrop } from "./resolveBoardDrop";
 import { resolveBoardInventoryDrop } from "./resolveBoardInventoryDrop";
 import { resolveInventoryDrop } from "./resolveInventoryDrop";
 import type { AnyDropContext, Feedback, TypedDropContext } from "./types";
-import type { Command } from "~/action/command";
+import type { Command } from "~/command/Command";
 import type { GameDragView } from "~/play/logic/playTypes";
 
 export namespace resolveDrop {
@@ -23,7 +24,7 @@ export const resolveDrop = ({
 	game,
 	feedback,
 	run,
-}: resolveDrop.Props): DropPlan<string, VisualTransitionKind, VisualMeta> => {
+}: resolveDrop.Props): DropPlan<ItemId, VisualTransitionKind, VisualMeta> => {
 	if (!game || !context.target)
 		return reject(() =>
 			flashDrop({

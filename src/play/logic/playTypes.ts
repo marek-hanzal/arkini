@@ -1,6 +1,6 @@
 import type { BoardCell } from "~/board/BoardCell";
 import type { CraftRecipeInput } from "~/manifest/craft";
-import type { ItemId } from "~/manifest/manifestId";
+import type { ItemId, UpgradeId } from "~/manifest/manifestId";
 
 export interface GameSaveView {
 	id: string;
@@ -9,7 +9,7 @@ export interface GameSaveView {
 	inventorySlots: number;
 }
 
-export type ItemCatalogView = Record<string, ViewItem>;
+export type ItemCatalogView = Partial<Record<ItemId, ViewItem>>;
 
 export interface BoardView {
 	items: BoardViewItem[];
@@ -30,7 +30,7 @@ export interface UpgradeListView {
 }
 
 export interface UpgradeView {
-	id: string;
+	id: UpgradeId;
 	code: string;
 	name: string;
 	description: string;
@@ -48,7 +48,7 @@ export interface UpgradeView {
 }
 
 export interface UpgradeCostView {
-	itemId: string;
+	itemId: ItemId;
 	quantity: number;
 	available: number;
 }
@@ -59,7 +59,7 @@ export interface GameDragView {
 }
 
 export interface ViewItem {
-	id: string;
+	id: ItemId;
 	name: string;
 	description: string;
 	label?: string;
@@ -72,24 +72,24 @@ export interface ViewItem {
 	producerTrigger?: "click";
 	canMerge: boolean;
 	mergeResults?: {
-		withItemId: string;
-		resultItemId: string;
+		withItemId: ItemId;
+		resultItemId: ItemId;
 		secret?: boolean;
 	}[];
 	usedInCrafts?: {
-		targetItemId: string;
-		resultItemId: string;
+		targetItemId: ItemId;
+		resultItemId: ItemId;
 	}[];
 	usedInMerges?: {
-		targetItemId: string;
-		resultItemId: string;
+		targetItemId: ItemId;
+		resultItemId: ItemId;
 		secret?: boolean;
 	}[];
 }
 
 export interface BoardViewItem {
 	id: string;
-	itemId: string;
+	itemId: ItemId;
 	x: number;
 	y: number;
 	state: BoardItemState;
@@ -101,7 +101,7 @@ export interface InventorySlot {
 	slotIndex: number;
 	stack?: {
 		id: string;
-		itemId: string;
+		itemId: ItemId;
 		quantity: number;
 		state: BoardItemState;
 		stateJson: string;
@@ -113,7 +113,7 @@ export type CraftProgressPhase = "collecting_inputs" | "waiting" | "ready";
 
 export interface CraftProgressView {
 	id: string;
-	resultItemId: string;
+	resultItemId: ItemId;
 	durationMs: number;
 	inputs: CraftRecipeInput[];
 	delivered: Record<string, number>;
@@ -126,7 +126,7 @@ export interface CraftProgressView {
 	startedAtMs?: number;
 	readyAtMs?: number;
 	remainingMs?: number;
-	acceptedInputItemIds: string[];
+	acceptedInputItemIds: ItemId[];
 }
 
 export interface ActivationView {
@@ -140,7 +140,7 @@ export interface ActivationView {
 }
 
 export interface ActivationInputView {
-	itemId: string;
+	itemId: ItemId;
 	quantity: number;
 	capacity: number;
 	stored: number;

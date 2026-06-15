@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { useDraggableControl } from "~/drag/hook/useDraggableControl";
 import { flashDrop } from "~/interaction/flashDrop";
+import type { ItemId } from "~/manifest/manifestId";
 import { resolveDrop } from "~/interaction/resolveDrop";
 import type { AnyDropContext, Feedback } from "~/interaction/types";
 import { useCommand } from "~/play/hook/useCommand";
@@ -105,7 +106,7 @@ export function usePlayDraggableControl({
 		],
 	);
 	const control = useDraggableControl<
-		string,
+		ItemId,
 		DragSource,
 		DropTarget,
 		VisualMeta,

@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import type { Command, CommandResult } from "~/action/command";
-import { invalidation } from "~/action/invalidation";
-import { run } from "~/action/run";
+import type { Command } from "~/command/Command";
+import type { CommandResult } from "~/command/CommandResult";
+import { commandInvalidation } from "~/command/commandInvalidation";
+import { runCommand } from "~/command/runCommand";
 import { usePlayDataInvalidation } from "./usePlayDataInvalidation";
 
 export namespace useCommand {
@@ -15,14 +16,14 @@ export function useCommand<TCommand extends Command = Command>(options: useComma
 
 	return useMutation({
 		async mutationFn(command: TCommand): Promise<CommandResult<TCommand>> {
-			return run({
+			return runCommand({
 				command,
 			});
 		},
 		async onSuccess(_result, command) {
 			if (options.invalidateOnSuccess === false) return;
 			await invalidatePlayData(
-				invalidation({
+				commandInvalidation({
 					command,
 				}),
 			);

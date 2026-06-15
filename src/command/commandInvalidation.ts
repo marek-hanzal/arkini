@@ -1,15 +1,15 @@
-import type { PlayDataInvalidationTarget } from "~/play/hook/usePlayDataInvalidation";
-import type { Command } from "./command";
+import type { PlayDataInvalidationTarget } from "~/play/hook/PlayDataInvalidationTarget";
+import type { Command } from "./Command";
 
-export namespace invalidation {
+export namespace commandInvalidation {
 	export interface Props {
 		command: Command;
 	}
 }
 
-export const invalidation = ({
+export const commandInvalidation = ({
 	command,
-}: invalidation.Props): readonly PlayDataInvalidationTarget[] => {
+}: commandInvalidation.Props): readonly PlayDataInvalidationTarget[] => {
 	switch (command.type) {
 		case "board.move":
 		case "board.swap":

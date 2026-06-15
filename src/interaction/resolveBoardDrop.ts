@@ -16,7 +16,7 @@ export namespace resolveBoardDrop {
 }
 
 const consumeSourceAnimation = (props: {
-	itemId: string;
+	itemId: ItemId;
 	boardItemId: string;
 	targetNodeId: string;
 }) => ({
@@ -30,7 +30,7 @@ const consumeSourceAnimation = (props: {
 export const resolveBoardDrop = ({
 	context: { source, target },
 	runtime,
-}: resolveBoardDrop.Props): DropPlan<string, VisualTransitionKind, VisualMeta> => {
+}: resolveBoardDrop.Props): DropPlan<ItemId, VisualTransitionKind, VisualMeta> => {
 	if (target.target.boardItemId === source.source.boardItemId)
 		return {
 			type: "ignore",
@@ -69,7 +69,7 @@ export const resolveBoardDrop = ({
 	}
 
 	const intent = resolveDropIntent({
-		sourceItemId: source.itemId as ItemId,
+		sourceItemId: source.itemId,
 		targetItem,
 	});
 

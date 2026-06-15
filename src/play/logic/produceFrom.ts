@@ -1,6 +1,6 @@
 import { stageProducerDrops } from "~/animation/stageProducerDrops";
 import { highlightInventoryNav } from "~/animation/highlightInventoryNav";
-import type { Command } from "~/action/command";
+import type { Command } from "~/command/Command";
 import { cellKey } from "~/board/util/cell";
 import type { Feedback } from "~/play/hook/usePlayDraggableControl";
 import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";

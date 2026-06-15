@@ -9,6 +9,7 @@ import { dbFx } from "~/database/fx/dbFx";
 import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import type { ItemId } from "~/manifest/manifestId";
 import { defaultSaveGameId } from "~/play/logic/save";
 import type { BoardItemState, BoardView, BoardViewItem } from "~/play/logic/playTypes";
 import { json } from "~/shared/json";
@@ -84,19 +85,19 @@ export const readViewFx = Effect.fn("readViewFx")(function* () {
 		const state = parseJson<BoardItemState>(item.stateJson || json({}));
 		return {
 			id: item.id,
-			itemId: item.itemDefinitionId,
+			itemId: item.itemDefinitionId as ItemId,
 			x: item.x,
 			y: item.y,
 			state,
 			activation: readActivationView({
-				itemId: item.itemDefinitionId,
+				itemId: item.itemDefinitionId as ItemId,
 				state,
 				date,
 				gameConfig,
 				upgradeRows,
 			}),
 			craft: readCraftView({
-				itemId: item.itemDefinitionId,
+				itemId: item.itemDefinitionId as ItemId,
 				state,
 				date,
 				gameConfig,

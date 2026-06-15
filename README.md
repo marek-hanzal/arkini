@@ -52,7 +52,7 @@ Randomness is provided through `RandomServiceFx`; producer rolls do not call `Ma
 
 ## Game engine boundary
 
-Gameplay mutations go through typed `Command` values in `src/action/`. React UI and XState workflows do not import individual Effect roots directly. Command execution is routed through small functional engine facades: board, inventory, producer, and upgrade. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
+Gameplay mutations go through typed `Command` values in `src/command/`. React UI and XState workflows do not import individual domain Effect roots directly. `runCommandFx` validates the discriminated command union and delegates to the owning domain root effect, while `useCommand` is only the React Query bridge and invalidation hook. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
 
 ## Tile engine boundary
 
@@ -143,7 +143,7 @@ src/id/context/                  Effect id service context tag.
 src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
-src/action/                     Game command router and mutation invalidation.
+src/command/                    Typed command schemas, command Effect router, and mutation invalidation.
 src/animation/                  Visual planning helpers for game events.
 src/interaction/                UI gesture/drop intent translation.
 src/merge/                      Merge, craft-input, and producer-input intent resolution.

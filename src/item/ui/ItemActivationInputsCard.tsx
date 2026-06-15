@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import type { ItemId } from "~/manifest/manifestId";
 import type { ActivationView, BoardViewItem } from "~/play/logic/playTypes";
 import type { ItemCatalogView } from "~/play/logic/playTypes";
 
@@ -8,7 +9,7 @@ export namespace ItemActivationInputsCard {
 		boardItem: BoardViewItem;
 		items: ItemCatalogView;
 		pending: boolean;
-		onWithdraw(itemId: string): void;
+		onWithdraw(itemId: ItemId): void;
 	}
 }
 

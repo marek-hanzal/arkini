@@ -1,6 +1,6 @@
 # Remove legacy runtime fossils
 
-Status: TODO
+Status: DONE
 
 ## Goal
 
@@ -34,3 +34,7 @@ Some of those files are still useful. Some are fossilized compromises wearing fr
 
 - Do not delete generic drag workflow code until TileEngine/pointer runtime is verified.
 - Do not collapse everything into one giant hook. We already tried the box-of-trash strategy. It was trash.
+
+## Completion note
+
+Completed in the v0 cleanup pass after the active runtime became self-contained. The pre-v0 root runtime directories and the `src/ancient` snapshot were deleted. Active source is now limited to `src/app`, `src/assets`, `src/v0`, and `src/vite-env.d.ts`.

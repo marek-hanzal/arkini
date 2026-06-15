@@ -15,7 +15,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, upgrades, and local database/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
-The game has one gameplay source of truth: `GameConfig` in `src/manifest/GameConfig.ts`. The public config object is composed from focused files in `src/manifest/config/` so the actual data does not rot inside one 3000-line shrine to human suffering. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins. Config IDs are locked by explicit Zod enum schemas such as `GameItemIdSchema`, `GameLootTableIdSchema`, and `GameUpgradeIdSchema`; gameplay string IDs should flow through those types instead of prefix-only string guesses.
+The game has one gameplay source of truth: `GameConfig` in `src/v0/manifest/GameConfig.ts`. The public config object is composed from focused files in `src/v0/manifest/config/` so the actual data does not rot inside one 3000-line shrine to human suffering. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins. Config IDs are locked by explicit Zod enum schemas such as `GameItemIdSchema`, `GameLootTableIdSchema`, and `GameUpgradeIdSchema`; gameplay string IDs should flow through those types instead of prefix-only string guesses.
 
 Item definitions drive behavior. An item may define:
 
@@ -35,7 +35,7 @@ There are no separate static `merges`, `producers`, and `craftRecipes` arrays. L
 
 ## Logic and Effect boundary
 
-Effect belongs to the server-like game backend, not the UI. React components, React Query hooks, drag surfaces, and Motion animation code stay normal UI code. In the active `v0` runtime, React Query options and mutation hooks call domain-local Fx roots through `src/v0/fx/runGameFx.ts`. The old `src/play/logic/playBackend.ts` façade is historical compatibility, not the v0 direction.
+Effect belongs to the server-like game backend, not the UI. React components, React Query hooks, drag surfaces, and Motion animation code stay normal UI code. React Query options and mutation hooks call domain-local Fx roots through `src/v0/fx/runGameFx.ts`.
 
 Active v0 effects live in the owning domain under `src/v0/**/fx/*Fx.ts`. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. v0 uses explicit names such as `moveBoardItemFx`, `swapInventorySlotsFx`, `readBoardViewFx`, and `readDatabaseStatusFx`, because cache/action callsites should not need detective work or alias gymnastics just to know which domain is moving what.
 
@@ -52,7 +52,7 @@ Randomness is provided through `RandomServiceFx`; activation rolls do not call `
 
 ## Game engine boundary
 
-The historical runtime still has typed `Command` values in `src/command/`, but v0 does not route user actions through a central command bus and no longer imports command result/error schemas from the old layer. v0 mutations call the owning domain Fx root directly: board actions call board/activation/craft Fx roots, inventory actions call inventory Fx roots, and upgrade actions call upgrade Fx roots. Action errors and visual result schemas live in `src/v0/play/action`, because active action facts should not depend on the dead command router wearing a fake mustache.
+The active runtime does not route user actions through a central command bus. Concrete domain action hooks call the owning Fx root directly: board actions call board/activation/craft Fx roots, inventory actions call inventory Fx roots, and upgrade actions call upgrade Fx roots. Action errors and visual result schemas live in `src/v0/play/action`, because active action facts should stay close to the runtime that actually consumes them.
 
 ## Tile engine boundary
 
@@ -94,7 +94,7 @@ The current content direction is Settlers-like: small producers create raw goods
 
 ## Interaction model
 
-The active play runtime lives in `src/v0`. Old UI/runtime code is quarantined in `src/ancient` and should not be imported back into v0 unless the point is to smuggle the plague into a fresh house.
+The active play runtime lives in `src/v0`. The pre-v0 root runtime and `src/ancient` archaeology snapshot have been removed; do not recreate legacy buckets beside `src/v0` unless the goal is to reintroduce the plague in a fresh little hat.
 
 Tap/press recognition is owned by `src/v0/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions patch React Query cache before the DB round-trip and then reconcile cached views from SQLite without remounting the board like a nervous intern.
 
@@ -153,9 +153,6 @@ src/v0/play/drop/               Arkini-specific drop policy over the generic Til
 src/v0/play/sheet/              Active play sheet state and bottom-sheet shell.
 src/v0/play/feedback/           Local play feedback pulse state and feedback contract.
 src/v0/play/bootstrap/          Tiny bootstrap status holder, not gameplay state.
-src/ancient/                    Snapshot of the pre-v0 runtime kept for archaeology only; do not import ancient UI/runtime code into v0.
-src/command/                    Historical command router for old root runtime only; v0 uses `src/v0/play/action`.
-src/**                          Legacy/root runtime still compiled while migration continues. Do not import legacy code into active v0 code unless the current task is explicitly migrating it.
 ```
 
 ## Local run

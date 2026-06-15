@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { FeedbackFlags } from "~/v0/play/feedback/FeedbackFlags";
 
 const defaultDurationMs = 650;
 
-export function useTransientFlags(durationMs = defaultDurationMs) {
+export function useFeedbackFlags(durationMs = defaultDurationMs): FeedbackFlags.Type {
 	const timersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 	const [flags, setFlags] = useState<ReadonlySet<string>>(() => new Set());
 

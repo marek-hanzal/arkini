@@ -9,8 +9,8 @@ import type { ItemId } from "~/manifest/manifestId";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { SheetHeader } from "~/shared/ui/SheetHeader";
 import { useWithdrawActivationInputMutation } from "~/v0/item/action/useWithdrawActivationInputMutation";
-import { boardViewQueryOptions } from "~/v0/query/boardViewQueryOptions";
-import { itemCatalogQueryOptions } from "~/v0/query/itemCatalogQueryOptions";
+import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
+import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
 
 export namespace ItemSheet {
 	export interface Props {

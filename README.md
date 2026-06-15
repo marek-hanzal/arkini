@@ -52,7 +52,7 @@ Randomness is provided through `RandomServiceFx`; activation rolls do not call `
 
 ## Game engine boundary
 
-Gameplay mutations go through typed `Command` values in `src/command/`. React UI workflows do not import individual domain Effect roots directly. `runCommandFx` validates the discriminated command union and delegates to the owning domain root effect, while `useRunCommandMutation` is the React Query bridge for optimistic cache updates, rollback, and invalidation. Command results now carry typed visual events such as `item.moved`, `item.spawned`, `item.fed`, `activation.activated`, and `upgrade.started`; these are domain facts, not DOM animation instructions. `src/animation/stageCommandVisualEvents.ts` maps those Arkini-specific facts into generic actor motion entries outside `TileEngine`, so the engine stays reusable instead of learning what an activation, producer, stash, or inventory slot means. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
+Gameplay mutations go through typed `Command` values in `src/command/`. React UI workflows do not import individual domain Effect roots directly. `runCommandFx` validates the discriminated command union and delegates to the owning domain root effect, while `useRunCommandMutation` is the historical React Query bridge for cache updates, rollback, and invalidation. Command results now carry typed visual events such as `item.moved`, `item.spawned`, `item.fed`, `activation.activated`, and `upgrade.started`; these are domain facts, not DOM animation instructions. `src/animation/stageCommandVisualEvents.ts` maps those Arkini-specific facts into generic actor motion entries outside `TileEngine`, so the engine stays reusable instead of learning what an activation, producer, stash, or inventory slot means. Gesture-specific decisions live in interaction/merge engines, while animation helpers only visualize accepted results.
 
 ## Tile engine boundary
 
@@ -96,7 +96,7 @@ The current content direction is Settlers-like: small producers create raw goods
 
 The active play runtime lives in `src/v0`. Old UI/runtime code is quarantined in `src/ancient` and should not be imported back into v0 unless the point is to smuggle the plague into a fresh house.
 
-Tap/press recognition is owned by `src/v0/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions patch React Query optimistically and then reconcile cached views from SQLite without remounting the board like a nervous intern.
+Tap/press recognition is owned by `src/v0/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions patch React Query cache before the DB round-trip and then reconcile cached views from SQLite without remounting the board like a nervous intern.
 
 Game-specific drop policy lives in `src/v0/play/drop`. The top-level `resolveDrop` is only a tiny delegator over focused case resolvers such as `resolveBoardCellDrop`, `resolveInventoryCellDrop`, and `resolveInventorySlotDrop`. Board/inventory mutation calls are provided as concrete `DropActions`, not as a generic `Command` router. The engine stays game-agnostic: it receives slots, tiles, renderers, drag bindings, and a drop resolver; it does not know what a producer, stash, merge recipe, or inventory stack means.
 
@@ -108,9 +108,9 @@ v0 does not use app-owned React context. Vendor providers such as React Query an
 
 All read paths use `useSuspenseQuery`, not plain `useQuery`, so rendered components do not get `undefined` data traps. Initial missing data belongs to Suspense/error boundaries, not to `if (!data) return null` confetti scattered through feature components.
 
-Do not read UI flow data with `queryClient.getQueryData`. View/runtime code subscribes through query options. Mutation internals may write with `setQueryData` for optimistic patches and post-success reconciliation, but cache peeking is not a data-access architecture, it is rummaging in a drawer and calling it state management.
+Do not read UI flow data with `queryClient.getQueryData`. View/runtime code subscribes through query options. Mutation internals may write with `setQueryData` for cache patches and post-success reconciliation, but cache peeking is not a data-access architecture, it is rummaging in a drawer and calling it state management.
 
-Concrete gameplay actions use concrete mutation hooks in `src/v0/mutation`: `useMoveBoardItemMutation`, `useSwapBoardItemsMutation`, `useMergeBoardItemsMutation`, `usePlaceInventoryItemMutation`, `useStashBoardItemMutation`, `useSwapInventorySlotsMutation`, `useActivateBoardItemMutation`, `useClaimCraftMutation`, `useWithdrawActivationInputMutation`, and `useBuyUpgradeMutation`. v0 deliberately does not use a central `useGameCommandMutation`; each hook owns its own Effect call, optimistic patch, rollback, and cache sync.
+Concrete gameplay actions use concrete domain action hooks under paths such as `src/v0/board/action`, `src/v0/inventory/action`, `src/v0/item/action`, and `src/v0/upgrade/action`. v0 deliberately does not use a central `useGameCommandMutation`; each hook owns its own Effect call, cache patch, rollback, and cache sync in the domain that uses it.
 
 Components should stay boring: render props, wire callbacks, and shut up. If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
 
@@ -135,7 +135,7 @@ src/id/context/                  Effect id service context tag.
 src/id/logic/                    CUID2-backed id service and provider helper.
 src/random/context/              Effect random service context tag and generic weighted input types.
 src/random/logic/                Live random service and provider helper.
-src/v0/                        Active client play runtime: query options, concrete mutation hooks, play shell, drop policy, and reusable TileEngine.
+src/v0/                        Active client play runtime: domain-local query/action/cache files, play shell, drop policy, feedback state, and reusable TileEngine.
 src/ancient/                   Snapshot of the pre-v0 runtime kept for archaeology only; do not import ancient UI/runtime code into v0.
 src/command/                    Historical typed command schemas and command Effect router kept for old runtime/domain compatibility. v0 calls domain Fx roots directly.
 src/animation/                  Historical visual planning helpers for game events.
@@ -224,4 +224,4 @@ SQLite is local storage, not the final game authority. Gameplay inputs and loade
 
 ## Minimal-code philosophy
 
-Prefer direct data and small operations. Avoid class hierarchies, hidden frameworks, and helper confetti. When behavior can live on an item definition, put it in `GameConfig`. When UI state is transient and has real phases, model it with a focused XState machine. When it is just DOM measurement or a clock tick, a focused hook is enough. When state must survive reloads, store it in SQLite. Everything else is probably just code wearing a fake mustache.
+Prefer direct data and small operations. Avoid class hierarchies, hidden frameworks, and helper confetti. When behavior can live on an item definition, put it in `GameConfig`. When UI state is transient, keep it as tiny colocated React state or a domain hook. When it is just DOM measurement or a clock tick, a focused hook is enough. When state must survive reloads, store it in SQLite. Everything else is probably just code wearing a fake mustache.

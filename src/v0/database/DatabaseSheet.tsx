@@ -7,7 +7,7 @@ import { StatusPill } from "~/shared/ui/StatusPill";
 import { hardResetBrowserStorage } from "~/shared/util/hardResetBrowserStorage";
 import { logResetError } from "~/shared/util/logResetError";
 import { reloadWindow } from "~/shared/util/reloadWindow";
-import { databaseStatusQueryOptions } from "~/v0/query/databaseStatusQueryOptions";
+import { databaseStatusQueryOptions } from "~/v0/database/query/databaseStatusQueryOptions";
 
 export namespace DatabaseSheet {
 	export interface Props {

@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { databaseStatusQueryOptions } from "~/v0/query/databaseStatusQueryOptions";
+import { databaseStatusQueryOptions } from "~/v0/database/query/databaseStatusQueryOptions";
 
 export namespace refreshDatabaseStatusCache {
 	export interface Props {

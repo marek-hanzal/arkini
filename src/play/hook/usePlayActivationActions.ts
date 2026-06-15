@@ -7,13 +7,13 @@ import { usePlayFeedbackState } from "~/play/hook/usePlayFeedbackState";
 import { usePlaySchedule } from "~/play/hook/usePlaySchedule";
 import { usePlaySheetsState } from "~/play/hook/usePlaySheetsState";
 import { usePlayVisualMotionsState } from "~/play/hook/usePlayVisualMotionsState";
-import { produceFrom } from "~/play/logic/produceFrom";
+import { activateFrom } from "~/play/logic/activateFrom";
 
-export namespace usePlayProducerActions {
+export namespace usePlayActivationActions {
 	export interface Props {}
 }
 
-export const usePlayProducerActions = (_props?: usePlayProducerActions.Props) => {
+export const usePlayActivationActions = (_props?: usePlayActivationActions.Props) => {
 	const sheets = usePlaySheetsState();
 	const visualMotions = usePlayVisualMotionsState();
 	const feedback = usePlayFeedbackState();
@@ -23,7 +23,7 @@ export const usePlayProducerActions = (_props?: usePlayProducerActions.Props) =>
 		Extract<
 			Command,
 			{
-				type: "producer.activate";
+				type: "activation.activate";
 			}
 		>
 	>({
@@ -31,10 +31,10 @@ export const usePlayProducerActions = (_props?: usePlayProducerActions.Props) =>
 	});
 	const run = command.mutateAsync;
 
-	const produce = useCallback(
+	const activate = useCallback(
 		(boardItem: BoardViewItem, activation: "single" | "exhaust" = "single") =>
-			schedule(`producer ${activation}`, () =>
-				produceFrom({
+			schedule(`activation ${activation}`, () =>
+				activateFrom({
 					activeSheet: sheets.activeSheet,
 					boardItem,
 					activation,
@@ -56,10 +56,10 @@ export const usePlayProducerActions = (_props?: usePlayProducerActions.Props) =>
 
 	return useMemo(
 		() => ({
-			produceFrom: produce,
+			activateFrom: activate,
 		}),
 		[
-			produce,
+			activate,
 		],
 	);
 };

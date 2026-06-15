@@ -12,7 +12,7 @@ import type { ViewItem } from "~/item/view/ViewItemSchema";
 import { usePlayDragState } from "~/play/hook/usePlayDragState";
 import { usePlayFeedbackState } from "~/play/hook/usePlayFeedbackState";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import { usePlayProducerActions } from "~/play/hook/usePlayProducerActions";
+import { usePlayActivationActions } from "~/play/hook/usePlayActivationActions";
 import { usePlaySheetsState } from "~/play/hook/usePlaySheetsState";
 import { visualBoardItemKey } from "~/play/hook/useVisualItemMotions";
 import { usePlayVisualMotionsState } from "~/play/hook/usePlayVisualMotionsState";
@@ -48,7 +48,7 @@ export const useBoardTileEngine = (
 	const drag = usePlayDragState();
 	const feedback = usePlayFeedbackState();
 	const visualMotions = usePlayVisualMotionsState();
-	const producerActions = usePlayProducerActions();
+	const activationActions = usePlayActivationActions();
 	const showDelayedMergeHints = useDelayedMergeHints({
 		activeDrag: drag.activeDrag ?? undefined,
 	});
@@ -65,13 +65,13 @@ export const useBoardTileEngine = (
 		(item: BoardViewItem) => {
 			if (!item.activation) return;
 
-			void producerActions.produceFrom(
+			void activationActions.activateFrom(
 				item,
 				item.activation.kind === "stash" ? "exhaust" : "single",
 			);
 		},
 		[
-			producerActions.produceFrom,
+			activationActions.activateFrom,
 		],
 	);
 	const openBoardTileDetail = useCallback(

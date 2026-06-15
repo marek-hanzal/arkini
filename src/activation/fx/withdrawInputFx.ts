@@ -9,7 +9,7 @@ import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { WithdrawProducerInputSchema } from "~/play/schema/WithdrawProducerInputSchema";
+import { WithdrawActivationInputSchema } from "~/activation/type/WithdrawActivationInputSchema";
 
 export namespace withdrawInputFx {
 	export interface Props {
@@ -22,7 +22,7 @@ export const withdrawInputFx = Effect.fn("withdrawInputFx")(function* (
 	props: withdrawInputFx.Props,
 ) {
 	const input = yield* Effect.try({
-		try: () => WithdrawProducerInputSchema.parse(props),
+		try: () => WithdrawActivationInputSchema.parse(props),
 		catch: toGameActionError,
 	});
 

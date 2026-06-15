@@ -5,7 +5,7 @@ import { table } from "~/database/local/tables";
 import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { PlacementPlan } from "~/inventory/logic/planning/types";
 import { defaultSaveGameId } from "~/play/logic/save";
-import type { ProducerPlacement } from "~/producer/type/ProducerPlacementSchema";
+import type { ActivationPlacementSchema } from "~/activation/type/ActivationPlacementSchema";
 
 export namespace applyPlacementPlanFx {
 	export interface Props {
@@ -19,7 +19,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 	const date = yield* DateServiceFx;
 	const timestamp = date.timestamp();
 
-	const placements: ProducerPlacement[] = [];
+	const placements: ActivationPlacementSchema.Type[] = [];
 
 	for (const placement of plan.board) {
 		const boardItemId = yield* insertFx({

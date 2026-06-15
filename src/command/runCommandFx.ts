@@ -6,8 +6,8 @@ import { placeFx } from "~/inventory/fx/placeFx";
 import { stashFx } from "~/inventory/fx/stashFx";
 import { swapFx as swapInventoryFx } from "~/inventory/fx/swapFx";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { produceFx } from "~/producer/fx/produceFx";
-import { withdrawInputFx } from "~/producer/fx/withdrawInputFx";
+import { activateFx } from "~/activation/fx/activateFx";
+import { withdrawInputFx } from "~/activation/fx/withdrawInputFx";
 import { buyFx } from "~/upgrade/fx/buyFx";
 import type { Command } from "./Command";
 import { CommandSchema } from "./CommandSchema";
@@ -57,12 +57,12 @@ export const runCommandFx = Effect.fn("runCommandFx")(function* ({ command }: ru
 				boardItemId: input.boardItemId,
 				slotIndex: input.slotIndex,
 			});
-		case "producer.activate":
-			return yield* produceFx({
+		case "activation.activate":
+			return yield* activateFx({
 				boardItemId: input.boardItemId,
 				activation: input.activation,
 			});
-		case "producer.withdrawInput":
+		case "activation.withdrawInput":
 			return yield* withdrawInputFx({
 				boardItemId: input.boardItemId,
 				itemId: input.itemId,

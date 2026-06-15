@@ -25,8 +25,8 @@ export const commandInvalidation = ({
 			];
 		case "inventory.place":
 		case "inventory.stash":
-		case "producer.activate":
-		case "producer.withdrawInput":
+		case "activation.activate":
+		case "activation.withdrawInput":
 			return [
 				"board",
 				"inventory",

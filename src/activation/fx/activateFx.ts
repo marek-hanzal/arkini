@@ -1,6 +1,14 @@
 import { Effect } from "effect";
+import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
+import { spendActivationInputFx } from "~/activation/fx/spendActivationInputFx";
+import { activationLabel } from "~/activation/logic/activationLabel";
+import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
+import { ActivateItemInputSchema } from "~/activation/type/ActivateItemInputSchema";
+import type { ActivationResultSchema } from "~/activation/type/ActivationResultSchema";
 import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
 import { readBoardState } from "~/board/logic/readBoardState";
+import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
+import { GameActionError } from "~/command/GameActionError";
 import { dbFx } from "~/database/fx/dbFx";
 import { withTransactionFx } from "~/database/fx/withTransactionFx";
 import { table } from "~/database/local/tables";
@@ -11,31 +19,23 @@ import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { ItemId } from "~/manifest/manifestId";
 import { applyPlacementPlanFx } from "~/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/play/fx/readMutableSaveFx";
-import { ProduceBoardItemInputSchema } from "~/play/schema/ProduceBoardItemInputSchema";
-import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
-import { readActivationInputRowsFx } from "~/activation/fx/readActivationInputRowsFx";
-import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
-import { spendActivationInputFx } from "~/activation/fx/spendActivationInputFx";
-import type { ProducerDropResult } from "~/producer/type/ProducerDropResultSchema";
-import { GameActionError } from "~/command/GameActionError";
 import { toGameActionError } from "~/play/logic/toGameActionError";
-import { itemLabel } from "~/producer/logic/itemLabel";
 import { json } from "~/shared/json";
 import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
-import { depleteFx } from "./depleteFx";
-import { rollOutputFx } from "./rollOutputFx";
+import { depleteActivationFx } from "./depleteActivationFx";
+import { rollActivationOutputFx } from "./rollActivationOutputFx";
 
-export namespace produceFx {
+export namespace activateFx {
 	export interface Props {
 		boardItemId: string;
 		activation?: "single" | "exhaust";
 	}
 }
 
-export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Props) {
+export const activateFx = Effect.fn("activateFx")(function* (props: activateFx.Props) {
 	const input = yield* Effect.try({
 		try: () =>
-			ProduceBoardItemInputSchema.parse({
+			ActivateItemInputSchema.parse({
 				...props,
 				activation: props.activation ?? "single",
 			}),
@@ -48,7 +48,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			const gameConfig = yield* GameConfigServiceFx;
 			const id = yield* IdServiceFx;
 			const now = date.now();
-			const timestamp = now.toMillis();
+			const timestampMs = now.toMillis();
 			const updatedAt = date.toTimestamp(now);
 
 			const mutable = yield* readMutableSaveFx();
@@ -61,6 +61,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			if (!baseActivation) {
 				return yield* Effect.fail(new GameActionError("This item cannot be activated."));
 			}
+
 			const activation =
 				baseActivation.type === "producer"
 					? applyProducerUpgradeEffects({
@@ -92,7 +93,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				activation.type === "producer" &&
 				!isExhaust &&
 				activationState.cooldownUntil &&
-				(date.parseTimestampMs(activationState.cooldownUntil) ?? 0) > timestamp
+				(date.parseTimestampMs(activationState.cooldownUntil) ?? 0) > timestampMs
 			) {
 				return yield* Effect.fail(new GameActionError("Producer is still cooling down."));
 			}
@@ -121,7 +122,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				if (stored < needed) {
 					const name = gameConfig.getItem(required.itemId)?.name ?? required.itemId;
 					return yield* Effect.fail(
-						new GameActionError(`${itemLabel(activation.type)} needs ${name}.`),
+						new GameActionError(`${activationLabel(activation.type)} needs ${name}.`),
 					);
 				}
 			}
@@ -129,7 +130,7 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			const allDrops: ItemId[] = [];
 			for (let step = 0; step < steps; step++) {
 				allDrops.push(
-					...(yield* rollOutputFx({
+					...(yield* rollActivationOutputFx({
 						outputs: lootTable.output,
 					})),
 				);
@@ -171,15 +172,15 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 				nextRemainingCharges <= 0;
 
 			if (shouldDeplete) {
-				const depletion = yield* depleteFx({
+				const depletion = yield* depleteActivationFx({
 					row,
 					stash: activation,
 				});
 				return {
-					producerBoardItemId: row.id,
+					activationBoardItemId: row.id,
 					placements,
 					depletion,
-				} satisfies ProducerDropResult;
+				} satisfies ActivationResultSchema.Type;
 			}
 
 			yield* dbFx((db) =>
@@ -208,9 +209,9 @@ export const produceFx = Effect.fn("produceFx")(function* (props: produceFx.Prop
 			);
 
 			return {
-				producerBoardItemId: row.id,
+				activationBoardItemId: row.id,
 				placements,
-			} satisfies ProducerDropResult;
+			} satisfies ActivationResultSchema.Type;
 		}),
 	);
 });

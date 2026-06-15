@@ -7,17 +7,20 @@ import { DateServiceFx } from "~/date/context/DateServiceFx";
 import type { BoardRow } from "~/inventory/logic/planning/types";
 import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
 import type { StashDefinition } from "~/manifest/producer";
-import type { ProducerDepletion } from "~/producer/type/ProducerDepletionSchema";
+import type { ActivationDepletionSchema } from "~/activation/type/ActivationDepletionSchema";
 import { json } from "~/shared/json";
 
-export namespace depleteFx {
+export namespace depleteActivationFx {
 	export interface Props {
 		row: BoardRow;
 		stash: StashDefinition;
 	}
 }
 
-export const depleteFx = Effect.fn("depleteFx")(function* ({ row, stash }: depleteFx.Props) {
+export const depleteActivationFx = Effect.fn("depleteActivationFx")(function* ({
+	row,
+	stash,
+}: depleteActivationFx.Props) {
 	const date = yield* DateServiceFx;
 	const gameConfig = yield* GameConfigServiceFx;
 	const timestamp = date.timestamp();
@@ -33,7 +36,7 @@ export const depleteFx = Effect.fn("depleteFx")(function* ({ row, stash }: deple
 				await db.deleteFrom(table.itemInstance).where("id", "=", row.id).execute();
 				return {
 					kind: "remove",
-				} satisfies ProducerDepletion;
+				} satisfies ActivationDepletionSchema.Type;
 			}),
 		)
 		.with(
@@ -59,7 +62,7 @@ export const depleteFx = Effect.fn("depleteFx")(function* ({ row, stash }: deple
 					return {
 						kind: "replace",
 						itemId: replaceWithItemId,
-					} satisfies ProducerDepletion;
+					} satisfies ActivationDepletionSchema.Type;
 				}),
 		)
 		.exhaustive();

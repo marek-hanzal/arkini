@@ -1,8 +1,8 @@
-import type { GameConfigService } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
-import { ItemCatalogViewSchema, type ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
-import type { ViewItem } from "~/item/view/ViewItemSchema";
-import { GameActionError } from "~/command/GameActionError";
+import type { GameConfigService } from "~/v0/game/context/GameConfigServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
+import { ItemCatalogViewSchema, type ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 
 export namespace createItemCatalogView {
 	export interface Props {

@@ -1,5 +1,5 @@
-import type { ItemCraftRecipe } from "~/manifest/craft";
-import type { ItemId } from "~/manifest/manifestId";
+import type { ItemCraftRecipe } from "~/v0/manifest/craft";
+import type { ItemId } from "~/v0/manifest/manifestId";
 
 export namespace resolveCraftProgress {
 	export interface Props {

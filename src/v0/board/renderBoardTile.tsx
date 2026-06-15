@@ -1,4 +1,4 @@
-import { GameItemView } from "~/item/ui/GameItemView";
+import { GameItemView } from "~/v0/item/ui/GameItemView";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 

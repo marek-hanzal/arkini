@@ -1,5 +1,5 @@
-import type { ItemInstanceRowSchema } from "~/item-instance/type/ItemInstanceRowSchema";
-import type { ItemId } from "~/manifest/manifestId";
+import type { ItemInstanceRowSchema } from "~/v0/item-instance/type/ItemInstanceRowSchema";
+import type { ItemId } from "~/v0/manifest/manifestId";
 
 export const groupActivationInputRows = (rows: readonly ItemInstanceRowSchema.Type[]) => {
 	const grouped = new Map<string, Map<ItemId, number>>();

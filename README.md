@@ -52,7 +52,7 @@ Randomness is provided through `RandomServiceFx`; activation rolls do not call `
 
 ## Game engine boundary
 
-The historical runtime still has typed `Command` values in `src/command/`, but v0 does not route user actions through a central command bus. v0 mutations call the owning domain Fx root directly: board actions call board/activation/craft Fx roots, inventory actions call inventory Fx roots, and upgrade actions call upgrade Fx roots. Command schemas/results are still reused as compatibility types while the old runtime is being drained, but the active architecture is concrete action hook → concrete Fx → React Query cache patch/reconcile.
+The historical runtime still has typed `Command` values in `src/command/`, but v0 does not route user actions through a central command bus and no longer imports command result/error schemas from the old layer. v0 mutations call the owning domain Fx root directly: board actions call board/activation/craft Fx roots, inventory actions call inventory Fx roots, and upgrade actions call upgrade Fx roots. Action errors and visual result schemas live in `src/v0/play/action`, because active action facts should not depend on the dead command router wearing a fake mustache.
 
 ## Tile engine boundary
 
@@ -118,39 +118,24 @@ Components should stay boring: render props, wire callbacks, and shut up. If a c
 
 ```txt
 src/app/                         App entry, router, global styles, cross-origin isolation fallback.
-src/manifest/                    GameConfig composition, typed ID schemas, craft/merge/producer definitions, Zod config schema, validation, derived indexes.
-src/manifest/config/             Focused static gameplay definition collections composed by GameConfig.
-src/assets/                      PNG gameplay assets imported by manifest helper utilities.
-src/manifest/context/            Effect game config service context tag.
-src/manifest/logic/              Live config service, derived lookup helpers, and provider helper.
-src/database/local/              OPFS SQLite client, Kysely schema, migrations, local DB status.
-src/database/context/            Effect database context tags.
-src/database/fx/                 Database Effect helpers such as dbFx and withTransactionFx.
-src/database/logic/              Non-root database Effect providers/helpers and browser database service.
-src/date/context/                Effect date/time service context tag.
-src/date/logic/                  Live Luxon date service and timestamp helpers.
-src/hash/context/                Effect hash service context tag.
-src/hash/logic/                  Live WebCrypto hashing service and provider helper.
-src/id/context/                  Effect id service context tag.
-src/id/logic/                    CUID2-backed id service and provider helper.
-src/random/context/              Effect random service context tag and generic weighted input types.
-src/random/logic/                Live random service and provider helper.
-src/v0/                        Active client play runtime: domain-local query/action/cache/Fx files, play shell, drop policy, feedback state, and reusable TileEngine.
-src/v0/**/fx/                    Active v0 domain Fx roots for gameplay actions, save lifecycle, reads, persistence, and bootstrap.
-src/ancient/                   Snapshot of the pre-v0 runtime kept for archaeology only; do not import ancient UI/runtime code into v0.
-src/command/                    Historical typed command schemas and command Effect router kept for old runtime/domain compatibility. v0 calls domain Fx roots directly.
-src/animation/                  Historical visual planning helpers for game events.
-src/merge/                      Merge, craft-input, and activation-input intent resolution.
-src/play/logic/                  Historical Promise backend façade and old runtime helpers. Do not route new v0 query/mutation work through it.
-src/**/fx/                       Legacy/root domain Effect roots still compiled while migration continues. Prefer `src/v0/**/fx` for active runtime work.
-src/board/                       Legacy board identity, board state logic, board view model/schema, board UI, cell feedback.
-src/inventory/                   Legacy inventory identity, stack planning/storage logic, inventory view model/schema, inventory sheet UI.
-src/activation/                 Activatable item runtime: producer/stash activation, output rolling, depletion, consumable inputs, and persistent requirements.
-src/craft/                      Craft/progress input storage helpers for nested item instances.
-src/producer/                    Producer readiness tracking and cooldown helpers.
-src/upgrade/                     Tiered global upgrades, purchase effects, producer modifiers, upgrade view model/schema, and upgrade sheet UI.
-src/item/                        Static item catalog view model/schema and shared item visual renderer used by board, inventory, and TileEngine actors.
-src/shared/                      Small UI/util hooks and helpers.
+src/assets/                      PNG gameplay assets imported by v0 manifest helper utilities.
+src/v0/                         Active client play runtime. v0 should be self-contained except asset imports.
+src/v0/manifest/                Active GameConfig composition, typed IDs, definitions, validation, derived indexes.
+src/v0/game/                    Active GameConfig Effect service and derived lookup helpers.
+src/v0/database/                Active OPFS SQLite client, Kysely schema, migrations, status UI, dbFx, transactions, hard reset Fx/action.
+src/v0/date/                    Active Luxon date Effect service.
+src/v0/hash/                    Active WebCrypto hash Effect service.
+src/v0/id/                      Active CUID2 id Effect service.
+src/v0/random/                  Active random Effect service and weighted helpers.
+src/v0/**/fx/                   Active v0 domain Fx roots for gameplay actions, save lifecycle, reads, persistence, and bootstrap.
+src/v0/**/query/                Suspense query options and keys owned by their data domain.
+src/v0/**/action/               Concrete mutation hooks owned by the action domain.
+src/v0/**/cache/                React Query cache patch/reconcile helpers owned by the view cache domain.
+src/v0/tile-engine/             Game-agnostic drag/drop/tap/animation runtime for stable tile actors.
+src/v0/play/drop/               Arkini-specific drop policy over the generic TileEngine.
+src/ancient/                    Snapshot of the pre-v0 runtime kept for archaeology only; do not import ancient UI/runtime code into v0.
+src/command/                    Historical command router for old root runtime only; v0 uses `src/v0/play/action`.
+src/**                          Legacy/root runtime still compiled while migration continues. Do not import legacy code into active v0 code unless the current task is explicitly migrating it.
 ```
 
 ## Local run
@@ -221,7 +206,7 @@ The database sheet hard reset uses the same full OPFS reset path as the root err
 
 ## Validation policy
 
-SQLite is local storage, not the final game authority. Gameplay inputs and loaded mutable rows are validated with Zod in `src/play/logic/gameActionSchemas.ts` and `readMutableSaveFx()`. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
+SQLite is local storage, not the final game authority. Gameplay inputs and loaded mutable rows are validated with Zod through active `src/v0/**/schema|type|view` models and `readMutableSaveFx()`. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
 
 ## Minimal-code philosophy
 

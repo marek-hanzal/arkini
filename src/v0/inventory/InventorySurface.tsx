@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { memo, type ReactNode, useCallback, useMemo } from "react";
-import { inventoryColumns } from "~/inventory/inventoryColumns";
-import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
-import { SheetHeader } from "~/shared/ui/SheetHeader";
+import { inventoryColumns } from "~/v0/inventory/inventoryColumns";
+import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
+import { SheetHeader } from "~/v0/sheet/SheetHeader";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import { inventoryViewQueryOptions } from "~/v0/inventory/query/inventoryViewQueryOptions";
 import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";

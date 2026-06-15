@@ -1,12 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { FC } from "react";
-import { cn } from "~/shared/cn";
-import { useHardResetAction } from "~/shared/hook/useHardResetAction";
-import { SheetHeader } from "~/shared/ui/SheetHeader";
-import { StatusPill } from "~/shared/ui/StatusPill";
-import { hardResetBrowserStorage } from "~/shared/util/hardResetBrowserStorage";
-import { logResetError } from "~/shared/util/logResetError";
-import { reloadWindow } from "~/shared/util/reloadWindow";
+import { cn } from "~/v0/style/cn";
+import { SheetHeader } from "~/v0/sheet/SheetHeader";
+import { StatusPill } from "~/v0/database/StatusPill";
+import { useHardResetMutation } from "~/v0/database/action/useHardResetMutation";
 import { databaseStatusQueryOptions } from "~/v0/database/query/databaseStatusQueryOptions";
 
 export namespace DatabaseSheet {
@@ -17,11 +14,7 @@ export namespace DatabaseSheet {
 
 export const DatabaseSheet: FC<DatabaseSheet.Props> = ({ onClose }) => {
 	const { data: status } = useSuspenseQuery(databaseStatusQueryOptions());
-	const reset = useHardResetAction({
-		reset: hardResetBrowserStorage,
-		onSuccess: reloadWindow,
-		onError: logResetError,
-	});
+	const hardResetMutation = useHardResetMutation();
 	const isolated = window.crossOriginIsolated;
 
 	return (
@@ -73,13 +66,15 @@ export const DatabaseSheet: FC<DatabaseSheet.Props> = ({ onClose }) => {
 						<div className="min-w-40">
 							<button
 								type="button"
-								disabled={reset.pending}
-								onClick={() => void reset.run()}
+								disabled={hardResetMutation.isPending}
+								onClick={() => hardResetMutation.mutate()}
 								className="w-full rounded-md border border-red-300/45 bg-red-300 px-4 py-3 text-sm font-black text-slate-950 disabled:cursor-wait disabled:opacity-60"
 							>
-								{reset.pending ? "Dropping OPFS storage…" : "Hard reset DB"}
+								{hardResetMutation.isPending
+									? "Dropping OPFS storage…"
+									: "Hard reset DB"}
 							</button>
-							{reset.failed ? (
+							{hardResetMutation.isError ? (
 								<p className="mt-3 text-sm text-red-100">
 									Reset failed. Check the console.
 								</p>

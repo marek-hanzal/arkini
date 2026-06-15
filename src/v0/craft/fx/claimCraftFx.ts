@@ -1,22 +1,21 @@
 import { Effect } from "effect";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
-import { readBoardState } from "~/board/logic/readBoardState";
-import type { Command } from "~/command/Command";
-import type { CommandResult } from "~/command/CommandResult";
-import { GameActionError } from "~/command/GameActionError";
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
+import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
+import { readBoardState } from "~/v0/board/logic/readBoardState";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { deleteCraftInputsFx } from "~/v0/craft/fx/deleteCraftInputsFx";
 import { readCraftInputRowsFx } from "~/v0/craft/fx/readCraftInputRowsFx";
-import { resolveCraftProgress } from "~/craft/logic/resolveCraftProgress";
-import { ClaimCraftInputSchema } from "~/craft/type/ClaimCraftInputSchema";
-import type { CraftResultSchema } from "~/craft/type/CraftResultSchema";
+import { resolveCraftProgress } from "~/v0/craft/logic/resolveCraftProgress";
+import { ClaimCraftInputSchema } from "~/v0/craft/type/ClaimCraftInputSchema";
+import type { CraftResultSchema } from "~/v0/craft/type/CraftResultSchema";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { json } from "~/shared/json";
+import { json } from "~/v0/style/json";
 import { groupCraftInputRows } from "../logic/groupCraftInputRows";
 
 export namespace claimCraftFx {
@@ -109,14 +108,9 @@ export const claimCraftFx = Effect.fn("claimCraftFx")(function* (props: claimCra
 						resultItemId: recipe.resultItemId,
 					},
 				],
-			} satisfies CommandResult<
-				Extract<
-					Command,
-					{
-						type: "craft.claim";
-					}
-				>
-			>;
+			} satisfies ActionResultSchema.Type & {
+				craft: CraftResultSchema.Type;
+			};
 		}),
 	);
 });

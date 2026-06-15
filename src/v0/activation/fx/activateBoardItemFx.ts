@@ -1,29 +1,28 @@
 import { Effect } from "effect";
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { spendActivationInputFx } from "~/v0/activation/fx/spendActivationInputFx";
-import { activationLabel } from "~/activation/logic/activationLabel";
-import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
-import { ActivateItemInputSchema } from "~/activation/type/ActivateItemInputSchema";
-import type { ActivationResultSchema } from "~/activation/type/ActivationResultSchema";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
-import { readBoardState } from "~/board/logic/readBoardState";
-import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
-import { GameActionError } from "~/command/GameActionError";
+import { activationLabel } from "~/v0/activation/logic/activationLabel";
+import { groupActivationInputRows } from "~/v0/activation/logic/groupActivationInputRows";
+import { ActivateItemInputSchema } from "~/v0/activation/type/ActivateItemInputSchema";
+import type { ActivationResultSchema } from "~/v0/activation/type/ActivationResultSchema";
+import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
+import { readBoardState } from "~/v0/board/logic/readBoardState";
+import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { IdServiceFx } from "~/id/context/IdServiceFx";
-import { planPlacements } from "~/inventory/logic/planning/placement";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { IdServiceFx } from "~/v0/id/context/IdServiceFx";
+import { planPlacements } from "~/v0/inventory/logic/planning/placement";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
 import { applyPlacementPlanFx } from "~/v0/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { json } from "~/shared/json";
-import { applyProducerUpgradeEffects } from "~/upgrade/logic/applyProducerUpgradeEffects";
-import type { Command } from "~/command/Command";
-import type { CommandResult } from "~/command/CommandResult";
-import type { CommandVisualEventSchema } from "~/command/CommandVisualEventSchema";
+import { json } from "~/v0/style/json";
+import { applyProducerUpgradeEffects } from "~/v0/upgrade/logic/applyProducerUpgradeEffects";
+import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { depleteActivationFx } from "./depleteActivationFx";
 import { rollActivationOutputFx } from "./rollActivationOutputFx";
 
@@ -195,13 +194,13 @@ export const activateBoardItemFx = Effect.fn("activateBoardItemFx")(function* (
 				nextRemainingCharges !== undefined &&
 				nextRemainingCharges <= 0;
 
-			const visualEvents: CommandVisualEventSchema.Type[] = [
+			const visualEvents: ActionVisualEventSchema.Type[] = [
 				{
 					type: "activation.activated",
 					itemInstanceId: row.id,
 					mode: input.activation,
 				},
-				...placements.flatMap((placement): CommandVisualEventSchema.Type[] => {
+				...placements.flatMap((placement): ActionVisualEventSchema.Type[] => {
 					if (placement.kind === "board") {
 						if (
 							!placement.boardItemId ||
@@ -265,14 +264,9 @@ export const activateBoardItemFx = Effect.fn("activateBoardItemFx")(function* (
 							depletion,
 						},
 					],
-				} satisfies CommandResult<
-					Extract<
-						Command,
-						{
-							type: "activation.activate";
-						}
-					>
-				>;
+				} satisfies ActionResultSchema.Type & {
+					activation: ActivationResultSchema.Type;
+				};
 			}
 
 			yield* dbFx((db) =>
@@ -308,14 +302,9 @@ export const activateBoardItemFx = Effect.fn("activateBoardItemFx")(function* (
 			return {
 				activation: activationResult,
 				visualEvents,
-			} satisfies CommandResult<
-				Extract<
-					Command,
-					{
-						type: "activation.activate";
-					}
-				>
-			>;
+			} satisfies ActionResultSchema.Type & {
+				activation: ActivationResultSchema.Type;
+			};
 		}),
 	);
 });

@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { stashBoardItemFx } from "~/v0/inventory/fx/stashBoardItemFx";
-import type { BoardView } from "~/board/view/BoardViewSchema";
-import { rebuildBoardView } from "~/board/view/rebuildBoardView";
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { isStatefulStack } from "~/v0/inventory/cache/isStatefulStack";
 import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";

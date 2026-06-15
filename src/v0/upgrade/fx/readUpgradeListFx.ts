@@ -2,14 +2,17 @@ import { Effect } from "effect";
 import { completeReadyFx } from "~/v0/upgrade/fx/completeReadyFx";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { readInventoryStackRowsFx } from "~/v0/item-instance/fx/readInventoryStackRowsFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { isEmptyInventoryStateJson } from "~/inventory/logic/isEmptyInventoryStateJson";
-import { canSpendInventoryItems } from "~/inventory/logic/planning/canSpendInventoryItems";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import { UpgradeListViewSchema, type UpgradeListView } from "~/upgrade/view/UpgradeListViewSchema";
-import type { UpgradeView } from "~/upgrade/view/UpgradeViewSchema";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { isEmptyInventoryStateJson } from "~/v0/inventory/logic/isEmptyInventoryStateJson";
+import { canSpendInventoryItems } from "~/v0/inventory/logic/planning/canSpendInventoryItems";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import {
+	UpgradeListViewSchema,
+	type UpgradeListView,
+} from "~/v0/upgrade/view/UpgradeListViewSchema";
+import type { UpgradeView } from "~/v0/upgrade/view/UpgradeViewSchema";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { describeUpgradeEffect } from "~/upgrade/logic/describeUpgradeEffect";
+import { describeUpgradeEffect } from "~/v0/upgrade/logic/describeUpgradeEffect";
 
 export const readUpgradeListFx = Effect.fn("readUpgradeListFx")(function* () {
 	yield* completeReadyFx();

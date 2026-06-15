@@ -1,5 +1,5 @@
-import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { ViewItem } from "~/item/view/ViewItemSchema";
+import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { Feedback } from "~/v0/play/Feedback";
 
 export namespace BoardSurface {

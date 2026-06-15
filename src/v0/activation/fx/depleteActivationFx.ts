@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import { P, match } from "ts-pattern";
-import { createInitialBoardState } from "~/board/logic/createInitialBoardState";
+import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import type { BoardRow } from "~/inventory/logic/planning/types";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { StashDefinition } from "~/manifest/producer";
-import type { ActivationDepletionSchema } from "~/activation/type/ActivationDepletionSchema";
-import { json } from "~/shared/json";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import type { BoardRow } from "~/v0/inventory/logic/planning/types";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import type { StashDefinition } from "~/v0/manifest/producer";
+import type { ActivationDepletionSchema } from "~/v0/activation/type/ActivationDepletionSchema";
+import { json } from "~/v0/style/json";
 
 export namespace depleteActivationFx {
 	export interface Props {

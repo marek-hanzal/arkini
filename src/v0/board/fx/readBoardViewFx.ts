@@ -1,23 +1,23 @@
 import { Effect } from "effect";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
-import { groupActivationInputRows } from "~/activation/logic/groupActivationInputRows";
-import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
-import { readActivationView } from "~/board/logic/readActivationView";
-import { readBoardState } from "~/board/logic/readBoardState";
-import { readCraftView } from "~/board/logic/readCraftView";
-import { cellKey } from "~/board/util/cell";
-import type { BoardItemState } from "~/board/view/BoardItemStateSchema";
-import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import { BoardViewSchema, type BoardView } from "~/board/view/BoardViewSchema";
+import { groupActivationInputRows } from "~/v0/activation/logic/groupActivationInputRows";
+import { findFirstEmptyCell } from "~/v0/board/logic/findFirstEmptyCell";
+import { readActivationView } from "~/v0/board/logic/readActivationView";
+import { readBoardState } from "~/v0/board/logic/readBoardState";
+import { readCraftView } from "~/v0/board/logic/readCraftView";
+import { cellKey } from "~/v0/board/util/cell";
+import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
+import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { BoardViewSchema, type BoardView } from "~/v0/board/view/BoardViewSchema";
 import { readCraftInputRowsFx } from "~/v0/craft/fx/readCraftInputRowsFx";
-import { groupCraftInputRows } from "~/craft/logic/groupCraftInputRows";
+import { groupCraftInputRows } from "~/v0/craft/logic/groupCraftInputRows";
 import { dbFx } from "~/v0/database/fx/dbFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
 import { readBoardItemRowsFx } from "~/v0/item-instance/fx/readBoardItemRowsFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import type { ItemId } from "~/manifest/manifestId";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import type { ItemId } from "~/v0/manifest/manifestId";
 import { defaultSaveGameId } from "~/v0/play/save";
-import { parseJson } from "~/shared/parseJson";
+import { parseJson } from "~/v0/style/parseJson";
 
 export const readBoardViewFx = Effect.fn("readBoardViewFx")(function* () {
 	const date = yield* DateServiceFx;

@@ -2,11 +2,11 @@ import { Effect } from "effect";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { SwapBoardItemsInputSchema } from "~/play/schema/SwapBoardItemsInputSchema";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameActionError } from "~/command/GameActionError";
+import { SwapBoardItemsInputSchema } from "~/v0/play/schema/SwapBoardItemsInputSchema";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import type { CommandResultSchema } from "~/command/CommandResultSchema";
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 
 export namespace swapBoardItemsFx {
 	export interface Props {
@@ -28,7 +28,7 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* (
 	if (input.sourceBoardItemId === input.targetBoardItemId) {
 		return {
 			visualEvents: [],
-		} satisfies CommandResultSchema.Type;
+		} satisfies ActionResultSchema.Type;
 	}
 
 	return yield* withTransactionFx(
@@ -104,7 +104,7 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* (
 						},
 					},
 				],
-			} satisfies CommandResultSchema.Type;
+			} satisfies ActionResultSchema.Type;
 		}),
 	);
 });

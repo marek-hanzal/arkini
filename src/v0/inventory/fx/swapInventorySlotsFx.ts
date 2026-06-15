@@ -1,13 +1,13 @@
 import { Effect } from "effect";
-import { assertInsideInventory } from "~/board/logic/assertInsideInventory";
+import { assertInsideInventory } from "~/v0/board/logic/assertInsideInventory";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { SwapInventorySlotsInputSchema } from "~/play/schema/SwapInventorySlotsInputSchema";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { GameActionError } from "~/command/GameActionError";
+import { SwapInventorySlotsInputSchema } from "~/v0/play/schema/SwapInventorySlotsInputSchema";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import type { CommandResultSchema } from "~/command/CommandResultSchema";
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 
 export namespace swapInventorySlotsFx {
 	export interface Props {
@@ -29,7 +29,7 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 	if (input.sourceSlotIndex === input.targetSlotIndex) {
 		return {
 			visualEvents: [],
-		} satisfies CommandResultSchema.Type;
+		} satisfies ActionResultSchema.Type;
 	}
 
 	return yield* withTransactionFx(
@@ -71,7 +71,7 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 							},
 						},
 					],
-				} satisfies CommandResultSchema.Type;
+				} satisfies ActionResultSchema.Type;
 			}
 
 			yield* dbFx((db) =>
@@ -131,7 +131,7 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 						},
 					},
 				],
-			} satisfies CommandResultSchema.Type;
+			} satisfies ActionResultSchema.Type;
 		}),
 	);
 });

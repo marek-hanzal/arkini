@@ -1,5 +1,5 @@
 import { memo, useRef, useState } from "react";
-import { cn } from "~/shared/cn";
+import { cn } from "~/v0/style/cn";
 import { actorStyle } from "~/v0/tile-engine/actorStyle";
 import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/TileEngineActor.types";
 import { useTileActorDrag } from "~/v0/tile-engine/useTileActorDrag";

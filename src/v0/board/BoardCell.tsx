@@ -1,13 +1,13 @@
 import { memo } from "react";
-import { boardColumns } from "~/board/boardColumns";
-import { boardRows } from "~/board/boardRows";
-import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
-import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
-import type { BoardCellView } from "~/board/boardCells";
-import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import { isProducerReady } from "~/producer/logic/isProducerReady";
-import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
-import { cn } from "~/shared/cn";
+import { boardColumns } from "~/v0/board/boardColumns";
+import { boardRows } from "~/v0/board/boardRows";
+import { BoardCellCooldownProgress } from "~/v0/board/ui/BoardCellCooldownProgress";
+import { BoardCellProgress } from "~/v0/board/ui/BoardCellProgress";
+import type { BoardCellView } from "~/v0/board/boardCells";
+import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
+import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
+import { cn } from "~/v0/style/cn";
 
 export namespace BoardCell {
 	export interface Props {

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { Quantity } from "~/manifest/producer";
-import { RandomServiceFx } from "~/random/context/RandomServiceFx";
+import type { Quantity } from "~/v0/manifest/producer";
+import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 
 export namespace resolveActivationQuantityFx {
 	export interface Props {

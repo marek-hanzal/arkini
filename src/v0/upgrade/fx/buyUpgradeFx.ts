@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
-import { DateServiceFx } from "~/date/context/DateServiceFx";
-import { IdServiceFx } from "~/id/context/IdServiceFx";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
-import { spendInventoryItems } from "~/inventory/logic/planning/spendInventoryItems";
+import { DateServiceFx } from "~/v0/date/context/DateServiceFx";
+import { IdServiceFx } from "~/v0/id/context/IdServiceFx";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
+import { spendInventoryItems } from "~/v0/inventory/logic/planning/spendInventoryItems";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
-import { BuyUpgradeInputSchema } from "~/play/schema/BuyUpgradeInputSchema";
-import { GameActionError } from "~/command/GameActionError";
+import { BuyUpgradeInputSchema } from "~/v0/play/schema/BuyUpgradeInputSchema";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import type { CommandResultSchema } from "~/command/CommandResultSchema";
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 
 export namespace buyUpgradeFx {
 	export interface Props {
@@ -138,7 +138,7 @@ export const buyUpgradeFx = Effect.fn("buyUpgradeFx")(function* (props: buyUpgra
 						targetLevel,
 					},
 				],
-			} satisfies CommandResultSchema.Type;
+			} satisfies ActionResultSchema.Type;
 		}),
 	);
 });

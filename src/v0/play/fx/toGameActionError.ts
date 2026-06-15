@@ -1,4 +1,4 @@
-import { GameActionError } from "~/command/GameActionError";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 
 export function toGameActionError(error: unknown) {
 	if (error instanceof GameActionError) return error;

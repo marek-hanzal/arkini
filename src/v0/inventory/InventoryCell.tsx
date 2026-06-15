@@ -1,6 +1,6 @@
 import { memo } from "react";
-import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
-import { cn } from "~/shared/cn";
+import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
+import { cn } from "~/v0/style/cn";
 
 export namespace InventoryCell {
 	export interface Props {

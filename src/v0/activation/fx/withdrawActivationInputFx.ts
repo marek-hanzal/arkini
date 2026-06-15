@@ -1,17 +1,17 @@
 import { Effect } from "effect";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { spendActivationInputFx } from "~/v0/activation/fx/spendActivationInputFx";
-import { GameActionError } from "~/command/GameActionError";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
-import { IdServiceFx } from "~/id/context/IdServiceFx";
-import { planPlacements } from "~/inventory/logic/planning/placement";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import { IdServiceFx } from "~/v0/id/context/IdServiceFx";
+import { planPlacements } from "~/v0/inventory/logic/planning/placement";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import { applyPlacementPlanFx } from "~/v0/play/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/v0/play/fx/toGameActionError";
-import { WithdrawActivationInputSchema } from "~/activation/type/WithdrawActivationInputSchema";
-import type { CommandResultSchema } from "~/command/CommandResultSchema";
-import type { CommandVisualEventSchema } from "~/command/CommandVisualEventSchema";
+import { WithdrawActivationInputSchema } from "~/v0/activation/type/WithdrawActivationInputSchema";
+import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
+import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 
 export namespace withdrawActivationInputFx {
 	export interface Props {
@@ -82,7 +82,7 @@ export const withdrawActivationInputFx = Effect.fn("withdrawActivationInputFx")(
 			});
 
 			return {
-				visualEvents: placements.flatMap((placement): CommandVisualEventSchema.Type[] => {
+				visualEvents: placements.flatMap((placement): ActionVisualEventSchema.Type[] => {
 					if (placement.kind === "board") {
 						if (
 							!placement.boardItemId ||
@@ -123,7 +123,7 @@ export const withdrawActivationInputFx = Effect.fn("withdrawActivationInputFx")(
 						},
 					];
 				}),
-			} satisfies CommandResultSchema.Type;
+			} satisfies ActionResultSchema.Type;
 		}),
 	);
 });

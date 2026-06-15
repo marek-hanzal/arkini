@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { GameConfigServiceFx } from "~/manifest/context/GameConfigServiceFx";
+import { GameConfigServiceFx } from "~/v0/game/context/GameConfigServiceFx";
 import type { DatabaseStatus } from "~/v0/database/model/DatabaseStatus";
 import { readSaveTableCountsFx } from "~/v0/database/fx/readSaveTableCountsFx";
 import { readDatabasePathFx } from "~/v0/database/fx/readDatabasePathFx";

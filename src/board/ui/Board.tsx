@@ -1,18 +1,21 @@
-import { memo, type FC } from "react";
+import { memo, type FC, useCallback, useMemo } from "react";
 import { boardColumns } from "~/board/boardColumns";
 import { boardContainerNodeId } from "~/board/boardContainerNodeId";
 import { boardRows } from "~/board/boardRows";
+import { boardSourceId } from "~/board/boardSourceId";
 import { useDelayedMergeHints } from "~/board/hook/useDelayedMergeHints";
 import { BoardCell } from "~/board/ui/BoardCell";
-import { BoardItemLayer } from "~/board/ui/BoardItemLayer";
+import { BoardTile } from "~/board/ui/BoardTile";
 import { cellKey } from "~/board/util/cell";
 import { resolveItemMergeRule } from "~/manifest/logic/resolveItemMergeRule";
 import type { ItemId } from "~/manifest/manifestId";
 import { usePlayBoard } from "~/play/hook/usePlayBoard";
 import { usePlayItems } from "~/play/hook/usePlayItems";
-import type { BoardViewItem } from "~/play/logic/playTypes";
-import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
+import { visualBoardItemKey, type useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
+import type { BoardViewItem, ViewItem } from "~/play/logic/playTypes";
 import type { DragData } from "~/play/types";
+import { useProducerClock } from "~/producer/hook/useProducerClock";
+import { TileEngine } from "~/tile-engine/ui/TileEngine";
 
 const boardCells = Array.from(
 	{
@@ -24,9 +27,7 @@ const boardCells = Array.from(
 		key: cellKey(index % boardColumns, Math.floor(index / boardColumns)),
 	}),
 );
-const boardGridStyle = {
-	gridTemplateColumns: `repeat(${boardColumns}, minmax(0, 1fr))`,
-};
+
 export namespace Board {
 	export interface DragState {
 		activeDrag?: DragData;
@@ -52,67 +53,134 @@ export namespace Board {
 	}
 }
 
+interface BoardTileData {
+	boardItem: BoardViewItem;
+	item: ViewItem;
+	activationNowMs?: number;
+}
+
 export const Board: FC<Board.Props> = memo(({ drag, feedback, actions, visualMotions }) => {
 	const board = usePlayBoard().data;
 	const items = usePlayItems().data;
 	const showDelayedMergeHints = useDelayedMergeHints({
 		activeDrag: drag.activeDrag ?? undefined,
 	});
+	const nowMs = useProducerClock(board?.items ?? []);
+	const tileSlots = useMemo(
+		() =>
+			boardCells.map((cell) => ({
+				id: cell.key,
+				data: cell,
+			})),
+		[],
+	);
+
 	if (!board || !items) return null;
 
-	return (
-		<div
-			data-drag-boundary-id={boardContainerNodeId}
-			className="relative grid w-full overflow-hidden rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
-			style={boardGridStyle}
-		>
-			{boardCells.map((cell) => {
-				const boardItem = board.byCellKey[cell.key];
-				const canMerge =
-					drag.activeDrag?.source.kind === "board" &&
-					boardItem !== undefined &&
-					boardItem.id !== drag.activeDrag.source.boardItemId
-						? Boolean(
-								resolveItemMergeRule(
-									drag.activeDrag.itemId as ItemId,
-									boardItem.itemId as ItemId,
+	const tileActors = board.items.flatMap((boardItem) => {
+		const item = items[boardItem.itemId];
+		if (!item) return [];
+
+		const motionKey = visualBoardItemKey(boardItem.id);
+		const visualMotion = visualMotions.motions[motionKey];
+
+		return [
+			{
+				id: boardItem.id,
+				slotId: cellKey(boardItem.x, boardItem.y),
+				hidden: drag.isSourceHidden(boardSourceId(boardItem.id)),
+				motion: visualMotion,
+				onMotionSettle: visualMotion
+					? () => visualMotions.settle(motionKey, visualMotion.nonce)
+					: undefined,
+				data: {
+					boardItem,
+					item,
+					activationNowMs: boardItem.activation ? nowMs : undefined,
+				} satisfies BoardTileData,
+			},
+		];
+	});
+
+	const renderSlot = useCallback(
+		({ slot }: TileEngine.RenderSlotProps<(typeof boardCells)[number]>) => {
+			const cell = slot.data;
+			const boardItem = board.byCellKey[cell.key];
+			const canMerge =
+				drag.activeDrag?.source.kind === "board" &&
+				boardItem !== undefined &&
+				boardItem.id !== drag.activeDrag.source.boardItemId
+					? Boolean(
+							resolveItemMergeRule(
+								drag.activeDrag.itemId as ItemId,
+								boardItem.itemId as ItemId,
+							),
+						) ||
+						Boolean(
+							boardItem.craft?.canAcceptInputs &&
+								boardItem.craft.acceptedInputItemIds.includes(
+									drag.activeDrag.itemId,
 								),
-							) ||
-							Boolean(
-								boardItem.craft?.canAcceptInputs &&
-									boardItem.craft.acceptedInputItemIds.includes(
-										drag.activeDrag.itemId,
-									),
-							) ||
-							Boolean(
-								boardItem.activation?.inputs.some(
-									(input) =>
-										input.itemId === drag.activeDrag?.itemId &&
-										input.stored < input.capacity,
-								),
-							)
-						: false;
-				return (
-					<BoardCell
-						key={cell.key}
-						x={cell.x}
-						y={cell.y}
-						boardItem={boardItem}
-						canMerge={canMerge}
-						showDelayedMergeHint={showDelayedMergeHints}
-						invalid={feedback.invalidCellKey === cell.key}
-						merged={feedback.mergedCellKey === cell.key}
-						imprinted={feedback.imprintedCellKey === cell.key}
-					/>
-				);
-			})}
-			<BoardItemLayer
-				boardItems={board.items}
-				items={items}
-				isSourceHidden={drag.isSourceHidden}
-				visualMotions={visualMotions}
-				actions={actions}
+						) ||
+						Boolean(
+							boardItem.activation?.inputs.some(
+								(input) =>
+									input.itemId === drag.activeDrag?.itemId &&
+									input.stored < input.capacity,
+							),
+						)
+					: false;
+
+			return (
+				<BoardCell
+					x={cell.x}
+					y={cell.y}
+					boardItem={boardItem}
+					canMerge={canMerge}
+					showDelayedMergeHint={showDelayedMergeHints}
+					invalid={feedback.invalidCellKey === cell.key}
+					merged={feedback.mergedCellKey === cell.key}
+					imprinted={feedback.imprintedCellKey === cell.key}
+				/>
+			);
+		},
+		[
+			board.byCellKey,
+			drag.activeDrag,
+			feedback.imprintedCellKey,
+			feedback.invalidCellKey,
+			feedback.mergedCellKey,
+			showDelayedMergeHints,
+		],
+	);
+	const renderTile = useCallback(
+		({ tile }: TileEngine.RenderTileProps<BoardTileData>) => (
+			<BoardTile
+				boardItem={tile.data.boardItem}
+				item={tile.data.item}
+				activationNowMs={tile.data.activationNowMs}
+				hidden={Boolean(tile.hidden)}
+				onSingleActivate={actions.tileSingleActivate}
+				onLongActivate={actions.tileLongActivate}
 			/>
-		</div>
+		),
+		[
+			actions.tileLongActivate,
+			actions.tileSingleActivate,
+		],
+	);
+
+	return (
+		<TileEngine<BoardTileData, (typeof boardCells)[number]>
+			id="board"
+			columns={boardColumns}
+			slots={tileSlots}
+			tiles={tileActors}
+			gapPx={1}
+			className="w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
+			itemLayerClassName="pointer-events-none"
+			renderSlot={renderSlot}
+			renderTile={renderTile}
+		/>
 	);
 });

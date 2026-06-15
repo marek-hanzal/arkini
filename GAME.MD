@@ -419,6 +419,12 @@ Inventory drag/drop must not trigger merge, craft input deposit, producer input 
 
 Inventory does not need a manual stack-combine interaction because stack normalization is automatic whenever items enter inventory.
 
+### 7.7 Visual tile engine
+
+Board cells and inventory slots are visual geometry and drop targets, not item owners. Rendered item tiles are stable actors managed through the generic `TileEngine` visual layer. A gameplay mutation may update durable board/inventory data, but the visual tile must not be replaced by a separate flyer copy just to animate movement.
+
+Tile actions that create or move items should stage the final actor from an external rect, drop rect, producer, or stash source and let it settle into its committed slot. Spawn supports both instant batch output and stack/staggered output. This is visual state only; gameplay data remains owned by the parent game engine and SQLite.
+
 ## 8. Interaction rules
 
 ### 8.1 Single-click

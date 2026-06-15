@@ -12,7 +12,7 @@ import type { useVisualItemMotions } from "~/play/hook/useVisualItemMotions";
 import { usePlayItems } from "~/play/hook/usePlayItems";
 import type { BoardView, GameDragView, InventoryView } from "~/play/logic/playTypes";
 import type { VisualTransitionKind, DragSource, DropTarget, VisualMeta } from "~/play/types";
-import { visualItemMotionDurationMs } from "~/animation/useVisualItemMotionAnimation";
+import { tileEngineMotionDurationMs } from "~/tile-engine/hook/useTileEngineMotionAnimation";
 import { waitForMs } from "~/shared/util/waitForMs";
 import { resolveMagneticDropTarget } from "./resolveMagneticDropTarget";
 
@@ -79,7 +79,7 @@ export function usePlayDraggableControl({
 					priority: "raised",
 				},
 			]);
-			await waitForMs(visualItemMotionDurationMs);
+			await waitForMs(tileEngineMotionDurationMs);
 		},
 		[
 			visualMotions,

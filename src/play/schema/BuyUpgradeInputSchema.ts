@@ -1,5 +1,11 @@
 import { z } from "zod";
+import { GameUpgradeIdSchema } from "~/manifest/GameUpgradeIdSchema";
 
 export const BuyUpgradeInputSchema = z.object({
-	upgradeId: z.string().startsWith("upgrade:"),
+	upgradeId: GameUpgradeIdSchema,
 });
+
+type BuyUpgradeInputSchema = typeof BuyUpgradeInputSchema;
+export namespace BuyUpgradeInputSchema {
+	export type Type = z.infer<BuyUpgradeInputSchema>;
+}

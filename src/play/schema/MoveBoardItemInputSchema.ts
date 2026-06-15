@@ -6,3 +6,8 @@ export const MoveBoardItemInputSchema = z.object({
 	boardItemId: BoardItemIdSchema,
 	...BoardCellSchema.shape,
 });
+
+type MoveBoardItemInputSchema = typeof MoveBoardItemInputSchema;
+export namespace MoveBoardItemInputSchema {
+	export type Type = z.infer<MoveBoardItemInputSchema>;
+}

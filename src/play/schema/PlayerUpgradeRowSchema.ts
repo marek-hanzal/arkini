@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { GameUpgradeIdSchema } from "~/manifest/GameUpgradeIdSchema";
 
 export const PlayerUpgradeRowSchema = z.object({
 	id: z.string().min(1),
 	saveGameId: z.string().min(1),
-	upgradeDefinitionId: z.string().startsWith("upgrade:"),
+	upgradeDefinitionId: GameUpgradeIdSchema,
 	level: z.number().int().min(0),
 	targetLevel: z.number().int().min(0).nullable(),
 	startedAt: z.string().min(1).nullable(),
@@ -11,3 +12,8 @@ export const PlayerUpgradeRowSchema = z.object({
 	createdAt: z.string().min(1),
 	updatedAt: z.string().min(1),
 });
+
+type PlayerUpgradeRowSchema = typeof PlayerUpgradeRowSchema;
+export namespace PlayerUpgradeRowSchema {
+	export type Type = z.infer<PlayerUpgradeRowSchema>;
+}

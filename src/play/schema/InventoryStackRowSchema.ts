@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ItemIdSchema } from "~/manifest/ItemIdSchema";
+import { GameItemIdSchema } from "~/manifest/GameItemIdSchema";
 import { PositiveIntegerSchema } from "~/manifest/PositiveIntegerSchema";
 import { InventorySlotIndexSchema } from "./InventorySlotIndexSchema";
 
@@ -7,9 +7,14 @@ export const InventoryStackRowSchema = z.object({
 	id: z.string().min(1),
 	saveGameId: z.string().min(1),
 	slotIndex: InventorySlotIndexSchema,
-	itemDefinitionId: ItemIdSchema,
+	itemDefinitionId: GameItemIdSchema,
 	quantity: PositiveIntegerSchema,
 	stateJson: z.string(),
 	createdAt: z.string().min(1),
 	updatedAt: z.string().min(1),
 });
+
+type InventoryStackRowSchema = typeof InventoryStackRowSchema;
+export namespace InventoryStackRowSchema {
+	export type Type = z.infer<InventoryStackRowSchema>;
+}

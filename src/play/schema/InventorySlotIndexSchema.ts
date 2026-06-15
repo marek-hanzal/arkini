@@ -6,3 +6,8 @@ export const InventorySlotIndexSchema = z
 	.int()
 	.min(0)
 	.max(gameConfig.game.inventory.slots - 1);
+
+type InventorySlotIndexSchema = typeof InventorySlotIndexSchema;
+export namespace InventorySlotIndexSchema {
+	export type Type = z.infer<InventorySlotIndexSchema>;
+}

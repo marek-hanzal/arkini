@@ -1,5 +1,5 @@
 import type { ItemId } from "../manifestId";
-import type { ProducerDefinition } from "../producer";
+import type { ProducerDefinition } from "~/v0/manifest/activation/ProducerDefinition";
 
 export namespace producerInput {
 	export interface Props {

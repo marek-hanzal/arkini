@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { Quantity } from "~/v0/manifest/producer";
+import type { Quantity } from "~/v0/manifest/activation/Quantity";
 import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 
 export namespace resolveActivationQuantityFx {

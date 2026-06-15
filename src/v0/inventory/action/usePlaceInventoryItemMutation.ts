@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { placeInventoryItemFx } from "~/v0/inventory/fx/placeInventoryItemFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
@@ -10,7 +11,12 @@ import { refreshBoardAndInventoryCaches } from "~/v0/play/cache/refreshBoardAndI
 export const usePlaceInventoryItemMutation = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<ActionResult.Type, unknown, placeInventoryItemFx.Props, CacheSnapshot.Type>({
+	return useMutation<
+		ActionResult.Type,
+		GameActionError,
+		placeInventoryItemFx.Props,
+		CacheSnapshot.Type
+	>({
 		mutationFn(input) {
 			return runGameFx({
 				effect: placeInventoryItemFx(input),

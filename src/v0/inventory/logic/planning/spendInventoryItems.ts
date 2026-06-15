@@ -1,9 +1,9 @@
 import { isEmptyInventoryStateJson } from "~/v0/inventory/logic/isEmptyInventoryStateJson";
-import type { UpgradeCostDefinition } from "~/v0/manifest/upgrade";
+import type { UpgradeCostDefinition } from "~/v0/manifest/upgrade/UpgradeCostDefinition";
 import { canSpendInventoryItems } from "./canSpendInventoryItems";
 import { groupQuantity } from "./groupQuantity";
 import type { InventorySpendPlan } from "./InventorySpendPlan";
-import type { InventoryRow } from "./types";
+import type { InventoryRow } from "~/v0/inventory/model/InventoryRow";
 
 export const spendInventoryItems = (
 	rows: InventoryRow[],

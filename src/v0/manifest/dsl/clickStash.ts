@@ -1,5 +1,5 @@
 import type { LootTableId } from "../manifestId";
-import type { StashDefinition } from "../producer";
+import type { StashDefinition } from "~/v0/manifest/activation/StashDefinition";
 
 export namespace clickStash {
 	export interface Props {

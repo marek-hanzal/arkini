@@ -1,4 +1,5 @@
-import type { UpgradeEffectDefinition, UpgradeTierDefinition } from "../upgrade";
+import type { UpgradeEffectDefinition } from "~/v0/manifest/upgrade/UpgradeEffectDefinition";
+import type { UpgradeTierDefinition } from "~/v0/manifest/upgrade/UpgradeTierDefinition";
 
 export namespace tier {
 	export interface Props {

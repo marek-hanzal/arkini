@@ -4,7 +4,9 @@ import { isEmptyInventoryStateJson } from "~/v0/inventory/logic/isEmptyInventory
 import type { GameConfigService } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { getPlanItem } from "./itemLookup";
-import type { InventoryPlacementPlan, InventoryRow, SaveShape } from "./types";
+import type { InventoryRow } from "~/v0/inventory/model/InventoryRow";
+import type { InventoryPlacementPlan } from "~/v0/placement/model/InventoryPlacementPlan";
+import type { SaveShape } from "~/v0/play/save/model/SaveShape";
 
 export function planEmptySlotPlacement(
 	save: SaveShape,

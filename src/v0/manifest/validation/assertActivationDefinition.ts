@@ -1,5 +1,5 @@
 import type { ItemId } from "../manifestId";
-import type { ActivationDefinition } from "../producer";
+import type { ActivationDefinition } from "~/v0/manifest/activation/ActivationDefinition";
 import { assert } from "./assert";
 
 export const assertActivationDefinition = (

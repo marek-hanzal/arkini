@@ -1,4 +1,4 @@
-import type { Quantity } from "../producer";
+import type { Quantity } from "~/v0/manifest/activation/Quantity";
 import { assert } from "./assert";
 
 export function assertQuantity(quantity: Quantity, label: string) {

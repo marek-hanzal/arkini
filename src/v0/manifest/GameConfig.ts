@@ -10,7 +10,7 @@ import type { ItemDefinition } from "./item";
 import type { LootTableDefinition } from "./lootTable";
 import type { ResourceDefinition } from "./resource";
 import type { GameStartingStateDefinition } from "./type/GameStartingStateDefinition";
-import type { UpgradeDefinition } from "./upgrade";
+import type { UpgradeDefinition } from "~/v0/manifest/upgrade/UpgradeDefinition";
 
 // One config owns the gameplay shape. The heavy data lives in focused definition
 // files, because one 3000-line god object is how codebases start wearing capes.

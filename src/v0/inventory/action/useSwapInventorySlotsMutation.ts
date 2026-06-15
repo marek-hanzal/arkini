@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { swapInventorySlotsFx } from "~/v0/inventory/fx/swapInventorySlotsFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
@@ -11,7 +12,12 @@ import { refreshInventoryViewCache } from "~/v0/inventory/cache/refreshInventory
 export const useSwapInventorySlotsMutation = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<ActionResult.Type, unknown, swapInventorySlotsFx.Props, CacheSnapshot.Type>({
+	return useMutation<
+		ActionResult.Type,
+		GameActionError,
+		swapInventorySlotsFx.Props,
+		CacheSnapshot.Type
+	>({
 		mutationFn(input) {
 			return runGameFx({
 				effect: swapInventorySlotsFx(input),

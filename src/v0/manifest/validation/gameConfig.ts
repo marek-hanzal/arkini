@@ -13,7 +13,7 @@ import type { GameConfig } from "../GameConfig";
 import { assert } from "./assert";
 import { assertUnique } from "./assertUnique";
 import { assertActivationOutput } from "./assertActivationOutput";
-import { assertProducerDefinition } from "./producer";
+import { assertProducerDefinition } from "./assertProducerDefinition";
 import { assertStartingState } from "./startingState";
 
 export function assertGameConfig(config: GameConfig) {

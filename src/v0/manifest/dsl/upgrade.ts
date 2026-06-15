@@ -1,5 +1,6 @@
 import type { UpgradeId } from "../manifestId";
-import type { UpgradeDefinition, UpgradeTierDefinition } from "../upgrade";
+import type { UpgradeDefinition } from "~/v0/manifest/upgrade/UpgradeDefinition";
+import type { UpgradeTierDefinition } from "~/v0/manifest/upgrade/UpgradeTierDefinition";
 
 export namespace upgrade {
 	export interface Props {

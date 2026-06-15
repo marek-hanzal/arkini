@@ -32,7 +32,9 @@ If installed libraries are not enough, explicitly consider whether a small focus
 - Prefer React Query as the owner for durable read references. Do not rebuild query-owned view data in root components unless the transformation is tiny and stable.
 - Any long-lived pointer, timer, animation, or drag handler must not capture volatile render objects directly. Use a local latest-ref pattern when runtime callbacks need fresh values without changing handler identity.
 - Use `Effect` for domain/persistence roots.
+- Effect dependency channels should be inferred by each Fx root. Do not write fake explicit dependency types or cast an Effect to `never`; if TypeScript complains, fix the source dependency, not the type witness.
 - Use Zod schemas with the `Schema.Type` namespace pattern.
 - One exported function/component/type/schema per file unless there is a strong local reason not to.
+- Standalone model/types belong in owner-domain files. Do not create mixed `types.ts` buckets that become shared trash cans with a nicer hat.
 - Do not create compatibility shims as a dumping ground. Prefer clean migration or deletion. The pre-v0 root runtime and `src/ancient` snapshot are gone; do not recreate them.
 - When finishing work, commit changes and produce a fresh zip including `.git` plus a SHA256 file.

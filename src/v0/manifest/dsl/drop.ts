@@ -1,5 +1,6 @@
 import type { ItemId } from "../manifestId";
-import type { ActivationWeightedEntry, Quantity } from "../producer";
+import type { ActivationWeightedEntry } from "~/v0/manifest/activation/ActivationWeightedEntry";
+import type { Quantity } from "~/v0/manifest/activation/Quantity";
 
 export namespace drop {
 	export interface Props {

@@ -6,7 +6,9 @@ import type { ItemId } from "~/v0/manifest/manifestId";
 import { assertInsideInventory } from "./inventoryBounds";
 import { planEmptySlotPlacement } from "./inventorySlot";
 import { planStackPlacement } from "./inventoryStack";
-import type { InventoryPlacementPlan, InventoryRow, SaveShape } from "./types";
+import type { InventoryRow } from "~/v0/inventory/model/InventoryRow";
+import type { InventoryPlacementPlan } from "~/v0/placement/model/InventoryPlacementPlan";
+import type { SaveShape } from "~/v0/play/save/model/SaveShape";
 
 export namespace planInventoryPlacement {
 	export interface Options {

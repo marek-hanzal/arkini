@@ -1,6 +1,6 @@
 import type { GameConfigService } from "~/v0/game/context/GameConfigServiceFx";
 import type { ItemId } from "~/v0/manifest/manifestId";
-import type { ProducerDefinition } from "~/v0/manifest/producer";
+import type { ProducerDefinition } from "~/v0/manifest/activation/ProducerDefinition";
 import type { OwnedUpgradeRow } from "~/v0/upgrade/logic/readOwnedUpgradeEffects";
 import { readOwnedUpgradeEffects } from "~/v0/upgrade/logic/readOwnedUpgradeEffects";
 

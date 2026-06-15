@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { GameActionError } from "~/v0/play/action/GameActionError";
 import { mergeBoardItemsFx } from "~/v0/board/fx/mergeBoardItemsFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
@@ -10,7 +11,12 @@ import { refreshBoardAndInventoryCaches } from "~/v0/play/cache/refreshBoardAndI
 export const useMergeBoardItemsMutation = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<ActionResult.Type, unknown, mergeBoardItemsFx.Props, CacheSnapshot.Type>({
+	return useMutation<
+		ActionResult.Type,
+		GameActionError,
+		mergeBoardItemsFx.Props,
+		CacheSnapshot.Type
+	>({
 		mutationFn(input) {
 			return runGameFx({
 				effect: mergeBoardItemsFx(input),

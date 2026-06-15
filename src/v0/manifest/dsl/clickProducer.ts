@@ -1,5 +1,5 @@
 import type { LootTableId } from "../manifestId";
-import type { ProducerDefinition } from "../producer";
+import type { ProducerDefinition } from "~/v0/manifest/activation/ProducerDefinition";
 
 export namespace clickProducer {
 	export interface Props {

@@ -1,5 +1,5 @@
 import type { ItemId, LootTableId } from "../manifestId";
-import type { UpgradeEffectDefinition } from "../upgrade";
+import type { UpgradeEffectDefinition } from "~/v0/manifest/upgrade/UpgradeEffectDefinition";
 
 export namespace setLootTable {
 	export interface Props {

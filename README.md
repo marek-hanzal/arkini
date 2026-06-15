@@ -37,6 +37,8 @@ There are no separate static `merges`, `producers`, and `craftRecipes` arrays. L
 
 Effect belongs to the server-like game backend, not the UI. React components, React Query hooks, drag surfaces, and Motion animation code stay normal UI code. React Query options and mutation hooks call domain-local Fx roots through `src/v0/fx/runGameFx.ts`.
 
+The runner provides the full game runtime service set at the boundary; individual Fx roots still infer their own context requirements from the services they yield. Do not patch dependency errors with explicit fake `R` types or `as Effect.Effect<..., never>` casts, because that is just type-system tax fraud.
+
 Active v0 effects live in the owning domain under `src/v0/**/fx/*Fx.ts`. Each root effect has one file, the exported constant name matches the file name, and inputs use a same-name namespace with `Props` when input exists. v0 uses explicit names such as `moveBoardItemFx`, `swapInventorySlotsFx`, `readBoardViewFx`, and `readDatabaseStatusFx`, because cache/action callsites should not need detective work or alias gymnastics just to know which domain is moving what.
 
 Effect roots own validation, typed gameplay failures, SQLite transactions, config/save bootstrap, read projections, activation output rolling, and save mutation pipelines. Files inside `src/v0/**/fx/` are reserved for root `Effect.fn(...)` operations and their private Fx-facing helpers. Pure deterministic helpers may remain pure when they are not an async/domain boundary, but any query/mutation backend operation should be an Fx root instead of a plain Promise helper wearing a fake mustache. UI feedback still happens from action results/hooks; effects do not know DOM nodes, Motion animation sequences, React state, or pointer events.
@@ -120,6 +122,8 @@ Components should stay boring: render props, wire callbacks, and shut up. If a c
 The active `src/v0` runtime should remain the template for new code. Do not add generic buckets such as `src/v0/shared`, `src/v0/query`, `src/v0/mutation`, or `src/v0/play/schema`. If something feels shared, name the owning domain first. If no domain owns it, the design is probably still mushy.
 
 Types and schemas live with the domain they describe: board schemas in `board/schema`, inventory schemas in `inventory/schema`, upgrade schemas in `upgrade/schema`, save schemas in `play/save`, manifest definition schemas in `manifest/*DefinitionSchema.ts`, and view schemas in the relevant domain `view` folder. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
+
+Standalone model files are preferred over mixed `types.ts` piles. Inventory planning rows, placement plans, activation definitions, upgrade definitions, and service contracts should live as one exported concept per file unless a file is intentionally a tiny namespace wrapper around the same concept.
 
 Centralized hooks are banned unless the domain is explicitly the runtime, such as `tile-engine`. A hook named after a broad concept like game/session/runtime is guilty until proven tiny. Prefer concrete action hooks, domain query options, and small components over one hook that returns a sack of callbacks like a cursed Santa.
 

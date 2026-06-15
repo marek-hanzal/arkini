@@ -1,5 +1,5 @@
 import type { ItemId } from "../manifestId";
-import type { UpgradeTierDefinition } from "../upgrade";
+import type { UpgradeTierDefinition } from "~/v0/manifest/upgrade/UpgradeTierDefinition";
 
 export namespace cost {
 	export interface Props {

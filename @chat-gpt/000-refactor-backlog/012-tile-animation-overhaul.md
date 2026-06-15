@@ -1,0 +1,148 @@
+# Overhaul tile animations through TileEngine
+
+Status: TODO
+Priority: CRITICAL
+
+## Goal
+
+Centralize real tile animations inside TileEngine. Outside layers may decide what happened and map game events into generic animation requests, but they must not physically animate board/inventory item actors themselves.
+
+The desired architecture is:
+
+intent -> command -> state change -> command visual events -> Arkini adapter maps to generic TileEngine animation requests -> TileEngine performs actor animations.
+
+Outside TileEngine can still animate non-tile UI affordances such as buttons, sheets, nav pulses, or cell feedback. It must not animate actual tile actors directly.
+
+## Reported symptoms
+
+- Animations feel inconsistent and scattered.
+- Some actors fly or settle from wrong rects.
+- Swap/move/drop animation behavior is mixed with drag state and external visual registries.
+- There is still too much room for board/inventory/play hooks to stage tile movement outside the engine.
+- The current architecture has improved, but animation ownership is not strict enough.
+
+## Current technical risk areas
+
+- `stageCommandVisualEvents` maps app-specific command visual events to external visual motion registry entries.
+- `useVisualItemMotions`/visual motion staging lives outside TileEngine and feeds `tile.motion` back into TileEngine actors.
+- TileEngine performs the actual Motion animation in `useTileEngineMotionAnimation`, but orchestration still partly lives outside.
+- `drag` still owns rejected-return animation through generic drag runtime. This may remain outside only if it is clearly modeled as interaction physics, or it should become a generic TileEngine return animation.
+- Some local helpers in `src/animation` are UI feedback helpers and should be classified so future work does not confuse them with tile actor animation.
+
+## Required design rules
+
+- TileEngine stays standalone.
+- TileEngine may accept generic animation requests through public API, props, or injected hooks.
+- Arkini-specific visual event mapping stays outside TileEngine.
+- TileEngine must be the only layer that mutates/transforms real board/inventory tile actor DOM.
+- Domain command results must stay semantic, not pixel-based.
+- Animation planning may use DOM rects outside TileEngine only to create generic requests; final execution belongs to TileEngine.
+- Avoid remount-driven animation. Actor key stability is mandatory.
+
+## Proposed work
+
+### 1. Define animation ownership taxonomy
+
+Document and enforce three categories:
+
+1. Tile actor animations: move, swap, merge, consume, spawn, feed, activation burst, craft claim. These belong to TileEngine execution.
+2. Interaction physics: active drag follow, rejected drop return, cancel recovery. Prefer TileEngine ownership; if kept in drag runtime, it must use generic TileEngine hooks and not Arkini-specific animation state.
+3. UI affordance animations: nav pulse, button bounce, cell highlight/error/success. These may stay outside TileEngine because they are not tile actor transforms.
+
+### 2. Create generic TileEngine animation request API
+
+Possible shape:
+
+- `TileEngineAnimationRequestSchema` or TS type only if schema is unnecessary.
+- request kinds:
+  - `actor.moveFromRect`,
+  - `actor.spawnFromRect`,
+  - `actor.consumeToRect`,
+  - `actor.swapWith`,
+  - `actor.pulse`,
+  - `actor.exit`,
+  - `actor.returnToOrigin`.
+- generic fields only:
+  - `actorId`,
+  - `fromRect`,
+  - `toActorId` or `toSlotId` if generic,
+  - `priority`,
+  - `transitionKind`,
+  - `nonce/groupId`,
+  - timing policy.
+
+No `itemId`, no `boardItemId`, no `inventorySlotIndex`, no `activation` inside TileEngine.
+
+### 3. Move execution registry into TileEngine
+
+Today the game-level visual motion registry stages entries and TileEngine consumes `tile.motion`. The stricter target should be:
+
+- TileEngine receives animation requests through a handle/prop/hook,
+- TileEngine stores transient animation registry internally,
+- TileEngine resolves actor lifecycle and settle callbacks,
+- parent only commits data/query state and passes stable actors/slots.
+
+The Arkini adapter may still compute rects and actor keys, but it should hand generic requests to TileEngine rather than storing motion state in play-level hooks.
+
+### 4. Rework command visual event adapter
+
+`stageCommandVisualEvents` should become a mapper from `CommandVisualEvent` to generic TileEngine animation requests.
+
+It should not stage game-level visual motions directly after this task.
+
+Expected mapping examples:
+
+- `item.moved` -> actor move request,
+- `item.swapped` -> two actor move requests or swap group,
+- `item.merged` -> consume source + pulse/spawn target,
+- `item.fed` -> consume source + pulse target,
+- `item.spawned` -> spawn actor from source rect,
+- `activation.activated` -> pulse/burst source actor,
+- `craft.claimed` -> transform/pulse actor.
+
+### 5. Remove or quarantine external tile animation helpers
+
+Audit and either remove, rename, or explicitly classify:
+
+- `useVisualItemMotions`,
+- `stageCommandVisualEvents`,
+- `commandVisualEventStageEntries`,
+- `actorVisualRect`,
+- `locationVisualRect`,
+- `locationVisualActorKey`,
+- `placeInventoryOnBoardWithFly`,
+- drag return animation utilities.
+
+If a helper remains outside TileEngine, its name/documentation must make clear that it maps Arkini semantics to generic engine requests, not that it performs tile animation.
+
+### 6. Animation settlement contract
+
+Define and enforce:
+
+- when request is staged,
+- when data invalidation/render happens,
+- when actor is hidden or shown,
+- when motion state settles,
+- how interrupted animations are canceled/replaced,
+- how resize/orientation/pointer cancel clears or recalculates animations.
+
+This must prevent ghost actors, stale hidden sources, duplicate actors, and post-invalidation teleporting.
+
+## Acceptance
+
+- TileEngine performs all real tile actor transforms.
+- Board/inventory/play hooks do not directly stage tile actor motion outside TileEngine.
+- `src/tile-engine` remains free of Arkini-specific imports.
+- Command visual events remain semantic and app-level.
+- Arkini adapter maps semantic events to generic TileEngine animation requests.
+- Move, swap, merge, feed, activation output spawn, inventory placement, and craft claim all animate through the same engine execution path.
+- Rejected drop return is either owned by TileEngine or explicitly documented as generic interaction physics with no Arkini-specific visual registry.
+- UI affordance animations outside TileEngine are explicitly allowed only for non-tile elements.
+- Typecheck and build pass.
+
+## Watchouts
+
+- Do not centralize animation by making TileEngine understand Arkini gameplay. That would just move the mess into a shinier basement.
+- Do not solve by hiding/remounting actors. Stable actor identity is the entire point.
+- Do not keep both old visual motion registry and new TileEngine request registry as parallel truths.
+- Do not overfit animation requests to current board/inventory layout. TileEngine should remain reusable.

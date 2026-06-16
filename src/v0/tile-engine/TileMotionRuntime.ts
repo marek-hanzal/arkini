@@ -53,11 +53,12 @@ export namespace TileMotionRuntime {
 }
 
 const activeMotions = new Map<string, TileMotionRuntime.ActiveMotion>();
+let motionSequence = 0;
 
 export const tileMotionScope = (tileId: TileEngine.Id) => `tile:${tileId}`;
 export const tilePresenceMotionScope = (tileId: TileEngine.Id) => `tile-presence:${tileId}`;
 
-const createMotionId = (scope: string) => `motion:${scope}:${Math.round(performance.now() * 100)}`;
+const createMotionId = (scope: string) => `motion:${scope}:${++motionSequence}`;
 
 const resolveValue = (
 	value: string | ((snapshot: TileVisualSnapshot.Type) => string),

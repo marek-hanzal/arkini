@@ -6,6 +6,8 @@ export namespace TilePresenceMotionMarker {
 	}
 }
 
+let presenceMotionSequence = 0;
+
 export const createTilePresenceMotionToken = ({
 	groupId,
 	kind,
@@ -15,7 +17,7 @@ export const createTilePresenceMotionToken = ({
 		kind,
 		tileId,
 		groupId ?? "ungrouped",
-		Math.round(performance.now() * 100),
+		++presenceMotionSequence,
 	].join(":");
 
 export const markTilePresenceMotion = (element: HTMLElement, token: string) => {

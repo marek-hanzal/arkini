@@ -142,6 +142,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}
 							onOpenItem={openItem}
+							disabled={Boolean(activeSheet)}
 							dragConstraintsRef={playAreaRef}
 						/>
 					</div>

@@ -142,6 +142,7 @@ export namespace TileEngine {
 		className?: string;
 		cellClassName?: string;
 		actorLayerClassName?: string;
+		disabled?: boolean;
 		layerRole?: LayerRole;
 		gapPx?: number;
 		drag?: DragConfig<TTile, TSlot, TDrag, TDrop>;

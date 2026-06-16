@@ -26,6 +26,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	className,
 	cellClassName,
 	actorLayerClassName,
+	disabled = false,
 	layerRole = "base",
 	gapPx = TileEngineTiming.defaultGapPx,
 	drag,
@@ -60,7 +61,12 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 		<div
 			data-ak-tile-engine-id={id}
 			data-ak-tile-engine-layer-role={layerRole}
-			className={cn("ak-tile-engine relative overflow-visible", className)}
+			data-ak-tile-engine-disabled={disabled ? "true" : undefined}
+			className={cn(
+				"ak-tile-engine relative overflow-visible",
+				disabled && "pointer-events-none",
+				className,
+			)}
 		>
 			<TileEngineSlots
 				columns={columns}
@@ -70,7 +76,8 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				activeDropId={activeDropId}
 				activeDropFeedback={activeDropFeedback}
 				cellClassName={cellClassName}
-				drag={drag}
+				disabled={disabled}
+				drag={disabled ? undefined : drag}
 				renderSlot={renderSlot}
 				registerDrop={drops.registerDrop}
 			/>
@@ -82,7 +89,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				rowCount={indexes.rowCount}
 				gapPx={gapPx}
 				actorLayerClassName={actorLayerClassName}
-				drag={drag}
+				drag={disabled ? undefined : drag}
 				dragConstraintsRef={dragConstraintsRef}
 				resolveDrop={drops.resolveDrop}
 				setActiveDropId={setActiveDropId}

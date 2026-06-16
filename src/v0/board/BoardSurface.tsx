@@ -17,7 +17,13 @@ const boardSlots = boardCells.map((cell) => ({
 })) satisfies readonly TileEngineType.Slot<BoardCellView>[];
 
 export const BoardSurface = memo(
-	({ feedback, feedbackFlags, onOpenItem, dragConstraintsRef }: BoardSurfaceType.Props) => {
+	({
+		feedback,
+		feedbackFlags,
+		onOpenItem,
+		disabled = false,
+		dragConstraintsRef,
+	}: BoardSurfaceType.Props) => {
 		const { drag, tiles } = useBoardTileEngineModel({
 			feedback,
 			onOpenItem,
@@ -48,6 +54,7 @@ export const BoardSurface = memo(
 				className="ak-layer-base-surface w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
 				actorLayerClassName="pointer-events-none"
 				layerRole="base"
+				disabled={disabled}
 				drag={drag}
 				dragConstraintsRef={dragConstraintsRef}
 				renderSlot={renderSlot}

@@ -1,6 +1,6 @@
 # Audit domain Effect boundaries
 
-Status: TODO
+Status: IN_PROGRESS
 
 ## Goal
 
@@ -11,6 +11,7 @@ Make sure domain logic lives in Effect-backed roots or small pure helpers, not i
 - Command routing uses Effect.
 - Many persistence/domain roots exist under feature `fx` folders.
 - Some hooks still coordinate too much behavior.
+- First slice moved board-item tap intent and inventory-slot tap intent from TileEngine adapter hooks into pure `logic/` helpers with tests.
 
 ## Audit checklist
 
@@ -30,3 +31,11 @@ Make sure domain logic lives in Effect-backed roots or small pure helpers, not i
 ## Watchouts
 
 - Do not create abstract factories just to feel clever. Future us has enough enemies.
+
+## 2026-06-16 slice
+
+- Added `resolveBoardItemTapAction` so board tap policy chooses `claim-craft`, `activate`, or `none` outside `useBoardTileEngineModel`.
+- Added `resolveInventorySlotTapAction` so inventory double-tap policy chooses board placement or inventory-slot feedback outside `useInventoryTileEngineModel`.
+- Added focused tests for both helpers.
+
+Remaining audit should look for larger hook-side orchestration, especially mutation hooks that mix domain follow-up decisions with UI/cache concerns.

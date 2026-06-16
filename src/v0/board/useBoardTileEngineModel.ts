@@ -8,7 +8,7 @@ import { useSwapBoardItemsMutation } from "~/v0/board/action/useSwapBoardItemsMu
 import type { BoardCellView } from "~/v0/board/boardCells";
 import { cellKey } from "~/v0/board/cellKey";
 import { resolveBoardDropFeedback } from "~/v0/board/drop/resolveBoardDropFeedback";
-import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
+import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
@@ -108,22 +108,24 @@ export const useBoardTileEngineModel = ({
 
 	const activateBoardItem = useCallback(
 		(boardItem: BoardViewItem) => {
-			const liveCraft = readLiveCraftView({
-				craft: boardItem.craft,
+			const action = resolveBoardItemTapAction({
+				boardItem,
 				nowMs: Date.now(),
 			});
-			if (liveCraft?.complete) {
+
+			if (action.type === "claim-craft") {
 				claimCraftMutation.mutate({
-					boardItemId: boardItem.id,
+					boardItemId: action.boardItemId,
 				});
 				return;
 			}
 
-			if (!boardItem.activation) return;
-			activateBoardItemMutation.mutate({
-				boardItemId: boardItem.id,
-				activation: boardItem.activation.kind === "stash" ? "exhaust" : "single",
-			});
+			if (action.type === "activate") {
+				activateBoardItemMutation.mutate({
+					boardItemId: action.boardItemId,
+					activation: action.activation,
+				});
+			}
 		},
 		[
 			activateBoardItemMutation.mutate,

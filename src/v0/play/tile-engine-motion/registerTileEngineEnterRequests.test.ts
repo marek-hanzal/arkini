@@ -4,10 +4,7 @@ import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { registerTileEngineEnterRequests } from "~/v0/play/tile-engine-motion/registerTileEngineEnterRequests";
-import {
-	clearTileEngineMotionRequests,
-	readTileEngineMotionRequests,
-} from "~/v0/tile-engine/TileEngineMotionRequestStore";
+import { clearTileEngineMotionRequests, readTileEngineMotionRequests } from "~/v0/tile-engine";
 
 afterEach(() => {
 	clearTileEngineMotionRequests();

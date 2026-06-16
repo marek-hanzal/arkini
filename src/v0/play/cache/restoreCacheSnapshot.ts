@@ -3,7 +3,7 @@ import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
 import { boardQueryKeys } from "~/v0/board/query/boardQueryKeys";
 import { removeBoardTransientTilesByGroup } from "~/v0/board/animation/BoardTransientTileStore";
 import { inventoryQueryKeys } from "~/v0/inventory/query/inventoryQueryKeys";
-import { clearTileEngineMotionRequestsByGroup } from "~/v0/tile-engine/TileEngineMotionRequestStore";
+import { clearTileEngineMotionRequestsByGroup } from "~/v0/tile-engine";
 
 export namespace restoreCacheSnapshot {
 	export interface Props {

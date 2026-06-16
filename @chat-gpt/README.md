@@ -25,6 +25,7 @@ Drag/drop hover feedback is also owned by `TileEngine`. Concrete adapters may ma
 These are now enforced by `npm run dc` through dependency-cruiser where possible:
 
 - `src/v0/tile-engine` must not import Arkini domains such as board, inventory, play, manifest, item, activation, database, craft, upgrade or game.
+- Code outside `src/v0/tile-engine` must import TileEngine through the public `~/v0/tile-engine` barrel, not deep implementation files.
 - `src/v0/manifest` must not import runtime/UI/persistence domains.
 - domain `fx/` roots must not import React or React Query.
 - production code must not import tests.
@@ -180,8 +181,8 @@ Presence motion CSS must use an attribute-presence selector (`[data-ak-tile-engi
 
 Presence motion cleanup order matters: cancel the scoped presence motion first, then clear the marker token. The marker suppresses CSS transitions, so freeze/cancel must run while the marker still protects the visual element. Drop motion timeline IDs should also be monotonic counters, not timestamp guesses.
 
-TileEngine `enter` metadata in board/inventory query cache is temporary handoff data. `scheduleTileEngineMotionCleanup` must clear it after the presence duration plus `TileEngineTiming.motionCleanupBufferMs`, guarded by animation `groupId`. Do not leave stale `motion.enter` on cache rows; remounting a sheet/surface with stale enter metadata can replay old fade/spawn animations and make everyone blame Safari for a crime committed by our own cache.
+TileEngine presence handoff is no longer stored on board/inventory React Query rows. Arkini adapters register exact generic motion requests in `TileEngineMotionRequestStore` through the public `~/v0/tile-engine` barrel, keyed by `engineId` and `tileId`. Do not reintroduce temporary `motion.enter` data on cache rows; cache is durable view state, while presence animation requests belong to the TileEngine registry. Exact request settlement is owner-guarded so a sequenced producer output cannot let the first cleanup evict younger requests from the same `groupId`.
 
 ### Shared TileEngine motion settlement timing
 
-Temporary TileEngine motion handoffs must use `actionVisualMotionSettlementDelayMs(animation)` for cleanup windows. It includes `delayMs`, `durationMs` and `TileEngineTiming.motionCleanupBufferMs`. Do not hand-roll `duration + buffer` near cache cleanup or transient render actors; delayed sequence/presence motions will eventually make that shortcut look clever for about six minutes and broken forever after.
+Temporary TileEngine motion request cleanup must use `actionVisualMotionSettlementDelayMs(animation)`. It includes `delayMs`, `durationMs` and `TileEngineTiming.motionCleanupBufferMs`. Do not hand-roll `duration + buffer` near presence request registration or transient render actors; delayed sequence/presence motions will eventually make that shortcut look clever for about six minutes and broken forever after.

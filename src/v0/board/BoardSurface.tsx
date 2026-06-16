@@ -8,8 +8,8 @@ import { renderBoardTile } from "~/v0/board/renderBoardTile";
 import { useBoardTileEngineModel } from "~/v0/board/useBoardTileEngineModel";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
-import { TileEngine } from "~/v0/tile-engine/TileEngine";
-import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.types";
+import { TileEngine } from "~/v0/tile-engine";
+import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 
 const boardSlots = boardCells.map((cell) => ({
 	id: cell.key,

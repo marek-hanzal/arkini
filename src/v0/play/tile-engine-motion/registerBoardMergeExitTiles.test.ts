@@ -8,10 +8,7 @@ import {
 	readBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
 import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
-import {
-	clearTileEngineMotionRequests,
-	readTileEngineMotionRequests,
-} from "~/v0/tile-engine/TileEngineMotionRequestStore";
+import { clearTileEngineMotionRequests, readTileEngineMotionRequests } from "~/v0/tile-engine";
 
 const boardView = () =>
 	rebuildBoardView([

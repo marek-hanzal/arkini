@@ -1,5 +1,5 @@
 import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
-import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
+import type { TileEnterMotionSchema } from "~/v0/tile-engine";
 
 export namespace toTileEngineEnterMotion {
 	export interface Options {

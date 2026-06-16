@@ -1,5 +1,5 @@
 import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
-import type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema";
+import type { TileExitMotionSchema } from "~/v0/tile-engine";
 
 export const toTileEngineExitMotion = (
 	animation: ActionVisualAnimationSchema.Type,

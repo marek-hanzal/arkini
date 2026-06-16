@@ -16,7 +16,7 @@ import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
-import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useInventoryTileEngineModel {
 	export interface Props {

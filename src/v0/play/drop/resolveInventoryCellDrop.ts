@@ -3,7 +3,7 @@ import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
-import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 import { acceptDrop } from "~/v0/play/drop/acceptDrop";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { rejectDrop } from "~/v0/play/drop/rejectDrop";

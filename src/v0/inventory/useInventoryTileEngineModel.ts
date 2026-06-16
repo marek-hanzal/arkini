@@ -6,6 +6,7 @@ import { useSwapBoardItemsMutation } from "~/v0/board/action/useSwapBoardItemsMu
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import { usePlaceInventoryItemMutation } from "~/v0/inventory/action/usePlaceInventoryItemMutation";
 import { resolveInventoryDropFeedback } from "~/v0/inventory/drop/resolveInventoryDropFeedback";
+import { resolveInventorySlotTapAction } from "~/v0/inventory/logic/resolveInventorySlotTapAction";
 import { useStashBoardItemMutation } from "~/v0/inventory/action/useStashBoardItemMutation";
 import { useSwapInventorySlotsMutation } from "~/v0/inventory/action/useSwapInventorySlotsMutation";
 import type { InventorySurface } from "~/v0/inventory/InventorySurface.types";
@@ -91,16 +92,20 @@ export const useInventoryTileEngineModel = ({
 
 	const placeInventoryOnBoard = useCallback(
 		(slot: InventorySlot) => {
-			const target = board.firstEmptyCell;
-			if (!slot.stack || !target) {
-				feedback.flashInventorySlot(slot.slotIndex);
+			const action = resolveInventorySlotTapAction({
+				firstEmptyCell: board.firstEmptyCell,
+				slot,
+			});
+
+			if (action.type === "flash-inventory-slot") {
+				feedback.flashInventorySlot(action.slotIndex);
 				return;
 			}
 
 			placeInventoryItemMutation.mutate({
-				slotIndex: slot.slotIndex,
-				x: target.x,
-				y: target.y,
+				slotIndex: action.slotIndex,
+				x: action.x,
+				y: action.y,
 			});
 		},
 		[

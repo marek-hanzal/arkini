@@ -5,6 +5,7 @@ import { useMoveBoardItemMutation } from "~/v0/board/action/useMoveBoardItemMuta
 import { useSwapBoardItemsMutation } from "~/v0/board/action/useSwapBoardItemsMutation";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import { usePlaceInventoryItemMutation } from "~/v0/inventory/action/usePlaceInventoryItemMutation";
+import { resolveInventoryDropFeedback } from "~/v0/inventory/drop/resolveInventoryDropFeedback";
 import { useStashBoardItemMutation } from "~/v0/inventory/action/useStashBoardItemMutation";
 import { useSwapInventorySlotsMutation } from "~/v0/inventory/action/useSwapInventorySlotsMutation";
 import type { InventorySurface } from "~/v0/inventory/InventorySurface.types";
@@ -148,6 +149,11 @@ export const useInventoryTileEngineModel = ({
 						slotIndex: slot.data.slotIndex,
 					},
 				};
+			},
+			dropFeedback(context) {
+				return resolveInventoryDropFeedback({
+					context,
+				});
 			},
 			onDrop(context) {
 				return resolveDrop({

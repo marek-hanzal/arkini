@@ -1,0 +1,94 @@
+import { describe, expect, it } from "vitest";
+import { resolveInventoryDropFeedback } from "~/v0/inventory/drop/resolveInventoryDropFeedback";
+import type { InventorySurface } from "~/v0/inventory/InventorySurface.types";
+import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
+import type { DragSource } from "~/v0/play/drag/DragSource";
+import type { DropTarget } from "~/v0/play/drag/DropTarget";
+import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+
+const source = {
+	kind: "inventory",
+	slotIndex: 0,
+	itemId: "item:twig",
+	slot: {
+		slotIndex: 0,
+		stack: {
+			id: "stack:source",
+			itemId: "item:twig",
+			quantity: 1,
+			state: {},
+			stateJson: "{}",
+			stateful: false,
+		},
+	},
+} satisfies DragSource;
+
+const createContext = ({
+	targetSlotIndex,
+	targetTile,
+}: {
+	targetSlotIndex: number;
+	targetTile?: TileEngine.Tile<InventorySurface.TileData> | null;
+}): TileEngine.DragOverContext<
+	InventorySurface.TileData,
+	InventorySlot,
+	DragSource,
+	DropTarget
+> => ({
+	source,
+	target: {
+		kind: "inventory-slot",
+		slotIndex: targetSlotIndex,
+	},
+	targetSlot: {
+		id: String(targetSlotIndex),
+		data: {
+			slotIndex: targetSlotIndex,
+		},
+	},
+	targetTile: targetTile ?? null,
+	dropId: `inventory-slot:${targetSlotIndex}`,
+});
+
+describe("resolveInventoryDropFeedback", () => {
+	it("returns no feedback for the source slot", () => {
+		expect(
+			resolveInventoryDropFeedback({
+				context: createContext({
+					targetSlotIndex: 0,
+				}),
+			}),
+		).toBeNull();
+	});
+
+	it("returns empty feedback for empty inventory targets", () => {
+		expect(
+			resolveInventoryDropFeedback({
+				context: createContext({
+					targetSlotIndex: 1,
+				}),
+			}),
+		).toEqual({
+			effect: "empty",
+		});
+	});
+
+	it("returns blocked feedback for occupied inventory swap targets", () => {
+		expect(
+			resolveInventoryDropFeedback({
+				context: createContext({
+					targetSlotIndex: 1,
+					targetTile: {
+						id: "stack:target",
+						slotId: "1",
+						data: {
+							slotIndex: 1,
+						},
+					},
+				}),
+			}),
+		).toEqual({
+			effect: "blocked",
+		});
+	});
+});

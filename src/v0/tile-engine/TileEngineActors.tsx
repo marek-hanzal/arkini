@@ -44,7 +44,12 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	consumeHandoff,
 	renderTile,
 }: TileEngineActors.Props<TTile, TSlot, TDrag, TDrop>) => (
-	<div className={cn("pointer-events-none absolute inset-0", itemLayerClassName)}>
+	<div
+		className={cn(
+			"ak-tile-engine-actors pointer-events-none absolute inset-0",
+			itemLayerClassName,
+		)}
+	>
 		{tiles.map((tile) => {
 			const index = slotIndexById.get(tile.slotId);
 			if (index === undefined) return null;

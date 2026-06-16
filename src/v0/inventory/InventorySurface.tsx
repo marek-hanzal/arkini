@@ -49,6 +49,7 @@ export const InventorySurface = memo(
 						tiles={tiles}
 						gapPx={1}
 						className="ak-game-width mx-auto border-l border-t border-slate-800"
+						layerContext="sheet"
 						itemLayerClassName="pointer-events-none"
 						drag={drag}
 						renderSlot={renderSlot}

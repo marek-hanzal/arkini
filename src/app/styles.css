@@ -28,6 +28,69 @@ button {
 	touch-action: manipulation;
 }
 
+:root {
+	--ak-bottom-nav-height: calc(5.4rem + env(safe-area-inset-bottom));
+	--ak-sheet-width: 100dvw;
+	--ak-sheet-max-height: 85dvh;
+
+	/* Global layer ladder. Do not use raw z-index values outside these variables. */
+	--ak-layer-board: 0;
+	--ak-layer-board-item: 10;
+	--ak-layer-board-drag-item: 20;
+	--ak-layer-bottom-nav: 30;
+	--ak-layer-toast: 40;
+	--ak-layer-sheet: 50;
+	--ak-layer-sheet-backdrop: 0;
+	--ak-layer-sheet-panel: 10;
+	--ak-layer-sheet-item: 0;
+	--ak-layer-sheet-drag-item: 20;
+
+	--ak-tile-engine-slot-layer: 0;
+	--ak-tile-engine-slot-feedback-layer: 1;
+	--ak-tile-engine-item-layer: var(--ak-layer-board-item);
+	--ak-tile-engine-drag-item-layer: var(--ak-layer-board-drag-item);
+}
+
+.ak-layer-board {
+	position: relative;
+	z-index: var(--ak-layer-board);
+}
+
+.ak-layer-bottom-nav {
+	z-index: var(--ak-layer-bottom-nav);
+}
+
+.ak-layer-toast {
+	z-index: var(--ak-layer-toast);
+}
+
+.ak-tile-engine {
+	--ak-tile-engine-item-layer: var(--ak-layer-board-item);
+	--ak-tile-engine-drag-item-layer: var(--ak-layer-board-drag-item);
+}
+
+.ak-tile-engine[data-ak-tile-engine-layer="sheet"] {
+	--ak-tile-engine-item-layer: var(--ak-layer-sheet-item);
+	--ak-tile-engine-drag-item-layer: var(--ak-layer-sheet-drag-item);
+}
+
+.ak-tile-engine-slots {
+	position: relative;
+	z-index: var(--ak-tile-engine-slot-layer);
+}
+
+.ak-tile-engine-actors {
+	z-index: var(--ak-tile-engine-item-layer);
+}
+
+.ak-tile-engine-actor {
+	z-index: var(--ak-tile-engine-item-layer);
+}
+
+.ak-tile-engine-actor[data-ak-tile-engine-dragging="true"] {
+	z-index: var(--ak-tile-engine-drag-item-layer);
+}
+
 .ak-tile-engine-slot {
 	position: relative;
 }
@@ -35,7 +98,7 @@ button {
 .ak-tile-engine-slot::after {
 	position: absolute;
 	inset: 0.16rem;
-	z-index: 3;
+	z-index: var(--ak-tile-engine-slot-feedback-layer);
 	border-radius: 0.42rem;
 	background: transparent;
 	box-shadow: none;
@@ -154,23 +217,17 @@ button {
 	pointer-events: none;
 }
 
-:root {
-	--ak-bottom-nav-height: calc(5.4rem + env(safe-area-inset-bottom));
-	--ak-sheet-width: 100dvw;
-	--ak-sheet-max-height: 85dvh;
-}
-
 .ak-bottom-sheet {
 	position: fixed;
 	inset: 0;
-	z-index: 90;
+	z-index: var(--ak-layer-sheet);
 	pointer-events: none;
 }
 
 .ak-bottom-sheet-backdrop {
 	position: absolute;
 	inset: 0;
-	z-index: 0;
+	z-index: var(--ak-layer-sheet-backdrop);
 	display: block;
 	width: auto;
 	height: auto;
@@ -185,7 +242,7 @@ button {
 .ak-bottom-sheet-panel {
 	position: absolute;
 	inset-inline: 0;
-	z-index: 1;
+	z-index: var(--ak-layer-sheet-panel);
 	bottom: 0;
 	display: flex;
 	width: var(--ak-sheet-width);
@@ -222,7 +279,6 @@ button {
 
 .ak-bottom-nav {
 	position: absolute;
-	z-index: 40;
 	inset-inline: 0;
 	bottom: 0;
 	height: var(--ak-bottom-nav-height);

@@ -32,7 +32,7 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 }: TileEngineSlots.Props<TTile, TSlot, TDrop>) => (
 	<div
 		data-ak-tile-engine-slots=""
-		className="grid h-full w-full"
+		className="ak-tile-engine-slots grid h-full w-full"
 		style={{
 			gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
 			gap: gapPx,

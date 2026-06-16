@@ -67,6 +67,7 @@ const readComputedMotion = (element: HTMLElement, pseudoElement?: string) => {
 	const style = window.getComputedStyle(element, pseudoElement);
 
 	return {
+		zIndex: style.zIndex,
 		transform: style.transform,
 		transitionProperty: style.transitionProperty,
 		transitionDuration: style.transitionDuration,
@@ -91,10 +92,17 @@ const readElementMotionSnapshot = (element: HTMLElement) => ({
 });
 
 const readTileEngineDom = () =>
-	Array.from(document.querySelectorAll<HTMLElement>("[data-ak-tile-engine-id]")).map(
-		(engine) => ({
+	Array.from(document.querySelectorAll<HTMLElement>("[data-ak-tile-engine-id]")).map((engine) => {
+		const engineStyle = window.getComputedStyle(engine);
+
+		return {
 			id: engine.dataset.akTileEngineId,
+			layer: engine.dataset.akTileEngineLayer,
 			className: engine.className,
+			layerVars: {
+				item: engineStyle.getPropertyValue("--ak-tile-engine-item-layer").trim(),
+				dragItem: engineStyle.getPropertyValue("--ak-tile-engine-drag-item-layer").trim(),
+			},
 			actors: Array.from(
 				engine.querySelectorAll<HTMLElement>("[data-ak-tile-engine-tile-id]"),
 			).map((actor) => {
@@ -127,8 +135,8 @@ const readTileEngineDom = () =>
 				computed: readComputedMotion(slot),
 				after: readComputedMotion(slot, "::after"),
 			})),
-		}),
-	);
+		};
+	});
 
 const readQueryState = (queryClient: QueryClient | undefined) => {
 	if (!queryClient) {

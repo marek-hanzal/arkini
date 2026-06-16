@@ -18,7 +18,7 @@ The active runtime has four layers:
 
 `TileEngine` is generic tile interaction infrastructure: pointer lifecycle, hit testing, drop target geometry, snap/rollback, handoff and tile motion. It must not know Arkini game rules. Game-specific drop policy belongs in `src/v0/play/drop`; board/inventory adapter wiring belongs in concrete hooks such as `useBoardTileEngineModel` and `useInventoryTileEngineModel`.
 
-Drag/drop hover feedback is also owned by `TileEngine`. Concrete adapters may map their domain state to generic effects (`empty`, `merge`, `blocked`) through `drag.dropFeedback`, but slot background highlighting, target tile scale feedback and dragged tile spring feedback belong in the engine layer. Do not style board cells directly for hover feedback unless the behavior is truly board-specific.
+Drag/drop hover feedback is also owned by `TileEngine`. Concrete adapters may map their domain state to generic effects (`empty`, `merge`, `blocked`) through `drag.dropFeedback`, but slot background highlighting, target tile scale feedback and dragged tile visual feedback belong in the engine layer. Do not style board cells directly for hover feedback unless the behavior is truly board-specific.
 
 ## Hard boundaries
 
@@ -68,6 +68,18 @@ npm run check
 
 Arkini uses npm without a committed lockfile. Do not add `package-lock.json`, `bun.lockb`, or similar unless the dependency policy changes deliberately.
 
+
+## Layer system
+
+Z-index is global infrastructure, not a local styling snack. All stack order must go through the CSS variables in `src/app/styles.css`:
+
+- board/passive tile actors use `--ak-layer-board-item`.
+- board dragging uses `--ak-layer-board-drag-item`.
+- bottom nav and toast have named app layers.
+- sheet root uses `--ak-layer-sheet`; backdrop/panel are only relative inside that sheet.
+- inventory/sheet TileEngine instances set `layerContext="sheet"`, so passive sheet tiles use `--ak-layer-sheet-item` and dragged sheet tiles use `--ak-layer-sheet-drag-item`.
+
+Do not add Tailwind `z-*`, inline `zIndex`, or raw `z-index: 123` declarations. `src/v0/layer/layerSystem.test.ts` exists specifically to slap that hand away. If a new surface needs layering, define or reuse a named layer variable and connect it through the relevant component data/class, not through a one-off number. Yes, even if the number feels “obvious”; that is how z-index archaeology begins.
 
 ## Animation contract
 

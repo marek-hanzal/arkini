@@ -95,8 +95,8 @@ export const useTileActorExitMotion = ({
 		});
 
 		return () => {
-			clearPresenceMotion();
 			cancelTileMotion(scope, "presence-exit-cleanup");
+			clearPresenceMotion();
 		};
 	}, [
 		actorRef,

@@ -147,8 +147,8 @@ export const useTileActorEnterMotion = ({
 		});
 
 		return () => {
-			clearPresenceMotion();
 			cancelTileMotion(scope, "presence-enter-cleanup");
+			clearPresenceMotion();
 		};
 	}, [
 		actorRef,

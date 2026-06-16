@@ -191,3 +191,8 @@ Keep task 012 open. The remaining larger step is a real TileEngine animation req
 ## 2026-06-16 presence marker selector note
 
 - Presence marker CSS now matches any `data-ak-tile-engine-presence-motion` value instead of only `"true"`. The marker became a unique owner token, so the old equality selector silently stopped disabling CSS transitions during WAAPI enter/exit animations. Yes, the bug was one CSS selector cosplaying as architecture.
+
+## 2026-06-16 presence cleanup ordering note
+
+- Enter/exit cleanup now cancels the TileEngine presence motion before clearing the presence marker. The marker disables visual CSS transitions, so cancellation/freeze must happen while the marker still owns the element; clearing first lets CSS transitions wake up during cleanup like a tiny sabotage intern.
+- Drop motion debug IDs now use a monotonic sequence too. They are only timeline metadata, but timestamp-ish IDs invite false correlations when debugging parallel swap/merge reports.

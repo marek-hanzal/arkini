@@ -15,14 +15,13 @@ Add enough safety checks and runtime traces to stop future refactors from silent
 - The Dev Sheet has deterministic scenario buttons for animation bug reports, and dev builds expose `window.__ARKINI_SCENARIO__.list/load`.
 - Zod schemas validate many view/config shapes.
 - Manifest validation now has focused Vitest coverage for shipped config sanity plus item, asset, loot table, activation input/requirement, craft recipe and upgrade reference failures.
+- Domain planning coverage now guards activation placement overflow, virtual inventory planning, activation requirement/input semantics and craft progress completion math.
 
 ## Remaining proposed work
 
-- Add focused tests for domain action results:
-  - activation with insufficient placement
-  - craft claim with no output space
-  - requirement present but non-consumed
-  - input consumed only after successful output plan
+- Add focused tests for remaining domain action results once an in-memory/effect DB test harness exists:
+  - full activate action transaction failure does not consume stored inputs after output placement failure
+  - full craft claim transaction behavior around stored input deletion and board item replacement
 - Expand debug timeline only when a bug report needs more data. Prefer structured JSON events over a visual overlay until geometry itself becomes impossible to report.
 - Add more scenario fixtures as real animation bugs appear; keep them deterministic and tiny.
 

@@ -17,11 +17,10 @@ export const InventorySurface = memo(
 			feedback,
 		});
 		const renderSlot = useCallback(
-			({ slot, isOver }: TileEngineType.RenderSlotProps<InventorySlot>): ReactNode => (
+			({ slot }: TileEngineType.RenderSlotProps<InventorySlot>): ReactNode => (
 				<InventoryCell
 					slotIndex={slot.data.slotIndex}
 					invalid={feedbackFlags.has(`inventory:error:${slot.data.slotIndex}`)}
-					isOver={isOver}
 				/>
 			),
 			[

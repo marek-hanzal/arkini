@@ -86,6 +86,7 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 	const handlePointerDown = useTilePointerDown({
 		actorRef,
 		bindingRef,
+		tileRef,
 		disabledRef,
 		dragConstraintsRef,
 		dragSessionRef,

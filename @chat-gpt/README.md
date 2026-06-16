@@ -171,3 +171,5 @@ Tile actor travel and presence timings are intentionally a little slower than th
 Merge success should stay subtle: result `merge-in` scales from roughly `0.9` to `1`, and old inputs `merge-out` scale only slightly down. Avoid giant `0.72 -> 1` scale pops for normal item tiles; they look dramatic on desktop and crunchy on iOS.
 
 Presence motion ownership is tokenized. Never clear `data-ak-tile-engine-presence-motion` blindly from an async continuation; only the motion token that set the marker may clear it. Replaced/cancelled motions resolving late must not re-enable CSS transitions while a newer WAAPI enter/exit animation is still running. This tiny race is exactly how a perfectly innocent merge fade becomes chunky on iOS and makes everyone question their career choices.
+
+User drag owns the outer actor transform as soon as pointer down starts. Cancel only `tileMotionScope(tile.id)` before resetting that actor transform; do not blanket-cancel descendant presence motions from pointer down, because the inner visual may be mid fade/pop and freezing that opacity is a different stupid bug wearing sunglasses.

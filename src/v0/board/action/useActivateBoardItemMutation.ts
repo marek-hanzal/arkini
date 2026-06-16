@@ -8,14 +8,12 @@ import type { ActionResult } from "~/v0/play/action/ActionResult";
 import { runGameFx } from "~/v0/fx/runGameFx";
 import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 import { refreshBoardViewCache } from "~/v0/board/cache/refreshBoardViewCache";
-import { sequenceCompletionDelayMs } from "~/v0/play/cache/sequenceSpawnVisualEvents";
+import { resolveActivationDepletionFollowUp } from "~/v0/play/action/resolveActivationDepletionFollowUp";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 
 export type ActivateBoardItemResult = ActionResult.Type & {
 	activation?: ActivationResultSchema.Type;
 };
-
-const depleteAfterAnimationBufferMs = 40;
 
 export namespace useActivateBoardItemMutation {
 	export interface Props {
@@ -58,22 +56,21 @@ export const useActivateBoardItemMutation = ({
 				result,
 			});
 
-			if (!result.activation?.depletion) return;
+			const followUp = resolveActivationDepletionFollowUp({
+				activation: result.activation,
+				visualEvents: result.visualEvents,
+			});
+			if (!followUp) return;
 
-			const delayMs =
-				sequenceCompletionDelayMs(result.visualEvents) + depleteAfterAnimationBufferMs;
 			globalThis.setTimeout(() => {
 				recordActionMutation({
 					action: "activateBoardItem",
 					phase: "side-effect.start",
-					detail: {
-						boardItemId: result.activation?.activationBoardItemId,
-						delayMs,
-					},
+					detail: followUp,
 				});
 				void runGameFx({
 					effect: depleteActivationByItemIdFx({
-						boardItemId: result.activation!.activationBoardItemId,
+						boardItemId: followUp.boardItemId,
 					}),
 				})
 					.then((depletion) => {
@@ -93,7 +90,7 @@ export const useActivateBoardItemMutation = ({
 							detail: error,
 						});
 					});
-			}, delayMs);
+			}, followUp.delayMs);
 		},
 	});
 };

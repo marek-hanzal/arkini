@@ -1,7 +1,4 @@
-import { match } from "ts-pattern";
-import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
-import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
@@ -10,6 +7,7 @@ import { acceptDrop } from "~/v0/play/drop/acceptDrop";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { ignoreDrop } from "~/v0/play/drop/ignoreDrop";
 import { rejectDrop } from "~/v0/play/drop/rejectDrop";
+import { resolveBoardCellDropAction } from "~/v0/play/drop/resolveBoardCellDropAction";
 
 export namespace resolveBoardCellDrop {
 	export interface Props {
@@ -32,90 +30,46 @@ export namespace resolveBoardCellDrop {
 }
 
 export const resolveBoardCellDrop = ({
-	source,
-	target,
+	actions,
 	board,
 	feedback,
-	actions,
+	source,
+	target,
 }: resolveBoardCellDrop.Props): TileEngine.DropOutcome => {
-	if (target.boardItemId === source.boardItemId) return ignoreDrop();
-
-	if (!target.boardItemId) {
-		return acceptDrop(() =>
-			actions.moveBoardItem({
-				boardItemId: source.boardItemId,
-				x: target.x,
-				y: target.y,
-			}),
-		);
-	}
-
-	const targetItem = board.byId[target.boardItemId];
-	if (!targetItem) {
-		return rejectDrop(() => feedback.flashBoardCell(cellKey(target.x, target.y)));
-	}
-
-	const intent = resolveDropIntent({
-		sourceItemId: source.itemId,
-		targetItem,
+	const action = resolveBoardCellDropAction({
+		board,
+		source,
+		target,
 	});
 
-	return match(intent)
-		.with(
-			{
-				type: "reject",
-			},
-			() => rejectDrop(() => feedback.flashBoardCell(cellKey(target.x, target.y))),
-		)
-		.with(
-			{
-				type: "swap",
-			},
-			() =>
-				acceptDrop(
-					() =>
-						actions.swapBoardItems({
-							sourceBoardItemId: source.boardItemId,
-							targetBoardItemId: targetItem.id,
-						}),
-					{
-						animation: "parallel-swap",
-					},
-				),
-		)
-		.with(
-			{
-				type: "merge",
-			},
-			(merge) =>
-				acceptDrop(
-					async () => {
-						await actions.mergeBoardItems({
-							sourceBoardItemId: source.boardItemId,
-							targetBoardItemId: targetItem.id,
-						});
-						if (merge.directed) feedback.pulseImprintCell(cellKey(target.x, target.y));
-						else feedback.pulseMergeCell(cellKey(target.x, target.y));
-					},
-					{
-						animation: "parallel-merge",
-					},
-				),
-		)
-		.with(
-			{
-				type: "craft-input",
-			},
-			{
-				type: "producer-input",
-			},
-			() =>
-				acceptDrop(() =>
-					actions.mergeBoardItems({
-						sourceBoardItemId: source.boardItemId,
-						targetBoardItemId: targetItem.id,
-					}),
-				),
-		)
-		.exhaustive();
+	if (action.type === "ignore") return ignoreDrop();
+
+	if (action.type === "reject") {
+		return rejectDrop(() => feedback.flashBoardCell(action.feedback.cellKey));
+	}
+
+	if (action.type === "move-board-item") {
+		return acceptDrop(() => actions.moveBoardItem(action.input));
+	}
+
+	if (action.type === "swap-board-items") {
+		return acceptDrop(() => actions.swapBoardItems(action.input), {
+			animation: action.animation,
+		});
+	}
+
+	return acceptDrop(
+		async () => {
+			await actions.mergeBoardItems(action.input);
+			if (action.feedback?.kind === "imprint-cell") {
+				feedback.pulseImprintCell(action.feedback.cellKey);
+			}
+			if (action.feedback?.kind === "merge-cell") {
+				feedback.pulseMergeCell(action.feedback.cellKey);
+			}
+		},
+		{
+			animation: action.animation,
+		},
+	);
 };

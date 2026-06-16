@@ -4,6 +4,7 @@ import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 import { acceptDrop } from "~/v0/play/drop/acceptDrop";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { ignoreDrop } from "~/v0/play/drop/ignoreDrop";
+import { resolveInventorySlotDropAction } from "~/v0/play/drop/resolveInventorySlotDropAction";
 
 export namespace resolveInventorySlotDrop {
 	export interface Props {
@@ -28,16 +29,14 @@ export const resolveInventorySlotDrop = ({
 	target,
 	actions,
 }: resolveInventorySlotDrop.Props): TileEngine.DropOutcome => {
-	if (source.slotIndex === target.slotIndex) return ignoreDrop();
+	const action = resolveInventorySlotDropAction({
+		source,
+		target,
+	});
 
-	return acceptDrop(
-		() =>
-			actions.swapInventorySlots({
-				sourceSlotIndex: source.slotIndex,
-				targetSlotIndex: target.slotIndex,
-			}),
-		{
-			animation: "parallel-swap",
-		},
-	);
+	if (action.type === "ignore") return ignoreDrop();
+
+	return acceptDrop(() => actions.swapInventorySlots(action.input), {
+		animation: action.animation,
+	});
 };

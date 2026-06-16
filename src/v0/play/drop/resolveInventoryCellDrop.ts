@@ -1,4 +1,3 @@
-import { cellKey } from "~/v0/board/cellKey";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -7,6 +6,7 @@ import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 import { acceptDrop } from "~/v0/play/drop/acceptDrop";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { rejectDrop } from "~/v0/play/drop/rejectDrop";
+import { resolveInventoryCellDropAction } from "~/v0/play/drop/resolveInventoryCellDropAction";
 
 export namespace resolveInventoryCellDrop {
 	export interface Props {
@@ -29,26 +29,27 @@ export namespace resolveInventoryCellDrop {
 }
 
 export const resolveInventoryCellDrop = ({
-	source,
-	target,
+	actions,
 	inventory,
 	feedback,
-	actions,
+	source,
+	target,
 }: resolveInventoryCellDrop.Props): TileEngine.DropOutcome => {
-	if (target.boardItemId) {
-		return rejectDrop(() => feedback.flashBoardCell(cellKey(target.x, target.y)));
+	const action = resolveInventoryCellDropAction({
+		inventory,
+		source,
+		target,
+	});
+
+	if (action.type === "reject") {
+		return rejectDrop(() => {
+			if (action.feedback.kind === "board-cell") {
+				feedback.flashBoardCell(action.feedback.cellKey);
+				return;
+			}
+			feedback.flashInventorySlot(action.feedback.slotIndex);
+		});
 	}
 
-	const sourceSlot = inventory.bySlotIndex[String(source.slotIndex)];
-	if (!sourceSlot?.stack) {
-		return rejectDrop(() => feedback.flashInventorySlot(source.slotIndex));
-	}
-
-	return acceptDrop(() =>
-		actions.placeInventoryItem({
-			slotIndex: source.slotIndex,
-			x: target.x,
-			y: target.y,
-		}),
-	);
+	return acceptDrop(() => actions.placeInventoryItem(action.input));
 };

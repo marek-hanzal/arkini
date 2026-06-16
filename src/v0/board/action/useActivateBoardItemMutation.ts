@@ -9,6 +9,7 @@ import { runGameFx } from "~/v0/fx/runGameFx";
 import { applyActionResultCachePatch } from "~/v0/play/cache/applyActionResultCachePatch";
 import { refreshBoardViewCache } from "~/v0/board/cache/refreshBoardViewCache";
 import { sequenceCompletionDelayMs } from "~/v0/play/cache/sequenceSpawnVisualEvents";
+import type { Feedback } from "~/v0/play/feedback/Feedback";
 
 export type ActivateBoardItemResult = ActionResult.Type & {
 	activation?: ActivationResultSchema.Type;
@@ -16,7 +17,15 @@ export type ActivateBoardItemResult = ActionResult.Type & {
 
 const depleteAfterAnimationBufferMs = 40;
 
-export const useActivateBoardItemMutation = () => {
+export namespace useActivateBoardItemMutation {
+	export interface Props {
+		feedback?: Feedback.Type;
+	}
+}
+
+export const useActivateBoardItemMutation = ({
+	feedback,
+}: useActivateBoardItemMutation.Props = {}) => {
 	const queryClient = useQueryClient();
 
 	return useMutation<ActivateBoardItemResult, GameActionError, activateBoardItemFx.Props>({
@@ -36,6 +45,7 @@ export const useActivateBoardItemMutation = () => {
 				phase: "mutate.error",
 				detail: error,
 			});
+			feedback?.showError(error);
 		},
 		onSuccess(result) {
 			recordActionMutation({

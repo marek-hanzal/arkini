@@ -169,6 +169,45 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						},
 					});
 
+					if (kind === "accept" && animation === "parallel-merge") {
+						try {
+							DebugTimeline.record({
+								scope: "tile-engine",
+								event: "drop.commit.start",
+								detail: {
+									motionId,
+									animation,
+									hasCommit: Boolean(commit),
+									immediate: true,
+								},
+							});
+							await commit?.();
+							DebugTimeline.record({
+								scope: "tile-engine",
+								event: "drop.commit.ok",
+								detail: {
+									motionId,
+									animation,
+									immediate: true,
+								},
+							});
+							return;
+						} catch {
+							DebugTimeline.record({
+								scope: "tile-engine",
+								event: "drop.commit.error",
+								detail: {
+									motionId,
+									animation,
+									immediate: true,
+								},
+							});
+							setHandoff(null);
+							resetAfterMotion = await animateBack();
+							return;
+						}
+					}
+
 					if (kind === "accept" && resolved?.element) {
 						const sourceHandoff = createSourceHandoff({
 							sourceTile: sourceTile as TileEngine.Tile<unknown>,

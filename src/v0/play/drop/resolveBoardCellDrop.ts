@@ -88,14 +88,19 @@ export const resolveBoardCellDrop = ({
 				type: "merge",
 			},
 			(merge) =>
-				acceptDrop(async () => {
-					await actions.mergeBoardItems({
-						sourceBoardItemId: source.boardItemId,
-						targetBoardItemId: targetItem.id,
-					});
-					if (merge.directed) feedback.pulseImprintCell(cellKey(target.x, target.y));
-					else feedback.pulseMergeCell(cellKey(target.x, target.y));
-				}),
+				acceptDrop(
+					async () => {
+						await actions.mergeBoardItems({
+							sourceBoardItemId: source.boardItemId,
+							targetBoardItemId: targetItem.id,
+						});
+						if (merge.directed) feedback.pulseImprintCell(cellKey(target.x, target.y));
+						else feedback.pulseMergeCell(cellKey(target.x, target.y));
+					},
+					{
+						animation: "parallel-merge",
+					},
+				),
 		)
 		.with(
 			{

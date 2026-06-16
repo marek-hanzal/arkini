@@ -77,4 +77,80 @@ describe("resolveDrop animation contract", () => {
 			targetSlotIndex: 1,
 		});
 	});
+
+	it("marks board merges as immediate parallel merge cache animations", async () => {
+		const mergeBoardItems = vi.fn(async () => undefined);
+		const feedback = {
+			pulseMergeCell: vi.fn(),
+			showError: vi.fn(),
+		} as unknown as Feedback.Type;
+		const actions = {
+			mergeBoardItems,
+			moveBoardItem: vi.fn(),
+			placeInventoryItem: vi.fn(),
+			stashBoardItem: vi.fn(),
+			swapBoardItems: vi.fn(),
+			swapInventorySlots: vi.fn(),
+		} satisfies DropActions;
+
+		const outcome = resolveDrop({
+			actions,
+			feedback,
+			inventory: {} as never,
+			board: {
+				byId: {
+					target: {
+						id: "target",
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				},
+			} as never,
+			context: {
+				dragRect: rect,
+				source: {
+					kind: "board",
+					boardItemId: "source",
+					itemId: "item:twig",
+					boardItem: {} as never,
+				} satisfies DragSource,
+				sourceTile: {
+					id: "source",
+					slotId: "0:0",
+					data: {},
+				},
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: "target",
+				} satisfies DropTarget,
+				targetRect: rect,
+				targetSlot: {
+					id: "1:0",
+					data: {},
+				},
+				targetTile: {
+					id: "target",
+					slotId: "1:0",
+					data: {},
+				},
+			},
+		});
+
+		expect(outcome).toMatchObject({
+			animation: "parallel-merge",
+			type: "accept",
+		});
+
+		if (typeof outcome !== "string" && outcome.type === "accept") {
+			await outcome.commit?.();
+		}
+
+		expect(mergeBoardItems).toHaveBeenCalledWith({
+			sourceBoardItemId: "source",
+			targetBoardItemId: "target",
+		});
+	});
 });

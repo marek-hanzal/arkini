@@ -17,16 +17,11 @@ export const createActivationVisualEventsFx = Effect.fn("createActivationVisualE
 	function* ({ mode, placements, row }: createActivationVisualEventsFx.Props) {
 		const groupId = `activation:${row.id}:${mode}`;
 		const spawnAnimation = (sequenceIndex: number) =>
-			mode === "exhaust"
-				? ActionVisualAnimation.sequenceFadeIn({
-						cause: "stash",
-						groupId,
-						sequenceIndex,
-					})
-				: ActionVisualAnimation.instantFadeIn({
-						cause: "producer",
-						groupId,
-					});
+			ActionVisualAnimation.sequenceFadeIn({
+				cause: mode === "exhaust" ? "stash" : "producer",
+				groupId,
+				sequenceIndex,
+			});
 
 		return [
 			{

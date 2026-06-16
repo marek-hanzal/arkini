@@ -8,6 +8,10 @@ export namespace InventorySurface {
 		onClose(): void;
 	}
 
+	export interface SlotData {
+		slotIndex: number;
+	}
+
 	export interface TileData {
 		slotIndex: number;
 		stackId: string;

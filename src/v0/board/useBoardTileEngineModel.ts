@@ -34,6 +34,10 @@ export namespace useBoardTileEngineModel {
 	}
 }
 
+const transientTileStyle = {
+	pointerEvents: "none" as const,
+};
+
 export const useBoardTileEngineModel = ({
 	feedback,
 	onOpenItem,
@@ -53,26 +57,30 @@ export const useBoardTileEngineModel = ({
 	const tiles = useMemo(
 		() =>
 			[
-				...board.items.map((boardItem) => ({
-					id: boardItem.id,
-					slotId: cellKey(boardItem.x, boardItem.y),
-					data: {
-						kind: "board-item" as const,
-						boardItemId: boardItem.id,
-					},
-					disabled: false,
-				})),
+				...board.items.map((boardItem) => {
+					const slotId = cellKey(boardItem.x, boardItem.y);
+
+					return {
+						id: boardItem.id,
+						slotId,
+						renderKey: `board-item:${boardItem.id}:${slotId}`,
+						data: {
+							kind: "board-item" as const,
+							boardItemId: boardItem.id,
+						},
+						disabled: false,
+					};
+				}),
 				...transientTiles.map((tile) => ({
 					id: tile.id,
 					slotId: tile.slotId,
+					renderKey: `static-item:${tile.id}:${tile.slotId}:${tile.itemId}`,
 					data: {
 						kind: "static-item" as const,
 						itemId: tile.itemId,
 					},
 					disabled: true,
-					style: {
-						pointerEvents: "none" as const,
-					},
+					style: transientTileStyle,
 				})),
 			] satisfies TileEngine.Tile<BoardSurface.TileData>[],
 		[

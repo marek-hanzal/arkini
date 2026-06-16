@@ -1,8 +1,41 @@
-import { memo, type ReactNode, useEffect, useRef } from "react";
+import { memo, type ReactNode, type RefObject, useEffect, useRef } from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { cn } from "~/v0/ui/cn";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+import { sameTileEngineSlot } from "~/v0/tile-engine/sameTileEngineSlot";
+import { sameTileEngineTile } from "~/v0/tile-engine/sameTileEngineTile";
+
+const sameActiveDropFeedback = (
+	left: TileEngine.ActiveDropFeedback | null,
+	right: TileEngine.ActiveDropFeedback | null,
+) =>
+	left?.dropId === right?.dropId &&
+	left?.effect === right?.effect &&
+	left?.targetTileId === right?.targetTileId;
+
+const sameOptionalTileEngineTile = <TTile,>(
+	left: TileEngine.Tile<TTile> | undefined,
+	right: TileEngine.Tile<TTile> | undefined,
+) => {
+	if (!left || !right) return left === right;
+
+	return sameTileEngineTile(left, right);
+};
+
+const sameTileEngineSlotProps = <TTile, TSlot, TDrop>(
+	left: TileEngineSlot.Props<TTile, TSlot, TDrop>,
+	right: TileEngineSlot.Props<TTile, TSlot, TDrop>,
+) =>
+	sameTileEngineSlot(left.slot, right.slot) &&
+	left.index === right.index &&
+	sameOptionalTileEngineTile(left.targetTile, right.targetTile) &&
+	sameActiveDropFeedback(left.dropFeedback, right.dropFeedback) &&
+	left.disabled === right.disabled &&
+	left.className === right.className &&
+	left.dragRef === right.dragRef &&
+	left.renderSlot === right.renderSlot &&
+	left.registerDrop === right.registerDrop;
 
 export namespace TileEngineSlot {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrop = unknown> {
@@ -12,7 +45,7 @@ export namespace TileEngineSlot {
 		dropFeedback: TileEngine.ActiveDropFeedback | null;
 		disabled?: boolean;
 		className?: string;
-		drag?: TileEngine.DragConfig<TTile, TSlot, unknown, TDrop>;
+		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, unknown, TDrop> | undefined>;
 		renderSlot(props: TileEngine.RenderSlotProps<TSlot>): ReactNode;
 		registerDrop(entry: TileEngineDrop.Registration<TSlot, TTile, TDrop>): () => void;
 	}
@@ -25,12 +58,12 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	dropFeedback,
 	disabled: engineDisabled = false,
 	className,
-	drag,
+	dragRef,
 	renderSlot,
 	registerDrop,
 }: TileEngineSlot.Props<TTile, TSlot, TDrop>) => {
 	const ref = useRef<HTMLDivElement | null>(null);
-	const binding = drag?.slot(slot, targetTile);
+	const binding = dragRef.current?.slot(slot, targetTile);
 	const dropId = binding?.id ?? slot.dropId ?? slot.id;
 	const disabled = engineDisabled || !binding || binding.disabled || slot.disabled;
 	const slotFeedback = disabled ? null : dropFeedback;
@@ -99,4 +132,7 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	);
 };
 
-export const TileEngineSlot = memo(TileEngineSlotComponent) as typeof TileEngineSlotComponent;
+export const TileEngineSlot = memo(
+	TileEngineSlotComponent,
+	sameTileEngineSlotProps,
+) as typeof TileEngineSlotComponent;

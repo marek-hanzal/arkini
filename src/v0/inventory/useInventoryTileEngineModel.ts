@@ -25,11 +25,11 @@ export namespace useInventoryTileEngineModel {
 
 	export interface Result {
 		filled: number;
-		slots: TileEngine.Slot<InventorySlot>[];
+		slots: TileEngine.Slot<InventorySurface.SlotData>[];
 		tiles: TileEngine.Tile<InventorySurface.TileData>[];
 		drag: TileEngine.DragConfig<
 			InventorySurface.TileData,
-			InventorySlot,
+			InventorySurface.SlotData,
 			DragSource,
 			DropTarget
 		>;
@@ -48,15 +48,19 @@ export const useInventoryTileEngineModel = ({
 	const swapBoardItemsMutation = useSwapBoardItemsMutation();
 	const swapInventorySlotsMutation = useSwapInventorySlotsMutation();
 
+	const slotLayoutKey = inventory.slots.map((slot) => slot.slotIndex).join("|");
 	const slots = useMemo(
 		() =>
 			inventory.slots.map((slot) => ({
 				id: String(slot.slotIndex),
 				dropId: `inventory-slot:${slot.slotIndex}`,
-				data: slot,
-			})) satisfies TileEngine.Slot<InventorySlot>[],
+				renderKey: slot.slotIndex,
+				data: {
+					slotIndex: slot.slotIndex,
+				},
+			})) satisfies TileEngine.Slot<InventorySurface.SlotData>[],
 		[
-			inventory.slots,
+			slotLayoutKey,
 		],
 	);
 
@@ -70,6 +74,7 @@ export const useInventoryTileEngineModel = ({
 					{
 						id: stack.id,
 						slotId: String(slot.slotIndex),
+						renderKey: `inventory:${stack.id}:${slot.slotIndex}:${stack.itemId}:${stack.quantity}`,
 						data: {
 							slotIndex: slot.slotIndex,
 							stackId: stack.id,
@@ -125,7 +130,12 @@ export const useInventoryTileEngineModel = ({
 	);
 
 	const drag = useMemo<
-		TileEngine.DragConfig<InventorySurface.TileData, InventorySlot, DragSource, DropTarget>
+		TileEngine.DragConfig<
+			InventorySurface.TileData,
+			InventorySurface.SlotData,
+			DragSource,
+			DropTarget
+		>
 	>(
 		() => ({
 			tile(tile) {

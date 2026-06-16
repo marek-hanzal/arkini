@@ -4,7 +4,6 @@ import type { InventorySurface as InventorySurfaceType } from "~/v0/inventory/In
 import { inventoryColumns } from "~/v0/inventory/inventoryColumns";
 import { renderInventoryTile } from "~/v0/inventory/renderInventoryTile";
 import { useInventoryTileEngineModel } from "~/v0/inventory/useInventoryTileEngineModel";
-import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
@@ -18,7 +17,9 @@ export const InventorySurface = memo(
 			feedback,
 		});
 		const renderSlot = useCallback(
-			({ slot }: TileEngineType.RenderSlotProps<InventorySlot>): ReactNode => (
+			({
+				slot,
+			}: TileEngineType.RenderSlotProps<InventorySurfaceType.SlotData>): ReactNode => (
 				<InventoryCell
 					slotIndex={slot.data.slotIndex}
 					invalid={feedbackFlags.has(`inventory:error:${slot.data.slotIndex}`)}
@@ -43,7 +44,7 @@ export const InventorySurface = memo(
 					>
 						<TileEngine<
 							InventorySurfaceType.TileData,
-							InventorySlot,
+							InventorySurfaceType.SlotData,
 							DragSource,
 							DropTarget
 						>

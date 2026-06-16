@@ -1,4 +1,4 @@
-import { memo, type ReactNode } from "react";
+import { memo, type ReactNode, type RefObject } from "react";
 import { TileEngineSlot } from "~/v0/tile-engine/TileEngineSlot";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
@@ -13,7 +13,7 @@ export namespace TileEngineSlots {
 		activeDropFeedback: TileEngine.ActiveDropFeedback | null;
 		cellClassName?: string;
 		disabled?: boolean;
-		drag?: TileEngine.DragConfig<TTile, TSlot, unknown, TDrop>;
+		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, unknown, TDrop> | undefined>;
 		renderSlot(props: TileEngine.RenderSlotProps<TSlot>): ReactNode;
 		registerDrop(entry: TileEngineDrop.Registration<TSlot, TTile, TDrop>): () => void;
 	}
@@ -28,7 +28,7 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 	activeDropFeedback,
 	cellClassName,
 	disabled = false,
-	drag,
+	dragRef,
 	renderSlot,
 	registerDrop,
 }: TileEngineSlots.Props<TTile, TSlot, TDrop>) => (
@@ -56,7 +56,7 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 					dropFeedback={slotDropFeedback}
 					disabled={disabled}
 					className={cellClassName}
-					drag={drag}
+					dragRef={dragRef}
 					renderSlot={renderSlot}
 					registerDrop={registerDrop}
 				/>

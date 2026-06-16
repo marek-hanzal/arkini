@@ -13,6 +13,7 @@ export namespace useTilePointerDown {
 		bindingRef: RefObject<TileEngine.DragBinding<TDrag> | undefined>;
 		tileRef: RefObject<TileEngine.Tile<TTile>>;
 		disabledRef: RefObject<boolean>;
+		dragRef: RefObject<TileEngine.DragConfig<TTile, unknown, TDrag, unknown> | undefined>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		dragSessionRef: RefObject<TileEngineActor.DragSession<TDrag> | null>;
 		longTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
@@ -26,6 +27,7 @@ export const useTilePointerDown = <TTile, TDrag>({
 	bindingRef,
 	tileRef,
 	disabledRef,
+	dragRef,
 	dragConstraintsRef,
 	dragSessionRef,
 	longTimerRef,
@@ -34,10 +36,12 @@ export const useTilePointerDown = <TTile, TDrag>({
 }: useTilePointerDown.Props<TTile, TDrag>) =>
 	useCallback(
 		(event: ReactPointerEvent<HTMLDivElement>) => {
-			const binding = bindingRef.current;
 			if (disabledRef.current || event.button !== 0) return;
+
+			const binding = dragRef.current?.tile(tileRef.current);
+			bindingRef.current = binding;
 			const element = actorRef.current;
-			if (!element || !binding) return;
+			if (!element || !binding || binding.disabled) return;
 
 			const constraints = dragConstraintsRef?.current;
 			if (constraints && !constraints.contains(event.currentTarget)) return;
@@ -97,6 +101,7 @@ export const useTilePointerDown = <TTile, TDrag>({
 			clearTimers,
 			disabledRef,
 			dragConstraintsRef,
+			dragRef,
 			dragSessionRef,
 			longTimerRef,
 			setHandoff,

@@ -1,6 +1,6 @@
 # Render performance and remount audit
 
-Status: IN_PROGRESS
+Status: DONE
 
 ## Goal
 
@@ -43,4 +43,13 @@ Ensure board/inventory/tile rendering stays fast, stable, and animation-friendly
 - Removed the per-tile inventory slot query from `InventoryTile`; stack id, item id and quantity now come from TileEngine tile data, while the tile still subscribes only to the item catalog view.
 - Added DEV timeline actor lifecycle diagnostics (`actor.lifecycle.mount` / `actor.lifecycle.unmount`) so bug reports can prove whether a move reused the same actor or accidentally remounted it.
 
-Remaining audit areas: parent render/callback stability review and any mobile-specific render churn found during manual play.
+Final 2026-06-16 closure slice:
+
+- Checkpointed the first render-audit slice into `v0` before touching TileEngine equality semantics.
+- Added adapter-owned `renderKey` tokens for TileEngine slots/tiles so memoized slot/actor components can treat recreated cache snapshot objects as equivalent when their renderer data is semantically unchanged.
+- Added shallow TileEngine slot/tile equality helpers and wired custom memo comparators into `TileEngineSlot` and `TileEngineActor`. Geometry, visibility, style, motion request, feedback and callback changes still wake the component; equivalent `renderKey` data churn does not.
+- Moved current drag config behind a stable ref at the TileEngine boundary, so board/inventory cache changes can update drag/drop behavior without forcing every slot/actor prop to change. Pointer-down re-reads the latest binding from the ref, so skipped actor renders do not leave tap/drag source data stale.
+- Changed inventory slot data to carry only stable slot layout data (`slotIndex`) instead of the full mutable stack snapshot; inventory stack details now live only on tile data where changes are expected to wake the actor.
+- Kept hidden sheet views lazy by review: `PlayShell` only renders the currently active sheet content inside `BottomSheet`.
+
+Result: DONE. Remaining performance work should be driven by profiler/manual mobile evidence, not by speculative memo carpeting.

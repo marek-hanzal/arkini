@@ -35,6 +35,12 @@ export namespace TileEngine {
 		 * dynamic DropBinding id so hover feedback can be scoped before slot render.
 		 */
 		dropId?: Id;
+		/**
+		 * Adapter-owned equality token for slot renderer data. When provided,
+		 * TileEngine memoization may reuse slot actors across equivalent data object
+		 * instances instead of treating every cache snapshot as a render change.
+		 */
+		renderKey?: string | number;
 		data: TSlot;
 		disabled?: boolean;
 	}
@@ -42,6 +48,13 @@ export namespace TileEngine {
 	export interface Tile<TTile = unknown> {
 		id: Id;
 		slotId: Id;
+		/**
+		 * Adapter-owned equality token for tile renderer data. When provided,
+		 * TileEngine memoization may reuse actors across equivalent data object
+		 * instances. Include every scalar value that renderTile needs directly from
+		 * tile.data.
+		 */
+		renderKey?: string | number;
 		data: TTile;
 		hidden?: boolean;
 		disabled?: boolean;

@@ -8,6 +8,7 @@ import { useTileEngineDrops } from "~/v0/tile-engine/useTileEngineDrops";
 import { useTileEngineHandoff } from "~/v0/tile-engine/useTileEngineHandoff";
 import { useTileEngineIndexes } from "~/v0/tile-engine/useTileEngineIndexes";
 import { useTileEngineMotionRequests } from "~/v0/tile-engine/TileEngineMotionRequestStore";
+import { useLatestRef } from "~/v0/react/useLatestRef";
 
 export type { TileEngine as TileEngineNamespace } from "~/v0/tile-engine/TileEngine.types";
 
@@ -56,6 +57,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 		tiles,
 	});
 	const motionByTileId = useTileEngineMotionRequests(id);
+	const dragRef = useLatestRef(disabled ? undefined : drag);
 	const drops = useTileEngineDrops<TSlot, TTile, TDrop>();
 	const handoff = useTileEngineHandoff();
 
@@ -79,7 +81,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				activeDropFeedback={activeDropFeedback}
 				cellClassName={cellClassName}
 				disabled={disabled}
-				drag={disabled ? undefined : drag}
+				dragRef={dragRef}
 				renderSlot={renderSlot}
 				registerDrop={drops.registerDrop}
 			/>
@@ -91,7 +93,8 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				rowCount={indexes.rowCount}
 				gapPx={gapPx}
 				actorLayerClassName={actorLayerClassName}
-				drag={disabled ? undefined : drag}
+				dragRef={dragRef}
+				dragDisabled={disabled || !drag}
 				dragConstraintsRef={dragConstraintsRef}
 				motionByTileId={motionByTileId}
 				resolveDrop={drops.resolveDrop}

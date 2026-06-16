@@ -36,7 +36,8 @@ export namespace TileEngineActor {
 		gapPx: number;
 		enter?: TileEnterMotionSchema.Type;
 		exit?: TileExitMotionSchema.Type;
-		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
+		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop> | undefined>;
+		dragDisabled: boolean;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		dropFeedback: TileEngine.ActiveDropFeedback | null;

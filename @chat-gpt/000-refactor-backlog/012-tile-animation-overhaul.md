@@ -172,3 +172,9 @@ Keep task 012 open. This commit improves the existing runtime path; it does not 
 - Moved the Arkini semantic adapter helpers to `src/v0/play/tile-engine-motion`: `toTileEngineEnterMotion` and `toTileEngineExitMotion`. These helpers map `ActionVisualAnimation` into generic TileEngine presence motion; they must not touch DOM or run animations.
 
 Keep task 012 open. The remaining larger step is a real TileEngine animation request queue/registry so cache rows no longer need to carry `motion` metadata as the handoff vehicle. Do that only after current mobile/merge behavior stays stable.
+
+## 2026-06-16 presence ownership race note
+
+- Presence motions now mark the visual element with a unique token instead of a shared `true` flag. A cancelled/replaced enter or exit motion may only clear `data-ak-tile-engine-presence-motion` when its token still owns the visual.
+- Enter/exit hooks now cancel their own TileEngine presence scope on cleanup. This prevents stale WAAPI work and stale CSS-transition locks when a presence request is replaced, the actor unmounts, or React runs effect cleanup during development.
+- This specifically protects merge success on mobile Safari: an older cancelled fade-out/fade-in promise can no longer re-enable `.ak-tile-engine-visual` CSS transitions in the middle of the newer WAAPI presence animation.

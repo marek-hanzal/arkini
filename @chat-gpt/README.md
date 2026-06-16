@@ -175,3 +175,5 @@ Presence motion ownership is tokenized. Never clear `data-ak-tile-engine-presenc
 User drag owns the outer actor transform as soon as pointer down starts. Cancel only `tileMotionScope(tile.id)` before resetting that actor transform; do not blanket-cancel descendant presence motions from pointer down, because the inner visual may be mid fade/pop and freezing that opacity is a different stupid bug wearing sunglasses.
 
 Motion IDs and presence tokens must be monotonic owner IDs, not rounded timestamps. A stale `finished`/`catch` continuation compares owner IDs before cleanup; if IDs collide, the old animation can delete the new one and everyone gets to enjoy another fake Safari bug.
+
+Presence motion CSS must use an attribute-presence selector (`[data-ak-tile-engine-presence-motion]`), not an equality selector. The dataset value is a unique owner token, not `"true"`; matching only `"true"` re-enables CSS transitions during WAAPI enter/exit and resurrects merge fade chunkiness.

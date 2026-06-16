@@ -22,7 +22,9 @@ const createBoardItem = (
 		y: event.to.y,
 		state: {},
 		motion: {
-			enter: toTileEnterMotion(event.animation),
+			enter: toTileEnterMotion(event.animation, {
+				fromTileId: event.originItemInstanceId,
+			}),
 		},
 	};
 };

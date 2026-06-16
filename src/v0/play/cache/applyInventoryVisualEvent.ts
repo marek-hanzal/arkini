@@ -55,7 +55,9 @@ export const applyInventoryVisualEvent = (
 										stateJson: emptyStateJson,
 										stateful: false,
 										motion: {
-											enter: toTileEnterMotion(spawned.animation),
+											enter: toTileEnterMotion(spawned.animation, {
+												fromTileId: spawned.originItemInstanceId,
+											}),
 										},
 									},
 					}),

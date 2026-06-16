@@ -152,3 +152,9 @@ Status values:
 - `OBSOLETE` means replaced by newer architecture or task notes.
 
 Do not delete completed task files. Update status and add a short result note. Old dated audit notes in this folder are reference material only; this README wins when they disagree.
+
+### Stash/producer output animation notes
+
+Activation output spawns may carry an origin tile id into TileEngine enter motion. That id is generic `fromTileId`, not Arkini-specific state, and it lets spawned tiles animate from the current rendered source actor. This matters for producers and exhaust stashes: if the source tile moves while output is being sequenced, later spawn animations should read the source's current DOM rect rather than an old cached board coordinate. Yes, this is exactly the sort of detail that turns “just animate it” into plumbing.
+
+For stash exhaust, do not delete the durable stash row before the sequenced output batch has finished. The stash should become empty/unclickable immediately, remain draggable while it visually emits items, and only apply durable depletion after sequence completion. Visual `activation.depleted` is delayed with the sequence; the follow-up DB finalizer runs after the same sequence window plus a tiny buffer.

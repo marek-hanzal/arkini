@@ -1,6 +1,10 @@
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { type RefObject, useLayoutEffect, useRef } from "react";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
+import { findTileEngineActorById } from "~/v0/tile-engine/findTileEngineActorById";
+import { rectFromElement } from "~/v0/tile-engine/rect";
+import { targetDelta } from "~/v0/tile-engine/targetDelta";
+import { translate3d } from "~/v0/tile-engine/TileVisualSnapshot";
 import { startTileStyleMotion, tilePresenceMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
@@ -28,6 +32,7 @@ export const useTileActorEnterMotion = ({
 		const enterKey = [
 			enter.groupId ?? "group:none",
 			enter.kind ?? "fade-in",
+			enter.fromTileId ?? "from:none",
 			enter.delayMs ?? 0,
 			enter.durationMs ?? "duration:default",
 		].join(":");
@@ -49,35 +54,57 @@ export const useTileActorEnterMotion = ({
 			},
 		});
 
+		const originElement =
+			enter.fromTileId && enter.fromTileId !== tileId
+				? findTileEngineActorById(enter.fromTileId)
+				: null;
+		const spawnDelta = originElement
+			? targetDelta({
+					origin: rectFromElement(element),
+					target: rectFromElement(originElement),
+				})
+			: null;
+
 		const keyframes =
-			kind === "fade-in"
+			kind === "spawn-from-tile" && spawnDelta
 				? {
 						opacity: [
 							0,
 							1,
 						],
+						transform: [
+							`${translate3d(spawnDelta.x, spawnDelta.y)} scale(0.68)`,
+							"translate3d(0px, 0px, 0px) scale(1)",
+						],
 					}
-				: kind === "merge-in"
+				: kind === "fade-in"
 					? {
 							opacity: [
 								0,
 								1,
 							],
-							transform: [
-								"translate3d(0px, 0px, 0px) scale(0.72)",
-								"translate3d(0px, 0px, 0px) scale(1)",
-							],
 						}
-					: {
-							opacity: [
-								0,
-								1,
-							],
-							transform: [
-								"translate3d(0px, 8px, 0px) scale(0.72)",
-								"translate3d(0px, 0px, 0px) scale(1)",
-							],
-						};
+					: kind === "merge-in"
+						? {
+								opacity: [
+									0,
+									1,
+								],
+								transform: [
+									"translate3d(0px, 0px, 0px) scale(0.72)",
+									"translate3d(0px, 0px, 0px) scale(1)",
+								],
+							}
+						: {
+								opacity: [
+									0,
+									1,
+								],
+								transform: [
+									"translate3d(0px, 8px, 0px) scale(0.72)",
+									"translate3d(0px, 0px, 0px) scale(1)",
+								],
+							};
 
 		void startTileStyleMotion({
 			scope: tilePresenceMotionScope(tileId),
@@ -89,6 +116,7 @@ export const useTileActorEnterMotion = ({
 			meta: {
 				kind: "enter",
 				enterKind: kind,
+				fromTileId: enter.fromTileId,
 				groupId: enter.groupId,
 				tileId,
 			},

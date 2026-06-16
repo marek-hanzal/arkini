@@ -1,6 +1,6 @@
 # Overhaul tile animations through TileEngine
 
-Status: TODO
+Status: IN_PROGRESS
 Priority: CRITICAL
 
 ## Goal
@@ -146,3 +146,12 @@ This must prevent ghost actors, stale hidden sources, duplicate actors, and post
 - Do not solve by hiding/remounting actors. Stable actor identity is the entire point.
 - Do not keep both old visual motion registry and new TileEngine request registry as parallel truths.
 - Do not overfit animation requests to current board/inventory layout. TileEngine should remain reusable.
+
+## 2026-06-16 progress note
+
+- Added `TileMotionRuntime` as the cancellable TileEngine actor motion runtime.
+- Added origin-aware tile enter motion through generic `fromTileId`, so producer/stash spawns can animate from the current source actor without the game layer mutating actor DOM.
+- Stash exhaust sequencing now delays `activation.depleted` until the sequenced output batch has finished visually.
+- Depleted stashes are now persisted as empty/unclickable until the output animation completes, then a delayed finalizer applies the durable depletion. This keeps the source tile draggable while it is still visually vomiting items, instead of deleting the row before the animation has even had the decency to happen.
+
+Keep this task open: the remaining work is to replace the old play-level motion staging/cleanup vocabulary with a stricter generic TileEngine animation request adapter. Do not do that as a giant rewrite unless the current runtime starts behaving like a haunted umbrella.

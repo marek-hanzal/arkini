@@ -39,3 +39,11 @@ Make sure domain logic lives in Effect-backed roots or small pure helpers, not i
 - Added focused tests for both helpers.
 
 Remaining audit should look for larger hook-side orchestration, especially mutation hooks that mix domain follow-up decisions with UI/cache concerns.
+
+## 2026-06-17 slice
+
+- Added pure drop action resolvers for board-cell, inventory-cell and inventory-slot drops. `resolve*Drop` adapters now map action intents to TileEngine outcomes, mutations and feedback instead of mixing gameplay/drop policy with UI commit wiring.
+- Added `resolveActivationDepletionFollowUp` so `useActivateBoardItemMutation` delegates delayed stash depletion follow-up timing/eligibility out of the hook.
+- Added focused tests for the new drop action resolvers and activation depletion follow-up.
+
+Remaining audit should continue with larger mutation/cache orchestration only if it shows real duplicated policy. Do not peel every adapter into ceremonial abstractions; the boundary goal is domain clarity, not file cosplay.

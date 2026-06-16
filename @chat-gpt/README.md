@@ -11,7 +11,7 @@ This directory is the repo-local working memory for GPT-led Arkini work. Treat t
 
 ## Current work
 
-- `008-domain-effect-boundary-audit` is in progress. First slice moved board-item tap and inventory-slot tap decisions out of TileEngine adapter hooks into pure domain helpers (`resolveBoardItemTapAction`, `resolveInventorySlotTapAction`) with focused tests. Hooks should compose query data, mutations and UI feedback; pure gameplay decisions should live in `logic/` helpers or `fx/` roots.
+- `008-domain-effect-boundary-audit` is in progress. Board/inventory tap decisions and play/drop action decisions now live in focused pure helpers (`resolveBoardItemTapAction`, `resolveInventorySlotTapAction`, `resolve*DropAction`) with focused tests. Hooks and TileEngine adapters should compose query data, mutations and UI feedback; pure gameplay/drop decisions should live in `logic/` helpers or explicit play/drop action resolvers.
 
 ## Current mental model
 
@@ -152,7 +152,7 @@ Inventory slot data should stay layout-only (`slotIndex`). Stack/item/quantity b
 1. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.
 2. Keep action visual events explicit through `ActionVisualAnimation`; test event ordering and animation contract when adding new animated behavior. Drop runtime animation flags must survive error wrapping; losing `parallel-swap` breaks swap concurrency before cache events even get a vote.
 3. Add more Vitest coverage around domain action results, visual-event ordering, cache patches, placement planning and manifest validation.
-4. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks. Adapter hooks may wire React Query, mutations and feedback, but gameplay decisions such as tap activation intent should be delegated to small pure `logic/` helpers.
+4. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks. Adapter hooks may wire React Query, mutations and feedback, but gameplay decisions such as tap activation intent and drop action policy should be delegated to small pure `logic/` helpers or play/drop action resolvers.
 5. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.
 6. Keep manifest content editable through small topic files and a documented checklist rather than inventing a config framework that cosplays as productivity.
 

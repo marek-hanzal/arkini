@@ -23,7 +23,7 @@ export const BoardSurface = memo(
 			onOpenItem,
 		});
 		const renderSlot = useCallback(
-			({ slot, isOver }: TileEngineType.RenderSlotProps<BoardCellView>): ReactNode => {
+			({ slot }: TileEngineType.RenderSlotProps<BoardCellView>): ReactNode => {
 				const cell = slot.data;
 				const key = cellKey(cell.x, cell.y);
 				return (
@@ -32,7 +32,6 @@ export const BoardSurface = memo(
 						invalid={feedbackFlags.has(`board:error:${key}`)}
 						merged={feedbackFlags.has(`board:merge:${key}`)}
 						imprinted={feedbackFlags.has(`board:imprint:${key}`)}
-						isOver={isOver}
 					/>
 				);
 			},

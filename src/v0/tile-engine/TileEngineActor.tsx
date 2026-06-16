@@ -28,7 +28,9 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	drag,
 	dragConstraintsRef,
 	resolveDrop,
+	dropFeedback,
 	setActiveDropId,
+	setActiveDropFeedback,
 	setHandoff,
 	setHandoffs,
 	consumeHandoff,
@@ -87,6 +89,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		animateToTarget: motion.animateToTarget,
 		resolveDrop,
 		setActiveDropId,
+		setActiveDropFeedback,
 		setHandoff,
 		setHandoffs,
 	});
@@ -97,8 +100,9 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-tile-id={tile.id}
 			data-ak-tile-engine-slot-id={tile.slotId}
 			data-ak-tile-engine-dragging={dragging ? "true" : undefined}
+			data-ak-tile-engine-drop-feedback={dropFeedback?.effect}
 			className={cn(
-				"pointer-events-auto absolute touch-none select-none will-change-transform",
+				"ak-tile-engine-actor pointer-events-auto absolute touch-none select-none will-change-transform",
 				tile.hidden && "pointer-events-none opacity-0",
 				disabled && "pointer-events-none",
 			)}

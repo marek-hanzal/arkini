@@ -18,6 +18,8 @@ The active runtime has four layers:
 
 `TileEngine` is generic tile interaction infrastructure: pointer lifecycle, hit testing, drop target geometry, snap/rollback, handoff and tile motion. It must not know Arkini game rules. Game-specific drop policy belongs in `src/v0/play/drop`; board/inventory adapter wiring belongs in concrete hooks such as `useBoardTileEngineModel` and `useInventoryTileEngineModel`.
 
+Drag/drop hover feedback is also owned by `TileEngine`. Concrete adapters may map their domain state to generic effects (`empty`, `merge`, `blocked`) through `drag.dropFeedback`, but slot background highlighting, target tile scale feedback and dragged tile spring feedback belong in the engine layer. Do not style board cells directly for hover feedback unless the behavior is truly board-specific.
+
 ## Hard boundaries
 
 These are now enforced by `npm run dc` through dependency-cruiser where possible:

@@ -10,6 +10,7 @@ export namespace TileEngineSlots {
 		slots: readonly TileEngine.Slot<TSlot>[];
 		tileBySlotId: ReadonlyMap<string, TileEngine.Tile<TTile>>;
 		activeDropId: string | null;
+		activeDropFeedback: TileEngine.ActiveDropFeedback | null;
 		cellClassName?: string;
 		drag?: TileEngine.DragConfig<TTile, TSlot, unknown, TDrop>;
 		renderSlot(props: TileEngine.RenderSlotProps<TSlot>): ReactNode;
@@ -23,6 +24,7 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 	slots,
 	tileBySlotId,
 	activeDropId,
+	activeDropFeedback,
 	cellClassName,
 	drag,
 	renderSlot,
@@ -43,6 +45,7 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 				index={index}
 				targetTile={tileBySlotId.get(slot.id)}
 				activeDropId={activeDropId}
+				activeDropFeedback={activeDropFeedback}
 				className={cellClassName}
 				drag={drag}
 				renderSlot={renderSlot}

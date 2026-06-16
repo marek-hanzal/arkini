@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { cn } from "~/v0/ui/cn";
 import { TileEngineActors } from "~/v0/tile-engine/TileEngineActors";
 import { TileEngineSlots } from "~/v0/tile-engine/TileEngineSlots";
@@ -9,6 +9,14 @@ import { useTileEngineHandoff } from "~/v0/tile-engine/useTileEngineHandoff";
 import { useTileEngineIndexes } from "~/v0/tile-engine/useTileEngineIndexes";
 
 export type { TileEngine as TileEngineNamespace } from "~/v0/tile-engine/TileEngine.types";
+
+const sameActiveDropFeedback = (
+	left: TileEngineType.ActiveDropFeedback | null,
+	right: TileEngineType.ActiveDropFeedback | null,
+) =>
+	left?.dropId === right?.dropId &&
+	left?.effect === right?.effect &&
+	left?.targetTileId === right?.targetTileId;
 
 const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	id,
@@ -24,7 +32,21 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	renderSlot,
 	renderTile,
 }: TileEngineType.Props<TTile, TSlot, TDrag, TDrop>) => {
-	const [activeDropId, setActiveDropId] = useState<string | null>(null);
+	const [activeDropId, setRawActiveDropId] = useState<string | null>(null);
+	const [activeDropFeedback, setRawActiveDropFeedback] =
+		useState<TileEngineType.ActiveDropFeedback | null>(null);
+	const setActiveDropFeedback = useCallback(
+		(feedback: TileEngineType.ActiveDropFeedback | null) => {
+			setRawActiveDropFeedback((current) =>
+				sameActiveDropFeedback(current, feedback) ? current : feedback,
+			);
+		},
+		[],
+	);
+	const setActiveDropId = useCallback((dropId: string | null) => {
+		setRawActiveDropId((current) => (current === dropId ? current : dropId));
+		if (!dropId) setRawActiveDropFeedback(null);
+	}, []);
 	const indexes = useTileEngineIndexes({
 		columns,
 		slots,
@@ -44,6 +66,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				slots={slots}
 				tileBySlotId={indexes.tileBySlotId}
 				activeDropId={activeDropId}
+				activeDropFeedback={activeDropFeedback}
 				cellClassName={cellClassName}
 				drag={drag}
 				renderSlot={renderSlot}
@@ -61,6 +84,8 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				dragConstraintsRef={dragConstraintsRef}
 				resolveDrop={drops.resolveDrop}
 				setActiveDropId={setActiveDropId}
+				setActiveDropFeedback={setActiveDropFeedback}
+				activeDropFeedback={activeDropFeedback}
 				setHandoff={handoff.setHandoff}
 				setHandoffs={handoff.setHandoffs}
 				consumeHandoff={handoff.consumeHandoff}

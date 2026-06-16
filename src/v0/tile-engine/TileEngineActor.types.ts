@@ -35,7 +35,9 @@ export namespace TileEngineActor {
 		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
+		dropFeedback: TileEngine.ActiveDropFeedback | null;
 		setActiveDropId(dropId: string | null): void;
+		setActiveDropFeedback(feedback: TileEngine.ActiveDropFeedback | null): void;
 		setHandoff(handoff: Handoff | null): void;
 		setHandoffs(handoffs: readonly Handoff[]): void;
 		consumeHandoff(tileId: string, slotId: string): boolean;

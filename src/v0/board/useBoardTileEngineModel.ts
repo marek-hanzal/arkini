@@ -7,6 +7,7 @@ import { useMoveBoardItemMutation } from "~/v0/board/action/useMoveBoardItemMuta
 import { useSwapBoardItemsMutation } from "~/v0/board/action/useSwapBoardItemsMutation";
 import type { BoardCellView } from "~/v0/board/boardCells";
 import { cellKey } from "~/v0/board/cellKey";
+import { resolveBoardDropFeedback } from "~/v0/board/drop/resolveBoardDropFeedback";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
@@ -166,6 +167,12 @@ export const useBoardTileEngineModel = ({
 						boardItemId: targetBoardItemId,
 					},
 				};
+			},
+			dropFeedback(context) {
+				return resolveBoardDropFeedback({
+					board,
+					context,
+				});
 			},
 			onDrop(context) {
 				return resolveDrop({

@@ -14,6 +14,7 @@ Add enough safety checks and runtime traces to stop future refactors from silent
 - Dev builds expose `window.__ARKINI_DEBUG_TIMELINE__` with selected TileEngine pointer/drag/drop events and action-cache visual event application.
 - The Dev Sheet has deterministic scenario buttons for animation bug reports, and dev builds expose `window.__ARKINI_SCENARIO__.list/load`.
 - Zod schemas validate many view/config shapes.
+- Manifest validation now has focused Vitest coverage for shipped config sanity plus item, asset, loot table, activation input/requirement, craft recipe and upgrade reference failures.
 
 ## Remaining proposed work
 
@@ -22,13 +23,6 @@ Add enough safety checks and runtime traces to stop future refactors from silent
   - craft claim with no output space
   - requirement present but non-consumed
   - input consumed only after successful output plan
-- Add manifest validation tests:
-  - item IDs
-  - asset IDs
-  - loot table IDs
-  - activation inputs/requirements
-  - craft recipes
-  - upgrade costs/effects
 - Expand debug timeline only when a bug report needs more data. Prefer structured JSON events over a visual overlay until geometry itself becomes impossible to report.
 - Add more scenario fixtures as real animation bugs appear; keep them deterministic and tiny.
 

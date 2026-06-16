@@ -86,7 +86,7 @@ export const useTileActorEnterMotion = ({
 									1,
 								],
 								transform: [
-									"translate3d(0px, 0px, 0px) scale(0.72)",
+									"translate3d(0px, 0px, 0px) scale(0.9)",
 									"translate3d(0px, 0px, 0px) scale(1)",
 								],
 							}
@@ -96,18 +96,19 @@ export const useTileActorEnterMotion = ({
 									1,
 								],
 								transform: [
-									"translate3d(0px, 8px, 0px) scale(0.72)",
+									"translate3d(0px, 8px, 0px) scale(0.88)",
 									"translate3d(0px, 0px, 0px) scale(1)",
 								],
 							};
 
 		const scope = tilePresenceMotionScope(tileId);
+		visualElement.dataset.akTileEnginePresenceMotion = "true";
 		void startTileStyleMotion({
 			scope,
 			element: visualElement,
 			keyframes,
 			delay: delayMs / 1000,
-			duration: (durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
+			duration: (durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
 			meta: {
 				kind: "enter",
@@ -118,6 +119,7 @@ export const useTileActorEnterMotion = ({
 				tileId,
 			},
 		}).then((result) => {
+			delete visualElement.dataset.akTileEnginePresenceMotion;
 			if (result.status !== "completed") return;
 			visualElement.style.opacity = "";
 			visualElement.style.transform = "";

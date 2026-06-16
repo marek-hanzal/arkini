@@ -9,8 +9,6 @@ import {
 	upsertBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
 
-const mergeMotionCleanupBufferMs = 80;
-
 export namespace registerBoardMergeTransientTiles {
 	export interface Props {
 		board: BoardView;
@@ -65,8 +63,8 @@ export const registerBoardMergeTransientTiles = ({
 		upsertBoardTransientTiles(transientTiles);
 
 		const cleanupDelayMs =
-			(event.animation.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) +
-			mergeMotionCleanupBufferMs;
+			(event.animation.durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) +
+			TileEngineTiming.motionCleanupBufferMs;
 		globalThis.setTimeout(() => {
 			DebugTimeline.record({
 				scope: "action-cache",

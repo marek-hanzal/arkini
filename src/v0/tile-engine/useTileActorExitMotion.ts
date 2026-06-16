@@ -44,6 +44,7 @@ export const useTileActorExitMotion = ({
 			},
 		});
 
+		element.dataset.akTileEnginePresenceMotion = "true";
 		void startTileStyleMotion({
 			scope: tilePresenceMotionScope(tileId),
 			element,
@@ -54,11 +55,11 @@ export const useTileActorExitMotion = ({
 				],
 				transform: [
 					"translate3d(0px, 0px, 0px) scale(1)",
-					"translate3d(0px, 0px, 0px) scale(0.72)",
+					"translate3d(0px, 0px, 0px) scale(0.92)",
 				],
 			},
 			delay: delayMs / 1000,
-			duration: (durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
+			duration: (durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
 			meta: {
 				kind: "exit",
@@ -67,6 +68,7 @@ export const useTileActorExitMotion = ({
 				tileId,
 			},
 		}).then((result) => {
+			delete element.dataset.akTileEnginePresenceMotion;
 			if (result.status !== "completed") return;
 			DebugTimeline.record({
 				scope: "tile-engine",

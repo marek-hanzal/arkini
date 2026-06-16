@@ -1,9 +1,9 @@
 import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
 
-export const actionVisualSequenceDelayMs = 135;
-export const actionVisualFadeDurationMs = 280;
-export const actionVisualMoveDurationMs = 280;
-export const actionVisualMergeDurationMs = 260;
+export const actionVisualSequenceDelayMs = 200;
+export const actionVisualFadeDurationMs = 420;
+export const actionVisualMoveDurationMs = 420;
+export const actionVisualMergeDurationMs = 390;
 
 export namespace ActionVisualAnimation {
 	export interface BaseProps {

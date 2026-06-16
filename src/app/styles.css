@@ -138,7 +138,12 @@ button {
 		transform 150ms cubic-bezier(0.18, 0.86, 0.22, 1),
 		filter 150ms ease-out,
 		opacity 150ms ease-out;
-	will-change: transform;
+	will-change: transform, opacity;
+	backface-visibility: hidden;
+}
+
+.ak-tile-engine-visual[data-ak-tile-engine-presence-motion="true"] {
+	transition: none;
 }
 
 .ak-tile-engine-actor[data-ak-tile-engine-drop-feedback="merge"] > .ak-tile-engine-visual {

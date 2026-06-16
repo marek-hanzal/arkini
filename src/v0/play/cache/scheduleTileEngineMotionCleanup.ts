@@ -28,7 +28,8 @@ type CleanupTarget =
 			animation: ActionVisualAnimationSchema.Type;
 	  };
 
-const cleanupDelayMs = (animation: ActionVisualAnimationSchema.Type) =>
+export const tileEngineMotionCleanupDelayMs = (animation: ActionVisualAnimationSchema.Type) =>
+	(animation.delayMs ?? 0) +
 	(animation.durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) +
 	TileEngineTiming.motionCleanupBufferMs;
 
@@ -134,7 +135,7 @@ export const scheduleTileEngineMotionCleanup = ({
 	for (const event of events) {
 		for (const target of cleanupTargetsForEvent(event)) {
 			const { groupId } = target.animation;
-			const delayMs = cleanupDelayMs(target.animation);
+			const delayMs = tileEngineMotionCleanupDelayMs(target.animation);
 
 			globalThis.setTimeout(() => {
 				DebugTimeline.record({

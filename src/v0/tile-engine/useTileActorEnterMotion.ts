@@ -1,5 +1,5 @@
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
-import { type RefObject, useLayoutEffect, useRef } from "react";
+import { type RefObject, useLayoutEffect } from "react";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 import { findTileEngineActorById } from "~/v0/tile-engine/findTileEngineActorById";
 import { rectFromElement } from "~/v0/tile-engine/rect";
@@ -16,51 +16,46 @@ export namespace useTileActorEnterMotion {
 	}
 }
 
+const readActorVisual = (actor: HTMLElement | null) =>
+	actor?.querySelector<HTMLElement>("[data-ak-tile-engine-visual]") ?? null;
+
 export const useTileActorEnterMotion = ({
 	actorRef,
 	enter,
 	tileId,
 }: useTileActorEnterMotion.Props) => {
-	const lastEnterKeyRef = useRef<string | null>(null);
+	const kind = enter?.kind ?? "fade-in";
+	const delayMs = enter?.delayMs ?? 0;
+	const durationMs = enter?.durationMs;
+	const fromTileId = enter?.fromTileId;
+	const groupId = enter?.groupId;
+	const sequenceIndex = enter?.sequenceIndex;
+	const hasEnter = Boolean(enter);
 
 	useLayoutEffect(() => {
-		if (!enter) {
-			lastEnterKeyRef.current = null;
-			return;
-		}
+		if (!hasEnter) return;
 
-		const enterKey = [
-			enter.groupId ?? "group:none",
-			enter.kind ?? "fade-in",
-			enter.fromTileId ?? "from:none",
-			enter.delayMs ?? 0,
-			enter.durationMs ?? "duration:default",
-		].join(":");
-		if (lastEnterKeyRef.current === enterKey) return;
-		lastEnterKeyRef.current = enterKey;
+		const actorElement = actorRef.current;
+		const visualElement = readActorVisual(actorElement);
+		if (!actorElement || !visualElement) return;
 
-		const element = actorRef.current;
-		if (!element) return;
-
-		const kind = enter.kind ?? "fade-in";
 		DebugTimeline.record({
 			scope: "tile-engine",
 			event: "motion.enter.start",
 			detail: {
 				kind,
 				tileId,
-				delayMs: enter.delayMs ?? 0,
-				durationMs: enter.durationMs,
+				delayMs,
+				durationMs,
+				sequenceIndex,
 			},
 		});
 
 		const originElement =
-			enter.fromTileId && enter.fromTileId !== tileId
-				? findTileEngineActorById(enter.fromTileId)
-				: null;
+			fromTileId && fromTileId !== tileId ? findTileEngineActorById(fromTileId) : null;
 		const spawnDelta = originElement
 			? targetDelta({
-					origin: rectFromElement(element),
+					origin: rectFromElement(actorElement),
 					target: rectFromElement(originElement),
 				})
 			: null;
@@ -106,34 +101,44 @@ export const useTileActorEnterMotion = ({
 								],
 							};
 
+		const scope = tilePresenceMotionScope(tileId);
 		void startTileStyleMotion({
-			scope: tilePresenceMotionScope(tileId),
-			element,
+			scope,
+			element: visualElement,
 			keyframes,
-			delay: (enter.delayMs ?? 0) / 1000,
-			duration: (enter.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
+			delay: delayMs / 1000,
+			duration: (durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
 			meta: {
 				kind: "enter",
 				enterKind: kind,
-				fromTileId: enter.fromTileId,
-				groupId: enter.groupId,
+				fromTileId,
+				groupId,
+				sequenceIndex,
 				tileId,
 			},
 		}).then((result) => {
 			if (result.status !== "completed") return;
+			visualElement.style.opacity = "";
+			visualElement.style.transform = "";
 			DebugTimeline.record({
 				scope: "tile-engine",
 				event: "motion.enter.end",
 				detail: {
-					groupId: enter.groupId,
+					groupId,
 					tileId,
 				},
 			});
 		});
 	}, [
 		actorRef,
-		enter,
+		delayMs,
+		durationMs,
+		fromTileId,
+		groupId,
+		hasEnter,
+		kind,
+		sequenceIndex,
 		tileId,
 	]);
 };

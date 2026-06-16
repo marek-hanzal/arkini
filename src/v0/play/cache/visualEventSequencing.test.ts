@@ -5,6 +5,7 @@ import {
 	sequenceCompletionDelayMs,
 	shouldSequenceSpawnVisualEvents,
 	spawnSequenceDelayMs,
+	toImmediateSequencedVisualEvent,
 } from "~/v0/play/cache/sequenceSpawnVisualEvents";
 
 const boardLocation = (x: number, y: number) =>
@@ -136,6 +137,31 @@ describe("visual event sequencing", () => {
 			0,
 			spawnSequenceDelayMs,
 		]);
+	});
+
+	it("clears render delay after a sequence event is already scheduled", () => {
+		const event = {
+			type: "item.spawned",
+			animation: ActionVisualAnimation.sequenceFadeIn({
+				cause: "producer",
+				groupId: "activation:producer:single",
+				sequenceIndex: 2,
+			}),
+			itemInstanceId: "spawned-c",
+			itemId: "item:twig",
+			originItemInstanceId: "producer",
+			to: boardLocation(3, 6),
+			reason: "activation-output",
+		} satisfies ActionVisualEventSchema.Type;
+
+		const immediate = toImmediateSequencedVisualEvent(event);
+
+		expect(immediate.animation).toMatchObject({
+			delayMs: 0,
+			mode: "sequence",
+			sequenceIndex: 2,
+		});
+		expect(event.animation?.delayMs).toBe(spawnSequenceDelayMs * 2);
 	});
 
 	it("delays stash depletion until the sequenced output batch finishes", () => {

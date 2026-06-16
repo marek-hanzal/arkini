@@ -39,6 +39,20 @@ const shouldDelayUntilSequenceEnd = (
 export const shouldSequenceSpawnVisualEvents = (events: readonly ActionVisualEventSchema.Type[]) =>
 	events.some(isSequencedEvent);
 
+export const toImmediateSequencedVisualEvent = (
+	event: ActionVisualEventSchema.Type,
+): ActionVisualEventSchema.Type => {
+	if (!event.animation || event.animation.mode !== "sequence") return event;
+
+	return {
+		...event,
+		animation: {
+			...event.animation,
+			delayMs: 0,
+		},
+	};
+};
+
 export namespace sequenceSpawnVisualEvents {
 	export interface Props {
 		queryClient: QueryClient;
@@ -97,7 +111,7 @@ export const sequenceSpawnVisualEvents = ({
 			applyVisualEvents({
 				queryClient,
 				events: [
-					event,
+					toImmediateSequencedVisualEvent(event),
 				],
 			});
 		}, delayMs);

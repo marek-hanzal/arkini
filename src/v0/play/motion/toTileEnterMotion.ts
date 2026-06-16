@@ -21,6 +21,7 @@ export const toTileEnterMotion = (
 					: "pop-in",
 	delayMs: animation.delayMs,
 	durationMs: animation.durationMs,
+	sequenceIndex: animation.sequenceIndex,
 	fromTileId: options.fromTileId,
 	groupId: animation.groupId,
 });

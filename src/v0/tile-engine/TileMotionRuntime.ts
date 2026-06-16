@@ -198,7 +198,7 @@ export const cancelTileMotionForElement = (element: HTMLElement | null, reason =
 	if (!element) return;
 
 	for (const [scope, active] of activeMotions) {
-		if (active.element !== element) continue;
+		if (active.element !== element && !element.contains(active.element)) continue;
 		cancelTileMotion(scope, reason);
 	}
 };

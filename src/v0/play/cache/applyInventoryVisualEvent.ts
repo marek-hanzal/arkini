@@ -44,6 +44,11 @@ export const applyInventoryVisualEvent = (
 								? {
 										...slot.stack,
 										quantity: slot.stack.quantity + 1,
+										motion: {
+											enter: toTileEnterMotion(spawned.animation, {
+												fromTileId: spawned.originItemInstanceId,
+											}),
+										},
 									}
 								: {
 										id:

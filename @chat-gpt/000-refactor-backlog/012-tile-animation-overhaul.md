@@ -183,3 +183,7 @@ Keep task 012 open. The remaining larger step is a real TileEngine animation req
 
 - Pointer down now explicitly cancels the outer actor transform motion scope before resetting the actor transform and creating a new drag session. Direct drag interaction must not leave an old layout/snap/reject WAAPI task alive behind the user pointer, because a late `finished` continuation can otherwise commit stale inline transform over the drag-owned transform.
 - This cancellation is intentionally scoped to `tileMotionScope(tile.id)` instead of all descendant motions. Do not cancel presence motion on the inner visual just because the user touches a tile; freezing a half-faded visual is how we get ghost opacity bugs and then pretend Safari is cursed.
+
+## 2026-06-16 motion token sequence note
+
+- Tile motion IDs and presence tokens now use monotonic in-module counters instead of rounded `performance.now()` timestamps. Owner identity must be collision-proof within a JS runtime; “timestamp but probably fine” is how stale async cleanup gets one lottery ticket too many.

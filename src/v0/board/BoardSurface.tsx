@@ -13,6 +13,7 @@ import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 
 const boardSlots = boardCells.map((cell) => ({
 	id: cell.key,
+	dropId: `board-cell:${cell.key}`,
 	data: cell,
 })) satisfies readonly TileEngineType.Slot<BoardCellView>[];
 

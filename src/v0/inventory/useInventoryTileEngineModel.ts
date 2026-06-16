@@ -52,6 +52,7 @@ export const useInventoryTileEngineModel = ({
 		() =>
 			inventory.slots.map((slot) => ({
 				id: String(slot.slotIndex),
+				dropId: `inventory-slot:${slot.slotIndex}`,
 				data: slot,
 			})) satisfies TileEngine.Slot<InventorySlot>[],
 		[
@@ -71,6 +72,9 @@ export const useInventoryTileEngineModel = ({
 						slotId: String(slot.slotIndex),
 						data: {
 							slotIndex: slot.slotIndex,
+							stackId: stack.id,
+							itemId: stack.itemId,
+							quantity: stack.quantity,
 						},
 					},
 				] satisfies TileEngine.Tile<InventorySurface.TileData>[];
@@ -142,7 +146,6 @@ export const useInventoryTileEngineModel = ({
 			},
 			slot(slot) {
 				return {
-					id: `inventory-slot:${slot.data.slotIndex}`,
 					data: {
 						kind: "inventory-slot",
 						slotIndex: slot.data.slotIndex,

@@ -15,6 +15,7 @@ this so future quick fixes have somewhere to bounce off, ideally before becoming
 ## What TileEngine owns
 
 - slot and actor geometry;
+- stable slot/drop identifiers used to scope hover feedback to old/new targets;
 - pointer lifecycle, tap/double/long activation and drag handoff;
 - generic drop hit testing and hover feedback (`empty`, `merge`, `blocked`);
 - generic drop outcomes (`accept`, `reject`, `ignore`, `parallel-swap`, `parallel-merge`);
@@ -31,7 +32,10 @@ this so future quick fixes have somewhere to bounce off, ideally before becoming
 Game-specific behavior belongs in adapters. Board and inventory build generic
 `TileEngine.Slot` / `TileEngine.Tile` models, `src/v0/play/drop` resolves Arkini drop rules,
 and `src/v0/play/tile-engine-motion` maps semantic action visual events into generic
-TileEngine motion requests.
+TileEngine motion requests. Prefer a stable `TileEngine.Slot.dropId` over ad-hoc
+`DropBinding.id` values; the engine uses that id to scope hover feedback before rendering
+individual slots, so a drag-over transition only wakes the previous/current targets instead
+of politely asking every grid cell to participate in the drama.
 
 ## Public exports
 

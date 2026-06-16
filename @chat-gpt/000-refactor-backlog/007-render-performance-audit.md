@@ -1,6 +1,6 @@
 # Render performance and remount audit
 
-Status: TODO
+Status: IN_PROGRESS
 
 ## Goal
 
@@ -33,3 +33,13 @@ Ensure board/inventory/tile rendering stays fast, stable, and animation-friendly
 
 - Do not blindly wrap everything in `memo`. Fix data flow first.
 - Do not put transient drag position into React state.
+
+## 2026-06-16 result slice
+
+- Checkpointed the prior test coverage state into `v0`.
+- Added stable `TileEngine.Slot.dropId` support so hover feedback can be scoped before slot render. Board/inventory adapters now provide stable drop ids and no longer return redundant drop ids from every slot binding.
+- Changed `TileEngineSlot` to receive only its own resolved feedback instead of global `activeDropId` / `activeDropFeedback`, so drag-over changes do not pass changing props to every slot. This keeps memoized cells asleep except for the previous/current hover targets.
+- Removed unnecessary per-cell inventory slot query subscription from `InventoryCell`; it only needed the slot index it already receives.
+- Removed the per-tile inventory slot query from `InventoryTile`; stack id, item id and quantity now come from TileEngine tile data, while the tile still subscribes only to the item catalog view.
+
+Remaining audit areas: actor remount diagnostics, parent render/callback stability review, and any mobile-specific render churn found during manual play.

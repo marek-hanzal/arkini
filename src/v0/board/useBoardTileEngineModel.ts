@@ -152,7 +152,6 @@ export const useBoardTileEngineModel = ({
 						? board.byId[targetTile.data.boardItemId]?.id
 						: undefined;
 				return {
-					id: `board-cell:${cell.key}`,
 					data: {
 						kind: "cell",
 						x: cell.x,

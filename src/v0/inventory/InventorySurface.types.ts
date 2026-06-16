@@ -1,3 +1,4 @@
+import type { ItemId } from "~/v0/manifest/manifestId";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 
 export namespace InventorySurface {
@@ -9,5 +10,8 @@ export namespace InventorySurface {
 
 	export interface TileData {
 		slotIndex: number;
+		stackId: string;
+		itemId: ItemId;
+		quantity: number;
 	}
 }

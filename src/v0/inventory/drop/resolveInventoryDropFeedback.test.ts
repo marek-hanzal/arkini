@@ -83,6 +83,9 @@ describe("resolveInventoryDropFeedback", () => {
 						slotId: "1",
 						data: {
 							slotIndex: 1,
+							stackId: "stack:target",
+							itemId: "item:pebble",
+							quantity: 1,
 						},
 					},
 				}),

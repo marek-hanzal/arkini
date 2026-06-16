@@ -178,3 +178,8 @@ Keep task 012 open. The remaining larger step is a real TileEngine animation req
 - Presence motions now mark the visual element with a unique token instead of a shared `true` flag. A cancelled/replaced enter or exit motion may only clear `data-ak-tile-engine-presence-motion` when its token still owns the visual.
 - Enter/exit hooks now cancel their own TileEngine presence scope on cleanup. This prevents stale WAAPI work and stale CSS-transition locks when a presence request is replaced, the actor unmounts, or React runs effect cleanup during development.
 - This specifically protects merge success on mobile Safari: an older cancelled fade-out/fade-in promise can no longer re-enable `.ak-tile-engine-visual` CSS transitions in the middle of the newer WAAPI presence animation.
+
+## 2026-06-16 drag/motion ownership note
+
+- Pointer down now explicitly cancels the outer actor transform motion scope before resetting the actor transform and creating a new drag session. Direct drag interaction must not leave an old layout/snap/reject WAAPI task alive behind the user pointer, because a late `finished` continuation can otherwise commit stale inline transform over the drag-owned transform.
+- This cancellation is intentionally scoped to `tileMotionScope(tile.id)` instead of all descendant motions. Do not cancel presence motion on the inner visual just because the user touches a tile; freezing a half-faded visual is how we get ghost opacity bugs and then pretend Safari is cursed.

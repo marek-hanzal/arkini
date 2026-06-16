@@ -1,15 +1,17 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback } from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
+import { cancelTileMotion, tileMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 import type { TileEngineActor } from "~/v0/tile-engine/TileEngineActor.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
 export namespace useTilePointerDown {
-	export interface Props<TDrag = unknown> {
+	export interface Props<TTile = unknown, TDrag = unknown> {
 		actorRef: RefObject<HTMLDivElement | null>;
 		bindingRef: RefObject<TileEngine.DragBinding<TDrag> | undefined>;
+		tileRef: RefObject<TileEngine.Tile<TTile>>;
 		disabledRef: RefObject<boolean>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		dragSessionRef: RefObject<TileEngineActor.DragSession<TDrag> | null>;
@@ -19,16 +21,17 @@ export namespace useTilePointerDown {
 	}
 }
 
-export const useTilePointerDown = <TDrag>({
+export const useTilePointerDown = <TTile, TDrag>({
 	actorRef,
 	bindingRef,
+	tileRef,
 	disabledRef,
 	dragConstraintsRef,
 	dragSessionRef,
 	longTimerRef,
 	clearTimers,
 	setHandoff,
-}: useTilePointerDown.Props<TDrag>) =>
+}: useTilePointerDown.Props<TTile, TDrag>) =>
 	useCallback(
 		(event: ReactPointerEvent<HTMLDivElement>) => {
 			const binding = bindingRef.current;
@@ -41,6 +44,7 @@ export const useTilePointerDown = <TDrag>({
 
 			clearTimers();
 			setHandoff(null);
+			cancelTileMotion(tileMotionScope(tileRef.current.id), "pointer-down");
 			resetElementTransform(element);
 			element.setPointerCapture(event.pointerId);
 
@@ -96,5 +100,6 @@ export const useTilePointerDown = <TDrag>({
 			dragSessionRef,
 			longTimerRef,
 			setHandoff,
+			tileRef,
 		],
 	);

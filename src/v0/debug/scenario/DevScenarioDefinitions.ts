@@ -51,6 +51,33 @@ export const DevScenarioDefinitions = [
 		inventory: [],
 	},
 	{
+		id: "drag-merge-feedback",
+		label: "Drag merge feedback",
+		description:
+			"Two mergeable twigs, one blocked pebble, and empty cells. Drag the left twig over the right twig, pebble, and empty cells to capture hover feedback.",
+		board: [
+			{
+				id: "scenario:drag-merge-feedback:board:twig-left",
+				itemId: "item:twig",
+				x: 2,
+				y: 4,
+			},
+			{
+				id: "scenario:drag-merge-feedback:board:twig-right",
+				itemId: "item:twig",
+				x: 4,
+				y: 4,
+			},
+			{
+				id: "scenario:drag-merge-feedback:board:pebble",
+				itemId: "item:pebble",
+				x: 5,
+				y: 4,
+			},
+		],
+		inventory: [],
+	},
+	{
 		id: "producer-single-spawn",
 		label: "Producer single spawn",
 		description:

@@ -26,6 +26,7 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 	setActiveDropFeedback,
 }: useTileDragHover.Props<TTile, TSlot, TDrag, TDrop>) => {
 	const lastDropIdRef = useRef<string | null>(null);
+	const lastFeedbackKeyRef = useRef<string | null>(null);
 
 	return useCallback(() => {
 		const session = dragSessionRef.current;
@@ -54,6 +55,13 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 						...feedback,
 					}
 				: null;
+		const sourceElement = actorRef.current;
+		const sourceTileId = sourceElement?.dataset.akTileEngineTileId;
+		const sourceSlotId = sourceElement?.dataset.akTileEngineSlotId;
+		const feedbackKey = activeFeedback
+			? `${session.pointerId}:${activeFeedback.dropId}:${activeFeedback.targetTileId ?? ""}:${activeFeedback.effect}`
+			: `${session.pointerId}:${nextDropId ?? "none"}:none`;
+
 		if (lastDropIdRef.current !== nextDropId) {
 			lastDropIdRef.current = nextDropId;
 			DebugTimeline.record({
@@ -62,12 +70,39 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 				detail: {
 					dropId: nextDropId,
 					source: session.source,
+					sourceTileId,
+					sourceSlotId,
 					target: resolved?.payload ?? null,
+					targetSlotId: resolved?.slot?.id,
+					targetTileId: resolved?.targetTile?.id,
 					hasSlot: Boolean(resolved?.slot),
 					hasTargetTile: Boolean(resolved?.targetTile),
 				},
 			});
 		}
+
+		if (lastFeedbackKeyRef.current !== feedbackKey) {
+			const previousFeedbackKey = lastFeedbackKeyRef.current;
+			lastFeedbackKeyRef.current = feedbackKey;
+			DebugTimeline.record({
+				scope: "tile-engine",
+				event: "drag.feedback.resolve",
+				detail: {
+					previousFeedbackKey,
+					feedbackKey,
+					dropId: nextDropId,
+					feedback: activeFeedback,
+					source: session.source,
+					sourceTileId,
+					sourceSlotId,
+					target: resolved?.payload ?? null,
+					targetSlotId: resolved?.slot?.id,
+					targetTileId: resolved?.targetTile?.id,
+					targetTileSlotId: resolved?.targetTile?.slotId,
+				},
+			});
+		}
+
 		setActiveDropId(nextDropId);
 		setActiveDropFeedback(activeFeedback);
 		dragRef.current?.onDragOver?.(context);

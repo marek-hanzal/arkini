@@ -61,6 +61,72 @@ const readLocation = () => ({
 	hash: window.location.hash,
 });
 
+const readDataset = (element: HTMLElement) => Object.fromEntries(Object.entries(element.dataset));
+
+const readComputedMotion = (element: HTMLElement, pseudoElement?: string) => {
+	const style = window.getComputedStyle(element, pseudoElement);
+
+	return {
+		transform: style.transform,
+		transitionProperty: style.transitionProperty,
+		transitionDuration: style.transitionDuration,
+		transitionTimingFunction: style.transitionTimingFunction,
+		animationName: style.animationName,
+		animationDuration: style.animationDuration,
+		opacity: style.opacity,
+		backgroundColor: style.backgroundColor,
+		boxShadow: style.boxShadow,
+	};
+};
+
+const readTileEngineDom = () =>
+	Array.from(document.querySelectorAll<HTMLElement>("[data-ak-tile-engine-id]")).map(
+		(engine) => ({
+			id: engine.dataset.akTileEngineId,
+			className: engine.className,
+			actors: Array.from(
+				engine.querySelectorAll<HTMLElement>("[data-ak-tile-engine-tile-id]"),
+			).map((actor) => {
+				const child = actor.firstElementChild as HTMLElement | null;
+
+				return {
+					tileId: actor.dataset.akTileEngineTileId,
+					slotId: actor.dataset.akTileEngineSlotId,
+					dataset: readDataset(actor),
+					className: actor.className,
+					inlineStyle: {
+						transform: actor.style.transform,
+						zIndex: actor.style.zIndex,
+					},
+					computed: readComputedMotion(actor),
+					child: child
+						? {
+								tag: child.tagName.toLowerCase(),
+								dataset: readDataset(child),
+								className: child.className,
+								inlineStyle: {
+									transform: child.style.transform,
+								},
+								computed: readComputedMotion(child),
+							}
+						: null,
+				};
+			}),
+			slots: Array.from(
+				engine.querySelectorAll<HTMLElement>(
+					".ak-tile-engine-slot[data-ak-tile-engine-slot-id]",
+				),
+			).map((slot) => ({
+				slotId: slot.dataset.akTileEngineSlotId,
+				dropId: slot.dataset.akTileEngineDropId,
+				dataset: readDataset(slot),
+				className: slot.className,
+				computed: readComputedMotion(slot),
+				after: readComputedMotion(slot, "::after"),
+			})),
+		}),
+	);
+
 const readQueryState = (queryClient: QueryClient | undefined) => {
 	if (!queryClient) {
 		return {
@@ -116,6 +182,7 @@ const createReport = () => ({
 	browser: readBrowser(),
 	screen: readScreen(),
 	location: readLocation(),
+	tileEngineDom: readTileEngineDom(),
 	query: readQueryState(queryClientRef),
 	timeline: DebugTimeline.entries(),
 });

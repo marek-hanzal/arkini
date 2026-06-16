@@ -96,13 +96,16 @@ window.__ARKINI_BUG_REPORT__.clear()
 window.__ARKINI_DEBUG_TIMELINE__.entries()
 window.__ARKINI_SCENARIO__.list()
 window.__ARKINI_SCENARIO__.load("swap-board-items")
+window.__ARKINI_SCENARIO__.load("drag-merge-feedback")
 ```
 
-Bug reports are boring JSON on purpose: browser metadata, active sheet/error context, last loaded scenario, React Query cache snapshots for board/inventory/database, query states and the latest timeline entries. The timeline records TileEngine pointer/drag/drop/motion lifecycle, action mutation phases, optimistic cache restores, dev scenario loads and visual-event patch sequencing.
+Bug reports are boring JSON on purpose: browser metadata, active sheet/error context, last loaded scenario, TileEngine DOM snapshots, React Query cache snapshots for board/inventory/database, query states and the latest timeline entries. The timeline records TileEngine pointer/drag/drop/hover feedback/motion lifecycle, action mutation phases, optimistic cache restores, dev scenario loads and visual-event patch sequencing.
 
 Motion timeline events now include `motionId`, source/target tile IDs, source/target slot IDs, runtime drop animation (`parallel-swap`) and action visual animation groups (`groupId`, `mode`, `effect`, `cause`). For swap bugs, verify the same `motionId` has `motion.snap.start` and `motion.peer-snap.start` at nearly the same timestamp. For merge bugs, look for one `effect: "merge"` group followed by two `motion.exit.start` events and one `motion.enter.start` event with the same `groupId`; they should overlap, not politely queue like sad little DOM citizens.
 
 For animation bugs, use the Dev Sheet `Scenarios` section first when possible. Load the closest scenario, reproduce exactly one bug, then click `Copy bug report`. The useful report shape is: scenario ID, exact action, expected behavior, visible symptom, pasted JSON dump. Fewer vibes, more evidence, humanity heals slightly.
+
+For DnD hover feedback regressions, use `drag-merge-feedback`: drag the left twig over the right twig for `merge`, over the pebble for `blocked`, and over an empty cell for `empty`. The report must include `drag.feedback.resolve`, `slot.feedback.render`, `tile.feedback.render`, and `tileEngineDom`. Those distinguish resolver bugs, React/render propagation bugs, and CSS/data-attribute bugs instead of forcing another glorious séance with the DOM.
 
 ## Active improvement priorities
 

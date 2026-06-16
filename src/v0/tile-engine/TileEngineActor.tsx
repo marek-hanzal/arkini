@@ -1,4 +1,5 @@
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { cn } from "~/v0/ui/cn";
 import { actorStyle } from "~/v0/tile-engine/actorStyle";
 import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/TileEngineActor.types";
@@ -57,6 +58,32 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		exit: tile.exit,
 		tileId: tile.id,
 	});
+
+	useEffect(() => {
+		if (!dragging && !dropFeedback) return;
+
+		DebugTimeline.record({
+			scope: "tile-engine",
+			event: "tile.feedback.render",
+			detail: {
+				tileId: tile.id,
+				slotId: tile.slotId,
+				dragging,
+				feedback: dropFeedback,
+				actorDataset: actorRef.current
+					? {
+							dragging: actorRef.current.dataset.akTileEngineDragging,
+							dropFeedback: actorRef.current.dataset.akTileEngineDropFeedback,
+						}
+					: null,
+			},
+		});
+	}, [
+		dragging,
+		dropFeedback,
+		tile.id,
+		tile.slotId,
+	]);
 
 	const tap = useTileActorTap({
 		bindingRef,

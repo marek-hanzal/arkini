@@ -161,3 +161,9 @@ For stash exhaust, do not delete the durable stash row before the sequenced outp
 Producer output also uses explicit `mode: "sequence"` spawn events. First item enters immediately, later items follow by `actionVisualSequenceDelayMs`; do not silently revert producers to one cache batch unless we deliberately want the player to miss the output animation.
 
 Board merge drops use TileEngine `parallel-merge`, which commits the merge cache patch immediately instead of running a pre-commit source snap first. Merge fade/pop belongs to the merge visual event group, not to a separate “please wait while this twig politely parks itself” phase.
+
+### Tile presence animation tuning
+
+Tile actor travel and presence timings are intentionally a little slower than the old snappy values. Mobile Safari made the old merge success cross-fade feel choppy, especially when opacity and transform changed on the same tile visual. Keep short UI affordance transitions in CSS, but TileEngine presence motions (`enter`/`exit`) should temporarily disable the `.ak-tile-engine-visual` CSS transition with `data-ak-tile-engine-presence-motion`. Otherwise the browser can run CSS transition cleanup and WAAPI keyframes over the same `opacity`/`transform` properties, because apparently two animation systems touching one element is how frontend summons goblins.
+
+Merge success should stay subtle: result `merge-in` scales from roughly `0.9` to `1`, and old inputs `merge-out` scale only slightly down. Avoid giant `0.72 -> 1` scale pops for normal item tiles; they look dramatic on desktop and crunchy on iOS.

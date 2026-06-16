@@ -155,3 +155,12 @@ This must prevent ghost actors, stale hidden sources, duplicate actors, and post
 - Depleted stashes are now persisted as empty/unclickable until the output animation completes, then a delayed finalizer applies the durable depletion. This keeps the source tile draggable while it is still visually vomiting items, instead of deleting the row before the animation has even had the decency to happen.
 
 Keep this task open: the remaining work is to replace the old play-level motion staging/cleanup vocabulary with a stricter generic TileEngine animation request adapter. Do not do that as a giant rewrite unless the current runtime starts behaving like a haunted umbrella.
+
+## 2026-06-16 mobile/presence tuning note
+
+- Slowed global tile/action animation timings by roughly 50% so movement and spawn/merge presence have time to read visually instead of flashing like a tiny UI seizure.
+- Added a dedicated TileEngine `presenceDurationSeconds` and shared `motionCleanupBufferMs` so merge enter/exit cleanup no longer duplicates local magic buffers.
+- Presence motions now mark the visual element with `data-ak-tile-engine-presence-motion` while WAAPI owns `opacity`/`transform`; CSS transitions are disabled during that window to avoid transition/WAAPI property fights on merge success, especially on iOS Safari.
+- Merge-in/out scale deltas are deliberately less aggressive. The animation should read as a cross-fade/pop, not a rasterized accordion having a bad day.
+
+Keep task 012 open. This commit improves the existing runtime path; it does not yet replace the remaining play/cache visual-event adapter vocabulary with a formal generic TileEngine animation request API.

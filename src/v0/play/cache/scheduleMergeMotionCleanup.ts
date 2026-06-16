@@ -4,15 +4,12 @@ import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
-
 export namespace scheduleMergeMotionCleanup {
 	export interface Props {
 		queryClient: QueryClient;
 		events: readonly ActionVisualEventSchema.Type[];
 	}
 }
-
-const mergeMotionCleanupBufferMs = 80;
 
 export const scheduleMergeMotionCleanup = ({
 	events,
@@ -23,8 +20,8 @@ export const scheduleMergeMotionCleanup = ({
 
 		const { groupId } = event.animation;
 		const cleanupDelayMs =
-			(event.animation.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) +
-			mergeMotionCleanupBufferMs;
+			(event.animation.durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) +
+			TileEngineTiming.motionCleanupBufferMs;
 		globalThis.setTimeout(() => {
 			DebugTimeline.record({
 				scope: "action-cache",

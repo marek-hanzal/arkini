@@ -1,5 +1,5 @@
 import { animate } from "motion";
-import { type RefObject, useLayoutEffect } from "react";
+import { type RefObject, useLayoutEffect, useRef } from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
@@ -17,8 +17,22 @@ export const useTileActorExitMotion = ({
 	exit,
 	tileId,
 }: useTileActorExitMotion.Props) => {
+	const lastExitKeyRef = useRef<string | null>(null);
+
 	useLayoutEffect(() => {
-		if (!exit) return;
+		if (!exit) {
+			lastExitKeyRef.current = null;
+			return;
+		}
+
+		const exitKey = [
+			exit.groupId ?? "group:none",
+			exit.kind ?? "merge-out",
+			exit.delayMs ?? 0,
+			exit.durationMs ?? "duration:default",
+		].join(":");
+		if (lastExitKeyRef.current === exitKey) return;
+		lastExitKeyRef.current = exitKey;
 
 		const element = actorRef.current;
 		if (!element) return;

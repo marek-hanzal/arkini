@@ -4,7 +4,6 @@ import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { toTileEnterMotion } from "~/v0/play/motion/toTileEnterMotion";
-import { toTileExitMotion } from "~/v0/play/motion/toTileExitMotion";
 
 const createBoardItem = (
 	event: Extract<
@@ -124,56 +123,33 @@ export const applyBoardVisualEvent = (
 				const source = board.byId[merged.sourceItemInstanceId];
 				const target = board.byId[merged.targetItemInstanceId];
 				if (!target) return board;
+				if (!source && target.itemId === merged.resultItemId) return board;
 
-				const exit = toTileExitMotion(merged.animation);
-				const targetSlot = {
-					x: target.x,
-					y: target.y,
-				};
-				const sourceExitGhost =
-					merged.consumeSource && source
-						? {
-								...source,
-								id: `cache:merge-out:${merged.animation.groupId}:source:${source.id}`,
-								x: targetSlot.x,
-								y: targetSlot.y,
+				return rebuildBoardView(
+					board.items.flatMap((item) => {
+						if (merged.consumeSource && item.id === merged.sourceItemInstanceId) {
+							return [];
+						}
+						if (item.id !== merged.targetItemInstanceId) {
+							return [
+								item,
+							];
+						}
+
+						return [
+							{
+								...item,
+								itemId: merged.resultItemId,
+								state: {},
+								activation: undefined,
+								craft: undefined,
 								motion: {
-									exit,
+									enter: toTileEnterMotion(merged.animation),
 								},
-							}
-						: undefined;
-				const targetExitGhost = {
-					...target,
-					id: `cache:merge-out:${merged.animation.groupId}:target:${target.id}`,
-					motion: {
-						exit,
-					},
-				};
-				const result = {
-					...target,
-					itemId: merged.resultItemId,
-					state: {},
-					activation: undefined,
-					craft: undefined,
-					motion: {
-						enter: toTileEnterMotion(merged.animation),
-					},
-				};
-
-				return rebuildBoardView([
-					...board.items.filter(
-						(item) =>
-							item.id !== merged.sourceItemInstanceId &&
-							item.id !== merged.targetItemInstanceId,
-					),
-					...(sourceExitGhost
-						? [
-								sourceExitGhost,
-							]
-						: []),
-					targetExitGhost,
-					result,
-				]);
+							},
+						];
+					}),
+				);
 			},
 		)
 		.with(

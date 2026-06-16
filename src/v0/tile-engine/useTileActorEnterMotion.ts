@@ -1,6 +1,6 @@
 import { animate } from "motion";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
-import { type RefObject, useLayoutEffect } from "react";
+import { type RefObject, useLayoutEffect, useRef } from "react";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
@@ -17,8 +17,22 @@ export const useTileActorEnterMotion = ({
 	enter,
 	tileId,
 }: useTileActorEnterMotion.Props) => {
+	const lastEnterKeyRef = useRef<string | null>(null);
+
 	useLayoutEffect(() => {
-		if (!enter) return;
+		if (!enter) {
+			lastEnterKeyRef.current = null;
+			return;
+		}
+
+		const enterKey = [
+			enter.groupId ?? "group:none",
+			enter.kind ?? "fade-in",
+			enter.delayMs ?? 0,
+			enter.durationMs ?? "duration:default",
+		].join(":");
+		if (lastEnterKeyRef.current === enterKey) return;
+		lastEnterKeyRef.current = enterKey;
 
 		const element = actorRef.current;
 		if (!element) return;

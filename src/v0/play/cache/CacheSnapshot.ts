@@ -5,5 +5,6 @@ export namespace CacheSnapshot {
 	export interface Type {
 		board?: BoardView;
 		inventory?: InventoryView;
+		boardTransientMergeGroupIds?: readonly string[];
 	}
 }

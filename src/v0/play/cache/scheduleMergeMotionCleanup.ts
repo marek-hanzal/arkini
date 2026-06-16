@@ -3,6 +3,7 @@ import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
+import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
 export namespace scheduleMergeMotionCleanup {
 	export interface Props {
@@ -13,14 +14,6 @@ export namespace scheduleMergeMotionCleanup {
 
 const mergeMotionCleanupBufferMs = 80;
 
-const isMergeExitGhost = (
-	groupId: string,
-	item: {
-		id: string;
-		motion?: unknown;
-	},
-) => item.id.startsWith(`cache:merge-out:${groupId}:`);
-
 export const scheduleMergeMotionCleanup = ({
 	events,
 	queryClient,
@@ -29,8 +22,9 @@ export const scheduleMergeMotionCleanup = ({
 		if (event.type !== "item.merged") continue;
 
 		const { groupId } = event.animation;
-		const durationMs = event.animation.durationMs ?? 0;
-		const cleanupDelayMs = durationMs + mergeMotionCleanupBufferMs;
+		const cleanupDelayMs =
+			(event.animation.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) +
+			mergeMotionCleanupBufferMs;
 		globalThis.setTimeout(() => {
 			DebugTimeline.record({
 				scope: "action-cache",
@@ -45,22 +39,17 @@ export const scheduleMergeMotionCleanup = ({
 				queryClient,
 				patch: (board) =>
 					rebuildBoardView(
-						board.items.flatMap((item) => {
-							if (isMergeExitGhost(groupId, item)) return [];
+						board.items.map((item) => {
 							if (
 								item.id === event.targetItemInstanceId &&
 								item.motion?.enter?.groupId === groupId
 							) {
-								return [
-									{
-										...item,
-										motion: undefined,
-									},
-								];
+								return {
+									...item,
+									motion: undefined,
+								};
 							}
-							return [
-								item,
-							];
+							return item;
 						}),
 					),
 			});

@@ -3,6 +3,7 @@ import { cn } from "~/v0/ui/cn";
 import { TileEngineActor } from "~/v0/tile-engine/TileEngineActor";
 import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/TileEngineActor.types";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
+import type { TileEngineMotionSchema } from "~/v0/tile-engine/TileEngineMotionSchema";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
 export namespace TileEngineActors {
@@ -15,6 +16,7 @@ export namespace TileEngineActors {
 		actorLayerClassName?: string;
 		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
+		motionByTileId: ReadonlyMap<string, TileEngineMotionSchema.Type>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		activeDropFeedback: TileEngine.ActiveDropFeedback | null;
 		setActiveDropId(dropId: string | null): void;
@@ -35,6 +37,7 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	actorLayerClassName,
 	drag,
 	dragConstraintsRef,
+	motionByTileId,
 	resolveDrop,
 	activeDropFeedback,
 	setActiveDropId,
@@ -53,6 +56,7 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 		{tiles.map((tile) => {
 			const index = slotIndexById.get(tile.slotId);
 			if (index === undefined) return null;
+			const motion = motionByTileId.get(tile.id);
 
 			const tileDropFeedback =
 				activeDropFeedback?.targetTileId === tile.id ? activeDropFeedback : null;
@@ -61,6 +65,8 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 				<TileEngineActor
 					key={tile.id}
 					tile={tile}
+					enter={motion?.enter}
+					exit={motion?.exit}
 					index={index}
 					columns={columns}
 					rowCount={rowCount}

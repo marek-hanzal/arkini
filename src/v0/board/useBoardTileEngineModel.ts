@@ -61,7 +61,6 @@ export const useBoardTileEngineModel = ({
 						boardItemId: boardItem.id,
 					},
 					disabled: false,
-					enter: boardItem.motion?.enter,
 				})),
 				...transientTiles.map((tile) => ({
 					id: tile.id,
@@ -71,7 +70,6 @@ export const useBoardTileEngineModel = ({
 						itemId: tile.itemId,
 					},
 					disabled: true,
-					exit: tile.exit,
 					style: {
 						pointerEvents: "none" as const,
 					},

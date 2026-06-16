@@ -72,7 +72,6 @@ export const useInventoryTileEngineModel = ({
 						data: {
 							slotIndex: slot.slotIndex,
 						},
-						enter: stack.motion?.enter,
 					},
 				] satisfies TileEngine.Tile<InventorySurface.TileData>[];
 			}),

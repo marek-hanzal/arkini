@@ -7,6 +7,7 @@ import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.t
 import { useTileEngineDrops } from "~/v0/tile-engine/useTileEngineDrops";
 import { useTileEngineHandoff } from "~/v0/tile-engine/useTileEngineHandoff";
 import { useTileEngineIndexes } from "~/v0/tile-engine/useTileEngineIndexes";
+import { useTileEngineMotionRequests } from "~/v0/tile-engine/TileEngineMotionRequestStore";
 
 export type { TileEngine as TileEngineNamespace } from "~/v0/tile-engine/TileEngine.types";
 
@@ -54,6 +55,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 		slots,
 		tiles,
 	});
+	const motionByTileId = useTileEngineMotionRequests(id);
 	const drops = useTileEngineDrops<TSlot, TTile, TDrop>();
 	const handoff = useTileEngineHandoff();
 
@@ -91,6 +93,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				actorLayerClassName={actorLayerClassName}
 				drag={disabled ? undefined : drag}
 				dragConstraintsRef={dragConstraintsRef}
+				motionByTileId={motionByTileId}
 				resolveDrop={drops.resolveDrop}
 				setActiveDropId={setActiveDropId}
 				setActiveDropFeedback={setActiveDropFeedback}

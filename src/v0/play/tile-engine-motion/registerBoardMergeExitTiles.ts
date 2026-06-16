@@ -8,6 +8,7 @@ import {
 	removeBoardTransientTilesByGroup,
 	upsertBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
+import { registerTileEngineMotionRequests } from "~/v0/tile-engine/TileEngineMotionRequestStore";
 
 export namespace registerBoardMergeExitTiles {
 	export interface Props {
@@ -34,17 +35,17 @@ export const registerBoardMergeExitTiles = ({
 				? [
 						{
 							id: `transient:merge-out:${event.animation.groupId}:source:${source.id}`,
+							groupId: event.animation.groupId,
 							itemId: event.sourceItemId,
 							slotId: cellKey(target.x, target.y),
-							exit,
 						},
 					]
 				: []),
 			{
 				id: `transient:merge-out:${event.animation.groupId}:target:${target.id}`,
+				groupId: event.animation.groupId,
 				itemId: event.targetItemId,
 				slotId: cellKey(target.x, target.y),
-				exit,
 			},
 		];
 
@@ -61,6 +62,14 @@ export const registerBoardMergeExitTiles = ({
 		});
 
 		upsertBoardTransientTiles(transientTiles);
+		registerTileEngineMotionRequests({
+			engineId: "board",
+			requests: transientTiles.map((tile) => ({
+				cleanupDelayMs: actionVisualMotionSettlementDelayMs(event.animation),
+				tileId: tile.id,
+				exit,
+			})),
+		});
 
 		const cleanupDelayMs = actionVisualMotionSettlementDelayMs(event.animation);
 		globalThis.setTimeout(() => {

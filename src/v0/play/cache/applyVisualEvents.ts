@@ -3,6 +3,8 @@ import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { boardQueryKeys } from "~/v0/board/query/boardQueryKeys";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
+import { inventoryQueryKeys } from "~/v0/inventory/query/inventoryQueryKeys";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
 import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryViewCache";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
@@ -10,7 +12,7 @@ import { patchBoardVisualEvents } from "~/v0/play/cache/applyBoardVisualEvent";
 import { patchInventoryVisualEvents } from "~/v0/play/cache/applyInventoryVisualEvent";
 import { summarizeVisualEventGroups } from "~/v0/play/cache/summarizeVisualEventGroups";
 import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
-import { scheduleTileEngineMotionCleanup } from "~/v0/play/cache/scheduleTileEngineMotionCleanup";
+import { registerTileEngineEnterRequests } from "~/v0/play/tile-engine-motion/registerTileEngineEnterRequests";
 
 export namespace applyVisualEvents {
 	export interface Props {
@@ -45,9 +47,10 @@ export const applyVisualEvents = ({ events, queryClient }: applyVisualEvents.Pro
 		queryClient,
 		patch: (inventory) => patchInventoryVisualEvents(inventory, events),
 	});
-	scheduleTileEngineMotionCleanup({
+	registerTileEngineEnterRequests({
+		board: queryClient.getQueryData<BoardView>(boardQueryKeys.view),
 		events,
-		queryClient,
+		inventory: queryClient.getQueryData<InventoryView>(inventoryQueryKeys.view),
 	});
 	DebugTimeline.record({
 		scope: "action-cache",

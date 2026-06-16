@@ -3,6 +3,10 @@ import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
 import {
+	clearTileEngineMotionRequests,
+	readTileEngineMotionRequests,
+} from "~/v0/tile-engine/TileEngineMotionRequestStore";
+import {
 	clearBoardTransientTiles,
 	readBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
@@ -91,9 +95,13 @@ describe("applyBoardVisualEvent", () => {
 
 		const next = applyBoardVisualEvent(boardView(), event);
 
-		expect(next.byId.spawned?.motion?.enter).toMatchObject({
-			kind: "fade-in",
+		expect(next.byId.spawned).toMatchObject({
+			id: "spawned",
+			itemId: "item:twig",
+			x: 3,
+			y: 1,
 		});
+		expect("motion" in (next.byId.spawned ?? {})).toBe(false);
 	});
 
 	it("anchors spawned board item motion to the origin tile when available", () => {
@@ -116,10 +124,13 @@ describe("applyBoardVisualEvent", () => {
 
 		const next = applyBoardVisualEvent(boardView(), event);
 
-		expect(next.byId.spawned?.motion?.enter).toMatchObject({
-			fromTileId: "source",
-			kind: "spawn-from-tile",
+		expect(next.byId.spawned).toMatchObject({
+			id: "spawned",
+			itemId: "item:twig",
+			x: 3,
+			y: 1,
 		});
+		expect("motion" in (next.byId.spawned ?? {})).toBe(false);
 	});
 
 	it("cross-fades merge inputs out while the merge result appears", () => {
@@ -141,10 +152,7 @@ describe("applyBoardVisualEvent", () => {
 
 		expect(next.byId.source).toBeUndefined();
 		expect(next.byId.target?.itemId).toBe("item:branch");
-		expect(next.byId.target?.motion?.enter).toMatchObject({
-			groupId: "merge:source:target",
-			kind: "merge-in",
-		});
+		expect("motion" in (next.byId.target ?? {})).toBe(false);
 		expect(next.items.some((item) => item.id.startsWith("cache:merge-out:"))).toBe(false);
 		expect(next.byCellKey["1:0"]?.id).toBe("target");
 		expect(next.items).toHaveLength(1);
@@ -228,24 +236,27 @@ describe("applyBoardVisualEvent", () => {
 			expect(readBoardTransientTiles()).toMatchObject([
 				{
 					id: "transient:merge-out:merge:source:target:source:source",
+					groupId: "merge:source:target",
 					itemId: "item:twig",
 					slotId: "1:0",
-					exit: {
-						groupId: "merge:source:target",
-						kind: "merge-out",
-					},
 				},
 				{
 					id: "transient:merge-out:merge:source:target:target:target",
+					groupId: "merge:source:target",
 					itemId: "item:twig",
 					slotId: "1:0",
-					exit: {
-						groupId: "merge:source:target",
-						kind: "merge-out",
-					},
 				},
 			]);
+			expect(
+				readTileEngineMotionRequests("board").get(
+					"transient:merge-out:merge:source:target:source:source",
+				)?.exit,
+			).toMatchObject({
+				groupId: "merge:source:target",
+				kind: "merge-out",
+			});
 			clearBoardTransientTiles();
+			clearTileEngineMotionRequests();
 		});
 	});
 });
@@ -271,9 +282,7 @@ describe("applyInventoryVisualEvent", () => {
 
 		expect(next.bySlotIndex["0"]?.stack?.id).toBe("stack-0");
 		expect(next.bySlotIndex["0"]?.stack?.quantity).toBe(3);
-		expect(next.bySlotIndex["0"]?.stack?.motion?.enter).toMatchObject({
-			kind: "fade-in",
-		});
+		expect("motion" in (next.bySlotIndex["0"]?.stack ?? {})).toBe(false);
 	});
 
 	it("creates an inventory stack when a spawned item lands in an empty slot", () => {
@@ -300,11 +309,6 @@ describe("applyInventoryVisualEvent", () => {
 			quantity: 1,
 			stateJson: "{}",
 			stateful: false,
-			motion: {
-				enter: {
-					kind: "fade-in",
-				},
-			},
 		});
 	});
 });

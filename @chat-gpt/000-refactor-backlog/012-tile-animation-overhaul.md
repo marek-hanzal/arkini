@@ -196,3 +196,11 @@ Keep task 012 open. The remaining larger step is a real TileEngine animation req
 
 - Enter/exit cleanup now cancels the TileEngine presence motion before clearing the presence marker. The marker disables visual CSS transitions, so cancellation/freeze must happen while the marker still owns the element; clearing first lets CSS transitions wake up during cleanup like a tiny sabotage intern.
 - Drop motion debug IDs now use a monotonic sequence too. They are only timeline metadata, but timestamp-ish IDs invite false correlations when debugging parallel swap/merge reports.
+
+## 2026-06-16 TileEngine motion cache settlement note
+
+- Replaced the merge-only motion cleanup scheduler with `scheduleTileEngineMotionCleanup`, which clears generic TileEngine `enter` metadata for both board and inventory animation targets after the visual duration plus the shared cleanup buffer.
+- Spawned board items, spawned/stacked inventory items and merge result targets no longer keep stale `motion.enter` data in React Query cache forever. The metadata is now treated as a temporary handoff into TileEngine presence execution, not as durable view state.
+- Cleanup is group guarded through `clearTileEngineEnterMotion`. A delayed cleanup only removes the enter motion that still has the same animation group, so a newer spawn/merge on the same target slot will not get wiped by an older timeout doing its best impression of a haunted janitor.
+
+Keep task 012 open. The remaining larger cleanup is still to move this handoff from cache row metadata toward a real TileEngine request registry, but this step tightens the current settlement contract without a risky rewrite.

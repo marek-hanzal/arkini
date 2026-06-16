@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActivateItemInputSchema } from "~/v0/activation/type/ActivateItemInputSchema";
 import type { ActivationPlacementSchema } from "~/v0/activation/type/ActivationPlacementSchema";
 import type { BoardItemRowSchema } from "~/v0/board/schema/BoardItemRowSchema";
@@ -14,13 +15,30 @@ export namespace createActivationVisualEventsFx {
 
 export const createActivationVisualEventsFx = Effect.fn("createActivationVisualEventsFx")(
 	function* ({ mode, placements, row }: createActivationVisualEventsFx.Props) {
+		const groupId = `activation:${row.id}:${mode}`;
+		const spawnAnimation = (sequenceIndex: number) =>
+			mode === "exhaust"
+				? ActionVisualAnimation.sequenceFadeIn({
+						cause: "stash",
+						groupId,
+						sequenceIndex,
+					})
+				: ActionVisualAnimation.instantFadeIn({
+						cause: "producer",
+						groupId,
+					});
+
 		return [
 			{
 				type: "activation.activated",
+				animation: ActionVisualAnimation.state({
+					cause: "activation",
+					groupId,
+				}),
 				itemInstanceId: row.id,
 				mode,
 			},
-			...placements.flatMap((placement): ActionVisualEventSchema.Type[] => {
+			...placements.flatMap((placement, sequenceIndex): ActionVisualEventSchema.Type[] => {
 				if (placement.kind === "board") {
 					if (
 						!placement.boardItemId ||
@@ -33,6 +51,7 @@ export const createActivationVisualEventsFx = Effect.fn("createActivationVisualE
 					return [
 						{
 							type: "item.spawned",
+							animation: spawnAnimation(sequenceIndex),
 							itemInstanceId: placement.boardItemId,
 							itemId: placement.itemId,
 							originItemInstanceId: row.id,
@@ -51,6 +70,7 @@ export const createActivationVisualEventsFx = Effect.fn("createActivationVisualE
 				return [
 					{
 						type: "item.spawned",
+						animation: spawnAnimation(sequenceIndex),
 						itemInstanceId: placement.itemInstanceId,
 						itemId: placement.itemId,
 						originItemInstanceId: row.id,

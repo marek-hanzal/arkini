@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
@@ -78,6 +79,10 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* (
 				visualEvents: [
 					{
 						type: "item.swapped",
+						animation: ActionVisualAnimation.parallelMove({
+							cause: "swap",
+							groupId: `swap:${source.id}:${target.id}`,
+						}),
 						sourceItemInstanceId: source.id,
 						sourceItemId: source.itemDefinitionId,
 						sourceFrom: {

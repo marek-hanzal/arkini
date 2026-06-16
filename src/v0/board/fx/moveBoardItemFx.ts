@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import { assertInsideBoard } from "~/v0/board/logic/assertInsideBoard";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
@@ -64,6 +65,10 @@ export const moveBoardItemFx = Effect.fn("moveBoardItemFx")(function* (
 				visualEvents: [
 					{
 						type: "item.moved",
+						animation: ActionVisualAnimation.parallelMove({
+							cause: "move",
+							groupId: `board-move:${boardItem.id}:${input.x}:${input.y}`,
+						}),
 						itemInstanceId: boardItem.id,
 						itemId: boardItem.itemDefinitionId,
 						from: {

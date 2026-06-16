@@ -23,30 +23,40 @@ export const useTileActorEnterMotion = ({
 		const element = actorRef.current;
 		if (!element) return;
 
+		const kind = enter.kind ?? "fade-in";
 		DebugTimeline.record({
 			scope: "tile-engine",
 			event: "motion.enter.start",
 			detail: {
+				kind,
 				tileId,
 				delayMs: enter.delayMs ?? 0,
+				durationMs: enter.durationMs,
 			},
 		});
 
 		void animate(
 			element,
-			{
-				opacity: [
-					0,
-					1,
-				],
-				transform: [
-					"translate3d(0px, 8px, 0px) scale(0.72)",
-					"translate3d(0px, 0px, 0px) scale(1)",
-				],
-			},
+			kind === "fade-in"
+				? {
+						opacity: [
+							0,
+							1,
+						],
+					}
+				: {
+						opacity: [
+							0,
+							1,
+						],
+						transform: [
+							"translate3d(0px, 8px, 0px) scale(0.72)",
+							"translate3d(0px, 0px, 0px) scale(1)",
+						],
+					},
 			{
 				delay: (enter.delayMs ?? 0) / 1000,
-				duration: TileEngineTiming.moveDurationSeconds,
+				duration: (enter.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
 				ease: TileEngineTiming.moveEase,
 			},
 		).then(() =>

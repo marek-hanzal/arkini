@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 import { insertBoardItemFx } from "~/v0/board/fx/insertBoardItemFx";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
@@ -101,6 +102,10 @@ export const placeInventoryItemFx = Effect.fn("placeInventoryItemFx")(function* 
 					visualEvents: [
 						{
 							type: "item.moved",
+							animation: ActionVisualAnimation.parallelMove({
+								cause: "inventory",
+								groupId: `inventory-place:${stack.id}:${input.x}:${input.y}`,
+							}),
 							itemInstanceId: inventoryPlace.boardItemId,
 							itemId: stack.itemDefinitionId as ItemId,
 							from: {
@@ -142,6 +147,10 @@ export const placeInventoryItemFx = Effect.fn("placeInventoryItemFx")(function* 
 				visualEvents: [
 					{
 						type: "item.spawned",
+						animation: ActionVisualAnimation.instantFadeIn({
+							cause: "inventory",
+							groupId: `inventory-place:${boardItemId}:${input.x}:${input.y}`,
+						}),
 						itemInstanceId: boardItemId,
 						itemId: stack.itemDefinitionId as ItemId,
 						from: {

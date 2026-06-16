@@ -10,7 +10,7 @@ Add enough safety checks and runtime traces to stop future refactors from silent
 
 - `npm run check` is the fast local gate: format check, dependency-cruiser, typecheck and Vitest. Run `npm run build` separately before packaging non-doc work.
 - `npm run dc` enforces the first boundary rules with dependency-cruiser.
-- Vitest is installed and has focused tests for board/inventory visual event cache patching plus visual-event sequencing expectations.
+- Vitest is installed and has focused tests for board/inventory visual event cache patching plus visual-event sequencing and animation contract expectations.
 - Dev builds expose `window.__ARKINI_DEBUG_TIMELINE__` with selected TileEngine pointer/drag/drop events and action-cache visual event application.
 - The Dev Sheet has deterministic scenario buttons for animation bug reports, and dev builds expose `window.__ARKINI_SCENARIO__.list/load`.
 - Zod schemas validate many view/config shapes.
@@ -37,6 +37,7 @@ Add enough safety checks and runtime traces to stop future refactors from silent
 - `npm run check` stays green.
 - New action/cache/manifest behavior has focused tests when practical.
 - Debug timeline can provide enough ordered information for drag/drop/animation bug reports without polluting production behavior.
+- Animated action results carry explicit `animation` metadata for parallel swap, sequenced stash output and instant fade-in spawn behavior.
 
 ## Watchouts
 

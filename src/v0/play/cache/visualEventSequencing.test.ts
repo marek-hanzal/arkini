@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import {
 	shouldSequenceSpawnVisualEvents,
@@ -13,10 +14,14 @@ const boardLocation = (x: number, y: number) =>
 	}) as const;
 
 describe("visual event sequencing", () => {
-	it("keeps swap events as one immediate batch so both tiles can animate in parallel", () => {
+	it("keeps swap events as one parallel animation contract", () => {
 		const events = [
 			{
 				type: "item.swapped",
+				animation: ActionVisualAnimation.parallelMove({
+					cause: "swap",
+					groupId: "swap:source:target",
+				}),
 				sourceItemInstanceId: "source",
 				sourceItemId: "item:twig",
 				sourceFrom: boardLocation(2, 4),
@@ -32,12 +37,18 @@ describe("visual event sequencing", () => {
 		expect(events).toHaveLength(1);
 		expect(events[0]).toMatchObject({
 			type: "item.swapped",
+			animation: {
+				cause: "swap",
+				effect: "move",
+				groupId: "swap:source:target",
+				mode: "parallel",
+			},
 			sourceTo: boardLocation(4, 4),
 			targetTo: boardLocation(2, 4),
 		});
 	});
 
-	it("does not sequence normal producer spawn batches", () => {
+	it("does not sequence normal producer spawn batches, but still marks them as instant fade-in", () => {
 		const events = [
 			{
 				type: "activation.activated",
@@ -46,6 +57,10 @@ describe("visual event sequencing", () => {
 			},
 			{
 				type: "item.spawned",
+				animation: ActionVisualAnimation.instantFadeIn({
+					cause: "producer",
+					groupId: "activation:producer:single",
+				}),
 				itemInstanceId: "spawned-a",
 				itemId: "item:twig",
 				originItemInstanceId: "producer",
@@ -54,6 +69,10 @@ describe("visual event sequencing", () => {
 			},
 			{
 				type: "item.spawned",
+				animation: ActionVisualAnimation.instantFadeIn({
+					cause: "producer",
+					groupId: "activation:producer:single",
+				}),
 				itemInstanceId: "spawned-b",
 				itemId: "item:branch",
 				originItemInstanceId: "producer",
@@ -63,6 +82,14 @@ describe("visual event sequencing", () => {
 		] satisfies ActionVisualEventSchema.Type[];
 
 		expect(shouldSequenceSpawnVisualEvents(events)).toBe(false);
+		expect(events.slice(1).map((event) => event.animation?.mode)).toEqual([
+			"instant",
+			"instant",
+		]);
+		expect(events.slice(1).map((event) => event.animation?.effect)).toEqual([
+			"fade-in",
+			"fade-in",
+		]);
 	});
 
 	it("sequences exhaust spawn batches with a visible stagger", () => {
@@ -74,6 +101,11 @@ describe("visual event sequencing", () => {
 			},
 			{
 				type: "item.spawned",
+				animation: ActionVisualAnimation.sequenceFadeIn({
+					cause: "stash",
+					groupId: "activation:stash:exhaust",
+					sequenceIndex: 0,
+				}),
 				itemInstanceId: "spawned-a",
 				itemId: "item:twig",
 				originItemInstanceId: "stash",
@@ -82,6 +114,11 @@ describe("visual event sequencing", () => {
 			},
 			{
 				type: "item.spawned",
+				animation: ActionVisualAnimation.sequenceFadeIn({
+					cause: "stash",
+					groupId: "activation:stash:exhaust",
+					sequenceIndex: 1,
+				}),
 				itemInstanceId: "spawned-b",
 				itemId: "item:pebble",
 				originItemInstanceId: "stash",
@@ -92,5 +129,9 @@ describe("visual event sequencing", () => {
 
 		expect(shouldSequenceSpawnVisualEvents(events)).toBe(true);
 		expect(spawnSequenceDelayMs).toBeGreaterThanOrEqual(100);
+		expect(events.slice(1).map((event) => event.animation?.delayMs)).toEqual([
+			0,
+			spawnSequenceDelayMs,
+		]);
 	});
 });

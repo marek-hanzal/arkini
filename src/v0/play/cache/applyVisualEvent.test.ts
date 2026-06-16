@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { applyBoardVisualEvent } from "~/v0/play/cache/applyBoardVisualEvent";
 import { applyInventoryVisualEvent } from "~/v0/play/cache/applyInventoryVisualEvent";
@@ -64,6 +65,30 @@ describe("applyBoardVisualEvent", () => {
 		expect(next.byId.source?.x).toBe(2);
 		expect(next.byId.source?.y).toBe(3);
 		expect(next.byCellKey["2:3"]?.id).toBe("source");
+	});
+
+	it("uses instant fade-in motion for spawned board items", () => {
+		const event = {
+			type: "item.spawned",
+			animation: ActionVisualAnimation.instantFadeIn({
+				cause: "producer",
+				groupId: "activation:producer:single",
+			}),
+			itemInstanceId: "spawned",
+			itemId: "item:twig",
+			to: {
+				kind: "board",
+				x: 3,
+				y: 1,
+			},
+			reason: "activation-output",
+		} satisfies ActionVisualEventSchema.Type;
+
+		const next = applyBoardVisualEvent(boardView(), event);
+
+		expect(next.byId.spawned?.motion?.enter).toMatchObject({
+			kind: "fade-in",
+		});
 	});
 
 	it("consumes merge sources and upgrades the merge target", () => {
@@ -159,6 +184,10 @@ describe("applyInventoryVisualEvent", () => {
 	it("creates an inventory stack when a spawned item lands in an empty slot", () => {
 		const event = {
 			type: "item.spawned",
+			animation: ActionVisualAnimation.instantFadeIn({
+				cause: "producer",
+				groupId: "activation:producer:single",
+			}),
 			itemInstanceId: "spawned",
 			itemId: "item:branch",
 			to: {
@@ -176,6 +205,11 @@ describe("applyInventoryVisualEvent", () => {
 			quantity: 1,
 			stateJson: "{}",
 			stateful: false,
+			motion: {
+				enter: {
+					kind: "fade-in",
+				},
+			},
 		});
 	});
 });

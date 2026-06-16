@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
 import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
@@ -76,6 +77,10 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 	return [
 		{
 			type: "craft.started",
+			animation: ActionVisualAnimation.state({
+				cause: "craft",
+				groupId: `craft-start:${boardItemId}:${recipe.id}`,
+			}),
 			itemInstanceId: boardItemId,
 			recipeId: recipe.id,
 			resultItemId: recipe.resultItemId,

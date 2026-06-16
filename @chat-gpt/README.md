@@ -66,6 +66,19 @@ npm run check
 
 Arkini uses npm without a committed lockfile. Do not add `package-lock.json`, `bun.lockb`, or similar unless the dependency policy changes deliberately.
 
+
+## Animation contract
+
+Action visual events may carry `animation` metadata. Treat this as the data contract between domain actions, cache patching and TileEngine rendering:
+
+- `mode: "parallel"` means related movement must be allowed to start together. Swap events use this; do not split them into staggered follow-up events unless the UX explicitly changes.
+- `mode: "sequence"` means the cache patcher schedules the event by `delayMs` / `sequenceIndex`. Stash exhaust output uses this to drip items one by one.
+- `mode: "instant"` is still an animation. It means no travel/path intent, only enter/fade-in. Never interpret it as “render without animation”, because apparently even words need guard rails now.
+- `effect: "fade-in"` maps to TileEngine enter motion without translate/scale. `effect: "move"` means the item is expected to travel or has already been handed off by drag/drop.
+- `groupId` ties events that belong to one user-visible action. Keep it deterministic and readable; bug reports include this metadata.
+
+Prefer `ActionVisualAnimation` helpers instead of hand-writing animation objects in fx roots. The helpers are intentionally boring so the event contract stays consistent and testable.
+
 ## Dev Sheet and bug reports
 
 The bottom nav `Dev` sheet replaces the old database-only sheet. It keeps the OPFS/SQLite status and hard reset button, but adds a `Copy bug report` button for animation/debug work.
@@ -88,10 +101,11 @@ For animation bugs, use the Dev Sheet `Scenarios` section first when possible. L
 ## Active improvement priorities
 
 1. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.
-2. Add more Vitest coverage around domain action results, visual-event ordering, cache patches, placement planning and manifest validation.
-3. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks.
-4. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.
-5. Keep manifest content editable through small topic files and a documented checklist rather than inventing a config framework that cosplays as productivity.
+2. Keep action visual events explicit through `ActionVisualAnimation`; test event ordering and animation contract when adding new animated behavior.
+3. Add more Vitest coverage around domain action results, visual-event ordering, cache patches, placement planning and manifest validation.
+4. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks.
+5. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.
+6. Keep manifest content editable through small topic files and a documented checklist rather than inventing a config framework that cosplays as productivity.
 
 ## Backlog conventions
 

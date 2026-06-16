@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import { assertInsideInventory } from "~/v0/board/logic/assertInsideInventory";
 import { dbFx } from "~/v0/database/fx/dbFx";
 import { withTransactionFx } from "~/v0/database/fx/withTransactionFx";
@@ -109,6 +110,10 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 				visualEvents: [
 					{
 						type: "item.swapped",
+						animation: ActionVisualAnimation.parallelMove({
+							cause: "swap",
+							groupId: `inventory-swap:${source.id}:${target.id}`,
+						}),
 						sourceItemInstanceId: source.id,
 						sourceItemId: source.itemDefinitionId,
 						sourceFrom: {

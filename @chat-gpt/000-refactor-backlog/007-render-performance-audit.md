@@ -41,5 +41,6 @@ Ensure board/inventory/tile rendering stays fast, stable, and animation-friendly
 - Changed `TileEngineSlot` to receive only its own resolved feedback instead of global `activeDropId` / `activeDropFeedback`, so drag-over changes do not pass changing props to every slot. This keeps memoized cells asleep except for the previous/current hover targets.
 - Removed unnecessary per-cell inventory slot query subscription from `InventoryCell`; it only needed the slot index it already receives.
 - Removed the per-tile inventory slot query from `InventoryTile`; stack id, item id and quantity now come from TileEngine tile data, while the tile still subscribes only to the item catalog view.
+- Added DEV timeline actor lifecycle diagnostics (`actor.lifecycle.mount` / `actor.lifecycle.unmount`) so bug reports can prove whether a move reused the same actor or accidentally remounted it.
 
-Remaining audit areas: actor remount diagnostics, parent render/callback stability review, and any mobile-specific render churn found during manual play.
+Remaining audit areas: parent render/callback stability review and any mobile-specific render churn found during manual play.

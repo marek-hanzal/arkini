@@ -155,7 +155,6 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 					index,
 					gapPx,
 				}),
-				zIndex: dragging ? 30 : 10,
 				...tile.style,
 			}}
 			onPointerDown={dragHandlers.handlePointerDown}

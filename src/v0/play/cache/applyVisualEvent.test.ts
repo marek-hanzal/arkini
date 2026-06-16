@@ -203,7 +203,7 @@ describe("applyBoardVisualEvent", () => {
 				{
 					id: "transient:merge-out:merge:source:target:source:source",
 					itemId: "item:twig",
-					slotId: "0:0",
+					slotId: "1:0",
 					exit: {
 						groupId: "merge:source:target",
 						kind: "merge-out",

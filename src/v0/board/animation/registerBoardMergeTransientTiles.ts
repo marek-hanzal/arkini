@@ -37,7 +37,7 @@ export const registerBoardMergeTransientTiles = ({
 						{
 							id: `transient:merge-out:${event.animation.groupId}:source:${source.id}`,
 							itemId: event.sourceItemId,
-							slotId: cellKey(source.x, source.y),
+							slotId: cellKey(target.x, target.y),
 							exit,
 						},
 					]

@@ -40,13 +40,15 @@ export namespace useTilePointerUp {
 	}
 }
 
+let dropMotionSequence = 0;
+
 const createDropMotionId = ({
 	pointerId,
 	sourceTileId,
 }: {
 	pointerId: number;
 	sourceTileId: string;
-}) => `drop:${sourceTileId}:${pointerId}:${Math.round(performance.now() * 100)}`;
+}) => `drop:${sourceTileId}:${pointerId}:${++dropMotionSequence}`;
 
 const createSourceHandoff = ({
 	sourceTile,

@@ -271,6 +271,9 @@ describe("applyInventoryVisualEvent", () => {
 
 		expect(next.bySlotIndex["0"]?.stack?.id).toBe("stack-0");
 		expect(next.bySlotIndex["0"]?.stack?.quantity).toBe(3);
+		expect(next.bySlotIndex["0"]?.stack?.motion?.enter).toMatchObject({
+			kind: "fade-in",
+		});
 	});
 
 	it("creates an inventory stack when a spawned item lands in an empty slot", () => {

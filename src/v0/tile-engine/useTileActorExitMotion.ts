@@ -1,4 +1,4 @@
-import { type RefObject, useLayoutEffect, useRef } from "react";
+import { type RefObject, useLayoutEffect } from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema";
 import { startTileStyleMotion, tilePresenceMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
@@ -12,41 +12,35 @@ export namespace useTileActorExitMotion {
 	}
 }
 
+const readActorVisual = (actor: HTMLElement | null) =>
+	actor?.querySelector<HTMLElement>("[data-ak-tile-engine-visual]") ?? null;
+
 export const useTileActorExitMotion = ({
 	actorRef,
 	exit,
 	tileId,
 }: useTileActorExitMotion.Props) => {
-	const lastExitKeyRef = useRef<string | null>(null);
+	const kind = exit?.kind ?? "merge-out";
+	const delayMs = exit?.delayMs ?? 0;
+	const durationMs = exit?.durationMs;
+	const groupId = exit?.groupId;
+	const hasExit = Boolean(exit);
 
 	useLayoutEffect(() => {
-		if (!exit) {
-			lastExitKeyRef.current = null;
-			return;
-		}
+		if (!hasExit) return;
 
-		const exitKey = [
-			exit.groupId ?? "group:none",
-			exit.kind ?? "merge-out",
-			exit.delayMs ?? 0,
-			exit.durationMs ?? "duration:default",
-		].join(":");
-		if (lastExitKeyRef.current === exitKey) return;
-		lastExitKeyRef.current = exitKey;
-
-		const element = actorRef.current;
+		const element = readActorVisual(actorRef.current);
 		if (!element) return;
 
-		const kind = exit.kind ?? "merge-out";
 		DebugTimeline.record({
 			scope: "tile-engine",
 			event: "motion.exit.start",
 			detail: {
-				groupId: exit.groupId,
+				groupId,
 				kind,
 				tileId,
-				delayMs: exit.delayMs ?? 0,
-				durationMs: exit.durationMs,
+				delayMs,
+				durationMs,
 			},
 		});
 
@@ -63,13 +57,13 @@ export const useTileActorExitMotion = ({
 					"translate3d(0px, 0px, 0px) scale(0.72)",
 				],
 			},
-			delay: (exit.delayMs ?? 0) / 1000,
-			duration: (exit.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
+			delay: delayMs / 1000,
+			duration: (durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
 			meta: {
 				kind: "exit",
 				exitKind: kind,
-				groupId: exit.groupId,
+				groupId,
 				tileId,
 			},
 		}).then((result) => {
@@ -78,14 +72,18 @@ export const useTileActorExitMotion = ({
 				scope: "tile-engine",
 				event: "motion.exit.end",
 				detail: {
-					groupId: exit.groupId,
+					groupId,
 					tileId,
 				},
 			});
 		});
 	}, [
 		actorRef,
-		exit,
+		delayMs,
+		durationMs,
+		groupId,
+		hasExit,
+		kind,
 		tileId,
 	]);
 };

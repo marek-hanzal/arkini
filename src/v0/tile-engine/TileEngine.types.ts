@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode, RefObject } from "react";
-import type { EnterMotionSchema } from "~/v0/play/motion/EnterMotionSchema";
+import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 
 export namespace TileEngine {
 	export type Id = string;
@@ -40,7 +40,7 @@ export namespace TileEngine {
 		hidden?: boolean;
 		disabled?: boolean;
 		style?: CSSProperties;
-		enter?: EnterMotionSchema.Type;
+		enter?: TileEnterMotionSchema.Type;
 	}
 
 	export interface DragBinding<TDrag = unknown> {

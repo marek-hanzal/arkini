@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { EnterMotionSchema } from "~/v0/play/motion/EnterMotionSchema";
+import { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 
 export const ViewMotionSchema = z.object({
-	enter: EnterMotionSchema.optional(),
+	enter: TileEnterMotionSchema.optional(),
 });
 
 type ViewMotionSchema = typeof ViewMotionSchema;

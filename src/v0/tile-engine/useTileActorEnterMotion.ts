@@ -1,12 +1,12 @@
 import { animate } from "motion";
 import { type RefObject, useLayoutEffect } from "react";
-import type { EnterMotionSchema } from "~/v0/play/motion/EnterMotionSchema";
+import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
 export namespace useTileActorEnterMotion {
 	export interface Props {
 		actorRef: RefObject<HTMLDivElement | null>;
-		enter?: EnterMotionSchema.Type;
+		enter?: TileEnterMotionSchema.Type;
 		tileId: string;
 	}
 }

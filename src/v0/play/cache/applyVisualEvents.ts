@@ -5,6 +5,7 @@ import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryView
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { patchBoardVisualEvents } from "~/v0/play/cache/applyBoardVisualEvent";
 import { patchInventoryVisualEvents } from "~/v0/play/cache/applyInventoryVisualEvent";
+import { summarizeVisualEventGroups } from "~/v0/play/cache/summarizeVisualEventGroups";
 import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
 
 export namespace applyVisualEvents {
@@ -21,6 +22,7 @@ export const applyVisualEvents = ({ events, queryClient }: applyVisualEvents.Pro
 		detail: {
 			count: events.length,
 			events: summarizeVisualEvents(events),
+			animationGroups: summarizeVisualEventGroups(events),
 		},
 	});
 	patchBoardViewCache({
@@ -36,6 +38,7 @@ export const applyVisualEvents = ({ events, queryClient }: applyVisualEvents.Pro
 		event: "visual-events.patch.end",
 		detail: {
 			count: events.length,
+			animationGroups: summarizeVisualEventGroups(events),
 		},
 	});
 };

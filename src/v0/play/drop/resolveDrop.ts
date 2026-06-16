@@ -36,6 +36,7 @@ const withSafeCommit = ({
 
 	return {
 		type: "accept",
+		animation: outcome.animation,
 		commit: withDropErrorFeedback({
 			feedback,
 			commit: async () => outcome.commit?.(),

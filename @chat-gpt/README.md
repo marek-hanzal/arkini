@@ -97,12 +97,14 @@ window.__ARKINI_SCENARIO__.load("swap-board-items")
 
 Bug reports are boring JSON on purpose: browser metadata, active sheet/error context, last loaded scenario, React Query cache snapshots for board/inventory/database, query states and the latest timeline entries. The timeline records TileEngine pointer/drag/drop/motion lifecycle, action mutation phases, optimistic cache restores, dev scenario loads and visual-event patch sequencing.
 
+Motion timeline events now include `motionId`, source/target tile IDs, source/target slot IDs, runtime drop animation (`parallel-swap`) and action visual animation groups (`groupId`, `mode`, `effect`, `cause`). For swap bugs, verify the same `motionId` has `motion.snap.start` and `motion.peer-snap.start` at nearly the same timestamp. If not, the runtime is lying about parallelism, the tiny bastard.
+
 For animation bugs, use the Dev Sheet `Scenarios` section first when possible. Load the closest scenario, reproduce exactly one bug, then click `Copy bug report`. The useful report shape is: scenario ID, exact action, expected behavior, visible symptom, pasted JSON dump. Fewer vibes, more evidence, humanity heals slightly.
 
 ## Active improvement priorities
 
 1. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.
-2. Keep action visual events explicit through `ActionVisualAnimation`; test event ordering and animation contract when adding new animated behavior.
+2. Keep action visual events explicit through `ActionVisualAnimation`; test event ordering and animation contract when adding new animated behavior. Drop runtime animation flags must survive error wrapping; losing `parallel-swap` breaks swap concurrency before cache events even get a vote.
 3. Add more Vitest coverage around domain action results, visual-event ordering, cache patches, placement planning and manifest validation.
 4. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks.
 5. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.

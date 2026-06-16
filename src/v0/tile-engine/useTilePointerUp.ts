@@ -22,7 +22,16 @@ export namespace useTilePointerUp {
 		clearLongTimer(): void;
 		handleTap(event: Pick<ReactPointerEvent<HTMLDivElement>, "clientX" | "clientY">): void;
 		animateBack(): Promise<void>;
-		animateToTarget(targetRect: TileEngine.Rect | null): Promise<void>;
+		animateToTarget(
+			targetRect: TileEngine.Rect | null,
+			meta?: {
+				motionId?: string;
+				animation?: TileEngine.DropAnimation;
+				role?: "source" | "target";
+				fromSlotId?: string;
+				toSlotId?: string;
+			},
+		): Promise<void>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		finishDrag(): void;
 		setActiveDropId(dropId: string | null): void;
@@ -30,6 +39,14 @@ export namespace useTilePointerUp {
 		setHandoffs(handoffs: readonly TileEngineActor.Handoff[]): void;
 	}
 }
+
+const createDropMotionId = ({
+	pointerId,
+	sourceTileId,
+}: {
+	pointerId: number;
+	sourceTileId: string;
+}) => `drop:${sourceTileId}:${pointerId}:${Math.round(performance.now() * 100)}`;
 
 const createSourceHandoff = ({
 	sourceTile,
@@ -120,6 +137,10 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 			void (async () => {
 				try {
 					const sourceTile = tileRef.current;
+					const motionId = createDropMotionId({
+						pointerId: event.pointerId,
+						sourceTileId: sourceTile.id,
+					});
 					const outcome = await dragRef.current?.onDrop?.({
 						source: session.source,
 						target: resolved?.payload ?? null,
@@ -136,9 +157,14 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						scope: "tile-engine",
 						event: "drop.outcome",
 						detail: {
+							motionId,
 							kind,
 							animation,
 							hasCommit: Boolean(commit),
+							sourceTileId: sourceTile.id,
+							sourceSlotId: sourceTile.slotId,
+							targetTileId: resolved?.targetTile?.id,
+							targetSlotId: resolved?.slot?.id,
 						},
 					});
 
@@ -167,15 +193,55 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 									})
 								: null;
 
+						DebugTimeline.record({
+							scope: "tile-engine",
+							event: "drop.motion.start",
+							detail: {
+								motionId,
+								animation,
+								sourceTileId: sourceTile.id,
+								sourceFromSlotId: sourceTile.slotId,
+								sourceToSlotId: resolved.slot?.id,
+								targetTileId: resolved.targetTile?.id,
+								targetFromSlotId: resolved.targetTile?.slotId,
+								targetToSlotId: sourceTile.slotId,
+								parallel: Boolean(targetActorElement),
+							},
+						});
+
 						await Promise.all([
-							animateToTarget(rectFromElement(resolved.element)),
+							animateToTarget(rectFromElement(resolved.element), {
+								motionId,
+								animation,
+								role: "source",
+								fromSlotId: sourceTile.slotId,
+								toSlotId: resolved.slot?.id,
+							}),
 							targetActorElement
 								? animateElementToRect({
 										element: targetActorElement,
 										target: session.origin,
+										meta: {
+											motionId,
+											animation,
+											role: "target",
+											tileId: resolved.targetTile?.id,
+											fromSlotId: resolved.targetTile?.slotId,
+											toSlotId: sourceTile.slotId,
+										},
 									})
 								: Promise.resolve(),
 						]);
+
+						DebugTimeline.record({
+							scope: "tile-engine",
+							event: "drop.motion.end",
+							detail: {
+								motionId,
+								animation,
+								parallel: Boolean(targetActorElement),
+							},
+						});
 
 						setHandoffs(
 							[
@@ -186,16 +252,33 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 							),
 						);
 						try {
+							DebugTimeline.record({
+								scope: "tile-engine",
+								event: "drop.commit.start",
+								detail: {
+									motionId,
+									animation,
+									hasCommit: Boolean(commit),
+								},
+							});
 							await commit?.();
 							DebugTimeline.record({
 								scope: "tile-engine",
 								event: "drop.commit.ok",
+								detail: {
+									motionId,
+									animation,
+								},
 							});
 							return;
 						} catch {
 							DebugTimeline.record({
 								scope: "tile-engine",
 								event: "drop.commit.error",
+								detail: {
+									motionId,
+									animation,
+								},
 							});
 							setHandoff(null);
 							await animateBack();

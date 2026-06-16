@@ -3,6 +3,7 @@ import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { actionVisualSequenceDelayMs } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { applyVisualEvents } from "~/v0/play/cache/applyVisualEvents";
+import { summarizeVisualEventGroups } from "~/v0/play/cache/summarizeVisualEventGroups";
 import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
 
 export const spawnSequenceDelayMs = actionVisualSequenceDelayMs;
@@ -37,6 +38,7 @@ export const sequenceSpawnVisualEvents = ({
 			sequencedCount: sequencedEvents.length,
 			delayMs: spawnSequenceDelayMs,
 			sequenced: summarizeVisualEvents(sequencedEvents),
+			animationGroups: summarizeVisualEventGroups(events),
 		},
 	});
 
@@ -55,6 +57,9 @@ export const sequenceSpawnVisualEvents = ({
 					delayMs,
 					index,
 					event: summarizeVisualEvents([
+						event,
+					])[0],
+					animationGroup: summarizeVisualEventGroups([
 						event,
 					])[0],
 				},

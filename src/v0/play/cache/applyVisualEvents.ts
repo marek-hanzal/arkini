@@ -10,7 +10,7 @@ import { patchBoardVisualEvents } from "~/v0/play/cache/applyBoardVisualEvent";
 import { patchInventoryVisualEvents } from "~/v0/play/cache/applyInventoryVisualEvent";
 import { summarizeVisualEventGroups } from "~/v0/play/cache/summarizeVisualEventGroups";
 import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
-import { scheduleMergeMotionCleanup } from "~/v0/play/cache/scheduleMergeMotionCleanup";
+import { scheduleTileEngineMotionCleanup } from "~/v0/play/cache/scheduleTileEngineMotionCleanup";
 
 export namespace applyVisualEvents {
 	export interface Props {
@@ -45,7 +45,7 @@ export const applyVisualEvents = ({ events, queryClient }: applyVisualEvents.Pro
 		queryClient,
 		patch: (inventory) => patchInventoryVisualEvents(inventory, events),
 	});
-	scheduleMergeMotionCleanup({
+	scheduleTileEngineMotionCleanup({
 		events,
 		queryClient,
 	});

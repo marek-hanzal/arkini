@@ -1,4 +1,5 @@
 import { memo, type ReactNode, useEffect, useRef } from "react";
+import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { cn } from "~/v0/ui/cn";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
@@ -52,6 +53,33 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 		registerDrop,
 		slot,
 		targetTile,
+	]);
+
+	useEffect(() => {
+		if (!isOver && !slotFeedback) return;
+
+		DebugTimeline.record({
+			scope: "tile-engine",
+			event: "slot.feedback.render",
+			detail: {
+				slotId: slot.id,
+				dropId,
+				isOver,
+				feedback: slotFeedback,
+				targetTileId: targetTile?.id,
+				slotDataset: ref.current
+					? {
+							dropFeedback: ref.current.dataset.akTileEngineDropFeedback,
+						}
+					: null,
+			},
+		});
+	}, [
+		dropId,
+		isOver,
+		slot.id,
+		slotFeedback,
+		targetTile?.id,
 	]);
 
 	return (

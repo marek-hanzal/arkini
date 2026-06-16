@@ -1,4 +1,5 @@
 import { memo, type ReactNode, useEffect, useRef } from "react";
+import { cn } from "~/v0/ui/cn";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
@@ -8,6 +9,7 @@ export namespace TileEngineSlot {
 		index: number;
 		targetTile?: TileEngine.Tile<TTile>;
 		activeDropId: string | null;
+		activeDropFeedback: TileEngine.ActiveDropFeedback | null;
 		className?: string;
 		drag?: TileEngine.DragConfig<TTile, TSlot, unknown, TDrop>;
 		renderSlot(props: TileEngine.RenderSlotProps<TSlot>): ReactNode;
@@ -20,6 +22,7 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	index,
 	targetTile,
 	activeDropId,
+	activeDropFeedback,
 	className,
 	drag,
 	renderSlot,
@@ -29,6 +32,8 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	const binding = drag?.slot(slot, targetTile);
 	const dropId = binding?.id ?? slot.id;
 	const disabled = !binding || binding.disabled || slot.disabled;
+	const isOver = !disabled && activeDropId === dropId;
+	const slotFeedback = isOver ? activeDropFeedback : null;
 
 	useEffect(() => {
 		if (disabled || !ref.current) return;
@@ -54,12 +59,14 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 			ref={ref}
 			data-ak-tile-engine-slot-id={slot.id}
 			data-ak-tile-engine-drop-id={disabled ? undefined : dropId}
-			className={className}
+			data-ak-tile-engine-drop-feedback={slotFeedback?.effect}
+			className={cn("ak-tile-engine-slot", className)}
 		>
 			{renderSlot({
 				slot,
 				index,
-				isOver: !disabled && activeDropId === dropId,
+				isOver,
+				dropFeedback: slotFeedback,
 			})}
 		</div>
 	);

@@ -37,6 +37,7 @@ export namespace useTileActorDrag {
 		): Promise<void>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		setActiveDropId(dropId: string | null): void;
+		setActiveDropFeedback(feedback: TileEngine.ActiveDropFeedback | null): void;
 		setHandoff(handoff: TileEngineActor.Handoff | null): void;
 		setHandoffs(handoffs: readonly TileEngineActor.Handoff[]): void;
 	}
@@ -60,6 +61,7 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 	animateToTarget,
 	resolveDrop,
 	setActiveDropId,
+	setActiveDropFeedback,
 	setHandoff,
 	setHandoffs,
 }: useTileActorDrag.Props<TTile, TSlot, TDrag, TDrop>): TileEngineActor.DragHandlers => {
@@ -69,6 +71,7 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 		dragRef,
 		resolveDrop,
 		setActiveDropId,
+		setActiveDropFeedback,
 	});
 	const lifecycle = useTileDragLifecycle({
 		actorRef,

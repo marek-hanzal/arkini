@@ -18,11 +18,10 @@ export namespace BoardCell {
 		invalid: boolean;
 		merged: boolean;
 		imprinted: boolean;
-		isOver: boolean;
 	}
 }
 
-export const BoardCell = memo(({ cell, invalid, merged, imprinted, isOver }: BoardCell.Props) => {
+export const BoardCell = memo(({ cell, invalid, merged, imprinted }: BoardCell.Props) => {
 	const { data: boardItem } = useSuspenseQuery(
 		boardCellItemQueryOptions({
 			cellKey: cell.key,
@@ -58,8 +57,6 @@ export const BoardCell = memo(({ cell, invalid, merged, imprinted, isOver }: Boa
 				"relative aspect-square touch-none border-b border-r border-slate-800/65 bg-slate-900/45",
 				cell.x === boardColumns - 1 && "border-r-0",
 				cell.y === boardRows - 1 && "border-b-0",
-				isOver &&
-					"bg-slate-800/80 outline outline-2 -outline-offset-2 outline-emerald-300/80",
 				producerReady && !invalid && "ak-producer-ready",
 				invalid && "ak-cell-error",
 				merged && "ak-merge-target-over",

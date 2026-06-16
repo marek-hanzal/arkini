@@ -13,6 +13,7 @@ export namespace useTileDragHover {
 		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop> | undefined>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		setActiveDropId(dropId: string | null): void;
+		setActiveDropFeedback(feedback: TileEngine.ActiveDropFeedback | null): void;
 	}
 }
 
@@ -22,6 +23,7 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 	dragRef,
 	resolveDrop,
 	setActiveDropId,
+	setActiveDropFeedback,
 }: useTileDragHover.Props<TTile, TSlot, TDrag, TDrop>) => {
 	const lastDropIdRef = useRef<string | null>(null);
 
@@ -33,6 +35,25 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 		const rect = element ? rectFromElement(element) : dragSessionRect(session);
 		const resolved = resolveDrop(rect);
 		const nextDropId = resolved?.dropId ?? null;
+		const context: TileEngine.DragOverContext<TTile, TSlot, TDrag, TDrop> = {
+			source: session.source,
+			target: resolved?.payload ?? null,
+			targetSlot: resolved?.slot ?? null,
+			targetTile: resolved?.targetTile ?? null,
+			dropId: nextDropId,
+		};
+		const feedback =
+			nextDropId && dragRef.current?.dropFeedback
+				? dragRef.current.dropFeedback(context)
+				: null;
+		const activeFeedback: TileEngine.ActiveDropFeedback | null =
+			nextDropId && feedback
+				? {
+						dropId: nextDropId,
+						targetTileId: resolved?.targetTile?.id,
+						...feedback,
+					}
+				: null;
 		if (lastDropIdRef.current !== nextDropId) {
 			lastDropIdRef.current = nextDropId;
 			DebugTimeline.record({
@@ -48,13 +69,8 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 			});
 		}
 		setActiveDropId(nextDropId);
-		dragRef.current?.onDragOver?.({
-			source: session.source,
-			target: resolved?.payload ?? null,
-			targetSlot: resolved?.slot ?? null,
-			targetTile: resolved?.targetTile ?? null,
-			dropId: resolved?.dropId ?? null,
-		});
+		setActiveDropFeedback(activeFeedback);
+		dragRef.current?.onDragOver?.(context);
 		return resolved;
 	}, [
 		actorRef,
@@ -62,5 +78,6 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 		dragSessionRef,
 		resolveDrop,
 		setActiveDropId,
+		setActiveDropFeedback,
 	]);
 };

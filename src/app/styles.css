@@ -28,6 +28,76 @@ button {
 	touch-action: manipulation;
 }
 
+.ak-tile-engine-slot {
+	position: relative;
+}
+
+.ak-tile-engine-slot::after {
+	position: absolute;
+	inset: 0.16rem;
+	z-index: 3;
+	border-radius: 0.42rem;
+	background: transparent;
+	box-shadow: none;
+	content: "";
+	opacity: 0;
+	pointer-events: none;
+	transition:
+		opacity 110ms ease-out,
+		background 110ms ease-out,
+		box-shadow 110ms ease-out;
+}
+
+.ak-tile-engine-slot[data-ak-tile-engine-drop-feedback="empty"]::after {
+	background: rgb(45 212 191 / 0.11);
+	box-shadow: inset 0 0 0 1px rgb(94 234 212 / 0.16);
+	opacity: 1;
+}
+
+.ak-tile-engine-slot[data-ak-tile-engine-drop-feedback="merge"]::after {
+	background: rgb(16 185 129 / 0.13);
+	box-shadow: inset 0 0 0 1px rgb(110 231 183 / 0.18);
+	opacity: 1;
+}
+
+.ak-tile-engine-slot[data-ak-tile-engine-drop-feedback="blocked"]::after {
+	background: rgb(251 146 60 / 0.1);
+	box-shadow: inset 0 0 0 1px rgb(251 146 60 / 0.14);
+	opacity: 1;
+}
+
+.ak-tile-engine-actor > * {
+	transform-origin: center;
+	transition: transform 130ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ak-tile-engine-actor[data-ak-tile-engine-drop-feedback="merge"] > * {
+	transform: scale(1.035);
+}
+
+.ak-tile-engine-actor[data-ak-tile-engine-drop-feedback="blocked"] > * {
+	transform: scale(0.965);
+}
+
+.ak-tile-engine-actor[data-ak-tile-engine-dragging="true"] > * {
+	animation: ak-tile-engine-drag-spring 190ms cubic-bezier(0.2, 0.9, 0.25, 1.2) both;
+	transform: scale(1.012);
+}
+
+@keyframes ak-tile-engine-drag-spring {
+	0% {
+		transform: scale(1);
+	}
+
+	58% {
+		transform: scale(1.026);
+	}
+
+	100% {
+		transform: scale(1.012);
+	}
+}
+
 .ak-game-width {
 	width: min(calc(100dvw - 1.5rem), 430px);
 }

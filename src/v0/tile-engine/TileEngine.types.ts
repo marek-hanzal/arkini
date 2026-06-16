@@ -55,6 +55,17 @@ export namespace TileEngine {
 		onLongActivate?(): void;
 	}
 
+	export type DropFeedbackEffect = "empty" | "merge" | "blocked";
+
+	export interface DropFeedback {
+		effect: DropFeedbackEffect;
+	}
+
+	export interface ActiveDropFeedback extends DropFeedback {
+		dropId: Id;
+		targetTileId?: Id;
+	}
+
 	export interface DropBinding<TDrop = unknown> {
 		id?: Id;
 		data: TDrop;
@@ -76,6 +87,19 @@ export namespace TileEngine {
 		targetRect: Rect | null;
 	}
 
+	export interface DragOverContext<
+		TTile = unknown,
+		TSlot = unknown,
+		TDrag = unknown,
+		TDrop = unknown,
+	> {
+		source: TDrag;
+		target: TDrop | null;
+		targetSlot: Slot<TSlot> | null;
+		targetTile: Tile<TTile> | null;
+		dropId: string | null;
+	}
+
 	export interface DragConfig<
 		TTile = unknown,
 		TSlot = unknown,
@@ -87,14 +111,9 @@ export namespace TileEngine {
 			slot: Slot<TSlot>,
 			targetTile: Tile<TTile> | undefined,
 		): DropBinding<TDrop> | undefined;
+		dropFeedback?(context: DragOverContext<TTile, TSlot, TDrag, TDrop>): DropFeedback | null;
 		onDragStart?(context: { source: TDrag; tile: Tile<TTile>; rect: Rect }): void;
-		onDragOver?(context: {
-			source: TDrag;
-			target: TDrop | null;
-			targetSlot: Slot<TSlot> | null;
-			targetTile: Tile<TTile> | null;
-			dropId: string | null;
-		}): void;
+		onDragOver?(context: DragOverContext<TTile, TSlot, TDrag, TDrop>): void;
 		onDrop?(
 			context: DropContext<TTile, TSlot, TDrag, TDrop>,
 		): DropOutcome | Promise<DropOutcome>;
@@ -105,6 +124,7 @@ export namespace TileEngine {
 		slot: Slot<TSlot>;
 		index: number;
 		isOver: boolean;
+		dropFeedback: ActiveDropFeedback | null;
 	}
 
 	export interface RenderTileProps<TTile = unknown> {

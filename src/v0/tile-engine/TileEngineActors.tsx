@@ -16,7 +16,9 @@ export namespace TileEngineActors {
 		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
+		activeDropFeedback: TileEngine.ActiveDropFeedback | null;
 		setActiveDropId(dropId: string | null): void;
+		setActiveDropFeedback(feedback: TileEngine.ActiveDropFeedback | null): void;
 		setHandoff(handoff: TileEngineActorType.Handoff | null): void;
 		setHandoffs(handoffs: readonly TileEngineActorType.Handoff[]): void;
 		consumeHandoff(tileId: string, slotId: string): boolean;
@@ -34,7 +36,9 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	drag,
 	dragConstraintsRef,
 	resolveDrop,
+	activeDropFeedback,
 	setActiveDropId,
+	setActiveDropFeedback,
 	setHandoff,
 	setHandoffs,
 	consumeHandoff,
@@ -44,6 +48,9 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 		{tiles.map((tile) => {
 			const index = slotIndexById.get(tile.slotId);
 			if (index === undefined) return null;
+
+			const tileDropFeedback =
+				activeDropFeedback?.targetTileId === tile.id ? activeDropFeedback : null;
 
 			return (
 				<TileEngineActor
@@ -56,7 +63,9 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 					drag={drag}
 					dragConstraintsRef={dragConstraintsRef}
 					resolveDrop={resolveDrop}
+					dropFeedback={tileDropFeedback}
 					setActiveDropId={setActiveDropId}
+					setActiveDropFeedback={setActiveDropFeedback}
 					setHandoff={setHandoff}
 					setHandoffs={setHandoffs}
 					consumeHandoff={consumeHandoff}

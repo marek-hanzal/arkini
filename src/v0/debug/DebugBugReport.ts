@@ -4,6 +4,7 @@ import { databaseQueryKeys } from "~/v0/database/query/databaseQueryKeys";
 import { inventoryQueryKeys } from "~/v0/inventory/query/inventoryQueryKeys";
 import type { Sheet } from "~/v0/play/sheet/Sheet";
 import { DebugTimeline, createDebugJsonReplacer } from "~/v0/debug/DebugTimeline";
+import { readLastLoadedDevScenario } from "~/v0/debug/scenario/DevScenarioRuntime";
 
 export namespace DebugBugReport {
 	export interface SnapshotContext {
@@ -108,7 +109,10 @@ const createReport = () => ({
 		prod: import.meta.env.PROD,
 		baseUrl: import.meta.env.BASE_URL,
 	},
-	context: getContextRef?.() ?? {},
+	context: {
+		...getContextRef?.(),
+		lastLoadedScenario: readLastLoadedDevScenario(),
+	},
 	browser: readBrowser(),
 	screen: readScreen(),
 	location: readLocation(),

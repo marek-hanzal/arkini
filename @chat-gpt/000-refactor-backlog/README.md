@@ -24,5 +24,6 @@ This backlog captures remaining Arkini v0 work after the core rewrite, TileEngin
 - Vitest introduced with focused visual-event cache patch tests.
 - board/inventory TileEngine wiring moved into concrete model hooks.
 - dev debug timeline exposed as `window.__ARKINI_DEBUG_TIMELINE__`.
+- Dev Sheet scenario loader added for deterministic animation bug reports.
 
 Completed task files are retained with `DONE` status. Old audit files outside this backlog are reference material only. The top-level `@chat-gpt/README.md` is the current working map.

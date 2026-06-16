@@ -91,9 +91,13 @@ describe("applyBoardVisualEvent", () => {
 		});
 	});
 
-	it("consumes merge sources and upgrades the merge target", () => {
+	it("cross-fades merge inputs out while the merge result appears", () => {
 		const event = {
 			type: "item.merged",
+			animation: ActionVisualAnimation.merge({
+				cause: "merge",
+				groupId: "merge:source:target",
+			}),
 			sourceItemInstanceId: "source",
 			sourceItemId: "item:twig",
 			targetItemInstanceId: "target",
@@ -106,7 +110,34 @@ describe("applyBoardVisualEvent", () => {
 
 		expect(next.byId.source).toBeUndefined();
 		expect(next.byId.target?.itemId).toBe("item:branch");
-		expect(next.items).toHaveLength(1);
+		expect(next.byId.target?.motion?.enter).toMatchObject({
+			groupId: "merge:source:target",
+			kind: "merge-in",
+		});
+		expect(next.byId["cache:merge-out:merge:source:target:source:source"]).toMatchObject({
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+			motion: {
+				exit: {
+					groupId: "merge:source:target",
+					kind: "merge-out",
+				},
+			},
+		});
+		expect(next.byId["cache:merge-out:merge:source:target:target:target"]).toMatchObject({
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+			motion: {
+				exit: {
+					groupId: "merge:source:target",
+					kind: "merge-out",
+				},
+			},
+		});
+		expect(next.byCellKey["1:0"]?.id).toBe("target");
+		expect(next.items).toHaveLength(3);
 	});
 
 	it("starts craft progress deterministically enough for cache patch tests", () => {

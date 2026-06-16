@@ -132,7 +132,7 @@ export const mergeBoardItemsFx = Effect.fn("mergeBoardItemsFx")(function* (
 					visualEvents: [
 						{
 							type: "item.merged",
-							animation: ActionVisualAnimation.parallelMove({
+							animation: ActionVisualAnimation.merge({
 								cause: "merge",
 								groupId: `merge:${source.id}:${target.id}`,
 							}),

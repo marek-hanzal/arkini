@@ -76,6 +76,7 @@ Action visual events may carry `animation` metadata. Treat this as the data cont
 - There is no legacy/inferred sequencing. Exhaust mode, event reason or item type must not secretly change timing. If something should be sequenced, its event must say `animation.mode: "sequence"`.
 - `mode: "instant"` is still an animation. It means no travel/path intent, only enter/fade-in. Never interpret it as “render without animation”, because apparently even words need guard rails now.
 - `effect: "fade-in"` maps to TileEngine enter motion without translate/scale. `effect: "move"` means the item is expected to travel or has already been handed off by drag/drop.
+- `effect: "merge"` is a parallel cross-fade/pop contract: old merge inputs use `merge-out` scale-down + fade-out ghosts, while the result uses `merge-in` scale-up + fade-in. The merge optimistic cache patch must preserve the old board view until the explicit visual event arrives, otherwise the source tile vanishes before it can animate, because apparently even a disappearing stick needs due process.
 - `groupId` ties events that belong to one user-visible action. Keep it deterministic and readable; bug reports include this metadata.
 
 Prefer `ActionVisualAnimation` helpers instead of hand-writing animation objects in fx roots. The helpers are intentionally boring so the event contract stays consistent and testable.
@@ -97,7 +98,7 @@ window.__ARKINI_SCENARIO__.load("swap-board-items")
 
 Bug reports are boring JSON on purpose: browser metadata, active sheet/error context, last loaded scenario, React Query cache snapshots for board/inventory/database, query states and the latest timeline entries. The timeline records TileEngine pointer/drag/drop/motion lifecycle, action mutation phases, optimistic cache restores, dev scenario loads and visual-event patch sequencing.
 
-Motion timeline events now include `motionId`, source/target tile IDs, source/target slot IDs, runtime drop animation (`parallel-swap`) and action visual animation groups (`groupId`, `mode`, `effect`, `cause`). For swap bugs, verify the same `motionId` has `motion.snap.start` and `motion.peer-snap.start` at nearly the same timestamp. If not, the runtime is lying about parallelism, the tiny bastard.
+Motion timeline events now include `motionId`, source/target tile IDs, source/target slot IDs, runtime drop animation (`parallel-swap`) and action visual animation groups (`groupId`, `mode`, `effect`, `cause`). For swap bugs, verify the same `motionId` has `motion.snap.start` and `motion.peer-snap.start` at nearly the same timestamp. For merge bugs, look for one `effect: "merge"` group followed by two `motion.exit.start` events and one `motion.enter.start` event with the same `groupId`; they should overlap, not politely queue like sad little DOM citizens.
 
 For animation bugs, use the Dev Sheet `Scenarios` section first when possible. Load the closest scenario, reproduce exactly one bug, then click `Copy bug report`. The useful report shape is: scenario ID, exact action, expected behavior, visible symptom, pasted JSON dump. Fewer vibes, more evidence, humanity heals slightly.
 

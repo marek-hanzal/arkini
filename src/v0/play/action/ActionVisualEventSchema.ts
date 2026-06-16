@@ -48,7 +48,7 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		targetFrom: ItemLocationSchema,
 		targetTo: ItemLocationSchema,
 	}),
-	actionVisualEvent({
+	animatedActionVisualEvent({
 		type: z.literal("item.merged"),
 		sourceItemInstanceId: ItemInstanceIdSchema,
 		sourceItemId: GameItemIdSchema,

@@ -35,8 +35,7 @@ export const useTileActorEnterMotion = ({
 			},
 		});
 
-		void animate(
-			element,
+		const keyframes =
 			kind === "fade-in"
 				? {
 						opacity: [
@@ -44,26 +43,38 @@ export const useTileActorEnterMotion = ({
 							1,
 						],
 					}
-				: {
-						opacity: [
-							0,
-							1,
-						],
-						transform: [
-							"translate3d(0px, 8px, 0px) scale(0.72)",
-							"translate3d(0px, 0px, 0px) scale(1)",
-						],
-					},
-			{
-				delay: (enter.delayMs ?? 0) / 1000,
-				duration: (enter.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
-				ease: TileEngineTiming.moveEase,
-			},
-		).then(() =>
+				: kind === "merge-in"
+					? {
+							opacity: [
+								0,
+								1,
+							],
+							transform: [
+								"translate3d(0px, 0px, 0px) scale(0.72)",
+								"translate3d(0px, 0px, 0px) scale(1)",
+							],
+						}
+					: {
+							opacity: [
+								0,
+								1,
+							],
+							transform: [
+								"translate3d(0px, 8px, 0px) scale(0.72)",
+								"translate3d(0px, 0px, 0px) scale(1)",
+							],
+						};
+
+		void animate(element, keyframes, {
+			delay: (enter.delayMs ?? 0) / 1000,
+			duration: (enter.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
+			ease: TileEngineTiming.moveEase,
+		}).then(() =>
 			DebugTimeline.record({
 				scope: "tile-engine",
 				event: "motion.enter.end",
 				detail: {
+					groupId: enter.groupId,
 					tileId,
 				},
 			}),

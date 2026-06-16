@@ -11,6 +11,7 @@ import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { useBoardTransientTiles } from "~/v0/board/animation/BoardTransientTileStore";
 import { useStashBoardItemMutation } from "~/v0/inventory/action/useStashBoardItemMutation";
 import { inventoryViewQueryOptions } from "~/v0/inventory/query/inventoryViewQueryOptions";
 import type { DragSource } from "~/v0/play/drag/DragSource";
@@ -44,31 +45,45 @@ export const useBoardTileEngineModel = ({
 	const moveBoardItemMutation = useMoveBoardItemMutation();
 	const stashBoardItemMutation = useStashBoardItemMutation();
 	const swapBoardItemsMutation = useSwapBoardItemsMutation();
+	const transientTiles = useBoardTransientTiles();
 
 	const tiles = useMemo(
 		() =>
-			board.items.map((boardItem) => ({
-				id: boardItem.id,
-				slotId: cellKey(boardItem.x, boardItem.y),
-				data: {
-					boardItemId: boardItem.id,
-				},
-				disabled: Boolean(boardItem.motion?.exit),
-				enter: boardItem.motion?.enter,
-				exit: boardItem.motion?.exit,
-				style: boardItem.motion?.exit
-					? {
-							pointerEvents: "none",
-							zIndex: 24,
-						}
-					: boardItem.motion?.enter?.kind === "merge-in"
-						? {
-								zIndex: 22,
-							}
-						: undefined,
-			})) satisfies TileEngine.Tile<BoardSurface.TileData>[],
+			[
+				...board.items.map((boardItem) => ({
+					id: boardItem.id,
+					slotId: cellKey(boardItem.x, boardItem.y),
+					data: {
+						kind: "board-item" as const,
+						boardItemId: boardItem.id,
+					},
+					disabled: false,
+					enter: boardItem.motion?.enter,
+					style:
+						boardItem.motion?.enter?.kind === "merge-in"
+							? {
+									zIndex: 22,
+								}
+							: undefined,
+				})),
+				...transientTiles.map((tile) => ({
+					id: tile.id,
+					slotId: tile.slotId,
+					data: {
+						kind: "static-item" as const,
+						itemId: tile.itemId,
+					},
+					disabled: true,
+					exit: tile.exit,
+					style: {
+						pointerEvents: "none" as const,
+						zIndex: 24,
+					},
+				})),
+			] satisfies TileEngine.Tile<BoardSurface.TileData>[],
 		[
 			board.items,
+			transientTiles,
 		],
 	);
 
@@ -119,6 +134,8 @@ export const useBoardTileEngineModel = ({
 	>(
 		() => ({
 			tile(tile) {
+				if (tile.data.kind !== "board-item") return undefined;
+
 				const boardItem = board.byId[tile.data.boardItemId];
 				if (!boardItem) return undefined;
 
@@ -136,9 +153,10 @@ export const useBoardTileEngineModel = ({
 			},
 			slot(slot, targetTile) {
 				const cell = slot.data;
-				const targetBoardItemId = targetTile
-					? board.byId[targetTile.data.boardItemId]?.id
-					: undefined;
+				const targetBoardItemId =
+					targetTile?.data.kind === "board-item"
+						? board.byId[targetTile.data.boardItemId]?.id
+						: undefined;
 				return {
 					id: `board-cell:${cell.key}`,
 					data: {

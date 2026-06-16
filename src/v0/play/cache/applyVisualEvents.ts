@@ -1,5 +1,8 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { boardQueryKeys } from "~/v0/board/query/boardQueryKeys";
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import { registerBoardMergeTransientTiles } from "~/v0/board/animation/registerBoardMergeTransientTiles";
 import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
 import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryViewCache";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
@@ -26,6 +29,14 @@ export const applyVisualEvents = ({ events, queryClient }: applyVisualEvents.Pro
 			animationGroups: summarizeVisualEventGroups(events),
 		},
 	});
+	const board = queryClient.getQueryData<BoardView>(boardQueryKeys.view);
+	if (board) {
+		registerBoardMergeTransientTiles({
+			board,
+			events,
+		});
+	}
+
 	patchBoardViewCache({
 		queryClient,
 		patch: (board) => patchBoardVisualEvents(board, events),

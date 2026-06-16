@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
+import { registerBoardMergeTransientTiles } from "~/v0/board/animation/registerBoardMergeTransientTiles";
+import {
+	clearBoardTransientTiles,
+	readBoardTransientTiles,
+} from "~/v0/board/animation/BoardTransientTileStore";
 import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { applyBoardVisualEvent } from "~/v0/play/cache/applyBoardVisualEvent";
@@ -114,30 +119,9 @@ describe("applyBoardVisualEvent", () => {
 			groupId: "merge:source:target",
 			kind: "merge-in",
 		});
-		expect(next.byId["cache:merge-out:merge:source:target:source:source"]).toMatchObject({
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-			motion: {
-				exit: {
-					groupId: "merge:source:target",
-					kind: "merge-out",
-				},
-			},
-		});
-		expect(next.byId["cache:merge-out:merge:source:target:target:target"]).toMatchObject({
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-			motion: {
-				exit: {
-					groupId: "merge:source:target",
-					kind: "merge-out",
-				},
-			},
-		});
+		expect(next.items.some((item) => item.id.startsWith("cache:merge-out:"))).toBe(false);
 		expect(next.byCellKey["1:0"]?.id).toBe("target");
-		expect(next.items).toHaveLength(3);
+		expect(next.items).toHaveLength(1);
 	});
 
 	it("starts craft progress deterministically enough for cache patch tests", () => {
@@ -190,6 +174,53 @@ describe("applyBoardVisualEvent", () => {
 		expect(next.byId.crafter?.craft?.canAcceptInputs).toBe(false);
 
 		vi.useRealTimers();
+	});
+	describe("merge transient render actors", () => {
+		it("keeps merge exit actors out of board cache and in the render-layer store", () => {
+			clearBoardTransientTiles();
+			const event = {
+				type: "item.merged",
+				animation: ActionVisualAnimation.merge({
+					cause: "merge",
+					groupId: "merge:source:target",
+				}),
+				sourceItemInstanceId: "source",
+				sourceItemId: "item:twig",
+				targetItemInstanceId: "target",
+				targetItemId: "item:twig",
+				resultItemId: "item:branch",
+				consumeSource: true,
+			} satisfies ActionVisualEventSchema.Type;
+
+			registerBoardMergeTransientTiles({
+				board: boardView(),
+				events: [
+					event,
+				],
+			});
+
+			expect(readBoardTransientTiles()).toMatchObject([
+				{
+					id: "transient:merge-out:merge:source:target:source:source",
+					itemId: "item:twig",
+					slotId: "0:0",
+					exit: {
+						groupId: "merge:source:target",
+						kind: "merge-out",
+					},
+				},
+				{
+					id: "transient:merge-out:merge:source:target:target:target",
+					itemId: "item:twig",
+					slotId: "1:0",
+					exit: {
+						groupId: "merge:source:target",
+						kind: "merge-out",
+					},
+				},
+			]);
+			clearBoardTransientTiles();
+		});
 	});
 });
 

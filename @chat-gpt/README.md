@@ -76,10 +76,10 @@ Action visual events may carry `animation` metadata. Treat this as the data cont
 - There is no legacy/inferred sequencing. Exhaust mode, event reason or item type must not secretly change timing. If something should be sequenced, its event must say `animation.mode: "sequence"`.
 - `mode: "instant"` is still an animation. It means no travel/path intent, only enter/fade-in. Never interpret it as “render without animation”, because apparently even words need guard rails now.
 - `effect: "fade-in"` maps to TileEngine enter motion without translate/scale. `effect: "move"` means the item is expected to travel or has already been handed off by drag/drop.
-- `effect: "merge"` is a parallel cross-fade/pop contract: old merge inputs use `merge-out` scale-down + fade-out ghosts, while the result uses `merge-in` scale-up + fade-in. The merge optimistic cache patch must preserve the old board view until the explicit visual event arrives, otherwise the source tile vanishes before it can animate, because apparently even a disappearing stick needs due process.
+- `effect: "merge"` is a parallel cross-fade/pop contract: old merge inputs use transient render-layer actors with `merge-out` scale-down + fade-out, while the durable target tile becomes the result and uses `merge-in` scale-up + fade-in. Never put merge-out actors into board/inventory cache data. Cache is game state, not a prop closet with commitment issues.
 - `groupId` ties events that belong to one user-visible action. Keep it deterministic and readable; bug reports include this metadata.
 
-Prefer `ActionVisualAnimation` helpers instead of hand-writing animation objects in fx roots. The helpers are intentionally boring so the event contract stays consistent and testable.
+Prefer `ActionVisualAnimation` helpers instead of hand-writing animation objects in fx roots. The helpers are intentionally boring so the event contract stays consistent and testable. Merge can be optimistically rendered from the static `GameConfig` merge rule so the animation starts immediately on drop instead of waiting for SQLite to finish thinking about twigs.
 
 ## Dev Sheet and bug reports
 

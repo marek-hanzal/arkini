@@ -1,4 +1,5 @@
-import { type RefObject, useCallback } from "react";
+import { type RefObject, useCallback, useRef } from "react";
+import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { dragSessionRect } from "~/v0/tile-engine/dragSessionRect";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import type { TileEngineActor } from "~/v0/tile-engine/TileEngineActor.types";
@@ -21,15 +22,32 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 	dragRef,
 	resolveDrop,
 	setActiveDropId,
-}: useTileDragHover.Props<TTile, TSlot, TDrag, TDrop>) =>
-	useCallback(() => {
+}: useTileDragHover.Props<TTile, TSlot, TDrag, TDrop>) => {
+	const lastDropIdRef = useRef<string | null>(null);
+
+	return useCallback(() => {
 		const session = dragSessionRef.current;
 		if (!session || !session.started) return null;
 
 		const element = actorRef.current;
 		const rect = element ? rectFromElement(element) : dragSessionRect(session);
 		const resolved = resolveDrop(rect);
-		setActiveDropId(resolved?.dropId ?? null);
+		const nextDropId = resolved?.dropId ?? null;
+		if (lastDropIdRef.current !== nextDropId) {
+			lastDropIdRef.current = nextDropId;
+			DebugTimeline.record({
+				scope: "tile-engine",
+				event: "drop.hover",
+				detail: {
+					dropId: nextDropId,
+					source: session.source,
+					target: resolved?.payload ?? null,
+					hasSlot: Boolean(resolved?.slot),
+					hasTargetTile: Boolean(resolved?.targetTile),
+				},
+			});
+		}
+		setActiveDropId(nextDropId);
 		dragRef.current?.onDragOver?.({
 			source: session.source,
 			target: resolved?.payload ?? null,
@@ -45,3 +63,4 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 		resolveDrop,
 		setActiveDropId,
 	]);
+};

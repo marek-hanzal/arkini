@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { recordActionMutation } from "~/v0/debug/recordActionMutation";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { buyUpgradeFx } from "~/v0/upgrade/fx/buyUpgradeFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
@@ -10,11 +11,28 @@ export const useBuyUpgradeMutation = () => {
 
 	return useMutation<ActionResult.Type, GameActionError, buyUpgradeFx.Props>({
 		mutationFn(input) {
+			recordActionMutation({
+				action: "buyUpgrade",
+				phase: "mutate.start",
+				detail: input,
+			});
 			return runGameFx({
 				effect: buyUpgradeFx(input),
 			});
 		},
-		async onSuccess() {
+		onError(error) {
+			recordActionMutation({
+				action: "buyUpgrade",
+				phase: "mutate.error",
+				detail: error,
+			});
+		},
+		async onSuccess(result) {
+			recordActionMutation({
+				action: "buyUpgrade",
+				phase: "mutate.success",
+				detail: result,
+			});
 			await refreshUpgradePurchaseCaches({
 				queryClient,
 			});

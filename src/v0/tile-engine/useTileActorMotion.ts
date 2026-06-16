@@ -1,4 +1,5 @@
 import { animate } from "motion";
+import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { type RefObject, useCallback, useLayoutEffect, useRef } from "react";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
 import { targetDelta } from "~/v0/tile-engine/targetDelta";
@@ -55,6 +56,18 @@ export const useTileActorMotion = <TTile, TDrag>({
 		const deltaY = previous.top - current.top;
 		if (Math.abs(deltaX) < 0.5 && Math.abs(deltaY) < 0.5) return;
 
+		DebugTimeline.record({
+			scope: "tile-engine",
+			event: "motion.layout.start",
+			detail: {
+				tileId: tile.id,
+				fromSlotId: previousSlotId,
+				toSlotId: tile.slotId,
+				deltaX,
+				deltaY,
+			},
+		});
+
 		void animate(
 			element,
 			{
@@ -67,6 +80,15 @@ export const useTileActorMotion = <TTile, TDrag>({
 				duration: TileEngineTiming.moveDurationSeconds,
 				ease: TileEngineTiming.moveEase,
 			},
+		).then(() =>
+			DebugTimeline.record({
+				scope: "tile-engine",
+				event: "motion.layout.end",
+				detail: {
+					tileId: tile.id,
+					toSlotId: tile.slotId,
+				},
+			}),
 		);
 	}, [
 		actorRef,
@@ -80,6 +102,16 @@ export const useTileActorMotion = <TTile, TDrag>({
 		const session = dragSessionRef.current;
 		const element = actorRef.current;
 		if (!session || !element) return;
+		DebugTimeline.record({
+			scope: "tile-engine",
+			event: "motion.reject.start",
+			detail: {
+				tileId: tile.id,
+				slotId: tile.slotId,
+				currentX: session.currentX,
+				currentY: session.currentY,
+			},
+		});
 		await animate(
 			element,
 			{
@@ -93,9 +125,19 @@ export const useTileActorMotion = <TTile, TDrag>({
 				ease: TileEngineTiming.rejectEase,
 			},
 		);
+		DebugTimeline.record({
+			scope: "tile-engine",
+			event: "motion.reject.end",
+			detail: {
+				tileId: tile.id,
+				slotId: tile.slotId,
+			},
+		});
 	}, [
 		actorRef,
 		dragSessionRef,
+		tile.id,
+		tile.slotId,
 	]);
 
 	const animateToTarget = useCallback(
@@ -109,6 +151,19 @@ export const useTileActorMotion = <TTile, TDrag>({
 				target: targetRect,
 			});
 
+			DebugTimeline.record({
+				scope: "tile-engine",
+				event: "motion.snap.start",
+				detail: {
+					tileId: tile.id,
+					slotId: tile.slotId,
+					fromX: session.currentX,
+					fromY: session.currentY,
+					targetX: target.x,
+					targetY: target.y,
+					targetRect,
+				},
+			});
 			await animate(
 				element,
 				{
@@ -124,10 +179,22 @@ export const useTileActorMotion = <TTile, TDrag>({
 			);
 			session.currentX = target.x;
 			session.currentY = target.y;
+			DebugTimeline.record({
+				scope: "tile-engine",
+				event: "motion.snap.end",
+				detail: {
+					tileId: tile.id,
+					slotId: tile.slotId,
+					targetX: target.x,
+					targetY: target.y,
+				},
+			});
 		},
 		[
 			actorRef,
 			dragSessionRef,
+			tile.id,
+			tile.slotId,
 		],
 	);
 

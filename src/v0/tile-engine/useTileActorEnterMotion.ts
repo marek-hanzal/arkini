@@ -1,4 +1,5 @@
 import { animate } from "motion";
+import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { type RefObject, useLayoutEffect } from "react";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
@@ -22,6 +23,15 @@ export const useTileActorEnterMotion = ({
 		const element = actorRef.current;
 		if (!element) return;
 
+		DebugTimeline.record({
+			scope: "tile-engine",
+			event: "motion.enter.start",
+			detail: {
+				tileId,
+				delayMs: enter.delayMs ?? 0,
+			},
+		});
+
 		void animate(
 			element,
 			{
@@ -39,6 +49,14 @@ export const useTileActorEnterMotion = ({
 				duration: TileEngineTiming.moveDurationSeconds,
 				ease: TileEngineTiming.moveEase,
 			},
+		).then(() =>
+			DebugTimeline.record({
+				scope: "tile-engine",
+				event: "motion.enter.end",
+				detail: {
+					tileId,
+				},
+			}),
 		);
 	}, [
 		actorRef,

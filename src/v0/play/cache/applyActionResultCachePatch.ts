@@ -2,6 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
 import { applyVisualEvents } from "~/v0/play/cache/applyVisualEvents";
+import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
 import {
 	sequenceSpawnVisualEvents,
 	shouldSequenceSpawnVisualEvents,
@@ -24,6 +25,7 @@ export const applyActionResultCachePatch = ({
 		detail: {
 			count: result.visualEvents.length,
 			types: result.visualEvents.map((event) => event.type),
+			items: summarizeVisualEvents(result.visualEvents),
 			sequenced: shouldSequenceSpawnVisualEvents(result.visualEvents),
 		},
 	});

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { recordActionMutation } from "~/v0/debug/recordActionMutation";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { swapInventorySlotsFx } from "~/v0/inventory/fx/swapInventorySlotsFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
@@ -18,23 +19,47 @@ export const useSwapInventorySlotsMutation = () => {
 		CacheSnapshot.Type
 	>({
 		mutationFn(input) {
+			recordActionMutation({
+				action: "swapInventorySlots",
+				phase: "mutate.start",
+				detail: input,
+			});
 			return runGameFx({
 				effect: swapInventorySlotsFx(input),
 			});
 		},
 		onMutate(input) {
+			recordActionMutation({
+				action: "swapInventorySlots",
+				phase: "cache.optimistic.start",
+				detail: input,
+			});
 			return applyInventorySwapCachePatch({
 				queryClient,
 				input,
 			});
 		},
-		onError(_error, _input, snapshot) {
+		onError(error, _input, snapshot) {
+			recordActionMutation({
+				action: "swapInventorySlots",
+				phase: "mutate.error",
+				detail: error,
+			});
+			recordActionMutation({
+				action: "swapInventorySlots",
+				phase: "cache.restore",
+			});
 			restoreCacheSnapshot({
 				queryClient,
 				snapshot,
 			});
 		},
 		onSuccess(result) {
+			recordActionMutation({
+				action: "swapInventorySlots",
+				phase: "mutate.success",
+				detail: result,
+			});
 			applyActionResultCachePatch({
 				queryClient,
 				result,

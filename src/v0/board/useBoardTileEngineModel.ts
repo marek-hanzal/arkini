@@ -60,12 +60,6 @@ export const useBoardTileEngineModel = ({
 					},
 					disabled: false,
 					enter: boardItem.motion?.enter,
-					style:
-						boardItem.motion?.enter?.kind === "merge-in"
-							? {
-									zIndex: 22,
-								}
-							: undefined,
 				})),
 				...transientTiles.map((tile) => ({
 					id: tile.id,
@@ -78,7 +72,6 @@ export const useBoardTileEngineModel = ({
 					exit: tile.exit,
 					style: {
 						pointerEvents: "none" as const,
-						zIndex: 24,
 					},
 				})),
 			] satisfies TileEngine.Tile<BoardSurface.TileData>[],

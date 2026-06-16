@@ -1,10 +1,16 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { memo, useMemo } from "react";
 import { boardItemQueryOptions } from "~/v0/board/query/boardItemQueryOptions";
+import { BoardCellCooldownProgress } from "~/v0/board/ui/BoardCellCooldownProgress";
+import { BoardCellProgress } from "~/v0/board/ui/BoardCellProgress";
 import { itemViewQueryOptions } from "~/v0/item/query/itemViewQueryOptions";
 import { GameItemView } from "~/v0/item/ui/GameItemView";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
+import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
+import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
+import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
+import { cn } from "~/v0/ui/cn";
 
 export namespace BoardTile {
 	export interface Props {
@@ -35,13 +41,25 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			itemId: (boardItem?.itemId ?? "item-seed") as ItemId,
 		}),
 	);
+	const liveCraft = readLiveCraftView({
+		craft: boardItem?.craft,
+		nowMs,
+	});
+	const producerReady = isProducerReady(boardItem?.activation, nowMs);
+	const producerCooldown = readProducerCooldown({
+		activation: boardItem?.activation,
+		nowMs,
+	});
 
 	if (!boardItem || !item) return null;
 
 	return (
 		<div
 			data-ak-board-item-id={boardItem.id}
-			className="h-full w-full"
+			className={cn(
+				"relative h-full w-full overflow-hidden",
+				producerReady && "ak-board-tile-ready",
+			)}
 		>
 			<GameItemView
 				item={item}
@@ -49,6 +67,8 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 				activation={boardItem.activation}
 				activationNowMs={nowMs}
 			/>
+			<BoardCellProgress progress={liveCraft?.progress} />
+			<BoardCellCooldownProgress progress={producerCooldown?.progress} />
 		</div>
 	);
 });

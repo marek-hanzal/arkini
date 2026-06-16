@@ -1,4 +1,5 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback } from "react";
+import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { animateElementToRect } from "~/v0/tile-engine/animateElementToRect";
 import { dragSessionRect } from "~/v0/tile-engine/dragSessionRect";
 import { dropOutcomeAnimation } from "~/v0/tile-engine/dropOutcomeAnimation";
@@ -83,6 +84,15 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 			clearLongTimer();
 
 			if (!session.started) {
+				DebugTimeline.record({
+					scope: "tile-engine",
+					event: "pointer.tap-release",
+					detail: {
+						pointerId: event.pointerId,
+						longFired: session.longFired,
+						source: session.source,
+					},
+				});
 				const longFired = session.longFired;
 				dragSessionRef.current = null;
 				resetElementTransform(element);
@@ -92,6 +102,19 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 
 			const releaseRect = element ? rectFromElement(element) : dragSessionRect(session);
 			const resolved = resolveDrop(releaseRect);
+			DebugTimeline.record({
+				scope: "tile-engine",
+				event: "drop.resolved",
+				detail: {
+					pointerId: event.pointerId,
+					dropId: resolved?.dropId ?? null,
+					hasSlot: Boolean(resolved?.slot),
+					hasTargetTile: Boolean(resolved?.targetTile),
+					releaseRect,
+					source: session.source,
+					target: resolved?.payload ?? null,
+				},
+			});
 			setActiveDropId(null);
 
 			void (async () => {
@@ -109,6 +132,15 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 					const kind = dropOutcomeKind(outcome);
 					const animation = dropOutcomeAnimation(outcome);
 					const commit = dropOutcomeCommit(outcome);
+					DebugTimeline.record({
+						scope: "tile-engine",
+						event: "drop.outcome",
+						detail: {
+							kind,
+							animation,
+							hasCommit: Boolean(commit),
+						},
+					});
 
 					if (kind === "accept" && resolved?.element) {
 						const sourceHandoff = createSourceHandoff({
@@ -155,8 +187,16 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						);
 						try {
 							await commit?.();
+							DebugTimeline.record({
+								scope: "tile-engine",
+								event: "drop.commit.ok",
+							});
 							return;
 						} catch {
+							DebugTimeline.record({
+								scope: "tile-engine",
+								event: "drop.commit.error",
+							});
 							setHandoff(null);
 							await animateBack();
 							return;
@@ -166,6 +206,10 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 					setHandoff(null);
 					await animateBack();
 				} catch {
+					DebugTimeline.record({
+						scope: "tile-engine",
+						event: "drop.error",
+					});
 					setHandoff(null);
 					await animateBack();
 				} finally {

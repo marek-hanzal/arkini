@@ -2,24 +2,27 @@
 
 Status: ACTIVE
 
-This backlog captures remaining Arkini refactor work after the core rewrite pass reached command events and normalized runtime item storage.
+This backlog captures remaining Arkini v0 work after the core rewrite, TileEngine split, animation pass, and GPT working-environment cleanup.
 
-Recommended order:
+## Recommended order
 
 1. `012-tile-animation-overhaul.md`
-2. `004-split-game-item-definitions.md`
-3. `005-remove-legacy-runtime-fossils.md`
-4. `006-tile-engine-public-api-hardening.md`
-5. `007-render-performance-audit.md`
-6. `008-domain-effect-boundary-audit.md`
-7. `009-economy-content-pass.md`
-8. `010-tests-and-debug-tools.md`
+2. `013-dnd-motion-bugfix.md`
+3. `014-tile-engine-grid-snap-bugfix.md`
+4. `016-drag-snap-before-commit.md`
+5. `004-split-game-item-definitions.md`
+6. `006-tile-engine-public-api-hardening.md`
+7. `007-render-performance-audit.md`
+8. `008-domain-effect-boundary-audit.md`
+9. `009-economy-content-pass.md`
+10. `010-tests-and-debug-tools.md`
 
-Completed earlier tasks are retained with `DONE` status:
+## Recently completed environment work
 
-- `001-finish-craft-runtime.md`
-- `002-command-animation-planner-cleanup.md`
-- `003-save-config-version-reset.md`
-- `011-dnd-overhaul.md`
+- dependency-cruiser boundary gate added as `npm run dc`.
+- unified validation gate added as `npm run check`.
+- Vitest introduced with focused visual-event cache patch tests.
+- board/inventory TileEngine wiring moved into concrete model hooks.
+- dev debug timeline exposed as `window.__ARKINI_DEBUG_TIMELINE__`.
 
-Already completed context is in `000-completed-baseline.md`. Do not delete it; future tasks should update statuses instead of pretending history went to live on a farm.
+Completed task files are retained with `DONE` status. Old audit files outside this backlog are reference material only. The top-level `@chat-gpt/README.md` is the current working map.

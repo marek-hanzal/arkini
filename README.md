@@ -140,6 +140,7 @@ src/v0/game/                    Active GameConfig Effect service and derived loo
 src/v0/database/                Active OPFS SQLite client, Kysely schema, migrations, status UI, dbFx, transactions, hard reset Fx/action.
 src/v0/database/bootstrap/      Browser DB bootstrap helper used by React Query bridge plumbing.
 src/v0/date/                    Active Luxon date Effect service.
+src/v0/debug/                   Dev-only structured timeline buffer for drag/drop/action reports.
 src/v0/hash/                    Active WebCrypto hash Effect service.
 src/v0/id/                      Active CUID2 id Effect service.
 src/v0/random/                  Active random Effect service and weighted helpers.
@@ -168,6 +169,16 @@ npm install --no-package-lock
 npm run dev
 ```
 
+## Local check gate
+
+Use the full local gate before committing non-trivial work:
+
+```bash
+npm run check
+```
+
+This runs `format:check`, dependency-cruiser boundaries, TypeScript, and Vitest. Run `npm run build` separately for the production bundle. `npm run dc` can be run alone when changing imports or architecture boundaries. `npm run test` runs the focused Vitest suite.
+
 ## Formatting
 
 Code formatting is owned by Biome. The config is intentionally formatter-only: `biome format` is allowed to rewrite code shape, but Biome linting and assist actions are disabled. Do not sneak lint rules into `biome.json`; lint creep is how a formatter becomes a tiny annoying government.
@@ -190,6 +201,18 @@ VITE_BASE=/arkini/ npm run build
 ```
 
 The router uses hash history, so static hosts do not need SPA rewrite rules.
+
+## Debug timeline
+
+Dev builds expose a small structured timeline buffer for drag/drop/action-cache bug reports:
+
+```js
+window.__ARKINI_DEBUG_TIMELINE__.dump();
+window.__ARKINI_DEBUG_TIMELINE__.clear();
+window.__ARKINI_DEBUG_TIMELINE__.entries();
+```
+
+Use this before adding visual debug overlays. JSON logs are easier to paste back into chat than “it kinda jumped left and then maybe swapped”, a phrase that has destroyed more engineering hours than anyone deserves.
 
 ## GitHub Pages deploy
 

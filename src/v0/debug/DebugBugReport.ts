@@ -97,7 +97,7 @@ const readTileEngineDom = () =>
 
 		return {
 			id: engine.dataset.akTileEngineId,
-			layer: engine.dataset.akTileEngineLayer,
+			layerRole: engine.dataset.akTileEngineLayerRole,
 			className: engine.className,
 			layerVars: {
 				item: engineStyle.getPropertyValue("--ak-tile-engine-item-layer").trim(),

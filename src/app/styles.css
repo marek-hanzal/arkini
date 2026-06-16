@@ -34,26 +34,26 @@ button {
 	--ak-sheet-max-height: 85dvh;
 
 	/* Global layer ladder. Do not use raw z-index values outside these variables. */
-	--ak-layer-board: 0;
-	--ak-layer-board-item: 10;
-	--ak-layer-board-drag-item: 20;
+	--ak-layer-base-surface: 0;
+	--ak-layer-base-tile: 10;
+	--ak-layer-base-drag-tile: 20;
 	--ak-layer-bottom-nav: 30;
 	--ak-layer-toast: 40;
-	--ak-layer-sheet: 50;
-	--ak-layer-sheet-backdrop: 0;
-	--ak-layer-sheet-panel: 10;
-	--ak-layer-sheet-item: 0;
-	--ak-layer-sheet-drag-item: 20;
+	--ak-layer-overlay-root: 50;
+	--ak-layer-overlay-backdrop: 0;
+	--ak-layer-overlay-panel: 10;
+	--ak-layer-overlay-tile: 0;
+	--ak-layer-overlay-drag-tile: 20;
 
 	--ak-tile-engine-slot-layer: 0;
 	--ak-tile-engine-slot-feedback-layer: 1;
-	--ak-tile-engine-item-layer: var(--ak-layer-board-item);
-	--ak-tile-engine-drag-item-layer: var(--ak-layer-board-drag-item);
+	--ak-tile-engine-item-layer: var(--ak-layer-base-tile);
+	--ak-tile-engine-drag-item-layer: var(--ak-layer-base-drag-tile);
 }
 
-.ak-layer-board {
+.ak-layer-base-surface {
 	position: relative;
-	z-index: var(--ak-layer-board);
+	z-index: var(--ak-layer-base-surface);
 }
 
 .ak-layer-bottom-nav {
@@ -65,13 +65,14 @@ button {
 }
 
 .ak-tile-engine {
-	--ak-tile-engine-item-layer: var(--ak-layer-board-item);
-	--ak-tile-engine-drag-item-layer: var(--ak-layer-board-drag-item);
+	--ak-tile-engine-item-layer: var(--ak-layer-base-tile);
+	--ak-tile-engine-drag-item-layer: var(--ak-layer-base-drag-tile);
+	isolation: isolate;
 }
 
-.ak-tile-engine[data-ak-tile-engine-layer="sheet"] {
-	--ak-tile-engine-item-layer: var(--ak-layer-sheet-item);
-	--ak-tile-engine-drag-item-layer: var(--ak-layer-sheet-drag-item);
+.ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] {
+	--ak-tile-engine-item-layer: var(--ak-layer-overlay-tile);
+	--ak-tile-engine-drag-item-layer: var(--ak-layer-overlay-drag-tile);
 }
 
 .ak-tile-engine-slots {
@@ -220,14 +221,14 @@ button {
 .ak-bottom-sheet {
 	position: fixed;
 	inset: 0;
-	z-index: var(--ak-layer-sheet);
+	z-index: var(--ak-layer-overlay-root);
 	pointer-events: none;
 }
 
 .ak-bottom-sheet-backdrop {
 	position: absolute;
 	inset: 0;
-	z-index: var(--ak-layer-sheet-backdrop);
+	z-index: var(--ak-layer-overlay-backdrop);
 	display: block;
 	width: auto;
 	height: auto;
@@ -242,7 +243,7 @@ button {
 .ak-bottom-sheet-panel {
 	position: absolute;
 	inset-inline: 0;
-	z-index: var(--ak-layer-sheet-panel);
+	z-index: var(--ak-layer-overlay-panel);
 	bottom: 0;
 	display: flex;
 	width: var(--ak-sheet-width);

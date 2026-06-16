@@ -25,8 +25,8 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	tiles,
 	className,
 	cellClassName,
-	itemLayerClassName,
-	layerContext = "board",
+	actorLayerClassName,
+	layerRole = "base",
 	gapPx = TileEngineTiming.defaultGapPx,
 	drag,
 	dragConstraintsRef,
@@ -59,7 +59,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	return (
 		<div
 			data-ak-tile-engine-id={id}
-			data-ak-tile-engine-layer={layerContext}
+			data-ak-tile-engine-layer-role={layerRole}
 			className={cn("ak-tile-engine relative overflow-hidden", className)}
 		>
 			<TileEngineSlots
@@ -81,7 +81,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				columns={columns}
 				rowCount={indexes.rowCount}
 				gapPx={gapPx}
-				itemLayerClassName={itemLayerClassName}
+				actorLayerClassName={actorLayerClassName}
 				drag={drag}
 				dragConstraintsRef={dragConstraintsRef}
 				resolveDrop={drops.resolveDrop}

@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { spendActivationInputFx } from "~/v0/activation/fx/spendActivationInputFx";
 import { GameActionError } from "~/v0/play/action/GameActionError";
@@ -75,6 +76,7 @@ export const withdrawActivationInputFx = Effect.fn("withdrawActivationInputFx")(
 			const placements = yield* applyPlacementPlanFx({
 				plan,
 			});
+			const animationGroupId = `activation-withdraw:${row.id}:${input.itemId}`;
 			yield* spendActivationInputFx({
 				ownerItemInstanceId: row.id,
 				itemId: input.itemId,
@@ -95,6 +97,10 @@ export const withdrawActivationInputFx = Effect.fn("withdrawActivationInputFx")(
 						return [
 							{
 								type: "item.spawned",
+								animation: ActionVisualAnimation.instantFadeIn({
+									cause: "activation",
+									groupId: animationGroupId,
+								}),
 								itemInstanceId: placement.boardItemId,
 								itemId: placement.itemId,
 								originItemInstanceId: row.id,
@@ -113,6 +119,10 @@ export const withdrawActivationInputFx = Effect.fn("withdrawActivationInputFx")(
 					return [
 						{
 							type: "item.spawned",
+							animation: ActionVisualAnimation.instantFadeIn({
+								cause: "activation",
+								groupId: animationGroupId,
+							}),
 							itemInstanceId: placement.itemInstanceId,
 							itemId: placement.itemId,
 							originItemInstanceId: row.id,

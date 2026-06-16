@@ -7,21 +7,14 @@ import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
 
 export const spawnSequenceDelayMs = actionVisualSequenceDelayMs;
 
-const isLegacyExhaustBatch = (events: readonly ActionVisualEventSchema.Type[]) =>
-	events.some((event) => event.type === "activation.activated" && event.mode === "exhaust");
-
-const isSequencedEvent = (
-	event: ActionVisualEventSchema.Type,
-	events: readonly ActionVisualEventSchema.Type[],
-) =>
-	event.animation?.mode === "sequence" ||
-	(isLegacyExhaustBatch(events) && event.type === "item.spawned");
+const isSequencedEvent = (event: ActionVisualEventSchema.Type) =>
+	event.animation?.mode === "sequence";
 
 const visualEventDelayMs = (event: ActionVisualEventSchema.Type, sequenceIndex: number) =>
 	event.animation?.delayMs ?? sequenceIndex * spawnSequenceDelayMs;
 
 export const shouldSequenceSpawnVisualEvents = (events: readonly ActionVisualEventSchema.Type[]) =>
-	events.some((event) => isSequencedEvent(event, events));
+	events.some(isSequencedEvent);
 
 export namespace sequenceSpawnVisualEvents {
 	export interface Props {
@@ -34,8 +27,8 @@ export const sequenceSpawnVisualEvents = ({
 	events,
 	queryClient,
 }: sequenceSpawnVisualEvents.Props) => {
-	const sequencedEvents = events.filter((event) => isSequencedEvent(event, events));
-	const immediateEvents = events.filter((event) => !isSequencedEvent(event, events));
+	const sequencedEvents = events.filter(isSequencedEvent);
+	const immediateEvents = events.filter((event) => !isSequencedEvent(event));
 	DebugTimeline.record({
 		scope: "action-cache",
 		event: "visual-events.sequence.schedule",

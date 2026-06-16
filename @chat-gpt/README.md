@@ -73,6 +73,7 @@ Action visual events may carry `animation` metadata. Treat this as the data cont
 
 - `mode: "parallel"` means related movement must be allowed to start together. Swap events use this; do not split them into staggered follow-up events unless the UX explicitly changes.
 - `mode: "sequence"` means the cache patcher schedules the event by `delayMs` / `sequenceIndex`. Stash exhaust output uses this to drip items one by one.
+- There is no legacy/inferred sequencing. Exhaust mode, event reason or item type must not secretly change timing. If something should be sequenced, its event must say `animation.mode: "sequence"`.
 - `mode: "instant"` is still an animation. It means no travel/path intent, only enter/fade-in. Never interpret it as “render without animation”, because apparently even words need guard rails now.
 - `effect: "fade-in"` maps to TileEngine enter motion without translate/scale. `effect: "move"` means the item is expected to travel or has already been handed off by drag/drop.
 - `groupId` ties events that belong to one user-visible action. Keep it deterministic and readable; bug reports include this metadata.

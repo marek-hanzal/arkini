@@ -134,4 +134,27 @@ describe("visual event sequencing", () => {
 			spawnSequenceDelayMs,
 		]);
 	});
+	it("does not infer sequencing from exhaust without explicit sequence animation metadata", () => {
+		const events = [
+			{
+				type: "activation.activated",
+				itemInstanceId: "stash",
+				mode: "exhaust",
+			},
+			{
+				type: "item.spawned",
+				animation: ActionVisualAnimation.instantFadeIn({
+					cause: "stash",
+					groupId: "activation:stash:exhaust",
+				}),
+				itemInstanceId: "spawned-a",
+				itemId: "item:twig",
+				originItemInstanceId: "stash",
+				to: boardLocation(3, 3),
+				reason: "activation-output",
+			},
+		] satisfies ActionVisualEventSchema.Type[];
+
+		expect(shouldSequenceSpawnVisualEvents(events)).toBe(false);
+	});
 });

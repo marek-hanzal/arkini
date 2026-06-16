@@ -208,3 +208,11 @@ Keep task 012 open. The remaining larger cleanup is still to move this handoff f
 ## 2026-06-16 sequenced cleanup timing note
 
 - TileEngine motion cleanup delay includes `animation.delayMs` in addition to duration and cleanup buffer. This is mandatory for producer/stash sequence output: a later item may have a delayed enter animation, and clearing its cache handoff before that delayed WAAPI work finishes cancels the exact animation we were trying to protect. Tiny arithmetic bug, gigantic clown shoes.
+
+## 2026-06-16 transient settlement note
+
+- Introduced a shared `actionVisualMotionSettlementDelayMs` helper for temporary TileEngine motion handoffs.
+- Merge transient exit actors now use the same delay + duration + cleanup buffer calculation as board/inventory enter metadata cleanup.
+- This prevents future delayed merge/exit animation metadata from being removed before the visual exit has actually finished. Yes, timing math now has one source of truth, which is apparently how civilization narrowly survives JavaScript timers.
+
+Keep task 012 open. The remaining larger step is still to replace cache-carried motion metadata with a formal TileEngine animation request queue once the current path is boringly stable.

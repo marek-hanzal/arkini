@@ -3,7 +3,7 @@ import { cellKey } from "~/v0/board/cellKey";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { toTileEngineExitMotion } from "~/v0/play/tile-engine-motion/toTileEngineExitMotion";
-import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
+import { actionVisualMotionSettlementDelayMs } from "~/v0/play/tile-engine-motion/actionVisualMotionSettlementDelayMs";
 import {
 	removeBoardTransientTilesByGroup,
 	upsertBoardTransientTiles,
@@ -62,9 +62,7 @@ export const registerBoardMergeTransientTiles = ({
 
 		upsertBoardTransientTiles(transientTiles);
 
-		const cleanupDelayMs =
-			(event.animation.durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) +
-			TileEngineTiming.motionCleanupBufferMs;
+		const cleanupDelayMs = actionVisualMotionSettlementDelayMs(event.animation);
 		globalThis.setTimeout(() => {
 			DebugTimeline.record({
 				scope: "action-cache",

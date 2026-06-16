@@ -5,9 +5,9 @@ import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { patchInventorySlotCache } from "~/v0/inventory/cache/patchInventorySlotCache";
 import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryViewCache";
 import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
+import { actionVisualMotionSettlementDelayMs } from "~/v0/play/tile-engine-motion/actionVisualMotionSettlementDelayMs";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { clearTileEngineEnterMotion } from "~/v0/play/tile-engine-motion/clearTileEngineEnterMotion";
-import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
 export namespace scheduleTileEngineMotionCleanup {
 	export interface Props {
@@ -27,11 +27,6 @@ type CleanupTarget =
 			slotIndex: number;
 			animation: ActionVisualAnimationSchema.Type;
 	  };
-
-export const tileEngineMotionCleanupDelayMs = (animation: ActionVisualAnimationSchema.Type) =>
-	(animation.delayMs ?? 0) +
-	(animation.durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) +
-	TileEngineTiming.motionCleanupBufferMs;
 
 const cleanupTargetsForEvent = (event: ActionVisualEventSchema.Type): readonly CleanupTarget[] => {
 	if (event.type === "item.merged") {
@@ -135,7 +130,7 @@ export const scheduleTileEngineMotionCleanup = ({
 	for (const event of events) {
 		for (const target of cleanupTargetsForEvent(event)) {
 			const { groupId } = target.animation;
-			const delayMs = tileEngineMotionCleanupDelayMs(target.animation);
+			const delayMs = actionVisualMotionSettlementDelayMs(target.animation);
 
 			globalThis.setTimeout(() => {
 				DebugTimeline.record({

@@ -181,3 +181,7 @@ Presence motion CSS must use an attribute-presence selector (`[data-ak-tile-engi
 Presence motion cleanup order matters: cancel the scoped presence motion first, then clear the marker token. The marker suppresses CSS transitions, so freeze/cancel must run while the marker still protects the visual element. Drop motion timeline IDs should also be monotonic counters, not timestamp guesses.
 
 TileEngine `enter` metadata in board/inventory query cache is temporary handoff data. `scheduleTileEngineMotionCleanup` must clear it after the presence duration plus `TileEngineTiming.motionCleanupBufferMs`, guarded by animation `groupId`. Do not leave stale `motion.enter` on cache rows; remounting a sheet/surface with stale enter metadata can replay old fade/spawn animations and make everyone blame Safari for a crime committed by our own cache.
+
+### Shared TileEngine motion settlement timing
+
+Temporary TileEngine motion handoffs must use `actionVisualMotionSettlementDelayMs(animation)` for cleanup windows. It includes `delayMs`, `durationMs` and `TileEngineTiming.motionCleanupBufferMs`. Do not hand-roll `duration + buffer` near cache cleanup or transient render actors; delayed sequence/presence motions will eventually make that shortcut look clever for about six minutes and broken forever after.

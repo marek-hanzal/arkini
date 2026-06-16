@@ -164,3 +164,11 @@ Keep this task open: the remaining work is to replace the old play-level motion 
 - Merge-in/out scale deltas are deliberately less aggressive. The animation should read as a cross-fade/pop, not a rasterized accordion having a bad day.
 
 Keep task 012 open. This commit improves the existing runtime path; it does not yet replace the remaining play/cache visual-event adapter vocabulary with a formal generic TileEngine animation request API.
+
+## 2026-06-16 adapter vocabulary cleanup note
+
+- Removed the old `src/v0/play/motion` module name. It was too easy to read as play-level tile animation ownership, even though execution already belongs to TileEngine.
+- Added `TileEngineMotionSchema` next to the TileEngine enter/exit schemas. Board/inventory cache view rows may still carry temporary presence metadata, but the schema now clearly belongs to the generic engine boundary.
+- Moved the Arkini semantic adapter helpers to `src/v0/play/tile-engine-motion`: `toTileEngineEnterMotion` and `toTileEngineExitMotion`. These helpers map `ActionVisualAnimation` into generic TileEngine presence motion; they must not touch DOM or run animations.
+
+Keep task 012 open. The remaining larger step is a real TileEngine animation request queue/registry so cache rows no longer need to carry `motion` metadata as the handoff vehicle. Do that only after current mobile/merge behavior stays stable.

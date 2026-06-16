@@ -3,7 +3,7 @@ import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
 import { ActivationViewSchema } from "./ActivationViewSchema";
 import { BoardItemStateSchema } from "./BoardItemStateSchema";
 import { CraftProgressViewSchema } from "./CraftProgressViewSchema";
-import { ViewMotionSchema } from "~/v0/play/motion/ViewMotionSchema";
+import { TileEngineMotionSchema } from "~/v0/tile-engine/TileEngineMotionSchema";
 
 export const BoardViewItemSchema = z.object({
 	id: z.string().min(1),
@@ -13,7 +13,7 @@ export const BoardViewItemSchema = z.object({
 	state: BoardItemStateSchema,
 	activation: ActivationViewSchema.optional(),
 	craft: CraftProgressViewSchema.optional(),
-	motion: ViewMotionSchema.optional(),
+	motion: TileEngineMotionSchema.optional(),
 });
 
 type BoardViewItemSchema = typeof BoardViewItemSchema;

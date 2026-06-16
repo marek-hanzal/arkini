@@ -3,6 +3,7 @@ import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualA
 export const actionVisualSequenceDelayMs = 135;
 export const actionVisualFadeDurationMs = 280;
 export const actionVisualMoveDurationMs = 280;
+export const actionVisualMergeDurationMs = 260;
 
 export namespace ActionVisualAnimation {
 	export interface BaseProps {
@@ -39,6 +40,17 @@ export const ActionVisualAnimation = {
 		effect: "fade-in",
 		groupId,
 		mode: "instant",
+	}),
+	merge: ({
+		cause,
+		durationMs = actionVisualMergeDurationMs,
+		groupId,
+	}: ActionVisualAnimation.BaseProps): ActionVisualAnimationSchema.Type => ({
+		cause,
+		durationMs,
+		effect: "merge",
+		groupId,
+		mode: "parallel",
 	}),
 	sequenceFadeIn: ({
 		cause,

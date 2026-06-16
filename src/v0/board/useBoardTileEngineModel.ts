@@ -53,7 +53,19 @@ export const useBoardTileEngineModel = ({
 				data: {
 					boardItemId: boardItem.id,
 				},
+				disabled: Boolean(boardItem.motion?.exit),
 				enter: boardItem.motion?.enter,
+				exit: boardItem.motion?.exit,
+				style: boardItem.motion?.exit
+					? {
+							pointerEvents: "none",
+							zIndex: 24,
+						}
+					: boardItem.motion?.enter?.kind === "merge-in"
+						? {
+								zIndex: 22,
+							}
+						: undefined,
 			})) satisfies TileEngine.Tile<BoardSurface.TileData>[],
 		[
 			board.items,

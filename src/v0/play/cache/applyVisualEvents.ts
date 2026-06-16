@@ -7,6 +7,7 @@ import { patchBoardVisualEvents } from "~/v0/play/cache/applyBoardVisualEvent";
 import { patchInventoryVisualEvents } from "~/v0/play/cache/applyInventoryVisualEvent";
 import { summarizeVisualEventGroups } from "~/v0/play/cache/summarizeVisualEventGroups";
 import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
+import { scheduleMergeMotionCleanup } from "~/v0/play/cache/scheduleMergeMotionCleanup";
 
 export namespace applyVisualEvents {
 	export interface Props {
@@ -32,6 +33,10 @@ export const applyVisualEvents = ({ events, queryClient }: applyVisualEvents.Pro
 	patchInventoryViewCache({
 		queryClient,
 		patch: (inventory) => patchInventoryVisualEvents(inventory, events),
+	});
+	scheduleMergeMotionCleanup({
+		events,
+		queryClient,
 	});
 	DebugTimeline.record({
 		scope: "action-cache",

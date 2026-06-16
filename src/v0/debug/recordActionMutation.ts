@@ -7,7 +7,10 @@ export namespace recordActionMutation {
 		| "mutate.success"
 		| "mutate.error"
 		| "cache.optimistic.start"
-		| "cache.restore";
+		| "cache.restore"
+		| "side-effect.start"
+		| "side-effect.success"
+		| "side-effect.error";
 
 	export interface Props {
 		action: string;

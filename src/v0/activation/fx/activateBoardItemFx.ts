@@ -20,10 +20,11 @@ import { applyPlacementPlanFx } from "~/v0/placement/fx/applyPlacementPlanFx";
 import { readMutableSaveFx } from "~/v0/play/fx/readMutableSaveFx";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import { json } from "~/v0/serialization/json";
+import { resolveActivationDepletion } from "~/v0/activation/logic/resolveActivationDepletion";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import { applyProducerUpgradeEffects } from "~/v0/upgrade/logic/applyProducerUpgradeEffects";
 import { assertActivationStoredInputsFx } from "./assertActivationStoredInputsFx";
 import { createActivationVisualEventsFx } from "./createActivationVisualEventsFx";
-import { depleteActivationFx } from "./depleteActivationFx";
 import { rollActivationOutputFx } from "./rollActivationOutputFx";
 
 export namespace activateBoardItemFx {
@@ -185,10 +186,24 @@ export const activateBoardItemFx = Effect.fn("activateBoardItemFx")(function* (
 			});
 
 			if (shouldDeplete) {
-				const depletion = yield* depleteActivationFx({
-					row,
-					stash: activation,
-				});
+				const depletion = resolveActivationDepletion(activation);
+				yield* dbFx((db) =>
+					db
+						.updateTable("itemInstance")
+						.set({
+							stateJson: json({
+								...state,
+								activation: {
+									...activationState,
+									cooldownUntil: undefined,
+									remainingCharges: nextRemainingCharges,
+								},
+							} satisfies BoardItemState),
+							updatedAt,
+						})
+						.where("id", "=", row.id)
+						.execute(),
+				);
 				const activationResult = {
 					activationBoardItemId: row.id,
 					placements,
@@ -201,6 +216,10 @@ export const activateBoardItemFx = Effect.fn("activateBoardItemFx")(function* (
 						...visualEvents,
 						{
 							type: "activation.depleted",
+							animation: ActionVisualAnimation.state({
+								cause: "stash",
+								groupId: `activation:${row.id}:${input.activation}`,
+							}),
 							itemInstanceId: row.id,
 							depletion,
 						},

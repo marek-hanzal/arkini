@@ -112,6 +112,12 @@ export const useBoardTileEngineModel = ({
 			}
 
 			if (!boardItem.activation) return;
+			if (
+				boardItem.activation.kind === "stash" &&
+				(boardItem.activation.remainingCharges ?? 1) <= 0
+			) {
+				return;
+			}
 			activateBoardItemMutation.mutate({
 				boardItemId: boardItem.id,
 				activation: boardItem.activation.kind === "stash" ? "exhaust" : "single",

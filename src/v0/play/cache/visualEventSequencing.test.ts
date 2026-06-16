@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import {
+	sequenceCompletionDelayMs,
 	shouldSequenceSpawnVisualEvents,
 	spawnSequenceDelayMs,
 } from "~/v0/play/cache/sequenceSpawnVisualEvents";
@@ -134,6 +135,60 @@ describe("visual event sequencing", () => {
 			spawnSequenceDelayMs,
 		]);
 	});
+
+	it("delays stash depletion until the sequenced output batch finishes", () => {
+		const groupId = "activation:stash:exhaust";
+		const events = [
+			{
+				type: "activation.activated",
+				itemInstanceId: "stash",
+				mode: "exhaust",
+			},
+			{
+				type: "item.spawned",
+				animation: ActionVisualAnimation.sequenceFadeIn({
+					cause: "stash",
+					groupId,
+					sequenceIndex: 0,
+				}),
+				itemInstanceId: "spawned-a",
+				itemId: "item:twig",
+				originItemInstanceId: "stash",
+				to: boardLocation(3, 3),
+				reason: "activation-output",
+			},
+			{
+				type: "item.spawned",
+				animation: ActionVisualAnimation.sequenceFadeIn({
+					cause: "stash",
+					groupId,
+					sequenceIndex: 1,
+				}),
+				itemInstanceId: "spawned-b",
+				itemId: "item:pebble",
+				originItemInstanceId: "stash",
+				to: boardLocation(3, 5),
+				reason: "activation-output",
+			},
+			{
+				type: "activation.depleted",
+				animation: ActionVisualAnimation.state({
+					cause: "stash",
+					groupId,
+				}),
+				itemInstanceId: "stash",
+				depletion: {
+					kind: "remove",
+				},
+			},
+		] satisfies ActionVisualEventSchema.Type[];
+
+		expect(shouldSequenceSpawnVisualEvents(events)).toBe(true);
+		expect(sequenceCompletionDelayMs(events)).toBe(
+			spawnSequenceDelayMs + (events[2].animation?.durationMs ?? 0),
+		);
+	});
+
 	it("does not infer sequencing from exhaust without explicit sequence animation metadata", () => {
 		const events = [
 			{

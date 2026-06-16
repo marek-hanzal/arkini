@@ -96,6 +96,32 @@ describe("applyBoardVisualEvent", () => {
 		});
 	});
 
+	it("anchors spawned board item motion to the origin tile when available", () => {
+		const event = {
+			type: "item.spawned",
+			animation: ActionVisualAnimation.instantFadeIn({
+				cause: "producer",
+				groupId: "activation:producer:single",
+			}),
+			itemInstanceId: "spawned",
+			itemId: "item:twig",
+			originItemInstanceId: "source",
+			to: {
+				kind: "board",
+				x: 3,
+				y: 1,
+			},
+			reason: "activation-output",
+		} satisfies ActionVisualEventSchema.Type;
+
+		const next = applyBoardVisualEvent(boardView(), event);
+
+		expect(next.byId.spawned?.motion?.enter).toMatchObject({
+			fromTileId: "source",
+			kind: "spawn-from-tile",
+		});
+	});
+
 	it("cross-fades merge inputs out while the merge result appears", () => {
 		const event = {
 			type: "item.merged",

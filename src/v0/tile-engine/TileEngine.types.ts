@@ -30,6 +30,11 @@ export namespace TileEngine {
 
 	export interface Slot<TSlot = unknown> {
 		id: Id;
+		/**
+		 * Stable DOM/drop registry id for this slot. Prefer this over returning a
+		 * dynamic DropBinding id so hover feedback can be scoped before slot render.
+		 */
+		dropId?: Id;
 		data: TSlot;
 		disabled?: boolean;
 	}

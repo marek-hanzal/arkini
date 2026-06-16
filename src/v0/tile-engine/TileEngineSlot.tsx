@@ -9,8 +9,7 @@ export namespace TileEngineSlot {
 		slot: TileEngine.Slot<TSlot>;
 		index: number;
 		targetTile?: TileEngine.Tile<TTile>;
-		activeDropId: string | null;
-		activeDropFeedback: TileEngine.ActiveDropFeedback | null;
+		dropFeedback: TileEngine.ActiveDropFeedback | null;
 		disabled?: boolean;
 		className?: string;
 		drag?: TileEngine.DragConfig<TTile, TSlot, unknown, TDrop>;
@@ -23,8 +22,7 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	slot,
 	index,
 	targetTile,
-	activeDropId,
-	activeDropFeedback,
+	dropFeedback,
 	disabled: engineDisabled = false,
 	className,
 	drag,
@@ -33,10 +31,10 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 }: TileEngineSlot.Props<TTile, TSlot, TDrop>) => {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const binding = drag?.slot(slot, targetTile);
-	const dropId = binding?.id ?? slot.id;
+	const dropId = binding?.id ?? slot.dropId ?? slot.id;
 	const disabled = engineDisabled || !binding || binding.disabled || slot.disabled;
-	const isOver = !disabled && activeDropId === dropId;
-	const slotFeedback = isOver ? activeDropFeedback : null;
+	const slotFeedback = disabled ? null : dropFeedback;
+	const isOver = Boolean(slotFeedback);
 
 	useEffect(() => {
 		if (disabled || !ref.current) return;
@@ -58,7 +56,7 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	]);
 
 	useEffect(() => {
-		if (!isOver && !slotFeedback) return;
+		if (!slotFeedback) return;
 
 		DebugTimeline.record({
 			scope: "tile-engine",
@@ -78,7 +76,6 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 		});
 	}, [
 		dropId,
-		isOver,
 		slot.id,
 		slotFeedback,
 		targetTile?.id,

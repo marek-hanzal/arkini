@@ -40,21 +40,28 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 			gap: gapPx,
 		}}
 	>
-		{slots.map((slot, index) => (
-			<TileEngineSlot
-				key={slot.id}
-				slot={slot}
-				index={index}
-				targetTile={tileBySlotId.get(slot.id)}
-				activeDropId={activeDropId}
-				activeDropFeedback={activeDropFeedback}
-				disabled={disabled}
-				className={cellClassName}
-				drag={drag}
-				renderSlot={renderSlot}
-				registerDrop={registerDrop}
-			/>
-		))}
+		{slots.map((slot, index) => {
+			const dropId = slot.dropId ?? slot.id;
+			const slotDropFeedback =
+				activeDropFeedback?.dropId === activeDropId && activeDropFeedback.dropId === dropId
+					? activeDropFeedback
+					: null;
+
+			return (
+				<TileEngineSlot
+					key={slot.id}
+					slot={slot}
+					index={index}
+					targetTile={tileBySlotId.get(slot.id)}
+					dropFeedback={slotDropFeedback}
+					disabled={disabled}
+					className={cellClassName}
+					drag={drag}
+					renderSlot={renderSlot}
+					registerDrop={registerDrop}
+				/>
+			);
+		})}
 	</div>
 );
 

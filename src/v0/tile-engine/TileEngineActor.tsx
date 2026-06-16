@@ -10,7 +10,39 @@ import { useTileActorMotion } from "~/v0/tile-engine/useTileActorMotion";
 import { useTileActorTap } from "~/v0/tile-engine/useTileActorTap";
 import { useTileActorTimers } from "~/v0/tile-engine/useTileActorTimers";
 import { cancelTileMotionForElement } from "~/v0/tile-engine/TileMotionRuntime";
-import { useLatestRef } from "~/v0/tile-engine/useLatestRef";
+import { useLatestRef } from "~/v0/react/useLatestRef";
+import { sameTileEngineTile } from "~/v0/tile-engine/sameTileEngineTile";
+
+const sameActiveDropFeedback = (
+	left: TileEngineActorType.Props["dropFeedback"],
+	right: TileEngineActorType.Props["dropFeedback"],
+) =>
+	left?.dropId === right?.dropId &&
+	left?.effect === right?.effect &&
+	left?.targetTileId === right?.targetTileId;
+
+const sameTileEngineActorProps = <TTile, TSlot, TDrag, TDrop>(
+	left: TileEngineActorType.Props<TTile, TSlot, TDrag, TDrop>,
+	right: TileEngineActorType.Props<TTile, TSlot, TDrag, TDrop>,
+) =>
+	sameTileEngineTile(left.tile, right.tile) &&
+	left.index === right.index &&
+	left.columns === right.columns &&
+	left.rowCount === right.rowCount &&
+	left.gapPx === right.gapPx &&
+	left.enter === right.enter &&
+	left.exit === right.exit &&
+	left.dragRef === right.dragRef &&
+	left.dragDisabled === right.dragDisabled &&
+	left.dragConstraintsRef === right.dragConstraintsRef &&
+	left.resolveDrop === right.resolveDrop &&
+	sameActiveDropFeedback(left.dropFeedback, right.dropFeedback) &&
+	left.setActiveDropId === right.setActiveDropId &&
+	left.setActiveDropFeedback === right.setActiveDropFeedback &&
+	left.setHandoff === right.setHandoff &&
+	left.setHandoffs === right.setHandoffs &&
+	left.consumeHandoff === right.consumeHandoff &&
+	left.renderTile === right.renderTile;
 
 export namespace TileEngineActor {
 	export type Props<
@@ -29,7 +61,8 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	gapPx,
 	enter,
 	exit,
-	drag,
+	dragRef,
+	dragDisabled,
 	dragConstraintsRef,
 	resolveDrop,
 	dropFeedback,
@@ -48,12 +81,11 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	});
 	const lastTapRef = useRef<TileEngineActorType.LastTap | null>(null);
 	const timers = useTileActorTimers();
-	const binding = drag?.tile(tile);
-	const disabled = tile.disabled || tile.hidden || binding?.disabled || !binding;
+	const binding = dragRef.current?.tile(tile);
+	const disabled = tile.disabled || tile.hidden || dragDisabled || binding?.disabled || !binding;
 	const tileRef = useLatestRef(tile);
 	const bindingRef = useLatestRef(binding);
 	const disabledRef = useLatestRef(disabled);
-	const dragRef = useLatestRef(drag);
 	const [dragging, setDragging] = useState(false);
 
 	useEffect(() => {
@@ -207,4 +239,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	);
 };
 
-export const TileEngineActor = memo(TileEngineActorComponent) as typeof TileEngineActorComponent;
+export const TileEngineActor = memo(
+	TileEngineActorComponent,
+	sameTileEngineActorProps,
+) as typeof TileEngineActorComponent;

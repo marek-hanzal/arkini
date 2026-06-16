@@ -133,6 +133,12 @@ For animation bugs, use the Dev Sheet `Scenarios` section first when possible. L
 
 For DnD hover feedback regressions, use `drag-merge-feedback`: drag the left twig over the right twig for `merge`, over the pebble for `blocked`, and over an empty cell for `empty`. The report must include `drag.feedback.resolve`, `slot.feedback.render`, `tile.feedback.render`, and `tileEngineDom`. Those distinguish resolver bugs, React/render propagation bugs, and CSS/data-attribute bugs instead of forcing another glorious séance with the DOM.
 
+### Render performance notes
+
+TileEngine slot and actor components use adapter-owned `renderKey` tokens to avoid waking memoized cells/actors just because React Query produced a fresh cache snapshot object. If a TileEngine adapter puts scalar renderer data directly in `slot.data` or `tile.data`, include every relevant scalar in `renderKey`. If data identity itself is meaningful, omit `renderKey` and the engine falls back to object identity. Do not use `renderKey` to hide geometry, visibility, style, motion or feedback changes; those are compared separately and must keep rendering observable.
+
+Inventory slot data should stay layout-only (`slotIndex`). Stack/item/quantity belongs on the tile data, where real stack changes can wake the actor and renderer. Board item actors can use stable board-item keys because the actual mutable board item details are read by focused tile views. TileEngine keeps the latest drag config behind a stable ref; pointer-down re-reads the binding from that ref, so cache changes can update drag/drop behavior without making every actor prop change. This keeps drag/hover/board cache churn from politely asking every actor to rerender because one twig blinked.
+
 ## Active improvement priorities
 
 1. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.

@@ -14,7 +14,8 @@ export namespace TileEngineActors {
 		rowCount: number;
 		gapPx: number;
 		actorLayerClassName?: string;
-		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
+		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop> | undefined>;
+		dragDisabled: boolean;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		motionByTileId: ReadonlyMap<string, TileEngineMotionSchema.Type>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
@@ -35,7 +36,8 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	rowCount,
 	gapPx,
 	actorLayerClassName,
-	drag,
+	dragRef,
+	dragDisabled,
 	dragConstraintsRef,
 	motionByTileId,
 	resolveDrop,
@@ -71,7 +73,8 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 					columns={columns}
 					rowCount={rowCount}
 					gapPx={gapPx}
-					drag={drag}
+					dragRef={dragRef}
+					dragDisabled={dragDisabled}
 					dragConstraintsRef={dragConstraintsRef}
 					resolveDrop={resolveDrop}
 					dropFeedback={tileDropFeedback}

@@ -88,6 +88,7 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 		bindingRef,
 		tileRef,
 		disabledRef,
+		dragRef,
 		dragConstraintsRef,
 		dragSessionRef,
 		longTimerRef,

@@ -64,4 +64,17 @@ describe("global layer system", () => {
 
 		expect(offenders).toEqual([]);
 	});
+	it("keeps TileEngine motion animations behind the cancellable runtime", () => {
+		const offenders = listSourceFiles(join(sourceRoot, "v0/tile-engine")).flatMap((path) => {
+			if (path.endsWith("TileMotionRuntime.ts")) return [];
+			const source = readFileSync(path, "utf8");
+			return source.includes('from "motion"') || source.includes("from 'motion'")
+				? [
+						path.replace(process.cwd(), ""),
+					]
+				: [];
+		});
+
+		expect(offenders).toEqual([]);
+	});
 });

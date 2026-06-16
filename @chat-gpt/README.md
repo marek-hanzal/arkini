@@ -98,6 +98,14 @@ Action visual events may carry `animation` metadata. Treat this as the data cont
 
 Prefer `ActionVisualAnimation` helpers instead of hand-writing animation objects in fx roots. The helpers are intentionally boring so the event contract stays consistent and testable. Merge can be optimistically rendered from the static `GameConfig` merge rule so the animation starts immediately on drop instead of waiting for SQLite to finish thinking about twigs.
 
+## Tile motion runtime
+
+TileEngine animations are cancellable visual tasks, not state rollbacks. A cancelled motion must freeze the element at its current computed transform and let the next motion start from that rendered state. Never implement cancellation by resetting `style.transform` to zero; that is how jump bugs crawl back out of the grave wearing a tiny hat.
+
+Use `TileMotionRuntime` for actor transform animations instead of calling `motion.animate` directly inside TileEngine code. Motions are scoped by tile ID via `tileMotionScope(tile.id)`, and starting a new transform motion in the same scope cancels the previous one with `controls.stop()`, captures the current transform/opacity/rect, resolves the old task as `cancelled`, and starts the new task from the captured visual state. Awaiters must check `result.status` or the boolean wrapper return before committing follow-up cleanup. If a motion was cancelled, do not run stale reset/commit cleanup from the old async flow.
+
+Domain actions still own game state. The motion runtime only owns temporary visual transforms and cancellation cleanup. Do not add reverse actions or rollback logic here; optimistic cache rollback belongs in action/cache code, not in animation plumbing.
+
 ## Dev Sheet and bug reports
 
 The bottom nav `Dev` sheet replaces the old database-only sheet. It keeps the OPFS/SQLite status and hard reset button, but adds a `Copy bug report` button for animation/debug work.

@@ -9,6 +9,7 @@ import { useTileActorExitMotion } from "~/v0/tile-engine/useTileActorExitMotion"
 import { useTileActorMotion } from "~/v0/tile-engine/useTileActorMotion";
 import { useTileActorTap } from "~/v0/tile-engine/useTileActorTap";
 import { useTileActorTimers } from "~/v0/tile-engine/useTileActorTimers";
+import { cancelTileMotionForElement } from "~/v0/tile-engine/TileMotionRuntime";
 import { useLatestRef } from "~/v0/tile-engine/useLatestRef";
 
 export namespace TileEngineActor {
@@ -48,6 +49,11 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	const disabledRef = useLatestRef(disabled);
 	const dragRef = useLatestRef(drag);
 	const [dragging, setDragging] = useState(false);
+
+	useEffect(() => {
+		const element = actorRef.current;
+		return () => cancelTileMotionForElement(element, "actor-unmount");
+	}, []);
 	useTileActorEnterMotion({
 		actorRef,
 		enter: tile.enter,

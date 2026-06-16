@@ -21,7 +21,7 @@ export namespace useTilePointerUp {
 		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop> | undefined>;
 		clearLongTimer(): void;
 		handleTap(event: Pick<ReactPointerEvent<HTMLDivElement>, "clientX" | "clientY">): void;
-		animateBack(): Promise<void>;
+		animateBack(): Promise<boolean>;
 		animateToTarget(
 			targetRect: TileEngine.Rect | null,
 			meta?: {
@@ -31,7 +31,7 @@ export namespace useTilePointerUp {
 				fromSlotId?: string;
 				toSlotId?: string;
 			},
-		): Promise<void>;
+		): Promise<boolean>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		finishDrag(): void;
 		setActiveDropId(dropId: string | null): void;
@@ -135,6 +135,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 			setActiveDropId(null);
 
 			void (async () => {
+				let resetAfterMotion = true;
 				try {
 					const sourceTile = tileRef.current;
 					const motionId = createDropMotionId({
@@ -209,7 +210,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 							},
 						});
 
-						await Promise.all([
+						const [sourceMotionCompleted, targetMotionCompleted] = await Promise.all([
 							animateToTarget(rectFromElement(resolved.element), {
 								motionId,
 								animation,
@@ -230,8 +231,26 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 											toSlotId: sourceTile.slotId,
 										},
 									})
-								: Promise.resolve(),
+								: Promise.resolve(true),
 						]);
+
+						if (
+							!sourceMotionCompleted ||
+							(targetActorElement && !targetMotionCompleted)
+						) {
+							resetAfterMotion = false;
+							DebugTimeline.record({
+								scope: "tile-engine",
+								event: "drop.motion.cancelled",
+								detail: {
+									motionId,
+									animation,
+									sourceMotionCompleted,
+									targetMotionCompleted,
+								},
+							});
+							return;
+						}
 
 						DebugTimeline.record({
 							scope: "tile-engine",
@@ -281,23 +300,23 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 								},
 							});
 							setHandoff(null);
-							await animateBack();
+							resetAfterMotion = await animateBack();
 							return;
 						}
 					}
 
 					setHandoff(null);
-					await animateBack();
+					resetAfterMotion = await animateBack();
 				} catch {
 					DebugTimeline.record({
 						scope: "tile-engine",
 						event: "drop.error",
 					});
 					setHandoff(null);
-					await animateBack();
+					resetAfterMotion = await animateBack();
 				} finally {
 					finishDrag();
-					resetElementTransform(actorRef.current);
+					if (resetAfterMotion) resetElementTransform(actorRef.current);
 				}
 			})();
 		},

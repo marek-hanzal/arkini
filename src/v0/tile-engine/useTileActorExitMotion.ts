@@ -1,7 +1,7 @@
-import { animate } from "motion";
 import { type RefObject, useLayoutEffect, useRef } from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema";
+import { startTileStyleMotion, tilePresenceMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
 export namespace useTileActorExitMotion {
@@ -50,9 +50,10 @@ export const useTileActorExitMotion = ({
 			},
 		});
 
-		void animate(
+		void startTileStyleMotion({
+			scope: tilePresenceMotionScope(tileId),
 			element,
-			{
+			keyframes: {
 				opacity: [
 					1,
 					0,
@@ -62,12 +63,17 @@ export const useTileActorExitMotion = ({
 					"translate3d(0px, 0px, 0px) scale(0.72)",
 				],
 			},
-			{
-				delay: (exit.delayMs ?? 0) / 1000,
-				duration: (exit.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
-				ease: TileEngineTiming.moveEase,
+			delay: (exit.delayMs ?? 0) / 1000,
+			duration: (exit.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
+			ease: TileEngineTiming.moveEase,
+			meta: {
+				kind: "exit",
+				exitKind: kind,
+				groupId: exit.groupId,
+				tileId,
 			},
-		).then(() =>
+		}).then((result) => {
+			if (result.status !== "completed") return;
 			DebugTimeline.record({
 				scope: "tile-engine",
 				event: "motion.exit.end",
@@ -75,8 +81,8 @@ export const useTileActorExitMotion = ({
 					groupId: exit.groupId,
 					tileId,
 				},
-			}),
-		);
+			});
+		});
 	}, [
 		actorRef,
 		exit,

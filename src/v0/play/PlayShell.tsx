@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { match } from "ts-pattern";
-import { type FC, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { type FC, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BoardSurface } from "~/v0/board/BoardSurface";
 import { DevSheet } from "~/v0/debug/DevSheet";
 import { registerDebugBugReport } from "~/v0/debug/DebugBugReport";
@@ -26,6 +26,7 @@ const messageForError = (error: unknown) =>
 export const PlayShell: FC<PlayShell.Props> = () => {
 	const queryClient = useQueryClient();
 	const feedbackFlags = useFeedbackFlags();
+	const playAreaRef = useRef<HTMLDivElement | null>(null);
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
 	const closeSheet = useCallback(() => setActiveSheet(undefined), []);
@@ -46,11 +47,11 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 	);
 	const feedback = useMemo<Feedback.Type>(
 		() => ({
-			pulseMergeCell(key) {
-				if (key) feedbackFlags.pulse(`board:merge:${key}`);
+			pulseMergeCell() {
+				// Merge is fully communicated by tile animation; no persistent cell flash.
 			},
-			pulseImprintCell(key) {
-				if (key) feedbackFlags.pulse(`board:imprint:${key}`);
+			pulseImprintCell() {
+				// Directed merge/imprint uses the same animation-only feedback path.
 			},
 			flashBoardCell(key) {
 				if (key) feedbackFlags.pulse(`board:error:${key}`);
@@ -92,6 +93,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}
 							onClose={closeSheet}
+							dragConstraintsRef={playAreaRef}
 						/>
 					),
 				)
@@ -122,9 +124,12 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 		: null;
 
 	return (
-		<>
-			<div className="relative h-dvh w-dvw overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
-				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-hidden">
+		<div
+			ref={playAreaRef}
+			className="relative h-dvh w-dvw overflow-hidden"
+		>
+			<div className="relative h-full w-full overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
+				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-visible">
 					<div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
 						<p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">
 							Arkini
@@ -137,6 +142,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}
 							onOpenItem={openItem}
+							dragConstraintsRef={playAreaRef}
 						/>
 					</div>
 				</main>
@@ -159,6 +165,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 			>
 				<Suspense fallback={<SheetFallback />}>{sheetContent}</Suspense>
 			</BottomSheet>
-		</>
+		</div>
 	);
 };

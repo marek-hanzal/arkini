@@ -60,7 +60,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 		<div
 			data-ak-tile-engine-id={id}
 			data-ak-tile-engine-layer-role={layerRole}
-			className={cn("ak-tile-engine relative overflow-hidden", className)}
+			className={cn("ak-tile-engine relative overflow-visible", className)}
 		>
 			<TileEngineSlots
 				columns={columns}

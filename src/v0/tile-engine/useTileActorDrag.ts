@@ -96,6 +96,7 @@ export const useTileActorDrag = <TTile, TSlot, TDrag, TDrop>({
 	const handlePointerMove = useTilePointerMove({
 		actorRef,
 		dragSessionRef,
+		dragConstraintsRef,
 		clearLongTimer,
 		startActualDrag: lifecycle.startActualDrag,
 		updateHover,

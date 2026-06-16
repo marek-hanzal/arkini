@@ -3,8 +3,8 @@ import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { actionVisualMotionSettlementDelayMs } from "~/v0/play/tile-engine-motion/actionVisualMotionSettlementDelayMs";
 import { toTileEngineEnterMotion } from "~/v0/play/tile-engine-motion/toTileEngineEnterMotion";
-import { registerTileEngineMotionRequests } from "~/v0/tile-engine/TileEngineMotionRequestStore";
-import type { TileEngineMotionRequest } from "~/v0/tile-engine/TileEngineMotionRequest";
+import { registerTileEngineMotionRequests } from "~/v0/tile-engine";
+import type { TileEngineMotionRequest } from "~/v0/tile-engine";
 
 export namespace registerTileEngineEnterRequests {
 	export interface Props {

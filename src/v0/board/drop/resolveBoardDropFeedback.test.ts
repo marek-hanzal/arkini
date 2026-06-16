@@ -5,7 +5,7 @@ import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardCellView } from "~/v0/board/boardCells";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
-import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 import { resolveBoardDropFeedback } from "./resolveBoardDropFeedback";
 
 const boardItem = (props: Pick<BoardViewItem, "id" | "itemId" | "x" | "y">): BoardViewItem => ({

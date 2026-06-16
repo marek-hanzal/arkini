@@ -1,5 +1,5 @@
 import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
-import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
+import { TileEngineTiming } from "~/v0/tile-engine";
 
 export const actionVisualMotionSettlementDelayMs = (animation: ActionVisualAnimationSchema.Type) =>
 	(animation.delayMs ?? 0) +

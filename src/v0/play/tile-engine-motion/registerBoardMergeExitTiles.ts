@@ -8,7 +8,7 @@ import {
 	removeBoardTransientTilesByGroup,
 	upsertBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
-import { registerTileEngineMotionRequests } from "~/v0/tile-engine/TileEngineMotionRequestStore";
+import { registerTileEngineMotionRequests } from "~/v0/tile-engine";
 
 export namespace registerBoardMergeExitTiles {
 	export interface Props {

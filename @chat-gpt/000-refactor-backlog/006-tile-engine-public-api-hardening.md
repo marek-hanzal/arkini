@@ -1,6 +1,6 @@
 # Harden TileEngine public API
 
-Status: TODO
+Status: DONE
 
 ## Goal
 
@@ -35,3 +35,12 @@ A small ownership leak was fixed: enter-motion schema data now lives in `src/v0/
 
 - Do not add `CommandVisualEventSchema` to TileEngine. That is game-level language.
 - Do not add item/board/inventory IDs to generic engine types.
+
+
+## 2026-06-16 result
+
+- Added `src/v0/tile-engine/index.ts` as the public package-like barrel.
+- Migrated board, inventory and play code to import TileEngine components, public types, timing and motion request APIs only from `~/v0/tile-engine`.
+- Added the `tile-engine-public-api-only` Dependency Cruiser rule so code outside TileEngine cannot deep-import implementation files.
+- Added `src/v0/tile-engine/README.md` documenting ownership, forbidden Arkini knowledge and public exports.
+- Kept the motion request registry as a public adapter extension point, while `useTileEngineMotionRequests` and runtime hooks remain internal implementation details.

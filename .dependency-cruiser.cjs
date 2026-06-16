@@ -15,6 +15,21 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "tile-engine-public-api-only",
+		comment:
+			"Code outside TileEngine must import the public ~/v0/tile-engine barrel instead of reaching into package internals.",
+		severity: "error",
+		from: {
+			path: "^src/v0/(?!tile-engine(?:/|$)).+",
+		},
+		to: {
+			path: "^src/v0/tile-engine/.+",
+			pathNot: [
+				"^src/v0/tile-engine/index\\.ts$",
+			],
+		},
+	},
+	{
 		name: "manifest-no-runtime-imports",
 		comment:
 			"Manifest owns static game definitions only. Runtime state, UI and persistence must not leak back into game data.",

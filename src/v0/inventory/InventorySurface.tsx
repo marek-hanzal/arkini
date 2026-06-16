@@ -8,8 +8,8 @@ import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
-import { TileEngine } from "~/v0/tile-engine/TileEngine";
-import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.types";
+import { TileEngine } from "~/v0/tile-engine";
+import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 
 export const InventorySurface = memo(
 	({ feedback, feedbackFlags, onClose }: InventorySurfaceType.Props) => {

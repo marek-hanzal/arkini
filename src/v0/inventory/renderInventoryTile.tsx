@@ -1,6 +1,6 @@
 import { InventoryTile } from "~/v0/inventory/InventoryTile";
 import type { InventorySurface } from "~/v0/inventory/InventorySurface.types";
-import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export const renderInventoryTile = ({
 	tile,

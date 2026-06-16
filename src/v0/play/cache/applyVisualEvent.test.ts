@@ -2,10 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
-import {
-	clearTileEngineMotionRequests,
-	readTileEngineMotionRequests,
-} from "~/v0/tile-engine/TileEngineMotionRequestStore";
+import { clearTileEngineMotionRequests, readTileEngineMotionRequests } from "~/v0/tile-engine";
 import {
 	clearBoardTransientTiles,
 	readBoardTransientTiles,

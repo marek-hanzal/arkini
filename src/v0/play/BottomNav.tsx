@@ -1,7 +1,7 @@
 import { memo, type FC, type RefObject } from "react";
 import type { Sheet } from "~/v0/play/sheet/Sheet";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
-import { TileEngineDropTarget } from "~/v0/tile-engine/TileEngineDropTarget";
+import { TileEngineDropTarget } from "~/v0/tile-engine";
 
 export namespace BottomNav {
 	export interface Props {

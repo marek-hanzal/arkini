@@ -20,16 +20,26 @@ interface ButtonProps {
 
 const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) => {
 	const button = (ref?: RefObject<HTMLDivElement | null>) => (
-		<div ref={ref}>
+		<div
+			ref={ref}
+			className="ak-bottom-nav-slot"
+		>
 			<button
 				type="button"
 				className="ak-bottom-nav-button"
 				data-active={active ? "true" : "false"}
 				data-tone={tone}
+				aria-label={label}
+				title={label}
 				onClick={() => onOpen(tone)}
 			>
-				<span className="ak-bottom-nav-icon">{icon}</span>
-				<span>{label}</span>
+				<span
+					className="ak-bottom-nav-icon"
+					aria-hidden="true"
+				>
+					{icon}
+				</span>
+				<span className="ak-visually-hidden">{label}</span>
 			</button>
 		</div>
 	);
@@ -54,21 +64,21 @@ export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => 
 			<NavButton
 				active={activeSheet === "inventory"}
 				label="Inventory"
-				icon="▦"
+				icon="🎒"
 				tone="inventory"
 				onOpen={onOpen}
 			/>
 			<NavButton
 				active={activeSheet === "upgrades"}
 				label="Upgrades"
-				icon="▲"
+				icon="⏫"
 				tone="upgrades"
 				onOpen={onOpen}
 			/>
 			<NavButton
 				active={activeSheet === "dev"}
 				label="Dev"
-				icon="⌘"
+				icon="🛠️"
 				tone="dev"
 				onOpen={onOpen}
 			/>

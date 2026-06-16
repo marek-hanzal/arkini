@@ -59,7 +59,7 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 });
 
 export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => (
-	<nav className="ak-bottom-nav">
+	<nav className="ak-layer-bottom-nav ak-bottom-nav">
 		<div className="ak-bottom-nav-inner">
 			<NavButton
 				active={activeSheet === "inventory"}

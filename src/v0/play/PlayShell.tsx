@@ -142,7 +142,7 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 				</main>
 
 				{lastError && feedbackFlags.has("toast:error") ? (
-					<div className="pointer-events-none absolute inset-x-3 bottom-[calc(var(--ak-bottom-nav-height)+0.85rem)] z-50 mx-auto max-w-[430px] rounded-md border border-red-300/35 bg-red-950/90 px-3 py-2 text-sm text-red-50 shadow-xl shadow-black/35">
+					<div className="ak-layer-toast pointer-events-none absolute inset-x-3 bottom-[calc(var(--ak-bottom-nav-height)+0.85rem)] mx-auto max-w-[430px] rounded-md border border-red-300/35 bg-red-950/90 px-3 py-2 text-sm text-red-50 shadow-xl shadow-black/35">
 						{lastError}
 					</div>
 				) : null}

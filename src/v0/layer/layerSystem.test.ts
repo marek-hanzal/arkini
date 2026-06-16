@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const sourceRoot = join(process.cwd(), "src");
+const packagePath = join(process.cwd(), "package.json");
 const stylePath = join(process.cwd(), "src/app/styles.css");
 
 const listSourceFiles = (directory: string): string[] =>
@@ -64,9 +65,26 @@ describe("global layer system", () => {
 
 		expect(offenders).toEqual([]);
 	});
-	it("keeps TileEngine motion animations behind the cancellable runtime", () => {
+	it("keeps TileEngine DOM animations behind the cancellable runtime", () => {
 		const offenders = listSourceFiles(join(sourceRoot, "v0/tile-engine")).flatMap((path) => {
 			if (path.endsWith("TileMotionRuntime.ts")) return [];
+			const source = readFileSync(path, "utf8");
+			return /\.animate\(/.test(source) ||
+				source.includes('from "motion"') ||
+				source.includes("from 'motion'")
+				? [
+						path.replace(process.cwd(), ""),
+					]
+				: [];
+		});
+
+		expect(offenders).toEqual([]);
+	});
+
+	it("does not depend on the external Motion package", () => {
+		const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
+		const sourceOffenders = listSourceFiles(sourceRoot).flatMap((path) => {
+			if (path.endsWith("layerSystem.test.ts")) return [];
 			const source = readFileSync(path, "utf8");
 			return source.includes('from "motion"') || source.includes("from 'motion'")
 				? [
@@ -75,6 +93,7 @@ describe("global layer system", () => {
 				: [];
 		});
 
-		expect(offenders).toEqual([]);
+		expect(packageJson.dependencies?.motion).toBeUndefined();
+		expect(sourceOffenders).toEqual([]);
 	});
 });

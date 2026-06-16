@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
-import { tileEngineMotionCleanupDelayMs } from "~/v0/play/cache/scheduleTileEngineMotionCleanup";
+import { actionVisualMotionSettlementDelayMs } from "~/v0/play/tile-engine-motion/actionVisualMotionSettlementDelayMs";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
-describe("tileEngineMotionCleanupDelayMs", () => {
+describe("actionVisualMotionSettlementDelayMs", () => {
 	it("waits for sequence delay, duration and cleanup buffer", () => {
 		const animation = ActionVisualAnimation.sequenceFadeIn({
 			cause: "producer",
@@ -11,7 +11,7 @@ describe("tileEngineMotionCleanupDelayMs", () => {
 			sequenceIndex: 3,
 		});
 
-		expect(tileEngineMotionCleanupDelayMs(animation)).toBe(
+		expect(actionVisualMotionSettlementDelayMs(animation)).toBe(
 			(animation.delayMs ?? 0) +
 				(animation.durationMs ?? 0) +
 				TileEngineTiming.motionCleanupBufferMs,

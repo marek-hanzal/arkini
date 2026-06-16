@@ -1,6 +1,8 @@
 import type { PointerEvent as ReactPointerEvent, ReactNode, RefObject } from "react";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
+import type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema";
 
 export namespace TileEngineActor {
 	export interface DragSession<TDrag = unknown> {
@@ -32,6 +34,8 @@ export namespace TileEngineActor {
 		columns: number;
 		rowCount: number;
 		gapPx: number;
+		enter?: TileEnterMotionSchema.Type;
+		exit?: TileExitMotionSchema.Type;
 		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;

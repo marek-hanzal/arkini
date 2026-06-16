@@ -27,6 +27,8 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	columns,
 	rowCount,
 	gapPx,
+	enter,
+	exit,
 	drag,
 	dragConstraintsRef,
 	resolveDrop,
@@ -56,12 +58,12 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	}, []);
 	useTileActorEnterMotion({
 		actorRef,
-		enter: tile.enter,
+		enter,
 		tileId: tile.id,
 	});
 	useTileActorExitMotion({
 		actorRef,
-		exit: tile.exit,
+		exit,
 		tileId: tile.id,
 	});
 

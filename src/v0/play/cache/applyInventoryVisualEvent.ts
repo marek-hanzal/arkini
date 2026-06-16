@@ -2,7 +2,6 @@ import { match } from "ts-pattern";
 import { patchInventorySlotCache } from "~/v0/inventory/cache/patchInventorySlotCache";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
-import { toTileEngineEnterMotion } from "~/v0/play/tile-engine-motion/toTileEngineEnterMotion";
 
 const emptyStateJson = "{}";
 
@@ -44,11 +43,6 @@ export const applyInventoryVisualEvent = (
 								? {
 										...slot.stack,
 										quantity: slot.stack.quantity + 1,
-										motion: {
-											enter: toTileEngineEnterMotion(spawned.animation, {
-												fromTileId: spawned.originItemInstanceId,
-											}),
-										},
 									}
 								: {
 										id:
@@ -59,11 +53,6 @@ export const applyInventoryVisualEvent = (
 										state: {},
 										stateJson: emptyStateJson,
 										stateful: false,
-										motion: {
-											enter: toTileEngineEnterMotion(spawned.animation, {
-												fromTileId: spawned.originItemInstanceId,
-											}),
-										},
 									},
 					}),
 				});

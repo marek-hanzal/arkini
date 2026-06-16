@@ -8,6 +8,10 @@ import {
 	readBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
 import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
+import {
+	clearTileEngineMotionRequests,
+	readTileEngineMotionRequests,
+} from "~/v0/tile-engine/TileEngineMotionRequestStore";
 
 const boardView = () =>
 	rebuildBoardView([
@@ -31,6 +35,7 @@ describe("registerBoardMergeExitTiles", () => {
 	it("keeps delayed exit transients until the motion settles", () => {
 		vi.useFakeTimers();
 		clearBoardTransientTiles();
+		clearTileEngineMotionRequests();
 
 		const animation = {
 			...ActionVisualAnimation.merge({
@@ -59,13 +64,17 @@ describe("registerBoardMergeExitTiles", () => {
 		});
 
 		expect(readBoardTransientTiles()).toHaveLength(2);
+		expect(readTileEngineMotionRequests("board").size).toBe(2);
 
 		vi.advanceTimersByTime(actionVisualMotionSettlementDelayMs(animation) - 1);
 		expect(readBoardTransientTiles()).toHaveLength(2);
+		expect(readTileEngineMotionRequests("board").size).toBe(2);
 
 		vi.advanceTimersByTime(1);
 		expect(readBoardTransientTiles()).toHaveLength(0);
+		expect(readTileEngineMotionRequests("board").size).toBe(0);
 
+		clearTileEngineMotionRequests();
 		vi.useRealTimers();
 	});
 });

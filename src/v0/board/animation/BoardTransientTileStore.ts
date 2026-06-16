@@ -34,7 +34,7 @@ export const upsertBoardTransientTiles = (tiles: readonly BoardTransientTile[]) 
 };
 
 export const removeBoardTransientTilesByGroup = (groupId: string) => {
-	const next = transientTiles.filter((tile) => tile.exit.groupId !== groupId);
+	const next = transientTiles.filter((tile) => tile.groupId !== groupId);
 	if (next.length === transientTiles.length) return;
 
 	transientTiles = next;

@@ -1,6 +1,6 @@
 # Overhaul tile animations through TileEngine
 
-Status: IN_PROGRESS
+Status: DONE
 Priority: CRITICAL
 
 ## Goal
@@ -223,3 +223,14 @@ Keep task 012 open. The remaining larger step is still to replace cache-carried 
 - The helper still writes board transient render actors, but its public location now makes the ownership clearer: Arkini visual events map to TileEngine exit tiles; board rendering only supplies the transient store.
 
 Keep task 012 open. This is a boundary cleanup, not yet the full request-queue rewrite.
+
+## 2026-06-16 TileEngine motion request registry note
+
+- Added `TileEngineMotionRequestStore` as the generic TileEngine-side request registry for temporary tile presence motions.
+- Removed temporary `motion` metadata from `BoardViewItem`, inventory stacks, and `TileEngine.Tile`. React Query cache rows are now durable view state again, not a tiny mail truck for enter animations.
+- Arkini visual events now patch board/inventory data first, then `registerTileEngineEnterRequests` maps semantic spawn/merge events to generic TileEngine `enter` requests by rendered tile id.
+- Merge exit transients now store only render facts (`id`, `groupId`, `itemId`, `slotId`). Their `exit` presence motion is registered through the same TileEngine request store instead of being carried by board transient data.
+- Motion request cleanup is exact-request guarded. A delayed settlement clears only the same request object it registered, so the first item in a sequenced spawn group cannot wipe a newer request on the same tile or another tile just because the `groupId` matches. Broad group clearing remains only for rollback/snapshot cleanup.
+- Deleted the cache-row enter cleanup helper and scheduler. Settlement belongs to the TileEngine motion request registry, not React Query view patching.
+
+Task 012 is now complete for the current architecture. Future animation work should extend the generic TileEngine request boundary instead of reintroducing cache-carried `motion` metadata or app-level DOM animation staging.

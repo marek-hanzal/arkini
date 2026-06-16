@@ -45,10 +45,12 @@ export const useTileDragLifecycle = <TTile, TSlot, TDrag, TDrop>({
 					}
 				: undefined,
 		});
+		actorRef.current?.removeAttribute("data-ak-tile-engine-dragging");
 		dragSessionRef.current = null;
 		setDragging(false);
 		setActiveDropId(null);
 	}, [
+		actorRef,
 		dragSessionRef,
 		setActiveDropId,
 		setDragging,
@@ -99,6 +101,7 @@ export const useTileDragLifecycle = <TTile, TSlot, TDrag, TDrop>({
 			},
 		});
 		clearTimers();
+		actorRef.current?.setAttribute("data-ak-tile-engine-dragging", "true");
 		setDragging(true);
 		dragRef.current?.onDragStart?.({
 			source: session.source,
@@ -106,6 +109,7 @@ export const useTileDragLifecycle = <TTile, TSlot, TDrag, TDrop>({
 			rect: session.origin,
 		});
 	}, [
+		actorRef,
 		clearTimers,
 		dragRef,
 		dragSessionRef,

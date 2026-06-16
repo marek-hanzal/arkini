@@ -12,7 +12,7 @@ export namespace TileEngineActors {
 		columns: number;
 		rowCount: number;
 		gapPx: number;
-		itemLayerClassName?: string;
+		actorLayerClassName?: string;
 		drag?: TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
@@ -32,7 +32,7 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	columns,
 	rowCount,
 	gapPx,
-	itemLayerClassName,
+	actorLayerClassName,
 	drag,
 	dragConstraintsRef,
 	resolveDrop,
@@ -47,7 +47,7 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	<div
 		className={cn(
 			"ak-tile-engine-actors pointer-events-none absolute inset-0",
-			itemLayerClassName,
+			actorLayerClassName,
 		)}
 	>
 		{tiles.map((tile) => {

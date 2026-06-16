@@ -4,7 +4,7 @@ import type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema
 
 export namespace TileEngine {
 	export type Id = string;
-	export type LayerContext = "board" | "sheet";
+	export type LayerRole = "base" | "overlay";
 	export type TileStyle = Omit<CSSProperties, "zIndex">;
 	export type DropAnimation = "parallel-swap";
 	export type DropOutcome =
@@ -141,8 +141,8 @@ export namespace TileEngine {
 		tiles: readonly Tile<TTile>[];
 		className?: string;
 		cellClassName?: string;
-		itemLayerClassName?: string;
-		layerContext?: LayerContext;
+		actorLayerClassName?: string;
+		layerRole?: LayerRole;
 		gapPx?: number;
 		drag?: DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;

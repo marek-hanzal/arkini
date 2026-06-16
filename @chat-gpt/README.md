@@ -73,11 +73,11 @@ Arkini uses npm without a committed lockfile. Do not add `package-lock.json`, `b
 
 Z-index is global infrastructure, not a local styling snack. All stack order must go through the CSS variables in `src/app/styles.css`:
 
-- board/passive tile actors use `--ak-layer-board-item`.
-- board dragging uses `--ak-layer-board-drag-item`.
+- base surface passive tile actors use `--ak-layer-base-tile`.
+- base surface dragging uses `--ak-layer-base-drag-tile`.
 - bottom nav and toast have named app layers.
-- sheet root uses `--ak-layer-sheet`; backdrop/panel are only relative inside that sheet.
-- inventory/sheet TileEngine instances set `layerContext="sheet"`, so passive sheet tiles use `--ak-layer-sheet-item` and dragged sheet tiles use `--ak-layer-sheet-drag-item`.
+- overlay roots use `--ak-layer-overlay-root`; backdrop/panel are only relative inside that overlay.
+- TileEngine only knows generic layer roles: `base` and `overlay`. Feature code maps board-like surfaces to `layerRole="base"` and sheet-like surfaces to `layerRole="overlay"`. Passive overlay tiles use `--ak-layer-overlay-tile` and dragged overlay tiles use `--ak-layer-overlay-drag-tile`.
 
 Do not add Tailwind `z-*`, inline `zIndex`, or raw `z-index: 123` declarations. `src/v0/layer/layerSystem.test.ts` exists specifically to slap that hand away. If a new surface needs layering, define or reuse a named layer variable and connect it through the relevant component data/class, not through a one-off number. Yes, even if the number feels “obvious”; that is how z-index archaeology begins.
 

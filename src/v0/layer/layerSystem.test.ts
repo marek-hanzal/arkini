@@ -40,4 +40,28 @@ describe("global layer system", () => {
 
 		expect(offenders).toEqual([]);
 	});
+	it("keeps TileEngine layer API generic", () => {
+		const offenders = [
+			"LayerContext",
+			"layerContext",
+			"data-ak-tile-engine-layer=",
+			'layerRole="board"',
+			'layerRole="sheet"',
+			'data-ak-tile-engine-layer-role="board"',
+			'data-ak-tile-engine-layer-role="sheet"',
+		].flatMap((needle) => {
+			const matches = listSourceFiles(sourceRoot).filter(
+				(path) =>
+					!path.endsWith("layerSystem.test.ts") &&
+					readFileSync(path, "utf8").includes(needle),
+			);
+
+			return matches.map((path) => ({
+				needle,
+				path: path.replace(process.cwd(), ""),
+			}));
+		});
+
+		expect(offenders).toEqual([]);
+	});
 });

@@ -1,3 +1,4 @@
+import type { RefObject } from "react";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 
 export namespace InventorySurface {
@@ -5,6 +6,7 @@ export namespace InventorySurface {
 		feedback: Feedback.Type;
 		feedbackFlags: ReadonlySet<string>;
 		onClose(): void;
+		dragConstraintsRef?: RefObject<HTMLElement | null>;
 	}
 
 	export interface TileData {

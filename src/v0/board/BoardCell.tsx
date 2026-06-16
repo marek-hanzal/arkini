@@ -8,12 +8,10 @@ export namespace BoardCell {
 	export interface Props {
 		cell: BoardCellView;
 		invalid: boolean;
-		merged: boolean;
-		imprinted: boolean;
 	}
 }
 
-export const BoardCell = memo(({ cell, invalid, merged, imprinted }: BoardCell.Props) => (
+export const BoardCell = memo(({ cell, invalid }: BoardCell.Props) => (
 	<div
 		data-ak-board-cell={`${cell.x}:${cell.y}`}
 		className={cn(
@@ -21,8 +19,6 @@ export const BoardCell = memo(({ cell, invalid, merged, imprinted }: BoardCell.P
 			cell.x === boardColumns - 1 && "border-r-0",
 			cell.y === boardRows - 1 && "border-b-0",
 			invalid && "ak-cell-error",
-			merged && "ak-merge-target-over",
-			imprinted && "ak-merge-target",
 		)}
 	/>
 ));

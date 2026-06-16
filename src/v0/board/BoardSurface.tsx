@@ -17,7 +17,7 @@ const boardSlots = boardCells.map((cell) => ({
 })) satisfies readonly TileEngineType.Slot<BoardCellView>[];
 
 export const BoardSurface = memo(
-	({ feedback, feedbackFlags, onOpenItem }: BoardSurfaceType.Props) => {
+	({ feedback, feedbackFlags, onOpenItem, dragConstraintsRef }: BoardSurfaceType.Props) => {
 		const { drag, tiles } = useBoardTileEngineModel({
 			feedback,
 			onOpenItem,
@@ -30,8 +30,6 @@ export const BoardSurface = memo(
 					<BoardCell
 						cell={cell}
 						invalid={feedbackFlags.has(`board:error:${key}`)}
-						merged={feedbackFlags.has(`board:merge:${key}`)}
-						imprinted={feedbackFlags.has(`board:imprint:${key}`)}
 					/>
 				);
 			},
@@ -51,6 +49,7 @@ export const BoardSurface = memo(
 				actorLayerClassName="pointer-events-none"
 				layerRole="base"
 				drag={drag}
+				dragConstraintsRef={dragConstraintsRef}
 				renderSlot={renderSlot}
 				renderTile={renderBoardTile}
 			/>

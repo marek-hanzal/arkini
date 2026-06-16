@@ -12,7 +12,7 @@ import { TileEngine } from "~/v0/tile-engine/TileEngine";
 import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.types";
 
 export const InventorySurface = memo(
-	({ feedback, feedbackFlags, onClose }: InventorySurfaceType.Props) => {
+	({ feedback, feedbackFlags, onClose, dragConstraintsRef }: InventorySurfaceType.Props) => {
 		const { drag, filled, slots, tiles } = useInventoryTileEngineModel({
 			feedback,
 		});
@@ -36,7 +36,7 @@ export const InventorySurface = memo(
 					description={`${filled}/${slots.length} slots`}
 					onClose={onClose}
 				/>
-				<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
+				<div className="min-h-0 flex-1 overflow-visible px-3 py-4">
 					<TileEngine<
 						InventorySurfaceType.TileData,
 						InventorySlot,
@@ -52,6 +52,7 @@ export const InventorySurface = memo(
 						layerRole="overlay"
 						actorLayerClassName="pointer-events-none"
 						drag={drag}
+						dragConstraintsRef={dragConstraintsRef}
 						renderSlot={renderSlot}
 						renderTile={renderInventoryTile}
 					/>

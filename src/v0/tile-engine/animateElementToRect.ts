@@ -1,7 +1,8 @@
-import { animate } from "motion";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { targetDelta } from "~/v0/tile-engine/targetDelta";
+import { startTileTransformMotion, tileMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
+import { translate3d } from "~/v0/tile-engine/TileVisualSnapshot";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
@@ -25,8 +26,9 @@ export const animateElementToRect = async ({
 	target: TileEngine.Rect;
 	meta?: animateElementToRect.Meta;
 }) => {
+	const fromRect = rectFromElement(element);
 	const delta = targetDelta({
-		origin: rectFromElement(element),
+		origin: fromRect,
 		target,
 	});
 
@@ -35,26 +37,27 @@ export const animateElementToRect = async ({
 		event: "motion.peer-snap.start",
 		detail: {
 			...meta,
-			fromRect: rectFromElement(element),
+			fromRect,
 			targetRect: target,
 			deltaX: delta.x,
 			deltaY: delta.y,
 		},
 	});
 
-	await animate(
+	const result = await startTileTransformMotion({
+		scope: tileMotionScope(meta.tileId ?? `peer:${meta.motionId ?? "unknown"}`),
 		element,
-		{
-			transform: [
-				"translate3d(0px, 0px, 0px)",
-				`translate3d(${delta.x}px, ${delta.y}px, 0px)`,
-			],
+		from: (snapshot) => translate3d(snapshot.translateX, snapshot.translateY),
+		to: (snapshot) => translate3d(snapshot.translateX + delta.x, snapshot.translateY + delta.y),
+		duration: TileEngineTiming.snapDurationSeconds,
+		ease: TileEngineTiming.moveEase,
+		meta: {
+			kind: "peer-snap",
+			...meta,
 		},
-		{
-			duration: TileEngineTiming.snapDurationSeconds,
-			ease: TileEngineTiming.moveEase,
-		},
-	);
+	});
+
+	if (result.status !== "completed") return false;
 
 	DebugTimeline.record({
 		scope: "tile-engine",
@@ -64,4 +67,6 @@ export const animateElementToRect = async ({
 			targetRect: target,
 		},
 	});
+
+	return true;
 };

@@ -24,7 +24,7 @@ export namespace useTileActorDrag {
 		clearTimers(): void;
 		clearLongTimer(): void;
 		handleTap(event: { clientX: number; clientY: number }): void;
-		animateBack(): Promise<void>;
+		animateBack(): Promise<boolean>;
 		animateToTarget(
 			targetRect: TileEngine.Rect | null,
 			meta?: {
@@ -34,7 +34,7 @@ export namespace useTileActorDrag {
 				fromSlotId?: string;
 				toSlotId?: string;
 			},
-		): Promise<void>;
+		): Promise<boolean>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		setActiveDropId(dropId: string | null): void;
 		setActiveDropFeedback(feedback: TileEngine.ActiveDropFeedback | null): void;

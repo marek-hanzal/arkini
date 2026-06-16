@@ -1,7 +1,7 @@
-import { animate } from "motion";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { type RefObject, useLayoutEffect, useRef } from "react";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
+import { startTileStyleMotion, tilePresenceMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
 export namespace useTileActorEnterMotion {
@@ -79,11 +79,21 @@ export const useTileActorEnterMotion = ({
 							],
 						};
 
-		void animate(element, keyframes, {
+		void startTileStyleMotion({
+			scope: tilePresenceMotionScope(tileId),
+			element,
+			keyframes,
 			delay: (enter.delayMs ?? 0) / 1000,
 			duration: (enter.durationMs ?? TileEngineTiming.moveDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
-		}).then(() =>
+			meta: {
+				kind: "enter",
+				enterKind: kind,
+				groupId: enter.groupId,
+				tileId,
+			},
+		}).then((result) => {
+			if (result.status !== "completed") return;
 			DebugTimeline.record({
 				scope: "tile-engine",
 				event: "motion.enter.end",
@@ -91,8 +101,8 @@ export const useTileActorEnterMotion = ({
 					groupId: enter.groupId,
 					tileId,
 				},
-			}),
-		);
+			});
+		});
 	}, [
 		actorRef,
 		enter,

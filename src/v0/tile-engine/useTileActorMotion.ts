@@ -1,7 +1,12 @@
-import { animate } from "motion";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { type RefObject, useCallback, useLayoutEffect, useRef } from "react";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
+import {
+	cancelTileMotion,
+	startTileTransformMotion,
+	tileMotionScope,
+} from "~/v0/tile-engine/TileMotionRuntime";
+import { translate3d } from "~/v0/tile-engine/TileVisualSnapshot";
 import { targetDelta } from "~/v0/tile-engine/targetDelta";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
@@ -26,8 +31,8 @@ export namespace useTileActorMotion {
 	}
 
 	export interface Result {
-		animateBack(): Promise<void>;
-		animateToTarget(targetRect: TileEngine.Rect | null, meta?: MotionMeta): Promise<void>;
+		animateBack(): Promise<boolean>;
+		animateToTarget(targetRect: TileEngine.Rect | null, meta?: MotionMeta): Promise<boolean>;
 	}
 }
 
@@ -46,6 +51,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 		if (!element) return;
 
 		if (consumeHandoff(tile.id, tile.slotId)) {
+			cancelTileMotion(tileMotionScope(tile.id), "handoff");
 			resetElementTransform(element);
 			previousRectRef.current = rectFromElement(element);
 			previousSlotIdRef.current = tile.slotId;
@@ -76,19 +82,21 @@ export const useTileActorMotion = <TTile, TDrag>({
 			},
 		});
 
-		void animate(
+		void startTileTransformMotion({
+			scope: tileMotionScope(tile.id),
 			element,
-			{
-				transform: [
-					`translate3d(${deltaX}px, ${deltaY}px, 0px)`,
-					"translate3d(0px, 0px, 0px)",
-				],
+			from: translate3d(deltaX, deltaY),
+			to: translate3d(0, 0),
+			duration: TileEngineTiming.moveDurationSeconds,
+			ease: TileEngineTiming.moveEase,
+			meta: {
+				kind: "layout",
+				tileId: tile.id,
+				fromSlotId: previousSlotId,
+				toSlotId: tile.slotId,
 			},
-			{
-				duration: TileEngineTiming.moveDurationSeconds,
-				ease: TileEngineTiming.moveEase,
-			},
-		).then(() =>
+		}).then((result) => {
+			if (result.status !== "completed") return;
 			DebugTimeline.record({
 				scope: "tile-engine",
 				event: "motion.layout.end",
@@ -96,8 +104,8 @@ export const useTileActorMotion = <TTile, TDrag>({
 					tileId: tile.id,
 					toSlotId: tile.slotId,
 				},
-			}),
-		);
+			});
+		});
 	}, [
 		actorRef,
 		consumeHandoff,
@@ -109,7 +117,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 	const animateBack = useCallback(async () => {
 		const session = dragSessionRef.current;
 		const element = actorRef.current;
-		if (!session || !element) return;
+		if (!session || !element) return false;
 		DebugTimeline.record({
 			scope: "tile-engine",
 			event: "motion.reject.start",
@@ -120,19 +128,20 @@ export const useTileActorMotion = <TTile, TDrag>({
 				currentY: session.currentY,
 			},
 		});
-		await animate(
+		const result = await startTileTransformMotion({
+			scope: tileMotionScope(tile.id),
 			element,
-			{
-				transform: [
-					`translate3d(${session.currentX}px, ${session.currentY}px, 0px)`,
-					"translate3d(0px, 0px, 0px)",
-				],
+			from: (snapshot) => translate3d(snapshot.translateX, snapshot.translateY),
+			to: translate3d(0, 0),
+			duration: TileEngineTiming.rejectDurationSeconds,
+			ease: TileEngineTiming.rejectEase,
+			meta: {
+				kind: "reject",
+				tileId: tile.id,
+				slotId: tile.slotId,
 			},
-			{
-				duration: TileEngineTiming.rejectDurationSeconds,
-				ease: TileEngineTiming.rejectEase,
-			},
-		);
+		});
+		if (result.status !== "completed") return false;
 		DebugTimeline.record({
 			scope: "tile-engine",
 			event: "motion.reject.end",
@@ -141,6 +150,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 				slotId: tile.slotId,
 			},
 		});
+		return true;
 	}, [
 		actorRef,
 		dragSessionRef,
@@ -152,7 +162,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 		async (targetRect: TileEngine.Rect | null, meta: useTileActorMotion.MotionMeta = {}) => {
 			const session = dragSessionRef.current;
 			const element = actorRef.current;
-			if (!session || !element || !targetRect) return;
+			if (!session || !element || !targetRect) return false;
 
 			const target = targetDelta({
 				origin: session.origin,
@@ -177,19 +187,22 @@ export const useTileActorMotion = <TTile, TDrag>({
 					targetRect,
 				},
 			});
-			await animate(
+			const result = await startTileTransformMotion({
+				scope: tileMotionScope(tile.id),
 				element,
-				{
-					transform: [
-						`translate3d(${session.currentX}px, ${session.currentY}px, 0px)`,
-						`translate3d(${target.x}px, ${target.y}px, 0px)`,
-					],
+				from: (snapshot) => translate3d(snapshot.translateX, snapshot.translateY),
+				to: translate3d(target.x, target.y),
+				duration: TileEngineTiming.snapDurationSeconds,
+				ease: TileEngineTiming.moveEase,
+				meta: {
+					kind: "snap",
+					...meta,
+					tileId: tile.id,
 				},
-				{
-					duration: TileEngineTiming.snapDurationSeconds,
-					ease: TileEngineTiming.moveEase,
-				},
-			);
+			});
+			session.currentX = result.snapshot.translateX;
+			session.currentY = result.snapshot.translateY;
+			if (result.status !== "completed") return false;
 			session.currentX = target.x;
 			session.currentY = target.y;
 			DebugTimeline.record({
@@ -207,6 +220,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 					targetY: target.y,
 				},
 			});
+			return true;
 		},
 		[
 			actorRef,

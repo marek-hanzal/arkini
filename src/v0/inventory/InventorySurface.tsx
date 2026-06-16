@@ -1,4 +1,4 @@
-import { memo, type ReactNode, useCallback } from "react";
+import { memo, type ReactNode, useCallback, useRef } from "react";
 import { InventoryCell } from "~/v0/inventory/InventoryCell";
 import type { InventorySurface as InventorySurfaceType } from "~/v0/inventory/InventorySurface.types";
 import { inventoryColumns } from "~/v0/inventory/inventoryColumns";
@@ -12,7 +12,8 @@ import { TileEngine } from "~/v0/tile-engine/TileEngine";
 import type { TileEngine as TileEngineType } from "~/v0/tile-engine/TileEngine.types";
 
 export const InventorySurface = memo(
-	({ feedback, feedbackFlags, onClose, dragConstraintsRef }: InventorySurfaceType.Props) => {
+	({ feedback, feedbackFlags, onClose }: InventorySurfaceType.Props) => {
+		const inventoryDragBoundsRef = useRef<HTMLDivElement | null>(null);
 		const { drag, filled, slots, tiles } = useInventoryTileEngineModel({
 			feedback,
 		});
@@ -36,25 +37,30 @@ export const InventorySurface = memo(
 					onClose={onClose}
 				/>
 				<div className="min-h-0 flex-1 overflow-visible px-3 py-4">
-					<TileEngine<
-						InventorySurfaceType.TileData,
-						InventorySlot,
-						DragSource,
-						DropTarget
+					<div
+						ref={inventoryDragBoundsRef}
+						className="ak-game-width mx-auto"
 					>
-						id="inventory"
-						columns={inventoryColumns}
-						slots={slots}
-						tiles={tiles}
-						gapPx={1}
-						className="ak-game-width mx-auto border-l border-t border-slate-800"
-						layerRole="overlay"
-						actorLayerClassName="pointer-events-none"
-						drag={drag}
-						dragConstraintsRef={dragConstraintsRef}
-						renderSlot={renderSlot}
-						renderTile={renderInventoryTile}
-					/>
+						<TileEngine<
+							InventorySurfaceType.TileData,
+							InventorySlot,
+							DragSource,
+							DropTarget
+						>
+							id="inventory"
+							columns={inventoryColumns}
+							slots={slots}
+							tiles={tiles}
+							gapPx={1}
+							className="w-full border-l border-t border-slate-800"
+							layerRole="overlay"
+							actorLayerClassName="pointer-events-none"
+							drag={drag}
+							dragConstraintsRef={inventoryDragBoundsRef}
+							renderSlot={renderSlot}
+							renderTile={renderInventoryTile}
+						/>
+					</div>
 				</div>
 			</div>
 		);

@@ -93,7 +93,6 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}
 							onClose={closeSheet}
-							dragConstraintsRef={playAreaRef}
 						/>
 					),
 				)

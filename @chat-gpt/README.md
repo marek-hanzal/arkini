@@ -78,7 +78,7 @@ Z-index is global infrastructure, not a local styling snack. All stack order mus
 - bottom nav and toast have named app layers.
 - overlay roots use `--ak-layer-overlay-root`; backdrop/panel are only relative inside that overlay.
 - TileEngine only knows generic layer roles: `base` and `overlay`. Feature code maps board-like surfaces to `layerRole="base"` and sheet-like surfaces to `layerRole="overlay"`. Passive overlay tiles use `--ak-layer-overlay-tile` and dragged overlay tiles use `--ak-layer-overlay-drag-tile`.
-- TileEngine roots must allow overflow for actors; drag boundaries are controlled by `dragConstraintsRef`, not by clipping the engine itself. Base actors may leave their surface so they can reach global drop targets such as an inventory trigger, but movement is clamped to the app canvas.
+- TileEngine roots must allow overflow for actors; drag boundaries are controlled by `dragConstraintsRef`, not by clipping the engine itself. Base actors may leave their surface so they can reach global drop targets such as an inventory trigger, but movement is clamped to the app canvas. Overlay/item-container surfaces should usually clamp to their own grid bounds, not the whole sheet, so inventory items cannot drift into headers or surrounding panel chrome.
 - When an overlay surface is open, disable covered base TileEngine instances through the generic `disabled` prop. Disabled engines unregister their drops and ignore pointer events instead of competing with overlay hit testing.
 - Drop resolution is global but must prefer the visually topmost registered drop by using DOM hit-test order, not registration order. Registration order is not a layering model; it is just a bug wearing a queue costume.
 

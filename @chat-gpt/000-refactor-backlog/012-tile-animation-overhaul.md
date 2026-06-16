@@ -204,3 +204,7 @@ Keep task 012 open. The remaining larger step is a real TileEngine animation req
 - Cleanup is group guarded through `clearTileEngineEnterMotion`. A delayed cleanup only removes the enter motion that still has the same animation group, so a newer spawn/merge on the same target slot will not get wiped by an older timeout doing its best impression of a haunted janitor.
 
 Keep task 012 open. The remaining larger cleanup is still to move this handoff from cache row metadata toward a real TileEngine request registry, but this step tightens the current settlement contract without a risky rewrite.
+
+## 2026-06-16 sequenced cleanup timing note
+
+- TileEngine motion cleanup delay includes `animation.delayMs` in addition to duration and cleanup buffer. This is mandatory for producer/stash sequence output: a later item may have a delayed enter animation, and clearing its cache handoff before that delayed WAAPI work finishes cancels the exact animation we were trying to protect. Tiny arithmetic bug, gigantic clown shoes.

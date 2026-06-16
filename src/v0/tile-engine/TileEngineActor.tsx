@@ -42,6 +42,10 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 }: TileEngineActor.Props<TTile, TSlot, TDrag, TDrop>) => {
 	const actorRef = useRef<HTMLDivElement | null>(null);
 	const dragSessionRef = useRef<TileEngineActorType.DragSession<TDrag> | null>(null);
+	const initialTileRef = useRef({
+		id: tile.id,
+		slotId: tile.slotId,
+	});
 	const lastTapRef = useRef<TileEngineActorType.LastTap | null>(null);
 	const timers = useTileActorTimers();
 	const binding = drag?.tile(tile);
@@ -54,7 +58,27 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 
 	useEffect(() => {
 		const element = actorRef.current;
-		return () => cancelTileMotionForElement(element, "actor-unmount");
+		const initialTile = initialTileRef.current;
+		DebugTimeline.record({
+			scope: "tile-engine",
+			event: "actor.lifecycle.mount",
+			detail: {
+				tileId: initialTile.id,
+				slotId: initialTile.slotId,
+			},
+		});
+
+		return () => {
+			DebugTimeline.record({
+				scope: "tile-engine",
+				event: "actor.lifecycle.unmount",
+				detail: {
+					tileId: initialTile.id,
+					slotId: initialTile.slotId,
+				},
+			});
+			cancelTileMotionForElement(element, "actor-unmount");
+		};
 	}, []);
 	useTileActorEnterMotion({
 		actorRef,

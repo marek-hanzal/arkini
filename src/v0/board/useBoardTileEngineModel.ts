@@ -40,7 +40,9 @@ export const useBoardTileEngineModel = ({
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
 	const { data: board } = useSuspenseQuery(boardViewQueryOptions());
 	const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
-	const activateBoardItemMutation = useActivateBoardItemMutation();
+	const activateBoardItemMutation = useActivateBoardItemMutation({
+		feedback,
+	});
 	const claimCraftMutation = useClaimCraftMutation();
 	const mergeBoardItemsMutation = useMergeBoardItemsMutation();
 	const moveBoardItemMutation = useMoveBoardItemMutation();
@@ -112,12 +114,6 @@ export const useBoardTileEngineModel = ({
 			}
 
 			if (!boardItem.activation) return;
-			if (
-				boardItem.activation.kind === "stash" &&
-				(boardItem.activation.remainingCharges ?? 1) <= 0
-			) {
-				return;
-			}
 			activateBoardItemMutation.mutate({
 				boardItemId: boardItem.id,
 				activation: boardItem.activation.kind === "stash" ? "exhaust" : "single",

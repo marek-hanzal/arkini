@@ -49,7 +49,7 @@ describe("visual event sequencing", () => {
 		});
 	});
 
-	it("does not sequence normal producer spawn batches, but still marks them as instant fade-in", () => {
+	it("sequences normal producer spawn batches instead of dumping the whole batch instantly", () => {
 		const events = [
 			{
 				type: "activation.activated",
@@ -58,9 +58,10 @@ describe("visual event sequencing", () => {
 			},
 			{
 				type: "item.spawned",
-				animation: ActionVisualAnimation.instantFadeIn({
+				animation: ActionVisualAnimation.sequenceFadeIn({
 					cause: "producer",
 					groupId: "activation:producer:single",
+					sequenceIndex: 0,
 				}),
 				itemInstanceId: "spawned-a",
 				itemId: "item:twig",
@@ -70,9 +71,10 @@ describe("visual event sequencing", () => {
 			},
 			{
 				type: "item.spawned",
-				animation: ActionVisualAnimation.instantFadeIn({
+				animation: ActionVisualAnimation.sequenceFadeIn({
 					cause: "producer",
 					groupId: "activation:producer:single",
+					sequenceIndex: 1,
 				}),
 				itemInstanceId: "spawned-b",
 				itemId: "item:branch",
@@ -82,14 +84,14 @@ describe("visual event sequencing", () => {
 			},
 		] satisfies ActionVisualEventSchema.Type[];
 
-		expect(shouldSequenceSpawnVisualEvents(events)).toBe(false);
+		expect(shouldSequenceSpawnVisualEvents(events)).toBe(true);
 		expect(events.slice(1).map((event) => event.animation?.mode)).toEqual([
-			"instant",
-			"instant",
+			"sequence",
+			"sequence",
 		]);
-		expect(events.slice(1).map((event) => event.animation?.effect)).toEqual([
-			"fade-in",
-			"fade-in",
+		expect(events.slice(1).map((event) => event.animation?.delayMs)).toEqual([
+			0,
+			spawnSequenceDelayMs,
 		]);
 	});
 

@@ -6,7 +6,7 @@ export namespace TileEngine {
 	export type Id = string;
 	export type LayerRole = "base" | "overlay";
 	export type TileStyle = Omit<CSSProperties, "zIndex">;
-	export type DropAnimation = "parallel-swap";
+	export type DropAnimation = "parallel-swap" | "parallel-merge";
 	export type DropOutcome =
 		| "accept"
 		| "reject"

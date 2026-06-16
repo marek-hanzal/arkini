@@ -1,7 +1,7 @@
 import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
 import type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema";
 
-export const toTileExitMotion = (
+export const toTileEngineExitMotion = (
 	animation: ActionVisualAnimationSchema.Type,
 ): TileExitMotionSchema.Type => ({
 	kind: "merge-out",

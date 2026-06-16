@@ -2,7 +2,7 @@ import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import { cellKey } from "~/v0/board/cellKey";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
-import { toTileExitMotion } from "~/v0/play/motion/toTileExitMotion";
+import { toTileEngineExitMotion } from "~/v0/play/tile-engine-motion/toTileEngineExitMotion";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 import {
 	removeBoardTransientTilesByGroup,
@@ -28,7 +28,7 @@ export const registerBoardMergeTransientTiles = ({
 		if (!target) continue;
 		if (target.itemId === event.resultItemId && !source) continue;
 
-		const exit = toTileExitMotion(event.animation);
+		const exit = toTileEngineExitMotion(event.animation);
 		const transientTiles = [
 			...(event.consumeSource && source
 				? [

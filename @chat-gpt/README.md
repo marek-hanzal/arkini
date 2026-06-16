@@ -106,6 +106,8 @@ Use `TileMotionRuntime` for actor transform animations instead of calling DOM an
 
 Domain actions still own game state. The motion runtime only owns temporary visual transforms and cancellation cleanup. Do not add reverse actions or rollback logic here; optimistic cache rollback belongs in action/cache code, not in animation plumbing.
 
+Arkini-specific visual events may be mapped to TileEngine presence metadata only through `src/v0/play/tile-engine-motion/*`. That directory is an adapter boundary: it converts semantic `ActionVisualAnimation` data into generic TileEngine enter/exit motion objects. It must not read or mutate DOM, and it must not become a second animation runtime. The old `play/motion` name is intentionally gone because it sounded like play-level tile animation ownership, which is exactly the kind of naming lie that later turns into a bug report with screenshots.
+
 ## Dev Sheet and bug reports
 
 The bottom nav `Dev` sheet replaces the old database-only sheet. It keeps the OPFS/SQLite status and hard reset button, but adds a `Copy bug report` button for animation/debug work.

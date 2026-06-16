@@ -1,15 +1,15 @@
 import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 
-export namespace toTileEnterMotion {
+export namespace toTileEngineEnterMotion {
 	export interface Options {
 		fromTileId?: string;
 	}
 }
 
-export const toTileEnterMotion = (
+export const toTileEngineEnterMotion = (
 	animation: ActionVisualAnimationSchema.Type,
-	options: toTileEnterMotion.Options = {},
+	options: toTileEngineEnterMotion.Options = {},
 ): TileEnterMotionSchema.Type => ({
 	kind:
 		animation.effect === "merge"

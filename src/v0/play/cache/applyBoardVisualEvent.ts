@@ -3,7 +3,7 @@ import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
-import { toTileEnterMotion } from "~/v0/play/motion/toTileEnterMotion";
+import { toTileEngineEnterMotion } from "~/v0/play/tile-engine-motion/toTileEngineEnterMotion";
 
 const createBoardItem = (
 	event: Extract<
@@ -22,7 +22,7 @@ const createBoardItem = (
 		y: event.to.y,
 		state: {},
 		motion: {
-			enter: toTileEnterMotion(event.animation, {
+			enter: toTileEngineEnterMotion(event.animation, {
 				fromTileId: event.originItemInstanceId,
 			}),
 		},
@@ -146,7 +146,7 @@ export const applyBoardVisualEvent = (
 								activation: undefined,
 								craft: undefined,
 								motion: {
-									enter: toTileEnterMotion(merged.animation),
+									enter: toTileEngineEnterMotion(merged.animation),
 								},
 							},
 						];

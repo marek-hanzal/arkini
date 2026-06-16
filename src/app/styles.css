@@ -142,7 +142,7 @@ button {
 	backface-visibility: hidden;
 }
 
-.ak-tile-engine-visual[data-ak-tile-engine-presence-motion="true"] {
+.ak-tile-engine-visual[data-ak-tile-engine-presence-motion] {
 	transition: none;
 }
 

@@ -187,3 +187,7 @@ Keep task 012 open. The remaining larger step is a real TileEngine animation req
 ## 2026-06-16 motion token sequence note
 
 - Tile motion IDs and presence tokens now use monotonic in-module counters instead of rounded `performance.now()` timestamps. Owner identity must be collision-proof within a JS runtime; “timestamp but probably fine” is how stale async cleanup gets one lottery ticket too many.
+
+## 2026-06-16 presence marker selector note
+
+- Presence marker CSS now matches any `data-ak-tile-engine-presence-motion` value instead of only `"true"`. The marker became a unique owner token, so the old equality selector silently stopped disabling CSS transitions during WAAPI enter/exit animations. Yes, the bug was one CSS selector cosplaying as architecture.

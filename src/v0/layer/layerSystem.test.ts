@@ -81,6 +81,15 @@ describe("global layer system", () => {
 		expect(offenders).toEqual([]);
 	});
 
+	it("keeps TileEngine presence CSS keyed by marker presence", () => {
+		const styles = readFileSync(stylePath, "utf8");
+
+		expect(styles).toContain(".ak-tile-engine-visual[data-ak-tile-engine-presence-motion]");
+		expect(styles).not.toContain(
+			'.ak-tile-engine-visual[data-ak-tile-engine-presence-motion="true"]',
+		);
+	});
+
 	it("does not depend on the external Motion package", () => {
 		const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
 		const sourceOffenders = listSourceFiles(sourceRoot).flatMap((path) => {

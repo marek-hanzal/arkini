@@ -17,9 +17,17 @@ export namespace useTileActorMotion {
 		consumeHandoff(tileId: string, slotId: string): boolean;
 	}
 
+	export interface MotionMeta {
+		motionId?: string;
+		animation?: TileEngine.DropAnimation;
+		role?: "source" | "target";
+		fromSlotId?: string;
+		toSlotId?: string;
+	}
+
 	export interface Result {
 		animateBack(): Promise<void>;
-		animateToTarget(targetRect: TileEngine.Rect | null): Promise<void>;
+		animateToTarget(targetRect: TileEngine.Rect | null, meta?: MotionMeta): Promise<void>;
 	}
 }
 
@@ -141,7 +149,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 	]);
 
 	const animateToTarget = useCallback(
-		async (targetRect: TileEngine.Rect | null) => {
+		async (targetRect: TileEngine.Rect | null, meta: useTileActorMotion.MotionMeta = {}) => {
 			const session = dragSessionRef.current;
 			const element = actorRef.current;
 			if (!session || !element || !targetRect) return;
@@ -155,7 +163,12 @@ export const useTileActorMotion = <TTile, TDrag>({
 				scope: "tile-engine",
 				event: "motion.snap.start",
 				detail: {
+					motionId: meta.motionId,
+					animation: meta.animation,
+					role: meta.role ?? "source",
 					tileId: tile.id,
+					fromSlotId: meta.fromSlotId ?? tile.slotId,
+					toSlotId: meta.toSlotId,
 					slotId: tile.slotId,
 					fromX: session.currentX,
 					fromY: session.currentY,
@@ -183,7 +196,12 @@ export const useTileActorMotion = <TTile, TDrag>({
 				scope: "tile-engine",
 				event: "motion.snap.end",
 				detail: {
+					motionId: meta.motionId,
+					animation: meta.animation,
+					role: meta.role ?? "source",
 					tileId: tile.id,
+					fromSlotId: meta.fromSlotId ?? tile.slotId,
+					toSlotId: meta.toSlotId,
 					slotId: tile.slotId,
 					targetX: target.x,
 					targetY: target.y,

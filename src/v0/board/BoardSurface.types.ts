@@ -7,6 +7,7 @@ export namespace BoardSurface {
 		feedback: Feedback.Type;
 		feedbackFlags: ReadonlySet<string>;
 		onOpenItem(boardItemId: string): void;
+		disabled?: boolean;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 	}
 

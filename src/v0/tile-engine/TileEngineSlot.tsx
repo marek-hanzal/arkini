@@ -11,6 +11,7 @@ export namespace TileEngineSlot {
 		targetTile?: TileEngine.Tile<TTile>;
 		activeDropId: string | null;
 		activeDropFeedback: TileEngine.ActiveDropFeedback | null;
+		disabled?: boolean;
 		className?: string;
 		drag?: TileEngine.DragConfig<TTile, TSlot, unknown, TDrop>;
 		renderSlot(props: TileEngine.RenderSlotProps<TSlot>): ReactNode;
@@ -24,6 +25,7 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	targetTile,
 	activeDropId,
 	activeDropFeedback,
+	disabled: engineDisabled = false,
 	className,
 	drag,
 	renderSlot,
@@ -32,7 +34,7 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	const ref = useRef<HTMLDivElement | null>(null);
 	const binding = drag?.slot(slot, targetTile);
 	const dropId = binding?.id ?? slot.id;
-	const disabled = !binding || binding.disabled || slot.disabled;
+	const disabled = engineDisabled || !binding || binding.disabled || slot.disabled;
 	const isOver = !disabled && activeDropId === dropId;
 	const slotFeedback = isOver ? activeDropFeedback : null;
 

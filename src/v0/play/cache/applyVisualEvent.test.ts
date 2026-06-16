@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
-import { registerBoardMergeTransientTiles } from "~/v0/board/animation/registerBoardMergeTransientTiles";
+import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
 import {
 	clearBoardTransientTiles,
 	readBoardTransientTiles,
@@ -218,7 +218,7 @@ describe("applyBoardVisualEvent", () => {
 				consumeSource: true,
 			} satisfies ActionVisualEventSchema.Type;
 
-			registerBoardMergeTransientTiles({
+			registerBoardMergeExitTiles({
 				board: boardView(),
 				events: [
 					event,

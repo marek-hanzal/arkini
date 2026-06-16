@@ -216,3 +216,10 @@ Keep task 012 open. The remaining larger cleanup is still to move this handoff f
 - This prevents future delayed merge/exit animation metadata from being removed before the visual exit has actually finished. Yes, timing math now has one source of truth, which is apparently how civilization narrowly survives JavaScript timers.
 
 Keep task 012 open. The remaining larger step is still to replace cache-carried motion metadata with a formal TileEngine animation request queue once the current path is boringly stable.
+
+## 2026-06-16 merge exit adapter naming note
+
+- Renamed `registerBoardMergeTransientTiles` to `registerBoardMergeExitTiles` and moved it under `src/v0/play/tile-engine-motion`.
+- The helper still writes board transient render actors, but its public location now makes the ownership clearer: Arkini visual events map to TileEngine exit tiles; board rendering only supplies the transient store.
+
+Keep task 012 open. This is a boundary cleanup, not yet the full request-queue rewrite.

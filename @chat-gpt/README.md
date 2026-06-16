@@ -70,21 +70,25 @@ Arkini uses npm without a committed lockfile. Do not add `package-lock.json`, `b
 
 The bottom nav `Dev` sheet replaces the old database-only sheet. It keeps the OPFS/SQLite status and hard reset button, but adds a `Copy bug report` button for animation/debug work.
 
-Dev builds expose two console APIs:
+Dev builds expose these console APIs:
 
 ```js
 window.__ARKINI_BUG_REPORT__.dump()
 window.__ARKINI_BUG_REPORT__.copy()
 window.__ARKINI_BUG_REPORT__.clear()
 window.__ARKINI_DEBUG_TIMELINE__.entries()
+window.__ARKINI_SCENARIO__.list()
+window.__ARKINI_SCENARIO__.load("swap-board-items")
 ```
 
-Bug reports are boring JSON on purpose: browser metadata, active sheet/error context, React Query cache snapshots for board/inventory/database, query states and the latest timeline entries. The timeline records TileEngine pointer/drag/drop/motion lifecycle, action mutation phases, optimistic cache restores and visual-event patch sequencing. When Marek reports an animation bug, ask for: scenario/actions, visible symptom, and the copied bug report dump. Fewer vibes, more evidence, humanity heals slightly.
+Bug reports are boring JSON on purpose: browser metadata, active sheet/error context, last loaded scenario, React Query cache snapshots for board/inventory/database, query states and the latest timeline entries. The timeline records TileEngine pointer/drag/drop/motion lifecycle, action mutation phases, optimistic cache restores, dev scenario loads and visual-event patch sequencing.
+
+For animation bugs, use the Dev Sheet `Scenarios` section first when possible. Load the closest scenario, reproduce exactly one bug, then click `Copy bug report`. The useful report shape is: scenario ID, exact action, expected behavior, visible symptom, pasted JSON dump. Fewer vibes, more evidence, humanity heals slightly.
 
 ## Active improvement priorities
 
 1. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.
-2. Add more Vitest coverage around domain action results, cache patches, placement planning and manifest validation.
+2. Add more Vitest coverage around domain action results, visual-event ordering, cache patches, placement planning and manifest validation.
 3. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks.
 4. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.
 5. Keep manifest content editable through small topic files and a documented checklist rather than inventing a config framework that cosplays as productivity.

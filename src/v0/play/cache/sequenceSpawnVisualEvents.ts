@@ -4,7 +4,7 @@ import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEvent
 import { applyVisualEvents } from "~/v0/play/cache/applyVisualEvents";
 import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
 
-const spawnSequenceDelayMs = 135;
+export const spawnSequenceDelayMs = 135;
 
 export const shouldSequenceSpawnVisualEvents = (events: readonly ActionVisualEventSchema.Type[]) =>
 	events.some((event) => event.type === "activation.activated" && event.mode === "exhaust");

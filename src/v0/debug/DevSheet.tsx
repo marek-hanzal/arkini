@@ -1,10 +1,16 @@
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { type FC, useCallback, useMemo, useState } from "react";
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useHardResetMutation } from "~/v0/database/action/useHardResetMutation";
 import { databaseStatusQueryOptions } from "~/v0/database/query/databaseStatusQueryOptions";
 import { StatusPill } from "~/v0/database/StatusPill";
 import { DebugBugReport } from "~/v0/debug/DebugBugReport";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import {
+	DevScenarioDefinitions,
+	type DevScenarioId,
+	isDevScenarioId,
+} from "~/v0/debug/scenario/DevScenarioDefinitions";
+import { useLoadDevScenarioMutation } from "~/v0/debug/scenario/useLoadDevScenarioMutation";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { cn } from "~/v0/ui/cn";
 
@@ -39,10 +45,51 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	const queryClient = useQueryClient();
 	const { data: status } = useSuspenseQuery(databaseStatusQueryOptions());
 	const hardResetMutation = useHardResetMutation();
+	const loadScenarioMutation = useLoadDevScenarioMutation();
 	const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
 	const [timelineSize, setTimelineSize] = useState(DebugTimeline.entries().length);
 	const isolated = window.crossOriginIsolated;
 	const queryCount = queryClient.getQueryCache().getAll().length;
+
+	const loadScenario = useCallback(
+		(scenarioId: DevScenarioId) => {
+			setCopyState("idle");
+			loadScenarioMutation.mutate(
+				{
+					scenarioId,
+				},
+				{
+					onSettled: () => setTimelineSize(DebugTimeline.entries().length),
+				},
+			);
+		},
+		[
+			loadScenarioMutation.mutate,
+		],
+	);
+
+	useEffect(() => {
+		if (!import.meta.env.DEV) return;
+
+		Object.assign(window, {
+			__ARKINI_SCENARIO__: {
+				list: () => DevScenarioDefinitions,
+				load: async (scenarioId: string) => {
+					if (!isDevScenarioId(scenarioId)) {
+						throw new Error(`Unknown Arkini dev scenario ${scenarioId}.`);
+					}
+
+					const result = await loadScenarioMutation.mutateAsync({
+						scenarioId,
+					});
+					setTimelineSize(DebugTimeline.entries().length);
+					return result;
+				},
+			},
+		});
+	}, [
+		loadScenarioMutation.mutateAsync,
+	]);
 
 	const dumpPreview = useMemo(() => {
 		const report = DebugBugReport.report();
@@ -144,6 +191,60 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 					<pre className="mt-3 max-h-36 overflow-auto rounded-md border border-slate-800 bg-slate-950/80 p-2 text-[0.65rem] text-slate-300">
 						{dumpPreview}
 					</pre>
+				</section>
+
+				<section className="rounded-md border border-indigo-300/20 bg-indigo-950/20 p-3 shadow-lg shadow-slate-950/25">
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+						<div>
+							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-indigo-300">
+								Scenarios
+							</p>
+							<h2 className="mt-1 text-base font-semibold text-white">
+								Load debug save
+							</h2>
+							<p className="mt-2 text-sm text-slate-300">
+								Reset the default save into a deterministic state before reproducing
+								an animation bug. The loaded scenario is recorded into the bug
+								report timeline.
+							</p>
+						</div>
+						<div className="shrink-0">
+							<StatusPill
+								label="Scenarios"
+								value={String(DevScenarioDefinitions.length)}
+							/>
+						</div>
+					</div>
+					<div className="mt-3 grid gap-2">
+						{DevScenarioDefinitions.map((scenario) => (
+							<button
+								type="button"
+								key={scenario.id}
+								disabled={loadScenarioMutation.isPending}
+								onClick={() => loadScenario(scenario.id)}
+								className="rounded-md border border-slate-700 bg-slate-900/80 px-3 py-2 text-left transition hover:border-indigo-300/60 hover:bg-indigo-950/35 disabled:cursor-wait disabled:opacity-60"
+							>
+								<span className="block text-sm font-bold text-slate-50">
+									{scenario.label}
+								</span>
+								<span className="mt-1 block text-xs text-slate-400">
+									{scenario.description}
+								</span>
+							</button>
+						))}
+					</div>
+					{loadScenarioMutation.isSuccess ? (
+						<p className="mt-3 text-sm font-semibold text-indigo-100">
+							Loaded {loadScenarioMutation.data.scenarioId}. Reproduce the bug, then
+							copy a bug report.
+						</p>
+					) : null}
+					{loadScenarioMutation.isError ? (
+						<p className="mt-3 text-sm font-semibold text-red-100">
+							Scenario load failed. Check the console; naturally, even debugging needs
+							debugging.
+						</p>
+					) : null}
 				</section>
 
 				<section className="rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-lg shadow-slate-950/25">

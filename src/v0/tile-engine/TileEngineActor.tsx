@@ -62,6 +62,9 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	useEffect(() => {
 		if (!dragging && !dropFeedback) return;
 
+		const visual = actorRef.current?.querySelector<HTMLElement>("[data-ak-tile-engine-visual]");
+		const visualStyle = visual ? window.getComputedStyle(visual) : null;
+
 		DebugTimeline.record({
 			scope: "tile-engine",
 			event: "tile.feedback.render",
@@ -74,6 +77,18 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 					? {
 							dragging: actorRef.current.dataset.akTileEngineDragging,
 							dropFeedback: actorRef.current.dataset.akTileEngineDropFeedback,
+						}
+					: null,
+				visualDataset: visual
+					? {
+							feedbackVisual: visual.dataset.akTileEngineVisual,
+						}
+					: null,
+				visualComputed: visualStyle
+					? {
+							transform: visualStyle.transform,
+							transitionProperty: visualStyle.transitionProperty,
+							animationName: visualStyle.animationName,
 						}
 					: null,
 			},
@@ -148,10 +163,15 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 			onPointerUp={dragHandlers.handlePointerUp}
 			onPointerCancel={dragHandlers.handlePointerCancel}
 		>
-			{renderTile({
-				tile,
-				isDragging: dragging,
-			})}
+			<div
+				data-ak-tile-engine-visual="true"
+				className="ak-tile-engine-visual"
+			>
+				{renderTile({
+					tile,
+					isDragging: dragging,
+				})}
+			</div>
 		</div>
 	);
 };

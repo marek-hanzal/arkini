@@ -79,6 +79,17 @@ const readComputedMotion = (element: HTMLElement, pseudoElement?: string) => {
 	};
 };
 
+const readElementMotionSnapshot = (element: HTMLElement) => ({
+	tag: element.tagName.toLowerCase(),
+	dataset: readDataset(element),
+	className: element.className,
+	inlineStyle: {
+		transform: element.style.transform,
+		zIndex: element.style.zIndex,
+	},
+	computed: readComputedMotion(element),
+});
+
 const readTileEngineDom = () =>
 	Array.from(document.querySelectorAll<HTMLElement>("[data-ak-tile-engine-id]")).map(
 		(engine) => ({
@@ -87,7 +98,8 @@ const readTileEngineDom = () =>
 			actors: Array.from(
 				engine.querySelectorAll<HTMLElement>("[data-ak-tile-engine-tile-id]"),
 			).map((actor) => {
-				const child = actor.firstElementChild as HTMLElement | null;
+				const visual = actor.querySelector<HTMLElement>("[data-ak-tile-engine-visual]");
+				const rendered = visual?.firstElementChild as HTMLElement | null | undefined;
 
 				return {
 					tileId: actor.dataset.akTileEngineTileId,
@@ -99,17 +111,8 @@ const readTileEngineDom = () =>
 						zIndex: actor.style.zIndex,
 					},
 					computed: readComputedMotion(actor),
-					child: child
-						? {
-								tag: child.tagName.toLowerCase(),
-								dataset: readDataset(child),
-								className: child.className,
-								inlineStyle: {
-									transform: child.style.transform,
-								},
-								computed: readComputedMotion(child),
-							}
-						: null,
+					visual: visual ? readElementMotionSnapshot(visual) : null,
+					child: rendered ? readElementMotionSnapshot(rendered) : null,
 				};
 			}),
 			slots: Array.from(

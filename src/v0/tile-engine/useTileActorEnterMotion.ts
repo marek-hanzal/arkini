@@ -5,8 +5,16 @@ import { findTileEngineActorById } from "~/v0/tile-engine/findTileEngineActorByI
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { targetDelta } from "~/v0/tile-engine/targetDelta";
 import { translate3d } from "~/v0/tile-engine/TileVisualSnapshot";
-import { startTileStyleMotion, tilePresenceMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
+import {
+	cancelTileMotion,
+	startTileStyleMotion,
+	tilePresenceMotionScope,
+} from "~/v0/tile-engine/TileMotionRuntime";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
+import {
+	createTilePresenceMotionToken,
+	markTilePresenceMotion,
+} from "~/v0/tile-engine/TilePresenceMotionMarker";
 
 export namespace useTileActorEnterMotion {
 	export interface Props {
@@ -102,7 +110,12 @@ export const useTileActorEnterMotion = ({
 							};
 
 		const scope = tilePresenceMotionScope(tileId);
-		visualElement.dataset.akTileEnginePresenceMotion = "true";
+		const token = createTilePresenceMotionToken({
+			groupId,
+			kind: "enter",
+			tileId,
+		});
+		const clearPresenceMotion = markTilePresenceMotion(visualElement, token);
 		void startTileStyleMotion({
 			scope,
 			element: visualElement,
@@ -119,7 +132,7 @@ export const useTileActorEnterMotion = ({
 				tileId,
 			},
 		}).then((result) => {
-			delete visualElement.dataset.akTileEnginePresenceMotion;
+			clearPresenceMotion();
 			if (result.status !== "completed") return;
 			visualElement.style.opacity = "";
 			visualElement.style.transform = "";
@@ -132,6 +145,11 @@ export const useTileActorEnterMotion = ({
 				},
 			});
 		});
+
+		return () => {
+			clearPresenceMotion();
+			cancelTileMotion(scope, "presence-enter-cleanup");
+		};
 	}, [
 		actorRef,
 		delayMs,

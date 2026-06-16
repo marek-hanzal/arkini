@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
 import { ActivationDepletionSchema } from "~/v0/activation/type/ActivationDepletionSchema";
 import { ActivationModeSchema } from "~/v0/activation/type/ActivationModeSchema";
 import { ItemInstanceIdSchema } from "~/v0/item-instance/type/ItemInstanceIdSchema";
@@ -8,15 +9,25 @@ import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
 import { GameUpgradeIdSchema } from "~/v0/manifest/GameUpgradeIdSchema";
 import { PositiveIntegerSchema } from "~/v0/manifest/PositiveIntegerSchema";
 
-export const ActionVisualEventSchema = z.discriminatedUnion("type", [
+const animationShape = {
+	animation: ActionVisualAnimationSchema.optional(),
+};
+
+const actionVisualEvent = <TShape extends z.ZodRawShape>(shape: TShape) =>
 	z.object({
+		...shape,
+		...animationShape,
+	});
+
+export const ActionVisualEventSchema = z.discriminatedUnion("type", [
+	actionVisualEvent({
 		type: z.literal("item.moved"),
 		itemInstanceId: ItemInstanceIdSchema,
 		itemId: GameItemIdSchema,
 		from: ItemLocationSchema,
 		to: ItemLocationSchema,
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("item.swapped"),
 		sourceItemInstanceId: ItemInstanceIdSchema,
 		sourceItemId: GameItemIdSchema,
@@ -27,7 +38,7 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		targetFrom: ItemLocationSchema,
 		targetTo: ItemLocationSchema,
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("item.merged"),
 		sourceItemInstanceId: ItemInstanceIdSchema,
 		sourceItemId: GameItemIdSchema,
@@ -36,13 +47,13 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		resultItemId: GameItemIdSchema,
 		consumeSource: z.boolean(),
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("item.fed"),
 		sourceItemInstanceId: ItemInstanceIdSchema,
 		targetItemInstanceId: ItemInstanceIdSchema,
 		itemId: GameItemIdSchema,
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("item.spawned"),
 		itemInstanceId: ItemInstanceIdSchema.optional(),
 		itemId: GameItemIdSchema,
@@ -55,7 +66,7 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 			"inventory-placement",
 		]),
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("item.consumed"),
 		itemInstanceId: ItemInstanceIdSchema,
 		itemId: GameItemIdSchema,
@@ -68,38 +79,38 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 			"inventory-stack",
 		]),
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("activation.activated"),
 		itemInstanceId: ItemInstanceIdSchema,
 		mode: ActivationModeSchema,
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("activation.depleted"),
 		itemInstanceId: ItemInstanceIdSchema,
 		depletion: ActivationDepletionSchema,
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("inventory.stacked"),
 		sourceItemInstanceId: ItemInstanceIdSchema,
 		targetItemInstanceId: ItemInstanceIdSchema,
 		itemId: GameItemIdSchema,
 		quantity: PositiveIntegerSchema,
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("craft.started"),
 		itemInstanceId: ItemInstanceIdSchema,
 		recipeId: GameCraftRecipeIdSchema,
 		resultItemId: GameItemIdSchema,
 		readyAtMs: z.number().optional(),
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("craft.claimed"),
 		itemInstanceId: ItemInstanceIdSchema,
 		recipeId: GameCraftRecipeIdSchema,
 		sourceItemId: GameItemIdSchema,
 		resultItemId: GameItemIdSchema,
 	}),
-	z.object({
+	actionVisualEvent({
 		type: z.literal("upgrade.started"),
 		upgradeId: GameUpgradeIdSchema,
 		targetLevel: PositiveIntegerSchema,

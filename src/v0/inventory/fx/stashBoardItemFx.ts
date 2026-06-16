@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { readCraftInputRowsFx } from "~/v0/craft/fx/readCraftInputRowsFx";
 import { pauseCraftTimer } from "~/v0/board/logic/pauseCraftTimer";
@@ -99,6 +100,10 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* (
 						visualEvents: [
 							{
 								type: "inventory.stacked",
+								animation: ActionVisualAnimation.parallelMove({
+									cause: "inventory",
+									groupId: `stash-stack:${boardItem.id}:${stack.id}`,
+								}),
 								sourceItemInstanceId: boardItem.id,
 								targetItemInstanceId: stack.id,
 								itemId: boardItem.itemDefinitionId as ItemId,
@@ -141,6 +146,10 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* (
 						visualEvents: [
 							{
 								type: "inventory.stacked",
+								animation: ActionVisualAnimation.parallelMove({
+									cause: "inventory",
+									groupId: `stash-stack:${boardItem.id}:${targetStack.id}`,
+								}),
 								sourceItemInstanceId: boardItem.id,
 								targetItemInstanceId: targetStack.id,
 								itemId: boardItem.itemDefinitionId as ItemId,
@@ -204,6 +213,10 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* (
 				visualEvents: [
 					{
 						type: "item.moved",
+						animation: ActionVisualAnimation.parallelMove({
+							cause: "inventory",
+							groupId: `stash-move:${boardItem.id}:${targetSlotIndex}`,
+						}),
 						itemInstanceId: boardItem.id,
 						itemId: boardItem.itemDefinitionId as ItemId,
 						from: {

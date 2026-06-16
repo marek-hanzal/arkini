@@ -3,6 +3,7 @@ import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
+import { toTileEnterMotion } from "~/v0/play/motion/toTileEnterMotion";
 
 const createBoardItem = (
 	event: Extract<
@@ -21,7 +22,7 @@ const createBoardItem = (
 		y: event.to.y,
 		state: {},
 		motion: {
-			enter: {},
+			enter: toTileEnterMotion(event.animation),
 		},
 	};
 };

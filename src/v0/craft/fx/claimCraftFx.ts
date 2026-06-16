@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionResultSchema } from "~/v0/play/action/ActionResultSchema";
 import { createInitialBoardState } from "~/v0/board/logic/createInitialBoardState";
 import { readBoardState } from "~/v0/board/logic/readBoardState";
@@ -102,6 +103,10 @@ export const claimCraftFx = Effect.fn("claimCraftFx")(function* (props: claimCra
 				visualEvents: [
 					{
 						type: "craft.claimed",
+						animation: ActionVisualAnimation.instantFadeIn({
+							cause: "craft",
+							groupId: `craft-claim:${row.id}:${recipe.id}`,
+						}),
 						itemInstanceId: row.id,
 						recipeId: recipe.id,
 						sourceItemId: row.itemDefinitionId as ItemId,

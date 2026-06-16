@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ActionVisualAnimation } from "~/v0/play/action/ActionVisualAnimation";
 import { readActivationInputRowsFx } from "~/v0/activation/fx/readActivationInputRowsFx";
 import { storeActivationInputFx } from "~/v0/activation/fx/storeActivationInputFx";
 import { groupActivationInputRows } from "~/v0/activation/logic/groupActivationInputRows";
@@ -131,6 +132,10 @@ export const mergeBoardItemsFx = Effect.fn("mergeBoardItemsFx")(function* (
 					visualEvents: [
 						{
 							type: "item.merged",
+							animation: ActionVisualAnimation.parallelMove({
+								cause: "merge",
+								groupId: `merge:${source.id}:${target.id}`,
+							}),
 							sourceItemInstanceId: source.id,
 							sourceItemId: source.itemDefinitionId,
 							targetItemInstanceId: target.id,
@@ -192,6 +197,10 @@ export const mergeBoardItemsFx = Effect.fn("mergeBoardItemsFx")(function* (
 					visualEvents: [
 						{
 							type: "item.consumed",
+							animation: ActionVisualAnimation.parallelMove({
+								cause: "craft",
+								groupId: `craft-input:${source.id}:${target.id}`,
+							}),
 							itemInstanceId: source.id,
 							itemId: source.itemDefinitionId,
 							from: {
@@ -239,6 +248,10 @@ export const mergeBoardItemsFx = Effect.fn("mergeBoardItemsFx")(function* (
 					visualEvents: [
 						{
 							type: "item.fed",
+							animation: ActionVisualAnimation.parallelMove({
+								cause: "activation",
+								groupId: `activation-input:${source.id}:${target.id}`,
+							}),
 							sourceItemInstanceId: source.id,
 							targetItemInstanceId: target.id,
 							itemId: source.itemDefinitionId,

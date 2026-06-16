@@ -1,13 +1,27 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { actionVisualSequenceDelayMs } from "~/v0/play/action/ActionVisualAnimation";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
 import { applyVisualEvents } from "~/v0/play/cache/applyVisualEvents";
 import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
 
-export const spawnSequenceDelayMs = 135;
+export const spawnSequenceDelayMs = actionVisualSequenceDelayMs;
+
+const isLegacyExhaustBatch = (events: readonly ActionVisualEventSchema.Type[]) =>
+	events.some((event) => event.type === "activation.activated" && event.mode === "exhaust");
+
+const isSequencedEvent = (
+	event: ActionVisualEventSchema.Type,
+	events: readonly ActionVisualEventSchema.Type[],
+) =>
+	event.animation?.mode === "sequence" ||
+	(isLegacyExhaustBatch(events) && event.type === "item.spawned");
+
+const visualEventDelayMs = (event: ActionVisualEventSchema.Type, sequenceIndex: number) =>
+	event.animation?.delayMs ?? sequenceIndex * spawnSequenceDelayMs;
 
 export const shouldSequenceSpawnVisualEvents = (events: readonly ActionVisualEventSchema.Type[]) =>
-	events.some((event) => event.type === "activation.activated" && event.mode === "exhaust");
+	events.some((event) => isSequencedEvent(event, events));
 
 export namespace sequenceSpawnVisualEvents {
 	export interface Props {
@@ -20,16 +34,16 @@ export const sequenceSpawnVisualEvents = ({
 	events,
 	queryClient,
 }: sequenceSpawnVisualEvents.Props) => {
-	const spawnedEvents = events.filter((event) => event.type === "item.spawned");
-	const immediateEvents = events.filter((event) => event.type !== "item.spawned");
+	const sequencedEvents = events.filter((event) => isSequencedEvent(event, events));
+	const immediateEvents = events.filter((event) => !isSequencedEvent(event, events));
 	DebugTimeline.record({
 		scope: "action-cache",
 		event: "visual-events.sequence.schedule",
 		detail: {
 			immediateCount: immediateEvents.length,
-			spawnedCount: spawnedEvents.length,
+			sequencedCount: sequencedEvents.length,
 			delayMs: spawnSequenceDelayMs,
-			spawned: summarizeVisualEvents(spawnedEvents),
+			sequenced: summarizeVisualEvents(sequencedEvents),
 		},
 	});
 
@@ -38,12 +52,14 @@ export const sequenceSpawnVisualEvents = ({
 		events: immediateEvents,
 	});
 
-	spawnedEvents.forEach((event, index) => {
+	sequencedEvents.forEach((event, index) => {
+		const delayMs = visualEventDelayMs(event, index);
 		window.setTimeout(() => {
 			DebugTimeline.record({
 				scope: "action-cache",
 				event: "visual-events.sequence.tick",
 				detail: {
+					delayMs,
 					index,
 					event: summarizeVisualEvents([
 						event,
@@ -56,6 +72,6 @@ export const sequenceSpawnVisualEvents = ({
 					event,
 				],
 			});
-		}, index * spawnSequenceDelayMs);
+		}, delayMs);
 	});
 };

@@ -7,6 +7,7 @@ export const summarizeVisualEvents = (events: readonly ActionVisualEventSchema.T
 		const target = "targetItemInstanceId" in event ? event.targetItemInstanceId : undefined;
 		return {
 			type: event.type,
+			animation: event.animation,
 			item,
 			source,
 			target,

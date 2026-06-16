@@ -1,40 +1,101 @@
-# ChatGPT work notes
+# ChatGPT working map
 
 Status: ACTIVE
+Updated: 2026-06-16
 
-This directory is the working task memory for ChatGPT-assisted Arkini refactors.
+This directory is the repo-local working memory for GPT-led Arkini work. Treat this file as the current truth. Older task files are retained as audit trail, not as instructions to blindly execute like a cursed treasure map.
 
-Do not delete completed task files. Mark their `Status` line instead:
+## Current mental model
+
+Arkini v0 is a client-only/offline Vite + React SPA. No SSR, no server runtime. Durable save state lives in browser OPFS SQLite through SQLocal/Kysely. Static game truth lives in `src/v0/manifest/GameConfig.ts`, composed from focused files under `src/v0/manifest/config`.
+
+The active runtime has four layers:
+
+1. `manifest` defines all static gameplay data and IDs.
+2. SQLite + migrations store mutable save/runtime state.
+3. domain `fx/` roots implement backend-like use-cases through Effect.
+4. React Query + UI components render cached views and apply visual optimistic patches.
+
+`TileEngine` is generic tile interaction infrastructure: pointer lifecycle, hit testing, drop target geometry, snap/rollback, handoff and tile motion. It must not know Arkini game rules. Game-specific drop policy belongs in `src/v0/play/drop`; board/inventory adapter wiring belongs in concrete hooks such as `useBoardTileEngineModel` and `useInventoryTileEngineModel`.
+
+## Hard boundaries
+
+These are now enforced by `npm run dc` through dependency-cruiser where possible:
+
+- `src/v0/tile-engine` must not import Arkini domains such as board, inventory, play, manifest, item, activation, database, craft, upgrade or game.
+- `src/v0/manifest` must not import runtime/UI/persistence domains.
+- domain `fx/` roots must not import React or React Query.
+- production code must not import tests.
+- production `src` code must not import devDependencies, except type/test-only edges covered by config exceptions.
+- `~/v0/play/resolveDrop` wrapper is gone; use `~/v0/play/drop/resolveDrop` directly.
+
+If dependency-cruiser complains, fix the boundary. Do not weaken the rule unless the rule is genuinely wrong for the architecture, because otherwise we are just letting the mess negotiate with us. Software does that enough already.
+
+## Standard task start
+
+Before coding:
+
+1. Read this file.
+2. Run or inspect `git status --short --branch`; if `.git` is missing, stop.
+3. Do a library-first check: use installed libraries before writing in-house infrastructure, and consider a small focused dependency when custom code would be worse.
+4. Identify the owning domain before adding files. No `shared` trash cans unless the ownership is truly generic UI/infrastructure.
+
+## Standard task finish
+
+Run the full gate unless the task is explicitly docs-only:
+
+```bash
+npm run check
+npm run build
+git diff --check
+```
+
+`npm run check` runs format check, dependency boundaries, typecheck, and Vitest. Run `npm run build` separately before packaging non-doc work. This two-step gate avoids forcing every small test cycle through the production bundle, because waiting on bundlers for tiny pure tests is how machines learn resentment.
+
+Then commit and package a fresh zip including `.git` plus a SHA256 file. Zip names must stay unique to dodge cache weirdness, because apparently downloading a file is still a boss fight.
+
+## Current commands
+
+```bash
+npm install --no-package-lock
+npm run dev
+npm run dc
+npm run test
+npm run check
+```
+
+Arkini uses npm without a committed lockfile. Do not add `package-lock.json`, `bun.lockb`, or similar unless the dependency policy changes deliberately.
+
+## Debug timeline
+
+Dev builds expose a tiny in-browser timeline buffer:
+
+```js
+window.__ARKINI_DEBUG_TIMELINE__.dump()
+window.__ARKINI_DEBUG_TIMELINE__.clear()
+window.__ARKINI_DEBUG_TIMELINE__.entries()
+```
+
+The buffer currently records selected TileEngine pointer/drag/drop events and action-cache visual-event patches. It is intentionally boring JSON so Marek can paste a dump into chat and the next model can reconstruct timing without both sides waving their hands at “the animation thingy”.
+
+## Active improvement priorities
+
+1. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.
+2. Add more Vitest coverage around domain action results, cache patches, placement planning and manifest validation.
+3. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks.
+4. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.
+5. Keep manifest content editable through small topic files and a documented checklist rather than inventing a config framework that cosplays as productivity.
+
+## Backlog conventions
+
+Task files live in `000-refactor-backlog/`.
+
+Status values:
 
 - `TODO` means not started.
-- `IN_PROGRESS` means currently being edited.
+- `IN_PROGRESS` means partly done and still relevant.
 - `DONE` means completed in a committed change.
-- `BLOCKED` means intentionally stopped because a product/design decision is missing.
-- `OBSOLETE` means replaced by a newer task, with a note pointing to the replacement.
+- `BLOCKED` means waiting for a product/design decision.
+- `OBSOLETE` means replaced by newer architecture or task notes.
 
-Each task file should describe one coherent piece of work. A task may be a whole story, but it must have a clear acceptance section so the next model does not have to reconstruct intent from chat archaeology, because apparently civilization still communicates through zip files and vibes.
-
-Current baseline commit when this backlog was created: `6b86b70 Normalize craft inputs and activation requirements`.
-
-## Library-first rule
-
-Before starting every implementation task, first do a short library-capability analysis. Check whether already installed libraries can own the boring infrastructure before writing in-house code. Prefer using existing library APIs for gestures, animation primitives, data fetching, state machines, schemas, and persistence boundaries when they fit the task.
-
-If installed libraries are not enough, explicitly consider whether a small focused dependency would be safer than custom code. Only write in-house infrastructure when the task is genuinely game/domain-specific or when library behavior would fight Arkini architecture. Document the decision in the task file when it affects architecture.
-
-## Working rules
-
-- Keep the repo client-only and offline-first.
-- Keep PNG assets in `src/assets` unless the user explicitly asks for asset changes.
-- Keep `src/v0/tile-engine` standalone. Arkini-specific behavior may be injected through props/hooks/adapters, but the tile engine must not import Arkini domains such as `board`, `inventory`, `activation`, `manifest`, `item`, or `play`.
-- Components should render only. Data derivation, command creation, Effect execution, view-model shaping, and animation planning belong in hooks, Fx roots, or adapters.
-- Read hooks use `useSuspenseQuery` by default. App-level Suspense handles initial loading.
-- Prefer React Query as the owner for durable read references. Do not rebuild query-owned view data in root components unless the transformation is tiny and stable.
-- Any long-lived pointer, timer, animation, or drag handler must not capture volatile render objects directly. Use a local latest-ref pattern when runtime callbacks need fresh values without changing handler identity.
-- Use `Effect` for domain/persistence roots.
-- Effect dependency channels should be inferred by each Fx root. Do not write fake explicit dependency types or cast an Effect to `never`; if TypeScript complains, fix the source dependency, not the type witness.
-- Use Zod schemas with the `Schema.Type` namespace pattern.
-- One exported function/component/type/schema per file unless there is a strong local reason not to.
-- Standalone model/types belong in owner-domain files. Do not create mixed `types.ts` buckets that become shared trash cans with a nicer hat.
-- Do not create compatibility shims as a dumping ground. Prefer clean migration or deletion. The pre-v0 root runtime and `src/ancient` snapshot are gone; do not recreate them.
-- When finishing work, commit changes and produce a fresh zip including `.git` plus a SHA256 file.
+Do not delete completed task files. Update status and add a short result note. Old dated audit notes in this folder are reference material only; this README wins when they disagree.

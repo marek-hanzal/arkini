@@ -7,7 +7,7 @@ import {
 	clearBoardTransientTiles,
 	readBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
-import { registerBoardMergeTransientTiles } from "~/v0/board/animation/registerBoardMergeTransientTiles";
+import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
 
 const boardView = () =>
 	rebuildBoardView([
@@ -27,7 +27,7 @@ const boardView = () =>
 		},
 	]);
 
-describe("registerBoardMergeTransientTiles", () => {
+describe("registerBoardMergeExitTiles", () => {
 	it("keeps delayed exit transients until the motion settles", () => {
 		vi.useFakeTimers();
 		clearBoardTransientTiles();
@@ -51,7 +51,7 @@ describe("registerBoardMergeTransientTiles", () => {
 			consumeSource: true,
 		} satisfies ActionVisualEventSchema.Type;
 
-		registerBoardMergeTransientTiles({
+		registerBoardMergeExitTiles({
 			board: boardView(),
 			events: [
 				event,

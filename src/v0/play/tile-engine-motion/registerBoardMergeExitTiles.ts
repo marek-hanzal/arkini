@@ -9,17 +9,17 @@ import {
 	upsertBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
 
-export namespace registerBoardMergeTransientTiles {
+export namespace registerBoardMergeExitTiles {
 	export interface Props {
 		board: BoardView;
 		events: readonly ActionVisualEventSchema.Type[];
 	}
 }
 
-export const registerBoardMergeTransientTiles = ({
+export const registerBoardMergeExitTiles = ({
 	board,
 	events,
-}: registerBoardMergeTransientTiles.Props) => {
+}: registerBoardMergeExitTiles.Props) => {
 	for (const event of events) {
 		if (event.type !== "item.merged") continue;
 

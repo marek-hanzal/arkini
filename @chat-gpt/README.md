@@ -5,6 +5,10 @@ Updated: 2026-06-16
 
 This directory is the repo-local working memory for GPT-led Arkini work. Treat this file as the current truth. Older task files are retained as audit trail, not as instructions to blindly execute like a cursed treasure map.
 
+## Latest completed work
+
+- `004-split-game-item-definitions` is done: large root item config files now compose smaller one-level content-family files (`natural/*`, `blueprint/*`, `building/*`, `container/*`) while `GameItemDefinitions.ts` remains the single exported item collection.
+
 ## Current mental model
 
 Arkini v0 is a client-only/offline Vite + React SPA. No SSR, no server runtime. Durable save state lives in browser OPFS SQLite through SQLocal/Kysely. Static game truth lives in `src/v0/manifest/GameConfig.ts`, composed from focused files under `src/v0/manifest/config`.

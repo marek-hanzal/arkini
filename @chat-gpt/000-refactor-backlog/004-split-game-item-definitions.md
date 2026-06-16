@@ -1,6 +1,6 @@
 # Split GameItemDefinitions
 
-Status: TODO
+Status: DONE
 
 ## Goal
 
@@ -8,23 +8,21 @@ Break the remaining large item definition file into focused item-definition grou
 
 ## Current state
 
-- `GameConfig` has been split into focused manifest config files.
-- `GameItemDefinitions.ts` remains too large and should not keep absorbing all economy data like a hungry spreadsheet demon.
+- `GameConfig` is split into focused manifest config files.
+- `GameItemDefinitions.ts` stays as the single composed item collection.
+- Large root item categories now fan out into focused one-level folders instead of absorbing every economy detail like a hungry spreadsheet demon.
 
-## Proposed grouping
+## Final grouping
 
-Possible folders/files under `src/manifest/config/item/`:
+Top-level composed groups under `src/v0/manifest/config/item/`:
 
-- `RawMaterialItemDefinitions.ts`
-- `CraftedMaterialItemDefinitions.ts`
-- `CurrencyItemDefinitions.ts`
-- `ProducerItemDefinitions.ts`
-- `StashItemDefinitions.ts`
-- `BlueprintItemDefinitions.ts`
-- `CraftConstructionItemDefinitions.ts`
-- `UtilityItemDefinitions.ts`
+- `NaturalItemDefinitions.ts` composes `natural/PlantItemDefinitions.ts`, `natural/WoodItemDefinitions.ts`, `natural/StoneItemDefinitions.ts` and `natural/UtilityMaterialItemDefinitions.ts`.
+- `CurrencyItemDefinitions.ts` stays flat because the chain is still tiny.
+- `BlueprintItemDefinitions.ts` composes blank blueprint progression plus lumber camp, quarry and town hall blueprint families.
+- `BuildingItemDefinitions.ts` composes town hall, lumber camp, quarry and coal mine families.
+- `CrateItemDefinitions.ts` composes finite crate containers and keys from `container/*`.
 
-Then compose in `GameItemDefinitions.ts`.
+`GameItemDefinitions.ts` remains the single exported collection used by `GameConfig`.
 
 ## Acceptance
 
@@ -38,3 +36,7 @@ Then compose in `GameItemDefinitions.ts`.
 
 - Avoid inventing extra helper factories unless they remove meaningful duplication.
 - Keep asset imports stable and do not touch PNG files.
+
+## Result
+
+Completed on 2026-06-16. No gameplay behavior changed; this was a file-ownership/content-scanning cleanup only. `npm run check` and `npm run build` passed.

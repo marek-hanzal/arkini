@@ -166,6 +166,10 @@ describe("applyInventoryVisualEvent", () => {
 	it("stacks spawned inventory items into the existing stack", () => {
 		const event = {
 			type: "item.spawned",
+			animation: ActionVisualAnimation.instantFadeIn({
+				cause: "producer",
+				groupId: "activation:producer:single",
+			}),
 			itemInstanceId: "spawned",
 			itemId: "item:twig",
 			to: {

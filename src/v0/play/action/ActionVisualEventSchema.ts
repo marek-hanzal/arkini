@@ -9,14 +9,24 @@ import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
 import { GameUpgradeIdSchema } from "~/v0/manifest/GameUpgradeIdSchema";
 import { PositiveIntegerSchema } from "~/v0/manifest/PositiveIntegerSchema";
 
-const animationShape = {
+const optionalAnimationShape = {
 	animation: ActionVisualAnimationSchema.optional(),
+};
+
+const requiredAnimationShape = {
+	animation: ActionVisualAnimationSchema,
 };
 
 const actionVisualEvent = <TShape extends z.ZodRawShape>(shape: TShape) =>
 	z.object({
 		...shape,
-		...animationShape,
+		...optionalAnimationShape,
+	});
+
+const animatedActionVisualEvent = <TShape extends z.ZodRawShape>(shape: TShape) =>
+	z.object({
+		...shape,
+		...requiredAnimationShape,
 	});
 
 export const ActionVisualEventSchema = z.discriminatedUnion("type", [
@@ -53,7 +63,7 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		targetItemInstanceId: ItemInstanceIdSchema,
 		itemId: GameItemIdSchema,
 	}),
-	actionVisualEvent({
+	animatedActionVisualEvent({
 		type: z.literal("item.spawned"),
 		itemInstanceId: ItemInstanceIdSchema.optional(),
 		itemId: GameItemIdSchema,

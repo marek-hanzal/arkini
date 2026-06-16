@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { recordActionMutation } from "~/v0/debug/recordActionMutation";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { mergeBoardItemsFx } from "~/v0/board/fx/mergeBoardItemsFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
@@ -18,23 +19,47 @@ export const useMergeBoardItemsMutation = () => {
 		CacheSnapshot.Type
 	>({
 		mutationFn(input) {
+			recordActionMutation({
+				action: "mergeBoardItems",
+				phase: "mutate.start",
+				detail: input,
+			});
 			return runGameFx({
 				effect: mergeBoardItemsFx(input),
 			});
 		},
 		onMutate(input) {
+			recordActionMutation({
+				action: "mergeBoardItems",
+				phase: "cache.optimistic.start",
+				detail: input,
+			});
 			return applyBoardMergeCachePatch({
 				queryClient,
 				input,
 			});
 		},
-		onError(_error, _input, snapshot) {
+		onError(error, _input, snapshot) {
+			recordActionMutation({
+				action: "mergeBoardItems",
+				phase: "mutate.error",
+				detail: error,
+			});
+			recordActionMutation({
+				action: "mergeBoardItems",
+				phase: "cache.restore",
+			});
 			restoreCacheSnapshot({
 				queryClient,
 				snapshot,
 			});
 		},
 		onSuccess(result) {
+			recordActionMutation({
+				action: "mergeBoardItems",
+				phase: "mutate.success",
+				detail: result,
+			});
 			applyActionResultCachePatch({
 				queryClient,
 				result,

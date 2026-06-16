@@ -1,1 +1,1 @@
-export type Sheet = "inventory" | "upgrades" | "database" | "item";
+export type Sheet = "inventory" | "upgrades" | "dev" | "item";

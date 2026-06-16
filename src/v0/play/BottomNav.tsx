@@ -66,10 +66,10 @@ export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => 
 				onOpen={onOpen}
 			/>
 			<NavButton
-				active={activeSheet === "database"}
-				label="Database"
-				icon="◈"
-				tone="database"
+				active={activeSheet === "dev"}
+				label="Dev"
+				icon="⌘"
+				tone="dev"
 				onOpen={onOpen}
 			/>
 		</div>

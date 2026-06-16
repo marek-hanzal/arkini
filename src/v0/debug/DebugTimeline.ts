@@ -27,7 +27,7 @@ const entries: DebugTimeline.Entry[] = [];
 
 const shouldRecord = () => Boolean(import.meta.env.DEV);
 
-const createJsonReplacer = () => {
+export const createDebugJsonReplacer = () => {
 	const seen = new WeakSet<object>();
 	return (_key: string, value: unknown) => {
 		if (typeof value === "function") return `[Function ${value.name || "anonymous"}]`;
@@ -64,7 +64,7 @@ export const DebugTimeline: DebugTimeline.Api = {
 		];
 	},
 	dump() {
-		return JSON.stringify(entries, createJsonReplacer(), "\t");
+		return JSON.stringify(entries, createDebugJsonReplacer(), "\t");
 	},
 	clear() {
 		entries.length = 0;

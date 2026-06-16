@@ -1,7 +1,9 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { match } from "ts-pattern";
-import { type FC, Suspense, useCallback, useMemo, useState } from "react";
+import { type FC, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { BoardSurface } from "~/v0/board/BoardSurface";
-import { DatabaseSheet } from "~/v0/database/DatabaseSheet";
+import { DevSheet } from "~/v0/debug/DevSheet";
+import { registerDebugBugReport } from "~/v0/debug/DebugBugReport";
 import { InventorySurface } from "~/v0/inventory/InventorySurface";
 import { ItemSheet } from "~/v0/item/ItemSheet";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
@@ -22,6 +24,7 @@ const messageForError = (error: unknown) =>
 	error instanceof Error ? error.message : typeof error === "string" ? error : "Action failed.";
 
 export const PlayShell: FC<PlayShell.Props> = () => {
+	const queryClient = useQueryClient();
 	const feedbackFlags = useFeedbackFlags();
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
@@ -64,6 +67,20 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 			feedbackFlags.pulse,
 		],
 	);
+	useEffect(() => {
+		registerDebugBugReport({
+			queryClient,
+			getContext: () => ({
+				activeSheet: activeSheet?.type,
+				lastError,
+			}),
+		});
+	}, [
+		activeSheet?.type,
+		lastError,
+		queryClient,
+	]);
+
 	const sheetContent = activeSheet
 		? match(activeSheet)
 				.with(
@@ -86,9 +103,9 @@ export const PlayShell: FC<PlayShell.Props> = () => {
 				)
 				.with(
 					{
-						type: "database",
+						type: "dev",
 					},
-					() => <DatabaseSheet onClose={closeSheet} />,
+					() => <DevSheet onClose={closeSheet} />,
 				)
 				.with(
 					{

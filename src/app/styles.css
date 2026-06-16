@@ -210,7 +210,7 @@ button {
 	background: rgb(30 41 59 / 0.28);
 }
 
-.ak-bottom-nav-button[data-tone="database"] {
+.ak-bottom-nav-button[data-tone="dev"] {
 	border-color: rgb(129 140 248 / 0.42);
 	background: rgb(49 46 129 / 0.23);
 }
@@ -252,7 +252,7 @@ button {
 	color: rgb(241 245 249);
 }
 
-.ak-bottom-nav-button[data-active="true"][data-tone="database"] {
+.ak-bottom-nav-button[data-active="true"][data-tone="dev"] {
 	border-color: rgb(165 180 252 / 0.9);
 	background: rgb(99 102 241 / 0.22);
 	color: rgb(224 231 255);

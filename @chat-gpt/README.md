@@ -66,17 +66,20 @@ npm run check
 
 Arkini uses npm without a committed lockfile. Do not add `package-lock.json`, `bun.lockb`, or similar unless the dependency policy changes deliberately.
 
-## Debug timeline
+## Dev Sheet and bug reports
 
-Dev builds expose a tiny in-browser timeline buffer:
+The bottom nav `Dev` sheet replaces the old database-only sheet. It keeps the OPFS/SQLite status and hard reset button, but adds a `Copy bug report` button for animation/debug work.
+
+Dev builds expose two console APIs:
 
 ```js
-window.__ARKINI_DEBUG_TIMELINE__.dump()
-window.__ARKINI_DEBUG_TIMELINE__.clear()
+window.__ARKINI_BUG_REPORT__.dump()
+window.__ARKINI_BUG_REPORT__.copy()
+window.__ARKINI_BUG_REPORT__.clear()
 window.__ARKINI_DEBUG_TIMELINE__.entries()
 ```
 
-The buffer currently records selected TileEngine pointer/drag/drop events and action-cache visual-event patches. It is intentionally boring JSON so Marek can paste a dump into chat and the next model can reconstruct timing without both sides waving their hands at “the animation thingy”.
+Bug reports are boring JSON on purpose: browser metadata, active sheet/error context, React Query cache snapshots for board/inventory/database, query states and the latest timeline entries. The timeline records TileEngine pointer/drag/drop/motion lifecycle, action mutation phases, optimistic cache restores and visual-event patch sequencing. When Marek reports an animation bug, ask for: scenario/actions, visible symptom, and the copied bug report dump. Fewer vibes, more evidence, humanity heals slightly.
 
 ## Active improvement priorities
 

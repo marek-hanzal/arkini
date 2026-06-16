@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { recordActionMutation } from "~/v0/debug/recordActionMutation";
 import { GameActionError } from "~/v0/play/action/GameActionError";
 import { placeInventoryItemFx } from "~/v0/inventory/fx/placeInventoryItemFx";
 import type { ActionResult } from "~/v0/play/action/ActionResult";
@@ -18,23 +19,47 @@ export const usePlaceInventoryItemMutation = () => {
 		CacheSnapshot.Type
 	>({
 		mutationFn(input) {
+			recordActionMutation({
+				action: "placeInventoryItem",
+				phase: "mutate.start",
+				detail: input,
+			});
 			return runGameFx({
 				effect: placeInventoryItemFx(input),
 			});
 		},
 		onMutate(input) {
+			recordActionMutation({
+				action: "placeInventoryItem",
+				phase: "cache.optimistic.start",
+				detail: input,
+			});
 			return applyInventoryPlaceCachePatch({
 				queryClient,
 				input,
 			});
 		},
-		onError(_error, _input, snapshot) {
+		onError(error, _input, snapshot) {
+			recordActionMutation({
+				action: "placeInventoryItem",
+				phase: "mutate.error",
+				detail: error,
+			});
+			recordActionMutation({
+				action: "placeInventoryItem",
+				phase: "cache.restore",
+			});
 			restoreCacheSnapshot({
 				queryClient,
 				snapshot,
 			});
 		},
 		onSuccess(result) {
+			recordActionMutation({
+				action: "placeInventoryItem",
+				phase: "mutate.success",
+				detail: result,
+			});
 			applyActionResultCachePatch({
 				queryClient,
 				result,

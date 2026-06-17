@@ -1,17 +1,19 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
-import { createInitialGameSave } from "~/v0/game/engine/logic/createInitialGameSave";
-import { createEngineTestConfig } from "~/v0/game/engine/logic/testGameConfig";
+import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
 const runAction = (props: applyGameActionFx.Props) => Effect.runSync(applyGameActionFx(props));
+const runInitialSave = (props: createInitialGameSaveFx.Props) =>
+	Effect.runSync(createInitialGameSaveFx(props));
 const runActionEither = (props: applyGameActionFx.Props) =>
 	Effect.runSync(Effect.either(applyGameActionFx(props)));
 
 describe("applyGameActionFx", () => {
 	it("starts a no-input producer product as an Effect action", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -52,7 +54,7 @@ describe("applyGameActionFx", () => {
 
 	it("consumes explicit inventory inputs at product start", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -121,7 +123,7 @@ describe("applyGameActionFx", () => {
 				},
 			},
 		});
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -167,7 +169,7 @@ describe("applyGameActionFx", () => {
 				},
 			},
 		});
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});

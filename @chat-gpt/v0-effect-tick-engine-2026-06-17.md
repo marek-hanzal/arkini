@@ -97,7 +97,7 @@ The save model will need explicit runtime structures for things currently hidden
 - running craft jobs.
 - running upgrades.
 - depleted/removed/replaced stash state.
-- random seed or deterministic RNG state if loot rolls need reproducible tests.
+- randomness supplied through `RandomServiceFx`; tests use fake/scripted services instead of engine-local RNG helpers.
 
 The static `GameConfig` says what can happen. Save state says what is currently happening.
 
@@ -105,13 +105,7 @@ The static `GameConfig` says what can happen. Save state says what is currently 
 
 Time must be injected as `nowMs`. Do not call `Date.now()` inside engine logic. Tests must be able to fake time without séance-level mocking.
 
-Loot randomness should be injected or deterministic. Candidate approaches:
-
-- pass an RNG service through Effect.
-- store a seed in save and return the advanced seed.
-- for tests, use a scripted RNG sequence.
-
-Do not let loot tables call `Math.random()` directly from domain logic. That is how tests become astrology.
+Loot randomness must be injected through `RandomServiceFx`. App callsites already get it through `runEffect`; engine tests must provide fake or scripted services. Do not add engine-local seeded helpers such as `nextGameRandom`, and do not let loot tables call `Math.random()` directly from domain logic. That is how tests become astrology.
 
 ## Validation of the idea
 
@@ -139,10 +133,10 @@ It also gives a clean route to validate that the engine honors the config: for e
 
 1. Define `GameSave` and `GameEvent` draft types in a new domain area beside the current runtime, not inside UI.
 2. Add a small bootstrap helper that creates initial `GameSave` from validated `GameConfig.startingState`; this is enough for engine tests before final persistence exists.
-3. Implement pure placement planner against `GameConfig` + save.
-4. Implement requirement/input evaluators.
+3. Implement Effect-first placement planner against `GameConfig` + save.
+4. Implement Effect-first requirement/input evaluators.
 5. Implement `runTickFx` for already-running jobs only.
-6. Add tests with fake `nowMs` and deterministic RNG.
+6. Add tests with fake `nowMs` and fake `RandomServiceFx`.
 7. Implement action reducers: feed producer, open stash, start craft, merge, removeBy, start upgrade.
 8. Add adapter that converts current UI actions to engine actions while current UI still renders from existing state.
 9. Switch one mechanic at a time once event parity is proven.
@@ -158,13 +152,13 @@ First side-by-side engine slice is implemented under `src/v0/game/engine`.
 
 Added:
 
-- `GameSaveSchema` with board item instances, inventory slots/stacks, deterministic counters, RNG seed, running producer jobs and running craft jobs.
+- `GameSaveSchema` with board item instances, inventory slots/stacks, deterministic ID counters, running producer jobs and running craft jobs.
 - `GameEventSchema` with domain events for item creation, product completion/blocking and craft completion/blocking.
-- `createInitialGameSave(config, nowMs)` bootstrapping from `GameConfig.startingState`.
-- `placeGameSaveItems(...)` implementing the current `board_then_inventory` contract atomically: board tiles first, then inventory stacks/empty slots, no partial mutation on overflow.
-- deterministic LCG RNG helpers and loot-table rolling for guaranteed/chance/weighted output.
-- `runGameTick(...)` for already-running producer/craft jobs. Completed product jobs either emit output through loot tables, finish as delayed sinks when no output table exists, or stay pending with a blocked event when placement is unavailable.
-- `runGameTickFx(...)` Effect wrapper. The engine remains persistence-free and imports no database/storage/UI modules.
+- `createInitialGameSaveFx(config, nowMs)` bootstrapping from `GameConfig.startingState`.
+- `placeGameSaveItemsFx(...)` implementing the current `board_then_inventory` contract atomically: board tiles first, then inventory stacks/empty slots, no partial mutation on overflow.
+- loot-table rolling for guaranteed/chance/weighted output through `RandomServiceFx`; no engine-local RNG helper exists.
+- `runGameTickFx(...)` for already-running producer/craft jobs. Completed product jobs either emit output through loot tables, finish as delayed sinks when no output table exists, or stay pending with a blocked event when placement is unavailable.
+- The engine remains persistence-free and imports no database/storage/UI modules.
 - focused tests for initial save bootstrap, placement, product completion, blocked completion and sink products.
 
 Still deliberately not done:
@@ -184,11 +178,11 @@ The tick engine now owns a persisted scheduler queue in `GameSave.scheduledEvent
 Current implemented scheduler contract:
 
 - Scheduled events are part of save state and survive reload/offline gaps.
-- `item.spawn` scheduled events mutate save only when processed by `processScheduledGameEvents(...)` / `runGameTick(...)`.
+- `item.spawn` scheduled events mutate save only when processed by `processScheduledGameEventsFx(...)` / `runGameTickFx(...)`.
 - Non-exclusive due events may be processed in the same tick.
 - Events with the same `exclusiveKey` are throttled to at most one processed event per tick, even if multiple entries are overdue. This prevents late browser timers from batching a sequential spawn stream into `<spawn, spawn>` after one missed tick.
 - Blocked scheduled item spawns stay pending and emit `item.spawn.blocked`.
-- `runGameTick(...)` processes scheduled events before and after job completion, so existing queued work runs first and freshly completed instant outputs can still appear in the same tick.
+- `runGameTickFx(...)` processes scheduled events before and after job completion, so existing queued work runs first and freshly completed instant outputs can still appear in the same tick.
 - Job completion now schedules item spawns and then lets the scheduler emit `item.created`; the engine still preflights placement for product/craft completion so existing atomic blocked-completion semantics remain intact.
 - `GameEngineResult.nextWakeAtMs` is a scheduling hint for the outside orchestrator. The engine still does not own timers or call `setTimeout`.
 
@@ -197,7 +191,7 @@ Important UI boundary: visual animation timing is still outside the engine. The 
 ## 2026-06-17 action-entrypoint checkpoint
 
 - New engine implementation must be Effect-first. Do not add new domain engine code under `src/v0/game/engine/logic/*` as a naked pure function plus a cosmetic `Fx` wrapper.
-- `src/v0/game/engine/fx/applyGameActionFx.ts` is the action entrypoint. It currently supports `producer.product.start` and dispatches through `ts-pattern`.
+- `src/v0/game/engine/fx/applyGameActionFx.ts` is the action entrypoint. It currently supports `producer.product.start` and dispatches through `ts-pattern`. Keep it small: dispatch only, flow logic belongs in focused Fx files.
 - Action rejection/config problems use the `GameEngineError` typed error channel instead of throwing exceptions.
-- `runGameTickFx` is now the tick entrypoint and is no longer just `Effect.sync(() => runGameTick(...))`. The old `logic/*` slice remains temporarily for tests/backwards compatibility, but should be migrated out as the new engine grows instead of expanded.
+- `runGameTickFx` is now the tick entrypoint. The old `src/v0/game/engine/logic/*` slice has been removed; do not recreate it. New logic belongs in focused `fx/*` files with one exported function per file and `namespace FunctionName.Props`.
 - Current supported action contract: explicit producer tile + product line + input refs. Product inputs are consumed at start. Passive requirements are checked against board/inventory scopes. Stored requirements intentionally fail as unsupported until save state can represent stored requirement slots.

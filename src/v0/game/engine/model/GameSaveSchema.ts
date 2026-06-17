@@ -93,7 +93,6 @@ export const GameSaveSchema = z
 		gameId: IdSchema,
 		createdAtMs: NonNegativeIntegerSchema,
 		updatedAtMs: NonNegativeIntegerSchema,
-		rngSeed: NonNegativeIntegerSchema,
 		nextItemInstanceIndex: PositiveIntegerSchema,
 		nextJobIndex: PositiveIntegerSchema,
 		nextScheduledEventIndex: PositiveIntegerSchema,

@@ -13,7 +13,8 @@ This directory is the repo-local working memory for GPT-led Arkini work. Treat t
 
 ## Current work
 
-- No active refactor task is currently selected. `009-economy-content-pass` is deliberately deferred until the incoming large product change lands, because starting economy work now would create avoidable conflicts and humanity has already suffered enough merge conflicts for one week.
+- Upcoming large product change: move static game content/rules toward a standalone JSON package (`arkini.json`) with a CLI validator before runtime loading. See `v0-json-game-definition-plan-2026-06-17.md`.
+- No implementation is started yet. First concrete step should be schema/source inventory, then validation, then loading. `009-economy-content-pass` remains deferred until this direction settles, because starting economy work now would create avoidable conflicts and humanity has already suffered enough merge conflicts for one week.
 
 ## Current mental model
 

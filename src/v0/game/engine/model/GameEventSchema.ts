@@ -8,11 +8,17 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"product-output",
 	"craft-output",
 	"craft-requirement-return",
+	"stash-output",
 	"debug",
 ]);
 
 export const GameItemConsumedReasonSchema = z.enum([
 	"product-input",
+	"stash-input",
+]);
+
+export const GameBoardItemChangeReasonSchema = z.enum([
+	"stash-depleted",
 ]);
 
 export const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
@@ -71,6 +77,25 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
+			type: z.literal("item.removed"),
+			itemId: IdSchema,
+			itemInstanceId: IdSchema,
+			reason: GameBoardItemChangeReasonSchema,
+			removedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("item.replaced"),
+			fromItemId: IdSchema,
+			itemInstanceId: IdSchema,
+			reason: GameBoardItemChangeReasonSchema,
+			replacedAtMs: NonNegativeIntegerSchema,
+			toItemId: IdSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("product.started"),
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
@@ -96,6 +121,23 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			productId: IdSchema,
 			reason: z.literal("placement_unavailable"),
 			blockedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("stash.opened"),
+			stashId: IdSchema,
+			stashItemInstanceId: IdSchema,
+			openedAtMs: NonNegativeIntegerSchema,
+			remainingCharges: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("stash.depleted"),
+			stashId: IdSchema,
+			stashItemInstanceId: IdSchema,
+			depletedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
 	z

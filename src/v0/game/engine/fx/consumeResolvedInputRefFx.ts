@@ -10,6 +10,12 @@ export namespace consumeResolvedInputRefFx {
 		nextSave: GameSave;
 		ref: GameActionResolvedInputRef;
 		events: GameEvent[];
+		reason: Extract<
+			GameEvent,
+			{
+				type: "item.consumed";
+			}
+		>["reason"];
 	}
 }
 
@@ -17,6 +23,7 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 	nextSave,
 	ref,
 	events,
+	reason,
 }: consumeResolvedInputRefFx.Props) {
 	yield* match(ref)
 		.with(
@@ -31,7 +38,7 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 						itemInstanceId: boardRef.itemInstanceId,
 					},
 					itemId: boardRef.itemId,
-					reason: "product-input",
+					reason,
 					type: "item.consumed",
 				});
 				return Effect.void;
@@ -78,7 +85,7 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 							slotIndex: inventoryRef.slotIndex,
 						},
 						itemId: inventoryRef.itemId,
-						reason: "product-input",
+						reason,
 						type: "item.consumed",
 					});
 				}),

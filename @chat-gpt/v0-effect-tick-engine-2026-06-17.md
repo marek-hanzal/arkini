@@ -195,3 +195,18 @@ Important UI boundary: visual animation timing is still outside the engine. The 
 - Action rejection/config problems use the `GameEngineError` typed error channel instead of throwing exceptions.
 - `runGameTickFx` is now the tick entrypoint. The old `src/v0/game/engine/logic/*` slice has been removed; do not recreate it. New logic belongs in focused `fx/*` files with one exported function per file and `namespace FunctionName.Props`.
 - Current supported action contract: explicit producer tile + product line + input refs. Product inputs are consumed at start. Passive requirements are checked against board/inventory scopes. Stored requirements intentionally fail as unsupported until save state can represent stored requirement slots.
+
+## 2026-06-17 stash-open action slice
+
+Implemented `stash.open` as the second `applyGameActionFx` branch. The action is Effect-first and keeps the scheduler inside the engine boundary:
+
+- `stash.open` validates the board actor through `readStashBoardItemFx`.
+- stash-level requirements are checked with the same requirement Fx used by producer products.
+- stash inputs use the generic activation input consumer with `reason: "stash-input"`.
+- loot is rolled through `RandomServiceFx`, not local RNG helpers.
+- stash output is scheduled as `item.spawn` with `reason: "stash-output"`.
+- depleted stashes schedule dependent board source changes (`board.item.remove` / `board.item.replace`) after all scheduled output events are processed.
+- multi-charge stashes now have per-instance save state under `GameSave.stashes[stashItemInstanceId].remainingCharges`.
+- scheduler dependencies use `afterEventIds` so source removal/replacement does not fire while exclusive/sequential output events are still pending.
+
+The old product-specific input helper was replaced with activation-level helpers so products and stashes share one input-consumption path. Keep new gameplay actions in `fx/*` and keep adding focused schema/type files instead of embedding more anonymous object schemas into parent schemas.

@@ -1,31 +1,38 @@
 import { Effect } from "effect";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/v0/game/engine/fx/consumeResolvedInputRefFx";
-import { mergeProductInputRequirementsFx } from "~/v0/game/engine/fx/mergeProductInputRequirementsFx";
+import { mergeActivationInputRequirementsFx } from "~/v0/game/engine/fx/mergeActivationInputRequirementsFx";
 import { resolveInputRefsFx } from "~/v0/game/engine/fx/resolveInputRefsFx";
 import { sumResolvedInputRefsFx } from "~/v0/game/engine/fx/sumResolvedInputRefsFx";
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
+import type { GameActivationInput } from "~/v0/game/engine/model/GameActivationInput";
+import type { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
-export namespace consumeProductInputsFx {
+export namespace consumeActivationInputsFx {
 	export interface Props {
 		save: GameSave;
-		inputs: GameConfig["products"][string]["inputs"];
-		inputRefs: GameActionProducerProductStart["inputRefs"];
+		inputs: readonly GameActivationInput[];
+		inputRefs: readonly GameActionItemRefSchema.Type[];
 		nowMs: number;
+		reason: Extract<
+			GameEvent,
+			{
+				type: "item.consumed";
+			}
+		>["reason"];
 	}
 }
 
-export const consumeProductInputsFx = Effect.fn("consumeProductInputsFx")(function* ({
+export const consumeActivationInputsFx = Effect.fn("consumeActivationInputsFx")(function* ({
 	save,
 	inputs,
 	inputRefs,
 	nowMs,
-}: consumeProductInputsFx.Props) {
-	const requiredByItemId = yield* mergeProductInputRequirementsFx({
+	reason,
+}: consumeActivationInputsFx.Props) {
+	const requiredByItemId = yield* mergeActivationInputRequirementsFx({
 		inputs,
 	});
 	const resolvedRefs = yield* resolveInputRefsFx({
@@ -41,7 +48,7 @@ export const consumeProductInputsFx = Effect.fn("consumeProductInputsFx")(functi
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"input_mismatch",
-					`Input "${itemId}" is not required by this product.`,
+					`Input "${itemId}" is not required by this activation.`,
 				),
 			);
 		}
@@ -88,6 +95,7 @@ export const consumeProductInputsFx = Effect.fn("consumeProductInputsFx")(functi
 		yield* consumeResolvedInputRefFx({
 			events,
 			nextSave,
+			reason,
 			ref,
 		});
 	}

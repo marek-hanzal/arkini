@@ -3,12 +3,17 @@ import { describe, expect, it } from "vitest";
 import { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
+import { withRandomService } from "~/v0/random/logic/withRandomService";
 
-const runAction = (props: applyGameActionFx.Props) => Effect.runSync(applyGameActionFx(props));
+const runAction = (props: applyGameActionFx.Props) =>
+	Effect.runSync(applyGameActionFx(props).pipe(withRandomService(TestRandomService)));
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));
 const runActionEither = (props: applyGameActionFx.Props) =>
-	Effect.runSync(Effect.either(applyGameActionFx(props)));
+	Effect.runSync(
+		Effect.either(applyGameActionFx(props).pipe(withRandomService(TestRandomService))),
+	);
 
 describe("applyGameActionFx", () => {
 	it("starts a no-input producer product as an Effect action", () => {
@@ -193,5 +198,145 @@ describe("applyGameActionFx", () => {
 				reason: "missing_requirement",
 			});
 		}
+	});
+	it("opens a stash by consuming input and scheduling output plus depletion", () => {
+		const config = createEngineTestConfig({
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:stash",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [
+					{
+						kind: "inventory",
+						quantity: 1,
+						slotIndex: 0,
+					},
+				],
+				stashItemInstanceId: "item-instance:2",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toBeNull();
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:key",
+				reason: "stash-input",
+				type: "item.consumed",
+			},
+			{
+				remainingCharges: 0,
+				stashItemInstanceId: "item-instance:2",
+				type: "stash.opened",
+			},
+			{
+				stashItemInstanceId: "item-instance:2",
+				type: "stash.depleted",
+			},
+		]);
+		expect(Object.values(result.save.scheduledEvents)).toEqual([
+			expect.objectContaining({
+				itemId: "item:twig",
+				reason: "stash-output",
+				type: "item.spawn",
+			}),
+			expect.objectContaining({
+				itemId: "item:twig",
+				reason: "stash-output",
+				type: "item.spawn",
+			}),
+			expect.objectContaining({
+				afterEventIds: [
+					"scheduled-event:1",
+					"scheduled-event:2",
+				],
+				itemInstanceId: "item-instance:2",
+				type: "board.item.remove",
+			}),
+		]);
+	});
+
+	it("keeps multi-charge stash state without scheduling depletion", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			stashes: {
+				...baseConfig.stashes,
+				"stash:test": {
+					...baseConfig.stashes["stash:test"],
+					charges: 2,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [
+					{
+						kind: "inventory",
+						quantity: 1,
+						slotIndex: 0,
+					},
+				],
+				stashItemInstanceId: "item-instance:1",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.stashes["item-instance:1"]).toEqual({
+			remainingCharges: 1,
+		});
+		expect(result.events.map((event) => event.type)).toEqual([
+			"item.consumed",
+			"stash.opened",
+		]);
 	});
 });

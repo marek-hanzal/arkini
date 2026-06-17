@@ -36,6 +36,9 @@ export const processScheduledGameEventsFx = Effect.fn("processScheduledGameEvent
 		) {
 			continue;
 		}
+		if (scheduledEvent.afterEventIds?.some((eventId) => nextSave.scheduledEvents[eventId])) {
+			continue;
+		}
 
 		const result = yield* processScheduledGameEventFx({
 			config,

@@ -1,17 +1,12 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GamePassiveRequirementScope } from "~/v0/game/engine/model/GamePassiveRequirementScope";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace countPassiveItemQuantityFx {
 	export interface Props {
 		itemId: string;
 		save: GameSave;
-		scope: Extract<
-			GameConfig["products"][string]["requirements"][number],
-			{
-				type: "passive";
-			}
-		>["scope"];
+		scope: GamePassiveRequirementScope;
 	}
 }
 

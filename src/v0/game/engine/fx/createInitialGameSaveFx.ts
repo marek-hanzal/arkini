@@ -70,6 +70,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		nextScheduledEventIndex: 1,
 		producerJobs: {},
 		scheduledEvents: {},
+		stashes: {},
 		updatedAtMs: nowMs,
 		version: 1,
 	};

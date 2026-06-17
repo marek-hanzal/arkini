@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { GameItemCreatedReasonSchema } from "~/v0/game/engine/model/GameEventSchema";
+import {
+	GameBoardItemChangeReasonSchema,
+	GameItemCreatedReasonSchema,
+} from "~/v0/game/engine/model/GameEventSchema";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
@@ -65,20 +68,43 @@ export const GameSaveCraftJobSchema = z
 		],
 	});
 
+export const GameSaveStashStateSchema = z
+	.object({
+		remainingCharges: NonNegativeIntegerSchema,
+	})
+	.strict();
+
+export const GameSaveScheduledEventBaseSchema = z
+	.object({
+		id: IdSchema,
+		dueAtMs: NonNegativeIntegerSchema,
+		exclusiveKey: IdSchema.optional(),
+		afterEventIds: z.array(IdSchema).optional(),
+	})
+	.strict();
+
 export const GameSaveScheduledEventSchema = z
 	.discriminatedUnion("type", [
-		z
-			.object({
-				id: IdSchema,
-				type: z.literal("item.spawn"),
-				dueAtMs: NonNegativeIntegerSchema,
-				exclusiveKey: IdSchema.optional(),
-				itemId: IdSchema,
-				quantity: PositiveIntegerSchema,
-				reason: GameItemCreatedReasonSchema,
-				originItemInstanceId: IdSchema.optional(),
-			})
-			.strict(),
+		GameSaveScheduledEventBaseSchema.extend({
+			itemId: IdSchema,
+			originItemInstanceId: IdSchema.optional(),
+			quantity: PositiveIntegerSchema,
+			reason: GameItemCreatedReasonSchema,
+			type: z.literal("item.spawn"),
+		}).strict(),
+		GameSaveScheduledEventBaseSchema.extend({
+			itemId: IdSchema,
+			itemInstanceId: IdSchema,
+			reason: GameBoardItemChangeReasonSchema,
+			type: z.literal("board.item.remove"),
+		}).strict(),
+		GameSaveScheduledEventBaseSchema.extend({
+			fromItemId: IdSchema,
+			itemInstanceId: IdSchema,
+			reason: GameBoardItemChangeReasonSchema,
+			toItemId: IdSchema,
+			type: z.literal("board.item.replace"),
+		}).strict(),
 	])
 	.refine((value) => !value.exclusiveKey || value.exclusiveKey !== value.id, {
 		message: "exclusiveKey must group events and must not equal event id",
@@ -108,6 +134,7 @@ export const GameSaveSchema = z
 			.strict(),
 		producerJobs: z.record(IdSchema, GameSaveProducerJobSchema),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
+		stashes: z.record(IdSchema, GameSaveStashStateSchema),
 		scheduledEvents: z.record(IdSchema, GameSaveScheduledEventSchema),
 	})
 	.strict()
@@ -123,5 +150,6 @@ export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
+export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
 export type GameSaveScheduledEvent = z.infer<typeof GameSaveScheduledEventSchema>;
 export type GameSave = z.infer<typeof GameSaveSchema>;

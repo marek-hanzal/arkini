@@ -2,14 +2,12 @@ import { Effect } from "effect";
 import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 import { rollGameQuantityFx } from "~/v0/game/engine/fx/rollGameQuantityFx";
 import { rollWeightedLootTableEntryFx } from "~/v0/game/engine/fx/rollWeightedLootTableEntryFx";
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameLootTable } from "~/v0/game/engine/model/GameLootTable";
 import type { LootTableRollResult } from "~/v0/game/engine/model/LootTableRollResult";
-
-type LootTable = GameConfig["lootTables"][string];
 
 export namespace rollLootTableItemsFx {
 	export interface Props {
-		lootTable: LootTable;
+		lootTable: GameLootTable;
 	}
 }
 

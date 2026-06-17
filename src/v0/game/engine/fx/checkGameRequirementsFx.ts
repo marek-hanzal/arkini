@@ -3,15 +3,14 @@ import { match } from "ts-pattern";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { countPassiveItemQuantityFx } from "~/v0/game/engine/fx/countPassiveItemQuantityFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import type { GameRequirement } from "~/v0/game/engine/model/GameRequirement";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-
-type Requirements = GameConfig["producers"][string]["requirements"];
 
 export namespace checkGameRequirementsFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		requirements: Requirements;
+		requirements: readonly GameRequirement[];
 	}
 }
 

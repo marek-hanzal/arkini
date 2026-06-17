@@ -2629,7 +2629,145 @@
 	},
 	"producers": {
 		"producer:coal-mine-1": {
-			"cooldownMs": 5200,
+			"productIds": [
+				"product:coal-mine-1"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:lumber-camp-1": {
+			"productIds": [
+				"product:lumber-camp-1"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:lumber-camp-2": {
+			"productIds": [
+				"product:lumber-camp-2"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:lumber-camp-3": {
+			"productIds": [
+				"product:lumber-camp-3"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:lumber-camp-4": {
+			"productIds": [
+				"product:lumber-camp-4"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:lumber-camp-5": {
+			"productIds": [
+				"product:lumber-camp-5"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:quarry-1": {
+			"productIds": [
+				"product:quarry-1"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:quarry-2": {
+			"productIds": [
+				"product:quarry-2"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:quarry-3": {
+			"productIds": [
+				"product:quarry-3"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:quarry-4": {
+			"productIds": [
+				"product:quarry-4"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:quarry-5": {
+			"productIds": [
+				"product:quarry-5"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:townhall-1": {
+			"productIds": [
+				"product:townhall-1"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:townhall-2": {
+			"productIds": [
+				"product:townhall-2"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:townhall-3": {
+			"productIds": [
+				"product:townhall-3"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:townhall-4": {
+			"productIds": [
+				"product:townhall-4"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:townhall-5": {
+			"productIds": [
+				"product:townhall-5"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		},
+		"producer:tree": {
+			"productIds": [
+				"product:tree"
+			],
+			"requirements": [],
+			"trigger": "click",
+			"type": "producer"
+		}
+	},
+	"products": {
+		"product:coal-mine-1": {
+			"durationMs": 5200,
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2642,158 +2780,140 @@
 					"quantity": 1
 				}
 			],
+			"name": "Coal Mine I Production",
 			"outputTableId": "loot:coal-mine-1",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:lumber-camp-1": {
-			"cooldownMs": 5000,
+		"product:lumber-camp-1": {
+			"durationMs": 5000,
 			"inputs": [],
+			"name": "Lumber Camp I Production",
 			"outputTableId": "loot:lumber-camp-1",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:lumber-camp-2": {
-			"cooldownMs": 4500,
+		"product:lumber-camp-2": {
+			"durationMs": 4500,
 			"inputs": [],
+			"name": "Lumber Camp II Production",
 			"outputTableId": "loot:lumber-camp-2",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:lumber-camp-3": {
-			"cooldownMs": 4000,
+		"product:lumber-camp-3": {
+			"durationMs": 4000,
 			"inputs": [],
+			"name": "Lumber Camp III Production",
 			"outputTableId": "loot:lumber-camp-3",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:lumber-camp-4": {
-			"cooldownMs": 3600,
+		"product:lumber-camp-4": {
+			"durationMs": 3600,
 			"inputs": [],
+			"name": "Lumber Camp IV Production",
 			"outputTableId": "loot:lumber-camp-4",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:lumber-camp-5": {
-			"cooldownMs": 3200,
+		"product:lumber-camp-5": {
+			"durationMs": 3200,
 			"inputs": [],
+			"name": "Lumber Camp V Production",
 			"outputTableId": "loot:lumber-camp-5",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:quarry-1": {
-			"cooldownMs": 5500,
+		"product:quarry-1": {
+			"durationMs": 5500,
 			"inputs": [],
+			"name": "Quarry I Production",
 			"outputTableId": "loot:quarry-1",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:quarry-2": {
-			"cooldownMs": 5000,
+		"product:quarry-2": {
+			"durationMs": 5000,
 			"inputs": [],
+			"name": "Quarry II Production",
 			"outputTableId": "loot:quarry-2",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:quarry-3": {
-			"cooldownMs": 4500,
+		"product:quarry-3": {
+			"durationMs": 4500,
 			"inputs": [],
+			"name": "Quarry III Production",
 			"outputTableId": "loot:quarry-3",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:quarry-4": {
-			"cooldownMs": 4100,
+		"product:quarry-4": {
+			"durationMs": 4100,
 			"inputs": [],
+			"name": "Quarry IV Production",
 			"outputTableId": "loot:quarry-4",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:quarry-5": {
-			"cooldownMs": 3700,
+		"product:quarry-5": {
+			"durationMs": 3700,
 			"inputs": [],
+			"name": "Quarry V Production",
 			"outputTableId": "loot:quarry-5",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:townhall-1": {
-			"cooldownMs": 3500,
+		"product:townhall-1": {
+			"durationMs": 3500,
 			"inputs": [],
+			"name": "Town Hall I Production",
 			"outputTableId": "loot:townhall-1",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:townhall-2": {
-			"cooldownMs": 3000,
+		"product:townhall-2": {
+			"durationMs": 3000,
 			"inputs": [],
+			"name": "Town Hall II Production",
 			"outputTableId": "loot:townhall-2",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:townhall-3": {
-			"cooldownMs": 2500,
+		"product:townhall-3": {
+			"durationMs": 2500,
 			"inputs": [],
+			"name": "Town Hall III Production",
 			"outputTableId": "loot:townhall-3",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:townhall-4": {
-			"cooldownMs": 2200,
+		"product:townhall-4": {
+			"durationMs": 2200,
 			"inputs": [],
+			"name": "Town Hall IV Production",
 			"outputTableId": "loot:townhall-4",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:townhall-5": {
-			"cooldownMs": 1900,
+		"product:townhall-5": {
+			"durationMs": 1900,
 			"inputs": [],
+			"name": "Town Hall V Production",
 			"outputTableId": "loot:townhall-5",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		},
-		"producer:tree": {
-			"cooldownMs": 6200,
+		"product:tree": {
+			"durationMs": 6200,
 			"inputs": [],
+			"name": "Tree Production",
 			"outputTableId": "loot:tree",
 			"placement": "board_then_inventory",
-			"requirements": [],
-			"trigger": "click",
-			"type": "producer"
+			"requirements": []
 		}
 	},
-	"products": {},
 	"startingState": {
 		"board": [
 			{
@@ -2914,9 +3034,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
+							"productId": "product:lumber-camp-1",
 							"tableId": "loot:lumber-camp-1:better-1",
-							"type": "producer.outputTable.set"
+							"type": "product.outputTable.set"
 						}
 					]
 				},
@@ -2930,9 +3050,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
+							"productId": "product:lumber-camp-1",
 							"tableId": "loot:lumber-camp-1:better-2",
-							"type": "producer.outputTable.set"
+							"type": "product.outputTable.set"
 						}
 					]
 				}
@@ -2954,9 +3074,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -2970,9 +3090,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -2986,9 +3106,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -3002,9 +3122,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -3018,9 +3138,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				}
@@ -3042,9 +3162,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
+							"productId": "product:quarry-1",
 							"tableId": "loot:quarry-1:better-1",
-							"type": "producer.outputTable.set"
+							"type": "product.outputTable.set"
 						}
 					]
 				},
@@ -3058,9 +3178,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
+							"productId": "product:quarry-1",
 							"tableId": "loot:quarry-1:better-2",
-							"type": "producer.outputTable.set"
+							"type": "product.outputTable.set"
 						}
 					]
 				}
@@ -3082,9 +3202,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -3098,9 +3218,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -3114,9 +3234,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -3130,9 +3250,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -3146,9 +3266,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				}

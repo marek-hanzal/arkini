@@ -11,11 +11,12 @@
 		"typecheck": "tsc --noEmit",
 		"dc": "depcruise src --output-type err-long",
 		"test": "vitest run --no-color --pool=forks --maxWorkers=1 --no-file-parallelism",
-		"check": "npm run format:check && npm run dc && npm run typecheck && npm run test",
+		"check": "npm run format:check && npm run game:validate -- game/arkini && npm run dc && npm run typecheck && npm run test",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"game:compile": "tsx cli/game/compile.ts",
-		"game:validate": "tsx cli/game/validate.ts"
+		"game:validate": "tsx cli/game/validate.ts",
+		"game:validate:default": "npm run game:validate -- game/arkini"
 	},
 	"dependencies": {
 		"@paralleldrive/cuid2": "^3.3.0",

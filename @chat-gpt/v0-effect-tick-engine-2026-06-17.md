@@ -176,3 +176,20 @@ Still deliberately not done:
 - persistence/Dexie integration.
 
 Design note: empty ticks should not mutate save timestamps. Persistence should not write just because time passed and nothing happened, protože jinak si vyrobíme storage treadmill pro nic za nic.
+
+## 2026-06-17 scheduler checkpoint
+
+The tick engine now owns a persisted scheduler queue in `GameSave.scheduledEvents`. This is the intended place for "spawn now vs spawn gradually" rules so sequencing does not leak into React/UI adapters.
+
+Current implemented scheduler contract:
+
+- Scheduled events are part of save state and survive reload/offline gaps.
+- `item.spawn` scheduled events mutate save only when processed by `processScheduledGameEvents(...)` / `runGameTick(...)`.
+- Non-exclusive due events may be processed in the same tick.
+- Events with the same `exclusiveKey` are throttled to at most one processed event per tick, even if multiple entries are overdue. This prevents late browser timers from batching a sequential spawn stream into `<spawn, spawn>` after one missed tick.
+- Blocked scheduled item spawns stay pending and emit `item.spawn.blocked`.
+- `runGameTick(...)` processes scheduled events before and after job completion, so existing queued work runs first and freshly completed instant outputs can still appear in the same tick.
+- Job completion now schedules item spawns and then lets the scheduler emit `item.created`; the engine still preflights placement for product/craft completion so existing atomic blocked-completion semantics remain intact.
+- `GameEngineResult.nextWakeAtMs` is a scheduling hint for the outside orchestrator. The engine still does not own timers or call `setTimeout`.
+
+Important UI boundary: visual animation timing is still outside the engine. The scheduler describes domain timing and event emission order, not CSS/Motion animation duration. UI may still be animating event N while the engine emits event N+1; that is fine and likely desirable as long as save state remains the source of truth.

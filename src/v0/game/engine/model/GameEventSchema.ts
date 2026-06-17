@@ -4,6 +4,13 @@ const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
 
+export const GameItemCreatedReasonSchema = z.enum([
+	"product-output",
+	"craft-output",
+	"craft-requirement-return",
+	"debug",
+]);
+
 export const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
 	z
 		.object({
@@ -30,12 +37,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("item.created"),
 			itemId: IdSchema,
 			originItemInstanceId: IdSchema.optional(),
-			reason: z.enum([
-				"product-output",
-				"craft-output",
-				"craft-requirement-return",
-				"debug",
-			]),
+			reason: GameItemCreatedReasonSchema,
 			to: GameEventPlacementTargetSchema,
 		})
 		.strict(),
@@ -71,6 +73,15 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("craft.blocked"),
 			jobId: IdSchema,
 			recipeId: IdSchema,
+			reason: z.literal("placement_unavailable"),
+			blockedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("item.spawn.blocked"),
+			scheduledEventId: IdSchema,
+			itemId: IdSchema,
 			reason: z.literal("placement_unavailable"),
 			blockedAtMs: NonNegativeIntegerSchema,
 		})

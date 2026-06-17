@@ -4,4 +4,5 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 export interface GameEngineResult {
 	save: GameSave;
 	events: GameEvent[];
+	nextWakeAtMs: number | null;
 }

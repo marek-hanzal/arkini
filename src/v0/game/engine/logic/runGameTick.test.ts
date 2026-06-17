@@ -88,7 +88,7 @@ describe("runGameTick", () => {
 			game: {
 				id: "game:test",
 				inventory: {
-					slots: 0,
+					slots: 1,
 				},
 				board: {
 					height: 1,
@@ -101,6 +101,10 @@ describe("runGameTick", () => {
 			config,
 			nowMs: 0,
 		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
 		save.producerJobs["job:1"] = {
 			completesAtMs: 1000,
 			id: "job:1",

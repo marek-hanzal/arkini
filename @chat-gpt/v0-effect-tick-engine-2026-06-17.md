@@ -193,3 +193,11 @@ Current implemented scheduler contract:
 - `GameEngineResult.nextWakeAtMs` is a scheduling hint for the outside orchestrator. The engine still does not own timers or call `setTimeout`.
 
 Important UI boundary: visual animation timing is still outside the engine. The scheduler describes domain timing and event emission order, not CSS/Motion animation duration. UI may still be animating event N while the engine emits event N+1; that is fine and likely desirable as long as save state remains the source of truth.
+
+## 2026-06-17 action-entrypoint checkpoint
+
+- New engine implementation must be Effect-first. Do not add new domain engine code under `src/v0/game/engine/logic/*` as a naked pure function plus a cosmetic `Fx` wrapper.
+- `src/v0/game/engine/fx/applyGameActionFx.ts` is the action entrypoint. It currently supports `producer.product.start` and dispatches through `ts-pattern`.
+- Action rejection/config problems use the `GameEngineError` typed error channel instead of throwing exceptions.
+- `runGameTickFx` is now the tick entrypoint and is no longer just `Effect.sync(() => runGameTick(...))`. The old `logic/*` slice remains temporarily for tests/backwards compatibility, but should be migrated out as the new engine grows instead of expanded.
+- Current supported action contract: explicit producer tile + product line + input refs. Product inputs are consumed at start. Passive requirements are checked against board/inventory scopes. Stored requirements intentionally fail as unsupported until save state can represent stored requirement slots.

@@ -1,3 +1,4 @@
+export { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
 export { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
 export { createInitialGameSave } from "~/v0/game/engine/logic/createInitialGameSave";
 export { placeGameSaveItems } from "~/v0/game/engine/logic/placeGameSaveItems";
@@ -8,6 +9,7 @@ export { scheduleGameItemSpawns } from "~/v0/game/engine/logic/scheduleGameItemS
 export {
 	GameEventPlacementTargetSchema,
 	GameEventSchema,
+	GameItemConsumedReasonSchema,
 	GameItemCreatedReasonSchema,
 } from "~/v0/game/engine/model/GameEventSchema";
 export {
@@ -20,8 +22,11 @@ export {
 	GameSaveScheduledEventSchema,
 	GameSaveSchema,
 } from "~/v0/game/engine/model/GameSaveSchema";
+export type { GameAction, GameActionItemRef } from "~/v0/game/engine/model/GameActionSchema";
+export { GameActionItemRefSchema, GameActionSchema } from "~/v0/game/engine/model/GameActionSchema";
 export type { GameEvent, GameEventPlacementTarget } from "~/v0/game/engine/model/GameEventSchema";
-export type { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+export { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+export type { GameEngineError as GameEngineErrorType } from "~/v0/game/engine/model/GameEngineError";
 export type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 export type {
 	GameSave,

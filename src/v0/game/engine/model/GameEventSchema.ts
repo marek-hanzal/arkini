@@ -11,6 +11,10 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"debug",
 ]);
 
+export const GameItemConsumedReasonSchema = z.enum([
+	"product-input",
+]);
+
 export const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
 	z
 		.object({
@@ -39,6 +43,40 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			originItemInstanceId: IdSchema.optional(),
 			reason: GameItemCreatedReasonSchema,
 			to: GameEventPlacementTargetSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("item.consumed"),
+			itemId: IdSchema,
+			reason: GameItemConsumedReasonSchema,
+			from: z.discriminatedUnion("kind", [
+				z
+					.object({
+						kind: z.literal("board"),
+						itemInstanceId: IdSchema,
+					})
+					.strict(),
+				z
+					.object({
+						kind: z.literal("inventory"),
+						slotIndex: NonNegativeIntegerSchema,
+						quantity: PositiveIntegerSchema,
+						previousQuantity: PositiveIntegerSchema,
+						nextQuantity: NonNegativeIntegerSchema,
+					})
+					.strict(),
+			]),
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("product.started"),
+			jobId: IdSchema,
+			producerItemInstanceId: IdSchema,
+			productId: IdSchema,
+			startedAtMs: NonNegativeIntegerSchema,
+			completesAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
 	z

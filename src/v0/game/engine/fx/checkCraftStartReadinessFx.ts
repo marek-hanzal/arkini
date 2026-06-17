@@ -27,6 +27,25 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		);
 	}
 
+	const targetItem = save.board.items[action.targetItemInstanceId];
+	if (!targetItem) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"invalid_actor",
+				`Craft target "${action.targetItemInstanceId}" is not on the board.`,
+			),
+		);
+	}
+	const targetDefinition = config.items[targetItem.itemId];
+	if (targetDefinition?.craftRecipeId !== action.recipeId) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"invalid_actor",
+				`Item "${targetItem.itemId}" cannot start craft recipe "${action.recipeId}".`,
+			),
+		);
+	}
+
 	const requirements = yield* splitCraftRequirementsFx({
 		requirements: recipe.requirements,
 	});
@@ -53,5 +72,6 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 	return {
 		recipe,
 		requirements,
+		targetItem,
 	};
 });

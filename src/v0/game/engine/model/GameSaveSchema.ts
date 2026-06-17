@@ -35,7 +35,10 @@ export const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
 		producerItemInstanceId: IdSchema,
-		outputTableId: z.union([IdSchema, z.null()]),
+		outputTableId: z.union([
+			IdSchema,
+			z.null(),
+		]),
 		placement: z.literal("board_then_inventory").optional(),
 		productId: IdSchema,
 		startedAtMs: NonNegativeIntegerSchema,
@@ -63,6 +66,7 @@ export const GameSaveCraftJobSchema = z
 		startedAtMs: NonNegativeIntegerSchema,
 		completesAtMs: NonNegativeIntegerSchema,
 		returnItems: z.array(GameSaveCraftJobReturnItemSchema),
+		targetItemInstanceId: IdSchema,
 	})
 	.strict()
 	.refine((value) => value.completesAtMs >= value.startedAtMs, {
@@ -83,16 +87,12 @@ export const GameSaveProducerLineStateSchema = z
 		disabledProductIds: z.array(IdSchema),
 	})
 	.strict()
-	.refine(
-		(value) =>
-			new Set(value.disabledProductIds).size === value.disabledProductIds.length,
-		{
-			message: "disabledProductIds must be unique",
-			path: [
-				"disabledProductIds",
-			],
-		},
-	);
+	.refine((value) => new Set(value.disabledProductIds).size === value.disabledProductIds.length, {
+		message: "disabledProductIds must be unique",
+		path: [
+			"disabledProductIds",
+		],
+	});
 
 export const GameSaveStoredRequirementStateSchema = z
 	.object({
@@ -180,14 +180,10 @@ export type GameSaveBoardItem = z.infer<typeof GameSaveBoardItemSchema>;
 export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema>;
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
-export type GameSaveProducerLineState = z.infer<
-	typeof GameSaveProducerLineStateSchema
->;
+export type GameSaveProducerLineState = z.infer<typeof GameSaveProducerLineStateSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
-export type GameSaveStoredRequirementState = z.infer<
-	typeof GameSaveStoredRequirementStateSchema
->;
+export type GameSaveStoredRequirementState = z.infer<typeof GameSaveStoredRequirementStateSchema>;
 export type GameSaveUpgradeJob = z.infer<typeof GameSaveUpgradeJobSchema>;
 export type GameSaveUpgradeState = z.infer<typeof GameSaveUpgradeStateSchema>;
 export type GameSaveScheduledEvent = z.infer<typeof GameSaveScheduledEventSchema>;

@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
+import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -60,9 +61,10 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 		save: consumed.save,
 	});
 	delete nextSave.board.items[checked.target.id];
-	delete nextSave.stashes[checked.target.id];
-	delete nextSave.producerLines[checked.target.id];
-	delete nextSave.storedRequirements[checked.target.id];
+	removeBoardItemRuntimeState({
+		itemInstanceId: checked.target.id,
+		save: nextSave,
+	});
 	nextSave.updatedAtMs = nowMs;
 
 	return {

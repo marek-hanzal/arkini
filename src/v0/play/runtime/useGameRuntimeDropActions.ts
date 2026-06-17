@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemRef } from "~/v0/game/engine/model/GameActionItemRefSchema";
-import type { GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
+import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { useGameRuntimeStore } from "~/v0/play/runtime/GameRuntimeContext";
 
@@ -23,27 +23,46 @@ const hasMergeRule = ({
 	);
 };
 
+const productLineEnabled = ({
+	productId,
+	save,
+	targetItemInstanceId,
+}: {
+	productId: string;
+	save: GameSave;
+	targetItemInstanceId: string;
+}) => !(save.producerLines[targetItemInstanceId]?.disabledProductIds ?? []).includes(productId);
+
 const storedRequirementAcceptsItem = ({
 	config,
 	itemId,
+	save,
 	target,
 }: {
 	config: GameConfig;
 	itemId: string;
+	save: GameSave;
 	target: GameSaveBoardItem;
 }) => {
 	const targetItem = config.items[target.itemId];
 	if (!targetItem) return false;
 
+	const productRequirements = targetItem.producerId
+		? (config.producers[targetItem.producerId]?.productIds ?? []).flatMap((productId) =>
+				productLineEnabled({
+					productId,
+					save,
+					targetItemInstanceId: target.id,
+				})
+					? (config.products[productId]?.requirements ?? [])
+					: [],
+			)
+		: [];
 	const requirements = [
 		...(targetItem.producerId
 			? (config.producers[targetItem.producerId]?.requirements ?? [])
 			: []),
-		...(targetItem.producerId
-			? (config.producers[targetItem.producerId]?.productIds ?? []).flatMap(
-					(productId) => config.products[productId]?.requirements ?? [],
-				)
-			: []),
+		...productRequirements,
 		...(targetItem.stashId ? (config.stashes[targetItem.stashId]?.requirements ?? []) : []),
 	];
 
@@ -54,10 +73,12 @@ const storedRequirementAcceptsItem = ({
 
 const productIdForInput = ({
 	config,
+	save,
 	sourceItemId,
 	target,
 }: {
 	config: GameConfig;
+	save: GameSave;
 	sourceItemId: string;
 	target: GameSaveBoardItem;
 }) => {
@@ -66,8 +87,13 @@ const productIdForInput = ({
 	const producer = producerId ? config.producers[producerId] : undefined;
 	if (!producer) return undefined;
 
-	return producer.productIds.find((productId) =>
-		config.products[productId]?.inputs.some((input) => input.itemId === sourceItemId),
+	return producer.productIds.find(
+		(productId) =>
+			productLineEnabled({
+				productId,
+				save,
+				targetItemInstanceId: target.id,
+			}) && config.products[productId]?.inputs.some((input) => input.itemId === sourceItemId),
 	);
 };
 
@@ -89,12 +115,14 @@ const stashAcceptsInput = ({
 
 const dispatchApplyItemToBoardItem = ({
 	config,
+	save,
 	sourceItemId,
 	sourceRef,
 	store,
 	target,
 }: {
 	config: GameConfig;
+	save: GameSave;
 	sourceItemId: string;
 	sourceRef: GameActionItemRef;
 	store: ReturnType<typeof useGameRuntimeStore>;
@@ -127,6 +155,7 @@ const dispatchApplyItemToBoardItem = ({
 				],
 				recipeId,
 				requirementRefs: [],
+				targetItemInstanceId: target.id,
 				type: "craft.start",
 			},
 		});
@@ -134,6 +163,7 @@ const dispatchApplyItemToBoardItem = ({
 
 	const productId = productIdForInput({
 		config,
+		save,
 		sourceItemId,
 		target,
 	});
@@ -172,6 +202,7 @@ const dispatchApplyItemToBoardItem = ({
 		storedRequirementAcceptsItem({
 			config,
 			itemId: sourceItemId,
+			save,
 			target,
 		})
 	) {
@@ -218,6 +249,7 @@ export const useGameRuntimeDropActions = (): DropActions => {
 
 				return dispatchApplyItemToBoardItem({
 					config,
+					save,
 					sourceItemId: source.itemId,
 					sourceRef: {
 						kind: "board",
@@ -248,6 +280,7 @@ export const useGameRuntimeDropActions = (): DropActions => {
 
 				return dispatchApplyItemToBoardItem({
 					config,
+					save,
 					sourceItemId: source.itemId,
 					sourceRef: {
 						kind: "inventory",

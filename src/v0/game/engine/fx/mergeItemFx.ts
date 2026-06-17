@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
+import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -62,9 +63,10 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 	}
 
 	liveTarget.itemId = checked.merge.resultItemId;
-	delete nextSave.stashes[checked.target.id];
-	delete nextSave.producerLines[checked.target.id];
-	delete nextSave.storedRequirements[checked.target.id];
+	removeBoardItemRuntimeState({
+		itemInstanceId: checked.target.id,
+		save: nextSave,
+	});
 	nextSave.updatedAtMs = nowMs;
 
 	return {

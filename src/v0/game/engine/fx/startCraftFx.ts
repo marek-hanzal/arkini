@@ -64,6 +64,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 			quantity: requirement.quantity,
 		})),
 		startedAtMs: nowMs,
+		targetItemInstanceId: action.targetItemInstanceId,
 	};
 	nextSave.updatedAtMs = nowMs;
 
@@ -76,6 +77,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 				jobId,
 				recipeId: action.recipeId,
 				startedAtMs: nowMs,
+				targetItemInstanceId: action.targetItemInstanceId,
 				type: "craft.started" as const,
 			},
 		],

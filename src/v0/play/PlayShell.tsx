@@ -13,6 +13,7 @@ import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import type { Sheet } from "~/v0/play/sheet/Sheet";
 import { useFeedbackFlags } from "~/v0/play/feedback/useFeedbackFlags";
 import { UpgradesSheet } from "~/v0/upgrade/UpgradesSheet";
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import { GameRuntimeProvider, useGameRuntimeStore } from "~/v0/play/runtime";
 
 export namespace PlayShell {
@@ -20,21 +21,6 @@ export namespace PlayShell {
 }
 
 const SheetFallback: FC = () => <div className="p-4 text-sm text-slate-300">Loading sheet…</div>;
-
-const messageForError = (error: unknown) => {
-	if (error instanceof Error) return error.message;
-	if (typeof error === "string") return error;
-	if (error && typeof error === "object" && "message" in error) {
-		const message = (
-			error as {
-				message?: unknown;
-			}
-		).message;
-		if (typeof message === "string") return message;
-	}
-
-	return "Action failed.";
-};
 
 const PlayShellContent: FC = () => {
 	const queryClient = useQueryClient();
@@ -74,7 +60,7 @@ const PlayShellContent: FC = () => {
 				if (slotIndex !== undefined) feedbackFlags.pulse(`inventory:error:${slotIndex}`);
 			},
 			showError(error) {
-				setLastError(messageForError(error));
+				setLastError(toGameActionError(error).message);
 				feedbackFlags.pulse("toast:error");
 			},
 		}),

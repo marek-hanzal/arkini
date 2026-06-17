@@ -110,13 +110,14 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
-			const item = runtimeStore.getSnapshot().runtime.config.items[boardItem.itemId];
-			const producerId = item?.producerId;
-			const productId = producerId
-				? runtimeStore.getSnapshot().runtime.config.producers[producerId]?.productIds[0]
-				: undefined;
+			const productId = boardItem.activation.productLines?.find(
+				(line) => line.enabled,
+			)?.productId;
 
-			if (!productId) return;
+			if (!productId) {
+				feedback.showError("No enabled product line.");
+				return;
+			}
 
 			void runtimeStore
 				.dispatch({

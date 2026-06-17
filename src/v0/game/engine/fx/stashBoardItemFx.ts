@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
+import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import { placeGameSaveInventoryItemsFx } from "~/v0/game/engine/fx/placeGameSaveInventoryItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameActionBoardItemStashSchema } from "~/v0/game/engine/model/GameActionBoardItemStashSchema";
@@ -35,11 +36,14 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 		);
 	}
 
-	const nextSave = yield* cloneGameSaveFx({ save });
+	const nextSave = yield* cloneGameSaveFx({
+		save,
+	});
 	delete nextSave.board.items[item.id];
-	delete nextSave.stashes[item.id];
-	delete nextSave.producerLines[item.id];
-	delete nextSave.storedRequirements[item.id];
+	removeBoardItemRuntimeState({
+		itemInstanceId: item.id,
+		save: nextSave,
+	});
 
 	const placed = yield* placeGameSaveInventoryItemsFx({
 		config,
@@ -76,7 +80,9 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 			},
 			...placed.events,
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({ save: placed.save }),
+		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			save: placed.save,
+		}),
 		save: placed.save,
 	} satisfies GameEngineResult;
 });

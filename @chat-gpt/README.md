@@ -85,6 +85,92 @@ npm run check
 
 Arkini uses npm without a committed lockfile. Do not add `package-lock.json`, `bun.lockb`, or similar unless the dependency policy changes deliberately.
 
+## ZIP dependency and test bootstrap
+
+Generated ZIP handoffs intentionally do **not** include `node_modules`. Every fresh unzip starts without installed packages, because shipping dependency directories in the handoff would be barbarism with compression. Do not waste time rediscovering this when commands fail with missing `tsx`, `vitest`, `zod`, `react`, or similar.
+
+Preferred dependency bootstrap inside the unzipped repo:
+
+```bash
+npm install --no-package-lock --ignore-scripts
+```
+
+Use `--ignore-scripts` in the sandbox unless a task explicitly needs install scripts. It avoids some package postinstall nonsense and keeps the install closer to “download dependency graph” than “let packages perform interpretive dance”. The install may still timeout in this environment; if it does, do not keep retrying like a tragic slot machine. Use focused `npx -p ...` commands for the slice being validated.
+
+For game-config CLI work, the scripts are:
+
+```bash
+npm run game:validate -- game/arkini
+npm run game:compile -- game/arkini
+npm run game:validate -- game/arkini.game.json game/arkini.assets.json
+```
+
+If `node_modules` is missing and install is not available, run the same tools through temporary packages:
+
+```bash
+npx --yes -p tsx@4.22.4 -p zod@4.4.3 tsx cli/game/validate.ts game/arkini
+npx --yes -p tsx@4.22.4 -p zod@4.4.3 tsx cli/game/compile.ts game/arkini
+npx --yes -p tsx@4.22.4 -p zod@4.4.3 tsx cli/game/validate.ts game/arkini.game.json game/arkini.assets.json
+```
+
+For focused engine tests without a full install, create a tiny temporary Vitest config that only wires the `~` alias and does not load `vite.config.ts` plugins. Loading the normal Vite config pulls React/Tailwind/SQLocal plugin dependencies, which is hilarious only if your hobby is watching tools fail before tests start.
+
+```bash
+cat > /tmp/arkini-vitest.config.mjs <<'EOF'
+import { fileURLToPath } from "node:url";
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "~": fileURLToPath(new URL("./src", `file://${process.cwd()}/`)),
+    },
+  },
+  test: {
+    environment: "node",
+    globals: false,
+    pool: "forks",
+    maxWorkers: 1,
+    fileParallelism: false,
+  },
+});
+EOF
+
+npx --yes -p vitest@4.1.7 -p tsx@4.22.4 -p zod@4.4.3 -p effect@3.21.3 \
+  vitest run --no-color --config /tmp/arkini-vitest.config.mjs src/v0/game/engine
+```
+
+For a focused TypeScript check without full repo dependencies, use a temporary tsconfig that includes only the touched slice and any package needed by that slice through `npx -p`:
+
+```bash
+cat > /tmp/arkini-engine-tsconfig.json <<'EOF'
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src/v0/game/config/GameConfigSchema.ts",
+    "src/v0/game/engine/**/*.ts",
+    "cli/game/**/*.ts"
+  ]
+}
+EOF
+
+npx --yes -p typescript@6.0.3 -p zod@4.4.3 -p effect@3.21.3 \
+  tsc -p /tmp/arkini-engine-tsconfig.json --pretty false
+```
+
+When `node_modules` is present, prefer the normal project commands. The temporary `npx -p` path is a sandbox fallback, not a new development religion.
+
 
 ## Layer system
 

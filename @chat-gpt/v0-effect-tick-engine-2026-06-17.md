@@ -151,3 +151,28 @@ It also gives a clean route to validate that the engine honors the config: for e
 ## Current decision
 
 The idea is valid and fits the config migration. It should be a deliberate side-by-side runtime engine, not a hidden refactor inside components. It is now the next architectural priority before the persistence rewrite: the engine can run from `GameConfigSchema` and `startingState`, while final Dexie/SQLite decisions can wait until the `GameSave` shape is real. Tests are mandatory because this engine becomes the game’s actual law, and laws without tests are just folklore with TypeScript syntax.
+
+## 2026-06-17 implementation checkpoint
+
+First side-by-side engine slice is implemented under `src/v0/game/engine`.
+
+Added:
+
+- `GameSaveSchema` with board item instances, inventory slots/stacks, deterministic counters, RNG seed, running producer jobs and running craft jobs.
+- `GameEventSchema` with domain events for item creation, product completion/blocking and craft completion/blocking.
+- `createInitialGameSave(config, nowMs)` bootstrapping from `GameConfig.startingState`.
+- `placeGameSaveItems(...)` implementing the current `board_then_inventory` contract atomically: board tiles first, then inventory stacks/empty slots, no partial mutation on overflow.
+- deterministic LCG RNG helpers and loot-table rolling for guaranteed/chance/weighted output.
+- `runGameTick(...)` for already-running producer/craft jobs. Completed product jobs either emit output through loot tables, finish as delayed sinks when no output table exists, or stay pending with a blocked event when placement is unavailable.
+- `runGameTickFx(...)` Effect wrapper. The engine remains persistence-free and imports no database/storage/UI modules.
+- focused tests for initial save bootstrap, placement, product completion, blocked completion and sink products.
+
+Still deliberately not done:
+
+- action reducers for player intent: feed producer, start product, open stash, start craft, merge, removeBy, start upgrade.
+- readiness evaluation for product lines/stashes/craft.
+- upgrade state/effect application.
+- UI adapter from current actions to engine actions.
+- persistence/Dexie integration.
+
+Design note: empty ticks should not mutate save timestamps. Persistence should not write just because time passed and nothing happened, protože jinak si vyrobíme storage treadmill pro nic za nic.

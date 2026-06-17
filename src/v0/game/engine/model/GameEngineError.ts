@@ -10,6 +10,8 @@ export type GameEngineError =
 				| "input_unavailable"
 				| "invalid_actor"
 				| "missing_requirement"
+				| "placement_unavailable"
+				| "stash_depleted"
 				| "unsupported_requirement";
 			readonly message: string;
 	  }

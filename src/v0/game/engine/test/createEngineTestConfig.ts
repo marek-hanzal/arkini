@@ -60,6 +60,37 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tags: [],
 				tier: 1,
 			},
+			"item:key": {
+				assetId: "asset:test",
+				code: "key",
+				description: "Key",
+				maxStackSize: 3,
+				name: "Key",
+				sort: 4,
+				tags: [],
+				tier: 0,
+			},
+			"item:stash": {
+				assetId: "asset:test",
+				code: "stash",
+				description: "Stash",
+				maxStackSize: 1,
+				name: "Stash",
+				sort: 5,
+				stashId: "stash:test",
+				tags: [],
+				tier: 0,
+			},
+			"item:empty-stash": {
+				assetId: "asset:test",
+				code: "empty-stash",
+				description: "Empty stash",
+				maxStackSize: 1,
+				name: "Empty Stash",
+				sort: 6,
+				tags: [],
+				tier: 0,
+			},
 		},
 		merge: {},
 		producers: {
@@ -96,7 +127,24 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				requirements: [],
 			},
 		},
-		stashes: {},
+		stashes: {
+			"stash:test": {
+				charges: 1,
+				inputs: [
+					{
+						capacity: 1,
+						consume: true,
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+				onDepleted: "remove",
+				outputTableId: "loot:test",
+				placement: "board_then_inventory",
+				requirements: [],
+				type: "stash",
+			},
+		},
 		craftRecipes: {
 			"craft:plank": {
 				durationMs: 1000,

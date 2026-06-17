@@ -1,7 +1,9 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
-import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
+import { processScheduledBoardItemRemoveFx } from "~/v0/game/engine/fx/processScheduledBoardItemRemoveFx";
+import { processScheduledBoardItemReplaceFx } from "~/v0/game/engine/fx/processScheduledBoardItemReplaceFx";
+import { processScheduledItemSpawnFx } from "~/v0/game/engine/fx/processScheduledItemSpawnFx";
 import type { GameSave, GameSaveScheduledEvent } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace processScheduledGameEventFx {
@@ -19,39 +21,40 @@ export const processScheduledGameEventFx = Effect.fn("processScheduledGameEventF
 	scheduledEvent,
 	nowMs,
 }: processScheduledGameEventFx.Props) {
-	const placement = yield* placeGameSaveItemsFx({
-		config,
-		items: [
+	return yield* match(scheduledEvent)
+		.with(
 			{
-				itemId: scheduledEvent.itemId,
-				originItemInstanceId: scheduledEvent.originItemInstanceId,
-				quantity: scheduledEvent.quantity,
-				reason: scheduledEvent.reason,
+				type: "item.spawn",
 			},
-		],
-		nowMs,
-		save,
-	});
-
-	if (placement.type === "blocked") {
-		return {
-			event: {
-				blockedAtMs: nowMs,
-				itemId: scheduledEvent.itemId,
-				reason: "placement_unavailable" as const,
-				scheduledEventId: scheduledEvent.id,
-				type: "item.spawn.blocked" as const,
+			(itemSpawn) =>
+				processScheduledItemSpawnFx({
+					config,
+					nowMs,
+					save,
+					scheduledEvent: itemSpawn,
+				}),
+		)
+		.with(
+			{
+				type: "board.item.remove",
 			},
-			type: "blocked" as const,
-		} satisfies GameEngineCompletionResult;
-	}
-
-	delete placement.save.scheduledEvents[scheduledEvent.id];
-	placement.save.updatedAtMs = nowMs;
-
-	return {
-		events: placement.events,
-		save: placement.save,
-		type: "completed" as const,
-	} satisfies GameEngineCompletionResult;
+			(itemRemove) =>
+				processScheduledBoardItemRemoveFx({
+					nowMs,
+					save,
+					scheduledEvent: itemRemove,
+				}),
+		)
+		.with(
+			{
+				type: "board.item.replace",
+			},
+			(itemReplace) =>
+				processScheduledBoardItemReplaceFx({
+					nowMs,
+					save,
+					scheduledEvent: itemReplace,
+				}),
+		)
+		.exhaustive();
 });

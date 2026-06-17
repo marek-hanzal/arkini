@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
 import { processScheduledGameEventsFx } from "~/v0/game/engine/fx/processScheduledGameEventsFx";
+import { scheduleBoardItemRemoveFx } from "~/v0/game/engine/fx/scheduleBoardItemRemoveFx";
 import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
@@ -11,6 +12,8 @@ const runScheduled = (props: processScheduledGameEventsFx.Props) =>
 	Effect.runSync(processScheduledGameEventsFx(props));
 const runScheduleItems = (props: scheduleGameItemSpawnsFx.Props) =>
 	Effect.runSync(scheduleGameItemSpawnsFx(props));
+const runScheduleRemove = (props: scheduleBoardItemRemoveFx.Props) =>
+	Effect.runSync(scheduleBoardItemRemoveFx(props));
 
 describe("processScheduledGameEventsFx", () => {
 	it("emits every due non-exclusive scheduled spawn in one tick", () => {
@@ -138,5 +141,71 @@ describe("processScheduledGameEventsFx", () => {
 			},
 		]);
 		expect(result.save.scheduledEvents).toHaveProperty("scheduled-event:1");
+	});
+	it("waits with dependent source removal until exclusive spawns are processed", () => {
+		const config = createEngineTestConfig({
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const scheduledSpawns = runScheduleItems({
+			dueAtMs: 100,
+			exclusiveKey: "spawn-group:stash-1",
+			intervalMs: 100,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 2,
+					reason: "stash-output",
+				},
+			],
+			save,
+		});
+		runScheduleRemove({
+			afterEventIds: scheduledSpawns.eventIds,
+			dueAtMs: scheduledSpawns.lastDueAtMs,
+			itemId: "item:stash",
+			itemInstanceId: "item-instance:1",
+			reason: "stash-depleted",
+			save,
+		});
+
+		const lateTick = runScheduled({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(lateTick.events.map((event) => event.type)).toEqual([
+			"item.created",
+		]);
+		expect(lateTick.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:stash",
+		});
+		expect(Object.values(lateTick.save.scheduledEvents)).toHaveLength(2);
+
+		const nextTick = runScheduled({
+			config,
+			nowMs: 1001,
+			save: lateTick.save,
+		});
+
+		expect(nextTick.events.map((event) => event.type)).toEqual([
+			"item.created",
+			"item.removed",
+		]);
+		expect(nextTick.save.board.items).not.toHaveProperty("item-instance:1");
+		expect(nextTick.save.scheduledEvents).toEqual({});
 	});
 });

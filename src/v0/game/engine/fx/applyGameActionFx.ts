@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
+import { openStashFx } from "~/v0/game/engine/fx/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
 import { startProducerProductFx } from "~/v0/game/engine/fx/startProducerProductFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -32,6 +33,18 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(startAction) =>
 				startProducerProductFx({
 					action: startAction,
+					config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "stash.open",
+			},
+			(openAction) =>
+				openStashFx({
+					action: openAction,
 					config,
 					nowMs,
 					save,

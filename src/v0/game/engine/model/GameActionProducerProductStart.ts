@@ -1,8 +1,3 @@
-import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
+import type { GameActionProducerProductStartSchema } from "~/v0/game/engine/model/GameActionProducerProductStartSchema";
 
-export type GameActionProducerProductStart = Extract<
-	GameAction,
-	{
-		type: "producer.product.start";
-	}
->;
+export type GameActionProducerProductStart = GameActionProducerProductStartSchema.Type;

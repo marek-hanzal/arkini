@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
+import type { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
 import type { GameActionResolvedInputRef } from "~/v0/game/engine/model/GameActionResolvedInputRef";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -8,7 +8,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 export namespace resolveInputRefsFx {
 	export interface Props {
 		save: GameSave;
-		inputRefs: GameActionProducerProductStart["inputRefs"];
+		inputRefs: readonly GameActionItemRefSchema.Type[];
 	}
 }
 

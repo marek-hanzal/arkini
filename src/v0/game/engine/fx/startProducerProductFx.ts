@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { consumeProductInputsFx } from "~/v0/game/engine/fx/consumeProductInputsFx";
+import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
@@ -67,10 +67,11 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		save,
 	});
 
-	const consumed = yield* consumeProductInputsFx({
+	const consumed = yield* consumeActivationInputsFx({
 		inputRefs: action.inputRefs,
 		inputs: product.inputs,
 		nowMs,
+		reason: "product-input",
 		save,
 	});
 	const nextSave = yield* cloneGameSaveFx({

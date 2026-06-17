@@ -1,10 +1,7 @@
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameQuantity } from "~/v0/game/engine/model/GameQuantity";
 
-type LootTable = GameConfig["lootTables"][string];
-
-export type WeightedLootTableEntry = Extract<
-	LootTable["output"][number],
-	{
-		type: "weighted";
-	}
->["entries"][number];
+export interface WeightedLootTableEntry {
+	itemId: string;
+	weight: number;
+	quantity?: GameQuantity;
+}

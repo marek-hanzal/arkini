@@ -36,7 +36,7 @@ Priority order:
    - Product start/readiness rejects disabled lines with `product_line_disabled`.
    - Running producer jobs are not cancelled by toggling a line; the toggle affects future starts only.
 
-5. **Engine integration adapter, without persistence first** — DONE / CURRENT
+5. **Engine integration adapter, without persistence first** — DONE
    - Added `RuntimeGameEngineAdapter` as the first app-facing runtime boundary around `(config, save)`.
    - Loads the default compiled config by default, or accepts an injected test/config package. The engine default synthesizes resource placeholders from asset references so the runtime adapter does not drag base64 art payloads into gameplay code.
    - Bootstraps a `GameSave` from `startingState` when no save is injected.
@@ -44,14 +44,17 @@ Priority order:
    - Added `runGameEngineEffect`, a narrow engine runner that provides only `RandomServiceFx`. Do not use the app-level `runEffect` here because it currently wires SQLite/Kysely/browser storage and would make the no-persistence adapter lie through its teeth.
    - This adapter deliberately does not import Dexie, SQLite, React Query or TileEngine. Persistence and visuals wrap it later instead of leaking into game rules like some kind of architectural sewage.
 
-6. **Domain-event to visual-event bridge** — NEXT
-   - Board/TileEngine subscribes to engine results; it must not recalculate gameplay rules.
-   - Translate raw `GameEvent` values to the existing `ActionVisualEvent` / TileEngine motion request language.
-   - Keep this bridge outside the standalone engine and outside storage.
+6. **Domain-event to visual-event bridge** — IN PROGRESS / CURRENT
+   - Added the first bridge under `src/v0/play/game-engine-bridge`, intentionally outside `src/v0/game/engine` so the standalone engine does not import UI visual language.
+   - `createActionVisualEventsFromGameEvents` maps raw engine events into `ActionVisualEvent` values for board spawns, inventory quantity patches, board source merges, standalone replacements, board removals and upgrade-start state visuals.
+   - Added `createActionVisualEventsFromGameEngineResult` convenience wrapper for runtime adapter subscribers.
+   - Extended the visual event vocabulary with `inventory.quantity_changed`, because engine inventory slots are stack snapshots, not item-instance rows, and pretending every inventory delta is an item spawn would make cache patching beautifully wrong.
+   - Added `item.replaced` visual support so non-consuming directed merge/replacement events can patch board state even when there is no consumed source event to fold into `item.merged`.
+   - Current bridge is not yet wired into React/TileEngine subscription flow. Next pass should connect runtime adapter results to cache/snapshot patching and motion request registration.
 
 7. **Persistence/Dexie later**
    - Storage remains outside the engine.
    - Dexie/IndexedDB simplification follows after the engine can run in memory and after the domain-event bridge proves the shape UI actually needs.
    - Do not implement Dexie before the adapter/bridge boundary is clear, otherwise storage starts shaping gameplay state and the project wakes up with database Stockholm syndrome.
 
-Current task: item 5 is implemented; next continue into item 6, the domain-event to visual-event bridge. Dexie should wait until the runtime adapter plus visual bridge are wired enough to know the real persistence boundary.
+Current task: item 6 is partially implemented. Continue by wiring the visual bridge into the app-facing runtime subscription/cache path, then revisit whether enough UI parity exists to start Dexie. Dexie should still wait until runtime adapter plus visual bridge prove the real persistence boundary.

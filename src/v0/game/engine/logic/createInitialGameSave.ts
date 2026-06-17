@@ -58,6 +58,7 @@ export const createInitialGameSave = ({
 		rngSeed,
 		nextItemInstanceIndex,
 		nextJobIndex: 1,
+		nextScheduledEventIndex: 1,
 		board: {
 			items: boardItems,
 		},
@@ -66,6 +67,7 @@ export const createInitialGameSave = ({
 		},
 		producerJobs: {},
 		craftJobs: {},
+		scheduledEvents: {},
 	};
 };
 

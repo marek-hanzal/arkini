@@ -11,7 +11,9 @@ import {
 	placeGameSaveItems,
 	type GameSaveItemPlacementRequest,
 } from "~/v0/game/engine/logic/placeGameSaveItems";
+import { processScheduledGameEvents } from "~/v0/game/engine/logic/processScheduledGameEvents";
 import { rollLootTableItems } from "~/v0/game/engine/logic/rollLootTableItems";
+import { scheduleGameItemSpawns } from "~/v0/game/engine/logic/scheduleGameItemSpawns";
 
 export interface RunGameTickInput {
 	config: GameConfig;
@@ -22,6 +24,14 @@ export interface RunGameTickInput {
 export const runGameTick = ({ config, save, nowMs }: RunGameTickInput): GameEngineResult => {
 	let nextSave = save;
 	const events: GameEvent[] = [];
+
+	const scheduledBeforeJobs = processScheduledGameEvents({
+		config,
+		nowMs,
+		save: nextSave,
+	});
+	nextSave = scheduledBeforeJobs.save;
+	events.push(...scheduledBeforeJobs.events);
 
 	for (const job of readCompletedProducerJobs(nextSave, nowMs)) {
 		const result = completeProducerJob({
@@ -38,6 +48,14 @@ export const runGameTick = ({ config, save, nowMs }: RunGameTickInput): GameEngi
 
 		nextSave = result.save;
 		events.push(...result.events);
+
+		const scheduledAfterJob = processScheduledGameEvents({
+			config,
+			nowMs,
+			save: nextSave,
+		});
+		nextSave = scheduledAfterJob.save;
+		events.push(...scheduledAfterJob.events);
 	}
 
 	for (const job of readCompletedCraftJobs(nextSave, nowMs)) {
@@ -55,11 +73,28 @@ export const runGameTick = ({ config, save, nowMs }: RunGameTickInput): GameEngi
 
 		nextSave = result.save;
 		events.push(...result.events);
+
+		const scheduledAfterJob = processScheduledGameEvents({
+			config,
+			nowMs,
+			save: nextSave,
+		});
+		nextSave = scheduledAfterJob.save;
+		events.push(...scheduledAfterJob.events);
 	}
 
-	return {
+	const scheduledAfterJobs = processScheduledGameEvents({
+		config,
+		nowMs,
 		save: nextSave,
+	});
+	nextSave = scheduledAfterJobs.save;
+	events.push(...scheduledAfterJobs.events);
+
+	return {
 		events,
+		nextWakeAtMs: readNextWakeAtMs(nextSave),
+		save: nextSave,
 	};
 };
 
@@ -104,9 +139,9 @@ const completeProducerJob = ({
 
 	if (!liveJob) {
 		return {
-			type: "completed" as const,
-			save,
 			events: [],
+			save,
+			type: "completed" as const,
 		};
 	}
 
@@ -118,17 +153,17 @@ const completeProducerJob = ({
 		nextSave.updatedAtMs = nowMs;
 
 		return {
-			type: "completed" as const,
-			save: nextSave,
 			events: [
 				{
-					type: "product.completed" as const,
 					completedAtMs: nowMs,
 					jobId: liveJob.id,
 					producerItemInstanceId: liveJob.producerItemInstanceId,
 					productId: liveJob.productId,
+					type: "product.completed" as const,
 				},
 			],
+			save: nextSave,
+			type: "completed" as const,
 		};
 	}
 
@@ -136,29 +171,30 @@ const completeProducerJob = ({
 
 	if (!lootTable) {
 		return {
-			type: "blocked" as const,
 			event: {
-				type: "product.blocked" as const,
 				blockedAtMs: nowMs,
 				jobId: liveJob.id,
 				producerItemInstanceId: liveJob.producerItemInstanceId,
 				productId: liveJob.productId,
 				reason: "placement_unavailable" as const,
+				type: "product.blocked" as const,
 			},
+			type: "blocked" as const,
 		};
 	}
 
 	const roll = rollLootTableItems(lootTable, save.rngSeed);
-	const placement = placeGameSaveItems({
+	const placementRequests = roll.items.map(
+		(item) =>
+			({
+				...item,
+				originItemInstanceId: liveJob.producerItemInstanceId,
+				reason: "product-output",
+			}) satisfies GameSaveItemPlacementRequest,
+	);
+	const preflightPlacement = placeGameSaveItems({
 		config,
-		items: roll.items.map(
-			(item) =>
-				({
-					...item,
-					originItemInstanceId: liveJob.producerItemInstanceId,
-					reason: "product-output",
-				}) satisfies GameSaveItemPlacementRequest,
-		),
+		items: placementRequests,
 		nowMs,
 		save: {
 			...save,
@@ -166,36 +202,42 @@ const completeProducerJob = ({
 		},
 	});
 
-	if (placement.type === "blocked") {
+	if (preflightPlacement.type === "blocked") {
 		return {
-			type: "blocked" as const,
 			event: {
-				type: "product.blocked" as const,
 				blockedAtMs: nowMs,
 				jobId: liveJob.id,
 				producerItemInstanceId: liveJob.producerItemInstanceId,
 				productId: liveJob.productId,
 				reason: "placement_unavailable" as const,
+				type: "product.blocked" as const,
 			},
+			type: "blocked" as const,
 		};
 	}
 
-	delete placement.save.producerJobs[liveJob.id];
-	placement.save.updatedAtMs = nowMs;
+	const nextSave = cloneGameSave(save);
+	nextSave.rngSeed = roll.seed;
+	delete nextSave.producerJobs[liveJob.id];
+	scheduleGameItemSpawns({
+		dueAtMs: nowMs,
+		items: placementRequests,
+		save: nextSave,
+	});
+	nextSave.updatedAtMs = nowMs;
 
 	return {
-		type: "completed" as const,
-		save: placement.save,
 		events: [
 			{
-				type: "product.completed" as const,
 				completedAtMs: nowMs,
 				jobId: liveJob.id,
 				producerItemInstanceId: liveJob.producerItemInstanceId,
 				productId: liveJob.productId,
+				type: "product.completed" as const,
 			},
-			...placement.events,
 		],
+		save: nextSave,
+		type: "completed" as const,
 	};
 };
 
@@ -214,9 +256,9 @@ const completeCraftJob = ({
 
 	if (!liveJob) {
 		return {
-			type: "completed" as const,
-			save,
 			events: [],
+			save,
+			type: "completed" as const,
 		};
 	}
 
@@ -224,14 +266,14 @@ const completeCraftJob = ({
 
 	if (!recipe) {
 		return {
-			type: "blocked" as const,
 			event: {
-				type: "craft.blocked" as const,
 				blockedAtMs: nowMs,
 				jobId: liveJob.id,
 				reason: "placement_unavailable" as const,
 				recipeId: liveJob.recipeId,
+				type: "craft.blocked" as const,
 			},
+			type: "blocked" as const,
 		};
 	}
 
@@ -249,40 +291,59 @@ const completeCraftJob = ({
 			reason: "craft-output",
 		},
 	];
-	const placement = placeGameSaveItems({
+	const preflightPlacement = placeGameSaveItems({
 		config,
 		items: placementRequests,
 		nowMs,
 		save,
 	});
 
-	if (placement.type === "blocked") {
+	if (preflightPlacement.type === "blocked") {
 		return {
-			type: "blocked" as const,
 			event: {
-				type: "craft.blocked" as const,
 				blockedAtMs: nowMs,
 				jobId: liveJob.id,
 				reason: "placement_unavailable" as const,
 				recipeId: liveJob.recipeId,
+				type: "craft.blocked" as const,
 			},
+			type: "blocked" as const,
 		};
 	}
 
-	delete placement.save.craftJobs[liveJob.id];
-	placement.save.updatedAtMs = nowMs;
+	const nextSave = cloneGameSave(save);
+	delete nextSave.craftJobs[liveJob.id];
+	scheduleGameItemSpawns({
+		dueAtMs: nowMs,
+		items: placementRequests,
+		save: nextSave,
+	});
+	nextSave.updatedAtMs = nowMs;
 
 	return {
-		type: "completed" as const,
-		save: placement.save,
 		events: [
 			{
-				type: "craft.completed" as const,
 				completedAtMs: nowMs,
 				jobId: liveJob.id,
 				recipeId: liveJob.recipeId,
+				type: "craft.completed" as const,
 			},
-			...placement.events,
 		],
+		save: nextSave,
+		type: "completed" as const,
 	};
+};
+
+const readNextWakeAtMs = (save: GameSave): number | null => {
+	const wakeTimes = [
+		...Object.values(save.scheduledEvents).map((event) => event.dueAtMs),
+		...Object.values(save.producerJobs).map((job) => job.completesAtMs),
+		...Object.values(save.craftJobs).map((job) => job.completesAtMs),
+	];
+
+	if (wakeTimes.length === 0) {
+		return null;
+	}
+
+	return Math.min(...wakeTimes);
 };

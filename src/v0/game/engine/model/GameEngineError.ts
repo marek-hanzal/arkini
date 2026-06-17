@@ -16,6 +16,10 @@ export type GameEngineError =
 	| {
 			readonly _tag: "GameConfigReferenceMissing";
 			readonly message: string;
+	  }
+	| {
+			readonly _tag: "GameSaveInvalid";
+			readonly message: string;
 	  };
 
 export const GameEngineError = {
@@ -43,6 +47,12 @@ export const GameEngineError = {
 	configReferenceMissing(message: string): GameEngineError {
 		return {
 			_tag: "GameConfigReferenceMissing",
+			message,
+		};
+	},
+	saveInvalid(message: string): GameEngineError {
+		return {
+			_tag: "GameSaveInvalid",
 			message,
 		};
 	},

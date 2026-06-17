@@ -1,12 +1,19 @@
+import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { BoardCell } from "~/v0/game/engine/model/BoardCell";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
-export interface BoardCell {
-	x: number;
-	y: number;
+export namespace findFirstEmptyBoardCellFx {
+	export interface Props {
+		config: GameConfig;
+		save: GameSave;
+	}
 }
 
-export const findFirstEmptyBoardCell = (config: GameConfig, save: GameSave): BoardCell | null => {
+export const findFirstEmptyBoardCellFx = Effect.fn("findFirstEmptyBoardCellFx")(function* ({
+	config,
+	save,
+}: findFirstEmptyBoardCellFx.Props) {
 	const occupiedCells = new Set(
 		Object.values(save.board.items).map((item) => `${item.x}:${item.y}`),
 	);
@@ -17,10 +24,10 @@ export const findFirstEmptyBoardCell = (config: GameConfig, save: GameSave): Boa
 				return {
 					x,
 					y,
-				};
+				} satisfies BoardCell;
 			}
 		}
 	}
 
 	return null;
-};
+});

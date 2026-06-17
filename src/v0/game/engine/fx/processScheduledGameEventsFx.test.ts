@@ -1,17 +1,25 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createInitialGameSave } from "~/v0/game/engine/logic/createInitialGameSave";
-import { processScheduledGameEvents } from "~/v0/game/engine/logic/processScheduledGameEvents";
-import { scheduleGameItemSpawns } from "~/v0/game/engine/logic/scheduleGameItemSpawns";
-import { createEngineTestConfig } from "~/v0/game/engine/logic/testGameConfig";
+import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { processScheduledGameEventsFx } from "~/v0/game/engine/fx/processScheduledGameEventsFx";
+import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
-describe("processScheduledGameEvents", () => {
+const runInitialSave = (props: createInitialGameSaveFx.Props) =>
+	Effect.runSync(createInitialGameSaveFx(props));
+const runScheduled = (props: processScheduledGameEventsFx.Props) =>
+	Effect.runSync(processScheduledGameEventsFx(props));
+const runScheduleItems = (props: scheduleGameItemSpawnsFx.Props) =>
+	Effect.runSync(scheduleGameItemSpawnsFx(props));
+
+describe("processScheduledGameEventsFx", () => {
 	it("emits every due non-exclusive scheduled spawn in one tick", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
-		scheduleGameItemSpawns({
+		runScheduleItems({
 			dueAtMs: 100,
 			items: [
 				{
@@ -23,7 +31,7 @@ describe("processScheduledGameEvents", () => {
 			save,
 		});
 
-		const result = processScheduledGameEvents({
+		const result = runScheduled({
 			config,
 			nowMs: 250,
 			save,
@@ -39,11 +47,11 @@ describe("processScheduledGameEvents", () => {
 
 	it("emits at most one due event per exclusive key in one tick", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
-		scheduleGameItemSpawns({
+		runScheduleItems({
 			dueAtMs: 100,
 			exclusiveKey: "spawn-group:stash-1",
 			intervalMs: 100,
@@ -57,7 +65,7 @@ describe("processScheduledGameEvents", () => {
 			save,
 		});
 
-		const lateTick = processScheduledGameEvents({
+		const lateTick = runScheduled({
 			config,
 			nowMs: 1000,
 			save,
@@ -70,7 +78,7 @@ describe("processScheduledGameEvents", () => {
 		});
 		expect(Object.values(lateTick.save.scheduledEvents)).toHaveLength(2);
 
-		const nextTick = processScheduledGameEvents({
+		const nextTick = runScheduled({
 			config,
 			nowMs: 1001,
 			save: lateTick.save,
@@ -94,7 +102,7 @@ describe("processScheduledGameEvents", () => {
 				title: "Test",
 			},
 		});
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -102,7 +110,7 @@ describe("processScheduledGameEvents", () => {
 			itemId: "item:twig",
 			quantity: 3,
 		};
-		scheduleGameItemSpawns({
+		runScheduleItems({
 			dueAtMs: 100,
 			items: [
 				{
@@ -114,7 +122,7 @@ describe("processScheduledGameEvents", () => {
 			save,
 		});
 
-		const result = processScheduledGameEvents({
+		const result = runScheduled({
 			config,
 			nowMs: 100,
 			save,

@@ -1,11 +1,10 @@
 export { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
+export { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+export { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+export { processScheduledGameEventsFx } from "~/v0/game/engine/fx/processScheduledGameEventsFx";
+export { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
 export { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
-export { createInitialGameSave } from "~/v0/game/engine/logic/createInitialGameSave";
-export { placeGameSaveItems } from "~/v0/game/engine/logic/placeGameSaveItems";
-export { processScheduledGameEvents } from "~/v0/game/engine/logic/processScheduledGameEvents";
-export { rollLootTableItems } from "~/v0/game/engine/logic/rollLootTableItems";
-export { runGameTick } from "~/v0/game/engine/logic/runGameTick";
-export { scheduleGameItemSpawns } from "~/v0/game/engine/logic/scheduleGameItemSpawns";
+export { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 export {
 	GameEventPlacementTargetSchema,
 	GameEventSchema,

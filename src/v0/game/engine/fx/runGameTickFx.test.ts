@@ -1,12 +1,20 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createInitialGameSave } from "~/v0/game/engine/logic/createInitialGameSave";
-import { runGameTick } from "~/v0/game/engine/logic/runGameTick";
-import { createEngineTestConfig } from "~/v0/game/engine/logic/testGameConfig";
+import { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
+import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
+import { withRandomService } from "~/v0/random/logic/withRandomService";
 
-describe("runGameTick", () => {
+const runInitialSave = (props: createInitialGameSaveFx.Props) =>
+	Effect.runSync(createInitialGameSaveFx(props));
+const runTick = (props: runGameTickFx.Props) =>
+	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
+
+describe("runGameTickFx", () => {
 	it("ignores unfinished jobs", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -18,7 +26,7 @@ describe("runGameTick", () => {
 			startedAtMs: 0,
 		};
 
-		const result = runGameTick({
+		const result = runTick({
 			config,
 			nowMs: 999,
 			save,
@@ -30,7 +38,7 @@ describe("runGameTick", () => {
 
 	it("completes product jobs and places output board first, then inventory", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -42,7 +50,7 @@ describe("runGameTick", () => {
 			startedAtMs: 0,
 		};
 
-		const result = runGameTick({
+		const result = runTick({
 			config,
 			nowMs: 1000,
 			save,
@@ -97,7 +105,7 @@ describe("runGameTick", () => {
 				title: "Test",
 			},
 		});
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -113,7 +121,7 @@ describe("runGameTick", () => {
 			startedAtMs: 0,
 		};
 
-		const result = runGameTick({
+		const result = runTick({
 			config,
 			nowMs: 1000,
 			save,
@@ -134,7 +142,7 @@ describe("runGameTick", () => {
 
 	it("completes craft jobs only when requirement returns and result can be placed", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -151,7 +159,7 @@ describe("runGameTick", () => {
 			startedAtMs: 0,
 		};
 
-		const result = runGameTick({
+		const result = runTick({
 			config,
 			nowMs: 1000,
 			save,
@@ -192,7 +200,7 @@ describe("runGameTick", () => {
 
 	it("completes delayed sink products without output", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -204,7 +212,7 @@ describe("runGameTick", () => {
 			startedAtMs: 0,
 		};
 
-		const result = runGameTick({
+		const result = runTick({
 			config,
 			nowMs: 1000,
 			save,

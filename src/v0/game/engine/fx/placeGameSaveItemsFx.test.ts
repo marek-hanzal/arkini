@@ -1,17 +1,23 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createInitialGameSave } from "~/v0/game/engine/logic/createInitialGameSave";
-import { placeGameSaveItems } from "~/v0/game/engine/logic/placeGameSaveItems";
-import { createEngineTestConfig } from "~/v0/game/engine/logic/testGameConfig";
+import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
-describe("placeGameSaveItems", () => {
+const runInitialSave = (props: createInitialGameSaveFx.Props) =>
+	Effect.runSync(createInitialGameSaveFx(props));
+const runPlacement = (props: placeGameSaveItemsFx.Props) =>
+	Effect.runSync(placeGameSaveItemsFx(props));
+
+describe("placeGameSaveItemsFx", () => {
 	it("places loose board tiles first and stacks the remainder in inventory", () => {
 		const config = createEngineTestConfig();
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
 
-		const result = placeGameSaveItems({
+		const result = runPlacement({
 			config,
 			items: [
 				{
@@ -78,7 +84,7 @@ describe("placeGameSaveItems", () => {
 				title: "Test",
 			},
 		});
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
@@ -87,7 +93,7 @@ describe("placeGameSaveItems", () => {
 			quantity: 3,
 		};
 
-		const result = placeGameSaveItems({
+		const result = runPlacement({
 			config,
 			items: [
 				{

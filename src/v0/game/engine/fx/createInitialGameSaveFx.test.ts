@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { parseGameConfig, type GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { createInitialGameSave } from "~/v0/game/engine/logic/createInitialGameSave";
+import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
 
 const createConfig = (overrides: Partial<GameConfig> = {}) =>
 	parseGameConfig({
@@ -106,9 +107,12 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 		...overrides,
 	});
 
-describe("createInitialGameSave", () => {
+const runInitialSave = (props: createInitialGameSaveFx.Props) =>
+	Effect.runSync(createInitialGameSaveFx(props));
+
+describe("createInitialGameSaveFx", () => {
 	it("bootstraps board item instances and inventory stacks from startingState", () => {
-		const save = createInitialGameSave({
+		const save = runInitialSave({
 			config: createConfig(),
 			nowMs: 100,
 		});
@@ -141,7 +145,7 @@ describe("createInitialGameSave", () => {
 		]);
 	});
 
-	it("rejects duplicate starting board cells before they become spooky runtime bugs", () => {
+	it("rejects duplicate starting board cells through the Effect error channel", () => {
 		const config = createConfig({
 			startingState: {
 				board: [
@@ -160,11 +164,21 @@ describe("createInitialGameSave", () => {
 			},
 		});
 
-		expect(() =>
-			createInitialGameSave({
-				config,
-				nowMs: 0,
-			}),
-		).toThrow('Duplicate starting board cell "0:0".');
+		const result = Effect.runSync(
+			Effect.either(
+				createInitialGameSaveFx({
+					config,
+					nowMs: 0,
+				}),
+			),
+		);
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameSaveInvalid",
+				message: 'Duplicate starting board cell "0:0".',
+			});
+		}
 	});
 });

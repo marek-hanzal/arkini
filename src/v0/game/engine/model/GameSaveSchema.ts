@@ -35,7 +35,7 @@ export const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
 		producerItemInstanceId: IdSchema,
-		outputTableId: IdSchema.optional(),
+		outputTableId: z.union([IdSchema, z.null()]),
 		placement: z.literal("board_then_inventory").optional(),
 		productId: IdSchema,
 		startedAtMs: NonNegativeIntegerSchema,
@@ -75,6 +75,12 @@ export const GameSaveCraftJobSchema = z
 export const GameSaveStashStateSchema = z
 	.object({
 		remainingCharges: NonNegativeIntegerSchema,
+	})
+	.strict();
+
+export const GameSaveStoredRequirementStateSchema = z
+	.object({
+		items: z.record(IdSchema, NonNegativeIntegerSchema),
 	})
 	.strict();
 
@@ -142,6 +148,7 @@ export const GameSaveSchema = z
 		upgradeJobs: z.record(IdSchema, GameSaveUpgradeJobSchema),
 		upgrades: z.record(IdSchema, GameSaveUpgradeStateSchema),
 		stashes: z.record(IdSchema, GameSaveStashStateSchema),
+		storedRequirements: z.record(IdSchema, GameSaveStoredRequirementStateSchema),
 		scheduledEvents: z.record(IdSchema, GameSaveScheduledEventSchema),
 	})
 	.strict()
@@ -158,6 +165,9 @@ export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
+export type GameSaveStoredRequirementState = z.infer<
+	typeof GameSaveStoredRequirementStateSchema
+>;
 export type GameSaveUpgradeJob = z.infer<typeof GameSaveUpgradeJobSchema>;
 export type GameSaveUpgradeState = z.infer<typeof GameSaveUpgradeStateSchema>;
 export type GameSaveScheduledEvent = z.infer<typeof GameSaveScheduledEventSchema>;

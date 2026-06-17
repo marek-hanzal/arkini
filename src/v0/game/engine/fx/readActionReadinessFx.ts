@@ -6,6 +6,8 @@ import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartR
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
+import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementStoreReadinessFx";
+import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementWithdrawReadinessFx";
 import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
 import { checkUpgradeStartReadinessFx } from "~/v0/game/engine/fx/checkUpgradeStartReadinessFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
@@ -76,6 +78,28 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				(openAction) =>
 					checkStashOpenReadinessFx({
 						action: openAction,
+						config: gameConfig.config,
+						save,
+					}),
+			)
+			.with(
+				{
+					type: "stored_requirement.store",
+				},
+				(storeAction) =>
+					checkStoredRequirementStoreReadinessFx({
+						action: storeAction,
+						config: gameConfig.config,
+						save,
+					}),
+			)
+			.with(
+				{
+					type: "stored_requirement.withdraw",
+				},
+				(withdrawAction) =>
+					checkStoredRequirementWithdrawReadinessFx({
+						action: withdrawAction,
 						config: gameConfig.config,
 						save,
 					}),

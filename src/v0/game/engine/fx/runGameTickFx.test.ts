@@ -21,6 +21,8 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			completesAtMs: 1000,
 			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startedAtMs: 0,
@@ -45,6 +47,8 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			completesAtMs: 1000,
 			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startedAtMs: 0,
@@ -116,6 +120,8 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			completesAtMs: 1000,
 			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startedAtMs: 0,
@@ -207,6 +213,8 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			completesAtMs: 1000,
 			id: "job:1",
+			outputTableId: null,
+			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:shred",
 			startedAtMs: 0,

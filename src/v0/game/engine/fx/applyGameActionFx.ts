@@ -9,6 +9,8 @@ import { removeTileFx } from "~/v0/game/engine/fx/removeTileFx";
 import { startCraftFx } from "~/v0/game/engine/fx/startCraftFx";
 import { startProducerProductFx } from "~/v0/game/engine/fx/startProducerProductFx";
 import { startUpgradeFx } from "~/v0/game/engine/fx/startUpgradeFx";
+import { storeStoredRequirementFx } from "~/v0/game/engine/fx/storeStoredRequirementFx";
+import { withdrawStoredRequirementFx } from "~/v0/game/engine/fx/withdrawStoredRequirementFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -86,6 +88,30 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(openAction) =>
 				openStashFx({
 					action: openAction,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "stored_requirement.store",
+			},
+			(storeAction) =>
+				storeStoredRequirementFx({
+					action: storeAction,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "stored_requirement.withdraw",
+			},
+			(withdrawAction) =>
+				withdrawStoredRequirementFx({
+					action: withdrawAction,
 					config: gameConfig.config,
 					nowMs,
 					save,

@@ -14,16 +14,19 @@ Priority order:
    - Readiness reuses focused validation Fx used by `applyGameActionFx`.
    - UI must use this boundary instead of inventing parallel action availability rules.
 
-2. **Upgrade runtime support** — IN PROGRESS / CURRENT
+2. **Upgrade runtime support** — DONE / FOLLOW-UP
    - Upgrade actions/jobs live in the tick engine.
    - Config stays immutable; save stores completed/in-progress upgrade state.
    - Runtime config mutation uses `GameConfigLayer`: base `GameConfig` + derived layer from save -> effective config service.
    - Entry points build/provide `GameConfigFx` so downstream Fx read effective config and do not care whether a value came from base config or upgrade patch.
    - Persist only minimal upgrade state (`completedTiers`, jobs), not the derived full layer; rebuild layer from config + save on each engine call.
+   - Follow-up hygiene done in the stored requirements pass: producer jobs now snapshot missing `outputTableId` as explicit `null`, so delayed sink jobs cannot accidentally see a future upgraded output table.
 
-3. **Stored requirements save model**
-   - Stored requirements exist in config and craft currently reserves/returns them for jobs.
-   - Producer/stash stored requirement slots need a real save representation before UI integration.
+3. **Stored requirements save model** — IN PROGRESS / CURRENT
+   - Added `save.storedRequirements[targetItemInstanceId].items[itemId] = quantity` as the runtime home for long-lived producer/stash stored requirement slots.
+   - Added generic `stored_requirement.store` and `stored_requirement.withdraw` engine actions.
+   - Producer/stash readiness now evaluates stored requirements from the concrete target board item instance, not from global inventory or config wishful thinking, the worst database known to humankind.
+   - Added regression coverage for producer stored requirements, missing stored requirements, withdraw flow and stash stored requirements.
 
 4. **Product line enable/disable runtime state**
    - This is save state, not config.
@@ -42,4 +45,4 @@ Priority order:
    - Storage remains outside the engine.
    - Dexie/IndexedDB simplification follows after the engine can run in memory.
 
-Current task: finish item 2 and keep `GameConfigLayer` hidden behind `GameConfigFx` service so engine internals read effective config, not ad-hoc upgrade resolvers.
+Current task: finish item 3 by validating stored requirement actions, then continue into product line enable/disable runtime state.

@@ -1,6 +1,6 @@
 # Audit domain Effect boundaries
 
-Status: IN_PROGRESS
+Status: DONE
 
 ## Goal
 
@@ -47,3 +47,10 @@ Remaining audit should look for larger hook-side orchestration, especially mutat
 - Added focused tests for the new drop action resolvers and activation depletion follow-up.
 
 Remaining audit should continue with larger mutation/cache orchestration only if it shows real duplicated policy. Do not peel every adapter into ceremonial abstractions; the boundary goal is domain clarity, not file cosplay.
+
+## 2026-06-17 final slice
+
+- Moved optimistic board merge visual-event creation out of the cache patcher into `resolveOptimisticBoardMergeVisualEvent`, so the cache layer no longer resolves manifest merge rules directly.
+- Moved inventory statefulness detection from cache helpers into `inventory/logic/isStatefulInventoryState`.
+- Final audit found the remaining mutation hooks are mostly thin React Query shells: run Fx, apply optimistic cache patch where needed, restore snapshot on error, and apply action-result visual events on success. Larger DB/domain decisions stay in Fx roots or focused pure helpers.
+- Marked the task done; future work should only extract new helpers when real duplicated policy appears, not because adapter glue exists and offends somebody's architecture cosplay budget.

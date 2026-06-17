@@ -380,6 +380,20 @@ describe("applyGameActionFx", () => {
 	it("starts craft jobs by consuming inputs and reserving stored requirements", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					assetId: "asset:test",
+					code: "craft-table",
+					craftRecipeId: "craft:plank",
+					description: "Craft table",
+					maxStackSize: 1,
+					name: "Craft Table",
+					sort: 8,
+					tags: [],
+					tier: 0,
+				},
+			},
 			craftRecipes: {
 				...baseConfig.craftRecipes,
 				"craft:plank": {
@@ -402,7 +416,13 @@ describe("applyGameActionFx", () => {
 				},
 			},
 			startingState: {
-				board: [],
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
 				inventory: [
 					{
 						itemId: "item:twig",
@@ -430,6 +450,7 @@ describe("applyGameActionFx", () => {
 					},
 				],
 				recipeId: "craft:plank",
+				targetItemInstanceId: "item-instance:1",
 				requirementRefs: [
 					{
 						kind: "inventory",
@@ -451,6 +472,7 @@ describe("applyGameActionFx", () => {
 		expect(result.save.craftJobs["job:1"]).toMatchObject({
 			completesAtMs: 1100,
 			recipeId: "craft:plank",
+			targetItemInstanceId: "item-instance:1",
 			returnItems: [
 				{
 					itemId: "item:axe",
@@ -475,6 +497,7 @@ describe("applyGameActionFx", () => {
 			},
 			{
 				completesAtMs: 1100,
+				targetItemInstanceId: "item-instance:1",
 				type: "craft.started",
 			},
 		]);
@@ -794,7 +817,6 @@ describe("applyGameActionFx", () => {
 			]),
 		);
 	});
-
 
 	it("stores disabled producer product lines in save state", () => {
 		const config = createEngineTestConfig();

@@ -95,7 +95,6 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
-
 	it("completes already running producer jobs even when the product line is later disabled", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -196,6 +195,7 @@ describe("runGameTickFx", () => {
 			completesAtMs: 1000,
 			id: "job:craft",
 			recipeId: "craft:plank",
+			targetItemInstanceId: "item-instance:1",
 			returnItems: [
 				{
 					itemId: "item:twig",
@@ -223,6 +223,7 @@ describe("runGameTickFx", () => {
 			{
 				jobId: "job:craft",
 				recipeId: "craft:plank",
+				targetItemInstanceId: "item-instance:1",
 				type: "craft.completed",
 			},
 			{

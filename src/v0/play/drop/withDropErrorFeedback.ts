@@ -1,3 +1,4 @@
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 
 export namespace withDropErrorFeedback {
@@ -13,7 +14,8 @@ export const withDropErrorFeedback =
 		try {
 			await commit();
 		} catch (error) {
-			feedback.showError(error);
-			throw error;
+			const actionError = toGameActionError(error);
+			feedback.showError(actionError);
+			throw actionError;
 		}
 	};

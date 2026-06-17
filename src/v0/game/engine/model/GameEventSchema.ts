@@ -164,6 +164,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("craft.started"),
 			jobId: IdSchema,
 			recipeId: IdSchema,
+			targetItemInstanceId: IdSchema,
 			startedAtMs: NonNegativeIntegerSchema,
 			completesAtMs: NonNegativeIntegerSchema,
 		})
@@ -218,6 +219,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("craft.completed"),
 			jobId: IdSchema,
 			recipeId: IdSchema,
+			targetItemInstanceId: IdSchema,
 			completedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
@@ -226,6 +228,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("craft.blocked"),
 			jobId: IdSchema,
 			recipeId: IdSchema,
+			targetItemInstanceId: IdSchema,
 			reason: z.literal("placement_unavailable"),
 			blockedAtMs: NonNegativeIntegerSchema,
 		})

@@ -8,6 +8,7 @@ import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSch
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
+import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
 export namespace readRuntimeBoardViewFromGameSave {
 	export interface Props {
@@ -120,13 +121,105 @@ const activationRequirements = ({
 				}),
 	);
 
+const productLineEnabled = ({
+	productId,
+	save,
+	targetItemInstanceId,
+}: {
+	productId: string;
+	save: GameSave;
+	targetItemInstanceId: string;
+}) => !(save.producerLines[targetItemInstanceId]?.disabledProductIds ?? []).includes(productId);
+
+const readProductLineViews = ({
+	config,
+	nowMs,
+	productIds,
+	save,
+	targetItemInstanceId,
+}: {
+	config: GameConfig;
+	nowMs: number;
+	productIds: readonly string[];
+	save: GameSave;
+	targetItemInstanceId: string;
+}): ProducerProductLineView[] =>
+	productIds.flatMap((productId) => {
+		const product = config.products[productId];
+		if (!product) return [];
+
+		const jobs = Object.values(save.producerJobs)
+			.filter(
+				(job) =>
+					job.producerItemInstanceId === targetItemInstanceId &&
+					job.productId === productId,
+			)
+			.sort(
+				(left, right) =>
+					left.startedAtMs - right.startedAtMs || left.id.localeCompare(right.id),
+			);
+		const activeJob = jobs.find((job) => job.completesAtMs > nowMs) ?? jobs[0];
+		const progress = activeJob
+			? Math.max(
+					0,
+					Math.min(
+						1,
+						(nowMs - activeJob.startedAtMs) /
+							Math.max(1, activeJob.completesAtMs - activeJob.startedAtMs),
+					),
+				)
+			: undefined;
+
+		return [
+			{
+				durationMs: product.durationMs,
+				enabled: productLineEnabled({
+					productId,
+					save,
+					targetItemInstanceId,
+				}),
+				inProgress: jobs.length > 0,
+				inputItemIds: product.inputs.map((input) => input.itemId as ItemId),
+				name: product.name,
+				outputTableId: product.outputTableId,
+				productId,
+				progress,
+				queuedJobs: jobs.length,
+				readyAtMs: activeJob?.completesAtMs,
+				requirementItemIds: product.requirements.map(
+					(requirement) => requirement.itemId as ItemId,
+				),
+				startedAtMs: activeJob?.startedAtMs,
+			},
+		];
+	});
+
+const activeProductId = ({
+	productIds,
+	save,
+	targetItemInstanceId,
+}: {
+	productIds: readonly string[];
+	save: GameSave;
+	targetItemInstanceId: string;
+}) =>
+	productIds.find((productId) =>
+		productLineEnabled({
+			productId,
+			save,
+			targetItemInstanceId,
+		}),
+	) ?? productIds[0];
+
 const readRuntimeActivationView = ({
 	boardItem,
 	config,
+	nowMs,
 	save,
 }: {
 	boardItem: GameSaveBoardItem;
 	config: GameConfig;
+	nowMs: number;
 	save: GameSave;
 }): ActivationView | undefined => {
 	const item = config.items[boardItem.itemId];
@@ -158,12 +251,16 @@ const readRuntimeActivationView = ({
 	if (item.producerId) {
 		const producer = config.producers[item.producerId];
 		if (!producer) return undefined;
-		const primaryProductId = producer.productIds[0];
-		const primaryProduct = primaryProductId ? config.products[primaryProductId] : undefined;
+		const selectedProductId = activeProductId({
+			productIds: producer.productIds,
+			save,
+			targetItemInstanceId: boardItem.id,
+		});
+		const selectedProduct = selectedProductId ? config.products[selectedProductId] : undefined;
 
 		return {
 			inputs:
-				primaryProduct?.inputs.map((input) =>
+				selectedProduct?.inputs.map((input) =>
 					inputView({
 						input,
 						save,
@@ -171,15 +268,22 @@ const readRuntimeActivationView = ({
 					}),
 				) ?? [],
 			kind: "producer",
+			productLines: readProductLineViews({
+				config,
+				nowMs,
+				productIds: producer.productIds,
+				save,
+				targetItemInstanceId: boardItem.id,
+			}),
 			requirements: [
 				...activationRequirements({
 					requirements: producer.requirements,
 					save,
 					targetItemInstanceId: boardItem.id,
 				}),
-				...(primaryProduct
+				...(selectedProduct
 					? activationRequirements({
-							requirements: primaryProduct.requirements,
+							requirements: selectedProduct.requirements,
 							save,
 							targetItemInstanceId: boardItem.id,
 						})
@@ -208,7 +312,9 @@ const readRuntimeCraftView = ({
 	const recipe = config.craftRecipes[recipeId];
 	if (!recipe) return undefined;
 
-	const runningJob = Object.values(save.craftJobs).find((job) => job.recipeId === recipeId);
+	const runningJob = Object.values(save.craftJobs).find(
+		(job) => job.recipeId === recipeId && job.targetItemInstanceId === boardItem.id,
+	);
 	const startedAtMs = runningJob?.startedAtMs;
 	const readyAtMs = runningJob?.completesAtMs;
 	const timeProgress =
@@ -266,6 +372,7 @@ export const readRuntimeBoardViewFromGameSave = ({
 				activation: readRuntimeActivationView({
 					boardItem,
 					config,
+					nowMs,
 					save,
 				}),
 				craft: readRuntimeCraftView({

@@ -3,12 +3,14 @@ import { type FC, useMemo } from "react";
 import { ItemActivationCard } from "~/v0/item/ui/ItemActivationCard";
 import { ItemActivationInputsCard } from "~/v0/item/ui/ItemActivationInputsCard";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
+import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
 import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
+import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import { useGameAction, useGameBoardView } from "~/v0/play/runtime";
 
 export namespace ItemSheet {
@@ -22,9 +24,12 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const board = useGameBoardView();
 	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
 	const withdrawAction = useGameAction();
+	const productLineAction = useGameAction();
 	const nowMs = useProducerClock(board.items);
 	const boardItem = boardItemId ? board.byId[boardItemId] : undefined;
 	const item = boardItem ? items[boardItem.itemId] : undefined;
+	const actionError = productLineAction.error ?? withdrawAction.error;
+	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 	const relations = useMemo(
 		() => ({
 			mergeResults: (item?.mergeResults ?? []).map((rule) => ({
@@ -70,6 +75,24 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		});
 	};
 
+	const setProductLineEnabled = (productId: string, enabled: boolean) => {
+		void productLineAction.run({
+			enabled,
+			producerItemInstanceId: boardItem.id,
+			productId,
+			type: "producer.product_line.set_enabled",
+		});
+	};
+
+	const startProductLine = (productId: string) => {
+		void productLineAction.run({
+			inputRefs: [],
+			producerItemInstanceId: boardItem.id,
+			productId,
+			type: "producer.product.start",
+		});
+	};
+
 	return (
 		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
 			<SheetHeader
@@ -78,6 +101,11 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				onClose={onClose}
 			/>
 			<div className="space-y-4 p-4 pt-1 text-sm text-slate-200">
+				{actionErrorMessage ? (
+					<div className="rounded-md border border-red-300/30 bg-red-950/35 px-3 py-2 text-xs font-semibold text-red-100">
+						{actionErrorMessage}
+					</div>
+				) : null}
 				<ItemSummaryCard item={item} />
 				{boardItem.craft ? (
 					<ItemCraftCard
@@ -89,6 +117,15 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					<ItemActivationCard
 						activation={boardItem.activation}
 						nowMs={nowMs}
+					/>
+				) : null}
+				{boardItem.activation?.productLines?.length ? (
+					<ItemProducerProductLinesCard
+						lines={boardItem.activation.productLines}
+						nowMs={nowMs}
+						pending={productLineAction.isPending}
+						onSetEnabled={setProductLineEnabled}
+						onStart={startProductLine}
 					/>
 				) : null}
 				{boardItem.activation?.inputs.length ||

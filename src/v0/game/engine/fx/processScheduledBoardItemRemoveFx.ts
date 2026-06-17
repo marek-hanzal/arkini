@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
+import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import type { GameSave, GameSaveScheduledEvent } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -32,9 +33,10 @@ export const processScheduledBoardItemRemoveFx = Effect.fn("processScheduledBoar
 			} satisfies GameEngineCompletionResult;
 		}
 		delete nextSave.board.items[scheduledEvent.itemInstanceId];
-		delete nextSave.stashes[scheduledEvent.itemInstanceId];
-		delete nextSave.producerLines[scheduledEvent.itemInstanceId];
-		delete nextSave.storedRequirements[scheduledEvent.itemInstanceId];
+		removeBoardItemRuntimeState({
+			itemInstanceId: scheduledEvent.itemInstanceId,
+			save: nextSave,
+		});
 		nextSave.updatedAtMs = nowMs;
 
 		return {

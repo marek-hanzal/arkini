@@ -73,6 +73,11 @@ Priority order:
    - Converted the upgrade sheet to runtime selectors/actions; React Query remains only for static item catalog data.
    - Converted dev scenario loading to replace the runtime save directly, so debug scenarios no longer write old SQLite gameplay state and then hope the runtime follows.
    - Added inventory-to-occupied-board drop routing for merge/craft/producer/stash/stored-requirement interactions through runtime actions.
+   - Added runtime product-line view projection and item-sheet controls for enabling/disabling producer product lines and starting no-input lines. Board taps and input routing now choose the first enabled product line instead of blindly poking the first static config entry like a drunk pigeon.
+   - Craft jobs now belong to a concrete target board item instance through `targetItemInstanceId`; runtime board projection only shows progress on that station, so multiple same-recipe stations no longer share one haunted job bar.
+   - Board item removal/replacement/stashing now cleans attached producer jobs, craft jobs, product line state, stash state and stored requirements through one helper.
+   - Runtime action errors from plain Effect failures now normalize through `toGameActionError`, and item/upgrade sheets/display toasts use the same normalized messages instead of silently swallowing rejected commands.
+   - Producer/craft clock refresh now watches runtime product-line `readyAtMs` values too, so item-sheet progress does not freeze like a budget dashboard.
    - Debug bug reports now include runtime revision/board/inventory summary instead of old board/inventory cache snapshots.
 
 9. **Persistence/Dexie later**
@@ -80,4 +85,4 @@ Priority order:
    - Dexie/IndexedDB simplification follows after the engine can run in memory and after the domain-event bridge proves the shape UI actually needs.
    - Do not implement Dexie before the adapter/bridge boundary is clear, otherwise storage starts shaping gameplay state and the project wakes up with database Stockholm syndrome.
 
-Current task: item 8 is the active cleanup/parity pass. Next pass should keep sealing runtime-only gaps: product line controls in UI, richer readiness messages for rejected drops/actions, craft/job ownership correctness if multiple same-recipe stations become a thing, and then Dexie only after runtime remains the single gameplay source of truth.
+Current task: item 8 is the active cleanup/parity pass. Product line UI controls, basic runtime action error surfacing, craft/job ownership and product-line progress refresh are now covered. Next pass should keep sealing runtime-only gaps around remaining sheet actions and any old SQLite gameplay helpers that still look reachable from runtime UI. Dexie only after runtime remains the single gameplay source of truth.

@@ -7,6 +7,7 @@ export const GameActionCraftStartSchema = z
 	.object({
 		inputRefs: z.array(GameActionItemRefSchema),
 		recipeId: IdSchema,
+		targetItemInstanceId: IdSchema,
 		requirementRefs: z.array(GameActionItemRefSchema),
 		type: z.literal("craft.start"),
 	})

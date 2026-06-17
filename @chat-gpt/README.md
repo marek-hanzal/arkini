@@ -13,7 +13,7 @@ This directory is the repo-local working memory for GPT-led Arkini work. Treat t
 
 ## Current work
 
-- JSON game package compiler work is started. CLI source lives under `./cli/game/`, not `./scripts`, because it is a CLI and we are not animals. `./game/arkini/` contains the first JSON authoring source plus copied PNG assets; `npm run game:compile -- game/arkini` writes `./game/arkini.game.json` and `./game/arkini.assets.json`. `npm run game:validate -- game/arkini` validates source folders including generated PNG resources. See `v0-json-game-definition-plan-2026-06-17.md`.
+- JSON game package compiler work is started. CLI source lives under `./cli/game/`, not `./scripts`, because it is a CLI and we are not animals. `./game/arkini/` contains the first JSON authoring package split into top-level source fragments (`items.json`, `loot-tables.json`, `producers.json`, etc.) plus copied PNG assets. `npm run game:compile -- game/arkini` writes `./game/arkini.game.json` and `./game/arkini.assets.json`. `npm run game:validate -- game/arkini` is mandatory after touching game config source, because otherwise we are just hoping JSON feelings are valid. See `v0-json-game-definition-plan-2026-06-17.md`.
 - Runtime loading is not wired yet. Current app behavior still uses the TS manifest through `GameConfig`; next migration step is to load compiled JSON through a normalization boundary without teaching TileEngine or UI surfaces about source fragments. `009-economy-content-pass` remains deferred until this config migration settles, because starting economy work now would create avoidable conflicts and humanity has already suffered enough merge conflicts for one week.
 
 ## Current mental model
@@ -207,7 +207,7 @@ Temporary TileEngine motion request cleanup must use `actionVisualMotionSettleme
 
 ### JSON game compiler checkpoint
 
-The repo now has the first source-package compiler for the JSON game-definition migration. Default authoring source lives under `./game/arkini/`, with raw PNG item assets in `./game/arkini/assets/` and gameplay source in JSON fragments such as `./game/arkini/game.json`.
+The repo now has the first source-package compiler for the JSON game-definition migration. Default authoring source lives under `./game/arkini/`, with raw PNG item assets in `./game/arkini/assets/` and gameplay source split by top-level key into JSON fragments such as `items.json`, `loot-tables.json`, `merge-rules.json`, `producers.json`, `stashes.json`, `craft-recipes.json`, `upgrades.json`, `assets.json`, `starting-state.json`, `game.json` and `version.json`. The old monolithic `game.json` source is gone; `game.json` now only contains the top-level `game` metadata fragment.
 
 Use:
 
@@ -217,4 +217,4 @@ npm run game:validate -- game/arkini
 npm run game:validate -- game/arkini.game.json game/arkini.assets.json
 ```
 
-`game:compile` writes `./game/arkini.game.json` and `./game/arkini.assets.json`. Runtime loading is not wired yet; current app behavior still uses the TS manifest. Do not add a permanent `game:dump-config` command. The initial JSON source was produced once from the current `GameConfig` and reshaped into the new keyed structure; the old dump shape is not part of the supported contract. CLI code lives under `./cli`, but the shared canonical schema/validation belongs to runtime source under `src/v0/game/config/GameConfigSchema.ts` so the future loader and the CLI validate the same object instead of maintaining two almost-identical lies.
+`game:compile` writes `./game/arkini.game.json` and `./game/arkini.assets.json`. Treat `npm run game:validate -- game/arkini` as part of the mandatory validation checklist whenever any source config fragment or PNG resource changes; also validate the compiled outputs with `npm run game:validate -- game/arkini.game.json game/arkini.assets.json` before handing off. Runtime loading is not wired yet; current app behavior still uses the TS manifest. Do not add a permanent `game:dump-config` command. The initial JSON source was produced once from the current `GameConfig` and reshaped into the new keyed structure; the old dump shape is not part of the supported contract. CLI code lives under `./cli`, but the shared canonical schema/validation belongs to runtime source under `src/v0/game/config/GameConfigSchema.ts` so the future loader and the CLI validate the same object instead of maintaining two almost-identical lies.

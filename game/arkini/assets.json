@@ -1,0 +1,301 @@
+{
+	"assets": {
+		"asset:item-beam": {
+			"kind": "item",
+			"label": "Beam",
+			"render": "plain",
+			"resourceId": "item-beam",
+			"sort": 68
+		},
+		"asset:item-beer": {
+			"kind": "item",
+			"label": "Beer",
+			"render": "plain",
+			"resourceId": "item-beer",
+			"sort": 136
+		},
+		"asset:item-blueprint": {
+			"kind": "item",
+			"label": "Finished Blueprint",
+			"render": "plain",
+			"resourceId": "item-blueprint",
+			"sort": 112
+		},
+		"asset:item-blueprint-draft": {
+			"kind": "item",
+			"label": "Blueprint Draft",
+			"render": "plain",
+			"resourceId": "item-blueprint-draft",
+			"sort": 110
+		},
+		"asset:item-blueprint-fragment": {
+			"kind": "item",
+			"label": "Blueprint Fragment",
+			"render": "plain",
+			"resourceId": "item-blueprint-fragment",
+			"sort": 108
+		},
+		"asset:item-blueprint-lumber-camp": {
+			"kind": "item",
+			"label": "Lumber Camp Blueprint",
+			"overlayAssetId": "asset:item-lumber-camp",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 116
+		},
+		"asset:item-blueprint-quarry": {
+			"kind": "item",
+			"label": "Quarry Blueprint",
+			"overlayAssetId": "asset:item-quarry",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 120
+		},
+		"asset:item-blueprint-scrap": {
+			"kind": "item",
+			"label": "Blueprint Scrap",
+			"render": "plain",
+			"resourceId": "item-blueprint-scrap",
+			"sort": 106
+		},
+		"asset:item-blueprint-townhall": {
+			"kind": "item",
+			"label": "Town Hall Blueprint",
+			"overlayAssetId": "asset:item-townhall",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 124
+		},
+		"asset:item-branch": {
+			"kind": "item",
+			"label": "Branch",
+			"render": "plain",
+			"resourceId": "item-branch",
+			"sort": 50
+		},
+		"asset:item-bush": {
+			"kind": "item",
+			"label": "Bush",
+			"render": "plain",
+			"resourceId": "item-bush",
+			"sort": 34
+		},
+		"asset:item-coal": {
+			"kind": "item",
+			"label": "Coal",
+			"render": "plain",
+			"resourceId": "item-coal",
+			"sort": 132
+		},
+		"asset:item-coal-mine": {
+			"kind": "item",
+			"label": "Coal Mine",
+			"render": "plain",
+			"resourceId": "item-coal-mine",
+			"sort": 138
+		},
+		"asset:item-coin": {
+			"kind": "item",
+			"label": "Coin",
+			"render": "plain",
+			"resourceId": "item-coin",
+			"sort": 101
+		},
+		"asset:item-coin-chest": {
+			"kind": "item",
+			"label": "Coin Chest",
+			"render": "plain",
+			"resourceId": "item-coin-chest",
+			"sort": 104
+		},
+		"asset:item-coin-pair": {
+			"kind": "item",
+			"label": "Coin Pair",
+			"render": "plain",
+			"resourceId": "item-coin-pair",
+			"sort": 102
+		},
+		"asset:item-coin-stack": {
+			"kind": "item",
+			"label": "Coin Stack",
+			"render": "plain",
+			"resourceId": "item-coin-stack",
+			"sort": 103
+		},
+		"asset:item-crate": {
+			"kind": "item",
+			"label": "Common Crate",
+			"render": "plain",
+			"resourceId": "item-crate",
+			"sort": 150
+		},
+		"asset:item-crate-epic": {
+			"kind": "item",
+			"label": "Epic Crate",
+			"render": "plain",
+			"resourceId": "item-crate-epic",
+			"sort": 180
+		},
+		"asset:item-crate-rare": {
+			"kind": "item",
+			"label": "Rare Crate",
+			"render": "plain",
+			"resourceId": "item-crate-rare",
+			"sort": 170
+		},
+		"asset:item-crate-sturdy": {
+			"kind": "item",
+			"label": "Sturdy Crate",
+			"render": "plain",
+			"resourceId": "item-crate-sturdy",
+			"sort": 160
+		},
+		"asset:item-crystal": {
+			"kind": "item",
+			"label": "Crystal",
+			"render": "plain",
+			"resourceId": "item-crystal",
+			"sort": 90
+		},
+		"asset:item-epic-key": {
+			"kind": "item",
+			"label": "Epic Key",
+			"render": "plain",
+			"resourceId": "item-epic-key",
+			"sort": 182
+		},
+		"asset:item-gem": {
+			"kind": "item",
+			"label": "Gem",
+			"render": "plain",
+			"resourceId": "item-gem",
+			"sort": 94
+		},
+		"asset:item-leaf": {
+			"kind": "item",
+			"label": "Leaf",
+			"render": "plain",
+			"resourceId": "item-leaf",
+			"sort": 30
+		},
+		"asset:item-log": {
+			"kind": "item",
+			"label": "Log",
+			"render": "plain",
+			"resourceId": "item-log",
+			"sort": 60
+		},
+		"asset:item-lumber-camp": {
+			"kind": "item",
+			"label": "Lumber Camp",
+			"render": "plain",
+			"resourceId": "item-lumber-camp",
+			"sort": 130
+		},
+		"asset:item-ore": {
+			"kind": "item",
+			"label": "Ore",
+			"render": "plain",
+			"resourceId": "item-ore",
+			"sort": 84
+		},
+		"asset:item-pebble": {
+			"kind": "item",
+			"label": "Pebble",
+			"render": "plain",
+			"resourceId": "item-pebble",
+			"sort": 70
+		},
+		"asset:item-plank": {
+			"kind": "item",
+			"label": "Plank",
+			"render": "plain",
+			"resourceId": "item-plank",
+			"sort": 66
+		},
+		"asset:item-quarry": {
+			"kind": "item",
+			"label": "Quarry",
+			"render": "plain",
+			"resourceId": "item-quarry",
+			"sort": 140
+		},
+		"asset:item-sapling": {
+			"kind": "item",
+			"label": "Sapling",
+			"render": "plain",
+			"resourceId": "item-sapling",
+			"sort": 38
+		},
+		"asset:item-sausage": {
+			"kind": "item",
+			"label": "Sausage",
+			"render": "plain",
+			"resourceId": "item-sausage",
+			"sort": 134
+		},
+		"asset:item-seed": {
+			"kind": "item",
+			"label": "Seed",
+			"render": "plain",
+			"resourceId": "item-seed",
+			"sort": 10
+		},
+		"asset:item-sprout": {
+			"kind": "item",
+			"label": "Sprout",
+			"render": "plain",
+			"resourceId": "item-sprout",
+			"sort": 20
+		},
+		"asset:item-stone": {
+			"kind": "item",
+			"label": "Stone",
+			"render": "plain",
+			"resourceId": "item-stone",
+			"sort": 80
+		},
+		"asset:item-stone-block": {
+			"kind": "item",
+			"label": "Stone Block",
+			"render": "plain",
+			"resourceId": "item-stone-block",
+			"sort": 82
+		},
+		"asset:item-townhall": {
+			"kind": "item",
+			"label": "Town Hall",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 125
+		},
+		"asset:item-tree": {
+			"kind": "item",
+			"label": "Tree",
+			"render": "plain",
+			"resourceId": "item-tree",
+			"sort": 39
+		},
+		"asset:item-twig": {
+			"kind": "item",
+			"label": "Twig",
+			"render": "plain",
+			"resourceId": "item-twig",
+			"sort": 40
+		},
+		"asset:item-water": {
+			"kind": "item",
+			"label": "Water",
+			"render": "plain",
+			"resourceId": "item-water",
+			"sort": 100
+		},
+		"asset:item-wood-bundle": {
+			"kind": "item",
+			"label": "Wood Bundle",
+			"render": "plain",
+			"resourceId": "item-wood-bundle",
+			"sort": 64
+		}
+	}
+}

@@ -1,0 +1,260 @@
+{
+	"upgrades": {
+		"upgrade:lumber-camp-1-loot": {
+			"code": "lumber-camp-1-loot",
+			"description": "Upgrades the first lumber camp loot table instead of poking random percentages with a stick.",
+			"name": "Lumber Camp I Better Finds",
+			"sort": 30,
+			"tiers": [
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:lumber-camp-1",
+							"tableId": "loot:lumber-camp-1:better-1",
+							"type": "producer.outputTable.set"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-chest",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:lumber-camp-1",
+							"tableId": "loot:lumber-camp-1:better-2",
+							"type": "producer.outputTable.set"
+						}
+					]
+				}
+			]
+		},
+		"upgrade:lumber-camp-1-speed": {
+			"code": "lumber-camp-1-speed",
+			"description": "Shaves a little time off first-tier lumber production.",
+			"name": "Lumber Camp I Speed",
+			"sort": 10,
+			"tiers": [
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 1
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:lumber-camp-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:lumber-camp-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-chest",
+							"quantity": 1
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:lumber-camp-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-chest",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:lumber-camp-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-chest",
+							"quantity": 3
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:lumber-camp-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				}
+			]
+		},
+		"upgrade:quarry-1-loot": {
+			"code": "quarry-1-loot",
+			"description": "Lets the first quarry find better rocks, because apparently holes need career growth.",
+			"name": "Quarry I Better Finds",
+			"sort": 40,
+			"tiers": [
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:quarry-1",
+							"tableId": "loot:quarry-1:better-1",
+							"type": "producer.outputTable.set"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-chest",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:quarry-1",
+							"tableId": "loot:quarry-1:better-2",
+							"type": "producer.outputTable.set"
+						}
+					]
+				}
+			]
+		},
+		"upgrade:quarry-1-speed": {
+			"code": "quarry-1-speed",
+			"description": "Makes the first quarry slightly less geological about deadlines.",
+			"name": "Quarry I Speed",
+			"sort": 20,
+			"tiers": [
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 1
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:quarry-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:quarry-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-chest",
+							"quantity": 1
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:quarry-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-chest",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:quarry-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-chest",
+							"quantity": 3
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"itemId": "item:quarry-1",
+							"ms": -100,
+							"type": "producer.cooldown.add"
+						}
+					]
+				}
+			]
+		}
+	}
+}

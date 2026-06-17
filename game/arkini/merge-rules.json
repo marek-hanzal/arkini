@@ -1,0 +1,196 @@
+{
+	"mergeRules": {
+		"merge:blueprint-draft-final": {
+			"resultItemId": "item:blueprint",
+			"withItemId": "item:blueprint-draft"
+		},
+		"merge:blueprint-fragment-draft": {
+			"resultItemId": "item:blueprint-draft",
+			"withItemId": "item:blueprint-fragment"
+		},
+		"merge:blueprint-scrap-fragment": {
+			"resultItemId": "item:blueprint-fragment",
+			"withItemId": "item:blueprint-scrap"
+		},
+		"merge:branch-branch-log": {
+			"resultItemId": "item:log",
+			"withItemId": "item:branch"
+		},
+		"merge:bush-bush-sapling": {
+			"resultItemId": "item:sapling",
+			"withItemId": "item:bush"
+		},
+		"merge:coin-coin-pair": {
+			"resultItemId": "item:coin-pair",
+			"withItemId": "item:coin"
+		},
+		"merge:coin-pair-stack": {
+			"resultItemId": "item:coin-stack",
+			"withItemId": "item:coin-pair"
+		},
+		"merge:coin-stack-chest": {
+			"resultItemId": "item:coin-chest",
+			"withItemId": "item:coin-stack"
+		},
+		"merge:crate-1-crate-2": {
+			"resultItemId": "item:crate-2",
+			"withItemId": "item:crate-1"
+		},
+		"merge:crate-2-crate-3": {
+			"resultItemId": "item:crate-3",
+			"withItemId": "item:crate-2"
+		},
+		"merge:crate-3-crate-4": {
+			"resultItemId": "item:crate-4",
+			"withItemId": "item:crate-3"
+		},
+		"merge:crystal-crystal-gem": {
+			"resultItemId": "item:gem",
+			"withItemId": "item:crystal"
+		},
+		"merge:leaf-leaf-bush": {
+			"resultItemId": "item:bush",
+			"withItemId": "item:leaf"
+		},
+		"merge:log-log-wood-bundle": {
+			"resultItemId": "item:wood-bundle",
+			"withItemId": "item:log"
+		},
+		"merge:lumber-camp-1-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-lumber-camp",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:lumber-camp-2-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-lumber-camp-2",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:lumber-camp-3-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-lumber-camp-3",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:lumber-camp-4-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-lumber-camp-4",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:lumber-camp-5-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-lumber-camp-5",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:ore-ore-crystal": {
+			"resultItemId": "item:crystal",
+			"withItemId": "item:ore"
+		},
+		"merge:pebble-pebble-stone": {
+			"resultItemId": "item:stone",
+			"withItemId": "item:pebble"
+		},
+		"merge:plank-plank-beam": {
+			"resultItemId": "item:beam",
+			"withItemId": "item:plank"
+		},
+		"merge:quarry-1-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-quarry",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:quarry-2-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-quarry-2",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:quarry-3-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-quarry-3",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:quarry-4-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-quarry-4",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:quarry-5-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-quarry-5",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:seed-seed-sprout": {
+			"resultItemId": "item:sprout",
+			"withItemId": "item:seed"
+		},
+		"merge:sprout-sprout-leaf": {
+			"resultItemId": "item:leaf",
+			"withItemId": "item:sprout"
+		},
+		"merge:stone-block-stone-block-ore": {
+			"resultItemId": "item:ore",
+			"withItemId": "item:stone-block"
+		},
+		"merge:stone-stone-stone-block": {
+			"resultItemId": "item:stone-block",
+			"withItemId": "item:stone"
+		},
+		"merge:stone-water-crystal": {
+			"resultItemId": "item:crystal",
+			"secret": true,
+			"withItemId": "item:water"
+		},
+		"merge:townhall-1-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-townhall",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:townhall-2-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-townhall-2",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:townhall-3-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-townhall-3",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:townhall-4-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-townhall-4",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:townhall-5-blueprint": {
+			"consumeSource": false,
+			"resultItemId": "item:blueprint-townhall-5",
+			"secret": true,
+			"withItemId": "item:blueprint"
+		},
+		"merge:twig-twig-branch": {
+			"resultItemId": "item:branch",
+			"withItemId": "item:twig"
+		},
+		"merge:twig-water-sprout": {
+			"resultItemId": "item:sprout",
+			"secret": true,
+			"withItemId": "item:water"
+		},
+		"merge:wood-bundle-wood-bundle-plank": {
+			"resultItemId": "item:plank",
+			"withItemId": "item:wood-bundle"
+		}
+	}
+}

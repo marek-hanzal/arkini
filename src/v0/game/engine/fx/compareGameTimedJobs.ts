@@ -1,6 +1,13 @@
-import type { GameSaveCraftJob, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
+import type {
+	GameSaveCraftJob,
+	GameSaveProducerJob,
+	GameSaveUpgradeJob,
+} from "~/v0/game/engine/model/GameSaveSchema";
 
-type TimedJob = Pick<GameSaveProducerJob | GameSaveCraftJob, "completesAtMs" | "id">;
+type TimedJob = Pick<
+	GameSaveProducerJob | GameSaveCraftJob | GameSaveUpgradeJob,
+	"completesAtMs" | "id"
+>;
 
 export namespace compareGameTimedJobs {
 	export interface Props {
@@ -9,5 +16,5 @@ export namespace compareGameTimedJobs {
 	}
 }
 
-export const compareGameTimedJobs = (left: TimedJob, right: TimedJob) =>
+export const compareGameTimedJobs = ({ left, right }: compareGameTimedJobs.Props) =>
 	left.completesAtMs - right.completesAtMs || left.id.localeCompare(right.id);

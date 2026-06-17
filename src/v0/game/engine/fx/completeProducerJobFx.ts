@@ -4,6 +4,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
+import { readProductFx } from "~/v0/game/engine/fx/readProductFx";
 import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -35,15 +36,13 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		} satisfies GameEngineCompletionResult;
 	}
 
-	const product = config.products[liveJob.productId];
+	const product = yield* readProductFx({
+		productId: liveJob.productId,
+	});
+	const outputTableId = liveJob.outputTableId ?? product.outputTableId;
+	const placement = liveJob.placement ?? product.placement;
 
-	if (!product) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing product "${liveJob.productId}".`),
-		);
-	}
-
-	if (!product.outputTableId) {
+	if (!outputTableId) {
 		const nextSave = yield* cloneGameSaveFx({
 			save,
 		});
@@ -65,17 +64,15 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		} satisfies GameEngineCompletionResult;
 	}
 
-	yield* match(product.placement)
+	yield* match(placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
 
-	const lootTable = config.lootTables[product.outputTableId];
+	const lootTable = config.lootTables[outputTableId];
 
 	if (!lootTable) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(
-				`Missing loot table "${product.outputTableId}".`,
-			),
+			GameEngineError.configReferenceMissing(`Missing loot table "${outputTableId}".`),
 		);
 	}
 

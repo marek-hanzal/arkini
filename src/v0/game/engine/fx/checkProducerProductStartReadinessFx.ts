@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInputsFx";
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
 import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
+import { readProductFx } from "~/v0/game/engine/fx/readProductFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -42,12 +43,9 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		);
 	}
 
-	const product = config.products[action.productId];
-	if (!product) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing product "${action.productId}".`),
-		);
-	}
+	const product = yield* readProductFx({
+		productId: action.productId,
+	});
 
 	yield* checkGameRequirementsFx({
 		config,

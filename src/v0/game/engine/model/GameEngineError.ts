@@ -14,7 +14,9 @@ export type GameEngineError =
 				| "placement_unavailable"
 				| "stash_depleted"
 				| "unsupported_target"
-				| "unsupported_requirement";
+				| "unsupported_requirement"
+				| "upgrade_complete"
+				| "upgrade_in_progress";
 			readonly message: string;
 	  }
 	| {

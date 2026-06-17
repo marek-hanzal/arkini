@@ -2,18 +2,18 @@ import { Effect } from "effect";
 import { compareGameTimedJobs } from "~/v0/game/engine/fx/compareGameTimedJobs";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
-export namespace readCompletedProducerJobsFx {
+export namespace readCompletedUpgradeJobsFx {
 	export interface Props {
 		save: GameSave;
 		nowMs: number;
 	}
 }
 
-export const readCompletedProducerJobsFx = Effect.fn("readCompletedProducerJobsFx")(function* ({
+export const readCompletedUpgradeJobsFx = Effect.fn("readCompletedUpgradeJobsFx")(function* ({
 	save,
 	nowMs,
-}: readCompletedProducerJobsFx.Props) {
-	return Object.values(save.producerJobs)
+}: readCompletedUpgradeJobsFx.Props) {
+	return Object.values(save.upgradeJobs)
 		.filter((job) => job.completesAtMs <= nowMs)
 		.sort((left, right) =>
 			compareGameTimedJobs({

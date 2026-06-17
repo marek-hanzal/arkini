@@ -23,6 +23,8 @@ export {
 	GameSaveSchema,
 	GameSaveStashStateSchema,
 } from "~/v0/game/engine/model/GameSaveSchema";
+export { GameSaveUpgradeJobSchema } from "~/v0/game/engine/model/GameSaveUpgradeJobSchema";
+export { GameSaveUpgradeStateSchema } from "~/v0/game/engine/model/GameSaveUpgradeStateSchema";
 export type { GameActionReadiness } from "~/v0/game/engine/model/GameActionReadinessSchema";
 export { GameActionReadinessSchema } from "~/v0/game/engine/model/GameActionReadinessSchema";
 export { GameActionReadyReadinessSchema } from "~/v0/game/engine/model/GameActionReadyReadinessSchema";
@@ -44,4 +46,6 @@ export type {
 	GameSaveProducerJob,
 	GameSaveScheduledEvent,
 	GameSaveStashState,
+	GameSaveUpgradeJob,
+	GameSaveUpgradeState,
 } from "~/v0/game/engine/model/GameSaveSchema";

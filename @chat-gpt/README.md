@@ -38,6 +38,21 @@ The active runtime has four layers:
 
 Drag/drop hover feedback is also owned by `TileEngine`. Concrete adapters may map their domain state to generic effects (`empty`, `merge`, `blocked`) through `drag.dropFeedback`, but slot background highlighting, target tile scale feedback and dragged tile visual feedback belong in the engine layer. Do not style board or inventory cells directly for hover feedback unless the behavior is truly domain-specific. Board and inventory surfaces must use the same TileEngine feedback path, so a filled inventory slot swap target is a generic `blocked` target and an empty inventory slot is a generic `empty` target.
 
+## Code guidance
+
+Use these rules as hard defaults for new Arkini code and refactors. They exist because the alternative is another pile of almost-clean code that later needs a ceremonial burning.
+
+- Everything in logic space is Effect. Domain/gameplay logic must live as real Effect implementations, normally under focused `fx/` files, not as pure helpers wrapped at the boundary. Use typed error channels, services and `Effect.gen` instead of throwing exceptions or hiding state in helper functions.
+- When an Effect is called from client-space such as a React component or hook, run it through the existing `runEffect` utility. Do not invent local runners or client-specific execution wrappers unless the runtime boundary itself is being redesigned.
+- Use `ts-pattern` extensively for branching over unions, action types, event types and defensive value checks. Prefer explicit matches for `undefined`, `null`, `typeof value === "string"`, discriminants and impossible branches over loose if-ladders that pretend JavaScript is a serious language.
+- Props/types belong in a namespace named after the exported item: `export namespace foo { export interface Props { ... } }` followed by `export const foo = (props: foo.Props) => ...`. Use the same shape for Effect functions, React components and focused utilities.
+- Export Schema metadata consistently: `export const FooSchema = z...`; `export type FooSchema = typeof FooSchema`; `export namespace FooSchema { export type Type = z.infer<typeof FooSchema>; }`. Do not hide standalone schema types behind indexed monster types like `GameConfig["lootTables"][string]["output"][number]`.
+- Keep strictly one item per file: one function, one Effect, one React component or one standalone schema per file. Split helper Effects/schemas into their own files instead of growing monoliths like old `applyGameActionFx.ts` or `runGameTick.ts`. A file doing three jobs is not “pragmatic”; it is future archaeology with syntax highlighting.
+- Do not overuse domain names in nested domains. If code lives under `./game/engine`, names like `fooGameEngineActionFx` are redundant sludge; prefer `fooActionFx` or `applyActionFx` and resolve call-site conflicts with import aliases.
+- Keep strict domain separation. The current `./game` domain is overloaded because many game items may deserve their own domain over time. Interaction concerns such as drag/drop/pointer choreography belong in an `interaction` domain, not smeared across gameplay logic or rendering components.
+- Do not embed object schemas inside large parent schemas when the embedded object is meaningful on its own or used as a standalone type. Each standalone schema gets its own file and exported metadata. Parent schemas compose named child schemas instead of hiding them in anonymous `z.object(...)` piles.
+- Avoid stupid re-exports such as `export const gameConfig = GameConfigServiceLive.config` or type aliases that only rename an already clear source. Import and use the real thing. Re-export only at deliberate public boundaries, not because an import path looked mildly inconvenient.
+
 ## Hard boundaries
 
 These are now enforced by `npm run dc` through dependency-cruiser where possible:

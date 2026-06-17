@@ -1,14 +1,11 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
-import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
+import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
-import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
-import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -27,54 +24,14 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	action,
 	nowMs,
 }: startProducerProductFx.Props) {
-	const producerItem = yield* readProducerBoardItemFx({
+	const checked = yield* checkProducerProductStartReadinessFx({
+		action,
 		config,
-		producerItemInstanceId: action.producerItemInstanceId,
 		save,
 	});
-	const producerDefinition =
-		config.producers[config.items[producerItem.itemId]?.producerId ?? ""];
-	if (!producerDefinition) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(
-				`Producer item "${producerItem.itemId}" references missing producer.`,
-			),
-		);
-	}
-	if (!producerDefinition.productIds.includes(action.productId)) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"invalid_actor",
-				`Product "${action.productId}" does not belong to producer "${producerDefinition.type}" on item "${producerItem.itemId}".`,
-			),
-		);
-	}
-
-	const product = config.products[action.productId];
-	if (!product) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing product "${action.productId}".`),
-		);
-	}
-
-	yield* checkGameRequirementsFx({
-		config,
-		requirements: producerDefinition.requirements,
-		save,
-	});
-	yield* checkGameRequirementsFx({
-		config,
-		requirements: product.requirements,
-		save,
-	});
-
-	yield* match(product.placement)
-		.with("board_then_inventory", () => Effect.void)
-		.exhaustive();
-
 	const consumed = yield* consumeActivationInputsFx({
 		inputRefs: action.inputRefs,
-		inputs: product.inputs,
+		inputs: checked.product.inputs,
 		nowMs,
 		reason: "product-input",
 		save,
@@ -91,7 +48,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
 			.map((job) => job.completesAtMs),
 	);
-	const completesAtMs = queuedStartAtMs + product.durationMs;
+	const completesAtMs = queuedStartAtMs + checked.product.durationMs;
 	nextSave.producerJobs[jobId] = {
 		completesAtMs,
 		id: jobId,

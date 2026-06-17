@@ -1,12 +1,9 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
-import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
+import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
-import { readStashBoardItemFx } from "~/v0/game/engine/fx/readStashBoardItemFx";
-import { readStashRemainingChargesFx } from "~/v0/game/engine/fx/readStashRemainingChargesFx";
 import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
 import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 import { scheduleStashDepletionFx } from "~/v0/game/engine/fx/scheduleStashDepletionFx";
@@ -32,54 +29,23 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	action,
 	nowMs,
 }: openStashFx.Props) {
-	const stashItem = yield* readStashBoardItemFx({
+	const checked = yield* checkStashOpenReadinessFx({
+		action,
 		config,
 		save,
-		stashItemInstanceId: action.stashItemInstanceId,
 	});
-	const stashId = config.items[stashItem.itemId]?.stashId;
-	const stash = stashId ? config.stashes[stashId] : undefined;
-	if (!stashId || !stash) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(
-				`Stash item "${stashItem.itemId}" references missing stash.`,
-			),
-		);
-	}
-	const lootTable = config.lootTables[stash.outputTableId];
+	const lootTable = config.lootTables[checked.stash.outputTableId];
 	if (!lootTable) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing loot table "${stash.outputTableId}".`),
-		);
-	}
-	const remainingCharges = yield* readStashRemainingChargesFx({
-		config,
-		save,
-		stashId,
-		stashItemInstanceId: action.stashItemInstanceId,
-	});
-	if (remainingCharges <= 0) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"stash_depleted",
-				`Stash "${action.stashItemInstanceId}" has no charges left.`,
+			GameEngineError.configReferenceMissing(
+				`Missing loot table "${checked.stash.outputTableId}".`,
 			),
 		);
 	}
-
-	yield* checkGameRequirementsFx({
-		config,
-		requirements: stash.requirements,
-		save,
-	});
-
-	yield* match(stash.placement)
-		.with("board_then_inventory", () => Effect.void)
-		.exhaustive();
 
 	const consumed = yield* consumeActivationInputsFx({
 		inputRefs: action.inputRefs,
-		inputs: stash.inputs,
+		inputs: checked.stash.inputs,
 		nowMs,
 		reason: "stash-input",
 		save,
@@ -113,7 +79,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	const nextSave = yield* cloneGameSaveFx({
 		save: consumed.save,
 	});
-	const nextRemainingCharges = remainingCharges - 1;
+	const nextRemainingCharges = checked.remainingCharges - 1;
 	if (nextRemainingCharges > 0) {
 		nextSave.stashes[action.stashItemInstanceId] = {
 			remainingCharges: nextRemainingCharges,
@@ -130,9 +96,9 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		yield* scheduleStashDepletionFx({
 			afterEventIds: scheduledSpawns.eventIds,
 			dueAtMs: scheduledSpawns.lastDueAtMs,
-			onDepleted: stash.onDepleted,
+			onDepleted: checked.stash.onDepleted,
 			save: nextSave,
-			stashItemId: stashItem.itemId,
+			stashItemId: checked.stashItem.itemId,
 			stashItemInstanceId: action.stashItemInstanceId,
 		});
 	}
@@ -144,7 +110,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 			{
 				openedAtMs: nowMs,
 				remainingCharges: nextRemainingCharges,
-				stashId,
+				stashId: checked.stashId,
 				stashItemInstanceId: action.stashItemInstanceId,
 				type: "stash.opened" as const,
 			},
@@ -152,7 +118,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 				? [
 						{
 							depletedAtMs: nowMs,
-							stashId,
+							stashId: checked.stashId,
 							stashItemInstanceId: action.stashItemInstanceId,
 							type: "stash.depleted" as const,
 						},

@@ -6,7 +6,7 @@ Status: TODO
 
 Move Arkini static game content/rules toward JSON-authored game packages with one canonical final shape in memory, but many possible source fragments during authoring. This is a structural/content authoring change, not a TileEngine or UI rewrite.
 
-The default Arkini source package should live at repo root under `./game/arkini/`. The game package source may contain any number of JSON fragments plus raw PNG resources under `./game/arkini/assets/`. A compile step turns that folder into one canonical `ArkiniGamePackage` JSON that the app can use during dev/build.
+The default Arkini source package should live at repo root under `./game/arkini/`. The game package source may contain any number of JSON fragments plus raw PNG resources under `./game/arkini/assets/`. A compile step turns that folder into one canonical `GameConfig` JSON shape that the app can use during dev/build.
 
 The intended end state is:
 
@@ -18,7 +18,7 @@ The intended end state is:
   assets/*.png              # raw source PNGs; replaces src/assets over time
 
 npm run game:compile ./game/arkini
-  -> compiled canonical ArkiniGamePackage JSON
+  -> compiled canonical GameConfig JSON
 
 npm run game:validate game.json resources.json
   -> validate explicit source fragments when needed
@@ -41,7 +41,7 @@ Use top-level collections keyed by stable IDs. Avoid nested domain objects that 
 There is one canonical final shape, but no requirement that authoring uses one physical file. The compiler/loader API should be conceptually boring:
 
 ```ts
-load([json1, json2, json3]) -> ArkiniGamePackage
+load([json1, json2, json3]) -> GameConfig
 ```
 
 Each JSON source file may contain any subset of the canonical shape. A tiny one-file package is valid. A split package like `game.json` + `resources.json` is valid. A more granular package like `items.wood.json` + `lootTables.early.json` + `resources.icons.json` is valid. A small patch file that modifies one loot table can also be valid once patch semantics are explicitly defined.
@@ -49,7 +49,7 @@ Each JSON source file may contain any subset of the canonical shape. A tiny one-
 The folder compiler is just a convenience over the same source-fragment compiler:
 
 ```ts
-compileDirectory("./game/arkini") -> ArkiniGamePackage
+compileDirectory("./game/arkini") -> GameConfig
 ```
 
 It should recursively load every JSON file in the folder and add one generated resource fragment from PNGs found under `assets/`.
@@ -143,9 +143,11 @@ Expected compile responsibilities:
 1. recursively discover JSON source fragments in the input directory.
 2. parse them with source filename/path tracking.
 3. scan `assets/**/*.png` and synthesize a resources fragment.
-4. merge fragments into one canonical `ArkiniGamePackage` object.
+4. merge fragments into one canonical `GameConfig` object.
 5. validate the compiled package.
 6. write a generated canonical JSON artifact for the app/dev tooling to consume.
+
+The canonical Zod schema and cross-reference refinements live in `src/v0/game/config/GameConfigSchema.ts`, not inside `./cli`. The CLI imports this runtime-owned schema so future browser loading and local validation share the same validator. CLI-only code should stay filesystem/process focused.
 
 The exact generated output path can be finalized during implementation. Keep these principles:
 

@@ -15,7 +15,7 @@ This directory is the repo-local working memory for GPT-led Arkini work. Treat t
 
 - JSON game package compiler work is started. CLI source lives under `./cli/game/`, not `./scripts`, because it is a CLI and we are not animals. `./game/arkini/` contains the first JSON authoring package split into top-level source fragments (`items.json`, `loot-tables.json`, `producers.json`, etc.) plus copied PNG assets. `npm run game:compile -- game/arkini` writes `./game/arkini.game.json` and `./game/arkini.assets.json`. `npm run game:validate -- game/arkini` is mandatory after touching game config source, because otherwise we are just hoping JSON feelings are valid. See `v0-json-game-definition-plan-2026-06-17.md`.
 - Runtime loading is not wired yet. Current app behavior still uses the TS manifest through `GameConfig`; next migration step is to load compiled JSON through a normalization boundary without teaching TileEngine or UI surfaces about source fragments. `009-economy-content-pass` remains deferred until this config migration settles, because starting economy work now would create avoidable conflicts and humanity has already suffered enough merge conflicts for one week.
-- Producer/product-line schema is now planned as a separate runtime migration note in `v0-producer-product-line-logic-2026-06-17.md`: producer `productIds` are ordered line definitions, products own `durationMs`/`inputs`/`requirements`/optional `outputTableId`, stash and producer/product requirements can be stored or passive, and generic tile removal lives on `items.*.removeBy`, not producer logic.
+- Producer/product-line schema is now planned as a separate runtime migration note in `v0-producer-product-line-logic-2026-06-17.md`: producer `productIds` are ordered line definitions, products own `durationMs`/`inputs`/`requirements`/optional `outputTableId`, craft recipes also own `requirements`, stash and producer/product/craft requirements can be stored or passive with explicit scope, and generic tile removal lives on `items.*.removeBy`, not producer logic.
 
 ## Current mental model
 
@@ -208,7 +208,7 @@ Temporary TileEngine motion request cleanup must use `actionVisualMotionSettleme
 
 ### JSON game compiler checkpoint
 
-The repo now has the first source-package compiler for the JSON game-definition migration. Default authoring source lives under `./game/arkini/`, with raw PNG item assets in `./game/arkini/assets/` and gameplay source split by top-level key into JSON fragments such as `items.json`, `loot-tables.json`, `merge-rules.json`, `producers.json`, `stashes.json`, `craft-recipes.json`, `upgrades.json`, `assets.json`, `starting-state.json`, `game.json` and `version.json`. The old monolithic `game.json` source is gone; `game.json` now only contains the top-level `game` metadata fragment.
+The repo now has the first source-package compiler for the JSON game-definition migration. Default authoring source lives under `./game/arkini/`, with raw PNG item assets in `./game/arkini/assets/` and gameplay source split by top-level key into JSON fragments such as `items.json`, `loot-tables.json`, `merge.json`, `producers.json`, `stashes.json`, `craft-recipes.json`, `upgrades.json`, `assets.json`, `starting-state.json`, `game.json` and `version.json`. The old monolithic `game.json` source is gone; `game.json` now only contains the top-level `game` metadata fragment.
 
 Use:
 

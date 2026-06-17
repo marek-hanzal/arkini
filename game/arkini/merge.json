@@ -1,5 +1,5 @@
 {
-	"mergeRules": {
+	"merge": {
 		"merge:blueprint-draft-final": {
 			"resultItemId": "item:blueprint",
 			"withItemId": "item:blueprint-draft"

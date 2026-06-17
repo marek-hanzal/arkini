@@ -8,8 +8,10 @@ Created: 2026-06-17
 The JSON package schema now separates producer activation from product lines:
 
 - `producers.*.productIds` defines ordered production lines.
-- `products.*.inputs` defines consumed/stored line inputs.
+- `products.*.inputs` defines line inputs with explicit `consume`.
 - `products.*.requirements` defines per-line requirements.
+- `craftRecipes.*.inputs` defines craft inputs with explicit `consume`.
+- `craftRecipes.*.requirements` defines non-consumed craft requirements that must return to board/inventory on completion.
 - `producers.*.requirements` defines producer-level requirements.
 - `stashes.*.requirements` defines stash/container-level requirements.
 - `items.*.removeBy` defines generic tile removal tools, not producer behavior.
@@ -31,7 +33,7 @@ Product lines may have no output table. That is valid and represents a delayed s
 Requirements are not one thing anymore, because otherwise the model turns into soup:
 
 - `stored` requirement: item must be placed/stored on the target producer/product/stash. It is not the consumed input itself.
-- `passive` requirement: item must exist in the selected scope, currently `board`, `inventory`, or `board_or_inventory`; omitted scope means runtime should treat it as `board_or_inventory` unless the schema later makes this explicit.
+- `passive` requirement: item must exist in the selected explicit scope, currently `board`, `inventory`, or `board_or_inventory`. The scope is required in JSON so runtime does not guess.
 
 Producer-level requirements gate the whole producer. Product-level requirements gate only that line. Stash requirements gate whether the stash can be opened, beside any consumed inputs such as keys.
 
@@ -61,3 +63,11 @@ Example shape:
 ```
 
 When `mode` is `keep`, the tool item returns to its original position after removing the target tile. When `mode` is `consume`, the tool item is consumed. Removal is a board/tile interaction rule and must not be implemented as a fake producer line. Please do not make the tree run a manufacturing process called “being chopped”, we are troubled enough already.
+
+## Craft requirement completion contract
+
+Craft recipe requirements are non-consumed gating/tool items. When a craft finishes, stored craft requirements must be returned to the board first and then inventory using the same placement policy as produced items. If there is no room to return the requirements and the craft result atomically, the craft must not complete yet. Inputs are consumed at craft start; requirements are not consumed unless a future explicit rule says otherwise.
+
+## Static config cleanup checkpoint
+
+The canonical JSON schema intentionally removed producer/stash `trigger`, merge `inputCount`, and `startingState.resources`. Merge definitions live under `merge`, items point to them through `mergeIds`, chance loot entries use `chance`, activation/craft inputs require explicit `consume`, and passive requirements require explicit `scope`. Product lines are enabled by default by contract and do not need a config flag.

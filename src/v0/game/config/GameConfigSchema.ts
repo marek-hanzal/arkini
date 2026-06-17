@@ -3,6 +3,10 @@ import { z } from "zod";
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
+const SignedIntegerSchema = z.number().int();
+const PlacementSchema = z.enum([
+	"board_then_inventory",
+]);
 
 const QuantitySchema = z.union([
 	PositiveIntegerSchema,
@@ -22,7 +26,15 @@ const ItemStackInputSchema = z
 		itemId: IdSchema,
 		quantity: PositiveIntegerSchema,
 		capacity: PositiveIntegerSchema,
-		consume: z.boolean().optional(),
+		consume: z.boolean(),
+	})
+	.strict();
+
+const CraftRecipeInputSchema = z
+	.object({
+		itemId: IdSchema,
+		quantity: PositiveIntegerSchema,
+		consume: z.boolean(),
 	})
 	.strict();
 
@@ -40,25 +52,21 @@ const PassiveItemRequirementSchema = z
 		type: z.literal("passive"),
 		itemId: IdSchema,
 		quantity: PositiveIntegerSchema,
-		scope: z
-			.enum([
-				"board",
-				"inventory",
-				"board_or_inventory",
-			])
-			.optional(),
+		scope: z.enum([
+			"board",
+			"inventory",
+			"board_or_inventory",
+		]),
 	})
 	.strict();
 
-const ActivationInputSchema = z.array(ItemStackInputSchema).optional();
-const ActivationRequirementSchema = z
-	.array(
-		z.discriminatedUnion("type", [
-			StoredItemRequirementSchema,
-			PassiveItemRequirementSchema,
-		]),
-	)
-	.optional();
+const ActivationInputSchema = z.array(ItemStackInputSchema);
+const ActivationRequirementSchema = z.array(
+	z.discriminatedUnion("type", [
+		StoredItemRequirementSchema,
+		PassiveItemRequirementSchema,
+	]),
+);
 
 const ActivationOutputSchema = z.array(
 	z.discriminatedUnion("type", [
@@ -73,7 +81,7 @@ const ActivationOutputSchema = z.array(
 			.object({
 				type: z.literal("chance"),
 				itemId: IdSchema,
-				probability: z.number().min(0).max(1),
+				chance: z.number().min(0).max(1),
 				quantity: QuantitySchema.optional(),
 			})
 			.strict(),
@@ -140,12 +148,11 @@ const AssetDefinitionSchema = z
 	})
 	.strict();
 
-const MergeRuleSchema = z
+const MergeDefinitionSchema = z
 	.object({
 		withItemId: IdSchema,
 		resultItemId: IdSchema,
 		consumeSource: z.boolean().optional(),
-		inputCount: z.literal(2).optional(),
 		secret: z.boolean().optional(),
 	})
 	.strict();
@@ -171,7 +178,7 @@ const ItemDefinitionSchema = z
 		label: z.string().optional(),
 		tags: z.array(z.string().min(1)),
 		sort: NonNegativeIntegerSchema,
-		mergeRuleIds: z.array(IdSchema).optional(),
+		mergeIds: z.array(IdSchema).optional(),
 		producerId: IdSchema.optional(),
 		stashId: IdSchema.optional(),
 		craftRecipeId: IdSchema.optional(),
@@ -182,7 +189,6 @@ const ItemDefinitionSchema = z
 const ProducerDefinitionSchema = z
 	.object({
 		type: z.literal("producer"),
-		trigger: z.literal("click"),
 		productIds: z.array(IdSchema).min(1),
 		requirements: ActivationRequirementSchema,
 	})
@@ -191,8 +197,7 @@ const ProducerDefinitionSchema = z
 const StashDefinitionSchema = z
 	.object({
 		type: z.literal("stash"),
-		trigger: z.literal("click"),
-		placement: z.literal("board_then_inventory"),
+		placement: PlacementSchema,
 		outputTableId: IdSchema,
 		inputs: ActivationInputSchema,
 		requirements: ActivationRequirementSchema,
@@ -211,14 +216,8 @@ const StashDefinitionSchema = z
 const CraftRecipeSchema = z
 	.object({
 		resultItemId: IdSchema,
-		inputs: z.array(
-			z
-				.object({
-					itemId: IdSchema,
-					quantity: PositiveIntegerSchema,
-				})
-				.strict(),
-		),
+		inputs: z.array(CraftRecipeInputSchema),
+		requirements: ActivationRequirementSchema,
 		durationMs: NonNegativeIntegerSchema,
 	})
 	.strict();
@@ -234,7 +233,7 @@ const ProductDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
 		durationMs: NonNegativeIntegerSchema,
-		placement: z.literal("board_then_inventory"),
+		placement: PlacementSchema,
 		inputs: ActivationInputSchema,
 		requirements: ActivationRequirementSchema,
 		outputTableId: IdSchema.optional(),
@@ -253,7 +252,7 @@ const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
 		.object({
 			type: z.literal("product.duration.add"),
 			productId: IdSchema,
-			ms: z.number().int(),
+			ms: SignedIntegerSchema,
 		})
 		.strict(),
 	z
@@ -261,6 +260,14 @@ const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
 			type: z.literal("product.outputTable.set"),
 			productId: IdSchema,
 			tableId: IdSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("product.input.quantity.add"),
+			productId: IdSchema,
+			itemId: IdSchema,
+			quantity: SignedIntegerSchema,
 		})
 		.strict(),
 ]);
@@ -285,14 +292,6 @@ const UpgradeDefinitionSchema = z
 
 const StartingStateDefinitionSchema = z
 	.object({
-		resources: z.array(
-			z
-				.object({
-					resourceId: IdSchema,
-					quantity: NonNegativeIntegerSchema,
-				})
-				.strict(),
-		),
 		inventory: z.array(
 			z
 				.object({
@@ -320,7 +319,7 @@ const GameConfigFragmentSchema = z
 		resources: z.record(IdSchema, ResourceDefinitionSchema).optional(),
 		assets: z.record(IdSchema, AssetDefinitionSchema).optional(),
 		items: z.record(IdSchema, ItemDefinitionSchema).optional(),
-		mergeRules: z.record(IdSchema, MergeRuleSchema).optional(),
+		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema).optional(),
@@ -338,7 +337,7 @@ const BaseGameConfigSchema = z
 		resources: z.record(IdSchema, ResourceDefinitionSchema),
 		assets: z.record(IdSchema, AssetDefinitionSchema),
 		items: z.record(IdSchema, ItemDefinitionSchema),
-		mergeRules: z.record(IdSchema, MergeRuleSchema),
+		merge: z.record(IdSchema, MergeDefinitionSchema),
 		producers: z.record(IdSchema, ProducerDefinitionSchema),
 		stashes: z.record(IdSchema, StashDefinitionSchema),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema),
@@ -353,7 +352,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasResource = createRecordGuard(value.resources);
 	const hasAsset = createRecordGuard(value.assets);
 	const hasItem = createRecordGuard(value.items);
-	const hasMergeRule = createRecordGuard(value.mergeRules);
+	const hasMerge = createRecordGuard(value.merge);
 	const hasProducer = createRecordGuard(value.producers);
 	const hasProduct = createRecordGuard(value.products);
 	const hasStash = createRecordGuard(value.stashes);
@@ -399,17 +398,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 
-		for (const [index, mergeRuleId] of (item.mergeRuleIds ?? []).entries()) {
-			if (!hasMergeRule(mergeRuleId)) {
+		for (const [index, mergeId] of (item.mergeIds ?? []).entries()) {
+			if (!hasMerge(mergeId)) {
 				addIssue(
 					ctx,
 					[
 						"items",
 						itemId,
-						"mergeRuleIds",
+						"mergeIds",
 						index,
 					],
-					`Missing merge rule "${mergeRuleId}".`,
+					`Missing merge "${mergeId}".`,
 				);
 			}
 		}
@@ -467,28 +466,28 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
-	for (const [mergeRuleId, mergeRule] of Object.entries(value.mergeRules)) {
-		if (!hasItem(mergeRule.withItemId)) {
+	for (const [mergeId, merge] of Object.entries(value.merge)) {
+		if (!hasItem(merge.withItemId)) {
 			addIssue(
 				ctx,
 				[
-					"mergeRules",
-					mergeRuleId,
+					"merge",
+					mergeId,
 					"withItemId",
 				],
-				`Missing item "${mergeRule.withItemId}".`,
+				`Missing item "${merge.withItemId}".`,
 			);
 		}
 
-		if (!hasItem(mergeRule.resultItemId)) {
+		if (!hasItem(merge.resultItemId)) {
 			addIssue(
 				ctx,
 				[
-					"mergeRules",
-					mergeRuleId,
+					"merge",
+					mergeId,
 					"resultItemId",
 				],
-				`Missing item "${mergeRule.resultItemId}".`,
+				`Missing item "${merge.resultItemId}".`,
 			);
 		}
 	}
@@ -582,21 +581,26 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 
-		for (const [index, input] of recipe.inputs.entries()) {
-			if (!hasItem(input.itemId)) {
-				addIssue(
-					ctx,
-					[
-						"craftRecipes",
-						craftRecipeId,
-						"inputs",
-						index,
-						"itemId",
-					],
-					`Missing item "${input.itemId}".`,
-				);
-			}
-		}
+		validateCraftRecipeInputs(
+			ctx,
+			[
+				"craftRecipes",
+				craftRecipeId,
+				"inputs",
+			],
+			recipe.inputs,
+			hasItem,
+		);
+		validateItemRequirements(
+			ctx,
+			[
+				"craftRecipes",
+				craftRecipeId,
+				"requirements",
+			],
+			recipe.requirements,
+			hasItem,
+		);
 	}
 
 	for (const [lootTableId, lootTable] of Object.entries(value.lootTables)) {
@@ -682,6 +686,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 						],
 						`Missing product "${effect.productId}".`,
 					);
+					continue;
 				}
 
 				if (effect.type === "product.outputTable.set" && !hasLootTable(effect.tableId)) {
@@ -698,6 +703,44 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 						],
 						`Missing loot table "${effect.tableId}".`,
 					);
+				}
+
+				if (effect.type === "product.input.quantity.add") {
+					if (!hasItem(effect.itemId)) {
+						addIssue(
+							ctx,
+							[
+								"upgrades",
+								upgradeId,
+								"tiers",
+								tierIndex,
+								"effects",
+								effectIndex,
+								"itemId",
+							],
+							`Missing item "${effect.itemId}".`,
+						);
+					}
+
+					const product = value.products[effect.productId];
+					if (
+						product &&
+						!product.inputs.some((input) => input.itemId === effect.itemId)
+					) {
+						addIssue(
+							ctx,
+							[
+								"upgrades",
+								upgradeId,
+								"tiers",
+								tierIndex,
+								"effects",
+								effectIndex,
+								"itemId",
+							],
+							`Product "${effect.productId}" has no input "${effect.itemId}".`,
+						);
+					}
 				}
 			}
 		}
@@ -781,14 +824,35 @@ const addIssue = (ctx: z.RefinementCtx, path: GameConfigIssuePath, message: stri
 const validateItemInputs = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	inputs:
-		| readonly {
-				itemId: string;
-		  }[]
-		| undefined,
+	inputs: readonly {
+		itemId: string;
+	}[],
 	hasItem: (itemId: string) => boolean,
 ) => {
-	for (const [index, input] of (inputs ?? []).entries()) {
+	for (const [index, input] of inputs.entries()) {
+		if (!hasItem(input.itemId)) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+					"itemId",
+				],
+				`Missing item "${input.itemId}".`,
+			);
+		}
+	}
+};
+
+const validateCraftRecipeInputs = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	inputs: readonly {
+		itemId: string;
+	}[],
+	hasItem: (itemId: string) => boolean,
+) => {
+	for (const [index, input] of inputs.entries()) {
 		if (!hasItem(input.itemId)) {
 			addIssue(
 				ctx,
@@ -806,14 +870,12 @@ const validateItemInputs = (
 const validateItemRequirements = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	requirements:
-		| readonly {
-				itemId: string;
-		  }[]
-		| undefined,
+	requirements: readonly {
+		itemId: string;
+	}[],
 	hasItem: (itemId: string) => boolean,
 ) => {
-	for (const [index, requirement] of (requirements ?? []).entries()) {
+	for (const [index, requirement] of requirements.entries()) {
 		if (!hasItem(requirement.itemId)) {
 			addIssue(
 				ctx,

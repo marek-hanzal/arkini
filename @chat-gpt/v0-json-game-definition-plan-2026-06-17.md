@@ -63,7 +63,7 @@ Expected package sections, names still negotiable:
 - `stashes`: stash/container behavior definitions keyed by stash id.
 - `lootTables`: reusable weighted output tables keyed by loot table id.
 - `products`: reusable producer/product definitions keyed by product id. Producer outputs should reference product ids, not inline output objects.
-- `mergeRules`: merge relationships keyed or listed with input/result ids.
+- `merge`: asymmetric two-item merge relationships keyed by merge id. Items reference them through `mergeIds`.
 - `upgrades`: upgrade/building/blueprint relationships keyed by upgrade id.
 - `recipes`: craft/build recipes if/when separated from upgrades.
 - `board`, `inventory`, `economy`, `timing`, `uiHints`: only if the current TS manifest actually needs these concepts represented outside code.
@@ -287,7 +287,7 @@ Implemented the first version of the JSON source package toolchain:
 
 - `./game/arkini/` is now the default authoring source folder.
 - Existing game PNG item assets were copied into `./game/arkini/assets/`.
-- The initial monolithic `./game/arkini/game.json` source was split by top-level key into focused fragments (`items.json`, `loot-tables.json`, `merge-rules.json`, `producers.json`, `stashes.json`, `craft-recipes.json`, `upgrades.json`, `assets.json`, `starting-state.json`, `game.json`, `version.json`). `game.json` now contains only the `game` metadata fragment. The old dump shape is not supported.
+- The initial monolithic `./game/arkini/game.json` source was split by top-level key into focused fragments (`items.json`, `loot-tables.json`, `merge.json`, `producers.json`, `stashes.json`, `craft-recipes.json`, `upgrades.json`, `assets.json`, `starting-state.json`, `game.json`, `version.json`). `game.json` now contains only the `game` metadata fragment. The old dump shape is not supported.
 - `npm run game:compile -- game/arkini` recursively reads JSON fragments, scans `assets/**/*.png`, generates `{ "resourceId": { "data": "...base64..." } }` resource entries, validates the merged package, and writes:
   - `./game/arkini.game.json`
   - `./game/arkini.assets.json`

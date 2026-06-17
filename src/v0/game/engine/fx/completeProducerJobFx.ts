@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
@@ -63,6 +64,10 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			type: "completed" as const,
 		} satisfies GameEngineCompletionResult;
 	}
+
+	yield* match(product.placement)
+		.with("board_then_inventory", () => Effect.void)
+		.exhaustive();
 
 	const lootTable = config.lootTables[product.outputTableId];
 

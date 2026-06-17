@@ -80,6 +80,7 @@ export const GameSaveScheduledEventBaseSchema = z
 		dueAtMs: NonNegativeIntegerSchema,
 		exclusiveKey: IdSchema.optional(),
 		afterEventIds: z.array(IdSchema).optional(),
+		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
 	})
 	.strict();
 

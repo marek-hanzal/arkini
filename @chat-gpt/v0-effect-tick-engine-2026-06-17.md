@@ -210,3 +210,24 @@ Implemented `stash.open` as the second `applyGameActionFx` branch. The action is
 - scheduler dependencies use `afterEventIds` so source removal/replacement does not fire while exclusive/sequential output events are still pending.
 
 The old product-specific input helper was replaced with activation-level helpers so products and stashes share one input-consumption path. Keep new gameplay actions in `fx/*` and keep adding focused schema/type files instead of embedding more anonymous object schemas into parent schemas.
+
+## 2026-06-17 action-closure checkpoint
+
+Implemented the remaining initial tick-engine action slice so the standalone engine can cover core gameplay intent before UI/storage integration:
+
+- `producer.product.start` now queues jobs per producer instance instead of starting parallel jobs. A producer may be fed again while a job is running, but the next job starts at the previous job's `completesAtMs`.
+- `craft.start` is supported. Craft inputs are consumed at start with `reason: "craft-input"`; stored craft requirements are reserved/removed at start with `reason: "craft-requirement"`; the craft job stores `returnItems`, which completion returns together with the craft result.
+- `tile.remove` is supported through `items.*.removeBy`. `mode: "keep"` leaves the tool in place/inventory, `mode: "consume"` consumes one tool unit. The target board tile emits `item.removed` with `reason: "tile-remove"`.
+- `item.merge` is supported as an asymmetric source-driven action. The source item chooses the merge rule through its `mergeIds`; the target must currently be a board tile and is replaced with the merge result. Source is consumed unless the merge rule says `consumeSource: false`.
+- Scheduled blocked item spawns now mark `lastBlockedAtMs` and emit `item.spawn.blocked` only the first time they get blocked. The event remains pending and can still complete after space becomes available, but repeated ticks no longer spam duplicate blocked events.
+- Engine code continues to use Effect-first `fx/*` files. New action schemas live in their own files.
+- `GameConfigSchema` now validates starting-state inventory slot count, starting inventory quantities against `maxStackSize`, and duplicate starting board cells.
+- Product/stash/product-completion placement is explicitly matched even though `board_then_inventory` is still the only supported enum value. Keep this pattern so future placement modes force exhaustive handling.
+
+Still not done in this slice:
+
+- UI adapter from existing gameplay events to the new engine events.
+- readiness/selectors for “what can the player do now?”.
+- upgrades.
+- persistence/Dexie integration.
+- active runtime DB/inventory hardening from the review report.

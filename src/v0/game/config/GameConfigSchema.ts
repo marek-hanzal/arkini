@@ -918,6 +918,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
+	if (value.startingState.inventory.length > value.game.inventory.slots) {
+		addIssue(
+			ctx,
+			[
+				"startingState",
+				"inventory",
+			],
+			`Starting inventory has ${value.startingState.inventory.length} stacks but only ${value.game.inventory.slots} slots are configured.`,
+		);
+	}
+
 	for (const [index, entry] of value.startingState.inventory.entries()) {
 		if (!hasItem(entry.itemId)) {
 			addIssue(
@@ -930,9 +941,25 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				],
 				`Missing item "${entry.itemId}".`,
 			);
+			continue;
+		}
+
+		const item = value.items[entry.itemId];
+		if (item && entry.quantity > item.maxStackSize) {
+			addIssue(
+				ctx,
+				[
+					"startingState",
+					"inventory",
+					index,
+					"quantity",
+				],
+				`Quantity must be <= item maxStackSize (${item.maxStackSize}).`,
+			);
 		}
 	}
 
+	const usedStartingBoardCells = new Set<string>();
 	for (const [index, entry] of value.startingState.board.entries()) {
 		if (!hasItem(entry.itemId)) {
 			addIssue(
@@ -972,6 +999,20 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`y must be < board height (${value.game.board.height}).`,
 			);
 		}
+
+		const cellKey = `${entry.x}:${entry.y}`;
+		if (usedStartingBoardCells.has(cellKey)) {
+			addIssue(
+				ctx,
+				[
+					"startingState",
+					"board",
+					index,
+				],
+				`Duplicate starting board cell (${entry.x}, ${entry.y}).`,
+			);
+		}
+		usedStartingBoardCells.add(cellKey);
 	}
 });
 

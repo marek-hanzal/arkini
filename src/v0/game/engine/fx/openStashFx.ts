@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
@@ -71,6 +72,10 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		requirements: stash.requirements,
 		save,
 	});
+
+	yield* match(stash.placement)
+		.with("board_then_inventory", () => Effect.void)
+		.exhaustive();
 
 	const consumed = yield* consumeActivationInputsFx({
 		inputRefs: action.inputRefs,

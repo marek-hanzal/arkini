@@ -339,4 +339,255 @@ describe("applyGameActionFx", () => {
 			"stash.opened",
 		]);
 	});
+
+	it("queues product jobs for the same producer instead of running them in parallel", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const first = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		const second = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 600,
+			save: first.save,
+		});
+
+		expect(second.save.producerJobs["job:2"]).toMatchObject({
+			completesAtMs: 2500,
+			startedAtMs: 1500,
+		});
+		expect(second.nextWakeAtMs).toBe(1500);
+	});
+
+	it("starts craft jobs by consuming inputs and reserving stored requirements", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"craft:plank": {
+					...baseConfig.craftRecipes["craft:plank"],
+					requirements: [
+						{
+							capacity: 1,
+							itemId: "item:axe",
+							quantity: 1,
+							type: "stored",
+						},
+					],
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 2,
+					width: 3,
+				},
+			},
+			startingState: {
+				board: [],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+					},
+					{
+						itemId: "item:axe",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [
+					{
+						kind: "inventory",
+						quantity: 2,
+						slotIndex: 0,
+					},
+				],
+				recipeId: "craft:plank",
+				requirementRefs: [
+					{
+						kind: "inventory",
+						quantity: 1,
+						slotIndex: 1,
+					},
+				],
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.inventory.slots).toEqual([
+			null,
+			null,
+		]);
+		expect(result.save.craftJobs["job:1"]).toMatchObject({
+			completesAtMs: 1100,
+			recipeId: "craft:plank",
+			returnItems: [
+				{
+					itemId: "item:axe",
+					quantity: 1,
+				},
+			],
+			startedAtMs: 100,
+		});
+		expect(result.events.map((event) => event.type)).toEqual([
+			"item.consumed",
+			"item.consumed",
+			"craft.started",
+		]);
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:twig",
+				reason: "craft-input",
+			},
+			{
+				itemId: "item:axe",
+				reason: "craft-requirement",
+			},
+			{
+				completesAtMs: 1100,
+				type: "craft.started",
+			},
+		]);
+	});
+
+	it("removes a tile with a kept tool", () => {
+		const config = createEngineTestConfig({
+			startingState: {
+				board: [
+					{
+						itemId: "item:rock",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:axe",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				targetItemInstanceId: "item-instance:1",
+				toolRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				type: "tile.remove",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items).toEqual({});
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:axe",
+			quantity: 1,
+		});
+		expect(result.events).toEqual([
+			{
+				itemId: "item:rock",
+				itemInstanceId: "item-instance:1",
+				reason: "tile-remove",
+				removedAtMs: 100,
+				type: "item.removed",
+			},
+		]);
+	});
+
+	it("merges an inventory source into a board target", () => {
+		const config = createEngineTestConfig({
+			startingState: {
+				board: [
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				sourceRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "item.merge",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toBeNull();
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:plank",
+		});
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:twig",
+				reason: "merge-source",
+				type: "item.consumed",
+			},
+			{
+				fromItemId: "item:twig",
+				reason: "merge-result",
+				toItemId: "item:plank",
+				type: "item.replaced",
+			},
+		]);
+	});
 });

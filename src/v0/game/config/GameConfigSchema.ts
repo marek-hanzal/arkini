@@ -1,13 +1,124 @@
 import { z } from "zod";
 
+/**
+ * Canonical Arkini v0 game package contract.
+ *
+ * This file is intentionally owned by the runtime game source, not by the CLI. The
+ * local `game:compile` and `game:validate` commands import the same schema that the
+ * browser-side loader will eventually use, so JSON authoring feedback and runtime
+ * package loading do not drift into two similar-but-different religions. Humanity
+ * already tried that with date formats and somehow survived, but we should not test
+ * its luck again.
+ *
+ * `GameConfig` is the compiled, canonical shape consumed by the game engine. Authoring
+ * files under `./game/<package>/` may be split into any number of JSON fragments, but
+ * after compile/merge the engine must only see this single shape:
+ *
+ * ```txt
+ * resources -> assets -> items -> merge/producers/products/stashes/craft/loot/upgrades
+ * ```
+ *
+ * The package contains static game truth only. Mutable save state such as occupied
+ * board slots, producer line progress, disabled production lines, running craft jobs
+ * or upgrade progress belongs to the save/runtime engine state, not here.
+ *
+ * Important gameplay contracts represented by this schema:
+ *
+ * - Board tiles never stack. Produced/crafted/dropped items are placed onto empty board
+ *   cells first and then into inventory stacks/slots through `board_then_inventory`.
+ * - Inventory may stack items up to each item's `maxStackSize`.
+ * - Merge definitions are intentionally asymmetric. An item opts into its merge options
+ *   through `items.*.mergeIds`; the reverse direction is not automatic unless authored.
+ * - Activation inputs always say whether they are consumed. Producer/product/stash/craft
+ *   code must not guess this from context, because guessing is just a bug wearing a hat.
+ * - Passive requirements always declare their search scope (`board`, `inventory`, or
+ *   `board_or_inventory`). They model global knowledge/permission/ownership gates, not
+ *   spatial adjacency or aura rules.
+ * - Producer `productIds` are ordered production lines. If multiple lines can use the
+ *   same input, runtime should feed/start them from top to bottom unless the player has
+ *   disabled a line in save state.
+ * - Product and craft inputs are consumed at start. Outputs/results are emitted at
+ *   completion. Craft requirements are non-consumed gating/tool items and must be able
+ *   to return together with the craft result before the craft can complete.
+ * - A product without `outputTableId` is valid. That is a delayed sink/destructor such
+ *   as a shredder.
+ * - `items.*.removeBy` is a generic board/tile removal rule. It is not producer logic.
+ *
+ * Minimal source fragment example:
+ *
+ * ```json
+ * {
+ *   "items": {
+ *     "item:twig": {
+ *       "assetId": "asset:twig",
+ *       "code": "twig",
+ *       "name": "Twig",
+ *       "tier": 0,
+ *       "maxStackSize": 32,
+ *       "description": "A tiny piece of future infrastructure.",
+ *       "tags": ["wood"],
+ *       "sort": 10,
+ *       "mergeIds": ["merge:twig-to-stick"]
+ *     }
+ *   },
+ *   "merge": {
+ *     "merge:twig-to-stick": {
+ *       "withItemId": "item:twig",
+ *       "resultItemId": "item:stick"
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * Producer line example:
+ *
+ * ```json
+ * {
+ *   "producers": {
+ *     "producer:lumber-camp": {
+ *       "type": "producer",
+ *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
+ *       "requirements": []
+ *     }
+ *   },
+ *   "products": {
+ *     "product:lumber-camp.saw": {
+ *       "name": "Saw logs",
+ *       "durationMs": 5000,
+ *       "placement": "board_then_inventory",
+ *       "inputs": [{ "itemId": "item:log", "quantity": 1, "capacity": 1, "consume": true }],
+ *       "requirements": [
+ *         { "type": "passive", "itemId": "item:saw-license", "quantity": 1, "scope": "board_or_inventory" }
+ *       ],
+ *       "outputTableId": "loot:lumber-camp.saw"
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * The schema validates structure and cross-reference integrity. It does not run the
+ * economy. The standalone engine should still be tested against this contract by
+ * applying actions/ticks to `(config, save)` and asserting emitted events plus resulting
+ * save changes. In other words: this file says what the game is allowed to mean; engine
+ * tests prove the runtime actually respects it instead of performing interpretive dance.
+ */
+
+/** Stable authoring ID. IDs are plain strings so JSON fragments can cross-link by key. */
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
 const SignedIntegerSchema = z.number().int();
+/**
+ * Output placement policy.
+ *
+ * Keep this as an enum even while it has one value so runtime code can use exhaustive
+ * matching when future placement modes finally arrive to make our lives worse.
+ */
 const PlacementSchema = z.enum([
 	"board_then_inventory",
 ]);
 
+/** Fixed or ranged output quantity used by loot tables. */
 const QuantitySchema = z.union([
 	PositiveIntegerSchema,
 	z
@@ -21,6 +132,10 @@ const QuantitySchema = z.union([
 		}),
 ]);
 
+/**
+ * Input slot for activations that can be gradually filled, currently products/stashes.
+ * `consume` is required because config authors must see whether a fed item disappears.
+ */
 const ItemStackInputSchema = z
 	.object({
 		itemId: IdSchema,
@@ -30,6 +145,7 @@ const ItemStackInputSchema = z
 	})
 	.strict();
 
+/** Craft input consumed or preserved at craft start; craft has no stored capacity slot. */
 const CraftRecipeInputSchema = z
 	.object({
 		itemId: IdSchema,
@@ -38,6 +154,10 @@ const CraftRecipeInputSchema = z
 	})
 	.strict();
 
+/**
+ * Stored requirement means the item is placed onto the target capability and gates use.
+ * It is not an activation input. Runtime must return craft requirements on completion.
+ */
 const StoredItemRequirementSchema = z
 	.object({
 		type: z.literal("stored"),
@@ -47,6 +167,10 @@ const StoredItemRequirementSchema = z
 	})
 	.strict();
 
+/**
+ * Passive requirement gates by ownership/presence in an explicit scope. This deliberately
+ * avoids spatial rules such as adjacency; those are not part of the current engine DSL.
+ */
 const PassiveItemRequirementSchema = z
 	.object({
 		type: z.literal("passive"),
@@ -68,6 +192,12 @@ const ActivationRequirementSchema = z.array(
 	]),
 );
 
+/**
+ * Loot output model.
+ *
+ * `guaranteed` always emits, `chance` is an independent probability roll, and
+ * `weighted` chooses from weighted entries for the configured number of rolls.
+ */
 const ActivationOutputSchema = z.array(
 	z.discriminatedUnion("type", [
 		z
@@ -105,6 +235,7 @@ const ActivationOutputSchema = z.array(
 	]),
 );
 
+/** Package-level board/inventory dimensions and human-readable title. */
 const GameMetaSchema = z
 	.object({
 		id: IdSchema,
@@ -123,12 +254,14 @@ const GameMetaSchema = z
 	})
 	.strict();
 
+/** Generated base64 resource payload, usually from PNG files under `game/<id>/assets`. */
 const ResourceDefinitionSchema = z
 	.object({
 		data: z.string().min(1),
 	})
 	.strict();
 
+/** Render-facing asset metadata that maps game definitions to generated resources. */
 const AssetDefinitionSchema = z
 	.object({
 		kind: z.enum([
@@ -148,6 +281,7 @@ const AssetDefinitionSchema = z
 	})
 	.strict();
 
+/** Asymmetric two-item merge option referenced from `items.*.mergeIds`. */
 const MergeDefinitionSchema = z
 	.object({
 		withItemId: IdSchema,
@@ -157,6 +291,7 @@ const MergeDefinitionSchema = z
 	})
 	.strict();
 
+/** Generic tile removal tool rule. `keep` returns the tool; `consume` destroys it. */
 const RemoveByDefinitionSchema = z
 	.object({
 		itemId: IdSchema,
@@ -167,6 +302,13 @@ const RemoveByDefinitionSchema = z
 	})
 	.strict();
 
+/**
+ * Core tile/item definition.
+ *
+ * An item may be plain merge content, a producer tile, stash/container tile, craft
+ * blueprint, removable obstacle, tool, currency-like stackable object, or any tasteful
+ * combination the future economy decides to inflict on us.
+ */
 const ItemDefinitionSchema = z
 	.object({
 		assetId: IdSchema,
@@ -186,6 +328,7 @@ const ItemDefinitionSchema = z
 	})
 	.strict();
 
+/** Producer shell with ordered product lines and producer-level requirements. */
 const ProducerDefinitionSchema = z
 	.object({
 		type: z.literal("producer"),
@@ -194,6 +337,7 @@ const ProducerDefinitionSchema = z
 	})
 	.strict();
 
+/** Click/open container that may consume inputs, check requirements and emit loot charges. */
 const StashDefinitionSchema = z
 	.object({
 		type: z.literal("stash"),
@@ -213,6 +357,12 @@ const StashDefinitionSchema = z
 	})
 	.strict();
 
+/**
+ * Delayed recipe outside two-item merge.
+ *
+ * Inputs are handled at start. Requirements gate craft and must be placeable back with
+ * the result when the duration completes.
+ */
 const CraftRecipeSchema = z
 	.object({
 		resultItemId: IdSchema,
@@ -222,6 +372,7 @@ const CraftRecipeSchema = z
 	})
 	.strict();
 
+/** Reusable output table referenced by stashes and product lines. */
 const LootTableDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
@@ -229,6 +380,12 @@ const LootTableDefinitionSchema = z
 	})
 	.strict();
 
+/**
+ * Producer product line.
+ *
+ * Product lines are enabled by default by static contract. Player-disabled lines belong
+ * to save state. Missing `outputTableId` means a valid delayed sink/destructor product.
+ */
 const ProductDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
@@ -247,6 +404,7 @@ const UpgradeCostDefinitionSchema = z
 	})
 	.strict();
 
+/** Upgrade effects intentionally target product lines, not producer tiles. */
 const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
 	z
 		.object({
@@ -290,6 +448,7 @@ const UpgradeDefinitionSchema = z
 	})
 	.strict();
 
+/** New-game seed. Board entries are individual tiles; inventory entries may stack. */
 const StartingStateDefinitionSchema = z
 	.object({
 		inventory: z.array(
@@ -312,6 +471,10 @@ const StartingStateDefinitionSchema = z
 	})
 	.strict();
 
+/**
+ * Authoring fragment shape. Any source JSON may contain any subset of these sections;
+ * the CLI merges fragments into `BaseGameConfigSchema` before full validation.
+ */
 const GameConfigFragmentSchema = z
 	.object({
 		version: z.literal(1).optional(),
@@ -330,6 +493,7 @@ const GameConfigFragmentSchema = z
 	})
 	.strict();
 
+/** Fully compiled canonical package shape before cross-reference validation. */
 const BaseGameConfigSchema = z
 	.object({
 		version: z.literal(1),
@@ -348,6 +512,14 @@ const BaseGameConfigSchema = z
 	})
 	.strict();
 
+/**
+ * Canonical config parser with cross-reference validation.
+ *
+ * Structural Zod validation catches malformed sections. This refinement catches the
+ * problems that actually ruin content work: missing referenced items/assets/resources,
+ * broken product/loot links, invalid starting board coordinates and upgrade effects
+ * pointing at products or inputs that do not exist.
+ */
 export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) => {
 	const hasResource = createRecordGuard(value.resources);
 	const hasAsset = createRecordGuard(value.assets);
@@ -807,7 +979,9 @@ export type GameConfig = z.infer<typeof GameConfigSchema>;
 export type GameConfigFragment = z.infer<typeof GameConfigFragmentSchema>;
 export type GameConfigIssuePath = (string | number)[];
 
+/** Parse one authoring fragment before merge. */
 export const parseGameConfigFragment = (value: unknown) => GameConfigFragmentSchema.parse(value);
+/** Parse and fully validate the compiled canonical package. */
 export const parseGameConfig = (value: unknown) => GameConfigSchema.parse(value);
 
 const createRecordGuard = (record: Readonly<Record<string, unknown>>) => (key: string) =>

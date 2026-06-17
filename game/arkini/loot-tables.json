@@ -1,0 +1,772 @@
+{
+	"lootTables": {
+		"loot:coal-mine-1": {
+			"name": "Coal Mine I",
+			"output": [
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:coin",
+					"probability": 0.12,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:crate-1": {
+			"name": "Common Crate",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:twig",
+							"quantity": 1,
+							"weight": 35
+						},
+						{
+							"itemId": "item:pebble",
+							"quantity": 1,
+							"weight": 35
+						},
+						{
+							"itemId": "item:water",
+							"quantity": 1,
+							"weight": 15
+						},
+						{
+							"itemId": "item:seed",
+							"quantity": 1,
+							"weight": 12
+						},
+						{
+							"itemId": "item:coin",
+							"quantity": 1,
+							"weight": 8
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:twig",
+					"probability": 0.18,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:crate-2": {
+			"name": "Sturdy Crate",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:branch",
+							"quantity": 1,
+							"weight": 35
+						},
+						{
+							"itemId": "item:stone",
+							"quantity": 1,
+							"weight": 35
+						},
+						{
+							"itemId": "item:water",
+							"quantity": 1,
+							"weight": 15
+						},
+						{
+							"itemId": "item:crate-1",
+							"quantity": 1,
+							"weight": 12
+						},
+						{
+							"itemId": "item:coin-pair",
+							"quantity": 1,
+							"weight": 8
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:pebble",
+					"probability": 0.22,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:crate-3": {
+			"name": "Rare Crate",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:log",
+							"quantity": 1,
+							"weight": 30
+						},
+						{
+							"itemId": "item:crystal",
+							"quantity": 1,
+							"weight": 30
+						},
+						{
+							"itemId": "item:crate-2",
+							"quantity": 1,
+							"weight": 20
+						},
+						{
+							"itemId": "item:water",
+							"quantity": 1,
+							"weight": 16
+						},
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 1,
+							"weight": 8
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:branch",
+					"probability": 0.24,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:epic-key",
+					"probability": 0.1,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:crate-4": {
+			"name": "Epic Crate",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:wood-bundle",
+							"quantity": 1,
+							"weight": 25
+						},
+						{
+							"itemId": "item:beam",
+							"quantity": 1,
+							"weight": 15
+						},
+						{
+							"itemId": "item:crystal",
+							"quantity": 1,
+							"weight": 25
+						},
+						{
+							"itemId": "item:gem",
+							"quantity": 1,
+							"weight": 15
+						},
+						{
+							"itemId": "item:water",
+							"quantity": 1,
+							"weight": 16
+						},
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 1,
+							"weight": 8
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:crate-3",
+					"probability": 0.2,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:lumber-camp-1": {
+			"name": "Lumber Camp I",
+			"output": [
+				{
+					"itemId": "item:twig",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:branch",
+					"probability": 0.35,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:coin",
+					"probability": 0.08,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:lumber-camp-1:better-1": {
+			"name": "Lumber Camp I Better Finds I",
+			"output": [
+				{
+					"itemId": "item:twig",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:branch",
+					"probability": 0.55,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:coin",
+					"probability": 0.1,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:lumber-camp-1:better-2": {
+			"name": "Lumber Camp I Better Finds II",
+			"output": [
+				{
+					"itemId": "item:branch",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:twig",
+					"probability": 0.85,
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				},
+				{
+					"itemId": "item:log",
+					"probability": 0.24,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:coin-pair",
+					"probability": 0.08,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:lumber-camp-2": {
+			"name": "Lumber Camp II",
+			"output": [
+				{
+					"itemId": "item:branch",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:twig",
+					"probability": 0.5,
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				},
+				{
+					"itemId": "item:log",
+					"probability": 0.35,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:lumber-camp-3": {
+			"name": "Lumber Camp III",
+			"output": [
+				{
+					"itemId": "item:branch",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:log",
+					"probability": 0.7,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:lumber-camp-4": {
+			"name": "Lumber Camp IV",
+			"output": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:branch",
+					"probability": 0.75,
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				},
+				{
+					"itemId": "item:wood-bundle",
+					"probability": 0.3,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:lumber-camp-5": {
+			"name": "Lumber Camp V",
+			"output": [
+				{
+					"itemId": "item:log",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:wood-bundle",
+					"probability": 0.55,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:beam",
+					"probability": 0.18,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:quarry-1": {
+			"name": "Quarry I",
+			"output": [
+				{
+					"itemId": "item:pebble",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:stone",
+					"probability": 0.32,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:coin",
+					"probability": 0.08,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:quarry-1:better-1": {
+			"name": "Quarry I Better Finds I",
+			"output": [
+				{
+					"itemId": "item:pebble",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:stone",
+					"probability": 0.5,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:coin",
+					"probability": 0.1,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:quarry-1:better-2": {
+			"name": "Quarry I Better Finds II",
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:pebble",
+					"probability": 0.85,
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				},
+				{
+					"itemId": "item:ore",
+					"probability": 0.18,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:coin-pair",
+					"probability": 0.08,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:quarry-2": {
+			"name": "Quarry II",
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:pebble",
+					"probability": 0.5,
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				},
+				{
+					"itemId": "item:crystal",
+					"probability": 0.28,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:quarry-3": {
+			"name": "Quarry III",
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:crystal",
+					"probability": 0.72,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:quarry-4": {
+			"name": "Quarry IV",
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:ore",
+					"probability": 0.48,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:crystal",
+					"probability": 0.28,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:quarry-5": {
+			"name": "Quarry V",
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:ore",
+					"probability": 0.7,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:crystal",
+					"probability": 0.42,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:gem",
+					"probability": 0.12,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:townhall-1": {
+			"name": "Town Hall I",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:blueprint-scrap",
+							"quantity": 1,
+							"weight": 90
+						},
+						{
+							"itemId": "item:crate-1",
+							"quantity": 1,
+							"weight": 10
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:water",
+					"probability": 0.32,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:townhall-2": {
+			"name": "Town Hall II",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:blueprint-scrap",
+							"quantity": 1,
+							"weight": 60
+						},
+						{
+							"itemId": "item:crate-1",
+							"quantity": 1,
+							"weight": 28
+						},
+						{
+							"itemId": "item:crate-2",
+							"quantity": 1,
+							"weight": 12
+						},
+						{
+							"itemId": "item:blueprint-lumber-camp-2",
+							"quantity": 1,
+							"weight": 6
+						},
+						{
+							"itemId": "item:blueprint-quarry-2",
+							"quantity": 1,
+							"weight": 6
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:water",
+					"probability": 0.4,
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				}
+			]
+		},
+		"loot:townhall-3": {
+			"name": "Town Hall III",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:blueprint-scrap",
+							"quantity": 1,
+							"weight": 40
+						},
+						{
+							"itemId": "item:crate-1",
+							"quantity": 1,
+							"weight": 18
+						},
+						{
+							"itemId": "item:crate-2",
+							"quantity": 1,
+							"weight": 30
+						},
+						{
+							"itemId": "item:crate-3",
+							"quantity": 1,
+							"weight": 12
+						},
+						{
+							"itemId": "item:blueprint-lumber-camp-3",
+							"quantity": 1,
+							"weight": 5
+						},
+						{
+							"itemId": "item:blueprint-quarry-3",
+							"quantity": 1,
+							"weight": 5
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:water",
+					"probability": 0.55,
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				}
+			]
+		},
+		"loot:townhall-4": {
+			"name": "Town Hall IV",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:blueprint-scrap",
+							"quantity": 1,
+							"weight": 36
+						},
+						{
+							"itemId": "item:crate-2",
+							"quantity": 1,
+							"weight": 34
+						},
+						{
+							"itemId": "item:crate-3",
+							"quantity": 1,
+							"weight": 22
+						},
+						{
+							"itemId": "item:crate-4",
+							"quantity": 1,
+							"weight": 8
+						},
+						{
+							"itemId": "item:blueprint-lumber-camp-4",
+							"quantity": 1,
+							"weight": 4
+						},
+						{
+							"itemId": "item:blueprint-quarry-4",
+							"quantity": 1,
+							"weight": 4
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:water",
+					"probability": 0.62,
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				}
+			]
+		},
+		"loot:townhall-5": {
+			"name": "Town Hall V",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:blueprint-scrap",
+							"quantity": 1,
+							"weight": 30
+						},
+						{
+							"itemId": "item:crate-2",
+							"quantity": 1,
+							"weight": 28
+						},
+						{
+							"itemId": "item:crate-3",
+							"quantity": 1,
+							"weight": 30
+						},
+						{
+							"itemId": "item:crate-4",
+							"quantity": 1,
+							"weight": 12
+						},
+						{
+							"itemId": "item:blueprint-lumber-camp-5",
+							"quantity": 1,
+							"weight": 3
+						},
+						{
+							"itemId": "item:blueprint-quarry-5",
+							"quantity": 1,
+							"weight": 3
+						}
+					],
+					"rolls": 1,
+					"type": "weighted"
+				},
+				{
+					"itemId": "item:water",
+					"probability": 0.72,
+					"quantity": {
+						"max": 3,
+						"min": 1
+					},
+					"type": "chance"
+				}
+			]
+		},
+		"loot:tree": {
+			"name": "Tree",
+			"output": [
+				{
+					"itemId": "item:twig",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:branch",
+					"probability": 0.35,
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"itemId": "item:coin",
+					"probability": 0.08,
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		}
+	}
+}

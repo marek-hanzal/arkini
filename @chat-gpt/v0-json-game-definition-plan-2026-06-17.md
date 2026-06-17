@@ -287,12 +287,12 @@ Implemented the first version of the JSON source package toolchain:
 
 - `./game/arkini/` is now the default authoring source folder.
 - Existing game PNG item assets were copied into `./game/arkini/assets/`.
-- `./game/arkini/game.json` is the first manually reshaped source fragment derived from the current TS manifest. It is not a supported legacy dump shape; it already uses keyed top-level collections and extracted behavior IDs.
+- The initial monolithic `./game/arkini/game.json` source was split by top-level key into focused fragments (`items.json`, `loot-tables.json`, `merge-rules.json`, `producers.json`, `stashes.json`, `craft-recipes.json`, `upgrades.json`, `assets.json`, `starting-state.json`, `game.json`, `version.json`). `game.json` now contains only the `game` metadata fragment. The old dump shape is not supported.
 - `npm run game:compile -- game/arkini` recursively reads JSON fragments, scans `assets/**/*.png`, generates `{ "resourceId": { "data": "...base64..." } }` resource entries, validates the merged package, and writes:
   - `./game/arkini.game.json`
   - `./game/arkini.assets.json`
-- `npm run game:validate -- game/arkini` validates a source folder including generated PNG resources.
-- `npm run game:validate -- game/arkini.game.json game/arkini.assets.json` validates explicit compiled fragments.
+- `npm run game:validate -- game/arkini` validates a source folder including generated PNG resources and is mandatory after touching any game config fragment or source PNG.
+- `npm run game:validate -- game/arkini.game.json game/arkini.assets.json` validates explicit compiled fragments and should be part of handoff checks together with source validation.
 - The validator uses Zod for shape validation and `superRefine` for cross-reference checks across resources, assets, items, merge rules, producers, stashes, craft recipes, loot tables, upgrades and starting state.
 - Duplicate IDs are hard errors during source merge. Patch/override semantics remain intentionally unsupported until we design them explicitly.
 

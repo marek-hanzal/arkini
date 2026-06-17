@@ -1,25 +1,21 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { useActivateBoardItemMutation } from "~/v0/board/action/useActivateBoardItemMutation";
-import { useClaimCraftMutation } from "~/v0/board/action/useClaimCraftMutation";
-import { useMergeBoardItemsMutation } from "~/v0/board/action/useMergeBoardItemsMutation";
-import { useMoveBoardItemMutation } from "~/v0/board/action/useMoveBoardItemMutation";
-import { useSwapBoardItemsMutation } from "~/v0/board/action/useSwapBoardItemsMutation";
 import type { BoardCellView } from "~/v0/board/boardCells";
 import { cellKey } from "~/v0/board/cellKey";
 import { resolveBoardDropFeedback } from "~/v0/board/drop/resolveBoardDropFeedback";
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
-import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { useBoardTransientTiles } from "~/v0/board/animation/BoardTransientTileStore";
-import { useStashBoardItemMutation } from "~/v0/inventory/action/useStashBoardItemMutation";
-import { inventoryViewQueryOptions } from "~/v0/inventory/query/inventoryViewQueryOptions";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
-import type { DropActions } from "~/v0/play/drop/DropActions";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
+import {
+	useGameBoardView,
+	useGameInventoryView,
+	useGameRuntimeDropActions,
+	useGameRuntimeStore,
+} from "~/v0/play/runtime";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useBoardTileEngineModel {
@@ -42,16 +38,10 @@ export const useBoardTileEngineModel = ({
 	feedback,
 	onOpenItem,
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
-	const { data: board } = useSuspenseQuery(boardViewQueryOptions());
-	const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
-	const activateBoardItemMutation = useActivateBoardItemMutation({
-		feedback,
-	});
-	const claimCraftMutation = useClaimCraftMutation();
-	const mergeBoardItemsMutation = useMergeBoardItemsMutation();
-	const moveBoardItemMutation = useMoveBoardItemMutation();
-	const stashBoardItemMutation = useStashBoardItemMutation();
-	const swapBoardItemsMutation = useSwapBoardItemsMutation();
+	const board = useGameBoardView();
+	const inventory = useGameInventoryView();
+	const actions = useGameRuntimeDropActions();
+	const runtimeStore = useGameRuntimeStore();
 	const transientTiles = useBoardTransientTiles();
 
 	const tiles = useMemo(
@@ -89,23 +79,6 @@ export const useBoardTileEngineModel = ({
 		],
 	);
 
-	const actions = useMemo<DropActions>(
-		() => ({
-			mergeBoardItems: mergeBoardItemsMutation.mutateAsync,
-			moveBoardItem: moveBoardItemMutation.mutateAsync,
-			placeInventoryItem: async () => undefined,
-			stashBoardItem: stashBoardItemMutation.mutateAsync,
-			swapBoardItems: swapBoardItemsMutation.mutateAsync,
-			swapInventorySlots: async () => undefined,
-		}),
-		[
-			mergeBoardItemsMutation.mutateAsync,
-			moveBoardItemMutation.mutateAsync,
-			stashBoardItemMutation.mutateAsync,
-			swapBoardItemsMutation.mutateAsync,
-		],
-	);
-
 	const activateBoardItem = useCallback(
 		(boardItem: BoardViewItem) => {
 			const action = resolveBoardItemTapAction({
@@ -114,22 +87,51 @@ export const useBoardTileEngineModel = ({
 			});
 
 			if (action.type === "claim-craft") {
-				claimCraftMutation.mutate({
-					boardItemId: action.boardItemId,
-				});
+				void runtimeStore
+					.tick({
+						nowMs: Date.now(),
+					})
+					.catch(feedback.showError);
 				return;
 			}
 
-			if (action.type === "activate") {
-				activateBoardItemMutation.mutate({
-					boardItemId: action.boardItemId,
-					activation: action.activation,
-				});
+			if (action.type !== "activate") return;
+
+			if (boardItem.activation?.kind === "stash") {
+				void runtimeStore
+					.dispatch({
+						action: {
+							inputRefs: [],
+							stashItemInstanceId: boardItem.id,
+							type: "stash.open",
+						},
+					})
+					.catch(feedback.showError);
+				return;
 			}
+
+			const item = runtimeStore.getSnapshot().runtime.config.items[boardItem.itemId];
+			const producerId = item?.producerId;
+			const productId = producerId
+				? runtimeStore.getSnapshot().runtime.config.producers[producerId]?.productIds[0]
+				: undefined;
+
+			if (!productId) return;
+
+			void runtimeStore
+				.dispatch({
+					action: {
+						inputRefs: [],
+						producerItemInstanceId: boardItem.id,
+						productId,
+						type: "producer.product.start",
+					},
+				})
+				.catch(feedback.showError);
 		},
 		[
-			activateBoardItemMutation.mutate,
-			claimCraftMutation.mutate,
+			feedback.showError,
+			runtimeStore,
 		],
 	);
 
@@ -186,7 +188,7 @@ export const useBoardTileEngineModel = ({
 				});
 			},
 			onDragCancel() {
-				// The engine owns visual rollback. App state remains untouched until commit.
+				// The runtime engine owns visual rollback. App state remains untouched until commit.
 			},
 		}),
 		[

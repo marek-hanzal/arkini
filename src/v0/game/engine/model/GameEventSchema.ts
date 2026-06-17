@@ -15,10 +15,16 @@ export const GameItemCreatedReasonSchema = z.enum([
 export const GameItemConsumedReasonSchema = z.enum([
 	"product-input",
 	"stash-input",
+	"craft-input",
+	"craft-requirement",
+	"remove-tool",
+	"merge-source",
 ]);
 
 export const GameBoardItemChangeReasonSchema = z.enum([
 	"stash-depleted",
+	"tile-remove",
+	"merge-result",
 ]);
 
 export const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
@@ -100,6 +106,15 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
+			startedAtMs: NonNegativeIntegerSchema,
+			completesAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("craft.started"),
+			jobId: IdSchema,
+			recipeId: IdSchema,
 			startedAtMs: NonNegativeIntegerSchema,
 			completesAtMs: NonNegativeIntegerSchema,
 		})

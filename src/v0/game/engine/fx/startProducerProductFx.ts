@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
@@ -67,6 +68,10 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		save,
 	});
 
+	yield* match(product.placement)
+		.with("board_then_inventory", () => Effect.void)
+		.exhaustive();
+
 	const consumed = yield* consumeActivationInputsFx({
 		inputRefs: action.inputRefs,
 		inputs: product.inputs,
@@ -80,13 +85,19 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	const jobId = yield* createGameJobIdFx({
 		save: nextSave,
 	});
-	const completesAtMs = nowMs + product.durationMs;
+	const queuedStartAtMs = Math.max(
+		nowMs,
+		...Object.values(nextSave.producerJobs)
+			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
+			.map((job) => job.completesAtMs),
+	);
+	const completesAtMs = queuedStartAtMs + product.durationMs;
 	nextSave.producerJobs[jobId] = {
 		completesAtMs,
 		id: jobId,
 		producerItemInstanceId: action.producerItemInstanceId,
 		productId: action.productId,
-		startedAtMs: nowMs,
+		startedAtMs: queuedStartAtMs,
 	};
 	nextSave.updatedAtMs = nowMs;
 
@@ -98,7 +109,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 				jobId,
 				producerItemInstanceId: action.producerItemInstanceId,
 				productId: action.productId,
-				startedAtMs: nowMs,
+				startedAtMs: queuedStartAtMs,
 				type: "product.started" as const,
 			},
 		],

@@ -142,6 +142,58 @@ describe("processScheduledGameEventsFx", () => {
 		]);
 		expect(result.save.scheduledEvents).toHaveProperty("scheduled-event:1");
 	});
+	it("does not spam the same blocked scheduled spawn on every retry tick", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		runScheduleItems({
+			dueAtMs: 100,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			save,
+		});
+
+		const first = runScheduled({
+			config,
+			nowMs: 100,
+			save,
+		});
+		const second = runScheduled({
+			config,
+			nowMs: 200,
+			save: first.save,
+		});
+
+		expect(first.events).toHaveLength(1);
+		expect(second.events).toEqual([]);
+		expect(second.save.scheduledEvents["scheduled-event:1"]).toMatchObject({
+			lastBlockedAtMs: 200,
+		});
+	});
+
 	it("waits with dependent source removal until exclusive spawns are processed", () => {
 		const config = createEngineTestConfig({
 			startingState: {

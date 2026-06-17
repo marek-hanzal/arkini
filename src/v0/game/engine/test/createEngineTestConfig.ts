@@ -45,6 +45,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				code: "twig",
 				description: "Twig",
 				maxStackSize: 3,
+				mergeIds: [
+					"merge:twig-plank",
+				],
 				name: "Twig",
 				sort: 2,
 				tags: [],
@@ -81,6 +84,32 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tags: [],
 				tier: 0,
 			},
+			"item:axe": {
+				assetId: "asset:test",
+				code: "axe",
+				description: "Axe",
+				maxStackSize: 1,
+				name: "Axe",
+				sort: 6,
+				tags: [],
+				tier: 0,
+			},
+			"item:rock": {
+				assetId: "asset:test",
+				code: "rock",
+				description: "Rock",
+				maxStackSize: 1,
+				name: "Rock",
+				removeBy: [
+					{
+						itemId: "item:axe",
+						mode: "keep",
+					},
+				],
+				sort: 7,
+				tags: [],
+				tier: 0,
+			},
 			"item:empty-stash": {
 				assetId: "asset:test",
 				code: "empty-stash",
@@ -92,7 +121,12 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 		},
-		merge: {},
+		merge: {
+			"merge:twig-plank": {
+				resultItemId: "item:plank",
+				withItemId: "item:twig",
+			},
+		},
 		producers: {
 			"producer:test": {
 				productIds: [

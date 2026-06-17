@@ -1,7 +1,10 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
+import { mergeItemFx } from "~/v0/game/engine/fx/mergeItemFx";
 import { openStashFx } from "~/v0/game/engine/fx/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
+import { removeTileFx } from "~/v0/game/engine/fx/removeTileFx";
+import { startCraftFx } from "~/v0/game/engine/fx/startCraftFx";
 import { startProducerProductFx } from "~/v0/game/engine/fx/startProducerProductFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -28,6 +31,30 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 	return yield* match(parsedAction)
 		.with(
 			{
+				type: "craft.start",
+			},
+			(craftAction) =>
+				startCraftFx({
+					action: craftAction,
+					config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "item.merge",
+			},
+			(mergeAction) =>
+				mergeItemFx({
+					action: mergeAction,
+					config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
 				type: "producer.product.start",
 			},
 			(startAction) =>
@@ -45,6 +72,18 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(openAction) =>
 				openStashFx({
 					action: openAction,
+					config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "tile.remove",
+			},
+			(removeAction) =>
+				removeTileFx({
+					action: removeAction,
 					config,
 					nowMs,
 					save,

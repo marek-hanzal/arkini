@@ -100,7 +100,7 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 			inventory: [
 				{
 					itemId: "item:twig",
-					quantity: 7,
+					quantity: 5,
 				},
 			],
 		},
@@ -137,48 +137,30 @@ describe("createInitialGameSaveFx", () => {
 				itemId: "item:twig",
 				quantity: 5,
 			},
-			{
-				itemId: "item:twig",
-				quantity: 2,
-			},
+			null,
 			null,
 		]);
 	});
 
-	it("rejects duplicate starting board cells through the Effect error channel", () => {
-		const config = createConfig({
-			startingState: {
-				board: [
-					{
-						itemId: "item:producer",
-						x: 0,
-						y: 0,
-					},
-					{
-						itemId: "item:twig",
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [],
-			},
-		});
-
-		const result = Effect.runSync(
-			Effect.either(
-				createInitialGameSaveFx({
-					config,
-					nowMs: 0,
-				}),
-			),
-		);
-
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") {
-			expect(result.left).toMatchObject({
-				_tag: "GameSaveInvalid",
-				message: 'Duplicate starting board cell "0:0".',
-			});
-		}
+	it("rejects duplicate starting board cells through config validation", () => {
+		expect(() =>
+			createConfig({
+				startingState: {
+					board: [
+						{
+							itemId: "item:producer",
+							x: 0,
+							y: 0,
+						},
+						{
+							itemId: "item:twig",
+							x: 0,
+							y: 0,
+						},
+					],
+					inventory: [],
+				},
+			}),
+		).toThrow(/Duplicate starting board cell/);
 	});
 });

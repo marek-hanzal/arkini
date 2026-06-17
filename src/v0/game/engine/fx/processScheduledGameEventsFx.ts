@@ -52,7 +52,15 @@ export const processScheduledGameEventsFx = Effect.fn("processScheduledGameEvent
 		}
 
 		if (result.type === "blocked") {
-			events.push(result.event);
+			const alreadyBlocked = scheduledEvent.lastBlockedAtMs !== undefined;
+			nextSave.scheduledEvents[scheduledEvent.id] = {
+				...scheduledEvent,
+				lastBlockedAtMs: nowMs,
+			};
+			nextSave.updatedAtMs = nowMs;
+			if (!alreadyBlocked) {
+				events.push(result.event);
+			}
 			continue;
 		}
 

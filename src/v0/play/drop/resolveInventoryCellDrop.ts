@@ -1,3 +1,4 @@
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -22,6 +23,7 @@ export namespace resolveInventoryCellDrop {
 				kind: "cell";
 			}
 		>;
+		board: BoardView;
 		inventory: InventoryView;
 		feedback: Feedback.Type;
 		actions: DropActions;
@@ -30,12 +32,14 @@ export namespace resolveInventoryCellDrop {
 
 export const resolveInventoryCellDrop = ({
 	actions,
+	board,
 	inventory,
 	feedback,
 	source,
 	target,
 }: resolveInventoryCellDrop.Props): TileEngine.DropOutcome => {
 	const action = resolveInventoryCellDropAction({
+		board,
 		inventory,
 		source,
 		target,
@@ -49,6 +53,10 @@ export const resolveInventoryCellDrop = ({
 			}
 			feedback.flashInventorySlot(action.feedback.slotIndex);
 		});
+	}
+
+	if (action.type === "apply-inventory-item-to-board-item") {
+		return acceptDrop(() => actions.applyInventoryItemToBoardItem(action.input));
 	}
 
 	return acceptDrop(() => actions.placeInventoryItem(action.input));

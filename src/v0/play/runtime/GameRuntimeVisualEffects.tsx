@@ -1,8 +1,8 @@
 import { type FC, useEffect } from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { createActionVisualEventsFromGameEngineResult } from "~/v0/play/game-engine-bridge";
-import { summarizeVisualEventGroups } from "~/v0/play/cache/summarizeVisualEventGroups";
-import { summarizeVisualEvents } from "~/v0/play/cache/summarizeVisualEvents";
+import { summarizeVisualEventGroups } from "~/v0/play/visual-events/summarizeVisualEventGroups";
+import { summarizeVisualEvents } from "~/v0/play/visual-events/summarizeVisualEvents";
 import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
 import { registerTileEngineEnterRequests } from "~/v0/play/tile-engine-motion/registerTileEngineEnterRequests";
 import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";

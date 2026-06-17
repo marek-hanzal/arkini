@@ -121,6 +121,7 @@ export const resolveDrop = ({
 					resolveInventoryCellDrop({
 						source,
 						target,
+						board,
 						inventory,
 						feedback,
 						actions,

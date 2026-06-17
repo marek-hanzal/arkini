@@ -1,5 +1,6 @@
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
 import {
 	RuntimeGameEngineAdapter,
@@ -31,6 +32,11 @@ export namespace GameRuntimeStore {
 	export interface DispatchProps {
 		action: GameAction | unknown;
 		nowMs?: number;
+	}
+
+	export interface ReplaceSaveProps {
+		nowMs?: number;
+		save: GameSave;
 	}
 
 	export type Listener = () => void;
@@ -81,12 +87,13 @@ export class GameRuntimeStore {
 		});
 	}
 
-	static async create({
-		adapter,
-		nowMs = Date.now(),
-	}: GameRuntimeStore.Options = {}) {
+	static async create({ adapter, nowMs = Date.now() }: GameRuntimeStore.Options = {}) {
 		return new GameRuntimeStore({
-			adapter: adapter ?? (await RuntimeGameEngineAdapter.create({ nowMs })),
+			adapter:
+				adapter ??
+				(await RuntimeGameEngineAdapter.create({
+					nowMs,
+				})),
 			nowMs,
 		});
 	}
@@ -123,7 +130,16 @@ export class GameRuntimeStore {
 	}
 
 	async readiness({ action }: RuntimeGameEngineAdapter.ReadinessProps) {
-		return this.adapter.readiness({ action });
+		return this.adapter.readiness({
+			action,
+		});
+	}
+
+	async replaceSave({ save, nowMs = Date.now() }: GameRuntimeStore.ReplaceSaveProps) {
+		return this.adapter.replaceSave({
+			nowMs,
+			save,
+		});
 	}
 
 	destroy() {

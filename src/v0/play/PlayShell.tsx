@@ -13,7 +13,7 @@ import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import type { Sheet } from "~/v0/play/sheet/Sheet";
 import { useFeedbackFlags } from "~/v0/play/feedback/useFeedbackFlags";
 import { UpgradesSheet } from "~/v0/upgrade/UpgradesSheet";
-import { GameRuntimeProvider } from "~/v0/play/runtime";
+import { GameRuntimeProvider, useGameRuntimeStore } from "~/v0/play/runtime";
 
 export namespace PlayShell {
 	export interface Props {}
@@ -25,7 +25,11 @@ const messageForError = (error: unknown) => {
 	if (error instanceof Error) return error.message;
 	if (typeof error === "string") return error;
 	if (error && typeof error === "object" && "message" in error) {
-		const message = (error as { message?: unknown }).message;
+		const message = (
+			error as {
+				message?: unknown;
+			}
+		).message;
 		if (typeof message === "string") return message;
 	}
 
@@ -34,6 +38,7 @@ const messageForError = (error: unknown) => {
 
 const PlayShellContent: FC = () => {
 	const queryClient = useQueryClient();
+	const runtimeStore = useGameRuntimeStore();
 	const feedbackFlags = useFeedbackFlags();
 	const playAreaRef = useRef<HTMLDivElement | null>(null);
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
@@ -80,15 +85,26 @@ const PlayShellContent: FC = () => {
 	useEffect(() => {
 		registerDebugBugReport({
 			queryClient,
-			getContext: () => ({
-				activeSheet: activeSheet?.type,
-				lastError,
-			}),
+			getContext: () => {
+				const runtime = runtimeStore.getSnapshot();
+				return {
+					activeSheet: activeSheet?.type,
+					lastError,
+					runtime: {
+						boardItems: runtime.board.items.length,
+						inventoryStacks: runtime.inventory.slots.filter((slot) => slot.stack)
+							.length,
+						nextWakeAtMs: runtime.runtime.nextWakeAtMs,
+						revision: runtime.revision,
+					},
+				};
+			},
 		});
 	}, [
 		activeSheet?.type,
 		lastError,
 		queryClient,
+		runtimeStore,
 	]);
 
 	const sheetContent = activeSheet

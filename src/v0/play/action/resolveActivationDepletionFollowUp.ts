@@ -1,6 +1,6 @@
 import type { ActivationResultSchema } from "~/v0/activation/type/ActivationResultSchema";
 import type { ActionVisualEventSchema } from "~/v0/play/action/ActionVisualEventSchema";
-import { sequenceCompletionDelayMs } from "~/v0/play/cache/sequenceSpawnVisualEvents";
+import { sequenceCompletionDelayMs } from "~/v0/play/visual-events/visualEventSequencing";
 
 export const activationDepletionFollowUpBufferMs = 40;
 

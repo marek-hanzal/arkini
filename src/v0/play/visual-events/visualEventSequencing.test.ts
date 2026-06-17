@@ -6,7 +6,7 @@ import {
 	shouldSequenceSpawnVisualEvents,
 	spawnSequenceDelayMs,
 	toImmediateSequencedVisualEvent,
-} from "~/v0/play/cache/sequenceSpawnVisualEvents";
+} from "~/v0/play/visual-events/visualEventSequencing";
 
 const boardLocation = (x: number, y: number) =>
 	({

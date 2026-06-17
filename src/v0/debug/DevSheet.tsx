@@ -10,7 +10,7 @@ import {
 	type DevScenarioId,
 	isDevScenarioId,
 } from "~/v0/debug/scenario/DevScenarioDefinitions";
-import { useLoadDevScenarioMutation } from "~/v0/debug/scenario/useLoadDevScenarioMutation";
+import { useLoadDevScenarioAction } from "~/v0/debug/scenario/useLoadDevScenarioAction";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { cn } from "~/v0/ui/cn";
 
@@ -45,7 +45,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	const queryClient = useQueryClient();
 	const { data: status } = useSuspenseQuery(databaseStatusQueryOptions());
 	const hardResetMutation = useHardResetMutation();
-	const loadScenarioMutation = useLoadDevScenarioMutation();
+	const loadScenarioAction = useLoadDevScenarioAction();
 	const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
 	const [timelineSize, setTimelineSize] = useState(DebugTimeline.entries().length);
 	const isolated = window.crossOriginIsolated;
@@ -54,17 +54,14 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	const loadScenario = useCallback(
 		(scenarioId: DevScenarioId) => {
 			setCopyState("idle");
-			loadScenarioMutation.mutate(
-				{
+			void loadScenarioAction
+				.run({
 					scenarioId,
-				},
-				{
-					onSettled: () => setTimelineSize(DebugTimeline.entries().length),
-				},
-			);
+				})
+				.finally(() => setTimelineSize(DebugTimeline.entries().length));
 		},
 		[
-			loadScenarioMutation.mutate,
+			loadScenarioAction,
 		],
 	);
 
@@ -79,7 +76,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 						throw new Error(`Unknown Arkini dev scenario ${scenarioId}.`);
 					}
 
-					const result = await loadScenarioMutation.mutateAsync({
+					const result = await loadScenarioAction.run({
 						scenarioId,
 					});
 					setTimelineSize(DebugTimeline.entries().length);
@@ -88,7 +85,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 			},
 		});
 	}, [
-		loadScenarioMutation.mutateAsync,
+		loadScenarioAction,
 	]);
 
 	const dumpPreview = useMemo(() => {
@@ -146,7 +143,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 								Copy diagnostic dump
 							</h2>
 							<p className="mt-2 text-sm text-slate-300">
-								One JSON packet with browser metadata, query cache snapshots and the
+								One JSON packet with browser metadata, runtime diagnostics and the
 								latest debug timeline. Paste it into chat after reproducing a bug.
 							</p>
 						</div>
@@ -220,7 +217,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							<button
 								type="button"
 								key={scenario.id}
-								disabled={loadScenarioMutation.isPending}
+								disabled={loadScenarioAction.isPending}
 								onClick={() => loadScenario(scenario.id)}
 								className="rounded-md border border-slate-700 bg-slate-900/80 px-3 py-2 text-left transition hover:border-indigo-300/60 hover:bg-indigo-950/35 disabled:cursor-wait disabled:opacity-60"
 							>
@@ -233,13 +230,13 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							</button>
 						))}
 					</div>
-					{loadScenarioMutation.isSuccess ? (
+					{loadScenarioAction.isSuccess ? (
 						<p className="mt-3 text-sm font-semibold text-indigo-100">
-							Loaded {loadScenarioMutation.data.scenarioId}. Reproduce the bug, then
+							Loaded {loadScenarioAction.data.scenarioId}. Reproduce the bug, then
 							copy a bug report.
 						</p>
 					) : null}
-					{loadScenarioMutation.isError ? (
+					{loadScenarioAction.isError ? (
 						<p className="mt-3 text-sm font-semibold text-red-100">
 							Scenario load failed. Check the console; naturally, even debugging needs
 							debugging.

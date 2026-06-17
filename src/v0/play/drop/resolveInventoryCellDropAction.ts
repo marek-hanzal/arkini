@@ -1,5 +1,7 @@
 import { cellKey } from "~/v0/board/cellKey";
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
+import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 
@@ -17,6 +19,13 @@ export type InventoryCellDropAction =
 				  };
 	  }
 	| {
+			type: "apply-inventory-item-to-board-item";
+			input: {
+				sourceSlotIndex: number;
+				targetBoardItemId: string;
+			};
+	  }
+	| {
 			type: "place-inventory-item";
 			input: {
 				slotIndex: number;
@@ -27,6 +36,7 @@ export type InventoryCellDropAction =
 
 export namespace resolveInventoryCellDropAction {
 	export interface Props {
+		board: BoardView;
 		source: Extract<
 			DragSource,
 			{
@@ -44,37 +54,63 @@ export namespace resolveInventoryCellDropAction {
 }
 
 export const resolveInventoryCellDropAction = ({
+	board,
 	inventory,
 	source,
 	target,
 }: resolveInventoryCellDropAction.Props): InventoryCellDropAction => {
-	if (target.boardItemId) {
-		return {
-			type: "reject",
-			feedback: {
-				kind: "board-cell",
-				cellKey: cellKey(target.x, target.y),
-			},
-		};
-	}
-
 	const sourceSlot = inventory.bySlotIndex[String(source.slotIndex)];
 	if (!sourceSlot?.stack) {
 		return {
-			type: "reject",
 			feedback: {
 				kind: "inventory-slot",
 				slotIndex: source.slotIndex,
 			},
+			type: "reject",
+		};
+	}
+
+	if (target.boardItemId) {
+		const targetItem = board.byId[target.boardItemId];
+		if (!targetItem) {
+			return {
+				feedback: {
+					kind: "board-cell",
+					cellKey: cellKey(target.x, target.y),
+				},
+				type: "reject",
+			};
+		}
+
+		const intent = resolveDropIntent({
+			sourceItemId: source.itemId,
+			targetItem,
+		});
+		if (intent.type === "reject" || intent.type === "swap") {
+			return {
+				feedback: {
+					kind: "board-cell",
+					cellKey: cellKey(target.x, target.y),
+				},
+				type: "reject",
+			};
+		}
+
+		return {
+			input: {
+				sourceSlotIndex: source.slotIndex,
+				targetBoardItemId: target.boardItemId,
+			},
+			type: "apply-inventory-item-to-board-item",
 		};
 	}
 
 	return {
-		type: "place-inventory-item",
 		input: {
 			slotIndex: source.slotIndex,
 			x: target.x,
 			y: target.y,
 		},
+		type: "place-inventory-item",
 	};
 };

@@ -20,7 +20,8 @@ describe("resolveDrop animation contract", () => {
 			showError: vi.fn(),
 		} as unknown as Feedback.Type;
 		const actions = {
-			mergeBoardItems: vi.fn(),
+			applyBoardItemToBoardItem: vi.fn(),
+			applyInventoryItemToBoardItem: vi.fn(),
 			moveBoardItem: vi.fn(),
 			placeInventoryItem: vi.fn(),
 			stashBoardItem: vi.fn(),
@@ -79,13 +80,14 @@ describe("resolveDrop animation contract", () => {
 	});
 
 	it("marks board merges as immediate parallel merge cache animations", async () => {
-		const mergeBoardItems = vi.fn(async () => undefined);
+		const applyBoardItemToBoardItem = vi.fn(async () => undefined);
 		const feedback = {
 			pulseMergeCell: vi.fn(),
 			showError: vi.fn(),
 		} as unknown as Feedback.Type;
 		const actions = {
-			mergeBoardItems,
+			applyBoardItemToBoardItem,
+			applyInventoryItemToBoardItem: vi.fn(),
 			moveBoardItem: vi.fn(),
 			placeInventoryItem: vi.fn(),
 			stashBoardItem: vi.fn(),
@@ -148,7 +150,7 @@ describe("resolveDrop animation contract", () => {
 			await outcome.commit?.();
 		}
 
-		expect(mergeBoardItems).toHaveBeenCalledWith({
+		expect(applyBoardItemToBoardItem).toHaveBeenCalledWith({
 			sourceBoardItemId: "source",
 			targetBoardItemId: "target",
 		});

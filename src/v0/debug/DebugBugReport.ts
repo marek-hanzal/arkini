@@ -1,7 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { boardQueryKeys } from "~/v0/board/query/boardQueryKeys";
 import { databaseQueryKeys } from "~/v0/database/query/databaseQueryKeys";
-import { inventoryQueryKeys } from "~/v0/inventory/query/inventoryQueryKeys";
 import type { Sheet } from "~/v0/play/sheet/Sheet";
 import { DebugTimeline, createDebugJsonReplacer } from "~/v0/debug/DebugTimeline";
 import { readLastLoadedDevScenario } from "~/v0/debug/scenario/DevScenarioRuntime";
@@ -10,6 +8,12 @@ export namespace DebugBugReport {
 	export interface SnapshotContext {
 		activeSheet?: Sheet;
 		lastError?: string;
+		runtime?: {
+			boardItems: number;
+			inventoryStacks: number;
+			nextWakeAtMs: number | null;
+			revision: number;
+		};
 	}
 
 	export interface SnapshotGetterProps {
@@ -147,8 +151,6 @@ const readQueryState = (queryClient: QueryClient | undefined) => {
 
 	return {
 		available: true,
-		board: queryClient.getQueryData(boardQueryKeys.view),
-		inventory: queryClient.getQueryData(inventoryQueryKeys.view),
 		database: queryClient.getQueryData(databaseQueryKeys.status),
 		queries: queryClient
 			.getQueryCache()

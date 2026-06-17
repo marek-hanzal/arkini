@@ -6,6 +6,7 @@ import { mergeItemFx } from "~/v0/game/engine/fx/mergeItemFx";
 import { openStashFx } from "~/v0/game/engine/fx/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/engine/fx/removeTileFx";
+import { setProducerProductLineEnabledFx } from "~/v0/game/engine/fx/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/engine/fx/startCraftFx";
 import { startProducerProductFx } from "~/v0/game/engine/fx/startProducerProductFx";
 import { startUpgradeFx } from "~/v0/game/engine/fx/startUpgradeFx";
@@ -76,6 +77,18 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(startAction) =>
 				startProducerProductFx({
 					action: startAction,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "producer.product_line.set_enabled",
+			},
+			(setEnabledAction) =>
+				setProducerProductLineEnabledFx({
+					action: setEnabledAction,
 					config: gameConfig.config,
 					nowMs,
 					save,

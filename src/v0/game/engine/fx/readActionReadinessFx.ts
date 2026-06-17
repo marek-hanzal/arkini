@@ -4,6 +4,7 @@ import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigSer
 import { match } from "ts-pattern";
 import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
+import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/engine/fx/checkProducerProductLineSetEnabledReadinessFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
 import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementStoreReadinessFx";
@@ -67,6 +68,17 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				(startAction) =>
 					checkProducerProductStartReadinessFx({
 						action: startAction,
+						config: gameConfig.config,
+						save,
+					}),
+			)
+			.with(
+				{
+					type: "producer.product_line.set_enabled",
+				},
+				(setEnabledAction) =>
+					checkProducerProductLineSetEnabledReadinessFx({
+						action: setEnabledAction,
 						config: gameConfig.config,
 						save,
 					}),

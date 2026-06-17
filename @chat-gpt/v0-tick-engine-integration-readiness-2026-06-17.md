@@ -22,15 +22,18 @@ Priority order:
    - Persist only minimal upgrade state (`completedTiers`, jobs), not the derived full layer; rebuild layer from config + save on each engine call.
    - Follow-up hygiene done in the stored requirements pass: producer jobs now snapshot missing `outputTableId` as explicit `null`, so delayed sink jobs cannot accidentally see a future upgraded output table.
 
-3. **Stored requirements save model** — IN PROGRESS / CURRENT
+3. **Stored requirements save model** — DONE
    - Added `save.storedRequirements[targetItemInstanceId].items[itemId] = quantity` as the runtime home for long-lived producer/stash stored requirement slots.
    - Added generic `stored_requirement.store` and `stored_requirement.withdraw` engine actions.
    - Producer/stash readiness now evaluates stored requirements from the concrete target board item instance, not from global inventory or config wishful thinking, the worst database known to humankind.
    - Added regression coverage for producer stored requirements, missing stored requirements, withdraw flow and stash stored requirements.
 
-4. **Product line enable/disable runtime state**
-   - This is save state, not config.
-   - Product start/readiness must respect disabled lines once implemented.
+4. **Product line enable/disable runtime state** — DONE / CURRENT
+   - Added `save.producerLines[producerItemInstanceId].disabledProductIds` as per-producer runtime state.
+   - Product lines stay enabled by default; save stores only disabled exceptions.
+   - Added `producer.product_line.set_enabled` action and `producer.product_line.enabled_changed` event.
+   - Product start/readiness rejects disabled lines with `product_line_disabled`.
+   - Running producer jobs are not cancelled by toggling a line; the toggle affects future starts only.
 
 5. **Engine integration adapter, without persistence first**
    - Load default compiled config.
@@ -45,4 +48,4 @@ Priority order:
    - Storage remains outside the engine.
    - Dexie/IndexedDB simplification follows after the engine can run in memory.
 
-Current task: finish item 3 by validating stored requirement actions, then continue into product line enable/disable runtime state.
+Current task: item 4 is implemented; next continue into item 5, the in-memory engine integration adapter, once tests pass in a dependency-installed workspace.

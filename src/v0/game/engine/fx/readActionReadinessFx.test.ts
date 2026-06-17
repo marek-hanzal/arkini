@@ -58,6 +58,37 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
+
+	it("returns rejected readiness for disabled producer product lines", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerLines["item-instance:1"] = {
+			disabledProductIds: [
+				"product:test",
+			],
+		};
+
+		const readiness = runReadiness({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toMatchObject({
+			errorTag: "GameActionRejected",
+			reason: "product_line_disabled",
+			type: "rejected",
+		});
+	});
+
 	it("returns rejected readiness for invalid action shape", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

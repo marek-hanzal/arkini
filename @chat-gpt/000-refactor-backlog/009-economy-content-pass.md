@@ -1,12 +1,15 @@
 # Economy/content pass
 
-Status: TODO
+Status: BLOCKED
 
 ## Goal
 
 After the runtime is stable, revisit actual gameplay content and balance so Arkini feels like a small economy simulator rather than a random merge chain pile.
 
 ## Current direction
+
+Deferred on purpose as of 2026-06-17. A large product change is expected next, so economy/content work should wait until that change lands to avoid designing against stale data and manufacturing conflicts for sport.
+
 
 - Merge is only one basic mechanic.
 - Producers/stashes/craft/upgrades are the long-term economy.

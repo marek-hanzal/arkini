@@ -1,4 +1,6 @@
-import { Effect } from "effect";
+import { Effect, type Effect as EffectType } from "effect";
+import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
+import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
 import { match } from "ts-pattern";
 import { mergeItemFx } from "~/v0/game/engine/fx/mergeItemFx";
 import { openStashFx } from "~/v0/game/engine/fx/openStashFx";
@@ -6,8 +8,12 @@ import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/engine/fx/removeTileFx";
 import { startCraftFx } from "~/v0/game/engine/fx/startCraftFx";
 import { startProducerProductFx } from "~/v0/game/engine/fx/startProducerProductFx";
+import { startUpgradeFx } from "~/v0/game/engine/fx/startUpgradeFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import type { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 
 export namespace applyGameActionFx {
 	export interface Props {
@@ -27,8 +33,16 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 	const parsedAction = yield* parseGameActionFx({
 		action,
 	});
+	const gameConfig = yield* buildGameConfigServiceFx({
+		config,
+		save,
+	});
 
-	return yield* match(parsedAction)
+	const result: EffectType.Effect<
+		GameEngineResult,
+		GameEngineError,
+		GameConfigFx | RandomServiceFx
+	> = match(parsedAction)
 		.with(
 			{
 				type: "craft.start",
@@ -36,7 +50,7 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(craftAction) =>
 				startCraftFx({
 					action: craftAction,
-					config,
+					config: gameConfig.config,
 					nowMs,
 					save,
 				}),
@@ -48,7 +62,7 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(mergeAction) =>
 				mergeItemFx({
 					action: mergeAction,
-					config,
+					config: gameConfig.config,
 					nowMs,
 					save,
 				}),
@@ -60,7 +74,7 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(startAction) =>
 				startProducerProductFx({
 					action: startAction,
-					config,
+					config: gameConfig.config,
 					nowMs,
 					save,
 				}),
@@ -72,7 +86,7 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(openAction) =>
 				openStashFx({
 					action: openAction,
-					config,
+					config: gameConfig.config,
 					nowMs,
 					save,
 				}),
@@ -84,10 +98,24 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(removeAction) =>
 				removeTileFx({
 					action: removeAction,
-					config,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "upgrade.start",
+			},
+			(upgradeAction) =>
+				startUpgradeFx({
+					action: upgradeAction,
+					config: gameConfig.config,
 					nowMs,
 					save,
 				}),
 		)
 		.exhaustive();
+
+	return yield* Effect.provideService(result, GameConfigFx, gameConfig);
 });

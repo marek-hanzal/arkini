@@ -19,6 +19,7 @@ export const GameItemConsumedReasonSchema = z.enum([
 	"craft-requirement",
 	"remove-tool",
 	"merge-source",
+	"upgrade-cost",
 ]);
 
 export const GameBoardItemChangeReasonSchema = z.enum([
@@ -112,6 +113,16 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
+			type: z.literal("upgrade.started"),
+			jobId: IdSchema,
+			upgradeId: IdSchema,
+			tierIndex: NonNegativeIntegerSchema,
+			startedAtMs: NonNegativeIntegerSchema,
+			completesAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("craft.started"),
 			jobId: IdSchema,
 			recipeId: IdSchema,
@@ -125,6 +136,15 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
+			completedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("upgrade.completed"),
+			jobId: IdSchema,
+			upgradeId: IdSchema,
+			tierIndex: NonNegativeIntegerSchema,
 			completedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),

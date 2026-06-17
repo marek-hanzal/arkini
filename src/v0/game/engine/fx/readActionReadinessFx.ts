@@ -1,10 +1,13 @@
 import { Effect } from "effect";
+import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
+import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
 import { match } from "ts-pattern";
 import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
 import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
+import { checkUpgradeStartReadinessFx } from "~/v0/game/engine/fx/checkUpgradeStartReadinessFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionReadiness } from "~/v0/game/engine/model/GameActionReadinessSchema";
@@ -24,6 +27,10 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 	save,
 	action,
 }: readActionReadinessFx.Props) {
+	const gameConfig = yield* buildGameConfigServiceFx({
+		config,
+		save,
+	});
 	const readinessEffect = Effect.gen(function* () {
 		const parsedAction = yield* parseGameActionFx({
 			action,
@@ -36,7 +43,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				(craftAction) =>
 					checkCraftStartReadinessFx({
 						action: craftAction,
-						config,
+						config: gameConfig.config,
 						save,
 					}),
 			)
@@ -47,7 +54,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				(mergeAction) =>
 					checkItemMergeReadinessFx({
 						action: mergeAction,
-						config,
+						config: gameConfig.config,
 						save,
 					}),
 			)
@@ -58,7 +65,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				(startAction) =>
 					checkProducerProductStartReadinessFx({
 						action: startAction,
-						config,
+						config: gameConfig.config,
 						save,
 					}),
 			)
@@ -69,7 +76,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				(openAction) =>
 					checkStashOpenReadinessFx({
 						action: openAction,
-						config,
+						config: gameConfig.config,
 						save,
 					}),
 			)
@@ -80,14 +87,25 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				(removeAction) =>
 					checkTileRemoveReadinessFx({
 						action: removeAction,
-						config,
+						config: gameConfig.config,
+						save,
+					}),
+			)
+			.with(
+				{
+					type: "upgrade.start",
+				},
+				(upgradeAction) =>
+					checkUpgradeStartReadinessFx({
+						action: upgradeAction,
+						config: gameConfig.config,
 						save,
 					}),
 			)
 			.exhaustive();
 	});
 
-	return yield* readinessEffect.pipe(
+	return yield* Effect.provideService(readinessEffect, GameConfigFx, gameConfig).pipe(
 		Effect.match({
 			onFailure: (error: GameEngineError) =>
 				({

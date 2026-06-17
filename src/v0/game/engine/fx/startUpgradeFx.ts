@@ -1,39 +1,39 @@
 import { Effect } from "effect";
-import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
+import { checkUpgradeStartReadinessFx } from "~/v0/game/engine/fx/checkUpgradeStartReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
+import type { GameActionUpgradeStartSchema } from "~/v0/game/engine/model/GameActionUpgradeStartSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
-export namespace startProducerProductFx {
+export namespace startUpgradeFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionProducerProductStart;
+		action: GameActionUpgradeStartSchema.Type;
 		nowMs: number;
 	}
 }
 
-export const startProducerProductFx = Effect.fn("startProducerProductFx")(function* ({
+export const startUpgradeFx = Effect.fn("startUpgradeFx")(function* ({
 	config,
 	save,
 	action,
 	nowMs,
-}: startProducerProductFx.Props) {
-	const checked = yield* checkProducerProductStartReadinessFx({
+}: startUpgradeFx.Props) {
+	const checked = yield* checkUpgradeStartReadinessFx({
 		action,
 		config,
 		save,
 	});
 	const consumed = yield* consumeActivationInputsFx({
 		inputRefs: action.inputRefs,
-		inputs: checked.product.inputs,
+		inputs: checked.costInputs,
 		nowMs,
-		reason: "product-input",
+		reason: "upgrade-cost",
 		save,
 	});
 	const nextSave = yield* cloneGameSaveFx({
@@ -42,21 +42,13 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	const jobId = yield* createGameJobIdFx({
 		save: nextSave,
 	});
-	const queuedStartAtMs = Math.max(
-		nowMs,
-		...Object.values(nextSave.producerJobs)
-			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
-			.map((job) => job.completesAtMs),
-	);
-	const completesAtMs = queuedStartAtMs + checked.product.durationMs;
-	nextSave.producerJobs[jobId] = {
+	const completesAtMs = nowMs + checked.tier.durationMs;
+	nextSave.upgradeJobs[jobId] = {
 		completesAtMs,
 		id: jobId,
-		outputTableId: checked.product.outputTableId,
-		placement: checked.product.placement,
-		producerItemInstanceId: action.producerItemInstanceId,
-		productId: action.productId,
-		startedAtMs: queuedStartAtMs,
+		startedAtMs: nowMs,
+		tierIndex: checked.tierIndex,
+		upgradeId: action.upgradeId,
 	};
 	nextSave.updatedAtMs = nowMs;
 
@@ -66,10 +58,10 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			{
 				completesAtMs,
 				jobId,
-				producerItemInstanceId: action.producerItemInstanceId,
-				productId: action.productId,
-				startedAtMs: queuedStartAtMs,
-				type: "product.started" as const,
+				startedAtMs: nowMs,
+				tierIndex: checked.tierIndex,
+				type: "upgrade.started" as const,
+				upgradeId: action.upgradeId,
 			},
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({

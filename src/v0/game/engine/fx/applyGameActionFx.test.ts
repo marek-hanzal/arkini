@@ -35,14 +35,14 @@ describe("applyGameActionFx", () => {
 			save,
 		});
 
-		expect(result.save.producerJobs).toEqual({
-			"job:1": {
-				completesAtMs: 1500,
-				id: "job:1",
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				startedAtMs: 500,
-			},
+		expect(result.save.producerJobs["job:1"]).toMatchObject({
+			completesAtMs: 1500,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 500,
 		});
 		expect(result.events).toEqual([
 			{

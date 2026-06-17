@@ -15,5 +15,10 @@ export const readCompletedCraftJobsFx = Effect.fn("readCompletedCraftJobsFx")(fu
 }: readCompletedCraftJobsFx.Props) {
 	return Object.values(save.craftJobs)
 		.filter((job) => job.completesAtMs <= nowMs)
-		.sort(compareGameTimedJobs);
+		.sort((left, right) =>
+			compareGameTimedJobs({
+				left,
+				right,
+			}),
+		);
 });

@@ -14,8 +14,8 @@
 		"check": "npm run format:check && npm run dc && npm run typecheck && npm run test",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
-		"game:compile": "tsx scripts/game/compile.ts",
-		"game:validate": "tsx scripts/game/validate.ts"
+		"game:compile": "tsx cli/game/compile.ts",
+		"game:validate": "tsx cli/game/validate.ts"
 	},
 	"dependencies": {
 		"@paralleldrive/cuid2": "^3.3.0",

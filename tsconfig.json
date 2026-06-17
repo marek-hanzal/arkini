@@ -24,6 +24,6 @@
 		"src/v0",
 		"src/vite-env.d.ts",
 		"vite.config.ts",
-		"scripts/**/*.ts"
+		"cli/**/*.ts"
 	]
 }

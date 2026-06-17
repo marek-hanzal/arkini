@@ -2,11 +2,11 @@ import { readFile, readdir, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { ZodError } from "zod";
 import {
-	parseGamePackage,
-	parseGamePackageFragment,
-	type GamePackage,
-	type GamePackageFragment,
-} from "./schema";
+	parseGameConfig,
+	parseGameConfigFragment,
+	type GameConfig,
+	type GameConfigFragment,
+} from "../../src/v0/game/config/GameConfigSchema";
 
 const collectionKeys = [
 	"resources",
@@ -36,7 +36,7 @@ export interface CompileDirectoryResult {
 	packageName: string;
 	gamePath: string;
 	assetsPath: string;
-	package: GamePackage;
+	package: GameConfig;
 }
 
 export const compileDirectory = async (
@@ -117,15 +117,15 @@ export const validateSources = async (paths: readonly string[]) => {
 	return validatePackage(packageValue);
 };
 
-export const mergeSources = (sources: readonly FileSource[]): GamePackage => {
+export const mergeSources = (sources: readonly FileSource[]): GameConfig => {
 	const output = createEmptyPackage();
 	const sourceByKey = new Map<string, string>();
 
 	for (const source of sources) {
-		let fragment: GamePackageFragment;
+		let fragment: GameConfigFragment;
 
 		try {
-			fragment = parseGamePackageFragment(source.json);
+			fragment = parseGameConfigFragment(source.json);
 		} catch (error) {
 			throw formatZodError(error, source.path);
 		}
@@ -174,9 +174,9 @@ export const mergeSources = (sources: readonly FileSource[]): GamePackage => {
 	return output;
 };
 
-export const validatePackage = (value: unknown): GamePackage => {
+export const validatePackage = (value: unknown): GameConfig => {
 	try {
-		return parseGamePackage(value);
+		return parseGameConfig(value);
 	} catch (error) {
 		throw formatZodError(error, "compiled package");
 	}
@@ -269,7 +269,7 @@ const isDirectory = async (path: string) => {
 	}
 };
 
-const createEmptyPackage = (): GamePackage => ({
+const createEmptyPackage = (): GameConfig => ({
 	version: 1,
 	game: undefined as never,
 	resources: {},
@@ -302,7 +302,7 @@ const assignSingleton = <T>(
 	sourceByKey.set(key, sourcePath);
 };
 
-const withoutResources = (value: GamePackage) => {
+const withoutResources = (value: GameConfig) => {
 	const { resources: _resources, ...rest } = value;
 
 	return rest;

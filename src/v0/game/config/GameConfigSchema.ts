@@ -276,7 +276,7 @@ const StartingStateDefinitionSchema = z
 	})
 	.strict();
 
-const PartialGamePackageSchema = z
+const GameConfigFragmentSchema = z
 	.object({
 		version: z.literal(1).optional(),
 		game: GameMetaSchema.optional(),
@@ -294,7 +294,7 @@ const PartialGamePackageSchema = z
 	})
 	.strict();
 
-const BaseGamePackageSchema = z
+const BaseGameConfigSchema = z
 	.object({
 		version: z.literal(1),
 		game: GameMetaSchema,
@@ -312,7 +312,7 @@ const BaseGamePackageSchema = z
 	})
 	.strict();
 
-export const GamePackageSchema = BaseGamePackageSchema.superRefine((value, ctx) => {
+export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) => {
 	const hasResource = createRecordGuard(value.resources);
 	const hasAsset = createRecordGuard(value.assets);
 	const hasItem = createRecordGuard(value.items);
@@ -665,17 +665,17 @@ export const GamePackageSchema = BaseGamePackageSchema.superRefine((value, ctx) 
 	}
 });
 
-export type GamePackage = z.infer<typeof GamePackageSchema>;
-export type GamePackageFragment = z.infer<typeof PartialGamePackageSchema>;
-export type GamePackageIssuePath = (string | number)[];
+export type GameConfig = z.infer<typeof GameConfigSchema>;
+export type GameConfigFragment = z.infer<typeof GameConfigFragmentSchema>;
+export type GameConfigIssuePath = (string | number)[];
 
-export const parseGamePackageFragment = (value: unknown) => PartialGamePackageSchema.parse(value);
-export const parseGamePackage = (value: unknown) => GamePackageSchema.parse(value);
+export const parseGameConfigFragment = (value: unknown) => GameConfigFragmentSchema.parse(value);
+export const parseGameConfig = (value: unknown) => GameConfigSchema.parse(value);
 
 const createRecordGuard = (record: Readonly<Record<string, unknown>>) => (key: string) =>
 	Object.hasOwn(record, key);
 
-const addIssue = (ctx: z.RefinementCtx, path: GamePackageIssuePath, message: string) => {
+const addIssue = (ctx: z.RefinementCtx, path: GameConfigIssuePath, message: string) => {
 	ctx.addIssue({
 		code: "custom",
 		path,
@@ -685,7 +685,7 @@ const addIssue = (ctx: z.RefinementCtx, path: GamePackageIssuePath, message: str
 
 const validateActivationDefinition = (
 	ctx: z.RefinementCtx,
-	path: GamePackageIssuePath,
+	path: GameConfigIssuePath,
 	value: {
 		outputTableId: string;
 		inputs?: readonly {
@@ -742,7 +742,7 @@ const validateActivationDefinition = (
 
 const validateActivationOutput = (
 	ctx: z.RefinementCtx,
-	path: GamePackageIssuePath,
+	path: GameConfigIssuePath,
 	output: z.infer<typeof ActivationOutputSchema>,
 	hasItem: (itemId: string) => boolean,
 ) => {

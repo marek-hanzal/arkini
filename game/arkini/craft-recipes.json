@@ -4,292 +4,356 @@
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-1"
 		},
 		"craft:lumber-camp-2": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:lumber-camp-1",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-2"
 		},
 		"craft:lumber-camp-3": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:lumber-camp-2",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-3"
 		},
 		"craft:lumber-camp-4": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:lumber-camp-3",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-4"
 		},
 		"craft:lumber-camp-5": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:lumber-camp-4",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-5"
 		},
 		"craft:quarry": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-1"
 		},
 		"craft:quarry-2": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:quarry-1",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-2"
 		},
 		"craft:quarry-3": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:quarry-2",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-3"
 		},
 		"craft:quarry-4": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:quarry-3",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-4"
 		},
 		"craft:quarry-5": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:quarry-4",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-5"
 		},
 		"craft:sapling-water-tree": {
 			"durationMs": 30000,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:water",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:tree"
 		},
 		"craft:seed-water-sprout": {
 			"durationMs": 10000,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:sprout"
 		},
 		"craft:sprout-water-sapling": {
 			"durationMs": 15000,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:sapling"
 		},
 		"craft:townhall": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:gem",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-1"
 		},
 		"craft:townhall-2": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:townhall-1",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-2"
 		},
 		"craft:townhall-3": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:townhall-2",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-3"
 		},
 		"craft:townhall-4": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:townhall-3",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-4"
 		},
 		"craft:townhall-5": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:townhall-4",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-5"
 		}
 	}

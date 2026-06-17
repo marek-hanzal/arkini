@@ -303,292 +303,356 @@
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-1"
 		},
 		"craft:lumber-camp-2": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:lumber-camp-1",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-2"
 		},
 		"craft:lumber-camp-3": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:lumber-camp-2",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-3"
 		},
 		"craft:lumber-camp-4": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:lumber-camp-3",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-4"
 		},
 		"craft:lumber-camp-5": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:lumber-camp-4",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:lumber-camp-5"
 		},
 		"craft:quarry": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-1"
 		},
 		"craft:quarry-2": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:quarry-1",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-2"
 		},
 		"craft:quarry-3": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:quarry-2",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-3"
 		},
 		"craft:quarry-4": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:quarry-3",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-4"
 		},
 		"craft:quarry-5": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:quarry-4",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:quarry-5"
 		},
 		"craft:sapling-water-tree": {
 			"durationMs": 30000,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:water",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:tree"
 		},
 		"craft:seed-water-sprout": {
 			"durationMs": 10000,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:sprout"
 		},
 		"craft:sprout-water-sapling": {
 			"durationMs": 15000,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:sapling"
 		},
 		"craft:townhall": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 1
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:gem",
 					"quantity": 1
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-1"
 		},
 		"craft:townhall-2": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:townhall-1",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-2"
 		},
 		"craft:townhall-3": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:townhall-2",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-3"
 		},
 		"craft:townhall-4": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:townhall-3",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-4"
 		},
 		"craft:townhall-5": {
 			"durationMs": 0,
 			"inputs": [
 				{
+					"consume": true,
 					"itemId": "item:townhall-4",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:beam",
 					"quantity": 2
 				},
 				{
+					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
 				}
 			],
+			"requirements": [],
 			"resultItemId": "item:townhall-5"
 		}
 	},
@@ -648,7 +712,7 @@
 			"code": "blueprint-draft",
 			"description": "A nearly usable blank plan. Construction bureaucracy is blooming.",
 			"maxStackSize": 10,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:blueprint-draft-final"
 			],
 			"name": "Blueprint Draft",
@@ -664,7 +728,7 @@
 			"code": "blueprint-fragment",
 			"description": "A bigger blank plan piece. Still technically a mess, but taller.",
 			"maxStackSize": 15,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:blueprint-fragment-draft"
 			],
 			"name": "Blueprint Fragment",
@@ -828,7 +892,7 @@
 			"code": "blueprint-scrap",
 			"description": "A torn blank construction note. Inspiring, in the way paperwork can be.",
 			"maxStackSize": 20,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:blueprint-scrap-fragment"
 			],
 			"name": "Blueprint Scrap",
@@ -918,7 +982,7 @@
 			"code": "branch",
 			"description": "Bigger stick. Humanity is saved.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:branch-branch-log"
 			],
 			"name": "Branch",
@@ -934,7 +998,7 @@
 			"code": "bush",
 			"description": "A leaf committee with roots.",
 			"maxStackSize": 25,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:bush-bush-sapling"
 			],
 			"name": "Bush",
@@ -979,7 +1043,7 @@
 			"code": "coin",
 			"description": "A small metal excuse for progression.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:coin-coin-pair"
 			],
 			"name": "Coin",
@@ -1006,7 +1070,7 @@
 			"code": "coin-pair",
 			"description": "Two coins. Somehow this already feels like accounting.",
 			"maxStackSize": 40,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:coin-pair-stack"
 			],
 			"name": "Coin Pair",
@@ -1021,7 +1085,7 @@
 			"code": "coin-stack",
 			"description": "A stack of little reasons to open the upgrades sheet.",
 			"maxStackSize": 30,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:coin-stack-chest"
 			],
 			"name": "Coin Stack",
@@ -1036,7 +1100,7 @@
 			"code": "crate-1",
 			"description": "A finite producer with suspicious contents.",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:crate-1-crate-2"
 			],
 			"name": "Common Crate",
@@ -1053,7 +1117,7 @@
 			"code": "crate-2",
 			"description": "Same box, fewer disappointments.",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:crate-2-crate-3"
 			],
 			"name": "Sturdy Crate",
@@ -1070,7 +1134,7 @@
 			"code": "crate-3",
 			"description": "A tiny treasure economy in a box.",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:crate-3-crate-4"
 			],
 			"name": "Rare Crate",
@@ -1103,7 +1167,7 @@
 			"code": "crystal",
 			"description": "Shiny enough to justify bad decisions.",
 			"maxStackSize": 25,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:crystal-crystal-gem"
 			],
 			"name": "Crystal",
@@ -1147,7 +1211,7 @@
 			"code": "leaf",
 			"description": "Photosynthesis with storage problems.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:leaf-leaf-bush"
 			],
 			"name": "Leaf",
@@ -1163,7 +1227,7 @@
 			"code": "log",
 			"description": "A tree with fewer opinions.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:log-log-wood-bundle"
 			],
 			"name": "Log",
@@ -1180,7 +1244,7 @@
 			"description": "A polite machine for turning time into sticks.",
 			"label": "1",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:lumber-camp-1-blueprint"
 			],
 			"name": "Lumber Camp I",
@@ -1199,7 +1263,7 @@
 			"description": "Still wood, but now with ambition.",
 			"label": "2",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:lumber-camp-2-blueprint"
 			],
 			"name": "Lumber Camp II",
@@ -1218,7 +1282,7 @@
 			"description": "A compact shrine to deforestation.",
 			"label": "3",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:lumber-camp-3-blueprint"
 			],
 			"name": "Lumber Camp III",
@@ -1237,7 +1301,7 @@
 			"description": "Deforestation, now with workflows.",
 			"label": "4",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:lumber-camp-4-blueprint"
 			],
 			"name": "Lumber Camp IV",
@@ -1256,7 +1320,7 @@
 			"description": "At this point the forest has filed a complaint.",
 			"label": "5",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:lumber-camp-5-blueprint"
 			],
 			"name": "Lumber Camp V",
@@ -1274,7 +1338,7 @@
 			"code": "ore",
 			"description": "Stone with ambition and questionable impurities.",
 			"maxStackSize": 40,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:ore-ore-crystal"
 			],
 			"name": "Ore",
@@ -1290,7 +1354,7 @@
 			"code": "pebble",
 			"description": "Small rock. Big destiny. Apparently.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:pebble-pebble-stone"
 			],
 			"name": "Pebble",
@@ -1306,7 +1370,7 @@
 			"code": "plank",
 			"description": "Wood with straight edges. Humanity briefly improves.",
 			"maxStackSize": 20,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:plank-plank-beam"
 			],
 			"name": "Plank",
@@ -1323,7 +1387,7 @@
 			"description": "A hole in the ground with a business model.",
 			"label": "1",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:quarry-1-blueprint"
 			],
 			"name": "Quarry I",
@@ -1342,7 +1406,7 @@
 			"description": "A deeper hole, because progress is weird.",
 			"label": "2",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:quarry-2-blueprint"
 			],
 			"name": "Quarry II",
@@ -1361,7 +1425,7 @@
 			"description": "Rocks leaving the earth at startup velocity.",
 			"label": "3",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:quarry-3-blueprint"
 			],
 			"name": "Quarry III",
@@ -1380,7 +1444,7 @@
 			"description": "A sophisticated hole. Still a hole.",
 			"label": "4",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:quarry-4-blueprint"
 			],
 			"name": "Quarry IV",
@@ -1399,7 +1463,7 @@
 			"description": "Rocks surrender before the tap lands.",
 			"label": "5",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:quarry-5-blueprint"
 			],
 			"name": "Quarry V",
@@ -1445,7 +1509,7 @@
 			"craftRecipeId": "craft:seed-water-sprout",
 			"description": "Tiny start of something suspiciously grindy.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:seed-seed-sprout"
 			],
 			"name": "Seed",
@@ -1462,7 +1526,7 @@
 			"craftRecipeId": "craft:sprout-water-sapling",
 			"description": "A plant pretending it has a future.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:sprout-sprout-leaf"
 			],
 			"name": "Sprout",
@@ -1478,7 +1542,7 @@
 			"code": "stone",
 			"description": "Rock with self-esteem.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:stone-stone-stone-block",
 				"merge:stone-water-crystal"
 			],
@@ -1495,7 +1559,7 @@
 			"code": "stone-block",
 			"description": "Stone that finally agreed to geometry.",
 			"maxStackSize": 30,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:stone-block-stone-block-ore"
 			],
 			"name": "Stone Block",
@@ -1512,7 +1576,7 @@
 			"description": "A tiny bureaucracy that spits out progress.",
 			"label": "1",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:townhall-1-blueprint"
 			],
 			"name": "Town Hall I",
@@ -1531,7 +1595,7 @@
 			"description": "Same bureaucracy, slightly shinier clipboard.",
 			"label": "2",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:townhall-2-blueprint"
 			],
 			"name": "Town Hall II",
@@ -1550,7 +1614,7 @@
 			"description": "Municipal paperwork with actual momentum.",
 			"label": "3",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:townhall-3-blueprint"
 			],
 			"name": "Town Hall III",
@@ -1569,7 +1633,7 @@
 			"description": "Bureaucracy with sparkles. Humanity had options.",
 			"label": "4",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:townhall-4-blueprint"
 			],
 			"name": "Town Hall IV",
@@ -1588,7 +1652,7 @@
 			"description": "A municipal beast with alarming confidence.",
 			"label": "5",
 			"maxStackSize": 1,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:townhall-5-blueprint"
 			],
 			"name": "Town Hall V",
@@ -1621,7 +1685,7 @@
 			"code": "twig",
 			"description": "Nature's disposable stick.",
 			"maxStackSize": 50,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:twig-twig-branch",
 				"merge:twig-water-sprout"
 			],
@@ -1651,7 +1715,7 @@
 			"code": "wood-bundle",
 			"description": "Several logs tied together, because one headache was not enough.",
 			"maxStackSize": 25,
-			"mergeRuleIds": [
+			"mergeIds": [
 				"merge:wood-bundle-wood-bundle-plank"
 			],
 			"name": "Wood Bundle",
@@ -1673,8 +1737,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.12,
 					"itemId": "item:coin",
-					"probability": 0.12,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1715,8 +1779,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.18,
 					"itemId": "item:twig",
-					"probability": 0.18,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1757,8 +1821,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.22,
 					"itemId": "item:pebble",
-					"probability": 0.22,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1799,14 +1863,14 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.24,
 					"itemId": "item:branch",
-					"probability": 0.24,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.1,
 					"itemId": "item:epic-key",
-					"probability": 0.1,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1852,8 +1916,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.2,
 					"itemId": "item:crate-3",
-					"probability": 0.2,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1868,14 +1932,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.35,
 					"itemId": "item:branch",
-					"probability": 0.35,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1890,14 +1954,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.55,
 					"itemId": "item:branch",
-					"probability": 0.55,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.1,
 					"itemId": "item:coin",
-					"probability": 0.1,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1912,8 +1976,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.85,
 					"itemId": "item:twig",
-					"probability": 0.85,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -1921,14 +1985,14 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.24,
 					"itemId": "item:log",
-					"probability": 0.24,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin-pair",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1943,8 +2007,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.5,
 					"itemId": "item:twig",
-					"probability": 0.5,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -1952,8 +2016,8 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.35,
 					"itemId": "item:log",
-					"probability": 0.35,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1968,8 +2032,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.7,
 					"itemId": "item:log",
-					"probability": 0.7,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -1984,8 +2048,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.75,
 					"itemId": "item:branch",
-					"probability": 0.75,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -1993,8 +2057,8 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.3,
 					"itemId": "item:wood-bundle",
-					"probability": 0.3,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2009,14 +2073,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.55,
 					"itemId": "item:wood-bundle",
-					"probability": 0.55,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.18,
 					"itemId": "item:beam",
-					"probability": 0.18,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2031,14 +2095,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.32,
 					"itemId": "item:stone",
-					"probability": 0.32,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2053,14 +2117,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.5,
 					"itemId": "item:stone",
-					"probability": 0.5,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.1,
 					"itemId": "item:coin",
-					"probability": 0.1,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2075,8 +2139,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.85,
 					"itemId": "item:pebble",
-					"probability": 0.85,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -2084,14 +2148,14 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.18,
 					"itemId": "item:ore",
-					"probability": 0.18,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin-pair",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2106,8 +2170,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.5,
 					"itemId": "item:pebble",
-					"probability": 0.5,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -2115,8 +2179,8 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.28,
 					"itemId": "item:crystal",
-					"probability": 0.28,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2131,8 +2195,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.72,
 					"itemId": "item:crystal",
-					"probability": 0.72,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2147,14 +2211,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.48,
 					"itemId": "item:ore",
-					"probability": 0.48,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.28,
 					"itemId": "item:crystal",
-					"probability": 0.28,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2169,20 +2233,20 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.7,
 					"itemId": "item:ore",
-					"probability": 0.7,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.42,
 					"itemId": "item:crystal",
-					"probability": 0.42,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.12,
 					"itemId": "item:gem",
-					"probability": 0.12,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2208,8 +2272,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.32,
 					"itemId": "item:water",
-					"probability": 0.32,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -2250,8 +2314,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.4,
 					"itemId": "item:water",
-					"probability": 0.4,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -2300,8 +2364,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.55,
 					"itemId": "item:water",
-					"probability": 0.55,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -2350,8 +2414,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.62,
 					"itemId": "item:water",
-					"probability": 0.62,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -2400,8 +2464,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.72,
 					"itemId": "item:water",
-					"probability": 0.72,
 					"quantity": {
 						"max": 3,
 						"min": 1
@@ -2419,21 +2483,21 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.35,
 					"itemId": "item:branch",
-					"probability": 0.35,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
 			]
 		}
 	},
-	"mergeRules": {
+	"merge": {
 		"merge:blueprint-draft-final": {
 			"resultItemId": "item:blueprint",
 			"withItemId": "item:blueprint-draft"
@@ -2633,7 +2697,6 @@
 				"product:coal-mine-1"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-1": {
@@ -2641,7 +2704,6 @@
 				"product:lumber-camp-1"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-2": {
@@ -2649,7 +2711,6 @@
 				"product:lumber-camp-2"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-3": {
@@ -2657,7 +2718,6 @@
 				"product:lumber-camp-3"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-4": {
@@ -2665,7 +2725,6 @@
 				"product:lumber-camp-4"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-5": {
@@ -2673,7 +2732,6 @@
 				"product:lumber-camp-5"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-1": {
@@ -2681,7 +2739,6 @@
 				"product:quarry-1"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-2": {
@@ -2689,7 +2746,6 @@
 				"product:quarry-2"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-3": {
@@ -2697,7 +2753,6 @@
 				"product:quarry-3"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-4": {
@@ -2705,7 +2760,6 @@
 				"product:quarry-4"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-5": {
@@ -2713,7 +2767,6 @@
 				"product:quarry-5"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-1": {
@@ -2721,7 +2774,6 @@
 				"product:townhall-1"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-2": {
@@ -2729,7 +2781,6 @@
 				"product:townhall-2"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-3": {
@@ -2737,7 +2788,6 @@
 				"product:townhall-3"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-4": {
@@ -2745,7 +2795,6 @@
 				"product:townhall-4"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-5": {
@@ -2753,7 +2802,6 @@
 				"product:townhall-5"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:tree": {
@@ -2761,7 +2809,6 @@
 				"product:tree"
 			],
 			"requirements": [],
-			"trigger": "click",
 			"type": "producer"
 		}
 	},
@@ -2771,11 +2818,13 @@
 			"inputs": [
 				{
 					"capacity": 4,
+					"consume": true,
 					"itemId": "item:sausage",
 					"quantity": 1
 				},
 				{
 					"capacity": 4,
+					"consume": true,
 					"itemId": "item:beer",
 					"quantity": 1
 				}
@@ -2966,8 +3015,7 @@
 				"itemId": "item:coin-stack",
 				"quantity": 1
 			}
-		],
-		"resources": []
+		]
 	},
 	"stashes": {
 		"stash:crate-1": {
@@ -2977,7 +3025,6 @@
 			"outputTableId": "loot:crate-1",
 			"placement": "board_then_inventory",
 			"requirements": [],
-			"trigger": "click",
 			"type": "stash"
 		},
 		"stash:crate-2": {
@@ -2987,7 +3034,6 @@
 			"outputTableId": "loot:crate-2",
 			"placement": "board_then_inventory",
 			"requirements": [],
-			"trigger": "click",
 			"type": "stash"
 		},
 		"stash:crate-3": {
@@ -2997,7 +3043,6 @@
 			"outputTableId": "loot:crate-3",
 			"placement": "board_then_inventory",
 			"requirements": [],
-			"trigger": "click",
 			"type": "stash"
 		},
 		"stash:crate-4": {
@@ -3005,6 +3050,7 @@
 			"inputs": [
 				{
 					"capacity": 1,
+					"consume": true,
 					"itemId": "item:epic-key",
 					"quantity": 1
 				}
@@ -3013,7 +3059,6 @@
 			"outputTableId": "loot:crate-4",
 			"placement": "board_then_inventory",
 			"requirements": [],
-			"trigger": "click",
 			"type": "stash"
 		}
 	},

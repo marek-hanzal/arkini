@@ -9,8 +9,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.12,
 					"itemId": "item:coin",
-					"probability": 0.12,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -51,8 +51,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.18,
 					"itemId": "item:twig",
-					"probability": 0.18,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -93,8 +93,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.22,
 					"itemId": "item:pebble",
-					"probability": 0.22,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -135,14 +135,14 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.24,
 					"itemId": "item:branch",
-					"probability": 0.24,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.1,
 					"itemId": "item:epic-key",
-					"probability": 0.1,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -188,8 +188,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.2,
 					"itemId": "item:crate-3",
-					"probability": 0.2,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -204,14 +204,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.35,
 					"itemId": "item:branch",
-					"probability": 0.35,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -226,14 +226,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.55,
 					"itemId": "item:branch",
-					"probability": 0.55,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.1,
 					"itemId": "item:coin",
-					"probability": 0.1,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -248,8 +248,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.85,
 					"itemId": "item:twig",
-					"probability": 0.85,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -257,14 +257,14 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.24,
 					"itemId": "item:log",
-					"probability": 0.24,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin-pair",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -279,8 +279,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.5,
 					"itemId": "item:twig",
-					"probability": 0.5,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -288,8 +288,8 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.35,
 					"itemId": "item:log",
-					"probability": 0.35,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -304,8 +304,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.7,
 					"itemId": "item:log",
-					"probability": 0.7,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -320,8 +320,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.75,
 					"itemId": "item:branch",
-					"probability": 0.75,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -329,8 +329,8 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.3,
 					"itemId": "item:wood-bundle",
-					"probability": 0.3,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -345,14 +345,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.55,
 					"itemId": "item:wood-bundle",
-					"probability": 0.55,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.18,
 					"itemId": "item:beam",
-					"probability": 0.18,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -367,14 +367,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.32,
 					"itemId": "item:stone",
-					"probability": 0.32,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -389,14 +389,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.5,
 					"itemId": "item:stone",
-					"probability": 0.5,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.1,
 					"itemId": "item:coin",
-					"probability": 0.1,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -411,8 +411,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.85,
 					"itemId": "item:pebble",
-					"probability": 0.85,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -420,14 +420,14 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.18,
 					"itemId": "item:ore",
-					"probability": 0.18,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin-pair",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -442,8 +442,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.5,
 					"itemId": "item:pebble",
-					"probability": 0.5,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -451,8 +451,8 @@
 					"type": "chance"
 				},
 				{
+					"chance": 0.28,
 					"itemId": "item:crystal",
-					"probability": 0.28,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -467,8 +467,8 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.72,
 					"itemId": "item:crystal",
-					"probability": 0.72,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -483,14 +483,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.48,
 					"itemId": "item:ore",
-					"probability": 0.48,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.28,
 					"itemId": "item:crystal",
-					"probability": 0.28,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -505,20 +505,20 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.7,
 					"itemId": "item:ore",
-					"probability": 0.7,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.42,
 					"itemId": "item:crystal",
-					"probability": 0.42,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.12,
 					"itemId": "item:gem",
-					"probability": 0.12,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -544,8 +544,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.32,
 					"itemId": "item:water",
-					"probability": 0.32,
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -586,8 +586,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.4,
 					"itemId": "item:water",
-					"probability": 0.4,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -636,8 +636,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.55,
 					"itemId": "item:water",
-					"probability": 0.55,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -686,8 +686,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.62,
 					"itemId": "item:water",
-					"probability": 0.62,
 					"quantity": {
 						"max": 2,
 						"min": 1
@@ -736,8 +736,8 @@
 					"type": "weighted"
 				},
 				{
+					"chance": 0.72,
 					"itemId": "item:water",
-					"probability": 0.72,
 					"quantity": {
 						"max": 3,
 						"min": 1
@@ -755,14 +755,14 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.35,
 					"itemId": "item:branch",
-					"probability": 0.35,
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
+					"chance": 0.08,
 					"itemId": "item:coin",
-					"probability": 0.08,
 					"quantity": 1,
 					"type": "chance"
 				}

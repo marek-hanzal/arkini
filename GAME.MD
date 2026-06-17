@@ -1128,17 +1128,17 @@ Expected fields or equivalent rule definitions:
 - withdrawal placement rules
 - failure feedback rules
 
-### 18.5 Merge chain definition
+### 18.5 Merge definition
 
 Expected fields:
 
 - `id`
-- `name`
-- `tiers`
-- `inputCount`
-- `consumeInputs`
-- `result`
-- `specialRules`, if needed
+- `withItemId`
+- `resultItemId`
+- `consumeSource`, if needed
+- `secret`, if needed
+
+Merge is always a two-item interaction. Anything more complex belongs to producers, stashes, craft recipes or another explicit mechanic, not a fake variable-input merge rule.
 
 ### 18.6 Producer definition
 
@@ -1146,9 +1146,9 @@ Expected fields:
 
 - `id`
 - `name`
-- trigger: `click`
-- cooldown/refresh time
-- active loot table ID
+- ordered product line IDs
+- producer-level requirements
+- product-level duration/input/output-table rules
 - input requirements
 - input storage capacities
 - output placement rules

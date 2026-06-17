@@ -9,10 +9,11 @@ This directory is the repo-local working memory for GPT-led Arkini work. Treat t
 
 - `008-domain-effect-boundary-audit` is done: tap intent, drop action policy, activation depletion follow-up, optimistic merge visual-event resolution and inventory statefulness detection now live in focused pure helpers instead of UI/cache glue.
 - `004-split-game-item-definitions` is done: large root item config files now compose smaller one-level content-family files (`natural/*`, `blueprint/*`, `building/*`, `container/*`) while `GameItemDefinitions.ts` remains the single exported item collection.
+- Repository hygiene checkpoint is prepared for an incoming large product change: the latest completed boundary-audit code checkpoint is saved, and only docs-only handoff notes sit on top before further feature work.
 
 ## Current work
 
-- No active refactor task is currently selected. Next likely work is `009-economy-content-pass` unless product testing exposes a sharper bug.
+- No active refactor task is currently selected. `009-economy-content-pass` is deliberately deferred until the incoming large product change lands, because starting economy work now would create avoidable conflicts and humanity has already suffered enough merge conflicts for one week.
 
 ## Current mental model
 
@@ -150,12 +151,13 @@ Inventory slot data should stay layout-only (`slotIndex`). Stack/item/quantity b
 
 ## Active improvement priorities
 
-1. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.
-2. Keep action visual events explicit through `ActionVisualAnimation`; test event ordering and animation contract when adding new animated behavior. Drop runtime animation flags must survive error wrapping; losing `parallel-swap` breaks swap concurrency before cache events even get a vote.
-3. Add more Vitest coverage around domain action results, visual-event ordering, cache patches, placement planning and manifest validation.
-4. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks. Adapter hooks may wire React Query, mutations and feedback, but gameplay decisions such as tap activation intent, drop action policy, optimistic merge resolution and inventory statefulness should be delegated to small pure `logic/` helpers or play/drop action resolvers.
-5. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.
-6. Keep manifest content editable through small topic files and a documented checklist rather than inventing a config framework that cosplays as productivity.
+1. Keep the current checkpoint stable for the incoming large change. Avoid starting `009-economy-content-pass` or another broad refactor until the new product branch/ZIP lands.
+2. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.
+3. Keep action visual events explicit through `ActionVisualAnimation`; test event ordering and animation contract when adding new animated behavior. Drop runtime animation flags must survive error wrapping; losing `parallel-swap` breaks swap concurrency before cache events even get a vote.
+4. Add more Vitest coverage around domain action results, visual-event ordering, cache patches, placement planning and manifest validation when the behavior is being touched anyway.
+5. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks. Adapter hooks may wire React Query, mutations and feedback, but gameplay decisions such as tap activation intent, drop action policy, optimistic merge resolution and inventory statefulness should be delegated to small pure `logic/` helpers or play/drop action resolvers.
+6. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.
+7. Keep manifest content editable through small topic files and a documented checklist rather than inventing a config framework that cosplays as productivity.
 
 ## Backlog conventions
 

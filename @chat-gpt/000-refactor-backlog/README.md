@@ -6,14 +6,14 @@ This backlog captures remaining Arkini v0 work after the core rewrite, TileEngin
 
 ## Recommended order
 
-1. `012-tile-animation-overhaul.md`
-2. `013-dnd-motion-bugfix.md`
-3. `014-tile-engine-grid-snap-bugfix.md`
-4. `016-drag-snap-before-commit.md`
-5. `008-domain-effect-boundary-audit.md`
-6. `009-economy-content-pass.md`
+No new broad refactor is selected right now. The repo is intentionally checkpointed for an incoming large product change, so avoid opening `009-economy-content-pass.md` or additional architecture work until that change lands. Future cleanup should be picked from the actual conflict/feature shape after the new ZIP is available, not from stale optimism, the most renewable resource in software.
 
-Done recently: `004-split-game-item-definitions.md`, `006-tile-engine-public-api-hardening.md`, `007-render-performance-audit.md`, `010-tests-and-debug-tools.md`
+Current deferred candidates:
+
+1. `009-economy-content-pass.md` - blocked/deferred until the incoming product change lands.
+2. `010-tests-and-debug-tools.md` - continue only when new behavior needs focused coverage or debug timeline data.
+
+Done recently: `004-split-game-item-definitions.md`, `006-tile-engine-public-api-hardening.md`, `007-render-performance-audit.md`, `008-domain-effect-boundary-audit.md`, `010-tests-and-debug-tools.md` initial coverage slice.
 
 ## Recently completed environment work
 

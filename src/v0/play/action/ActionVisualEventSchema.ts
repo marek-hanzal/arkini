@@ -4,10 +4,13 @@ import { ActivationDepletionSchema } from "~/v0/activation/type/ActivationDeplet
 import { ActivationModeSchema } from "~/v0/activation/type/ActivationModeSchema";
 import { ItemInstanceIdSchema } from "~/v0/item-instance/type/ItemInstanceIdSchema";
 import { ItemLocationSchema } from "~/v0/item-instance/type/ItemLocationSchema";
+import { InventorySlotIndexSchema } from "~/v0/inventory/schema/InventorySlotIndexSchema";
 import { GameCraftRecipeIdSchema } from "~/v0/manifest/GameCraftRecipeIdSchema";
 import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
 import { GameUpgradeIdSchema } from "~/v0/manifest/GameUpgradeIdSchema";
 import { PositiveIntegerSchema } from "~/v0/manifest/PositiveIntegerSchema";
+
+const NonNegativeIntegerSchema = z.number().int().min(0);
 
 const optionalAnimationShape = {
 	animation: ActionVisualAnimationSchema.optional(),
@@ -57,6 +60,18 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		resultItemId: GameItemIdSchema,
 		consumeSource: z.boolean(),
 	}),
+
+	actionVisualEvent({
+		type: z.literal("item.replaced"),
+		itemInstanceId: ItemInstanceIdSchema,
+		fromItemId: GameItemIdSchema,
+		toItemId: GameItemIdSchema,
+		reason: z.enum([
+			"merge-result",
+			"stash-depleted",
+			"tile-remove",
+		]),
+	}),
 	actionVisualEvent({
 		type: z.literal("item.fed"),
 		sourceItemInstanceId: ItemInstanceIdSchema,
@@ -73,7 +88,13 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		reason: z.enum([
 			"activation-output",
 			"activation-withdrawal",
+			"craft-output",
+			"craft-requirement-return",
+			"debug",
 			"inventory-placement",
+			"product-output",
+			"stash-output",
+			"stored-requirement-withdraw",
 		]),
 	}),
 	actionVisualEvent({
@@ -82,11 +103,20 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		itemId: GameItemIdSchema,
 		from: ItemLocationSchema.optional(),
 		reason: z.enum([
-			"merge",
-			"craft-input",
 			"activation-input",
-			"upgrade-cost",
+			"craft-input",
+			"craft-requirement",
 			"inventory-stack",
+			"merge",
+			"merge-result",
+			"merge-source",
+			"product-input",
+			"remove-tool",
+			"stash-depleted",
+			"stash-input",
+			"stored-requirement-store",
+			"tile-remove",
+			"upgrade-cost",
 		]),
 	}),
 	actionVisualEvent({
@@ -98,6 +128,37 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		type: z.literal("activation.depleted"),
 		itemInstanceId: ItemInstanceIdSchema,
 		depletion: ActivationDepletionSchema,
+	}),
+
+	actionVisualEvent({
+		type: z.literal("inventory.quantity_changed"),
+		itemId: GameItemIdSchema,
+		slotIndex: InventorySlotIndexSchema,
+		quantity: PositiveIntegerSchema,
+		previousQuantity: NonNegativeIntegerSchema,
+		nextQuantity: NonNegativeIntegerSchema,
+		reason: z.enum([
+			"activation-input",
+			"craft-input",
+			"craft-output",
+			"craft-requirement",
+			"craft-requirement-return",
+			"debug",
+			"inventory-stack",
+			"merge",
+			"merge-result",
+			"merge-source",
+			"product-input",
+			"product-output",
+			"stash-input",
+			"stash-output",
+			"remove-tool",
+			"stash-depleted",
+			"stored-requirement-store",
+			"stored-requirement-withdraw",
+			"tile-remove",
+			"upgrade-cost",
+		]),
 	}),
 	actionVisualEvent({
 		type: z.literal("inventory.stacked"),

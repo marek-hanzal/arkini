@@ -145,6 +145,30 @@ export const applyBoardVisualEvent = (
 				);
 			},
 		)
+
+		.with(
+			{
+				type: "item.replaced",
+			},
+			(replaced) => {
+				const target = board.byId[replaced.itemInstanceId];
+				if (!target) return board;
+
+				return rebuildBoardView(
+					board.items.map((item) =>
+						item.id === target.id
+							? {
+									...item,
+									itemId: replaced.toItemId,
+									state: {},
+									activation: undefined,
+									craft: undefined,
+								}
+							: item,
+					),
+				);
+			},
+		)
 		.with(
 			{
 				type: "item.fed",

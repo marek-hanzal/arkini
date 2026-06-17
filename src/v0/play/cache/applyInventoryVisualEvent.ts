@@ -58,6 +58,34 @@ export const applyInventoryVisualEvent = (
 				});
 			},
 		)
+
+		.with(
+			{
+				type: "inventory.quantity_changed",
+			},
+			(changed) =>
+				patchInventorySlotCache({
+					inventory,
+					slotIndex: changed.slotIndex,
+					patch: (slot) => ({
+						...slot,
+						stack:
+							changed.nextQuantity > 0
+								? {
+										id:
+											slot.stack?.itemId === changed.itemId
+												? slot.stack.id
+												: `cache:${changed.itemId}:${changed.slotIndex}`,
+										itemId: changed.itemId,
+										quantity: changed.nextQuantity,
+										state: slot.stack?.state ?? {},
+										stateJson: slot.stack?.stateJson ?? emptyStateJson,
+										stateful: slot.stack?.stateful ?? false,
+									}
+								: undefined,
+					}),
+				}),
+		)
 		.with(
 			{
 				type: "inventory.stacked",

@@ -1026,3 +1026,108 @@ describe("applyGameActionFx", () => {
 		]);
 	});
 });
+
+describe("applyGameActionFx runtime placement actions", () => {
+	it("moves a board item inside the runtime save", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			x: 1,
+			y: 0,
+		});
+	});
+
+	it("places one inventory item on a board cell", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 2,
+		};
+
+		const result = runAction({
+			action: {
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+		expect(result.events).toMatchObject([
+			{
+				reason: "inventory-placement",
+				type: "item.consumed",
+			},
+			{
+				reason: "inventory-placement",
+				type: "item.created",
+			},
+		]);
+	});
+
+	it("stashes a board item into inventory", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.stash",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:producer",
+			quantity: 1,
+		});
+		expect(result.events).toMatchObject([
+			{
+				reason: "board-stash",
+				type: "item.consumed",
+			},
+			{
+				reason: "board-stash",
+				type: "item.created",
+			},
+		]);
+	});
+});

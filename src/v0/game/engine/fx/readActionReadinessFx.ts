@@ -41,6 +41,24 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 		yield* match(parsedAction)
 			.with(
 				{
+					type: "board.item.move",
+				},
+				() => Effect.succeed(undefined),
+			)
+			.with(
+				{
+					type: "board.item.stash",
+				},
+				() => Effect.succeed(undefined),
+			)
+			.with(
+				{
+					type: "board.items.swap",
+				},
+				() => Effect.succeed(undefined),
+			)
+			.with(
+				{
 					type: "craft.start",
 				},
 				(craftAction) =>
@@ -60,6 +78,18 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 						config: gameConfig.config,
 						save,
 					}),
+			)
+			.with(
+				{
+					type: "inventory.item.place",
+				},
+				() => Effect.succeed(undefined),
+			)
+			.with(
+				{
+					type: "inventory.slots.swap",
+				},
+				() => Effect.succeed(undefined),
 			)
 			.with(
 				{

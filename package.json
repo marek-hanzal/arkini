@@ -10,7 +10,7 @@
 		"serve": "vite preview",
 		"typecheck": "tsc --noEmit",
 		"dc": "depcruise src --output-type err-long",
-		"test": "vitest run --no-color --pool=forks --maxWorkers=1 --no-file-parallelism",
+		"test": "vitest run --no-color",
 		"check": "npm run format:check && npm run game:validate -- game/arkini && npm run dc && npm run typecheck && npm run test",
 		"format": "biome format --write .",
 		"format:check": "biome format .",

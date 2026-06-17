@@ -2,6 +2,11 @@ import { Effect, type Effect as EffectType } from "effect";
 import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
 import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
 import { match } from "ts-pattern";
+import { moveBoardItemFx } from "~/v0/game/engine/fx/moveBoardItemFx";
+import { placeInventoryItemOnBoardFx } from "~/v0/game/engine/fx/placeInventoryItemOnBoardFx";
+import { stashBoardItemFx } from "~/v0/game/engine/fx/stashBoardItemFx";
+import { swapBoardItemsFx } from "~/v0/game/engine/fx/swapBoardItemsFx";
+import { swapInventorySlotsFx } from "~/v0/game/engine/fx/swapInventorySlotsFx";
 import { mergeItemFx } from "~/v0/game/engine/fx/mergeItemFx";
 import { openStashFx } from "~/v0/game/engine/fx/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
@@ -48,6 +53,41 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 	> = match(parsedAction)
 		.with(
 			{
+				type: "board.item.move",
+			},
+			(moveAction) =>
+				moveBoardItemFx({
+					action: moveAction,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "board.item.stash",
+			},
+			(stashAction) =>
+				stashBoardItemFx({
+					action: stashAction,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "board.items.swap",
+			},
+			(swapAction) =>
+				swapBoardItemsFx({
+					action: swapAction,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
 				type: "craft.start",
 			},
 			(craftAction) =>
@@ -66,6 +106,29 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 				mergeItemFx({
 					action: mergeAction,
 					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "inventory.item.place",
+			},
+			(placeAction) =>
+				placeInventoryItemOnBoardFx({
+					action: placeAction,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "inventory.slots.swap",
+			},
+			(swapAction) =>
+				swapInventorySlotsFx({
+					action: swapAction,
 					nowMs,
 					save,
 				}),

@@ -1,22 +1,17 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { useMergeBoardItemsMutation } from "~/v0/board/action/useMergeBoardItemsMutation";
-import { useMoveBoardItemMutation } from "~/v0/board/action/useMoveBoardItemMutation";
-import { useSwapBoardItemsMutation } from "~/v0/board/action/useSwapBoardItemsMutation";
-import { boardViewQueryOptions } from "~/v0/board/query/boardViewQueryOptions";
-import { usePlaceInventoryItemMutation } from "~/v0/inventory/action/usePlaceInventoryItemMutation";
 import { resolveInventoryDropFeedback } from "~/v0/inventory/drop/resolveInventoryDropFeedback";
 import { resolveInventorySlotTapAction } from "~/v0/inventory/logic/resolveInventorySlotTapAction";
-import { useStashBoardItemMutation } from "~/v0/inventory/action/useStashBoardItemMutation";
-import { useSwapInventorySlotsMutation } from "~/v0/inventory/action/useSwapInventorySlotsMutation";
 import type { InventorySurface } from "~/v0/inventory/InventorySurface.types";
-import { inventoryViewQueryOptions } from "~/v0/inventory/query/inventoryViewQueryOptions";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
-import type { DropActions } from "~/v0/play/drop/DropActions";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
+import {
+	useGameBoardView,
+	useGameInventoryView,
+	useGameRuntimeDropActions,
+} from "~/v0/play/runtime";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useInventoryTileEngineModel {
@@ -40,14 +35,9 @@ export namespace useInventoryTileEngineModel {
 export const useInventoryTileEngineModel = ({
 	feedback,
 }: useInventoryTileEngineModel.Props): useInventoryTileEngineModel.Result => {
-	const { data: board } = useSuspenseQuery(boardViewQueryOptions());
-	const { data: inventory } = useSuspenseQuery(inventoryViewQueryOptions());
-	const mergeBoardItemsMutation = useMergeBoardItemsMutation();
-	const moveBoardItemMutation = useMoveBoardItemMutation();
-	const placeInventoryItemMutation = usePlaceInventoryItemMutation();
-	const stashBoardItemMutation = useStashBoardItemMutation();
-	const swapBoardItemsMutation = useSwapBoardItemsMutation();
-	const swapInventorySlotsMutation = useSwapInventorySlotsMutation();
+	const board = useGameBoardView();
+	const inventory = useGameInventoryView();
+	const actions = useGameRuntimeDropActions();
 
 	const slotLayoutKey = inventory.slots.map((slot) => slot.slotIndex).join("|");
 	const slots = useMemo(
@@ -62,6 +52,7 @@ export const useInventoryTileEngineModel = ({
 			})) satisfies TileEngine.Slot<InventorySurface.SlotData>[],
 		[
 			slotLayoutKey,
+			inventory.slots,
 		],
 	);
 
@@ -102,35 +93,18 @@ export const useInventoryTileEngineModel = ({
 				return;
 			}
 
-			placeInventoryItemMutation.mutate({
-				slotIndex: action.slotIndex,
-				x: action.x,
-				y: action.y,
-			});
+			void actions
+				.placeInventoryItem({
+					slotIndex: action.slotIndex,
+					x: action.x,
+					y: action.y,
+				})
+				.catch(feedback.showError);
 		},
 		[
+			actions,
 			board.firstEmptyCell,
 			feedback,
-			placeInventoryItemMutation.mutate,
-		],
-	);
-
-	const actions = useMemo<DropActions>(
-		() => ({
-			mergeBoardItems: mergeBoardItemsMutation.mutateAsync,
-			moveBoardItem: moveBoardItemMutation.mutateAsync,
-			placeInventoryItem: placeInventoryItemMutation.mutateAsync,
-			stashBoardItem: stashBoardItemMutation.mutateAsync,
-			swapBoardItems: swapBoardItemsMutation.mutateAsync,
-			swapInventorySlots: swapInventorySlotsMutation.mutateAsync,
-		}),
-		[
-			mergeBoardItemsMutation.mutateAsync,
-			moveBoardItemMutation.mutateAsync,
-			placeInventoryItemMutation.mutateAsync,
-			stashBoardItemMutation.mutateAsync,
-			swapBoardItemsMutation.mutateAsync,
-			swapInventorySlotsMutation.mutateAsync,
 		],
 	);
 

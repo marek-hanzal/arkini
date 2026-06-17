@@ -10,6 +10,8 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"craft-requirement-return",
 	"stash-output",
 	"stored-requirement-withdraw",
+	"inventory-placement",
+	"board-stash",
 	"debug",
 ]);
 
@@ -19,6 +21,8 @@ export const GameItemConsumedReasonSchema = z.enum([
 	"craft-input",
 	"craft-requirement",
 	"stored-requirement-store",
+	"inventory-placement",
+	"board-stash",
 	"remove-tool",
 	"merge-source",
 	"upgrade-cost",

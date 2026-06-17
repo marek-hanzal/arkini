@@ -88,6 +88,7 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		reason: z.enum([
 			"activation-output",
 			"activation-withdrawal",
+			"board-stash",
 			"craft-output",
 			"craft-requirement-return",
 			"debug",
@@ -104,8 +105,10 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		from: ItemLocationSchema.optional(),
 		reason: z.enum([
 			"activation-input",
+			"board-stash",
 			"craft-input",
 			"craft-requirement",
+			"inventory-placement",
 			"inventory-stack",
 			"merge",
 			"merge-result",
@@ -139,11 +142,13 @@ export const ActionVisualEventSchema = z.discriminatedUnion("type", [
 		nextQuantity: NonNegativeIntegerSchema,
 		reason: z.enum([
 			"activation-input",
+			"board-stash",
 			"craft-input",
 			"craft-output",
 			"craft-requirement",
 			"craft-requirement-return",
 			"debug",
+			"inventory-placement",
 			"inventory-stack",
 			"merge",
 			"merge-result",

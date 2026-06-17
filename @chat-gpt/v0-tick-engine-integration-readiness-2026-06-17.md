@@ -53,11 +53,22 @@ Priority order:
    - Runtime cache bridge now exists: `connectRuntimeGameEngineToQueryCache` primes board/inventory React Query caches from a `RuntimeGameEngineAdapter` snapshot, subscribes to runtime results, maps domain events to visual events and feeds the existing cache patch + TileEngine motion request pipeline.
    - Added runtime snapshot readers for board/inventory views so the new engine can seed the old UI cache contract without importing React Query or TileEngine into the standalone engine.
    - Added stash-open visual mapping to keep cache activation state/remaining charges in sync with runtime `stash.opened` results.
-   - Follow-up: this bridge is app-facing but not yet mounted as the live PlayShell runtime. Next pass should add a controlled runtime action path/dev switch, then replace old SQLite action mutations incrementally.
+   - Follow-up closed in the runtime store pass: PlayShell now mounts a `GameRuntimeProvider`, board/inventory read state comes from a `useSyncExternalStore` selector layer and gameplay drops/taps dispatch into the runtime adapter instead of React Query mutation hooks.
+   - Runtime visual effects now subscribe to runtime updates directly and register TileEngine enter/merge motion from domain->visual events without patching board/inventory React Query caches.
 
-7. **Persistence/Dexie later**
+7. **Runtime selector/action layer** — DONE / CURRENT
+   - Added `GameRuntimeStore` as a React-facing wrapper around `RuntimeGameEngineAdapter`.
+   - Added `useGameRuntimeSelector` based on `useSyncExternalStore`; selectors return stable selected values when the root runtime snapshot changes but the selected slice does not.
+   - Board/inventory surfaces now read `BoardView`/`InventoryView` from runtime selectors instead of `useSuspenseQuery(boardViewQueryOptions)` / `inventoryViewQueryOptions`.
+   - Replaced gameplay `useMutation` hooks in the live board/inventory/item paths with `useGameAction` and `useGameRuntimeDropActions`. Runtime actions are command functions over `RuntimeGameEngineAdapter`, not fake server mutations with a cache hostage situation.
+   - Removed dead board/inventory/item gameplay mutation hooks so React Query stops pretending to be the game state source of truth.
+   - Added runtime engine actions for board move, board swap, inventory-to-board placement, board-to-inventory stash and inventory slot swap. This avoids the split-brain disaster where UI reads from the new runtime store but writes to the old SQLite mutation path.
+   - Board-to-board drop commands now route merge/craft/producer/stash/stored-requirement interactions into runtime actions where the new engine has coverage. Remaining parity gaps are explicit rather than hidden behind old mutation hooks.
+   - Added a checked-in Vitest config so focused tests do not need repeated CLI flag witchcraft.
+
+8. **Persistence/Dexie later**
    - Storage remains outside the engine.
    - Dexie/IndexedDB simplification follows after the engine can run in memory and after the domain-event bridge proves the shape UI actually needs.
    - Do not implement Dexie before the adapter/bridge boundary is clear, otherwise storage starts shaping gameplay state and the project wakes up with database Stockholm syndrome.
 
-Current task: item 6 is closed enough to move on. Continue with a controlled runtime action path/dev switch that lets UI actions dispatch into `RuntimeGameEngineAdapter` and reuse the query-cache bridge. Dexie should still wait until the runtime action path proves the real persistence boundary.
+Current task: item 7 is the active runtime UI path. Next pass should harden remaining UI parity around inventory-to-target activation feeding, upgrade sheet runtime views and any old debug/scenario paths that still assume SQLite is the gameplay source of truth. After that, remove or retire the old board/inventory React Query cache bridge code once no live path depends on it. Dexie should still wait until the runtime action layer proves the real persistence boundary.

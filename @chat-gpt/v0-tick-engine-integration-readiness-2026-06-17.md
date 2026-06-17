@@ -44,17 +44,20 @@ Priority order:
    - Added `runGameEngineEffect`, a narrow engine runner that provides only `RandomServiceFx`. Do not use the app-level `runEffect` here because it currently wires SQLite/Kysely/browser storage and would make the no-persistence adapter lie through its teeth.
    - This adapter deliberately does not import Dexie, SQLite, React Query or TileEngine. Persistence and visuals wrap it later instead of leaking into game rules like some kind of architectural sewage.
 
-6. **Domain-event to visual-event bridge** — IN PROGRESS / CURRENT
+6. **Domain-event to visual-event bridge** — DONE / FOLLOW-UP
    - Added the first bridge under `src/v0/play/game-engine-bridge`, intentionally outside `src/v0/game/engine` so the standalone engine does not import UI visual language.
    - `createActionVisualEventsFromGameEvents` maps raw engine events into `ActionVisualEvent` values for board spawns, inventory quantity patches, board source merges, standalone replacements, board removals and upgrade-start state visuals.
    - Added `createActionVisualEventsFromGameEngineResult` convenience wrapper for runtime adapter subscribers.
    - Extended the visual event vocabulary with `inventory.quantity_changed`, because engine inventory slots are stack snapshots, not item-instance rows, and pretending every inventory delta is an item spawn would make cache patching beautifully wrong.
    - Added `item.replaced` visual support so non-consuming directed merge/replacement events can patch board state even when there is no consumed source event to fold into `item.merged`.
-   - Current bridge is not yet wired into React/TileEngine subscription flow. Next pass should connect runtime adapter results to cache/snapshot patching and motion request registration.
+   - Runtime cache bridge now exists: `connectRuntimeGameEngineToQueryCache` primes board/inventory React Query caches from a `RuntimeGameEngineAdapter` snapshot, subscribes to runtime results, maps domain events to visual events and feeds the existing cache patch + TileEngine motion request pipeline.
+   - Added runtime snapshot readers for board/inventory views so the new engine can seed the old UI cache contract without importing React Query or TileEngine into the standalone engine.
+   - Added stash-open visual mapping to keep cache activation state/remaining charges in sync with runtime `stash.opened` results.
+   - Follow-up: this bridge is app-facing but not yet mounted as the live PlayShell runtime. Next pass should add a controlled runtime action path/dev switch, then replace old SQLite action mutations incrementally.
 
 7. **Persistence/Dexie later**
    - Storage remains outside the engine.
    - Dexie/IndexedDB simplification follows after the engine can run in memory and after the domain-event bridge proves the shape UI actually needs.
    - Do not implement Dexie before the adapter/bridge boundary is clear, otherwise storage starts shaping gameplay state and the project wakes up with database Stockholm syndrome.
 
-Current task: item 6 is partially implemented. Continue by wiring the visual bridge into the app-facing runtime subscription/cache path, then revisit whether enough UI parity exists to start Dexie. Dexie should still wait until runtime adapter plus visual bridge prove the real persistence boundary.
+Current task: item 6 is closed enough to move on. Continue with a controlled runtime action path/dev switch that lets UI actions dispatch into `RuntimeGameEngineAdapter` and reuse the query-cache bridge. Dexie should still wait until the runtime action path proves the real persistence boundary.

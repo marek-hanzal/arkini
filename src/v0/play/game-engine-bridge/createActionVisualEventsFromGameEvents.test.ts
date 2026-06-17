@@ -164,4 +164,24 @@ describe("createActionVisualEventsFromGameEvents", () => {
 			},
 		]);
 	});
+
+	it("maps stash opened events to activation state visuals", () => {
+		const visualEvents = map([
+			{
+				openedAtMs: 100,
+				remainingCharges: 0,
+				stashId: "stash:test",
+				stashItemInstanceId: "stash-1",
+				type: "stash.opened",
+			},
+		]);
+
+		expect(visualEvents).toMatchObject([
+			{
+				itemInstanceId: "stash-1",
+				mode: "exhaust",
+				type: "activation.activated",
+			},
+		]);
+	});
 });

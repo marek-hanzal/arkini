@@ -93,7 +93,7 @@ export const sequenceSpawnVisualEvents = ({
 
 	sequencedEvents.forEach((event, index) => {
 		const delayMs = visualEventDelayMs(event, index);
-		window.setTimeout(() => {
+		globalThis.setTimeout(() => {
 			DebugTimeline.record({
 				scope: "action-cache",
 				event: "visual-events.sequence.tick",
@@ -118,7 +118,7 @@ export const sequenceSpawnVisualEvents = ({
 	});
 
 	if (delayedEvents.length > 0) {
-		window.setTimeout(() => {
+		globalThis.setTimeout(() => {
 			DebugTimeline.record({
 				scope: "action-cache",
 				event: "visual-events.sequence.complete",

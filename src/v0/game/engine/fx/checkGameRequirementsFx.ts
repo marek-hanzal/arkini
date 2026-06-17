@@ -11,6 +11,7 @@ export namespace checkGameRequirementsFx {
 		config: GameConfig;
 		save: GameSave;
 		requirements: readonly GameRequirement[];
+		storedItems?: ReadonlyMap<string, number>;
 	}
 }
 
@@ -18,6 +19,7 @@ export const checkGameRequirementsFx = Effect.fn("checkGameRequirementsFx")(func
 	config,
 	save,
 	requirements,
+	storedItems,
 }: checkGameRequirementsFx.Props) {
 	for (const requirement of requirements) {
 		yield* match(requirement)
@@ -47,12 +49,26 @@ export const checkGameRequirementsFx = Effect.fn("checkGameRequirementsFx")(func
 					type: "stored",
 				},
 				(storedRequirement) =>
-					Effect.fail(
-						GameEngineError.actionRejected(
-							"unsupported_requirement",
-							`Stored requirement "${storedRequirement.itemId}" needs save storage before the new engine can evaluate it.`,
-						),
-					),
+					Effect.gen(function* () {
+						if (!storedItems) {
+							return yield* Effect.fail(
+								GameEngineError.actionRejected(
+									"unsupported_requirement",
+									`Stored requirement "${storedRequirement.itemId}" needs target save storage.`,
+								),
+							);
+						}
+
+						const availableQuantity = storedItems.get(storedRequirement.itemId) ?? 0;
+						if (availableQuantity < storedRequirement.quantity) {
+							return yield* Effect.fail(
+								GameEngineError.actionRejected(
+									"missing_requirement",
+									`Missing stored requirement "${storedRequirement.itemId}" (${availableQuantity}/${storedRequirement.quantity}).`,
+								),
+							);
+						}
+					})
 			)
 			.exhaustive();
 	}

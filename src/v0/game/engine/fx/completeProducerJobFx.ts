@@ -39,7 +39,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 	const product = yield* readProductFx({
 		productId: liveJob.productId,
 	});
-	const outputTableId = liveJob.outputTableId ?? product.outputTableId;
+	const outputTableId = liveJob.outputTableId;
 	const placement = liveJob.placement ?? product.placement;
 
 	if (!outputTableId) {

@@ -22,6 +22,7 @@ export {
 	GameSaveScheduledEventSchema,
 	GameSaveSchema,
 	GameSaveStashStateSchema,
+	GameSaveStoredRequirementStateSchema,
 } from "~/v0/game/engine/model/GameSaveSchema";
 export { GameSaveUpgradeJobSchema } from "~/v0/game/engine/model/GameSaveUpgradeJobSchema";
 export { GameSaveUpgradeStateSchema } from "~/v0/game/engine/model/GameSaveUpgradeStateSchema";
@@ -33,6 +34,10 @@ export type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
 export { GameActionSchema } from "~/v0/game/engine/model/GameActionSchema";
 export type { GameActionItemRef } from "~/v0/game/engine/model/GameActionItemRefSchema";
 export { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
+export type { GameActionStoredRequirementStore } from "~/v0/game/engine/model/GameActionStoredRequirementStore";
+export { GameActionStoredRequirementStoreSchema } from "~/v0/game/engine/model/GameActionStoredRequirementStoreSchema";
+export type { GameActionStoredRequirementWithdraw } from "~/v0/game/engine/model/GameActionStoredRequirementWithdraw";
+export { GameActionStoredRequirementWithdrawSchema } from "~/v0/game/engine/model/GameActionStoredRequirementWithdrawSchema";
 export type { GameEvent, GameEventPlacementTarget } from "~/v0/game/engine/model/GameEventSchema";
 export { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 export type { GameEngineError as GameEngineErrorType } from "~/v0/game/engine/model/GameEngineError";
@@ -46,6 +51,7 @@ export type {
 	GameSaveProducerJob,
 	GameSaveScheduledEvent,
 	GameSaveStashState,
+	GameSaveStoredRequirementState,
 	GameSaveUpgradeJob,
 	GameSaveUpgradeState,
 } from "~/v0/game/engine/model/GameSaveSchema";

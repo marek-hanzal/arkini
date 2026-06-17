@@ -63,6 +63,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 
 	liveTarget.itemId = checked.merge.resultItemId;
 	delete nextSave.stashes[checked.target.id];
+	delete nextSave.storedRequirements[checked.target.id];
 	nextSave.updatedAtMs = nowMs;
 
 	return {

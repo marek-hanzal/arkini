@@ -73,6 +73,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		upgrades: {},
 		scheduledEvents: {},
 		stashes: {},
+		storedRequirements: {},
 		updatedAtMs: nowMs,
 		version: 1,
 	};

@@ -4,6 +4,7 @@ import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInpu
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
 import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
 import { readProductFx } from "~/v0/game/engine/fx/readProductFx";
+import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -46,16 +47,22 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	const product = yield* readProductFx({
 		productId: action.productId,
 	});
+	const storedItems = yield* readStoredRequirementQuantitiesFx({
+		save,
+		targetItemInstanceId: action.producerItemInstanceId,
+	});
 
 	yield* checkGameRequirementsFx({
 		config,
 		requirements: producerDefinition.requirements,
 		save,
+		storedItems,
 	});
 	yield* checkGameRequirementsFx({
 		config,
 		requirements: product.requirements,
 		save,
+		storedItems,
 	});
 	yield* match(product.placement)
 		.with("board_then_inventory", () => Effect.void)

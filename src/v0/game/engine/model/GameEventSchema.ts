@@ -9,6 +9,7 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"craft-output",
 	"craft-requirement-return",
 	"stash-output",
+	"stored-requirement-withdraw",
 	"debug",
 ]);
 
@@ -17,6 +18,7 @@ export const GameItemConsumedReasonSchema = z.enum([
 	"stash-input",
 	"craft-input",
 	"craft-requirement",
+	"stored-requirement-store",
 	"remove-tool",
 	"merge-source",
 	"upgrade-cost",
@@ -99,6 +101,28 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			reason: GameBoardItemChangeReasonSchema,
 			replacedAtMs: NonNegativeIntegerSchema,
 			toItemId: IdSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("stored_requirement.stored"),
+			targetItemInstanceId: IdSchema,
+			itemId: IdSchema,
+			quantity: PositiveIntegerSchema,
+			previousQuantity: NonNegativeIntegerSchema,
+			nextQuantity: PositiveIntegerSchema,
+			storedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("stored_requirement.withdrawn"),
+			targetItemInstanceId: IdSchema,
+			itemId: IdSchema,
+			quantity: PositiveIntegerSchema,
+			previousQuantity: PositiveIntegerSchema,
+			nextQuantity: NonNegativeIntegerSchema,
+			withdrawnAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
 	z

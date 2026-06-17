@@ -293,6 +293,115 @@ describe("upgrade runtime", () => {
 		);
 	});
 
+	it("keeps already started sink product jobs as sinks after output upgrades", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			lootTables: {
+				...baseConfig.lootTables,
+				"loot:better": {
+					name: "Better loot",
+					output: [
+						{
+							itemId: "item:plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+			},
+			upgrades: {
+				"upgrade:shred-output": {
+					code: "shred-output",
+					description: "Shred output",
+					name: "Shred Output",
+					sort: 1,
+					tiers: [
+						{
+							cost: [],
+							durationMs: 0,
+							effects: [
+								{
+									productId: "product:shred",
+									tableId: "loot:better",
+									type: "product.outputTable.set",
+								},
+							],
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const startedSink = runAction({
+			action: {
+				inputRefs: [
+					{
+						kind: "inventory",
+						quantity: 1,
+						slotIndex: 0,
+					},
+				],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const startedUpgrade = runAction({
+			action: {
+				inputRefs: [],
+				type: "upgrade.start",
+				upgradeId: "upgrade:shred-output",
+			},
+			config,
+			nowMs: 0,
+			save: startedSink.save,
+		});
+		const completedUpgrade = runTick({
+			config,
+			nowMs: 0,
+			save: startedUpgrade.save,
+		});
+		const completedSink = runTick({
+			config,
+			nowMs: 1000,
+			save: completedUpgrade.save,
+		});
+
+		expect(startedSink.save.producerJobs["job:1"]).toMatchObject({
+			outputTableId: null,
+		});
+		expect(completedSink.events.some((event) => event.type === "item.created")).toBe(false);
+		expect(completedSink.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					productId: "product:shred",
+					type: "product.completed",
+				}),
+			]),
+		);
+	});
+
 	it("uses upgraded input costs for future product starts", () => {
 		const config = createEngineTestConfig({
 			upgrades: {

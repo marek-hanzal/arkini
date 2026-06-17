@@ -4,6 +4,7 @@ import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInpu
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
 import { readStashBoardItemFx } from "~/v0/game/engine/fx/readStashBoardItemFx";
 import { readStashRemainingChargesFx } from "~/v0/game/engine/fx/readStashRemainingChargesFx";
+import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStashOpen } from "~/v0/game/engine/model/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -57,10 +58,15 @@ export const checkStashOpenReadinessFx = Effect.fn("checkStashOpenReadinessFx")(
 		);
 	}
 
+	const storedItems = yield* readStoredRequirementQuantitiesFx({
+		save,
+		targetItemInstanceId: action.stashItemInstanceId,
+	});
 	yield* checkGameRequirementsFx({
 		config,
 		requirements: stash.requirements,
 		save,
+		storedItems,
 	});
 	yield* match(stash.placement)
 		.with("board_then_inventory", () => Effect.void)

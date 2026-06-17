@@ -58,14 +58,14 @@ The active runtime does not route user actions through a central command bus. Co
 
 ## Tile engine boundary
 
-Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/v0/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory data belongs to SQLite and React Query cached views. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules.
+Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/v0/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory gameplay data belongs to `RuntimeGameEngineAdapter`/`GameRuntimeStore`; persistence wraps that later. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules.
 
 `TileEngine` is standalone by design: it accepts slots, tiles, render callbacks, generic drag bindings, and drop resolution callbacks. It must not import Arkini board/inventory/producers directly. Game-specific stuff lives in `src/v0/play/drop` and the board/inventory surfaces. If a future game surface needs tile behavior, it should feed generic slots/tiles into `TileEngine` instead of inventing another tiny haunted renderer.
 
 Rules for this layer:
 
 - no classes, no service objects, no hidden mutable engine instances; use functions and namespace `Props`,
-- no durable game data in engine memory; SQLite remains the source of truth,
+- no durable game data in TileEngine memory; gameplay truth lives in the runtime adapter/store,
 - no React state in engines; hooks wire engines to UI and workflow machines,
 - no pure re-export barrels pretending to be architecture.
 
@@ -98,21 +98,21 @@ The current content direction is Settlers-like: small producers create raw goods
 
 The active play runtime lives in `src/v0`. The pre-v0 root runtime and `src/ancient` archaeology snapshot have been removed; do not recreate legacy buckets beside `src/v0` unless the goal is to reintroduce the plague in a fresh little hat.
 
-Tap/press recognition is owned by `src/v0/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions patch React Query cache before the DB round-trip and then reconcile cached views from SQLite without remounting the board like a nervous intern.
+Tap/press recognition is owned by `src/v0/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions dispatch into the runtime engine, runtime selectors publish the new board/inventory view, and visual-event adapters register TileEngine motion requests without a React Query cache detour.
 
 Game-specific drop policy lives in `src/v0/play/drop`. The top-level `resolveDrop` is only a tiny delegator over focused case resolvers such as `resolveBoardCellDrop`, `resolveInventoryCellDrop`, and `resolveInventorySlotDrop`. Board/inventory mutation calls are provided as concrete `DropActions`, not as a generic `Command` router. The engine stays game-agnostic: it receives slots, tiles, renderers, drag bindings, and a drop resolver; it does not know what a producer, stash, merge recipe, or inventory stack means.
 
-XState is no longer part of the runtime. The app has three state buckets: SQLite for durable game state, React Query for stable cached read views and mutation lifecycle, and tiny colocated React state for transient UI such as active sheet and feedback pulses. If a workflow does not branch across meaningful domain states, it stays as a hook, reducer, or concrete mutation instead of becoming a statechart shrine.
+XState is no longer part of the runtime. The app has three state buckets: the runtime engine/store for gameplay state, React Query for static/async support data such as item catalog and database/dev status, and tiny colocated React state for transient UI such as active sheet and feedback pulses. If a workflow does not branch across meaningful domain states, it stays as a hook, reducer, or concrete runtime action instead of becoming a statechart shrine.
 
 ## React data subscriptions
 
-v0 does not use app-owned React context. Vendor providers such as React Query and the router stay at the boundary because apparently even purity needs plumbing. Everything else subscribes where it is used.
+Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/v0/play/runtime`. Board and inventory surfaces must not use React Query as their source of truth. React Query remains acceptable for genuinely async or static support data such as item catalog, database status, dev diagnostics and future cloud/shop work.
 
-All read paths use `useSuspenseQuery`, not plain `useQuery`, so rendered components do not get `undefined` data traps. Initial missing data belongs to Suspense/error boundaries, not to `if (!data) return null` confetti scattered through feature components.
+All React Query read paths still use `useSuspenseQuery`, not plain `useQuery`, so rendered components do not get `undefined` data traps. Initial missing data belongs to Suspense/error boundaries, not to `if (!data) return null` confetti scattered through feature components.
 
-Do not read UI flow data with `queryClient.getQueryData`. View/runtime code subscribes through query options. Mutation internals may write with `setQueryData` for cache patches and post-success reconciliation, but cache peeking is not a data-access architecture, it is rummaging in a drawer and calling it state management.
+Do not read gameplay flow data with `queryClient.getQueryData`. Runtime code reads from `GameRuntimeStore`. Query cache peeking is not a data-access architecture, it is rummaging in a drawer and calling it state management.
 
-Concrete gameplay actions use concrete domain action hooks under paths such as `src/v0/board/action`, `src/v0/inventory/action`, `src/v0/item/action`, and `src/v0/upgrade/action`. v0 deliberately does not use a central `useGameCommandMutation`; each hook owns its own Effect call, cache patch, rollback, and cache sync in the domain that uses it.
+Concrete gameplay actions use runtime commands such as `useGameAction` and `useGameRuntimeDropActions`. Do not add new gameplay `useMutation` hooks for board/inventory/producer/stash/craft/upgrade state. `useMutation` is for real async side effects outside the gameplay loop, not for moving a twig.
 
 Components should stay boring: render props, wire callbacks, and shut up. If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
 
@@ -151,7 +151,7 @@ src/v0/ui/                      Generic UI-only helpers such as class merging.
 src/v0/**/fx/                   Active v0 domain Fx roots for gameplay actions, save lifecycle, reads, persistence, and bootstrap.
 src/v0/**/query/                Suspense query options and keys owned by their data domain.
 src/v0/**/action/               Concrete mutation hooks owned by the action domain.
-src/v0/**/cache/                React Query cache patch/reconcile helpers owned by the view cache domain.
+src/v0/play/runtime/            Runtime store, selectors and action dispatch hooks for gameplay state.
 src/v0/tile-engine/             Game-agnostic drag/drop/tap/animation runtime for stable tile actors.
 src/v0/play/drag/               Arkini-specific drag source/target contracts for TileEngine.
 src/v0/play/drop/               Arkini-specific drop policy over the generic TileEngine.

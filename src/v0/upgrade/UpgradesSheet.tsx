@@ -2,9 +2,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import type { FC } from "react";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { UpgradeCard } from "~/v0/upgrade/ui/UpgradeCard";
-import { useBuyUpgradeMutation } from "~/v0/upgrade/action/useBuyUpgradeMutation";
 import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
-import { upgradeListQueryOptions } from "~/v0/upgrade/query/upgradeListQueryOptions";
+import { useGameAction, useGameRuntimeStore, useGameUpgradeListView } from "~/v0/play/runtime";
+import type { UpgradeId } from "~/v0/manifest/manifestId";
 
 export namespace UpgradesSheet {
 	export interface Props {
@@ -12,10 +12,51 @@ export namespace UpgradesSheet {
 	}
 }
 
+const inventoryInputRefsForUpgrade = ({
+	store,
+	upgradeId,
+}: {
+	store: ReturnType<typeof useGameRuntimeStore>;
+	upgradeId: UpgradeId;
+}) => {
+	const snapshot = store.getSnapshot().runtime;
+	const upgrade = snapshot.config.upgrades[upgradeId];
+	const completed = snapshot.save.upgrades[upgradeId]?.completedTiers ?? 0;
+	const runningJob = Object.values(snapshot.save.upgradeJobs).find(
+		(job) => job.upgradeId === upgradeId,
+	);
+	const tier = upgrade?.tiers[runningJob?.tierIndex ?? completed];
+	if (!tier) return [];
+
+	return tier.cost.flatMap((cost) => {
+		let remaining = cost.quantity;
+		const refs: {
+			kind: "inventory";
+			quantity: number;
+			slotIndex: number;
+		}[] = [];
+
+		for (const [slotIndex, slot] of snapshot.save.inventory.slots.entries()) {
+			if (!slot || slot.itemId !== cost.itemId || remaining <= 0) continue;
+
+			const quantity = Math.min(slot.quantity, remaining);
+			refs.push({
+				kind: "inventory",
+				quantity,
+				slotIndex,
+			});
+			remaining -= quantity;
+		}
+
+		return refs;
+	});
+};
+
 export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
-	const { data: upgrades } = useSuspenseQuery(upgradeListQueryOptions());
+	const upgrades = useGameUpgradeListView();
+	const store = useGameRuntimeStore();
+	const upgradeAction = useGameAction();
 	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
-	const buyUpgradeMutation = useBuyUpgradeMutation();
 
 	return (
 		<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
@@ -31,9 +72,14 @@ export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 							key={upgrade.id}
 							upgrade={upgrade}
 							items={items}
-							pending={buyUpgradeMutation.isPending}
+							pending={upgradeAction.isPending}
 							onBuy={(upgradeId) =>
-								buyUpgradeMutation.mutate({
+								void upgradeAction.run({
+									inputRefs: inventoryInputRefsForUpgrade({
+										store,
+										upgradeId,
+									}),
+									type: "upgrade.start",
 									upgradeId,
 								})
 							}

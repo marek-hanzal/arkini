@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import { resolveInventoryCellDropAction } from "~/v0/play/drop/resolveInventoryCellDropAction";
@@ -20,6 +21,23 @@ const inventory = rebuildInventoryView([
 	},
 ]);
 
+const board = rebuildBoardView([
+	{
+		id: "merge-target",
+		itemId: "item:twig",
+		state: {},
+		x: 2,
+		y: 1,
+	},
+	{
+		id: "blocked-target",
+		itemId: "item:branch",
+		state: {},
+		x: 3,
+		y: 1,
+	},
+]);
+
 const inventorySource = (slotIndex: number) =>
 	({
 		kind: "inventory",
@@ -29,23 +47,46 @@ const inventorySource = (slotIndex: number) =>
 	}) satisfies DragSource;
 
 describe("resolveInventoryCellDropAction", () => {
-	it("rejects occupied board cells", () => {
+	it("applies inventory items to occupied board cells when the target accepts the item", () => {
 		expect(
 			resolveInventoryCellDropAction({
+				board,
 				inventory,
 				source: inventorySource(0),
 				target: {
 					kind: "cell",
 					x: 2,
 					y: 1,
-					boardItemId: "board-item",
+					boardItemId: "merge-target",
+				},
+			}),
+		).toEqual({
+			type: "apply-inventory-item-to-board-item",
+			input: {
+				sourceSlotIndex: 0,
+				targetBoardItemId: "merge-target",
+			},
+		});
+	});
+
+	it("rejects occupied board cells that cannot accept the inventory item", () => {
+		expect(
+			resolveInventoryCellDropAction({
+				board,
+				inventory,
+				source: inventorySource(0),
+				target: {
+					kind: "cell",
+					x: 3,
+					y: 1,
+					boardItemId: "blocked-target",
 				},
 			}),
 		).toEqual({
 			type: "reject",
 			feedback: {
 				kind: "board-cell",
-				cellKey: "2:1",
+				cellKey: "3:1",
 			},
 		});
 	});
@@ -53,6 +94,7 @@ describe("resolveInventoryCellDropAction", () => {
 	it("rejects empty inventory sources", () => {
 		expect(
 			resolveInventoryCellDropAction({
+				board,
 				inventory,
 				source: inventorySource(1),
 				target: {
@@ -73,6 +115,7 @@ describe("resolveInventoryCellDropAction", () => {
 	it("places inventory items into empty board cells", () => {
 		expect(
 			resolveInventoryCellDropAction({
+				board,
 				inventory,
 				source: inventorySource(0),
 				target: {

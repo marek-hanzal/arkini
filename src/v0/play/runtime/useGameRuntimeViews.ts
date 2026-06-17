@@ -2,6 +2,8 @@ import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
+import { readRuntimeUpgradeListViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeUpgradeListViewFromGameSave";
+import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
 
 const stableStringify = (value: unknown) => JSON.stringify(value ?? null);
@@ -50,4 +52,13 @@ export const useGameInventorySlot = (slotIndex: number): InventorySlot =>
 				slotIndex,
 			},
 		sameInventorySlot,
+	);
+
+export const useGameUpgradeListView = (): UpgradeListView =>
+	useGameRuntimeSelector((state) =>
+		readRuntimeUpgradeListViewFromGameSave({
+			config: state.runtime.config,
+			nowMs: Date.now(),
+			save: state.runtime.save,
+		}),
 	);

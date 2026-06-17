@@ -39,6 +39,12 @@ export namespace RuntimeGameEngineAdapter {
 		action: GameAction | unknown;
 	}
 
+	export interface ReplaceSaveProps {
+		events?: GameEvent[];
+		nowMs?: number;
+		save: GameSave;
+	}
+
 	export interface TickProps {
 		nowMs?: number;
 	}
@@ -154,6 +160,35 @@ export class RuntimeGameEngineAdapter {
 			},
 		);
 
+		this.commit(result);
+
+		return result;
+	}
+
+	async replaceSave({
+		events = [],
+		nowMs = Date.now(),
+		save,
+	}: RuntimeGameEngineAdapter.ReplaceSaveProps): Promise<GameEngineResult> {
+		const nextWakeAtMs = await runGameEngineEffect(
+			readNextWakeAtMsFx({
+				save,
+			}),
+			{
+				random: this.random,
+			},
+		);
+
+		const result = {
+			events: [
+				...events,
+			],
+			nextWakeAtMs,
+			save: {
+				...save,
+				updatedAtMs: nowMs,
+			},
+		} satisfies GameEngineResult;
 		this.commit(result);
 
 		return result;

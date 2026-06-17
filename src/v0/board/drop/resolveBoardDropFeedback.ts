@@ -26,7 +26,7 @@ export const resolveBoardDropFeedback = ({
 	context,
 }: resolveBoardDropFeedback.Props): TileEngine.DropFeedback | null => {
 	const { source, target, targetTile } = context;
-	if (source.kind !== "board" || target?.kind !== "cell") return null;
+	if (target?.kind !== "cell") return null;
 
 	const targetBoardItemId =
 		targetTile?.data.kind === "board-item" ? targetTile.data.boardItemId : undefined;
@@ -36,7 +36,7 @@ export const resolveBoardDropFeedback = ({
 		};
 	}
 
-	if (targetBoardItemId === source.boardItemId) return null;
+	if (source.kind === "board" && targetBoardItemId === source.boardItemId) return null;
 
 	const targetItem = board.byId[targetBoardItemId];
 	if (!targetItem) {

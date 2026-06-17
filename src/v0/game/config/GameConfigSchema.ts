@@ -17,27 +17,46 @@ const QuantitySchema = z.union([
 		}),
 ]);
 
-const ActivationInputSchema = z
-	.array(
-		z
-			.object({
-				itemId: IdSchema,
-				quantity: PositiveIntegerSchema,
-				capacity: PositiveIntegerSchema,
-			})
-			.strict(),
-	)
-	.optional();
+const ItemStackInputSchema = z
+	.object({
+		itemId: IdSchema,
+		quantity: PositiveIntegerSchema,
+		capacity: PositiveIntegerSchema,
+		consume: z.boolean().optional(),
+	})
+	.strict();
 
+const StoredItemRequirementSchema = z
+	.object({
+		type: z.literal("stored"),
+		itemId: IdSchema,
+		quantity: PositiveIntegerSchema,
+		capacity: PositiveIntegerSchema,
+	})
+	.strict();
+
+const PassiveItemRequirementSchema = z
+	.object({
+		type: z.literal("passive"),
+		itemId: IdSchema,
+		quantity: PositiveIntegerSchema,
+		scope: z
+			.enum([
+				"board",
+				"inventory",
+				"board_or_inventory",
+			])
+			.optional(),
+	})
+	.strict();
+
+const ActivationInputSchema = z.array(ItemStackInputSchema).optional();
 const ActivationRequirementSchema = z
 	.array(
-		z
-			.object({
-				itemId: IdSchema,
-				quantity: PositiveIntegerSchema,
-				capacity: PositiveIntegerSchema,
-			})
-			.strict(),
+		z.discriminatedUnion("type", [
+			StoredItemRequirementSchema,
+			PassiveItemRequirementSchema,
+		]),
 	)
 	.optional();
 
@@ -131,6 +150,16 @@ const MergeRuleSchema = z
 	})
 	.strict();
 
+const RemoveByDefinitionSchema = z
+	.object({
+		itemId: IdSchema,
+		mode: z.enum([
+			"keep",
+			"consume",
+		]),
+	})
+	.strict();
+
 const ItemDefinitionSchema = z
 	.object({
 		assetId: IdSchema,
@@ -146,34 +175,38 @@ const ItemDefinitionSchema = z
 		producerId: IdSchema.optional(),
 		stashId: IdSchema.optional(),
 		craftRecipeId: IdSchema.optional(),
+		removeBy: z.array(RemoveByDefinitionSchema).optional(),
 	})
 	.strict();
 
-const ActivationSharedSchema = z.object({
-	trigger: z.literal("click"),
-	placement: z.literal("board_then_inventory"),
-	outputTableId: IdSchema,
-	inputs: ActivationInputSchema,
-	requirements: ActivationRequirementSchema,
-});
+const ProducerDefinitionSchema = z
+	.object({
+		type: z.literal("producer"),
+		trigger: z.literal("click"),
+		productIds: z.array(IdSchema).min(1),
+		requirements: ActivationRequirementSchema,
+	})
+	.strict();
 
-const ProducerDefinitionSchema = ActivationSharedSchema.extend({
-	type: z.literal("producer"),
-	cooldownMs: NonNegativeIntegerSchema,
-}).strict();
-
-const StashDefinitionSchema = ActivationSharedSchema.extend({
-	type: z.literal("stash"),
-	charges: PositiveIntegerSchema,
-	onDepleted: z.union([
-		z.literal("remove"),
-		z
-			.object({
-				replaceWithItemId: IdSchema,
-			})
-			.strict(),
-	]),
-}).strict();
+const StashDefinitionSchema = z
+	.object({
+		type: z.literal("stash"),
+		trigger: z.literal("click"),
+		placement: z.literal("board_then_inventory"),
+		outputTableId: IdSchema,
+		inputs: ActivationInputSchema,
+		requirements: ActivationRequirementSchema,
+		charges: PositiveIntegerSchema,
+		onDepleted: z.union([
+			z.literal("remove"),
+			z
+				.object({
+					replaceWithItemId: IdSchema,
+				})
+				.strict(),
+		]),
+	})
+	.strict();
 
 const CraftRecipeSchema = z
 	.object({
@@ -200,7 +233,11 @@ const LootTableDefinitionSchema = z
 const ProductDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
-		output: ActivationOutputSchema.min(1),
+		durationMs: NonNegativeIntegerSchema,
+		placement: z.literal("board_then_inventory"),
+		inputs: ActivationInputSchema,
+		requirements: ActivationRequirementSchema,
+		outputTableId: IdSchema.optional(),
 	})
 	.strict();
 
@@ -214,15 +251,15 @@ const UpgradeCostDefinitionSchema = z
 const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
 	z
 		.object({
-			type: z.literal("producer.cooldown.add"),
-			itemId: IdSchema,
+			type: z.literal("product.duration.add"),
+			productId: IdSchema,
 			ms: z.number().int(),
 		})
 		.strict(),
 	z
 		.object({
-			type: z.literal("producer.outputTable.set"),
-			itemId: IdSchema,
+			type: z.literal("product.outputTable.set"),
+			productId: IdSchema,
 			tableId: IdSchema,
 		})
 		.strict(),
@@ -318,6 +355,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasItem = createRecordGuard(value.items);
 	const hasMergeRule = createRecordGuard(value.mergeRules);
 	const hasProducer = createRecordGuard(value.producers);
+	const hasProduct = createRecordGuard(value.products);
 	const hasStash = createRecordGuard(value.stashes);
 	const hasCraftRecipe = createRecordGuard(value.craftRecipes);
 	const hasLootTable = createRecordGuard(value.lootTables);
@@ -411,6 +449,22 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`Missing craft recipe "${item.craftRecipeId}".`,
 			);
 		}
+
+		for (const [index, removal] of (item.removeBy ?? []).entries()) {
+			if (!hasItem(removal.itemId)) {
+				addIssue(
+					ctx,
+					[
+						"items",
+						itemId,
+						"removeBy",
+						index,
+						"itemId",
+					],
+					`Missing item "${removal.itemId}".`,
+				);
+			}
+		}
 	}
 
 	for (const [mergeRuleId, mergeRule] of Object.entries(value.mergeRules)) {
@@ -440,28 +494,65 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [producerId, producer] of Object.entries(value.producers)) {
-		validateActivationDefinition(
+		for (const [index, productId] of producer.productIds.entries()) {
+			if (!hasProduct(productId)) {
+				addIssue(
+					ctx,
+					[
+						"producers",
+						producerId,
+						"productIds",
+						index,
+					],
+					`Missing product "${productId}".`,
+				);
+			}
+		}
+
+		validateItemRequirements(
 			ctx,
 			[
 				"producers",
 				producerId,
+				"requirements",
 			],
-			producer,
+			producer.requirements,
 			hasItem,
-			hasLootTable,
 		);
 	}
 
 	for (const [stashId, stash] of Object.entries(value.stashes)) {
-		validateActivationDefinition(
+		if (!hasLootTable(stash.outputTableId)) {
+			addIssue(
+				ctx,
+				[
+					"stashes",
+					stashId,
+					"outputTableId",
+				],
+				`Missing loot table "${stash.outputTableId}".`,
+			);
+		}
+
+		validateItemInputs(
 			ctx,
 			[
 				"stashes",
 				stashId,
+				"inputs",
 			],
-			stash,
+			stash.inputs,
 			hasItem,
-			hasLootTable,
+		);
+		validateItemRequirements(
+			ctx,
+			[
+				"stashes",
+				stashId,
+				"requirements",
+			],
+			stash.requirements,
+			hasItem,
 		);
 
 		if (typeof stash.onDepleted === "object" && !hasItem(stash.onDepleted.replaceWithItemId)) {
@@ -522,16 +613,38 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [productId, product] of Object.entries(value.products)) {
-		validateActivationOutput(
+		validateItemInputs(
 			ctx,
 			[
 				"products",
 				productId,
-				"output",
+				"inputs",
 			],
-			product.output,
+			product.inputs,
 			hasItem,
 		);
+		validateItemRequirements(
+			ctx,
+			[
+				"products",
+				productId,
+				"requirements",
+			],
+			product.requirements,
+			hasItem,
+		);
+
+		if (product.outputTableId && !hasLootTable(product.outputTableId)) {
+			addIssue(
+				ctx,
+				[
+					"products",
+					productId,
+					"outputTableId",
+				],
+				`Missing loot table "${product.outputTableId}".`,
+			);
+		}
 	}
 
 	for (const [upgradeId, upgrade] of Object.entries(value.upgrades)) {
@@ -555,7 +668,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			}
 
 			for (const [effectIndex, effect] of tier.effects.entries()) {
-				if (effect.type === "producer.cooldown.add" && !hasItem(effect.itemId)) {
+				if (!hasProduct(effect.productId)) {
 					addIssue(
 						ctx,
 						[
@@ -565,44 +678,26 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 							tierIndex,
 							"effects",
 							effectIndex,
-							"itemId",
+							"productId",
 						],
-						`Missing item "${effect.itemId}".`,
+						`Missing product "${effect.productId}".`,
 					);
 				}
 
-				if (effect.type === "producer.outputTable.set") {
-					if (!hasItem(effect.itemId)) {
-						addIssue(
-							ctx,
-							[
-								"upgrades",
-								upgradeId,
-								"tiers",
-								tierIndex,
-								"effects",
-								effectIndex,
-								"itemId",
-							],
-							`Missing item "${effect.itemId}".`,
-						);
-					}
-
-					if (!hasLootTable(effect.tableId)) {
-						addIssue(
-							ctx,
-							[
-								"upgrades",
-								upgradeId,
-								"tiers",
-								tierIndex,
-								"effects",
-								effectIndex,
-								"tableId",
-							],
-							`Missing loot table "${effect.tableId}".`,
-						);
-					}
+				if (effect.type === "product.outputTable.set" && !hasLootTable(effect.tableId)) {
+					addIssue(
+						ctx,
+						[
+							"upgrades",
+							upgradeId,
+							"tiers",
+							tierIndex,
+							"effects",
+							effectIndex,
+							"tableId",
+						],
+						`Missing loot table "${effect.tableId}".`,
+					);
 				}
 			}
 		}
@@ -683,39 +778,22 @@ const addIssue = (ctx: z.RefinementCtx, path: GameConfigIssuePath, message: stri
 	});
 };
 
-const validateActivationDefinition = (
+const validateItemInputs = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	value: {
-		outputTableId: string;
-		inputs?: readonly {
-			itemId: string;
-		}[];
-		requirements?: readonly {
-			itemId: string;
-		}[];
-	},
+	inputs:
+		| readonly {
+				itemId: string;
+		  }[]
+		| undefined,
 	hasItem: (itemId: string) => boolean,
-	hasLootTable: (lootTableId: string) => boolean,
 ) => {
-	if (!hasLootTable(value.outputTableId)) {
-		addIssue(
-			ctx,
-			[
-				...path,
-				"outputTableId",
-			],
-			`Missing loot table "${value.outputTableId}".`,
-		);
-	}
-
-	for (const [index, input] of (value.inputs ?? []).entries()) {
+	for (const [index, input] of (inputs ?? []).entries()) {
 		if (!hasItem(input.itemId)) {
 			addIssue(
 				ctx,
 				[
 					...path,
-					"inputs",
 					index,
 					"itemId",
 				],
@@ -723,14 +801,24 @@ const validateActivationDefinition = (
 			);
 		}
 	}
+};
 
-	for (const [index, requirement] of (value.requirements ?? []).entries()) {
+const validateItemRequirements = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	requirements:
+		| readonly {
+				itemId: string;
+		  }[]
+		| undefined,
+	hasItem: (itemId: string) => boolean,
+) => {
+	for (const [index, requirement] of (requirements ?? []).entries()) {
 		if (!hasItem(requirement.itemId)) {
 			addIssue(
 				ctx,
 				[
 					...path,
-					"requirements",
 					index,
 					"itemId",
 				],

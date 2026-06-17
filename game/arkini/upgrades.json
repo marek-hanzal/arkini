@@ -16,9 +16,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
+							"productId": "product:lumber-camp-1",
 							"tableId": "loot:lumber-camp-1:better-1",
-							"type": "producer.outputTable.set"
+							"type": "product.outputTable.set"
 						}
 					]
 				},
@@ -32,9 +32,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
+							"productId": "product:lumber-camp-1",
 							"tableId": "loot:lumber-camp-1:better-2",
-							"type": "producer.outputTable.set"
+							"type": "product.outputTable.set"
 						}
 					]
 				}
@@ -56,9 +56,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -72,9 +72,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -88,9 +88,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -104,9 +104,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -120,9 +120,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:lumber-camp-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:lumber-camp-1",
+							"type": "product.duration.add"
 						}
 					]
 				}
@@ -144,9 +144,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
+							"productId": "product:quarry-1",
 							"tableId": "loot:quarry-1:better-1",
-							"type": "producer.outputTable.set"
+							"type": "product.outputTable.set"
 						}
 					]
 				},
@@ -160,9 +160,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
+							"productId": "product:quarry-1",
 							"tableId": "loot:quarry-1:better-2",
-							"type": "producer.outputTable.set"
+							"type": "product.outputTable.set"
 						}
 					]
 				}
@@ -184,9 +184,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -200,9 +200,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -216,9 +216,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -232,9 +232,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				},
@@ -248,9 +248,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"itemId": "item:quarry-1",
 							"ms": -100,
-							"type": "producer.cooldown.add"
+							"productId": "product:quarry-1",
+							"type": "product.duration.add"
 						}
 					]
 				}

@@ -1,165 +1,137 @@
 {
 	"producers": {
 		"producer:coal-mine-1": {
-			"cooldownMs": 5200,
-			"inputs": [
-				{
-					"capacity": 4,
-					"itemId": "item:sausage",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"itemId": "item:beer",
-					"quantity": 1
-				}
+			"productIds": [
+				"product:coal-mine-1"
 			],
-			"outputTableId": "loot:coal-mine-1",
-			"placement": "board_then_inventory",
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-1": {
-			"cooldownMs": 5000,
-			"inputs": [],
-			"outputTableId": "loot:lumber-camp-1",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:lumber-camp-1"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-2": {
-			"cooldownMs": 4500,
-			"inputs": [],
-			"outputTableId": "loot:lumber-camp-2",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:lumber-camp-2"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-3": {
-			"cooldownMs": 4000,
-			"inputs": [],
-			"outputTableId": "loot:lumber-camp-3",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:lumber-camp-3"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-4": {
-			"cooldownMs": 3600,
-			"inputs": [],
-			"outputTableId": "loot:lumber-camp-4",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:lumber-camp-4"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:lumber-camp-5": {
-			"cooldownMs": 3200,
-			"inputs": [],
-			"outputTableId": "loot:lumber-camp-5",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:lumber-camp-5"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-1": {
-			"cooldownMs": 5500,
-			"inputs": [],
-			"outputTableId": "loot:quarry-1",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:quarry-1"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-2": {
-			"cooldownMs": 5000,
-			"inputs": [],
-			"outputTableId": "loot:quarry-2",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:quarry-2"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-3": {
-			"cooldownMs": 4500,
-			"inputs": [],
-			"outputTableId": "loot:quarry-3",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:quarry-3"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-4": {
-			"cooldownMs": 4100,
-			"inputs": [],
-			"outputTableId": "loot:quarry-4",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:quarry-4"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:quarry-5": {
-			"cooldownMs": 3700,
-			"inputs": [],
-			"outputTableId": "loot:quarry-5",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:quarry-5"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-1": {
-			"cooldownMs": 3500,
-			"inputs": [],
-			"outputTableId": "loot:townhall-1",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:townhall-1"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-2": {
-			"cooldownMs": 3000,
-			"inputs": [],
-			"outputTableId": "loot:townhall-2",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:townhall-2"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-3": {
-			"cooldownMs": 2500,
-			"inputs": [],
-			"outputTableId": "loot:townhall-3",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:townhall-3"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-4": {
-			"cooldownMs": 2200,
-			"inputs": [],
-			"outputTableId": "loot:townhall-4",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:townhall-4"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:townhall-5": {
-			"cooldownMs": 1900,
-			"inputs": [],
-			"outputTableId": "loot:townhall-5",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:townhall-5"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"
 		},
 		"producer:tree": {
-			"cooldownMs": 6200,
-			"inputs": [],
-			"outputTableId": "loot:tree",
-			"placement": "board_then_inventory",
+			"productIds": [
+				"product:tree"
+			],
 			"requirements": [],
 			"trigger": "click",
 			"type": "producer"

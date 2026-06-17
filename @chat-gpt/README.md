@@ -53,6 +53,11 @@ Use these rules as hard defaults for new Arkini code and refactors. They exist b
 - Do not embed object schemas inside large parent schemas when the embedded object is meaningful on its own or used as a standalone type. Each standalone schema gets its own file and exported metadata. Parent schemas compose named child schemas instead of hiding them in anonymous `z.object(...)` piles.
 - Avoid stupid re-exports such as `export const gameConfig = GameConfigServiceLive.config` or type aliases that only rename an already clear source. Import and use the real thing. Re-export only at deliberate public boundaries, not because an import path looked mildly inconvenient.
 
+
+## Tick engine next plan
+
+The tick engine closure order is documented in `v0-tick-engine-integration-readiness-2026-06-17.md`. The current priority is readiness/explain API before upgrades/storage/UI integration. A concrete proposed action should be validated by an Effect-first readiness entrypoint that reuses the same focused validation Fx as `applyGameActionFx`; React/UI must not duplicate gameplay rules just to decide whether an action looks available.
+
 ## Hard boundaries
 
 These are now enforced by `npm run dc` through dependency-cruiser where possible:

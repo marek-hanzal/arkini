@@ -13,8 +13,8 @@ This directory is the repo-local working memory for GPT-led Arkini work. Treat t
 
 ## Current work
 
-- Upcoming large product change: move static game content/rules toward a root `./game/arkini/` JSON-authored source package with one canonical compiled shape. Source can be many JSON fragments plus raw PNGs under `./game/arkini/assets`; `npm run game:compile ./game/arkini` should recursively compile JSON fragments and auto-generate simple base64 resources from PNG filenames. See `v0-json-game-definition-plan-2026-06-17.md`.
-- No implementation is started yet. First concrete step should be schema/source/assets inventory plus the `./game/arkini` source layout and `game:compile` contract, then validation/compiler, then runtime loading through the existing GameConfig boundary. `009-economy-content-pass` remains deferred until this direction settles, because starting economy work now would create avoidable conflicts and humanity has already suffered enough merge conflicts for one week.
+- JSON game package compiler work is started. `./game/arkini/` contains the first JSON authoring source plus copied PNG assets; `npm run game:compile -- game/arkini` writes `./game/arkini.game.json` and `./game/arkini.assets.json`. `npm run game:validate -- game/arkini` validates source folders including generated PNG resources. See `v0-json-game-definition-plan-2026-06-17.md`.
+- Runtime loading is not wired yet. Current app behavior still uses the TS manifest through `GameConfig`; next migration step is to load compiled JSON through a normalization boundary without teaching TileEngine or UI surfaces about source fragments. `009-economy-content-pass` remains deferred until this config migration settles, because starting economy work now would create avoidable conflicts and humanity has already suffered enough merge conflicts for one week.
 
 ## Current mental model
 
@@ -204,3 +204,17 @@ TileEngine presence handoff is no longer stored on board/inventory React Query r
 ### Shared TileEngine motion settlement timing
 
 Temporary TileEngine motion request cleanup must use `actionVisualMotionSettlementDelayMs(animation)`. It includes `delayMs`, `durationMs` and `TileEngineTiming.motionCleanupBufferMs`. Do not hand-roll `duration + buffer` near presence request registration or transient render actors; delayed sequence/presence motions will eventually make that shortcut look clever for about six minutes and broken forever after.
+
+### JSON game compiler checkpoint
+
+The repo now has the first source-package compiler for the JSON game-definition migration. Default authoring source lives under `./game/arkini/`, with raw PNG item assets in `./game/arkini/assets/` and gameplay source in JSON fragments such as `./game/arkini/game.json`.
+
+Use:
+
+```bash
+npm run game:compile -- game/arkini
+npm run game:validate -- game/arkini
+npm run game:validate -- game/arkini.game.json game/arkini.assets.json
+```
+
+`game:compile` writes `./game/arkini.game.json` and `./game/arkini.assets.json`. Runtime loading is not wired yet; current app behavior still uses the TS manifest. Do not add a permanent `game:dump-config` command. The initial JSON source was produced once from the current `GameConfig` and reshaped into the new keyed structure; the old dump shape is not part of the supported contract.

@@ -13,7 +13,9 @@
 		"test": "vitest run --no-color --pool=forks --maxWorkers=1 --no-file-parallelism",
 		"check": "npm run format:check && npm run dc && npm run typecheck && npm run test",
 		"format": "biome format --write .",
-		"format:check": "biome format ."
+		"format:check": "biome format .",
+		"game:compile": "tsx scripts/game/compile.ts",
+		"game:validate": "tsx scripts/game/validate.ts"
 	},
 	"dependencies": {
 		"@paralleldrive/cuid2": "^3.3.0",
@@ -41,6 +43,7 @@
 		"tailwindcss": "4.3.0",
 		"typescript": "6.0.3",
 		"vite": "8.0.16",
-		"vitest": "4.1.7"
+		"vitest": "4.1.7",
+		"tsx": "4.22.4"
 	}
 }

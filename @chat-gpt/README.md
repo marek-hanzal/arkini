@@ -18,11 +18,12 @@ This directory is the repo-local working memory for GPT-led Arkini work. Treat t
 - Producer/product-line schema is now planned as a separate runtime migration note in `v0-producer-product-line-logic-2026-06-17.md`: producer `productIds` are ordered line definitions, products own `durationMs`/`inputs`/`requirements`/optional `outputTableId`, craft recipes also own `requirements`, stash and producer/product/craft requirements can be stored or passive with explicit scope, and generic tile removal lives on `items.*.removeBy`, not producer logic.
 - `GameConfigSchema` is now the core runtime/spec documentation for what the JSON-driven engine can express. Keep its comments accurate when changing schema semantics; it is both validator input and the mechanic contract for the future loader/engine.
 - Product-line categories are a pending UX/config discussion in `v0-product-line-categories-2026-06-17.md`. Do not add category fields until the production-line UI needs them.
-- The standalone Effect tick-engine idea is captured in `v0-effect-tick-engine-2026-06-17.md`: evaluate `(GameConfig, save, action/tick, nowMs)` outside React, emit domain events, keep UI as subscriber/adapter, and test with fake time/deterministic RNG.
+- The standalone Effect tick-engine idea is captured in `v0-effect-tick-engine-2026-06-17.md`: evaluate `(GameConfig, save, action/tick, nowMs)` outside React, emit domain events, keep UI as subscriber/adapter, and test with fake time/deterministic RNG. This is the next priority before persistence work; initial `GameSave` can be bootstrapped from `GameConfig.startingState`.
+- Dexie/IndexedDB save-storage simplification is captured in `v0-dexie-save-storage-migration-2026-06-17.md`. Treat it as follow-up after the standalone engine/save model exists. The engine must never import DB/storage code; persistence should become a thin adapter around load/save/reset, likely replacing the current SQLite/OPFS/worker stack if the audit confirms it is only serving save snapshots.
 
 ## Current mental model
 
-Arkini v0 is a client-only/offline Vite + React SPA. No SSR, no server runtime. Durable save state lives in browser OPFS SQLite through SQLocal/Kysely. Static game truth lives in `src/v0/manifest/GameConfig.ts`, composed from focused files under `src/v0/manifest/config`.
+Arkini v0 is a client-only/offline Vite + React SPA. No SSR, no server runtime. Durable save state currently lives in browser OPFS SQLite through SQLocal/Kysely, but this is now a simplification candidate: once the standalone tick engine defines `GameSave`, evaluate replacing the SQLite/OPFS/worker stack with Dexie/IndexedDB. Static game truth is migrating from the TS manifest to validated JSON `GameConfig` sources under `./game/arkini/` compiled through `game:compile`.
 
 The active runtime has four layers:
 

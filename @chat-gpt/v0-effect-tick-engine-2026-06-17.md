@@ -40,6 +40,13 @@ applyActionFx({ config, save, action, nowMs }) -> Effect<GameEngineResult, GameE
 
 The caller decides how often ticks happen. The engine does not own timers. The browser may tick every animation frame, every 250 ms, on tab resume, on player action, or after loading an offline save. Engine logic must be deterministic for a given `(config, save, nowMs, action)`.
 
+
+## Persistence boundary
+
+The engine must not touch persistence. No SQLite, Dexie, OPFS, Kysely, IndexedDB, localStorage or React Query imports inside engine code. Storage loads `GameSave`, the engine evaluates rules, and storage persists the returned save. The engine is the game law; the database is only a box. We do not put legislation in the box, because apparently we still have standards.
+
+This also means the first engine prototype does not need the final persistence layer. It can derive an initial `GameSave` from `GameConfig.startingState`, run ticks/actions in memory and prove the event/save model before storage migration begins.
+
 ## Responsibilities
 
 The standalone engine should own all gameplay rule evaluation:
@@ -131,14 +138,16 @@ It also gives a clean route to validate that the engine honors the config: for e
 ## Proposed implementation path
 
 1. Define `GameSave` and `GameEvent` draft types in a new domain area beside the current runtime, not inside UI.
-2. Implement pure placement planner against `GameConfig` + save.
-3. Implement requirement/input evaluators.
-4. Implement `runTickFx` for already-running jobs only.
-5. Add tests with fake `nowMs` and deterministic RNG.
-6. Implement action reducers: feed producer, open stash, start craft, merge, removeBy, start upgrade.
-7. Add adapter that converts current UI actions to engine actions while current UI still renders from existing state.
-8. Switch one mechanic at a time once event parity is proven.
+2. Add a small bootstrap helper that creates initial `GameSave` from validated `GameConfig.startingState`; this is enough for engine tests before final persistence exists.
+3. Implement pure placement planner against `GameConfig` + save.
+4. Implement requirement/input evaluators.
+5. Implement `runTickFx` for already-running jobs only.
+6. Add tests with fake `nowMs` and deterministic RNG.
+7. Implement action reducers: feed producer, open stash, start craft, merge, removeBy, start upgrade.
+8. Add adapter that converts current UI actions to engine actions while current UI still renders from existing state.
+9. Switch one mechanic at a time once event parity is proven.
+10. Only then migrate persistence/storage, likely through the Dexie cleanup task in `v0-dexie-save-storage-migration-2026-06-17.md`.
 
 ## Current decision
 
-The idea is valid and fits the config migration. It should be a deliberate side-by-side runtime engine, not a hidden refactor inside components. Tests are mandatory because this engine becomes the game’s actual law, and laws without tests are just folklore with TypeScript syntax.
+The idea is valid and fits the config migration. It should be a deliberate side-by-side runtime engine, not a hidden refactor inside components. It is now the next architectural priority before the persistence rewrite: the engine can run from `GameConfigSchema` and `startingState`, while final Dexie/SQLite decisions can wait until the `GameSave` shape is real. Tests are mandatory because this engine becomes the game’s actual law, and laws without tests are just folklore with TypeScript syntax.

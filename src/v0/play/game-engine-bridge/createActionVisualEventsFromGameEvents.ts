@@ -221,6 +221,24 @@ const removedEvent = (
 	} as ActionVisualEventSchema.Type;
 };
 
+const stashOpenedEvent = (
+	event: Extract<
+		GameEvent,
+		{
+			type: "stash.opened";
+		}
+	>,
+): ActionVisualEventSchema.Type =>
+	({
+		animation: ActionVisualAnimation.state({
+			cause: "stash",
+			groupId: `engine:stash-opened:${event.stashItemInstanceId}`,
+		}),
+		itemInstanceId: event.stashItemInstanceId,
+		mode: event.remainingCharges === 0 ? "exhaust" : "single",
+		type: "activation.activated",
+	}) as ActionVisualEventSchema.Type;
+
 const upgradeStartedEvent = (
 	event: Extract<
 		GameEvent,
@@ -288,6 +306,11 @@ export const createActionVisualEventsFromGameEvents = ({
 
 		if (event.type === "item.removed") {
 			visualEvents.push(removedEvent(event));
+			continue;
+		}
+
+		if (event.type === "stash.opened") {
+			visualEvents.push(stashOpenedEvent(event));
 			continue;
 		}
 

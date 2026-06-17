@@ -1,3 +1,10 @@
+export { InMemoryGameEngineAdapter } from "~/v0/game/engine/runtime/InMemoryGameEngineAdapter";
+export type {
+	GameEngineRuntimeListener,
+	GameEngineRuntimeSnapshot,
+} from "~/v0/game/engine/runtime/InMemoryGameEngineAdapter";
+export { runGameEngineEffect } from "~/v0/game/engine/runtime/runGameEngineEffect";
+export type { GameEngineRuntimeServiceFx } from "~/v0/game/engine/runtime/runGameEngineEffect";
 export { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
 export { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
 export { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";

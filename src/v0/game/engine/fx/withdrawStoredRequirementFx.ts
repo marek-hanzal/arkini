@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementWithdrawReadinessFx";
-import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+import { placeGameSaveInventoryItemsFx } from "~/v0/game/engine/fx/placeGameSaveInventoryItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStoredRequirementWithdraw } from "~/v0/game/engine/model/GameActionStoredRequirementWithdraw";
@@ -29,7 +29,7 @@ export const withdrawStoredRequirementFx = Effect.fn("withdrawStoredRequirementF
 		config,
 		save,
 	});
-	const placement = yield* placeGameSaveItemsFx({
+	const placement = yield* placeGameSaveInventoryItemsFx({
 		config,
 		items: [
 			{

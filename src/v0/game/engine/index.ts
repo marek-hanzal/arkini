@@ -1,8 +1,8 @@
-export { InMemoryGameEngineAdapter } from "~/v0/game/engine/runtime/InMemoryGameEngineAdapter";
+export { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 export type {
 	GameEngineRuntimeListener,
 	GameEngineRuntimeSnapshot,
-} from "~/v0/game/engine/runtime/InMemoryGameEngineAdapter";
+} from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 export { runGameEngineEffect } from "~/v0/game/engine/runtime/runGameEngineEffect";
 export type { GameEngineRuntimeServiceFx } from "~/v0/game/engine/runtime/runGameEngineEffect";
 export { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";

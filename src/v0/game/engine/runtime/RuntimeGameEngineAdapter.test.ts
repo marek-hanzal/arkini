@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { InMemoryGameEngineAdapter } from "~/v0/game/engine/runtime/InMemoryGameEngineAdapter";
+import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
 
-describe("InMemoryGameEngineAdapter", () => {
+describe("RuntimeGameEngineAdapter", () => {
 	it("bootstraps a save from the config starting state", async () => {
-		const adapter = await InMemoryGameEngineAdapter.create({
+		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createEngineTestConfig(),
 			nowMs: 100,
 			random: TestRandomService,
@@ -27,7 +27,7 @@ describe("InMemoryGameEngineAdapter", () => {
 	});
 
 	it("dispatches actions, stores the next save and emits domain results", async () => {
-		const adapter = await InMemoryGameEngineAdapter.create({
+		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createEngineTestConfig(),
 			nowMs: 0,
 			random: TestRandomService,
@@ -63,7 +63,7 @@ describe("InMemoryGameEngineAdapter", () => {
 	});
 
 	it("runs ticks against the stored save and publishes completion events", async () => {
-		const adapter = await InMemoryGameEngineAdapter.create({
+		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createEngineTestConfig(),
 			nowMs: 0,
 			random: TestRandomService,
@@ -101,7 +101,7 @@ describe("InMemoryGameEngineAdapter", () => {
 	});
 
 	it("reads readiness from the current stored save", async () => {
-		const adapter = await InMemoryGameEngineAdapter.create({
+		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createEngineTestConfig(),
 			nowMs: 0,
 			random: TestRandomService,

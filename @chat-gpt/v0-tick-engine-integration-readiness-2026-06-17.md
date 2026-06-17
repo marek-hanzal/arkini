@@ -37,7 +37,7 @@ Priority order:
    - Running producer jobs are not cancelled by toggling a line; the toggle affects future starts only.
 
 5. **Engine integration adapter, without persistence first** — DONE / CURRENT
-   - Added `InMemoryGameEngineAdapter` as the first app-facing runtime boundary around `(config, save)`.
+   - Added `RuntimeGameEngineAdapter` as the first app-facing runtime boundary around `(config, save)`.
    - Loads the default compiled config by default, or accepts an injected test/config package. The engine default synthesizes resource placeholders from asset references so the runtime adapter does not drag base64 art payloads into gameplay code.
    - Bootstraps a `GameSave` from `startingState` when no save is injected.
    - Dispatches `applyGameActionFx`, ticks via `runGameTickFx`, stores the returned next save in memory and publishes raw domain `GameEngineResult` events to subscribers.
@@ -54,4 +54,4 @@ Priority order:
    - Dexie/IndexedDB simplification follows after the engine can run in memory and after the domain-event bridge proves the shape UI actually needs.
    - Do not implement Dexie before the adapter/bridge boundary is clear, otherwise storage starts shaping gameplay state and the project wakes up with database Stockholm syndrome.
 
-Current task: item 5 is implemented; next continue into item 6, the domain-event to visual-event bridge. Dexie should wait until the in-memory adapter plus visual bridge are wired enough to know the real persistence boundary.
+Current task: item 5 is implemented; next continue into item 6, the domain-event to visual-event bridge. Dexie should wait until the runtime adapter plus visual bridge are wired enough to know the real persistence boundary.

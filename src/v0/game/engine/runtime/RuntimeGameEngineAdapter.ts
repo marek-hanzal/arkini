@@ -22,7 +22,7 @@ export interface GameEngineRuntimeSnapshot {
 	save: GameSave;
 }
 
-export namespace InMemoryGameEngineAdapter {
+export namespace RuntimeGameEngineAdapter {
 	export interface Options {
 		config?: GameConfig;
 		initialSave?: GameSave;
@@ -45,14 +45,14 @@ export namespace InMemoryGameEngineAdapter {
 }
 
 /**
- * Small in-memory adapter around the standalone tick/action engine.
+ * Runtime adapter around the standalone tick/action engine.
  *
  * It owns the current `(config, save)` pair for a running browser session and publishes
  * domain events from engine results. It deliberately does not know Dexie, SQLite,
  * React Query or TileEngine. Those layers can subscribe/wrap it later like civilized
  * code instead of pouring persistence concrete into gameplay rules.
  */
-export class InMemoryGameEngineAdapter {
+export class RuntimeGameEngineAdapter {
 	readonly config: GameConfig;
 	private readonly listeners = new Set<GameEngineRuntimeListener>();
 	private readonly random?: RandomService;
@@ -72,7 +72,7 @@ export class InMemoryGameEngineAdapter {
 		initialSave,
 		nowMs = Date.now(),
 		random,
-	}: InMemoryGameEngineAdapter.Options = {}) {
+	}: RuntimeGameEngineAdapter.Options = {}) {
 		const save =
 			initialSave ??
 			(await runGameEngineEffect(
@@ -94,7 +94,7 @@ export class InMemoryGameEngineAdapter {
 			},
 		);
 
-		return new InMemoryGameEngineAdapter({
+		return new RuntimeGameEngineAdapter({
 			config,
 			initialSave: save,
 			nextWakeAtMs,
@@ -125,7 +125,7 @@ export class InMemoryGameEngineAdapter {
 
 	async readiness({
 		action,
-	}: InMemoryGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
+	}: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
 		return runGameEngineEffect(
 			readActionReadinessFx({
 				action,
@@ -141,7 +141,7 @@ export class InMemoryGameEngineAdapter {
 	async dispatch({
 		action,
 		nowMs = Date.now(),
-	}: InMemoryGameEngineAdapter.DispatchProps): Promise<GameEngineResult> {
+	}: RuntimeGameEngineAdapter.DispatchProps): Promise<GameEngineResult> {
 		const result = await runGameEngineEffect(
 			applyGameActionFx({
 				action,
@@ -161,7 +161,7 @@ export class InMemoryGameEngineAdapter {
 
 	async tick({
 		nowMs = Date.now(),
-	}: InMemoryGameEngineAdapter.TickProps = {}): Promise<GameEngineResult> {
+	}: RuntimeGameEngineAdapter.TickProps = {}): Promise<GameEngineResult> {
 		const result = await runGameEngineEffect(
 			runGameTickFx({
 				config: this.config,

@@ -3,7 +3,7 @@ import type { stashBoardItemFx } from "~/v0/inventory/fx/stashBoardItemFx";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import type { CacheSnapshot } from "~/v0/play/cache/CacheSnapshot";
-import { isStatefulStack } from "~/v0/inventory/cache/isStatefulStack";
+import { isStatefulInventoryState } from "~/v0/inventory/logic/isStatefulInventoryState";
 import { patchBoardViewCache } from "~/v0/board/cache/patchBoardViewCache";
 import { patchInventorySlotCache } from "~/v0/inventory/cache/patchInventorySlotCache";
 import { patchInventoryViewCache } from "~/v0/inventory/cache/patchInventoryViewCache";
@@ -43,7 +43,7 @@ export const applyInventoryStashCachePatch = ({
 					input.slotIndex === undefined &&
 					slot.stack?.itemId === item.itemId &&
 					!slot.stack.stateful &&
-					!isStatefulStack(item.state),
+					!isStatefulInventoryState(item.state),
 			);
 			const targetSlotIndex =
 				input.slotIndex ?? compatibleStackSlot?.slotIndex ?? inventory.firstEmptySlotIndex;
@@ -65,7 +65,7 @@ export const applyInventoryStashCachePatch = ({
 								quantity: 1,
 								state: item.state,
 								stateJson: JSON.stringify(item.state ?? {}),
-								stateful: isStatefulStack(item.state),
+								stateful: isStatefulInventoryState(item.state),
 							},
 				}),
 			});

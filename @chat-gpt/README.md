@@ -1,17 +1,18 @@
 # ChatGPT working map
 
 Status: ACTIVE
-Updated: 2026-06-16
+Updated: 2026-06-17
 
 This directory is the repo-local working memory for GPT-led Arkini work. Treat this file as the current truth. Older task files are retained as audit trail, not as instructions to blindly execute like a cursed treasure map.
 
 ## Latest completed work
 
+- `008-domain-effect-boundary-audit` is done: tap intent, drop action policy, activation depletion follow-up, optimistic merge visual-event resolution and inventory statefulness detection now live in focused pure helpers instead of UI/cache glue.
 - `004-split-game-item-definitions` is done: large root item config files now compose smaller one-level content-family files (`natural/*`, `blueprint/*`, `building/*`, `container/*`) while `GameItemDefinitions.ts` remains the single exported item collection.
 
 ## Current work
 
-- `008-domain-effect-boundary-audit` is in progress. Board/inventory tap decisions and play/drop action decisions now live in focused pure helpers (`resolveBoardItemTapAction`, `resolveInventorySlotTapAction`, `resolve*DropAction`) with focused tests. Hooks and TileEngine adapters should compose query data, mutations and UI feedback; pure gameplay/drop decisions should live in `logic/` helpers or explicit play/drop action resolvers.
+- No active refactor task is currently selected. Next likely work is `009-economy-content-pass` unless product testing exposes a sharper bug.
 
 ## Current mental model
 
@@ -152,7 +153,7 @@ Inventory slot data should stay layout-only (`slotIndex`). Stack/item/quantity b
 1. Keep `applyActionResultCachePatch` thin. Board and inventory visual event patching already live in focused pure helpers; continue that direction.
 2. Keep action visual events explicit through `ActionVisualAnimation`; test event ordering and animation contract when adding new animated behavior. Drop runtime animation flags must survive error wrapping; losing `parallel-swap` breaks swap concurrency before cache events even get a vote.
 3. Add more Vitest coverage around domain action results, visual-event ordering, cache patches, placement planning and manifest validation.
-4. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks. Adapter hooks may wire React Query, mutations and feedback, but gameplay decisions such as tap activation intent and drop action policy should be delegated to small pure `logic/` helpers or play/drop action resolvers.
+4. Keep board/inventory surfaces as render shells; put TileEngine model wiring in concrete adapter hooks. Adapter hooks may wire React Query, mutations and feedback, but gameplay decisions such as tap activation intent, drop action policy, optimistic merge resolution and inventory statefulness should be delegated to small pure `logic/` helpers or play/drop action resolvers.
 5. Expand debug timeline only where it helps bug reports. Do not build a giant debug cockpit unless the game actually needs it.
 6. Keep manifest content editable through small topic files and a documented checklist rather than inventing a config framework that cosplays as productivity.
 

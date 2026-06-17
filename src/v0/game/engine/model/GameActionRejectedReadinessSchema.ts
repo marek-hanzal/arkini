@@ -17,6 +17,7 @@ export const GameActionRejectedReadinessSchema = z
 				"invalid_merge",
 				"missing_requirement",
 				"placement_unavailable",
+				"product_line_disabled",
 				"stash_depleted",
 				"unsupported_target",
 				"unsupported_requirement",

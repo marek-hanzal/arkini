@@ -33,6 +33,7 @@ export const processScheduledBoardItemReplaceFx = Effect.fn("processScheduledBoa
 		}
 		liveItem.itemId = scheduledEvent.toItemId;
 		delete nextSave.stashes[scheduledEvent.itemInstanceId];
+		delete nextSave.producerLines[scheduledEvent.itemInstanceId];
 		delete nextSave.storedRequirements[scheduledEvent.itemInstanceId];
 		nextSave.updatedAtMs = nowMs;
 

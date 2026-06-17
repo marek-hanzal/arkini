@@ -137,6 +137,16 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
+			type: z.literal("producer.product_line.enabled_changed"),
+			producerItemInstanceId: IdSchema,
+			productId: IdSchema,
+			previousEnabled: z.boolean(),
+			nextEnabled: z.boolean(),
+			changedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("upgrade.started"),
 			jobId: IdSchema,
 			upgradeId: IdSchema,

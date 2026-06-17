@@ -795,6 +795,126 @@ describe("applyGameActionFx", () => {
 		);
 	});
 
+
+	it("stores disabled producer product lines in save state", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const disabled = runAction({
+			action: {
+				enabled: false,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.set_enabled",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(disabled.save.producerLines).toEqual({
+			"item-instance:1": {
+				disabledProductIds: [
+					"product:test",
+				],
+			},
+		});
+		expect(disabled.events).toEqual([
+			{
+				changedAtMs: 100,
+				nextEnabled: false,
+				previousEnabled: true,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.enabled_changed",
+			},
+		]);
+	});
+
+	it("blocks starting disabled producer product lines", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const disabled = runAction({
+			action: {
+				enabled: false,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.set_enabled",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 200,
+			save: disabled.save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "product_line_disabled",
+			});
+		}
+	});
+
+	it("re-enables producer product lines by removing empty line state", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const disabled = runAction({
+			action: {
+				enabled: false,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.set_enabled",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+		const enabled = runAction({
+			action: {
+				enabled: true,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.set_enabled",
+			},
+			config,
+			nowMs: 200,
+			save: disabled.save,
+		});
+
+		expect(enabled.save.producerLines).toEqual({});
+		expect(enabled.events).toEqual([
+			{
+				changedAtMs: 200,
+				nextEnabled: true,
+				previousEnabled: false,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.enabled_changed",
+			},
+		]);
+	});
+
 	it("removes a tile with a kept tool", () => {
 		const config = createEngineTestConfig({
 			startingState: {

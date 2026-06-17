@@ -61,6 +61,7 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 	});
 	delete nextSave.board.items[checked.target.id];
 	delete nextSave.stashes[checked.target.id];
+	delete nextSave.producerLines[checked.target.id];
 	delete nextSave.storedRequirements[checked.target.id];
 	nextSave.updatedAtMs = nowMs;
 

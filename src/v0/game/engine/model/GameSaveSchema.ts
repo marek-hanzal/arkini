@@ -78,6 +78,22 @@ export const GameSaveStashStateSchema = z
 	})
 	.strict();
 
+export const GameSaveProducerLineStateSchema = z
+	.object({
+		disabledProductIds: z.array(IdSchema),
+	})
+	.strict()
+	.refine(
+		(value) =>
+			new Set(value.disabledProductIds).size === value.disabledProductIds.length,
+		{
+			message: "disabledProductIds must be unique",
+			path: [
+				"disabledProductIds",
+			],
+		},
+	);
+
 export const GameSaveStoredRequirementStateSchema = z
 	.object({
 		items: z.record(IdSchema, NonNegativeIntegerSchema),
@@ -144,6 +160,7 @@ export const GameSaveSchema = z
 			})
 			.strict(),
 		producerJobs: z.record(IdSchema, GameSaveProducerJobSchema),
+		producerLines: z.record(IdSchema, GameSaveProducerLineStateSchema),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
 		upgradeJobs: z.record(IdSchema, GameSaveUpgradeJobSchema),
 		upgrades: z.record(IdSchema, GameSaveUpgradeStateSchema),
@@ -163,6 +180,9 @@ export type GameSaveBoardItem = z.infer<typeof GameSaveBoardItemSchema>;
 export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema>;
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
+export type GameSaveProducerLineState = z.infer<
+	typeof GameSaveProducerLineStateSchema
+>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
 export type GameSaveStoredRequirementState = z.infer<

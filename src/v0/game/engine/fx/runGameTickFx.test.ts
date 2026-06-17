@@ -95,6 +95,46 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
+
+	it("completes already running producer jobs even when the product line is later disabled", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+		save.producerLines["item-instance:1"] = {
+			disabledProductIds: [
+				"product:test",
+			],
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					jobId: "job:1",
+					productId: "product:test",
+					type: "product.completed",
+				}),
+			]),
+		);
+	});
+
 	it("keeps a completed product job pending when output cannot be placed", () => {
 		const config = createEngineTestConfig({
 			game: {

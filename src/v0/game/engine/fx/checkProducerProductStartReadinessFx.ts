@@ -4,6 +4,7 @@ import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInpu
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
 import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
 import { readProductFx } from "~/v0/game/engine/fx/readProductFx";
+import { readProducerProductLineEnabledFx } from "~/v0/game/engine/fx/readProducerProductLineEnabledFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
@@ -40,6 +41,20 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			GameEngineError.actionRejected(
 				"invalid_actor",
 				`Product "${action.productId}" does not belong to producer "${producerDefinition.type}" on item "${producerItem.itemId}".`,
+			),
+		);
+	}
+
+	const productLineEnabled = yield* readProducerProductLineEnabledFx({
+		producerItemInstanceId: action.producerItemInstanceId,
+		productId: action.productId,
+		save,
+	});
+	if (!productLineEnabled) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"product_line_disabled",
+				`Product line "${action.productId}" is disabled for producer item "${action.producerItemInstanceId}".`,
 			),
 		);
 	}

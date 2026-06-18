@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { completeCraftJobFx } from "~/v0/game/engine/fx/completeCraftJobFx";
-import { processScheduledGameEventsFx } from "~/v0/game/engine/fx/processScheduledGameEventsFx";
 import { readCompletedCraftJobsFx } from "~/v0/game/engine/fx/readCompletedCraftJobsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
@@ -34,22 +33,8 @@ export const processCompletedCraftJobsFx = Effect.fn("processCompletedCraftJobsF
 			save: nextSave,
 		});
 
-		if (result.type === "blocked") {
-			nextSave = result.save;
-			events.push(...result.events);
-			continue;
-		}
-
 		nextSave = result.save;
 		events.push(...result.events);
-
-		const scheduledAfterJob = yield* processScheduledGameEventsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		});
-		nextSave = scheduledAfterJob.save;
-		events.push(...scheduledAfterJob.events);
 	}
 
 	return {

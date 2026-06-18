@@ -51,6 +51,18 @@ const boardEnterRequests = ({
 			];
 		}
 
+		if (event.type === "item.replaced" && event.animation) {
+			if (!board.byId[event.itemInstanceId]) return [];
+
+			return [
+				{
+					cleanupDelayMs: actionVisualMotionSettlementDelayMs(event.animation),
+					tileId: event.itemInstanceId,
+					enter: toTileEngineEnterMotion(event.animation),
+				},
+			];
+		}
+
 		return [];
 	});
 };

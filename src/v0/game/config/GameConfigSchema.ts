@@ -167,7 +167,7 @@ const CraftRecipeInputSchema = z
 
 /**
  * Stored requirement means the item is placed onto the target capability and gates use.
- * It is not an activation input. Runtime must return craft requirements on completion.
+ * It is not an activation input. Craft consumes stored requirements into its final replacement result.
  */
 const StoredItemRequirementSchema = z
 	.object({
@@ -381,8 +381,8 @@ const StashDefinitionSchema = z
 /**
  * Delayed recipe outside two-item merge.
  *
- * Inputs are handled at start. Requirements gate craft and must be placeable back with
- * the result when the duration completes.
+ * Inputs and stored requirements are handled at start. Completion replaces the target
+ * item in-place with exactly one result item.
  */
 const CraftRecipeSchema = z
 	.object({

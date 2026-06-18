@@ -7,7 +7,7 @@ Current runtime behavior:
 - `stored_requirement.store` consumes one resolved board/inventory input ref and increments the target stored requirement quantity.
 - `stored_requirement.withdraw` returns stored quantity through normal placement and removes empty stored state buckets.
 - Producer and stash readiness read stored quantities from the target board item save state and reject use with `missing_requirement` while the stored quantity is below the configured requirement.
-- Craft stored requirements are reserved at craft start through `requirementRefs` and returned on craft completion as `craft-requirement-return` items.
+- Craft stored requirements are reserved/consumed at craft start through `requirementRefs` and are absorbed into the final target replacement result. They are not returned as separate items on craft completion.
 
 Current UI parity checkpoint:
 

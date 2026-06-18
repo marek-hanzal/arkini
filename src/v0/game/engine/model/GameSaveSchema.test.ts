@@ -23,7 +23,6 @@ const createCraftJob = (id: string, targetItemInstanceId: string) => ({
 	completesAtMs: 1000,
 	id,
 	recipeId: "craft:plank",
-	returnItems: [],
 	startedAtMs: 0,
 	targetItemInstanceId,
 });

@@ -6,8 +6,6 @@ const PositiveIntegerSchema = z.number().int().positive();
 
 export const GameItemCreatedReasonSchema = z.enum([
 	"product-output",
-	"craft-output",
-	"craft-requirement-return",
 	"stash-output",
 	"stored-requirement-withdraw",
 	"producer-input-withdraw",
@@ -34,6 +32,7 @@ export const GameBoardItemChangeReasonSchema = z.enum([
 	"stash-depleted",
 	"tile-remove",
 	"merge-result",
+	"craft-result",
 ]);
 
 export const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
@@ -247,16 +246,6 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			recipeId: IdSchema,
 			targetItemInstanceId: IdSchema,
 			completedAtMs: NonNegativeIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("craft.blocked"),
-			jobId: IdSchema,
-			recipeId: IdSchema,
-			targetItemInstanceId: IdSchema,
-			reason: z.literal("placement_unavailable"),
-			blockedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
 	z

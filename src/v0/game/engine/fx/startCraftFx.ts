@@ -59,10 +59,6 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 		completesAtMs,
 		id: jobId,
 		recipeId: action.recipeId,
-		returnItems: checked.requirements.storedRequirements.map((requirement) => ({
-			itemId: requirement.itemId,
-			quantity: requirement.quantity,
-		})),
 		startedAtMs: nowMs,
 		targetItemInstanceId: action.targetItemInstanceId,
 	};

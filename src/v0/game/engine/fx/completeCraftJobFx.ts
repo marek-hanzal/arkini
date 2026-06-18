@@ -1,12 +1,9 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
-import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
-import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
+import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
 import type { GameSave, GameSaveCraftJob } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace completeCraftJobFx {
@@ -42,59 +39,50 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		);
 	}
 
-	const seedCell = readBoardItemCell({
-		itemInstanceId: liveJob.targetItemInstanceId,
-		save,
-	});
+	const liveTarget = save.board.items[liveJob.targetItemInstanceId];
+	if (!liveTarget) {
+		return yield* Effect.fail(
+			GameEngineError.saveInvalid(
+				`Craft job "${liveJob.id}" target "${liveJob.targetItemInstanceId}" is missing.`,
+			),
+		);
+	}
 
-	const placementRequests: GameSaveItemPlacementRequest[] = [
-		...liveJob.returnItems.map(
-			(item) =>
-				({
-					...item,
-					reason: "craft-requirement-return",
-				}) satisfies GameSaveItemPlacementRequest,
-		),
-		{
-			itemId: recipe.resultItemId,
-			quantity: 1,
-			reason: "craft-output",
-		},
-	];
-	const preflightPlacement = yield* placeGameSaveItemsFx({
-		config,
-		items: placementRequests,
-		nowMs,
-		save,
-		seedCell,
-	});
+	const targetDefinition = config.items[liveTarget.itemId];
+	if (targetDefinition?.craftRecipeId !== liveJob.recipeId) {
+		return yield* Effect.fail(
+			GameEngineError.saveInvalid(
+				`Craft job "${liveJob.id}" target "${liveJob.targetItemInstanceId}" no longer matches recipe "${liveJob.recipeId}".`,
+			),
+		);
+	}
 
-	if (preflightPlacement.type === "blocked") {
-		return {
-			events: [
-				{
-					blockedAtMs: nowMs,
-					jobId: liveJob.id,
-					reason: "placement_unavailable" as const,
-					recipeId: liveJob.recipeId,
-					targetItemInstanceId: liveJob.targetItemInstanceId,
-					type: "craft.blocked" as const,
-				},
-			],
-			save,
-			type: "blocked" as const,
-		} satisfies GameEngineCompletionResult;
+	if (!config.items[recipe.resultItemId]) {
+		return yield* Effect.fail(
+			GameEngineError.configReferenceMissing(
+				`Missing craft result item "${recipe.resultItemId}".`,
+			),
+		);
 	}
 
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
+	const nextTarget = nextSave.board.items[liveJob.targetItemInstanceId];
+	if (!nextTarget) {
+		return yield* Effect.fail(
+			GameEngineError.saveInvalid(
+				`Craft job "${liveJob.id}" target "${liveJob.targetItemInstanceId}" disappeared during completion.`,
+			),
+		);
+	}
+
 	delete nextSave.craftJobs[liveJob.id];
-	yield* scheduleGameItemSpawnsFx({
-		dueAtMs: nowMs,
-		items: placementRequests,
+	removeBoardItemRuntimeState({
+		itemInstanceId: liveJob.targetItemInstanceId,
 		save: nextSave,
 	});
+	nextTarget.itemId = recipe.resultItemId;
 	nextSave.updatedAtMs = nowMs;
 
 	return {
@@ -105,6 +93,14 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 				recipeId: liveJob.recipeId,
 				targetItemInstanceId: liveJob.targetItemInstanceId,
 				type: "craft.completed" as const,
+			},
+			{
+				fromItemId: liveTarget.itemId,
+				itemInstanceId: liveJob.targetItemInstanceId,
+				reason: "craft-result" as const,
+				replacedAtMs: nowMs,
+				toItemId: recipe.resultItemId,
+				type: "item.replaced" as const,
 			},
 		],
 		save: nextSave,

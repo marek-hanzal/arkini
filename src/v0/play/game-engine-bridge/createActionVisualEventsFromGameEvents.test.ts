@@ -165,6 +165,33 @@ describe("createActionVisualEventsFromGameEvents", () => {
 		]);
 	});
 
+	it("maps craft result replacement to a craft replacement visual", () => {
+		const visualEvents = map([
+			{
+				fromItemId: "item:blueprint",
+				itemInstanceId: "target-1",
+				reason: "craft-result",
+				replacedAtMs: 100,
+				toItemId: "item:lumber-camp-1",
+				type: "item.replaced",
+			},
+		]);
+
+		expect(visualEvents).toMatchObject([
+			{
+				animation: {
+					cause: "craft",
+					groupId: "engine:craft-result:target-1",
+				},
+				fromItemId: "item:blueprint",
+				itemInstanceId: "target-1",
+				reason: "craft-result",
+				toItemId: "item:lumber-camp-1",
+				type: "item.replaced",
+			},
+		]);
+	});
+
 	it("maps stash opened events to activation state visuals", () => {
 		const visualEvents = map([
 			{

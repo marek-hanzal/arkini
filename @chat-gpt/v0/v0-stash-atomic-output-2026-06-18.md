@@ -51,7 +51,7 @@ Důvod: board remove/replace scheduled events byly jen stash animation plumbing.
 Doplněno/změněno:
 
 - stash open aplikuje output + depletion atomicky a nezapisuje scheduled events,
-- multi-charge stash ukládá remainingCharges bez scheduled depletion,
+- původní T3 multi-charge policy byla následně zpřesněna v `v0-stash-full-open-output-2026-06-18.md`: stash se na jedno otevření celý vyčerpá, neukládá další remaining charge pro další click,
 - placement blocked failne akci a nepohne původním save,
 - depleted stash umí atomicky replace-nout target item,
 - scheduled event testy už netestují board remove; dependency/exclusive behavior se testuje přes dependent scheduled spawn.
@@ -59,6 +59,6 @@ Doplněno/změněno:
 ## Poznámky pro další práci
 
 - Producer blocked delivery zůstává zachovaný. To je timed job, takže blocked output může viset na jobu jako explicitní delivery state.
-- Stash open je user action, takže policy je jednodušší: když nejde placement, action failne a stash se neotevře.
+- Stash open je user action, takže policy je jednodušší: když nejde placement celého remaining output batchu, action failne a stash se neotevře.
 - Craft completion je už po T2 target replacement bez scheduled outputu.
 - Další task v epicu: T4 effective upgrade/config validation. Tady už budeme muset validovat, že aplikované upgrade prefixy nikdy nevyrábí nulové/záporné effective quantity/duration/cost/capacity hodnoty.

@@ -1,7 +1,7 @@
 # Task: Replace gameplay cache patching with raw snapshot/subtree subscriptions
 
 Date: 2026-06-18
-Status: PLANNED
+Status: IMPLEMENTED FIRST PASS
 Priority: high, before broad UI overhaul if feasible
 
 ## Context
@@ -167,3 +167,10 @@ Prefer small vertical slices:
 5. Only add memoization where profiling or obvious structure needs it.
 
 The danger is replacing one cache system with another fancy cache system under a nicer name. Do not do that. The win is fewer moving parts, not shinier moving parts.
+
+
+## 2026-06-18 implementation checkpoint
+
+First implementation pass removed derived `board`, `inventory` and `items` fields from `GameRuntimeStore`. The store now owns only the authoritative runtime snapshot, revision and action time. React hooks derive board/inventory/catalog/upgrade views from raw snapshot selectors; visual effects derive their previous/current board snapshots only when building `GameEngineVisualPlan`.
+
+Remaining acceptable work: split broad view readers into finer `boardItem`/`inventorySlot` readers later if profiling or complexity demands it. Do not reintroduce a gameplay cache patching layer.

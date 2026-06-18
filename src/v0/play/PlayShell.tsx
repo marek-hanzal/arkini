@@ -85,9 +85,9 @@ const PlayShellContent: FC = () => {
 					activeSheet: activeSheet?.type,
 					lastError,
 					runtime: {
-						boardItems: runtime.board.items.length,
-						inventoryStacks: runtime.inventory.slots.filter((slot) => slot.stack)
-							.length,
+						boardItems: Object.keys(runtime.runtime.save.board.items).length,
+						inventoryStacks:
+							runtime.runtime.save.inventory.slots.filter(Boolean).length,
 						nextWakeAtMs: runtime.runtime.nextWakeAtMs,
 						revision: runtime.revision,
 					},

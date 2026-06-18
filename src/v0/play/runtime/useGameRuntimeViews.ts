@@ -1,13 +1,18 @@
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
-import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { readRuntimeUpgradeListViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeUpgradeListViewFromGameSave";
-import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
+import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
+import {
+	readGameRuntimeBoardView,
+	readGameRuntimeInventoryView,
+	readGameRuntimeItemCatalogView,
+} from "~/v0/play/runtime/readGameRuntimeViews";
 
 const stableStringify = (value: unknown) => JSON.stringify(value ?? null);
 
@@ -40,18 +45,21 @@ const sameInventorySlot = (left: InventorySlot, right: InventorySlot) => {
 	);
 };
 
-export const useGameBoardView = (): BoardView => useGameRuntimeSelector((state) => state.board);
+export const useGameBoardView = (): BoardView => useGameRuntimeSelector(readGameRuntimeBoardView);
 
 export const useGameInventoryView = (): InventoryView =>
-	useGameRuntimeSelector((state) => state.inventory);
+	useGameRuntimeSelector(readGameRuntimeInventoryView);
 
 export const useGameBoardItem = (boardItemId: string): BoardViewItem | null =>
-	useGameRuntimeSelector((state) => state.board.byId[boardItemId] ?? null, sameBoardItem);
+	useGameRuntimeSelector(
+		(state) => readGameRuntimeBoardView(state).byId[boardItemId] ?? null,
+		sameBoardItem,
+	);
 
 export const useGameInventorySlot = (slotIndex: number): InventorySlot =>
 	useGameRuntimeSelector(
 		(state) =>
-			state.inventory.bySlotIndex[String(slotIndex)] ?? {
+			readGameRuntimeInventoryView(state).bySlotIndex[String(slotIndex)] ?? {
 				slotIndex,
 			},
 		sameInventorySlot,
@@ -67,7 +75,9 @@ export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView =>
 	);
 
 export const useGameItemCatalogView = (): ItemCatalogView =>
-	useGameRuntimeSelector((state) => state.items);
+	useGameRuntimeSelector(readGameRuntimeItemCatalogView);
 
 export const useGameItemView = (itemId: ItemId | string | undefined): ViewItem | null =>
-	useGameRuntimeSelector((state) => (itemId ? (state.items[itemId as ItemId] ?? null) : null));
+	useGameRuntimeSelector((state) =>
+		itemId ? (readGameRuntimeItemCatalogView(state)[itemId as ItemId] ?? null) : null,
+	);

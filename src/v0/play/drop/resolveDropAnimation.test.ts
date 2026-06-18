@@ -128,7 +128,7 @@ describe("resolveDrop animation contract", () => {
 		expect(actions.moveBoardItem).not.toHaveBeenCalled();
 	});
 
-	it("marks board merges as immediate parallel merge cache animations", async () => {
+	it("marks board merges as immediate parallel merge commit animations", async () => {
 		const applyBoardItemToBoardItem = vi.fn(async () => undefined);
 		const feedback = {
 			pulseMergeCell: vi.fn(),

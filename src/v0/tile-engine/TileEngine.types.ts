@@ -38,7 +38,7 @@ export namespace TileEngine {
 		/**
 		 * Adapter-owned equality token for slot renderer data. When provided,
 		 * TileEngine memoization may reuse slot actors across equivalent data object
-		 * instances instead of treating every cache snapshot as a render change.
+		 * instances instead of treating every derived snapshot as a render change.
 		 */
 		renderKey?: string | number;
 		data: TSlot;

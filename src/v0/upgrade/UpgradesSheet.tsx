@@ -90,7 +90,7 @@ export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 				onClose={onClose}
 			/>
 			<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-				<div className="ak-game-width mx-auto grid gap-3">
+				<div className="mx-auto grid w-full max-w-[430px] gap-3">
 					{actionErrorMessage ? (
 						<div className="rounded-sm border border-rose-300/50 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800">
 							{actionErrorMessage}

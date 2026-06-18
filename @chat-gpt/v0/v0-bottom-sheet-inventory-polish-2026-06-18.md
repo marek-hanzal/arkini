@@ -14,8 +14,8 @@ Follow-up to the first UI overhaul foundation pass, driven by the screenshot rev
 - Replaced the text `Close` button with a top-right `✕` icon button with an accessible label.
 - Reduced the large rounded bottom-sheet corners and pushed common UI radius values toward small/minimal rounding.
 - Reduced board/inventory TileEngine surface radius and common card/pill/control radii touched by this pass.
-- Fixed the inventory bottom-sheet horizontal scrollbar by making `.ak-game-width` parent-relative (`min(100%, 430px)`) instead of viewport-relative inside padded sheet content, and by clipping sheet horizontal overflow.
-- Moved tile quantity/level badges to `bottom-0 right-[8px]` so numbers sit on the inner bottom-right edge across board/inventory item views.
+- Fixed the inventory bottom-sheet horizontal scrollbar by making the width parent-relative; this was later converted from `.ak-game-width` to direct Tailwind `w-full max-w-[430px]`.
+- Moved tile quantity/level badges to `bottom-0 right-[8px]`; this was later tightened to `bottom-0 right-0` after follow-up screenshot review.
 
 ## Notes
 

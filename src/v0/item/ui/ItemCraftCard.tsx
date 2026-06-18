@@ -28,32 +28,36 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 	return (
 		<div
 			data-ui="craft requirements"
-			className="ak-ui-card-soft p-3"
+			className="rounded-sm border border-pink-200 bg-pink-50/40 p-3"
 		>
 			<div className="flex items-center justify-between gap-3">
-				<p className="ak-ui-eyebrow">Craft progress</p>
+				<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
+					Craft progress
+				</p>
 				<p className="text-xs font-semibold text-emerald-700">
 					{craftStatusLabel({
 						craft,
 					})}
 				</p>
 			</div>
-			<div className="ak-ui-progress-track mt-2">
+			<div className="h-2 overflow-hidden rounded-sm bg-pink-50 mt-2">
 				<div
-					className="ak-ui-progress-success"
+					className="h-full rounded-sm bg-emerald-500 transition-[width] duration-200 ease-linear"
 					style={{
 						width: `${Math.round(craft.progress * 100)}%`,
 					}}
 				/>
 			</div>
-			<p className="ak-ui-muted mt-3 text-xs">
+			<p className="text-ak-text-muted mt-3 text-xs">
 				Creates{" "}
 				<strong className="text-ak-text">
 					{items[craft.resultItemId]?.name ?? craft.resultItemId}
 				</strong>
 			</p>
 			{craft.durationMs > 0 ? (
-				<p className="ak-ui-muted mt-1 text-xs">Build time: {formatMs(craft.durationMs)}</p>
+				<p className="text-ak-text-muted mt-1 text-xs">
+					Build time: {formatMs(craft.durationMs)}
+				</p>
 			) : null}
 			<div className="mt-3 grid gap-2">
 				{craft.inputs.map((input) => {
@@ -62,7 +66,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 					return (
 						<div
 							key={input.itemId}
-							className="ak-ui-row flex min-w-0 items-center justify-between gap-2 px-2 py-2 text-xs"
+							className="rounded-sm bg-white/70 flex min-w-0 items-center justify-between gap-2 px-2 py-2 text-xs"
 						>
 							<span className="min-w-0 truncate font-semibold">
 								{items[input.itemId]?.name ?? input.itemId}
@@ -72,7 +76,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 									"shrink-0 tabular-nums",
 									delivered >= input.quantity
 										? "font-bold text-emerald-700"
-										: "ak-ui-muted",
+										: "text-ak-text-muted",
 								)}
 							>
 								{delivered}/{input.quantity}
@@ -83,7 +87,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 									data-ui="withdraw action"
 									disabled={pending}
 									onClick={() => onWithdrawInput(input.itemId)}
-									className="ak-ui-button ak-ui-button-secondary min-h-10 shrink-0 px-3 text-xs"
+									className="min-h-10 shrink-0 rounded-sm border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-extrabold leading-none text-violet-900 transition-[transform,border-color,background,color,opacity] hover:bg-violet-100 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45"
 								>
 									Withdraw
 								</button>
@@ -97,8 +101,10 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 				disabled={!canStart || pending}
 				onClick={onStart}
 				className={cn(
-					"ak-ui-button mt-3 w-full",
-					canStart ? "ak-ui-button-primary" : "ak-ui-button-ghost",
+					"mt-3 min-h-10 w-full rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
+					canStart
+						? "border-fuchsia-500 bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+						: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
 				)}
 			>
 				{craft.phase !== "collecting_inputs"

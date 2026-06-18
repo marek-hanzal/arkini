@@ -21,8 +21,10 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 	);
 
 	return (
-		<div className="ak-ui-card-soft p-3">
-			<p className="ak-ui-eyebrow">{title}</p>
+		<div className="rounded-sm border border-pink-200 bg-pink-50/40 p-3">
+			<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
+				{title}
+			</p>
 			{storedRequirements.length ? (
 				<div className="mt-3 grid gap-2">
 					<p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-violet-700/80">
@@ -31,7 +33,7 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 					{storedRequirements.map((requirement) => (
 						<div
 							key={requirement.itemId}
-							className="ak-ui-row break-words px-2 py-2 text-xs"
+							className="rounded-sm bg-white/70 break-words px-2 py-2 text-xs"
 						>
 							{items[requirement.itemId]?.name ?? requirement.itemId}:{" "}
 							{requirement.stored}/{requirement.capacity} stored, requires{" "}
@@ -48,7 +50,7 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 					{passiveRequirements.map((requirement) => (
 						<div
 							key={requirement.itemId}
-							className="ak-ui-row break-words px-2 py-2 text-xs"
+							className="rounded-sm bg-white/70 break-words px-2 py-2 text-xs"
 						>
 							{items[requirement.itemId]?.name ?? requirement.itemId}: requires{" "}
 							{requirement.quantity} owned/available, not dragged here
@@ -64,7 +66,7 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 					{activation.inputs.map((input) => (
 						<div
 							key={input.itemId}
-							className="ak-ui-row break-words px-2 py-2 text-xs"
+							className="rounded-sm bg-white/70 break-words px-2 py-2 text-xs"
 						>
 							{items[input.itemId]?.name ?? input.itemId}: feed {input.quantity} by
 							drag

@@ -151,9 +151,9 @@ const PlayShellContent: FC = () => {
 		>
 			<div
 				data-ui="game screen"
-				className="relative h-full w-full overflow-hidden px-2 pt-2 pb-[calc(var(--ak-bottom-nav-height)+0.55rem)]"
+				className="relative h-full w-full overflow-hidden bg-white px-2 pt-2 pb-[calc(var(--ak-bottom-nav-height)+0.55rem)]"
 			>
-				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col overflow-visible">
+				<main className="mx-auto flex h-full w-full max-w-[430px] min-h-0 flex-col overflow-visible">
 					<div className="min-h-0 shrink-0">
 						<BoardSurface
 							feedback={feedback}
@@ -168,7 +168,10 @@ const PlayShellContent: FC = () => {
 				{lastError && feedbackFlags.has("toast:error") ? (
 					<div
 						data-ui="error toast"
-						className="ak-layer-toast pointer-events-none absolute inset-x-3 bottom-[calc(var(--ak-bottom-nav-height)+0.85rem)] mx-auto max-w-[430px] rounded-xl border border-rose-300/50 bg-rose-50/95 px-3 py-2 text-sm font-semibold text-rose-800 shadow-xl shadow-rose-900/10"
+						className="pointer-events-none absolute inset-x-3 bottom-[calc(var(--ak-bottom-nav-height)+0.85rem)] mx-auto max-w-[430px] rounded-sm border border-rose-300/50 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-800"
+						style={{
+							zIndex: "var(--ak-layer-toast)",
+						}}
 					>
 						{lastError}
 					</div>

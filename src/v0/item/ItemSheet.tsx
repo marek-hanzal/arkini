@@ -75,7 +75,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					description="Nothing selected"
 					onClose={onClose}
 				/>
-				<p className="ak-ui-muted p-4 text-sm">Select a board item first.</p>
+				<p className="text-ak-text-muted p-4 text-sm">Select a board item first.</p>
 			</section>
 		);
 	}

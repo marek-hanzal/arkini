@@ -25,7 +25,7 @@ Implemented the first broad UI overhaul pass after the runtime/cache cleanup.
 
 This is a UI/layout/design-token task only. No gameplay logic, save schema, placement or engine rules were changed.
 
-The task intentionally did not build a full design-system abstraction. The current shared CSS helpers are enough to remove repeated heavy dark classes while keeping the UI easy to change. Do not grow them into a component framework unless repeated real usage earns it.
+Superseded by the flat follow-up: app-level shared visual CSS helper classes were removed again after screenshot review. Keep ordinary component styling in native Tailwind utilities unless repeated real usage earns a proper component abstraction.
 
 Board/inventory still use TileEngine as the structural grid owner. `data-ak-tile-engine-id="board"` / `inventory` remains the grid-level identifier; `data-ui` is only added around game-specific roots and rendered cells/items.
 
@@ -34,4 +34,4 @@ Board/inventory still use TileEngine as the structural grid owner. `data-ak-tile
 - Manually inspect the UI in browser. Build/type/test passed, but screenshots matter for visual work because compilers have no taste, tragically.
 - If the board still feels small, tune board dimensions/layout after seeing real device screenshots. Header removal already gives more vertical room.
 - Continue reducing nested border cards where future UI work touches the same components. This pass got the main surfaces/card tone lighter, not perfect.
-- When a proper button component appears naturally, derive it from the current `.ak-ui-button` variants rather than reintroducing random per-component button styling.
+- When a proper button component appears naturally, derive it from repeated Tailwind usage rather than reintroducing random custom CSS utility classes.

@@ -33,13 +33,13 @@ export const GameItemContent: FC<GameItemContent.Props> = memo(
 							src={item.assetSrc}
 							alt=""
 							draggable={false}
-							className="absolute left-0 top-0 h-[68%] w-[68%] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
+							className="absolute left-0 top-0 h-[68%] w-[68%] object-contain"
 						/>
 						<img
 							src={item.assetOverlaySrc}
 							alt=""
 							draggable={false}
-							className="absolute bottom-0 right-0 h-[72%] w-[72%] object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,0.45)]"
+							className="absolute bottom-0 right-0 h-[72%] w-[72%] object-contain"
 						/>
 					</div>
 				) : (
@@ -51,7 +51,7 @@ export const GameItemContent: FC<GameItemContent.Props> = memo(
 					/>
 				)}
 				{quantity && quantity > 1 ? (
-					<span className="absolute bottom-0 right-[8px] min-w-4 rounded-sm bg-fuchsia-700/90 px-1 text-center text-[0.62rem] font-bold text-white shadow-sm">
+					<span className="absolute bottom-0 right-0 min-w-4 rounded-sm bg-fuchsia-700/90 px-1 text-center text-[0.62rem] font-bold text-white">
 						{quantity}
 					</span>
 				) : item.label ? (

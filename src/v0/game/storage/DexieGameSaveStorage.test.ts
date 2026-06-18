@@ -67,12 +67,13 @@ describe("DexieGameSaveStorage", () => {
 		});
 
 		await storage.saveActiveSave({
+			config,
 			configHash,
 			save,
 		});
 		const loaded = await storage.loadActiveSave({
+			config,
 			configHash,
-			gameId: config.game.id,
 		});
 
 		expect(loaded).toEqual(save);
@@ -89,14 +90,15 @@ describe("DexieGameSaveStorage", () => {
 		});
 
 		await storage.saveActiveSave({
+			config,
 			configHash,
 			save,
 		});
 
 		await expect(
 			storage.loadActiveSave({
+				config,
 				configHash: "different-config-hash",
-				gameId: config.game.id,
 			}),
 		).resolves.toBeNull();
 		await expect(countRawSaves(databaseName)).resolves.toBe(0);
@@ -124,8 +126,8 @@ describe("DexieGameSaveStorage", () => {
 
 		await expect(
 			storage.loadActiveSave({
+				config,
 				configHash,
-				gameId: config.game.id,
 			}),
 		).resolves.toBeNull();
 		await expect(countRawSaves(databaseName)).resolves.toBe(0);
@@ -154,8 +156,41 @@ describe("DexieGameSaveStorage", () => {
 
 		await expect(
 			storage.loadActiveSave({
+				config,
 				configHash,
-				gameId: config.game.id,
+			}),
+		).resolves.toBeNull();
+		await expect(countRawSaves(databaseName)).resolves.toBe(0);
+		storage.close();
+	});
+
+	it("drops stored saves for semantically invalid save payloads", async () => {
+		const config = createEngineTestConfig();
+		const configHash = await hashRuntimeGameConfig(config);
+		const databaseName = createDatabaseName();
+		const save = await createInitialSave();
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 4,
+		};
+		const storage = new DexieGameSaveStorage({
+			databaseName,
+		});
+
+		await putRawRecord(databaseName, {
+			id: activeGameSaveId,
+			configHash,
+			gameId: config.game.id,
+			save,
+			saveVersion: save.version,
+			schemaVersion: gameSaveStorageSchemaVersion,
+			updatedAtMs: save.updatedAtMs,
+		});
+
+		await expect(
+			storage.loadActiveSave({
+				config,
+				configHash,
 			}),
 		).resolves.toBeNull();
 		await expect(countRawSaves(databaseName)).resolves.toBe(0);
@@ -171,26 +206,28 @@ describe("DexieGameSaveStorage", () => {
 		});
 
 		await storage.saveActiveSave({
+			config,
 			configHash,
 			save,
 		});
 		await storage.deleteActiveSave();
 		await expect(
 			storage.loadActiveSave({
+				config,
 				configHash,
-				gameId: config.game.id,
 			}),
 		).resolves.toBeNull();
 
 		await storage.saveActiveSave({
+			config,
 			configHash,
 			save,
 		});
 		await storage.wipe();
 		await expect(
 			storage.loadActiveSave({
+				config,
 				configHash,
-				gameId: config.game.id,
 			}),
 		).resolves.toBeNull();
 		storage.close();

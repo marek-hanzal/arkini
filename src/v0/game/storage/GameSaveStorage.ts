@@ -1,15 +1,17 @@
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export const activeGameSaveId = "default";
 export const gameSaveStorageSchemaVersion = 1;
 
 export interface GameSaveStorageScope {
+	config: GameConfig;
 	configHash: string;
-	gameId: string;
 	saveId?: string;
 }
 
 export interface SaveActiveGameSaveProps {
+	config: GameConfig;
 	configHash: string;
 	save: GameSave;
 	saveId?: string;

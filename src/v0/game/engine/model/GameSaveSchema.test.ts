@@ -1,0 +1,191 @@
+import { Effect } from "effect";
+import { describe, expect, it } from "vitest";
+import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { GameSaveConfigSchema, type GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+
+const createInitialSave = (props: createInitialGameSaveFx.Props) =>
+	Effect.runSync(createInitialGameSaveFx(props));
+
+const cloneSave = (save: GameSave): GameSave => structuredClone(save);
+
+const createProducerJob = (id: string) => ({
+	completesAtMs: 1000,
+	id,
+	outputTableId: "loot:test",
+	productId: "product:test",
+	producerItemInstanceId: "item-instance:1",
+	startedAtMs: 0,
+});
+
+const createQueueUpgradeConfig = () =>
+	createEngineTestConfig({
+		upgrades: {
+			"upgrade:queue": {
+				code: "queue",
+				description: "Queue upgrade",
+				name: "Queue",
+				sort: 1,
+				tiers: [
+					{
+						cost: [
+							{
+								itemId: "item:twig",
+								quantity: 1,
+							},
+						],
+						durationMs: 0,
+						effects: [
+							{
+								producerId: "producer:test",
+								quantity: 1,
+								type: "producer.maxQueueSize.add",
+							},
+						],
+					},
+				],
+			},
+		},
+	});
+
+describe("GameSaveConfigSchema", () => {
+	it("accepts a valid save for its config", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		expect(() =>
+			GameSaveConfigSchema.parse({
+				config,
+				save,
+			}),
+		).not.toThrow();
+	});
+
+	it("rejects duplicate occupied board cells", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("Duplicate board cell");
+	});
+
+	it("rejects inventory stacks above the item max stack size", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 4,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("maxStackSize");
+	});
+
+	it("rejects producer queues above their effective max queue size", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.producerJobs["job:1"] = createProducerJob("job:1");
+		invalidSave.producerJobs["job:2"] = createProducerJob("job:2");
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("maxQueueSize");
+	});
+
+	it("accepts producer queues unlocked by completed queue upgrades", () => {
+		const config = createQueueUpgradeConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const upgradedSave = cloneSave(save);
+		upgradedSave.upgrades["upgrade:queue"] = {
+			completedTiers: 1,
+		};
+		upgradedSave.producerJobs["job:1"] = createProducerJob("job:1");
+		upgradedSave.producerJobs["job:2"] = createProducerJob("job:2");
+
+		expect(() =>
+			GameSaveConfigSchema.parse({
+				config,
+				save: upgradedSave,
+			}),
+		).not.toThrow();
+	});
+
+	it("rejects stored requirements above their target capacity", () => {
+		const config = createEngineTestConfig({
+			producers: {
+				"producer:test": {
+					maxQueueSize: 1,
+					productIds: [
+						"product:test",
+						"product:shred",
+					],
+					requirements: [
+						{
+							capacity: 1,
+							itemId: "item:key",
+							quantity: 1,
+							type: "stored",
+						},
+					],
+					type: "producer",
+				},
+			},
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.storedRequirements["item-instance:1"] = {
+			items: {
+				"item:key": 2,
+			},
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("capacity");
+	});
+});

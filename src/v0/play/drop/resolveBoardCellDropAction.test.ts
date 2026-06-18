@@ -155,7 +155,7 @@ describe("resolveBoardCellDropAction", () => {
 		});
 	});
 
-	it("maps regular combo merges to merge actions from either drag direction", () => {
+	it("maps only source-owned explicit merge rules to merge actions", () => {
 		const twig = boardItem({
 			id: "twig",
 			itemId: "item:twig",
@@ -205,8 +205,8 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toMatchObject({
-			animation: "parallel-merge",
-			type: "merge-board-items",
+			animation: "parallel-swap",
+			type: "swap-board-items",
 		});
 	});
 

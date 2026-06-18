@@ -1306,22 +1306,19 @@ describe("applyGameActionFx", () => {
 		]);
 	});
 
-	it("merges regular combo items from either board drag direction", () => {
+	it("merges only source-owned explicit combo rules", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			items: {
 				...baseConfig.items,
-				"item:twig": {
-					...baseConfig.items["item:twig"],
-					mergeIds: [
-						"merge:twig-water",
-					],
-				},
 				"item:water": {
 					assetId: "asset:test",
 					code: "water",
 					description: "Water",
 					maxStackSize: 3,
+					mergeIds: [
+						"merge:water-twig",
+					],
 					name: "Water",
 					sort: 8,
 					tags: [],
@@ -1330,9 +1327,9 @@ describe("applyGameActionFx", () => {
 			},
 			merge: {
 				...baseConfig.merge,
-				"merge:twig-water": {
+				"merge:water-twig": {
 					resultItemId: "item:plank",
-					withItemId: "item:water",
+					withItemId: "item:twig",
 				},
 			},
 			startingState: {
@@ -1379,7 +1376,7 @@ describe("applyGameActionFx", () => {
 			config,
 			nowMs: 0,
 		});
-		const twigIntoWater = runAction({
+		const twigIntoWater = runActionEither({
 			action: {
 				sourceRef: {
 					kind: "board",
@@ -1393,10 +1390,7 @@ describe("applyGameActionFx", () => {
 			save: freshSave,
 		});
 
-		expect(twigIntoWater.save.board.items["item-instance:2"]).toBeUndefined();
-		expect(twigIntoWater.save.board.items["item-instance:1"]).toMatchObject({
-			itemId: "item:plank",
-		});
+		expect(twigIntoWater._tag).toBe("Left");
 	});
 
 	it("merges an inventory source into a board target", () => {

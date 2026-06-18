@@ -1,5 +1,4 @@
 import type { ItemDefinition } from "../../../item";
-import { combo } from "../../../dsl/combo";
 import { same } from "../../../dsl/same";
 import { item } from "../../../dsl/item";
 
@@ -23,12 +22,6 @@ export const WoodItemDefinitions = [
 					id: "merge:twig-twig-branch",
 					selfItemId: "item:twig",
 					resultItemId: "item:branch",
-				}),
-				combo({
-					id: "merge:twig-water-sprout",
-					withItemId: "item:water",
-					resultItemId: "item:sprout",
-					secret: true,
 				}),
 			],
 		},

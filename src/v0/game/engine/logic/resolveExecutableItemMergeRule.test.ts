@@ -6,22 +6,7 @@ import {
 } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 
 describe("resolveExecutableItemMergeRule", () => {
-	it("resolves regular combo merges from either drag direction", () => {
-		expect(
-			resolveExecutableItemMergeRule({
-				config: defaultGameConfig,
-				sourceItemId: "item:twig",
-				targetItemId: "item:water",
-			}),
-		).toMatchObject({
-			directed: false,
-			merge: {
-				resultItemId: "item:sprout",
-				withItemId: "item:water",
-			},
-			ruleOwnerItemId: "item:twig",
-		});
-
+	it("resolves only source-owned explicit merge rules", () => {
 		expect(
 			resolveExecutableItemMergeRule({
 				config: defaultGameConfig,
@@ -32,10 +17,18 @@ describe("resolveExecutableItemMergeRule", () => {
 			directed: false,
 			merge: {
 				resultItemId: "item:sprout",
-				withItemId: "item:water",
+				withItemId: "item:twig",
 			},
-			ruleOwnerItemId: "item:twig",
+			ruleOwnerItemId: "item:water",
 		});
+
+		expect(
+			resolveExecutableItemMergeRule({
+				config: defaultGameConfig,
+				sourceItemId: "item:twig",
+				targetItemId: "item:water",
+			}),
+		).toBeUndefined();
 	});
 
 	it("keeps imprint merges directed", () => {

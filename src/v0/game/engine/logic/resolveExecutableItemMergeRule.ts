@@ -46,28 +46,20 @@ export const resolveExecutableItemMergeRule = ({
 		ownerItemId: sourceItemId,
 		withItemId: targetItemId,
 	});
-	if (sourceOwnedRule) {
-		return {
-			directed: sourceOwnedRule.consumeSource === false,
-			merge: sourceOwnedRule,
-			ruleOwnerItemId: sourceItemId,
-		};
-	}
-
-	const targetOwnedRule = readOwnedMergeRule({
-		config,
-		ownerItemId: targetItemId,
-		withItemId: sourceItemId,
-	});
-	if (!targetOwnedRule || targetOwnedRule.consumeSource === false) return undefined;
+	if (!sourceOwnedRule) return undefined;
 
 	return {
-		directed: false,
-		merge: targetOwnedRule,
-		ruleOwnerItemId: targetItemId,
+		directed: sourceOwnedRule.consumeSource === false,
+		merge: sourceOwnedRule,
+		ruleOwnerItemId: sourceItemId,
 	};
 };
 
+/**
+ * Reverse-directed imprint rules are not executable merges, but they still block the
+ * generic occupied-tile swap fallback. A building -> blueprint rule means dragging a
+ * blueprint onto that building should be rejected, not silently treated as a swap.
+ */
 export const hasReverseDirectedItemMergeRule = ({
 	config,
 	sourceItemId,

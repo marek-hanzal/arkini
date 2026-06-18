@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
 import { withRandomService } from "~/v0/random/logic/withRandomService";
@@ -688,6 +689,42 @@ describe("applyGameActionFx", () => {
 			expect(second.left).toMatchObject({
 				_tag: "GameActionRejected",
 				reason: "producer_queue_full",
+			});
+		}
+	});
+
+	it("rejects starting another craft job on the same target", () => {
+		const config = createEngineCraftTableTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const action = {
+			inputRefs: [],
+			recipeId: "craft:plank",
+			requirementRefs: [],
+			targetItemInstanceId: "item-instance:1",
+			type: "craft.start" as const,
+		};
+		const first = runAction({
+			action,
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		const second = runActionEither({
+			action,
+			config,
+			nowMs: 200,
+			save: first.save,
+		});
+
+		expect(second._tag).toBe("Left");
+		if (second._tag === "Left") {
+			expect(second.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "craft_in_progress",
 			});
 		}
 	});

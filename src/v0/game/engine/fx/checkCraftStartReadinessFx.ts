@@ -46,6 +46,18 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		);
 	}
 
+	const runningCraftJob = Object.values(save.craftJobs).find(
+		(job) => job.targetItemInstanceId === action.targetItemInstanceId,
+	);
+	if (runningCraftJob) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"craft_in_progress",
+				`Craft target "${action.targetItemInstanceId}" already has running craft job "${runningCraftJob.id}".`,
+			),
+		);
+	}
+
 	const requirements = yield* splitCraftRequirementsFx({
 		requirements: recipe.requirements,
 	});

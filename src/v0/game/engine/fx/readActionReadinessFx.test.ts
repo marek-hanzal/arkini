@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
 import { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
+import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
@@ -118,6 +119,40 @@ describe("readActionReadinessFx", () => {
 		expect(readiness).toMatchObject({
 			errorTag: "GameActionRejected",
 			reason: "producer_queue_full",
+			type: "rejected",
+		});
+	});
+
+	it("returns rejected readiness when craft is already in progress on the target", () => {
+		const config = createEngineCraftTableTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			recipeId: "craft:plank",
+			returnItems: [],
+			startedAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const readiness = runReadiness({
+			action: {
+				inputRefs: [],
+				recipeId: "craft:plank",
+				requirementRefs: [],
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toMatchObject({
+			errorTag: "GameActionRejected",
+			reason: "craft_in_progress",
 			type: "rejected",
 		});
 	});

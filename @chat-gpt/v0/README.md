@@ -16,7 +16,7 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ### 1. Stabilization epic
 
-Start with `v0-stabilization-epic-2026-06-18.md`. Current first coding task is craft single-job invariant + save schema guard. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
+Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant is done. Current next coding task is T2 craft completion as target replacement/swap. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
 
 ## Deferred / historical notes
 
@@ -27,12 +27,13 @@ Start with `v0-stabilization-epic-2026-06-18.md`. Current first coding task is c
 
 ## Selected next task
 
-Recommended next coding task: **Stabilization epic T1: craft single-job invariant**.
+Recommended next coding task: **Stabilization epic T2: craft completion = target replacement**.
 
-Reason: craft is now clarified as one board target -> one running job -> one result replacement. The engine and save schema must enforce the one-job invariant before we build more gameplay on top of a target that can split into parallel nonsense universes.
+Reason: T1 now enforces one running craft job per board target. The next broken contract is completion: craft must replace/swap the original target into the result item in-place, not spawn output somewhere else while the target survives like a smug little duplication bug.
 
 ## Completed recent task
 
+- `v0-craft-single-job-invariant-2026-06-18.md`: engine readiness/start and `GameSaveConfigSchema` now enforce max one running craft job per target item while allowing parallel craft on different targets.
 - `v0-stabilization-epic-2026-06-18.md`: corrected stabilization epic from GameConfig/tick audit plus clarified craft/inventory/overlay/event-flow decisions.
 - `v0-inventory-seeded-placement-2026-06-18.md`: long press on empty board cell opens inventory with seeded Manhattan placement; selecting a stack places it through shared board-then-inventory planner semantics.
 - `v0-board-dnd-confinement-2026-06-18.md`: board item DnD is confined to the board; inventory is no longer a board-item drop target and item detail owns explicit `Store` to inventory.

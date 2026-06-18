@@ -34,13 +34,13 @@ export const InventorySurface = memo(
 		return (
 			<div
 				data-ui="inventory root"
-				className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col"
+				className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden"
 			>
 				<SheetHeader
 					title="Inventory"
 					onClose={onClose}
 				/>
-				<div className="min-h-0 flex-1 overflow-x-hidden px-2 py-2">
+				<div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 					<div
 						ref={inventoryDragBoundsRef}
 						className="mx-auto w-full max-w-[430px]"

@@ -52,7 +52,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						<div
 							key={line.productId}
 							className={cn(
-								"rounded-sm bg-white/70 min-w-0 px-3 py-3 text-xs",
+								"min-w-0 rounded-sm bg-ak-surface px-3 py-3 text-xs",
 								!line.enabled && "opacity-70",
 							)}
 						>

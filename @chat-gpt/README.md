@@ -123,4 +123,5 @@ Product-line input ref checkpoint:
 - `GameConfig.inputs` is a top-level named input definition record. Products reference those records via `products.*.inputRefId`; use `readProductInputs({ config, productId })` instead of reading product-local inputs.
 - `producer.input.store` fills the first enabled product line, in `producer.productIds` order, that accepts the dragged item and has capacity. Shared inputs therefore resolve top-to-bottom by enabled line state.
 - Product line UI displays its own input rows/readiness. Filling still happens through core DnD/merge-like interaction onto the producer tile, not a special button.
+- Product line input rows with stored quantity can withdraw the whole stored amount at once. Withdraw uses producer-style board-then-inventory placement seeded at the producer tile and rejects without state changes if no placement is available.
 - `GameSaveConfigSchema` validates `save.producerInputs` against effective product input refs, including completed `product.inputRef.set` upgrades.

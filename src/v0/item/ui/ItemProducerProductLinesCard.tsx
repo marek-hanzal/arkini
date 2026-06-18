@@ -11,6 +11,7 @@ export namespace ItemProducerProductLinesCard {
 		pending: boolean;
 		onSetEnabled(productId: string, enabled: boolean): void;
 		onStart(productId: string): void;
+		onWithdrawInput(productId: string, itemId: string): void;
 	}
 }
 
@@ -20,6 +21,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 	pending,
 	onSetEnabled,
 	onStart,
+	onWithdrawInput,
 }) => {
 	if (lines.length === 0) return null;
 
@@ -90,17 +92,32 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									{line.inputs.map((input) => (
 										<div
 											key={input.itemId}
-											className="flex items-center justify-between rounded-sm border border-slate-700/60 bg-slate-950/35 px-2 py-1 text-[0.68rem]"
+											className="flex items-center justify-between gap-2 rounded-sm border border-slate-700/60 bg-slate-950/35 px-2 py-1 text-[0.68rem]"
 										>
-											<span className="font-semibold text-slate-300">
+											<span className="min-w-0 font-semibold text-slate-300">
 												{input.itemId.replace(/^item:/, "")}
 											</span>
-											<span className="text-slate-400">
+											<span className="ml-auto text-slate-400">
 												{input.stored}/{input.quantity}
 												{input.capacity > input.quantity
 													? ` · cap ${input.capacity}`
 													: ""}
 											</span>
+											{input.stored > 0 ? (
+												<button
+													type="button"
+													disabled={pending}
+													onClick={() =>
+														onWithdrawInput(
+															line.productId,
+															input.itemId,
+														)
+													}
+													className="shrink-0 rounded-sm border border-slate-600/70 px-1.5 py-0.5 font-bold text-slate-300 transition hover:border-slate-400/80 hover:text-slate-100 disabled:opacity-35"
+												>
+													Withdraw
+												</button>
+											) : null}
 										</div>
 									))}
 								</div>

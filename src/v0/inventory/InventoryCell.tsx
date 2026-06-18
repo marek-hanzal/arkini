@@ -12,6 +12,6 @@ export const InventoryCell = memo(({ slotIndex, invalid }: InventoryCell.Props) 
 		data-ui="inventory slot"
 		data-ak-inventory-slot={slotIndex}
 		data-ak-cell-invalid={invalid ? "true" : undefined}
-		className="relative aspect-square bg-white/80"
+		className="relative aspect-square bg-ak-surface/70"
 	/>
 ));

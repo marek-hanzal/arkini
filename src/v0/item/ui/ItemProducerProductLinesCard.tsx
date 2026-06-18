@@ -28,7 +28,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 	return (
 		<div
 			data-ui="producer controls"
-			className="rounded-sm border border-violet-200 bg-violet-50/40 p-3"
+			className="rounded-sm border border-ak-border bg-ak-surface-soft p-3"
 		>
 			<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
 				Product lines
@@ -80,8 +80,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									className={cn(
 										"min-h-10 shrink-0 rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
 										line.enabled
-											? "border-violet-200 bg-violet-50 text-violet-900 hover:bg-violet-100"
-											: "border-violet-200 bg-white text-ak-text hover:bg-violet-50",
+											? "border-ak-border bg-ak-surface-soft text-ak-text hover:border-ak-border-accent hover:bg-ak-primary-soft"
+											: "border-ak-border bg-ak-surface text-ak-text hover:border-ak-border-accent hover:bg-ak-surface-soft",
 									)}
 								>
 									{line.enabled ? "On" : "Off"}
@@ -93,7 +93,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									{line.inputs.map((input) => (
 										<div
 											key={input.itemId}
-											className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-white/68 px-2 py-2 text-[0.7rem]"
+											className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-ak-surface px-2 py-2 text-[0.7rem]"
 										>
 											<span className="min-w-0 truncate font-semibold text-ak-text">
 												{input.itemId.replace(/^item:/, "")}
@@ -115,7 +115,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 															input.itemId,
 														)
 													}
-													className="min-h-10 shrink-0 rounded-sm border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-extrabold leading-none text-violet-900 transition-[transform,border-color,background,color,opacity] hover:bg-violet-100 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45"
+													className="min-h-10 shrink-0 rounded-sm border border-ak-border bg-ak-surface px-3 py-2 text-xs font-extrabold leading-none text-ak-text transition-[transform,border-color,background,color,opacity] hover:border-ak-border-accent hover:bg-ak-surface-soft active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45"
 												>
 													Withdraw
 												</button>
@@ -126,8 +126,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 							) : null}
 
 							{line.inProgress ? (
-								<div className="mt-2 rounded-sm bg-white/68 p-2">
-									<div className="flex justify-between gap-3 font-bold text-violet-800">
+								<div className="mt-2 rounded-sm bg-ak-surface p-2">
+									<div className="flex justify-between gap-3 font-bold text-ak-primary">
 										<span>
 											Running
 											{line.queuedJobs > 1
@@ -140,9 +140,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												: "Queued"}
 										</span>
 									</div>
-									<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-violet-50">
+									<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-ak-surface">
 										<div
-											className="h-full rounded-sm bg-violet-600 transition-[width] duration-200 ease-linear"
+											className="h-full rounded-sm bg-ak-primary transition-[width] duration-200 ease-linear"
 											style={{
 												width: `${Math.round((line.progress ?? 0) * 100)}%`,
 											}}
@@ -158,8 +158,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								className={cn(
 									"mt-2 min-h-10 w-full rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
 									canStart
-										? "border-violet-500 bg-violet-600 text-white hover:bg-violet-700"
-										: "border-violet-200 bg-white text-ak-text hover:bg-violet-50",
+										? "border-ak-border-accent bg-ak-primary text-white hover:bg-pink-400"
+										: "border-ak-border bg-ak-surface text-ak-text hover:border-ak-border-accent hover:bg-ak-surface-soft",
 								)}
 							>
 								{line.queueFull

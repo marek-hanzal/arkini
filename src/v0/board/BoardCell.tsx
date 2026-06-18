@@ -19,7 +19,7 @@ export const BoardCell = memo(
 			data-ak-board-cell-feedback={feedbackVariant}
 			data-ak-board-cell-status={statusVariant}
 			data-ak-cell-invalid={invalid ? "true" : undefined}
-			className="relative aspect-square touch-none bg-white/78"
+			className="relative aspect-square touch-none bg-ak-surface/70"
 		/>
 	),
 );

@@ -10,7 +10,6 @@ import {
 import { useLoadDevScenarioAction } from "~/v0/debug/scenario/useLoadDevScenarioAction";
 import { StatusPill } from "~/v0/debug/ui/StatusPill";
 import { useGameRuntimeSelector } from "~/v0/play/runtime";
-import { useLiveNowMs } from "~/v0/time/useLiveNowMs";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { cn } from "~/v0/ui/cn";
 
@@ -21,9 +20,10 @@ export namespace DevSheet {
 }
 
 const debugButtonToneClassName: Record<"primary" | "neutral" | "danger", string> = {
-	danger: "border-rose-300 bg-rose-50 text-rose-800 hover:bg-rose-100",
-	neutral: "border-violet-200 bg-white text-ak-text hover:bg-violet-50",
-	primary: "border-violet-500 bg-violet-600 text-white hover:bg-violet-700",
+	danger: "border-rose-400/70 bg-rose-950/30 text-rose-200 hover:border-rose-300 hover:bg-rose-900/40",
+	neutral:
+		"border-ak-border bg-ak-surface-soft text-ak-text hover:border-ak-border-accent hover:bg-ak-primary-soft",
+	primary: "border-ak-border-accent bg-ak-primary text-white hover:bg-pink-400",
 };
 
 const DebugButton: FC<{
@@ -37,7 +37,7 @@ const DebugButton: FC<{
 		disabled={disabled}
 		onClick={onClick}
 		className={cn(
-			"min-h-10 rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-wait disabled:opacity-45",
+			"min-h-10 w-full rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-wait disabled:opacity-45",
 			debugButtonToneClassName[tone],
 		)}
 	>
@@ -45,33 +45,12 @@ const DebugButton: FC<{
 	</button>
 );
 
-const formatWake = (nextWakeAtMs: number | null, nowMs: number) => {
-	if (nextWakeAtMs === null) return "idle";
-	return `${Math.max(0, nextWakeAtMs - nowMs)}ms`;
-};
-
 export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	const loadScenarioAction = useLoadDevScenarioAction();
 	const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
 	const [resetState, setResetState] = useState<"idle" | "pending" | "failed">("idle");
 	const [timelineSize, setTimelineSize] = useState(DebugTimeline.entries().length);
-	const runtime = useGameRuntimeSelector(
-		(state) => ({
-			boardItems: Object.keys(state.runtime.save.board.items).length,
-			inventoryStacks: state.runtime.save.inventory.slots.filter(Boolean).length,
-			nextWakeAtMs: state.runtime.nextWakeAtMs,
-			revision: state.revision,
-		}),
-		(left, right) =>
-			left.boardItems === right.boardItems &&
-			left.inventoryStacks === right.inventoryStacks &&
-			left.nextWakeAtMs === right.nextWakeAtMs &&
-			left.revision === right.revision,
-	);
-
-	const nowMs = useLiveNowMs([
-		runtime.nextWakeAtMs,
-	]);
+	const runtimeRevision = useGameRuntimeSelector((state) => state.revision);
 
 	const loadScenario = useCallback(
 		(scenarioId: DevScenarioId) => {
@@ -123,7 +102,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 			"\t",
 		);
 	}, [
-		runtime.revision,
+		runtimeRevision,
 		timelineSize,
 	]);
 
@@ -159,36 +138,34 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	return (
 		<section
 			data-ui="dev sheet"
-			className="max-h-[var(--ak-sheet-max-height)] min-w-0 overflow-y-auto overscroll-contain"
+			className="min-h-0 overflow-hidden"
 		>
 			<SheetHeader
 				title="Developer"
 				onClose={onClose}
 			/>
-			<div className="mx-auto grid min-w-0 w-full max-w-[430px] gap-3 px-2 py-3">
-				<section className="rounded-sm border border-violet-200 bg-white min-w-0 overflow-hidden p-3">
-					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-						<div>
-							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">
-								Bug report
-							</p>
-							<h2 className="mt-1 text-base font-semibold text-ak-text">
-								Copy diagnostic dump
-							</h2>
-							<p className="mt-2 text-sm text-ak-text-muted">
-								One JSON packet with browser metadata, runtime diagnostics and the
-								latest debug timeline. Paste it into chat after reproducing a bug.
-							</p>
-						</div>
-						<div className="flex shrink-0 flex-wrap gap-2">
-							<DebugButton
-								tone="primary"
-								onClick={copyBugReport}
-							>
-								Copy bug report
-							</DebugButton>
-							<DebugButton onClick={clearTimeline}>Clear timeline</DebugButton>
-						</div>
+			<div className="mx-auto grid w-full max-w-[430px] gap-3 px-2 py-3">
+				<section className="min-w-0 overflow-hidden rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
+					<div>
+						<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ak-primary">
+							Bug report
+						</p>
+						<h2 className="mt-1 text-base font-semibold text-ak-text">
+							Copy diagnostic dump
+						</h2>
+						<p className="mt-2 text-sm text-ak-text-muted">
+							One JSON packet with browser metadata, runtime diagnostics and the
+							latest debug timeline. Paste it into chat after reproducing a bug.
+						</p>
+					</div>
+					<div className="mt-3 grid grid-cols-2 gap-2">
+						<DebugButton
+							tone="primary"
+							onClick={copyBugReport}
+						>
+							Copy bug report
+						</DebugButton>
+						<DebugButton onClick={clearTimeline}>Clear timeline</DebugButton>
 					</div>
 					<div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
 						<StatusPill
@@ -197,7 +174,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 						/>
 						<StatusPill
 							label="Revision"
-							value={String(runtime.revision)}
+							value={String(runtimeRevision)}
 						/>
 						<StatusPill
 							label="Mode"
@@ -209,41 +186,33 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 						/>
 					</div>
 					{copyState === "copied" ? (
-						<p className="mt-3 text-sm font-semibold text-emerald-800">
+						<p className="mt-3 text-sm font-semibold text-emerald-300">
 							Copied. Paste the JSON dump into chat with a one-line symptom.
 						</p>
 					) : null}
 					{copyState === "failed" ? (
-						<p className="mt-3 text-sm font-semibold text-rose-800">
+						<p className="mt-3 text-sm font-semibold text-rose-300">
 							Copy failed. Use window.__ARKINI_BUG_REPORT__.dump() in the console.
 						</p>
 					) : null}
-					<pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-sm border border-violet-200 bg-violet-50/70 p-2 text-[0.65rem] text-ak-text-muted">
+					<pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-sm border border-ak-border bg-ak-surface-soft p-2 text-[0.65rem] text-ak-text-muted [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 						{dumpPreview}
 					</pre>
 				</section>
 
-				<section className="rounded-sm border border-violet-200 bg-white min-w-0 overflow-hidden p-3">
-					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-						<div>
-							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">
-								Scenarios
-							</p>
-							<h2 className="mt-1 text-base font-semibold text-ak-text">
-								Load debug save
-							</h2>
-							<p className="mt-2 text-sm text-ak-text-muted">
-								Reset the runtime save into a deterministic state before reproducing
-								an animation bug. The loaded scenario is recorded into the bug
-								report timeline.
-							</p>
-						</div>
-						<div className="shrink-0">
-							<StatusPill
-								label="Scenarios"
-								value={String(DevScenarioDefinitions.length)}
-							/>
-						</div>
+				<section className="min-w-0 overflow-hidden rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
+					<div>
+						<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ak-primary">
+							Scenarios
+						</p>
+						<h2 className="mt-1 text-base font-semibold text-ak-text">
+							Load debug save
+						</h2>
+						<p className="mt-2 text-sm text-ak-text-muted">
+							Reset the runtime save into a deterministic state before reproducing an
+							animation bug. The loaded scenario is recorded into the bug report
+							timeline.
+						</p>
 					</div>
 					<div
 						data-ui="scenario list"
@@ -255,7 +224,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 								key={scenario.id}
 								disabled={loadScenarioAction.isPending}
 								onClick={() => loadScenario(scenario.id)}
-								className="min-w-0 rounded-sm border border-violet-200 bg-white/70 px-3 py-2 text-left transition hover:border-violet-300/70 hover:bg-violet-50/60 disabled:cursor-wait disabled:opacity-60"
+								className="min-w-0 rounded-sm border border-ak-border bg-ak-surface-soft px-3 py-2 text-left transition hover:border-ak-border-accent hover:bg-ak-primary-soft disabled:cursor-wait disabled:opacity-60"
 							>
 								<span className="block break-words text-sm font-bold text-ak-text">
 									{scenario.label}
@@ -267,68 +236,38 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 						))}
 					</div>
 					{loadScenarioAction.data ? (
-						<p className="mt-3 text-sm font-semibold text-violet-800">
+						<p className="mt-3 text-sm font-semibold text-emerald-300">
 							Loaded {loadScenarioAction.data.scenarioId}. Reproduce the bug, then
 							copy a bug report.
 						</p>
 					) : null}
 					{loadScenarioAction.isError ? (
-						<p className="mt-3 text-sm font-semibold text-rose-800">
+						<p className="mt-3 text-sm font-semibold text-rose-300">
 							Scenario load failed. Check the console; naturally, even debugging needs
 							debugging.
 						</p>
 					) : null}
 				</section>
 
-				<section className="rounded-sm border border-violet-200 bg-white min-w-0 overflow-hidden p-3">
-					<div className="flex h-full min-w-0 flex-wrap items-center gap-4">
-						<div className="min-w-0">
-							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">
-								Runtime
+				<section className="min-w-0 overflow-hidden rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
+					<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ak-primary">
+						Storage reset
+					</p>
+					<div className="mt-3">
+						<DebugButton
+							tone="danger"
+							disabled={resetState === "pending"}
+							onClick={hardReset}
+						>
+							{resetState === "pending"
+								? "Dropping browser storage…"
+								: "Hard reset storage"}
+						</DebugButton>
+						{resetState === "failed" ? (
+							<p className="mt-3 text-sm text-rose-300">
+								Reset failed. Check the console.
 							</p>
-							<h2 className="mt-1 text-base font-semibold text-ak-text">
-								Local session
-							</h2>
-							<span className="mt-2 inline-flex rounded-sm bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800">
-								dexie-save
-							</span>
-						</div>
-
-						<div className="grid min-w-0 flex-1 grid-cols-2 gap-2">
-							<StatusPill
-								label="Board"
-								value={String(runtime.boardItems)}
-							/>
-							<StatusPill
-								label="Inventory"
-								value={String(runtime.inventoryStacks)}
-							/>
-							<StatusPill
-								label="Next tick"
-								value={formatWake(runtime.nextWakeAtMs, nowMs)}
-							/>
-							<StatusPill
-								label="Source"
-								value="Dexie save"
-							/>
-						</div>
-
-						<div className="min-w-0">
-							<DebugButton
-								tone="danger"
-								disabled={resetState === "pending"}
-								onClick={hardReset}
-							>
-								{resetState === "pending"
-									? "Dropping browser storage…"
-									: "Hard reset storage"}
-							</DebugButton>
-							{resetState === "failed" ? (
-								<p className="mt-3 text-sm text-rose-800">
-									Reset failed. Check the console.
-								</p>
-							) : null}
-						</div>
+						) : null}
 					</div>
 				</section>
 			</div>

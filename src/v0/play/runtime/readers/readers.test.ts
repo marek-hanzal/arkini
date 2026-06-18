@@ -3,10 +3,10 @@ import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEn
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 import {
-	readGameRuntimeBoardFirstEmptyCell,
-	readGameRuntimeBoardItem,
-	readGameRuntimeBoardView,
-	readGameRuntimeInventorySlot,
+	readBoardFirstEmptyCell,
+	readBoardItem,
+	readBoardView,
+	readInventorySlot,
 } from "~/v0/play/runtime/readers";
 
 const createRuntimeState = async (): Promise<GameRuntimeState> => {
@@ -22,21 +22,21 @@ const createRuntimeState = async (): Promise<GameRuntimeState> => {
 	};
 };
 
-describe("game runtime readers", () => {
+describe("runtime readers", () => {
 	it("reads one board item without rebuilding the whole board view", async () => {
 		const state = await createRuntimeState();
-		const item = readGameRuntimeBoardItem({
+		const item = readBoardItem({
 			boardItemId: "item-instance:1",
 			state,
 		});
 
-		expect(item).toEqual(readGameRuntimeBoardView(state).byId["item-instance:1"]);
+		expect(item).toEqual(readBoardView(state).byId["item-instance:1"]);
 	});
 
 	it("reads the first empty board cell from raw save coordinates and config dimensions", async () => {
 		const state = await createRuntimeState();
 
-		expect(readGameRuntimeBoardFirstEmptyCell(state)).toEqual({
+		expect(readBoardFirstEmptyCell(state)).toEqual({
 			x: 1,
 			y: 0,
 		});
@@ -48,7 +48,7 @@ describe("game runtime readers", () => {
 			y: 0,
 		};
 
-		expect(readGameRuntimeBoardFirstEmptyCell(state)).toBeUndefined();
+		expect(readBoardFirstEmptyCell(state)).toBeUndefined();
 	});
 
 	it("reads one inventory slot without deriving the whole inventory view", async () => {
@@ -59,7 +59,7 @@ describe("game runtime readers", () => {
 		};
 
 		expect(
-			readGameRuntimeInventorySlot({
+			readInventorySlot({
 				slotIndex: 1,
 				state,
 			}),

@@ -37,6 +37,7 @@ Reason: save/model invariants are now much tighter and the old multi-language vi
 
 ## Completed recent task
 
+- `v0-runtime-reader-naming-hygiene-2026-06-18.md`: follow-up naming cleanup removed redundant `GameRuntime` prefixes from focused runtime reader files/functions; inside `play/runtime/readers`, names should be `readBoardView`, `readInventorySlot`, etc.
 - `v0-runtime-reader-hygiene-2026-06-18.md`: raw subscription follow-up split the catch-all runtime reader file into focused reader modules, added direct board-item/inventory-slot/first-empty-cell raw readers, and gave root board/inventory hooks semantic equality so derived object churn does not force unrelated redraws.
 - `v0-focused-runtime-subscriptions-2026-06-18.md`: raw subscription follow-up reduced broad board/inventory/config subscriptions in board/inventory surfaces and item detail; drop commits read latest raw snapshots instead of keeping unrelated render subscriptions alive.
 - `v0-event-flow-visual-planner-2026-06-18.md`: T8 removed the separate `ActionVisualEvent` runtime dialect. `GameRuntimeVisualEffects` now maps engine `GameEvent[]` directly into `GameEngineVisualPlan` motion/transient instructions.

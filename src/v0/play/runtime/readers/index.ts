@@ -1,7 +1,7 @@
-export { readGameRuntimeBoardFirstEmptyCell } from "~/v0/play/runtime/readers/readGameRuntimeBoardFirstEmptyCell";
-export { readGameRuntimeBoardItem } from "~/v0/play/runtime/readers/readGameRuntimeBoardItem";
-export { readGameRuntimeBoardView } from "~/v0/play/runtime/readers/readGameRuntimeBoardView";
-export { readGameRuntimeInventorySlot } from "~/v0/play/runtime/readers/readGameRuntimeInventorySlot";
-export { readGameRuntimeInventoryView } from "~/v0/play/runtime/readers/readGameRuntimeInventoryView";
-export { readGameRuntimeItemCatalogView } from "~/v0/play/runtime/readers/readGameRuntimeItemCatalogView";
-export { readGameRuntimeItemView } from "~/v0/play/runtime/readers/readGameRuntimeItemView";
+export { readBoardFirstEmptyCell } from "~/v0/play/runtime/readers/readBoardFirstEmptyCell";
+export { readBoardItem } from "~/v0/play/runtime/readers/readBoardItem";
+export { readBoardView } from "~/v0/play/runtime/readers/readBoardView";
+export { readInventorySlot } from "~/v0/play/runtime/readers/readInventorySlot";
+export { readInventoryView } from "~/v0/play/runtime/readers/readInventoryView";
+export { readItemCatalogView } from "~/v0/play/runtime/readers/readItemCatalogView";
+export { readItemView } from "~/v0/play/runtime/readers/readItemView";

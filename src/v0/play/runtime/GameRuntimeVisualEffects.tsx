@@ -3,7 +3,7 @@ import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { applyGameEngineVisualPlan } from "~/v0/play/game-engine-visual/applyGameEngineVisualPlan";
 import { createGameEngineVisualPlan } from "~/v0/play/game-engine-visual/createGameEngineVisualPlan";
 import { summarizeGameEngineVisualPlan } from "~/v0/play/game-engine-visual/summarizeGameEngineVisualPlan";
-import { readGameRuntimeBoardView, readGameRuntimeInventoryView } from "~/v0/play/runtime/readers";
+import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
 import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 
 export namespace GameRuntimeVisualEffects {
@@ -17,10 +17,10 @@ export const GameRuntimeVisualEffects: FC<GameRuntimeVisualEffects.Props> = ({ s
 		() =>
 			store.subscribeUpdate((update) => {
 				const plan = createGameEngineVisualPlan({
-					currentBoard: readGameRuntimeBoardView(update.current),
-					currentInventory: readGameRuntimeInventoryView(update.current),
+					currentBoard: readBoardView(update.current),
+					currentInventory: readInventoryView(update.current),
 					events: update.result.events,
-					previousBoard: readGameRuntimeBoardView(update.previous),
+					previousBoard: readBoardView(update.previous),
 				});
 
 				DebugTimeline.record({

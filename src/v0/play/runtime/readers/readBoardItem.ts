@@ -2,7 +2,7 @@ import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { readRuntimeBoardItemViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeBoardViewFromGameSave";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 
-export const readGameRuntimeBoardItem = ({
+export const readBoardItem = ({
 	boardItemId,
 	state,
 }: {

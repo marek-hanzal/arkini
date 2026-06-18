@@ -11,13 +11,13 @@ import { readRuntimeUpgradeListViewFromGameSave } from "~/v0/play/game-engine-br
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
 import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
 import {
-	readGameRuntimeBoardFirstEmptyCell,
-	readGameRuntimeBoardItem,
-	readGameRuntimeBoardView,
-	readGameRuntimeInventorySlot,
-	readGameRuntimeInventoryView,
-	readGameRuntimeItemCatalogView,
-	readGameRuntimeItemView,
+	readBoardFirstEmptyCell,
+	readBoardItem,
+	readBoardView,
+	readInventorySlot,
+	readInventoryView,
+	readItemCatalogView,
+	readItemView,
 } from "~/v0/play/runtime/readers";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 
@@ -69,15 +69,15 @@ const sameInventoryView = (left: InventoryView, right: InventoryView) =>
 	left.slots.every((leftSlot, index) => sameInventorySlot(leftSlot, right.slots[index]));
 
 export const useGameBoardView = (): BoardView =>
-	useGameRuntimeSelector(readGameRuntimeBoardView, sameBoardView);
+	useGameRuntimeSelector(readBoardView, sameBoardView);
 
 export const useGameInventoryView = (): InventoryView =>
-	useGameRuntimeSelector(readGameRuntimeInventoryView, sameInventoryView);
+	useGameRuntimeSelector(readInventoryView, sameInventoryView);
 
 export const useGameBoardItem = (boardItemId: string): BoardViewItem | null => {
 	const selector = useCallback(
 		(state: GameRuntimeState) =>
-			readGameRuntimeBoardItem({
+			readBoardItem({
 				boardItemId,
 				state,
 			}) ?? null,
@@ -92,7 +92,7 @@ export const useGameBoardItem = (boardItemId: string): BoardViewItem | null => {
 export const useGameInventorySlot = (slotIndex: number): InventorySlot => {
 	const selector = useCallback(
 		(state: GameRuntimeState) =>
-			readGameRuntimeInventorySlot({
+			readInventorySlot({
 				slotIndex,
 				state,
 			}),
@@ -105,7 +105,7 @@ export const useGameInventorySlot = (slotIndex: number): InventorySlot => {
 };
 
 export const useGameBoardFirstEmptyCell = (): BoardCellSchema.Type | undefined =>
-	useGameRuntimeSelector(readGameRuntimeBoardFirstEmptyCell, sameBoardCell);
+	useGameRuntimeSelector(readBoardFirstEmptyCell, sameBoardCell);
 
 export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView => {
 	const selector = useCallback(
@@ -124,12 +124,12 @@ export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView => {
 };
 
 export const useGameItemCatalogView = (): ItemCatalogView =>
-	useGameRuntimeSelector(readGameRuntimeItemCatalogView);
+	useGameRuntimeSelector(readItemCatalogView);
 
 export const useGameItemView = (itemId: ItemId | string | undefined): ViewItem | null => {
 	const selector = useCallback(
 		(state: GameRuntimeState) =>
-			readGameRuntimeItemView({
+			readItemView({
 				itemId,
 				state,
 			}) ?? null,

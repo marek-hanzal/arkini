@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 import { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
-import { readGameRuntimeBoardView } from "~/v0/play/runtime/readers";
+import { readBoardView } from "~/v0/play/runtime/readers";
 
 const createStore = async () => {
 	const config = createEngineTestConfig();
@@ -33,7 +33,7 @@ describe("GameRuntimeStore", () => {
 			nowMs: 10,
 		});
 
-		const board = readGameRuntimeBoardView(store.getSnapshot());
+		const board = readBoardView(store.getSnapshot());
 
 		expect(calls).toBe(1);
 		expect(board.byId["item-instance:1"]).toMatchObject({
@@ -63,18 +63,14 @@ describe("GameRuntimeStore", () => {
 		});
 
 		expect(updates).toHaveLength(1);
-		expect(
-			readGameRuntimeBoardView(updates[0]!.previous).byId["item-instance:1"],
-		).toMatchObject({
+		expect(readBoardView(updates[0]!.previous).byId["item-instance:1"]).toMatchObject({
 			x: 0,
 			y: 0,
 		});
-		expect(readGameRuntimeBoardView(updates[0]!.current).byId["item-instance:1"]).toMatchObject(
-			{
-				x: 1,
-				y: 0,
-			},
-		);
+		expect(readBoardView(updates[0]!.current).byId["item-instance:1"]).toMatchObject({
+			x: 1,
+			y: 0,
+		});
 
 		unsubscribe();
 		store.destroy();

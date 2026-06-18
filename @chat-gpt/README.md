@@ -70,7 +70,7 @@ See `@chat-gpt/v0/README.md` for the v0-specific task index.
 Raw subscription/cache cleanup checkpoint:
 
 - 2026-06-18: Next mental-load reduction task is documented in `@chat-gpt/v0/v0-raw-subscription-state-task-2026-06-18.md`. Direction: prefer authoritative runtime snapshot + focused `useSyncExternalStore` selectors over manual board/inventory cache patching. Cache is only acceptable as safe selector memoization or transient visual state; gameplay truth belongs to `GameSave` snapshots.
-- 2026-06-18: Runtime reader hygiene pass is documented in `@chat-gpt/v0/v0-runtime-reader-hygiene-2026-06-18.md`. The old catch-all `readGameRuntimeViews.ts` file is gone, focused raw readers live under `src/v0/play/runtime/readers/*`, root board/inventory hooks use semantic equality, and no gameplay cache patchers remain under `src/v0`.
+- 2026-06-18: Runtime reader hygiene pass is documented in `@chat-gpt/v0/v0-runtime-reader-hygiene-2026-06-18.md` and follow-up naming cleanup in `@chat-gpt/v0/v0-runtime-reader-naming-hygiene-2026-06-18.md`. The old catch-all `readGameRuntimeViews.ts` file is gone, focused raw readers live under `src/v0/play/runtime/readers/*`, reader filenames/functions no longer repeat `GameRuntime`, root board/inventory hooks use semantic equality, and no gameplay cache patchers remain under `src/v0`.
 
 Dexie destructive refresh checkpoint:
 

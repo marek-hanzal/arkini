@@ -37,6 +37,7 @@ Reason: runtime/cache/event mental-load cleanup is done enough for now, and the 
 
 ## Completed recent task
 
+- `v0-bottom-sheet-inventory-polish-2026-06-18.md`: follow-up screenshot polish made inventory header just `Inventory`, replaced close text with a top-right `✕`, reduced big rounded corners, fixed the sheet horizontal scrollbar and aligned tile count badges to the inner bottom-right edge.
 - `v0-ui-overhaul-foundation-2026-06-18.md`: first broad UI pass removed the unused top header, introduced light pink/violet tokens, lightened board/inventory/sheets/cards, enlarged withdraw actions and added useful `data-ui` anchors.
 - `v0-runtime-reader-naming-hygiene-2026-06-18.md`: follow-up naming cleanup removed redundant `GameRuntime` prefixes from focused runtime reader files/functions; inside `play/runtime/readers`, names should be `readBoardView`, `readInventorySlot`, etc.
 - `v0-runtime-reader-hygiene-2026-06-18.md`: raw subscription follow-up split the catch-all runtime reader file into focused reader modules, added direct board-item/inventory-slot/first-empty-cell raw readers, and gave root board/inventory hooks semantic equality so derived object churn does not force unrelated redraws.

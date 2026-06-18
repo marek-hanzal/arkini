@@ -23,7 +23,7 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 						{upgrade.description}
 					</p>
 				</div>
-				<span className="shrink-0 rounded-lg bg-pink-50 px-2 py-1 text-xs font-black tabular-nums text-fuchsia-800">
+				<span className="shrink-0 rounded-sm bg-pink-50 px-2 py-1 text-xs font-black tabular-nums text-fuchsia-800">
 					{upgrade.level}/{upgrade.maxLevel}
 				</span>
 			</div>
@@ -36,7 +36,7 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 					{upgrade.currentEffects.map((effect) => (
 						<p
 							key={effect}
-							className="rounded-lg bg-emerald-50 px-2 py-1 text-xs text-emerald-800"
+							className="rounded-sm bg-emerald-50 px-2 py-1 text-xs text-emerald-800"
 						>
 							{effect}
 						</p>
@@ -52,7 +52,7 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 					{upgrade.nextEffects.map((effect) => (
 						<p
 							key={effect}
-							className="rounded-lg bg-pink-50/90 px-2 py-1 text-xs text-ak-text"
+							className="rounded-sm bg-pink-50/90 px-2 py-1 text-xs text-ak-text"
 						>
 							{effect}
 						</p>
@@ -61,7 +61,7 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 			) : null}
 
 			{upgrade.inProgress ? (
-				<div className="mt-3 rounded-lg bg-violet-50/80 p-2">
+				<div className="mt-3 rounded-sm bg-violet-50/80 p-2">
 					<div className="flex items-center justify-between text-xs font-bold text-violet-800">
 						<span>Upgrade in progress</span>
 						<span>{Math.round((upgrade.progress ?? 0) * 100)}%</span>
@@ -79,7 +79,7 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 
 			<div className="mt-3 flex flex-wrap items-center gap-2">
 				{upgrade.maxed ? (
-					<span className="rounded-lg bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800">
+					<span className="rounded-sm bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800">
 						Maxed
 					</span>
 				) : (
@@ -89,7 +89,7 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 							<span
 								key={cost.itemId}
 								className={cn(
-									"rounded-lg px-2 py-1 text-xs font-semibold",
+									"rounded-sm px-2 py-1 text-xs font-semibold",
 									enough ? "bg-pink-50 text-ak-text" : "bg-rose-50 text-rose-800",
 								)}
 							>

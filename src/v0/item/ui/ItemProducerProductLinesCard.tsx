@@ -91,7 +91,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									{line.inputs.map((input) => (
 										<div
 											key={input.itemId}
-											className="flex min-w-0 items-center justify-between gap-2 rounded-lg bg-white/68 px-2 py-2 text-[0.7rem]"
+											className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-white/68 px-2 py-2 text-[0.7rem]"
 										>
 											<span className="min-w-0 truncate font-semibold text-ak-text">
 												{input.itemId.replace(/^item:/, "")}
@@ -124,7 +124,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 							) : null}
 
 							{line.inProgress ? (
-								<div className="mt-2 rounded-lg bg-white/68 p-2">
+								<div className="mt-2 rounded-sm bg-white/68 p-2">
 									<div className="flex justify-between gap-3 font-bold text-violet-800">
 										<span>
 											Running

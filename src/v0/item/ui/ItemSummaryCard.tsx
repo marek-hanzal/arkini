@@ -16,7 +16,7 @@ export const ItemSummaryCard: FC<ItemSummaryCard.Props> = ({
 	onStore,
 }) => (
 	<div className="ak-ui-card flex min-w-0 gap-3 p-3">
-		<div className="h-16 w-16 shrink-0 rounded-xl bg-pink-50/80">
+		<div className="h-16 w-16 shrink-0 rounded-sm bg-pink-50/80">
 			<GameItemView
 				item={item}
 				variant="inventory"

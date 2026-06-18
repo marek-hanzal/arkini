@@ -71,7 +71,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
 			>
 				<SheetHeader
-					eyebrow="Item"
+					title="Item"
 					description="Nothing selected"
 					onClose={onClose}
 				/>
@@ -141,13 +141,13 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 			className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
 		>
 			<SheetHeader
-				eyebrow="Item"
+				title="Item"
 				description={item.name}
 				onClose={onClose}
 			/>
 			<div className="space-y-3 p-4 pt-3 text-sm text-ak-text">
 				{actionErrorMessage ? (
-					<div className="rounded-xl border border-rose-300/50 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800">
+					<div className="rounded-sm border border-rose-300/50 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800">
 						{actionErrorMessage}
 					</div>
 				) : null}

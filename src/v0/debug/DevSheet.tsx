@@ -158,7 +158,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 			className="max-h-[var(--ak-sheet-max-height)] min-w-0 overflow-y-auto overscroll-contain"
 		>
 			<SheetHeader
-				eyebrow="Developer"
+				title="Developer"
 				description="Debug, diagnostics and runtime tools"
 				onClose={onClose}
 			/>
@@ -215,7 +215,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							Copy failed. Use window.__ARKINI_BUG_REPORT__.dump() in the console.
 						</p>
 					) : null}
-					<pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border border-pink-200 bg-pink-50/70 p-2 text-[0.65rem] text-ak-text-muted">
+					<pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-sm border border-pink-200 bg-pink-50/70 p-2 text-[0.65rem] text-ak-text-muted">
 						{dumpPreview}
 					</pre>
 				</section>
@@ -252,7 +252,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 								key={scenario.id}
 								disabled={loadScenarioAction.isPending}
 								onClick={() => loadScenario(scenario.id)}
-								className="min-w-0 rounded-lg border border-pink-200 bg-white/70 px-3 py-2 text-left transition hover:border-fuchsia-300/70 hover:bg-fuchsia-50/60 disabled:cursor-wait disabled:opacity-60"
+								className="min-w-0 rounded-sm border border-pink-200 bg-white/70 px-3 py-2 text-left transition hover:border-fuchsia-300/70 hover:bg-fuchsia-50/60 disabled:cursor-wait disabled:opacity-60"
 							>
 								<span className="block break-words text-sm font-bold text-ak-text">
 									{scenario.label}
@@ -286,7 +286,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							<h2 className="mt-1 text-base font-semibold text-ak-text">
 								Local session
 							</h2>
-							<span className="mt-2 inline-flex rounded-lg bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800">
+							<span className="mt-2 inline-flex rounded-sm bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800">
 								dexie-save
 							</span>
 						</div>

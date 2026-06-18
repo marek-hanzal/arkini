@@ -51,16 +51,12 @@ export const GameItemContent: FC<GameItemContent.Props> = memo(
 					/>
 				)}
 				{quantity && quantity > 1 ? (
-					<span
-						className={cn(
-							"absolute bottom-0.5 rounded-md bg-fuchsia-700/90 px-1 text-[0.62rem] font-bold text-white shadow-sm",
-							item.label ? "left-0.5" : "right-0.5",
-						)}
-					>
+					<span className="absolute bottom-0 right-[8px] min-w-4 rounded-sm bg-fuchsia-700/90 px-1 text-center text-[0.62rem] font-bold text-white shadow-sm">
 						{quantity}
 					</span>
+				) : item.label ? (
+					<ItemLevelBadge label={item.label} />
 				) : null}
-				{item.label ? <ItemLevelBadge label={item.label} /> : null}
 			</div>
 		);
 	},

@@ -1,12 +1,15 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
+import { placeGameSaveInventoryInstanceFx } from "~/v0/game/engine/fx/placeGameSaveInventoryInstanceFx";
 import { placeGameSaveInventoryItemsFx } from "~/v0/game/engine/fx/placeGameSaveInventoryItemsFx";
+import { readBoardItemRuntimeStateStatus } from "~/v0/game/engine/fx/readBoardItemRuntimeStateStatus";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import type { GameActionBoardItemStashSchema } from "~/v0/game/engine/model/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
+import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace stashBoardItemFx {
@@ -36,10 +39,61 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 		);
 	}
 
+	const stateStatus = readBoardItemRuntimeStateStatus({
+		itemInstanceId: item.id,
+		save,
+	});
+	if (stateStatus.busy) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"item_busy",
+				"Board item has a running job and cannot be moved to inventory.",
+			),
+		);
+	}
+
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
 	delete nextSave.board.items[item.id];
+
+	const consumedEvent = {
+		from: {
+			kind: "board" as const,
+			itemInstanceId: item.id,
+		},
+		itemId: item.itemId,
+		reason: "board-stash" as const,
+		type: "item.consumed" as const,
+	} satisfies GameEvent;
+
+	if (stateStatus.preservable) {
+		const events: GameEvent[] = [];
+		yield* placeGameSaveInventoryInstanceFx({
+			events,
+			itemId: item.itemId,
+			itemInstanceId: item.id,
+			reason: "board-stash",
+			slots: nextSave.inventory.slots,
+		}).pipe(
+			Effect.catchTag("GamePlacementFailed", (error) =>
+				Effect.fail(GameEngineError.actionRejected(error.reason, "Inventory is full.")),
+			),
+		);
+		nextSave.updatedAtMs = nowMs;
+
+		return {
+			events: [
+				consumedEvent,
+				...events,
+			],
+			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				save: nextSave,
+			}),
+			save: nextSave,
+		} satisfies GameEngineResult;
+	}
+
 	removeBoardItemRuntimeState({
 		itemInstanceId: item.id,
 		save: nextSave,
@@ -67,15 +121,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 
 	return {
 		events: [
-			{
-				from: {
-					kind: "board" as const,
-					itemInstanceId: item.id,
-				},
-				itemId: item.itemId,
-				reason: "board-stash" as const,
-				type: "item.consumed" as const,
-			},
+			consumedEvent,
 			...placed.events,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({

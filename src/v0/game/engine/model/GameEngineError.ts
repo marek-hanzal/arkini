@@ -17,6 +17,7 @@ export type GameEngineError =
 				| "input_unavailable"
 				| "invalid_actor"
 				| "invalid_merge"
+				| "item_busy"
 				| "craft_in_progress"
 				| "missing_requirement"
 				| GamePlacementFailureReason

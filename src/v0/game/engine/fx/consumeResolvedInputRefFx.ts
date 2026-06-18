@@ -1,8 +1,13 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionResolvedInputRef } from "~/v0/game/engine/model/GameActionResolvedInputRef";
+import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import {
+	isGameSaveInventoryInstance,
+	readGameSaveInventorySlotQuantity,
+} from "~/v0/game/engine/model/GameSaveInventorySlot";
 import type { GameSave, GameSaveInventoryStack } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace consumeResolvedInputRefFx {
@@ -59,7 +64,7 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 							),
 						);
 					}
-					const previousQuantity = slot.quantity;
+					const previousQuantity = readGameSaveInventorySlotQuantity(slot);
 					const nextQuantity = previousQuantity - inventoryRef.quantity;
 					if (nextQuantity < 0) {
 						return yield* Effect.fail(
@@ -69,13 +74,21 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 							),
 						);
 					}
-					nextSave.inventory.slots[inventoryRef.slotIndex] =
-						nextQuantity === 0
-							? null
-							: ({
-									itemId: slot.itemId,
-									quantity: nextQuantity,
-								} satisfies GameSaveInventoryStack);
+					if (isGameSaveInventoryInstance(slot)) {
+						nextSave.inventory.slots[inventoryRef.slotIndex] = null;
+						removeBoardItemRuntimeState({
+							itemInstanceId: slot.id,
+							save: nextSave,
+						});
+					} else {
+						nextSave.inventory.slots[inventoryRef.slotIndex] =
+							nextQuantity === 0
+								? null
+								: ({
+										itemId: slot.itemId,
+										quantity: nextQuantity,
+									} satisfies GameSaveInventoryStack);
+					}
 					events.push({
 						from: {
 							kind: "inventory",

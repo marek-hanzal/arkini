@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { UpgradeCostView } from "~/v0/upgrade/view/UpgradeCostViewSchema";
 import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
@@ -16,7 +17,10 @@ const inventoryQuantityByItemId = (save: GameSave) => {
 	const available = new Map<string, number>();
 	for (const slot of save.inventory.slots) {
 		if (!slot) continue;
-		available.set(slot.itemId, (available.get(slot.itemId) ?? 0) + slot.quantity);
+		available.set(
+			slot.itemId,
+			(available.get(slot.itemId) ?? 0) + readGameSaveInventorySlotQuantity(slot),
+		);
 	}
 	return available;
 };

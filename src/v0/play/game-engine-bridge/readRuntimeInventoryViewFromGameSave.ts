@@ -1,4 +1,8 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import {
+	isGameSaveInventoryInstance,
+	readGameSaveInventorySlotQuantity,
+} from "~/v0/game/engine/model/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ItemId } from "~/v0/manifest/manifestId";
@@ -30,11 +34,13 @@ export const readRuntimeInventoryViewFromGameSave = ({
 					slotIndex,
 					stack: stack
 						? {
-								id: `runtime:inventory:${slotIndex}:${stack.itemId}`,
+								id: isGameSaveInventoryInstance(stack)
+									? stack.id
+									: `runtime:inventory:${slotIndex}:${stack.itemId}`,
 								itemId: stack.itemId as ItemId,
-								quantity: stack.quantity,
+								quantity: readGameSaveInventorySlotQuantity(stack),
 								state: {},
-								stateful: false,
+								stateful: isGameSaveInventoryInstance(stack),
 								stateJson: emptyStateJson,
 							}
 						: undefined,

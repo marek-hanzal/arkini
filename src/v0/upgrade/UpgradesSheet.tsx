@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { UpgradeCard } from "~/v0/upgrade/ui/UpgradeCard";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
@@ -45,7 +46,7 @@ const inventoryInputRefsForUpgrade = ({
 		for (const [slotIndex, slot] of snapshot.save.inventory.slots.entries()) {
 			if (!slot || slot.itemId !== cost.itemId || remaining <= 0) continue;
 
-			const quantity = Math.min(slot.quantity, remaining);
+			const quantity = Math.min(readGameSaveInventorySlotQuantity(slot), remaining);
 			refs.push({
 				kind: "inventory",
 				quantity,

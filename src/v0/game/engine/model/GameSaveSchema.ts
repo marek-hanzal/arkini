@@ -24,8 +24,17 @@ export const GameSaveInventoryStackSchema = z
 	})
 	.strict();
 
+export const GameSaveInventoryInstanceSchema = z
+	.object({
+		id: IdSchema,
+		itemId: IdSchema,
+		kind: z.literal("instance"),
+	})
+	.strict();
+
 export const GameSaveInventorySlotSchema = z.union([
 	GameSaveInventoryStackSchema,
+	GameSaveInventoryInstanceSchema,
 	z.null(),
 ]);
 
@@ -244,6 +253,46 @@ const readBoardItemDefinition = ({
 	};
 };
 
+const readItemInstanceDefinition = ({
+	config,
+	save,
+	itemInstanceId,
+}: {
+	config: GameConfig;
+	save: GameSave;
+	itemInstanceId: string;
+}) => {
+	const board = readBoardItemDefinition({
+		config,
+		itemInstanceId,
+		save,
+	});
+	if (board) {
+		return {
+			item: board.item,
+			itemId: board.boardItem.itemId,
+			location: "board" as const,
+		};
+	}
+
+	for (const [slotIndex, slot] of save.inventory.slots.entries()) {
+		if (!slot || !("kind" in slot) || slot.kind !== "instance" || slot.id !== itemInstanceId) {
+			continue;
+		}
+
+		const item = config.items[slot.itemId];
+		if (!item) return undefined;
+		return {
+			item,
+			itemId: slot.itemId,
+			location: "inventory" as const,
+			slotIndex,
+		};
+	}
+
+	return undefined;
+};
+
 const readStoredRequirementSlots = ({
 	config,
 	save,
@@ -253,7 +302,7 @@ const readStoredRequirementSlots = ({
 	save: GameSave;
 	targetItemInstanceId: string;
 }) => {
-	const target = readBoardItemDefinition({
+	const target = readItemInstanceDefinition({
 		config,
 		itemInstanceId: targetItemInstanceId,
 		save,
@@ -491,6 +540,7 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	const inventoryInstanceIds = new Set<string>();
 	for (const [slotIndex, slot] of save.inventory.slots.entries()) {
 		if (!slot) continue;
 
@@ -509,7 +559,39 @@ const validateGameSaveAgainstConfig = (
 			continue;
 		}
 
-		if (slot.quantity > item.maxStackSize) {
+		if ("kind" in slot && slot.kind === "instance") {
+			if (save.board.items[slot.id]) {
+				addSaveIssue(
+					ctx,
+					[
+						"inventory",
+						"slots",
+						slotIndex,
+						"id",
+					],
+					`Inventory instance id "${slot.id}" already exists on board.`,
+				);
+			}
+
+			if (inventoryInstanceIds.has(slot.id)) {
+				addSaveIssue(
+					ctx,
+					[
+						"inventory",
+						"slots",
+						slotIndex,
+						"id",
+					],
+					`Duplicate inventory instance id "${slot.id}".`,
+				);
+			} else {
+				inventoryInstanceIds.add(slot.id);
+			}
+
+			continue;
+		}
+
+		if (!("kind" in slot) && slot.quantity > item.maxStackSize) {
 			addSaveIssue(
 				ctx,
 				[
@@ -663,7 +745,7 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [producerItemInstanceId, lineState] of Object.entries(save.producerLines)) {
-		const target = readBoardItemDefinition({
+		const target = readItemInstanceDefinition({
 			config,
 			itemInstanceId: producerItemInstanceId,
 			save,
@@ -699,7 +781,7 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [producerItemInstanceId, state] of Object.entries(save.producerInputs)) {
-		const target = readBoardItemDefinition({
+		const target = readItemInstanceDefinition({
 			config,
 			itemInstanceId: producerItemInstanceId,
 			save,
@@ -836,7 +918,7 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [targetItemInstanceId, state] of Object.entries(save.craftInputs)) {
-		const target = readBoardItemDefinition({
+		const target = readItemInstanceDefinition({
 			config,
 			itemInstanceId: targetItemInstanceId,
 			save,
@@ -980,7 +1062,7 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [stashItemInstanceId, state] of Object.entries(save.stashes)) {
-		const target = readBoardItemDefinition({
+		const target = readItemInstanceDefinition({
 			config,
 			itemInstanceId: stashItemInstanceId,
 			save,
@@ -1013,14 +1095,19 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [targetItemInstanceId, state] of Object.entries(save.storedRequirements)) {
-		if (!save.board.items[targetItemInstanceId]) {
+		const target = readItemInstanceDefinition({
+			config,
+			itemInstanceId: targetItemInstanceId,
+			save,
+		});
+		if (!target) {
 			addSaveIssue(
 				ctx,
 				[
 					"storedRequirements",
 					targetItemInstanceId,
 				],
-				`Stored requirement target "${targetItemInstanceId}" must be a board item.`,
+				`Stored requirement target "${targetItemInstanceId}" must reference a save item instance.`,
 			);
 			continue;
 		}
@@ -1104,6 +1191,7 @@ const validateGameSaveAgainstConfig = (
 
 export type GameSaveBoardItem = z.infer<typeof GameSaveBoardItemSchema>;
 export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema>;
+export type GameSaveInventoryInstance = z.infer<typeof GameSaveInventoryInstanceSchema>;
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveProducerDeliveryItem = z.infer<typeof GameSaveProducerDeliveryItemSchema>;
 export type GameSaveProducerDelivery = z.infer<typeof GameSaveProducerDeliverySchema>;

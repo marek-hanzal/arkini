@@ -361,3 +361,8 @@ Kontrolní body:
 8. `visual-event-planner-cleanup`
 
 Nedělat to v jednom mega commitu. Mega commit je jen zip bomb s lepším marketingem.
+
+
+### T6: Inventory stateless stack policy
+
+Status: DONE in `v0-inventory-stateless-stack-policy-2026-06-18.md`. Inventory slots now distinguish stateless stacks from preserved item instances. Stateful board items with editable runtime state move to inventory as `{ kind: "instance", id, itemId }`, running-job actors reject stash with `item_busy`, stateless output never stacks into instance slots, and placing an inventory instance back on board preserves the same item instance id/state buckets.

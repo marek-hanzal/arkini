@@ -150,6 +150,56 @@ describe("placeGameSaveItemsFx", () => {
 		]);
 	});
 
+	it("does not stack stateless output into an inventory instance slot", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			kind: "instance",
+		};
+
+		const result = runPlacement({
+			config,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.inventory.slots).toEqual([
+			{
+				id: "item-instance:2",
+				itemId: "item:twig",
+				kind: "instance",
+			},
+			{
+				itemId: "item:twig",
+				quantity: 1,
+			},
+		]);
+	});
+
 	it("keeps placement atomic when board and inventory cannot fit the whole output", () => {
 		const config = createEngineTestConfig({
 			game: {

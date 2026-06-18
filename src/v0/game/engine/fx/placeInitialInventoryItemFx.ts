@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { isGameSaveInventoryStack } from "~/v0/game/engine/model/GameSaveInventorySlot";
 import type { GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace placeInitialInventoryItemFx {
@@ -29,7 +30,11 @@ export const placeInitialInventoryItemFx = Effect.fn("placeInitialInventoryItemF
 	let remainingQuantity = quantity;
 
 	for (const slot of inventorySlots) {
-		if (!slot || slot.itemId !== itemId || slot.quantity >= item.maxStackSize) {
+		if (
+			!isGameSaveInventoryStack(slot) ||
+			slot.itemId !== itemId ||
+			slot.quantity >= item.maxStackSize
+		) {
 			continue;
 		}
 

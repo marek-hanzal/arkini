@@ -1,7 +1,8 @@
 import { Effect } from "effect";
-import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInputsFx";
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
-import { splitCraftRequirementsFx } from "~/v0/game/engine/fx/splitCraftRequirementsFx";
+import { readCraftBoardItemFx } from "~/v0/game/engine/fx/readCraftBoardItemFx";
+import { readCraftInputQuantitiesFx } from "~/v0/game/engine/fx/readCraftInputQuantitiesFx";
+import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/engine/model/GameActionCraftStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -20,31 +21,12 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 	save,
 	action,
 }: checkCraftStartReadinessFx.Props) {
-	const recipe = config.craftRecipes[action.recipeId];
-	if (!recipe) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing craft recipe "${action.recipeId}".`),
-		);
-	}
-
-	const targetItem = save.board.items[action.targetItemInstanceId];
-	if (!targetItem) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"invalid_actor",
-				`Craft target "${action.targetItemInstanceId}" is not on the board.`,
-			),
-		);
-	}
-	const targetDefinition = config.items[targetItem.itemId];
-	if (targetDefinition?.craftRecipeId !== action.recipeId) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"invalid_actor",
-				`Item "${targetItem.itemId}" cannot start craft recipe "${action.recipeId}".`,
-			),
-		);
-	}
+	const target = yield* readCraftBoardItemFx({
+		config,
+		recipeId: action.recipeId,
+		save,
+		targetItemInstanceId: action.targetItemInstanceId,
+	});
 
 	const runningCraftJob = Object.values(save.craftJobs).find(
 		(job) => job.targetItemInstanceId === action.targetItemInstanceId,
@@ -58,32 +40,35 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		);
 	}
 
-	const requirements = yield* splitCraftRequirementsFx({
-		requirements: recipe.requirements,
+	const storedInputs = yield* readCraftInputQuantitiesFx({
+		save,
+		targetItemInstanceId: action.targetItemInstanceId,
+	});
+	for (const input of target.recipe.inputs) {
+		const storedQuantity = storedInputs.get(input.itemId) ?? 0;
+		if (storedQuantity < input.quantity) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"input_unavailable",
+					`Craft input "${input.itemId}" is incomplete (${storedQuantity}/${input.quantity}).`,
+				),
+			);
+		}
+	}
+
+	const storedRequirementItems = yield* readStoredRequirementQuantitiesFx({
+		save,
+		targetItemInstanceId: action.targetItemInstanceId,
 	});
 	yield* checkGameRequirementsFx({
 		config,
-		requirements: requirements.passiveRequirements,
+		requirements: target.recipe.requirements,
 		save,
-	});
-	yield* checkActivationInputsFx({
-		inputRefs: action.inputRefs,
-		inputs: recipe.inputs,
-		save,
-	});
-	yield* checkActivationInputsFx({
-		inputRefs: action.requirementRefs,
-		inputs: requirements.storedRequirements.map((requirement) => ({
-			consume: true,
-			itemId: requirement.itemId,
-			quantity: requirement.quantity,
-		})),
-		save,
+		storedItems: storedRequirementItems,
 	});
 
 	return {
-		recipe,
-		requirements,
-		targetItem,
+		recipe: target.recipe,
+		targetItem: target.targetItem,
 	};
 });

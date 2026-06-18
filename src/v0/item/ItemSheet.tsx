@@ -85,6 +85,24 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		});
 	};
 
+	const startCraft = () => {
+		if (!liveCraft) return;
+		void itemAction.run({
+			recipeId: liveCraft.id,
+			targetItemInstanceId: boardItem.id,
+			type: "craft.start",
+		});
+	};
+
+	const withdrawCraftInput = (itemId: string) => {
+		void itemAction.run({
+			itemId,
+			quantity: 1,
+			targetItemInstanceId: boardItem.id,
+			type: "craft.input.withdraw",
+		});
+	};
+
 	const withdrawProductLineInput = (productId: string, itemId: string) => {
 		void itemAction.run({
 			itemId,
@@ -126,6 +144,9 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					<ItemCraftCard
 						craft={liveCraft}
 						items={items}
+						pending={itemAction.isPending}
+						onStart={startCraft}
+						onWithdrawInput={withdrawCraftInput}
 					/>
 				) : null}
 				{boardItem.activation ? (

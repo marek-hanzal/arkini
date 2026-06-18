@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
 import { CraftProgressPhaseSchema } from "./CraftProgressPhaseSchema";
+import { ActivationRequirementViewSchema } from "./ActivationRequirementViewSchema";
 
 export const CraftProgressViewSchema = z.object({
 	id: z.string().min(1),
@@ -13,6 +14,7 @@ export const CraftProgressViewSchema = z.object({
 		}),
 	),
 	delivered: z.record(z.string(), z.number().int().nonnegative()),
+	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	inputProgress: z.number(),
 	timeProgress: z.number(),
 	progress: z.number(),

@@ -26,9 +26,9 @@ describe("applyGameActionFx", () => {
 
 		const result = runAction({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -164,9 +164,9 @@ describe("applyGameActionFx", () => {
 
 		const started = runAction({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:shred",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -407,9 +407,9 @@ describe("applyGameActionFx", () => {
 
 		const result = runAction({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -449,9 +449,9 @@ describe("applyGameActionFx", () => {
 
 		const result = runActionEither({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -700,8 +700,8 @@ describe("applyGameActionFx", () => {
 
 		const result = runActionEither({
 			action: {
-				inputRefs: [],
 				stashItemInstanceId: "item-instance:1",
+				inputRefs: [],
 				type: "stash.open",
 			},
 			config,
@@ -779,8 +779,8 @@ describe("applyGameActionFx", () => {
 
 		const result = runActionEither({
 			action: {
-				inputRefs: [],
 				stashItemInstanceId: "item-instance:2",
+				inputRefs: [],
 				type: "stash.open",
 			},
 			config,
@@ -905,9 +905,9 @@ describe("applyGameActionFx", () => {
 		});
 		const first = runAction({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -917,9 +917,9 @@ describe("applyGameActionFx", () => {
 
 		const second = runAction({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -942,9 +942,9 @@ describe("applyGameActionFx", () => {
 		});
 		const first = runAction({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -954,9 +954,9 @@ describe("applyGameActionFx", () => {
 
 		const second = runActionEither({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -980,9 +980,7 @@ describe("applyGameActionFx", () => {
 			nowMs: 0,
 		});
 		const action = {
-			inputRefs: [],
 			recipeId: "craft:plank",
-			requirementRefs: [],
 			targetItemInstanceId: "item-instance:1",
 			type: "craft.start" as const,
 		};
@@ -1009,87 +1007,240 @@ describe("applyGameActionFx", () => {
 		}
 	});
 
-	it("starts craft jobs by consuming inputs and reserving stored requirements", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			items: {
-				...baseConfig.items,
-				"item:craft-table": {
-					assetId: "asset:test",
-					code: "craft-table",
-					craftRecipeId: "craft:plank",
-					description: "Craft table",
-					maxStackSize: 1,
-					name: "Craft Table",
-					sort: 8,
-					tags: [],
-					tier: 0,
-				},
-			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
-				"craft:plank": {
-					...baseConfig.craftRecipes["craft:plank"],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:axe",
-							quantity: 1,
-							type: "stored",
-						},
-					],
-				},
-			},
-			game: {
-				...baseConfig.game,
-				board: {
-					height: 2,
-					width: 3,
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:craft-table",
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [
-					{
-						itemId: "item:twig",
-						quantity: 2,
-					},
-					{
-						itemId: "item:axe",
-						quantity: 1,
-					},
-				],
-			},
+	it("stores craft inputs gradually and starts only after required inputs are complete", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
 		});
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 2,
+		};
+
+		const firstDeposit = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(firstDeposit.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(firstDeposit.save.craftInputs).toEqual({
+			"item-instance:1": {
+				items: {
+					"item:twig": 1,
+				},
+			},
+		});
+		expect(firstDeposit.events).toMatchObject([
+			{
+				itemId: "item:twig",
+				reason: "craft-input-store",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:twig",
+				nextQuantity: 1,
+				previousQuantity: 0,
+				type: "craft_input.stored",
+			},
+		]);
+
+		const earlyStart = runActionEither({
+			action: {
+				recipeId: "craft:plank",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 150,
+			save: firstDeposit.save,
+		});
+		expect(earlyStart._tag).toBe("Left");
+		if (earlyStart._tag === "Left") {
+			expect(earlyStart.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "input_unavailable",
+			});
+		}
+
+		const secondDeposit = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 200,
+			save: firstDeposit.save,
+		});
+
+		expect(secondDeposit.save.inventory.slots[0]).toBeNull();
+		expect(secondDeposit.save.craftInputs["item-instance:1"]?.items).toEqual({
+			"item:twig": 2,
+		});
+
+		const started = runAction({
+			action: {
+				recipeId: "craft:plank",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 300,
+			save: secondDeposit.save,
+		});
+
+		expect(started.save.craftInputs).toEqual({});
+		expect(started.save.craftJobs["job:1"]).toMatchObject({
+			completesAtMs: 1300,
+			recipeId: "craft:plank",
+			targetItemInstanceId: "item-instance:1",
+			startedAtMs: 300,
+		});
+		expect(started.events).toEqual([
+			{
+				completesAtMs: 1300,
+				jobId: "job:1",
+				recipeId: "craft:plank",
+				startedAtMs: 300,
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.started",
+			},
+		]);
+	});
+
+	it("withdraws one stored craft input through producer-style board placement", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 2,
+			},
+		};
 
 		const result = runAction({
 			action: {
-				inputRefs: [
-					{
-						kind: "inventory",
-						quantity: 2,
-						slotIndex: 0,
-					},
-				],
+				itemId: "item:twig",
+				quantity: 1,
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.withdraw",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.craftInputs["item-instance:1"]?.items).toEqual({
+			"item:twig": 1,
+		});
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:twig",
+				nextQuantity: 1,
+				previousQuantity: 2,
+				quantity: 1,
+				type: "craft_input.withdrawn",
+			},
+			{
+				itemId: "item:twig",
+				reason: "craft-input-withdraw",
+				to: {
+					kind: "board",
+					x: 1,
+					y: 0,
+				},
+				type: "item.created",
+			},
+		]);
+	});
+
+	it("keeps craft input stored when withdraw placement is unavailable", () => {
+		const config = createEngineCraftTableTestConfig({
+			boardItemCount: 2,
+			noRecipeInputs: false,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.inventory.slots[1] = {
+			itemId: "item:plank",
+			quantity: 2,
+		};
+		save.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 1,
+			},
+		};
+
+		const result = runActionEither({
+			action: {
+				itemId: "item:twig",
+				quantity: 1,
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.withdraw",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		expect(save.craftInputs["item-instance:1"]?.items).toEqual({
+			"item:twig": 1,
+		});
+	});
+
+	it("blocks craft input withdraw after craft start", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 2,
+			},
+		};
+		const started = runAction({
+			action: {
 				recipeId: "craft:plank",
 				targetItemInstanceId: "item-instance:1",
-				requirementRefs: [
-					{
-						kind: "inventory",
-						quantity: 1,
-						slotIndex: 1,
-					},
-				],
 				type: "craft.start",
 			},
 			config,
@@ -1097,36 +1248,25 @@ describe("applyGameActionFx", () => {
 			save,
 		});
 
-		expect(result.save.inventory.slots).toEqual([
-			null,
-			null,
-		]);
-		expect(result.save.craftJobs["job:1"]).toMatchObject({
-			completesAtMs: 1100,
-			recipeId: "craft:plank",
-			targetItemInstanceId: "item-instance:1",
-			startedAtMs: 100,
-		});
-		expect(result.events.map((event) => event.type)).toEqual([
-			"item.consumed",
-			"item.consumed",
-			"craft.started",
-		]);
-		expect(result.events).toMatchObject([
-			{
+		const result = runActionEither({
+			action: {
 				itemId: "item:twig",
-				reason: "craft-input",
-			},
-			{
-				itemId: "item:axe",
-				reason: "craft-requirement",
-			},
-			{
-				completesAtMs: 1100,
+				quantity: 1,
 				targetItemInstanceId: "item-instance:1",
-				type: "craft.started",
+				type: "craft.input.withdraw",
 			},
-		]);
+			config,
+			nowMs: 200,
+			save: started.save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "craft_in_progress",
+			});
+		}
 	});
 
 	it("stores producer requirements on the producer item before product start", () => {
@@ -1183,9 +1323,9 @@ describe("applyGameActionFx", () => {
 		});
 		const started = runAction({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -1246,9 +1386,9 @@ describe("applyGameActionFx", () => {
 
 		const result = runActionEither({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -1502,9 +1642,9 @@ describe("applyGameActionFx", () => {
 
 		const result = runActionEither({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,

@@ -76,6 +76,12 @@ export const resolveDropIntent = ({
 		) ||
 			targetItem.activation?.productLines?.some(
 				(line) => line.enabled && line.missingRequirementItemIds.includes(sourceItemId),
+			) ||
+			targetItem.craft?.requirements?.some(
+				(requirement) =>
+					requirement.type === "stored" &&
+					requirement.itemId === sourceItemId &&
+					requirement.stored < requirement.capacity,
 			),
 	);
 

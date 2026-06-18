@@ -18,6 +18,7 @@ const createdCause = (
 	>["reason"],
 ): ActionVisualAnimationSchema.Type["cause"] => {
 	if (reason === "product-output" || reason === "producer-input-withdraw") return "producer";
+	if (reason === "craft-input-withdraw") return "craft";
 	if (reason === "stash-output") return "stash";
 	return "inventory";
 };
@@ -110,7 +111,7 @@ const consumedEvent = (
 
 	return {
 		animation: ActionVisualAnimation.state({
-			cause: "activation",
+			cause: event.reason === "craft-input-store" ? "craft" : "activation",
 			groupId: consumedGroupId(event),
 		}),
 		itemId: event.itemId,

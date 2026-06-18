@@ -53,6 +53,7 @@ GameConfig / tick engine stabilization checkpoint:
 - T2 is done in `@chat-gpt/v0/v0-craft-target-replacement-2026-06-18.md`: completed craft replaces the target item in-place with one result and removed the old craft output/return scheduled-spawn path.
 - T2 visual follow-up is done in `@chat-gpt/v0/v0-craft-replace-crossfade-2026-06-18.md`: craft replacement now uses TileEngine `replace-in` / `replace-out` crossfade motion with an old-item board transient.
 - T3 is done in `@chat-gpt/v0/v0-stash-atomic-output-2026-06-18.md` plus `@chat-gpt/v0/v0-stash-full-open-output-2026-06-18.md`: stash open applies all remaining output in one atomic batch, places sequentially like producer, depletes in one click and fails without partial mutation if the whole batch does not fit.
+- Side quest is done in `@chat-gpt/v0/v0-craft-partial-input-withdraw-2026-06-18.md`: craft targets persist partial input progress in `save.craftInputs`, start only after inputs are complete, lock inputs on start, and allow pre-start single-unit withdraw through producer-style seeded placement.
 - Stabilization priority: effective upgrades must validate against invalid zero/negative states; inventory may contain anything but stacks are stateless; `GameSaveConfigSchema` should guard monotonic ID counters; visual event flow needs either an exhaustive planner from engine events or a much stricter bridge.
 
 Current task candidates:

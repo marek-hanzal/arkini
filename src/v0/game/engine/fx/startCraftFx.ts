@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -29,28 +28,11 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 		config,
 		save,
 	});
-	const consumedInputs = yield* consumeActivationInputsFx({
-		inputRefs: action.inputRefs,
-		inputs: checked.recipe.inputs,
-		nowMs,
-		reason: "craft-input",
-		save,
-	});
-	const consumedRequirements = yield* consumeActivationInputsFx({
-		inputRefs: action.requirementRefs,
-		inputs: checked.requirements.storedRequirements.map((requirement) => ({
-			consume: true,
-			itemId: requirement.itemId,
-			quantity: requirement.quantity,
-		})),
-		nowMs,
-		reason: "craft-requirement",
-		save: consumedInputs.save,
-	});
 
 	const nextSave = yield* cloneGameSaveFx({
-		save: consumedRequirements.save,
+		save,
 	});
+	delete nextSave.craftInputs[action.targetItemInstanceId];
 	const jobId = yield* createGameJobIdFx({
 		save: nextSave,
 	});
@@ -66,8 +48,6 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 
 	return {
 		events: [
-			...consumedInputs.events,
-			...consumedRequirements.events,
 			{
 				completesAtMs,
 				jobId,

@@ -13,6 +13,8 @@ import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/engine/fx/removeTileFx";
 import { setProducerProductLineEnabledFx } from "~/v0/game/engine/fx/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/engine/fx/startCraftFx";
+import { storeCraftInputFx } from "~/v0/game/engine/fx/storeCraftInputFx";
+import { withdrawCraftInputFx } from "~/v0/game/engine/fx/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/v0/game/engine/fx/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/v0/game/engine/fx/withdrawProducerInputFx";
 import { startProducerProductFx } from "~/v0/game/engine/fx/startProducerProductFx";
@@ -84,6 +86,30 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(swapAction) =>
 				swapBoardItemsFx({
 					action: swapAction,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "craft.input.store",
+			},
+			(storeCraftInputAction) =>
+				storeCraftInputFx({
+					action: storeCraftInputAction,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "craft.input.withdraw",
+			},
+			(withdrawCraftInputAction) =>
+				withdrawCraftInputFx({
+					action: withdrawCraftInputAction,
+					config: gameConfig.config,
 					nowMs,
 					save,
 				}),

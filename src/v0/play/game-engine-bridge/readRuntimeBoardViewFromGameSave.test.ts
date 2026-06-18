@@ -103,4 +103,116 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			deliveryBlocked: true,
 		});
 	});
+
+	it("shows partial craft input progress from persistent craft input state", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					assetId: "asset:test",
+					code: "craft-table",
+					craftRecipeId: "craft:plank",
+					description: "Craft table",
+					maxStackSize: 1,
+					name: "Craft Table",
+					sort: 8,
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 1,
+			},
+		};
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.craft).toMatchObject({
+			acceptedInputItemIds: [
+				"item:twig",
+			],
+			canAcceptInputs: true,
+			delivered: {
+				"item:twig": 1,
+			},
+			inputProgress: 0.5,
+			phase: "collecting_inputs",
+			progress: 0.5,
+		});
+	});
+
+	it("marks craft inputs complete without auto-starting the craft", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					assetId: "asset:test",
+					code: "craft-table",
+					craftRecipeId: "craft:plank",
+					description: "Craft table",
+					maxStackSize: 1,
+					name: "Craft Table",
+					sort: 8,
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 2,
+			},
+		};
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.craft).toMatchObject({
+			acceptedInputItemIds: [],
+			canAcceptInputs: false,
+			complete: false,
+			inputProgress: 1,
+			phase: "collecting_inputs",
+			progress: 1,
+		});
+	});
 });

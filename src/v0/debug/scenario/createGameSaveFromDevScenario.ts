@@ -72,6 +72,7 @@ export const createGameSaveFromDevScenario = ({
 			items: boardItems,
 		},
 		createdAtMs: nowMs,
+		craftInputs: {},
 		craftJobs: {},
 		gameId: config.game.id,
 		inventory: {

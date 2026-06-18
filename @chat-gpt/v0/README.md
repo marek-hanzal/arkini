@@ -16,7 +16,7 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ### 1. Stabilization epic
 
-Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement and T3 stash output atomicity/full-open policy are done. Current next coding task is T4 effective upgrade/config validation. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
+Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement and T3 stash output atomicity/full-open policy are done. Craft partial input/withdraw side quest is also done. Current next coding task is T4 effective upgrade/config validation. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
 
 ## Deferred / historical notes
 
@@ -33,6 +33,7 @@ Reason: craft and stash completion now mutate save atomically. The next big stab
 
 ## Completed recent task
 
+- `v0-craft-partial-input-withdraw-2026-06-18.md`: craft targets now persist partial input progress, start only after stored inputs are complete, support pre-start single-unit withdraw through producer-style placement, and keep completion on the existing target replacement/crossfade path.
 - `v0-stash-full-open-output-2026-06-18.md`: follow-up k T3: stash open rolls every remaining charge in one click, places the whole output batch sequentially/atomically, and fails without partial save mutation when the full batch does not fit.
 - `v0-stash-atomic-output-2026-06-18.md`: stash open now applies output/depletion atomically, fails without save mutation when placement is unavailable, and removed scheduled board remove/replace plumbing.
 - `v0-craft-target-replacement-2026-06-18.md`: craft completion now replaces the board target in-place with exactly one result item and removed the old craft output/return scheduled-spawn path.

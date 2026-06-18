@@ -789,6 +789,7 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	const runningCraftJobsByTargetItemInstanceId = new Map<string, string>();
 	for (const [jobId, job] of Object.entries(save.craftJobs)) {
 		if (job.id !== jobId) {
 			addSaveIssue(
@@ -830,6 +831,21 @@ const validateGameSaveAgainstConfig = (
 				],
 				`Craft job target "${job.targetItemInstanceId}" must reference item recipe "${job.recipeId}".`,
 			);
+		}
+
+		const runningJobId = runningCraftJobsByTargetItemInstanceId.get(job.targetItemInstanceId);
+		if (runningJobId) {
+			addSaveIssue(
+				ctx,
+				[
+					"craftJobs",
+					jobId,
+					"targetItemInstanceId",
+				],
+				`Craft target "${job.targetItemInstanceId}" already has running job "${runningJobId}".`,
+			);
+		} else {
+			runningCraftJobsByTargetItemInstanceId.set(job.targetItemInstanceId, jobId);
 		}
 
 		for (const [index, returnItem] of job.returnItems.entries()) {

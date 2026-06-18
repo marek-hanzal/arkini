@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
 import { GameSaveConfigSchema, type GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
 const createInitialSave = (props: createInitialGameSaveFx.Props) =>
@@ -16,6 +17,15 @@ const createProducerJob = (id: string) => ({
 	productId: "product:test",
 	producerItemInstanceId: "item-instance:1",
 	startedAtMs: 0,
+});
+
+const createCraftJob = (id: string, targetItemInstanceId: string) => ({
+	completesAtMs: 1000,
+	id,
+	recipeId: "craft:plank",
+	returnItems: [],
+	startedAtMs: 0,
+	targetItemInstanceId,
 });
 
 const createQueueUpgradeConfig = () =>
@@ -106,6 +116,47 @@ describe("GameSaveConfigSchema", () => {
 
 		expect(result.success).toBe(false);
 		expect(result.error?.issues[0]?.message).toContain("maxStackSize");
+	});
+
+	it("rejects multiple craft jobs for the same target item", () => {
+		const config = createEngineCraftTableTestConfig({
+			boardItemCount: 2,
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.craftJobs["job:1"] = createCraftJob("job:1", "item-instance:1");
+		invalidSave.craftJobs["job:2"] = createCraftJob("job:2", "item-instance:1");
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("already has running job");
+	});
+
+	it("accepts parallel craft jobs on different target items", () => {
+		const config = createEngineCraftTableTestConfig({
+			boardItemCount: 2,
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const parallelSave = cloneSave(save);
+		parallelSave.craftJobs["job:1"] = createCraftJob("job:1", "item-instance:1");
+		parallelSave.craftJobs["job:2"] = createCraftJob("job:2", "item-instance:2");
+
+		expect(() =>
+			GameSaveConfigSchema.parse({
+				config,
+				save: parallelSave,
+			}),
+		).not.toThrow();
 	});
 
 	it("rejects producer queues above their effective max queue size", () => {

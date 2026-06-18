@@ -7,6 +7,7 @@ export { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 export type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 export { useGameAction } from "~/v0/play/runtime/useGameAction";
 export {
+	useGameBoardFirstEmptyCell,
 	useGameBoardItem,
 	useGameBoardView,
 	useGameInventorySlot,

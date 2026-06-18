@@ -18,7 +18,7 @@ export const ItemActivationCard: FC<ItemActivationCard.Props> = ({ activation, n
 	const title = activation.kind === "stash" ? "Stash status" : "Producer status";
 
 	return (
-		<div className="rounded-sm border border-pink-200 bg-pink-50/40 p-3">
+		<div className="rounded-sm border border-violet-200 bg-violet-50/40 p-3">
 			<div className="flex items-center justify-between gap-3">
 				<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
 					{title}
@@ -31,9 +31,9 @@ export const ItemActivationCard: FC<ItemActivationCard.Props> = ({ activation, n
 				</p>
 			</div>
 			{cooldown ? (
-				<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-pink-50">
+				<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-violet-50">
 					<div
-						className="h-full rounded-sm bg-fuchsia-600 transition-[width] duration-200 ease-linear"
+						className="h-full rounded-sm bg-violet-600 transition-[width] duration-200 ease-linear"
 						style={{
 							width: `${Math.round(cooldown.progress * 100)}%`,
 						}}

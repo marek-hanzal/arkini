@@ -1,35 +1,31 @@
-import type { FC, ReactNode } from "react";
+import type { FC } from "react";
 
 export namespace SheetHeader {
 	export interface Props {
 		title: string;
-		description?: ReactNode;
-		anchor?: "inventory-summary";
 		onClose(): void;
 	}
 }
 
-export const SheetHeader: FC<SheetHeader.Props> = ({ title, description, anchor, onClose }) => {
+export const SheetHeader: FC<SheetHeader.Props> = ({ title, onClose }) => {
 	return (
 		<div
 			data-ui="sheet header"
-			data-inventory-summary={anchor === "inventory-summary" ? "" : undefined}
-			className="relative min-w-0 border-b border-pink-200 bg-white px-4 py-2.5 pr-12"
+			className="border-b border-violet-200 bg-white"
 		>
-			<div className="min-w-0">
-				<h2 className="truncate text-base font-black text-ak-text">{title}</h2>
-				{description ? (
-					<p className="mt-1 break-words text-sm text-ak-text-muted">{description}</p>
-				) : null}
+			<div className="mx-auto flex w-full max-w-[430px] items-start justify-between gap-3 px-2 py-3">
+				<h2 className="min-w-0 flex-1 text-[1.05rem] font-black leading-tight text-ak-text">
+					{title}
+				</h2>
+				<button
+					type="button"
+					aria-label="Close sheet"
+					className="grid h-9 w-9 shrink-0 place-items-center border border-violet-200 bg-white text-[1.75rem] leading-none text-ak-text transition hover:border-violet-300 hover:bg-violet-50 active:translate-y-px"
+					onClick={onClose}
+				>
+					✕
+				</button>
 			</div>
-			<button
-				type="button"
-				aria-label="Close sheet"
-				className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-sm border border-pink-200 bg-white text-xl font-black leading-none text-ak-text transition hover:border-fuchsia-300 hover:bg-fuchsia-50 active:translate-y-px"
-				onClick={onClose}
-			>
-				✕
-			</button>
 		</div>
 	);
 };

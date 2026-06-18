@@ -3,22 +3,22 @@
 @theme {
 	--color-ak-page: #ffffff;
 	--color-ak-surface: #ffffff;
-	--color-ak-surface-soft: #fff7fb;
+	--color-ak-surface-soft: #f8f7ff;
 	--color-ak-surface-elevated: #ffffff;
-	--color-ak-board: #fff7fb;
-	--color-ak-inventory: #fff7fb;
-	--color-ak-border: #f3d4e6;
-	--color-ak-border-accent: #e879f9;
-	--color-ak-text: #2b1426;
-	--color-ak-text-muted: #7a6072;
-	--color-ak-primary: #c026d3;
-	--color-ak-primary-soft: #fae8ff;
-	--color-ak-secondary: #7c3aed;
+	--color-ak-board: #f6f4ff;
+	--color-ak-inventory: #f6f4ff;
+	--color-ak-border: #ddd6fe;
+	--color-ak-border-accent: #8b5cf6;
+	--color-ak-text: #22162b;
+	--color-ak-text-muted: #6b6480;
+	--color-ak-primary: #7c3aed;
+	--color-ak-primary-soft: #ede9fe;
+	--color-ak-secondary: #6d28d9;
 	--color-ak-success: #059669;
 	--color-ak-success-soft: #d1fae5;
 	--color-ak-danger: #e11d48;
 	--color-ak-danger-soft: #ffe4e6;
-	--color-ak-focus: #d946ef;
+	--color-ak-focus: #7c3aed;
 }
 
 html,

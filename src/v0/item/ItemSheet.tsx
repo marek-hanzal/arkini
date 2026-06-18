@@ -1,15 +1,15 @@
 import { type FC, useMemo } from "react";
+import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { ItemActivationCard } from "~/v0/item/ui/ItemActivationCard";
 import { ItemActivationInputsCard } from "~/v0/item/ui/ItemActivationInputsCard";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
 import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
-import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
-import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import { useGameAction, useGameBoardItem, useGameItemCatalogView } from "~/v0/play/runtime";
+import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 
 export namespace ItemSheet {
 	export interface Props {
@@ -71,11 +71,12 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
 			>
 				<SheetHeader
-					title="Item"
-					description="Nothing selected"
+					title="Nothing selected"
 					onClose={onClose}
 				/>
-				<p className="text-ak-text-muted p-4 text-sm">Select a board item first.</p>
+				<div className="mx-auto w-full max-w-[430px] px-2 py-3">
+					<p className="text-sm text-ak-text-muted">Select a board item first.</p>
+				</div>
 			</section>
 		);
 	}
@@ -141,11 +142,10 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 			className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
 		>
 			<SheetHeader
-				title="Item"
-				description={item.name}
+				title={item.name}
 				onClose={onClose}
 			/>
-			<div className="space-y-3 p-4 pt-3 text-sm text-ak-text">
+			<div className="mx-auto w-full max-w-[430px] space-y-3 px-2 py-3 text-sm text-ak-text">
 				{actionErrorMessage ? (
 					<div className="rounded-sm border border-rose-300/50 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800">
 						{actionErrorMessage}

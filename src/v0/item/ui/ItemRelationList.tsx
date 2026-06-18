@@ -20,7 +20,7 @@ export const ItemRelationList: FC<ItemRelationList.Props> = ({ title, items, rel
 	if (!relations.length) return null;
 
 	return (
-		<div className="rounded-sm border border-pink-200 bg-pink-50/40 p-3">
+		<div className="rounded-sm border border-violet-200 bg-violet-50/40 p-3">
 			<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
 				{title}
 			</p>

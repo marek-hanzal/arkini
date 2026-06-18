@@ -28,7 +28,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 	return (
 		<div
 			data-ui="craft requirements"
-			className="rounded-sm border border-pink-200 bg-pink-50/40 p-3"
+			className="rounded-sm border border-violet-200 bg-violet-50/40 p-3"
 		>
 			<div className="flex items-center justify-between gap-3">
 				<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
@@ -40,7 +40,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 					})}
 				</p>
 			</div>
-			<div className="h-2 overflow-hidden rounded-sm bg-pink-50 mt-2">
+			<div className="h-2 overflow-hidden rounded-sm bg-violet-50 mt-2">
 				<div
 					className="h-full rounded-sm bg-emerald-500 transition-[width] duration-200 ease-linear"
 					style={{
@@ -103,8 +103,8 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 				className={cn(
 					"mt-3 min-h-10 w-full rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
 					canStart
-						? "border-fuchsia-500 bg-fuchsia-600 text-white hover:bg-fuchsia-700"
-						: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
+						? "border-violet-500 bg-violet-600 text-white hover:bg-violet-700"
+						: "border-violet-200 bg-white text-ak-text hover:bg-violet-50",
 				)}
 			>
 				{craft.phase !== "collecting_inputs"

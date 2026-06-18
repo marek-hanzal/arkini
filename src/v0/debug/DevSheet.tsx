@@ -22,8 +22,8 @@ export namespace DevSheet {
 
 const debugButtonToneClassName: Record<"primary" | "neutral" | "danger", string> = {
 	danger: "border-rose-300 bg-rose-50 text-rose-800 hover:bg-rose-100",
-	neutral: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
-	primary: "border-fuchsia-500 bg-fuchsia-600 text-white hover:bg-fuchsia-700",
+	neutral: "border-violet-200 bg-white text-ak-text hover:bg-violet-50",
+	primary: "border-violet-500 bg-violet-600 text-white hover:bg-violet-700",
 };
 
 const DebugButton: FC<{
@@ -163,14 +163,13 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 		>
 			<SheetHeader
 				title="Developer"
-				description="Debug, diagnostics and runtime tools"
 				onClose={onClose}
 			/>
-			<div className="grid min-w-0 gap-3 p-4 pt-3">
-				<section className="rounded-sm border border-pink-200 bg-white min-w-0 overflow-hidden p-3">
+			<div className="mx-auto grid min-w-0 w-full max-w-[430px] gap-3 px-2 py-3">
+				<section className="rounded-sm border border-violet-200 bg-white min-w-0 overflow-hidden p-3">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 						<div>
-							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-fuchsia-700">
+							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">
 								Bug report
 							</p>
 							<h2 className="mt-1 text-base font-semibold text-ak-text">
@@ -219,12 +218,12 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							Copy failed. Use window.__ARKINI_BUG_REPORT__.dump() in the console.
 						</p>
 					) : null}
-					<pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-sm border border-pink-200 bg-pink-50/70 p-2 text-[0.65rem] text-ak-text-muted">
+					<pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-sm border border-violet-200 bg-violet-50/70 p-2 text-[0.65rem] text-ak-text-muted">
 						{dumpPreview}
 					</pre>
 				</section>
 
-				<section className="rounded-sm border border-pink-200 bg-white min-w-0 overflow-hidden p-3">
+				<section className="rounded-sm border border-violet-200 bg-white min-w-0 overflow-hidden p-3">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 						<div>
 							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">
@@ -256,7 +255,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 								key={scenario.id}
 								disabled={loadScenarioAction.isPending}
 								onClick={() => loadScenario(scenario.id)}
-								className="min-w-0 rounded-sm border border-pink-200 bg-white/70 px-3 py-2 text-left transition hover:border-fuchsia-300/70 hover:bg-fuchsia-50/60 disabled:cursor-wait disabled:opacity-60"
+								className="min-w-0 rounded-sm border border-violet-200 bg-white/70 px-3 py-2 text-left transition hover:border-violet-300/70 hover:bg-violet-50/60 disabled:cursor-wait disabled:opacity-60"
 							>
 								<span className="block break-words text-sm font-bold text-ak-text">
 									{scenario.label}
@@ -281,7 +280,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 					) : null}
 				</section>
 
-				<section className="rounded-sm border border-pink-200 bg-white min-w-0 overflow-hidden p-3">
+				<section className="rounded-sm border border-violet-200 bg-white min-w-0 overflow-hidden p-3">
 					<div className="flex h-full min-w-0 flex-wrap items-center gap-4">
 						<div className="min-w-0">
 							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">

@@ -40,7 +40,7 @@ export const InventorySurface = memo(
 					title="Inventory"
 					onClose={onClose}
 				/>
-				<div className="min-h-0 flex-1 overflow-x-hidden px-3 py-4">
+				<div className="min-h-0 flex-1 overflow-x-hidden px-2 py-2">
 					<div
 						ref={inventoryDragBoundsRef}
 						className="mx-auto w-full max-w-[430px]"
@@ -56,7 +56,7 @@ export const InventorySurface = memo(
 							slots={slots}
 							tiles={tiles}
 							gapPx={1}
-							className="w-full rounded-sm border border-pink-200 bg-pink-100"
+							className="w-full bg-violet-100"
 							layerRole="overlay"
 							actorLayerClassName="pointer-events-none"
 							drag={drag}

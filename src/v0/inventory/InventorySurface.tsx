@@ -15,7 +15,6 @@ export const InventorySurface = memo(
 		const inventoryDragBoundsRef = useRef<HTMLDivElement | null>(null);
 		const { drag, filled, slots, tiles } = useInventoryTileEngineModel({
 			feedback,
-			onPlacementComplete: onClose,
 			placementTarget,
 		});
 		const renderSlot = useCallback(
@@ -38,7 +37,7 @@ export const InventorySurface = memo(
 					eyebrow={placementTarget ? "Place from inventory" : "Inventory"}
 					description={
 						placementTarget
-							? `Tap a stack to place around ${placementTarget.x},${placementTarget.y}`
+							? `Double-tap stacks to place around ${placementTarget.x},${placementTarget.y}`
 							: `${filled}/${slots.length} slots`
 					}
 					onClose={onClose}

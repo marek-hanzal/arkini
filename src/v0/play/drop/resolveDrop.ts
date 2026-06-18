@@ -1,5 +1,6 @@
 import { match } from "ts-pattern";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -17,6 +18,7 @@ export namespace resolveDrop {
 	export interface Props {
 		context: TileEngine.DropContext<unknown, unknown, DragSource, DropTarget>;
 		board: BoardView;
+		config: GameConfig;
 		inventory: InventoryView;
 		feedback: Feedback.Type;
 		actions: DropActions;
@@ -47,6 +49,7 @@ const withSafeCommit = ({
 export const resolveDrop = ({
 	context,
 	board,
+	config,
 	inventory,
 	feedback,
 	actions,
@@ -73,6 +76,7 @@ export const resolveDrop = ({
 						source,
 						target,
 						board,
+						config,
 						feedback,
 						actions,
 					}),
@@ -122,6 +126,7 @@ export const resolveDrop = ({
 						source,
 						target,
 						board,
+						config,
 						inventory,
 						feedback,
 						actions,

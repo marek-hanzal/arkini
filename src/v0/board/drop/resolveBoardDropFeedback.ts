@@ -1,6 +1,7 @@
 import type { BoardCellView } from "~/v0/board/boardCells";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -9,6 +10,7 @@ import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 export namespace resolveBoardDropFeedback {
 	export interface Props {
 		board: BoardView;
+		config: GameConfig;
 		context: TileEngine.DragOverContext<
 			BoardSurface.TileData,
 			BoardCellView,
@@ -23,6 +25,7 @@ const isMergeLikeIntent = (intent: ReturnType<typeof resolveDropIntent>) =>
 
 export const resolveBoardDropFeedback = ({
 	board,
+	config,
 	context,
 }: resolveBoardDropFeedback.Props): TileEngine.DropFeedback | null => {
 	const { source, target, targetTile } = context;
@@ -46,6 +49,7 @@ export const resolveBoardDropFeedback = ({
 	}
 
 	const intent = resolveDropIntent({
+		config,
 		sourceItemId: source.itemId,
 		targetItem,
 	});

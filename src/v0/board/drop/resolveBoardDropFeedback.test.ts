@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardCellView } from "~/v0/board/boardCells";
@@ -37,6 +38,8 @@ const context = (
 	dropId: "board-cell:0:0",
 });
 
+const config = createEngineTestConfig();
+
 describe("resolveBoardDropFeedback", () => {
 	it("marks empty board cells as empty feedback", () => {
 		const source = boardItem({
@@ -48,6 +51,7 @@ describe("resolveBoardDropFeedback", () => {
 
 		expect(
 			resolveBoardDropFeedback({
+				config,
 				board: boardView([
 					source,
 				]),
@@ -87,6 +91,7 @@ describe("resolveBoardDropFeedback", () => {
 
 		expect(
 			resolveBoardDropFeedback({
+				config,
 				board: boardView([
 					source,
 					target,
@@ -135,6 +140,7 @@ describe("resolveBoardDropFeedback", () => {
 
 		expect(
 			resolveBoardDropFeedback({
+				config,
 				board: boardView([
 					source,
 					target,

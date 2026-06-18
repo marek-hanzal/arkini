@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -12,6 +13,8 @@ const rect = {
 	width: 64,
 	height: 64,
 } satisfies TileEngine.Rect;
+
+const config = createEngineTestConfig();
 
 describe("resolveDrop animation contract", () => {
 	it("preserves parallel swap runtime animation when wrapping commits with error feedback", async () => {
@@ -31,6 +34,7 @@ describe("resolveDrop animation contract", () => {
 
 		const outcome = resolveDrop({
 			actions,
+			config,
 			board: {} as never,
 			feedback,
 			inventory: {} as never,

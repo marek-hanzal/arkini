@@ -1,5 +1,6 @@
 import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import type { DragSource } from "~/v0/play/drag/DragSource";
@@ -37,6 +38,7 @@ export type InventoryCellDropAction =
 export namespace resolveInventoryCellDropAction {
 	export interface Props {
 		board: BoardView;
+		config: GameConfig;
 		source: Extract<
 			DragSource,
 			{
@@ -55,6 +57,7 @@ export namespace resolveInventoryCellDropAction {
 
 export const resolveInventoryCellDropAction = ({
 	board,
+	config,
 	inventory,
 	source,
 	target,
@@ -83,6 +86,7 @@ export const resolveInventoryCellDropAction = ({
 		}
 
 		const intent = resolveDropIntent({
+			config,
 			sourceItemId: source.itemId,
 			targetItem,
 		});

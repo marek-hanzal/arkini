@@ -7,12 +7,15 @@ import {
 	type GameEngineRuntimeSnapshot,
 } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
+import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readRuntimeBoardViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeBoardViewFromGameSave";
 import { readRuntimeInventoryViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeInventoryViewFromGameSave";
+import { readRuntimeItemCatalogViewFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeItemCatalogViewFromGameConfig";
 
 export interface GameRuntimeState {
 	board: BoardView;
 	inventory: InventoryView;
+	items: ItemCatalogView;
 	revision: number;
 	runtime: GameEngineRuntimeSnapshot;
 }
@@ -61,6 +64,7 @@ const createRuntimeState = ({
 		config: runtime.config,
 		save: runtime.save,
 	}),
+	items: readRuntimeItemCatalogViewFromGameConfig(runtime.config),
 	revision,
 	runtime,
 });

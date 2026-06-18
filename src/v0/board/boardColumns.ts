@@ -1,3 +1,3 @@
-import { GameConfigServiceLive } from "~/v0/game/logic/GameConfigServiceLive";
+import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 
-export const boardColumns = GameConfigServiceLive.config.game.board.width;
+export const boardColumns = defaultGameConfig.game.board.width;

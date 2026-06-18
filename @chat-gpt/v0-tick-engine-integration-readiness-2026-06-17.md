@@ -70,9 +70,11 @@ Priority order:
 8. **Runtime cleanup and parity gaps** — DONE / CURRENT
    - Removed old board/inventory React Query query/cache modules and the runtime cache connector instead of leaving a split-brain migration path around.
    - Moved remaining pure visual-event sequencing/summarizing helpers under `play/visual-events` so they are not tied to cache patching.
-   - Converted the upgrade sheet to runtime selectors/actions; React Query remains only for static item catalog data.
+   - Converted the upgrade sheet to runtime selectors/actions.
+   - Removed the old item catalog React Query/fx path from live gameplay rendering; board, inventory, item sheet and upgrade sheet now read item views from runtime `GameConfig` through the selector store.
    - Converted dev scenario loading to replace the runtime save directly, so debug scenarios no longer write old SQLite gameplay state and then hope the runtime follows.
    - Added inventory-to-occupied-board drop routing for merge/craft/producer/stash/stored-requirement interactions through runtime actions.
+   - Drop feedback and drop action resolution now use the runtime `GameConfig` supplied by `RuntimeGameEngineAdapter` instead of the old `GameConfigServiceLive` manifest path, so UI hints and engine commands no longer consult two different rulebooks.
    - Added runtime product-line view projection and item-sheet controls for enabling/disabling producer product lines and starting no-input lines. Board taps and input routing now choose the first enabled product line instead of blindly poking the first static config entry like a drunk pigeon.
    - Craft jobs now belong to a concrete target board item instance through `targetItemInstanceId`; runtime board projection only shows progress on that station, so multiple same-recipe stations no longer share one haunted job bar.
    - Board item removal/replacement/stashing now cleans attached producer jobs, craft jobs, product line state, stash state and stored requirements through one helper.
@@ -85,4 +87,4 @@ Priority order:
    - Dexie/IndexedDB simplification follows after the engine can run in memory and after the domain-event bridge proves the shape UI actually needs.
    - Do not implement Dexie before the adapter/bridge boundary is clear, otherwise storage starts shaping gameplay state and the project wakes up with database Stockholm syndrome.
 
-Current task: item 8 is the active cleanup/parity pass. Product line UI controls, basic runtime action error surfacing, craft/job ownership and product-line progress refresh are now covered. Next pass should keep sealing runtime-only gaps around remaining sheet actions and any old SQLite gameplay helpers that still look reachable from runtime UI. Dexie only after runtime remains the single gameplay source of truth.
+Current task: item 8 is the active cleanup/parity pass. Product line UI controls, basic runtime action error surfacing, craft/job ownership, product-line progress refresh, runtime item catalog reads and runtime-config drop intent resolution are now covered. Next pass should keep sealing runtime-only gaps around remaining sheet actions and any old SQLite gameplay helpers that still look reachable from runtime UI. Dexie only after runtime remains the single gameplay source of truth.

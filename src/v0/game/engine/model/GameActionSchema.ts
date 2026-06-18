@@ -6,6 +6,7 @@ import { GameActionInventoryItemPlaceSchema } from "~/v0/game/engine/model/GameA
 import { GameActionInventorySlotsSwapSchema } from "~/v0/game/engine/model/GameActionInventorySlotsSwapSchema";
 import { GameActionCraftStartSchema } from "~/v0/game/engine/model/GameActionCraftStartSchema";
 import { GameActionItemMergeSchema } from "~/v0/game/engine/model/GameActionItemMergeSchema";
+import { GameActionProducerInputStoreSchema } from "~/v0/game/engine/model/GameActionProducerInputStoreSchema";
 import { GameActionProducerProductLineSetEnabledSchema } from "~/v0/game/engine/model/GameActionProducerProductLineSetEnabledSchema";
 import { GameActionProducerProductStartSchema } from "~/v0/game/engine/model/GameActionProducerProductStartSchema";
 import { GameActionStashOpenSchema } from "~/v0/game/engine/model/GameActionStashOpenSchema";
@@ -22,6 +23,7 @@ export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionItemMergeSchema,
 	GameActionInventoryItemPlaceSchema,
 	GameActionInventorySlotsSwapSchema,
+	GameActionProducerInputStoreSchema,
 	GameActionProducerProductLineSetEnabledSchema,
 	GameActionProducerProductStartSchema,
 	GameActionStashOpenSchema,

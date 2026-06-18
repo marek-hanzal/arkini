@@ -4,6 +4,7 @@ import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigSer
 import { match } from "ts-pattern";
 import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
+import { checkProducerInputStoreReadinessFx } from "~/v0/game/engine/fx/checkProducerInputStoreReadinessFx";
 import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/engine/fx/checkProducerProductLineSetEnabledReadinessFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
@@ -90,6 +91,17 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					type: "inventory.slots.swap",
 				},
 				() => Effect.succeed(undefined),
+			)
+			.with(
+				{
+					type: "producer.input.store",
+				},
+				(storeInputAction) =>
+					checkProducerInputStoreReadinessFx({
+						action: storeInputAction,
+						config: gameConfig.config,
+						save,
+					}),
 			)
 			.with(
 				{

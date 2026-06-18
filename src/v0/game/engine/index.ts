@@ -29,6 +29,8 @@ export {
 	GameSaveInventoryStackSchema,
 	GameSaveProducerJobSchema,
 	GameSaveProducerLineStateSchema,
+	GameSaveProducerInputStateSchema,
+	GameSaveProducerProductInputStateSchema,
 	GameSaveScheduledEventSchema,
 	GameSaveSchema,
 	GameSaveStashStateSchema,
@@ -44,6 +46,8 @@ export type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
 export { GameActionSchema } from "~/v0/game/engine/model/GameActionSchema";
 export type { GameActionItemRef } from "~/v0/game/engine/model/GameActionItemRefSchema";
 export { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
+export type { GameActionProducerInputStore } from "~/v0/game/engine/model/GameActionProducerInputStore";
+export { GameActionProducerInputStoreSchema } from "~/v0/game/engine/model/GameActionProducerInputStoreSchema";
 export type { GameActionProducerProductLineSetEnabled } from "~/v0/game/engine/model/GameActionProducerProductLineSetEnabled";
 export { GameActionProducerProductLineSetEnabledSchema } from "~/v0/game/engine/model/GameActionProducerProductLineSetEnabledSchema";
 export type { GameActionStoredRequirementStore } from "~/v0/game/engine/model/GameActionStoredRequirementStore";
@@ -63,6 +67,8 @@ export type {
 	GameSaveInventoryStack,
 	GameSaveProducerJob,
 	GameSaveProducerLineState,
+	GameSaveProducerInputState,
+	GameSaveProducerProductInputState,
 	GameSaveScheduledEvent,
 	GameSaveStashState,
 	GameSaveStoredRequirementState,

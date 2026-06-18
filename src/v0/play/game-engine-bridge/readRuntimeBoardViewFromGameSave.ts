@@ -2,6 +2,7 @@ import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
@@ -28,10 +29,21 @@ const storedQuantity = ({
 	targetItemInstanceId: string;
 }) => save.storedRequirements[targetItemInstanceId]?.items[itemId] ?? 0;
 
-const inputView = ({
-	input,
+const storedProductInputQuantity = ({
+	itemId,
+	productId,
 	save,
 	targetItemInstanceId,
+}: {
+	itemId: string;
+	productId: string;
+	save: GameSave;
+	targetItemInstanceId: string;
+}) => save.producerInputs[targetItemInstanceId]?.productInputs[productId]?.items[itemId] ?? 0;
+
+const inputView = ({
+	input,
+	stored,
 }: {
 	input: {
 		itemId: string;
@@ -39,15 +51,13 @@ const inputView = ({
 		capacity: number;
 		consume: boolean;
 	};
-	save: GameSave;
-	targetItemInstanceId: string;
+	stored: number;
 }): ActivationInputView => ({
 	capacity: input.capacity,
 	consume: input.consume,
 	itemId: input.itemId as ItemId,
 	quantity: input.quantity,
-	// Activation inputs are consumed at action start; they are not durable storage slots.
-	stored: 0,
+	stored,
 });
 
 const storedRequirementView = ({
@@ -265,6 +275,22 @@ const readProductLineViews = ({
 				)
 			: undefined;
 
+		const inputs = readProductInputs({
+			config,
+			productId,
+		}).map((input) =>
+			inputView({
+				input,
+				stored: storedProductInputQuantity({
+					itemId: input.itemId,
+					productId,
+					save,
+					targetItemInstanceId,
+				}),
+			}),
+		);
+		const inputsReady = inputs.every((input) => input.stored >= input.quantity);
+
 		return [
 			{
 				durationMs: product.durationMs,
@@ -274,7 +300,9 @@ const readProductLineViews = ({
 					targetItemInstanceId,
 				}),
 				inProgress: jobs.length > 0,
-				inputItemIds: product.inputs.map((input) => input.itemId as ItemId),
+				inputs,
+				inputsReady,
+				inputItemIds: inputs.map((input) => input.itemId as ItemId),
 				name: product.name,
 				outputTableId: product.outputTableId,
 				productId,
@@ -332,8 +360,7 @@ const readRuntimeActivationView = ({
 			inputs: stash.inputs.map((input) =>
 				inputView({
 					input,
-					save,
-					targetItemInstanceId: boardItem.id,
+					stored: 0,
 				}),
 			),
 			kind: "stash",
@@ -365,14 +392,7 @@ const readRuntimeActivationView = ({
 
 		return {
 			deliveryBlocked,
-			inputs:
-				selectedProduct?.inputs.map((input) =>
-					inputView({
-						input,
-						save,
-						targetItemInstanceId: boardItem.id,
-					}),
-				) ?? [],
+			inputs: [],
 			kind: "producer",
 			productLines: readProductLineViews({
 				config,

@@ -46,6 +46,12 @@ const describeRuntimeUpgradeEffect = ({
 		return `${effect.producerId}: ${sign}${Math.abs(effect.quantity)} queue slot${Math.abs(effect.quantity) === 1 ? "" : "s"}${producer ? "" : " (missing producer)"}`;
 	}
 
+	if (effect.type === "product.inputRef.set") {
+		const product = config.products[effect.productId];
+		const input = config.inputs[effect.inputRefId];
+		return `${product?.name ?? effect.productId}: input ${input?.name ?? effect.inputRefId}`;
+	}
+
 	const product = config.products[effect.productId];
 	const item = config.items[effect.itemId];
 	const sign = effect.quantity < 0 ? "-" : "+";

@@ -1,10 +1,12 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInputsFx";
+import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
 import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
 import { readProductFx } from "~/v0/game/engine/fx/readProductFx";
 import { readProducerProductLineEnabledFx } from "~/v0/game/engine/fx/readProducerProductLineEnabledFx";
+import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/engine/fx/readProducerProductStoredInputQuantitiesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
@@ -94,15 +96,39 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	yield* match(product.placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
-	yield* checkActivationInputsFx({
-		inputRefs: action.inputRefs,
-		inputs: product.inputs,
-		save,
+	const productInputs = readProductInputs({
+		config,
+		productId: action.productId,
 	});
+	if (action.inputRefs.length > 0) {
+		yield* checkActivationInputsFx({
+			inputRefs: action.inputRefs,
+			inputs: productInputs,
+			save,
+		});
+	} else {
+		const storedInputs = yield* readProducerProductStoredInputQuantitiesFx({
+			producerItemInstanceId: action.producerItemInstanceId,
+			productId: action.productId,
+			save,
+		});
+		for (const input of productInputs) {
+			const storedQuantity = storedInputs.get(input.itemId) ?? 0;
+			if (storedQuantity < input.quantity) {
+				return yield* Effect.fail(
+					GameEngineError.actionRejected(
+						"input_mismatch",
+						`Product input "${input.itemId}" quantity mismatch (${storedQuantity}/${input.quantity}).`,
+					),
+				);
+			}
+		}
+	}
 
 	return {
 		producerDefinition,
 		producerItem,
 		product,
+		productInputs,
 	};
 });

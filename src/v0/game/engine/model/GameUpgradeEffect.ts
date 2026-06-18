@@ -10,6 +10,11 @@ export type GameUpgradeEffect =
 			tableId: string;
 	  }
 	| {
+			type: "product.inputRef.set";
+			productId: string;
+			inputRefId: string;
+	  }
+	| {
 			type: "product.input.quantity.add";
 			productId: string;
 			itemId: string;

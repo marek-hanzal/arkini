@@ -59,8 +59,12 @@ export const resolveDropIntent = ({
 			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
 	);
 	const canSupplyProducer = Boolean(
-		targetItem.activation?.inputs.some(
-			(input) => input.itemId === sourceItemId && input.stored < input.capacity,
+		targetItem.activation?.productLines?.some(
+			(line) =>
+				line.enabled &&
+				line.inputs.some(
+					(input) => input.itemId === sourceItemId && input.stored < input.capacity,
+				),
 		),
 	);
 	const canSupplyStoredRequirement = Boolean(

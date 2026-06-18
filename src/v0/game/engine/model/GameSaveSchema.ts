@@ -111,6 +111,18 @@ export const GameSaveProducerLineStateSchema = z
 		],
 	});
 
+export const GameSaveProducerProductInputStateSchema = z
+	.object({
+		items: z.record(IdSchema, PositiveIntegerSchema),
+	})
+	.strict();
+
+export const GameSaveProducerInputStateSchema = z
+	.object({
+		productInputs: z.record(IdSchema, GameSaveProducerProductInputStateSchema),
+	})
+	.strict();
+
 export const GameSaveStoredRequirementStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
@@ -195,6 +207,7 @@ export const GameSaveSchema = z
 			.strict(),
 		producerJobs: z.record(IdSchema, GameSaveProducerJobSchema),
 		producerLines: z.record(IdSchema, GameSaveProducerLineStateSchema),
+		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
 		upgradeJobs: z.record(IdSchema, GameSaveUpgradeJobSchema),
 		upgrades: z.record(IdSchema, GameSaveUpgradeStateSchema),
@@ -343,6 +356,56 @@ const readEffectiveProducerMaxQueueSize = ({
 	}
 
 	return maxQueueSize;
+};
+
+const readEffectiveProductInputRefId = ({
+	config,
+	productId,
+	save,
+}: {
+	config: GameConfig;
+	productId: string;
+	save: GameSave;
+}) => {
+	let inputRefId = config.products[productId]?.inputRefId;
+
+	for (const [upgradeId, upgrade] of Object.entries(config.upgrades).sort(([left], [right]) =>
+		left.localeCompare(right),
+	)) {
+		const completedTiers = Math.min(
+			save.upgrades[upgradeId]?.completedTiers ?? 0,
+			upgrade.tiers.length,
+		);
+
+		for (const tier of upgrade.tiers.slice(0, completedTiers)) {
+			for (const effect of tier.effects) {
+				if (effect.type === "product.inputRef.set" && effect.productId === productId) {
+					inputRefId = effect.inputRefId;
+				}
+			}
+		}
+	}
+
+	return inputRefId;
+};
+
+const readEffectiveProductInputSlots = ({
+	config,
+	productId,
+	save,
+}: {
+	config: GameConfig;
+	productId: string;
+	save: GameSave;
+}) => {
+	const inputRefId = readEffectiveProductInputRefId({
+		config,
+		productId,
+		save,
+	});
+	if (!inputRefId) return [];
+
+	return config.inputs[inputRefId]?.inputs ?? [];
 };
 
 const validateGameSaveAgainstConfig = (
@@ -645,6 +708,83 @@ const validateGameSaveAgainstConfig = (
 					],
 					`Disabled product "${productId}" does not belong to producer "${producerId}".`,
 				);
+			}
+		}
+	}
+
+	for (const [producerItemInstanceId, state] of Object.entries(save.producerInputs)) {
+		const target = readBoardItemDefinition({
+			config,
+			itemInstanceId: producerItemInstanceId,
+			save,
+		});
+		const producerId = target?.item.producerId;
+		const producer = producerId ? config.producers[producerId] : undefined;
+		if (!target || !producerId || !producer) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerInputs",
+					producerItemInstanceId,
+				],
+				`Producer input state target "${producerItemInstanceId}" must reference a producer item.`,
+			);
+			continue;
+		}
+
+		for (const [productId, productInputState] of Object.entries(state.productInputs)) {
+			if (!producer.productIds.includes(productId)) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerInputs",
+						producerItemInstanceId,
+						"productInputs",
+						productId,
+					],
+					`Product "${productId}" does not belong to producer "${producerId}".`,
+				);
+				continue;
+			}
+
+			const inputSlots = readEffectiveProductInputSlots({
+				config,
+				productId,
+				save,
+			});
+
+			for (const [itemId, quantity] of Object.entries(productInputState.items)) {
+				const inputSlot = inputSlots.find((input) => input.itemId === itemId);
+				if (!inputSlot) {
+					addSaveIssue(
+						ctx,
+						[
+							"producerInputs",
+							producerItemInstanceId,
+							"productInputs",
+							productId,
+							"items",
+							itemId,
+						],
+						`Product "${productId}" has no input "${itemId}".`,
+					);
+					continue;
+				}
+
+				if (quantity > inputSlot.capacity) {
+					addSaveIssue(
+						ctx,
+						[
+							"producerInputs",
+							producerItemInstanceId,
+							"productInputs",
+							productId,
+							"items",
+							itemId,
+						],
+						`Stored input quantity must be <= capacity (${inputSlot.capacity}).`,
+					);
+				}
 			}
 		}
 	}
@@ -988,6 +1128,10 @@ export type GameSaveProducerDeliveryItem = z.infer<typeof GameSaveProducerDelive
 export type GameSaveProducerDelivery = z.infer<typeof GameSaveProducerDeliverySchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
 export type GameSaveProducerLineState = z.infer<typeof GameSaveProducerLineStateSchema>;
+export type GameSaveProducerProductInputState = z.infer<
+	typeof GameSaveProducerProductInputStateSchema
+>;
+export type GameSaveProducerInputState = z.infer<typeof GameSaveProducerInputStateSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
 export type GameSaveStoredRequirementState = z.infer<typeof GameSaveStoredRequirementStateSchema>;

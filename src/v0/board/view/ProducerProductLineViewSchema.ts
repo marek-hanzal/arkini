@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ActivationInputViewSchema } from "~/v0/board/view/ActivationInputViewSchema";
 
 const IdSchema = z.string().min(1);
 
@@ -12,6 +13,8 @@ export const ProducerProductLineViewSchema = z.object({
 	queueFull: z.boolean(),
 	queueSize: z.number().int().positive(),
 	queuedJobs: z.number().int().nonnegative(),
+	inputs: z.array(ActivationInputViewSchema),
+	inputsReady: z.boolean(),
 	requirementsReady: z.boolean(),
 	missingRequirementItemIds: z.array(IdSchema),
 	startedAtMs: z.number().int().nonnegative().optional(),

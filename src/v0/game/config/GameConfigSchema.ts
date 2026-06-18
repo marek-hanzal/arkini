@@ -15,7 +15,7 @@ import { z } from "zod";
  * after compile/merge the engine must only see this single shape:
  *
  * ```txt
- * resources -> assets -> items -> merge/producers/products/stashes/craft/loot/upgrades
+ * resources -> assets -> items -> merge/inputs/producers/products/stashes/craft/loot/upgrades
  * ```
  *
  * The package contains static game truth only. Mutable save state such as occupied
@@ -30,14 +30,15 @@ import { z } from "zod";
  * - Regular merge definitions model executable item pairs and work from either drag
  *   direction. `consumeSource: false` imprint rules are intentionally directed and only
  *   execute from the item that owns the merge id.
- * - Activation inputs always say whether they are consumed. Producer/product/stash/craft
+ * - Activation inputs always say whether they are consumed. Product-line/stash/craft
  *   code must not guess this from context, because guessing is just a bug wearing a hat.
  * - Passive requirements always declare their search scope (`board`, `inventory`, or
  *   `board_or_inventory`). They model global knowledge/permission/ownership gates, not
  *   spatial adjacency or aura rules.
- * - Producer `productIds` are ordered production lines. If multiple lines can use the
- *   same input, runtime should feed/start them from top to bottom unless the player has
- *   disabled a line in save state. `maxQueueSize` is a hard per-producer-instance cap
+ * - Producer `productIds` are ordered production lines. Producer shells do not own inputs;
+ *   product lines reference named input definitions through `inputRefId`. If multiple
+ *   enabled lines can accept the same dragged input, runtime feeds them from top to
+ *   bottom. `maxQueueSize` is a hard per-producer-instance cap
  *   covering both running and queued jobs.
  * - Product and craft inputs are consumed at start. Outputs/results are emitted at
  *   completion. Craft requirements are non-consumed gating/tool items and must be able
@@ -81,7 +82,14 @@ import { z } from "zod";
  *       "type": "producer",
  *       "maxQueueSize": 1,
  *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
- *       "requirements": []
+ *       "requirements": [],
+ *       "inputRefId": "input:lumber-camp.saw"
+ *     }
+ *   },
+ *   "inputs": {
+ *     "input:lumber-camp.saw": {
+ *       "name": "Saw inputs",
+ *       "inputs": [{ "itemId": "item:log", "quantity": 1, "capacity": 1, "consume": true }]
  *     }
  *   },
  *   "products": {
@@ -188,6 +196,15 @@ const PassiveItemRequirementSchema = z
 	.strict();
 
 const ActivationInputSchema = z.array(ItemStackInputSchema);
+
+/** Named product-line input bundle. Product lines reference these by `inputRefId`. */
+const ProductInputDefinitionSchema = z
+	.object({
+		name: z.string().min(1),
+		inputs: ActivationInputSchema,
+	})
+	.strict();
+
 const ActivationRequirementSchema = z.array(
 	z.discriminatedUnion("type", [
 		StoredItemRequirementSchema,
@@ -331,7 +348,7 @@ const ItemDefinitionSchema = z
 	})
 	.strict();
 
-/** Producer shell with ordered product lines and producer-level requirements. */
+/** Producer shell with ordered product lines and producer-level requirements. Inputs live on product lines. */
 const ProducerDefinitionSchema = z
 	.object({
 		type: z.literal("producer"),
@@ -395,7 +412,7 @@ const ProductDefinitionSchema = z
 		name: z.string().min(1),
 		durationMs: NonNegativeIntegerSchema,
 		placement: PlacementSchema,
-		inputs: ActivationInputSchema,
+		inputRefId: IdSchema.optional(),
 		requirements: ActivationRequirementSchema,
 		outputTableId: IdSchema.optional(),
 	})
@@ -422,6 +439,13 @@ const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
 			type: z.literal("product.outputTable.set"),
 			productId: IdSchema,
 			tableId: IdSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("product.inputRef.set"),
+			productId: IdSchema,
+			inputRefId: IdSchema,
 		})
 		.strict(),
 	z
@@ -494,6 +518,7 @@ const GameConfigFragmentSchema = z
 		assets: z.record(IdSchema, AssetDefinitionSchema).optional(),
 		items: z.record(IdSchema, ItemDefinitionSchema).optional(),
 		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
+		inputs: z.record(IdSchema, ProductInputDefinitionSchema).optional(),
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema).optional(),
@@ -513,6 +538,7 @@ const BaseGameConfigSchema = z
 		assets: z.record(IdSchema, AssetDefinitionSchema),
 		items: z.record(IdSchema, ItemDefinitionSchema),
 		merge: z.record(IdSchema, MergeDefinitionSchema),
+		inputs: z.record(IdSchema, ProductInputDefinitionSchema),
 		producers: z.record(IdSchema, ProducerDefinitionSchema),
 		stashes: z.record(IdSchema, StashDefinitionSchema),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema),
@@ -536,6 +562,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasAsset = createRecordGuard(value.assets);
 	const hasItem = createRecordGuard(value.items);
 	const hasMerge = createRecordGuard(value.merge);
+	const hasInput = createRecordGuard(value.inputs);
 	const hasProducer = createRecordGuard(value.producers);
 	const hasProduct = createRecordGuard(value.products);
 	const hasStash = createRecordGuard(value.stashes);
@@ -726,6 +753,19 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
+	for (const [inputId, inputDefinition] of Object.entries(value.inputs)) {
+		validateItemInputs(
+			ctx,
+			[
+				"inputs",
+				inputId,
+				"inputs",
+			],
+			inputDefinition.inputs,
+			hasItem,
+		);
+	}
+
 	for (const [producerId, producer] of Object.entries(value.producers)) {
 		validateUniqueStringList(
 			ctx,
@@ -862,16 +902,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [productId, product] of Object.entries(value.products)) {
-		validateItemInputs(
-			ctx,
-			[
-				"products",
-				productId,
-				"inputs",
-			],
-			product.inputs,
-			hasItem,
-		);
+		if (product.inputRefId && !hasInput(product.inputRefId)) {
+			addIssue(
+				ctx,
+				[
+					"products",
+					productId,
+					"inputRefId",
+				],
+				`Missing input "${product.inputRefId}".`,
+			);
+		}
 		validateItemRequirements(
 			ctx,
 			[
@@ -969,6 +1010,22 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					);
 				}
 
+				if (effect.type === "product.inputRef.set" && !hasInput(effect.inputRefId)) {
+					addIssue(
+						ctx,
+						[
+							"upgrades",
+							upgradeId,
+							"tiers",
+							tierIndex,
+							"effects",
+							effectIndex,
+							"inputRefId",
+						],
+						`Missing input "${effect.inputRefId}".`,
+					);
+				}
+
 				if (effect.type === "product.input.quantity.add") {
 					if (!hasItem(effect.itemId)) {
 						addIssue(
@@ -987,9 +1044,12 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					}
 
 					const product = value.products[effect.productId];
+					const inputDefinition = product?.inputRefId
+						? value.inputs[product.inputRefId]
+						: undefined;
 					if (
 						product &&
-						!product.inputs.some((input) => input.itemId === effect.itemId)
+						!inputDefinition?.inputs.some((input) => input.itemId === effect.itemId)
 					) {
 						addIssue(
 							ctx,
@@ -1002,7 +1062,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 								effectIndex,
 								"itemId",
 							],
-							`Product "${effect.productId}" has no input "${effect.itemId}".`,
+							`Product "${effect.productId}" inputRef has no input "${effect.itemId}".`,
 						);
 					}
 				}

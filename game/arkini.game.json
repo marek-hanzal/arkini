@@ -667,6 +667,25 @@
 		},
 		"title": "Arkini"
 	},
+	"inputs": {
+		"input:coal-mine-1-rations": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"name": "Coal Mine I Rations"
+		}
+	},
 	"items": {
 		"item:beam": {
 			"assetId": "asset:item-beam",
@@ -2832,20 +2851,7 @@
 	"products": {
 		"product:coal-mine-1": {
 			"durationMs": 5200,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 1
-				}
-			],
+			"inputRefId": "input:coal-mine-1-rations",
 			"name": "Coal Mine I Production",
 			"outputTableId": "loot:coal-mine-1",
 			"placement": "board_then_inventory",
@@ -2853,7 +2859,6 @@
 		},
 		"product:lumber-camp-1": {
 			"durationMs": 5000,
-			"inputs": [],
 			"name": "Lumber Camp I Production",
 			"outputTableId": "loot:lumber-camp-1",
 			"placement": "board_then_inventory",
@@ -2861,7 +2866,6 @@
 		},
 		"product:lumber-camp-2": {
 			"durationMs": 4500,
-			"inputs": [],
 			"name": "Lumber Camp II Production",
 			"outputTableId": "loot:lumber-camp-2",
 			"placement": "board_then_inventory",
@@ -2869,7 +2873,6 @@
 		},
 		"product:lumber-camp-3": {
 			"durationMs": 4000,
-			"inputs": [],
 			"name": "Lumber Camp III Production",
 			"outputTableId": "loot:lumber-camp-3",
 			"placement": "board_then_inventory",
@@ -2877,7 +2880,6 @@
 		},
 		"product:lumber-camp-4": {
 			"durationMs": 3600,
-			"inputs": [],
 			"name": "Lumber Camp IV Production",
 			"outputTableId": "loot:lumber-camp-4",
 			"placement": "board_then_inventory",
@@ -2885,7 +2887,6 @@
 		},
 		"product:lumber-camp-5": {
 			"durationMs": 3200,
-			"inputs": [],
 			"name": "Lumber Camp V Production",
 			"outputTableId": "loot:lumber-camp-5",
 			"placement": "board_then_inventory",
@@ -2893,7 +2894,6 @@
 		},
 		"product:quarry-1": {
 			"durationMs": 5500,
-			"inputs": [],
 			"name": "Quarry I Production",
 			"outputTableId": "loot:quarry-1",
 			"placement": "board_then_inventory",
@@ -2901,7 +2901,6 @@
 		},
 		"product:quarry-2": {
 			"durationMs": 5000,
-			"inputs": [],
 			"name": "Quarry II Production",
 			"outputTableId": "loot:quarry-2",
 			"placement": "board_then_inventory",
@@ -2909,7 +2908,6 @@
 		},
 		"product:quarry-3": {
 			"durationMs": 4500,
-			"inputs": [],
 			"name": "Quarry III Production",
 			"outputTableId": "loot:quarry-3",
 			"placement": "board_then_inventory",
@@ -2917,7 +2915,6 @@
 		},
 		"product:quarry-4": {
 			"durationMs": 4100,
-			"inputs": [],
 			"name": "Quarry IV Production",
 			"outputTableId": "loot:quarry-4",
 			"placement": "board_then_inventory",
@@ -2925,7 +2922,6 @@
 		},
 		"product:quarry-5": {
 			"durationMs": 3700,
-			"inputs": [],
 			"name": "Quarry V Production",
 			"outputTableId": "loot:quarry-5",
 			"placement": "board_then_inventory",
@@ -2933,7 +2929,6 @@
 		},
 		"product:townhall-1": {
 			"durationMs": 3500,
-			"inputs": [],
 			"name": "Town Hall I Production",
 			"outputTableId": "loot:townhall-1",
 			"placement": "board_then_inventory",
@@ -2941,7 +2936,6 @@
 		},
 		"product:townhall-2": {
 			"durationMs": 3000,
-			"inputs": [],
 			"name": "Town Hall II Production",
 			"outputTableId": "loot:townhall-2",
 			"placement": "board_then_inventory",
@@ -2949,7 +2943,6 @@
 		},
 		"product:townhall-3": {
 			"durationMs": 2500,
-			"inputs": [],
 			"name": "Town Hall III Production",
 			"outputTableId": "loot:townhall-3",
 			"placement": "board_then_inventory",
@@ -2957,7 +2950,6 @@
 		},
 		"product:townhall-4": {
 			"durationMs": 2200,
-			"inputs": [],
 			"name": "Town Hall IV Production",
 			"outputTableId": "loot:townhall-4",
 			"placement": "board_then_inventory",
@@ -2965,7 +2957,6 @@
 		},
 		"product:townhall-5": {
 			"durationMs": 1900,
-			"inputs": [],
 			"name": "Town Hall V Production",
 			"outputTableId": "loot:townhall-5",
 			"placement": "board_then_inventory",
@@ -2973,7 +2964,6 @@
 		},
 		"product:tree": {
 			"durationMs": 6200,
-			"inputs": [],
 			"name": "Tree Production",
 			"outputTableId": "loot:tree",
 			"placement": "board_then_inventory",

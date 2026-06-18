@@ -13,6 +13,7 @@ import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/engine/fx/removeTileFx";
 import { setProducerProductLineEnabledFx } from "~/v0/game/engine/fx/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/engine/fx/startCraftFx";
+import { storeProducerInputFx } from "~/v0/game/engine/fx/storeProducerInputFx";
 import { startProducerProductFx } from "~/v0/game/engine/fx/startProducerProductFx";
 import { startUpgradeFx } from "~/v0/game/engine/fx/startUpgradeFx";
 import { storeStoredRequirementFx } from "~/v0/game/engine/fx/storeStoredRequirementFx";
@@ -129,6 +130,18 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(swapAction) =>
 				swapInventorySlotsFx({
 					action: swapAction,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "producer.input.store",
+			},
+			(storeInputAction) =>
+				storeProducerInputFx({
+					action: storeInputAction,
+					config: gameConfig.config,
 					nowMs,
 					save,
 				}),

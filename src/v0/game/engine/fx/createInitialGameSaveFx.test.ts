@@ -65,10 +65,10 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				type: "producer",
 			},
 		},
+		inputs: {},
 		products: {
 			"product:test": {
 				durationMs: 1000,
-				inputs: [],
 				name: "Test product",
 				outputTableId: "loot:test",
 				placement: "board_then_inventory",

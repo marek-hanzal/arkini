@@ -1,4 +1,3 @@
-import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
@@ -6,16 +5,9 @@ import {
 	RuntimeGameEngineAdapter,
 	type GameEngineRuntimeSnapshot,
 } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
-import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
-import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { readRuntimeBoardViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeBoardViewFromGameSave";
-import { readRuntimeInventoryViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeInventoryViewFromGameSave";
-import { readRuntimeItemCatalogViewFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeItemCatalogViewFromGameConfig";
 
 export interface GameRuntimeState {
-	board: BoardView;
-	inventory: InventoryView;
-	items: ItemCatalogView;
+	nowMs: number;
 	revision: number;
 	runtime: GameEngineRuntimeSnapshot;
 }
@@ -55,16 +47,7 @@ const createRuntimeState = ({
 	revision: number;
 	runtime: GameEngineRuntimeSnapshot;
 }): GameRuntimeState => ({
-	board: readRuntimeBoardViewFromGameSave({
-		config: runtime.config,
-		nowMs,
-		save: runtime.save,
-	}),
-	inventory: readRuntimeInventoryViewFromGameSave({
-		config: runtime.config,
-		save: runtime.save,
-	}),
-	items: readRuntimeItemCatalogViewFromGameConfig(runtime.config),
+	nowMs,
 	revision,
 	runtime,
 });

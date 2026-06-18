@@ -53,8 +53,8 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	const [timelineSize, setTimelineSize] = useState(DebugTimeline.entries().length);
 	const runtime = useGameRuntimeSelector(
 		(state) => ({
-			boardItems: state.board.items.length,
-			inventoryStacks: state.inventory.slots.filter((slot) => slot.stack).length,
+			boardItems: Object.keys(state.runtime.save.board.items).length,
+			inventoryStacks: state.runtime.save.inventory.slots.filter(Boolean).length,
 			nextWakeAtMs: state.runtime.nextWakeAtMs,
 			revision: state.revision,
 		}),

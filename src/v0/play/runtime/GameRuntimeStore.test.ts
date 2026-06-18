@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 import { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
+import { readGameRuntimeBoardView } from "~/v0/play/runtime/readGameRuntimeViews";
 
 const createStore = async () => {
 	const config = createEngineTestConfig();
@@ -15,7 +16,7 @@ const createStore = async () => {
 };
 
 describe("GameRuntimeStore", () => {
-	it("publishes selected board and inventory views after dispatch", async () => {
+	it("publishes raw runtime snapshots after dispatch", async () => {
 		const store = await createStore();
 		let calls = 0;
 		const unsubscribe = store.subscribe(() => {
@@ -32,8 +33,10 @@ describe("GameRuntimeStore", () => {
 			nowMs: 10,
 		});
 
+		const board = readGameRuntimeBoardView(store.getSnapshot());
+
 		expect(calls).toBe(1);
-		expect(store.getSnapshot().board.byId["item-instance:1"]).toMatchObject({
+		expect(board.byId["item-instance:1"]).toMatchObject({
 			x: 1,
 			y: 0,
 		});
@@ -42,7 +45,7 @@ describe("GameRuntimeStore", () => {
 		unsubscribe();
 		store.destroy();
 	});
-	it("publishes runtime updates with previous and current snapshots", async () => {
+	it("publishes runtime updates with previous and current raw snapshots", async () => {
 		const store = await createStore();
 		const updates: GameRuntimeStore.Update[] = [];
 		const unsubscribe = store.subscribeUpdate((update) => {
@@ -60,14 +63,18 @@ describe("GameRuntimeStore", () => {
 		});
 
 		expect(updates).toHaveLength(1);
-		expect(updates[0]?.previous.board.byId["item-instance:1"]).toMatchObject({
+		expect(
+			readGameRuntimeBoardView(updates[0]!.previous).byId["item-instance:1"],
+		).toMatchObject({
 			x: 0,
 			y: 0,
 		});
-		expect(updates[0]?.current.board.byId["item-instance:1"]).toMatchObject({
-			x: 1,
-			y: 0,
-		});
+		expect(readGameRuntimeBoardView(updates[0]!.current).byId["item-instance:1"]).toMatchObject(
+			{
+				x: 1,
+				y: 0,
+			},
+		);
 
 		unsubscribe();
 		store.destroy();

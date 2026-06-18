@@ -11,7 +11,7 @@ import {
 	useGameBoardView,
 	useGameInventoryView,
 	useGameRuntimeDropActions,
-	useGameRuntimeStore,
+	useGameRuntimeSelector,
 } from "~/v0/play/runtime";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
@@ -44,8 +44,7 @@ export const useInventoryTileEngineModel = ({
 	const board = useGameBoardView();
 	const inventory = useGameInventoryView();
 	const actions = useGameRuntimeDropActions();
-	const runtimeStore = useGameRuntimeStore();
-	const config = runtimeStore.getSnapshot().runtime.config;
+	const config = useGameRuntimeSelector((state) => state.runtime.config);
 
 	const slotLayoutKey = inventory.slots.map((slot) => slot.slotIndex).join("|");
 	const slots = useMemo(

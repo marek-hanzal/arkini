@@ -12,7 +12,7 @@ const sameTileData = <TTile>(left: TileEngine.Tile<TTile>, right: TileEngine.Til
  * Shallow identity check for memoized TileEngine actor props.
  *
  * `renderKey` lets adapters opt into scalar equality for tile renderer data
- * without forcing every game cache update to recreate/mount actors.
+ * without forcing every derived snapshot update to recreate/mount actors.
  */
 export const sameTileEngineTile = <TTile>(
 	left: TileEngine.Tile<TTile>,

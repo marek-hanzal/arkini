@@ -14,15 +14,11 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ## Active / useful task candidates
 
-### 1. Tile detail executable-interaction parity
-
-The item detail must not display interactions that `resolveDropIntent` / runtime actions cannot execute. Known reported example: water detail promised a water → twig interaction that did not work on board. Detail hints should come from the same canonical executable resolver or be clearly marked locked/unavailable.
-
-### 2. Touch/long-press polish
+### 1. Touch/long-press polish
 
 Long press on game surfaces should not open native browser menus. Keep suppression scoped to board/tile surfaces so normal app UI is not wrecked for sport.
 
-### 3. Badge/visual polish
+### 2. Badge/visual polish
 
 Tile badge/level offset can be tightened toward the corner. Keep it tiny and do not redesign tile layout while pretending it is “just polish”.
 
@@ -35,12 +31,13 @@ Tile badge/level offset can be tightened toward the corner. Keep it tiny and do 
 
 ## Selected next task
 
-Recommended next coding task: **Tile detail executable-interaction parity**.
+Recommended next coding task: **Touch/long-press polish**.
 
-Reason: board interactions now run through a stronger DnD/drop contract. The item detail must use the same executable truth instead of showing stale/config-derived hints that cannot actually be performed on the board. Known reported example: water detail promised a water → twig interaction that runtime could not execute.
+Reason: native browser context/callout menus on the game surface are still a small UX landmine for touch play. Scope suppression to board/tile surfaces only, not the whole app.
 
 ## Completed recent task
 
+- `v0-merge-executable-parity-2026-06-18.md`: regular combo merges now resolve from either drag direction through one executable resolver shared by runtime, DnD and item catalog detail.
 - `v0-producer-board-progress-2026-06-18.md`: running producer jobs now show a subtle bottom progress bar on their board tile; future queue and blocked delivery are intentionally ignored.
 - `v0-producer-blocked-delivery-2026-06-18.md`: producer output rolls once, blocked delivery persists on the job, retries without spam/reroll, keeps queue capacity occupied, and marks blocked producer tiles with a subtle danger frame.
 - `v0-local-placement-planner-2026-06-18.md`: shared Manhattan `seedCell` placement planner wired into producer/stash/craft/scheduled output flow.

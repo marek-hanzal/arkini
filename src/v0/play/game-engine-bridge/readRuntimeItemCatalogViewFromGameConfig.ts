@@ -2,6 +2,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/manifest/manifestId";
+import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 
 const itemAssetUrls = import.meta.glob("../../../assets/*.png", {
 	eager: true,
@@ -35,27 +36,52 @@ const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameCon
 };
 
 const readMergeResults = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	(config.items[itemId]?.mergeIds ?? [])
-		.map((mergeId) => config.merge[mergeId])
-		.filter((rule): rule is NonNullable<typeof rule> => Boolean(rule))
-		.map((rule) => ({
-			withItemId: rule.withItemId as ItemId,
-			resultItemId: rule.resultItemId as ItemId,
-			secret: rule.secret,
-		}));
+	Object.keys(config.items).flatMap((targetItemId) => {
+		const executable = resolveExecutableItemMergeRule({
+			config,
+			sourceItemId: itemId,
+			targetItemId,
+		});
+		if (!executable) return [];
+
+		return [
+			{
+				withItemId: targetItemId as ItemId,
+				resultItemId: executable.merge.resultItemId as ItemId,
+				secret: executable.merge.secret,
+			},
+		];
+	});
 
 const readUsedInMerges = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	Object.entries(config.items).flatMap(([targetItemId, targetItem]) =>
-		(targetItem.mergeIds ?? [])
-			.map((mergeId) => config.merge[mergeId])
-			.filter((rule): rule is NonNullable<typeof rule> => Boolean(rule))
-			.filter((rule) => rule.withItemId === itemId)
-			.map((rule) => ({
-				targetItemId: targetItemId as ItemId,
-				resultItemId: rule.resultItemId as ItemId,
-				secret: rule.secret,
-			})),
-	);
+	Object.keys(config.items).flatMap((sourceItemId) => {
+		const executable = resolveExecutableItemMergeRule({
+			config,
+			sourceItemId,
+			targetItemId: itemId,
+		});
+		if (!executable) return [];
+
+		const reverseExecutable = resolveExecutableItemMergeRule({
+			config,
+			sourceItemId: itemId,
+			targetItemId: sourceItemId,
+		});
+		if (
+			!executable.directed &&
+			reverseExecutable?.merge.resultItemId === executable.merge.resultItemId
+		) {
+			return [];
+		}
+
+		return [
+			{
+				targetItemId: sourceItemId as ItemId,
+				resultItemId: executable.merge.resultItemId as ItemId,
+				secret: executable.merge.secret,
+			},
+		];
+	});
 
 const readUsedInCrafts = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
 	Object.entries(config.items).flatMap(([targetItemId, targetItem]) => {

@@ -46,10 +46,9 @@ Recent GameConfig hardening checkpoint:
 
 Current task candidates:
 
-1. Tile detail executable-interaction parity: detail must not promise interactions that `resolveDropIntent` / runtime actions cannot execute.
-2. Touch/long-press polish: suppress native context/callout only on game interaction surfaces.
-3. Inventory-to-board seeded placement: reuse the shared Manhattan placement planner for long-press empty-cell placement.
-4. Badge/visual polish: tighten tile badge offset toward the corner without redesigning the tile.
+1. Touch/long-press polish: suppress native context/callout only on game interaction surfaces.
+2. Inventory-to-board seeded placement: reuse the shared Manhattan placement planner for long-press empty-cell placement.
+3. Badge/visual polish: tighten tile badge offset toward the corner without redesigning the tile.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.
 
@@ -110,3 +109,9 @@ Producer board progress checkpoint:
 
 - Running producer jobs now show the existing subtle bottom progress bar directly on the board tile.
 - Board producer progress is active-work-only: future queued jobs and completed blocked deliveries do not show as running progress. Blocked delivery continues to use the subtle danger frame.
+
+Merge executable parity checkpoint:
+
+- Regular combo merges are executable item pairs and work from either drag direction. `consumeSource: false` imprint rules stay directed and reverse-directed drops reject instead of swapping.
+- `resolveExecutableItemMergeRule` is the shared source for runtime merge readiness, DnD drop intent/actions and item catalog merge relations. Do not reintroduce raw source-only `mergeIds` scans for executable behavior.
+- Regression target: `item:twig` + `item:water` must resolve to `item:sprout` from both drag directions.

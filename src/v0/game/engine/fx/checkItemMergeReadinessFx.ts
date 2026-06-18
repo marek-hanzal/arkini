@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { resolveInputRefsFx } from "~/v0/game/engine/fx/resolveInputRefsFx";
+import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/engine/model/GameActionItemMerge";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -51,9 +52,11 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 	}
 
 	const sourceDefinition = config.items[source.itemId];
-	const merge = (sourceDefinition?.mergeIds ?? [])
-		.map((mergeId) => config.merge[mergeId])
-		.find((entry) => entry?.withItemId === target.itemId);
+	const merge = resolveExecutableItemMergeRule({
+		config,
+		sourceItemId: source.itemId,
+		targetItemId: target.itemId,
+	})?.merge;
 	if (!sourceDefinition || !merge) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

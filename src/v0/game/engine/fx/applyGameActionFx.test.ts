@@ -1039,6 +1039,99 @@ describe("applyGameActionFx", () => {
 		]);
 	});
 
+	it("merges regular combo items from either board drag direction", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					mergeIds: [
+						"merge:twig-water",
+					],
+				},
+				"item:water": {
+					assetId: "asset:test",
+					code: "water",
+					description: "Water",
+					maxStackSize: 3,
+					name: "Water",
+					sort: 8,
+					tags: [],
+					tier: 0,
+				},
+			},
+			merge: {
+				...baseConfig.merge,
+				"merge:twig-water": {
+					resultItemId: "item:plank",
+					withItemId: "item:water",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:water",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const waterIntoTwig = runAction({
+			action: {
+				sourceRef: {
+					kind: "board",
+					itemInstanceId: "item-instance:1",
+				},
+				targetItemInstanceId: "item-instance:2",
+				type: "item.merge",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(waterIntoTwig.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(waterIntoTwig.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:plank",
+		});
+
+		const freshSave = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const twigIntoWater = runAction({
+			action: {
+				sourceRef: {
+					kind: "board",
+					itemInstanceId: "item-instance:2",
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "item.merge",
+			},
+			config,
+			nowMs: 100,
+			save: freshSave,
+		});
+
+		expect(twigIntoWater.save.board.items["item-instance:2"]).toBeUndefined();
+		expect(twigIntoWater.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:plank",
+		});
+	});
+
 	it("merges an inventory source into a board target", () => {
 		const config = createEngineTestConfig({
 			startingState: {

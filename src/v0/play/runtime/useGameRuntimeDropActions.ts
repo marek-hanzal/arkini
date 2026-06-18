@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemRef } from "~/v0/game/engine/model/GameActionItemRefSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
+import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { useGameRuntimeStore } from "~/v0/play/runtime/GameRuntimeContext";
 
@@ -13,15 +14,14 @@ const hasMergeRule = ({
 	config: GameConfig;
 	sourceItemId: string;
 	targetItemId: string;
-}) => {
-	const sourceItem = config.items[sourceItemId];
-
-	return Boolean(
-		sourceItem?.mergeIds
-			?.map((mergeId) => config.merge[mergeId])
-			.find((rule) => rule?.withItemId === targetItemId),
+}) =>
+	Boolean(
+		resolveExecutableItemMergeRule({
+			config,
+			sourceItemId,
+			targetItemId,
+		}),
 	);
-};
 
 const productLineEnabled = ({
 	productId,

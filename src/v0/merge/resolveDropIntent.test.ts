@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 
@@ -41,6 +42,37 @@ const productLine = (
 });
 
 describe("resolveDropIntent", () => {
+	it("treats regular combo merges as executable from either drag direction", () => {
+		expect(
+			resolveDropIntent({
+				config: defaultGameConfig,
+				sourceItemId: "item:twig",
+				targetItem: boardItem({
+					id: "target",
+					itemId: "item:water",
+				}),
+			}),
+		).toEqual({
+			directed: false,
+			resultItemId: "item:sprout",
+			type: "merge",
+		});
+
+		expect(
+			resolveDropIntent({
+				config: defaultGameConfig,
+				sourceItemId: "item:water",
+				targetItem: boardItem({
+					id: "target",
+					itemId: "item:twig",
+				}),
+			}),
+		).toEqual({
+			directed: false,
+			resultItemId: "item:sprout",
+			type: "merge",
+		});
+	});
 	it("keeps regular merge as the first merge-like board interaction", () => {
 		expect(
 			resolveDropIntent({

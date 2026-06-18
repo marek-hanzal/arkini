@@ -51,7 +51,7 @@ export const GameItemContent: FC<GameItemContent.Props> = memo(
 					/>
 				)}
 				{quantity && quantity > 1 ? (
-					<span className="absolute bottom-0 right-0 min-w-4 rounded-sm bg-violet-700/90 px-1 text-center text-[0.62rem] font-bold text-white">
+					<span className="absolute bottom-0 right-0 min-w-4 rounded-sm bg-ak-secondary px-1 text-center text-[0.62rem] font-bold text-white">
 						{quantity}
 					</span>
 				) : item.label ? (

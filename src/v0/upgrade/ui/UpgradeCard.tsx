@@ -79,7 +79,7 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 
 			<div className="mt-3 flex flex-wrap items-center gap-2">
 				{upgrade.maxed ? (
-					<span className="rounded-sm bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800">
+					<span className="rounded-sm bg-emerald-950/35 px-2 py-1 text-xs font-bold text-emerald-200">
 						Maxed
 					</span>
 				) : (

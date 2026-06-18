@@ -20,7 +20,7 @@ export namespace DevSheet {
 }
 
 const debugButtonToneClassName: Record<"primary" | "neutral" | "danger", string> = {
-	danger: "border-rose-400/70 bg-rose-950/30 text-rose-200 hover:border-rose-300 hover:bg-rose-900/40",
+	danger: "border-rose-500/35 bg-rose-950/25 text-rose-200 hover:border-rose-400/55 hover:bg-rose-900/35",
 	neutral:
 		"border-ak-border bg-ak-surface-soft text-ak-text hover:border-ak-border-accent hover:bg-ak-primary-soft",
 	primary: "border-ak-border-accent bg-ak-primary text-white hover:bg-pink-400",
@@ -138,13 +138,13 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	return (
 		<section
 			data-ui="dev sheet"
-			className="min-h-0 overflow-hidden"
+			className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden"
 		>
 			<SheetHeader
 				title="Developer"
 				onClose={onClose}
 			/>
-			<div className="mx-auto grid w-full max-w-[430px] gap-3 px-2 py-3">
+			<div className="mx-auto grid min-h-0 w-full max-w-[430px] flex-1 gap-3 overflow-y-auto overscroll-contain px-2 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 				<section className="min-w-0 overflow-hidden rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
 					<div>
 						<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ak-primary">

@@ -65,6 +65,11 @@ Current task candidates:
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.
 
+
+Raw subscription/cache cleanup checkpoint:
+
+- 2026-06-18: Next mental-load reduction task is documented in `@chat-gpt/v0/v0-raw-subscription-state-task-2026-06-18.md`. Direction: prefer authoritative runtime snapshot + focused `useSyncExternalStore` selectors over manual board/inventory cache patching. Cache is only acceptable as safe selector memoization or transient visual state; gameplay truth belongs to `GameSave` snapshots.
+
 Dexie destructive refresh checkpoint:
 
 - Prototype storage compatibility is intentionally coarse. If a Dexie save record has a stale storage schema version, stale save document version, mismatched game id/config hash or invalid `GameSave` payload, `DexieGameSaveStorage.loadActiveSave` wipes the whole save database and returns `null`.

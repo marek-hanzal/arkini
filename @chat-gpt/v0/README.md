@@ -14,9 +14,9 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ## Active / useful task candidates
 
-### 1. Badge/visual polish
+### 1. Stabilization epic
 
-Tile badge/level offset can be tightened toward the corner. Keep it tiny and do not redesign tile layout while pretending it is “just polish”.
+Start with `v0-stabilization-epic-2026-06-18.md`. Current first coding task is craft single-job invariant + save schema guard. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
 
 ## Deferred / historical notes
 
@@ -27,12 +27,13 @@ Tile badge/level offset can be tightened toward the corner. Keep it tiny and do 
 
 ## Selected next task
 
-Recommended next coding task: **Badge/visual polish**.
+Recommended next coding task: **Stabilization epic T1: craft single-job invariant**.
 
-Reason: tile level/badge placement is a small visual fix that was already called out and should be quick to close now that the larger inventory placement flow is done.
+Reason: craft is now clarified as one board target -> one running job -> one result replacement. The engine and save schema must enforce the one-job invariant before we build more gameplay on top of a target that can split into parallel nonsense universes.
 
 ## Completed recent task
 
+- `v0-stabilization-epic-2026-06-18.md`: corrected stabilization epic from GameConfig/tick audit plus clarified craft/inventory/overlay/event-flow decisions.
 - `v0-inventory-seeded-placement-2026-06-18.md`: long press on empty board cell opens inventory with seeded Manhattan placement; selecting a stack places it through shared board-then-inventory planner semantics.
 - `v0-board-dnd-confinement-2026-06-18.md`: board item DnD is confined to the board; inventory is no longer a board-item drop target and item detail owns explicit `Store` to inventory.
 - `v0-touch-long-press-polish-2026-06-18.md`: native context/callout menus are suppressed on TileEngine game surfaces without adding global app-wide hijacking.

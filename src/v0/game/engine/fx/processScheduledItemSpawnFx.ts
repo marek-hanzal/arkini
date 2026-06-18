@@ -46,13 +46,16 @@ export const processScheduledItemSpawnFx = Effect.fn("processScheduledItemSpawnF
 
 	if (placement.type === "blocked") {
 		return {
-			event: {
-				blockedAtMs: nowMs,
-				itemId: scheduledEvent.itemId,
-				reason: "placement_unavailable" as const,
-				scheduledEventId: scheduledEvent.id,
-				type: "item.spawn.blocked" as const,
-			},
+			events: [
+				{
+					blockedAtMs: nowMs,
+					itemId: scheduledEvent.itemId,
+					reason: "placement_unavailable" as const,
+					scheduledEventId: scheduledEvent.id,
+					type: "item.spawn.blocked" as const,
+				},
+			],
+			save,
 			type: "blocked" as const,
 		} satisfies GameEngineCompletionResult;
 	}

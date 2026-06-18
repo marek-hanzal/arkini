@@ -241,7 +241,19 @@ describe("runGameTickFx", () => {
 			save,
 		});
 
-		expect(result.save.producerJobs).toHaveProperty("job:1");
+		expect(result.save.producerJobs["job:1"]).toMatchObject({
+			delivery: {
+				items: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+					},
+				],
+				lastBlockedAtMs: 1000,
+				retryAtMs: 2000,
+			},
+		});
+		expect(result.nextWakeAtMs).toBe(2000);
 		expect(result.events).toEqual([
 			{
 				blockedAtMs: 1000,
@@ -251,6 +263,219 @@ describe("runGameTickFx", () => {
 				reason: "placement_unavailable",
 				type: "product.blocked",
 			},
+		]);
+	});
+
+	it("retries blocked product delivery without rerolling output", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+
+		const blocked = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+		const changedConfig = createEngineTestConfig({
+			...config,
+			lootTables: {
+				...config.lootTables,
+				"loot:test": {
+					name: "Changed loot",
+					output: [
+						{
+							itemId: "item:plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+		});
+		blocked.save.inventory.slots[0] = null;
+
+		const delivered = runTick({
+			config: changedConfig,
+			nowMs: 2000,
+			save: blocked.save,
+		});
+
+		expect(delivered.save.producerJobs).toEqual({});
+		expect(delivered.events).toEqual([
+			expect.objectContaining({
+				jobId: "job:1",
+				type: "product.completed",
+			}),
+			expect.objectContaining({
+				itemId: "item:twig",
+				type: "item.created",
+			}),
+		]);
+	});
+
+	it("keeps blocked product delivery quiet until retry wake", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+
+		const blocked = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+		const beforeRetry = runTick({
+			config,
+			nowMs: 1500,
+			save: blocked.save,
+		});
+		const secondBlocked = runTick({
+			config,
+			nowMs: 2000,
+			save: beforeRetry.save,
+		});
+
+		expect(beforeRetry.events).toEqual([]);
+		expect(beforeRetry.nextWakeAtMs).toBe(2000);
+		expect(secondBlocked.events).toEqual([]);
+		expect(secondBlocked.save.producerJobs["job:1"]?.delivery).toMatchObject({
+			lastBlockedAtMs: 2000,
+			retryAtMs: 3000,
+		});
+	});
+
+	it("reserves placement across multiple producers completing in one tick", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 2,
+					width: 2,
+				},
+				title: "Test",
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:producer",
+						x: 1,
+						y: 1,
+					},
+				],
+				inventory: [],
+			},
+			lootTables: {
+				"loot:test": {
+					name: "Test loot",
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+		save.producerJobs["job:2"] = {
+			completesAtMs: 1000,
+			id: "job:2",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:2",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.producerJobs).toEqual({});
+		expect(
+			Object.values(result.save.board.items)
+				.filter((item) => item.itemId === "item:twig")
+				.map((item) => `${item.x}:${item.y}`)
+				.sort(),
+		).toEqual([
+			"0:1",
+			"1:0",
 		]);
 	});
 

@@ -66,4 +66,41 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			requirementsReady: true,
 		});
 	});
+
+	it("marks producer activation danger when delivery is blocked", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			delivery: {
+				items: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+				lastBlockedAtMs: 1000,
+				retryAtMs: 2000,
+			},
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 1500,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation).toMatchObject({
+			deliveryBlocked: true,
+		});
+	});
 });

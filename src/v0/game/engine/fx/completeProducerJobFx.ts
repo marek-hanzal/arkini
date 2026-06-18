@@ -3,14 +3,18 @@ import { match } from "ts-pattern";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
-import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
-import { readProductFx } from "~/v0/game/engine/fx/readProductFx";
+import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/engine/fx/producerDeliveryTiming";
 import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
-import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
+import { readProductFx } from "~/v0/game/engine/fx/readProductFx";
+import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
-import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
+import type {
+	GameSave,
+	GameSaveProducerDeliveryItem,
+	GameSaveProducerJob,
+} from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace completeProducerJobFx {
 	export interface Props {
@@ -20,6 +24,22 @@ export namespace completeProducerJobFx {
 		nowMs: number;
 	}
 }
+
+const toPlacementRequests = ({
+	items,
+	producerItemInstanceId,
+}: {
+	items: readonly GameSaveProducerDeliveryItem[];
+	producerItemInstanceId: string;
+}) =>
+	items.map(
+		(item) =>
+			({
+				...item,
+				originItemInstanceId: producerItemInstanceId,
+				reason: "product-output",
+			}) satisfies GameSaveItemPlacementRequest,
+	);
 
 export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function* ({
 	config,
@@ -77,22 +97,43 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		);
 	}
 
-	const roll = yield* rollLootTableItemsFx({
-		lootTable,
+	const deliveryItems =
+		liveJob.delivery?.items ??
+		(yield* rollLootTableItemsFx({
+			lootTable,
+		})).items;
+
+	if (deliveryItems.length === 0) {
+		const nextSave = yield* cloneGameSaveFx({
+			save,
+		});
+		delete nextSave.producerJobs[liveJob.id];
+		nextSave.updatedAtMs = nowMs;
+
+		return {
+			events: [
+				{
+					completedAtMs: nowMs,
+					jobId: liveJob.id,
+					producerItemInstanceId: liveJob.producerItemInstanceId,
+					productId: liveJob.productId,
+					type: "product.completed" as const,
+				},
+			],
+			save: nextSave,
+			type: "completed" as const,
+		} satisfies GameEngineCompletionResult;
+	}
+
+	const placementRequests = toPlacementRequests({
+		items: deliveryItems,
+		producerItemInstanceId: liveJob.producerItemInstanceId,
 	});
-	const placementRequests = roll.items.map(
-		(item) =>
-			({
-				...item,
-				originItemInstanceId: liveJob.producerItemInstanceId,
-				reason: "product-output",
-			}) satisfies GameSaveItemPlacementRequest,
-	);
 	const seedCell = readBoardItemCell({
 		itemInstanceId: liveJob.producerItemInstanceId,
 		save,
 	});
-	const preflightPlacement = yield* placeGameSaveItemsFx({
+	const placementResult = yield* placeGameSaveItemsFx({
 		config,
 		items: placementRequests,
 		nowMs,
@@ -100,30 +141,41 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		seedCell,
 	});
 
-	if (preflightPlacement.type === "blocked") {
-		return {
-			event: {
-				blockedAtMs: nowMs,
-				jobId: liveJob.id,
-				producerItemInstanceId: liveJob.producerItemInstanceId,
-				productId: liveJob.productId,
-				reason: "placement_unavailable" as const,
-				type: "product.blocked" as const,
+	if (placementResult.type === "blocked") {
+		const nextSave = yield* cloneGameSaveFx({
+			save,
+		});
+		nextSave.producerJobs[liveJob.id] = {
+			...liveJob,
+			delivery: {
+				items: deliveryItems,
+				lastBlockedAtMs: nowMs,
+				retryAtMs: nowMs + blockedProducerDeliveryRetryDelayMs,
 			},
+		};
+		nextSave.updatedAtMs = nowMs;
+
+		return {
+			events:
+				liveJob.delivery?.lastBlockedAtMs === undefined
+					? [
+							{
+								blockedAtMs: nowMs,
+								jobId: liveJob.id,
+								producerItemInstanceId: liveJob.producerItemInstanceId,
+								productId: liveJob.productId,
+								reason: "placement_unavailable" as const,
+								type: "product.blocked" as const,
+							},
+						]
+					: [],
+			save: nextSave,
 			type: "blocked" as const,
 		} satisfies GameEngineCompletionResult;
 	}
 
-	const nextSave = yield* cloneGameSaveFx({
-		save,
-	});
-	delete nextSave.producerJobs[liveJob.id];
-	yield* scheduleGameItemSpawnsFx({
-		dueAtMs: nowMs,
-		items: placementRequests,
-		save: nextSave,
-	});
-	nextSave.updatedAtMs = nowMs;
+	delete placementResult.save.producerJobs[liveJob.id];
+	placementResult.save.updatedAtMs = nowMs;
 
 	return {
 		events: [
@@ -134,8 +186,9 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 				productId: liveJob.productId,
 				type: "product.completed" as const,
 			},
+			...placementResult.events,
 		],
-		save: nextSave,
+		save: placementResult.save,
 		type: "completed" as const,
 	} satisfies GameEngineCompletionResult;
 });

@@ -27,11 +27,18 @@ const boardSlots = boardCells.map((cell) => ({
 })) satisfies readonly TileEngineType.Slot<BoardCellView>[];
 
 export const BoardSurface = memo(
-	({ feedback, feedbackFlags, onOpenItem, disabled = false }: BoardSurfaceType.Props) => {
+	({
+		feedback,
+		feedbackFlags,
+		onOpenInventoryPlacementTarget,
+		onOpenItem,
+		disabled = false,
+	}: BoardSurfaceType.Props) => {
 		const boardDragBoundsRef = useRef<HTMLDivElement | null>(null);
 		const board = useGameBoardView();
 		const { drag, tiles } = useBoardTileEngineModel({
 			feedback,
+			onOpenInventoryPlacementTarget,
 			onOpenItem,
 		});
 		const renderSlot = useCallback(

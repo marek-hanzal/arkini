@@ -11,10 +11,12 @@ import { TileEngine } from "~/v0/tile-engine";
 import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 
 export const InventorySurface = memo(
-	({ feedback, feedbackFlags, onClose }: InventorySurfaceType.Props) => {
+	({ feedback, feedbackFlags, onClose, placementTarget }: InventorySurfaceType.Props) => {
 		const inventoryDragBoundsRef = useRef<HTMLDivElement | null>(null);
 		const { drag, filled, slots, tiles } = useInventoryTileEngineModel({
 			feedback,
+			onPlacementComplete: onClose,
+			placementTarget,
 		});
 		const renderSlot = useCallback(
 			({
@@ -33,8 +35,12 @@ export const InventorySurface = memo(
 		return (
 			<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
 				<SheetHeader
-					eyebrow="Inventory"
-					description={`${filled}/${slots.length} slots`}
+					eyebrow={placementTarget ? "Place from inventory" : "Inventory"}
+					description={
+						placementTarget
+							? `Tap a stack to place around ${placementTarget.x},${placementTarget.y}`
+							: `${filled}/${slots.length} slots`
+					}
 					onClose={onClose}
 				/>
 				<div className="min-h-0 flex-1 overflow-visible px-3 py-4">

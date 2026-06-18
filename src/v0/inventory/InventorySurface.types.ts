@@ -6,6 +6,10 @@ export namespace InventorySurface {
 		feedback: Feedback.Type;
 		feedbackFlags: ReadonlySet<string>;
 		onClose(): void;
+		placementTarget?: {
+			x: number;
+			y: number;
+		};
 	}
 
 	export interface SlotData {

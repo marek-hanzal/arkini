@@ -18,6 +18,11 @@ import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 export namespace useInventoryTileEngineModel {
 	export interface Props {
 		feedback: Feedback.Type;
+		onPlacementComplete?(): void;
+		placementTarget?: {
+			x: number;
+			y: number;
+		};
 	}
 
 	export interface Result {
@@ -35,6 +40,8 @@ export namespace useInventoryTileEngineModel {
 
 export const useInventoryTileEngineModel = ({
 	feedback,
+	onPlacementComplete,
+	placementTarget,
 }: useInventoryTileEngineModel.Props): useInventoryTileEngineModel.Result => {
 	const board = useGameBoardView();
 	const inventory = useGameInventoryView();
@@ -86,6 +93,26 @@ export const useInventoryTileEngineModel = ({
 
 	const placeInventoryOnBoard = useCallback(
 		(slot: InventorySlot) => {
+			const placementStack = slot.stack;
+			if (placementTarget) {
+				if (!placementStack) {
+					feedback.flashInventorySlot(slot.slotIndex);
+					return;
+				}
+
+				void actions
+					.placeInventoryItem({
+						placementMode: "nearest_by_manhattan",
+						quantity: placementStack.quantity,
+						slotIndex: slot.slotIndex,
+						x: placementTarget.x,
+						y: placementTarget.y,
+					})
+					.then(() => onPlacementComplete?.())
+					.catch(feedback.showError);
+				return;
+			}
+
 			const action = resolveInventorySlotTapAction({
 				firstEmptyCell: board.firstEmptyCell,
 				slot,
@@ -108,6 +135,8 @@ export const useInventoryTileEngineModel = ({
 			actions,
 			board.firstEmptyCell,
 			feedback,
+			onPlacementComplete,
+			placementTarget,
 		],
 	);
 
@@ -133,7 +162,12 @@ export const useInventoryTileEngineModel = ({
 						itemId: stack.itemId,
 						slot,
 					},
-					onDoubleActivate: () => placeInventoryOnBoard(slot),
+					onDoubleActivate: placementTarget
+						? undefined
+						: () => placeInventoryOnBoard(slot),
+					onSingleActivate: placementTarget
+						? () => placeInventoryOnBoard(slot)
+						: undefined,
 				};
 			},
 			slot(slot) {
@@ -167,6 +201,7 @@ export const useInventoryTileEngineModel = ({
 			feedback,
 			inventory,
 			placeInventoryOnBoard,
+			placementTarget,
 		],
 	);
 

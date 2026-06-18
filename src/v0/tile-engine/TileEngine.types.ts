@@ -88,6 +88,7 @@ export namespace TileEngine {
 		id?: Id;
 		data: TDrop;
 		disabled?: boolean;
+		onLongActivate?(): void;
 	}
 
 	export interface DropContext<

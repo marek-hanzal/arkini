@@ -1,6 +1,6 @@
 # JSON game definition package plan - 2026-06-17
 
-Status: TODO
+Status: HISTORICAL - JSON package compile/validate path is implemented; keep as rationale/reference.
 
 ## Product goal
 

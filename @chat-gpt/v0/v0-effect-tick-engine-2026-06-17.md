@@ -1,6 +1,6 @@
 # v0 standalone Effect tick engine plan
 
-Status: TODO
+Status: HISTORICAL - implemented by the live runtime tick/action engine path; keep as rationale/reference.
 Created: 2026-06-17
 
 ## Idea

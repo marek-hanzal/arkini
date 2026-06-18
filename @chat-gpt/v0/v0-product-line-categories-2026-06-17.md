@@ -1,6 +1,6 @@
 # v0 product line categories follow-up
 
-Status: TODO
+Status: DEFERRED - wait for product-line UI pressure before adding authored categories.
 Created: 2026-06-17
 
 ## Context

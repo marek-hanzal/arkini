@@ -12,6 +12,13 @@ Hard rules for future work:
 - TileEngine remains generic. `src/v0/tile-engine` must not import Arkini domains such as board, inventory, play, manifest, item, activation, craft, upgrade, database/storage or game.
 - Before each non-trivial task, check whether existing libraries already cover the need. Do not write in-house machinery just because humans enjoy inventing tiny cursed wheels.
 
+
+Working-notes layout:
+
+- Root `@chat-gpt/README.md` is the current high-level map. Keep it short and current.
+- v0-specific task notes and historical logs live under `@chat-gpt/v0/`. Do not dump new v0 task files into the root.
+- Epic-style/backlog task groups may live in dedicated subfolders such as `@chat-gpt/000-refactor-backlog/`; the `000-*` shape is optional, not a law handed down by an angry markdown god.
+
 Current architectural state:
 
 - Static rules compile into validated `GameConfig` JSON under `game/arkini.game.json`.
@@ -37,11 +44,14 @@ Recent GameConfig hardening checkpoint:
 - Dedicated schema tests cover starting-state invariants plus these semantic authoring guards.
 - Keep using `parseGameConfig` as the shared CLI/runtime gate. Do not add a second validator that drifts into another tiny religion.
 
-Active follow-up after the SQLite removal pass:
+Current task candidates:
 
-1. Storage/schema version migration policy for Dexie saves: save version, config hash mismatch, reset vs migrate vs repair.
-2. Continue runtime parity audit around remaining sheet actions and debug flows.
-3. Keep Dexie/IndexedDB outside the engine while adding any future persistence niceties.
+1. Producer/local placement planner: shared nearest-by-manhattan placement around an optional seed cell, first for producer output and later for inventory-to-board placement.
+2. Producer board progress: show the active runtime producer job as a subtle bottom progress bar on the tile.
+3. Tile detail executable-interaction parity: detail must not promise interactions that `resolveDropIntent` / runtime actions cannot execute.
+4. Touch/long-press polish: suppress native context/callout only on game interaction surfaces.
+
+See `@chat-gpt/v0/README.md` for the v0-specific task index.
 
 Dexie destructive refresh checkpoint:
 

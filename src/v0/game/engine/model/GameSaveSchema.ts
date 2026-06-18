@@ -69,20 +69,12 @@ export const GameSaveProducerJobSchema = z
 		],
 	});
 
-export const GameSaveCraftJobReturnItemSchema = z
-	.object({
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
-	})
-	.strict();
-
 export const GameSaveCraftJobSchema = z
 	.object({
 		id: IdSchema,
 		recipeId: IdSchema,
 		startedAtMs: NonNegativeIntegerSchema,
 		completesAtMs: NonNegativeIntegerSchema,
-		returnItems: z.array(GameSaveCraftJobReturnItemSchema),
 		targetItemInstanceId: IdSchema,
 	})
 	.strict()
@@ -846,22 +838,6 @@ const validateGameSaveAgainstConfig = (
 			);
 		} else {
 			runningCraftJobsByTargetItemInstanceId.set(job.targetItemInstanceId, jobId);
-		}
-
-		for (const [index, returnItem] of job.returnItems.entries()) {
-			if (!config.items[returnItem.itemId]) {
-				addSaveIssue(
-					ctx,
-					[
-						"craftJobs",
-						jobId,
-						"returnItems",
-						index,
-						"itemId",
-					],
-					`Missing item "${returnItem.itemId}".`,
-				);
-			}
 		}
 	}
 

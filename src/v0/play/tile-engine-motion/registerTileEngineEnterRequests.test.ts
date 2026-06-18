@@ -84,6 +84,33 @@ describe("registerTileEngineEnterRequests", () => {
 		});
 	});
 
+	it("registers board replacement enter requests against the replaced tile id", () => {
+		const event = {
+			type: "item.replaced",
+			animation: ActionVisualAnimation.state({
+				cause: "craft",
+				groupId: "engine:craft-result:target",
+			}),
+			fromItemId: "item:blueprint",
+			itemInstanceId: "target",
+			reason: "craft-result",
+			toItemId: "item:lumber-camp-1",
+		} satisfies ActionVisualEventSchema.Type;
+
+		registerTileEngineEnterRequests({
+			board: boardView(),
+			events: [
+				event,
+			],
+			inventory: undefined,
+		});
+
+		expect(readTileEngineMotionRequests("board").get("target")?.enter).toMatchObject({
+			groupId: "engine:craft-result:target",
+			kind: "pop-in",
+		});
+	});
+
 	it("registers inventory enter requests against the rendered stack tile id", () => {
 		const event = {
 			type: "item.spawned",

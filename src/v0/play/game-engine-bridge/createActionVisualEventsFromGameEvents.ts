@@ -19,9 +19,6 @@ const createdCause = (
 ): ActionVisualAnimationSchema.Type["cause"] => {
 	if (reason === "product-output" || reason === "producer-input-withdraw") return "producer";
 	if (reason === "stash-output") return "stash";
-	if (reason === "craft-output" || reason === "craft-requirement-return") {
-		return "craft";
-	}
 	return "inventory";
 };
 
@@ -177,7 +174,12 @@ const replacedEvent = (
 ): ActionVisualEventSchema.Type =>
 	({
 		animation: ActionVisualAnimation.state({
-			cause: event.reason === "stash-depleted" ? "stash" : "merge",
+			cause:
+				event.reason === "stash-depleted"
+					? "stash"
+					: event.reason === "craft-result"
+						? "craft"
+						: "merge",
 			groupId: `engine:${event.reason}:${event.itemInstanceId}`,
 		}),
 		fromItemId: event.fromItemId,

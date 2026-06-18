@@ -50,12 +50,13 @@ GameConfig / tick engine stabilization checkpoint:
 - Current `main` has been checkpointed into branch `v0`; continue normal work on `main`.
 - `@chat-gpt/v0/v0-game-config-tick-engine-brutal-review-2026-06-18.md` is the raw audit. `@chat-gpt/v0/v0-stabilization-epic-2026-06-18.md` is the corrected implementation epic after Marek clarified craft/inventory/overlay semantics.
 - T1 is done in `@chat-gpt/v0/v0-craft-single-job-invariant-2026-06-18.md`: craft start/readiness and save validation enforce max one running craft job per target item.
-- Stabilization priority: craft is one board target -> one job -> one result replacement; craft/stash output should be atomic like producer; effective upgrades must validate against invalid zero/negative states; inventory may contain anything but stacks are stateless; `GameSaveConfigSchema` should guard monotonic ID counters; visual event flow needs either an exhaustive planner from engine events or a much stricter bridge.
+- T2 is done in `@chat-gpt/v0/v0-craft-target-replacement-2026-06-18.md`: completed craft replaces the target item in-place with one result and removed the old craft output/return scheduled-spawn path.
+- Stabilization priority: craft/stash output should be atomic like producer; effective upgrades must validate against invalid zero/negative states; inventory may contain anything but stacks are stateless; `GameSaveConfigSchema` should guard monotonic ID counters; visual event flow needs either an exhaustive planner from engine events or a much stricter bridge.
 
 Current task candidates:
 
-1. V0 stabilization epic T2: craft completion must replace/swap the target item into the result item in-place.
-2. V0 stabilization epic T3: normalize craft/stash output atomicity after T2, using producer completion as the sane adult in the room.
+1. V0 stabilization epic T3: normalize stash output atomicity after T2, using producer completion as the sane adult in the room.
+2. V0 stabilization epic T4: validate effective upgrade/config prefixes against zero/negative invalid states.
 3. Badge/visual polish can wait; tiny UI cosmetics do not outrank save/model stabilization, no matter how shiny the little badge feels.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.

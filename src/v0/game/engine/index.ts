@@ -22,7 +22,6 @@ export {
 } from "~/v0/game/engine/model/GameEventSchema";
 export {
 	GameSaveBoardItemSchema,
-	GameSaveCraftJobReturnItemSchema,
 	GameSaveConfigSchema,
 	GameSaveCraftJobSchema,
 	GameSaveInventorySlotSchema,

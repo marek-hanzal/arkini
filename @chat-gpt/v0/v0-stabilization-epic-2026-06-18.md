@@ -91,7 +91,7 @@ Výsledek je střední jazyk, který není ani engine truth, ani přímo TileEng
 
 ### Co je přímo špatně / podezřelé
 
-- `createActionVisualEventsFromGameEvents` není exhaustive. Ignoruje `product.started`, `product.completed`, `product.blocked`, `craft.started`, `craft.completed`, `craft.blocked`, `upgrade.completed`, `stash.depleted`, producer input store/withdraw a stored requirement store/withdraw. Něco z toho je správný no-op, ale musí to být explicitní no-op s testem, ne tiché propadnutí do nicoty.
+- `createActionVisualEventsFromGameEvents` není exhaustive. Ignoruje `product.started`, `product.completed`, `product.blocked`, `craft.started`, `craft.completed`, `upgrade.completed`, `stash.depleted`, producer input store/withdraw a stored requirement store/withdraw. Něco z toho je správný no-op, ale musí to být explicitní no-op s testem, ne tiché propadnutí do nicoty.
 - Move/swap engine akce (`moveBoardItemFx`, `swapBoardItemsFx`, `swapInventorySlotsFx`) vrací `events: []`, protože gesture animace řeší TileEngine lokálně při dropu. To je pochopitelné, ale znamená to, že `GameEvent` není plný state-diff stream. Buď to tak pojmenujme, nebo začněme emitovat domain events i pro move/swap.
 - Merge visual bridge páruje `item.consumed(reason=merge-source)` s pozdějším `item.replaced(reason=merge-result)` přes dopředné hledání v poli. Funguje, ale je to křehká implicitní korelace. Engine by klidně mohl emitnout explicitní semantic event typu `item.merged` / `item.transformed` se source+target+result, a save mutace může pořád zůstat stejná.
 - Visual reason enumy nejsou 1:1 s engine reason enumy. Např. engine má `producer-input-withdraw`, visual spawned reason enum ho aktuálně neobsahuje; bridge vrací přes type assertion. Type assertion tady schová drift, což je programátorská verze koberečku přes díru v podlaze.
@@ -167,7 +167,7 @@ Implementace:
 - Vyčistit runtime state targetu podle nové item identity (`removeBoardItemRuntimeState` nebo přesnější helper).
 - Nastavit target `itemId = recipe.resultItemId`.
 - Emitnout `craft.completed` + `item.replaced(reason: "craft-result" | nový reason)` nebo rovnou nový explicitní `craft.target_replaced` event.
-- Return items z requirements buď přehodnotit: pokud craft requirements byly stored/fillnuté durable požadavky, nemají se vracet při úspěšném craftu, pokud design neříká jinak. Původní `returnItems` v jobu vypadá podezřele pro replace-target craft.
+- T2 rozhodnutí: stored craft requirements se při úspěšném craftu spotřebují do výsledku. Job už nenese `returnItems`; craft completion emituje `item.replaced(reason: "craft-result")`.
 
 Acceptance:
 

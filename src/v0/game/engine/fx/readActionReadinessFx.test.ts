@@ -133,7 +133,6 @@ describe("readActionReadinessFx", () => {
 			completesAtMs: 1000,
 			id: "job:1",
 			recipeId: "craft:plank",
-			returnItems: [],
 			startedAtMs: 0,
 			targetItemInstanceId: "item-instance:1",
 		};

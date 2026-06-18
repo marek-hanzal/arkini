@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
 import { withRandomService } from "~/v0/random/logic/withRandomService";
@@ -479,8 +480,8 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
-	it("completes craft jobs only when requirement returns and result can be placed", () => {
-		const config = createEngineTestConfig();
+	it("completes craft jobs by replacing the target with the result item", () => {
+		const config = createEngineCraftTableTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
@@ -490,12 +491,6 @@ describe("runGameTickFx", () => {
 			id: "job:craft",
 			recipeId: "craft:plank",
 			targetItemInstanceId: "item-instance:1",
-			returnItems: [
-				{
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
 			startedAtMs: 0,
 		};
 
@@ -506,13 +501,17 @@ describe("runGameTickFx", () => {
 		});
 
 		expect(result.save.craftJobs).toEqual({});
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			id: "item-instance:1",
+			itemId: "item:plank",
+			x: 0,
+			y: 0,
+		});
 		expect(result.save.inventory.slots).toEqual([
-			{
-				itemId: "item:plank",
-				quantity: 1,
-			},
+			null,
 			null,
 		]);
+		expect(result.save.scheduledEvents).toEqual({});
 		expect(result.events).toMatchObject([
 			{
 				jobId: "job:craft",
@@ -521,20 +520,11 @@ describe("runGameTickFx", () => {
 				type: "craft.completed",
 			},
 			{
-				itemId: "item:twig",
-				reason: "craft-requirement-return",
-				to: {
-					kind: "board",
-				},
-				type: "item.created",
-			},
-			{
-				itemId: "item:plank",
-				reason: "craft-output",
-				to: {
-					kind: "inventory",
-				},
-				type: "item.created",
+				fromItemId: "item:craft-table",
+				itemInstanceId: "item-instance:1",
+				reason: "craft-result",
+				toItemId: "item:plank",
+				type: "item.replaced",
 			},
 		]);
 	});

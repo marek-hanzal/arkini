@@ -825,12 +825,6 @@ describe("applyGameActionFx", () => {
 			completesAtMs: 1100,
 			recipeId: "craft:plank",
 			targetItemInstanceId: "item-instance:1",
-			returnItems: [
-				{
-					itemId: "item:axe",
-					quantity: 1,
-				},
-			],
 			startedAtMs: 100,
 		});
 		expect(result.events.map((event) => event.type)).toEqual([

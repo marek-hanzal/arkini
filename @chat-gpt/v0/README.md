@@ -16,7 +16,7 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ### 1. Stabilization epic
 
-Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant is done. Current next coding task is T2 craft completion as target replacement/swap. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
+Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant and T2 craft target replacement are done. Current next coding task is T3 stash output atomicity. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
 
 ## Deferred / historical notes
 
@@ -27,12 +27,13 @@ Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant 
 
 ## Selected next task
 
-Recommended next coding task: **Stabilization epic T2: craft completion = target replacement**.
+Recommended next coding task: **Stabilization epic T3: stash output atomicity**.
 
-Reason: T1 now enforces one running craft job per board target. The next broken contract is completion: craft must replace/swap the original target into the result item in-place, not spawn output somewhere else while the target survives like a smug little duplication bug.
+Reason: T2 moved craft completion out of the scheduled-spawn swamp. Stash still preflights placement and schedules output later, so save truth can still lag behind action success like a lazy intern with a clipboard.
 
 ## Completed recent task
 
+- `v0-craft-target-replacement-2026-06-18.md`: craft completion now replaces the board target in-place with exactly one result item and removed the old craft output/return scheduled-spawn path.
 - `v0-craft-single-job-invariant-2026-06-18.md`: engine readiness/start and `GameSaveConfigSchema` now enforce max one running craft job per target item while allowing parallel craft on different targets.
 - `v0-stabilization-epic-2026-06-18.md`: corrected stabilization epic from GameConfig/tick audit plus clarified craft/inventory/overlay/event-flow decisions.
 - `v0-inventory-seeded-placement-2026-06-18.md`: long press on empty board cell opens inventory with seeded Manhattan placement; selecting a stack places it through shared board-then-inventory planner semantics.

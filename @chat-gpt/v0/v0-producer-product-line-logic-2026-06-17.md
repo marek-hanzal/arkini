@@ -1,6 +1,6 @@
 # v0 producer/product line follow-up
 
-Status: PLANNED
+Status: PARTIAL / RUNTIME DONE - product line runtime exists; remaining UI/category ideas are deferred.
 Created: 2026-06-17
 
 ## Context

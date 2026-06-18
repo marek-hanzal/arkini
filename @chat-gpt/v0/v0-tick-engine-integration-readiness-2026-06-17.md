@@ -1,6 +1,6 @@
 # V0 tick engine integration readiness plan
 
-Status: ACTIVE
+Status: HISTORICAL - integration path is live; remaining work is tracked in the v0 index.
 Created: 2026-06-17
 Updated: 2026-06-18
 

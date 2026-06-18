@@ -5,7 +5,6 @@ import {
 	blockedScheduledEventRetryDelayMs,
 	processScheduledGameEventsFx,
 } from "~/v0/game/engine/fx/processScheduledGameEventsFx";
-import { scheduleBoardItemRemoveFx } from "~/v0/game/engine/fx/scheduleBoardItemRemoveFx";
 import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
@@ -15,8 +14,6 @@ const runScheduled = (props: processScheduledGameEventsFx.Props) =>
 	Effect.runSync(processScheduledGameEventsFx(props));
 const runScheduleItems = (props: scheduleGameItemSpawnsFx.Props) =>
 	Effect.runSync(scheduleGameItemSpawnsFx(props));
-const runScheduleRemove = (props: scheduleBoardItemRemoveFx.Props) =>
-	Effect.runSync(scheduleBoardItemRemoveFx(props));
 
 describe("processScheduledGameEventsFx", () => {
 	it("emits every due non-exclusive scheduled spawn in one tick", () => {
@@ -201,44 +198,37 @@ describe("processScheduledGameEventsFx", () => {
 		});
 	});
 
-	it("waits with dependent source removal until exclusive spawns are processed", () => {
-		const config = createEngineTestConfig({
-			startingState: {
-				board: [
-					{
-						itemId: "item:stash",
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [],
-			},
-		});
+	it("waits with dependent scheduled spawns until exclusive source spawns are processed", () => {
+		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
-		const scheduledSpawns = runScheduleItems({
+		runScheduleItems({
 			dueAtMs: 100,
-			exclusiveKey: "spawn-group:stash-1",
-			intervalMs: 100,
+			exclusiveKey: "spawn-group:test",
 			items: [
 				{
 					itemId: "item:twig",
-					quantity: 2,
-					reason: "stash-output",
+					quantity: 1,
+					reason: "debug",
 				},
 			],
 			save,
 		});
-		runScheduleRemove({
-			afterEventIds: scheduledSpawns.eventIds,
-			dueAtMs: scheduledSpawns.lastDueAtMs,
-			itemId: "item:stash",
-			itemInstanceId: "item-instance:1",
-			reason: "stash-depleted",
-			save,
-		});
+		save.scheduledEvents["scheduled-event:2"] = {
+			afterEventIds: [
+				"scheduled-event:1",
+			],
+			dueAtMs: 100,
+			exclusiveKey: "spawn-group:test",
+			id: "scheduled-event:2",
+			itemId: "item:plank",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+		save.nextScheduledEventIndex = 3;
 
 		const lateTick = runScheduled({
 			config,
@@ -249,10 +239,7 @@ describe("processScheduledGameEventsFx", () => {
 		expect(lateTick.events.map((event) => event.type)).toEqual([
 			"item.created",
 		]);
-		expect(lateTick.save.board.items["item-instance:1"]).toMatchObject({
-			itemId: "item:stash",
-		});
-		expect(Object.values(lateTick.save.scheduledEvents)).toHaveLength(2);
+		expect(Object.values(lateTick.save.scheduledEvents)).toHaveLength(1);
 
 		const nextTick = runScheduled({
 			config,
@@ -262,9 +249,10 @@ describe("processScheduledGameEventsFx", () => {
 
 		expect(nextTick.events.map((event) => event.type)).toEqual([
 			"item.created",
-			"item.removed",
 		]);
-		expect(nextTick.save.board.items).not.toHaveProperty("item-instance:1");
+		expect(nextTick.events[0]).toMatchObject({
+			itemId: "item:plank",
+		});
 		expect(nextTick.save.scheduledEvents).toEqual({});
 	});
 });

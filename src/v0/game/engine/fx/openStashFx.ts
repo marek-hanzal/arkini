@@ -1,17 +1,16 @@
 import { Effect } from "effect";
 import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
-import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
-import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
-import { scheduleStashDepletionFx } from "~/v0/game/engine/fx/scheduleStashDepletionFx";
+import { applyStashDepletionFx } from "~/v0/game/engine/fx/applyStashDepletionFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStashOpen } from "~/v0/game/engine/model/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
+import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -66,14 +65,14 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		itemInstanceId: action.stashItemInstanceId,
 		save: consumed.save,
 	});
-	const preflightPlacement = yield* placeGameSaveItemsFx({
+	const placement = yield* placeGameSaveItemsFx({
 		config,
 		items: placementRequests,
 		nowMs,
 		save: consumed.save,
 		seedCell,
 	});
-	if (preflightPlacement.type === "blocked") {
+	if (placement.type === "blocked") {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"placement_unavailable",
@@ -82,33 +81,22 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		);
 	}
 
-	const nextSave = yield* cloneGameSaveFx({
-		save: consumed.save,
-	});
 	const nextRemainingCharges = checked.remainingCharges - 1;
+	let depletionEvents: GameEvent[] = [];
 	if (nextRemainingCharges > 0) {
-		nextSave.stashes[action.stashItemInstanceId] = {
+		placement.save.stashes[action.stashItemInstanceId] = {
 			remainingCharges: nextRemainingCharges,
 		};
 	} else {
-		delete nextSave.stashes[action.stashItemInstanceId];
-	}
-	const scheduledSpawns = yield* scheduleGameItemSpawnsFx({
-		dueAtMs: nowMs,
-		items: placementRequests,
-		save: nextSave,
-	});
-	if (nextRemainingCharges === 0) {
-		yield* scheduleStashDepletionFx({
-			afterEventIds: scheduledSpawns.eventIds,
-			dueAtMs: scheduledSpawns.lastDueAtMs,
+		depletionEvents = yield* applyStashDepletionFx({
+			nowMs,
 			onDepleted: checked.stash.onDepleted,
-			save: nextSave,
+			save: placement.save,
 			stashItemId: checked.stashItem.itemId,
 			stashItemInstanceId: action.stashItemInstanceId,
 		});
 	}
-	nextSave.updatedAtMs = nowMs;
+	placement.save.updatedAtMs = nowMs;
 
 	return {
 		events: [
@@ -120,6 +108,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 				stashItemInstanceId: action.stashItemInstanceId,
 				type: "stash.opened" as const,
 			},
+			...placement.events,
 			...(nextRemainingCharges === 0
 				? [
 						{
@@ -130,10 +119,11 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 						},
 					]
 				: []),
+			...depletionEvents,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			save: nextSave,
+			save: placement.save,
 		}),
-		save: nextSave,
+		save: placement.save,
 	} satisfies GameEngineResult;
 });

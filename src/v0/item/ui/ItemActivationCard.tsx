@@ -18,12 +18,10 @@ export const ItemActivationCard: FC<ItemActivationCard.Props> = ({ activation, n
 	const title = activation.kind === "stash" ? "Stash status" : "Producer status";
 
 	return (
-		<div className="rounded-md border border-cyan-400/20 bg-cyan-950/18 p-3">
+		<div className="ak-ui-card-soft p-3">
 			<div className="flex items-center justify-between gap-3">
-				<p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-					{title}
-				</p>
-				<p className="text-xs text-cyan-100">
+				<p className="ak-ui-eyebrow">{title}</p>
+				<p className="text-xs font-semibold text-violet-800">
 					{activationStatusLabel({
 						activation,
 						nowMs,
@@ -31,9 +29,9 @@ export const ItemActivationCard: FC<ItemActivationCard.Props> = ({ activation, n
 				</p>
 			</div>
 			{cooldown ? (
-				<div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-950/80">
+				<div className="ak-ui-progress-track mt-2 h-1.5">
 					<div
-						className="h-full rounded-full bg-cyan-300/75 transition-[width] duration-200 ease-linear"
+						className="ak-ui-progress-primary"
 						style={{
 							width: `${Math.round(cooldown.progress * 100)}%`,
 						}}
@@ -41,8 +39,9 @@ export const ItemActivationCard: FC<ItemActivationCard.Props> = ({ activation, n
 				</div>
 			) : null}
 			{activation.remainingCharges !== undefined ? (
-				<p className="mt-3 text-xs text-slate-300">
-					Charges left: <strong>{activation.remainingCharges}</strong>
+				<p className="ak-ui-muted mt-3 text-xs">
+					Charges left:{" "}
+					<strong className="text-ak-text">{activation.remainingCharges}</strong>
 				</p>
 			) : null}
 		</div>

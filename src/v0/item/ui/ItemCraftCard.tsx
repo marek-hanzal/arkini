@@ -26,48 +26,53 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 		craft.phase === "collecting_inputs" && craft.inputProgress >= 1 && !craft.complete;
 
 	return (
-		<div className="rounded-md border border-emerald-400/20 bg-emerald-950/18 p-3">
+		<div
+			data-ui="craft requirements"
+			className="ak-ui-card-soft p-3"
+		>
 			<div className="flex items-center justify-between gap-3">
-				<p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
-					Craft progress
-				</p>
-				<p className="text-xs text-emerald-100">
+				<p className="ak-ui-eyebrow">Craft progress</p>
+				<p className="text-xs font-semibold text-emerald-700">
 					{craftStatusLabel({
 						craft,
 					})}
 				</p>
 			</div>
-			<div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-950/80">
+			<div className="ak-ui-progress-track mt-2">
 				<div
-					className="h-full rounded-full bg-emerald-300/70"
+					className="ak-ui-progress-success"
 					style={{
 						width: `${Math.round(craft.progress * 100)}%`,
 					}}
 				/>
 			</div>
-			<p className="mt-3 text-xs text-slate-300">
-				Creates <strong>{items[craft.resultItemId]?.name ?? craft.resultItemId}</strong>
+			<p className="ak-ui-muted mt-3 text-xs">
+				Creates{" "}
+				<strong className="text-ak-text">
+					{items[craft.resultItemId]?.name ?? craft.resultItemId}
+				</strong>
 			</p>
 			{craft.durationMs > 0 ? (
-				<p className="mt-1 text-xs text-slate-400">
-					Build time: {formatMs(craft.durationMs)}
-				</p>
+				<p className="ak-ui-muted mt-1 text-xs">Build time: {formatMs(craft.durationMs)}</p>
 			) : null}
-			<div className="mt-3 space-y-2">
+			<div className="mt-3 grid gap-2">
 				{craft.inputs.map((input) => {
 					const delivered = craft.delivered[input.itemId] ?? 0;
 					const canWithdraw = craft.phase === "collecting_inputs" && delivered > 0;
 					return (
 						<div
 							key={input.itemId}
-							className="flex items-center justify-between gap-2 rounded-sm bg-slate-950/45 px-2 py-1.5 text-xs"
+							className="ak-ui-row flex min-w-0 items-center justify-between gap-2 px-2 py-2 text-xs"
 						>
-							<span>{items[input.itemId]?.name ?? input.itemId}</span>
+							<span className="min-w-0 truncate font-semibold">
+								{items[input.itemId]?.name ?? input.itemId}
+							</span>
 							<span
 								className={cn(
+									"shrink-0 tabular-nums",
 									delivered >= input.quantity
-										? "text-emerald-200"
-										: "text-slate-400",
+										? "font-bold text-emerald-700"
+										: "ak-ui-muted",
 								)}
 							>
 								{delivered}/{input.quantity}
@@ -75,9 +80,10 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 							{canWithdraw ? (
 								<button
 									type="button"
+									data-ui="withdraw action"
 									disabled={pending}
 									onClick={() => onWithdrawInput(input.itemId)}
-									className="shrink-0 rounded-sm border border-slate-600/70 px-1.5 py-0.5 font-bold text-slate-300 transition hover:border-slate-400/80 hover:text-slate-100 disabled:opacity-35"
+									className="ak-ui-button ak-ui-button-secondary min-h-10 shrink-0 px-3 text-xs"
 								>
 									Withdraw
 								</button>
@@ -91,10 +97,8 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 				disabled={!canStart || pending}
 				onClick={onStart}
 				className={cn(
-					"mt-3 w-full rounded-sm px-2 py-1.5 text-xs font-black transition disabled:opacity-35",
-					canStart
-						? "bg-emerald-300 text-slate-950 active:scale-[0.99]"
-						: "bg-slate-800 text-slate-500",
+					"ak-ui-button mt-3 w-full",
+					canStart ? "ak-ui-button-primary" : "ak-ui-button-ghost",
 				)}
 			>
 				{craft.phase !== "collecting_inputs"

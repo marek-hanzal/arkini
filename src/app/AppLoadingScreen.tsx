@@ -5,7 +5,7 @@ export namespace AppLoadingScreen {
 }
 
 export const AppLoadingScreen: FC<AppLoadingScreen.Props> = () => (
-	<div className="grid h-dvh w-dvw place-items-center bg-slate-950 text-sm font-semibold tracking-[0.16em] text-slate-400 uppercase">
+	<div className="grid h-dvh w-dvw place-items-center bg-ak-page text-sm font-semibold uppercase tracking-[0.16em] text-ak-text-muted">
 		Booting Arkini…
 	</div>
 );

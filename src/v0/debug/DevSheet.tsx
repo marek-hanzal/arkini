@@ -31,10 +31,10 @@ const DebugButton: FC<{
 		disabled={disabled}
 		onClick={onClick}
 		className={cn(
-			"rounded-md border px-3 py-2 text-sm font-bold disabled:cursor-wait disabled:opacity-60",
-			tone === "primary" ? "border-emerald-300/45 bg-emerald-300 text-slate-950" : undefined,
-			tone === "neutral" ? "border-slate-600 bg-slate-800/80 text-slate-100" : undefined,
-			tone === "danger" ? "border-red-300/45 bg-red-300 text-slate-950" : undefined,
+			"ak-ui-button disabled:cursor-wait",
+			tone === "primary" ? "ak-ui-button-primary" : undefined,
+			tone === "neutral" ? "ak-ui-button-ghost" : undefined,
+			tone === "danger" ? "ak-ui-button-danger" : undefined,
 		)}
 	>
 		{children}
@@ -153,23 +153,26 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	}, []);
 
 	return (
-		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
+		<section
+			data-ui="dev sheet"
+			className="max-h-[var(--ak-sheet-max-height)] min-w-0 overflow-y-auto overscroll-contain"
+		>
 			<SheetHeader
 				eyebrow="Developer"
 				description="Debug, diagnostics and runtime tools"
 				onClose={onClose}
 			/>
-			<div className="grid gap-3 p-4 pt-1">
-				<section className="rounded-md border border-emerald-300/20 bg-emerald-950/20 p-3 shadow-lg shadow-slate-950/25">
+			<div className="grid min-w-0 gap-3 p-4 pt-3">
+				<section className="ak-ui-card min-w-0 overflow-hidden p-3">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 						<div>
-							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">
+							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-fuchsia-700">
 								Bug report
 							</p>
-							<h2 className="mt-1 text-base font-semibold text-white">
+							<h2 className="mt-1 text-base font-semibold text-ak-text">
 								Copy diagnostic dump
 							</h2>
-							<p className="mt-2 text-sm text-slate-300">
+							<p className="mt-2 text-sm text-ak-text-muted">
 								One JSON packet with browser metadata, runtime diagnostics and the
 								latest debug timeline. Paste it into chat after reproducing a bug.
 							</p>
@@ -203,30 +206,30 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 						/>
 					</div>
 					{copyState === "copied" ? (
-						<p className="mt-3 text-sm font-semibold text-emerald-200">
+						<p className="mt-3 text-sm font-semibold text-emerald-800">
 							Copied. Paste the JSON dump into chat with a one-line symptom.
 						</p>
 					) : null}
 					{copyState === "failed" ? (
-						<p className="mt-3 text-sm font-semibold text-red-100">
+						<p className="mt-3 text-sm font-semibold text-rose-800">
 							Copy failed. Use window.__ARKINI_BUG_REPORT__.dump() in the console.
 						</p>
 					) : null}
-					<pre className="mt-3 max-h-36 overflow-auto rounded-md border border-slate-800 bg-slate-950/80 p-2 text-[0.65rem] text-slate-300">
+					<pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border border-pink-200 bg-pink-50/70 p-2 text-[0.65rem] text-ak-text-muted">
 						{dumpPreview}
 					</pre>
 				</section>
 
-				<section className="rounded-md border border-indigo-300/20 bg-indigo-950/20 p-3 shadow-lg shadow-slate-950/25">
+				<section className="ak-ui-card min-w-0 overflow-hidden p-3">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 						<div>
-							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-indigo-300">
+							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">
 								Scenarios
 							</p>
-							<h2 className="mt-1 text-base font-semibold text-white">
+							<h2 className="mt-1 text-base font-semibold text-ak-text">
 								Load debug save
 							</h2>
-							<p className="mt-2 text-sm text-slate-300">
+							<p className="mt-2 text-sm text-ak-text-muted">
 								Reset the runtime save into a deterministic state before reproducing
 								an animation bug. The loaded scenario is recorded into the bug
 								report timeline.
@@ -239,53 +242,56 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							/>
 						</div>
 					</div>
-					<div className="mt-3 grid gap-2">
+					<div
+						data-ui="scenario list"
+						className="mt-3 grid gap-2"
+					>
 						{DevScenarioDefinitions.map((scenario) => (
 							<button
 								type="button"
 								key={scenario.id}
 								disabled={loadScenarioAction.isPending}
 								onClick={() => loadScenario(scenario.id)}
-								className="rounded-md border border-slate-700 bg-slate-900/80 px-3 py-2 text-left transition hover:border-indigo-300/60 hover:bg-indigo-950/35 disabled:cursor-wait disabled:opacity-60"
+								className="min-w-0 rounded-lg border border-pink-200 bg-white/70 px-3 py-2 text-left transition hover:border-fuchsia-300/70 hover:bg-fuchsia-50/60 disabled:cursor-wait disabled:opacity-60"
 							>
-								<span className="block text-sm font-bold text-slate-50">
+								<span className="block break-words text-sm font-bold text-ak-text">
 									{scenario.label}
 								</span>
-								<span className="mt-1 block text-xs text-slate-400">
+								<span className="mt-1 block break-words text-xs text-ak-text-muted">
 									{scenario.description}
 								</span>
 							</button>
 						))}
 					</div>
 					{loadScenarioAction.data ? (
-						<p className="mt-3 text-sm font-semibold text-indigo-100">
+						<p className="mt-3 text-sm font-semibold text-violet-800">
 							Loaded {loadScenarioAction.data.scenarioId}. Reproduce the bug, then
 							copy a bug report.
 						</p>
 					) : null}
 					{loadScenarioAction.isError ? (
-						<p className="mt-3 text-sm font-semibold text-red-100">
+						<p className="mt-3 text-sm font-semibold text-rose-800">
 							Scenario load failed. Check the console; naturally, even debugging needs
 							debugging.
 						</p>
 					) : null}
 				</section>
 
-				<section className="rounded-md border border-slate-800 bg-slate-900/60 p-3 shadow-lg shadow-slate-950/25">
-					<div className="flex h-full flex-wrap items-center gap-4">
-						<div className="min-w-40">
-							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-indigo-300">
+				<section className="ak-ui-card min-w-0 overflow-hidden p-3">
+					<div className="flex h-full min-w-0 flex-wrap items-center gap-4">
+						<div className="min-w-0">
+							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">
 								Runtime
 							</p>
-							<h2 className="mt-1 text-base font-semibold text-white">
+							<h2 className="mt-1 text-base font-semibold text-ak-text">
 								Local session
 							</h2>
-							<span className="mt-2 inline-flex rounded-sm bg-emerald-400/10 px-2 py-1 text-xs font-semibold text-emerald-200">
+							<span className="mt-2 inline-flex rounded-lg bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800">
 								dexie-save
 							</span>
 						</div>
 
-						<div className="grid min-w-64 flex-1 grid-cols-2 gap-2">
+						<div className="grid min-w-0 flex-1 grid-cols-2 gap-2">
 							<StatusPill
 								label="Board"
 								value={String(runtime.boardItems)}
@@ -304,7 +310,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							/>
 						</div>
 
-						<div className="min-w-40">
+						<div className="min-w-0">
 							<DebugButton
 								tone="danger"
 								disabled={resetState === "pending"}
@@ -315,7 +321,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 									: "Hard reset storage"}
 							</DebugButton>
 							{resetState === "failed" ? (
-								<p className="mt-3 text-sm text-red-100">
+								<p className="mt-3 text-sm text-rose-800">
 									Reset failed. Check the console.
 								</p>
 							) : null}

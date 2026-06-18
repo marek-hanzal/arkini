@@ -70,14 +70,17 @@ export const BoardSurface = memo(
 		);
 
 		return (
-			<div ref={boardDragBoundsRef}>
+			<div
+				ref={boardDragBoundsRef}
+				data-ui="board root"
+			>
 				<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
 					id="board"
 					columns={boardColumns}
 					slots={boardSlots}
 					tiles={tiles}
 					gapPx={1}
-					className="ak-layer-base-surface w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
+					className="ak-layer-base-surface w-full rounded-xl border border-pink-200/80 bg-ak-board p-1 shadow-xl shadow-pink-900/10"
 					actorLayerClassName="pointer-events-none"
 					layerRole="base"
 					disabled={disabled}

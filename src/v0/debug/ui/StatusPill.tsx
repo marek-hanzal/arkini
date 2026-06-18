@@ -9,9 +9,11 @@ export namespace StatusPill {
 
 export const StatusPill: FC<StatusPill.Props> = ({ label, value }) => {
 	return (
-		<div className="min-w-0 rounded-sm bg-slate-950/60 px-3 py-2">
-			<div className="text-[0.62rem] uppercase tracking-[0.18em] text-slate-500">{label}</div>
-			<div className="truncate text-sm font-medium text-slate-100">{value}</div>
+		<div className="min-w-0 rounded-lg bg-pink-50/80 px-3 py-2">
+			<div className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ak-text-muted">
+				{label}
+			</div>
+			<div className="truncate text-sm font-semibold text-ak-text">{value}</div>
 		</div>
 	);
 };

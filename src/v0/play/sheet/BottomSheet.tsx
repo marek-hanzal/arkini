@@ -12,6 +12,7 @@ export namespace BottomSheet {
 
 export const BottomSheet: FC<BottomSheet.Props> = ({ open, children, className, onClose }) => (
 	<div
+		data-ui="bottom sheet"
 		className="ak-bottom-sheet"
 		data-open={open ? "true" : "false"}
 	>
@@ -22,7 +23,10 @@ export const BottomSheet: FC<BottomSheet.Props> = ({ open, children, className, 
 			onClick={onClose}
 		/>
 
-		<section className={cn("ak-bottom-sheet-panel", className)}>
+		<section
+			data-ui="bottom sheet panel"
+			className={cn("ak-bottom-sheet-panel", className)}
+		>
 			<div className="ak-bottom-sheet-content">{children}</div>
 		</section>
 	</div>

@@ -49,6 +49,7 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 
 	return (
 		<div
+			data-ui="board item"
 			data-ak-board-item-id={boardItem.id}
 			className={cn(
 				"relative h-full w-full overflow-hidden",

@@ -174,3 +174,7 @@ The danger is replacing one cache system with another fancy cache system under a
 First implementation pass removed derived `board`, `inventory` and `items` fields from `GameRuntimeStore`. The store now owns only the authoritative runtime snapshot, revision and action time. React hooks derive board/inventory/catalog/upgrade views from raw snapshot selectors; visual effects derive their previous/current board snapshots only when building `GameEngineVisualPlan`.
 
 Remaining acceptable work: split broad view readers into finer `boardItem`/`inventorySlot` readers later if profiling or complexity demands it. Do not reintroduce a gameplay cache patching layer.
+
+## 2026-06-18 focused subscription checkpoint
+
+Second implementation pass reduced broad render subscriptions without changing gameplay rules. Board drop commits now read inventory/config from the latest raw snapshot at commit time instead of subscribing board rendering to inventory changes. Inventory rendering now subscribes to inventory plus focused `firstEmptyCell` instead of full board/config. Item detail subscribes to the selected board item instead of the full board. See `v0-focused-runtime-subscriptions-2026-06-18.md`.

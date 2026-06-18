@@ -1,5 +1,5 @@
 # Arkini GPT working notes
-- 2026-06-18: Arkini raw runtime store pass removed derived board/inventory/items from runtime store; source of truth is now raw engine snapshot plus selector-derived views.
+- 2026-06-18: Arkini raw runtime store pass removed derived board/inventory/items from runtime store; source of truth is now raw engine snapshot plus selector-derived views. Follow-up focused subscription pass moved drop-time board/inventory/config reads to raw commit-time snapshots and narrowed item detail / inventory subscriptions.
 
 This repo is now on the runtime tick/action engine path. Treat `RuntimeGameEngineAdapter` + `GameRuntimeStore` as the live gameplay source of truth.
 

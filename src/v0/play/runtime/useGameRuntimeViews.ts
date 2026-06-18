@@ -2,6 +2,7 @@ import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/manifest/manifestId";
@@ -30,6 +31,11 @@ const sameBoardItem = (left: BoardViewItem | null, right: BoardViewItem | null) 
 		stableStringify(left.state) === stableStringify(right.state)
 	);
 };
+
+const sameBoardCell = (
+	left: BoardCellSchema.Type | undefined,
+	right: BoardCellSchema.Type | undefined,
+) => left?.x === right?.x && left?.y === right?.y;
 
 const sameInventorySlot = (left: InventorySlot, right: InventorySlot) => {
 	if (left === right) return true;
@@ -63,6 +69,12 @@ export const useGameInventorySlot = (slotIndex: number): InventorySlot =>
 				slotIndex,
 			},
 		sameInventorySlot,
+	);
+
+export const useGameBoardFirstEmptyCell = (): BoardCellSchema.Type | undefined =>
+	useGameRuntimeSelector(
+		(state) => readGameRuntimeBoardView(state).firstEmptyCell,
+		sameBoardCell,
 	);
 
 export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView =>

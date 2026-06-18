@@ -12,11 +12,14 @@ import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 import {
 	useGameBoardView,
-	useGameInventoryView,
 	useGameRuntimeDropActions,
 	useGameRuntimeSelector,
 	useGameRuntimeStore,
 } from "~/v0/play/runtime";
+import {
+	readGameRuntimeBoardView,
+	readGameRuntimeInventoryView,
+} from "~/v0/play/runtime/readGameRuntimeViews";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useBoardTileEngineModel {
@@ -29,6 +32,7 @@ export namespace useBoardTileEngineModel {
 	export interface Result {
 		tiles: TileEngine.Tile<BoardSurface.TileData>[];
 		drag: TileEngine.DragConfig<BoardSurface.TileData, BoardCellView, DragSource, DropTarget>;
+		blockedCellKeys: readonly string[];
 	}
 }
 
@@ -42,7 +46,6 @@ export const useBoardTileEngineModel = ({
 	onOpenItem,
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
 	const board = useGameBoardView();
-	const inventory = useGameInventoryView();
 	const actions = useGameRuntimeDropActions();
 	const runtimeStore = useGameRuntimeStore();
 	const config = useGameRuntimeSelector((state) => state.runtime.config);
@@ -80,6 +83,16 @@ export const useBoardTileEngineModel = ({
 		[
 			board.items,
 			transientTiles,
+		],
+	);
+
+	const blockedCellKeys = useMemo(
+		() =>
+			Object.entries(board.byCellKey)
+				.filter(([, boardItem]) => boardItem.activation?.deliveryBlocked)
+				.map(([key]) => key),
+		[
+			board.byCellKey,
 		],
 	);
 
@@ -193,11 +206,13 @@ export const useBoardTileEngineModel = ({
 				});
 			},
 			onDrop(context) {
+				const snapshot = runtimeStore.getSnapshot();
+
 				return resolveDrop({
 					context,
-					board,
-					config,
-					inventory,
+					board: readGameRuntimeBoardView(snapshot),
+					config: snapshot.runtime.config,
+					inventory: readGameRuntimeInventoryView(snapshot),
 					feedback,
 					actions,
 				});
@@ -212,13 +227,14 @@ export const useBoardTileEngineModel = ({
 			config,
 			board,
 			feedback,
-			inventory,
+			runtimeStore,
 			onOpenInventoryPlacementTarget,
 			onOpenItem,
 		],
 	);
 
 	return {
+		blockedCellKeys,
 		drag,
 		tiles,
 	};

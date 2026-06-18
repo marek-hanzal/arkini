@@ -8,11 +8,15 @@ import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 import {
-	useGameBoardView,
+	useGameBoardFirstEmptyCell,
 	useGameInventoryView,
 	useGameRuntimeDropActions,
-	useGameRuntimeSelector,
+	useGameRuntimeStore,
 } from "~/v0/play/runtime";
+import {
+	readGameRuntimeBoardView,
+	readGameRuntimeInventoryView,
+} from "~/v0/play/runtime/readGameRuntimeViews";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useInventoryTileEngineModel {
@@ -41,10 +45,10 @@ export const useInventoryTileEngineModel = ({
 	feedback,
 	placementTarget,
 }: useInventoryTileEngineModel.Props): useInventoryTileEngineModel.Result => {
-	const board = useGameBoardView();
+	const firstEmptyCell = useGameBoardFirstEmptyCell();
 	const inventory = useGameInventoryView();
 	const actions = useGameRuntimeDropActions();
-	const config = useGameRuntimeSelector((state) => state.runtime.config);
+	const runtimeStore = useGameRuntimeStore();
 
 	const slotLayoutKey = inventory.slots.map((slot) => slot.slotIndex).join("|");
 	const slots = useMemo(
@@ -110,7 +114,7 @@ export const useInventoryTileEngineModel = ({
 			}
 
 			const action = resolveInventorySlotTapAction({
-				firstEmptyCell: board.firstEmptyCell,
+				firstEmptyCell,
 				slot,
 			});
 
@@ -129,7 +133,7 @@ export const useInventoryTileEngineModel = ({
 		},
 		[
 			actions,
-			board.firstEmptyCell,
+			firstEmptyCell,
 			feedback,
 			placementTarget,
 		],
@@ -174,11 +178,13 @@ export const useInventoryTileEngineModel = ({
 				});
 			},
 			onDrop(context) {
+				const snapshot = runtimeStore.getSnapshot();
+
 				return resolveDrop({
 					context,
-					board,
-					config,
-					inventory,
+					board: readGameRuntimeBoardView(snapshot),
+					config: snapshot.runtime.config,
+					inventory: readGameRuntimeInventoryView(snapshot),
 					feedback,
 					actions,
 				});
@@ -186,12 +192,11 @@ export const useInventoryTileEngineModel = ({
 		}),
 		[
 			actions,
-			board,
-			config,
 			feedback,
 			inventory,
 			placeInventoryOnBoard,
 			placementTarget,
+			runtimeStore,
 		],
 	);
 

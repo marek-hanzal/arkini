@@ -9,7 +9,7 @@ import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
-import { useGameAction, useGameBoardView, useGameItemCatalogView } from "~/v0/play/runtime";
+import { useGameAction, useGameBoardItem, useGameItemCatalogView } from "~/v0/play/runtime";
 
 export namespace ItemSheet {
 	export interface Props {
@@ -19,11 +19,21 @@ export namespace ItemSheet {
 }
 
 export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
-	const board = useGameBoardView();
+	const boardItem = useGameBoardItem(boardItemId ?? "");
 	const items = useGameItemCatalogView();
 	const itemAction = useGameAction();
-	const nowMs = useProducerClock(board.items);
-	const boardItem = boardItemId ? board.byId[boardItemId] : undefined;
+	const clockItems = useMemo(
+		() =>
+			boardItem
+				? [
+						boardItem,
+					]
+				: [],
+		[
+			boardItem,
+		],
+	);
+	const nowMs = useProducerClock(clockItems);
 	const item = boardItem ? items[boardItem.itemId] : undefined;
 	const liveCraft = readLiveCraftView({
 		craft: boardItem?.craft,

@@ -41,15 +41,16 @@ export const withdrawStoredRequirementFx = Effect.fn("withdrawStoredRequirementF
 		],
 		nowMs,
 		save,
-	});
-	if (placement.type === "blocked") {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"placement_unavailable",
-				`Stored requirement "${action.itemId}" cannot be withdrawn because there is no placement space.`,
+	}).pipe(
+		Effect.catchTag("GamePlacementFailed", (error) =>
+			Effect.fail(
+				GameEngineError.actionRejected(
+					error.reason,
+					`Stored requirement "${action.itemId}" cannot be withdrawn because there is no placement space.`,
+				),
 			),
-		);
-	}
+		),
+	);
 
 	const targetState = placement.save.storedRequirements[action.targetItemInstanceId] ?? {
 		items: {},

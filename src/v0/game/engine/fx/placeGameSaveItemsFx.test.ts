@@ -8,6 +8,8 @@ const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));
 const runPlacement = (props: placeGameSaveItemsFx.Props) =>
 	Effect.runSync(placeGameSaveItemsFx(props));
+const runPlacementEither = (props: placeGameSaveItemsFx.Props) =>
+	Effect.runSync(Effect.either(placeGameSaveItemsFx(props)));
 
 describe("placeGameSaveItemsFx", () => {
 	it("places loose board tiles first and stacks the remainder in inventory", () => {
@@ -171,7 +173,7 @@ describe("placeGameSaveItemsFx", () => {
 			quantity: 3,
 		};
 
-		const result = runPlacement({
+		const result = runPlacementEither({
 			config,
 			items: [
 				{
@@ -184,9 +186,13 @@ describe("placeGameSaveItemsFx", () => {
 			save,
 		});
 
-		expect(result).toEqual({
-			reason: "placement_unavailable",
-			type: "blocked",
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GamePlacementFailed",
+				message: "Placement target is full.",
+				reason: "board:full",
+			},
 		});
 		expect(save.nextItemInstanceIndex).toBe(2);
 		expect(Object.keys(save.board.items)).toEqual([

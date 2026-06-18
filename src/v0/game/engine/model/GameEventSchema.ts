@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GamePlacementFailureReasonSchema } from "~/v0/game/engine/model/GamePlacementFailureReasonSchema";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
@@ -245,7 +246,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
-			reason: z.literal("placement_unavailable"),
+			reason: GamePlacementFailureReasonSchema,
 			blockedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
@@ -280,7 +281,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("item.spawn.blocked"),
 			scheduledEventId: IdSchema,
 			itemId: IdSchema,
-			reason: z.literal("placement_unavailable"),
+			reason: GamePlacementFailureReasonSchema,
 			blockedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),

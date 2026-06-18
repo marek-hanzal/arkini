@@ -29,28 +29,35 @@ export const processScheduledItemSpawnFx = Effect.fn("processScheduledItemSpawnF
 		itemInstanceId: scheduledEvent.originItemInstanceId,
 		save,
 	});
-	const placement = yield* placeGameSaveItemsFx({
-		config,
-		items: [
-			{
-				itemId: scheduledEvent.itemId,
-				originItemInstanceId: scheduledEvent.originItemInstanceId,
-				quantity: scheduledEvent.quantity,
-				reason: scheduledEvent.reason,
-			},
-		],
-		nowMs,
-		save,
-		seedCell,
-	});
+	const placementEither = yield* Effect.either(
+		placeGameSaveItemsFx({
+			config,
+			items: [
+				{
+					itemId: scheduledEvent.itemId,
+					originItemInstanceId: scheduledEvent.originItemInstanceId,
+					quantity: scheduledEvent.quantity,
+					reason: scheduledEvent.reason,
+				},
+			],
+			nowMs,
+			save,
+			seedCell,
+		}),
+	);
 
-	if (placement.type === "blocked") {
+	if (placementEither._tag === "Left") {
+		const error = placementEither.left;
+		if (error._tag !== "GamePlacementFailed") {
+			return yield* Effect.fail(error);
+		}
+
 		return {
 			events: [
 				{
 					blockedAtMs: nowMs,
 					itemId: scheduledEvent.itemId,
-					reason: "placement_unavailable" as const,
+					reason: error.reason,
 					scheduledEventId: scheduledEvent.id,
 					type: "item.spawn.blocked" as const,
 				},
@@ -60,6 +67,7 @@ export const processScheduledItemSpawnFx = Effect.fn("processScheduledItemSpawnF
 		} satisfies GameEngineCompletionResult;
 	}
 
+	const placement = placementEither.right;
 	delete placement.save.scheduledEvents[scheduledEvent.id];
 	placement.save.updatedAtMs = nowMs;
 

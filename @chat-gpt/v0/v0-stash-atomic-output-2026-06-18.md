@@ -25,7 +25,7 @@ Po opravě `openStashFx`:
 2. spotřebuje vstupy na cloned save,
 3. rollne loot,
 4. aplikuje output přes `placeGameSaveItemsFx` přímo do save,
-5. pokud placement nejde, celá akce failne přes `placement_unavailable` a původní save zůstane beze změny,
+5. pokud placement nejde, celá akce failne přes `board:full` / `inventory:full` via `GamePlacementFailed` a původní save zůstane beze změny,
 6. pokud stash došel, aplikuje depletion okamžitě přes `applyStashDepletionFx`:
    - `remove` smaže board item a jeho runtime state,
    - `replaceWithItemId` přepíše stejný board item instance na replacement item a smaže runtime state.

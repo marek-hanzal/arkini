@@ -75,15 +75,16 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		nowMs,
 		save: consumed.save,
 		seedCell,
-	});
-	if (placement.type === "blocked") {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"placement_unavailable",
-				`Stash "${action.stashItemInstanceId}" output cannot be placed.`,
+	}).pipe(
+		Effect.catchTag("GamePlacementFailed", (error) =>
+			Effect.fail(
+				GameEngineError.actionRejected(
+					error.reason,
+					`Stash "${action.stashItemInstanceId}" output cannot be placed.`,
+				),
 			),
-		);
-	}
+		),
+	);
 
 	const nextRemainingCharges = 0;
 	const depletionEvents = yield* applyStashDepletionFx({

@@ -45,15 +45,16 @@ export const withdrawCraftInputFx = Effect.fn("withdrawCraftInputFx")(function* 
 			x: checked.target.targetItem.x,
 			y: checked.target.targetItem.y,
 		},
-	});
-	if (placement.type === "blocked") {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"placement_unavailable",
-				`Craft input "${action.itemId}" cannot be withdrawn because there is no placement space.`,
+	}).pipe(
+		Effect.catchTag("GamePlacementFailed", (error) =>
+			Effect.fail(
+				GameEngineError.actionRejected(
+					error.reason,
+					`Craft input "${action.itemId}" cannot be withdrawn because there is no placement space.`,
+				),
 			),
-		);
-	}
+		),
+	);
 
 	const craftInputState = placement.save.craftInputs[action.targetItemInstanceId] ?? {
 		items: {},

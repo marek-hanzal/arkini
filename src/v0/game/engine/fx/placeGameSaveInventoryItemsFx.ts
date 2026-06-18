@@ -45,10 +45,9 @@ export const placeGameSaveInventoryItemsFx = Effect.fn("placeGameSaveInventoryIt
 		});
 
 		if (!placed) {
-			return {
-				reason: "placement_unavailable",
-				type: "blocked",
-			} satisfies GameSaveItemPlacementResult;
+			return yield* Effect.fail(
+				GameEngineError.placementFailed("inventory:full", "Inventory is full."),
+			);
 		}
 	}
 

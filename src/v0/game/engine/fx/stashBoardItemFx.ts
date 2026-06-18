@@ -57,13 +57,11 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 		],
 		nowMs,
 		save: nextSave,
-	});
-
-	if (placed.type === "blocked") {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("placement_unavailable", "Inventory is full."),
-		);
-	}
+	}).pipe(
+		Effect.catchTag("GamePlacementFailed", (error) =>
+			Effect.fail(GameEngineError.actionRejected(error.reason, "Inventory is full.")),
+		),
+	);
 
 	placed.save.updatedAtMs = nowMs;
 

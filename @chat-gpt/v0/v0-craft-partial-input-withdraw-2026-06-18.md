@@ -18,7 +18,7 @@ Runtime contract:
 - `craft.input.withdraw` is allowed only before craft start
 - withdraw removes one stored unit per UI click and places exactly one item back through `placeGameSaveItemsFx`
 - withdraw seed is the craft target board position, matching producer/product withdraw placement rules
-- no-space withdraw fails with `placement_unavailable` and leaves stored input state untouched
+- no-space withdraw fails with `board:full` / `inventory:full` via `GamePlacementFailed` and leaves stored input state untouched
 - running craft targets reject input store/withdraw through `craft_in_progress`
 
 The completed craft replacement/crossfade path remains the same from earlier T2 follow-ups: completion replaces the target tile in place and TileEngine cross-fades old/new item visuals.

@@ -144,7 +144,7 @@ Board DnD confinement checkpoint:
 Stash atomic output checkpoint:
 
 - `stash.open` must apply its rolled output directly through `placeGameSaveItemsFx`; it must not schedule output just to get sequential animation.
-- If stash output placement is unavailable, `stash.open` fails with `placement_unavailable` and the original save remains unchanged.
+- If stash output placement is unavailable, `stash.open` fails with `board:full` / `inventory:full` via `GamePlacementFailed` and the original save remains unchanged.
 - Depleted stashes are handled immediately by `applyStashDepletionFx`: `remove` deletes the board item and runtime state; `replaceWithItemId` changes the same item instance and clears runtime state.
 - `GameSaveScheduledEventSchema` currently allows only `item.spawn`; scheduled board remove/replace events were removed because they were stash animation plumbing, not real delayed domain state.
 
@@ -163,3 +163,5 @@ Product-line input ref checkpoint:
 - Product line UI displays its own input rows/readiness. Filling still happens through core DnD/merge-like interaction onto the producer tile, not a special button.
 - Product line input rows with stored quantity can withdraw the whole stored amount at once. Withdraw uses producer-style board-then-inventory placement seeded at the producer tile and rejects without state changes if no placement is available.
 - `GameSaveConfigSchema` validates `save.producerInputs` against effective product input refs, including completed `product.inputRef.set` upgrades.
+
+- 2026-06-18: Placement capacity failures now use `GamePlacementFailed` tagged errors with concrete `board:full` / `inventory:full` / `placement-failed:unknown` reasons; low-level placement helpers fail through Effect and action/domain callers catch/map them. See `@chat-gpt/v0/v0-placement-failure-reasons-2026-06-18.md`.

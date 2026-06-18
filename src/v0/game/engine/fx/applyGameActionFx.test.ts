@@ -713,7 +713,7 @@ describe("applyGameActionFx", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "placement_unavailable",
+				reason: "board:full",
 			});
 		}
 		expect(save.stashes).toEqual({});
@@ -792,7 +792,7 @@ describe("applyGameActionFx", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "placement_unavailable",
+				reason: "board:full",
 			});
 		}
 		expect(save.stashes).toEqual({});

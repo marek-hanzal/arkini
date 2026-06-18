@@ -1,6 +1,13 @@
+import type { GamePlacementFailureReason } from "~/v0/game/engine/model/GamePlacementFailureReasonSchema";
+
 export type GameEngineError =
 	| {
 			readonly _tag: "GameActionInvalid";
+			readonly message: string;
+	  }
+	| {
+			readonly _tag: "GamePlacementFailed";
+			readonly reason: GamePlacementFailureReason;
 			readonly message: string;
 	  }
 	| {
@@ -12,7 +19,7 @@ export type GameEngineError =
 				| "invalid_merge"
 				| "craft_in_progress"
 				| "missing_requirement"
-				| "placement_unavailable"
+				| GamePlacementFailureReason
 				| "product_line_disabled"
 				| "producer_queue_full"
 				| "stash_depleted"
@@ -36,6 +43,13 @@ export const GameEngineError = {
 		return {
 			_tag: "GameActionInvalid",
 			message,
+		};
+	},
+	placementFailed(reason: GamePlacementFailureReason, message: string): GameEngineError {
+		return {
+			_tag: "GamePlacementFailed",
+			message,
+			reason,
 		};
 	},
 	actionRejected(

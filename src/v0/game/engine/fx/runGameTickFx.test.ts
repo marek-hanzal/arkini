@@ -261,7 +261,7 @@ describe("runGameTickFx", () => {
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
-				reason: "placement_unavailable",
+				reason: "board:full",
 				type: "product.blocked",
 			},
 		]);

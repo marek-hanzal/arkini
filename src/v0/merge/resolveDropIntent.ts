@@ -15,6 +15,9 @@ export type DropIntent =
 			type: "producer-input";
 	  }
 	| {
+			type: "stored-requirement";
+	  }
+	| {
 			type: "swap";
 	  }
 	| {
@@ -88,12 +91,17 @@ export const resolveDropIntent = ({
 	const canSupplyProducer = Boolean(
 		targetItem.activation?.inputs.some(
 			(input) => input.itemId === sourceItemId && input.stored < input.capacity,
+		),
+	);
+	const canSupplyStoredRequirement = Boolean(
+		targetItem.activation?.requirements.some(
+			(requirement) =>
+				requirement.type === "stored" &&
+				requirement.itemId === sourceItemId &&
+				requirement.stored < requirement.capacity,
 		) ||
-			targetItem.activation?.requirements.some(
-				(requirement) =>
-					requirement.type === "stored" &&
-					requirement.itemId === sourceItemId &&
-					requirement.stored < requirement.capacity,
+			targetItem.activation?.productLines?.some(
+				(line) => line.enabled && line.missingRequirementItemIds.includes(sourceItemId),
 			),
 	);
 
@@ -120,6 +128,12 @@ export const resolveDropIntent = ({
 	if (canSupplyProducer) {
 		return {
 			type: "producer-input",
+		};
+	}
+
+	if (canSupplyStoredRequirement) {
+		return {
+			type: "stored-requirement",
 		};
 	}
 

@@ -127,7 +127,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									: line.inputItemIds.length
 										? "Feed items by drag"
 										: !line.requirementsReady
-											? "Store requirements"
+											? "Drag requirements in"
 											: "Start"}
 							</button>
 						</div>

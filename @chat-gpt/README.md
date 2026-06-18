@@ -60,5 +60,7 @@ Stored requirements runtime checkpoint:
 
 - Stored requirements live in `save.storedRequirements[targetItemInstanceId].items` and are validated centrally by `GameSaveConfigSchema`.
 - Producer/stash readiness gates against stored quantities on the target board item; store/withdraw actions modify the same save bucket.
-- Product line views expose `requirementsReady` and `missingRequirementItemIds` so no-input product buttons are disabled with `Store requirements` until stored/passive requirements are satisfied.
+- Stored requirements must be filled through the core drag/drop + merge-like tile interaction model, not through special `Store` buttons or bespoke form UI. Drag matching items onto the building/target tile.
+- Product line views expose `requirementsReady` and `missingRequirementItemIds`; blocked product lines should describe the DnD requirement path, not trigger special storage UI.
+- Current runtime drop routing prioritizes missing stored requirements before producer/stash consumable inputs. If an item is both a durable requirement and a consumable input, the requirement fills first; after capacity is full, normal input actions can run.
 - Do not move this into storage/UI validation. UI flags are readiness hints; save integrity stays schema-owned.

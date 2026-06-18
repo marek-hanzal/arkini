@@ -65,9 +65,13 @@ const storedRequirementAcceptsItem = ({
 		...productRequirements,
 		...(targetItem.stashId ? (config.stashes[targetItem.stashId]?.requirements ?? []) : []),
 	];
+	const storedItems = save.storedRequirements[target.id]?.items ?? {};
 
 	return requirements.some(
-		(requirement) => requirement.type === "stored" && requirement.itemId === itemId,
+		(requirement) =>
+			requirement.type === "stored" &&
+			requirement.itemId === itemId &&
+			(storedItems[itemId] ?? 0) < requirement.capacity,
 	);
 };
 
@@ -161,6 +165,23 @@ const dispatchApplyItemToBoardItem = ({
 		});
 	}
 
+	if (
+		storedRequirementAcceptsItem({
+			config,
+			itemId: sourceItemId,
+			save,
+			target,
+		})
+	) {
+		return store.dispatch({
+			action: {
+				inputRef: sourceRef,
+				targetItemInstanceId: target.id,
+				type: "stored_requirement.store",
+			},
+		});
+	}
+
 	const productId = productIdForInput({
 		config,
 		save,
@@ -194,23 +215,6 @@ const dispatchApplyItemToBoardItem = ({
 				],
 				stashItemInstanceId: target.id,
 				type: "stash.open",
-			},
-		});
-	}
-
-	if (
-		storedRequirementAcceptsItem({
-			config,
-			itemId: sourceItemId,
-			save,
-			target,
-		})
-	) {
-		return store.dispatch({
-			action: {
-				inputRef: sourceRef,
-				targetItemInstanceId: target.id,
-				type: "stored_requirement.store",
 			},
 		});
 	}

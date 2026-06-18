@@ -21,7 +21,7 @@ These rules define how the game should be interpreted when implementation detail
 3. Game definitions must describe items, merge chains, producers, stashes, loot tables, blueprints, craft/construction requirements, upgrades, grid sizes, inventory sizes, starting state, and other game rules.
 4. The game is client-only and must be able to run offline in the browser.
 5. Saved state is not considered backwards-compatible unless a migration explicitly supports it.
-6. If the game crashes during startup or runtime because local storage is corrupt or incompatible, the first recovery action is a full OPFS hard reset followed by reload. Do not build soft recovery mazes for prototype saves.
+6. If the game crashes during startup or runtime because local storage is corrupt or incompatible, the first recovery action is a full browser-storage hard reset followed by reload. Do not build soft recovery mazes for prototype saves.
 7. If a saved game is incompatible with the active game definition version after migrations, the save may be dropped.
 8. Game mechanics should be simple, explicit, and consistent. If a rule needs a special exception, the design should be questioned first.
 9. Prefer one clean mechanic over several similar mechanics that behave slightly differently.
@@ -424,7 +424,7 @@ Inventory does not need a manual stack-combine interaction because stack normali
 
 Board cells and inventory slots are visual geometry and drop targets, not item owners. Rendered item tiles are stable actors managed through the generic `TileEngine` visual layer. A gameplay mutation may update durable board/inventory data, but the visual tile must not be replaced by a separate flyer copy just to animate movement.
 
-Tile actions that create or move items should stage the final actor from an external rect, drop rect, producer, or stash source and let it settle into its committed slot. Spawn supports both instant batch output and stack/staggered output. This is visual state only; gameplay data remains owned by the parent game engine and SQLite.
+Tile actions that create or move items should stage the final actor from an external rect, drop rect, producer, or stash source and let it settle into its committed slot. Spawn supports both instant batch output and stack/staggered output. This is visual state only; gameplay data remains owned by the runtime game engine.
 
 ## 8. Interaction rules
 

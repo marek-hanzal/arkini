@@ -15,9 +15,8 @@ export namespace runGameEngineEffect {
 /**
  * Minimal standalone runner for the new tick/action engine.
  *
- * This intentionally does not use the app-level `runEffect`, because that runner still
- * wires Kysely/SQLite/browser storage. The engine runtime only needs random numbers;
- * persistence should wrap the engine later, not sneak into it now wearing a fake beard.
+ * The engine runtime only needs random numbers. Persistence wraps this adapter from
+ * the outside instead of sneaking storage into gameplay rules wearing a fake beard.
  */
 export const runGameEngineEffect = <A, E>(
 	effect: EffectType.Effect<A, E, GameEngineRuntimeServiceFx>,

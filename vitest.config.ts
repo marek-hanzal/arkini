@@ -11,12 +11,13 @@ export default defineConfig({
 		clearMocks: true,
 		environment: "node",
 		fileParallelism: false,
+		isolate: false,
 		include: [
 			"src/**/*.test.ts",
 			"src/**/*.test.tsx",
 		],
 		maxWorkers: 1,
-		pool: "forks",
+		pool: "threads",
 		watch: false,
 	},
 });

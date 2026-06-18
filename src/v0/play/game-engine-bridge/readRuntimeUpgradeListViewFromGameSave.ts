@@ -1,5 +1,6 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import type { UpgradeCostView } from "~/v0/upgrade/view/UpgradeCostViewSchema";
 import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
 import type { UpgradeView } from "~/v0/upgrade/view/UpgradeViewSchema";
 
@@ -76,9 +77,9 @@ export const readRuntimeUpgradeListViewFromGameSave = ({
 							),
 						)
 					: undefined;
-			const nextCost = (nextTier?.cost ?? []).map((cost) => ({
+			const nextCost: UpgradeCostView[] = (nextTier?.cost ?? []).map((cost) => ({
 				available: available.get(cost.itemId) ?? 0,
-				itemId: cost.itemId,
+				itemId: cost.itemId as UpgradeCostView["itemId"],
 				quantity: cost.quantity,
 			}));
 			const canAfford = nextCost.every((cost) => cost.available >= cost.quantity);
@@ -95,7 +96,7 @@ export const readRuntimeUpgradeListViewFromGameSave = ({
 					),
 				),
 				description: upgrade.description,
-				id: upgradeId,
+				id: upgradeId as UpgradeView["id"],
 				inProgress,
 				level: completed,
 				maxLevel: upgrade.tiers.length,

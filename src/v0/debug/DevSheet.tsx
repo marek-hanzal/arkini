@@ -1,8 +1,5 @@
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
-import { useHardResetMutation } from "~/v0/database/action/useHardResetMutation";
-import { databaseStatusQueryOptions } from "~/v0/database/query/databaseStatusQueryOptions";
-import { StatusPill } from "~/v0/database/StatusPill";
+import { hardResetBrowserStorage } from "~/v0/browser/hardResetBrowserStorage";
 import { DebugBugReport } from "~/v0/debug/DebugBugReport";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import {
@@ -11,6 +8,8 @@ import {
 	isDevScenarioId,
 } from "~/v0/debug/scenario/DevScenarioDefinitions";
 import { useLoadDevScenarioAction } from "~/v0/debug/scenario/useLoadDevScenarioAction";
+import { StatusPill } from "~/v0/debug/ui/StatusPill";
+import { useGameRuntimeSelector } from "~/v0/play/runtime";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { cn } from "~/v0/ui/cn";
 
@@ -41,15 +40,29 @@ const DebugButton: FC<{
 	</button>
 );
 
+const formatWake = (nextWakeAtMs: number | null) => {
+	if (nextWakeAtMs === null) return "idle";
+	return `${Math.max(0, nextWakeAtMs - Date.now())}ms`;
+};
+
 export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
-	const queryClient = useQueryClient();
-	const { data: status } = useSuspenseQuery(databaseStatusQueryOptions());
-	const hardResetMutation = useHardResetMutation();
 	const loadScenarioAction = useLoadDevScenarioAction();
 	const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
+	const [resetState, setResetState] = useState<"idle" | "pending" | "failed">("idle");
 	const [timelineSize, setTimelineSize] = useState(DebugTimeline.entries().length);
-	const isolated = window.crossOriginIsolated;
-	const queryCount = queryClient.getQueryCache().getAll().length;
+	const runtime = useGameRuntimeSelector(
+		(state) => ({
+			boardItems: state.board.items.length,
+			inventoryStacks: state.inventory.slots.filter((slot) => slot.stack).length,
+			nextWakeAtMs: state.runtime.nextWakeAtMs,
+			revision: state.revision,
+		}),
+		(left, right) =>
+			left.boardItems === right.boardItems &&
+			left.inventoryStacks === right.inventoryStacks &&
+			left.nextWakeAtMs === right.nextWakeAtMs &&
+			left.revision === right.revision,
+	);
 
 	const loadScenario = useCallback(
 		(scenarioId: DevScenarioId) => {
@@ -96,13 +109,12 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 				createdAtIso: report.createdAtIso,
 				context: report.context,
 				timelineCount: Array.isArray(report.timeline) ? report.timeline.length : 0,
-				queryCount,
 			},
 			null,
 			"\t",
 		);
 	}, [
-		queryCount,
+		runtime.revision,
 		timelineSize,
 	]);
 
@@ -125,11 +137,21 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 		setCopyState("idle");
 	}, []);
 
+	const hardReset = useCallback(() => {
+		setResetState("pending");
+		void hardResetBrowserStorage()
+			.then(() => window.location.reload())
+			.catch((error: unknown) => {
+				console.error("Failed to hard reset Arkini browser storage", error);
+				setResetState("failed");
+			});
+	}, []);
+
 	return (
 		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
 			<SheetHeader
 				eyebrow="Developer"
-				description="Debug, diagnostics and local save tools"
+				description="Debug, diagnostics and runtime tools"
 				onClose={onClose}
 			/>
 			<div className="grid gap-3 p-4 pt-1">
@@ -163,8 +185,8 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							value={String(timelineSize)}
 						/>
 						<StatusPill
-							label="Queries"
-							value={String(queryCount)}
+							label="Revision"
+							value={String(runtime.revision)}
 						/>
 						<StatusPill
 							label="Mode"
@@ -200,7 +222,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 								Load debug save
 							</h2>
 							<p className="mt-2 text-sm text-slate-300">
-								Reset the default save into a deterministic state before reproducing
+								Reset the runtime save into a deterministic state before reproducing
 								an animation bug. The loaded scenario is recorded into the bug
 								report timeline.
 							</p>
@@ -230,7 +252,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							</button>
 						))}
 					</div>
-					{loadScenarioAction.isSuccess ? (
+					{loadScenarioAction.data ? (
 						<p className="mt-3 text-sm font-semibold text-indigo-100">
 							Loaded {loadScenarioAction.data.scenarioId}. Reproduce the bug, then
 							copy a bug report.
@@ -248,51 +270,46 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 					<div className="flex h-full flex-wrap items-center gap-4">
 						<div className="min-w-40">
 							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-indigo-300">
-								SQLite / OPFS
+								Runtime
 							</p>
-							<h2 className="mt-1 text-base font-semibold text-white">Local save</h2>
-							<span
-								className={cn(
-									"mt-2 inline-flex rounded-sm px-2 py-1 text-xs font-semibold",
-									isolated
-										? "bg-emerald-400/10 text-emerald-200"
-										: "bg-amber-400/10 text-amber-200",
-								)}
-							>
-								{isolated ? "isolated" : "headers missing"}
+							<h2 className="mt-1 text-base font-semibold text-white">
+								Local session
+							</h2>
+							<span className="mt-2 inline-flex rounded-sm bg-emerald-400/10 px-2 py-1 text-xs font-semibold text-emerald-200">
+								runtime-only
 							</span>
 						</div>
 
 						<div className="grid min-w-64 flex-1 grid-cols-2 gap-2">
 							<StatusPill
-								label="DB"
-								value={status.databasePath}
+								label="Board"
+								value={String(runtime.boardItems)}
 							/>
 							<StatusPill
-								label="Sync"
-								value={status.gameConfigHash}
+								label="Inventory"
+								value={String(runtime.inventoryStacks)}
 							/>
 							<StatusPill
-								label="Items"
-								value={String(status.itemCount)}
+								label="Next tick"
+								value={formatWake(runtime.nextWakeAtMs)}
 							/>
 							<StatusPill
-								label="Prod"
-								value={String(status.producerCount)}
+								label="Source"
+								value="Runtime store"
 							/>
 						</div>
 
 						<div className="min-w-40">
 							<DebugButton
 								tone="danger"
-								disabled={hardResetMutation.isPending}
-								onClick={() => hardResetMutation.mutate()}
+								disabled={resetState === "pending"}
+								onClick={hardReset}
 							>
-								{hardResetMutation.isPending
-									? "Dropping OPFS storage…"
-									: "Hard reset DB"}
+								{resetState === "pending"
+									? "Dropping browser storage…"
+									: "Hard reset storage"}
 							</DebugButton>
-							{hardResetMutation.isError ? (
+							{resetState === "failed" ? (
 								<p className="mt-3 text-sm text-red-100">
 									Reset failed. Check the console.
 								</p>

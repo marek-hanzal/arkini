@@ -101,6 +101,7 @@ describe("resolveDrop animation contract", () => {
 
 		const outcome = resolveDrop({
 			actions,
+			config,
 			feedback,
 			inventory: {} as never,
 			board: {

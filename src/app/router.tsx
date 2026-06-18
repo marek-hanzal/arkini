@@ -1,4 +1,3 @@
-import { QueryClient } from "@tanstack/react-query";
 import {
 	createHashHistory,
 	createRootRouteWithContext,
@@ -9,25 +8,8 @@ import { HomeScreen } from "~/app/HomeScreen";
 import { RootErrorBoundary } from "~/app/RootErrorBoundary";
 import { RootShell } from "~/app/RootShell";
 
-export interface RouterContext {
-	queryClient: QueryClient;
-}
+export interface RouterContext {}
 
-export function createArkiniQueryClient() {
-	return new QueryClient({
-		defaultOptions: {
-			queries: {
-				gcTime: 1000 * 60 * 30,
-				refetchOnReconnect: false,
-				refetchOnWindowFocus: false,
-				retry: 1,
-				staleTime: 1000 * 10,
-			},
-		},
-	});
-}
-
-const queryClient = createArkiniQueryClient();
 const history = createHashHistory();
 
 export const rootRoute = createRootRouteWithContext<RouterContext>()({
@@ -47,9 +29,7 @@ const routeTree = rootRoute.addChildren([
 
 export const router = createRouter({
 	routeTree,
-	context: {
-		queryClient,
-	},
+	context: {},
 	history,
 	defaultPreload: "intent",
 	scrollRestoration: true,

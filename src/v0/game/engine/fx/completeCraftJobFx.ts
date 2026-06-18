@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -41,6 +42,11 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		);
 	}
 
+	const seedCell = readBoardItemCell({
+		itemInstanceId: liveJob.targetItemInstanceId,
+		save,
+	});
+
 	const placementRequests: GameSaveItemPlacementRequest[] = [
 		...liveJob.returnItems.map(
 			(item) =>
@@ -60,6 +66,7 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		items: placementRequests,
 		nowMs,
 		save,
+		seedCell,
 	});
 
 	if (preflightPlacement.type === "blocked") {

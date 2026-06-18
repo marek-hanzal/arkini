@@ -4,6 +4,7 @@ import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
 import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 import { scheduleStashDepletionFx } from "~/v0/game/engine/fx/scheduleStashDepletionFx";
@@ -61,11 +62,16 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 				reason: "stash-output",
 			}) satisfies GameSaveItemPlacementRequest,
 	);
+	const seedCell = readBoardItemCell({
+		itemInstanceId: action.stashItemInstanceId,
+		save: consumed.save,
+	});
 	const preflightPlacement = yield* placeGameSaveItemsFx({
 		config,
 		items: placementRequests,
 		nowMs,
 		save: consumed.save,
+		seedCell,
 	});
 	if (preflightPlacement.type === "blocked") {
 		return yield* Effect.fail(

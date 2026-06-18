@@ -14,31 +14,19 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ## Active / useful task candidates
 
-### 1. Producer/local placement planner
-
-Producer output currently still deserves a focused pass: item placement should prefer cells around the producing tile instead of using a global first-empty board scan. Build this as shared placement planning, not a producer-local hack.
-
-Desired shape:
-
-- shared planner accepts board size, occupied cells and optional `seedCell`.
-- default mode can remain first-empty/global for cases without a seed.
-- producer completion/stash/open/scheduled spawn can pass `seedCell` from `originItemInstanceId` when available.
-- inventory-to-board placement can later reuse the same planner for long-press empty-cell placement.
-- ordering should be deterministic, nearest-by-manhattan from the seed.
-
-### 2. Producer board progress bar
+### 1. Producer board progress bar
 
 Item sheet product progress is live, but the board tile should also show the currently running producer job as a small bottom progress bar. The old activation cooldown progress path is not the same as runtime producer jobs. Keep this subtle and reuse existing board progress UI where possible.
 
-### 3. Tile detail executable-interaction parity
+### 2. Tile detail executable-interaction parity
 
 The item detail must not display interactions that `resolveDropIntent` / runtime actions cannot execute. Known reported example: water detail promised a water → twig interaction that did not work on board. Detail hints should come from the same canonical executable resolver or be clearly marked locked/unavailable.
 
-### 4. Touch/long-press polish
+### 3. Touch/long-press polish
 
 Long press on game surfaces should not open native browser menus. Keep suppression scoped to board/tile surfaces so normal app UI is not wrecked for sport.
 
-### 5. Badge/visual polish
+### 4. Badge/visual polish
 
 Tile badge/level offset can be tightened toward the corner. Keep it tiny and do not redesign tile layout while pretending it is “just polish”.
 
@@ -51,6 +39,10 @@ Tile badge/level offset can be tightened toward the corner. Keep it tiny and do 
 
 ## Selected next task
 
-Recommended next coding task: **Producer/local placement planner**.
+Recommended next coding task: **Producer board progress bar**.
 
-Reason: it is a real gameplay/UX mismatch, it creates shared infrastructure for both producer output and later inventory-to-board placement, and it is less speculative than product-line categories or broad content work. Also, dumping producer output into global top-left free cells makes the board feel like a spreadsheet with a skin condition. Fix the spatial causality first.
+Reason: placement now preserves spatial causality. The next visible gameplay gap is that active producer jobs should show a subtle bottom progress bar directly on the board tile, so the board itself communicates that production is running instead of forcing the player to open the sheet like a tiny bureaucrat.
+
+## Completed recent task
+
+- `v0-local-placement-planner-2026-06-18.md`: shared Manhattan `seedCell` placement planner wired into producer/stash/craft/scheduled output flow.

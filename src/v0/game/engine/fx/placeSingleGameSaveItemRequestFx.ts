@@ -4,6 +4,7 @@ import { createGameItemInstanceIdFx } from "~/v0/game/engine/fx/createGameItemIn
 import { findFirstEmptyBoardCellFx } from "~/v0/game/engine/fx/findFirstEmptyBoardCellFx";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/engine/fx/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import type { BoardCell } from "~/v0/game/engine/model/BoardCell";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -14,11 +15,12 @@ export namespace placeSingleGameSaveItemRequestFx {
 		events: GameEvent[];
 		item: GameSaveItemPlacementRequest;
 		save: GameSave;
+		seedCell?: BoardCell;
 	}
 }
 
 export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveItemRequestFx")(
-	function* ({ config, events, item, save }: placeSingleGameSaveItemRequestFx.Props) {
+	function* ({ config, events, item, save, seedCell }: placeSingleGameSaveItemRequestFx.Props) {
 		const itemDefinition = config.items[item.itemId];
 
 		if (!itemDefinition) {
@@ -33,6 +35,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			const emptyCell = yield* findFirstEmptyBoardCellFx({
 				config,
 				save,
+				seedCell,
 			});
 
 			if (!emptyCell) {

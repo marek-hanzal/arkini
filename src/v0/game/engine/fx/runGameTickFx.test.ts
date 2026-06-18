@@ -95,6 +95,75 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
+	it("places producer output around the producer before falling back to distant cells", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 3,
+					width: 3,
+				},
+				title: "Test",
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 1,
+						y: 1,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(
+			result.events
+				.filter((event) => event.type === "item.created" && event.to.kind === "board")
+				.map((event) => {
+					if (event.type !== "item.created" || event.to.kind !== "board") {
+						return null;
+					}
+
+					return {
+						x: event.to.x,
+						y: event.to.y,
+					};
+				}),
+		).toEqual([
+			{
+				x: 1,
+				y: 0,
+			},
+			{
+				x: 0,
+				y: 1,
+			},
+		]);
+	});
+
 	it("completes already running producer jobs even when the product line is later disabled", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

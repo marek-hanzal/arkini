@@ -19,7 +19,9 @@ export namespace PlayShell {
 	export interface Props {}
 }
 
-const SheetFallback: FC = () => <div className="p-4 text-sm text-slate-300">Loading sheet…</div>;
+const SheetFallback: FC = () => (
+	<div className="p-4 text-sm text-ak-text-muted">Loading sheet…</div>
+);
 
 const PlayShellContent: FC = () => {
 	const runtimeStore = useGameRuntimeStore();
@@ -144,17 +146,14 @@ const PlayShellContent: FC = () => {
 	return (
 		<div
 			ref={playAreaRef}
+			data-ui="app root"
 			className="relative h-dvh w-dvw overflow-hidden"
 		>
-			<div className="relative h-full w-full overflow-hidden px-3 pt-3 pb-[calc(var(--ak-bottom-nav-height)+0.75rem)]">
-				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col gap-3 overflow-visible">
-					<div className="shrink-0 rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
-						<p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-emerald-300">
-							Arkini
-						</p>
-						<h1 className="text-lg font-semibold text-slate-50">Merge board</h1>
-					</div>
-
+			<div
+				data-ui="game screen"
+				className="relative h-full w-full overflow-hidden px-2 pt-2 pb-[calc(var(--ak-bottom-nav-height)+0.55rem)]"
+			>
+				<main className="mx-auto flex h-full ak-game-width min-h-0 flex-col overflow-visible">
 					<div className="min-h-0 shrink-0">
 						<BoardSurface
 							feedback={feedback}
@@ -167,7 +166,10 @@ const PlayShellContent: FC = () => {
 				</main>
 
 				{lastError && feedbackFlags.has("toast:error") ? (
-					<div className="ak-layer-toast pointer-events-none absolute inset-x-3 bottom-[calc(var(--ak-bottom-nav-height)+0.85rem)] mx-auto max-w-[430px] rounded-md border border-red-300/35 bg-red-950/90 px-3 py-2 text-sm text-red-50 shadow-xl shadow-black/35">
+					<div
+						data-ui="error toast"
+						className="ak-layer-toast pointer-events-none absolute inset-x-3 bottom-[calc(var(--ak-bottom-nav-height)+0.85rem)] mx-auto max-w-[430px] rounded-xl border border-rose-300/50 bg-rose-50/95 px-3 py-2 text-sm font-semibold text-rose-800 shadow-xl shadow-rose-900/10"
+					>
 						{lastError}
 					</div>
 				) : null}

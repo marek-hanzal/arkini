@@ -26,11 +26,12 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 	if (lines.length === 0) return null;
 
 	return (
-		<div className="rounded-md border border-violet-400/20 bg-violet-950/18 p-3">
-			<p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
-				Product lines
-			</p>
-			<div className="mt-3 space-y-2">
+		<div
+			data-ui="producer controls"
+			className="ak-ui-card-soft p-3"
+		>
+			<p className="ak-ui-eyebrow">Product lines</p>
+			<div className="mt-3 grid gap-2">
 				{lines.map((baseLine) => {
 					const line = readLiveProducerProductLineView({
 						line: baseLine,
@@ -49,16 +50,14 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						<div
 							key={line.productId}
 							className={cn(
-								"rounded-sm border px-2 py-2 text-xs",
-								line.enabled
-									? "border-violet-300/20 bg-slate-950/45 text-slate-200"
-									: "border-slate-800 bg-slate-950/25 text-slate-500",
+								"ak-ui-row min-w-0 px-3 py-3 text-xs",
+								!line.enabled && "opacity-70",
 							)}
 						>
-							<div className="flex items-start justify-between gap-3">
+							<div className="flex min-w-0 items-start justify-between gap-3">
 								<div className="min-w-0">
-									<p className="font-bold text-slate-100">{line.name}</p>
-									<p className="mt-1 text-[0.7rem] text-slate-400">
+									<p className="truncate font-bold text-ak-text">{line.name}</p>
+									<p className="ak-ui-muted mt-1 break-words text-[0.7rem] leading-4">
 										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
 										{formatMs(line.durationMs)}
 										{line.inputItemIds.length
@@ -77,10 +76,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									disabled={pending}
 									onClick={() => onSetEnabled(line.productId, !line.enabled)}
 									className={cn(
-										"shrink-0 rounded-sm px-2 py-1 font-black transition disabled:opacity-35",
+										"ak-ui-button shrink-0 px-3 text-xs",
 										line.enabled
-											? "bg-emerald-300 text-slate-950"
-											: "bg-slate-800 text-slate-300",
+											? "ak-ui-button-secondary"
+											: "ak-ui-button-ghost",
 									)}
 								>
 									{line.enabled ? "On" : "Off"}
@@ -88,16 +87,16 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 							</div>
 
 							{line.inputs.length ? (
-								<div className="mt-2 grid gap-1">
+								<div className="mt-2 grid gap-1.5">
 									{line.inputs.map((input) => (
 										<div
 											key={input.itemId}
-											className="flex items-center justify-between gap-2 rounded-sm border border-slate-700/60 bg-slate-950/35 px-2 py-1 text-[0.68rem]"
+											className="flex min-w-0 items-center justify-between gap-2 rounded-lg bg-white/68 px-2 py-2 text-[0.7rem]"
 										>
-											<span className="min-w-0 font-semibold text-slate-300">
+											<span className="min-w-0 truncate font-semibold text-ak-text">
 												{input.itemId.replace(/^item:/, "")}
 											</span>
-											<span className="ml-auto text-slate-400">
+											<span className="ak-ui-muted ml-auto shrink-0 tabular-nums">
 												{input.stored}/{input.quantity}
 												{input.capacity > input.quantity
 													? ` · cap ${input.capacity}`
@@ -106,6 +105,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											{input.stored > 0 ? (
 												<button
 													type="button"
+													data-ui="withdraw action"
 													disabled={pending}
 													onClick={() =>
 														onWithdrawInput(
@@ -113,7 +113,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 															input.itemId,
 														)
 													}
-													className="shrink-0 rounded-sm border border-slate-600/70 px-1.5 py-0.5 font-bold text-slate-300 transition hover:border-slate-400/80 hover:text-slate-100 disabled:opacity-35"
+													className="ak-ui-button ak-ui-button-secondary min-h-10 shrink-0 px-3 text-xs"
 												>
 													Withdraw
 												</button>
@@ -124,8 +124,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 							) : null}
 
 							{line.inProgress ? (
-								<div className="mt-2 rounded-sm bg-slate-950/60 p-2">
-									<div className="flex justify-between gap-3 font-bold text-violet-100">
+								<div className="mt-2 rounded-lg bg-white/68 p-2">
+									<div className="flex justify-between gap-3 font-bold text-violet-800">
 										<span>
 											Running
 											{line.queuedJobs > 1
@@ -138,9 +138,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												: "Queued"}
 										</span>
 									</div>
-									<div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-900">
+									<div className="ak-ui-progress-track mt-2 h-1.5">
 										<div
-											className="h-full rounded-full bg-violet-300/80"
+											className="ak-ui-progress-secondary"
 											style={{
 												width: `${Math.round((line.progress ?? 0) * 100)}%`,
 											}}
@@ -154,10 +154,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								disabled={!canStart || pending}
 								onClick={() => onStart(line.productId)}
 								className={cn(
-									"mt-2 w-full rounded-sm px-2 py-1.5 font-black transition disabled:opacity-35",
-									canStart
-										? "bg-violet-300 text-slate-950 active:scale-[0.99]"
-										: "bg-slate-800 text-slate-500",
+									"ak-ui-button mt-2 w-full",
+									canStart ? "ak-ui-button-primary" : "ak-ui-button-ghost",
 								)}
 							>
 								{line.queueFull

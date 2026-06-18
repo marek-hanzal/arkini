@@ -15,28 +15,29 @@ export const ItemSummaryCard: FC<ItemSummaryCard.Props> = ({
 	storeDisabled = false,
 	onStore,
 }) => (
-	<div className="flex gap-3 rounded-md border border-slate-800 bg-slate-950/60 p-3">
-		<div className="h-16 w-16 shrink-0 rounded-md bg-slate-900/70">
+	<div className="ak-ui-card flex min-w-0 gap-3 p-3">
+		<div className="h-16 w-16 shrink-0 rounded-xl bg-pink-50/80">
 			<GameItemView
 				item={item}
 				variant="inventory"
 			/>
 		</div>
 		<div className="min-w-0 flex-1">
-			<div className="flex items-start justify-between gap-3">
-				<h2 className="min-w-0 font-semibold text-slate-50">{item.name}</h2>
+			<div className="flex min-w-0 items-start justify-between gap-3">
+				<h2 className="min-w-0 truncate font-semibold text-ak-text">{item.name}</h2>
 				{onStore ? (
 					<button
 						type="button"
+						data-ui="store action"
 						disabled={storeDisabled}
 						onClick={onStore}
-						className="shrink-0 rounded-sm border border-slate-600/70 px-2 py-1 text-xs font-bold text-slate-300 transition hover:border-slate-400/80 hover:text-slate-100 disabled:opacity-35"
+						className="ak-ui-button ak-ui-button-ghost min-h-10 shrink-0 px-3 text-xs"
 					>
 						Store
 					</button>
 				) : null}
 			</div>
-			<p className="mt-1 text-xs leading-5 text-slate-400">{item.description}</p>
+			<p className="ak-ui-muted mt-1 break-words text-xs leading-5">{item.description}</p>
 		</div>
 	</div>
 );

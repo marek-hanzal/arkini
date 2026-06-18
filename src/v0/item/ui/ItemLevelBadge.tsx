@@ -8,7 +8,7 @@ export namespace ItemLevelBadge {
 
 export const ItemLevelBadge: FC<ItemLevelBadge.Props> = ({ label }) => {
 	return (
-		<span className="absolute bottom-0.5 right-0.5 min-w-4 rounded-sm bg-slate-950/85 px-1 text-center text-[0.62rem] font-black text-amber-200 shadow-sm">
+		<span className="absolute bottom-0.5 right-0.5 min-w-4 rounded-md bg-violet-700/90 px-1 text-center text-[0.62rem] font-black text-white shadow-sm">
 			{label}
 		</span>
 	);

@@ -17,9 +17,13 @@ interface ButtonProps {
 }
 
 const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) => (
-	<div className="ak-bottom-nav-slot">
+	<div
+		data-ui="bottom nav slot"
+		className="ak-bottom-nav-slot"
+	>
 		<button
 			type="button"
+			data-ui="bottom nav action"
 			className="ak-bottom-nav-button"
 			data-active={active ? "true" : "false"}
 			data-tone={tone}
@@ -39,7 +43,10 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 ));
 
 export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => (
-	<nav className="ak-layer-bottom-nav ak-bottom-nav">
+	<nav
+		data-ui="bottom nav"
+		className="ak-layer-bottom-nav ak-bottom-nav"
+	>
 		<div className="ak-bottom-nav-inner">
 			<NavButton
 				active={activeSheet === "inventory"}

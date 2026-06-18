@@ -12,18 +12,17 @@ export namespace SheetHeader {
 export const SheetHeader: FC<SheetHeader.Props> = ({ eyebrow, description, anchor, onClose }) => {
 	return (
 		<div
+			data-ui="sheet header"
 			data-inventory-summary={anchor === "inventory-summary" ? "" : undefined}
-			className="flex items-center justify-between gap-3 border-b border-slate-800/80 p-4"
+			className="flex min-w-0 items-center justify-between gap-3 border-b border-pink-200/80 bg-white/80 p-4"
 		>
-			<div>
-				<p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-emerald-300">
-					{eyebrow}
-				</p>
-				<p className="text-sm text-slate-300">{description}</p>
+			<div className="min-w-0">
+				<p className="ak-ui-eyebrow">{eyebrow}</p>
+				<p className="ak-ui-muted mt-1 break-words text-sm">{description}</p>
 			</div>
 			<button
 				type="button"
-				className="rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300"
+				className="ak-ui-button ak-ui-button-ghost shrink-0"
 				onClick={onClose}
 			>
 				Close

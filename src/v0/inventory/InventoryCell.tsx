@@ -10,9 +10,10 @@ export namespace InventoryCell {
 
 export const InventoryCell = memo(({ slotIndex, invalid }: InventoryCell.Props) => (
 	<div
+		data-ui="inventory slot"
 		data-ak-inventory-slot={slotIndex}
 		className={cn(
-			"relative aspect-square border-b border-r border-slate-800 bg-slate-900/70",
+			"relative aspect-square border-b border-r border-pink-200/70 bg-white/64",
 			invalid && "ak-cell-error",
 		)}
 	/>

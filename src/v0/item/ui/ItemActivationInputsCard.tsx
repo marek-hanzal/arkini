@@ -21,38 +21,34 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 	);
 
 	return (
-		<div className="rounded-md border border-amber-400/20 bg-amber-950/18 p-3">
-			<p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">
-				{title}
-			</p>
+		<div className="ak-ui-card-soft p-3">
+			<p className="ak-ui-eyebrow">{title}</p>
 			{storedRequirements.length ? (
-				<div className="mt-3 space-y-2">
-					<p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-amber-200/80">
+				<div className="mt-3 grid gap-2">
+					<p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-violet-700/80">
 						Persistent requirements
 					</p>
 					{storedRequirements.map((requirement) => (
 						<div
 							key={requirement.itemId}
-							className="flex items-center justify-between gap-3 rounded-sm bg-slate-950/45 px-2 py-1.5 text-xs"
+							className="ak-ui-row break-words px-2 py-2 text-xs"
 						>
-							<span>
-								{items[requirement.itemId]?.name ?? requirement.itemId}:{" "}
-								{requirement.stored}/{requirement.capacity} stored, requires{" "}
-								{requirement.quantity}. Drag matching items onto this tile.
-							</span>
+							{items[requirement.itemId]?.name ?? requirement.itemId}:{" "}
+							{requirement.stored}/{requirement.capacity} stored, requires{" "}
+							{requirement.quantity}. Drag matching items onto this tile.
 						</div>
 					))}
 				</div>
 			) : null}
 			{passiveRequirements.length ? (
-				<div className="mt-3 space-y-2">
-					<p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-amber-200/80">
+				<div className="mt-3 grid gap-2">
+					<p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-violet-700/80">
 						Passive requirements
 					</p>
 					{passiveRequirements.map((requirement) => (
 						<div
 							key={requirement.itemId}
-							className="rounded-sm bg-slate-950/45 px-2 py-1.5 text-xs"
+							className="ak-ui-row break-words px-2 py-2 text-xs"
 						>
 							{items[requirement.itemId]?.name ?? requirement.itemId}: requires{" "}
 							{requirement.quantity} owned/available, not dragged here
@@ -61,14 +57,14 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 				</div>
 			) : null}
 			{activation.inputs.length ? (
-				<div className="mt-3 space-y-2">
-					<p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-amber-200/80">
+				<div className="mt-3 grid gap-2">
+					<p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-violet-700/80">
 						Consumable inputs
 					</p>
 					{activation.inputs.map((input) => (
 						<div
 							key={input.itemId}
-							className="rounded-sm bg-slate-950/45 px-2 py-1.5 text-xs"
+							className="ak-ui-row break-words px-2 py-2 text-xs"
 						>
 							{items[input.itemId]?.name ?? input.itemId}: feed {input.quantity} by
 							drag

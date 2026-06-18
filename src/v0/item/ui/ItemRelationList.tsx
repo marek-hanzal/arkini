@@ -20,15 +20,13 @@ export const ItemRelationList: FC<ItemRelationList.Props> = ({ title, items, rel
 	if (!relations.length) return null;
 
 	return (
-		<div className="rounded-md border border-slate-800 bg-slate-950/50 p-3">
-			<p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-				{title}
-			</p>
-			<div className="mt-2 space-y-2">
+		<div className="ak-ui-card-soft p-3">
+			<p className="ak-ui-eyebrow">{title}</p>
+			<div className="mt-2 grid gap-1.5">
 				{relations.map((relation) => (
 					<div
 						key={relation.key}
-						className="rounded-sm bg-slate-900/70 px-2 py-1.5 text-xs text-slate-300"
+						className="ak-ui-row break-words px-2 py-1.5 text-xs text-ak-text"
 					>
 						{items[relation.leftItemId]?.name ?? relation.leftItemId} →{" "}
 						{items[relation.resultItemId]?.name ?? relation.resultItemId}

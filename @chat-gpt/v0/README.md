@@ -27,16 +27,17 @@ Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant,
 
 ## Selected next task
 
-Recommended next coding task after T8: **raw subscription/cache cleanup** (`v0-raw-subscription-state-task-2026-06-18.md`).
+Recommended next coding task: continue manual/browser UI polish after `v0-ui-overhaul-foundation-2026-06-18.md`, then revisit board/inventory sizing with screenshots.
 
-Reason: save/model invariants are now much tighter and the old multi-language visual event bridge is gone, but manual gameplay cache patching is still the next mental-load trap. Prefer authoritative snapshot reads plus focused subtree subscriptions before broad UI styling work.
+Reason: runtime/cache/event mental-load cleanup is done enough for now, and the first UI foundation pass removed the biggest layout/theme issues without touching gameplay. Visual tasks need actual browser inspection next because compilers have the artistic sense of wet cardboard.
 
 ## Planned next task
 
-- `v0-raw-subscription-state-task-2026-06-18.md`: planned task to audit/remove gameplay cache patching in favor of authoritative runtime snapshots, focused selectors/subtree subscriptions and visual-only transient plans.
+- Browser/manual UI pass: verify header removal, sheet sizing, board/inventory readability and action hit areas on a real viewport; tune sizes rather than guessing from code.
 
 ## Completed recent task
 
+- `v0-ui-overhaul-foundation-2026-06-18.md`: first broad UI pass removed the unused top header, introduced light pink/violet tokens, lightened board/inventory/sheets/cards, enlarged withdraw actions and added useful `data-ui` anchors.
 - `v0-runtime-reader-naming-hygiene-2026-06-18.md`: follow-up naming cleanup removed redundant `GameRuntime` prefixes from focused runtime reader files/functions; inside `play/runtime/readers`, names should be `readBoardView`, `readInventorySlot`, etc.
 - `v0-runtime-reader-hygiene-2026-06-18.md`: raw subscription follow-up split the catch-all runtime reader file into focused reader modules, added direct board-item/inventory-slot/first-empty-cell raw readers, and gave root board/inventory hooks semantic equality so derived object churn does not force unrelated redraws.
 - `v0-focused-runtime-subscriptions-2026-06-18.md`: raw subscription follow-up reduced broad board/inventory/config subscriptions in board/inventory surfaces and item detail; drop commits read latest raw snapshots instead of keeping unrelated render subscriptions alive.

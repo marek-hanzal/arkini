@@ -32,7 +32,10 @@ export const InventorySurface = memo(
 		);
 
 		return (
-			<div className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col">
+			<div
+				data-ui="inventory root"
+				className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col"
+			>
 				<SheetHeader
 					eyebrow={placementTarget ? "Place from inventory" : "Inventory"}
 					description={
@@ -58,7 +61,7 @@ export const InventorySurface = memo(
 							slots={slots}
 							tiles={tiles}
 							gapPx={1}
-							className="w-full border-l border-t border-slate-800"
+							className="w-full rounded-xl border border-pink-200/80 bg-ak-inventory p-1 shadow-lg shadow-pink-900/10"
 							layerRole="overlay"
 							actorLayerClassName="pointer-events-none"
 							drag={drag}

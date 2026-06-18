@@ -23,7 +23,7 @@ export const GameItemContent: FC<GameItemContent.Props> = memo(
 			<div
 				data-ak-item-content
 				className={cn(
-					"relative grid h-full w-full place-items-center text-slate-50",
+					"relative grid h-full w-full place-items-center text-ak-text",
 					activationWaiting && "opacity-[0.82]",
 				)}
 			>
@@ -53,7 +53,7 @@ export const GameItemContent: FC<GameItemContent.Props> = memo(
 				{quantity && quantity > 1 ? (
 					<span
 						className={cn(
-							"absolute bottom-0.5 rounded-sm bg-slate-950/82 px-1 text-[0.62rem] font-bold text-slate-100 shadow-sm",
+							"absolute bottom-0.5 rounded-md bg-fuchsia-700/90 px-1 text-[0.62rem] font-bold text-white shadow-sm",
 							item.label ? "left-0.5" : "right-0.5",
 						)}
 					>

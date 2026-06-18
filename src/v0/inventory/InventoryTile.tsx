@@ -18,6 +18,7 @@ export const InventoryTile = memo(({ stackId, itemId, quantity }: InventoryTile.
 
 	return (
 		<div
+			data-ui="inventory item"
 			data-ak-inventory-stack-id={stackId}
 			className="h-full w-full"
 		>

@@ -31,6 +31,7 @@ export const GameItemView: FC<GameItemView.Props> = memo(
 
 		return (
 			<div
+				data-ui="item view"
 				data-ak-item-view
 				data-ak-item-variant={variant}
 				data-ak-item-size-variant={resolvedSizeVariant}

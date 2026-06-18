@@ -66,13 +66,16 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 
 	if (!boardItem || !item) {
 		return (
-			<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
+			<section
+				data-ui="tile detail"
+				className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
+			>
 				<SheetHeader
 					eyebrow="Item"
 					description="Nothing selected"
 					onClose={onClose}
 				/>
-				<p className="p-4 text-sm text-slate-400">Select a board item first.</p>
+				<p className="ak-ui-muted p-4 text-sm">Select a board item first.</p>
 			</section>
 		);
 	}
@@ -133,15 +136,18 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	};
 
 	return (
-		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
+		<section
+			data-ui="tile detail"
+			className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
+		>
 			<SheetHeader
 				eyebrow="Item"
 				description={item.name}
 				onClose={onClose}
 			/>
-			<div className="space-y-4 p-4 pt-1 text-sm text-slate-200">
+			<div className="space-y-3 p-4 pt-3 text-sm text-ak-text">
 				{actionErrorMessage ? (
-					<div className="rounded-md border border-red-300/30 bg-red-950/35 px-3 py-2 text-xs font-semibold text-red-100">
+					<div className="rounded-xl border border-rose-300/50 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800">
 						{actionErrorMessage}
 					</div>
 				) : null}

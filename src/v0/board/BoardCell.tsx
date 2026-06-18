@@ -17,11 +17,12 @@ export namespace BoardCell {
 export const BoardCell = memo(
 	({ cell, feedbackVariant, invalid, statusVariant }: BoardCell.Props) => (
 		<div
+			data-ui="board cell"
 			data-ak-board-cell={`${cell.x}:${cell.y}`}
 			data-ak-board-cell-feedback={feedbackVariant}
 			data-ak-board-cell-status={statusVariant}
 			className={cn(
-				"relative aspect-square touch-none border-b border-r border-slate-800/65 bg-slate-900/45",
+				"relative aspect-square touch-none border-b border-r border-pink-200/70 bg-white/58",
 				cell.x === boardColumns - 1 && "border-r-0",
 				cell.y === boardRows - 1 && "border-b-0",
 				feedbackVariant && "ak-cell-feedback",

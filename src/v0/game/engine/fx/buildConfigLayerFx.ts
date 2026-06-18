@@ -37,10 +37,8 @@ export const buildConfigLayerFx = Effect.fn("buildConfigLayerFx")(function* ({
 					}
 
 					const producerLayer = (layer.producers[effect.producerId] ??= {});
-					producerLayer.maxQueueSize = Math.max(
-						1,
-						(producerLayer.maxQueueSize ?? baseProducer.maxQueueSize) + effect.quantity,
-					);
+					producerLayer.maxQueueSize =
+						(producerLayer.maxQueueSize ?? baseProducer.maxQueueSize) + effect.quantity;
 					continue;
 				}
 
@@ -52,10 +50,8 @@ export const buildConfigLayerFx = Effect.fn("buildConfigLayerFx")(function* ({
 				const productLayer = (layer.products[effect.productId] ??= {});
 
 				if (effect.type === "product.duration.add") {
-					productLayer.durationMs = Math.max(
-						0,
-						(productLayer.durationMs ?? baseProduct.durationMs) + effect.ms,
-					);
+					productLayer.durationMs =
+						(productLayer.durationMs ?? baseProduct.durationMs) + effect.ms;
 				}
 
 				if (effect.type === "product.outputTable.set") {
@@ -89,7 +85,7 @@ export const buildConfigLayerFx = Effect.fn("buildConfigLayerFx")(function* ({
 					const inputLayer = (inputs[effect.itemId] ??= {
 						quantity: baseInput.quantity,
 					});
-					inputLayer.quantity = Math.max(0, inputLayer.quantity + effect.quantity);
+					inputLayer.quantity += effect.quantity;
 				}
 			}
 		}

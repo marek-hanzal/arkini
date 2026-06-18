@@ -54,7 +54,7 @@ GameConfig / tick engine stabilization checkpoint:
 - T2 visual follow-up is done in `@chat-gpt/v0/v0-craft-replace-crossfade-2026-06-18.md`: craft replacement now uses TileEngine `replace-in` / `replace-out` crossfade motion with an old-item board transient.
 - T3 is done in `@chat-gpt/v0/v0-stash-atomic-output-2026-06-18.md` plus `@chat-gpt/v0/v0-stash-full-open-output-2026-06-18.md`: stash open applies all remaining output in one atomic batch, places sequentially like producer, depletes in one click and fails without partial mutation if the whole batch does not fit.
 - Side quest is done in `@chat-gpt/v0/v0-craft-partial-input-withdraw-2026-06-18.md`: craft targets persist partial input progress in `save.craftInputs`, start only after inputs are complete, lock inputs on start, and allow pre-start single-unit withdraw through producer-style seeded placement.
-- Stabilization priority: effective upgrades must validate against invalid zero/negative states; inventory may contain anything but stacks are stateless; `GameSaveConfigSchema` should guard monotonic ID counters; visual event flow needs either an exhaustive planner from engine events or a much stricter bridge.
+- T4 is done in `@chat-gpt/v0/v0-effective-upgrade-validation-2026-06-18.md`: `GameConfigSchema` rejects effective upgrade prefixes that make product duration/input quantities/producer queue size invalid, and config layer building no longer clamps bad values. Stabilization priority now moves to T5 product input overlay scope, then inventory stateless stack policy and save ID counter validation.
 
 Current task candidates:
 
@@ -165,3 +165,4 @@ Product-line input ref checkpoint:
 - `GameSaveConfigSchema` validates `save.producerInputs` against effective product input refs, including completed `product.inputRef.set` upgrades.
 
 - 2026-06-18: Placement capacity failures now use `GamePlacementFailed` tagged errors with concrete `board:full` / `inventory:full` / `placement-failed:unknown` reasons; low-level placement helpers fail through Effect and action/domain callers catch/map them. See `@chat-gpt/v0/v0-placement-failure-reasons-2026-06-18.md`.
+- 2026-06-18: Effective upgrade validation is now schema-owned. `product.duration.add`, `product.input.quantity.add` and `producer.maxQueueSize.add` may not produce zero/negative runtime values, and input quantity upgrades must stay within capacity. See `@chat-gpt/v0/v0-effective-upgrade-validation-2026-06-18.md`.

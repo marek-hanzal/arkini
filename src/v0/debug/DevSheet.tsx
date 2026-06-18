@@ -276,7 +276,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 								Local session
 							</h2>
 							<span className="mt-2 inline-flex rounded-sm bg-emerald-400/10 px-2 py-1 text-xs font-semibold text-emerald-200">
-								runtime-only
+								dexie-save
 							</span>
 						</div>
 
@@ -295,7 +295,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							/>
 							<StatusPill
 								label="Source"
-								value="Runtime store"
+								value="Dexie save"
 							/>
 						</div>
 

@@ -18,3 +18,4 @@ export {
 export { useGameRuntimeDropActions } from "~/v0/play/runtime/useGameRuntimeDropActions";
 export { GameRuntimeVisualEffects } from "~/v0/play/runtime/GameRuntimeVisualEffects";
 export { connectGameRuntimeSavePersistence } from "~/v0/play/runtime/connectGameRuntimeSavePersistence";
+export { createPersistentGameRuntimeStore } from "~/v0/play/runtime/createPersistentGameRuntimeStore";

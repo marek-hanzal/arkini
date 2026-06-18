@@ -50,7 +50,9 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 		);
 	}
 
-	const nextSave = yield* cloneGameSaveFx({ save });
+	const nextSave = yield* cloneGameSaveFx({
+		save,
+	});
 	const liveSlot = nextSave.inventory.slots[action.slotIndex];
 	if (!liveSlot) {
 		return yield* Effect.fail(
@@ -65,7 +67,9 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 		nextSave.inventory.slots[action.slotIndex] = null;
 	}
 
-	const itemInstanceId = yield* createGameItemInstanceIdFx({ save: nextSave });
+	const itemInstanceId = yield* createGameItemInstanceIdFx({
+		save: nextSave,
+	});
 	nextSave.board.items[itemInstanceId] = {
 		id: itemInstanceId,
 		itemId: liveSlot.itemId,
@@ -100,7 +104,9 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 				type: "item.created" as const,
 			},
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({ save: nextSave }),
+		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			save: nextSave,
+		}),
 		save: nextSave,
 	} satisfies GameEngineResult;
 });

@@ -9,6 +9,7 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
+import { createPersistentGameRuntimeStore } from "~/v0/play/runtime/createPersistentGameRuntimeStore";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 import { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 import { GameRuntimeVisualEffects } from "~/v0/play/runtime/GameRuntimeVisualEffects";
@@ -32,29 +33,36 @@ export const GameRuntimeProvider: FC<GameRuntimeProvider.Props> = ({
 	children,
 	fallback = <DefaultFallback />,
 }) => {
+	const [startupError, setStartupError] = useState<unknown>(null);
 	const [store, setStore] = useState<GameRuntimeStore | null>(null);
-	const storeRef = useRef<GameRuntimeStore | null>(null);
+	const runtimeRef = useRef<createPersistentGameRuntimeStore.Result | null>(null);
 
 	useEffect(() => {
 		let disposed = false;
 
-		void GameRuntimeStore.create().then((nextStore) => {
-			if (disposed) {
-				nextStore.destroy();
-				return;
-			}
+		void createPersistentGameRuntimeStore()
+			.then((runtime) => {
+				if (disposed) {
+					void runtime.destroy();
+					return;
+				}
 
-			storeRef.current = nextStore;
-			setStore(nextStore);
-		});
+				runtimeRef.current = runtime;
+				setStore(runtime.store);
+			})
+			.catch((error: unknown) => {
+				if (disposed) return;
+				setStartupError(error);
+			});
 
 		return () => {
 			disposed = true;
-			storeRef.current?.destroy();
-			storeRef.current = null;
+			void runtimeRef.current?.destroy();
+			runtimeRef.current = null;
 		};
 	}, []);
 
+	if (startupError) throw startupError;
 	if (!store) return <>{fallback}</>;
 
 	return (
@@ -84,7 +92,7 @@ export function useGameRuntimeSelector<T>(
 		| {
 				root: GameRuntimeState;
 				selected: T;
-			}
+		  }
 		| undefined
 	>(undefined);
 
@@ -118,19 +126,19 @@ export function useGameRuntimeSelector<T>(
 
 const GameRuntimeAutoTicker: FC = () => {
 	const store = useGameRuntimeStore();
-	const nextWakeAtMs = useGameRuntimeSelector(
-		(state) => state.runtime.nextWakeAtMs,
-		Object.is,
-	);
+	const nextWakeAtMs = useGameRuntimeSelector((state) => state.runtime.nextWakeAtMs, Object.is);
 
 	useEffect(() => {
 		if (nextWakeAtMs === null) return undefined;
 
-		const timeout = globalThis.setTimeout(() => {
-			void store.tick({
-				nowMs: Date.now(),
-			});
-		}, Math.max(0, nextWakeAtMs - Date.now()));
+		const timeout = globalThis.setTimeout(
+			() => {
+				void store.tick({
+					nowMs: Date.now(),
+				});
+			},
+			Math.max(0, nextWakeAtMs - Date.now()),
+		);
 
 		return () => globalThis.clearTimeout(timeout);
 	}, [

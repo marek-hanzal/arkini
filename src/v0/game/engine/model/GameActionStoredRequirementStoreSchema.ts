@@ -11,8 +11,7 @@ export const GameActionStoredRequirementStoreSchema = z
 	})
 	.strict();
 
-export type GameActionStoredRequirementStoreSchema =
-	typeof GameActionStoredRequirementStoreSchema;
+export type GameActionStoredRequirementStoreSchema = typeof GameActionStoredRequirementStoreSchema;
 
 export namespace GameActionStoredRequirementStoreSchema {
 	export type Type = z.infer<typeof GameActionStoredRequirementStoreSchema>;

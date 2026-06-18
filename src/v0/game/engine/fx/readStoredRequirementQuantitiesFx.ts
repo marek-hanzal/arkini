@@ -8,8 +8,8 @@ export namespace readStoredRequirementQuantitiesFx {
 	}
 }
 
-export const readStoredRequirementQuantitiesFx = Effect.fn(
-	"readStoredRequirementQuantitiesFx",
-)(function* ({ save, targetItemInstanceId }: readStoredRequirementQuantitiesFx.Props) {
-	return new Map(Object.entries(save.storedRequirements[targetItemInstanceId]?.items ?? {}));
-});
+export const readStoredRequirementQuantitiesFx = Effect.fn("readStoredRequirementQuantitiesFx")(
+	function* ({ save, targetItemInstanceId }: readStoredRequirementQuantitiesFx.Props) {
+		return new Map(Object.entries(save.storedRequirements[targetItemInstanceId]?.items ?? {}));
+	},
+);

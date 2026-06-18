@@ -23,13 +23,7 @@ const resourceDataSrc = (data: string) => {
 const assetUrlForResourceId = (resourceId: string) =>
 	itemAssetUrls[`../../../assets/${resourceId}.png`];
 
-const resolveAssetSrc = ({
-	assetId,
-	config,
-}: {
-	assetId: string;
-	config: GameConfig;
-}) => {
+const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameConfig }) => {
 	const asset = config.assets[assetId];
 	if (!asset) return fallbackAssetSrc;
 
@@ -40,13 +34,7 @@ const resolveAssetSrc = ({
 	);
 };
 
-const readMergeResults = ({
-	config,
-	itemId,
-}: {
-	config: GameConfig;
-	itemId: string;
-}) =>
+const readMergeResults = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
 	(config.items[itemId]?.mergeIds ?? [])
 		.map((mergeId) => config.merge[mergeId])
 		.filter((rule): rule is NonNullable<typeof rule> => Boolean(rule))
@@ -56,13 +44,7 @@ const readMergeResults = ({
 			secret: rule.secret,
 		}));
 
-const readUsedInMerges = ({
-	config,
-	itemId,
-}: {
-	config: GameConfig;
-	itemId: string;
-}) =>
+const readUsedInMerges = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
 	Object.entries(config.items).flatMap(([targetItemId, targetItem]) =>
 		(targetItem.mergeIds ?? [])
 			.map((mergeId) => config.merge[mergeId])
@@ -75,13 +57,7 @@ const readUsedInMerges = ({
 			})),
 	);
 
-const readUsedInCrafts = ({
-	config,
-	itemId,
-}: {
-	config: GameConfig;
-	itemId: string;
-}) =>
+const readUsedInCrafts = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
 	Object.entries(config.items).flatMap(([targetItemId, targetItem]) => {
 		const recipe = targetItem.craftRecipeId
 			? config.craftRecipes[targetItem.craftRecipeId]
@@ -96,24 +72,12 @@ const readUsedInCrafts = ({
 		];
 	});
 
-const isMergeableItem = ({
-	config,
-	itemId,
-}: {
-	config: GameConfig;
-	itemId: string;
-}) =>
+const isMergeableItem = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
 	Object.values(config.merge).some(
 		(rule) => rule.resultItemId === itemId || rule.withItemId === itemId,
 	) || Boolean(config.items[itemId]?.mergeIds?.length);
 
-const readCatalogItem = ({
-	config,
-	itemId,
-}: {
-	config: GameConfig;
-	itemId: string;
-}): ViewItem => {
+const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: string }): ViewItem => {
 	const item = config.items[itemId];
 	const asset = config.assets[item.assetId];
 	const overlayAssetSrc = asset?.overlayAssetId

@@ -72,5 +72,4 @@ describe("GameRuntimeStore", () => {
 		unsubscribe();
 		store.destroy();
 	});
-
 });

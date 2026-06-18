@@ -22,7 +22,9 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 	if (action.sourceBoardItemId === action.targetBoardItemId) {
 		return {
 			events: [],
-			nextWakeAtMs: yield* readNextWakeAtMsFx({ save }),
+			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				save,
+			}),
 			save,
 		} satisfies GameEngineResult;
 	}
@@ -35,7 +37,9 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 		);
 	}
 
-	const nextSave = yield* cloneGameSaveFx({ save });
+	const nextSave = yield* cloneGameSaveFx({
+		save,
+	});
 	const liveSource = nextSave.board.items[source.id];
 	const liveTarget = nextSave.board.items[target.id];
 	if (!liveSource || !liveTarget) {
@@ -56,7 +60,9 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 
 	return {
 		events: [],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({ save: nextSave }),
+		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			save: nextSave,
+		}),
 		save: nextSave,
 	} satisfies GameEngineResult;
 });

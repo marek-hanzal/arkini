@@ -44,7 +44,9 @@ export const moveBoardItemFx = Effect.fn("moveBoardItemFx")(function* ({
 		);
 	}
 
-	const nextSave = yield* cloneGameSaveFx({ save });
+	const nextSave = yield* cloneGameSaveFx({
+		save,
+	});
 	const liveItem = nextSave.board.items[item.id];
 	if (!liveItem) {
 		return yield* Effect.fail(
@@ -58,7 +60,9 @@ export const moveBoardItemFx = Effect.fn("moveBoardItemFx")(function* ({
 
 	return {
 		events: [],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({ save: nextSave }),
+		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			save: nextSave,
+		}),
 		save: nextSave,
 	} satisfies GameEngineResult;
 });

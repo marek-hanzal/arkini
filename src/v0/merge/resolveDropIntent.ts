@@ -91,6 +91,7 @@ export const resolveDropIntent = ({
 		) ||
 			targetItem.activation?.requirements.some(
 				(requirement) =>
+					requirement.type === "stored" &&
 					requirement.itemId === sourceItemId &&
 					requirement.stored < requirement.capacity,
 			),

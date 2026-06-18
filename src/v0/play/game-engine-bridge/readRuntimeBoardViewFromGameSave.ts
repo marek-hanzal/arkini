@@ -37,18 +37,17 @@ const inputView = ({
 		itemId: string;
 		quantity: number;
 		capacity: number;
+		consume: boolean;
 	};
 	save: GameSave;
 	targetItemInstanceId: string;
 }): ActivationInputView => ({
 	capacity: input.capacity,
+	consume: input.consume,
 	itemId: input.itemId as ItemId,
 	quantity: input.quantity,
-	stored: storedQuantity({
-		itemId: input.itemId as ItemId,
-		save,
-		targetItemInstanceId,
-	}),
+	// Activation inputs are consumed at action start; they are not durable storage slots.
+	stored: 0,
 });
 
 const storedRequirementView = ({
@@ -65,6 +64,7 @@ const storedRequirementView = ({
 	targetItemInstanceId: string;
 }): ActivationRequirementView => ({
 	capacity: requirement.capacity,
+	type: "stored",
 	itemId: requirement.itemId as ItemId,
 	quantity: requirement.quantity,
 	stored: storedQuantity({
@@ -83,6 +83,7 @@ const passiveRequirementView = ({
 	};
 }): ActivationRequirementView => ({
 	capacity: requirement.quantity,
+	type: "passive",
 	itemId: requirement.itemId as ItemId,
 	quantity: requirement.quantity,
 	stored: 0,

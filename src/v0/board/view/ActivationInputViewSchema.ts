@@ -5,6 +5,7 @@ export const ActivationInputViewSchema = z.object({
 	itemId: GameItemIdSchema,
 	quantity: z.number().int().nonnegative(),
 	capacity: z.number().int().nonnegative(),
+	consume: z.boolean(),
 	stored: z.number().int().nonnegative(),
 });
 

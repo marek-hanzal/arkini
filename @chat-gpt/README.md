@@ -52,12 +52,13 @@ GameConfig / tick engine stabilization checkpoint:
 - T1 is done in `@chat-gpt/v0/v0-craft-single-job-invariant-2026-06-18.md`: craft start/readiness and save validation enforce max one running craft job per target item.
 - T2 is done in `@chat-gpt/v0/v0-craft-target-replacement-2026-06-18.md`: completed craft replaces the target item in-place with one result and removed the old craft output/return scheduled-spawn path.
 - T2 visual follow-up is done in `@chat-gpt/v0/v0-craft-replace-crossfade-2026-06-18.md`: craft replacement now uses TileEngine `replace-in` / `replace-out` crossfade motion with an old-item board transient.
-- Stabilization priority: craft/stash output should be atomic like producer; effective upgrades must validate against invalid zero/negative states; inventory may contain anything but stacks are stateless; `GameSaveConfigSchema` should guard monotonic ID counters; visual event flow needs either an exhaustive planner from engine events or a much stricter bridge.
+- T3 is done in `@chat-gpt/v0/v0-stash-atomic-output-2026-06-18.md` plus `@chat-gpt/v0/v0-stash-full-open-output-2026-06-18.md`: stash open applies all remaining output in one atomic batch, places sequentially like producer, depletes in one click and fails without partial mutation if the whole batch does not fit.
+- Stabilization priority: effective upgrades must validate against invalid zero/negative states; inventory may contain anything but stacks are stateless; `GameSaveConfigSchema` should guard monotonic ID counters; visual event flow needs either an exhaustive planner from engine events or a much stricter bridge.
 
 Current task candidates:
 
-1. V0 stabilization epic T3: normalize stash output atomicity after T2, using producer completion as the sane adult in the room.
-2. V0 stabilization epic T4: validate effective upgrade/config prefixes against zero/negative invalid states.
+1. V0 stabilization epic T4: validate effective upgrade/config prefixes against zero/negative invalid states.
+2. V0 stabilization epic T5: make product input overlay scope explicit, so reusable input refs do not become global mutation landmines.
 3. Badge/visual polish can wait; tiny UI cosmetics do not outrank save/model stabilization, no matter how shiny the little badge feels.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.

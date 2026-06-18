@@ -178,7 +178,7 @@ Acceptance:
 
 ### T3: Normalizovat craft/stash atomicitu podle produceru
 
-Status: DONE in `v0-stash-atomic-output-2026-06-18.md`. Craft was already normalized by T2; stash open now applies output/depletion atomically and scheduled board remove/replace events were removed.
+Status: DONE in `v0-stash-atomic-output-2026-06-18.md` + follow-up `v0-stash-full-open-output-2026-06-18.md`. Craft was already normalized by T2; stash open now applies the full remaining output batch atomically, depletes in one click, keeps sequential placement/visual event order, and scheduled board remove/replace events were removed.
 
 Cíl: žádná gameplay state změna nesmí viset na scheduled spawn eventu jen kvůli animaci.
 

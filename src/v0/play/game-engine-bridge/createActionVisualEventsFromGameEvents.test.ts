@@ -60,6 +60,58 @@ describe("createActionVisualEventsFromGameEvents", () => {
 		]);
 	});
 
+	it("maps stash board output to sequenced spawn visuals", () => {
+		const visualEvents = map([
+			{
+				itemId: "item:twig",
+				originItemInstanceId: "stash-1",
+				reason: "stash-output",
+				to: {
+					kind: "board",
+					itemInstanceId: "spawn-1",
+					x: 1,
+					y: 0,
+				},
+				type: "item.created",
+			},
+			{
+				itemId: "item:twig",
+				originItemInstanceId: "stash-1",
+				reason: "stash-output",
+				to: {
+					kind: "board",
+					itemInstanceId: "spawn-2",
+					x: 0,
+					y: 1,
+				},
+				type: "item.created",
+			},
+		]);
+
+		expect(visualEvents).toMatchObject([
+			{
+				animation: {
+					cause: "stash",
+					mode: "sequence",
+					sequenceIndex: 0,
+				},
+				itemInstanceId: "spawn-1",
+				reason: "stash-output",
+				type: "item.spawned",
+			},
+			{
+				animation: {
+					cause: "stash",
+					mode: "sequence",
+					sequenceIndex: 1,
+				},
+				itemInstanceId: "spawn-2",
+				reason: "stash-output",
+				type: "item.spawned",
+			},
+		]);
+	});
+
 	it("maps inventory creation and consumption to quantity patch visuals", () => {
 		const visualEvents = map([
 			{

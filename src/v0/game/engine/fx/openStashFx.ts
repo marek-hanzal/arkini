@@ -10,7 +10,6 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStashOpen } from "~/v0/game/engine/model/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -50,17 +49,22 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		reason: "stash-input",
 		save,
 	});
-	const roll = yield* rollLootTableItemsFx({
-		lootTable,
-	});
-	const placementRequests = roll.items.map(
-		(item) =>
-			({
-				...item,
-				originItemInstanceId: action.stashItemInstanceId,
-				reason: "stash-output",
-			}) satisfies GameSaveItemPlacementRequest,
-	);
+	const placementRequests: GameSaveItemPlacementRequest[] = [];
+	for (let chargeIndex = 0; chargeIndex < checked.remainingCharges; chargeIndex += 1) {
+		const roll = yield* rollLootTableItemsFx({
+			lootTable,
+		});
+		placementRequests.push(
+			...roll.items.map(
+				(item) =>
+					({
+						...item,
+						originItemInstanceId: action.stashItemInstanceId,
+						reason: "stash-output",
+					}) satisfies GameSaveItemPlacementRequest,
+			),
+		);
+	}
 	const seedCell = readBoardItemCell({
 		itemInstanceId: action.stashItemInstanceId,
 		save: consumed.save,
@@ -81,21 +85,14 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		);
 	}
 
-	const nextRemainingCharges = checked.remainingCharges - 1;
-	let depletionEvents: GameEvent[] = [];
-	if (nextRemainingCharges > 0) {
-		placement.save.stashes[action.stashItemInstanceId] = {
-			remainingCharges: nextRemainingCharges,
-		};
-	} else {
-		depletionEvents = yield* applyStashDepletionFx({
-			nowMs,
-			onDepleted: checked.stash.onDepleted,
-			save: placement.save,
-			stashItemId: checked.stashItem.itemId,
-			stashItemInstanceId: action.stashItemInstanceId,
-		});
-	}
+	const nextRemainingCharges = 0;
+	const depletionEvents = yield* applyStashDepletionFx({
+		nowMs,
+		onDepleted: checked.stash.onDepleted,
+		save: placement.save,
+		stashItemId: checked.stashItem.itemId,
+		stashItemInstanceId: action.stashItemInstanceId,
+	});
 	placement.save.updatedAtMs = nowMs;
 
 	return {
@@ -109,16 +106,12 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 				type: "stash.opened" as const,
 			},
 			...placement.events,
-			...(nextRemainingCharges === 0
-				? [
-						{
-							depletedAtMs: nowMs,
-							stashId: checked.stashId,
-							stashItemInstanceId: action.stashItemInstanceId,
-							type: "stash.depleted" as const,
-						},
-					]
-				: []),
+			{
+				depletedAtMs: nowMs,
+				stashId: checked.stashId,
+				stashItemInstanceId: action.stashItemInstanceId,
+				type: "stash.depleted" as const,
+			},
 			...depletionEvents,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({

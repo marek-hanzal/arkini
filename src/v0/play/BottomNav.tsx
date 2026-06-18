@@ -18,12 +18,12 @@ interface ButtonProps {
 }
 
 const toneClassName: Record<Sheet, string> = {
-	dev: "border-violet-200 bg-violet-50/60 text-ak-text-muted hover:border-violet-300 hover:bg-violet-50",
+	dev: "border-ak-border bg-ak-surface text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
 	inventory:
-		"border-violet-200 bg-violet-50/70 text-ak-text-muted hover:border-violet-300 hover:bg-violet-50",
+		"border-ak-border bg-ak-surface text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
 	upgrades:
-		"border-violet-200 bg-violet-50/60 text-ak-text-muted hover:border-violet-300 hover:bg-violet-50",
-	item: "border-violet-200 bg-white text-ak-text-muted hover:border-violet-300 hover:bg-violet-50",
+		"border-ak-border bg-ak-surface text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
+	item: "border-ak-border bg-ak-surface text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
 };
 
 const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) => (
@@ -41,7 +41,7 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 			className={cn(
 				"flex h-full w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-sm border text-[clamp(0.62rem,2.6vw,0.75rem)] font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px",
 				toneClassName[tone],
-				active && "border-violet-400 bg-violet-50 text-violet-900",
+				active && "border-ak-border-accent bg-ak-primary-soft text-ak-text",
 			)}
 			onClick={() => onOpen(tone)}
 		>
@@ -61,7 +61,7 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => (
 	<nav
 		data-ui="bottom nav"
-		className="absolute inset-x-0 bottom-0 h-[var(--ak-bottom-nav-height)] border-t border-violet-200 bg-white px-[max(0.65rem,env(safe-area-inset-left))] pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
+		className="absolute inset-x-0 bottom-0 h-[var(--ak-bottom-nav-height)] bg-transparent px-[max(0.65rem,env(safe-area-inset-left))] pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
 		style={{
 			zIndex: "var(--ak-layer-bottom-nav)",
 		}}

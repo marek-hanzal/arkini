@@ -68,7 +68,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		return (
 			<section
 				data-ui="tile detail"
-				className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
+				className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
 			>
 				<SheetHeader
 					title="Nothing selected"
@@ -139,7 +139,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	return (
 		<section
 			data-ui="tile detail"
-			className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain"
+			className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
 		>
 			<SheetHeader
 				title={item.name}
@@ -147,7 +147,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 			/>
 			<div className="mx-auto w-full max-w-[430px] space-y-3 px-2 py-3 text-sm text-ak-text">
 				{actionErrorMessage ? (
-					<div className="rounded-sm border border-rose-300/50 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800">
+					<div className="rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-xs font-semibold text-rose-100">
 						{actionErrorMessage}
 					</div>
 				) : null}

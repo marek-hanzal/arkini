@@ -23,7 +23,7 @@ export const BottomSheet: FC<BottomSheet.Props> = ({ open, children, className, 
 			type="button"
 			tabIndex={open ? 0 : -1}
 			className={cn(
-				"absolute inset-0 block h-auto w-auto border-0 bg-violet-950/8 p-0 transition-opacity duration-200 ease-out",
+				"absolute inset-0 block h-auto w-auto border-0 bg-black/50 p-0 transition-opacity duration-200 ease-out",
 				open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
 			)}
 			style={{
@@ -35,7 +35,7 @@ export const BottomSheet: FC<BottomSheet.Props> = ({ open, children, className, 
 		<section
 			data-ui="bottom sheet panel"
 			className={cn(
-				"absolute inset-x-0 bottom-0 mx-auto flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-[var(--ak-sheet-width)] max-w-[100dvw] overflow-hidden border-x border-t border-violet-200 bg-white text-ak-text transition-[opacity,transform] duration-200 ease-out",
+				"absolute inset-x-0 bottom-0 mx-auto flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-[var(--ak-sheet-width)] max-w-[100dvw] overflow-hidden border-x border-t border-ak-border bg-ak-surface text-ak-text transition-[opacity,transform] duration-200 ease-out",
 				open
 					? "pointer-events-auto translate-y-0 opacity-100"
 					: "pointer-events-none translate-y-[calc(100%+16px)] opacity-0",
@@ -45,7 +45,7 @@ export const BottomSheet: FC<BottomSheet.Props> = ({ open, children, className, 
 				zIndex: "var(--ak-layer-overlay-panel)",
 			}}
 		>
-			<div className="min-h-0 max-h-[inherit] w-full overflow-y-auto overflow-x-hidden overscroll-contain bg-white pb-[env(safe-area-inset-bottom)]">
+			<div className="min-h-0 max-h-[inherit] w-full overflow-y-auto overflow-x-hidden overscroll-contain bg-ak-surface pb-[env(safe-area-inset-bottom)] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 				{children}
 			</div>
 		</section>

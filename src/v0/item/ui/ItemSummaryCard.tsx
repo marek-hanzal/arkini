@@ -15,8 +15,8 @@ export const ItemSummaryCard: FC<ItemSummaryCard.Props> = ({
 	storeDisabled = false,
 	onStore,
 }) => (
-	<div className="rounded-sm border border-violet-200 bg-white flex min-w-0 gap-3 p-3">
-		<div className="h-16 w-16 shrink-0 rounded-sm bg-violet-50/80">
+	<div className="flex min-w-0 gap-3 rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
+		<div className="h-16 w-16 shrink-0 rounded-sm bg-ak-surface-soft">
 			<GameItemView
 				item={item}
 				variant="inventory"
@@ -31,7 +31,7 @@ export const ItemSummaryCard: FC<ItemSummaryCard.Props> = ({
 						data-ui="store action"
 						disabled={storeDisabled}
 						onClick={onStore}
-						className="min-h-10 shrink-0 rounded-sm border border-violet-200 bg-white px-3 py-2 text-xs font-extrabold leading-none text-ak-text transition-[transform,border-color,background,color,opacity] hover:bg-violet-50 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45"
+						className="min-h-10 shrink-0 rounded-sm border border-ak-border bg-ak-surface px-3 py-2 text-xs font-extrabold leading-none text-ak-text transition-[transform,border-color,background,color,opacity] hover:border-ak-border-accent hover:bg-ak-surface-soft active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45"
 					>
 						Store
 					</button>

@@ -16,10 +16,7 @@ import {
 	useGameRuntimeSelector,
 	useGameRuntimeStore,
 } from "~/v0/play/runtime";
-import {
-	readGameRuntimeBoardView,
-	readGameRuntimeInventoryView,
-} from "~/v0/play/runtime/readGameRuntimeViews";
+import { readGameRuntimeBoardView, readGameRuntimeInventoryView } from "~/v0/play/runtime/readers";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useBoardTileEngineModel {

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
@@ -10,10 +11,15 @@ import { readRuntimeUpgradeListViewFromGameSave } from "~/v0/play/game-engine-br
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
 import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
 import {
+	readGameRuntimeBoardFirstEmptyCell,
+	readGameRuntimeBoardItem,
 	readGameRuntimeBoardView,
+	readGameRuntimeInventorySlot,
 	readGameRuntimeInventoryView,
 	readGameRuntimeItemCatalogView,
-} from "~/v0/play/runtime/readGameRuntimeViews";
+	readGameRuntimeItemView,
+} from "~/v0/play/runtime/readers";
+import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 
 const stableStringify = (value: unknown) => JSON.stringify(value ?? null);
 
@@ -47,49 +53,90 @@ const sameInventorySlot = (left: InventorySlot, right: InventorySlot) => {
 		leftStack?.id === rightStack?.id &&
 		leftStack?.itemId === rightStack?.itemId &&
 		leftStack?.quantity === rightStack?.quantity &&
-		leftStack?.stateJson === rightStack?.stateJson
+		leftStack?.stateJson === rightStack?.stateJson &&
+		leftStack?.stateful === rightStack?.stateful
 	);
 };
 
-export const useGameBoardView = (): BoardView => useGameRuntimeSelector(readGameRuntimeBoardView);
+const sameBoardView = (left: BoardView, right: BoardView) =>
+	left.items.length === right.items.length &&
+	sameBoardCell(left.firstEmptyCell, right.firstEmptyCell) &&
+	left.items.every((leftItem, index) => sameBoardItem(leftItem, right.items[index] ?? null));
+
+const sameInventoryView = (left: InventoryView, right: InventoryView) =>
+	left.slots.length === right.slots.length &&
+	left.firstEmptySlotIndex === right.firstEmptySlotIndex &&
+	left.slots.every((leftSlot, index) => sameInventorySlot(leftSlot, right.slots[index]));
+
+export const useGameBoardView = (): BoardView =>
+	useGameRuntimeSelector(readGameRuntimeBoardView, sameBoardView);
 
 export const useGameInventoryView = (): InventoryView =>
-	useGameRuntimeSelector(readGameRuntimeInventoryView);
+	useGameRuntimeSelector(readGameRuntimeInventoryView, sameInventoryView);
 
-export const useGameBoardItem = (boardItemId: string): BoardViewItem | null =>
-	useGameRuntimeSelector(
-		(state) => readGameRuntimeBoardView(state).byId[boardItemId] ?? null,
-		sameBoardItem,
+export const useGameBoardItem = (boardItemId: string): BoardViewItem | null => {
+	const selector = useCallback(
+		(state: GameRuntimeState) =>
+			readGameRuntimeBoardItem({
+				boardItemId,
+				state,
+			}) ?? null,
+		[
+			boardItemId,
+		],
 	);
 
-export const useGameInventorySlot = (slotIndex: number): InventorySlot =>
-	useGameRuntimeSelector(
-		(state) =>
-			readGameRuntimeInventoryView(state).bySlotIndex[String(slotIndex)] ?? {
+	return useGameRuntimeSelector(selector, sameBoardItem);
+};
+
+export const useGameInventorySlot = (slotIndex: number): InventorySlot => {
+	const selector = useCallback(
+		(state: GameRuntimeState) =>
+			readGameRuntimeInventorySlot({
 				slotIndex,
-			},
-		sameInventorySlot,
+				state,
+			}),
+		[
+			slotIndex,
+		],
 	);
+
+	return useGameRuntimeSelector(selector, sameInventorySlot);
+};
 
 export const useGameBoardFirstEmptyCell = (): BoardCellSchema.Type | undefined =>
-	useGameRuntimeSelector(
-		(state) => readGameRuntimeBoardView(state).firstEmptyCell,
-		sameBoardCell,
+	useGameRuntimeSelector(readGameRuntimeBoardFirstEmptyCell, sameBoardCell);
+
+export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView => {
+	const selector = useCallback(
+		(state: GameRuntimeState) =>
+			readRuntimeUpgradeListViewFromGameSave({
+				config: state.runtime.config,
+				nowMs,
+				save: state.runtime.save,
+			}),
+		[
+			nowMs,
+		],
 	);
 
-export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView =>
-	useGameRuntimeSelector((state) =>
-		readRuntimeUpgradeListViewFromGameSave({
-			config: state.runtime.config,
-			nowMs,
-			save: state.runtime.save,
-		}),
-	);
+	return useGameRuntimeSelector(selector);
+};
 
 export const useGameItemCatalogView = (): ItemCatalogView =>
 	useGameRuntimeSelector(readGameRuntimeItemCatalogView);
 
-export const useGameItemView = (itemId: ItemId | string | undefined): ViewItem | null =>
-	useGameRuntimeSelector((state) =>
-		itemId ? (readGameRuntimeItemCatalogView(state)[itemId as ItemId] ?? null) : null,
+export const useGameItemView = (itemId: ItemId | string | undefined): ViewItem | null => {
+	const selector = useCallback(
+		(state: GameRuntimeState) =>
+			readGameRuntimeItemView({
+				itemId,
+				state,
+			}) ?? null,
+		[
+			itemId,
+		],
 	);
+
+	return useGameRuntimeSelector(selector);
+};

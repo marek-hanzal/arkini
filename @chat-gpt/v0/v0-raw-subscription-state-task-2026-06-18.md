@@ -178,3 +178,7 @@ Remaining acceptable work: split broad view readers into finer `boardItem`/`inve
 ## 2026-06-18 focused subscription checkpoint
 
 Second implementation pass reduced broad render subscriptions without changing gameplay rules. Board drop commits now read inventory/config from the latest raw snapshot at commit time instead of subscribing board rendering to inventory changes. Inventory rendering now subscribes to inventory plus focused `firstEmptyCell` instead of full board/config. Item detail subscribes to the selected board item instead of the full board. See `v0-focused-runtime-subscriptions-2026-06-18.md`.
+
+## 2026-06-18 runtime reader hygiene checkpoint
+
+Third implementation pass split the catch-all runtime reader file into focused reader modules under `src/v0/play/runtime/readers/*`, added direct `boardItem`, `inventorySlot` and `firstEmptyCell` raw readers, and gave board/inventory root hooks semantic equality so derived view object churn does not force unrelated redraws. Grep found no surviving gameplay cache patching paths under `src/v0`; only safe config-keyed item catalog memoization remains. See `v0-runtime-reader-hygiene-2026-06-18.md`.

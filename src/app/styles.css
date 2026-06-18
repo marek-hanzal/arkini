@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-	--color-ak-page: #08040b;
-	--color-ak-surface: #120817;
-	--color-ak-surface-soft: #1a0d22;
-	--color-ak-surface-elevated: #1e1028;
-	--color-ak-board: #0d0711;
-	--color-ak-inventory: #160b1d;
-	--color-ak-border: #281a31;
+	--color-ak-page: #0c0611;
+	--color-ak-surface: #14091a;
+	--color-ak-surface-soft: #1d1027;
+	--color-ak-surface-elevated: #22122d;
+	--color-ak-board: #1b0f24;
+	--color-ak-inventory: #21112b;
+	--color-ak-border: #24162d;
 	--color-ak-border-accent: #ec4899;
 	--color-ak-text: #f6efff;
-	--color-ak-text-muted: #a997bc;
+	--color-ak-text-muted: #b5a5c7;
 	--color-ak-primary: #ec4899;
 	--color-ak-primary-soft: #35162f;
 	--color-ak-secondary: #7c3aed;
@@ -130,7 +130,7 @@ button:focus-visible,
 }
 
 .ak-tile-engine-slot[data-ak-tile-engine-drop-feedback="empty"]::after {
-	background: rgb(244 114 182 / 0.14);
+	background: rgb(244 114 182 / 0.22);
 	opacity: 1;
 	outline-width: 1px;
 	outline-color: rgb(236 72 153 / 0.32);
@@ -141,21 +141,21 @@ button:focus-visible,
 }
 
 .ak-tile-engine-slot[data-ak-tile-engine-drop-feedback="merge"][data-ak-tile-engine-drop-feedback-variant="primary"]::after {
-	background: rgb(244 114 182 / 0.18);
+	background: rgb(244 114 182 / 0.22);
 	opacity: 1;
 	outline-width: 1px;
 	outline-color: rgb(236 72 153 / 0.38);
 }
 
 .ak-tile-engine-slot[data-ak-tile-engine-drop-feedback="merge"][data-ak-tile-engine-drop-feedback-variant="secondary"]::after {
-	background: rgb(52 211 153 / 0.18);
+	background: rgb(52 211 153 / 0.22);
 	opacity: 1;
 	outline-width: 1px;
 	outline-color: rgb(52 211 153 / 0.32);
 }
 
 .ak-tile-engine-slot[data-ak-tile-engine-drop-feedback="blocked"]::after {
-	background: rgb(251 113 133 / 0.12);
+	background: rgb(251 113 133 / 0.16);
 	opacity: 1;
 	outline-width: 1px;
 	outline-color: rgb(251 113 133 / 0.32);
@@ -208,22 +208,22 @@ button:focus-visible,
 }
 
 [data-ak-board-cell-feedback="primary"]::after {
-	background: rgb(244 114 182 / 0.18);
+	background: rgb(244 114 182 / 0.22);
 	outline-color: rgb(236 72 153 / 0.38);
 }
 
 [data-ak-board-cell-feedback="secondary"]::after {
-	background: rgb(52 211 153 / 0.18);
+	background: rgb(52 211 153 / 0.22);
 	outline-color: rgb(52 211 153 / 0.32);
 }
 
 [data-ak-board-cell-feedback="subtle"]::after {
-	background: rgb(168 85 247 / 0.18);
+	background: rgb(168 85 247 / 0.22);
 	outline-color: rgb(168 85 247 / 0.28);
 }
 
 [data-ak-board-cell-feedback="danger"]::after {
-	background: rgb(251 113 133 / 0.18);
+	background: rgb(251 113 133 / 0.22);
 	outline-color: rgb(251 113 133 / 0.34);
 }
 
@@ -249,7 +249,7 @@ button:focus-visible,
 }
 
 [data-ak-board-tile-ready="true"] {
-	background: rgb(209 250 229 / 0.26);
-	outline: 1px solid rgb(16 185 129 / 0.2);
+	background: rgb(209 250 229 / 0.32);
+	outline: 1px solid rgb(16 185 129 / 0.28);
 	outline-offset: -1px;
 }

@@ -148,23 +148,6 @@ const dispatchApplyItemToBoardItem = ({
 		});
 	}
 
-	const targetItem = config.items[target.itemId];
-	const recipeId = targetItem?.craftRecipeId;
-	const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
-	if (recipeId && recipe?.inputs.some((input) => input.itemId === sourceItemId)) {
-		return store.dispatch({
-			action: {
-				inputRefs: [
-					sourceRef,
-				],
-				recipeId,
-				requirementRefs: [],
-				targetItemInstanceId: target.id,
-				type: "craft.start",
-			},
-		});
-	}
-
 	if (
 		storedRequirementAcceptsItem({
 			config,
@@ -178,6 +161,23 @@ const dispatchApplyItemToBoardItem = ({
 				inputRef: sourceRef,
 				targetItemInstanceId: target.id,
 				type: "stored_requirement.store",
+			},
+		});
+	}
+
+	const targetItem = config.items[target.itemId];
+	const recipeId = targetItem?.craftRecipeId;
+	const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
+	if (recipeId && recipe?.inputs.some((input) => input.itemId === sourceItemId)) {
+		return store.dispatch({
+			action: {
+				inputRefs: [
+					sourceRef,
+				],
+				recipeId,
+				requirementRefs: [],
+				targetItemInstanceId: target.id,
+				type: "craft.start",
 			},
 		});
 	}

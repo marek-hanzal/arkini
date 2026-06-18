@@ -46,10 +46,10 @@ Recent GameConfig hardening checkpoint:
 
 Current task candidates:
 
-1. Producer board progress: show the active runtime producer job as a subtle bottom progress bar on the tile.
-2. Tile detail executable-interaction parity: detail must not promise interactions that `resolveDropIntent` / runtime actions cannot execute.
-3. Touch/long-press polish: suppress native context/callout only on game interaction surfaces.
-4. Inventory-to-board seeded placement: reuse the shared Manhattan placement planner for long-press empty-cell placement.
+1. Tile detail executable-interaction parity: detail must not promise interactions that `resolveDropIntent` / runtime actions cannot execute.
+2. Touch/long-press polish: suppress native context/callout only on game interaction surfaces.
+3. Inventory-to-board seeded placement: reuse the shared Manhattan placement planner for long-press empty-cell placement.
+4. Badge/visual polish: tighten tile badge offset toward the corner without redesigning the tile.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.
 
@@ -104,3 +104,9 @@ DnD feedback frame checkpoint:
 - Stored requirement fill uses primary/blue frame feedback; craft/producer/stash consumable input uses secondary/green frame feedback. Regular merge should rely on the existing merge animation rather than extra colored frames.
 - Keep hover feedback and post-success board-cell pulses aligned so the thing previewed during drag matches what flashes after commit.
 - Do not reduce existing hover scale just to make feedback subtle. Subtle means frame/border/glow intensity, while scale should remain clearly visible.
+
+
+Producer board progress checkpoint:
+
+- Running producer jobs now show the existing subtle bottom progress bar directly on the board tile.
+- Board producer progress is active-work-only: future queued jobs and completed blocked deliveries do not show as running progress. Blocked delivery continues to use the subtle danger frame.

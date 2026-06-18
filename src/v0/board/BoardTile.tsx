@@ -6,6 +6,7 @@ import { GameItemView } from "~/v0/item/ui/GameItemView";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
+import { readProducerBoardProgress } from "~/v0/producer/logic/readProducerBoardProgress";
 import { useGameBoardItem, useGameItemView } from "~/v0/play/runtime";
 import { cn } from "~/v0/ui/cn";
 
@@ -39,6 +40,10 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 		activation: boardItem?.activation,
 		nowMs,
 	});
+	const producerProgress = readProducerBoardProgress({
+		activation: boardItem?.activation,
+		nowMs,
+	});
 
 	if (!boardItem || !item) return null;
 
@@ -57,7 +62,9 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 				activationNowMs={nowMs}
 			/>
 			<BoardCellProgress progress={liveCraft?.progress} />
-			<BoardCellCooldownProgress progress={producerCooldown?.progress} />
+			<BoardCellCooldownProgress
+				progress={producerProgress?.progress ?? producerCooldown?.progress}
+			/>
 		</div>
 	);
 });

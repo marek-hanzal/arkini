@@ -44,6 +44,13 @@ Recent GameConfig hardening checkpoint:
 - Dedicated schema tests cover starting-state invariants plus these semantic authoring guards.
 - Keep using `parseGameConfig` as the shared CLI/runtime gate. Do not add a second validator that drifts into another tiny religion.
 
+
+GameConfig / tick engine brutal review checkpoint:
+
+- Current `main` has been checkpointed into branch `v0`; continue normal work on `main`.
+- See `@chat-gpt/v0/v0-game-config-tick-engine-brutal-review-2026-06-18.md` before the stabilization pass.
+- Highest-risk areas from the review: craft single-target job invariant, craft completion target semantics, craft/stash atomic completion vs scheduled visual sequencing, product input upgrade layer mutating shared `inputs`, zero-quantity effective inputs, capability/stateful items in stateless inventory stacks, and missing monotonic ID counter validation in `GameSaveConfigSchema`.
+
 Current task candidates:
 
 1. Badge/visual polish: tighten tile badge offset toward the corner without redesigning the tile.

@@ -101,7 +101,7 @@ export const useInventoryTileEngineModel = ({
 				void actions
 					.placeInventoryItem({
 						placementMode: "nearest_by_manhattan",
-						quantity: placementStack.quantity,
+						quantity: 1,
 						slotIndex: slot.slotIndex,
 						x: placementTarget.x,
 						y: placementTarget.y,

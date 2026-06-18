@@ -410,7 +410,7 @@ const LootTableDefinitionSchema = z
 const ProductDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
-		durationMs: NonNegativeIntegerSchema,
+		durationMs: PositiveIntegerSchema,
 		placement: PlacementSchema,
 		inputRefId: IdSchema.optional(),
 		requirements: ActivationRequirementSchema,
@@ -1026,49 +1026,26 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					);
 				}
 
-				if (effect.type === "product.input.quantity.add") {
-					if (!hasItem(effect.itemId)) {
-						addIssue(
-							ctx,
-							[
-								"upgrades",
-								upgradeId,
-								"tiers",
-								tierIndex,
-								"effects",
-								effectIndex,
-								"itemId",
-							],
-							`Missing item "${effect.itemId}".`,
-						);
-					}
-
-					const product = value.products[effect.productId];
-					const inputDefinition = product?.inputRefId
-						? value.inputs[product.inputRefId]
-						: undefined;
-					if (
-						product &&
-						!inputDefinition?.inputs.some((input) => input.itemId === effect.itemId)
-					) {
-						addIssue(
-							ctx,
-							[
-								"upgrades",
-								upgradeId,
-								"tiers",
-								tierIndex,
-								"effects",
-								effectIndex,
-								"itemId",
-							],
-							`Product "${effect.productId}" inputRef has no input "${effect.itemId}".`,
-						);
-					}
+				if (effect.type === "product.input.quantity.add" && !hasItem(effect.itemId)) {
+					addIssue(
+						ctx,
+						[
+							"upgrades",
+							upgradeId,
+							"tiers",
+							tierIndex,
+							"effects",
+							effectIndex,
+							"itemId",
+						],
+						`Missing item "${effect.itemId}".`,
+					);
 				}
 			}
 		}
 	}
+
+	validateEffectiveUpgradePrefixes(ctx, value);
 
 	if (value.startingState.inventory.length > value.game.inventory.slots) {
 		addIssue(
@@ -1248,6 +1225,227 @@ const validateUniqueRecordField = <
 
 		ownerIdByValue.set(value, entryId);
 	}
+};
+
+type EffectiveUpgradeConfig = z.infer<typeof BaseGameConfigSchema>;
+type EffectiveUpgradeProductState = {
+	durationMs: number;
+	inputRefId?: string;
+	inputQuantities: Record<string, number>;
+};
+type EffectiveUpgradeProducerState = {
+	maxQueueSize: number;
+};
+type EffectiveUpgradeState = {
+	producers: Record<string, EffectiveUpgradeProducerState>;
+	products: Record<string, EffectiveUpgradeProductState>;
+};
+type UpgradeSequenceEntry = readonly [
+	upgradeId: string,
+	upgrade: EffectiveUpgradeConfig["upgrades"][string],
+];
+
+const createEffectiveUpgradeState = (config: EffectiveUpgradeConfig): EffectiveUpgradeState => ({
+	producers: Object.fromEntries(
+		Object.entries(config.producers).map(([producerId, producer]) => [
+			producerId,
+			{
+				maxQueueSize: producer.maxQueueSize,
+			},
+		]),
+	),
+	products: Object.fromEntries(
+		Object.entries(config.products).map(([productId, product]) => [
+			productId,
+			{
+				durationMs: product.durationMs,
+				inputRefId: product.inputRefId,
+				inputQuantities: {},
+			},
+		]),
+	),
+});
+
+const validateEffectiveUpgradePrefixes = (ctx: z.RefinementCtx, config: EffectiveUpgradeConfig) => {
+	const upgradeEntries = Object.entries(config.upgrades).sort(([left], [right]) =>
+		left.localeCompare(right),
+	) satisfies UpgradeSequenceEntry[];
+
+	validateEffectiveUpgradeSequence(ctx, config, upgradeEntries);
+
+	if (upgradeEntries.length <= 1) return;
+
+	for (const entry of upgradeEntries) {
+		validateEffectiveUpgradeSequence(ctx, config, [
+			entry,
+		]);
+	}
+};
+
+const validateEffectiveUpgradeSequence = (
+	ctx: z.RefinementCtx,
+	config: EffectiveUpgradeConfig,
+	upgradeEntries: readonly UpgradeSequenceEntry[],
+) => {
+	const state = createEffectiveUpgradeState(config);
+
+	for (const [upgradeId, upgrade] of upgradeEntries) {
+		for (const [tierIndex, tier] of upgrade.tiers.entries()) {
+			for (const [effectIndex, effect] of tier.effects.entries()) {
+				const path = [
+					"upgrades",
+					upgradeId,
+					"tiers",
+					tierIndex,
+					"effects",
+					effectIndex,
+				];
+				applyEffectiveUpgradeEffect(ctx, config, state, path, effect);
+			}
+		}
+	}
+};
+
+const applyEffectiveUpgradeEffect = (
+	ctx: z.RefinementCtx,
+	config: EffectiveUpgradeConfig,
+	state: EffectiveUpgradeState,
+	path: GameConfigIssuePath,
+	effect: EffectiveUpgradeConfig["upgrades"][string]["tiers"][number]["effects"][number],
+) => {
+	if (effect.type === "producer.maxQueueSize.add") {
+		const producerState = state.producers[effect.producerId];
+		if (!producerState) return;
+
+		producerState.maxQueueSize += effect.quantity;
+		if (producerState.maxQueueSize <= 0) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"quantity",
+				],
+				`Effective producer "${effect.producerId}" maxQueueSize must stay > 0 after upgrade prefixes.`,
+			);
+		}
+		return;
+	}
+
+	const productState = state.products[effect.productId];
+	if (!productState) return;
+
+	if (effect.type === "product.duration.add") {
+		productState.durationMs += effect.ms;
+		if (productState.durationMs <= 0) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"ms",
+				],
+				`Effective product "${effect.productId}" durationMs must stay > 0 after upgrade prefixes.`,
+			);
+		}
+		return;
+	}
+
+	if (effect.type === "product.outputTable.set") {
+		return;
+	}
+
+	if (effect.type === "product.inputRef.set") {
+		productState.inputRefId = effect.inputRefId;
+		validateEffectiveProductInputOverrides(ctx, config, productState, effect.productId, path);
+		return;
+	}
+
+	const inputRefId = productState.inputRefId;
+	const input = readEffectiveProductInputSlot({
+		config,
+		inputRefId,
+		itemId: effect.itemId,
+	});
+	if (!input) {
+		addIssue(
+			ctx,
+			[
+				...path,
+				"itemId",
+			],
+			inputRefId
+				? `Effective product "${effect.productId}" inputRef "${inputRefId}" has no input "${effect.itemId}".`
+				: `Effective product "${effect.productId}" has no inputRef for input quantity upgrades.`,
+		);
+		return;
+	}
+
+	const currentQuantity = productState.inputQuantities[effect.itemId] ?? input.quantity;
+	productState.inputQuantities[effect.itemId] = currentQuantity + effect.quantity;
+	validateEffectiveProductInputOverrides(ctx, config, productState, effect.productId, path);
+};
+
+const validateEffectiveProductInputOverrides = (
+	ctx: z.RefinementCtx,
+	config: EffectiveUpgradeConfig,
+	productState: EffectiveUpgradeProductState,
+	productId: string,
+	path: GameConfigIssuePath,
+) => {
+	for (const [itemId, quantity] of Object.entries(productState.inputQuantities)) {
+		const input = readEffectiveProductInputSlot({
+			config,
+			inputRefId: productState.inputRefId,
+			itemId,
+		});
+		if (!input) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"itemId",
+				],
+				productState.inputRefId
+					? `Effective product "${productId}" inputRef "${productState.inputRefId}" has no input "${itemId}" after upgrade prefixes.`
+					: `Effective product "${productId}" has no inputRef for input quantity upgrades.`,
+			);
+			continue;
+		}
+
+		if (quantity <= 0) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"quantity",
+				],
+				`Effective product "${productId}" input "${itemId}" quantity must stay > 0 after upgrade prefixes.`,
+			);
+		}
+
+		if (quantity > input.capacity) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"quantity",
+				],
+				`Effective product "${productId}" input "${itemId}" quantity must stay <= capacity (${input.capacity}) after upgrade prefixes.`,
+			);
+		}
+	}
+};
+
+const readEffectiveProductInputSlot = ({
+	config,
+	inputRefId,
+	itemId,
+}: {
+	config: EffectiveUpgradeConfig;
+	inputRefId: string | undefined;
+	itemId: string;
+}) => {
+	if (!inputRefId) return undefined;
+	return config.inputs[inputRefId]?.inputs.find((input) => input.itemId === itemId);
 };
 
 const validateItemInputs = (

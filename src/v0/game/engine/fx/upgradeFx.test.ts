@@ -477,11 +477,39 @@ describe("upgrade runtime", () => {
 
 	it("uses upgraded input costs for future product starts", () => {
 		const config = createEngineTestConfig({
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+					},
+				],
+			},
+			inputs: {
+				"input:shred": {
+					name: "Shred input",
+					inputs: [
+						{
+							capacity: 2,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+				},
+			},
 			upgrades: {
-				"upgrade:free-shred": {
-					code: "free-shred",
-					description: "Free shred",
-					name: "Free Shred",
+				"upgrade:expensive-shred": {
+					code: "expensive-shred",
+					description: "Expensive shred",
+					name: "Expensive Shred",
 					sort: 1,
 					tiers: [
 						{
@@ -491,7 +519,7 @@ describe("upgrade runtime", () => {
 								{
 									itemId: "item:twig",
 									productId: "product:shred",
-									quantity: -1,
+									quantity: 1,
 									type: "product.input.quantity.add",
 								},
 							],
@@ -508,7 +536,7 @@ describe("upgrade runtime", () => {
 			action: {
 				inputRefs: [],
 				type: "upgrade.start",
-				upgradeId: "upgrade:free-shred",
+				upgradeId: "upgrade:expensive-shred",
 			},
 			config,
 			nowMs: 0,
@@ -522,7 +550,13 @@ describe("upgrade runtime", () => {
 
 		const readiness = runReadiness({
 			action: {
-				inputRefs: [],
+				inputRefs: [
+					{
+						kind: "inventory",
+						quantity: 2,
+						slotIndex: 0,
+					},
+				],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:shred",
 				type: "producer.product.start",

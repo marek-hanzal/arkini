@@ -207,6 +207,8 @@ Acceptance:
 
 ### T4: Effective upgrade/config validation
 
+Status: DONE in `v0-effective-upgrade-validation-2026-06-18.md`.
+
 Cíl: schema/validator zachytí invalidní effective config vzniklý postupnými upgrady.
 
 Soubory:
@@ -353,7 +355,7 @@ Kontrolní body:
 2. `craft-target-replacement`
 3. `stash-craft-atomic-output`
 4. `effective-config-validation`
-5. `product-input-overlay-scope`
+5. `product-input-overlay-scope` (next)
 6. `inventory-stateless-stack-policy`
 7. `save-id-counter-validation`
 8. `visual-event-planner-cleanup`

@@ -336,7 +336,7 @@ const readEffectiveProducerMaxQueueSize = ({
 					continue;
 				}
 
-				maxQueueSize = Math.max(1, maxQueueSize + effect.quantity);
+				maxQueueSize += effect.quantity;
 			}
 		}
 	}

@@ -42,6 +42,29 @@ type TestCraftRecipe = {
 	resultItemId: string;
 };
 
+type TestUpgradeEffect =
+	| {
+			ms: number;
+			productId: string;
+			type: "product.duration.add";
+	  }
+	| {
+			itemId: string;
+			productId: string;
+			quantity: number;
+			type: "product.input.quantity.add";
+	  }
+	| {
+			inputRefId: string;
+			productId: string;
+			type: "product.inputRef.set";
+	  }
+	| {
+			producerId: string;
+			quantity: number;
+			type: "producer.maxQueueSize.add";
+	  };
+
 type TestUpgrade = {
 	code: string;
 	description: string;
@@ -53,11 +76,7 @@ type TestUpgrade = {
 			quantity: number;
 		}[];
 		durationMs: number;
-		effects: {
-			ms: number;
-			productId: string;
-			type: "product.duration.add";
-		}[];
+		effects: TestUpgradeEffect[];
 	}[];
 };
 
@@ -356,6 +375,98 @@ describe("GameConfigSchema", () => {
 		);
 
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate requirement/);
+	});
+
+	it("rejects upgrade prefixes that reduce product duration to zero", () => {
+		const config = createValidConfigValue();
+		config.upgrades["upgrade:test"].tiers[0].effects = [
+			{
+				ms: -1000,
+				productId: "product:test",
+				type: "product.duration.add",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/durationMs must stay > 0/);
+	});
+
+	it("rejects upgrade prefixes that reduce product input quantity to zero", () => {
+		const config = createValidConfigValue();
+		config.upgrades["upgrade:test"].tiers[0].effects = [
+			{
+				itemId: "item:twig",
+				productId: "product:test",
+				quantity: -1,
+				type: "product.input.quantity.add",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/quantity must stay > 0/);
+	});
+
+	it("rejects upgrade prefixes that raise product input quantity above capacity", () => {
+		const config = createValidConfigValue();
+		config.upgrades["upgrade:test"].tiers[0].effects = [
+			{
+				itemId: "item:twig",
+				productId: "product:test",
+				quantity: 2,
+				type: "product.input.quantity.add",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/quantity must stay <= capacity \(2\)/);
+	});
+
+	it("rejects upgrade prefixes that reduce producer queue size below one", () => {
+		const config = createValidConfigValue();
+		config.upgrades["upgrade:test"].tiers[0].effects = [
+			{
+				producerId: "producer:test",
+				quantity: -1,
+				type: "producer.maxQueueSize.add",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/maxQueueSize must stay > 0/);
+	});
+
+	it("validates product input quantity upgrades against the effective input ref", () => {
+		const config = createValidConfigValue();
+		(
+			config.inputs as Record<
+				string,
+				{
+					inputs: TestProductInput[];
+					name: string;
+				}
+			>
+		)["input:plank"] = {
+			name: "Plank input",
+			inputs: [
+				{
+					capacity: 2,
+					consume: true,
+					itemId: "item:plank",
+					quantity: 1,
+				},
+			],
+		};
+		config.upgrades["upgrade:test"].tiers[0].effects = [
+			{
+				inputRefId: "input:plank",
+				productId: "product:test",
+				type: "product.inputRef.set",
+			},
+			{
+				itemId: "item:plank",
+				productId: "product:test",
+				quantity: 1,
+				type: "product.input.quantity.add",
+			},
+		];
+
+		expect(parseGameConfig(config).upgrades["upgrade:test"].tiers[0].effects).toHaveLength(2);
 	});
 
 	it("keeps structural checks for queue size and non-empty loot output", () => {

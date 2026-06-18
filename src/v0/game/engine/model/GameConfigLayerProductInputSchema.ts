@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-const NonNegativeIntegerSchema = z.number().int().min(0);
+const PositiveIntegerSchema = z.number().int().positive();
 
 export const GameConfigLayerProductInputSchema = z
 	.object({
-		quantity: NonNegativeIntegerSchema,
+		quantity: PositiveIntegerSchema,
 	})
 	.strict();
 

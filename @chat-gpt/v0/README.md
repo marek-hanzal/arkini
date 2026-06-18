@@ -27,9 +27,13 @@ Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant,
 
 ## Selected next task
 
-Recommended next coding task after T8: **general UI overhaul** unless another runtime stabilization issue is found first.
+Recommended next coding task after T8: **raw subscription/cache cleanup** (`v0-raw-subscription-state-task-2026-06-18.md`).
 
-Reason: save/model invariants are now much tighter and the old multi-language visual event bridge is gone. The pinned UI overhaul can now happen on top of a cleaner engine-event-to-motion adapter.
+Reason: save/model invariants are now much tighter and the old multi-language visual event bridge is gone, but manual gameplay cache patching is still the next mental-load trap. Prefer authoritative snapshot reads plus focused subtree subscriptions before broad UI styling work.
+
+## Planned next task
+
+- `v0-raw-subscription-state-task-2026-06-18.md`: planned task to audit/remove gameplay cache patching in favor of authoritative runtime snapshots, focused selectors/subtree subscriptions and visual-only transient plans.
 
 ## Completed recent task
 

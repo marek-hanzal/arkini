@@ -28,9 +28,11 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 	return (
 		<div
 			data-ui="producer controls"
-			className="ak-ui-card-soft p-3"
+			className="rounded-sm border border-pink-200 bg-pink-50/40 p-3"
 		>
-			<p className="ak-ui-eyebrow">Product lines</p>
+			<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
+				Product lines
+			</p>
 			<div className="mt-3 grid gap-2">
 				{lines.map((baseLine) => {
 					const line = readLiveProducerProductLineView({
@@ -50,14 +52,14 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						<div
 							key={line.productId}
 							className={cn(
-								"ak-ui-row min-w-0 px-3 py-3 text-xs",
+								"rounded-sm bg-white/70 min-w-0 px-3 py-3 text-xs",
 								!line.enabled && "opacity-70",
 							)}
 						>
 							<div className="flex min-w-0 items-start justify-between gap-3">
 								<div className="min-w-0">
 									<p className="truncate font-bold text-ak-text">{line.name}</p>
-									<p className="ak-ui-muted mt-1 break-words text-[0.7rem] leading-4">
+									<p className="text-ak-text-muted mt-1 break-words text-[0.7rem] leading-4">
 										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
 										{formatMs(line.durationMs)}
 										{line.inputItemIds.length
@@ -76,10 +78,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									disabled={pending}
 									onClick={() => onSetEnabled(line.productId, !line.enabled)}
 									className={cn(
-										"ak-ui-button shrink-0 px-3 text-xs",
+										"min-h-10 shrink-0 rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
 										line.enabled
-											? "ak-ui-button-secondary"
-											: "ak-ui-button-ghost",
+											? "border-violet-200 bg-violet-50 text-violet-900 hover:bg-violet-100"
+											: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
 									)}
 								>
 									{line.enabled ? "On" : "Off"}
@@ -96,7 +98,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											<span className="min-w-0 truncate font-semibold text-ak-text">
 												{input.itemId.replace(/^item:/, "")}
 											</span>
-											<span className="ak-ui-muted ml-auto shrink-0 tabular-nums">
+											<span className="text-ak-text-muted ml-auto shrink-0 tabular-nums">
 												{input.stored}/{input.quantity}
 												{input.capacity > input.quantity
 													? ` · cap ${input.capacity}`
@@ -113,7 +115,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 															input.itemId,
 														)
 													}
-													className="ak-ui-button ak-ui-button-secondary min-h-10 shrink-0 px-3 text-xs"
+													className="min-h-10 shrink-0 rounded-sm border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-extrabold leading-none text-violet-900 transition-[transform,border-color,background,color,opacity] hover:bg-violet-100 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45"
 												>
 													Withdraw
 												</button>
@@ -138,9 +140,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												: "Queued"}
 										</span>
 									</div>
-									<div className="ak-ui-progress-track mt-2 h-1.5">
+									<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-pink-50">
 										<div
-											className="ak-ui-progress-secondary"
+											className="h-full rounded-sm bg-violet-600 transition-[width] duration-200 ease-linear"
 											style={{
 												width: `${Math.round((line.progress ?? 0) * 100)}%`,
 											}}
@@ -154,8 +156,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								disabled={!canStart || pending}
 								onClick={() => onStart(line.productId)}
 								className={cn(
-									"ak-ui-button mt-2 w-full",
-									canStart ? "ak-ui-button-primary" : "ak-ui-button-ghost",
+									"mt-2 min-h-10 w-full rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
+									canStart
+										? "border-fuchsia-500 bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+										: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
 								)}
 							>
 								{line.queueFull

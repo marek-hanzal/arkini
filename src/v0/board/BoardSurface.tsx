@@ -73,6 +73,10 @@ export const BoardSurface = memo(
 			<div
 				ref={boardDragBoundsRef}
 				data-ui="board root"
+				className="relative"
+				style={{
+					zIndex: "var(--ak-layer-base-surface)",
+				}}
 			>
 				<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
 					id="board"
@@ -80,7 +84,7 @@ export const BoardSurface = memo(
 					slots={boardSlots}
 					tiles={tiles}
 					gapPx={1}
-					className="ak-layer-base-surface w-full rounded-sm border border-pink-200/80 bg-ak-board p-1 shadow-xl shadow-pink-900/10"
+					className="w-full rounded-sm border border-pink-200 bg-pink-100"
 					actorLayerClassName="pointer-events-none"
 					layerRole="base"
 					disabled={disabled}

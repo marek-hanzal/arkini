@@ -20,6 +20,12 @@ export namespace DevSheet {
 	}
 }
 
+const debugButtonToneClassName: Record<"primary" | "neutral" | "danger", string> = {
+	danger: "border-rose-300 bg-rose-50 text-rose-800 hover:bg-rose-100",
+	neutral: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
+	primary: "border-fuchsia-500 bg-fuchsia-600 text-white hover:bg-fuchsia-700",
+};
+
 const DebugButton: FC<{
 	children: string;
 	disabled?: boolean;
@@ -31,10 +37,8 @@ const DebugButton: FC<{
 		disabled={disabled}
 		onClick={onClick}
 		className={cn(
-			"ak-ui-button disabled:cursor-wait",
-			tone === "primary" ? "ak-ui-button-primary" : undefined,
-			tone === "neutral" ? "ak-ui-button-ghost" : undefined,
-			tone === "danger" ? "ak-ui-button-danger" : undefined,
+			"min-h-10 rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-wait disabled:opacity-45",
+			debugButtonToneClassName[tone],
 		)}
 	>
 		{children}
@@ -163,7 +167,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 				onClose={onClose}
 			/>
 			<div className="grid min-w-0 gap-3 p-4 pt-3">
-				<section className="ak-ui-card min-w-0 overflow-hidden p-3">
+				<section className="rounded-sm border border-pink-200 bg-white min-w-0 overflow-hidden p-3">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 						<div>
 							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-fuchsia-700">
@@ -220,7 +224,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 					</pre>
 				</section>
 
-				<section className="ak-ui-card min-w-0 overflow-hidden p-3">
+				<section className="rounded-sm border border-pink-200 bg-white min-w-0 overflow-hidden p-3">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 						<div>
 							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">
@@ -277,7 +281,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 					) : null}
 				</section>
 
-				<section className="ak-ui-card min-w-0 overflow-hidden p-3">
+				<section className="rounded-sm border border-pink-200 bg-white min-w-0 overflow-hidden p-3">
 					<div className="flex h-full min-w-0 flex-wrap items-center gap-4">
 						<div className="min-w-0">
 							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-violet-700">

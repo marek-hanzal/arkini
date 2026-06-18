@@ -43,7 +43,7 @@ export const InventorySurface = memo(
 				<div className="min-h-0 flex-1 overflow-x-hidden px-3 py-4">
 					<div
 						ref={inventoryDragBoundsRef}
-						className="ak-game-width mx-auto"
+						className="mx-auto w-full max-w-[430px]"
 					>
 						<TileEngine<
 							InventorySurfaceType.TileData,
@@ -56,7 +56,7 @@ export const InventorySurface = memo(
 							slots={slots}
 							tiles={tiles}
 							gapPx={1}
-							className="w-full rounded-sm border border-pink-200/80 bg-ak-inventory p-1 shadow-lg shadow-pink-900/10"
+							className="w-full rounded-sm border border-pink-200 bg-pink-100"
 							layerRole="overlay"
 							actorLayerClassName="pointer-events-none"
 							drag={drag}

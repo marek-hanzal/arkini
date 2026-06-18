@@ -15,11 +15,11 @@ export namespace UpgradeCard {
 
 export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, onBuy }) => {
 	return (
-		<div className="ak-ui-card p-3">
+		<div className="rounded-sm border border-pink-200 bg-white p-3">
 			<div className="flex min-w-0 items-start justify-between gap-3">
 				<div className="min-w-0">
 					<p className="truncate text-sm font-bold text-ak-text">{upgrade.name}</p>
-					<p className="ak-ui-muted mt-1 break-words text-xs leading-5">
+					<p className="text-ak-text-muted mt-1 break-words text-xs leading-5">
 						{upgrade.description}
 					</p>
 				</div>
@@ -66,9 +66,9 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 						<span>Upgrade in progress</span>
 						<span>{Math.round((upgrade.progress ?? 0) * 100)}%</span>
 					</div>
-					<div className="ak-ui-progress-track mt-2">
+					<div className="h-2 overflow-hidden rounded-sm bg-pink-50 mt-2">
 						<div
-							className="ak-ui-progress-secondary"
+							className="h-full rounded-sm bg-violet-600 transition-[width] duration-200 ease-linear"
 							style={{
 								width: `${Math.round((upgrade.progress ?? 0) * 100)}%`,
 							}}
@@ -103,10 +103,10 @@ export const UpgradeCard: FC<UpgradeCard.Props> = ({ upgrade, items, pending, on
 
 			<button
 				className={cn(
-					"ak-ui-button mt-3 w-full",
+					"mt-3 min-h-10 w-full rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
 					upgrade.canBuy && !pending && !upgrade.inProgress
-						? "ak-ui-button-primary"
-						: "ak-ui-button-ghost",
+						? "border-fuchsia-500 bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+						: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
 				)}
 				disabled={!upgrade.canBuy || upgrade.maxed || pending || upgrade.inProgress}
 				type="button"

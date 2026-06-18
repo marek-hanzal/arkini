@@ -1,5 +1,11 @@
 import type { CSSProperties } from "react";
 
+const gridCellSize = (count: number, gapPx: number) =>
+	`calc((100% - ${(count - 1) * gapPx}px) / ${count})`;
+
+const gridCellOffset = (index: number, count: number, gapPx: number) =>
+	`calc(${index} * (${gridCellSize(count, gapPx)} + ${gapPx}px))`;
+
 export const actorStyle = ({
 	columns,
 	rowCount,
@@ -15,11 +21,9 @@ export const actorStyle = ({
 	const row = Math.floor(index / columns);
 
 	return {
-		left: `${(column * 100) / columns}%`,
-		top: `${(row * 100) / rowCount}%`,
-		width: `${100 / columns}%`,
-		height: `${100 / rowCount}%`,
-		paddingRight: column === columns - 1 ? 0 : gapPx,
-		paddingBottom: row === rowCount - 1 ? 0 : gapPx,
+		left: gridCellOffset(column, columns, gapPx),
+		top: gridCellOffset(row, rowCount, gapPx),
+		width: gridCellSize(columns, gapPx),
+		height: gridCellSize(rowCount, gapPx),
 	};
 };

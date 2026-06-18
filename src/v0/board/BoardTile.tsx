@@ -8,7 +8,6 @@ import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
 import { readProducerBoardProgress } from "~/v0/producer/logic/readProducerBoardProgress";
 import { useGameBoardItem, useGameItemView } from "~/v0/play/runtime";
-import { cn } from "~/v0/ui/cn";
 
 export namespace BoardTile {
 	export interface Props {
@@ -51,10 +50,8 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 		<div
 			data-ui="board item"
 			data-ak-board-item-id={boardItem.id}
-			className={cn(
-				"relative h-full w-full overflow-hidden",
-				producerReady && "ak-board-tile-ready",
-			)}
+			data-ak-board-tile-ready={producerReady ? "true" : undefined}
+			className="relative h-full w-full overflow-hidden"
 		>
 			<GameItemView
 				item={item}

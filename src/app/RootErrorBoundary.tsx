@@ -19,7 +19,7 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 
 	return (
 		<main className="grid h-dvh w-dvw place-items-center bg-ak-page p-4 text-ak-text">
-			<section className="w-full max-w-xl rounded-xl border border-rose-300/50 bg-white/85 p-5 shadow-2xl shadow-rose-900/10">
+			<section className="w-full max-w-xl rounded-sm border border-rose-300/50 bg-white p-5">
 				<p className="text-[0.65rem] font-black uppercase tracking-[0.24em] text-rose-700">
 					Arkini crashed
 				</p>
@@ -29,7 +29,7 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 					reloads, because prototype saves are disposable and startup loops are not a
 					design pillar.
 				</p>
-				<pre className="mt-4 max-h-56 overflow-auto rounded-lg bg-rose-50 p-3 text-xs whitespace-pre-wrap text-rose-800">
+				<pre className="mt-4 max-h-56 overflow-auto rounded-sm bg-rose-50 p-3 text-xs whitespace-pre-wrap text-rose-800">
 					{message}
 				</pre>
 				<div className="mt-4">
@@ -37,7 +37,7 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 						type="button"
 						disabled={reset.pending}
 						onClick={() => void reset.run()}
-						className="ak-ui-button ak-ui-button-danger w-full disabled:cursor-wait"
+						className="min-h-10 w-full rounded-sm border border-rose-300 bg-rose-50 px-3 py-2 text-sm font-extrabold leading-none text-rose-800 transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-wait disabled:opacity-45"
 					>
 						{reset.pending
 							? "Dropping browser storage…"

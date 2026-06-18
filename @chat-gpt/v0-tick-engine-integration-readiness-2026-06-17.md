@@ -81,13 +81,15 @@ Priority order:
    - Runtime action errors from plain Effect failures now normalize through `toGameActionError`, and item/upgrade sheets/display toasts use the same normalized messages instead of silently swallowing rejected commands.
    - Producer/craft clock refresh now watches runtime product-line `readyAtMs` values too, so item-sheet progress does not freeze like a budget dashboard.
    - Debug bug reports now include runtime revision/board/inventory summary instead of old board/inventory cache snapshots.
+   - Activation inputs and requirements now keep their runtime semantics in the view model: consumable inputs are feed-by-drag only, stored requirements are withdrawable slots, and passive requirements are displayed as ownership gates rather than droppable storage.
+   - Drop intent no longer treats passive requirements as producer-input targets. That removes the last known UI/engine mismatch where hover feedback promised a valid drop and the engine then rejected the command.
 
-9. **Persistence/Dexie later**
+9. **Persistence/Dexie prep** — READY NEXT
    - Storage remains outside the engine.
-   - Dexie/IndexedDB simplification follows after the engine can run in memory and after the domain-event bridge proves the shape UI actually needs.
-   - Do not implement Dexie before the adapter/bridge boundary is clear, otherwise storage starts shaping gameplay state and the project wakes up with database Stockholm syndrome.
+   - Added `connectGameRuntimeSavePersistence`, a small debounced persistence port around `GameRuntimeStore` updates. Dexie should implement that `save(save)` port next instead of being imported by the runtime adapter.
+   - Dexie/IndexedDB simplification is now unblocked: runtime remains the single gameplay source of truth, UI reads through selectors, visual effects subscribe directly to runtime updates, and storage only needs to load/validate an initial save plus persist updated saves.
 
-Current task: item 8 is the active cleanup/parity pass. Product line UI controls, basic runtime action error surfacing, craft/job ownership, product-line progress refresh, runtime item catalog reads and runtime-config drop intent resolution are now covered. Next pass should keep sealing runtime-only gaps around remaining sheet actions and any old storage-shaped gameplay helpers that still look reachable from runtime UI. Dexie only after runtime remains the single gameplay source of truth.
+Current task: item 8 is done enough to move on. Next pass can implement Dexie/IndexedDB as a save storage wrapper around `GameRuntimeStore`/`RuntimeGameEngineAdapter`, not inside the engine.
 
 
 ## 2026-06-18 cleanup pass
@@ -96,4 +98,4 @@ Current task: item 8 is the active cleanup/parity pass. Product line UI controls
 - Removed the old DB-backed gameplay Fx shards under board/inventory/activation/craft/item-instance/play/placement where they only existed to mutate SQL rows.
 - Removed React Query from the app runtime dependency set. Runtime UI now reads diagnostics directly from `GameRuntimeStore`.
 - Root/dev hard reset is now a generic browser-storage wipe plus reload.
-- Future persistence should be Dexie/IndexedDB outside the runtime adapter after parity is stable.
+- Future persistence should be Dexie/IndexedDB outside the runtime adapter; the debounced save persistence port is ready for that implementation.

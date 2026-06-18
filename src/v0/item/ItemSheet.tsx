@@ -130,7 +130,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				boardItem.activation?.requirements.length ? (
 					<ItemActivationInputsCard
 						activation={boardItem.activation}
-						boardItem={boardItem}
 						items={items}
 						pending={withdrawAction.isPending}
 						onWithdraw={withdraw}

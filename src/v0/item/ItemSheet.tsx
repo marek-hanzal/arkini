@@ -6,6 +6,7 @@ import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLi
 import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
 import type { ItemId } from "~/v0/manifest/manifestId";
+import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
@@ -26,6 +27,10 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const nowMs = useProducerClock(board.items);
 	const boardItem = boardItemId ? board.byId[boardItemId] : undefined;
 	const item = boardItem ? items[boardItem.itemId] : undefined;
+	const liveCraft = readLiveCraftView({
+		craft: boardItem?.craft,
+		nowMs,
+	});
 	const actionError = productLineAction.error ?? withdrawAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 	const relations = useMemo(
@@ -105,9 +110,9 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					</div>
 				) : null}
 				<ItemSummaryCard item={item} />
-				{boardItem.craft ? (
+				{liveCraft ? (
 					<ItemCraftCard
-						craft={boardItem.craft}
+						craft={liveCraft}
 						items={items}
 					/>
 				) : null}

@@ -65,6 +65,22 @@ export const connectGameRuntimeSavePersistence = ({
 		return flushing;
 	};
 
+	const flushBeforePageHide = () => {
+		void flush();
+	};
+	const flushBeforeHidden = () => {
+		if (document.visibilityState === "hidden") void flush();
+	};
+	const hasPageLifecycle =
+		typeof window !== "undefined" &&
+		typeof document !== "undefined" &&
+		typeof window.addEventListener === "function" &&
+		typeof document.addEventListener === "function";
+	if (hasPageLifecycle) {
+		window.addEventListener("pagehide", flushBeforePageHide);
+		document.addEventListener("visibilitychange", flushBeforeHidden);
+	}
+
 	const schedule = (save: GameSave) => {
 		if (disposed) return;
 		pendingSave = save;
@@ -88,6 +104,10 @@ export const connectGameRuntimeSavePersistence = ({
 		async destroy() {
 			disposed = true;
 			unsubscribe();
+			if (hasPageLifecycle) {
+				window.removeEventListener("pagehide", flushBeforePageHide);
+				document.removeEventListener("visibilitychange", flushBeforeHidden);
+			}
 			await flush();
 		},
 		flush,

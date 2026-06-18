@@ -92,6 +92,7 @@ export function useGameRuntimeSelector<T>(
 		| {
 				root: GameRuntimeState;
 				selected: T;
+				selector: (state: GameRuntimeState) => T;
 		  }
 		| undefined
 	>(undefined);
@@ -99,13 +100,14 @@ export function useGameRuntimeSelector<T>(
 	const getSnapshot = useCallback(() => {
 		const root = store.getSnapshot();
 		const previous = lastRef.current;
-		if (previous?.root === root) return previous.selected;
+		if (previous?.root === root && previous.selector === selector) return previous.selected;
 
 		const selected = selector(root);
 		if (previous && isEqual(previous.selected, selected)) {
 			lastRef.current = {
 				root,
 				selected: previous.selected,
+				selector,
 			};
 			return previous.selected;
 		}
@@ -113,6 +115,7 @@ export function useGameRuntimeSelector<T>(
 		lastRef.current = {
 			root,
 			selected,
+			selector,
 		};
 		return selected;
 	}, [

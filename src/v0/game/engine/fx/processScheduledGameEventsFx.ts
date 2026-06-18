@@ -6,6 +6,8 @@ import { readDueScheduledGameEventsFx } from "~/v0/game/engine/fx/readDueSchedul
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
+export const blockedScheduledEventRetryDelayMs = 1000;
+
 export namespace processScheduledGameEventsFx {
 	export interface Props {
 		config: GameConfig;
@@ -55,6 +57,7 @@ export const processScheduledGameEventsFx = Effect.fn("processScheduledGameEvent
 			const alreadyBlocked = scheduledEvent.lastBlockedAtMs !== undefined;
 			nextSave.scheduledEvents[scheduledEvent.id] = {
 				...scheduledEvent,
+				dueAtMs: nowMs + blockedScheduledEventRetryDelayMs,
 				lastBlockedAtMs: nowMs,
 			};
 			nextSave.updatedAtMs = nowMs;

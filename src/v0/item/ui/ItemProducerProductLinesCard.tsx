@@ -28,7 +28,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 	return (
 		<div
 			data-ui="producer controls"
-			className="rounded-sm border border-pink-200 bg-pink-50/40 p-3"
+			className="rounded-sm border border-violet-200 bg-violet-50/40 p-3"
 		>
 			<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
 				Product lines
@@ -81,7 +81,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 										"min-h-10 shrink-0 rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
 										line.enabled
 											? "border-violet-200 bg-violet-50 text-violet-900 hover:bg-violet-100"
-											: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
+											: "border-violet-200 bg-white text-ak-text hover:bg-violet-50",
 									)}
 								>
 									{line.enabled ? "On" : "Off"}
@@ -140,7 +140,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												: "Queued"}
 										</span>
 									</div>
-									<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-pink-50">
+									<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-violet-50">
 										<div
 											className="h-full rounded-sm bg-violet-600 transition-[width] duration-200 ease-linear"
 											style={{
@@ -158,8 +158,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								className={cn(
 									"mt-2 min-h-10 w-full rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45",
 									canStart
-										? "border-fuchsia-500 bg-fuchsia-600 text-white hover:bg-fuchsia-700"
-										: "border-pink-200 bg-white text-ak-text hover:bg-pink-50",
+										? "border-violet-500 bg-violet-600 text-white hover:bg-violet-700"
+										: "border-violet-200 bg-white text-ak-text hover:bg-violet-50",
 								)}
 							>
 								{line.queueFull

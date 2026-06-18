@@ -37,7 +37,7 @@ export const InventorySurface = memo(
 					eyebrow={placementTarget ? "Place from inventory" : "Inventory"}
 					description={
 						placementTarget
-							? `Double-tap stacks to place around ${placementTarget.x},${placementTarget.y}`
+							? `Double-tap stack items to place around ${placementTarget.x},${placementTarget.y}`
 							: `${filled}/${slots.length} slots`
 					}
 					onClose={onClose}

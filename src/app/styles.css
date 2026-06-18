@@ -162,13 +162,13 @@ button {
 
 .ak-tile-engine-actor[data-ak-tile-engine-drop-feedback="merge"] > .ak-tile-engine-visual {
 	filter: drop-shadow(0 0 0.38rem rgb(52 211 153 / 0.16));
-	transform: scale(1.1);
+	transform: scale(1.14);
 }
 
 .ak-tile-engine-actor[data-ak-tile-engine-drop-feedback="blocked"] > .ak-tile-engine-visual {
 	filter: saturate(0.82) brightness(0.86);
 	opacity: 0.9;
-	transform: scale(0.92);
+	transform: scale(0.88);
 }
 
 .ak-game-width {

@@ -225,7 +225,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				({
 					errorTag: error._tag,
 					message: error.message,
-					...(error._tag === "GameActionRejected"
+					...(error._tag === "GameActionRejected" || error._tag === "GamePlacementFailed"
 						? {
 								reason: error.reason,
 							}

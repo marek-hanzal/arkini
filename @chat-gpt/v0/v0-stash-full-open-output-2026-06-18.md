@@ -17,7 +17,7 @@ Po opravě:
 3. Loot table se rollne jednou za každou remaining charge.
 4. Všechny rollnuté item requesty se předají do jednoho `placeGameSaveItemsFx` batchu.
 5. Placement běží sekvenčně přes stejná board-then-inventory pravidla jako producer output.
-6. Pokud se nevejde celý batch, akce failne přes `placement_unavailable` a původní save zůstane netknutý.
+6. Pokud se nevejde celý batch, akce failne přes `board:full` / `inventory:full` via `GamePlacementFailed` a původní save zůstane netknutý.
 7. Pokud se batch vejde, stash má `remainingCharges = 0` a depletion se aplikuje hned (`remove` nebo `replaceWithItemId`).
 
 Důležitý rozdíl: gameplay save je pořád atomic all-or-nothing, ale output eventy zůstávají v sekvenčním pořadí placementu. Visual bridge tak může dál dávkovat board spawny přes sequence metadata jako producer. Nevracet scheduled eventy jen kvůli animaci.

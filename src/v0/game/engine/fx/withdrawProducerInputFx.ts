@@ -45,15 +45,16 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 			x: checked.producerItem.x,
 			y: checked.producerItem.y,
 		},
-	});
-	if (placement.type === "blocked") {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"placement_unavailable",
-				`Producer input "${action.itemId}" cannot be withdrawn because there is no placement space.`,
+	}).pipe(
+		Effect.catchTag("GamePlacementFailed", (error) =>
+			Effect.fail(
+				GameEngineError.actionRejected(
+					error.reason,
+					`Producer input "${action.itemId}" cannot be withdrawn because there is no placement space.`,
+				),
 			),
-		);
-	}
+		),
+	);
 
 	const producerInputState = placement.save.producerInputs[action.producerItemInstanceId];
 	const productInputState = producerInputState?.productInputs[action.productId];

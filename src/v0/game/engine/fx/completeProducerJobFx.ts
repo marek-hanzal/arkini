@@ -133,15 +133,22 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		itemInstanceId: liveJob.producerItemInstanceId,
 		save,
 	});
-	const placementResult = yield* placeGameSaveItemsFx({
-		config,
-		items: placementRequests,
-		nowMs,
-		save,
-		seedCell,
-	});
+	const placementEither = yield* Effect.either(
+		placeGameSaveItemsFx({
+			config,
+			items: placementRequests,
+			nowMs,
+			save,
+			seedCell,
+		}),
+	);
 
-	if (placementResult.type === "blocked") {
+	if (placementEither._tag === "Left") {
+		const error = placementEither.left;
+		if (error._tag !== "GamePlacementFailed") {
+			return yield* Effect.fail(error);
+		}
+
 		const nextSave = yield* cloneGameSaveFx({
 			save,
 		});
@@ -164,7 +171,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 								jobId: liveJob.id,
 								producerItemInstanceId: liveJob.producerItemInstanceId,
 								productId: liveJob.productId,
-								reason: "placement_unavailable" as const,
+								reason: error.reason,
 								type: "product.blocked" as const,
 							},
 						]
@@ -174,6 +181,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		} satisfies GameEngineCompletionResult;
 	}
 
+	const placementResult = placementEither.right;
 	delete placementResult.save.producerJobs[liveJob.id];
 	placementResult.save.updatedAtMs = nowMs;
 

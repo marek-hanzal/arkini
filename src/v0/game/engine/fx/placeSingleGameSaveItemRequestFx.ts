@@ -9,6 +9,10 @@ import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
+export type GameSaveSingleItemPlacementResult = {
+	type: "placed";
+};
+
 export namespace placeSingleGameSaveItemRequestFx {
 	export interface Props {
 		config: GameConfig;
@@ -30,6 +34,8 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		}
 
 		let remainingQuantity = item.quantity;
+		let boardPlacedQuantity = 0;
+		let boardRanOutOfSpace = false;
 
 		while (remainingQuantity > 0) {
 			const emptyCell = yield* findFirstEmptyBoardCellFx({
@@ -39,6 +45,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			});
 
 			if (!emptyCell) {
+				boardRanOutOfSpace = true;
 				break;
 			}
 
@@ -64,14 +71,28 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 				type: "item.created",
 			});
 			remainingQuantity -= 1;
+			boardPlacedQuantity += 1;
 		}
 
-		return yield* placeGameSaveInventoryRemainderFx({
+		const inventoryPlaced = yield* placeGameSaveInventoryRemainderFx({
 			events,
 			item,
 			maxStackSize: itemDefinition.maxStackSize,
 			remainingQuantity,
 			slots: save.inventory.slots,
 		});
+
+		if (inventoryPlaced) {
+			return {
+				type: "placed",
+			} satisfies GameSaveSingleItemPlacementResult;
+		}
+
+		const reason =
+			boardRanOutOfSpace && boardPlacedQuantity === 0 ? "board:full" : "inventory:full";
+
+		return yield* Effect.fail(
+			GameEngineError.placementFailed(reason, "Placement target is full."),
+		);
 	},
 );

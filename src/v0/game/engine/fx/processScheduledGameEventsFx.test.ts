@@ -135,7 +135,7 @@ describe("processScheduledGameEventsFx", () => {
 			{
 				blockedAtMs: 100,
 				itemId: "item:twig",
-				reason: "placement_unavailable",
+				reason: "board:full",
 				scheduledEventId: "scheduled-event:1",
 				type: "item.spawn.blocked",
 			},

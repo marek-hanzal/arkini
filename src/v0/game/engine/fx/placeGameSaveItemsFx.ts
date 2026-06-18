@@ -31,20 +31,13 @@ export const placeGameSaveItemsFx = Effect.fn("placeGameSaveItemsFx")(function* 
 	const events: GameEvent[] = [];
 
 	for (const item of items) {
-		const placed = yield* placeSingleGameSaveItemRequestFx({
+		yield* placeSingleGameSaveItemRequestFx({
 			config,
 			events,
 			item,
 			save: nextSave,
 			seedCell,
 		});
-
-		if (!placed) {
-			return {
-				reason: "placement_unavailable",
-				type: "blocked",
-			} satisfies GameSaveItemPlacementResult;
-		}
 	}
 
 	nextSave.updatedAtMs = nowMs;

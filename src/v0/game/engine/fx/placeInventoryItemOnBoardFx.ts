@@ -134,16 +134,13 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 				x: action.x,
 				y: action.y,
 			},
-		});
-
-		if (placed.type === "blocked") {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected(
-					"placement_unavailable",
-					"No placement target available.",
+		}).pipe(
+			Effect.catchTag("GamePlacementFailed", (error) =>
+				Effect.fail(
+					GameEngineError.actionRejected(error.reason, "No placement target available."),
 				),
-			);
-		}
+			),
+		);
 
 		return {
 			events: [

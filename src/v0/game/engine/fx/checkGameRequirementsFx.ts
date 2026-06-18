@@ -68,7 +68,7 @@ export const checkGameRequirementsFx = Effect.fn("checkGameRequirementsFx")(func
 								),
 							);
 						}
-					})
+					}),
 			)
 			.exhaustive();
 	}

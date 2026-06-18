@@ -34,7 +34,10 @@ export const checkStoredRequirementStoreReadinessFx = Effect.fn(
 	const resolvedRef = resolvedRefs[0];
 	if (!resolvedRef) {
 		return yield* Effect.fail(
-			GameEngineError.actionRejected("input_unavailable", "Missing stored requirement input."),
+			GameEngineError.actionRejected(
+				"input_unavailable",
+				"Missing stored requirement input.",
+			),
 		);
 	}
 

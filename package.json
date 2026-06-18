@@ -21,6 +21,7 @@
 	"dependencies": {
 		"@paralleldrive/cuid2": "^3.3.0",
 		"@tanstack/react-router": "1.170.15",
+		"dexie": "^4.4.4",
 		"effect": "^3.21.3",
 		"luxon": "^3.7.2",
 		"react": "19.2.7",
@@ -38,10 +39,11 @@
 		"@types/react-dom": "19.2.3",
 		"@vitejs/plugin-react": "6.0.2",
 		"dependency-cruiser": "17.4.2",
+		"fake-indexeddb": "^6.2.5",
 		"tailwindcss": "4.3.0",
+		"tsx": "4.22.4",
 		"typescript": "6.0.3",
 		"vite": "8.0.16",
-		"vitest": "4.1.7",
-		"tsx": "4.22.4"
+		"vitest": "4.1.7"
 	}
 }

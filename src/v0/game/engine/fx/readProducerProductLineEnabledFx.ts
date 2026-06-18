@@ -9,10 +9,14 @@ export namespace readProducerProductLineEnabledFx {
 	}
 }
 
-export const readProducerProductLineEnabledFx = Effect.fn(
-	"readProducerProductLineEnabledFx",
-)(function* ({ save, producerItemInstanceId, productId }: readProducerProductLineEnabledFx.Props) {
-	return !(save.producerLines[producerItemInstanceId]?.disabledProductIds ?? []).includes(
+export const readProducerProductLineEnabledFx = Effect.fn("readProducerProductLineEnabledFx")(
+	function* ({
+		save,
+		producerItemInstanceId,
 		productId,
-	);
-});
+	}: readProducerProductLineEnabledFx.Props) {
+		return !(save.producerLines[producerItemInstanceId]?.disabledProductIds ?? []).includes(
+			productId,
+		);
+	},
+);

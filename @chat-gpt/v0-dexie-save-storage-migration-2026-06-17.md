@@ -1,6 +1,6 @@
 # v0 Dexie save storage migration and SQLite cleanup
 
-Status: TODO
+Status: DONE - Dexie save storage wired
 Created: 2026-06-17
 Priority: after standalone tick engine
 
@@ -136,3 +136,22 @@ Do not normalize every tile/job/input into separate IndexedDB tables unless we c
 - A Dexie-backed save can roundtrip the active game state.
 - Reset and corrupt-save recovery work.
 - SQLite/OPFS/worker code is removed only after tests pass and runtime behavior is switched.
+
+## 2026-06-18 implementation checkpoint
+
+Status: Dexie storage wrapper wired.
+
+Implemented:
+
+- Added `dexie` as the production IndexedDB dependency and `fake-indexeddb` for storage tests.
+- Added `src/v0/game/storage` as the persistence boundary outside the standalone engine.
+- Added a narrow `GameSaveStorage` port with active save load/save/delete/wipe methods.
+- Added `DexieGameSaveStorage` with a single document-style `saves` table. The record stores `schemaVersion`, `saveVersion`, `gameId`, `configHash`, `updatedAtMs` and the full `GameSave` snapshot.
+- Added config hashing via `hashRuntimeGameConfig` so saves are ignored when static config changes.
+- Added corrupt/mismatched save fallback: load returns `null` when storage schema, save version, game id, config hash or `GameSaveSchema` validation fails.
+- Added `createPersistentGameRuntimeStore`, which loads a saved `GameSave`, falls back to `RuntimeGameEngineAdapter` initial-save creation when missing/corrupt/mismatched, immediately persists the fallback save, then connects debounced persistence through `connectGameRuntimeSavePersistence`.
+- Updated `GameRuntimeProvider` to use the persistent runtime factory instead of creating a volatile store directly.
+- Updated hard reset to wipe Dexie save storage first, then best-effort OPFS/local/session storage. OPFS is feature-guarded so the recovery button does not die just because browser APIs are being browser APIs.
+- Added tests for Dexie roundtrip, config mismatch, corrupt save fallback, delete/wipe and persistent runtime fallback/load behavior.
+
+Boundary note: no engine file imports Dexie or browser storage. Storage imports engine model/schema types and the runtime factory wraps the adapter externally, which is the intended direction.

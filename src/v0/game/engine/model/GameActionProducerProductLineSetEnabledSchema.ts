@@ -15,7 +15,5 @@ export type GameActionProducerProductLineSetEnabledSchema =
 	typeof GameActionProducerProductLineSetEnabledSchema;
 
 export namespace GameActionProducerProductLineSetEnabledSchema {
-	export type Type = z.infer<
-		typeof GameActionProducerProductLineSetEnabledSchema
-	>;
+	export type Type = z.infer<typeof GameActionProducerProductLineSetEnabledSchema>;
 }

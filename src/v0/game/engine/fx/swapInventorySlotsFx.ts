@@ -24,18 +24,25 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 		action.targetSlotIndex >= save.inventory.slots.length
 	) {
 		return yield* Effect.fail(
-			GameEngineError.actionRejected("unsupported_target", "Inventory slot is outside inventory."),
+			GameEngineError.actionRejected(
+				"unsupported_target",
+				"Inventory slot is outside inventory.",
+			),
 		);
 	}
 	if (action.sourceSlotIndex === action.targetSlotIndex) {
 		return {
 			events: [],
-			nextWakeAtMs: yield* readNextWakeAtMsFx({ save }),
+			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				save,
+			}),
 			save,
 		} satisfies GameEngineResult;
 	}
 
-	const nextSave = yield* cloneGameSaveFx({ save });
+	const nextSave = yield* cloneGameSaveFx({
+		save,
+	});
 	const source = nextSave.inventory.slots[action.sourceSlotIndex] ?? null;
 	nextSave.inventory.slots[action.sourceSlotIndex] =
 		nextSave.inventory.slots[action.targetSlotIndex] ?? null;
@@ -44,7 +51,9 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 
 	return {
 		events: [],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({ save: nextSave }),
+		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			save: nextSave,
+		}),
 		save: nextSave,
 	} satisfies GameEngineResult;
 });

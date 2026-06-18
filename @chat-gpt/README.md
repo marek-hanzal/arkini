@@ -23,6 +23,14 @@ Current architectural state:
 - Producer queue size is now a config/runtime invariant. `producers.*.maxQueueSize` caps running+queued jobs per producer item instance; upgrades can adjust it through `producer.maxQueueSize.add`.
 - Runtime snapshots expose the effective config for the current save. `adapter.config` remains the immutable base config; `adapter.readSnapshot().config` is the layered config UI should read.
 
+
+Recent runtime parity checkpoint:
+
+- Live UI time is shared through `useLiveNowMs`. Use it for countdown/progress UI that should move without engine revisions.
+- `useGameRuntimeSelector` cache now keys on both runtime root snapshot and selector identity, so time/prop-driven selectors can recompute correctly.
+- Scheduled event blocks are retried after `blockedScheduledEventRetryDelayMs` instead of leaving `dueAtMs` in the past and hot-looping the auto ticker.
+- Debounced Dexie persistence flushes on pagehide/hidden as a best-effort safety net.
+
 Active follow-up after the SQLite removal pass:
 
 1. Run full local validation with dependencies: `npm run typecheck`, `npm run dc`, `npm run game:validate:default`, `npm run test`, `npm run build`.

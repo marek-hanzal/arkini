@@ -10,6 +10,7 @@ import {
 import { useLoadDevScenarioAction } from "~/v0/debug/scenario/useLoadDevScenarioAction";
 import { StatusPill } from "~/v0/debug/ui/StatusPill";
 import { useGameRuntimeSelector } from "~/v0/play/runtime";
+import { useLiveNowMs } from "~/v0/time/useLiveNowMs";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { cn } from "~/v0/ui/cn";
 
@@ -40,9 +41,9 @@ const DebugButton: FC<{
 	</button>
 );
 
-const formatWake = (nextWakeAtMs: number | null) => {
+const formatWake = (nextWakeAtMs: number | null, nowMs: number) => {
 	if (nextWakeAtMs === null) return "idle";
-	return `${Math.max(0, nextWakeAtMs - Date.now())}ms`;
+	return `${Math.max(0, nextWakeAtMs - nowMs)}ms`;
 };
 
 export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
@@ -63,6 +64,10 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 			left.nextWakeAtMs === right.nextWakeAtMs &&
 			left.revision === right.revision,
 	);
+
+	const nowMs = useLiveNowMs([
+		runtime.nextWakeAtMs,
+	]);
 
 	const loadScenario = useCallback(
 		(scenarioId: DevScenarioId) => {
@@ -291,7 +296,7 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							/>
 							<StatusPill
 								label="Next tick"
-								value={formatWake(runtime.nextWakeAtMs)}
+								value={formatWake(runtime.nextWakeAtMs, nowMs)}
 							/>
 							<StatusPill
 								label="Source"

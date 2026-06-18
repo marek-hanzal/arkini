@@ -1,7 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
-import { processScheduledGameEventsFx } from "~/v0/game/engine/fx/processScheduledGameEventsFx";
+import {
+	blockedScheduledEventRetryDelayMs,
+	processScheduledGameEventsFx,
+} from "~/v0/game/engine/fx/processScheduledGameEventsFx";
 import { scheduleBoardItemRemoveFx } from "~/v0/game/engine/fx/scheduleBoardItemRemoveFx";
 import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
@@ -140,7 +143,10 @@ describe("processScheduledGameEventsFx", () => {
 				type: "item.spawn.blocked",
 			},
 		]);
-		expect(result.save.scheduledEvents).toHaveProperty("scheduled-event:1");
+		expect(result.save.scheduledEvents["scheduled-event:1"]).toMatchObject({
+			dueAtMs: 100 + blockedScheduledEventRetryDelayMs,
+			lastBlockedAtMs: 100,
+		});
 	});
 	it("does not spam the same blocked scheduled spawn on every retry tick", () => {
 		const config = createEngineTestConfig({
@@ -183,14 +189,15 @@ describe("processScheduledGameEventsFx", () => {
 		});
 		const second = runScheduled({
 			config,
-			nowMs: 200,
+			nowMs: 100 + blockedScheduledEventRetryDelayMs,
 			save: first.save,
 		});
 
 		expect(first.events).toHaveLength(1);
 		expect(second.events).toEqual([]);
 		expect(second.save.scheduledEvents["scheduled-event:1"]).toMatchObject({
-			lastBlockedAtMs: 200,
+			dueAtMs: 100 + blockedScheduledEventRetryDelayMs * 2,
+			lastBlockedAtMs: 100 + blockedScheduledEventRetryDelayMs,
 		});
 	});
 

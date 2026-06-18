@@ -2,9 +2,11 @@ import type { FC } from "react";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { UpgradeCard } from "~/v0/upgrade/ui/UpgradeCard";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
+import { useLiveNowMs } from "~/v0/time/useLiveNowMs";
 import {
 	useGameAction,
 	useGameItemCatalogView,
+	useGameRuntimeSelector,
 	useGameRuntimeStore,
 	useGameUpgradeListView,
 } from "~/v0/play/runtime";
@@ -56,8 +58,19 @@ const inventoryInputRefsForUpgrade = ({
 	});
 };
 
+const sameNumberArray = (left: readonly number[], right: readonly number[]) =>
+	left.length === right.length && left.every((value, index) => value === right[index]);
+
 export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
-	const upgrades = useGameUpgradeListView();
+	const upgradeReadyAtMs = useGameRuntimeSelector(
+		(state) =>
+			Object.values(state.runtime.save.upgradeJobs)
+				.map((job) => job.completesAtMs)
+				.sort((left, right) => left - right),
+		sameNumberArray,
+	);
+	const nowMs = useLiveNowMs(upgradeReadyAtMs);
+	const upgrades = useGameUpgradeListView(nowMs);
 	const store = useGameRuntimeStore();
 	const upgradeAction = useGameAction();
 	const items = useGameItemCatalogView();

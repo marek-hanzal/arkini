@@ -1,41 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-
-const producerClockTickMs = 250;
+import { useLiveNowMs } from "~/v0/time/useLiveNowMs";
 
 export function useProducerClock(items: readonly BoardViewItem[]) {
-	const [nowMs, setNowMs] = useState(() => Date.now());
-
 	const activeUntilMs = useMemo(
 		() =>
-			items
-				.flatMap((item) => [
-					item.activation?.cooldownUntilMs ?? 0,
-					...(item.activation?.productLines?.map((line) => line.readyAtMs ?? 0) ?? []),
-					item.craft?.readyAtMs ?? 0,
-				])
-				.filter(Boolean),
+			items.flatMap((item) => [
+				item.activation?.cooldownUntilMs,
+				...(item.activation?.productLines?.map((line) => line.readyAtMs) ?? []),
+				item.craft?.readyAtMs,
+			]),
 		[
 			items,
 		],
 	);
 
-	useEffect(() => {
-		if (activeUntilMs.every((time) => time <= Date.now())) return undefined;
-
-		const interval = window.setInterval(() => {
-			const nextNowMs = Date.now();
-			setNowMs(nextNowMs);
-
-			if (activeUntilMs.every((time) => time <= nextNowMs)) {
-				window.clearInterval(interval);
-			}
-		}, producerClockTickMs);
-
-		return () => window.clearInterval(interval);
-	}, [
-		activeUntilMs,
-	]);
-
-	return nowMs;
+	return useLiveNowMs(activeUntilMs);
 }

@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
 import { formatMs } from "~/v0/time/formatMs";
 import { cn } from "~/v0/ui/cn";
 
@@ -28,7 +29,11 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 				Product lines
 			</p>
 			<div className="mt-3 space-y-2">
-				{lines.map((line) => {
+				{lines.map((baseLine) => {
+					const line = readLiveProducerProductLineView({
+						line: baseLine,
+						nowMs,
+					});
 					const canStart =
 						line.enabled && line.inputItemIds.length === 0 && !line.queueFull;
 					const remainingMs = line.readyAtMs

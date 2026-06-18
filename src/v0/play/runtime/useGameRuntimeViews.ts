@@ -57,11 +57,11 @@ export const useGameInventorySlot = (slotIndex: number): InventorySlot =>
 		sameInventorySlot,
 	);
 
-export const useGameUpgradeListView = (): UpgradeListView =>
+export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView =>
 	useGameRuntimeSelector((state) =>
 		readRuntimeUpgradeListViewFromGameSave({
 			config: state.runtime.config,
-			nowMs: Date.now(),
+			nowMs,
 			save: state.runtime.save,
 		}),
 	);

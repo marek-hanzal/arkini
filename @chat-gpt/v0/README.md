@@ -14,13 +14,13 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ## Active / useful task candidates
 
-### 1. Touch/long-press polish
-
-Long press on game surfaces should not open native browser menus. Keep suppression scoped to board/tile surfaces so normal app UI is not wrecked for sport.
-
-### 2. Badge/visual polish
+### 1. Badge/visual polish
 
 Tile badge/level offset can be tightened toward the corner. Keep it tiny and do not redesign tile layout while pretending it is “just polish”.
+
+### 2. Inventory-to-board seeded placement
+
+Long press on an empty board cell should open inventory with that cell as placement seed. Reuse the shared Manhattan placement planner; do not write a second local-nearest search because apparently one bug farm is not enough for humanity.
 
 ## Deferred / historical notes
 
@@ -31,12 +31,13 @@ Tile badge/level offset can be tightened toward the corner. Keep it tiny and do 
 
 ## Selected next task
 
-Recommended next coding task: **Touch/long-press polish**.
+Recommended next coding task: **Badge/visual polish**.
 
-Reason: native browser context/callout menus on the game surface are still a small UX landmine for touch play. Scope suppression to board/tile surfaces only, not the whole app.
+Reason: tile level/badge placement is a small visual fix that was already called out and should be quick to close before the larger inventory placement flow.
 
 ## Completed recent task
 
+- `v0-touch-long-press-polish-2026-06-18.md`: native context/callout menus are suppressed on TileEngine game surfaces without adding global app-wide hijacking.
 - `v0-product-line-input-withdraw-2026-06-18.md`: product-line input rows can withdraw their whole stored amount through producer-style board-then-inventory placement.
 - `v0-product-line-input-refs-2026-06-18.md`: producer-level consumable inputs moved to standalone named input definitions referenced by product lines; line inputs fill through DnD and are stored under `save.producerInputs`.
 - `v0-merge-executable-parity-2026-06-18.md`: regular combo merges now resolve from either drag direction through one executable resolver shared by runtime, DnD and item catalog detail.

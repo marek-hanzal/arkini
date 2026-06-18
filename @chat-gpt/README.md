@@ -117,6 +117,11 @@ Merge executable parity checkpoint:
 - Regression target: `item:twig` + `item:water` must resolve to `item:sprout` from both drag directions.
 
 
+Touch / long-press polish checkpoint:
+
+- TileEngine surfaces suppress native `contextmenu` and iOS touch callout/tap highlight so long-press game gestures are not hijacked by the browser.
+- Keep this scoped to game interaction surfaces. Do not prevent context menus globally across ordinary app UI unless there is a very specific reason.
+
 Product-line input ref checkpoint:
 
 - Producer-level consumable inputs are gone from the live model. Producer shells can have requirements/product lines, but only product lines own consumable production inputs.

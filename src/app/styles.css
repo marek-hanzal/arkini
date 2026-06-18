@@ -67,7 +67,10 @@ button {
 .ak-tile-engine {
 	--ak-tile-engine-item-layer: var(--ak-layer-base-tile);
 	--ak-tile-engine-drag-item-layer: var(--ak-layer-base-drag-tile);
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
 	isolation: isolate;
+	touch-action: none;
 }
 
 .ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] {

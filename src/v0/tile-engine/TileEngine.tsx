@@ -1,5 +1,6 @@
 import { memo, useCallback, useState } from "react";
 import { cn } from "~/v0/ui/cn";
+import { preventNativeTileEngineContextMenu } from "~/v0/tile-engine/preventNativeTileEngineContextMenu";
 import { TileEngineActors } from "~/v0/tile-engine/TileEngineActors";
 import { TileEngineSlots } from "~/v0/tile-engine/TileEngineSlots";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
@@ -64,6 +65,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 
 	return (
 		<div
+			onContextMenu={preventNativeTileEngineContextMenu}
 			data-ak-tile-engine-id={id}
 			data-ak-tile-engine-layer-role={layerRole}
 			data-ak-tile-engine-disabled={disabled ? "true" : undefined}

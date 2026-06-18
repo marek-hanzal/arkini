@@ -78,3 +78,4 @@ DnD feedback frame checkpoint:
 - TileEngine exposes only generic feedback variants (`subtle`, `primary`, `secondary`, `danger`). Domain layers map Arkini meanings onto those variants.
 - Stored requirement fill uses primary/blue frame feedback; craft/producer/stash consumable input uses secondary/green frame feedback. Regular merge should rely on the existing merge animation rather than extra colored frames.
 - Keep hover feedback and post-success board-cell pulses aligned so the thing previewed during drag matches what flashes after commit.
+- Do not reduce existing hover scale just to make feedback subtle. Subtle means frame/border/glow intensity, while scale should remain clearly visible.

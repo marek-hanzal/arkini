@@ -16,7 +16,7 @@ import {
 	useGameRuntimeSelector,
 	useGameRuntimeStore,
 } from "~/v0/play/runtime";
-import { readGameRuntimeBoardView, readGameRuntimeInventoryView } from "~/v0/play/runtime/readers";
+import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useBoardTileEngineModel {
@@ -207,9 +207,9 @@ export const useBoardTileEngineModel = ({
 
 				return resolveDrop({
 					context,
-					board: readGameRuntimeBoardView(snapshot),
+					board: readBoardView(snapshot),
 					config: snapshot.runtime.config,
-					inventory: readGameRuntimeInventoryView(snapshot),
+					inventory: readInventoryView(snapshot),
 					feedback,
 					actions,
 				});

@@ -3,7 +3,7 @@ import type { ItemId } from "~/v0/manifest/manifestId";
 import { readRuntimeItemCatalogViewFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeItemCatalogViewFromGameConfig";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 
-export const readGameRuntimeItemView = ({
+export const readItemView = ({
 	itemId,
 	state,
 }: {

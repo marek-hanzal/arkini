@@ -9,7 +9,7 @@ After raw runtime store and focused subscription passes, the remaining cleanup t
 
 - find broad subscriptions that recompute large derived views for tiny consumers
 - verify old gameplay cache patching is gone
-- prevent `readGameRuntimeViews` from becoming the next god-object reader barrel
+- prevent catch-all runtime reader modules from becoming the next god-object reader barrel
 - keep selectors stable and cheap, not a shiny cache system with a nicer haircut
 
 ## What changed
@@ -20,13 +20,13 @@ Deleted the old catch-all `src/v0/play/runtime/readGameRuntimeViews.ts` module.
 
 Added focused reader modules under `src/v0/play/runtime/readers/*`:
 
-- `readGameRuntimeBoardView`
-- `readGameRuntimeBoardItem`
-- `readGameRuntimeBoardFirstEmptyCell`
-- `readGameRuntimeInventoryView`
-- `readGameRuntimeInventorySlot`
-- `readGameRuntimeItemCatalogView`
-- `readGameRuntimeItemView`
+- `readBoardView`
+- `readBoardItem`
+- `readBoardFirstEmptyCell`
+- `readInventoryView`
+- `readInventorySlot`
+- `readItemCatalogView`
+- `readItemView`
 
 `src/v0/play/runtime/readers/index.ts` remains only a tiny barrel. It must stay boring. If it starts growing logic, slap it with a wet lint rule and split the logic back out.
 
@@ -70,7 +70,7 @@ That WeakMap is acceptable because config identity is immutable/effective and th
 
 ## Tests
 
-Added `src/v0/play/runtime/readers/readGameRuntimeReaders.test.ts` to cover focused readers:
+Added `src/v0/play/runtime/readers/readers.test.ts` to cover focused readers. Follow-up naming cleanup removed redundant `GameRuntime` from reader filenames/functions:
 
 - one board item reader matches the full board view item
 - first-empty-cell reader uses raw save coordinates and config board dimensions

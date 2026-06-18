@@ -8,7 +8,7 @@ import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 
 const emptyStateJson = "{}";
 
-export const readGameRuntimeInventorySlot = ({
+export const readInventorySlot = ({
 	slotIndex,
 	state,
 }: {

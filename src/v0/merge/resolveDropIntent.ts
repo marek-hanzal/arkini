@@ -1,6 +1,10 @@
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { ItemId } from "~/v0/manifest/manifestId";
+import {
+	hasReverseDirectedItemMergeRule,
+	resolveExecutableItemMergeRule,
+} from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 
 export type DropIntent =
 	| {
@@ -32,51 +36,17 @@ export namespace resolveDropIntent {
 	}
 }
 
-const resolveRuntimeMergeRule = ({
-	config,
-	sourceItemId,
-	targetItemId,
-}: {
-	config: GameConfig;
-	sourceItemId: string;
-	targetItemId: string;
-}) => {
-	const sourceItem = config.items[sourceItemId];
-	if (!sourceItem) return undefined;
-
-	return (sourceItem.mergeIds ?? [])
-		.map((mergeId) => config.merge[mergeId])
-		.find((rule) => rule?.withItemId === targetItemId);
-};
-
-const hasReverseDirectedMergeRule = ({
-	config,
-	sourceItemId,
-	targetItemId,
-}: {
-	config: GameConfig;
-	sourceItemId: string;
-	targetItemId: string;
-}) => {
-	const targetItemDefinition = config.items[targetItemId];
-	if (!targetItemDefinition) return false;
-
-	return (targetItemDefinition.mergeIds ?? [])
-		.map((mergeId) => config.merge[mergeId])
-		.some((rule) => rule?.withItemId === sourceItemId && rule.consumeSource === false);
-};
-
 export const resolveDropIntent = ({
 	config,
 	sourceItemId,
 	targetItem,
 }: resolveDropIntent.Props): DropIntent => {
-	const mergeRule = resolveRuntimeMergeRule({
+	const mergeRule = resolveExecutableItemMergeRule({
 		config,
 		sourceItemId,
 		targetItemId: targetItem.itemId,
 	});
-	const reverseDirectedMerge = hasReverseDirectedMergeRule({
+	const reverseDirectedMerge = hasReverseDirectedItemMergeRule({
 		config,
 		sourceItemId,
 		targetItemId: targetItem.itemId,
@@ -114,8 +84,8 @@ export const resolveDropIntent = ({
 	if (canMerge) {
 		return {
 			type: "merge",
-			resultItemId: mergeRule?.resultItemId as ItemId | undefined,
-			directed: mergeRule?.consumeSource === false,
+			resultItemId: mergeRule?.merge.resultItemId as ItemId | undefined,
+			directed: mergeRule?.directed ?? false,
 		};
 	}
 

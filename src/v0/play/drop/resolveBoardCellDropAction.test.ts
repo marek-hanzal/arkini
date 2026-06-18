@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
+import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
@@ -151,6 +152,61 @@ describe("resolveBoardCellDropAction", () => {
 				sourceBoardItemId: "source",
 				targetBoardItemId: "target",
 			},
+		});
+	});
+
+	it("maps regular combo merges to merge actions from either drag direction", () => {
+		const twig = boardItem({
+			id: "twig",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const water = boardItem({
+			id: "water",
+			itemId: "item:water",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config: defaultGameConfig,
+				board: rebuildBoardView([
+					twig,
+					water,
+				]),
+				source: boardSource(water),
+				target: {
+					kind: "cell",
+					x: 0,
+					y: 0,
+					boardItemId: twig.id,
+				},
+			}),
+		).toMatchObject({
+			animation: "parallel-merge",
+			type: "merge-board-items",
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config: defaultGameConfig,
+				board: rebuildBoardView([
+					twig,
+					water,
+				]),
+				source: boardSource(twig),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: water.id,
+				},
+			}),
+		).toMatchObject({
+			animation: "parallel-merge",
+			type: "merge-board-items",
 		});
 	});
 

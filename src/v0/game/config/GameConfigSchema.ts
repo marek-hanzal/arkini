@@ -27,8 +27,9 @@ import { z } from "zod";
  * - Board tiles never stack. Produced/crafted/dropped items are placed onto empty board
  *   cells first and then into inventory stacks/slots through `board_then_inventory`.
  * - Inventory may stack items up to each item's `maxStackSize`.
- * - Merge definitions are intentionally asymmetric. An item opts into its merge options
- *   through `items.*.mergeIds`; the reverse direction is not automatic unless authored.
+ * - Regular merge definitions model executable item pairs and work from either drag
+ *   direction. `consumeSource: false` imprint rules are intentionally directed and only
+ *   execute from the item that owns the merge id.
  * - Activation inputs always say whether they are consumed. Producer/product/stash/craft
  *   code must not guess this from context, because guessing is just a bug wearing a hat.
  * - Passive requirements always declare their search scope (`board`, `inventory`, or
@@ -283,7 +284,7 @@ const AssetDefinitionSchema = z
 	})
 	.strict();
 
-/** Asymmetric two-item merge option referenced from `items.*.mergeIds`. */
+/** Two-item merge option referenced from `items.*.mergeIds`. Regular merges are paired; imprint merges with `consumeSource: false` are directed. */
 const MergeDefinitionSchema = z
 	.object({
 		withItemId: IdSchema,

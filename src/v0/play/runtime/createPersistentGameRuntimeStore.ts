@@ -33,15 +33,18 @@ const isCloseableStorage = (storage: GameSaveStorage): storage is CloseableGameS
 	"close" in storage && typeof storage.close === "function";
 
 const saveThroughStorage = ({
+	config,
 	configHash,
 	save,
 	storage,
 }: {
+	config: GameConfig;
 	configHash: string;
 	save: GameSave;
 	storage: GameSaveStorage;
 }) =>
 	storage.saveActiveSave({
+		config,
 		configHash,
 		save,
 	});
@@ -56,8 +59,8 @@ export const createPersistentGameRuntimeStore = async ({
 }: createPersistentGameRuntimeStore.Options = {}): Promise<createPersistentGameRuntimeStore.Result> => {
 	const configHash = await hashRuntimeGameConfig(config);
 	const loadedSave = await storage.loadActiveSave({
+		config,
 		configHash,
-		gameId: config.game.id,
 	});
 	const adapter = await RuntimeGameEngineAdapter.create({
 		config,
@@ -72,6 +75,7 @@ export const createPersistentGameRuntimeStore = async ({
 
 	if (!loadedSave) {
 		await saveThroughStorage({
+			config,
 			configHash,
 			save: adapter.readSave(),
 			storage,
@@ -84,6 +88,7 @@ export const createPersistentGameRuntimeStore = async ({
 		storage: {
 			save: (save) =>
 				saveThroughStorage({
+					config,
 					configHash,
 					save,
 					storage,

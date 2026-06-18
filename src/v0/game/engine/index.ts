@@ -22,6 +22,7 @@ export {
 export {
 	GameSaveBoardItemSchema,
 	GameSaveCraftJobReturnItemSchema,
+	GameSaveConfigSchema,
 	GameSaveCraftJobSchema,
 	GameSaveInventorySlotSchema,
 	GameSaveInventoryStackSchema,
@@ -54,6 +55,7 @@ export type { GameEngineError as GameEngineErrorType } from "~/v0/game/engine/mo
 export type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 export type {
 	GameSave,
+	GameSaveConfig,
 	GameSaveBoardItem,
 	GameSaveCraftJob,
 	GameSaveInventorySlot,

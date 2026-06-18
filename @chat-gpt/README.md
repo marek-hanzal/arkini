@@ -48,3 +48,10 @@ Dexie destructive refresh checkpoint:
 - Prototype storage compatibility is intentionally coarse. If a Dexie save record has a stale storage schema version, stale save document version, mismatched game id/config hash or invalid `GameSave` payload, `DexieGameSaveStorage.loadActiveSave` wipes the whole save database and returns `null`.
 - `createPersistentGameRuntimeStore` then creates and persists a fresh initial save. Do not add partial IndexedDB migrations while the v0 save shape is still moving quickly.
 - Recoverable Dexie schema open/upgrade errors are treated the same way: drop the Dexie database and retry the operation against a fresh schema.
+
+GameSave schema validation checkpoint:
+
+- Save validation is centralized through `GameSaveConfigSchema`, a Zod schema for `{ save, config }` that sits in the game engine model/schema layer.
+- `GameSaveSchema` owns raw document shape; `GameSaveConfigSchema.superRefine` owns config-aware invariants such as board bounds/unique cells, inventory slot count/max stack sizes, producer queue caps including completed queue upgrades, job target references, stash/stored requirement state, upgrade progress and scheduled event references.
+- Dexie storage receives `config` and calls `GameSaveConfigSchema` on load/save. Invalid semantic save state is wiped through the existing drop-and-fresh policy.
+- Do not scatter save invariant checks into storage, React runtime, UI views or feature modules. Those layers may perform action-readiness/user-intent checks, but persisted save integrity belongs to the schema layer.

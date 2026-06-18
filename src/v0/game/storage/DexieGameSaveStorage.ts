@@ -1,5 +1,5 @@
 import Dexie, { type Table } from "dexie";
-import { GameSaveSchema, type GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { GameSaveConfigSchema, type GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import {
 	activeGameSaveId,
 	gameSaveStorageSchemaVersion,
@@ -55,8 +55,11 @@ export class DexieGameSaveStorage implements CloseableGameSaveStorage {
 		return this.withSchemaRefresh(() => this.loadActiveSaveFromCurrentDatabase(scope));
 	}
 
-	async saveActiveSave({ configHash, save, saveId }: SaveActiveGameSaveProps) {
-		const parsed = GameSaveSchema.parse(save);
+	async saveActiveSave({ config, configHash, save, saveId }: SaveActiveGameSaveProps) {
+		const parsed = GameSaveConfigSchema.parse({
+			config,
+			save,
+		}).save;
 		await this.withSchemaRefresh(() =>
 			this.database.saves.put({
 				id: readSaveId(saveId),
@@ -85,8 +88,8 @@ export class DexieGameSaveStorage implements CloseableGameSaveStorage {
 	}
 
 	private async loadActiveSaveFromCurrentDatabase({
+		config,
 		configHash,
-		gameId,
 		saveId,
 	}: GameSaveStorageScope) {
 		const record = await this.database.saves.get(readSaveId(saveId));
@@ -95,20 +98,23 @@ export class DexieGameSaveStorage implements CloseableGameSaveStorage {
 		if (
 			!this.isRecordCompatible(record, {
 				configHash,
-				gameId,
+				gameId: config.game.id,
 			})
 		) {
 			await this.wipe();
 			return null;
 		}
 
-		const parsed = GameSaveSchema.safeParse(record.save);
-		if (!parsed.success || parsed.data.gameId !== gameId) {
+		const parsed = GameSaveConfigSchema.safeParse({
+			config,
+			save: record.save,
+		});
+		if (!parsed.success) {
 			await this.wipe();
 			return null;
 		}
 
-		return parsed.data;
+		return parsed.data.save;
 	}
 
 	private isRecordCompatible(

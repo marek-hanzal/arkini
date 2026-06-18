@@ -139,6 +139,13 @@ Board DnD confinement checkpoint:
 - `DropActions` should not expose board-item stash for DnD plumbing.
 - Moving a board item into inventory is an explicit `Store` action from the item detail sheet, dispatching `board.item.stash`.
 
+Stash atomic output checkpoint:
+
+- `stash.open` must apply its rolled output directly through `placeGameSaveItemsFx`; it must not schedule output just to get sequential animation.
+- If stash output placement is unavailable, `stash.open` fails with `placement_unavailable` and the original save remains unchanged.
+- Depleted stashes are handled immediately by `applyStashDepletionFx`: `remove` deletes the board item and runtime state; `replaceWithItemId` changes the same item instance and clears runtime state.
+- `GameSaveScheduledEventSchema` currently allows only `item.spawn`; scheduled board remove/replace events were removed because they were stash animation plumbing, not real delayed domain state.
+
 Inventory seeded placement checkpoint:
 
 - Long-pressing an empty board cell opens inventory in placement mode with that cell as placement seed.

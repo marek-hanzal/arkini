@@ -2,10 +2,7 @@ import { z } from "zod";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameSaveUpgradeJobSchema } from "~/v0/game/engine/model/GameSaveUpgradeJobSchema";
 import { GameSaveUpgradeStateSchema } from "~/v0/game/engine/model/GameSaveUpgradeStateSchema";
-import {
-	GameBoardItemChangeReasonSchema,
-	GameItemCreatedReasonSchema,
-} from "~/v0/game/engine/model/GameEventSchema";
+import { GameItemCreatedReasonSchema } from "~/v0/game/engine/model/GameEventSchema";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
@@ -142,29 +139,14 @@ export const GameSaveScheduledEventBaseSchema = z
 		},
 	);
 
-export const GameSaveScheduledEventSchema = z
-	.discriminatedUnion("type", [
-		GameSaveScheduledEventBaseSchema.extend({
-			itemId: IdSchema,
-			originItemInstanceId: IdSchema.optional(),
-			quantity: PositiveIntegerSchema,
-			reason: GameItemCreatedReasonSchema,
-			type: z.literal("item.spawn"),
-		}).strict(),
-		GameSaveScheduledEventBaseSchema.extend({
-			itemId: IdSchema,
-			itemInstanceId: IdSchema,
-			reason: GameBoardItemChangeReasonSchema,
-			type: z.literal("board.item.remove"),
-		}).strict(),
-		GameSaveScheduledEventBaseSchema.extend({
-			fromItemId: IdSchema,
-			itemInstanceId: IdSchema,
-			reason: GameBoardItemChangeReasonSchema,
-			toItemId: IdSchema,
-			type: z.literal("board.item.replace"),
-		}).strict(),
-	])
+export const GameSaveScheduledEventSchema = GameSaveScheduledEventBaseSchema.extend({
+	itemId: IdSchema,
+	originItemInstanceId: IdSchema.optional(),
+	quantity: PositiveIntegerSchema,
+	reason: GameItemCreatedReasonSchema,
+	type: z.literal("item.spawn"),
+})
+	.strict()
 	.refine((value) => !value.exclusiveKey || value.exclusiveKey !== value.id, {
 		message: "exclusiveKey must group events and must not equal event id",
 		path: [
@@ -1031,83 +1013,15 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if (event.type === "item.spawn") {
-			if (!config.items[event.itemId]) {
-				addSaveIssue(
-					ctx,
-					[
-						"scheduledEvents",
-						eventId,
-						"itemId",
-					],
-					`Missing item "${event.itemId}".`,
-				);
-			}
-			continue;
-		}
-
-		if (event.type === "board.item.remove") {
-			if (!config.items[event.itemId]) {
-				addSaveIssue(
-					ctx,
-					[
-						"scheduledEvents",
-						eventId,
-						"itemId",
-					],
-					`Missing item "${event.itemId}".`,
-				);
-			}
-
-			const liveItem = save.board.items[event.itemInstanceId];
-			if (liveItem && liveItem.itemId !== event.itemId) {
-				addSaveIssue(
-					ctx,
-					[
-						"scheduledEvents",
-						eventId,
-						"itemInstanceId",
-					],
-					`Remove event target item must still be "${event.itemId}" when present.`,
-				);
-			}
-			continue;
-		}
-
-		if (!config.items[event.fromItemId]) {
+		if (!config.items[event.itemId]) {
 			addSaveIssue(
 				ctx,
 				[
 					"scheduledEvents",
 					eventId,
-					"fromItemId",
+					"itemId",
 				],
-				`Missing item "${event.fromItemId}".`,
-			);
-		}
-
-		if (!config.items[event.toItemId]) {
-			addSaveIssue(
-				ctx,
-				[
-					"scheduledEvents",
-					eventId,
-					"toItemId",
-				],
-				`Missing item "${event.toItemId}".`,
-			);
-		}
-
-		const liveItem = save.board.items[event.itemInstanceId];
-		if (liveItem && liveItem.itemId !== event.fromItemId) {
-			addSaveIssue(
-				ctx,
-				[
-					"scheduledEvents",
-					eventId,
-					"itemInstanceId",
-				],
-				`Replace event target item must still be "${event.fromItemId}" when present.`,
+				`Missing item "${event.itemId}".`,
 			);
 		}
 	}

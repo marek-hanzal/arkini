@@ -467,8 +467,19 @@ describe("applyGameActionFx", () => {
 			});
 		}
 	});
-	it("opens a stash by consuming input and scheduling output plus depletion", () => {
+	it("opens a stash by applying output and depletion atomically", () => {
 		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				board: {
+					height: 1,
+					width: 2,
+				},
+				title: "Test",
+			},
 			startingState: {
 				board: [
 					{
@@ -512,7 +523,12 @@ describe("applyGameActionFx", () => {
 			save,
 		});
 
-		expect(result.save.inventory.slots[0]).toBeNull();
+		expect(result.save.scheduledEvents).toEqual({});
+		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 2,
+		});
 		expect(result.events).toMatchObject([
 			{
 				itemId: "item:key",
@@ -525,29 +541,23 @@ describe("applyGameActionFx", () => {
 				type: "stash.opened",
 			},
 			{
+				itemId: "item:twig",
+				reason: "stash-output",
+				to: {
+					kind: "inventory",
+					quantity: 2,
+				},
+				type: "item.created",
+			},
+			{
 				stashItemInstanceId: "item-instance:2",
 				type: "stash.depleted",
 			},
-		]);
-		expect(Object.values(result.save.scheduledEvents)).toEqual([
-			expect.objectContaining({
-				itemId: "item:twig",
-				reason: "stash-output",
-				type: "item.spawn",
-			}),
-			expect.objectContaining({
-				itemId: "item:twig",
-				reason: "stash-output",
-				type: "item.spawn",
-			}),
-			expect.objectContaining({
-				afterEventIds: [
-					"scheduled-event:1",
-					"scheduled-event:2",
-				],
+			{
 				itemInstanceId: "item-instance:2",
-				type: "board.item.remove",
-			}),
+				reason: "stash-depleted",
+				type: "item.removed",
+			},
 		]);
 	});
 
@@ -602,10 +612,175 @@ describe("applyGameActionFx", () => {
 		expect(result.save.stashes["item-instance:1"]).toEqual({
 			remainingCharges: 1,
 		});
+		expect(result.save.scheduledEvents).toEqual({});
 		expect(result.events.map((event) => event.type)).toEqual([
 			"item.consumed",
 			"stash.opened",
+			"item.created",
+			"item.created",
 		]);
+	});
+
+	it("keeps stash open state untouched when output placement is unavailable", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				board: {
+					height: 1,
+					width: 2,
+				},
+				title: "Test",
+			},
+			stashes: {
+				...baseConfig.stashes,
+				"stash:test": {
+					...baseConfig.stashes["stash:test"],
+					inputs: [],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:stash",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 3,
+					},
+					{
+						itemId: "item:plank",
+						quantity: 2,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				stashItemInstanceId: "item-instance:2",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "placement_unavailable",
+			});
+		}
+		expect(save.stashes).toEqual({});
+		expect(save.scheduledEvents).toEqual({});
+		expect(save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:stash",
+		});
+	});
+
+	it("replaces a depleted stash atomically when configured", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				board: {
+					height: 1,
+					width: 2,
+				},
+				title: "Test",
+			},
+			stashes: {
+				...baseConfig.stashes,
+				"stash:test": {
+					...baseConfig.stashes["stash:test"],
+					onDepleted: {
+						replaceWithItemId: "item:empty-stash",
+					},
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:stash",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [
+					{
+						kind: "inventory",
+						quantity: 1,
+						slotIndex: 0,
+					},
+				],
+				stashItemInstanceId: "item-instance:2",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.scheduledEvents).toEqual({});
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:empty-stash",
+			x: 1,
+			y: 0,
+		});
+		expect(result.save.stashes).toEqual({});
+		expect(result.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					fromItemId: "item:stash",
+					itemInstanceId: "item-instance:2",
+					reason: "stash-depleted",
+					toItemId: "item:empty-stash",
+					type: "item.replaced",
+				}),
+			]),
+		);
 	});
 
 	it("queues product jobs for the same producer instead of running them in parallel", () => {

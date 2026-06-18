@@ -212,4 +212,61 @@ describe("createActionVisualEventsFromGameEvents", () => {
 			},
 		]);
 	});
+	it("maps atomic stash output and depletion in one visual batch", () => {
+		const visualEvents = map([
+			{
+				openedAtMs: 100,
+				remainingCharges: 0,
+				stashId: "stash:test",
+				stashItemInstanceId: "stash-1",
+				type: "stash.opened",
+			},
+			{
+				itemId: "item:twig",
+				originItemInstanceId: "stash-1",
+				reason: "stash-output",
+				to: {
+					kind: "board",
+					itemInstanceId: "spawn-1",
+					x: 1,
+					y: 0,
+				},
+				type: "item.created",
+			},
+			{
+				depletedAtMs: 100,
+				stashId: "stash:test",
+				stashItemInstanceId: "stash-1",
+				type: "stash.depleted",
+			},
+			{
+				itemId: "item:stash",
+				itemInstanceId: "stash-1",
+				reason: "stash-depleted",
+				removedAtMs: 100,
+				type: "item.removed",
+			},
+		]);
+
+		expect(visualEvents).toMatchObject([
+			{
+				itemInstanceId: "stash-1",
+				mode: "exhaust",
+				type: "activation.activated",
+			},
+			{
+				animation: {
+					cause: "stash",
+					mode: "sequence",
+				},
+				itemInstanceId: "spawn-1",
+				reason: "stash-output",
+				type: "item.spawned",
+			},
+			{
+				itemInstanceId: "stash-1",
+				type: "activation.depleted",
+			},
+		]);
+	});
 });

@@ -16,7 +16,7 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ### 1. Stabilization epic
 
-Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant and T2 craft target replacement are done. Current next coding task is T3 stash output atomicity. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
+Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement and T3 stash output atomicity are done. Current next coding task is T4 effective upgrade/config validation. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
 
 ## Deferred / historical notes
 
@@ -27,12 +27,13 @@ Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant 
 
 ## Selected next task
 
-Recommended next coding task: **Stabilization epic T3: stash output atomicity**.
+Recommended next coding task: **Stabilization epic T4: effective upgrade/config validation**.
 
-Reason: T2 moved craft completion out of the scheduled-spawn swamp. Stash still preflights placement and schedules output later, so save truth can still lag behind action success like a lazy intern with a clipboard.
+Reason: craft and stash completion now mutate save atomically. The next big stability hole is config overlays/upgrades being able to create invalid effective runtime values, like zero input quantity or negative duration, because apparently numbers also need adult supervision.
 
 ## Completed recent task
 
+- `v0-stash-atomic-output-2026-06-18.md`: stash open now applies output/depletion atomically, fails without save mutation when placement is unavailable, and removed scheduled board remove/replace plumbing.
 - `v0-craft-target-replacement-2026-06-18.md`: craft completion now replaces the board target in-place with exactly one result item and removed the old craft output/return scheduled-spawn path.
 - `v0-craft-replace-crossfade-2026-06-18.md` - follow-up k T2: craft replacement cross-fade přes TileEngine `replace-in` / `replace-out` motion a board transient starého itemu.
 - `v0-craft-single-job-invariant-2026-06-18.md`: engine readiness/start and `GameSaveConfigSchema` now enforce max one running craft job per target item while allowing parallel craft on different targets.

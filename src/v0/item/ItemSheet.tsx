@@ -85,6 +85,15 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		});
 	};
 
+	const withdrawProductLineInput = (productId: string, itemId: string) => {
+		void productLineAction.run({
+			itemId,
+			producerItemInstanceId: boardItem.id,
+			productId,
+			type: "producer.input.withdraw",
+		});
+	};
+
 	return (
 		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
 			<SheetHeader
@@ -118,6 +127,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						pending={productLineAction.isPending}
 						onSetEnabled={setProductLineEnabled}
 						onStart={startProductLine}
+						onWithdrawInput={withdrawProductLineInput}
 					/>
 				) : null}
 				{boardItem.activation?.inputs.length ||

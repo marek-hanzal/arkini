@@ -182,6 +182,142 @@ describe("applyGameActionFx", () => {
 		]);
 	});
 
+	it("withdraws an entire producer product-line input through board then inventory placement", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			inputs: {
+				...baseConfig.inputs,
+				"input:shred": {
+					...baseConfig.inputs["input:shred"],
+					inputs: [
+						{
+							capacity: 3,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerInputs["item-instance:1"] = {
+			productInputs: {
+				"product:shred": {
+					items: {
+						"item:twig": 2,
+					},
+				},
+			},
+		};
+
+		const result = runAction({
+			action: {
+				itemId: "item:twig",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.input.withdraw",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.producerInputs).toEqual({});
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:twig",
+				previousQuantity: 2,
+				productId: "product:shred",
+				quantity: 2,
+				type: "producer_input.withdrawn",
+			},
+			{
+				itemId: "item:twig",
+				reason: "producer-input-withdraw",
+				to: {
+					kind: "board",
+					x: 1,
+					y: 0,
+				},
+				type: "item.created",
+			},
+			{
+				itemId: "item:twig",
+				reason: "producer-input-withdraw",
+				to: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				type: "item.created",
+			},
+		]);
+	});
+
+	it("keeps producer line input stored when withdraw placement is unavailable", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:rock",
+			x: 1,
+			y: 0,
+		};
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.inventory.slots[1] = {
+			itemId: "item:plank",
+			quantity: 2,
+		};
+		save.nextItemInstanceIndex = 3;
+		save.producerInputs["item-instance:1"] = {
+			productInputs: {
+				"product:shred": {
+					items: {
+						"item:twig": 1,
+					},
+				},
+			},
+		};
+
+		const result = runActionEither({
+			action: {
+				itemId: "item:twig",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.input.withdraw",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		expect(
+			save.producerInputs["item-instance:1"]?.productInputs["product:shred"]?.items,
+		).toEqual({
+			"item:twig": 1,
+		});
+	});
+
 	it("stores duplicate producer input into the first enabled product line with capacity", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

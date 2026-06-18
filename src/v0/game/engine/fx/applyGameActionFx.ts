@@ -14,6 +14,7 @@ import { removeTileFx } from "~/v0/game/engine/fx/removeTileFx";
 import { setProducerProductLineEnabledFx } from "~/v0/game/engine/fx/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/engine/fx/startCraftFx";
 import { storeProducerInputFx } from "~/v0/game/engine/fx/storeProducerInputFx";
+import { withdrawProducerInputFx } from "~/v0/game/engine/fx/withdrawProducerInputFx";
 import { startProducerProductFx } from "~/v0/game/engine/fx/startProducerProductFx";
 import { startUpgradeFx } from "~/v0/game/engine/fx/startUpgradeFx";
 import { storeStoredRequirementFx } from "~/v0/game/engine/fx/storeStoredRequirementFx";
@@ -141,6 +142,18 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 			(storeInputAction) =>
 				storeProducerInputFx({
 					action: storeInputAction,
+					config: gameConfig.config,
+					nowMs,
+					save,
+				}),
+		)
+		.with(
+			{
+				type: "producer.input.withdraw",
+			},
+			(withdrawInputAction) =>
+				withdrawProducerInputFx({
+					action: withdrawInputAction,
 					config: gameConfig.config,
 					nowMs,
 					save,

@@ -10,6 +10,7 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"craft-requirement-return",
 	"stash-output",
 	"stored-requirement-withdraw",
+	"producer-input-withdraw",
 	"inventory-placement",
 	"board-stash",
 	"debug",
@@ -118,6 +119,18 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			previousQuantity: NonNegativeIntegerSchema,
 			nextQuantity: PositiveIntegerSchema,
 			storedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("producer_input.withdrawn"),
+			producerItemInstanceId: IdSchema,
+			productId: IdSchema,
+			itemId: IdSchema,
+			quantity: PositiveIntegerSchema,
+			previousQuantity: PositiveIntegerSchema,
+			nextQuantity: NonNegativeIntegerSchema,
+			withdrawnAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
 	z

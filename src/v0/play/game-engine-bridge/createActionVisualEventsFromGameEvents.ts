@@ -17,7 +17,7 @@ const createdCause = (
 		}
 	>["reason"],
 ): ActionVisualAnimationSchema.Type["cause"] => {
-	if (reason === "product-output") return "producer";
+	if (reason === "product-output" || reason === "producer-input-withdraw") return "producer";
 	if (reason === "stash-output") return "stash";
 	if (reason === "craft-output" || reason === "craft-requirement-return") {
 		return "craft";

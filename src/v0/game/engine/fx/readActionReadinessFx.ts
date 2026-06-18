@@ -5,6 +5,7 @@ import { match } from "ts-pattern";
 import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
 import { checkProducerInputStoreReadinessFx } from "~/v0/game/engine/fx/checkProducerInputStoreReadinessFx";
+import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkProducerInputWithdrawReadinessFx";
 import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/engine/fx/checkProducerProductLineSetEnabledReadinessFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
@@ -99,6 +100,17 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				(storeInputAction) =>
 					checkProducerInputStoreReadinessFx({
 						action: storeInputAction,
+						config: gameConfig.config,
+						save,
+					}),
+			)
+			.with(
+				{
+					type: "producer.input.withdraw",
+				},
+				(withdrawInputAction) =>
+					checkProducerInputWithdrawReadinessFx({
+						action: withdrawInputAction,
 						config: gameConfig.config,
 						save,
 					}),

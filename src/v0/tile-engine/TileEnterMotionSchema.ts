@@ -6,6 +6,7 @@ export const TileEnterMotionSchema = z.object({
 			"fade-in",
 			"merge-in",
 			"pop-in",
+			"replace-in",
 			"spawn-from-tile",
 		])
 		.optional(),

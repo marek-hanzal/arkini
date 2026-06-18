@@ -14,11 +14,13 @@ export const toTileEngineEnterMotion = (
 	kind:
 		animation.effect === "merge"
 			? "merge-in"
-			: options.fromTileId
-				? "spawn-from-tile"
-				: animation.effect === "fade-in"
-					? "fade-in"
-					: "pop-in",
+			: animation.effect === "replace"
+				? "replace-in"
+				: options.fromTileId
+					? "spawn-from-tile"
+					: animation.effect === "fade-in"
+						? "fade-in"
+						: "pop-in",
 	delayMs: animation.delayMs,
 	durationMs: animation.durationMs,
 	sequenceIndex: animation.sequenceIndex,

@@ -173,15 +173,16 @@ const replacedEvent = (
 	>,
 ): ActionVisualEventSchema.Type =>
 	({
-		animation: ActionVisualAnimation.state({
-			cause:
-				event.reason === "stash-depleted"
-					? "stash"
-					: event.reason === "craft-result"
-						? "craft"
-						: "merge",
-			groupId: `engine:${event.reason}:${event.itemInstanceId}`,
-		}),
+		animation:
+			event.reason === "craft-result"
+				? ActionVisualAnimation.replace({
+						cause: "craft",
+						groupId: `engine:${event.reason}:${event.itemInstanceId}`,
+					})
+				: ActionVisualAnimation.state({
+						cause: event.reason === "stash-depleted" ? "stash" : "merge",
+						groupId: `engine:${event.reason}:${event.itemInstanceId}`,
+					}),
 		fromItemId: event.fromItemId,
 		itemInstanceId: event.itemInstanceId,
 		reason: event.reason,

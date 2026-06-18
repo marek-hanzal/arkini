@@ -80,7 +80,7 @@ export const useTileActorEnterMotion = ({
 							"translate3d(0px, 0px, 0px) scale(1)",
 						],
 					}
-				: kind === "fade-in"
+				: kind === "fade-in" || kind === "replace-in"
 					? {
 							opacity: [
 								0,

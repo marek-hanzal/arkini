@@ -87,7 +87,7 @@ describe("registerTileEngineEnterRequests", () => {
 	it("registers board replacement enter requests against the replaced tile id", () => {
 		const event = {
 			type: "item.replaced",
-			animation: ActionVisualAnimation.state({
+			animation: ActionVisualAnimation.replace({
 				cause: "craft",
 				groupId: "engine:craft-result:target",
 			}),
@@ -107,7 +107,7 @@ describe("registerTileEngineEnterRequests", () => {
 
 		expect(readTileEngineMotionRequests("board").get("target")?.enter).toMatchObject({
 			groupId: "engine:craft-result:target",
-			kind: "pop-in",
+			kind: "replace-in",
 		});
 	});
 

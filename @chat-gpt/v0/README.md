@@ -34,6 +34,7 @@ Reason: T2 moved craft completion out of the scheduled-spawn swamp. Stash still 
 ## Completed recent task
 
 - `v0-craft-target-replacement-2026-06-18.md`: craft completion now replaces the board target in-place with exactly one result item and removed the old craft output/return scheduled-spawn path.
+- `v0-craft-replace-crossfade-2026-06-18.md` - follow-up k T2: craft replacement cross-fade přes TileEngine `replace-in` / `replace-out` motion a board transient starého itemu.
 - `v0-craft-single-job-invariant-2026-06-18.md`: engine readiness/start and `GameSaveConfigSchema` now enforce max one running craft job per target item while allowing parallel craft on different targets.
 - `v0-stabilization-epic-2026-06-18.md`: corrected stabilization epic from GameConfig/tick audit plus clarified craft/inventory/overlay/event-flow decisions.
 - `v0-inventory-seeded-placement-2026-06-18.md`: long press on empty board cell opens inventory with seeded Manhattan placement; selecting a stack places it through shared board-then-inventory planner semantics.

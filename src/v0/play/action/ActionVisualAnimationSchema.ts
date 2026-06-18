@@ -11,6 +11,7 @@ export const ActionVisualAnimationEffectSchema = z.enum([
 	"fade-in",
 	"merge",
 	"consume",
+	"replace",
 	"state",
 ]);
 

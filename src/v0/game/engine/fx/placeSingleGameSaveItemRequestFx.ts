@@ -49,9 +49,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 				break;
 			}
 
-			const itemInstanceId = yield* createGameItemInstanceIdFx({
-				save,
-			});
+			const itemInstanceId = yield* createGameItemInstanceIdFx();
 			save.board.items[itemInstanceId] = {
 				id: itemInstanceId,
 				itemId: item.itemId,

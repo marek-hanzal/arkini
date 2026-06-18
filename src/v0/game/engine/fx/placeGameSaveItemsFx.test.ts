@@ -44,12 +44,11 @@ describe("placeGameSaveItemsFx", () => {
 				x: 0,
 				y: 0,
 			},
-			{
-				id: "item-instance:2",
+			expect.objectContaining({
 				itemId: "item:twig",
 				x: 1,
 				y: 0,
-			},
+			}),
 		]);
 		expect(result.save.inventory.slots).toEqual([
 			{
@@ -244,7 +243,6 @@ describe("placeGameSaveItemsFx", () => {
 				reason: "board:full",
 			},
 		});
-		expect(save.nextItemInstanceIndex).toBe(2);
 		expect(Object.keys(save.board.items)).toEqual([
 			"item-instance:1",
 		]);

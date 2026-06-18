@@ -16,7 +16,7 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ### 1. Stabilization epic
 
-Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement, T3 stash output atomicity/full-open policy, T4 effective upgrade/config validation, T5 product input scope hardening and T6 inventory stateless stack policy are done. Craft partial input/withdraw side quest is also done. Current next coding task is T7 monotonic save ID counter validation. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
+Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement, T3 stash output atomicity/full-open policy, T4 effective upgrade/config validation, T5 product input scope hardening and T6 inventory stateless stack policy are done. Craft partial input/withdraw side quest is also done. Current next coding task is T8 event flow cleanup / visual planner hardening. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
 
 ## Deferred / historical notes
 
@@ -27,13 +27,14 @@ Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant,
 
 ## Selected next task
 
-Recommended next coding task: **Stabilization epic T7: monotonic save ID counter validation**.
+Recommended next coding task: **Stabilization epic T8: event flow cleanup / visual planner hardening**.
 
-Reason: T6 now prevents stateful inventory instances from anonymously stacking or losing identity. The next biggest save/model risk is counter drift: a corrupted `next*Index` can generate IDs that collide with existing board/inventory instances, jobs or scheduled events.
+Reason: save/model invariants are now much tighter: craft, stash, upgrade config, product input ownership, inventory stateful instances and runtime-generated IDs are stabilized. The next biggest complexity is the multi-language event bridge between engine domain events, visual events and TileEngine motion requests.
 
 ## Completed recent task
 
 - `v0-inventory-stateless-stack-policy-2026-06-18.md`: inventory save slots now distinguish stateless stacks from preserved instances; stateful board items stash as one-slot instances, running jobs reject stash, and inventory placement consumes/returns instances without losing identity.
+- `v0-generated-entity-ids-2026-06-18.md`: save-level ID counters are gone; runtime-created item/job/scheduled-event IDs use `genId`/cuid2 with domain prefixes, and tests capture generated IDs instead of expecting counter values.
 - `v0-product-input-scope-hardening-2026-06-18.md`: product definitions and product input refs are now single-owner per producer/product line; effective `product.inputRef.set` prefixes cannot make refs shared, and config layering uses an explicit input-ref owner map.
 - `v0-effective-upgrade-validation-2026-06-18.md`: `GameConfigSchema` now rejects effective upgrade prefixes that create zero/negative product duration, input quantities or producer queue size, and runtime config layering no longer clamps those mistakes.
 - `v0-craft-partial-input-withdraw-2026-06-18.md`: craft targets now persist partial input progress, start only after stored inputs are complete, support pre-start single-unit withdraw through producer-style placement, and keep completion on the existing target replacement/crossfade path.

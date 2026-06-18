@@ -71,4 +71,4 @@ Added coverage for:
 
 ## Follow-up
 
-T7 remains next: validate monotonic save ID counters (`nextItemInstanceIndex`, `nextJobIndex`, `nextScheduledEventIndex`) against existing board/inventory instance/job/event ids.
+T7 changed direction after follow-up: remove save ID counters and generate runtime entity IDs through `genId`/cuid2 with domain prefixes. No monotonic counter validation is needed because the counters are gone.

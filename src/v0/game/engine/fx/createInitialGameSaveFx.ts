@@ -17,7 +17,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 }: createInitialGameSaveFx.Props) {
 	const boardItems: GameSave["board"]["items"] = {};
 	const occupiedCells = new Set<string>();
-	let nextItemInstanceIndex = 1;
+	let initialItemInstanceIndex = 1;
 
 	for (const entry of config.startingState.board) {
 		const cellKey = `${entry.x}:${entry.y}`;
@@ -29,8 +29,8 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		}
 
 		occupiedCells.add(cellKey);
-		const id = `item-instance:${nextItemInstanceIndex}`;
-		nextItemInstanceIndex += 1;
+		const id = `item-instance:${initialItemInstanceIndex}`;
+		initialItemInstanceIndex += 1;
 		boardItems[id] = {
 			id,
 			itemId: entry.itemId,
@@ -66,9 +66,6 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		inventory: {
 			slots: inventorySlots,
 		},
-		nextItemInstanceIndex,
-		nextJobIndex: 1,
-		nextScheduledEventIndex: 1,
 		producerJobs: {},
 		producerLines: {},
 		producerInputs: {},

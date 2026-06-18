@@ -226,9 +226,7 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 		} satisfies GameEngineResult;
 	}
 
-	const itemInstanceId = yield* createGameItemInstanceIdFx({
-		save: nextSave,
-	});
+	const itemInstanceId = yield* createGameItemInstanceIdFx();
 	nextSave.board.items[itemInstanceId] = {
 		id: itemInstanceId,
 		itemId,

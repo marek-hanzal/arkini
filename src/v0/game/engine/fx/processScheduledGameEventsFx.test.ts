@@ -113,7 +113,7 @@ describe("processScheduledGameEventsFx", () => {
 			itemId: "item:twig",
 			quantity: 3,
 		};
-		runScheduleItems({
+		const scheduled = runScheduleItems({
 			dueAtMs: 100,
 			items: [
 				{
@@ -124,6 +124,7 @@ describe("processScheduledGameEventsFx", () => {
 			],
 			save,
 		});
+		const [scheduledEventId] = scheduled.eventIds;
 
 		const result = runScheduled({
 			config,
@@ -136,11 +137,11 @@ describe("processScheduledGameEventsFx", () => {
 				blockedAtMs: 100,
 				itemId: "item:twig",
 				reason: "board:full",
-				scheduledEventId: "scheduled-event:1",
+				scheduledEventId,
 				type: "item.spawn.blocked",
 			},
 		]);
-		expect(result.save.scheduledEvents["scheduled-event:1"]).toMatchObject({
+		expect(result.save.scheduledEvents[scheduledEventId]).toMatchObject({
 			dueAtMs: 100 + blockedScheduledEventRetryDelayMs,
 			lastBlockedAtMs: 100,
 		});
@@ -167,7 +168,7 @@ describe("processScheduledGameEventsFx", () => {
 			itemId: "item:twig",
 			quantity: 3,
 		};
-		runScheduleItems({
+		const scheduled = runScheduleItems({
 			dueAtMs: 100,
 			items: [
 				{
@@ -178,6 +179,7 @@ describe("processScheduledGameEventsFx", () => {
 			],
 			save,
 		});
+		const [scheduledEventId] = scheduled.eventIds;
 
 		const first = runScheduled({
 			config,
@@ -192,7 +194,7 @@ describe("processScheduledGameEventsFx", () => {
 
 		expect(first.events).toHaveLength(1);
 		expect(second.events).toEqual([]);
-		expect(second.save.scheduledEvents["scheduled-event:1"]).toMatchObject({
+		expect(second.save.scheduledEvents[scheduledEventId]).toMatchObject({
 			dueAtMs: 100 + blockedScheduledEventRetryDelayMs * 2,
 			lastBlockedAtMs: 100 + blockedScheduledEventRetryDelayMs,
 		});
@@ -204,7 +206,7 @@ describe("processScheduledGameEventsFx", () => {
 			config,
 			nowMs: 0,
 		});
-		runScheduleItems({
+		const scheduled = runScheduleItems({
 			dueAtMs: 100,
 			exclusiveKey: "spawn-group:test",
 			items: [
@@ -216,19 +218,20 @@ describe("processScheduledGameEventsFx", () => {
 			],
 			save,
 		});
-		save.scheduledEvents["scheduled-event:2"] = {
+		const [sourceEventId] = scheduled.eventIds;
+		const dependentEventId = "scheduled-event:dependent";
+		save.scheduledEvents[dependentEventId] = {
 			afterEventIds: [
-				"scheduled-event:1",
+				sourceEventId,
 			],
 			dueAtMs: 100,
 			exclusiveKey: "spawn-group:test",
-			id: "scheduled-event:2",
+			id: dependentEventId,
 			itemId: "item:plank",
 			quantity: 1,
 			reason: "debug",
 			type: "item.spawn",
 		};
-		save.nextScheduledEventIndex = 3;
 
 		const lateTick = runScheduled({
 			config,

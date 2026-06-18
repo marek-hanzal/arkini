@@ -33,9 +33,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 		save,
 	});
 	delete nextSave.craftInputs[action.targetItemInstanceId];
-	const jobId = yield* createGameJobIdFx({
-		save: nextSave,
-	});
+	const jobId = yield* createGameJobIdFx();
 	const completesAtMs = nowMs + checked.recipe.durationMs;
 	nextSave.craftJobs[jobId] = {
 		completesAtMs,

@@ -322,6 +322,20 @@ describe("applyGameActionFx", () => {
 	it("stores duplicate producer input into the first enabled product line with capacity", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			inputs: {
+				...baseConfig.inputs,
+				"input:alt-shred": {
+					name: "Alt shred input",
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+				},
+			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
@@ -336,6 +350,7 @@ describe("applyGameActionFx", () => {
 				...baseConfig.products,
 				"product:alt-shred": {
 					...baseConfig.products["product:shred"],
+					inputRefId: "input:alt-shred",
 					name: "Alt shred",
 				},
 			},

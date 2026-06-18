@@ -355,8 +355,8 @@ Kontrolní body:
 2. `craft-target-replacement`
 3. `stash-craft-atomic-output`
 4. `effective-config-validation`
-5. `product-input-overlay-scope` (next)
-6. `inventory-stateless-stack-policy`
+5. `product-input-overlay-scope` (done as product input scope hardening)
+6. `inventory-stateless-stack-policy` (next)
 7. `save-id-counter-validation`
 8. `visual-event-planner-cleanup`
 

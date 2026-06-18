@@ -314,6 +314,110 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate product/);
 	});
 
+	it("rejects product definitions shared across producers", () => {
+		const config = createValidConfigValue();
+		(
+			config.producers as Record<
+				string,
+				{
+					maxQueueSize: number;
+					productIds: string[];
+					requirements: TestActivationRequirement[];
+					type: string;
+				}
+			>
+		)["producer:second"] = {
+			maxQueueSize: 1,
+			productIds: [
+				"product:test",
+			],
+			requirements: [],
+			type: "producer",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/owned by exactly one producer/);
+	});
+
+	it("rejects product input refs shared across product lines", () => {
+		const config = createValidConfigValue();
+		config.products["product:second"] = {
+			...config.products["product:test"],
+			name: "Second product",
+		};
+		config.producers["producer:test"].productIds.push("product:second");
+
+		expect(() => parseGameConfig(config)).toThrow(/Input ref.*input:test.*owned/);
+	});
+
+	it("rejects upgrade prefixes that make product input refs shared", () => {
+		const config = createValidConfigValue();
+		(
+			config.inputs as Record<
+				string,
+				{
+					inputs: TestProductInput[];
+					name: string;
+				}
+			>
+		)["input:second"] = {
+			name: "Second input",
+			inputs: [
+				{
+					capacity: 2,
+					consume: true,
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+		};
+		config.products["product:second"] = {
+			...config.products["product:test"],
+			inputRefId: "input:second",
+			name: "Second product",
+		};
+		config.producers["producer:test"].productIds.push("product:second");
+		config.upgrades["upgrade:test"].tiers[0].effects = [
+			{
+				inputRefId: "input:second",
+				productId: "product:test",
+				type: "product.inputRef.set",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/Effective input ref.*input:second.*owned/);
+	});
+
+	it("allows separate product input refs to accept the same item", () => {
+		const config = createValidConfigValue();
+		(
+			config.inputs as Record<
+				string,
+				{
+					inputs: TestProductInput[];
+					name: string;
+				}
+			>
+		)["input:second"] = {
+			name: "Second input",
+			inputs: [
+				{
+					capacity: 2,
+					consume: true,
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+		};
+		config.products["product:second"] = {
+			...config.products["product:test"],
+			inputRefId: "input:second",
+			name: "Second product",
+		};
+		config.producers["producer:test"].productIds.push("product:second");
+
+		expect(parseGameConfig(config).products["product:second"].inputRefId).toBe("input:second");
+	});
+
 	it("rejects activation input slots with capacity below required quantity", () => {
 		const config = createValidConfigValue();
 		config.inputs["input:test"].inputs[0].quantity = 3;

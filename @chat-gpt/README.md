@@ -54,12 +54,13 @@ GameConfig / tick engine stabilization checkpoint:
 - T2 visual follow-up is done in `@chat-gpt/v0/v0-craft-replace-crossfade-2026-06-18.md`: craft replacement now uses TileEngine `replace-in` / `replace-out` crossfade motion with an old-item board transient.
 - T3 is done in `@chat-gpt/v0/v0-stash-atomic-output-2026-06-18.md` plus `@chat-gpt/v0/v0-stash-full-open-output-2026-06-18.md`: stash open applies all remaining output in one atomic batch, places sequentially like producer, depletes in one click and fails without partial mutation if the whole batch does not fit.
 - Side quest is done in `@chat-gpt/v0/v0-craft-partial-input-withdraw-2026-06-18.md`: craft targets persist partial input progress in `save.craftInputs`, start only after inputs are complete, lock inputs on start, and allow pre-start single-unit withdraw through producer-style seeded placement.
-- T4 is done in `@chat-gpt/v0/v0-effective-upgrade-validation-2026-06-18.md`: `GameConfigSchema` rejects effective upgrade prefixes that make product duration/input quantities/producer queue size invalid, and config layer building no longer clamps bad values. Stabilization priority now moves to T5 product input overlay scope, then inventory stateless stack policy and save ID counter validation.
+- T4 is done in `@chat-gpt/v0/v0-effective-upgrade-validation-2026-06-18.md`: `GameConfigSchema` rejects effective upgrade prefixes that make product duration/input quantities/producer queue size invalid, and config layer building no longer clamps bad values.
+- T5 is done in `@chat-gpt/v0/v0-product-input-scope-hardening-2026-06-18.md`: product definitions and product input refs are now owned by exactly one producer/product line, including effective `product.inputRef.set` prefixes; config layering resolves product input overrides through an explicit input-ref owner map. Stabilization priority now moves to inventory stateless stack policy and save ID counter validation.
 
 Current task candidates:
 
-1. V0 stabilization epic T4: validate effective upgrade/config prefixes against zero/negative invalid states.
-2. V0 stabilization epic T5: make product input overlay scope explicit, so reusable input refs do not become global mutation landmines.
+1. V0 stabilization epic T6: enforce inventory stateless stack policy.
+2. V0 stabilization epic T7: validate monotonic save ID counters.
 3. Badge/visual polish can wait; tiny UI cosmetics do not outrank save/model stabilization, no matter how shiny the little badge feels.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.

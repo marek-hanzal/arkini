@@ -16,7 +16,7 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ### 1. Stabilization epic
 
-Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement, T3 stash output atomicity/full-open policy and T4 effective upgrade/config validation are done. Craft partial input/withdraw side quest is also done. Current next coding task is T5 product input overlay scope. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
+Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement, T3 stash output atomicity/full-open policy, T4 effective upgrade/config validation and T5 product input scope hardening are done. Craft partial input/withdraw side quest is also done. Current next coding task is T6 inventory stateless stack policy. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
 
 ## Deferred / historical notes
 
@@ -27,12 +27,13 @@ Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant,
 
 ## Selected next task
 
-Recommended next coding task: **Stabilization epic T5: product input overlay scope**.
+Recommended next coding task: **Stabilization epic T6: inventory stateless stack policy**.
 
-Reason: T4 now validates effective numeric values, but product-scoped input upgrades still deserve a cleaner resolved-input shape so top-level reusable `inputRefId` records cannot behave like accidental shared mutable state.
+Reason: T5 now prevents product/input definition sharing from turning product-line upgrades into accidental shared mutable state. The next biggest save/model risk is stateful inventory accidentally stacking or splitting state, which would clone runtime state like a horror movie with enums.
 
 ## Completed recent task
 
+- `v0-product-input-scope-hardening-2026-06-18.md`: product definitions and product input refs are now single-owner per producer/product line; effective `product.inputRef.set` prefixes cannot make refs shared, and config layering uses an explicit input-ref owner map.
 - `v0-effective-upgrade-validation-2026-06-18.md`: `GameConfigSchema` now rejects effective upgrade prefixes that create zero/negative product duration, input quantities or producer queue size, and runtime config layering no longer clamps those mistakes.
 - `v0-craft-partial-input-withdraw-2026-06-18.md`: craft targets now persist partial input progress, start only after stored inputs are complete, support pre-start single-unit withdraw through producer-style placement, and keep completion on the existing target replacement/crossfade path.
 - `v0-stash-full-open-output-2026-06-18.md`: follow-up k T3: stash open rolls every remaining charge in one click, places the whole output batch sequentially/atomically, and fails without partial save mutation when the full batch does not fit.

@@ -28,17 +28,25 @@ const createInitialSave = async (): Promise<GameSave> => {
 	return adapter.readSave();
 };
 
-const putRawRecord = async (databaseName: string, record: GameSaveStorageRecord) => {
+const withRawDatabase = async <T>(databaseName: string, fn: (database: Dexie) => Promise<T>) => {
 	const database = new Dexie(databaseName);
 	database.version(1).stores({
 		saves: "&id, gameId, configHash, updatedAtMs",
 	});
 	try {
-		await database.table<GameSaveStorageRecord, string>("saves").put(record);
+		return await fn(database);
 	} finally {
 		database.close();
 	}
 };
+
+const putRawRecord = (databaseName: string, record: GameSaveStorageRecord) =>
+	withRawDatabase(databaseName, (database) =>
+		database.table<GameSaveStorageRecord, string>("saves").put(record),
+	);
+
+const countRawSaves = (databaseName: string) =>
+	withRawDatabase(databaseName, (database) => database.table("saves").count());
 
 afterEach(async () => {
 	await Promise.all(
@@ -71,12 +79,13 @@ describe("DexieGameSaveStorage", () => {
 		storage.close();
 	});
 
-	it("returns null when the stored config hash does not match", async () => {
+	it("drops stored saves when the stored config hash does not match", async () => {
 		const config = createEngineTestConfig();
 		const configHash = await hashRuntimeGameConfig(config);
+		const databaseName = createDatabaseName();
 		const save = await createInitialSave();
 		const storage = new DexieGameSaveStorage({
-			databaseName: createDatabaseName(),
+			databaseName,
 		});
 
 		await storage.saveActiveSave({
@@ -90,10 +99,40 @@ describe("DexieGameSaveStorage", () => {
 				gameId: config.game.id,
 			}),
 		).resolves.toBeNull();
+		await expect(countRawSaves(databaseName)).resolves.toBe(0);
 		storage.close();
 	});
 
-	it("returns null for corrupt save payloads", async () => {
+	it("drops stored saves when the storage schema version does not match", async () => {
+		const config = createEngineTestConfig();
+		const configHash = await hashRuntimeGameConfig(config);
+		const databaseName = createDatabaseName();
+		const save = await createInitialSave();
+		const storage = new DexieGameSaveStorage({
+			databaseName,
+		});
+
+		await putRawRecord(databaseName, {
+			id: activeGameSaveId,
+			configHash,
+			gameId: config.game.id,
+			save,
+			saveVersion: save.version,
+			schemaVersion: 0 as typeof gameSaveStorageSchemaVersion,
+			updatedAtMs: save.updatedAtMs,
+		});
+
+		await expect(
+			storage.loadActiveSave({
+				configHash,
+				gameId: config.game.id,
+			}),
+		).resolves.toBeNull();
+		await expect(countRawSaves(databaseName)).resolves.toBe(0);
+		storage.close();
+	});
+
+	it("drops stored saves for corrupt save payloads", async () => {
 		const config = createEngineTestConfig();
 		const configHash = await hashRuntimeGameConfig(config);
 		const databaseName = createDatabaseName();
@@ -119,6 +158,7 @@ describe("DexieGameSaveStorage", () => {
 				gameId: config.game.id,
 			}),
 		).resolves.toBeNull();
+		await expect(countRawSaves(databaseName)).resolves.toBe(0);
 		storage.close();
 	});
 

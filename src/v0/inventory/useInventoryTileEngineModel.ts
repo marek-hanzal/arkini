@@ -26,7 +26,6 @@ export namespace useInventoryTileEngineModel {
 	}
 
 	export interface Result {
-		filled: number;
 		slots: TileEngine.Slot<InventorySurface.SlotData>[];
 		tiles: TileEngine.Tile<InventorySurface.TileData>[];
 		drag: TileEngine.DragConfig<
@@ -199,7 +198,6 @@ export const useInventoryTileEngineModel = ({
 
 	return {
 		drag,
-		filled: inventory.slots.filter((slot) => slot.stack).length,
 		slots,
 		tiles,
 	};

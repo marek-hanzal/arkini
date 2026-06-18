@@ -13,7 +13,7 @@ import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 export const InventorySurface = memo(
 	({ feedback, feedbackFlags, onClose, placementTarget }: InventorySurfaceType.Props) => {
 		const inventoryDragBoundsRef = useRef<HTMLDivElement | null>(null);
-		const { drag, filled, slots, tiles } = useInventoryTileEngineModel({
+		const { drag, slots, tiles } = useInventoryTileEngineModel({
 			feedback,
 			placementTarget,
 		});
@@ -37,15 +37,10 @@ export const InventorySurface = memo(
 				className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 flex-col"
 			>
 				<SheetHeader
-					eyebrow={placementTarget ? "Place from inventory" : "Inventory"}
-					description={
-						placementTarget
-							? `Double-tap stack items to place around ${placementTarget.x},${placementTarget.y}`
-							: `${filled}/${slots.length} slots`
-					}
+					title="Inventory"
 					onClose={onClose}
 				/>
-				<div className="min-h-0 flex-1 overflow-visible px-3 py-4">
+				<div className="min-h-0 flex-1 overflow-x-hidden px-3 py-4">
 					<div
 						ref={inventoryDragBoundsRef}
 						className="ak-game-width mx-auto"
@@ -61,7 +56,7 @@ export const InventorySurface = memo(
 							slots={slots}
 							tiles={tiles}
 							gapPx={1}
-							className="w-full rounded-xl border border-pink-200/80 bg-ak-inventory p-1 shadow-lg shadow-pink-900/10"
+							className="w-full rounded-sm border border-pink-200/80 bg-ak-inventory p-1 shadow-lg shadow-pink-900/10"
 							layerRole="overlay"
 							actorLayerClassName="pointer-events-none"
 							drag={drag}

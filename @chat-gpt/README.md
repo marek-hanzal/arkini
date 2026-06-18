@@ -1,6 +1,7 @@
 # Arkini GPT working notes
 - 2026-06-18: Arkini raw runtime store pass removed derived board/inventory/items from runtime store; source of truth is now raw engine snapshot plus selector-derived views. Follow-up focused subscription pass moved drop-time board/inventory/config reads to raw commit-time snapshots and narrowed item detail / inventory subscriptions.
 - 2026-06-18: UI overhaul foundation removed the unused top header, introduced light pink/violet CSS/Tailwind tokens, lightened board/inventory/sheets/cards, enlarged withdraw/store actions and added useful `data-ui` anchors. See `@chat-gpt/v0/v0-ui-overhaul-foundation-2026-06-18.md`.
+- 2026-06-18: Bottom sheet follow-up simplified sheet headers, made inventory header only `Inventory`, replaced close text with a top-right `✕`, reduced radius, fixed the inventory sheet horizontal scrollbar and aligned tile badges to `bottom-0 right-[8px]`. See `@chat-gpt/v0/v0-bottom-sheet-inventory-polish-2026-06-18.md`.
 
 This repo is now on the runtime tick/action engine path. Treat `RuntimeGameEngineAdapter` + `GameRuntimeStore` as the live gameplay source of truth.
 

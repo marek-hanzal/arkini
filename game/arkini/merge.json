@@ -183,14 +183,14 @@
 			"resultItemId": "item:branch",
 			"withItemId": "item:twig"
 		},
-		"merge:twig-water-sprout": {
-			"resultItemId": "item:sprout",
-			"secret": true,
-			"withItemId": "item:water"
-		},
 		"merge:wood-bundle-wood-bundle-plank": {
 			"resultItemId": "item:plank",
 			"withItemId": "item:wood-bundle"
+		},
+		"merge:water-twig-sprout": {
+			"resultItemId": "item:sprout",
+			"secret": true,
+			"withItemId": "item:twig"
 		}
 	}
 }

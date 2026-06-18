@@ -6,7 +6,7 @@ export const GameMergeDefinitionIdSchema = z.enum([
 	"merge:leaf-leaf-bush",
 	"merge:bush-bush-sapling",
 	"merge:twig-twig-branch",
-	"merge:twig-water-sprout",
+	"merge:water-twig-sprout",
 	"merge:branch-branch-log",
 	"merge:log-log-wood-bundle",
 	"merge:wood-bundle-wood-bundle-plank",

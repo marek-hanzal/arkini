@@ -44,22 +44,7 @@ const productLine = (
 });
 
 describe("resolveDropIntent", () => {
-	it("treats regular combo merges as executable from either drag direction", () => {
-		expect(
-			resolveDropIntent({
-				config: defaultGameConfig,
-				sourceItemId: "item:twig",
-				targetItem: boardItem({
-					id: "target",
-					itemId: "item:water",
-				}),
-			}),
-		).toEqual({
-			directed: false,
-			resultItemId: "item:sprout",
-			type: "merge",
-		});
-
+	it("uses only source-owned explicit merge rules", () => {
 		expect(
 			resolveDropIntent({
 				config: defaultGameConfig,
@@ -73,6 +58,19 @@ describe("resolveDropIntent", () => {
 			directed: false,
 			resultItemId: "item:sprout",
 			type: "merge",
+		});
+
+		expect(
+			resolveDropIntent({
+				config: defaultGameConfig,
+				sourceItemId: "item:twig",
+				targetItem: boardItem({
+					id: "target",
+					itemId: "item:water",
+				}),
+			}),
+		).toEqual({
+			type: "swap",
 		});
 	});
 	it("keeps regular merge as the first merge-like board interaction", () => {

@@ -1,4 +1,5 @@
 import type { ItemDefinition } from "../../../item";
+import { combo } from "../../../dsl/combo";
 import { item } from "../../../dsl/item";
 
 export const UtilityMaterialItemDefinitions = [
@@ -15,6 +16,16 @@ export const UtilityMaterialItemDefinitions = [
 			"water",
 		],
 		sort: 100,
+		behavior: {
+			merge: [
+				combo({
+					id: "merge:water-twig-sprout",
+					withItemId: "item:twig",
+					resultItemId: "item:sprout",
+					secret: true,
+				}),
+			],
+		},
 	}),
 	item({
 		id: "item:coal",

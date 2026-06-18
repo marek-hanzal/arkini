@@ -1705,8 +1705,7 @@
 			"description": "Nature's disposable stick.",
 			"maxStackSize": 50,
 			"mergeIds": [
-				"merge:twig-twig-branch",
-				"merge:twig-water-sprout"
+				"merge:twig-twig-branch"
 			],
 			"name": "Twig",
 			"sort": 40,
@@ -1721,6 +1720,9 @@
 			"code": "water",
 			"description": "Liquid logistics. Somehow still your problem.",
 			"maxStackSize": 50,
+			"mergeIds": [
+				"merge:water-twig-sprout"
+			],
 			"name": "Water",
 			"sort": 100,
 			"tags": [
@@ -2700,10 +2702,10 @@
 			"resultItemId": "item:branch",
 			"withItemId": "item:twig"
 		},
-		"merge:twig-water-sprout": {
+		"merge:water-twig-sprout": {
 			"resultItemId": "item:sprout",
 			"secret": true,
-			"withItemId": "item:water"
+			"withItemId": "item:twig"
 		},
 		"merge:wood-bundle-wood-bundle-plank": {
 			"resultItemId": "item:plank",

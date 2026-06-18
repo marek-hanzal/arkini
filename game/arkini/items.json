@@ -1018,8 +1018,7 @@
 			"description": "Nature's disposable stick.",
 			"maxStackSize": 50,
 			"mergeIds": [
-				"merge:twig-twig-branch",
-				"merge:twig-water-sprout"
+				"merge:twig-twig-branch"
 			],
 			"name": "Twig",
 			"sort": 40,
@@ -1040,7 +1039,10 @@
 				"material",
 				"water"
 			],
-			"tier": 1
+			"tier": 1,
+			"mergeIds": [
+				"merge:water-twig-sprout"
+			]
 		},
 		"item:wood-bundle": {
 			"assetId": "asset:item-wood-bundle",

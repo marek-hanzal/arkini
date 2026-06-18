@@ -112,9 +112,9 @@ Producer board progress checkpoint:
 
 Merge executable parity checkpoint:
 
-- Regular combo merges are executable item pairs and work from either drag direction. `consumeSource: false` imprint rules stay directed and reverse-directed drops reject instead of swapping.
-- `resolveExecutableItemMergeRule` is the shared source for runtime merge readiness, DnD drop intent/actions and item catalog merge relations. Do not reintroduce raw source-only `mergeIds` scans for executable behavior.
-- Regression target: `item:twig` + `item:water` must resolve to `item:sprout` from both drag directions.
+- Merge/interactions are explicit source-owned `GameConfig` rules. `resolveExecutableItemMergeRule` must only resolve rules from `sourceItem.mergeIds`; it must not synthesize reverse merges from target-owned rules.
+- `water -> twig` is authored on `item:water` as `merge:water-twig-sprout`; `twig -> water` is not a merge unless `item:twig` gets its own explicit rule.
+- `consumeSource: false` imprint rules stay directed. Reverse-directed imprint drops may reject before swap, but they must not become executable merges.
 
 
 Touch / long-press polish checkpoint:

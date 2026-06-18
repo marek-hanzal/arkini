@@ -35,7 +35,8 @@ export const processCompletedCraftJobsFx = Effect.fn("processCompletedCraftJobsF
 		});
 
 		if (result.type === "blocked") {
-			events.push(result.event);
+			nextSave = result.save;
+			events.push(...result.events);
 			continue;
 		}
 

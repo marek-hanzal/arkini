@@ -8,6 +8,7 @@ import { renderBoardTile } from "~/v0/board/renderBoardTile";
 import { useBoardTileEngineModel } from "~/v0/board/useBoardTileEngineModel";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
+import { useGameBoardView } from "~/v0/play/runtime";
 import { TileEngine } from "~/v0/tile-engine";
 import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 
@@ -15,6 +16,7 @@ const boardCellFeedbackVariants = [
 	"primary",
 	"secondary",
 	"subtle",
+	"danger",
 ] as const;
 
 const boardSlots = boardCells.map((cell) => ({
@@ -32,6 +34,7 @@ export const BoardSurface = memo(
 		disabled = false,
 		dragConstraintsRef,
 	}: BoardSurfaceType.Props) => {
+		const board = useGameBoardView();
 		const { drag, tiles } = useBoardTileEngineModel({
 			feedback,
 			onOpenItem,
@@ -43,15 +46,20 @@ export const BoardSurface = memo(
 				const feedbackVariant = boardCellFeedbackVariants.find((variant) =>
 					feedbackFlags.has(`board:feedback:${variant}:${key}`),
 				);
+				const statusVariant = board.byCellKey[key]?.activation?.deliveryBlocked
+					? "danger"
+					: undefined;
 				return (
 					<BoardCell
 						cell={cell}
 						feedbackVariant={feedbackVariant}
+						statusVariant={statusVariant}
 						invalid={feedbackFlags.has(`board:error:${key}`)}
 					/>
 				);
 			},
 			[
+				board.byCellKey,
 				feedbackFlags,
 			],
 		);

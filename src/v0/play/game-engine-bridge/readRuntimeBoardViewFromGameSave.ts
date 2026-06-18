@@ -357,7 +357,14 @@ const readRuntimeActivationView = ({
 		});
 		const selectedProduct = selectedProductId ? config.products[selectedProductId] : undefined;
 
+		const deliveryBlocked = Object.values(save.producerJobs).some(
+			(job) =>
+				job.producerItemInstanceId === boardItem.id &&
+				job.delivery?.lastBlockedAtMs !== undefined,
+		);
+
 		return {
+			deliveryBlocked,
 			inputs:
 				selectedProduct?.inputs.map((input) =>
 					inputView({

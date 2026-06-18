@@ -32,9 +32,25 @@ export const GameSaveInventorySlotSchema = z.union([
 	z.null(),
 ]);
 
+export const GameSaveProducerDeliveryItemSchema = z
+	.object({
+		itemId: IdSchema,
+		quantity: PositiveIntegerSchema,
+	})
+	.strict();
+
+export const GameSaveProducerDeliverySchema = z
+	.object({
+		items: z.array(GameSaveProducerDeliveryItemSchema).min(1),
+		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
+		retryAtMs: NonNegativeIntegerSchema.optional(),
+	})
+	.strict();
+
 export const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
+		delivery: GameSaveProducerDeliverySchema.optional(),
 		producerItemInstanceId: IdSchema,
 		outputTableId: z.union([
 			IdSchema,
@@ -536,6 +552,37 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
+		if (job.delivery && job.outputTableId === null) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerJobs",
+					jobId,
+					"delivery",
+				],
+				"Producer delivery requires an output table.",
+			);
+		}
+
+		if (job.delivery) {
+			for (const [index, deliveryItem] of job.delivery.items.entries()) {
+				if (!config.items[deliveryItem.itemId]) {
+					addSaveIssue(
+						ctx,
+						[
+							"producerJobs",
+							jobId,
+							"delivery",
+							"items",
+							index,
+							"itemId",
+						],
+						`Missing item "${deliveryItem.itemId}".`,
+					);
+				}
+			}
+		}
+
 		producerJobCountByProducerItemInstanceId.set(
 			job.producerItemInstanceId,
 			(producerJobCountByProducerItemInstanceId.get(job.producerItemInstanceId) ?? 0) + 1,
@@ -937,6 +984,8 @@ const validateGameSaveAgainstConfig = (
 export type GameSaveBoardItem = z.infer<typeof GameSaveBoardItemSchema>;
 export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema>;
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
+export type GameSaveProducerDeliveryItem = z.infer<typeof GameSaveProducerDeliveryItemSchema>;
+export type GameSaveProducerDelivery = z.infer<typeof GameSaveProducerDeliverySchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
 export type GameSaveProducerLineState = z.infer<typeof GameSaveProducerLineStateSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;

@@ -89,6 +89,14 @@ Local placement planner checkpoint:
 - Producer, stash and craft completion preflight placement now pass their source/target board cell as seed. Scheduled spawn processing derives the same seed from `originItemInstanceId`, so delayed output still lands around its source while the source exists.
 - Inventory-to-board long-press placement should reuse this planner instead of creating a second near-cell search.
 
+Producer blocked delivery checkpoint:
+
+- Producer output rolls once. If placement is unavailable, the rolled output is persisted under `producerJobs[jobId].delivery.items`; retries deliver that same payload instead of rerolling.
+- Pending delivery keeps the producer job alive and therefore keeps consuming queue capacity. A package stuck in the doorway is still occupying the slot.
+- Blocked delivery retries via `delivery.retryAtMs` and does not spam `product.blocked` events after the first block.
+- Runtime board view exposes `activation.deliveryBlocked`; board cells map it to a subtle generic danger frame.
+- `placeGameSaveItemsFx` is the current placement reservation layer. It mutates a cloned save as each item is placed, so same-tick producer completions reserve distinct cells against the latest placement state.
+
 DnD feedback frame checkpoint:
 
 - Do not add labels/tooltips/special UI for DnD affordances. Visual feedback should stay in-frame and subtle.

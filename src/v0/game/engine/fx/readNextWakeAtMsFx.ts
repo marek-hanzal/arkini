@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readProducerJobWakeAtMs } from "~/v0/game/engine/fx/producerDeliveryTiming";
 
 export namespace readNextWakeAtMsFx {
 	export interface Props {
@@ -12,7 +13,7 @@ export const readNextWakeAtMsFx = Effect.fn("readNextWakeAtMsFx")(function* ({
 }: readNextWakeAtMsFx.Props) {
 	const wakeTimes = [
 		...Object.values(save.scheduledEvents).map((event) => event.dueAtMs),
-		...Object.values(save.producerJobs).map((job) => job.completesAtMs),
+		...Object.values(save.producerJobs).map(readProducerJobWakeAtMs),
 		...Object.values(save.craftJobs).map((job) => job.completesAtMs),
 		...Object.values(save.upgradeJobs).map((job) => job.completesAtMs),
 	];

@@ -9,5 +9,6 @@ export type GameEngineCompletionResult =
 	  }
 	| {
 			type: "blocked";
-			event: GameEvent;
+			save: GameSave;
+			events: GameEvent[];
 	  };

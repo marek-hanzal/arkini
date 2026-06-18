@@ -71,14 +71,17 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 
 	if (preflightPlacement.type === "blocked") {
 		return {
-			event: {
-				blockedAtMs: nowMs,
-				jobId: liveJob.id,
-				reason: "placement_unavailable" as const,
-				recipeId: liveJob.recipeId,
-				targetItemInstanceId: liveJob.targetItemInstanceId,
-				type: "craft.blocked" as const,
-			},
+			events: [
+				{
+					blockedAtMs: nowMs,
+					jobId: liveJob.id,
+					reason: "placement_unavailable" as const,
+					recipeId: liveJob.recipeId,
+					targetItemInstanceId: liveJob.targetItemInstanceId,
+					type: "craft.blocked" as const,
+				},
+			],
+			save,
 			type: "blocked" as const,
 		} satisfies GameEngineCompletionResult;
 	}

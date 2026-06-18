@@ -41,8 +41,9 @@ Tile badge/level offset can be tightened toward the corner. Keep it tiny and do 
 
 Recommended next coding task: **Producer board progress bar**.
 
-Reason: placement now preserves spatial causality. The next visible gameplay gap is that active producer jobs should show a subtle bottom progress bar directly on the board tile, so the board itself communicates that production is running instead of forcing the player to open the sheet like a tiny bureaucrat.
+Reason: placement now preserves spatial causality and blocked delivery now marks stuck producers. The next visible gameplay gap is that actively running producer jobs should show a subtle bottom progress bar directly on the board tile, so the board itself communicates that production is running instead of forcing the player to open the sheet like a tiny bureaucrat.
 
 ## Completed recent task
 
+- `v0-producer-blocked-delivery-2026-06-18.md`: producer output rolls once, blocked delivery persists on the job, retries without spam/reroll, keeps queue capacity occupied, and marks blocked producer tiles with a subtle danger frame.
 - `v0-local-placement-planner-2026-06-18.md`: shared Manhattan `seedCell` placement planner wired into producer/stash/craft/scheduled output flow.

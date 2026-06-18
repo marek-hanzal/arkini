@@ -62,7 +62,7 @@ export const processScheduledGameEventsFx = Effect.fn("processScheduledGameEvent
 			};
 			nextSave.updatedAtMs = nowMs;
 			if (!alreadyBlocked) {
-				events.push(result.event);
+				events.push(...result.events);
 			}
 			continue;
 		}

@@ -12,6 +12,7 @@ const sameActiveDropFeedback = (
 ) =>
 	left?.dropId === right?.dropId &&
 	left?.effect === right?.effect &&
+	left?.variant === right?.variant &&
 	left?.targetTileId === right?.targetTileId;
 
 const sameOptionalTileEngineTile = <TTile,>(
@@ -103,6 +104,8 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 				slotDataset: ref.current
 					? {
 							dropFeedback: ref.current.dataset.akTileEngineDropFeedback,
+							dropFeedbackVariant:
+								ref.current.dataset.akTileEngineDropFeedbackVariant,
 						}
 					: null,
 			},
@@ -120,6 +123,7 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 			data-ak-tile-engine-slot-id={slot.id}
 			data-ak-tile-engine-drop-id={disabled ? undefined : dropId}
 			data-ak-tile-engine-drop-feedback={slotFeedback?.effect}
+			data-ak-tile-engine-drop-feedback-variant={slotFeedback?.variant}
 			className={cn("ak-tile-engine-slot", className)}
 		>
 			{renderSlot({

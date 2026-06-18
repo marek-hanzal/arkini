@@ -71,3 +71,10 @@ DnD interaction contract checkpoint:
 - Missing stored requirements are accepted as merge-like interactions and should show merge feedback, not blocked feedback.
 - Priority after reverse-directed merge rejection is: regular merge, missing stored requirement, craft input, activation/producer/stash input, swap. Runtime dispatch mirrors the durable-before-consumable part after regular merge.
 - Product-line `missingRequirementItemIds` is only a DnD readiness hint. Disabled product lines must not make their requirements droppable.
+
+DnD feedback frame checkpoint:
+
+- Do not add labels/tooltips/special UI for DnD affordances. Visual feedback should stay in-frame and subtle.
+- TileEngine exposes only generic feedback variants (`subtle`, `primary`, `secondary`, `danger`). Domain layers map Arkini meanings onto those variants.
+- Stored requirement fill uses primary/blue frame feedback; craft/producer/stash consumable input uses secondary/green frame feedback. Regular merge should rely on the existing merge animation rather than extra colored frames.
+- Keep hover feedback and post-success board-cell pulses aligned so the thing previewed during drag matches what flashes after commit.

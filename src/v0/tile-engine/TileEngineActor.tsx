@@ -19,6 +19,7 @@ const sameActiveDropFeedback = (
 ) =>
 	left?.dropId === right?.dropId &&
 	left?.effect === right?.effect &&
+	left?.variant === right?.variant &&
 	left?.targetTileId === right?.targetTileId;
 
 const sameTileEngineActorProps = <TTile, TSlot, TDrag, TDrop>(
@@ -141,6 +142,8 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 					? {
 							dragging: actorRef.current.dataset.akTileEngineDragging,
 							dropFeedback: actorRef.current.dataset.akTileEngineDropFeedback,
+							dropFeedbackVariant:
+								actorRef.current.dataset.akTileEngineDropFeedbackVariant,
 						}
 					: null,
 				visualDataset: visual
@@ -207,6 +210,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-slot-id={tile.slotId}
 			data-ak-tile-engine-dragging={dragging ? "true" : undefined}
 			data-ak-tile-engine-drop-feedback={dropFeedback?.effect}
+			data-ak-tile-engine-drop-feedback-variant={dropFeedback?.variant}
 			className={cn(
 				"ak-tile-engine-actor pointer-events-auto absolute touch-none select-none will-change-transform",
 				tile.hidden && "pointer-events-none opacity-0",

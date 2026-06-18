@@ -59,7 +59,7 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 		const sourceTileId = sourceElement?.dataset.akTileEngineTileId;
 		const sourceSlotId = sourceElement?.dataset.akTileEngineSlotId;
 		const feedbackKey = activeFeedback
-			? `${session.pointerId}:${activeFeedback.dropId}:${activeFeedback.targetTileId ?? ""}:${activeFeedback.effect}`
+			? `${session.pointerId}:${activeFeedback.dropId}:${activeFeedback.targetTileId ?? ""}:${activeFeedback.effect}:${activeFeedback.variant ?? ""}`
 			: `${session.pointerId}:${nextDropId ?? "none"}:none`;
 
 		if (lastDropIdRef.current !== nextDropId) {

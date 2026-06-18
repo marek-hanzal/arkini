@@ -341,6 +341,11 @@ describe("resolveBoardCellDropAction", () => {
 			}),
 		).toEqual({
 			type: "merge-board-items",
+			feedback: {
+				cellKey: "1:0",
+				kind: "cell-feedback",
+				variant: "primary",
+			},
 			input: {
 				sourceBoardItemId: "source",
 				targetBoardItemId: "target",
@@ -408,6 +413,11 @@ describe("resolveBoardCellDropAction", () => {
 			}),
 		).toEqual({
 			type: "merge-board-items",
+			feedback: {
+				cellKey: "1:0",
+				kind: "cell-feedback",
+				variant: "primary",
+			},
 			input: {
 				sourceBoardItemId: "source",
 				targetBoardItemId: "target",

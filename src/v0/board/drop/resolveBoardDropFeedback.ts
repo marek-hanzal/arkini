@@ -20,12 +20,6 @@ export namespace resolveBoardDropFeedback {
 	}
 }
 
-const isMergeLikeIntent = (intent: ReturnType<typeof resolveDropIntent>) =>
-	intent.type === "merge" ||
-	intent.type === "craft-input" ||
-	intent.type === "producer-input" ||
-	intent.type === "stored-requirement";
-
 export const resolveBoardDropFeedback = ({
 	board,
 	config,
@@ -57,7 +51,27 @@ export const resolveBoardDropFeedback = ({
 		targetItem,
 	});
 
+	if (intent.type === "stored-requirement") {
+		return {
+			effect: "merge",
+			variant: "primary",
+		};
+	}
+
+	if (intent.type === "craft-input" || intent.type === "producer-input") {
+		return {
+			effect: "merge",
+			variant: "secondary",
+		};
+	}
+
+	if (intent.type === "merge") {
+		return {
+			effect: "merge",
+		};
+	}
+
 	return {
-		effect: isMergeLikeIntent(intent) ? "merge" : "blocked",
+		effect: "blocked",
 	};
 };

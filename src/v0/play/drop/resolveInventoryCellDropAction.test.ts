@@ -181,6 +181,10 @@ describe("resolveInventoryCellDropAction", () => {
 			}),
 		).toEqual({
 			type: "apply-inventory-item-to-board-item",
+			feedback: {
+				cellKey: "1:0",
+				variant: "primary",
+			},
 			input: {
 				sourceSlotIndex: 0,
 				targetBoardItemId: "requirement-target",

@@ -1,4 +1,4 @@
-import type { ActionVisualAnimationSchema } from "~/v0/play/action/ActionVisualAnimationSchema";
+import type { GameVisualMotion } from "~/v0/play/game-engine-visual/GameVisualMotion";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine";
 
 export namespace toTileEngineEnterMotion {
@@ -8,22 +8,20 @@ export namespace toTileEngineEnterMotion {
 }
 
 export const toTileEngineEnterMotion = (
-	animation: ActionVisualAnimationSchema.Type,
+	motion: GameVisualMotion,
 	options: toTileEngineEnterMotion.Options = {},
 ): TileEnterMotionSchema.Type => ({
 	kind:
-		animation.effect === "merge"
+		motion.effect === "merge"
 			? "merge-in"
-			: animation.effect === "replace"
+			: motion.effect === "replace"
 				? "replace-in"
 				: options.fromTileId
 					? "spawn-from-tile"
-					: animation.effect === "fade-in"
-						? "fade-in"
-						: "pop-in",
-	delayMs: animation.delayMs,
-	durationMs: animation.durationMs,
-	sequenceIndex: animation.sequenceIndex,
+					: "fade-in",
+	delayMs: motion.delayMs,
+	durationMs: motion.durationMs,
 	fromTileId: options.fromTileId,
-	groupId: animation.groupId,
+	groupId: motion.groupId,
+	sequenceIndex: motion.sequenceIndex,
 });

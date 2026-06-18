@@ -24,7 +24,7 @@ Current architectural state:
 - Static rules compile into validated `GameConfig` JSON under `game/arkini.game.json`.
 - Runtime save state is the `GameSave` document owned by `RuntimeGameEngineAdapter`.
 - React uses `GameRuntimeStore` with `useSyncExternalStore` selectors.
-- Visual events are derived from engine domain events under `src/v0/play/game-engine-bridge` and registered into TileEngine motion from `GameRuntimeVisualEffects`.
+- Visual effects are planned directly from engine domain events under `src/v0/play/game-engine-visual` and registered into TileEngine motion/transients from `GameRuntimeVisualEffects`. The old `ActionVisualEvent` bridge is gone.
 - Dev scenarios replace the runtime save directly.
 - Browser hard reset wipes Dexie save storage first, then best-effort OPFS/local/session storage and reloads. It is not a SQL database reset.
 - Producer queue size is now a config/runtime invariant. `producers.*.maxQueueSize` caps running+queued jobs per producer item instance; upgrades can adjust it through `producer.maxQueueSize.add`.
@@ -167,3 +167,4 @@ Product-line input ref checkpoint:
 
 - 2026-06-18: Placement capacity failures now use `GamePlacementFailed` tagged errors with concrete `board:full` / `inventory:full` / `placement-failed:unknown` reasons; low-level placement helpers fail through Effect and action/domain callers catch/map them. See `@chat-gpt/v0/v0-placement-failure-reasons-2026-06-18.md`.
 - 2026-06-18: Effective upgrade validation is now schema-owned. `product.duration.add`, `product.input.quantity.add` and `producer.maxQueueSize.add` may not produce zero/negative runtime values, and input quantity upgrades must stay within capacity. See `@chat-gpt/v0/v0-effective-upgrade-validation-2026-06-18.md`.
+- 2026-06-18: T8 event flow cleanup is done. `ActionVisualEvent` / `play/visual-events` / `play/tile-engine-motion` runtime dialects were removed; `GameEvent[]` now maps directly to `GameEngineVisualPlan` motion/transient instructions. See `@chat-gpt/v0/v0-event-flow-visual-planner-2026-06-18.md`.

@@ -367,3 +367,8 @@ Nedělat to v jednom mega commitu. Mega commit je jen zip bomb s lepším market
 ### T6: Inventory stateless stack policy
 
 Status: DONE in `v0-inventory-stateless-stack-policy-2026-06-18.md`. Inventory slots now distinguish stateless stacks from preserved item instances. Stateful board items with editable runtime state move to inventory as `{ kind: "instance", id, itemId }`, running-job actors reject stash with `item_busy`, stateless output never stacks into instance slots, and placing an inventory instance back on board preserves the same item instance id/state buckets.
+
+
+## T8 completed 2026-06-18
+
+Runtime visual effects no longer use `ActionVisualEvent` as a second event language. `GameRuntimeVisualEffects` now maps engine `GameEvent[]` directly into `GameEngineVisualPlan`, which contains concrete TileEngine motion requests and board transient tile plans. The old `play/visual-events`, `play/tile-engine-motion`, and visual-event bridge files were removed. See `v0-event-flow-visual-planner-2026-06-18.md`.

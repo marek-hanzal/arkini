@@ -43,6 +43,14 @@ const PlayShellContent: FC = () => {
 			}),
 		[],
 	);
+	const openInventoryPlacementTarget = useCallback(
+		(placementTarget: { x: number; y: number }) =>
+			setActiveSheet({
+				type: "inventory",
+				placementTarget,
+			}),
+		[],
+	);
 	const feedback = useMemo<Feedback.Type>(
 		() => ({
 			pulseMergeCell() {
@@ -98,11 +106,12 @@ const PlayShellContent: FC = () => {
 					{
 						type: "inventory",
 					},
-					() => (
+					(sheet) => (
 						<InventorySurface
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}
 							onClose={closeSheet}
+							placementTarget={sheet.placementTarget}
 						/>
 					),
 				)
@@ -150,6 +159,7 @@ const PlayShellContent: FC = () => {
 						<BoardSurface
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}
+							onOpenInventoryPlacementTarget={openInventoryPlacementTarget}
 							onOpenItem={openItem}
 							disabled={Boolean(activeSheet)}
 						/>

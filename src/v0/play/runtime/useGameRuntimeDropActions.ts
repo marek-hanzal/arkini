@@ -320,6 +320,8 @@ export const useGameRuntimeDropActions = (): DropActions => {
 			placeInventoryItem(input) {
 				return store.dispatch({
 					action: {
+						placementMode: input.placementMode,
+						quantity: input.quantity,
 						slotIndex: input.slotIndex,
 						type: "inventory.item.place",
 						x: input.x,

@@ -21,6 +21,7 @@ import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 export namespace useBoardTileEngineModel {
 	export interface Props {
 		feedback: Feedback.Type;
+		onOpenInventoryPlacementTarget(cell: { x: number; y: number }): void;
 		onOpenItem(boardItemId: string): void;
 	}
 
@@ -36,6 +37,7 @@ const transientTileStyle = {
 
 export const useBoardTileEngineModel = ({
 	feedback,
+	onOpenInventoryPlacementTarget,
 	onOpenItem,
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
 	const board = useGameBoardView();
@@ -173,6 +175,13 @@ export const useBoardTileEngineModel = ({
 						y: cell.y,
 						boardItemId: targetBoardItemId,
 					},
+					onLongActivate: targetBoardItemId
+						? undefined
+						: () =>
+								onOpenInventoryPlacementTarget({
+									x: cell.x,
+									y: cell.y,
+								}),
 				};
 			},
 			dropFeedback(context) {
@@ -203,6 +212,7 @@ export const useBoardTileEngineModel = ({
 			board,
 			feedback,
 			inventory,
+			onOpenInventoryPlacementTarget,
 			onOpenItem,
 		],
 	);

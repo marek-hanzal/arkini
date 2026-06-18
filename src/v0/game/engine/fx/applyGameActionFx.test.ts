@@ -1521,6 +1521,104 @@ describe("applyGameActionFx runtime placement actions", () => {
 		]);
 	});
 
+	it("places an inventory stack around a seeded board cell", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 2,
+		};
+
+		const result = runAction({
+			action: {
+				placementMode: "nearest_by_manhattan",
+				quantity: 2,
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(result.events).toMatchObject([
+			{
+				from: {
+					nextQuantity: 0,
+					previousQuantity: 2,
+					quantity: 2,
+					slotIndex: 0,
+				},
+				reason: "inventory-placement",
+				type: "item.consumed",
+			},
+			{
+				to: {
+					kind: "board",
+					x: 1,
+					y: 0,
+				},
+				type: "item.created",
+			},
+			{
+				to: {
+					kind: "inventory",
+					nextQuantity: 1,
+					previousQuantity: 0,
+					quantity: 1,
+					slotIndex: 0,
+				},
+				type: "item.created",
+			},
+		]);
+	});
+
+	it("places seeded inventory items around an occupied seed cell", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				placementMode: "nearest_by_manhattan",
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 0,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+		expect(result.save.inventory.slots[0]).toBeNull();
+	});
+
 	it("stashes a board item into inventory", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

@@ -46,9 +46,7 @@ Recent GameConfig hardening checkpoint:
 
 Current task candidates:
 
-1. Touch/long-press polish: suppress native context/callout only on game interaction surfaces.
-2. Inventory-to-board seeded placement: reuse the shared Manhattan placement planner for long-press empty-cell placement.
-3. Badge/visual polish: tighten tile badge offset toward the corner without redesigning the tile.
+1. Badge/visual polish: tighten tile badge offset toward the corner without redesigning the tile.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.
 
@@ -128,6 +126,13 @@ Board DnD confinement checkpoint:
 - The bottom inventory nav button must stay a normal button, not a `TileEngineDropTarget`.
 - `DropActions` should not expose board-item stash for DnD plumbing.
 - Moving a board item into inventory is an explicit `Store` action from the item detail sheet, dispatching `board.item.stash`.
+
+Inventory seeded placement checkpoint:
+
+- Long-pressing an empty board cell opens inventory in placement mode with that cell as placement seed.
+- Selecting a stack in that mode dispatches `inventory.item.place` with `placementMode: "nearest_by_manhattan"` and the full stack quantity. The engine consumes that stack and reuses the shared board-then-inventory placement planner, so placement starts at the seed and then expands by Manhattan distance with inventory fallback.
+- Normal inventory double-tap and explicit inventory-to-board DnD remain exact single-item placement. Do not replace those with nearest-cell behavior unless the UX explicitly changes.
+- TileEngine stays generic: slots only expose optional `onLongActivate`; Arkini board/inventory adapters attach the placement meaning outside the engine.
 
 Product-line input ref checkpoint:
 

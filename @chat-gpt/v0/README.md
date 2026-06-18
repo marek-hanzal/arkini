@@ -18,10 +18,6 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 Tile badge/level offset can be tightened toward the corner. Keep it tiny and do not redesign tile layout while pretending it is “just polish”.
 
-### 2. Inventory-to-board seeded placement
-
-Long press on an empty board cell should open inventory with that cell as placement seed. Reuse the shared Manhattan placement planner; do not write a second local-nearest search because apparently one bug farm is not enough for humanity.
-
 ## Deferred / historical notes
 
 - `v0-effect-tick-engine-2026-06-17.md` and `v0-tick-engine-integration-readiness-2026-06-17.md` are historical architecture plans. The runtime engine path is now live.
@@ -33,10 +29,11 @@ Long press on an empty board cell should open inventory with that cell as placem
 
 Recommended next coding task: **Badge/visual polish**.
 
-Reason: tile level/badge placement is a small visual fix that was already called out and should be quick to close before the larger inventory placement flow.
+Reason: tile level/badge placement is a small visual fix that was already called out and should be quick to close now that the larger inventory placement flow is done.
 
 ## Completed recent task
 
+- `v0-inventory-seeded-placement-2026-06-18.md`: long press on empty board cell opens inventory with seeded Manhattan placement; selecting a stack places it through shared board-then-inventory planner semantics.
 - `v0-board-dnd-confinement-2026-06-18.md`: board item DnD is confined to the board; inventory is no longer a board-item drop target and item detail owns explicit `Store` to inventory.
 - `v0-touch-long-press-polish-2026-06-18.md`: native context/callout menus are suppressed on TileEngine game surfaces without adding global app-wide hijacking.
 - `v0-product-line-input-withdraw-2026-06-18.md`: product-line input rows can withdraw their whole stored amount through producer-style board-then-inventory placement.

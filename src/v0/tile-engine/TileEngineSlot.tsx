@@ -1,8 +1,17 @@
-import { memo, type ReactNode, type RefObject, useEffect, useRef } from "react";
+import {
+	memo,
+	type PointerEvent as ReactPointerEvent,
+	type ReactNode,
+	type RefObject,
+	useCallback,
+	useEffect,
+	useRef,
+} from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import { cn } from "~/v0/ui/cn";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
+import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 import { sameTileEngineSlot } from "~/v0/tile-engine/sameTileEngineSlot";
 import { sameTileEngineTile } from "~/v0/tile-engine/sameTileEngineTile";
 
@@ -64,11 +73,58 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	registerDrop,
 }: TileEngineSlot.Props<TTile, TSlot, TDrop>) => {
 	const ref = useRef<HTMLDivElement | null>(null);
+	const longTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const activePointerIdRef = useRef<number | null>(null);
 	const binding = dragRef.current?.slot(slot, targetTile);
 	const dropId = binding?.id ?? slot.dropId ?? slot.id;
 	const disabled = engineDisabled || !binding || binding.disabled || slot.disabled;
 	const slotFeedback = disabled ? null : dropFeedback;
 	const isOver = Boolean(slotFeedback);
+
+	const clearLongTimer = useCallback(() => {
+		if (!longTimerRef.current) return;
+		clearTimeout(longTimerRef.current);
+		longTimerRef.current = null;
+	}, []);
+
+	const handlePointerDown = useCallback(
+		(event: ReactPointerEvent<HTMLDivElement>) => {
+			if (disabled || !binding?.onLongActivate || event.button !== 0) return;
+			activePointerIdRef.current = event.pointerId;
+			clearLongTimer();
+			longTimerRef.current = setTimeout(() => {
+				if (activePointerIdRef.current !== event.pointerId) return;
+				longTimerRef.current = null;
+				binding.onLongActivate?.();
+			}, TileEngineTiming.longPressMs);
+		},
+		[
+			binding,
+			clearLongTimer,
+			disabled,
+		],
+	);
+
+	const cancelPointerLongPress = useCallback(
+		(event: ReactPointerEvent<HTMLDivElement>) => {
+			if (activePointerIdRef.current !== event.pointerId) return;
+			activePointerIdRef.current = null;
+			clearLongTimer();
+		},
+		[
+			clearLongTimer,
+		],
+	);
+
+	useEffect(
+		() => () => {
+			activePointerIdRef.current = null;
+			clearLongTimer();
+		},
+		[
+			clearLongTimer,
+		],
+	);
 
 	useEffect(() => {
 		if (disabled || !ref.current) return;
@@ -125,6 +181,10 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 			data-ak-tile-engine-drop-feedback={slotFeedback?.effect}
 			data-ak-tile-engine-drop-feedback-variant={slotFeedback?.variant}
 			className={cn("ak-tile-engine-slot", className)}
+			onPointerDown={handlePointerDown}
+			onPointerLeave={cancelPointerLongPress}
+			onPointerUp={cancelPointerLongPress}
+			onPointerCancel={cancelPointerLongPress}
 		>
 			{renderSlot({
 				slot,

@@ -15,6 +15,7 @@ export const buildConfigLayerFx = Effect.fn("buildConfigLayerFx")(function* ({
 	save,
 }: buildConfigLayerFx.Props) {
 	const layer: GameConfigLayer = {
+		producers: {},
 		products: {},
 	};
 
@@ -28,6 +29,20 @@ export const buildConfigLayerFx = Effect.fn("buildConfigLayerFx")(function* ({
 
 		for (const tier of upgrade.tiers.slice(0, completedTiers)) {
 			for (const effect of tier.effects) {
+				if (effect.type === "producer.maxQueueSize.add") {
+					const baseProducer = config.producers[effect.producerId];
+					if (!baseProducer) {
+						continue;
+					}
+
+					const producerLayer = (layer.producers[effect.producerId] ??= {});
+					producerLayer.maxQueueSize = Math.max(
+						1,
+						(producerLayer.maxQueueSize ?? baseProducer.maxQueueSize) + effect.quantity,
+					);
+					continue;
+				}
+
 				const baseProduct = config.products[effect.productId];
 				if (!baseProduct) {
 					continue;

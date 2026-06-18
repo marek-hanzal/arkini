@@ -134,18 +134,25 @@ const productLineEnabled = ({
 
 const readProductLineViews = ({
 	config,
+	maxQueueSize,
 	nowMs,
 	productIds,
 	save,
 	targetItemInstanceId,
 }: {
 	config: GameConfig;
+	maxQueueSize: number;
 	nowMs: number;
 	productIds: readonly string[];
 	save: GameSave;
 	targetItemInstanceId: string;
-}): ProducerProductLineView[] =>
-	productIds.flatMap((productId) => {
+}): ProducerProductLineView[] => {
+	const producerQueuedJobs = Object.values(save.producerJobs).filter(
+		(job) => job.producerItemInstanceId === targetItemInstanceId,
+	).length;
+	const queueFull = producerQueuedJobs >= maxQueueSize;
+
+	return productIds.flatMap((productId) => {
 		const product = config.products[productId];
 		if (!product) return [];
 
@@ -184,7 +191,10 @@ const readProductLineViews = ({
 				name: product.name,
 				outputTableId: product.outputTableId,
 				productId,
+				producerQueuedJobs,
 				progress,
+				queueFull,
+				queueSize: maxQueueSize,
 				queuedJobs: jobs.length,
 				readyAtMs: activeJob?.completesAtMs,
 				requirementItemIds: product.requirements.map(
@@ -194,6 +204,7 @@ const readProductLineViews = ({
 			},
 		];
 	});
+};
 
 const activeProductId = ({
 	productIds,
@@ -271,6 +282,7 @@ const readRuntimeActivationView = ({
 			kind: "producer",
 			productLines: readProductLineViews({
 				config,
+				maxQueueSize: producer.maxQueueSize,
 				nowMs,
 				productIds: producer.productIds,
 				save,

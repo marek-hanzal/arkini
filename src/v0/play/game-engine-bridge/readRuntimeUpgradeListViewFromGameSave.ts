@@ -40,6 +40,12 @@ const describeRuntimeUpgradeEffect = ({
 		return `${product?.name ?? effect.productId}: ${table?.name ?? effect.tableId}`;
 	}
 
+	if (effect.type === "producer.maxQueueSize.add") {
+		const producer = config.producers[effect.producerId];
+		const sign = effect.quantity < 0 ? "-" : "+";
+		return `${effect.producerId}: ${sign}${Math.abs(effect.quantity)} queue slot${Math.abs(effect.quantity) === 1 ? "" : "s"}${producer ? "" : " (missing producer)"}`;
+	}
+
 	const product = config.products[effect.productId];
 	const item = config.items[effect.itemId];
 	const sign = effect.quantity < 0 ? "-" : "+";

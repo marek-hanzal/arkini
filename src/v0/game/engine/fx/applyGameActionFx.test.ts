@@ -341,7 +341,16 @@ describe("applyGameActionFx", () => {
 	});
 
 	it("queues product jobs for the same producer instead of running them in parallel", () => {
-		const config = createEngineTestConfig();
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			producers: {
+				...baseConfig.producers,
+				"producer:test": {
+					...baseConfig.producers["producer:test"],
+					maxQueueSize: 2,
+				},
+			},
+		});
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
@@ -375,6 +384,45 @@ describe("applyGameActionFx", () => {
 			startedAtMs: 1500,
 		});
 		expect(second.nextWakeAtMs).toBe(1500);
+	});
+
+	it("rejects producer product start when the producer queue is full", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const first = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		const second = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 600,
+			save: first.save,
+		});
+
+		expect(second._tag).toBe("Left");
+		if (second._tag === "Left") {
+			expect(second.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "producer_queue_full",
+			});
+		}
 	});
 
 	it("starts craft jobs by consuming inputs and reserving stored requirements", () => {

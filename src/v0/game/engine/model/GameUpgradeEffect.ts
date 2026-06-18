@@ -14,4 +14,9 @@ export type GameUpgradeEffect =
 			productId: string;
 			itemId: string;
 			quantity: number;
+	  }
+	| {
+			type: "producer.maxQueueSize.add";
+			producerId: string;
+			quantity: number;
 	  };

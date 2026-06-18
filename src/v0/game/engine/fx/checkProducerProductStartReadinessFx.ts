@@ -59,6 +59,18 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		);
 	}
 
+	const producerJobCount = Object.values(save.producerJobs).filter(
+		(job) => job.producerItemInstanceId === action.producerItemInstanceId,
+	).length;
+	if (producerJobCount >= producerDefinition.maxQueueSize) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"producer_queue_full",
+				`Producer item "${action.producerItemInstanceId}" queue is full (${producerJobCount}/${producerDefinition.maxQueueSize}).`,
+			),
+		);
+	}
+
 	const product = yield* readProductFx({
 		productId: action.productId,
 	});

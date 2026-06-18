@@ -129,6 +129,7 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 		},
 		producers: {
 			"producer:test": {
+				maxQueueSize: 1,
 				productIds: [
 					"product:test",
 					"product:shred",

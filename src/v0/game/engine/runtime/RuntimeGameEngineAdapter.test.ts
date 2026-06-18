@@ -100,6 +100,53 @@ describe("RuntimeGameEngineAdapter", () => {
 		]);
 	});
 
+	it("publishes the effective upgraded config in snapshots", async () => {
+		const config = createEngineTestConfig({
+			upgrades: {
+				"upgrade:test-queue": {
+					code: "test-queue",
+					description: "Test queue upgrade",
+					name: "Test Queue",
+					sort: 1,
+					tiers: [
+						{
+							cost: [],
+							durationMs: 0,
+							effects: [
+								{
+									producerId: "producer:test",
+									quantity: 1,
+									type: "producer.maxQueueSize.add",
+								},
+							],
+						},
+					],
+				},
+			},
+		});
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config,
+			nowMs: 0,
+			random: TestRandomService,
+		});
+
+		const startedUpgrade = await adapter.dispatch({
+			action: {
+				inputRefs: [],
+				type: "upgrade.start",
+				upgradeId: "upgrade:test-queue",
+			},
+			nowMs: 0,
+		});
+		expect(startedUpgrade.events.map((event) => event.type)).toContain("upgrade.started");
+		await adapter.tick({
+			nowMs: 0,
+		});
+
+		expect(adapter.readSnapshot().config.producers["producer:test"].maxQueueSize).toBe(2);
+		expect(adapter.config.producers["producer:test"].maxQueueSize).toBe(1);
+	});
+
 	it("reads readiness from the current stored save", async () => {
 		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createEngineTestConfig(),

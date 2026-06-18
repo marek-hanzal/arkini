@@ -402,6 +402,79 @@ describe("upgrade runtime", () => {
 		);
 	});
 
+	it("uses upgraded producer queue size for future product starts", () => {
+		const config = createEngineTestConfig({
+			upgrades: {
+				"upgrade:test-queue": {
+					code: "test-queue",
+					description: "Test queue upgrade",
+					name: "Test Queue",
+					sort: 1,
+					tiers: [
+						{
+							cost: [],
+							durationMs: 0,
+							effects: [
+								{
+									producerId: "producer:test",
+									quantity: 1,
+									type: "producer.maxQueueSize.add",
+								},
+							],
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const startedUpgrade = runAction({
+			action: {
+				inputRefs: [],
+				type: "upgrade.start",
+				upgradeId: "upgrade:test-queue",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const completedUpgrade = runTick({
+			config,
+			nowMs: 0,
+			save: startedUpgrade.save,
+		});
+
+		const firstProduct = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save: completedUpgrade.save,
+		});
+		const secondProduct = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save: firstProduct.save,
+		});
+
+		expect(secondProduct.save.producerJobs["job:3"]).toMatchObject({
+			completesAtMs: 2000,
+			startedAtMs: 1000,
+		});
+	});
+
 	it("uses upgraded input costs for future product starts", () => {
 		const config = createEngineTestConfig({
 			upgrades: {

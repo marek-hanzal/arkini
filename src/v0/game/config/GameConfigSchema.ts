@@ -35,11 +35,13 @@ import { z } from "zod";
  * - Passive requirements always declare their search scope (`board`, `inventory`, or
  *   `board_or_inventory`). They model global knowledge/permission/ownership gates, not
  *   spatial adjacency or aura rules.
- * - Producer `productIds` are ordered production lines. Producer shells do not own inputs;
- *   product lines reference named input definitions through `inputRefId`. If multiple
- *   enabled lines can accept the same dragged input, runtime feeds them from top to
- *   bottom. `maxQueueSize` is a hard per-producer-instance cap
- *   covering both running and queued jobs.
+ * - Producer `productIds` are ordered production lines. Product definitions are owned by
+ *   exactly one producer line; upgrades target that producer/product-line definition, not
+ *   concrete runtime instances. Producer shells do not own inputs; product lines reference
+ *   named input definitions through `inputRefId`. Runtime may still choose between multiple
+ *   enabled lines accepting the same dragged item from top to bottom, but their input
+ *   definitions must stay separate so product-line upgrades cannot leak across lines.
+ *   `maxQueueSize` is a hard per-producer-instance cap covering both running and queued jobs.
  * - Product inputs are stored per product line. Craft inputs are stored per craft
  *   target instance until the player explicitly starts the craft. Completion replaces
  *   the target with exactly one result item.
@@ -82,8 +84,7 @@ import { z } from "zod";
  *       "type": "producer",
  *       "maxQueueSize": 1,
  *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
- *       "requirements": [],
- *       "inputRefId": "input:lumber-camp.saw"
+ *       "requirements": []
  *     }
  *   },
  *   "inputs": {
@@ -97,7 +98,7 @@ import { z } from "zod";
  *       "name": "Saw logs",
  *       "durationMs": 5000,
  *       "placement": "board_then_inventory",
- *       "inputs": [{ "itemId": "item:log", "quantity": 1, "capacity": 1, "consume": true }],
+ *       "inputRefId": "input:lumber-camp.saw",
  *       "requirements": [
  *         { "type": "passive", "itemId": "item:saw-license", "quantity": 1, "scope": "board_or_inventory" }
  *       ],
@@ -1045,6 +1046,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
+	validateProductLineOwnership(ctx, value);
 	validateEffectiveUpgradePrefixes(ctx, value);
 
 	if (value.startingState.inventory.length > value.game.inventory.slots) {
@@ -1227,6 +1229,76 @@ const validateUniqueRecordField = <
 	}
 };
 
+const validateProductLineOwnership = (ctx: z.RefinementCtx, config: EffectiveUpgradeConfig) => {
+	const ownerByProductId = new Map<string, string>();
+
+	for (const [producerId, producer] of Object.entries(config.producers)) {
+		for (const [productIndex, productId] of producer.productIds.entries()) {
+			const previousProducerId = ownerByProductId.get(productId);
+			if (previousProducerId) {
+				addIssue(
+					ctx,
+					[
+						"producers",
+						producerId,
+						"productIds",
+						productIndex,
+					],
+					`Product "${productId}" must be owned by exactly one producer. First used by "${previousProducerId}".`,
+				);
+				continue;
+			}
+
+			ownerByProductId.set(productId, producerId);
+		}
+	}
+
+	validateProductInputRefOwnership(
+		ctx,
+		[
+			"products",
+		],
+		Object.fromEntries(
+			Object.entries(config.products).flatMap(([productId, product]) =>
+				product.inputRefId
+					? [
+							[
+								productId,
+								product.inputRefId,
+							],
+						]
+					: [],
+			),
+		),
+	);
+};
+
+const validateProductInputRefOwnership = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	inputRefIdByProductId: Readonly<Record<string, string>>,
+) => {
+	const productIdByInputRefId = new Map<string, string>();
+
+	for (const [productId, inputRefId] of Object.entries(inputRefIdByProductId)) {
+		const previousProductId = productIdByInputRefId.get(inputRefId);
+		if (previousProductId) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					productId,
+					"inputRefId",
+				],
+				`Input ref "${inputRefId}" must be owned by exactly one product line. First used by "${previousProductId}".`,
+			);
+			continue;
+		}
+
+		productIdByInputRefId.set(inputRefId, productId);
+	}
+};
+
 type EffectiveUpgradeConfig = z.infer<typeof BaseGameConfigSchema>;
 type EffectiveUpgradeProductState = {
 	durationMs: number;
@@ -1355,6 +1427,7 @@ const applyEffectiveUpgradeEffect = (
 
 	if (effect.type === "product.inputRef.set") {
 		productState.inputRefId = effect.inputRefId;
+		validateEffectiveProductInputRefOwnership(ctx, state, path);
 		validateEffectiveProductInputOverrides(ctx, config, productState, effect.productId, path);
 		return;
 	}
@@ -1382,6 +1455,35 @@ const applyEffectiveUpgradeEffect = (
 	const currentQuantity = productState.inputQuantities[effect.itemId] ?? input.quantity;
 	productState.inputQuantities[effect.itemId] = currentQuantity + effect.quantity;
 	validateEffectiveProductInputOverrides(ctx, config, productState, effect.productId, path);
+};
+
+const validateEffectiveProductInputRefOwnership = (
+	ctx: z.RefinementCtx,
+	state: EffectiveUpgradeState,
+	path: GameConfigIssuePath,
+) => {
+	const productIdByInputRefId = new Map<string, string>();
+
+	for (const [productId, productState] of Object.entries(state.products)) {
+		if (!productState.inputRefId) {
+			continue;
+		}
+
+		const previousProductId = productIdByInputRefId.get(productState.inputRefId);
+		if (previousProductId) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"inputRefId",
+				],
+				`Effective input ref "${productState.inputRefId}" must be owned by exactly one product line after upgrade prefixes. First used by "${previousProductId}"; also used by "${productId}".`,
+			);
+			continue;
+		}
+
+		productIdByInputRefId.set(productState.inputRefId, productId);
+	}
 };
 
 const validateEffectiveProductInputOverrides = (

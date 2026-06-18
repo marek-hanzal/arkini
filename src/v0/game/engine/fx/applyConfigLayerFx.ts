@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import type { GameConfigLayer } from "~/v0/game/engine/model/GameConfigLayerSchema";
 
 export namespace applyConfigLayerFx {
@@ -56,24 +55,37 @@ export const applyConfigLayerFx = Effect.fn("applyConfigLayerFx")(function* ({
 		}),
 	);
 
+	const inputLayerByInputRefId = new Map(
+		Object.entries(layer.products).flatMap(([productId, productLayer]) => {
+			const inputRefId = products[productId]?.inputRefId;
+			if (!inputRefId || !productLayer.inputs) {
+				return [];
+			}
+
+			return [
+				[
+					inputRefId,
+					productLayer.inputs,
+				],
+			];
+		}),
+	);
+
 	const inputs = Object.fromEntries(
-		Object.entries(config.inputs).map(([inputRefId, inputDefinition]) => [
-			inputRefId,
-			{
-				...inputDefinition,
-				inputs: inputDefinition.inputs.map((input) => ({
-					...input,
-					quantity:
-						Object.entries(layer.products).find(([productId, productLayer]) => {
-							const layeredProduct = products[productId];
-							return (
-								layeredProduct?.inputRefId === inputRefId &&
-								productLayer.inputs?.[input.itemId]
-							);
-						})?.[1].inputs?.[input.itemId]?.quantity ?? input.quantity,
-				})),
-			},
-		]),
+		Object.entries(config.inputs).map(([inputRefId, inputDefinition]) => {
+			const inputLayer = inputLayerByInputRefId.get(inputRefId);
+
+			return [
+				inputRefId,
+				{
+					...inputDefinition,
+					inputs: inputDefinition.inputs.map((input) => ({
+						...input,
+						quantity: inputLayer?.[input.itemId]?.quantity ?? input.quantity,
+					})),
+				},
+			];
+		}),
 	);
 
 	return {

@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 import type { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
 import type { GameActionResolvedInputRef } from "~/v0/game/engine/model/GameActionResolvedInputRef";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace resolveInputRefsFx {
@@ -70,7 +71,10 @@ export const resolveInputRefsFx = Effect.fn("resolveInputRefsFx")(function* ({
 							);
 						}
 						const slot = save.inventory.slots[inventoryRef.slotIndex];
-						if (!slot || slot.quantity < inventoryRef.quantity) {
+						if (
+							!slot ||
+							readGameSaveInventorySlotQuantity(slot) < inventoryRef.quantity
+						) {
 							return yield* Effect.fail(
 								GameEngineError.actionRejected(
 									"input_unavailable",

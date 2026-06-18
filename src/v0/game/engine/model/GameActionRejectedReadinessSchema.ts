@@ -18,6 +18,7 @@ export const GameActionRejectedReadinessSchema = z
 					"input_unavailable",
 					"invalid_actor",
 					"invalid_merge",
+					"item_busy",
 					"craft_in_progress",
 					"missing_requirement",
 					"product_line_disabled",

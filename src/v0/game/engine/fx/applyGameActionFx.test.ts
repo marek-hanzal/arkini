@@ -2085,6 +2085,136 @@ describe("applyGameActionFx runtime placement actions", () => {
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 
+	it("stashes a stateful stackable board item as an inventory instance", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:craft-stack": {
+					assetId: "asset:test",
+					code: "craft-stack",
+					craftRecipeId: "craft:plank",
+					description: "Stackable craft target",
+					maxStackSize: 3,
+					name: "Craft Stack",
+					sort: 8,
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-stack",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:craft-stack",
+						quantity: 2,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 1,
+			},
+		};
+
+		const stashed = runAction({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.stash",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(stashed.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(stashed.save.inventory.slots).toEqual([
+			{
+				itemId: "item:craft-stack",
+				quantity: 2,
+			},
+			{
+				id: "item-instance:1",
+				itemId: "item:craft-stack",
+				kind: "instance",
+			},
+		]);
+		expect(stashed.save.craftInputs["item-instance:1"]).toEqual({
+			items: {
+				"item:twig": 1,
+			},
+		});
+
+		const placed = runAction({
+			action: {
+				slotIndex: 1,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 20,
+			save: stashed.save,
+		});
+
+		expect(placed.save.inventory.slots[1]).toBeNull();
+		expect(placed.save.board.items["item-instance:1"]).toEqual({
+			id: "item-instance:1",
+			itemId: "item:craft-stack",
+			x: 1,
+			y: 0,
+		});
+		expect(placed.save.craftInputs["item-instance:1"]).toEqual({
+			items: {
+				"item:twig": 1,
+			},
+		});
+	});
+
+	it("rejects stashing a board item with a running job", () => {
+		const config = createEngineCraftTableTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			recipeId: "craft:plank",
+			startedAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const result = runActionEither({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.stash",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "item_busy",
+			},
+		});
+	});
+
 	it("stashes a board item into inventory", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

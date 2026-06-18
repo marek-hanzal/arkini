@@ -3,6 +3,7 @@ import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
@@ -159,7 +160,8 @@ const passiveItemQuantity = ({
 
 	if (scope === "inventory" || scope === "board_or_inventory") {
 		quantity += save.inventory.slots.reduce(
-			(total, slot) => total + (slot?.itemId === itemId ? slot.quantity : 0),
+			(total, slot) =>
+				total + (slot?.itemId === itemId ? readGameSaveInventorySlotQuantity(slot) : 0),
 			0,
 		);
 	}

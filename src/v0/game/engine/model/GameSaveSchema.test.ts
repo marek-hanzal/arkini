@@ -117,6 +117,84 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.error?.issues[0]?.message).toContain("maxStackSize");
 	});
 
+	it("accepts an inventory instance carrying preserved craft input state", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const inventorySave = cloneSave(save);
+		delete inventorySave.board.items["item-instance:1"];
+		inventorySave.inventory.slots[0] = {
+			id: "item-instance:1",
+			itemId: "item:craft-table",
+			kind: "instance",
+		};
+		inventorySave.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 1,
+			},
+		};
+
+		expect(() =>
+			GameSaveConfigSchema.parse({
+				config,
+				save: inventorySave,
+			}),
+		).not.toThrow();
+	});
+
+	it("rejects inventory instance ids that collide with board items", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.inventory.slots[0] = {
+			id: "item-instance:1",
+			itemId: "item:twig",
+			kind: "instance",
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("already exists on board");
+	});
+
+	it("rejects duplicate inventory instance ids", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.inventory.slots[0] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			kind: "instance",
+		};
+		invalidSave.inventory.slots[1] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			kind: "instance",
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("Duplicate inventory instance id");
+	});
+
 	it("rejects multiple craft jobs for the same target item", () => {
 		const config = createEngineCraftTableTestConfig({
 			boardItemCount: 2,

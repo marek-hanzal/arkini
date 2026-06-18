@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
 import type { GamePassiveRequirementScope } from "~/v0/game/engine/model/GamePassiveRequirementScope";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -23,7 +24,8 @@ export const countPassiveItemQuantityFx = Effect.fn("countPassiveItemQuantityFx"
 
 	if (scope === "inventory" || scope === "board_or_inventory") {
 		quantity += save.inventory.slots.reduce(
-			(total, slot) => total + (slot?.itemId === itemId ? slot.quantity : 0),
+			(total, slot) =>
+				total + (slot?.itemId === itemId ? readGameSaveInventorySlotQuantity(slot) : 0),
 			0,
 		);
 	}

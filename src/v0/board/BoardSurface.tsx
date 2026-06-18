@@ -11,6 +11,12 @@ import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { TileEngine } from "~/v0/tile-engine";
 import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 
+const boardCellFeedbackVariants = [
+	"primary",
+	"secondary",
+	"subtle",
+] as const;
+
 const boardSlots = boardCells.map((cell) => ({
 	id: cell.key,
 	dropId: `board-cell:${cell.key}`,
@@ -34,9 +40,13 @@ export const BoardSurface = memo(
 			({ slot }: TileEngineType.RenderSlotProps<BoardCellView>): ReactNode => {
 				const cell = slot.data;
 				const key = cellKey(cell.x, cell.y);
+				const feedbackVariant = boardCellFeedbackVariants.find((variant) =>
+					feedbackFlags.has(`board:feedback:${variant}:${key}`),
+				);
 				return (
 					<BoardCell
 						cell={cell}
+						feedbackVariant={feedbackVariant}
 						invalid={feedbackFlags.has(`board:error:${key}`)}
 					/>
 				);

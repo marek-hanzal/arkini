@@ -71,6 +71,9 @@ export const resolveBoardCellDrop = ({
 			if (action.feedback?.kind === "merge-cell") {
 				feedback.pulseMergeCell(action.feedback.cellKey);
 			}
+			if (action.feedback?.kind === "cell-feedback") {
+				feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
+			}
 		},
 		{
 			animation: action.animation,

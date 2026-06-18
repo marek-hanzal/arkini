@@ -5,6 +5,7 @@ import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
+import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export type InventoryCellDropAction =
 	| {
@@ -21,6 +22,10 @@ export type InventoryCellDropAction =
 	  }
 	| {
 			type: "apply-inventory-item-to-board-item";
+			feedback?: {
+				cellKey: string;
+				variant: TileEngine.DropFeedbackVariant;
+			};
 			input: {
 				sourceSlotIndex: number;
 				targetBoardItemId: string;
@@ -101,6 +106,18 @@ export const resolveInventoryCellDropAction = ({
 		}
 
 		return {
+			feedback:
+				intent.type === "stored-requirement"
+					? {
+							cellKey: cellKey(target.x, target.y),
+							variant: "primary",
+						}
+					: intent.type === "craft-input" || intent.type === "producer-input"
+						? {
+								cellKey: cellKey(target.x, target.y),
+								variant: "secondary",
+							}
+						: undefined,
 			input: {
 				sourceSlotIndex: source.slotIndex,
 				targetBoardItemId: target.boardItemId,

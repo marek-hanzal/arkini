@@ -4,6 +4,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
+import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export type BoardCellDropAction =
 	| {
@@ -35,10 +36,16 @@ export type BoardCellDropAction =
 	| {
 			type: "merge-board-items";
 			animation?: "parallel-merge";
-			feedback?: {
-				kind: "merge-cell" | "imprint-cell";
-				cellKey: string;
-			};
+			feedback?:
+				| {
+						kind: "merge-cell" | "imprint-cell";
+						cellKey: string;
+				  }
+				| {
+						kind: "cell-feedback";
+						cellKey: string;
+						variant: TileEngine.DropFeedbackVariant;
+				  };
 			input: {
 				sourceBoardItemId: string;
 				targetBoardItemId: string;
@@ -144,6 +151,18 @@ export const resolveBoardCellDropAction = ({
 
 	return {
 		type: "merge-board-items",
+		feedback:
+			intent.type === "stored-requirement"
+				? {
+						cellKey: targetCellKey,
+						kind: "cell-feedback",
+						variant: "primary",
+					}
+				: {
+						cellKey: targetCellKey,
+						kind: "cell-feedback",
+						variant: "secondary",
+					},
 		input: {
 			sourceBoardItemId: source.boardItemId,
 			targetBoardItemId: targetItem.id,

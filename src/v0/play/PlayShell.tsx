@@ -51,6 +51,9 @@ const PlayShellContent: FC = () => {
 			pulseImprintCell() {
 				// Directed merge/imprint uses the same animation-only feedback path.
 			},
+			pulseBoardCellFeedback(key, variant) {
+				if (key) feedbackFlags.pulse(`board:feedback:${variant}:${key}`);
+			},
 			flashBoardCell(key) {
 				if (key) feedbackFlags.pulse(`board:error:${key}`);
 			},

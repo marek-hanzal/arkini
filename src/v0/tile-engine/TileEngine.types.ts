@@ -72,9 +72,11 @@ export namespace TileEngine {
 	}
 
 	export type DropFeedbackEffect = "empty" | "merge" | "blocked";
+	export type DropFeedbackVariant = "subtle" | "primary" | "secondary" | "danger";
 
 	export interface DropFeedback {
 		effect: DropFeedbackEffect;
+		variant?: DropFeedbackVariant;
 	}
 
 	export interface ActiveDropFeedback extends DropFeedback {

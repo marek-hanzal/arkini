@@ -18,6 +18,7 @@ const sameActiveDropFeedback = (
 ) =>
 	left?.dropId === right?.dropId &&
 	left?.effect === right?.effect &&
+	left?.variant === right?.variant &&
 	left?.targetTileId === right?.targetTileId;
 
 const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({

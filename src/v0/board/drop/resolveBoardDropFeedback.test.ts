@@ -124,7 +124,7 @@ describe("resolveBoardDropFeedback", () => {
 		});
 	});
 
-	it("marks stored requirement targets as merge feedback", () => {
+	it("marks stored requirement targets as primary merge feedback", () => {
 		const source = boardItem({
 			id: "a",
 			itemId: "item:twig",
@@ -185,6 +185,72 @@ describe("resolveBoardDropFeedback", () => {
 			}),
 		).toEqual({
 			effect: "merge",
+			variant: "primary",
+		});
+	});
+
+	it("marks producer input targets as secondary merge feedback", () => {
+		const source = boardItem({
+			id: "a",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target: BoardViewItem = {
+			id: "b",
+			itemId: "item:lumber-camp-1",
+			state: {},
+			x: 1,
+			y: 0,
+			activation: {
+				inputs: [
+					{
+						capacity: 1,
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+						stored: 0,
+					},
+				],
+				kind: "producer",
+				requirements: [],
+				trigger: "click",
+			},
+		};
+
+		expect(
+			resolveBoardDropFeedback({
+				config,
+				board: boardView([
+					source,
+					target,
+				]),
+				context: context({
+					source: {
+						kind: "board",
+						boardItemId: source.id,
+						itemId: source.itemId,
+						boardItem: source,
+					},
+					target: {
+						kind: "cell",
+						x: target.x,
+						y: target.y,
+						boardItemId: target.id,
+					},
+					targetTile: {
+						id: target.id,
+						slotId: "1:0",
+						data: {
+							kind: "board-item",
+							boardItemId: target.id,
+						},
+					},
+				}),
+			}),
+		).toEqual({
+			effect: "merge",
+			variant: "secondary",
 		});
 	});
 

@@ -60,7 +60,12 @@ export const resolveInventoryCellDrop = ({
 	}
 
 	if (action.type === "apply-inventory-item-to-board-item") {
-		return acceptDrop(() => actions.applyInventoryItemToBoardItem(action.input));
+		return acceptDrop(async () => {
+			await actions.applyInventoryItemToBoardItem(action.input);
+			if (action.feedback) {
+				feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
+			}
+		});
 	}
 
 	return acceptDrop(() => actions.placeInventoryItem(action.input));

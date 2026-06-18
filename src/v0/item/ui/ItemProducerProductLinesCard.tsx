@@ -29,7 +29,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 			</p>
 			<div className="mt-3 space-y-2">
 				{lines.map((line) => {
-					const canStart = line.enabled && line.inputItemIds.length === 0;
+					const canStart =
+						line.enabled && line.inputItemIds.length === 0 && !line.queueFull;
 					const remainingMs = line.readyAtMs
 						? Math.max(0, line.readyAtMs - nowMs)
 						: undefined;
@@ -48,6 +49,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								<div className="min-w-0">
 									<p className="font-bold text-slate-100">{line.name}</p>
 									<p className="mt-1 text-[0.7rem] text-slate-400">
+										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
 										{formatMs(line.durationMs)}
 										{line.inputItemIds.length
 											? ` · needs ${line.inputItemIds.length} input type${line.inputItemIds.length === 1 ? "" : "s"}`
@@ -109,7 +111,11 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 										: "bg-slate-800 text-slate-500",
 								)}
 							>
-								{line.inputItemIds.length ? "Feed items by drag" : "Start"}
+								{line.queueFull
+									? "Queue full"
+									: line.inputItemIds.length
+										? "Feed items by drag"
+										: "Start"}
 							</button>
 						</div>
 					);

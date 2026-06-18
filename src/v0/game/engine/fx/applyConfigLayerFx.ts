@@ -13,6 +13,26 @@ export const applyConfigLayerFx = Effect.fn("applyConfigLayerFx")(function* ({
 	config,
 	layer,
 }: applyConfigLayerFx.Props) {
+	const producers = Object.fromEntries(
+		Object.entries(config.producers).map(([producerId, producer]) => {
+			const producerLayer = layer.producers[producerId];
+			if (!producerLayer) {
+				return [
+					producerId,
+					producer,
+				];
+			}
+
+			return [
+				producerId,
+				{
+					...producer,
+					maxQueueSize: producerLayer.maxQueueSize ?? producer.maxQueueSize,
+				},
+			];
+		}),
+	);
+
 	const products = Object.fromEntries(
 		Object.entries(config.products).map(([productId, product]) => {
 			const productLayer = layer.products[productId];
@@ -43,6 +63,7 @@ export const applyConfigLayerFx = Effect.fn("applyConfigLayerFx")(function* ({
 
 	return {
 		...config,
+		producers,
 		products,
 	} satisfies GameConfig;
 });

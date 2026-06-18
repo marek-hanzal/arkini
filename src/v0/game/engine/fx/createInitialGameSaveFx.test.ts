@@ -57,6 +57,7 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 		merge: {},
 		producers: {
 			"producer:test": {
+				maxQueueSize: 1,
 				productIds: [
 					"product:test",
 				],

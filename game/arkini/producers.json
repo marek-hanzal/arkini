@@ -5,119 +5,136 @@
 				"product:coal-mine-1"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:lumber-camp-1": {
 			"productIds": [
 				"product:lumber-camp-1"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:lumber-camp-2": {
 			"productIds": [
 				"product:lumber-camp-2"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:lumber-camp-3": {
 			"productIds": [
 				"product:lumber-camp-3"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:lumber-camp-4": {
 			"productIds": [
 				"product:lumber-camp-4"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:lumber-camp-5": {
 			"productIds": [
 				"product:lumber-camp-5"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:quarry-1": {
 			"productIds": [
 				"product:quarry-1"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:quarry-2": {
 			"productIds": [
 				"product:quarry-2"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:quarry-3": {
 			"productIds": [
 				"product:quarry-3"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:quarry-4": {
 			"productIds": [
 				"product:quarry-4"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:quarry-5": {
 			"productIds": [
 				"product:quarry-5"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:townhall-1": {
 			"productIds": [
 				"product:townhall-1"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:townhall-2": {
 			"productIds": [
 				"product:townhall-2"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:townhall-3": {
 			"productIds": [
 				"product:townhall-3"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:townhall-4": {
 			"productIds": [
 				"product:townhall-4"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:townhall-5": {
 			"productIds": [
 				"product:townhall-5"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		},
 		"producer:tree": {
 			"productIds": [
 				"product:tree"
 			],
 			"requirements": [],
-			"type": "producer"
+			"type": "producer",
+			"maxQueueSize": 1
 		}
 	}
 }

@@ -36,7 +36,8 @@ import { z } from "zod";
  *   spatial adjacency or aura rules.
  * - Producer `productIds` are ordered production lines. If multiple lines can use the
  *   same input, runtime should feed/start them from top to bottom unless the player has
- *   disabled a line in save state.
+ *   disabled a line in save state. `maxQueueSize` is a hard per-producer-instance cap
+ *   covering both running and queued jobs.
  * - Product and craft inputs are consumed at start. Outputs/results are emitted at
  *   completion. Craft requirements are non-consumed gating/tool items and must be able
  *   to return together with the craft result before the craft can complete.
@@ -77,6 +78,7 @@ import { z } from "zod";
  *   "producers": {
  *     "producer:lumber-camp": {
  *       "type": "producer",
+ *       "maxQueueSize": 1,
  *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
  *       "requirements": []
  *     }
@@ -332,6 +334,7 @@ const ItemDefinitionSchema = z
 const ProducerDefinitionSchema = z
 	.object({
 		type: z.literal("producer"),
+		maxQueueSize: PositiveIntegerSchema,
 		productIds: z.array(IdSchema).min(1),
 		requirements: ActivationRequirementSchema,
 	})
@@ -425,6 +428,13 @@ const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
 			type: z.literal("product.input.quantity.add"),
 			productId: IdSchema,
 			itemId: IdSchema,
+			quantity: SignedIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("producer.maxQueueSize.add"),
+			producerId: IdSchema,
 			quantity: SignedIntegerSchema,
 		})
 		.strict(),
@@ -844,6 +854,25 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			}
 
 			for (const [effectIndex, effect] of tier.effects.entries()) {
+				if (effect.type === "producer.maxQueueSize.add") {
+					if (!hasProducer(effect.producerId)) {
+						addIssue(
+							ctx,
+							[
+								"upgrades",
+								upgradeId,
+								"tiers",
+								tierIndex,
+								"effects",
+								effectIndex,
+								"producerId",
+							],
+							`Missing producer "${effect.producerId}".`,
+						);
+					}
+					continue;
+				}
+
 				if (!hasProduct(effect.productId)) {
 					addIssue(
 						ctx,

@@ -20,9 +20,11 @@ Current architectural state:
 - Visual events are derived from engine domain events under `src/v0/play/game-engine-bridge` and registered into TileEngine motion from `GameRuntimeVisualEffects`.
 - Dev scenarios replace the runtime save directly.
 - Browser hard reset wipes Dexie save storage first, then best-effort OPFS/local/session storage and reloads. It is not a SQL database reset.
+- Producer queue size is now a config/runtime invariant. `producers.*.maxQueueSize` caps running+queued jobs per producer item instance; upgrades can adjust it through `producer.maxQueueSize.add`.
+- Runtime snapshots expose the effective config for the current save. `adapter.config` remains the immutable base config; `adapter.readSnapshot().config` is the layered config UI should read.
 
 Active follow-up after the SQLite removal pass:
 
 1. Run full local validation with dependencies: `npm run typecheck`, `npm run dc`, `npm run game:validate:default`, `npm run test`, `npm run build`.
 2. Continue runtime parity audit around remaining sheet actions and debug flows.
-3. Continue runtime parity audit and keep Dexie/IndexedDB outside the engine.
+3. Keep Dexie/IndexedDB outside the engine while adding any future persistence niceties.

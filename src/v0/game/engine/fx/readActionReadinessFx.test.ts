@@ -88,6 +88,40 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
+	it("returns rejected readiness when the producer queue is full", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+
+		const readiness = runReadiness({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toMatchObject({
+			errorTag: "GameActionRejected",
+			reason: "producer_queue_full",
+			type: "rejected",
+		});
+	});
+
 	it("returns rejected readiness for invalid action shape", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

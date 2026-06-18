@@ -13,6 +13,7 @@ export type GameEngineError =
 				| "missing_requirement"
 				| "placement_unavailable"
 				| "product_line_disabled"
+				| "producer_queue_full"
 				| "stash_depleted"
 				| "unsupported_target"
 				| "unsupported_requirement"

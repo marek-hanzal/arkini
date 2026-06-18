@@ -2693,6 +2693,7 @@
 	},
 	"producers": {
 		"producer:coal-mine-1": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:coal-mine-1"
 			],
@@ -2700,6 +2701,7 @@
 			"type": "producer"
 		},
 		"producer:lumber-camp-1": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:lumber-camp-1"
 			],
@@ -2707,6 +2709,7 @@
 			"type": "producer"
 		},
 		"producer:lumber-camp-2": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:lumber-camp-2"
 			],
@@ -2714,6 +2717,7 @@
 			"type": "producer"
 		},
 		"producer:lumber-camp-3": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:lumber-camp-3"
 			],
@@ -2721,6 +2725,7 @@
 			"type": "producer"
 		},
 		"producer:lumber-camp-4": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:lumber-camp-4"
 			],
@@ -2728,6 +2733,7 @@
 			"type": "producer"
 		},
 		"producer:lumber-camp-5": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:lumber-camp-5"
 			],
@@ -2735,6 +2741,7 @@
 			"type": "producer"
 		},
 		"producer:quarry-1": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:quarry-1"
 			],
@@ -2742,6 +2749,7 @@
 			"type": "producer"
 		},
 		"producer:quarry-2": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:quarry-2"
 			],
@@ -2749,6 +2757,7 @@
 			"type": "producer"
 		},
 		"producer:quarry-3": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:quarry-3"
 			],
@@ -2756,6 +2765,7 @@
 			"type": "producer"
 		},
 		"producer:quarry-4": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:quarry-4"
 			],
@@ -2763,6 +2773,7 @@
 			"type": "producer"
 		},
 		"producer:quarry-5": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:quarry-5"
 			],
@@ -2770,6 +2781,7 @@
 			"type": "producer"
 		},
 		"producer:townhall-1": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:townhall-1"
 			],
@@ -2777,6 +2789,7 @@
 			"type": "producer"
 		},
 		"producer:townhall-2": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:townhall-2"
 			],
@@ -2784,6 +2797,7 @@
 			"type": "producer"
 		},
 		"producer:townhall-3": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:townhall-3"
 			],
@@ -2791,6 +2805,7 @@
 			"type": "producer"
 		},
 		"producer:townhall-4": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:townhall-4"
 			],
@@ -2798,6 +2813,7 @@
 			"type": "producer"
 		},
 		"producer:townhall-5": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:townhall-5"
 			],
@@ -2805,6 +2821,7 @@
 			"type": "producer"
 		},
 		"producer:tree": {
+			"maxQueueSize": 1,
 			"productIds": [
 				"product:tree"
 			],

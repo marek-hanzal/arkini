@@ -5,7 +5,6 @@ import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
 import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
-import type { ItemId } from "~/v0/manifest/manifestId";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
@@ -22,7 +21,6 @@ export namespace ItemSheet {
 export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const board = useGameBoardView();
 	const items = useGameItemCatalogView();
-	const withdrawAction = useGameAction();
 	const productLineAction = useGameAction();
 	const nowMs = useProducerClock(board.items);
 	const boardItem = boardItemId ? board.byId[boardItemId] : undefined;
@@ -31,7 +29,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		craft: boardItem?.craft,
 		nowMs,
 	});
-	const actionError = productLineAction.error ?? withdrawAction.error;
+	const actionError = productLineAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 	const relations = useMemo(
 		() => ({
@@ -68,15 +66,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 			</section>
 		);
 	}
-
-	const withdraw = (itemId: ItemId) => {
-		void withdrawAction.run({
-			itemId,
-			quantity: 1,
-			targetItemInstanceId: boardItem.id,
-			type: "stored_requirement.withdraw",
-		});
-	};
 
 	const setProductLineEnabled = (productId: string, enabled: boolean) => {
 		void productLineAction.run({
@@ -136,8 +125,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					<ItemActivationInputsCard
 						activation={boardItem.activation}
 						items={items}
-						pending={withdrawAction.isPending}
-						onWithdraw={withdraw}
 					/>
 				) : null}
 				<ItemRelationList

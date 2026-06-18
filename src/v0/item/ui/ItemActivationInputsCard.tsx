@@ -1,22 +1,16 @@
 import type { FC } from "react";
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
-
 export namespace ItemActivationInputsCard {
 	export interface Props {
 		activation: ActivationView;
 		items: ItemCatalogView;
-		pending: boolean;
-		onWithdraw(itemId: ItemId): void;
 	}
 }
 
 export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 	activation,
 	items,
-	pending,
-	onWithdraw,
 }) => {
 	const title = activation.kind === "stash" ? "Stash inputs" : "Producer inputs";
 	const storedRequirements = activation.requirements.filter(
@@ -44,16 +38,8 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 							<span>
 								{items[requirement.itemId]?.name ?? requirement.itemId}:{" "}
 								{requirement.stored}/{requirement.capacity} stored, requires{" "}
-								{requirement.quantity}, not consumed
+								{requirement.quantity}. Drag matching items onto this tile.
 							</span>
-							<button
-								type="button"
-								disabled={requirement.stored <= 0 || pending}
-								onClick={() => onWithdraw(requirement.itemId)}
-								className="rounded-sm bg-slate-800 px-2 py-1 font-bold text-slate-200 disabled:opacity-35"
-							>
-								Withdraw
-							</button>
 						</div>
 					))}
 				</div>

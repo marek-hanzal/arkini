@@ -31,8 +31,14 @@ Recent runtime parity checkpoint:
 - Scheduled event blocks are retried after `blockedScheduledEventRetryDelayMs` instead of leaving `dueAtMs` in the past and hot-looping the auto ticker.
 - Debounced Dexie persistence flushes on pagehide/hidden as a best-effort safety net.
 
+Recent GameConfig hardening checkpoint:
+
+- `GameConfigSchema` now rejects duplicate authoring codes, duplicate producer product IDs, duplicate activation/craft inputs, duplicate activation requirements, duplicate item tags/merge IDs, item definitions that point at non-item assets, and activation/stored requirement capacities below required quantity.
+- Dedicated schema tests cover starting-state invariants plus these semantic authoring guards.
+- Keep using `parseGameConfig` as the shared CLI/runtime gate. Do not add a second validator that drifts into another tiny religion.
+
 Active follow-up after the SQLite removal pass:
 
-1. Run full local validation with dependencies: `npm run typecheck`, `npm run dc`, `npm run game:validate:default`, `npm run test`, `npm run build`.
+1. Storage/schema version migration policy for Dexie saves: save version, config hash mismatch, reset vs migrate vs repair.
 2. Continue runtime parity audit around remaining sheet actions and debug flows.
 3. Keep Dexie/IndexedDB outside the engine while adding any future persistence niceties.

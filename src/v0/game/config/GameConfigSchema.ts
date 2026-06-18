@@ -541,6 +541,25 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasCraftRecipe = createRecordGuard(value.craftRecipes);
 	const hasLootTable = createRecordGuard(value.lootTables);
 
+	validateUniqueRecordField(
+		ctx,
+		[
+			"items",
+		],
+		value.items,
+		"code",
+		(value) => `Duplicate item code "${value}".`,
+	);
+	validateUniqueRecordField(
+		ctx,
+		[
+			"upgrades",
+		],
+		value.upgrades,
+		"code",
+		(value) => `Duplicate upgrade code "${value}".`,
+	);
+
 	for (const [assetId, asset] of Object.entries(value.assets)) {
 		if (!hasResource(asset.resourceId)) {
 			addIssue(
@@ -568,7 +587,8 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [itemId, item] of Object.entries(value.items)) {
-		if (!hasAsset(item.assetId)) {
+		const itemAsset = value.assets[item.assetId];
+		if (!itemAsset) {
 			addIssue(
 				ctx,
 				[
@@ -578,7 +598,38 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				],
 				`Missing asset "${item.assetId}".`,
 			);
+		} else if (itemAsset.kind !== "item") {
+			addIssue(
+				ctx,
+				[
+					"items",
+					itemId,
+					"assetId",
+				],
+				`Item asset "${item.assetId}" must have kind "item".`,
+			);
 		}
+
+		validateUniqueStringList(
+			ctx,
+			[
+				"items",
+				itemId,
+				"mergeIds",
+			],
+			item.mergeIds ?? [],
+			(value) => `Duplicate merge "${value}".`,
+		);
+		validateUniqueStringList(
+			ctx,
+			[
+				"items",
+				itemId,
+				"tags",
+			],
+			item.tags,
+			(value) => `Duplicate tag "${value}".`,
+		);
 
 		for (const [index, mergeId] of (item.mergeIds ?? []).entries()) {
 			if (!hasMerge(mergeId)) {
@@ -675,6 +726,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [producerId, producer] of Object.entries(value.producers)) {
+		validateUniqueStringList(
+			ctx,
+			[
+				"producers",
+				producerId,
+				"productIds",
+			],
+			producer.productIds,
+			(value) => `Duplicate product "${value}".`,
+		);
+
 		for (const [index, productId] of producer.productIds.entries()) {
 			if (!hasProduct(productId)) {
 				addIssue(
@@ -1065,14 +1127,85 @@ const addIssue = (ctx: z.RefinementCtx, path: GameConfigIssuePath, message: stri
 	});
 };
 
+const validateUniqueStringList = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	values: readonly string[],
+	createMessage: (value: string) => string,
+) => {
+	const firstIndexByValue = new Map<string, number>();
+
+	for (const [index, value] of values.entries()) {
+		const firstIndex = firstIndexByValue.get(value);
+		if (firstIndex !== undefined) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+				],
+				createMessage(value),
+			);
+			continue;
+		}
+
+		firstIndexByValue.set(value, index);
+	}
+};
+
+const validateUniqueRecordField = <
+	RecordValue extends Readonly<Record<string, unknown>>,
+	Field extends keyof RecordValue,
+>(
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	record: Readonly<Record<string, RecordValue>>,
+	field: Field,
+	createMessage: (value: string) => string,
+) => {
+	const ownerIdByValue = new Map<string, string>();
+
+	for (const [entryId, entry] of Object.entries(record)) {
+		const value = entry[field];
+		if (typeof value !== "string") {
+			continue;
+		}
+
+		const previousOwnerId = ownerIdByValue.get(value);
+		if (previousOwnerId) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					entryId,
+					field as string,
+				],
+				`${createMessage(value)} First used by "${previousOwnerId}".`,
+			);
+			continue;
+		}
+
+		ownerIdByValue.set(value, entryId);
+	}
+};
+
 const validateItemInputs = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
 	inputs: readonly {
+		capacity: number;
 		itemId: string;
+		quantity: number;
 	}[],
 	hasItem: (itemId: string) => boolean,
 ) => {
+	validateUniqueStringList(
+		ctx,
+		path,
+		inputs.map((input) => input.itemId),
+		(value) => `Duplicate input item "${value}".`,
+	);
+
 	for (const [index, input] of inputs.entries()) {
 		if (!hasItem(input.itemId)) {
 			addIssue(
@@ -1083,6 +1216,18 @@ const validateItemInputs = (
 					"itemId",
 				],
 				`Missing item "${input.itemId}".`,
+			);
+		}
+
+		if (input.capacity < input.quantity) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+					"capacity",
+				],
+				`Capacity must be >= quantity (${input.quantity}).`,
 			);
 		}
 	}
@@ -1096,6 +1241,13 @@ const validateCraftRecipeInputs = (
 	}[],
 	hasItem: (itemId: string) => boolean,
 ) => {
+	validateUniqueStringList(
+		ctx,
+		path,
+		inputs.map((input) => input.itemId),
+		(value) => `Duplicate craft input item "${value}".`,
+	);
+
 	for (const [index, input] of inputs.entries()) {
 		if (!hasItem(input.itemId)) {
 			addIssue(
@@ -1115,10 +1267,25 @@ const validateItemRequirements = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
 	requirements: readonly {
+		capacity?: number;
 		itemId: string;
+		quantity: number;
+		scope?: string;
+		type: string;
 	}[],
 	hasItem: (itemId: string) => boolean,
 ) => {
+	validateUniqueStringList(
+		ctx,
+		path,
+		requirements.map((requirement) =>
+			requirement.type === "passive"
+				? `${requirement.type}:${requirement.itemId}:${requirement.scope}`
+				: `${requirement.type}:${requirement.itemId}`,
+		),
+		(value) => `Duplicate requirement "${value}".`,
+	);
+
 	for (const [index, requirement] of requirements.entries()) {
 		if (!hasItem(requirement.itemId)) {
 			addIssue(
@@ -1129,6 +1296,22 @@ const validateItemRequirements = (
 					"itemId",
 				],
 				`Missing item "${requirement.itemId}".`,
+			);
+		}
+
+		if (
+			requirement.type === "stored" &&
+			typeof requirement.capacity === "number" &&
+			requirement.capacity < requirement.quantity
+		) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+					"capacity",
+				],
+				`Capacity must be >= quantity (${requirement.quantity}).`,
 			);
 		}
 	}

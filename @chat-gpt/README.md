@@ -45,15 +45,16 @@ Recent GameConfig hardening checkpoint:
 - Keep using `parseGameConfig` as the shared CLI/runtime gate. Do not add a second validator that drifts into another tiny religion.
 
 
-GameConfig / tick engine brutal review checkpoint:
+GameConfig / tick engine stabilization checkpoint:
 
 - Current `main` has been checkpointed into branch `v0`; continue normal work on `main`.
-- See `@chat-gpt/v0/v0-game-config-tick-engine-brutal-review-2026-06-18.md` before the stabilization pass.
-- Highest-risk areas from the review: craft single-target job invariant, craft completion target semantics, craft/stash atomic completion vs scheduled visual sequencing, product input upgrade layer mutating shared `inputs`, zero-quantity effective inputs, capability/stateful items in stateless inventory stacks, and missing monotonic ID counter validation in `GameSaveConfigSchema`.
+- `@chat-gpt/v0/v0-game-config-tick-engine-brutal-review-2026-06-18.md` is the raw audit. `@chat-gpt/v0/v0-stabilization-epic-2026-06-18.md` is the corrected implementation epic after Marek clarified craft/inventory/overlay semantics.
+- Stabilization priority: craft is one board target -> one job -> one result replacement; craft/stash output should be atomic like producer; effective upgrades must validate against invalid zero/negative states; inventory may contain anything but stacks are stateless; `GameSaveConfigSchema` should guard monotonic ID counters; visual event flow needs either an exhaustive planner from engine events or a much stricter bridge.
 
 Current task candidates:
 
-1. Badge/visual polish: tighten tile badge offset toward the corner without redesigning the tile.
+1. V0 stabilization epic T1: craft single-job invariant and matching `GameSaveConfigSchema` guard.
+2. Badge/visual polish can wait; tiny UI cosmetics do not outrank save/model stabilization, no matter how shiny the little badge feels.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.
 

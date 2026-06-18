@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 import { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
-import { readGameRuntimeBoardView } from "~/v0/play/runtime/readGameRuntimeViews";
+import { readGameRuntimeBoardView } from "~/v0/play/runtime/readers";
 
 const createStore = async () => {
 	const config = createEngineTestConfig();

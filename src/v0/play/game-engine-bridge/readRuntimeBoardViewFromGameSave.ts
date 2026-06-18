@@ -503,6 +503,42 @@ const readRuntimeCraftView = ({
 	};
 };
 
+export namespace readRuntimeBoardItemViewFromGameSave {
+	export interface Props extends readRuntimeBoardViewFromGameSave.Props {
+		boardItemId: string;
+	}
+}
+
+export const readRuntimeBoardItemViewFromGameSave = ({
+	boardItemId,
+	config,
+	nowMs,
+	save,
+}: readRuntimeBoardItemViewFromGameSave.Props): BoardViewItem | undefined => {
+	const boardItem = save.board.items[boardItemId];
+	if (!boardItem) return undefined;
+
+	return {
+		activation: readRuntimeActivationView({
+			boardItem,
+			config,
+			nowMs,
+			save,
+		}),
+		craft: readRuntimeCraftView({
+			boardItem,
+			config,
+			nowMs,
+			save,
+		}),
+		id: boardItem.id,
+		itemId: boardItem.itemId as ItemId,
+		state: {},
+		x: boardItem.x,
+		y: boardItem.y,
+	};
+};
+
 export const readRuntimeBoardViewFromGameSave = ({
 	config,
 	nowMs,
@@ -513,27 +549,20 @@ export const readRuntimeBoardViewFromGameSave = ({
 			(left, right) =>
 				left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),
 		)
-		.map(
-			(boardItem): BoardViewItem => ({
-				activation: readRuntimeActivationView({
-					boardItem,
-					config,
-					nowMs,
-					save,
-				}),
-				craft: readRuntimeCraftView({
-					boardItem,
-					config,
-					nowMs,
-					save,
-				}),
-				id: boardItem.id,
-				itemId: boardItem.itemId as ItemId,
-				state: {},
-				x: boardItem.x,
-				y: boardItem.y,
-			}),
-		);
+		.flatMap((boardItem) => {
+			const view = readRuntimeBoardItemViewFromGameSave({
+				boardItemId: boardItem.id,
+				config,
+				nowMs,
+				save,
+			});
+
+			return view
+				? [
+						view,
+					]
+				: [];
+		});
 
 	return rebuildBoardView(items);
 };

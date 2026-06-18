@@ -9,7 +9,7 @@ import type {
 	SaveActiveGameSaveProps,
 } from "~/v0/game/storage";
 import { createPersistentGameRuntimeStore } from "~/v0/play/runtime/createPersistentGameRuntimeStore";
-import { readGameRuntimeBoardView } from "~/v0/play/runtime/readGameRuntimeViews";
+import { readGameRuntimeBoardView } from "~/v0/play/runtime/readers";
 
 const createInitialSave = async (): Promise<GameSave> => {
 	const adapter = await RuntimeGameEngineAdapter.create({

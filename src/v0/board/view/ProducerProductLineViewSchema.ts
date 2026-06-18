@@ -12,6 +12,8 @@ export const ProducerProductLineViewSchema = z.object({
 	queueFull: z.boolean(),
 	queueSize: z.number().int().positive(),
 	queuedJobs: z.number().int().nonnegative(),
+	requirementsReady: z.boolean(),
+	missingRequirementItemIds: z.array(IdSchema),
 	startedAtMs: z.number().int().nonnegative().optional(),
 	readyAtMs: z.number().int().nonnegative().optional(),
 	progress: z.number().min(0).max(1).optional(),

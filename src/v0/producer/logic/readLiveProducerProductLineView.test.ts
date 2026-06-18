@@ -14,6 +14,8 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	queueFull: true,
 	queueSize: 1,
 	queuedJobs: 1,
+	requirementsReady: true,
+	missingRequirementItemIds: [],
 	readyAtMs: 1000,
 	requirementItemIds: [],
 	startedAtMs: 0,

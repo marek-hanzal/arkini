@@ -132,10 +132,84 @@ const productLineEnabled = ({
 	targetItemInstanceId: string;
 }) => !(save.producerLines[targetItemInstanceId]?.disabledProductIds ?? []).includes(productId);
 
+const passiveItemQuantity = ({
+	itemId,
+	save,
+	scope,
+}: {
+	itemId: string;
+	save: GameSave;
+	scope: "board" | "inventory" | "board_or_inventory";
+}) => {
+	let quantity = 0;
+
+	if (scope === "board" || scope === "board_or_inventory") {
+		quantity += Object.values(save.board.items).filter((item) => item.itemId === itemId).length;
+	}
+
+	if (scope === "inventory" || scope === "board_or_inventory") {
+		quantity += save.inventory.slots.reduce(
+			(total, slot) => total + (slot?.itemId === itemId ? slot.quantity : 0),
+			0,
+		);
+	}
+
+	return quantity;
+};
+
+const missingRequirementItemIds = ({
+	requirements,
+	save,
+	targetItemInstanceId,
+}: {
+	requirements: readonly (
+		| {
+				itemId: string;
+				quantity: number;
+				type: "stored";
+		  }
+		| {
+				itemId: string;
+				quantity: number;
+				scope: "board" | "inventory" | "board_or_inventory";
+				type: "passive";
+		  }
+	)[];
+	save: GameSave;
+	targetItemInstanceId: string;
+}) => [
+	...new Set(
+		requirements.flatMap((requirement) => {
+			if (requirement.type === "stored") {
+				return storedQuantity({
+					itemId: requirement.itemId,
+					save,
+					targetItemInstanceId,
+				}) >= requirement.quantity
+					? []
+					: [
+							requirement.itemId,
+						];
+			}
+
+			return passiveItemQuantity({
+				itemId: requirement.itemId,
+				save,
+				scope: requirement.scope,
+			}) >= requirement.quantity
+				? []
+				: [
+						requirement.itemId,
+					];
+		}),
+	),
+];
+
 const readProductLineViews = ({
 	config,
 	maxQueueSize,
 	nowMs,
+	producerRequirements,
 	productIds,
 	save,
 	targetItemInstanceId,
@@ -143,6 +217,7 @@ const readProductLineViews = ({
 	config: GameConfig;
 	maxQueueSize: number;
 	nowMs: number;
+	producerRequirements: GameConfig["producers"][string]["requirements"];
 	productIds: readonly string[];
 	save: GameSave;
 	targetItemInstanceId: string;
@@ -156,6 +231,18 @@ const readProductLineViews = ({
 		const product = config.products[productId];
 		if (!product) return [];
 
+		const requirements = [
+			...producerRequirements,
+			...product.requirements,
+		];
+		const requirementItemIds = [
+			...new Set(requirements.map((requirement) => requirement.itemId as ItemId)),
+		];
+		const missingRequirements = missingRequirementItemIds({
+			requirements,
+			save,
+			targetItemInstanceId,
+		});
 		const jobs = Object.values(save.producerJobs)
 			.filter(
 				(job) =>
@@ -196,10 +283,10 @@ const readProductLineViews = ({
 				queueFull,
 				queueSize: maxQueueSize,
 				queuedJobs: jobs.length,
+				requirementsReady: missingRequirements.length === 0,
+				missingRequirementItemIds: missingRequirements as ItemId[],
 				readyAtMs: activeJob?.completesAtMs,
-				requirementItemIds: product.requirements.map(
-					(requirement) => requirement.itemId as ItemId,
-				),
+				requirementItemIds,
 				startedAtMs: activeJob?.startedAtMs,
 			},
 		];
@@ -284,6 +371,7 @@ const readRuntimeActivationView = ({
 				config,
 				maxQueueSize: producer.maxQueueSize,
 				nowMs,
+				producerRequirements: producer.requirements,
 				productIds: producer.productIds,
 				save,
 				targetItemInstanceId: boardItem.id,

@@ -55,3 +55,10 @@ GameSave schema validation checkpoint:
 - `GameSaveSchema` owns raw document shape; `GameSaveConfigSchema.superRefine` owns config-aware invariants such as board bounds/unique cells, inventory slot count/max stack sizes, producer queue caps including completed queue upgrades, job target references, stash/stored requirement state, upgrade progress and scheduled event references.
 - Dexie storage receives `config` and calls `GameSaveConfigSchema` on load/save. Invalid semantic save state is wiped through the existing drop-and-fresh policy.
 - Do not scatter save invariant checks into storage, React runtime, UI views or feature modules. Those layers may perform action-readiness/user-intent checks, but persisted save integrity belongs to the schema layer.
+
+Stored requirements runtime checkpoint:
+
+- Stored requirements live in `save.storedRequirements[targetItemInstanceId].items` and are validated centrally by `GameSaveConfigSchema`.
+- Producer/stash readiness gates against stored quantities on the target board item; store/withdraw actions modify the same save bucket.
+- Product line views expose `requirementsReady` and `missingRequirementItemIds` so no-input product buttons are disabled with `Store requirements` until stored/passive requirements are satisfied.
+- Do not move this into storage/UI validation. UI flags are readiness hints; save integrity stays schema-owned.

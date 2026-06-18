@@ -35,7 +35,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						nowMs,
 					});
 					const canStart =
-						line.enabled && line.inputItemIds.length === 0 && !line.queueFull;
+						line.enabled &&
+						line.inputItemIds.length === 0 &&
+						line.requirementsReady &&
+						!line.queueFull;
 					const remainingMs = line.readyAtMs
 						? Math.max(0, line.readyAtMs - nowMs)
 						: undefined;
@@ -61,6 +64,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											: " · tap to run"}
 										{line.requirementItemIds.length
 											? ` · ${line.requirementItemIds.length} requirement${line.requirementItemIds.length === 1 ? "" : "s"}`
+											: ""}
+										{line.missingRequirementItemIds.length
+											? ` · missing ${line.missingRequirementItemIds.length}`
 											: ""}
 									</p>
 								</div>
@@ -120,7 +126,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									? "Queue full"
 									: line.inputItemIds.length
 										? "Feed items by drag"
-										: "Start"}
+										: !line.requirementsReady
+											? "Store requirements"
+											: "Start"}
 							</button>
 						</div>
 					);

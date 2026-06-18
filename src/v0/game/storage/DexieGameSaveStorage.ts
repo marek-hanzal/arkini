@@ -12,6 +12,8 @@ import {
 
 export const defaultDexieGameSaveDatabaseName = "arkini-v0-game-storage";
 
+const gameSaveDocumentVersion = 1;
+
 class DexieGameSaveDatabase extends Dexie {
 	saves!: Table<GameSaveStorageRecord, string>;
 
@@ -31,6 +33,13 @@ export namespace DexieGameSaveStorage {
 
 const readSaveId = (saveId: string | undefined) => saveId ?? activeGameSaveId;
 
+const isRecoverableDexieSchemaError = (error: unknown) =>
+	error instanceof Error &&
+	[
+		"VersionError",
+		"UpgradeError",
+	].includes(error.name);
+
 export class DexieGameSaveStorage implements CloseableGameSaveStorage {
 	private database: DexieGameSaveDatabase;
 	private readonly databaseName: string;
@@ -42,49 +51,92 @@ export class DexieGameSaveStorage implements CloseableGameSaveStorage {
 		this.database = new DexieGameSaveDatabase(databaseName);
 	}
 
-	async loadActiveSave({
-		configHash,
-		gameId,
-		saveId,
-	}: GameSaveStorageScope): Promise<GameSave | null> {
-		const record = await this.database.saves.get(readSaveId(saveId));
-		if (!record) return null;
-		if (record.schemaVersion !== gameSaveStorageSchemaVersion) return null;
-		if (record.gameId !== gameId) return null;
-		if (record.configHash !== configHash) return null;
-		if (record.saveVersion !== 1) return null;
-
-		const parsed = GameSaveSchema.safeParse(record.save);
-		if (!parsed.success) return null;
-		if (parsed.data.gameId !== gameId) return null;
-
-		return parsed.data;
+	async loadActiveSave(scope: GameSaveStorageScope): Promise<GameSave | null> {
+		return this.withSchemaRefresh(() => this.loadActiveSaveFromCurrentDatabase(scope));
 	}
 
 	async saveActiveSave({ configHash, save, saveId }: SaveActiveGameSaveProps) {
 		const parsed = GameSaveSchema.parse(save);
-		await this.database.saves.put({
-			id: readSaveId(saveId),
-			configHash,
-			gameId: parsed.gameId,
-			save: parsed,
-			saveVersion: parsed.version,
-			schemaVersion: gameSaveStorageSchemaVersion,
-			updatedAtMs: parsed.updatedAtMs,
-		});
+		await this.withSchemaRefresh(() =>
+			this.database.saves.put({
+				id: readSaveId(saveId),
+				configHash,
+				gameId: parsed.gameId,
+				save: parsed,
+				saveVersion: parsed.version,
+				schemaVersion: gameSaveStorageSchemaVersion,
+				updatedAtMs: parsed.updatedAtMs,
+			}),
+		);
 	}
 
 	async deleteActiveSave({ saveId }: DeleteActiveGameSaveProps = {}) {
-		await this.database.saves.delete(readSaveId(saveId));
+		await this.withSchemaRefresh(() => this.database.saves.delete(readSaveId(saveId)));
 	}
 
 	async wipe() {
-		await this.database.delete();
+		this.database.close();
+		await Dexie.delete(this.databaseName);
 		this.database = new DexieGameSaveDatabase(this.databaseName);
 	}
 
 	close() {
 		this.database.close();
+	}
+
+	private async loadActiveSaveFromCurrentDatabase({
+		configHash,
+		gameId,
+		saveId,
+	}: GameSaveStorageScope) {
+		const record = await this.database.saves.get(readSaveId(saveId));
+		if (!record) return null;
+
+		if (
+			!this.isRecordCompatible(record, {
+				configHash,
+				gameId,
+			})
+		) {
+			await this.wipe();
+			return null;
+		}
+
+		const parsed = GameSaveSchema.safeParse(record.save);
+		if (!parsed.success || parsed.data.gameId !== gameId) {
+			await this.wipe();
+			return null;
+		}
+
+		return parsed.data;
+	}
+
+	private isRecordCompatible(
+		record: GameSaveStorageRecord,
+		{
+			configHash,
+			gameId,
+		}: {
+			configHash: string;
+			gameId: string;
+		},
+	) {
+		return (
+			record.schemaVersion === gameSaveStorageSchemaVersion &&
+			record.saveVersion === gameSaveDocumentVersion &&
+			record.gameId === gameId &&
+			record.configHash === configHash
+		);
+	}
+
+	private async withSchemaRefresh<T>(run: () => Promise<T>): Promise<T> {
+		try {
+			return await run();
+		} catch (error) {
+			if (!isRecoverableDexieSchemaError(error)) throw error;
+			await this.wipe();
+			return await run();
+		}
 	}
 }
 

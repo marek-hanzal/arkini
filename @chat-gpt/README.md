@@ -42,3 +42,9 @@ Active follow-up after the SQLite removal pass:
 1. Storage/schema version migration policy for Dexie saves: save version, config hash mismatch, reset vs migrate vs repair.
 2. Continue runtime parity audit around remaining sheet actions and debug flows.
 3. Keep Dexie/IndexedDB outside the engine while adding any future persistence niceties.
+
+Dexie destructive refresh checkpoint:
+
+- Prototype storage compatibility is intentionally coarse. If a Dexie save record has a stale storage schema version, stale save document version, mismatched game id/config hash or invalid `GameSave` payload, `DexieGameSaveStorage.loadActiveSave` wipes the whole save database and returns `null`.
+- `createPersistentGameRuntimeStore` then creates and persists a fresh initial save. Do not add partial IndexedDB migrations while the v0 save shape is still moving quickly.
+- Recoverable Dexie schema open/upgrade errors are treated the same way: drop the Dexie database and retry the operation against a fresh schema.

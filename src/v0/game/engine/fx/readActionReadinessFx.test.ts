@@ -20,9 +20,9 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -43,9 +43,9 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:shred",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -73,9 +73,9 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -107,9 +107,9 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,
@@ -139,9 +139,7 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				inputRefs: [],
 				recipeId: "craft:plank",
-				requirementRefs: [],
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.start",
 			},
@@ -231,9 +229,9 @@ describe("readActionReadinessFx", () => {
 
 		runReadiness({
 			action: {
-				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
+				inputRefs: [],
 				type: "producer.product.start",
 			},
 			config,

@@ -238,4 +238,53 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.success).toBe(false);
 		expect(result.error?.issues[0]?.message).toContain("capacity");
 	});
+
+	it("rejects craft inputs above their recipe quantity", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 3,
+			},
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("recipe input quantity");
+	});
+
+	it("rejects editable craft inputs on a running craft target", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 1,
+			},
+		};
+		invalidSave.craftJobs["job:1"] = createCraftJob("job:1", "item-instance:1");
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("must not have editable input state");
+	});
 });

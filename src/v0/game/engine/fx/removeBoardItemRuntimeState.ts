@@ -9,6 +9,7 @@ export const removeBoardItemRuntimeState = ({
 }) => {
 	delete save.stashes[itemInstanceId];
 	delete save.producerLines[itemInstanceId];
+	delete save.craftInputs[itemInstanceId];
 	delete save.storedRequirements[itemInstanceId];
 
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {

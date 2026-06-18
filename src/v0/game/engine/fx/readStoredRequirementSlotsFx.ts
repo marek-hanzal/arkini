@@ -60,6 +60,19 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 		}
 	}
 
+	if (item.craftRecipeId) {
+		const recipe = config.craftRecipes[item.craftRecipeId];
+		if (!recipe) {
+			return yield* Effect.fail(
+				GameEngineError.configReferenceMissing(
+					`Craft item "${targetItem.itemId}" references missing recipe "${item.craftRecipeId}".`,
+				),
+			);
+		}
+
+		requirements.push(...recipe.requirements);
+	}
+
 	if (item.stashId) {
 		const stash = config.stashes[item.stashId];
 		if (!stash) {

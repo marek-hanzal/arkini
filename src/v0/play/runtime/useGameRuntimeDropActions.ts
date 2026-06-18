@@ -64,6 +64,9 @@ const storedRequirementAcceptsItem = ({
 			? (config.producers[targetItem.producerId]?.requirements ?? [])
 			: []),
 		...productRequirements,
+		...(targetItem.craftRecipeId
+			? (config.craftRecipes[targetItem.craftRecipeId]?.requirements ?? [])
+			: []),
 		...(targetItem.stashId ? (config.stashes[targetItem.stashId]?.requirements ?? []) : []),
 	];
 	const storedItems = save.storedRequirements[target.id]?.items ?? {};
@@ -113,6 +116,31 @@ const productIdForInput = ({
 			save.producerInputs[target.id]?.productInputs[productId]?.items[sourceItemId] ?? 0;
 		return storedQuantity < input.capacity;
 	});
+};
+
+const craftAcceptsInput = ({
+	config,
+	save,
+	sourceItemId,
+	target,
+}: {
+	config: GameConfig;
+	save: GameSave;
+	sourceItemId: string;
+	target: GameSaveBoardItem;
+}) => {
+	if (Object.values(save.craftJobs).some((job) => job.targetItemInstanceId === target.id)) {
+		return false;
+	}
+
+	const targetItem = config.items[target.itemId];
+	const recipeId = targetItem?.craftRecipeId;
+	const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
+	const input = recipe?.inputs.find((candidate) => candidate.itemId === sourceItemId);
+	if (!input) return false;
+
+	const storedQuantity = save.craftInputs[target.id]?.items[sourceItemId] ?? 0;
+	return storedQuantity < input.quantity;
 };
 
 const stashAcceptsInput = ({
@@ -179,19 +207,19 @@ const dispatchApplyItemToBoardItem = ({
 		});
 	}
 
-	const targetItem = config.items[target.itemId];
-	const recipeId = targetItem?.craftRecipeId;
-	const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
-	if (recipeId && recipe?.inputs.some((input) => input.itemId === sourceItemId)) {
+	if (
+		craftAcceptsInput({
+			config,
+			save,
+			sourceItemId,
+			target,
+		})
+	) {
 		return store.dispatch({
 			action: {
-				inputRefs: [
-					sourceRef,
-				],
-				recipeId,
-				requirementRefs: [],
+				inputRef: sourceRef,
 				targetItemInstanceId: target.id,
-				type: "craft.start",
+				type: "craft.input.store",
 			},
 		});
 	}

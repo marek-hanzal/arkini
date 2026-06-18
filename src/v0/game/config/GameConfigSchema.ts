@@ -40,9 +40,9 @@ import { z } from "zod";
  *   enabled lines can accept the same dragged input, runtime feeds them from top to
  *   bottom. `maxQueueSize` is a hard per-producer-instance cap
  *   covering both running and queued jobs.
- * - Product and craft inputs are consumed at start. Outputs/results are emitted at
- *   completion. Craft requirements are non-consumed gating/tool items and must be able
- *   to return together with the craft result before the craft can complete.
+ * - Product inputs are stored per product line. Craft inputs are stored per craft
+ *   target instance until the player explicitly starts the craft. Completion replaces
+ *   the target with exactly one result item.
  * - A product without `outputTableId` is valid. That is a delayed sink/destructor such
  *   as a shredder.
  * - `items.*.removeBy` is a generic board/tile removal rule. It is not producer logic.
@@ -156,7 +156,7 @@ const ItemStackInputSchema = z
 	})
 	.strict();
 
-/** Craft input consumed or preserved at craft start; craft has no stored capacity slot. */
+/** Craft input slot gradually filled on the concrete craft target before explicit start. */
 const CraftRecipeInputSchema = z
 	.object({
 		itemId: IdSchema,
@@ -381,8 +381,8 @@ const StashDefinitionSchema = z
 /**
  * Delayed recipe outside two-item merge.
  *
- * Inputs and stored requirements are handled at start. Completion replaces the target
- * item in-place with exactly one result item.
+ * Inputs are gradually stored on the concrete target before explicit start. Completion
+ * replaces the target item in-place with exactly one result item.
  */
 const CraftRecipeSchema = z
 	.object({

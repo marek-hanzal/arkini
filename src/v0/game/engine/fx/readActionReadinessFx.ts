@@ -3,6 +3,8 @@ import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
 import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
 import { match } from "ts-pattern";
 import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
+import { checkCraftInputStoreReadinessFx } from "~/v0/game/engine/fx/checkCraftInputStoreReadinessFx";
+import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkCraftInputWithdrawReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
 import { checkProducerInputStoreReadinessFx } from "~/v0/game/engine/fx/checkProducerInputStoreReadinessFx";
 import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkProducerInputWithdrawReadinessFx";
@@ -58,6 +60,28 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					type: "board.items.swap",
 				},
 				() => Effect.succeed(undefined),
+			)
+			.with(
+				{
+					type: "craft.input.store",
+				},
+				(storeCraftInputAction) =>
+					checkCraftInputStoreReadinessFx({
+						action: storeCraftInputAction,
+						config: gameConfig.config,
+						save,
+					}),
+			)
+			.with(
+				{
+					type: "craft.input.withdraw",
+				},
+				(withdrawCraftInputAction) =>
+					checkCraftInputWithdrawReadinessFx({
+						action: withdrawCraftInputAction,
+						config: gameConfig.config,
+						save,
+					}),
 			)
 			.with(
 				{

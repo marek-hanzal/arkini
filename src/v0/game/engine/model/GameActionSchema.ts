@@ -4,6 +4,8 @@ import { GameActionBoardItemStashSchema } from "~/v0/game/engine/model/GameActio
 import { GameActionBoardItemsSwapSchema } from "~/v0/game/engine/model/GameActionBoardItemsSwapSchema";
 import { GameActionInventoryItemPlaceSchema } from "~/v0/game/engine/model/GameActionInventoryItemPlaceSchema";
 import { GameActionInventorySlotsSwapSchema } from "~/v0/game/engine/model/GameActionInventorySlotsSwapSchema";
+import { GameActionCraftInputStoreSchema } from "~/v0/game/engine/model/GameActionCraftInputStoreSchema";
+import { GameActionCraftInputWithdrawSchema } from "~/v0/game/engine/model/GameActionCraftInputWithdrawSchema";
 import { GameActionCraftStartSchema } from "~/v0/game/engine/model/GameActionCraftStartSchema";
 import { GameActionItemMergeSchema } from "~/v0/game/engine/model/GameActionItemMergeSchema";
 import { GameActionProducerInputStoreSchema } from "~/v0/game/engine/model/GameActionProducerInputStoreSchema";
@@ -20,6 +22,8 @@ export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionBoardItemMoveSchema,
 	GameActionBoardItemStashSchema,
 	GameActionBoardItemsSwapSchema,
+	GameActionCraftInputStoreSchema,
+	GameActionCraftInputWithdrawSchema,
 	GameActionCraftStartSchema,
 	GameActionItemMergeSchema,
 	GameActionInventoryItemPlaceSchema,

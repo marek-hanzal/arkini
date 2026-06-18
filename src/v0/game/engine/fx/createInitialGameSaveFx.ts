@@ -60,6 +60,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 			items: boardItems,
 		},
 		createdAtMs: nowMs,
+		craftInputs: {},
 		craftJobs: {},
 		gameId: config.game.id,
 		inventory: {

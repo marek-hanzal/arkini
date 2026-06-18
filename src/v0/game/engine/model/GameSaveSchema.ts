@@ -112,6 +112,12 @@ export const GameSaveProducerInputStateSchema = z
 	})
 	.strict();
 
+export const GameSaveCraftInputStateSchema = z
+	.object({
+		items: z.record(IdSchema, PositiveIntegerSchema),
+	})
+	.strict();
+
 export const GameSaveStoredRequirementStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
@@ -183,6 +189,7 @@ export const GameSaveSchema = z
 		producerLines: z.record(IdSchema, GameSaveProducerLineStateSchema),
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
+		craftInputs: z.record(IdSchema, GameSaveCraftInputStateSchema),
 		upgradeJobs: z.record(IdSchema, GameSaveUpgradeJobSchema),
 		upgrades: z.record(IdSchema, GameSaveUpgradeStateSchema),
 		stashes: z.record(IdSchema, GameSaveStashStateSchema),
@@ -264,6 +271,11 @@ const readStoredRequirementSlots = ({
 				if (product) requirements.push(...product.requirements);
 			}
 		}
+	}
+
+	if (target.item.craftRecipeId) {
+		const recipe = config.craftRecipes[target.item.craftRecipeId];
+		if (recipe) requirements.push(...recipe.requirements);
 	}
 
 	if (target.item.stashId) {
@@ -823,6 +835,69 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	for (const [targetItemInstanceId, state] of Object.entries(save.craftInputs)) {
+		const target = readBoardItemDefinition({
+			config,
+			itemInstanceId: targetItemInstanceId,
+			save,
+		});
+		const recipeId = target?.item.craftRecipeId;
+		const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
+		if (!target || !recipeId || !recipe) {
+			addSaveIssue(
+				ctx,
+				[
+					"craftInputs",
+					targetItemInstanceId,
+				],
+				`Craft input state target "${targetItemInstanceId}" must reference a craft item.`,
+			);
+			continue;
+		}
+
+		const runningJobId = runningCraftJobsByTargetItemInstanceId.get(targetItemInstanceId);
+		if (runningJobId) {
+			addSaveIssue(
+				ctx,
+				[
+					"craftInputs",
+					targetItemInstanceId,
+				],
+				`Craft target "${targetItemInstanceId}" has running job "${runningJobId}" and must not have editable input state.`,
+			);
+		}
+
+		for (const [itemId, quantity] of Object.entries(state.items)) {
+			const inputSlot = recipe.inputs.find((input) => input.itemId === itemId);
+			if (!inputSlot) {
+				addSaveIssue(
+					ctx,
+					[
+						"craftInputs",
+						targetItemInstanceId,
+						"items",
+						itemId,
+					],
+					`Craft recipe "${recipeId}" has no input "${itemId}".`,
+				);
+				continue;
+			}
+
+			if (quantity > inputSlot.quantity) {
+				addSaveIssue(
+					ctx,
+					[
+						"craftInputs",
+						targetItemInstanceId,
+						"items",
+						itemId,
+					],
+					`Craft input quantity must be <= recipe input quantity (${inputSlot.quantity}).`,
+				);
+			}
+		}
+	}
+
 	const runningUpgradeJobs = new Set<string>();
 	for (const [jobId, job] of Object.entries(save.upgradeJobs)) {
 		if (job.id !== jobId) {
@@ -1038,6 +1113,7 @@ export type GameSaveProducerProductInputState = z.infer<
 	typeof GameSaveProducerProductInputStateSchema
 >;
 export type GameSaveProducerInputState = z.infer<typeof GameSaveProducerInputStateSchema>;
+export type GameSaveCraftInputState = z.infer<typeof GameSaveCraftInputStateSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
 export type GameSaveStoredRequirementState = z.infer<typeof GameSaveStoredRequirementStateSchema>;

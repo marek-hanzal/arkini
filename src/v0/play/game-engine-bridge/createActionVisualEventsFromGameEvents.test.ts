@@ -321,4 +321,34 @@ describe("createActionVisualEventsFromGameEvents", () => {
 			},
 		]);
 	});
+
+	it("maps craft input withdraw to craft sequenced spawn visuals", () => {
+		const visualEvents = map([
+			{
+				itemId: "item:twig",
+				originItemInstanceId: "craft-1",
+				reason: "craft-input-withdraw",
+				to: {
+					kind: "board",
+					itemInstanceId: "spawn-1",
+					x: 1,
+					y: 0,
+				},
+				type: "item.created",
+			},
+		]);
+
+		expect(visualEvents).toMatchObject([
+			{
+				animation: {
+					cause: "craft",
+					mode: "sequence",
+					sequenceIndex: 0,
+				},
+				itemInstanceId: "spawn-1",
+				reason: "craft-input-withdraw",
+				type: "item.spawned",
+			},
+		]);
+	});
 });

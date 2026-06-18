@@ -1,14 +1,11 @@
 import { z } from "zod";
-import { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
 
 const IdSchema = z.string().min(1);
 
 export const GameActionCraftStartSchema = z
 	.object({
-		inputRefs: z.array(GameActionItemRefSchema),
 		recipeId: IdSchema,
 		targetItemInstanceId: IdSchema,
-		requirementRefs: z.array(GameActionItemRefSchema),
 		type: z.literal("craft.start"),
 	})
 	.strict();

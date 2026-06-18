@@ -119,6 +119,12 @@ export const resolveDropIntent = ({
 		};
 	}
 
+	if (canSupplyStoredRequirement) {
+		return {
+			type: "stored-requirement",
+		};
+	}
+
 	if (canCraft) {
 		return {
 			type: "craft-input",
@@ -128,12 +134,6 @@ export const resolveDropIntent = ({
 	if (canSupplyProducer) {
 		return {
 			type: "producer-input",
-		};
-	}
-
-	if (canSupplyStoredRequirement) {
-		return {
-			type: "stored-requirement",
 		};
 	}
 

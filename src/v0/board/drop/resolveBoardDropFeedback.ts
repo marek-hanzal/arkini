@@ -21,7 +21,10 @@ export namespace resolveBoardDropFeedback {
 }
 
 const isMergeLikeIntent = (intent: ReturnType<typeof resolveDropIntent>) =>
-	intent.type === "merge" || intent.type === "craft-input" || intent.type === "producer-input";
+	intent.type === "merge" ||
+	intent.type === "craft-input" ||
+	intent.type === "producer-input" ||
+	intent.type === "stored-requirement";
 
 export const resolveBoardDropFeedback = ({
 	board,

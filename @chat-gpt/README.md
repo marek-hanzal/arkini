@@ -64,3 +64,10 @@ Stored requirements runtime checkpoint:
 - Product line views expose `requirementsReady` and `missingRequirementItemIds`; blocked product lines should describe the DnD requirement path, not trigger special storage UI.
 - Current runtime drop routing prioritizes missing stored requirements before producer/stash consumable inputs. If an item is both a durable requirement and a consumable input, the requirement fills first; after capacity is full, normal input actions can run.
 - Do not move this into storage/UI validation. UI flags are readiness hints; save integrity stays schema-owned.
+
+DnD interaction contract checkpoint:
+
+- `resolveDropIntent` is the central board-target interaction contract for merge-like DnD decisions. Keep board hover feedback, board drop actions and inventory-to-board drop acceptance aligned with it.
+- Missing stored requirements are accepted as merge-like interactions and should show merge feedback, not blocked feedback.
+- Priority after reverse-directed merge rejection is: regular merge, missing stored requirement, craft input, activation/producer/stash input, swap. Runtime dispatch mirrors the durable-before-consumable part after regular merge.
+- Product-line `missingRequirementItemIds` is only a DnD readiness hint. Disabled product lines must not make their requirements droppable.

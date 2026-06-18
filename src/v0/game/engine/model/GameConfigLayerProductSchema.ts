@@ -7,6 +7,7 @@ const NonNegativeIntegerSchema = z.number().int().min(0);
 export const GameConfigLayerProductSchema = z
 	.object({
 		durationMs: NonNegativeIntegerSchema.optional(),
+		inputRefId: IdSchema.optional(),
 		inputs: z.record(IdSchema, GameConfigLayerProductInputSchema).optional(),
 		outputTableId: IdSchema.optional(),
 	})

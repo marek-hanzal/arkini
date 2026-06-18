@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import type { GameConfigLayer } from "~/v0/game/engine/model/GameConfigLayerSchema";
 
 export namespace applyConfigLayerFx {
@@ -48,21 +49,36 @@ export const applyConfigLayerFx = Effect.fn("applyConfigLayerFx")(function* ({
 				{
 					...product,
 					durationMs: productLayer.durationMs ?? product.durationMs,
-					inputs: product.inputs
-						.map((input) => ({
-							...input,
-							quantity:
-								productLayer.inputs?.[input.itemId]?.quantity ?? input.quantity,
-						}))
-						.filter((input) => input.quantity > 0),
+					inputRefId: productLayer.inputRefId ?? product.inputRefId,
 					outputTableId: productLayer.outputTableId ?? product.outputTableId,
 				},
 			];
 		}),
 	);
 
+	const inputs = Object.fromEntries(
+		Object.entries(config.inputs).map(([inputRefId, inputDefinition]) => [
+			inputRefId,
+			{
+				...inputDefinition,
+				inputs: inputDefinition.inputs.map((input) => ({
+					...input,
+					quantity:
+						Object.entries(layer.products).find(([productId, productLayer]) => {
+							const layeredProduct = products[productId];
+							return (
+								layeredProduct?.inputRefId === inputRefId &&
+								productLayer.inputs?.[input.itemId]
+							);
+						})?.[1].inputs?.[input.itemId]?.quantity ?? input.quantity,
+				})),
+			},
+		]),
+	);
+
 	return {
 		...config,
+		inputs,
 		producers,
 		products,
 	} satisfies GameConfig;

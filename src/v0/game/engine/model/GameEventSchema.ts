@@ -17,6 +17,7 @@ export const GameItemCreatedReasonSchema = z.enum([
 
 export const GameItemConsumedReasonSchema = z.enum([
 	"product-input",
+	"producer-input-store",
 	"stash-input",
 	"craft-input",
 	"craft-requirement",
@@ -105,6 +106,18 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			reason: GameBoardItemChangeReasonSchema,
 			replacedAtMs: NonNegativeIntegerSchema,
 			toItemId: IdSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("producer_input.stored"),
+			producerItemInstanceId: IdSchema,
+			productId: IdSchema,
+			itemId: IdSchema,
+			quantity: PositiveIntegerSchema,
+			previousQuantity: NonNegativeIntegerSchema,
+			nextQuantity: PositiveIntegerSchema,
+			storedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
 	z

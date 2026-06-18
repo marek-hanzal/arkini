@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import type { GameActionItemRef } from "~/v0/game/engine/model/GameActionItemRefSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
@@ -91,14 +92,27 @@ const productIdForInput = ({
 	const producer = producerId ? config.producers[producerId] : undefined;
 	if (!producer) return undefined;
 
-	return producer.productIds.find(
-		(productId) =>
-			productLineEnabled({
+	return producer.productIds.find((productId) => {
+		if (
+			!productLineEnabled({
 				productId,
 				save,
 				targetItemInstanceId: target.id,
-			}) && config.products[productId]?.inputs.some((input) => input.itemId === sourceItemId),
-	);
+			})
+		) {
+			return false;
+		}
+
+		const input = readProductInputs({
+			config,
+			productId,
+		}).find((input) => input.itemId === sourceItemId);
+		if (!input) return false;
+
+		const storedQuantity =
+			save.producerInputs[target.id]?.productInputs[productId]?.items[sourceItemId] ?? 0;
+		return storedQuantity < input.capacity;
+	});
 };
 
 const stashAcceptsInput = ({
@@ -191,12 +205,10 @@ const dispatchApplyItemToBoardItem = ({
 	if (productId) {
 		return store.dispatch({
 			action: {
-				inputRefs: [
-					sourceRef,
-				],
+				inputRef: sourceRef,
 				producerItemInstanceId: target.id,
 				productId,
-				type: "producer.product.start",
+				type: "producer.input.store",
 			},
 		});
 	}

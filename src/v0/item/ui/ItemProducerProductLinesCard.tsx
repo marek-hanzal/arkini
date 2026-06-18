@@ -36,7 +36,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					});
 					const canStart =
 						line.enabled &&
-						line.inputItemIds.length === 0 &&
+						line.inputsReady &&
 						line.requirementsReady &&
 						!line.queueFull;
 					const remainingMs = line.readyAtMs
@@ -60,7 +60,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
 										{formatMs(line.durationMs)}
 										{line.inputItemIds.length
-											? ` · needs ${line.inputItemIds.length} input type${line.inputItemIds.length === 1 ? "" : "s"}`
+											? ` · ${line.inputsReady ? "input ready" : "needs input"}`
 											: " · tap to run"}
 										{line.requirementItemIds.length
 											? ` · ${line.requirementItemIds.length} requirement${line.requirementItemIds.length === 1 ? "" : "s"}`
@@ -84,6 +84,27 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									{line.enabled ? "On" : "Off"}
 								</button>
 							</div>
+
+							{line.inputs.length ? (
+								<div className="mt-2 grid gap-1">
+									{line.inputs.map((input) => (
+										<div
+											key={input.itemId}
+											className="flex items-center justify-between rounded-sm border border-slate-700/60 bg-slate-950/35 px-2 py-1 text-[0.68rem]"
+										>
+											<span className="font-semibold text-slate-300">
+												{input.itemId.replace(/^item:/, "")}
+											</span>
+											<span className="text-slate-400">
+												{input.stored}/{input.quantity}
+												{input.capacity > input.quantity
+													? ` · cap ${input.capacity}`
+													: ""}
+											</span>
+										</div>
+									))}
+								</div>
+							) : null}
 
 							{line.inProgress ? (
 								<div className="mt-2 rounded-sm bg-slate-950/60 p-2">
@@ -124,10 +145,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 							>
 								{line.queueFull
 									? "Queue full"
-									: line.inputItemIds.length
-										? "Feed items by drag"
-										: !line.requirementsReady
-											? "Drag requirements in"
+									: !line.requirementsReady
+										? "Drag requirements in"
+										: !line.inputsReady
+											? "Feed items by drag"
 											: "Start"}
 							</button>
 						</div>

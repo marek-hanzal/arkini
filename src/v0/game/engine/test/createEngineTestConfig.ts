@@ -127,6 +127,19 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				withItemId: "item:twig",
 			},
 		},
+		inputs: {
+			"input:shred": {
+				name: "Shred input",
+				inputs: [
+					{
+						capacity: 1,
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+			},
+		},
 		producers: {
 			"producer:test": {
 				maxQueueSize: 1,
@@ -141,7 +154,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 		products: {
 			"product:test": {
 				durationMs: 1000,
-				inputs: [],
 				name: "Test product",
 				outputTableId: "loot:test",
 				placement: "board_then_inventory",
@@ -149,14 +161,7 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"product:shred": {
 				durationMs: 1000,
-				inputs: [
-					{
-						capacity: 1,
-						consume: true,
-						itemId: "item:twig",
-						quantity: 1,
-					},
-				],
+				inputRefId: "input:shred",
 				name: "Shred",
 				placement: "board_then_inventory",
 				requirements: [],

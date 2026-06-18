@@ -28,6 +28,8 @@ const productLine = (
 	enabled: true,
 	inProgress: false,
 	inputItemIds: [],
+	inputs: [],
+	inputsReady: true,
 	missingRequirementItemIds: [],
 	name: "Test product",
 	producerQueuedJobs: 0,
@@ -96,16 +98,21 @@ describe("resolveDropIntent", () => {
 				config,
 				sourceItemId: "item:twig",
 				targetItem: activationTarget({
-					inputs: [
-						{
-							capacity: 1,
-							itemId: "item:twig",
-							quantity: 1,
-							consume: true,
-							stored: 0,
-						},
-					],
+					inputs: [],
 					kind: "producer",
+					productLines: [
+						productLine({
+							inputs: [
+								{
+									capacity: 1,
+									itemId: "item:twig",
+									quantity: 1,
+									consume: true,
+									stored: 0,
+								},
+							],
+						}),
+					],
 					requirements: [
 						{
 							capacity: 1,
@@ -129,16 +136,21 @@ describe("resolveDropIntent", () => {
 				config,
 				sourceItemId: "item:twig",
 				targetItem: activationTarget({
-					inputs: [
-						{
-							capacity: 1,
-							itemId: "item:twig",
-							quantity: 1,
-							consume: true,
-							stored: 0,
-						},
-					],
+					inputs: [],
 					kind: "producer",
+					productLines: [
+						productLine({
+							inputs: [
+								{
+									capacity: 1,
+									itemId: "item:twig",
+									quantity: 1,
+									consume: true,
+									stored: 0,
+								},
+							],
+						}),
+					],
 					requirements: [
 						{
 							capacity: 1,

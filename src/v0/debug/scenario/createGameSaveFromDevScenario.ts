@@ -80,6 +80,7 @@ export const createGameSaveFromDevScenario = ({
 		nextItemInstanceIndex: 1,
 		nextJobIndex: 1,
 		nextScheduledEventIndex: 1,
+		producerInputs: {},
 		producerJobs: {},
 		producerLines: {},
 		scheduledEvents: {},

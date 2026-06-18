@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
+import { consumeProducerStoredInputsFx } from "~/v0/game/engine/fx/consumeProducerStoredInputsFx";
 import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -29,16 +30,29 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		config,
 		save,
 	});
-	const consumed = yield* consumeActivationInputsFx({
-		inputRefs: action.inputRefs,
-		inputs: checked.product.inputs,
-		nowMs,
-		reason: "product-input",
-		save,
-	});
+	const consumed = action.inputRefs.length
+		? yield* consumeActivationInputsFx({
+				inputRefs: action.inputRefs,
+				inputs: checked.productInputs,
+				nowMs,
+				reason: "product-input",
+				save,
+			})
+		: {
+				events: [],
+				save,
+			};
 	const nextSave = yield* cloneGameSaveFx({
 		save: consumed.save,
 	});
+	if (action.inputRefs.length === 0) {
+		yield* consumeProducerStoredInputsFx({
+			inputs: checked.productInputs,
+			nextSave,
+			producerItemInstanceId: action.producerItemInstanceId,
+			productId: action.productId,
+		});
+	}
 	const jobId = yield* createGameJobIdFx({
 		save: nextSave,
 	});

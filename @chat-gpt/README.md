@@ -115,3 +115,12 @@ Merge executable parity checkpoint:
 - Regular combo merges are executable item pairs and work from either drag direction. `consumeSource: false` imprint rules stay directed and reverse-directed drops reject instead of swapping.
 - `resolveExecutableItemMergeRule` is the shared source for runtime merge readiness, DnD drop intent/actions and item catalog merge relations. Do not reintroduce raw source-only `mergeIds` scans for executable behavior.
 - Regression target: `item:twig` + `item:water` must resolve to `item:sprout` from both drag directions.
+
+
+Product-line input ref checkpoint:
+
+- Producer-level consumable inputs are gone from the live model. Producer shells can have requirements/product lines, but only product lines own consumable production inputs.
+- `GameConfig.inputs` is a top-level named input definition record. Products reference those records via `products.*.inputRefId`; use `readProductInputs({ config, productId })` instead of reading product-local inputs.
+- `producer.input.store` fills the first enabled product line, in `producer.productIds` order, that accepts the dragged item and has capacity. Shared inputs therefore resolve top-to-bottom by enabled line state.
+- Product line UI displays its own input rows/readiness. Filling still happens through core DnD/merge-like interaction onto the producer tile, not a special button.
+- `GameSaveConfigSchema` validates `save.producerInputs` against effective product input refs, including completed `product.inputRef.set` upgrades.

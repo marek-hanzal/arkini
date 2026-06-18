@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import type { GameConfigLayer } from "~/v0/game/engine/model/GameConfigLayerSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -61,10 +62,25 @@ export const buildConfigLayerFx = Effect.fn("buildConfigLayerFx")(function* ({
 					productLayer.outputTableId = effect.tableId;
 				}
 
+				if (effect.type === "product.inputRef.set") {
+					productLayer.inputRefId = effect.inputRefId;
+				}
+
 				if (effect.type === "product.input.quantity.add") {
-					const baseInput = baseProduct.inputs.find(
-						(input) => input.itemId === effect.itemId,
-					);
+					const effectiveInputRefId = productLayer.inputRefId ?? baseProduct.inputRefId;
+					const baseInput = readProductInputs({
+						config: {
+							...config,
+							products: {
+								...config.products,
+								[effect.productId]: {
+									...baseProduct,
+									inputRefId: effectiveInputRefId,
+								},
+							},
+						},
+						productId: effect.productId,
+					}).find((input) => input.itemId === effect.itemId);
 					if (!baseInput) {
 						continue;
 					}

@@ -37,6 +37,7 @@ Reason: native browser context/callout menus on the game surface are still a sma
 
 ## Completed recent task
 
+- `v0-product-line-input-refs-2026-06-18.md`: producer-level consumable inputs moved to standalone named input definitions referenced by product lines; line inputs fill through DnD and are stored under `save.producerInputs`.
 - `v0-merge-executable-parity-2026-06-18.md`: regular combo merges now resolve from either drag direction through one executable resolver shared by runtime, DnD and item catalog detail.
 - `v0-producer-board-progress-2026-06-18.md`: running producer jobs now show a subtle bottom progress bar on their board tile; future queue and blocked delivery are intentionally ignored.
 - `v0-producer-blocked-delivery-2026-06-18.md`: producer output rolls once, blocked delivery persists on the job, retries without spam/reroll, keeps queue capacity occupied, and marks blocked producer tiles with a subtle danger frame.

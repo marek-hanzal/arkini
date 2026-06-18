@@ -24,7 +24,7 @@ type TestProductInput = {
 
 type TestProduct = {
 	durationMs: number;
-	inputs: TestProductInput[];
+	inputRefId?: string;
 	name: string;
 	outputTableId?: string;
 	placement: "board_then_inventory";
@@ -158,9 +158,9 @@ const createValidConfigValue = () => ({
 			resultItemId: "item:plank",
 		},
 	} as Record<string, TestCraftRecipe>,
-	products: {
-		"product:test": {
-			durationMs: 1000,
+	inputs: {
+		"input:test": {
+			name: "Test input",
 			inputs: [
 				{
 					capacity: 2,
@@ -169,6 +169,12 @@ const createValidConfigValue = () => ({
 					quantity: 1,
 				},
 			],
+		},
+	},
+	products: {
+		"product:test": {
+			durationMs: 1000,
+			inputRefId: "input:test",
 			name: "Test product",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
@@ -291,15 +297,15 @@ describe("GameConfigSchema", () => {
 
 	it("rejects activation input slots with capacity below required quantity", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].inputs[0].quantity = 3;
-		config.products["product:test"].inputs[0].capacity = 2;
+		config.inputs["input:test"].inputs[0].quantity = 3;
+		config.inputs["input:test"].inputs[0].capacity = 2;
 
 		expect(() => parseGameConfig(config)).toThrow(/Capacity must be >= quantity/);
 	});
 
 	it("rejects duplicate activation inputs for one product", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].inputs.push({
+		config.inputs["input:test"].inputs.push({
 			capacity: 1,
 			consume: true,
 			itemId: "item:twig",

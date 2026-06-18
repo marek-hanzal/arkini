@@ -1,3 +1,3 @@
-import { GameConfigServiceLive } from "~/v0/game/logic/GameConfigServiceLive";
+import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 
-export const boardRows = GameConfigServiceLive.config.game.board.height;
+export const boardRows = defaultGameConfig.game.board.height;

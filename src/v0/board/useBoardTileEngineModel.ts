@@ -42,6 +42,7 @@ export const useBoardTileEngineModel = ({
 	const inventory = useGameInventoryView();
 	const actions = useGameRuntimeDropActions();
 	const runtimeStore = useGameRuntimeStore();
+	const config = runtimeStore.getSnapshot().runtime.config;
 	const transientTiles = useBoardTransientTiles();
 
 	const tiles = useMemo(
@@ -176,6 +177,7 @@ export const useBoardTileEngineModel = ({
 			dropFeedback(context) {
 				return resolveBoardDropFeedback({
 					board,
+					config,
 					context,
 				});
 			},
@@ -183,6 +185,7 @@ export const useBoardTileEngineModel = ({
 				return resolveDrop({
 					context,
 					board,
+					config,
 					inventory,
 					feedback,
 					actions,
@@ -195,6 +198,7 @@ export const useBoardTileEngineModel = ({
 		[
 			actions,
 			activateBoardItem,
+			config,
 			board,
 			feedback,
 			inventory,

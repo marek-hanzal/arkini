@@ -1,10 +1,13 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import type { FC } from "react";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { UpgradeCard } from "~/v0/upgrade/ui/UpgradeCard";
-import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
-import { useGameAction, useGameRuntimeStore, useGameUpgradeListView } from "~/v0/play/runtime";
+import {
+	useGameAction,
+	useGameItemCatalogView,
+	useGameRuntimeStore,
+	useGameUpgradeListView,
+} from "~/v0/play/runtime";
 import type { UpgradeId } from "~/v0/manifest/manifestId";
 
 export namespace UpgradesSheet {
@@ -57,7 +60,7 @@ export const UpgradesSheet: FC<UpgradesSheet.Props> = ({ onClose }) => {
 	const upgrades = useGameUpgradeListView();
 	const store = useGameRuntimeStore();
 	const upgradeAction = useGameAction();
-	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
+	const items = useGameItemCatalogView();
 	const actionErrorMessage = upgradeAction.error
 		? toGameActionError(upgradeAction.error).message
 		: undefined;

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import { resolveBoardCellDropAction } from "~/v0/play/drop/resolveBoardCellDropAction";
@@ -18,6 +19,8 @@ const boardSource = (item: BoardViewItem) =>
 		boardItem: item,
 	}) satisfies DragSource;
 
+const config = createEngineTestConfig();
+
 describe("resolveBoardCellDropAction", () => {
 	it("ignores drops onto the source item cell", () => {
 		const source = boardItem({
@@ -29,6 +32,7 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
+				config,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -55,6 +59,7 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
+				config,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -85,6 +90,7 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
+				config,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -121,6 +127,7 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
+				config,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -147,6 +154,54 @@ describe("resolveBoardCellDropAction", () => {
 		});
 	});
 
+	it("uses the supplied runtime config for merge decisions", () => {
+		const runtimeConfig = createEngineTestConfig({
+			items: {
+				...config.items,
+				"item:twig": {
+					...config.items["item:twig"],
+					mergeIds: [],
+				},
+			},
+		});
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "target",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config: runtimeConfig,
+				board: rebuildBoardView([
+					source,
+					target,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: target.id,
+				},
+			}),
+		).toEqual({
+			type: "swap-board-items",
+			animation: "parallel-swap",
+			input: {
+				sourceBoardItemId: "source",
+				targetBoardItemId: "target",
+			},
+		});
+	});
+
 	it("maps non-merge occupied cells to swap actions", () => {
 		const source = boardItem({
 			id: "source",
@@ -163,6 +218,7 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
+				config,
 				board: rebuildBoardView([
 					source,
 					target,

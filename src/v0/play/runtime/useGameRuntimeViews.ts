@@ -2,6 +2,9 @@ import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
+import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
+import type { ItemId } from "~/v0/manifest/manifestId";
 import { readRuntimeUpgradeListViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeUpgradeListViewFromGameSave";
 import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
@@ -62,3 +65,9 @@ export const useGameUpgradeListView = (): UpgradeListView =>
 			save: state.runtime.save,
 		}),
 	);
+
+export const useGameItemCatalogView = (): ItemCatalogView =>
+	useGameRuntimeSelector((state) => state.items);
+
+export const useGameItemView = (itemId: ItemId | string | undefined): ViewItem | null =>
+	useGameRuntimeSelector((state) => (itemId ? (state.items[itemId as ItemId] ?? null) : null));

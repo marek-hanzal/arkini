@@ -1,5 +1,6 @@
 import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -59,11 +60,13 @@ export namespace resolveBoardCellDropAction {
 			}
 		>;
 		board: BoardView;
+		config: GameConfig;
 	}
 }
 
 export const resolveBoardCellDropAction = ({
 	board,
+	config,
 	source,
 	target,
 }: resolveBoardCellDropAction.Props): BoardCellDropAction => {
@@ -98,6 +101,7 @@ export const resolveBoardCellDropAction = ({
 	}
 
 	const intent = resolveDropIntent({
+		config,
 		sourceItemId: source.itemId,
 		targetItem,
 	});

@@ -1,4 +1,5 @@
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
@@ -24,6 +25,7 @@ export namespace resolveBoardCellDrop {
 			}
 		>;
 		board: BoardView;
+		config: GameConfig;
 		feedback: Feedback.Type;
 		actions: DropActions;
 	}
@@ -32,12 +34,14 @@ export namespace resolveBoardCellDrop {
 export const resolveBoardCellDrop = ({
 	actions,
 	board,
+	config,
 	feedback,
 	source,
 	target,
 }: resolveBoardCellDrop.Props): TileEngine.DropOutcome => {
 	const action = resolveBoardCellDropAction({
 		board,
+		config,
 		source,
 		target,
 	});

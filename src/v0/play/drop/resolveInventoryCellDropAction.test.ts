@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
+import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import { resolveInventoryCellDropAction } from "~/v0/play/drop/resolveInventoryCellDropAction";
@@ -46,11 +47,14 @@ const inventorySource = (slotIndex: number) =>
 		slot: inventory.bySlotIndex[String(slotIndex)]!,
 	}) satisfies DragSource;
 
+const config = createEngineTestConfig();
+
 describe("resolveInventoryCellDropAction", () => {
 	it("applies inventory items to occupied board cells when the target accepts the item", () => {
 		expect(
 			resolveInventoryCellDropAction({
 				board,
+				config,
 				inventory,
 				source: inventorySource(0),
 				target: {
@@ -73,6 +77,7 @@ describe("resolveInventoryCellDropAction", () => {
 		expect(
 			resolveInventoryCellDropAction({
 				board,
+				config,
 				inventory,
 				source: inventorySource(0),
 				target: {
@@ -95,6 +100,7 @@ describe("resolveInventoryCellDropAction", () => {
 		expect(
 			resolveInventoryCellDropAction({
 				board,
+				config,
 				inventory,
 				source: inventorySource(1),
 				target: {
@@ -116,6 +122,7 @@ describe("resolveInventoryCellDropAction", () => {
 		expect(
 			resolveInventoryCellDropAction({
 				board,
+				config,
 				inventory,
 				source: inventorySource(0),
 				target: {

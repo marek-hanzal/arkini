@@ -1,4 +1,5 @@
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -24,6 +25,7 @@ export namespace resolveInventoryCellDrop {
 			}
 		>;
 		board: BoardView;
+		config: GameConfig;
 		inventory: InventoryView;
 		feedback: Feedback.Type;
 		actions: DropActions;
@@ -33,6 +35,7 @@ export namespace resolveInventoryCellDrop {
 export const resolveInventoryCellDrop = ({
 	actions,
 	board,
+	config,
 	inventory,
 	feedback,
 	source,
@@ -40,6 +43,7 @@ export const resolveInventoryCellDrop = ({
 }: resolveInventoryCellDrop.Props): TileEngine.DropOutcome => {
 	const action = resolveInventoryCellDropAction({
 		board,
+		config,
 		inventory,
 		source,
 		target,

@@ -1,4 +1,3 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { type FC, useMemo } from "react";
 import { ItemActivationCard } from "~/v0/item/ui/ItemActivationCard";
 import { ItemActivationInputsCard } from "~/v0/item/ui/ItemActivationInputsCard";
@@ -9,9 +8,8 @@ import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
-import { itemCatalogQueryOptions } from "~/v0/item/query/itemCatalogQueryOptions";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
-import { useGameAction, useGameBoardView } from "~/v0/play/runtime";
+import { useGameAction, useGameBoardView, useGameItemCatalogView } from "~/v0/play/runtime";
 
 export namespace ItemSheet {
 	export interface Props {
@@ -22,7 +20,7 @@ export namespace ItemSheet {
 
 export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const board = useGameBoardView();
-	const { data: items } = useSuspenseQuery(itemCatalogQueryOptions());
+	const items = useGameItemCatalogView();
 	const withdrawAction = useGameAction();
 	const productLineAction = useGameAction();
 	const nowMs = useProducerClock(board.items);

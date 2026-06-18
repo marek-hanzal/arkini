@@ -1,7 +1,6 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { memo } from "react";
-import { itemViewQueryOptions } from "~/v0/item/query/itemViewQueryOptions";
 import { GameItemView } from "~/v0/item/ui/GameItemView";
+import { useGameItemView } from "~/v0/play/runtime";
 import type { ItemId } from "~/v0/manifest/manifestId";
 
 export namespace InventoryTile {
@@ -13,11 +12,7 @@ export namespace InventoryTile {
 }
 
 export const InventoryTile = memo(({ stackId, itemId, quantity }: InventoryTile.Props) => {
-	const { data: item } = useSuspenseQuery(
-		itemViewQueryOptions({
-			itemId,
-		}),
-	);
+	const item = useGameItemView(itemId);
 
 	if (!item) return null;
 

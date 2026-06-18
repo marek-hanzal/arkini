@@ -1,4 +1,3 @@
-import type { RefObject } from "react";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 
@@ -8,7 +7,6 @@ export namespace BoardSurface {
 		feedbackFlags: ReadonlySet<string>;
 		onOpenItem(boardItemId: string): void;
 		disabled?: boolean;
-		dragConstraintsRef?: RefObject<HTMLElement | null>;
 	}
 
 	export type TileData =

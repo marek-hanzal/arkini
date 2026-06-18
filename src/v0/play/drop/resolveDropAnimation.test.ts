@@ -27,7 +27,6 @@ describe("resolveDrop animation contract", () => {
 			applyInventoryItemToBoardItem: vi.fn(),
 			moveBoardItem: vi.fn(),
 			placeInventoryItem: vi.fn(),
-			stashBoardItem: vi.fn(),
 			swapBoardItems: vi.fn(),
 			swapInventorySlots,
 		} satisfies DropActions;
@@ -83,6 +82,52 @@ describe("resolveDrop animation contract", () => {
 		});
 	});
 
+	it("rejects board item drops onto the inventory target", () => {
+		const feedback = {
+			showError: vi.fn(),
+		} as unknown as Feedback.Type;
+		const actions = {
+			applyBoardItemToBoardItem: vi.fn(),
+			applyInventoryItemToBoardItem: vi.fn(),
+			moveBoardItem: vi.fn(),
+			placeInventoryItem: vi.fn(),
+			swapBoardItems: vi.fn(),
+			swapInventorySlots: vi.fn(),
+		} satisfies DropActions;
+
+		const outcome = resolveDrop({
+			actions,
+			config,
+			board: {} as never,
+			feedback,
+			inventory: {} as never,
+			context: {
+				dragRect: rect,
+				source: {
+					boardItem: {} as never,
+					boardItemId: "board-item",
+					itemId: "item:twig",
+					kind: "board",
+				} satisfies DragSource,
+				sourceTile: {
+					id: "board-item",
+					slotId: "0:0",
+					data: {},
+				},
+				target: {
+					kind: "inventory",
+				} satisfies DropTarget,
+				targetRect: rect,
+				targetSlot: null,
+				targetTile: null,
+			},
+		});
+
+		expect(outcome).toBe("reject");
+		expect(actions.applyBoardItemToBoardItem).not.toHaveBeenCalled();
+		expect(actions.moveBoardItem).not.toHaveBeenCalled();
+	});
+
 	it("marks board merges as immediate parallel merge cache animations", async () => {
 		const applyBoardItemToBoardItem = vi.fn(async () => undefined);
 		const feedback = {
@@ -94,7 +139,6 @@ describe("resolveDrop animation contract", () => {
 			applyInventoryItemToBoardItem: vi.fn(),
 			moveBoardItem: vi.fn(),
 			placeInventoryItem: vi.fn(),
-			stashBoardItem: vi.fn(),
 			swapBoardItems: vi.fn(),
 			swapInventorySlots: vi.fn(),
 		} satisfies DropActions;

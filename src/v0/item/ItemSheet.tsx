@@ -21,7 +21,7 @@ export namespace ItemSheet {
 export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const board = useGameBoardView();
 	const items = useGameItemCatalogView();
-	const productLineAction = useGameAction();
+	const itemAction = useGameAction();
 	const nowMs = useProducerClock(board.items);
 	const boardItem = boardItemId ? board.byId[boardItemId] : undefined;
 	const item = boardItem ? items[boardItem.itemId] : undefined;
@@ -29,7 +29,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		craft: boardItem?.craft,
 		nowMs,
 	});
-	const actionError = productLineAction.error;
+	const actionError = itemAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 	const relations = useMemo(
 		() => ({
@@ -68,7 +68,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	}
 
 	const setProductLineEnabled = (productId: string, enabled: boolean) => {
-		void productLineAction.run({
+		void itemAction.run({
 			enabled,
 			producerItemInstanceId: boardItem.id,
 			productId,
@@ -77,7 +77,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	};
 
 	const startProductLine = (productId: string) => {
-		void productLineAction.run({
+		void itemAction.run({
 			inputRefs: [],
 			producerItemInstanceId: boardItem.id,
 			productId,
@@ -86,12 +86,22 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	};
 
 	const withdrawProductLineInput = (productId: string, itemId: string) => {
-		void productLineAction.run({
+		void itemAction.run({
 			itemId,
 			producerItemInstanceId: boardItem.id,
 			productId,
 			type: "producer.input.withdraw",
 		});
+	};
+
+	const storeBoardItem = () => {
+		void itemAction
+			.run({
+				boardItemId: boardItem.id,
+				type: "board.item.stash",
+			})
+			.then(onClose)
+			.catch(() => undefined);
 	};
 
 	return (
@@ -107,7 +117,11 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						{actionErrorMessage}
 					</div>
 				) : null}
-				<ItemSummaryCard item={item} />
+				<ItemSummaryCard
+					item={item}
+					storeDisabled={itemAction.isPending}
+					onStore={storeBoardItem}
+				/>
 				{liveCraft ? (
 					<ItemCraftCard
 						craft={liveCraft}
@@ -124,7 +138,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					<ItemProducerProductLinesCard
 						lines={boardItem.activation.productLines}
 						nowMs={nowMs}
-						pending={productLineAction.isPending}
+						pending={itemAction.isPending}
 						onSetEnabled={setProductLineEnabled}
 						onStart={startProductLine}
 						onWithdrawInput={withdrawProductLineInput}

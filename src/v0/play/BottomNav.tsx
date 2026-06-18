@@ -1,7 +1,5 @@
-import { memo, type FC, type RefObject } from "react";
+import { memo, type FC } from "react";
 import type { Sheet } from "~/v0/play/sheet/Sheet";
-import type { DropTarget } from "~/v0/play/drag/DropTarget";
-import { TileEngineDropTarget } from "~/v0/tile-engine";
 
 export namespace BottomNav {
 	export interface Props {
@@ -18,45 +16,27 @@ interface ButtonProps {
 	onOpen(sheet: Sheet): void;
 }
 
-const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) => {
-	const button = (ref?: RefObject<HTMLDivElement | null>) => (
-		<div
-			ref={ref}
-			className="ak-bottom-nav-slot"
+const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) => (
+	<div className="ak-bottom-nav-slot">
+		<button
+			type="button"
+			className="ak-bottom-nav-button"
+			data-active={active ? "true" : "false"}
+			data-tone={tone}
+			aria-label={label}
+			title={label}
+			onClick={() => onOpen(tone)}
 		>
-			<button
-				type="button"
-				className="ak-bottom-nav-button"
-				data-active={active ? "true" : "false"}
-				data-tone={tone}
-				aria-label={label}
-				title={label}
-				onClick={() => onOpen(tone)}
+			<span
+				className="ak-bottom-nav-icon"
+				aria-hidden="true"
 			>
-				<span
-					className="ak-bottom-nav-icon"
-					aria-hidden="true"
-				>
-					{icon}
-				</span>
-				<span className="ak-visually-hidden">{label}</span>
-			</button>
-		</div>
-	);
-
-	if (tone !== "inventory") return button();
-
-	return (
-		<TileEngineDropTarget<DropTarget>
-			id="bottom-nav:inventory"
-			data={{
-				kind: "inventory",
-			}}
-		>
-			{({ ref }) => button(ref)}
-		</TileEngineDropTarget>
-	);
-});
+				{icon}
+			</span>
+			<span className="ak-visually-hidden">{label}</span>
+		</button>
+	</div>
+));
 
 export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => (
 	<nav className="ak-layer-bottom-nav ak-bottom-nav">

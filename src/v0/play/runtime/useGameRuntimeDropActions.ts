@@ -327,14 +327,6 @@ export const useGameRuntimeDropActions = (): DropActions => {
 					},
 				});
 			},
-			stashBoardItem(input) {
-				return store.dispatch({
-					action: {
-						boardItemId: input.boardItemId,
-						type: "board.item.stash",
-					},
-				});
-			},
 			swapBoardItems(input) {
 				return store.dispatch({
 					action: {

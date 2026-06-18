@@ -59,19 +59,29 @@ export const useTileActorExitMotion = ({
 			tileId,
 		});
 		const clearPresenceMotion = markTilePresenceMotion(element, token);
+		const keyframes =
+			kind === "replace-out"
+				? {
+						opacity: [
+							1,
+							0,
+						],
+					}
+				: {
+						opacity: [
+							1,
+							0,
+						],
+						transform: [
+							"translate3d(0px, 0px, 0px) scale(1)",
+							"translate3d(0px, 0px, 0px) scale(0.92)",
+						],
+					};
+
 		void startTileStyleMotion({
 			scope,
 			element,
-			keyframes: {
-				opacity: [
-					1,
-					0,
-				],
-				transform: [
-					"translate3d(0px, 0px, 0px) scale(1)",
-					"translate3d(0px, 0px, 0px) scale(0.92)",
-				],
-			},
+			keyframes,
 			delay: delayMs / 1000,
 			duration: (durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,

@@ -4,6 +4,7 @@ export const TileExitMotionSchema = z.object({
 	kind: z
 		.enum([
 			"merge-out",
+			"replace-out",
 		])
 		.optional(),
 	delayMs: z.number().nonnegative().optional(),

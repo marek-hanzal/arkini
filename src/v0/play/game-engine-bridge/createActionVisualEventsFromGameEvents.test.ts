@@ -181,6 +181,7 @@ describe("createActionVisualEventsFromGameEvents", () => {
 			{
 				animation: {
 					cause: "craft",
+					effect: "replace",
 					groupId: "engine:craft-result:target-1",
 				},
 				fromItemId: "item:blueprint",

@@ -4,6 +4,7 @@ import { createActionVisualEventsFromGameEngineResult } from "~/v0/play/game-eng
 import { summarizeVisualEventGroups } from "~/v0/play/visual-events/summarizeVisualEventGroups";
 import { summarizeVisualEvents } from "~/v0/play/visual-events/summarizeVisualEvents";
 import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
+import { registerBoardReplaceExitTiles } from "~/v0/play/tile-engine-motion/registerBoardReplaceExitTiles";
 import { registerTileEngineEnterRequests } from "~/v0/play/tile-engine-motion/registerTileEngineEnterRequests";
 import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 
@@ -36,6 +37,10 @@ export const GameRuntimeVisualEffects: FC<GameRuntimeVisualEffects.Props> = ({ s
 				if (visualEvents.length === 0) return;
 
 				registerBoardMergeExitTiles({
+					board: update.previous.board,
+					events: visualEvents,
+				});
+				registerBoardReplaceExitTiles({
 					board: update.previous.board,
 					events: visualEvents,
 				});

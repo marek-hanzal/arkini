@@ -4,7 +4,7 @@ import type { TileExitMotionSchema } from "~/v0/tile-engine";
 export const toTileEngineExitMotion = (
 	animation: ActionVisualAnimationSchema.Type,
 ): TileExitMotionSchema.Type => ({
-	kind: "merge-out",
+	kind: animation.effect === "replace" ? "replace-out" : "merge-out",
 	delayMs: animation.delayMs,
 	durationMs: animation.durationMs,
 	groupId: animation.groupId,

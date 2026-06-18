@@ -1,0 +1,362 @@
+import { describe, expect, it } from "vitest";
+import { parseGameConfig } from "~/v0/game/config/GameConfigSchema";
+
+type TestActivationRequirement =
+	| {
+			capacity: number;
+			itemId: string;
+			quantity: number;
+			type: "stored";
+	  }
+	| {
+			itemId: string;
+			quantity: number;
+			scope: "board" | "inventory" | "board_or_inventory";
+			type: "passive";
+	  };
+
+type TestProductInput = {
+	capacity: number;
+	consume: boolean;
+	itemId: string;
+	quantity: number;
+};
+
+type TestProduct = {
+	durationMs: number;
+	inputs: TestProductInput[];
+	name: string;
+	outputTableId?: string;
+	placement: "board_then_inventory";
+	requirements: TestActivationRequirement[];
+};
+
+type TestCraftRecipe = {
+	durationMs: number;
+	inputs: {
+		consume: boolean;
+		itemId: string;
+		quantity: number;
+	}[];
+	requirements: TestActivationRequirement[];
+	resultItemId: string;
+};
+
+type TestUpgrade = {
+	code: string;
+	description: string;
+	name: string;
+	sort: number;
+	tiers: {
+		cost: {
+			itemId: string;
+			quantity: number;
+		}[];
+		durationMs: number;
+		effects: {
+			ms: number;
+			productId: string;
+			type: "product.duration.add";
+		}[];
+	}[];
+};
+
+const createValidConfigValue = () => ({
+	version: 1,
+	game: {
+		id: "game:test",
+		title: "Test",
+		board: {
+			width: 2,
+			height: 2,
+		},
+		inventory: {
+			slots: 2,
+		},
+	},
+	resources: {
+		"resource:item": {
+			data: "item-bytes",
+		},
+		"resource:ui": {
+			data: "ui-bytes",
+		},
+	},
+	assets: {
+		"asset:item": {
+			kind: "item",
+			label: "Item",
+			render: "plain",
+			resourceId: "resource:item",
+			sort: 1,
+		},
+		"asset:ui": {
+			kind: "ui",
+			label: "UI",
+			resourceId: "resource:ui",
+			sort: 2,
+		},
+	},
+	items: {
+		"item:producer": {
+			assetId: "asset:item",
+			code: "producer",
+			description: "Producer",
+			maxStackSize: 1,
+			name: "Producer",
+			producerId: "producer:test",
+			sort: 1,
+			tags: [],
+			tier: 0,
+		},
+		"item:twig": {
+			assetId: "asset:item",
+			code: "twig",
+			description: "Twig",
+			maxStackSize: 3,
+			name: "Twig",
+			sort: 2,
+			tags: [
+				"wood",
+			],
+			tier: 0,
+		},
+		"item:plank": {
+			assetId: "asset:item",
+			code: "plank",
+			description: "Plank",
+			maxStackSize: 2,
+			name: "Plank",
+			sort: 3,
+			tags: [],
+			tier: 1,
+		},
+	},
+	merge: {},
+	producers: {
+		"producer:test": {
+			maxQueueSize: 1,
+			productIds: [
+				"product:test",
+			],
+			requirements: [] as TestActivationRequirement[],
+			type: "producer",
+		},
+	},
+	stashes: {},
+	craftRecipes: {
+		"craft:test": {
+			durationMs: 1000,
+			inputs: [
+				{
+					consume: true,
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+			requirements: [] as TestActivationRequirement[],
+			resultItemId: "item:plank",
+		},
+	} as Record<string, TestCraftRecipe>,
+	products: {
+		"product:test": {
+			durationMs: 1000,
+			inputs: [
+				{
+					capacity: 2,
+					consume: true,
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+			name: "Test product",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			requirements: [] as TestActivationRequirement[],
+		},
+	} as Record<string, TestProduct>,
+	lootTables: {
+		"loot:test": {
+			name: "Test loot",
+			output: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					type: "guaranteed",
+				},
+			],
+		},
+	},
+	upgrades: {
+		"upgrade:test": {
+			code: "test-upgrade",
+			description: "Upgrade",
+			name: "Upgrade",
+			sort: 1,
+			tiers: [
+				{
+					cost: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+					durationMs: 1000,
+					effects: [
+						{
+							ms: -100,
+							productId: "product:test",
+							type: "product.duration.add",
+						},
+					],
+				},
+			],
+		},
+	} as Record<string, TestUpgrade>,
+	startingState: {
+		board: [
+			{
+				itemId: "item:producer",
+				x: 0,
+				y: 0,
+			},
+		],
+		inventory: [
+			{
+				itemId: "item:twig",
+				quantity: 2,
+			},
+		],
+	},
+});
+
+describe("GameConfigSchema", () => {
+	it("accepts the minimal valid test config", () => {
+		expect(parseGameConfig(createValidConfigValue()).game.id).toBe("game:test");
+	});
+
+	it("rejects starting inventory stack counts above configured slots", () => {
+		const config = createValidConfigValue();
+		config.game.inventory.slots = 1;
+		config.startingState.inventory.push({
+			itemId: "item:plank",
+			quantity: 1,
+		});
+
+		expect(() => parseGameConfig(config)).toThrow(/Starting inventory has 2 stacks/);
+	});
+
+	it("rejects starting inventory quantities above item maxStackSize", () => {
+		const config = createValidConfigValue();
+		config.startingState.inventory[0].quantity = 4;
+
+		expect(() => parseGameConfig(config)).toThrow(/Quantity must be <= item maxStackSize/);
+	});
+
+	it("rejects duplicate starting board cells", () => {
+		const config = createValidConfigValue();
+		config.startingState.board.push({
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate starting board cell/);
+	});
+
+	it("rejects item definitions that point at non-item assets", () => {
+		const config = createValidConfigValue();
+		config.items["item:twig"].assetId = "asset:ui";
+
+		expect(() => parseGameConfig(config)).toThrow(/must have kind/);
+	});
+
+	it("rejects duplicate item and upgrade authoring codes", () => {
+		const config = createValidConfigValue();
+		config.items["item:plank"].code = "twig";
+		config.upgrades["upgrade:test-2"] = {
+			...config.upgrades["upgrade:test"],
+			code: "test-upgrade",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate item code|Duplicate upgrade code/);
+	});
+
+	it("rejects duplicate producer product lines", () => {
+		const config = createValidConfigValue();
+		config.producers["producer:test"].productIds.push("product:test");
+
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate product/);
+	});
+
+	it("rejects activation input slots with capacity below required quantity", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].inputs[0].quantity = 3;
+		config.products["product:test"].inputs[0].capacity = 2;
+
+		expect(() => parseGameConfig(config)).toThrow(/Capacity must be >= quantity/);
+	});
+
+	it("rejects duplicate activation inputs for one product", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].inputs.push({
+			capacity: 1,
+			consume: true,
+			itemId: "item:twig",
+			quantity: 1,
+		});
+
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate input item/);
+	});
+
+	it("rejects duplicate craft inputs", () => {
+		const config = createValidConfigValue();
+		config.craftRecipes["craft:test"].inputs.push({
+			consume: true,
+			itemId: "item:twig",
+			quantity: 1,
+		});
+
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate craft input item/);
+	});
+
+	it("rejects stored requirements with capacity below required quantity", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].requirements.push({
+			capacity: 1,
+			itemId: "item:twig",
+			quantity: 2,
+			type: "stored",
+		});
+
+		expect(() => parseGameConfig(config)).toThrow(/Capacity must be >= quantity/);
+	});
+
+	it("rejects duplicate passive requirements in the same scope", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].requirements.push(
+			{
+				itemId: "item:twig",
+				quantity: 1,
+				scope: "board",
+				type: "passive",
+			},
+			{
+				itemId: "item:twig",
+				quantity: 2,
+				scope: "board",
+				type: "passive",
+			},
+		);
+
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate requirement/);
+	});
+
+	it("keeps structural checks for queue size and non-empty loot output", () => {
+		const config = createValidConfigValue();
+		config.producers["producer:test"].maxQueueSize = 0;
+		config.lootTables["loot:test"].output = [];
+
+		expect(() => parseGameConfig(config)).toThrow(/Too small/);
+	});
+});

@@ -1,16 +1,6 @@
 import { Effect } from "effect";
-import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { createGameScheduledEventId } from "~/v0/game/engine/logic/createGameEntityId";
 
-export namespace createGameScheduledEventIdFx {
-	export interface Props {
-		save: GameSave;
-	}
-}
-
-export const createGameScheduledEventIdFx = Effect.fn("createGameScheduledEventIdFx")(function* ({
-	save,
-}: createGameScheduledEventIdFx.Props) {
-	const id = `scheduled-event:${save.nextScheduledEventIndex}`;
-	save.nextScheduledEventIndex += 1;
-	return id;
+export const createGameScheduledEventIdFx = Effect.fn("createGameScheduledEventIdFx")(function* () {
+	return createGameScheduledEventId();
 });

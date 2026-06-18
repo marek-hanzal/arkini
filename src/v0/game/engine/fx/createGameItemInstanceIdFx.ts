@@ -1,16 +1,6 @@
 import { Effect } from "effect";
-import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { createGameItemInstanceId } from "~/v0/game/engine/logic/createGameEntityId";
 
-export namespace createGameItemInstanceIdFx {
-	export interface Props {
-		save: GameSave;
-	}
-}
-
-export const createGameItemInstanceIdFx = Effect.fn("createGameItemInstanceIdFx")(function* ({
-	save,
-}: createGameItemInstanceIdFx.Props) {
-	const id = `item-instance:${save.nextItemInstanceIndex}`;
-	save.nextItemInstanceIndex += 1;
-	return id;
+export const createGameItemInstanceIdFx = Effect.fn("createGameItemInstanceIdFx")(function* () {
+	return createGameItemInstanceId();
 });

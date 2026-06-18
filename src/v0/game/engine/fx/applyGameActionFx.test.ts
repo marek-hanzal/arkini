@@ -5,6 +5,7 @@ import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSa
 import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { withRandomService } from "~/v0/random/logic/withRandomService";
 
 const runAction = (props: applyGameActionFx.Props) =>
@@ -14,6 +15,24 @@ const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 const runActionEither = (props: applyGameActionFx.Props) =>
 	Effect.runSync(
 		Effect.either(applyGameActionFx(props).pipe(withRandomService(TestRandomService))),
+	);
+
+const readOnlyRecordValue = <T>(record: Record<string, T>) => {
+	const values = Object.values(record);
+	expect(values).toHaveLength(1);
+	return values[0] as T;
+};
+
+const findBoardItem = (
+	save: GameSave,
+	matcher: {
+		itemId: string;
+		x: number;
+		y: number;
+	},
+) =>
+	Object.values(save.board.items).find(
+		(item) => item.itemId === matcher.itemId && item.x === matcher.x && item.y === matcher.y,
 	);
 
 describe("applyGameActionFx", () => {
@@ -36,9 +55,9 @@ describe("applyGameActionFx", () => {
 			save,
 		});
 
-		expect(result.save.producerJobs["job:1"]).toMatchObject({
+		const job = readOnlyRecordValue(result.save.producerJobs);
+		expect(job).toMatchObject({
 			completesAtMs: 1500,
-			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
@@ -48,7 +67,7 @@ describe("applyGameActionFx", () => {
 		expect(result.events).toEqual([
 			{
 				completesAtMs: 1500,
-				jobId: "job:1",
+				jobId: job.id,
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
 				startedAtMs: 500,
@@ -228,11 +247,13 @@ describe("applyGameActionFx", () => {
 		});
 
 		expect(result.save.producerInputs).toEqual({});
-		expect(result.save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-		});
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.save.inventory.slots[0]).toEqual({
 			itemId: "item:twig",
 			quantity: 1,
@@ -288,7 +309,6 @@ describe("applyGameActionFx", () => {
 			itemId: "item:plank",
 			quantity: 2,
 		};
-		save.nextItemInstanceIndex = 3;
 		save.producerInputs["item-instance:1"] = {
 			productInputs: {
 				"product:shred": {
@@ -627,11 +647,13 @@ describe("applyGameActionFx", () => {
 		expect(result.save.stashes).toEqual({});
 		expect(result.save.scheduledEvents).toEqual({});
 		expect(result.save.board.items).not.toHaveProperty("item-instance:1");
-		expect(result.save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-		});
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.save.inventory.slots[0]).toEqual({
 			itemId: "item:twig",
 			quantity: 3,
@@ -942,9 +964,10 @@ describe("applyGameActionFx", () => {
 			save: first.save,
 		});
 
-		expect(second.save.producerJobs["job:2"]).toMatchObject({
+		const queuedJobs = Object.values(second.save.producerJobs);
+		expect(queuedJobs).toHaveLength(2);
+		expect(queuedJobs.find((job) => job.startedAtMs === 1500)).toMatchObject({
 			completesAtMs: 2500,
-			startedAtMs: 1500,
 		});
 		expect(second.nextWakeAtMs).toBe(1500);
 	});
@@ -1125,7 +1148,7 @@ describe("applyGameActionFx", () => {
 		});
 
 		expect(started.save.craftInputs).toEqual({});
-		expect(started.save.craftJobs["job:1"]).toMatchObject({
+		expect(readOnlyRecordValue(started.save.craftJobs)).toMatchObject({
 			completesAtMs: 1300,
 			recipeId: "craft:plank",
 			targetItemInstanceId: "item-instance:1",
@@ -1134,7 +1157,7 @@ describe("applyGameActionFx", () => {
 		expect(started.events).toEqual([
 			{
 				completesAtMs: 1300,
-				jobId: "job:1",
+				jobId: readOnlyRecordValue(started.save.craftJobs).id,
 				recipeId: "craft:plank",
 				startedAtMs: 300,
 				targetItemInstanceId: "item-instance:1",
@@ -1172,11 +1195,13 @@ describe("applyGameActionFx", () => {
 		expect(result.save.craftInputs["item-instance:1"]?.items).toEqual({
 			"item:twig": 1,
 		});
-		expect(result.save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-		});
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.events).toMatchObject([
 			{
 				itemId: "item:twig",
@@ -1970,11 +1995,13 @@ describe("applyGameActionFx runtime placement actions", () => {
 			itemId: "item:twig",
 			quantity: 1,
 		});
-		expect(result.save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-		});
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.events).toMatchObject([
 			{
 				reason: "inventory-placement",
@@ -2012,11 +2039,13 @@ describe("applyGameActionFx runtime placement actions", () => {
 			save,
 		});
 
-		expect(result.save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-		});
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.save.inventory.slots[0]).toEqual({
 			itemId: "item:twig",
 			quantity: 1,
@@ -2077,11 +2106,13 @@ describe("applyGameActionFx runtime placement actions", () => {
 			save,
 		});
 
-		expect(result.save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-		});
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 

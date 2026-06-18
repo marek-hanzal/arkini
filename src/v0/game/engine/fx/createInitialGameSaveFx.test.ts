@@ -121,7 +121,6 @@ describe("createInitialGameSaveFx", () => {
 		expect(save).toMatchObject({
 			createdAtMs: 100,
 			gameId: "game:test",
-			nextItemInstanceIndex: 2,
 			updatedAtMs: 100,
 			version: 1,
 		});

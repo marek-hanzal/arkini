@@ -17,6 +17,12 @@ const runReadiness = (props: readActionReadinessFx.Props) =>
 const runTick = (props: runGameTickFx.Props) =>
 	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
 
+const readOnlyRecordValue = <T>(record: Record<string, T>) => {
+	const values = Object.values(record);
+	expect(values).toHaveLength(1);
+	return values[0] as T;
+};
+
 describe("upgrade runtime", () => {
 	it("starts upgrade jobs by consuming the next tier cost", () => {
 		const config = createEngineTestConfig({
@@ -85,9 +91,9 @@ describe("upgrade runtime", () => {
 		});
 
 		expect(result.save.inventory.slots[0]).toBeNull();
-		expect(result.save.upgradeJobs["job:1"]).toEqual({
+		const upgradeJob = readOnlyRecordValue(result.save.upgradeJobs);
+		expect(upgradeJob).toMatchObject({
 			completesAtMs: 700,
-			id: "job:1",
 			startedAtMs: 100,
 			tierIndex: 0,
 			upgradeId: "upgrade:test-speed",
@@ -200,9 +206,10 @@ describe("upgrade runtime", () => {
 				upgradeId: "upgrade:test-speed",
 			},
 		]);
-		expect(startedProduct.save.producerJobs["job:2"]).toMatchObject({
+		expect(
+			Object.values(startedProduct.save.producerJobs).find((job) => job.startedAtMs === 700),
+		).toMatchObject({
 			completesAtMs: 1200,
-			startedAtMs: 700,
 		});
 	});
 
@@ -280,9 +287,11 @@ describe("upgrade runtime", () => {
 			save: startedProduct.save,
 		});
 
-		expect(startedProduct.save.producerJobs["job:2"]).toMatchObject({
-			outputTableId: "loot:better",
-		});
+		expect(
+			Object.values(startedProduct.save.producerJobs).find(
+				(job) => job.outputTableId === "loot:better",
+			),
+		).toBeDefined();
 		expect(completedProduct.events).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
@@ -388,7 +397,7 @@ describe("upgrade runtime", () => {
 			save: completedUpgrade.save,
 		});
 
-		expect(startedSink.save.producerJobs["job:1"]).toMatchObject({
+		expect(readOnlyRecordValue(startedSink.save.producerJobs)).toMatchObject({
 			outputTableId: null,
 		});
 		expect(completedSink.events.some((event) => event.type === "item.created")).toBe(false);
@@ -469,9 +478,10 @@ describe("upgrade runtime", () => {
 			save: firstProduct.save,
 		});
 
-		expect(secondProduct.save.producerJobs["job:3"]).toMatchObject({
+		expect(
+			Object.values(secondProduct.save.producerJobs).find((job) => job.startedAtMs === 1000),
+		).toMatchObject({
 			completesAtMs: 2000,
-			startedAtMs: 1000,
 		});
 	});
 

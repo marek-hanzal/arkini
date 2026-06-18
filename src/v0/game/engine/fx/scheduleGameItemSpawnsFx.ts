@@ -28,9 +28,7 @@ export const scheduleGameItemSpawnsFx = Effect.fn("scheduleGameItemSpawnsFx")(fu
 		for (let quantityIndex = 0; quantityIndex < item.quantity; quantityIndex += 1) {
 			const scheduledDueAtMs = dueAtMs + scheduledIndex * intervalMs;
 			lastDueAtMs = scheduledDueAtMs;
-			const id = yield* createGameScheduledEventIdFx({
-				save,
-			});
+			const id = yield* createGameScheduledEventIdFx();
 			save.scheduledEvents[id] = {
 				dueAtMs: scheduledDueAtMs,
 				exclusiveKey,

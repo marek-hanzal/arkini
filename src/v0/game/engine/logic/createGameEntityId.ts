@@ -1,0 +1,9 @@
+import { genId } from "~/v0/id/logic/genId";
+
+export const createGameEntityId = (prefix: string) => `${prefix}:${genId()}`;
+
+export const createGameItemInstanceId = () => createGameEntityId("item-instance");
+
+export const createGameJobId = () => createGameEntityId("job");
+
+export const createGameScheduledEventId = () => createGameEntityId("scheduled-event");

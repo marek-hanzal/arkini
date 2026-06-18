@@ -78,9 +78,6 @@ export const createGameSaveFromDevScenario = ({
 		inventory: {
 			slots: inventorySlots,
 		},
-		nextItemInstanceIndex: 1,
-		nextJobIndex: 1,
-		nextScheduledEventIndex: 1,
 		producerInputs: {},
 		producerJobs: {},
 		producerLines: {},

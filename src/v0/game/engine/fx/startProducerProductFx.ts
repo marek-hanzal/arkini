@@ -53,9 +53,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			productId: action.productId,
 		});
 	}
-	const jobId = yield* createGameJobIdFx({
-		save: nextSave,
-	});
+	const jobId = yield* createGameJobIdFx();
 	const queuedStartAtMs = Math.max(
 		nowMs,
 		...Object.values(nextSave.producerJobs)

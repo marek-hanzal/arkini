@@ -39,9 +39,7 @@ export const startUpgradeFx = Effect.fn("startUpgradeFx")(function* ({
 	const nextSave = yield* cloneGameSaveFx({
 		save: consumed.save,
 	});
-	const jobId = yield* createGameJobIdFx({
-		save: nextSave,
-	});
+	const jobId = yield* createGameJobIdFx();
 	const completesAtMs = nowMs + checked.tier.durationMs;
 	nextSave.upgradeJobs[jobId] = {
 		completesAtMs,

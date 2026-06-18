@@ -56,13 +56,12 @@ GameConfig / tick engine stabilization checkpoint:
 - Side quest is done in `@chat-gpt/v0/v0-craft-partial-input-withdraw-2026-06-18.md`: craft targets persist partial input progress in `save.craftInputs`, start only after inputs are complete, lock inputs on start, and allow pre-start single-unit withdraw through producer-style seeded placement.
 - T4 is done in `@chat-gpt/v0/v0-effective-upgrade-validation-2026-06-18.md`: `GameConfigSchema` rejects effective upgrade prefixes that make product duration/input quantities/producer queue size invalid, and config layer building no longer clamps bad values.
 - T5 is done in `@chat-gpt/v0/v0-product-input-scope-hardening-2026-06-18.md`: product definitions and product input refs are now owned by exactly one producer/product line, including effective `product.inputRef.set` prefixes; config layering resolves product input overrides through an explicit input-ref owner map.
-- T6 is done in `@chat-gpt/v0/v0-inventory-stateless-stack-policy-2026-06-18.md`: inventory save slots now distinguish stateless stacks from preserved item instances; stateful board items stash as one-slot inventory instances, running-job actors reject stash, and placement/consumption/view helpers respect instance quantity/state. Stabilization priority now moves to save ID counter validation.
+- T6 is done in `@chat-gpt/v0/v0-inventory-stateless-stack-policy-2026-06-18.md`: inventory save slots now distinguish stateless stacks from preserved item instances; stateful board items stash as one-slot inventory instances, running-job actors reject stash, and placement/consumption/view helpers respect instance quantity/state. T7 is done in `@chat-gpt/v0/v0-generated-entity-ids-2026-06-18.md`: save-level ID counters are gone, and runtime-created item/job/scheduled-event IDs use `genId`/cuid2 with domain prefixes.
 
 Current task candidates:
 
-1. V0 stabilization epic T7: validate monotonic save ID counters.
-2. Event flow cleanup / visual planner hardening.
-3. Badge/visual polish can wait; tiny UI cosmetics do not outrank save/model stabilization, no matter how shiny the little badge feels.
+1. Event flow cleanup / visual planner hardening.
+2. Badge/visual polish can wait; tiny UI cosmetics do not outrank save/model stabilization, no matter how shiny the little badge feels.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.
 

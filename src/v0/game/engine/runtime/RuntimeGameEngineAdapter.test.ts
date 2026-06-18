@@ -52,7 +52,7 @@ describe("RuntimeGameEngineAdapter", () => {
 				type: "product.started",
 			},
 		]);
-		expect(adapter.readSnapshot().save.producerJobs["job:1"]).toMatchObject({
+		expect(Object.values(adapter.readSnapshot().save.producerJobs)[0]).toMatchObject({
 			completesAtMs: 1200,
 			productId: "product:test",
 		});

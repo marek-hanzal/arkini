@@ -181,9 +181,6 @@ export const GameSaveSchema = z
 		gameId: IdSchema,
 		createdAtMs: NonNegativeIntegerSchema,
 		updatedAtMs: NonNegativeIntegerSchema,
-		nextItemInstanceIndex: PositiveIntegerSchema,
-		nextJobIndex: PositiveIntegerSchema,
-		nextScheduledEventIndex: PositiveIntegerSchema,
 		board: z
 			.object({
 				items: z.record(IdSchema, GameSaveBoardItemSchema),

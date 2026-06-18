@@ -56,11 +56,11 @@ Aktuální engine save model má inventory slot jako `itemId + quantity`, takže
 
 Nemíchat obě varianty potichu. To je přesně cesta k “mám jeden sapling, ale zároveň padesát saplingů a jeden z nich si pamatuje trauma z boardu”.
 
-### GameSaveConfigSchema monotonic counters
+### Generated entity IDs instead of save counters
 
-`GameSaveConfigSchema` má hlídat nejen reference a bounds, ale i to, že `nextItemInstanceIndex`, `nextJobIndex` a `nextScheduledEventIndex` jsou větší než všechny už existující odpovídající ID v save.
+T7 direction changed after Marek clarified that generated IDs do not need to be predictable. Runtime-created item instances, jobs and scheduled events should use `genId`/cuid2 through a small game-entity helper with domain prefixes such as `item-instance:*`, `job:*` and `scheduled-event:*`.
 
-Proč: pokud save obsahuje `job:7`, ale `nextJobIndex` je 7 nebo méně, další generated ID může collide-nout. V runtime se pak přepíše existující job/event/item a my budeme předstírat, že JavaScript je posedlý, i když jsme mu jen podstrčili rozbitou numerologii.
+The save document should not carry mutable `nextItemInstanceIndex`, `nextJobIndex` or `nextScheduledEventIndex` counters. We still validate ID record-key consistency and references, but no monotonic counter validation is needed. If cuid2 collides, the problem is bigger than our schema having opinions.
 
 ## Event flow audit
 
@@ -279,28 +279,29 @@ Acceptance:
 - Stateful/capability item v inventáři neztratí state omylem; pokud ho ztratit má, je to explicitní reset path a test.
 - Placement z inventory zpět na board vytvoří správný board actor/instance.
 
-### T7: GameSaveConfigSchema monotonic ID counters
+### T7: Generated game entity IDs
 
-Cíl: save validation odmítne ID countery, které mohou způsobit collision.
+Cíl: odstranit save-level ID countery a generovat runtime entity přes `genId`/cuid2 s doménovým prefixem.
 
 Soubory:
 
 - `src/v0/game/engine/model/GameSaveSchema.ts`
-- `src/v0/game/engine/model/GameSaveSchema.test.ts`
+- `src/v0/game/engine/logic/createGameEntityId.ts`
 - ID generator helpers: `createGameItemInstanceIdFx`, `createGameJobIdFx`, `createGameScheduledEventIdFx`
+- Tests that previously asserted exact generated IDs
 
 Implementace:
 
-- Parsovat známé ID prefixy (`item-instance:*`, `job:*`, `scheduled-event:*`).
-- Spočítat max numeric suffix pro board items, jobs a scheduled events.
-- Ověřit, že `next*Index > maxExistingSuffix`.
-- Neznámé ID tvary buď nechat projít kvůli dev importům, nebo je zvlášť validovat podle současných generator kontraktů. Rozhodnout explicitně.
+- Odstranit `nextItemInstanceIndex`, `nextJobIndex` a `nextScheduledEventIndex` ze save shape.
+- Runtime-created item/job/event IDs generovat přes `genId` with prefixes.
+- Nechat schema validovat record-key/id consistency, uniqueness and references, not counter monotonicity.
+- Test fixtures may keep explicit fixed IDs when they are authored manually. Assertions for runtime-generated IDs should capture IDs from records/events instead of expecting `job:1` and friends.
 
 Acceptance:
 
-- Save s `job:7` a `nextJobIndex: 7` failne.
-- Save s `job:7` a `nextJobIndex: 8` projde.
-- Totéž pro item instances a scheduled events.
+- New item/job/scheduled-event IDs are generated through `genId` with readable domain prefixes.
+- GameSave no longer stores ID counters.
+- Tests no longer depend on exact runtime-generated IDs.
 
 ### T8: Event flow cleanup / visual planner
 
@@ -356,8 +357,8 @@ Kontrolní body:
 3. `stash-craft-atomic-output`
 4. `effective-config-validation`
 5. `product-input-overlay-scope` (done as product input scope hardening)
-6. `inventory-stateless-stack-policy` (next)
-7. `save-id-counter-validation`
+6. `inventory-stateless-stack-policy` (done)
+7. `generated-entity-ids`
 8. `visual-event-planner-cleanup`
 
 Nedělat to v jednom mega commitu. Mega commit je jen zip bomb s lepším marketingem.

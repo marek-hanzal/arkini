@@ -1,11 +1,8 @@
 import { type FC, useEffect } from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
-import { createActionVisualEventsFromGameEngineResult } from "~/v0/play/game-engine-bridge";
-import { summarizeVisualEventGroups } from "~/v0/play/visual-events/summarizeVisualEventGroups";
-import { summarizeVisualEvents } from "~/v0/play/visual-events/summarizeVisualEvents";
-import { registerBoardMergeExitTiles } from "~/v0/play/tile-engine-motion/registerBoardMergeExitTiles";
-import { registerBoardReplaceExitTiles } from "~/v0/play/tile-engine-motion/registerBoardReplaceExitTiles";
-import { registerTileEngineEnterRequests } from "~/v0/play/tile-engine-motion/registerTileEngineEnterRequests";
+import { applyGameEngineVisualPlan } from "~/v0/play/game-engine-visual/applyGameEngineVisualPlan";
+import { createGameEngineVisualPlan } from "~/v0/play/game-engine-visual/createGameEngineVisualPlan";
+import { summarizeGameEngineVisualPlan } from "~/v0/play/game-engine-visual/summarizeGameEngineVisualPlan";
 import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 
 export namespace GameRuntimeVisualEffects {
@@ -18,36 +15,33 @@ export const GameRuntimeVisualEffects: FC<GameRuntimeVisualEffects.Props> = ({ s
 	useEffect(
 		() =>
 			store.subscribeUpdate((update) => {
-				const visualEvents = createActionVisualEventsFromGameEngineResult({
-					result: update.result,
+				const plan = createGameEngineVisualPlan({
+					currentBoard: update.current.board,
+					currentInventory: update.current.inventory,
+					events: update.result.events,
+					previousBoard: update.previous.board,
 				});
 
 				DebugTimeline.record({
 					detail: {
 						domainCount: update.result.events.length,
 						domainTypes: update.result.events.map((event) => event.type),
-						visualCount: visualEvents.length,
-						visualEvents: summarizeVisualEvents(visualEvents),
-						visualGroups: summarizeVisualEventGroups(visualEvents),
+						visualPlan: summarizeGameEngineVisualPlan(plan),
 					},
-					event: "runtime-result.visual-effects.apply",
+					event: "runtime-result.visual-plan.apply",
 					scope: "game-engine-runtime",
 				});
 
-				if (visualEvents.length === 0) return;
+				if (
+					plan.boardEnterRequests.length === 0 &&
+					plan.boardTransientTilePlans.length === 0 &&
+					plan.inventoryEnterRequests.length === 0
+				) {
+					return;
+				}
 
-				registerBoardMergeExitTiles({
-					board: update.previous.board,
-					events: visualEvents,
-				});
-				registerBoardReplaceExitTiles({
-					board: update.previous.board,
-					events: visualEvents,
-				});
-				registerTileEngineEnterRequests({
-					board: update.current.board,
-					events: visualEvents,
-					inventory: update.current.inventory,
+				applyGameEngineVisualPlan({
+					plan,
 				});
 			}),
 		[

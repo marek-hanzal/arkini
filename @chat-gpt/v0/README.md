@@ -16,7 +16,7 @@ This folder holds Arkini v0-specific working notes, completed task logs and foll
 
 ### 1. Stabilization epic
 
-Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement, T3 stash output atomicity/full-open policy, T4 effective upgrade/config validation, T5 product input scope hardening and T6 inventory stateless stack policy are done. Craft partial input/withdraw side quest is also done. Current next coding task is T8 event flow cleanup / visual planner hardening. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
+Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant, T2 craft target replacement, T3 stash output atomicity/full-open policy, T4 effective upgrade/config validation, T5 product input scope hardening, T6 inventory stateless stack policy, T7 generated entity IDs and T8 event flow visual planner cleanup are done. Craft partial input/withdraw side quest is also done. Badge polish is deferred until the model stops quietly sharpening knives in the drawer.
 
 ## Deferred / historical notes
 
@@ -27,12 +27,13 @@ Start with `v0-stabilization-epic-2026-06-18.md`. T1 craft single-job invariant,
 
 ## Selected next task
 
-Recommended next coding task: **Stabilization epic T8: event flow cleanup / visual planner hardening**.
+Recommended next coding task after T8: **general UI overhaul** unless another runtime stabilization issue is found first.
 
-Reason: save/model invariants are now much tighter: craft, stash, upgrade config, product input ownership, inventory stateful instances and runtime-generated IDs are stabilized. The next biggest complexity is the multi-language event bridge between engine domain events, visual events and TileEngine motion requests.
+Reason: save/model invariants are now much tighter and the old multi-language visual event bridge is gone. The pinned UI overhaul can now happen on top of a cleaner engine-event-to-motion adapter.
 
 ## Completed recent task
 
+- `v0-event-flow-visual-planner-2026-06-18.md`: T8 removed the separate `ActionVisualEvent` runtime dialect. `GameRuntimeVisualEffects` now maps engine `GameEvent[]` directly into `GameEngineVisualPlan` motion/transient instructions.
 - `v0-inventory-stateless-stack-policy-2026-06-18.md`: inventory save slots now distinguish stateless stacks from preserved instances; stateful board items stash as one-slot instances, running jobs reject stash, and inventory placement consumes/returns instances without losing identity.
 - `v0-generated-entity-ids-2026-06-18.md`: save-level ID counters are gone; runtime-created item/job/scheduled-event IDs use `genId`/cuid2 with domain prefixes, and tests capture generated IDs instead of expecting counter values.
 - `v0-product-input-scope-hardening-2026-06-18.md`: product definitions and product input refs are now single-owner per producer/product line; effective `product.inputRef.set` prefixes cannot make refs shared, and config layering uses an explicit input-ref owner map.

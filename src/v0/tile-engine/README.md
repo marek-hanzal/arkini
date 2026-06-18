@@ -31,8 +31,8 @@ this so future quick fixes have somewhere to bounce off, ideally before becoming
 
 Game-specific behavior belongs in adapters. Board and inventory build generic
 `TileEngine.Slot` / `TileEngine.Tile` models, `src/v0/play/drop` resolves Arkini drop rules,
-and `src/v0/play/tile-engine-motion` maps semantic action visual events into generic
-TileEngine motion requests. Prefer a stable `TileEngine.Slot.dropId` over ad-hoc
+and `src/v0/play/game-engine-visual` maps engine domain events directly into generic
+TileEngine motion plans. Prefer a stable `TileEngine.Slot.dropId` over ad-hoc
 `DropBinding.id` values; the engine uses that id to scope hover feedback before rendering
 individual slots, so a drag-over transition only wakes the previous/current targets instead
 of politely asking every grid cell to participate in the drama.

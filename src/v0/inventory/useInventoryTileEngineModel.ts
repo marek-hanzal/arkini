@@ -18,7 +18,6 @@ import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 export namespace useInventoryTileEngineModel {
 	export interface Props {
 		feedback: Feedback.Type;
-		onPlacementComplete?(): void;
 		placementTarget?: {
 			x: number;
 			y: number;
@@ -40,7 +39,6 @@ export namespace useInventoryTileEngineModel {
 
 export const useInventoryTileEngineModel = ({
 	feedback,
-	onPlacementComplete,
 	placementTarget,
 }: useInventoryTileEngineModel.Props): useInventoryTileEngineModel.Result => {
 	const board = useGameBoardView();
@@ -108,7 +106,6 @@ export const useInventoryTileEngineModel = ({
 						x: placementTarget.x,
 						y: placementTarget.y,
 					})
-					.then(() => onPlacementComplete?.())
 					.catch(feedback.showError);
 				return;
 			}
@@ -135,7 +132,6 @@ export const useInventoryTileEngineModel = ({
 			actions,
 			board.firstEmptyCell,
 			feedback,
-			onPlacementComplete,
 			placementTarget,
 		],
 	);
@@ -162,12 +158,7 @@ export const useInventoryTileEngineModel = ({
 						itemId: stack.itemId,
 						slot,
 					},
-					onDoubleActivate: placementTarget
-						? undefined
-						: () => placeInventoryOnBoard(slot),
-					onSingleActivate: placementTarget
-						? () => placeInventoryOnBoard(slot)
-						: undefined,
+					onDoubleActivate: () => placeInventoryOnBoard(slot),
 				};
 			},
 			slot(slot) {

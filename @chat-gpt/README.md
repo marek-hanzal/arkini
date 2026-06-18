@@ -130,7 +130,7 @@ Board DnD confinement checkpoint:
 Inventory seeded placement checkpoint:
 
 - Long-pressing an empty board cell opens inventory in placement mode with that cell as placement seed.
-- Selecting a stack in that mode dispatches `inventory.item.place` with `placementMode: "nearest_by_manhattan"` and the full stack quantity. The engine consumes that stack and reuses the shared board-then-inventory placement planner, so placement starts at the seed and then expands by Manhattan distance with inventory fallback.
+- Double-tapping a stack in that mode dispatches `inventory.item.place` with `placementMode: "nearest_by_manhattan"` and the full stack quantity. The inventory sheet stays open after successful placement, so the mode behaves like normal inventory access with a seeded board target, not a one-shot select-and-close flow. Single tap must not place items.
 - Normal inventory double-tap and explicit inventory-to-board DnD remain exact single-item placement. Do not replace those with nearest-cell behavior unless the UX explicitly changes.
 - TileEngine stays generic: slots only expose optional `onLongActivate`; Arkini board/inventory adapters attach the placement meaning outside the engine.
 

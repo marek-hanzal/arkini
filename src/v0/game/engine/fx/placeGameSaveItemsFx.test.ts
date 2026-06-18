@@ -70,6 +70,84 @@ describe("placeGameSaveItemsFx", () => {
 		]);
 	});
 
+	it("places board output near a provided seed cell before using global scan order", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 3,
+					width: 3,
+				},
+				title: "Test",
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 1,
+						y: 1,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runPlacement({
+			config,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 3,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+			seedCell: {
+				x: 1,
+				y: 1,
+			},
+		});
+
+		expect(result.type).toBe("placed");
+		if (result.type !== "placed") {
+			return;
+		}
+
+		expect(
+			result.events.map((event) => {
+				if (event.type !== "item.created" || event.to.kind !== "board") {
+					return null;
+				}
+
+				return {
+					x: event.to.x,
+					y: event.to.y,
+				};
+			}),
+		).toEqual([
+			{
+				x: 1,
+				y: 0,
+			},
+			{
+				x: 0,
+				y: 1,
+			},
+			{
+				x: 2,
+				y: 1,
+			},
+		]);
+	});
+
 	it("keeps placement atomic when board and inventory cannot fit the whole output", () => {
 		const config = createEngineTestConfig({
 			game: {

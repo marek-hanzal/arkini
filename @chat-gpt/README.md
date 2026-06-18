@@ -46,10 +46,10 @@ Recent GameConfig hardening checkpoint:
 
 Current task candidates:
 
-1. Producer/local placement planner: shared nearest-by-manhattan placement around an optional seed cell, first for producer output and later for inventory-to-board placement.
-2. Producer board progress: show the active runtime producer job as a subtle bottom progress bar on the tile.
-3. Tile detail executable-interaction parity: detail must not promise interactions that `resolveDropIntent` / runtime actions cannot execute.
-4. Touch/long-press polish: suppress native context/callout only on game interaction surfaces.
+1. Producer board progress: show the active runtime producer job as a subtle bottom progress bar on the tile.
+2. Tile detail executable-interaction parity: detail must not promise interactions that `resolveDropIntent` / runtime actions cannot execute.
+3. Touch/long-press polish: suppress native context/callout only on game interaction surfaces.
+4. Inventory-to-board seeded placement: reuse the shared Manhattan placement planner for long-press empty-cell placement.
 
 See `@chat-gpt/v0/README.md` for the v0-specific task index.
 
@@ -81,6 +81,13 @@ DnD interaction contract checkpoint:
 - Missing stored requirements are accepted as merge-like interactions and should show merge feedback, not blocked feedback.
 - Priority after reverse-directed merge rejection is: regular merge, missing stored requirement, craft input, activation/producer/stash input, swap. Runtime dispatch mirrors the durable-before-consumable part after regular merge.
 - Product-line `missingRequirementItemIds` is only a DnD readiness hint. Disabled product lines must not make their requirements droppable.
+
+
+Local placement planner checkpoint:
+
+- `planEmptyBoardCellsFx` is the shared board placement planner. Without `seedCell`, it preserves top-to-bottom / left-to-right scan order. With `seedCell`, it orders empty cells by Manhattan distance from the seed with scan order as deterministic tie-break.
+- Producer, stash and craft completion preflight placement now pass their source/target board cell as seed. Scheduled spawn processing derives the same seed from `originItemInstanceId`, so delayed output still lands around its source while the source exists.
+- Inventory-to-board long-press placement should reuse this planner instead of creating a second near-cell search.
 
 DnD feedback frame checkpoint:
 

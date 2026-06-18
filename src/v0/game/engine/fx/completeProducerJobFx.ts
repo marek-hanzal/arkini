@@ -5,6 +5,7 @@ import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
 import { readProductFx } from "~/v0/game/engine/fx/readProductFx";
+import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -87,11 +88,16 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 				reason: "product-output",
 			}) satisfies GameSaveItemPlacementRequest,
 	);
+	const seedCell = readBoardItemCell({
+		itemInstanceId: liveJob.producerItemInstanceId,
+		save,
+	});
 	const preflightPlacement = yield* placeGameSaveItemsFx({
 		config,
 		items: placementRequests,
 		nowMs,
 		save,
+		seedCell,
 	});
 
 	if (preflightPlacement.type === "blocked") {

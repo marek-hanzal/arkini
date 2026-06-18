@@ -152,7 +152,6 @@ const PlayShellContent: FC = () => {
 							feedbackFlags={feedbackFlags.flags}
 							onOpenItem={openItem}
 							disabled={Boolean(activeSheet)}
-							dragConstraintsRef={playAreaRef}
 						/>
 					</div>
 				</main>

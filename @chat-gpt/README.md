@@ -122,6 +122,13 @@ Touch / long-press polish checkpoint:
 - TileEngine surfaces suppress native `contextmenu` and iOS touch callout/tap highlight so long-press game gestures are not hijacked by the browser.
 - Keep this scoped to game interaction surfaces. Do not prevent context menus globally across ordinary app UI unless there is a very specific reason.
 
+Board DnD confinement checkpoint:
+
+- Board item DnD is board-only. Board items can move, swap, merge and interact with board cells/items, but inventory is no longer a board-item drop target.
+- The bottom inventory nav button must stay a normal button, not a `TileEngineDropTarget`.
+- `DropActions` should not expose board-item stash for DnD plumbing.
+- Moving a board item into inventory is an explicit `Store` action from the item detail sheet, dispatching `board.item.stash`.
+
 Product-line input ref checkpoint:
 
 - Producer-level consumable inputs are gone from the live model. Producer shells can have requirements/product lines, but only product lines own consumable production inputs.

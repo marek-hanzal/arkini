@@ -1,4 +1,4 @@
-import { memo, type ReactNode, useCallback } from "react";
+import { memo, type ReactNode, useCallback, useRef } from "react";
 import { BoardCell } from "~/v0/board/BoardCell";
 import type { BoardSurface as BoardSurfaceType } from "~/v0/board/BoardSurface.types";
 import { boardCells, type BoardCellView } from "~/v0/board/boardCells";
@@ -27,13 +27,8 @@ const boardSlots = boardCells.map((cell) => ({
 })) satisfies readonly TileEngineType.Slot<BoardCellView>[];
 
 export const BoardSurface = memo(
-	({
-		feedback,
-		feedbackFlags,
-		onOpenItem,
-		disabled = false,
-		dragConstraintsRef,
-	}: BoardSurfaceType.Props) => {
+	({ feedback, feedbackFlags, onOpenItem, disabled = false }: BoardSurfaceType.Props) => {
+		const boardDragBoundsRef = useRef<HTMLDivElement | null>(null);
 		const board = useGameBoardView();
 		const { drag, tiles } = useBoardTileEngineModel({
 			feedback,
@@ -65,21 +60,23 @@ export const BoardSurface = memo(
 		);
 
 		return (
-			<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
-				id="board"
-				columns={boardColumns}
-				slots={boardSlots}
-				tiles={tiles}
-				gapPx={1}
-				className="ak-layer-base-surface w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
-				actorLayerClassName="pointer-events-none"
-				layerRole="base"
-				disabled={disabled}
-				drag={drag}
-				dragConstraintsRef={dragConstraintsRef}
-				renderSlot={renderSlot}
-				renderTile={renderBoardTile}
-			/>
+			<div ref={boardDragBoundsRef}>
+				<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
+					id="board"
+					columns={boardColumns}
+					slots={boardSlots}
+					tiles={tiles}
+					gapPx={1}
+					className="ak-layer-base-surface w-full rounded-md border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/40"
+					actorLayerClassName="pointer-events-none"
+					layerRole="base"
+					disabled={disabled}
+					drag={drag}
+					dragConstraintsRef={boardDragBoundsRef}
+					renderSlot={renderSlot}
+					renderTile={renderBoardTile}
+				/>
+			</div>
 		);
 	},
 );

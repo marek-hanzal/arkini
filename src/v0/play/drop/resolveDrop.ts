@@ -9,7 +9,6 @@ import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { rejectDrop } from "~/v0/play/drop/rejectDrop";
 import { resolveBoardCellDrop } from "~/v0/play/drop/resolveBoardCellDrop";
-import { resolveBoardInventoryDrop } from "~/v0/play/drop/resolveBoardInventoryDrop";
 import { resolveInventoryCellDrop } from "~/v0/play/drop/resolveInventoryCellDrop";
 import { resolveInventorySlotDrop } from "~/v0/play/drop/resolveInventorySlotDrop";
 import { withDropErrorFeedback } from "~/v0/play/drop/withDropErrorFeedback";
@@ -78,21 +77,6 @@ export const resolveDrop = ({
 						board,
 						config,
 						feedback,
-						actions,
-					}),
-			)
-			.with(
-				{
-					source: {
-						kind: "board",
-					},
-					target: {
-						kind: "inventory",
-					},
-				},
-				({ source }) =>
-					resolveBoardInventoryDrop({
-						source,
 						actions,
 					}),
 			)

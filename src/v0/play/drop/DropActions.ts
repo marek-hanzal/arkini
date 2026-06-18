@@ -9,7 +9,6 @@ export interface DropActions {
 	}): Promise<unknown>;
 	moveBoardItem(input: { boardItemId: string; x: number; y: number }): Promise<unknown>;
 	placeInventoryItem(input: { slotIndex: number; x: number; y: number }): Promise<unknown>;
-	stashBoardItem(input: { boardItemId: string }): Promise<unknown>;
 	swapBoardItems(input: {
 		sourceBoardItemId: string;
 		targetBoardItemId: string;

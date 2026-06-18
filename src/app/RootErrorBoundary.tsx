@@ -25,9 +25,9 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 				</p>
 				<h1 className="mt-3 text-2xl font-black text-red-50">Hard reset in progress</h1>
 				<p className="mt-3 text-sm leading-6 text-red-100">
-					The game hit a runtime or database error. Arkini now drops OPFS browser storage
-					immediately and reloads, because prototype saves are disposable and startup
-					loops are not a design pillar.
+					The game hit a runtime error. Arkini now drops browser storage immediately and
+					reloads, because prototype saves are disposable and startup loops are not a
+					design pillar.
 				</p>
 				<pre className="mt-4 max-h-56 overflow-auto rounded-sm bg-slate-950/70 p-3 text-xs whitespace-pre-wrap text-red-100">
 					{message}
@@ -39,7 +39,9 @@ export const RootErrorBoundary: FC<RootErrorBoundary.Props> = ({ error }) => {
 						onClick={() => void reset.run()}
 						className="w-full rounded-md border border-red-300/45 bg-red-300 px-4 py-3 text-sm font-black text-slate-950 disabled:cursor-wait disabled:opacity-60"
 					>
-						{reset.pending ? "Dropping OPFS storage…" : "Retry OPFS hard reset"}
+						{reset.pending
+							? "Dropping browser storage…"
+							: "Retry browser storage reset"}
 					</button>
 					{reset.failed ? (
 						<p className="mt-3 text-sm text-red-100">

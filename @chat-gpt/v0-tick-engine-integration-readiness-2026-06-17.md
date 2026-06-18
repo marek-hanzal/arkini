@@ -41,8 +41,8 @@ Priority order:
    - Loads the default compiled config by default, or accepts an injected test/config package. The engine default synthesizes resource placeholders from asset references so the runtime adapter does not drag base64 art payloads into gameplay code.
    - Bootstraps a `GameSave` from `startingState` when no save is injected.
    - Dispatches `applyGameActionFx`, ticks via `runGameTickFx`, stores the returned next save in memory and publishes raw domain `GameEngineResult` events to subscribers.
-   - Added `runGameEngineEffect`, a narrow engine runner that provides only `RandomServiceFx`. Do not use the app-level `runEffect` here because it currently wires SQLite/Kysely/browser storage and would make the no-persistence adapter lie through its teeth.
-   - This adapter deliberately does not import Dexie, SQLite, React Query or TileEngine. Persistence and visuals wrap it later instead of leaking into game rules like some kind of architectural sewage.
+   - Added `runGameEngineEffect`, a narrow engine runner that provides only `RandomServiceFx`. Do not use an app-level storage runner here. The engine runner provides only engine services and keeps persistence outside.
+   - This adapter deliberately does not import Dexie, browser storage, React Query or TileEngine. Persistence and visuals wrap it later instead of leaking into game rules like some kind of architectural sewage.
 
 6. **Domain-event to visual-event bridge** — DONE / FOLLOW-UP
    - Added the first bridge under `src/v0/play/game-engine-bridge`, intentionally outside `src/v0/game/engine` so the standalone engine does not import UI visual language.
@@ -62,7 +62,7 @@ Priority order:
    - Board/inventory surfaces now read `BoardView`/`InventoryView` from runtime selectors instead of `useSuspenseQuery(boardViewQueryOptions)` / `inventoryViewQueryOptions`.
    - Replaced gameplay `useMutation` hooks in the live board/inventory/item paths with `useGameAction` and `useGameRuntimeDropActions`. Runtime actions are command functions over `RuntimeGameEngineAdapter`, not fake server mutations with a cache hostage situation.
    - Removed dead board/inventory/item gameplay mutation hooks so React Query stops pretending to be the game state source of truth.
-   - Added runtime engine actions for board move, board swap, inventory-to-board placement, board-to-inventory stash and inventory slot swap. This avoids the split-brain disaster where UI reads from the new runtime store but writes to the old SQLite mutation path.
+   - Added runtime engine actions for board move, board swap, inventory-to-board placement, board-to-inventory stash and inventory slot swap. This avoids the split-brain disaster where UI reads from the new runtime store but writes to the removed SQL mutation path.
    - Board-to-board drop commands now route merge/craft/producer/stash/stored-requirement interactions into runtime actions where the new engine has coverage. Remaining parity gaps are explicit rather than hidden behind old mutation hooks.
    - Added a checked-in Vitest config so focused tests do not need repeated CLI flag witchcraft.
 
@@ -72,7 +72,7 @@ Priority order:
    - Moved remaining pure visual-event sequencing/summarizing helpers under `play/visual-events` so they are not tied to cache patching.
    - Converted the upgrade sheet to runtime selectors/actions.
    - Removed the old item catalog React Query/fx path from live gameplay rendering; board, inventory, item sheet and upgrade sheet now read item views from runtime `GameConfig` through the selector store.
-   - Converted dev scenario loading to replace the runtime save directly, so debug scenarios no longer write old SQLite gameplay state and then hope the runtime follows.
+   - Converted dev scenario loading to replace the runtime save directly, so debug scenarios no longer write removed SQL gameplay state and then hope the runtime follows.
    - Added inventory-to-occupied-board drop routing for merge/craft/producer/stash/stored-requirement interactions through runtime actions.
    - Drop feedback and drop action resolution now use the runtime `GameConfig` supplied by `RuntimeGameEngineAdapter` instead of the old `GameConfigServiceLive` manifest path, so UI hints and engine commands no longer consult two different rulebooks.
    - Added runtime product-line view projection and item-sheet controls for enabling/disabling producer product lines and starting no-input lines. Board taps and input routing now choose the first enabled product line instead of blindly poking the first static config entry like a drunk pigeon.
@@ -87,4 +87,13 @@ Priority order:
    - Dexie/IndexedDB simplification follows after the engine can run in memory and after the domain-event bridge proves the shape UI actually needs.
    - Do not implement Dexie before the adapter/bridge boundary is clear, otherwise storage starts shaping gameplay state and the project wakes up with database Stockholm syndrome.
 
-Current task: item 8 is the active cleanup/parity pass. Product line UI controls, basic runtime action error surfacing, craft/job ownership, product-line progress refresh, runtime item catalog reads and runtime-config drop intent resolution are now covered. Next pass should keep sealing runtime-only gaps around remaining sheet actions and any old SQLite gameplay helpers that still look reachable from runtime UI. Dexie only after runtime remains the single gameplay source of truth.
+Current task: item 8 is the active cleanup/parity pass. Product line UI controls, basic runtime action error surfacing, craft/job ownership, product-line progress refresh, runtime item catalog reads and runtime-config drop intent resolution are now covered. Next pass should keep sealing runtime-only gaps around remaining sheet actions and any old storage-shaped gameplay helpers that still look reachable from runtime UI. Dexie only after runtime remains the single gameplay source of truth.
+
+
+## 2026-06-18 cleanup pass
+
+- Removed the old browser SQLite/Kysely layer entirely: `src/v0/database`, DB migrations, `dbFx`, `withTransactionFx`, SQL row projections, app-level `runEffect/runGameFx`, database status query UI and React Query provider.
+- Removed the old DB-backed gameplay Fx shards under board/inventory/activation/craft/item-instance/play/placement where they only existed to mutate SQL rows.
+- Removed React Query from the app runtime dependency set. Runtime UI now reads diagnostics directly from `GameRuntimeStore`.
+- Root/dev hard reset is now a generic browser-storage wipe plus reload.
+- Future persistence should be Dexie/IndexedDB outside the runtime adapter after parity is stable.

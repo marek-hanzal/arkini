@@ -1,5 +1,3 @@
-import type { QueryClient } from "@tanstack/react-query";
-import { databaseQueryKeys } from "~/v0/database/query/databaseQueryKeys";
 import type { Sheet } from "~/v0/play/sheet/Sheet";
 import { DebugTimeline, createDebugJsonReplacer } from "~/v0/debug/DebugTimeline";
 import { readLastLoadedDevScenario } from "~/v0/debug/scenario/DevScenarioRuntime";
@@ -16,12 +14,7 @@ export namespace DebugBugReport {
 		};
 	}
 
-	export interface SnapshotGetterProps {
-		queryClient: QueryClient;
-	}
-
 	export interface RegisterProps {
-		queryClient: QueryClient;
 		getContext(): SnapshotContext;
 	}
 
@@ -34,7 +27,6 @@ export namespace DebugBugReport {
 	}
 }
 
-let queryClientRef: QueryClient | undefined;
 let getContextRef: (() => DebugBugReport.SnapshotContext) | undefined;
 
 const copyText = async (text: string) => {
@@ -142,41 +134,6 @@ const readTileEngineDom = () =>
 		};
 	});
 
-const readQueryState = (queryClient: QueryClient | undefined) => {
-	if (!queryClient) {
-		return {
-			available: false,
-		};
-	}
-
-	return {
-		available: true,
-		database: queryClient.getQueryData(databaseQueryKeys.status),
-		queries: queryClient
-			.getQueryCache()
-			.getAll()
-			.map((query) => ({
-				queryHash: query.queryHash,
-				queryKey: query.queryKey,
-				state: {
-					dataUpdatedAt: query.state.dataUpdatedAt,
-					fetchStatus: query.state.fetchStatus,
-					status: query.state.status,
-					isInvalidated: query.state.isInvalidated,
-					error: query.state.error
-						? query.state.error instanceof Error
-							? {
-									name: query.state.error.name,
-									message: query.state.error.message,
-									stack: query.state.error.stack,
-								}
-							: query.state.error
-						: null,
-				},
-			})),
-	};
-};
-
 const createReport = () => ({
 	schema: "arkini.debug-report.v2",
 	createdAtIso: new Date().toISOString(),
@@ -196,7 +153,6 @@ const createReport = () => ({
 	screen: readScreen(),
 	location: readLocation(),
 	tileEngineDom: readTileEngineDom(),
-	query: readQueryState(queryClientRef),
 	timeline: DebugTimeline.entries(),
 });
 
@@ -218,11 +174,7 @@ export const DebugBugReport: DebugBugReport.Api = {
 	},
 };
 
-export const registerDebugBugReport = ({
-	getContext,
-	queryClient,
-}: DebugBugReport.RegisterProps) => {
-	queryClientRef = queryClient;
+export const registerDebugBugReport = ({ getContext }: DebugBugReport.RegisterProps) => {
 	getContextRef = getContext;
 
 	if (typeof window !== "undefined" && import.meta.env.DEV) {

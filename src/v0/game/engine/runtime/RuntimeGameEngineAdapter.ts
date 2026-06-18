@@ -54,8 +54,8 @@ export namespace RuntimeGameEngineAdapter {
  * Runtime adapter around the standalone tick/action engine.
  *
  * It owns the current `(config, save)` pair for a running browser session and publishes
- * domain events from engine results. It deliberately does not know Dexie, SQLite,
- * React Query or TileEngine. Those layers can subscribe/wrap it later like civilized
+ * domain events from engine results. It deliberately does not know Dexie, browser
+ * storage or TileEngine. Those layers can subscribe/wrap it later like civilized
  * code instead of pouring persistence concrete into gameplay rules.
  */
 export class RuntimeGameEngineAdapter {

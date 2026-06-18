@@ -98,7 +98,10 @@ export const useBoardTileEngineModel = ({
 
 			if (action.type !== "activate") return;
 
-			if (boardItem.activation?.kind === "stash") {
+			const activation = boardItem.activation;
+			if (!activation) return;
+
+			if (activation.kind === "stash") {
 				void runtimeStore
 					.dispatch({
 						action: {
@@ -111,9 +114,7 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
-			const productId = boardItem.activation.productLines?.find(
-				(line) => line.enabled,
-			)?.productId;
+			const productId = activation.productLines?.find((line) => line.enabled)?.productId;
 
 			if (!productId) {
 				feedback.showError("No enabled product line.");

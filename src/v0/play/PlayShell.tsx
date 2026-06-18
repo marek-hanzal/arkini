@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { match } from "ts-pattern";
 import { type FC, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BoardSurface } from "~/v0/board/BoardSurface";
@@ -23,7 +22,6 @@ export namespace PlayShell {
 const SheetFallback: FC = () => <div className="p-4 text-sm text-slate-300">Loading sheet…</div>;
 
 const PlayShellContent: FC = () => {
-	const queryClient = useQueryClient();
 	const runtimeStore = useGameRuntimeStore();
 	const feedbackFlags = useFeedbackFlags();
 	const playAreaRef = useRef<HTMLDivElement | null>(null);
@@ -70,7 +68,6 @@ const PlayShellContent: FC = () => {
 	);
 	useEffect(() => {
 		registerDebugBugReport({
-			queryClient,
 			getContext: () => {
 				const runtime = runtimeStore.getSnapshot();
 				return {
@@ -89,7 +86,6 @@ const PlayShellContent: FC = () => {
 	}, [
 		activeSheet?.type,
 		lastError,
-		queryClient,
 		runtimeStore,
 	]);
 

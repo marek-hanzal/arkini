@@ -15,7 +15,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, upgrades, and runtime/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
-The game has one gameplay source of truth: `GameConfig` in `src/v0/manifest/GameConfig.ts`. The public config object is composed from focused files in `src/v0/manifest/config/` so the actual data does not rot inside one 3000-line shrine to human suffering. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins. Config IDs are locked by explicit Zod enum schemas such as `GameItemIdSchema`, `GameLootTableIdSchema`, and `GameUpgradeIdSchema`; gameplay string IDs should flow through those types instead of prefix-only string guesses.
+The game has one gameplay source of truth: compiled JSON parsed by `src/v0/game/config/GameConfigSchema.ts`. Source fragments live under `game/arkini`; the browser/runtime consumes the compiled canonical config. Runtime ID value schemas are generic strings in `GameIdSchema`; cross-reference truth belongs to `GameConfigSchema` / `GameSaveConfigSchema`, not stale TS enum mirrors.
 
 Item definitions drive behavior. An item may define:
 
@@ -110,7 +110,7 @@ Components should stay boring: render props, wire callbacks, and shut up. If a c
 
 The active `src/v0` runtime should remain the template for new code. Do not add generic buckets such as `src/v0/shared`, `src/v0/query`, `src/v0/mutation`, or `src/v0/play/schema`. If something feels shared, name the owning domain first. If no domain owns it, the design is probably still mushy.
 
-Types and schemas live with the domain they describe: board schemas in `board/schema`, inventory schemas in `inventory/schema`, upgrade schemas in `upgrade/schema`, save schemas in `play/save`, manifest definition schemas in `manifest/*DefinitionSchema.ts`, and view schemas in the relevant domain `view` folder. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
+Types and schemas live with the domain they describe: board schemas in `board/view`, inventory schemas in `inventory/view`, upgrade schemas in `upgrade/view`, canonical game config schemas in `game/config`, and save/event schemas in `game/engine/model`. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
 
 Standalone model files are preferred over mixed `types.ts` piles. Inventory planning rows, placement plans, activation definitions, upgrade definitions, and service contracts should live as one exported concept per file unless a file is intentionally a tiny namespace wrapper around the same concept.
 
@@ -120,11 +120,10 @@ Centralized hooks are banned unless the domain is explicitly the runtime, such a
 
 ```txt
 src/app/                         App entry, router and global styles.
-src/assets/                      PNG gameplay assets imported by v0 manifest helper utilities.
+src/assets/                      Static source assets used by compiled game packages and UI.
 src/v0/                         Active client play runtime. v0 should be self-contained except asset imports.
-src/v0/manifest/                Active GameConfig composition, typed IDs, standalone definition schemas, validation, derived indexes.
-src/v0/manifest/config/*/       Manifest config split into topical asset/item/loot-table definition chunks.
-src/v0/manifest/dsl/            Manifest-local definition DSL helpers; not a generic utils bucket.
+src/v0/game/config/             Canonical compiled JSON config schema, ID value schemas, config readers.
+game/arkini/                    Source JSON game package compiled into canonical runtime config/assets.
 src/v0/game/                    Active GameConfig Effect service and derived lookup helpers.
 src/v0/date/                    Active Luxon date Effect service.
 src/v0/debug/                   Dev-only structured timeline buffer for drag/drop/action reports.

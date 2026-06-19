@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
+import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 import { ActivationViewSchema } from "./ActivationViewSchema";
 import { BoardItemStateSchema } from "./BoardItemStateSchema";
 import { CraftProgressViewSchema } from "./CraftProgressViewSchema";

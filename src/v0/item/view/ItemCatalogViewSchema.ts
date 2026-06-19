@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { ViewItemSchema, type ViewItem } from "./ViewItemSchema";
 
 export const ItemCatalogViewSchema = z.record(z.string(), ViewItemSchema);

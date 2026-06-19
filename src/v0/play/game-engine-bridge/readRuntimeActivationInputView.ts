@@ -1,5 +1,5 @@
 import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 
 export namespace readRuntimeActivationInputView {
 	export interface Props {

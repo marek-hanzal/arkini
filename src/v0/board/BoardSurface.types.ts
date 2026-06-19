@@ -1,4 +1,4 @@
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 
 export namespace BoardSurface {

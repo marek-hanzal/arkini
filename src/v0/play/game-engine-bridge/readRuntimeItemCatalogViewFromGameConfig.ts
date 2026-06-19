@@ -1,7 +1,7 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 
 const itemAssetUrls = import.meta.glob("../../../assets/*.png", {

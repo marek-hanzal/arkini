@@ -3,7 +3,7 @@ import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLin
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,

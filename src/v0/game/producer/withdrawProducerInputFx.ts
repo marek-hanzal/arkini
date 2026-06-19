@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkProducerInputWithdrawReadinessFx";
+import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/producer/checkProducerInputWithdrawReadinessFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";

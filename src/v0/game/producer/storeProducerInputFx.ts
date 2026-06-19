@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { checkProducerInputStoreReadinessFx } from "~/v0/game/engine/fx/checkProducerInputStoreReadinessFx";
+import { checkProducerInputStoreReadinessFx } from "~/v0/game/producer/checkProducerInputStoreReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/v0/game/engine/fx/consumeResolvedInputRefFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";

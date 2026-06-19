@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
+import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductLineSetEnabled } from "~/v0/game/engine/model/GameActionProducerProductLineSetEnabled";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

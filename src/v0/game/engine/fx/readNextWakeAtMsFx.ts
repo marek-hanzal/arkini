@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { readProducerJobWakeAtMs } from "~/v0/game/engine/fx/producerDeliveryTiming";
+import { readProducerJobWakeAtMs } from "~/v0/game/producer/producerDeliveryTiming";
 
 export namespace readNextWakeAtMsFx {
 	export interface Props {

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
 import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
 import { processCompletedCraftJobsFx } from "~/v0/game/engine/fx/processCompletedCraftJobsFx";
-import { processCompletedProducerJobsFx } from "~/v0/game/engine/fx/processCompletedProducerJobsFx";
+import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
 import { processCompletedUpgradeJobsFx } from "~/v0/game/engine/fx/processCompletedUpgradeJobsFx";
 import { processItemSpawnJobsFx } from "~/v0/game/engine/fx/processItemSpawnJobsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";

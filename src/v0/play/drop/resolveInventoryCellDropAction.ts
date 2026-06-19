@@ -2,7 +2,7 @@ import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
-import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
+import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
@@ -90,12 +90,12 @@ export const resolveInventoryCellDropAction = ({
 			};
 		}
 
-		const intent = resolveDropIntent({
+		const plan = resolveItemToBoardItemInteractionPlan({
 			config,
 			sourceItemId: source.itemId,
 			targetItem,
 		});
-		if (intent.type === "reject" || intent.type === "swap") {
+		if (plan.type === "reject" || plan.type === "swap") {
 			return {
 				feedback: {
 					kind: "board-cell",
@@ -107,17 +107,12 @@ export const resolveInventoryCellDropAction = ({
 
 		return {
 			feedback:
-				intent.type === "stored-requirement"
-					? {
+				plan.type === "merge"
+					? undefined
+					: {
 							cellKey: cellKey(target.x, target.y),
-							variant: "primary",
-						}
-					: intent.type === "craft-input" || intent.type === "producer-input"
-						? {
-								cellKey: cellKey(target.x, target.y),
-								variant: "secondary",
-							}
-						: undefined,
+							variant: plan.feedbackVariant,
+						},
 			input: {
 				sourceSlotIndex: source.slotIndex,
 				targetBoardItemId: target.boardItemId,

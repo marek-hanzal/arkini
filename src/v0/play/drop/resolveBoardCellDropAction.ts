@@ -1,7 +1,7 @@
 import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
+import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
@@ -35,17 +35,23 @@ export type BoardCellDropAction =
 	  }
 	| {
 			type: "merge-board-items";
-			animation?: "parallel-merge";
-			feedback?:
-				| {
-						kind: "merge-cell" | "imprint-cell";
-						cellKey: string;
-				  }
-				| {
-						kind: "cell-feedback";
-						cellKey: string;
-						variant: TileEngine.DropFeedbackVariant;
-				  };
+			animation: "parallel-merge";
+			feedback?: {
+				kind: "merge-cell" | "imprint-cell";
+				cellKey: string;
+			};
+			input: {
+				sourceBoardItemId: string;
+				targetBoardItemId: string;
+			};
+	  }
+	| {
+			type: "apply-board-item-to-board-item";
+			feedback?: {
+				kind: "cell-feedback";
+				cellKey: string;
+				variant: TileEngine.DropFeedbackVariant;
+			};
 			input: {
 				sourceBoardItemId: string;
 				targetBoardItemId: string;
@@ -107,13 +113,13 @@ export const resolveBoardCellDropAction = ({
 		};
 	}
 
-	const intent = resolveDropIntent({
+	const plan = resolveItemToBoardItemInteractionPlan({
 		config,
 		sourceItemId: source.itemId,
 		targetItem,
 	});
 
-	if (intent.type === "reject") {
+	if (plan.type === "reject") {
 		return {
 			type: "reject",
 			feedback: {
@@ -123,7 +129,7 @@ export const resolveBoardCellDropAction = ({
 		};
 	}
 
-	if (intent.type === "swap") {
+	if (plan.type === "swap") {
 		return {
 			type: "swap-board-items",
 			animation: "parallel-swap",
@@ -134,12 +140,12 @@ export const resolveBoardCellDropAction = ({
 		};
 	}
 
-	if (intent.type === "merge") {
+	if (plan.type === "merge") {
 		return {
 			type: "merge-board-items",
 			animation: "parallel-merge",
 			feedback: {
-				kind: intent.directed ? "imprint-cell" : "merge-cell",
+				kind: plan.directed ? "imprint-cell" : "merge-cell",
 				cellKey: targetCellKey,
 			},
 			input: {
@@ -150,19 +156,12 @@ export const resolveBoardCellDropAction = ({
 	}
 
 	return {
-		type: "merge-board-items",
-		feedback:
-			intent.type === "stored-requirement"
-				? {
-						cellKey: targetCellKey,
-						kind: "cell-feedback",
-						variant: "primary",
-					}
-				: {
-						cellKey: targetCellKey,
-						kind: "cell-feedback",
-						variant: "secondary",
-					},
+		type: "apply-board-item-to-board-item",
+		feedback: {
+			cellKey: targetCellKey,
+			kind: "cell-feedback",
+			variant: plan.feedbackVariant,
+		},
 		input: {
 			sourceBoardItemId: source.boardItemId,
 			targetBoardItemId: targetItem.id,

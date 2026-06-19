@@ -270,4 +270,28 @@ describe("resolveDropIntent", () => {
 			type: "stored-requirement",
 		});
 	});
+	it("routes stash inputs before the swap fallback", () => {
+		expect(
+			resolveDropIntent({
+				config,
+				sourceItemId: "item:twig",
+				targetItem: activationTarget({
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+							stored: 0,
+						},
+					],
+					kind: "stash",
+					requirements: [],
+					trigger: "click",
+				}),
+			}),
+		).toEqual({
+			type: "stash-input",
+		});
+	});
 });

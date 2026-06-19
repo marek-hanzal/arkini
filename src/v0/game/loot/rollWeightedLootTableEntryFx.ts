@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
-import type { WeightedLootTableEntry } from "~/v0/game/engine/model/WeightedLootTableEntry";
+import type { WeightedLootTableEntry } from "~/v0/game/loot/WeightedLootTableEntry";
 
 export namespace rollWeightedLootTableEntryFx {
 	export interface Props {

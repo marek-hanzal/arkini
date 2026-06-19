@@ -22,7 +22,7 @@ import { checkUpgradeStartReadinessFx } from "~/v0/game/upgrade/checkUpgradeStar
 import { parseGameActionFx } from "~/v0/game/engine/parseGameActionFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionReadiness } from "~/v0/game/engine/model/GameActionReadinessSchema";
+import type { GameActionReadiness } from "~/v0/game/action/GameActionReadinessSchema";
 import type { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

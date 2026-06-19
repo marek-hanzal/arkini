@@ -13,6 +13,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 ## Current architecture facts
 
 - Runtime truth: compiled JSON `GameConfig` + `GameSave` inside `RuntimeGameEngineAdapter` / `GameRuntimeStore`.
+- Action contracts live in `game/action`; output event contracts live in `game/event`; dense save contract stays in `game/engine/model`.
 - React reads runtime through `useGameRuntimeSelector` / focused hooks, not React Query.
 - Gameplay mutations go through typed engine actions, not `useMutation` wrappers.
 - Persistence is Dexie snapshot plumbing around `GameSave`; it is not gameplay truth.

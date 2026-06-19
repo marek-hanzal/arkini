@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameRequirement } from "~/v0/game/engine/model/GameRequirement";
+import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 
 export namespace splitCraftRequirementsFx {
 	export interface Props {

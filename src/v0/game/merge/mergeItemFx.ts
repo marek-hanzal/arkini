@@ -5,10 +5,10 @@ import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRunt
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionItemMerge } from "~/v0/game/engine/model/GameActionItemMerge";
+import type { GameActionItemMerge } from "~/v0/game/action/GameActionItemMerge";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace mergeItemFx {

@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
-import type { GameActivationInput } from "~/v0/game/engine/model/GameActivationInput";
-import type { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
+import type { GameActionItemRefSchema } from "~/v0/game/action/GameActionItemRefSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace consumeActivationInputsFx {

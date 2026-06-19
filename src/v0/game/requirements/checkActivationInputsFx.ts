@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { mergeActivationInputRequirementsFx } from "~/v0/game/requirements/mergeActivationInputRequirementsFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import { sumResolvedInputRefsFx } from "~/v0/game/requirements/sumResolvedInputRefsFx";
-import type { GameActivationInput } from "~/v0/game/engine/model/GameActivationInput";
-import type { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
-import type { GameActionResolvedInputRef } from "~/v0/game/engine/model/GameActionResolvedInputRef";
+import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
+import type { GameActionItemRefSchema } from "~/v0/game/action/GameActionItemRefSchema";
+import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

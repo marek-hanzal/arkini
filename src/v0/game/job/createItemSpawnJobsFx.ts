@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { createGameItemSpawnJobIdFx } from "~/v0/game/job/createGameItemSpawnJobIdFx";
-import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
+import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace createItemSpawnJobsFx {

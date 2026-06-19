@@ -1,5 +1,5 @@
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 

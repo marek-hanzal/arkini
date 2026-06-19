@@ -5,7 +5,7 @@ import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProduce
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionProducerInputStore } from "~/v0/game/engine/model/GameActionProducerInputStore";
+import type { GameActionProducerInputStore } from "~/v0/game/action/GameActionProducerInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

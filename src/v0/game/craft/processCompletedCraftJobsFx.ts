@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { completeCraftJobFx } from "~/v0/game/craft/completeCraftJobFx";
 import { readCompletedCraftJobsFx } from "~/v0/game/craft/readCompletedCraftJobsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace processCompletedCraftJobsFx {

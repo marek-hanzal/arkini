@@ -4,9 +4,9 @@ import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionCraftInputStore } from "~/v0/game/engine/model/GameActionCraftInputStore";
+import type { GameActionCraftInputStore } from "~/v0/game/action/GameActionCraftInputStore";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace storeCraftInputFx {

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
-import type { GamePassiveRequirementScope } from "~/v0/game/engine/model/GamePassiveRequirementScope";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+import type { GamePassiveRequirementScope } from "~/v0/game/requirements/GamePassiveRequirementScope";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace countPassiveItemQuantityFx {

@@ -3,9 +3,9 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
-import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
-import type { GameSaveItemPlacementResult } from "~/v0/game/engine/model/GameSaveItemPlacementResult";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
+import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
+import type { GameSaveItemPlacementResult } from "~/v0/game/placement/GameSaveItemPlacementResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace placeGameSaveInventoryItemsFx {

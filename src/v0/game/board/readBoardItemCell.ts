@@ -1,4 +1,4 @@
-import type { BoardCell } from "~/v0/game/engine/model/BoardCell";
+import type { BoardCell } from "~/v0/game/board/BoardCell";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export const readBoardItemCell = ({

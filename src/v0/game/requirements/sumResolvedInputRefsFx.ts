@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameActionResolvedInputRef } from "~/v0/game/engine/model/GameActionResolvedInputRef";
+import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
 
 export namespace sumResolvedInputRefsFx {
 	export interface Props {

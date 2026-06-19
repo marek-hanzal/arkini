@@ -110,7 +110,7 @@ Components should stay boring: render props, wire callbacks, and shut up. If a c
 
 The active `src/v0` runtime should remain the template for new code. Do not add generic buckets such as `src/v0/shared`, `src/v0/query`, `src/v0/mutation`, or `src/v0/play/schema`. If something feels shared, name the owning domain first. If no domain owns it, the design is probably still mushy.
 
-Types and schemas live with the domain they describe: board schemas in `board/view`, inventory schemas in `inventory/view`, upgrade schemas in `upgrade/view`, canonical game config schemas in `game/config`, and save/event schemas in `game/engine/model`. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
+Types and schemas live with the domain they describe: board schemas in `board/view`, inventory schemas in `inventory/view`, upgrade schemas in `upgrade/view`, canonical game config schemas in `game/config`, action contracts in `game/action`, output event contracts in `game/event`, and the dense save contract in `game/engine/model`. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
 
 Standalone model files are preferred over mixed `types.ts` piles. Inventory planning rows, placement plans, activation definitions, upgrade definitions, and service contracts should live as one exported concept per file unless a file is intentionally a tiny namespace wrapper around the same concept.
 
@@ -214,7 +214,7 @@ Future Dexie/IndexedDB persistence should wrap the runtime from outside: load a 
 
 ## Validation policy
 
-The runtime save is not trusted just because it came from memory or future storage. Gameplay inputs and saves are validated through active Zod models under `src/v0/game/engine/model` and the UI-facing `schema|type|view` models. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
+The runtime save is not trusted just because it came from memory or future storage. Gameplay inputs and saves are validated through active Zod models under `src/v0/game/action`, `src/v0/game/config`, `src/v0/game/event`, `src/v0/game/engine/model`, and the UI-facing `schema|type|view` models. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
 
 ## Minimal-code philosophy
 

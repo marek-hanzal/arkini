@@ -5,7 +5,7 @@ import { findStoredRequirementSlotFx } from "~/v0/game/requirements/findStoredRe
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import { readStoredRequirementSlotsFx } from "~/v0/game/requirements/readStoredRequirementSlotsFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
-import type { GameActionStoredRequirementStore } from "~/v0/game/engine/model/GameActionStoredRequirementStore";
+import type { GameActionStoredRequirementStore } from "~/v0/game/action/GameActionStoredRequirementStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

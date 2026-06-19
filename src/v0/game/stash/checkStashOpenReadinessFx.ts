@@ -6,7 +6,7 @@ import { readStashBoardItemFx } from "~/v0/game/stash/readStashBoardItemFx";
 import { readStashRemainingChargesFx } from "~/v0/game/stash/readStashRemainingChargesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionStashOpen } from "~/v0/game/engine/model/GameActionStashOpen";
+import type { GameActionStashOpen } from "~/v0/game/action/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

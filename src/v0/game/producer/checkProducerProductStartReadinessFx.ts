@@ -9,7 +9,7 @@ import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProduce
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
+import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

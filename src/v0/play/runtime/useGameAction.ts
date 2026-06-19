@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
+import type { GameAction } from "~/v0/game/action/GameActionSchema";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import { useGameRuntimeStore } from "~/v0/play/runtime/GameRuntimeContext";

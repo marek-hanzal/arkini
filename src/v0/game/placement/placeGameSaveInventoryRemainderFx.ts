@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
-import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
-import { isGameSaveInventoryStack } from "~/v0/game/engine/model/GameSaveInventorySlot";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
+import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
+import { isGameSaveInventoryStack } from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace placeGameSaveInventoryRemainderFx {

@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { UpgradeCard } from "~/v0/upgrade/ui/UpgradeCard";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";

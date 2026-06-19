@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import { createGameEngineVisualPlan } from "~/v0/play/game-engine-visual/createGameEngineVisualPlan";
 
 const boardView = (items: Parameters<typeof rebuildBoardView>[0]) => rebuildBoardView(items);

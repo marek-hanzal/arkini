@@ -1,7 +1,7 @@
 import { cellKey } from "~/v0/board/cellKey";
 import type { BoardTransientTile } from "~/v0/board/animation/BoardTransientTile";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import { createGameVisualMergeSourceTileId } from "~/v0/play/game-engine-visual/createGameVisualMergeSourceTileId";
 import { gameVisualMotionSettlementDelayMs } from "~/v0/play/game-engine-visual/gameVisualMotionSettlementDelayMs";
 import { GameVisualMotion } from "~/v0/play/game-engine-visual/GameVisualMotion";

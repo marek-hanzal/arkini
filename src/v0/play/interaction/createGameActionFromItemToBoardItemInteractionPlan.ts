@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
-import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
-import type { GameActionItemRef } from "~/v0/game/engine/model/GameActionItemRefSchema";
+import type { GameAction } from "~/v0/game/action/GameActionSchema";
+import type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema";
 import type { ItemToBoardItemInteractionPlan } from "~/v0/play/interaction/ItemToBoardItemInteractionPlan";
 
 export namespace createGameActionFromItemToBoardItemInteractionPlan {

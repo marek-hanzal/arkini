@@ -6,14 +6,14 @@ import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanc
 import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
-import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/engine/model/GameActionInventoryItemPlaceSchema";
+import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import {
 	isGameSaveInventoryInstance,
 	readGameSaveInventorySlotQuantity,
-} from "~/v0/game/engine/model/GameSaveInventorySlot";
+} from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace placeInventoryItemOnBoardFx {

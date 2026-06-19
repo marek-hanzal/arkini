@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
-import type { GameActionBoardItemStashSchema } from "~/v0/game/engine/model/GameActionBoardItemStashSchema";
+import type { GameActionBoardItemStashSchema } from "~/v0/game/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { isGameSaveInventoryStack } from "~/v0/game/engine/model/GameSaveInventorySlot";
+import { isGameSaveInventoryStack } from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace checkBoardItemStashReadinessFx {

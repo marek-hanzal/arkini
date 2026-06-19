@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameRequirement } from "~/v0/game/engine/model/GameRequirement";
+import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 
 export namespace findStoredRequirementSlotFx {
 	export interface Props {

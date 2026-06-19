@@ -4,7 +4,7 @@ import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionCraftStart } from "~/v0/game/engine/model/GameActionCraftStart";
+import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

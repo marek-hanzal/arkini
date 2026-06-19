@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
-import type { GameQuantity } from "~/v0/game/engine/model/GameQuantity";
-import type { GameQuantityRollResult } from "~/v0/game/engine/model/GameQuantityRollResult";
+import type { GameQuantity } from "~/v0/game/loot/GameQuantity";
+import type { GameQuantityRollResult } from "~/v0/game/loot/GameQuantityRollResult";
 
 export namespace rollGameQuantityFx {
 	export interface Props {

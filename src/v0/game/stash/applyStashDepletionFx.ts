@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace applyStashDepletionFx {

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameActionInventorySlotsSwapSchema } from "~/v0/game/engine/model/GameActionInventorySlotsSwapSchema";
+import type { GameActionInventorySlotsSwapSchema } from "~/v0/game/action/GameActionInventorySlotsSwapSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

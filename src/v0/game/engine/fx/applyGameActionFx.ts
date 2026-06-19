@@ -1,11 +1,11 @@
 import { Effect, type Effect as EffectType } from "effect";
 import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
 import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
-import { moveBoardItemFx } from "~/v0/game/engine/fx/moveBoardItemFx";
+import { moveBoardItemFx } from "~/v0/game/board/moveBoardItemFx";
 import { placeInventoryItemOnBoardFx } from "~/v0/game/placement/placeInventoryItemOnBoardFx";
 import { stashBoardItemFx } from "~/v0/game/stash/stashBoardItemFx";
-import { swapBoardItemsFx } from "~/v0/game/engine/fx/swapBoardItemsFx";
-import { swapInventorySlotsFx } from "~/v0/game/engine/fx/swapInventorySlotsFx";
+import { swapBoardItemsFx } from "~/v0/game/board/swapBoardItemsFx";
+import { swapInventorySlotsFx } from "~/v0/game/inventory/swapInventorySlotsFx";
 import { mergeItemFx } from "~/v0/game/engine/fx/mergeItemFx";
 import { openStashFx } from "~/v0/game/stash/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";

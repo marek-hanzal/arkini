@@ -4,7 +4,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/producer/producerDeliveryTiming";
-import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
+import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";

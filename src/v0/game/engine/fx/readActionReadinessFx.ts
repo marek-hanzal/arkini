@@ -1,14 +1,14 @@
 import { Effect, type Effect as EffectType } from "effect";
 import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
 import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
-import { checkBoardItemMoveReadinessFx } from "~/v0/game/engine/fx/checkBoardItemMoveReadinessFx";
+import { checkBoardItemMoveReadinessFx } from "~/v0/game/board/checkBoardItemMoveReadinessFx";
 import { checkBoardItemStashReadinessFx } from "~/v0/game/stash/checkBoardItemStashReadinessFx";
-import { checkBoardItemsSwapReadinessFx } from "~/v0/game/engine/fx/checkBoardItemsSwapReadinessFx";
+import { checkBoardItemsSwapReadinessFx } from "~/v0/game/board/checkBoardItemsSwapReadinessFx";
 import { checkCraftStartReadinessFx } from "~/v0/game/craft/checkCraftStartReadinessFx";
 import { checkCraftInputStoreReadinessFx } from "~/v0/game/craft/checkCraftInputStoreReadinessFx";
 import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/craft/checkCraftInputWithdrawReadinessFx";
-import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/engine/fx/checkInventoryItemPlaceReadinessFx";
-import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/engine/fx/checkInventorySlotsSwapReadinessFx";
+import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/placement/checkInventoryItemPlaceReadinessFx";
+import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/inventory/checkInventorySlotsSwapReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
 import { checkProducerInputStoreReadinessFx } from "~/v0/game/producer/checkProducerInputStoreReadinessFx";
 import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/producer/checkProducerInputWithdrawReadinessFx";

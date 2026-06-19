@@ -347,3 +347,8 @@ Continue reducing `src/v0/game/engine/fx` by moving the next coherent domain clu
 ## 2026-06-19 update: job domain extraction
 
 Moved generic job helpers, wake calculation, job IDs, and item-spawn job processing to `src/v0/game/job`. `engine/fx` should no longer own delayed/retry gameplay helpers. Remaining likely clusters: board/inventory actions, merge/remove, loot, config layer, orchestration shell.
+
+
+## 2026-06-19 update: board/inventory action helpers extracted
+
+Board move/swap helpers now live in `src/v0/game/board`, inventory slot swap helpers live in `src/v0/game/inventory`, and inventory-to-board placement readiness lives in `src/v0/game/placement`. `game/engine` imports these domains for action/readiness orchestration.

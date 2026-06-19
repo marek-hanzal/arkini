@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { GameConfigLayerProducerSchema } from "~/v0/game/engine/model/GameConfigLayerProducerSchema";
-import { GameConfigLayerProductSchema } from "~/v0/game/engine/model/GameConfigLayerProductSchema";
+import { GameConfigLayerProducerSchema } from "~/v0/game/config/GameConfigLayerProducerSchema";
+import { GameConfigLayerProductSchema } from "~/v0/game/config/GameConfigLayerProductSchema";
 
 const IdSchema = z.string().min(1);
 

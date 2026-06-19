@@ -1,6 +1,6 @@
 import { Context } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameConfigLayer } from "~/v0/game/engine/model/GameConfigLayerSchema";
+import type { GameConfigLayer } from "~/v0/game/config/GameConfigLayerSchema";
 
 export interface GameConfigFxService {
 	baseConfig: GameConfig;

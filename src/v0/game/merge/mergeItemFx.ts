@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { checkItemMergeReadinessFx } from "~/v0/game/merge/checkItemMergeReadinessFx";
-import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
+import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";

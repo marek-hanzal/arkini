@@ -33,10 +33,14 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: moved board move/swap helpers to `game/board`, inventory slot swap helpers to `game/inventory`, and inventory-to-board placement readiness to `game/placement`.
 - `2026-06-19`: moved merge execution/readiness to `game/merge`, remove execution/readiness to `game/remove`, and shared board runtime-state cleanup/status helpers to `game/board`.
 
+- `2026-06-19`: moved effective config layer/service files from `game/engine/fx` and `game/engine/context/model` into top-level `game/config`; config overlay is now a config domain, not engine-owned plumbing.
+- `2026-06-19`: moved initial save creation, save cloning, and item-instance ID creation into top-level `game/save`; save bootstrap/helpers are no longer engine-owned plumbing.
+- `2026-06-19`: removed `game/engine/fx`; action/readiness/tick orchestration now lives directly in `game/engine`, while domain behavior lives under top-level `game/*` folders.
+
 ## Next candidates
 
-1. Continue `game/engine/fx` production reshaping domain-by-domain. Next safest coding tasks: config layer extraction, initial save/helper extraction, and final orchestration cleanup. No behavior changes.
-2. Revisit whether `game/engine/fx` should disappear entirely or remain only for true orchestration/cross-domain glue after the remaining clusters move.
+1. Review whether `game/engine/model` contains domain models that should eventually move beside their top-level domains. Do not move dense core contracts (`GameSaveSchema`, `GameConfigSchema`) just for line count.
+2. Audit `RuntimeGameEngineAdapter.ts` only if it starts carrying domain behavior instead of runtime orchestration.
 3. TileEngine follow-up: current browser feel is acceptable. Do not split `TileMotionRuntime.ts` just for line count.
 4. GameEventSchema audit: only if event schema starts carrying behavior. It is an intentional output-event contract and should not be split just for line count.
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
-import { runAction, runInitialSave } from "~/v0/game/engine/fx/applyGameActionFx.testSupport";
+import { runAction, runInitialSave } from "~/v0/game/engine/applyGameActionFx.testSupport";
 
 describe("applyGameActionFx remove", () => {
 	it("removes a tile with a kept tool", () => {

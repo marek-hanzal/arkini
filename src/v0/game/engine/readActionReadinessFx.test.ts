@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
-import { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
+import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
 import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 

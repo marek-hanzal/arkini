@@ -7,7 +7,7 @@ import {
 	runAction,
 	runActionEither,
 	runInitialSave,
-} from "~/v0/game/engine/fx/applyGameActionFx.testSupport";
+} from "~/v0/game/engine/applyGameActionFx.testSupport";
 
 describe("applyGameActionFx Producer", () => {
 	it("starts a no-input producer product as an Effect action", () => {

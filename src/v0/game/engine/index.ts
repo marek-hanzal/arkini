@@ -5,14 +5,14 @@ export type {
 } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 export { runGameEngineEffect } from "~/v0/game/engine/runtime/runGameEngineEffect";
 export type { GameEngineRuntimeServiceFx } from "~/v0/game/engine/runtime/runGameEngineEffect";
-export { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
-export { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+export { applyGameActionFx } from "~/v0/game/engine/applyGameActionFx";
+export { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
 export { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 export { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
-export { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
+export { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
 export { processItemSpawnJobsFx } from "~/v0/game/job/processItemSpawnJobsFx";
 export { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
-export { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
+export { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
 export { createItemSpawnJobsFx } from "~/v0/game/job/createItemSpawnJobsFx";
 export {
 	GameEventPlacementTargetSchema,

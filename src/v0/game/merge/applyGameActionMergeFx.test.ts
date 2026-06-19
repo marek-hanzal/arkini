@@ -4,7 +4,7 @@ import {
 	runAction,
 	runActionEither,
 	runInitialSave,
-} from "~/v0/game/engine/fx/applyGameActionFx.testSupport";
+} from "~/v0/game/engine/applyGameActionFx.testSupport";
 
 describe("applyGameActionFx merge", () => {
 	it("merges only source-owned explicit combo rules", () => {

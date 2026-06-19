@@ -7,7 +7,7 @@ import {
 	runAction,
 	runActionEither,
 	runInitialSave,
-} from "~/v0/game/engine/fx/applyGameActionFx.testSupport";
+} from "~/v0/game/engine/applyGameActionFx.testSupport";
 
 describe("applyGameActionFx Stash", () => {
 	it("opens a stash by applying output and depletion atomically", () => {

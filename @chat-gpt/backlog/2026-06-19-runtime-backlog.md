@@ -4,6 +4,7 @@ Deferred or broader tasks. Promote one into `tasks/` when it becomes current wor
 
 ## Architecture / runtime
 
+- Pure vs Effect boundary audit: classify pure helpers vs Effect programs and remove duplicated business decisions. See `2026-06-19-pure-vs-effect-boundary-audit.md`.
 - Legacy manifest cleanup: remove old TS manifest/config/validation fossils after import-graph check.
 - Capability matrix enforcement after the audit decides allowed item combinations.
 - Split central schema files by domain while keeping central public validators.

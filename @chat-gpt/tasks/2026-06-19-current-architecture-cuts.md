@@ -24,8 +24,9 @@ Status: active task queue for the current cleanup/refactor block.
 
 ## Next candidates
 
-1. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item. Do not add hard validation without approving the matrix first.
-2. TileEngine follow-up audit: `TileEngineSlot.tsx` long-press extraction is done. Next likely TileEngine target is browser validation before deeper motion runtime cleanup. Do not split `TileMotionRuntime.ts` just for line count.
-3. GameEventSchema audit: only if event schema starts carrying behavior. It is an intentional output-event contract and should not be split just for line count.
+1. TileEngine follow-up audit: `TileEngineSlot.tsx` long-press extraction is done. Next likely TileEngine target is browser validation before deeper motion runtime cleanup. Do not split `TileMotionRuntime.ts` just for line count.
+2. GameEventSchema audit: only if event schema starts carrying behavior. It is an intentional output-event contract and should not be split just for line count.
+
+Not a task: item capability whitelist/matrix enforcement. `GameConfigSchema` defines legal item/capability combinations; if validation accepts the config, engine/runtime must support the combination deterministically. Revisit only for a concrete bug or new config validation rule.
 
 Before coding any risky item, inspect source and propose exact files/shape first.

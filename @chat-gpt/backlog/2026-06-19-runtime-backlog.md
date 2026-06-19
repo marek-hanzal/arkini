@@ -5,7 +5,7 @@ Deferred or broader tasks. Promote one into `tasks/` when it becomes current wor
 ## Architecture / runtime
 
 - Pure vs Effect boundary audit: classify pure helpers vs Effect programs and remove duplicated business decisions. See `2026-06-19-pure-vs-effect-boundary-audit.md`.
-- Capability matrix enforcement after the audit decides allowed item combinations.
+- Do not create capability matrix enforcement outside `GameConfigSchema`; legality belongs to config validation, not a separate runtime whitelist. Reopen only for a concrete bug or an intentional schema rule.
 - TileEngine topology audit: inspect long pointer/motion files and decide which complexity is inherent vs avoidable.
 - Game engine visual plan audit: consider splitting event-family visual mappers only if the public interpretation contract stays simple.
 - Runtime adapter audit: check whether `RuntimeGameEngineAdapter` is a justified orchestration boundary or carrying too many concerns.

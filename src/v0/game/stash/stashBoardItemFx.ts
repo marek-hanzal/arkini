@@ -5,7 +5,7 @@ import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveInventoryInstanceFx } from "~/v0/game/placement/placeGameSaveInventoryInstanceFx";
 import { placeGameSaveInventoryItemsFx } from "~/v0/game/placement/placeGameSaveInventoryItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
-import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import type { GameActionBoardItemStashSchema } from "~/v0/game/engine/model/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";

@@ -6,10 +6,10 @@ import { placeInventoryItemOnBoardFx } from "~/v0/game/placement/placeInventoryI
 import { stashBoardItemFx } from "~/v0/game/stash/stashBoardItemFx";
 import { swapBoardItemsFx } from "~/v0/game/board/swapBoardItemsFx";
 import { swapInventorySlotsFx } from "~/v0/game/inventory/swapInventorySlotsFx";
-import { mergeItemFx } from "~/v0/game/engine/fx/mergeItemFx";
+import { mergeItemFx } from "~/v0/game/merge/mergeItemFx";
 import { openStashFx } from "~/v0/game/stash/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
-import { removeTileFx } from "~/v0/game/engine/fx/removeTileFx";
+import { removeTileFx } from "~/v0/game/remove/removeTileFx";
 import { setProducerProductLineEnabledFx } from "~/v0/game/producer/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/craft/startCraftFx";
 import { storeCraftInputFx } from "~/v0/game/craft/storeCraftInputFx";

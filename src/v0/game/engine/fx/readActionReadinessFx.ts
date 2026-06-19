@@ -9,7 +9,7 @@ import { checkCraftInputStoreReadinessFx } from "~/v0/game/craft/checkCraftInput
 import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/craft/checkCraftInputWithdrawReadinessFx";
 import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/placement/checkInventoryItemPlaceReadinessFx";
 import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/inventory/checkInventorySlotsSwapReadinessFx";
-import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
+import { checkItemMergeReadinessFx } from "~/v0/game/merge/checkItemMergeReadinessFx";
 import { checkProducerInputStoreReadinessFx } from "~/v0/game/producer/checkProducerInputStoreReadinessFx";
 import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/producer/checkProducerInputWithdrawReadinessFx";
 import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/producer/checkProducerProductLineSetEnabledReadinessFx";
@@ -17,7 +17,7 @@ import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkPr
 import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadinessFx";
 import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/requirements/checkStoredRequirementStoreReadinessFx";
 import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/requirements/checkStoredRequirementWithdrawReadinessFx";
-import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
+import { checkTileRemoveReadinessFx } from "~/v0/game/remove/checkTileRemoveReadinessFx";
 import { checkUpgradeStartReadinessFx } from "~/v0/game/upgrade/checkUpgradeStartReadinessFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";

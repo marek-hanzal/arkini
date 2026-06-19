@@ -1,6 +1,6 @@
 # Game engine domain topology audit
 
-Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer, craft, stash, placement, requirements, upgrade, job, and loot runtime files were moved to top-level game domains without behavior changes.
+Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer, craft, stash, placement, requirements, upgrade, job, loot, board/inventory, merge, and remove runtime files were moved to top-level game domains without behavior changes.
 
 ## Problem
 
@@ -12,7 +12,7 @@ This creates navigation load. The engine is not conceptually one giant `fx` doma
 
 ## Current source shape
 
-- `src/v0/game/engine/fx`: started at 111 files; now 31 files after producer, craft, stash, placement, requirements, upgrade, job, and loot extraction.
+- `src/v0/game/engine/fx`: started at 111 files; now 23 files after producer, craft, stash, placement, requirements, upgrade, job, loot, board/inventory, merge, and remove extraction.
 - `src/v0/game/engine/model`: 68 files.
 - `src/v0/game/engine/runtime`: 3 files.
 - `src/v0/game/engine/logic`: 4 files.
@@ -60,18 +60,35 @@ Moved to `src/v0/game/placement/`:
 
 `createInitialGameSaveFx.ts` remains engine/bootstrap orchestration and imports placement. Placement is now a shared game domain, not engine-owned Effect plumbing.
 
-### Board/inventory movement, merge, remove
+### Board/inventory movement
+
+Moved to `src/v0/game/board/`, `src/v0/game/inventory/`, and `src/v0/game/placement/`:
 
 - `moveBoardItemFx.ts`
 - `swapBoardItemsFx.ts`
 - `swapInventorySlotsFx.ts`
-- `mergeItemFx.ts`
-- `removeTileFx.ts`
 - readiness files for those actions
 - `readBoardItemCell.ts`
 - `removeBoardItemRuntimeState.ts`
+- `readBoardItemRuntimeStateStatus.ts`
 
-This is interaction/action behavior, not producer/craft/stash domain.
+Board runtime-state cleanup/status helpers live in `game/board` because they are shared by stash, craft, requirements, merge, and remove.
+
+### Merge domain
+
+Moved to `src/v0/game/merge/`:
+
+- `mergeItemFx.ts`
+- `checkItemMergeReadinessFx.ts`
+- `applyGameActionMergeFx.test.ts`
+
+### Remove domain
+
+Moved to `src/v0/game/remove/`:
+
+- `removeTileFx.ts`
+- `checkTileRemoveReadinessFx.ts`
+- `applyGameActionRemoveFx.test.ts`
 
 ### Producer domain
 
@@ -230,7 +247,8 @@ If moving production files feels too large, start with tests:
   - `applyGameActionStashFx.test.ts`
   - `applyGameActionStoredRequirementFx.test.ts`
   - `applyGameActionBoardInventoryFx.test.ts`
-  - `applyGameActionMergeRemoveFx.test.ts`
+  - `applyGameActionMergeFx.test.ts`
+- `applyGameActionRemoveFx.test.ts`
 
 This reduces mental load without changing runtime imports.
 
@@ -246,8 +264,11 @@ Then move production files domain-by-domain.
 - [x] `upgrade` extraction into `src/v0/game/upgrade/`.
 - [x] `job` extraction into `src/v0/game/job/`.
 - [x] `loot` extraction into `src/v0/game/loot/`.
+- [x] `board` / `inventory` extraction for board movement, inventory swapping, and shared board runtime-state cleanup/status helpers.
+- [x] `merge` extraction into `src/v0/game/merge/`.
+- [x] `remove` extraction into `src/v0/game/remove/`.
 
-Next coding cut: board/inventory/merge/remove extraction, or config layer extraction, whichever forms the cleanest coherent cluster.
+Next coding cut: config layer extraction or initial save/helper extraction, whichever forms the cleanest coherent cluster.
 
 ## Recommended sequence
 
@@ -298,7 +319,8 @@ The end state should either delete `fx` or leave it only for true cross-domain E
 - `applyGameActionCraftFx.test.ts`
 - `applyGameActionStashFx.test.ts`
 - `applyGameActionStoredRequirementFx.test.ts`
-- `applyGameActionMergeRemoveFx.test.ts`
+- `applyGameActionMergeFx.test.ts`
+- `applyGameActionRemoveFx.test.ts`
 - `applyGameActionBoardInventoryFx.test.ts`
 
 The shared test helpers live in `applyGameActionFx.testSupport.ts`.
@@ -341,14 +363,19 @@ Reason: upgrade lifecycle is a game domain, not engine-owned Effect plumbing. `g
 
 ## Current recommended next coding task
 
-Continue reducing `src/v0/game/engine/fx` by moving the next coherent domain cluster. Candidate clusters: jobs/item-spawn, board/inventory actions, merge/remove, loot, and ID utilities. Move files/imports only; no behavior changes.
+Continue reducing `src/v0/game/engine/fx` by moving the next coherent domain cluster. Candidate clusters: config layer, initial save/helper extraction, and final orchestration shell cleanup. Move files/imports only; no behavior changes.
 
 
 ## 2026-06-19 update: job domain extraction
 
-Moved generic job helpers, wake calculation, job IDs, and item-spawn job processing to `src/v0/game/job`. `engine/fx` should no longer own delayed/retry gameplay helpers. Remaining likely clusters: board/inventory actions, merge/remove, loot, config layer, orchestration shell.
+Moved generic job helpers, wake calculation, job IDs, and item-spawn job processing to `src/v0/game/job`. `engine/fx` should no longer own delayed/retry gameplay helpers. Remaining likely clusters: config layer, initial save/helper extraction, and orchestration shell.
 
 
 ## 2026-06-19 update: board/inventory action helpers extracted
 
 Board move/swap helpers now live in `src/v0/game/board`, inventory slot swap helpers live in `src/v0/game/inventory`, and inventory-to-board placement readiness lives in `src/v0/game/placement`. `game/engine` imports these domains for action/readiness orchestration.
+
+
+## 2026-06-19 update: merge/remove domains extracted
+
+Merge execution/readiness now lives in `src/v0/game/merge`, tile removal execution/readiness now lives in `src/v0/game/remove`, and shared board runtime-state cleanup/status helpers live in `src/v0/game/board`. `game/engine` imports merge/remove for action/readiness orchestration.

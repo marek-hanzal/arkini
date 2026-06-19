@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import type { GameSave, GameSaveItemSpawnJob } from "~/v0/game/engine/model/GameSaveSchema";

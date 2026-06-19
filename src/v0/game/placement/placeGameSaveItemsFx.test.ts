@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
-import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadinessFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
-import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";

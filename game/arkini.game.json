@@ -1966,6 +1966,16 @@
 				}
 			]
 		},
+		"loot:lumber-camp-1-log": {
+			"name": "Lumber Camp I Logs",
+			"output": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:lumber-camp-1:better-1": {
 			"name": "Lumber Camp I Better Finds I",
 			"output": [
@@ -2724,7 +2734,8 @@
 		"producer:lumber-camp-1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:lumber-camp-1"
+				"product:lumber-camp-1",
+				"product:lumber-camp-1-log"
 			],
 			"requirementIds": [
 				"requirement:lumber-camp-1-near-tree"
@@ -2863,8 +2874,15 @@
 		},
 		"product:lumber-camp-1": {
 			"durationMs": 5000,
-			"name": "Lumber Camp I Production",
+			"name": "Twigs",
 			"outputTableId": "loot:lumber-camp-1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:lumber-camp-1-log": {
+			"durationMs": 8500,
+			"name": "Logs",
+			"outputTableId": "loot:lumber-camp-1-log",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

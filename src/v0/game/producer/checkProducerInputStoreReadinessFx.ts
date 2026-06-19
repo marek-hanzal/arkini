@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
+import { readProducerProductIdsByPriority } from "~/v0/game/producer/readProducerProductIdsByPriority";
 import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProducerProductLineEnabledFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
@@ -62,7 +63,11 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 			? [
 					action.productId,
 				]
-			: producerDefinition.productIds;
+			: readProducerProductIdsByPriority({
+					productIds: producerDefinition.productIds,
+					producerItemInstanceId: action.producerItemInstanceId,
+					save,
+				});
 
 		for (const productId of productIds) {
 			if (!producerDefinition.productIds.includes(productId)) {

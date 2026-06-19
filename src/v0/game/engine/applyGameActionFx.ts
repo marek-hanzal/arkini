@@ -10,6 +10,7 @@ import { mergeItemFx } from "~/v0/game/merge/mergeItemFx";
 import { openStashFx } from "~/v0/game/stash/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/remove/removeTileFx";
+import { setProducerProductLineDefaultFx } from "~/v0/game/producer/setProducerProductLineDefaultFx";
 import { setProducerProductLineEnabledFx } from "~/v0/game/producer/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/craft/startCraftFx";
 import { storeCraftInputFx } from "~/v0/game/craft/storeCraftInputFx";
@@ -128,6 +129,13 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		producerInputWithdraw: (withdrawInputAction) =>
 			withdrawProducerInputFx({
 				action: withdrawInputAction,
+				config: gameConfig.config,
+				nowMs,
+				save,
+			}),
+		producerProductLineSetDefault: (setDefaultAction) =>
+			setProducerProductLineDefaultFx({
+				action: setDefaultAction,
 				config: gameConfig.config,
 				nowMs,
 				save,

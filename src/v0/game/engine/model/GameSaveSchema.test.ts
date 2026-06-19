@@ -96,6 +96,27 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.error?.issues[0]?.message).toContain("Duplicate board cell");
 	});
 
+	it("rejects producer line default products that do not belong to the producer", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.producerLines["item-instance:1"] = {
+			defaultProductId: "product:missing",
+			disabledProductIds: [],
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("Default product");
+	});
+
 	it("rejects inventory stacks above the item max stack size", () => {
 		const config = createEngineTestConfig();
 		const save = createInitialSave({

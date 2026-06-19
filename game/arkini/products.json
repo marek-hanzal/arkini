@@ -10,8 +10,15 @@
 		},
 		"product:lumber-camp-1": {
 			"durationMs": 5000,
-			"name": "Lumber Camp I Production",
+			"name": "Twigs",
 			"outputTableId": "loot:lumber-camp-1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:lumber-camp-1-log": {
+			"durationMs": 8500,
+			"name": "Logs",
+			"outputTableId": "loot:lumber-camp-1-log",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

@@ -63,11 +63,18 @@ export const setProducerProductLineEnabledFx = Effect.fn("setProducerProductLine
 				(productOrder.get(right) ?? Number.MAX_SAFE_INTEGER);
 			return orderDiff || left.localeCompare(right);
 		});
-		if (nextDisabledProductIds.length === 0) {
+		const nextDefaultProductId =
+			nextSave.producerLines[action.producerItemInstanceId]?.defaultProductId;
+		if (nextDisabledProductIds.length === 0 && nextDefaultProductId === undefined) {
 			delete nextSave.producerLines[action.producerItemInstanceId];
 		} else {
 			nextSave.producerLines[action.producerItemInstanceId] = {
 				disabledProductIds: nextDisabledProductIds,
+				...(nextDefaultProductId
+					? {
+							defaultProductId: nextDefaultProductId,
+						}
+					: {}),
 			};
 		}
 		nextSave.updatedAtMs = nowMs;

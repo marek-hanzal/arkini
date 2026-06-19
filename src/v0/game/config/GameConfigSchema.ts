@@ -38,8 +38,9 @@ import { z } from "zod";
  *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
  *   includes diagonals around the target tile.
  * - Producer `productIds` are ordered production lines. The first entry is the
- *   default product line: board-click activation starts it, and generic producer feeding
- *   tries it before later lines when multiple lines accept the same input. Product
+ *   initial default product line. Runtime board-click activation and generic producer
+ *   feeding use the current runtime default (which falls back to the first line until a
+ *   player changes it). Product
  *   definitions are owned by exactly one producer line; upgrades target that
  *   producer/product-line definition, not concrete runtime instances. Producer shells do
  *   not own inputs; product lines reference named input definitions through `inputRefId`.

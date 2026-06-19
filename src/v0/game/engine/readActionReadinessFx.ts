@@ -12,6 +12,7 @@ import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/inventory/checkInv
 import { checkItemMergeReadinessFx } from "~/v0/game/merge/checkItemMergeReadinessFx";
 import { checkProducerInputStoreReadinessFx } from "~/v0/game/producer/checkProducerInputStoreReadinessFx";
 import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/producer/checkProducerInputWithdrawReadinessFx";
+import { checkProducerProductLineSetDefaultReadinessFx } from "~/v0/game/producer/checkProducerProductLineSetDefaultReadinessFx";
 import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/producer/checkProducerProductLineSetEnabledReadinessFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadinessFx";
@@ -112,6 +113,12 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				producerInputWithdraw: (withdrawInputAction) =>
 					checkProducerInputWithdrawReadinessFx({
 						action: withdrawInputAction,
+						config: gameConfig.config,
+						save,
+					}),
+				producerProductLineSetDefault: (setDefaultAction) =>
+					checkProducerProductLineSetDefaultReadinessFx({
+						action: setDefaultAction,
 						config: gameConfig.config,
 						save,
 					}),

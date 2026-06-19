@@ -150,6 +150,98 @@ describe("buildGameConfigServiceFx", () => {
 		});
 	});
 
+	it("replaces producer and product requirement ids through completed upgrades", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:near-twig-1": {
+					distance: 1,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+				"requirement:near-twig-2": {
+					distance: 2,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"producer:test": {
+					...baseConfig.producers["producer:test"],
+					requirementIds: [
+						"requirement:near-twig-1",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					requirementIds: [
+						"requirement:near-twig-1",
+					],
+				},
+			},
+			upgrades: {
+				"upgrade:requirements": {
+					code: "requirements",
+					description: "Replace requirements",
+					name: "Requirements",
+					sort: 1,
+					tiers: [
+						{
+							cost: [],
+							durationMs: 0,
+							effects: [
+								{
+									producerId: "producer:test",
+									requirementIds: [
+										"requirement:near-twig-2",
+									],
+									type: "producer.requirementIds.set",
+								},
+								{
+									productId: "product:test",
+									requirementIds: [],
+									type: "product.requirementIds.set",
+								},
+							],
+						},
+					],
+				},
+			},
+		});
+		const save = completeUpgradeTier({
+			save: runInitialSave({
+				config,
+				nowMs: 0,
+			}),
+			upgradeId: "upgrade:requirements",
+		});
+
+		const service = runConfigService({
+			config,
+			save,
+		});
+
+		expect(config.producers["producer:test"].requirementIds).toEqual([
+			"requirement:near-twig-1",
+		]);
+		expect(config.products["product:test"].requirementIds).toEqual([
+			"requirement:near-twig-1",
+		]);
+		expect(service.config.producers["producer:test"].requirementIds).toEqual([
+			"requirement:near-twig-2",
+		]);
+		expect(service.config.products["product:test"].requirementIds).toEqual([]);
+	});
+
 	it("keeps same-item product input upgrades scoped to the owning effective inputRef", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

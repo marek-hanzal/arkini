@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ActivationInputViewSchema } from "~/v0/board/view/ActivationInputViewSchema";
+import { ActivationRequirementViewSchema } from "~/v0/board/view/ActivationRequirementViewSchema";
 
 const IdSchema = z.string().min(1);
 
@@ -22,6 +23,7 @@ export const ProducerProductLineViewSchema = z.object({
 	progress: z.number().min(0).max(1).optional(),
 	inputItemIds: z.array(IdSchema),
 	requirementItemIds: z.array(IdSchema),
+	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	outputTableId: IdSchema.optional(),
 });
 

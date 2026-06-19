@@ -121,6 +121,7 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 		},
+		requirements: {},
 		merge: {
 			"merge:twig-plank": {
 				resultItemId: "item:plank",
@@ -147,7 +148,7 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 					"product:test",
 					"product:shred",
 				],
-				requirements: [],
+				requirementIds: [],
 				type: "producer",
 			},
 		},
@@ -157,14 +158,14 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				name: "Test product",
 				outputTableId: "loot:test",
 				placement: "board_then_inventory",
-				requirements: [],
+				requirementIds: [],
 			},
 			"product:shred": {
 				durationMs: 1000,
 				inputRefId: "input:shred",
 				name: "Shred",
 				placement: "board_then_inventory",
-				requirements: [],
+				requirementIds: [],
 			},
 		},
 		stashes: {

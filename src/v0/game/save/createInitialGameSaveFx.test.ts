@@ -55,13 +55,14 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 		},
 		merge: {},
+		requirements: {},
 		producers: {
 			"producer:test": {
 				maxQueueSize: 1,
 				productIds: [
 					"product:test",
 				],
-				requirements: [],
+				requirementIds: [],
 				type: "producer",
 			},
 		},
@@ -72,7 +73,7 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				name: "Test product",
 				outputTableId: "loot:test",
 				placement: "board_then_inventory",
-				requirements: [],
+				requirementIds: [],
 			},
 		},
 		stashes: {},

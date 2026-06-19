@@ -1,0 +1,18 @@
+{
+	"requirements": {
+		"requirement:lumber-camp-1-near-tree": {
+			"type": "proximity",
+			"itemIds": [
+				"item:tree"
+			],
+			"distance": 1
+		},
+		"requirement:lumber-camp-1-near-tree-2": {
+			"type": "proximity",
+			"itemIds": [
+				"item:tree"
+			],
+			"distance": 2
+		}
+	}
+}

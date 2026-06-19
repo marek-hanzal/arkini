@@ -20,6 +20,9 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 	const passiveRequirements = activation.requirements.filter(
 		(requirement) => requirement.type === "passive",
 	);
+	const proximityRequirements = activation.requirements.filter(
+		(requirement) => requirement.type === "proximity",
+	);
 
 	return (
 		<UiSection
@@ -60,6 +63,28 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 									{items[requirement.itemId]?.name ?? requirement.itemId}
 								</span>{" "}
 								· needs {requirement.quantity} available in your economy
+							</div>
+						))}
+					</div>
+				) : null}
+				{proximityRequirements.length ? (
+					<div className="grid gap-2">
+						<p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-ak-primary">
+							Nearby requirements
+						</p>
+						{proximityRequirements.map((requirement) => (
+							<div
+								key={`${requirement.itemIds.join("|")}:${requirement.distance}`}
+								className="rounded-sm bg-ak-surface px-2.5 py-2 text-sm text-ak-text-muted"
+							>
+								<span className="font-semibold text-ak-text">
+									{requirement.itemIds
+										.map((itemId) => items[itemId]?.name ?? itemId)
+										.join(" / ")}
+								</span>{" "}
+								· within {requirement.distance} tile
+								{requirement.distance === 1 ? "" : "s"} ·{" "}
+								{requirement.satisfied ? "nearby" : "move one nearby"}
 							</div>
 						))}
 					</div>

@@ -10,6 +10,7 @@ export const GameConfigLayerProductSchema = z
 		inputRefId: IdSchema.optional(),
 		inputs: z.record(IdSchema, GameConfigLayerProductInputSchema).optional(),
 		outputTableId: IdSchema.optional(),
+		requirementIds: z.array(IdSchema).optional(),
 	})
 	.strict();
 

@@ -665,25 +665,31 @@ Random output must be rolled as part of activation validation. If the rolled out
 
 Board placement must use a deterministic nearest-free-cell policy based on the producer origin. Exact tie-breaking must be deterministic and testable.
 
-### 10.6 Producer inputs and persistent requirements
+### 10.6 Producer inputs and requirements
 
-A producer may define both consumable inputs and persistent requirements.
+A producer may define consumable product-line inputs and reusable requirement gates.
 
-Consumable inputs are items consumed per successful production cycle.
+Consumable inputs are items consumed per successful production cycle. They belong to product lines through named input references.
 
-Persistent requirements are items that must be present in the producer's internal storage before production can run, but are not consumed by production.
+Producer and product requirements are referenced by `requirementIds`, not embedded inline. The IDs point into the central top-level `requirements` table. Producer-level `requirementIds` gate every product line on that producer. Product-level `requirementIds` gate only that concrete product line. When both exist, all producer and product requirements must pass.
 
-Both consumable inputs and persistent requirements define:
+Central requirement definitions currently support:
 
-- accepted item ID
-- required quantity per production cycle or activation check
-- storage capacity for that item
+- `stored`: an item must be stored inside the target item instance and is not consumed by production
+- `passive`: an item quantity must exist in board, inventory, or both according to scope
+- `proximity`: at least one configured item ID must exist near the producer tile within configured grid distance
+
+Proximity requirements use Chebyshev grid distance:
+
+`distance = max(abs(dx), abs(dy))`
+
+That means `distance: 1` includes all 8 neighboring cells around the producer, including diagonals. This is deliberate. We are building a grid game, not submitting lumber camps to a geometry tribunal.
 
 Example:
 
-A quarry may require `1 worker` as a persistent requirement. The worker remains assigned to that quarry and is not consumed. The same quarry may also consume `1 beer` and `1 sausage` per production cycle as consumable inputs.
+A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`, where that requirement is a proximity requirement for `item:tree` within distance `1`. A later upgrade may replace the producer requirement IDs with a looser distance `2` requirement, or with an empty list to remove the proximity gate entirely.
 
-Persistent requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
+Stored requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
 
 ### 10.7 Producer input storage
 
@@ -953,11 +959,15 @@ Upgrade lifecycle:
 
 Current implementation-supported effect types are:
 
-- `producer.cooldown.add`
-- `producer.outputTable.set`
-- `inventory.capacity.add`
+- `product.duration.add`
+- `product.outputTable.set`
+- `product.inputRef.set`
+- `product.input.quantity.add`
+- `product.requirementIds.set`
+- `producer.maxQueueSize.add`
+- `producer.requirementIds.set`
 
-Canonical gameplay currently uses producer cooldown and producer loot table upgrades.
+Requirement ID upgrade effects are replacement operations. They do not merge with current IDs. Setting `requirementIds: []` intentionally removes all requirements for that target. This applies both to producer/building-wide requirements and concrete product-line requirements.
 
 Inventory size is fixed at `7 x 5`. No current upgrade should change normal inventory size. Any existing player-inventory capacity upgrade is obsolete and should be removed with the split inventory system.
 

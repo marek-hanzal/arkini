@@ -11,17 +11,21 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 	it("marks producer product lines blocked until stored requirements are stocked", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:producer-axe": {
+					capacity: 1,
+					itemId: "item:axe",
+					quantity: 1,
+					type: "stored",
+				},
+			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
 					...baseConfig.producers["producer:test"],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:axe",
-							quantity: 1,
-							type: "stored",
-						},
+					requirementIds: [
+						"requirement:producer-axe",
 					],
 				},
 			},

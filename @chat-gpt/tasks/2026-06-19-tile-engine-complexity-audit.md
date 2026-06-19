@@ -137,4 +137,6 @@ Completed acceptance:
 - No nested folders were introduced.
 - Existing checks passed.
 
-Future caution: validate in browser before deeper TileEngine cleanup. The next possible target is `useTileActorMotion.ts`; do not split `TileMotionRuntime.ts` just for line count.
+Second implementation task completed on `2026-06-19`: `useTileActorMotion.ts` now delegates passive layout motion to `useTileActorLayoutMotion.ts` while keeping the same public imperative `animateBack` / `animateToTarget` contract.
+
+Future caution: validate in browser before deeper TileEngine cleanup. The next possible target is `TileEngineActor.tsx` prop comparison/tap-feedback extraction; do not split `TileMotionRuntime.ts` just for line count.

@@ -17,11 +17,12 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: completed v0 line-count/topology audit; TileEngine is the main future complexity cluster.
 - `2026-06-19`: completed TileEngine complexity audit; next safe cut is `useTilePointerUp.ts` phase extraction.
 - `2026-06-19`: split `useTilePointerUp.ts` drop finalization into focused motion/commit/handoff helpers.
+- `2026-06-19`: split `useTileActorMotion.ts` layout motion into `useTileActorLayoutMotion.ts`.
 
 ## Next candidates
 
 1. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item.
 2. Game engine visual plan audit: split event-family visual mappers only if it reduces mental load without hiding the output-event contract.
-3. TileEngine follow-up audit: consider `useTileActorMotion.ts` only after validating the pointer-up split in browser; do not split `TileMotionRuntime.ts` just for line count.
+3. TileEngine follow-up audit: next likely target is `TileEngineActor.tsx` prop comparison/tap-feedback extraction; validate TileEngine changes in browser before deeper motion runtime cleanup. Do not split `TileMotionRuntime.ts` just for line count.
 
 Before coding any risky item, inspect source and propose exact files/shape first.

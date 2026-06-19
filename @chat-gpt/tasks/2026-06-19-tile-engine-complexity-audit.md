@@ -139,4 +139,6 @@ Completed acceptance:
 
 Second implementation task completed on `2026-06-19`: `useTileActorMotion.ts` now delegates passive layout motion to `useTileActorLayoutMotion.ts` while keeping the same public imperative `animateBack` / `animateToTarget` contract.
 
-Future caution: validate in browser before deeper TileEngine cleanup. The next possible target is `TileEngineActor.tsx` prop comparison/tap-feedback extraction; do not split `TileMotionRuntime.ts` just for line count.
+Third implementation task completed on `2026-06-19`: `TileEngineActor.tsx` now delegates memo prop comparison to `sameTileEngineActorProps.ts`, feedback debug logging to `useTileActorFeedbackDebug.ts`, and shared active drop feedback equality to `sameTileEngineDropFeedback.ts`.
+
+Future caution: validate in browser before deeper TileEngine cleanup. Next possible TileEngine target is `TileEngineSlot.tsx` long-press extraction; do not split `TileMotionRuntime.ts` just for line count.

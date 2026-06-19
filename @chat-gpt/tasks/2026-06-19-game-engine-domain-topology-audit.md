@@ -1,6 +1,6 @@
 # Game engine domain topology audit
 
-Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer, craft, stash, and placement runtime files were moved to top-level game domains without behavior changes.
+Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer, craft, stash, placement, and requirements runtime files were moved to top-level game domains without behavior changes.
 
 ## Problem
 
@@ -12,7 +12,7 @@ This creates navigation load. The engine is not conceptually one giant `fx` doma
 
 ## Current source shape
 
-- `src/v0/game/engine/fx`: started at 111 files; now 68 files after producer, craft, stash, and placement extraction.
+- `src/v0/game/engine/fx`: started at 111 files; now 52 files after producer, craft, stash, placement, and requirements extraction.
 - `src/v0/game/engine/model`: 68 files.
 - `src/v0/game/engine/runtime`: 3 files.
 - `src/v0/game/engine/logic`: 4 files.
@@ -111,16 +111,19 @@ This is a coherent domain family.
 
 This is a coherent domain family.
 
-### Stored requirements domain
+### Requirements domain
+
+Moved to `src/v0/game/requirements/`:
 
 - `storeStoredRequirementFx.ts`
 - `withdrawStoredRequirementFx.ts`
-- stored requirement readiness files
-- `readStoredRequirementQuantitiesFx.ts`
-- `readStoredRequirementSlotsFx.ts`
-- `findStoredRequirementSlotFx.ts`
+- stored requirement readiness/readers
+- `checkGameRequirementsFx.ts`
+- passive requirement counting
+- activation input check/consume helpers
+- input ref resolve/sum/consume helpers
 
-This is not just a helper. Stored requirements are a reusable gameplay subdomain used by multiple actor types.
+This is not just a stored-requirement helper. Requirements are a shared gameplay subdomain used by producer, craft, stash, upgrade, merge/remove, and stored-requirement actions.
 
 ### Upgrades domain
 
@@ -151,16 +154,7 @@ This is now conceptually clear after the job/event split, but the files are stil
 
 ### Inputs / requirements / input refs
 
-- `checkActivationInputsFx.ts`
-- `consumeActivationInputsFx.ts`
-- `mergeActivationInputRequirementsFx.ts`
-- `checkGameRequirementsFx.ts`
-- `resolveInputRefsFx.ts`
-- `consumeResolvedInputRefFx.ts`
-- `sumResolvedInputRefsFx.ts`
-- `countPassiveItemQuantityFx.ts`
-
-This is a cross-cutting input/requirement subsystem. It feeds producer/craft/stored requirement behavior.
+Moved into `src/v0/game/requirements/` as part of the requirements extraction. This cross-cutting subsystem feeds producer, craft, stash, upgrade, merge/remove, and stored-requirement behavior.
 
 ### Loot / random
 
@@ -246,11 +240,11 @@ Then move production files domain-by-domain.
 - [x] `craft` domain extraction into `src/v0/game/craft/`.
 - [x] `stash` domain extraction into `src/v0/game/stash/`.
 - [x] `placement` domain extraction into `src/v0/game/placement/`.
-- [ ] `stored requirements` extraction into a top-level game domain.
+- [x] `requirements` domain extraction into `src/v0/game/requirements/`.
 - [ ] `upgrade` extraction into `src/v0/game/upgrade/`.
 - [ ] `jobs` extraction if the remaining job helpers form a coherent domain-sized cluster.
 
-Next coding cut: `stored requirements` domain extraction.
+Next coding cut: `upgrade` domain extraction.
 
 ## Recommended sequence
 

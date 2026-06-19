@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
-import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
+import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionTileRemove } from "~/v0/game/engine/model/GameActionTileRemove";

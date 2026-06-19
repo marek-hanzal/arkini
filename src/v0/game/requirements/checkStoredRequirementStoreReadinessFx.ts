@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { findStoredRequirementSlotFx } from "~/v0/game/engine/fx/findStoredRequirementSlotFx";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
-import { readStoredRequirementSlotsFx } from "~/v0/game/engine/fx/readStoredRequirementSlotsFx";
-import { resolveInputRefsFx } from "~/v0/game/engine/fx/resolveInputRefsFx";
+import { findStoredRequirementSlotFx } from "~/v0/game/requirements/findStoredRequirementSlotFx";
+import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
+import { readStoredRequirementSlotsFx } from "~/v0/game/requirements/readStoredRequirementSlotsFx";
+import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameActionStoredRequirementStore } from "~/v0/game/engine/model/GameActionStoredRequirementStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";

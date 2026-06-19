@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInputsFx";
-import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
+import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
+import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { readStashBoardItemFx } from "~/v0/game/stash/readStashBoardItemFx";
 import { readStashRemainingChargesFx } from "~/v0/game/stash/readStashRemainingChargesFx";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
+import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStashOpen } from "~/v0/game/engine/model/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

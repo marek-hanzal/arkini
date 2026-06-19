@@ -3,7 +3,7 @@ import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProducerProductLineEnabledFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
-import { resolveInputRefsFx } from "~/v0/game/engine/fx/resolveInputRefsFx";
+import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerInputStore } from "~/v0/game/engine/model/GameActionProducerInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

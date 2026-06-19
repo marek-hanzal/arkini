@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInputsFx";
+import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { consumeResolvedInputRefFx } from "~/v0/game/engine/fx/consumeResolvedInputRefFx";
+import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
 import type { GameActivationInput } from "~/v0/game/engine/model/GameActivationInput";
 import type { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";

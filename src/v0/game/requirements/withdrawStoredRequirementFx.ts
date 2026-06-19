@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementWithdrawReadinessFx";
+import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/requirements/checkStoredRequirementWithdrawReadinessFx";
 import { placeGameSaveInventoryItemsFx } from "~/v0/game/placement/placeGameSaveInventoryItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";

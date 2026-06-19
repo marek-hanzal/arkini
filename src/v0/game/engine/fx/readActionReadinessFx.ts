@@ -15,8 +15,8 @@ import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/producer/checkP
 import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/producer/checkProducerProductLineSetEnabledReadinessFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadinessFx";
-import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementStoreReadinessFx";
-import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementWithdrawReadinessFx";
+import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/requirements/checkStoredRequirementStoreReadinessFx";
+import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/requirements/checkStoredRequirementWithdrawReadinessFx";
 import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
 import { checkUpgradeStartReadinessFx } from "~/v0/game/engine/fx/checkUpgradeStartReadinessFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";

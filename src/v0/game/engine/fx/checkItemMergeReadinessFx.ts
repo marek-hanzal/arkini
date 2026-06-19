@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { resolveInputRefsFx } from "~/v0/game/engine/fx/resolveInputRefsFx";
+import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/engine/model/GameActionItemMerge";

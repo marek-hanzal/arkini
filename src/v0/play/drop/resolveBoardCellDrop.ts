@@ -62,21 +62,23 @@ export const resolveBoardCellDrop = ({
 		});
 	}
 
-	return acceptDrop(
-		async () => {
-			await actions.applyBoardItemToBoardItem(action.input);
-			if (action.feedback?.kind === "imprint-cell") {
-				feedback.pulseImprintCell(action.feedback.cellKey);
-			}
-			if (action.feedback?.kind === "merge-cell") {
-				feedback.pulseMergeCell(action.feedback.cellKey);
-			}
-			if (action.feedback?.kind === "cell-feedback") {
-				feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
-			}
-		},
-		{
-			animation: action.animation,
-		},
-	);
+	const options =
+		action.type === "merge-board-items"
+			? {
+					animation: action.animation,
+				}
+			: undefined;
+
+	return acceptDrop(async () => {
+		await actions.applyBoardItemToBoardItem(action.input);
+		if (action.feedback?.kind === "imprint-cell") {
+			feedback.pulseImprintCell(action.feedback.cellKey);
+		}
+		if (action.feedback?.kind === "merge-cell") {
+			feedback.pulseMergeCell(action.feedback.cellKey);
+		}
+		if (action.feedback?.kind === "cell-feedback") {
+			feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
+		}
+	}, options);
 };

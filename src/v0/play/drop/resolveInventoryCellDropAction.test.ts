@@ -191,4 +191,54 @@ describe("resolveInventoryCellDropAction", () => {
 			},
 		});
 	});
+	it("applies inventory items to stash inputs", () => {
+		const targetBoard = rebuildBoardView([
+			{
+				id: "stash-target",
+				itemId: "item:branch",
+				state: {},
+				x: 1,
+				y: 0,
+				activation: {
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+							stored: 0,
+						},
+					],
+					kind: "stash",
+					requirements: [],
+					trigger: "click",
+				},
+			},
+		]);
+
+		expect(
+			resolveInventoryCellDropAction({
+				board: targetBoard,
+				config,
+				inventory,
+				source: inventorySource(0),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: "stash-target",
+				},
+			}),
+		).toEqual({
+			type: "apply-inventory-item-to-board-item",
+			feedback: {
+				cellKey: "1:0",
+				variant: "secondary",
+			},
+			input: {
+				sourceSlotIndex: 0,
+				targetBoardItemId: "stash-target",
+			},
+		});
+	});
 });

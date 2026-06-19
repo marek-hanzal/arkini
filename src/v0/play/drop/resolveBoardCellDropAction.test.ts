@@ -396,7 +396,7 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
-			type: "merge-board-items",
+			type: "apply-board-item-to-board-item",
 			feedback: {
 				cellKey: "1:0",
 				kind: "cell-feedback",
@@ -470,11 +470,68 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
-			type: "merge-board-items",
+			type: "apply-board-item-to-board-item",
 			feedback: {
 				cellKey: "1:0",
 				kind: "cell-feedback",
 				variant: "primary",
+			},
+			input: {
+				sourceBoardItemId: "source",
+				targetBoardItemId: "target",
+			},
+		});
+	});
+	it("applies board items to stash inputs", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target = {
+			id: "target",
+			itemId: "item:branch",
+			state: {},
+			x: 1,
+			y: 0,
+			activation: {
+				inputs: [
+					{
+						capacity: 1,
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+						stored: 0,
+					},
+				],
+				kind: "stash",
+				requirements: [],
+				trigger: "click",
+			},
+		} satisfies BoardViewItem;
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				board: rebuildBoardView([
+					source,
+					target,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: target.id,
+				},
+			}),
+		).toEqual({
+			type: "apply-board-item-to-board-item",
+			feedback: {
+				cellKey: "1:0",
+				kind: "cell-feedback",
+				variant: "secondary",
 			},
 			input: {
 				sourceBoardItemId: "source",

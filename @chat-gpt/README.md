@@ -18,6 +18,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Persistence is Dexie snapshot plumbing around `GameSave`; it is not gameplay truth.
 - TileEngine is generic and must not import Arkini domain modules.
 - `GameConfigSchema` / `GameSaveConfigSchema` are central validation gates.
+- `GameConfig` is the primary gameplay contract: if config validation accepts an item/capability combination, the engine/runtime must support and honor it deterministically.
 - Base config is immutable; save upgrades build an effective overlay config.
 - Job/event split: anything delayed, scheduled, retrying, blocked, or persisted for future processing is a job. `GameEvent` is only an output for something processed now.
 

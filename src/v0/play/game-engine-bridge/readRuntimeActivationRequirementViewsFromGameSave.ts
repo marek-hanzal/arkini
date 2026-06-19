@@ -1,7 +1,9 @@
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
-import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+import { readProximityRequirementDurationMultiplier } from "~/v0/game/requirements/readProximityRequirementsDurationMultiplier";
+import { readProximityRequirementMatch } from "~/v0/game/requirements/readProximityRequirementMatch";
 
 export type RuntimeActivationRequirement =
 	| {
@@ -18,6 +20,7 @@ export type RuntimeActivationRequirement =
 	  }
 	| {
 			distance: number;
+			durationFactor?: number;
 			itemIds: string[];
 			type: "proximity";
 	  };
@@ -119,41 +122,6 @@ const readRuntimePassiveRequirementViewFromGameSave = ({
 	type: "passive",
 });
 
-const readProximityMatch = ({
-	itemIds,
-	save,
-	targetItemInstanceId,
-}: {
-	itemIds: readonly string[];
-	save: GameSave;
-	targetItemInstanceId: string;
-}) => {
-	const target = save.board.items[targetItemInstanceId];
-	if (!target) return undefined;
-
-	const acceptedItemIds = new Set(itemIds);
-	return Object.values(save.board.items)
-		.flatMap((item) => {
-			if (item.id === target.id || !acceptedItemIds.has(item.itemId)) {
-				return [];
-			}
-
-			return [
-				{
-					distance: readGridDistance(target, item),
-					item,
-				},
-			];
-		})
-		.sort(
-			(left, right) =>
-				left.distance - right.distance || left.item.id.localeCompare(right.item.id),
-		)[0];
-};
-
-const readGridDistance = (left: GameSaveBoardItem, right: GameSaveBoardItem) =>
-	Math.max(Math.abs(left.x - right.x), Math.abs(left.y - right.y));
-
 const readRuntimeProximityRequirementViewFromGameSave = ({
 	requirement,
 	save,
@@ -168,18 +136,27 @@ const readRuntimeProximityRequirementViewFromGameSave = ({
 	save: GameSave;
 	targetItemInstanceId: string;
 }): ActivationRequirementView => {
-	const match = readProximityMatch({
+	const match = readProximityRequirementMatch({
 		itemIds: requirement.itemIds,
 		save,
 		targetItemInstanceId,
 	});
+	const satisfied = match ? match.distance <= requirement.distance : false;
 
 	return {
 		distance: requirement.distance,
+		durationFactor: requirement.durationFactor ?? 1,
+		durationMultiplier: satisfied
+			? readProximityRequirementDurationMultiplier({
+					requirement,
+					save,
+					targetItemInstanceId,
+				})
+			: undefined,
 		itemIds: requirement.itemIds as ItemId[],
 		matchedDistance: match?.distance,
 		matchedItemId: match?.item.itemId as ItemId | undefined,
-		satisfied: match ? match.distance <= requirement.distance : false,
+		satisfied,
 		type: "proximity",
 	};
 };

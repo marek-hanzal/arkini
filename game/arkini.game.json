@@ -3060,14 +3060,16 @@
 	},
 	"requirements": {
 		"requirement:lumber-camp-1-near-tree": {
-			"distance": 1,
+			"distance": 2,
+			"durationFactor": 1,
 			"itemIds": [
 				"item:tree"
 			],
 			"type": "proximity"
 		},
-		"requirement:lumber-camp-1-near-tree-2": {
-			"distance": 2,
+		"requirement:lumber-camp-1-near-tree-3": {
+			"distance": 3,
+			"durationFactor": 1,
 			"itemIds": [
 				"item:tree"
 			],
@@ -3237,7 +3239,7 @@
 						{
 							"producerId": "producer:lumber-camp-1",
 							"requirementIds": [
-								"requirement:lumber-camp-1-near-tree-2"
+								"requirement:lumber-camp-1-near-tree-3"
 							],
 							"type": "producer.requirementIds.set"
 						}

@@ -5,14 +5,16 @@
 			"itemIds": [
 				"item:tree"
 			],
-			"distance": 1
+			"distance": 2,
+			"durationFactor": 1
 		},
-		"requirement:lumber-camp-1-near-tree-2": {
+		"requirement:lumber-camp-1-near-tree-3": {
 			"type": "proximity",
 			"itemIds": [
 				"item:tree"
 			],
-			"distance": 2
+			"distance": 3,
+			"durationFactor": 1
 		}
 	}
 }

@@ -6,6 +6,7 @@ import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivat
 import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProducerStoredInputsFx";
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
+import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -69,7 +70,13 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
 			.map((job) => job.completesAtMs),
 	);
-	const completesAtMs = queuedStartAtMs + checked.product.durationMs;
+	const durationMs = readProducerProductDurationMs({
+		product: checked.product,
+		producerItemInstanceId: action.producerItemInstanceId,
+		requirements: checked.requirements,
+		save,
+	});
+	const completesAtMs = queuedStartAtMs + durationMs;
 	nextSave.producerJobs[jobId] = {
 		completesAtMs,
 		id: jobId,

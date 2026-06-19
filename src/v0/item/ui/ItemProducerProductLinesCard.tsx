@@ -19,13 +19,23 @@ export namespace ItemProducerProductLinesCard {
 	}
 }
 
+const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "");
+
 const readRequirementLabel = (requirement: ActivationRequirementView) => {
 	if (requirement.type === "proximity") {
 		const itemLabel = requirement.itemIds
 			.map((itemId) => itemId.replace(/^item:/, ""))
 			.join(" / ");
+		const matchedDistance =
+			requirement.matchedDistance === undefined
+				? ""
+				: ` · nearest ${requirement.matchedDistance}`;
+		const durationEffect =
+			requirement.durationMultiplier === undefined || requirement.durationMultiplier <= 1
+				? ""
+				: ` · ${formatMultiplier(requirement.durationMultiplier)}× time`;
 
-		return `${itemLabel} within ${requirement.distance}`;
+		return `${itemLabel} within ${requirement.distance}${matchedDistance}${durationEffect}`;
 	}
 
 	return `${requirement.itemId.replace(/^item:/, "")} ${requirement.stored}/${requirement.quantity}`;

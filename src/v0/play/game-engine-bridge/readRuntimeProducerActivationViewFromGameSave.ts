@@ -7,6 +7,7 @@ import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSav
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
+import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
@@ -141,6 +142,14 @@ const readRuntimeProductLineViewsFromGameSave = ({
 					left.startedAtMs - right.startedAtMs || left.id.localeCompare(right.id),
 			);
 		const activeJob = jobs.find((job) => job.completesAtMs > nowMs) ?? jobs[0];
+		const durationMs = activeJob
+			? activeJob.completesAtMs - activeJob.startedAtMs
+			: readProducerProductDurationMs({
+					product,
+					producerItemInstanceId: targetItemInstanceId,
+					requirements,
+					save,
+				});
 		const progress = activeJob
 			? Math.max(
 					0,
@@ -180,7 +189,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 
 		return [
 			{
-				durationMs: product.durationMs,
+				durationMs,
 				enabled: productLineEnabled({
 					productId,
 					save,

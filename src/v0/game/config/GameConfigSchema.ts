@@ -85,7 +85,8 @@ import { z } from "zod";
  *     "requirement:lumber-camp.near-tree": {
  *       "type": "proximity",
  *       "itemIds": ["item:tree"],
- *       "distance": 1
+ *       "distance": 1,
+ *       "durationFactor": 1
  *     },
  *     "requirement:saw-license": {
  *       "type": "passive",
@@ -245,12 +246,15 @@ const ActivationRequirementSchema = z.array(
 /**
  * Proximity requirement gates a producer/product by nearby board items.
  * Distance uses Chebyshev grid radius, so distance 1 includes diagonals.
+ * `durationFactor` multiplies the matched resource distance into production time.
+ * Missing factor defaults to 1 at runtime.
  */
 const ProximityItemRequirementSchema = z
 	.object({
 		type: z.literal("proximity"),
 		itemIds: z.array(IdSchema).min(1),
 		distance: PositiveIntegerSchema,
+		durationFactor: z.number().min(0).optional(),
 	})
 	.strict();
 

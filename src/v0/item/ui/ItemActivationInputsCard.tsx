@@ -10,6 +10,8 @@ export namespace ItemActivationInputsCard {
 	}
 }
 
+const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "");
+
 export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 	activation,
 	items,
@@ -83,8 +85,15 @@ export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
 										.join(" / ")}
 								</span>{" "}
 								· within {requirement.distance} tile
-								{requirement.distance === 1 ? "" : "s"} ·{" "}
-								{requirement.satisfied ? "nearby" : "move one nearby"}
+								{requirement.distance === 1 ? "" : "s"}
+								{requirement.matchedDistance === undefined
+									? ""
+									: ` · nearest ${requirement.matchedDistance}`}
+								{requirement.durationMultiplier === undefined ||
+								requirement.durationMultiplier <= 1
+									? ""
+									: ` · ${formatMultiplier(requirement.durationMultiplier)}× time`}{" "}
+								· {requirement.satisfied ? "nearby" : "move one nearby"}
 							</div>
 						))}
 					</div>

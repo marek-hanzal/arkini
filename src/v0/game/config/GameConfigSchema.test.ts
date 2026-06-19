@@ -19,6 +19,7 @@ type TestGameRequirement =
 	| TestActivationRequirement
 	| {
 			distance: number;
+			durationFactor?: number;
 			itemIds: string[];
 			type: "proximity";
 	  };
@@ -528,6 +529,20 @@ describe("GameConfigSchema", () => {
 		);
 
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate requirement id/);
+	});
+
+	it("rejects negative proximity duration factors", () => {
+		const config = createValidConfigValue();
+		config.requirements["requirement:near-twig"] = {
+			distance: 1,
+			durationFactor: -1,
+			itemIds: [
+				"item:twig",
+			],
+			type: "proximity",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/durationFactor/);
 	});
 
 	it("rejects proximity requirements that point at missing items", () => {

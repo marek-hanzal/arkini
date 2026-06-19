@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
-import type { GameActionItemRef } from "~/v0/game/engine/model/GameActionItemRefSchema";
+import type { GameAction } from "~/v0/game/action/GameActionSchema";
+import type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { createGameActionFromItemToBoardItemInteractionPlan } from "~/v0/play/interaction/createGameActionFromItemToBoardItemInteractionPlan";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";

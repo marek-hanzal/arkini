@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionProducerInputWithdraw } from "~/v0/game/engine/model/GameActionProducerInputWithdraw";
+import type { GameActionProducerInputWithdraw } from "~/v0/game/action/GameActionProducerInputWithdraw";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

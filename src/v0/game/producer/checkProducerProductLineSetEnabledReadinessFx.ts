@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionProducerProductLineSetEnabled } from "~/v0/game/engine/model/GameActionProducerProductLineSetEnabled";
+import type { GameActionProducerProductLineSetEnabled } from "~/v0/game/action/GameActionProducerProductLineSetEnabled";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

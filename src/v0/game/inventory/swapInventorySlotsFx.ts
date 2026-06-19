@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/inventory/checkInventorySlotsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
-import type { GameActionInventorySlotsSwapSchema } from "~/v0/game/engine/model/GameActionInventorySlotsSwapSchema";
+import type { GameActionInventorySlotsSwapSchema } from "~/v0/game/action/GameActionInventorySlotsSwapSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

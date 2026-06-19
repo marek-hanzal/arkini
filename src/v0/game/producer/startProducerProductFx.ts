@@ -6,7 +6,7 @@ import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProduce
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
+import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

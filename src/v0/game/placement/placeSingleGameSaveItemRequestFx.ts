@@ -4,9 +4,9 @@ import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanc
 import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { BoardCell } from "~/v0/game/engine/model/BoardCell";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
-import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
+import type { BoardCell } from "~/v0/game/board/BoardCell";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
+import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export type GameSaveSingleItemPlacementResult = {

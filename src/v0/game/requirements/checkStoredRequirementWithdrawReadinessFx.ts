@@ -3,7 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { findStoredRequirementSlotFx } from "~/v0/game/requirements/findStoredRequirementSlotFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import { readStoredRequirementSlotsFx } from "~/v0/game/requirements/readStoredRequirementSlotsFx";
-import type { GameActionStoredRequirementWithdraw } from "~/v0/game/engine/model/GameActionStoredRequirementWithdraw";
+import type { GameActionStoredRequirementWithdraw } from "~/v0/game/action/GameActionStoredRequirementWithdraw";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

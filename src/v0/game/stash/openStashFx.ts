@@ -7,10 +7,10 @@ import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import { applyStashDepletionFx } from "~/v0/game/stash/applyStashDepletionFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionStashOpen } from "~/v0/game/engine/model/GameActionStashOpen";
+import type { GameActionStashOpen } from "~/v0/game/action/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
+import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace openStashFx {

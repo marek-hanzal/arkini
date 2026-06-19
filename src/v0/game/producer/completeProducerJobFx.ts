@@ -9,7 +9,7 @@ import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
+import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
 import type {
 	GameSave,
 	GameSaveProducerDeliveryItem,

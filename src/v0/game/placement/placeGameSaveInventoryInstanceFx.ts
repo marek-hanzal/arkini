@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace placeGameSaveInventoryInstanceFx {

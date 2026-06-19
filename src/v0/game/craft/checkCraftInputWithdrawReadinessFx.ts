@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionCraftInputWithdraw } from "~/v0/game/engine/model/GameActionCraftInputWithdraw";
+import type { GameActionCraftInputWithdraw } from "~/v0/game/action/GameActionCraftInputWithdraw";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

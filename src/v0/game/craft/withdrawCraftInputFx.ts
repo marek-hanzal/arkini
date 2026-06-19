@@ -3,10 +3,10 @@ import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/craft/checkCraftIn
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionCraftInputWithdraw } from "~/v0/game/engine/model/GameActionCraftInputWithdraw";
+import type { GameActionCraftInputWithdraw } from "~/v0/game/action/GameActionCraftInputWithdraw";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace withdrawCraftInputFx {

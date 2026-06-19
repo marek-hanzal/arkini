@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/engine/model/GameActionInventoryItemPlaceSchema";
+import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import {
 	isGameSaveInventoryInstance,
 	isGameSaveInventoryStack,
 	readGameSaveInventorySlotQuantity,
-} from "~/v0/game/engine/model/GameSaveInventorySlot";
+} from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave, GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace checkInventoryItemPlaceReadinessFx {

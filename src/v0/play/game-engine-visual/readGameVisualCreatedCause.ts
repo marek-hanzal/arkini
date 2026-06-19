@@ -1,4 +1,4 @@
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameVisualMotion } from "~/v0/play/game-engine-visual/GameVisualMotion";
 
 type CreatedEvent = Extract<

@@ -1,6 +1,6 @@
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
+import type { GameAction } from "~/v0/game/action/GameActionSchema";
 import {
 	RuntimeGameEngineAdapter,
 	type GameEngineRuntimeSnapshot,

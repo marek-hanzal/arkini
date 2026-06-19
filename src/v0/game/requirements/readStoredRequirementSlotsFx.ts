@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameRequirement } from "~/v0/game/engine/model/GameRequirement";
+import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace readStoredRequirementSlotsFx {

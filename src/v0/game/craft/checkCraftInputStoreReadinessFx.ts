@@ -3,7 +3,7 @@ import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionCraftInputStore } from "~/v0/game/engine/model/GameActionCraftInputStore";
+import type { GameActionCraftInputStore } from "~/v0/game/action/GameActionCraftInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

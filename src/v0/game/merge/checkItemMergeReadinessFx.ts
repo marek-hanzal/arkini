@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionItemMerge } from "~/v0/game/engine/model/GameActionItemMerge";
+import type { GameActionItemMerge } from "~/v0/game/action/GameActionItemMerge";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

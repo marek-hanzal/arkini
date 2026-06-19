@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { GameActivationInput } from "~/v0/game/engine/model/GameActivationInput";
-import type { GameActivationInputRequirement } from "~/v0/game/engine/model/GameActivationInputRequirement";
+import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
+import type { GameActivationInputRequirement } from "~/v0/game/requirements/GameActivationInputRequirement";
 
 export namespace mergeActivationInputRequirementsFx {
 	export interface Props {

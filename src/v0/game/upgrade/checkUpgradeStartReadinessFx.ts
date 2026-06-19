@@ -3,7 +3,7 @@ import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationI
 import { readUpgradeCompletedTierCountFx } from "~/v0/game/upgrade/readUpgradeCompletedTierCountFx";
 import { readUpgradeCostInputsFx } from "~/v0/game/upgrade/readUpgradeCostInputsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionUpgradeStartSchema } from "~/v0/game/engine/model/GameActionUpgradeStartSchema";
+import type { GameActionUpgradeStartSchema } from "~/v0/game/action/GameActionUpgradeStartSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

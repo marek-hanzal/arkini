@@ -19,7 +19,7 @@ export {
 	GameEventSchema,
 	GameItemConsumedReasonSchema,
 	GameItemCreatedReasonSchema,
-} from "~/v0/game/engine/model/GameEventSchema";
+} from "~/v0/game/event/GameEventSchema";
 export {
 	GameSaveBoardItemSchema,
 	GameSaveConfigSchema,
@@ -35,25 +35,25 @@ export {
 	GameSaveStashStateSchema,
 	GameSaveStoredRequirementStateSchema,
 } from "~/v0/game/engine/model/GameSaveSchema";
-export { GameSaveUpgradeJobSchema } from "~/v0/game/engine/model/GameSaveUpgradeJobSchema";
-export { GameSaveUpgradeStateSchema } from "~/v0/game/engine/model/GameSaveUpgradeStateSchema";
-export type { GameActionReadiness } from "~/v0/game/engine/model/GameActionReadinessSchema";
-export { GameActionReadinessSchema } from "~/v0/game/engine/model/GameActionReadinessSchema";
-export { GameActionReadyReadinessSchema } from "~/v0/game/engine/model/GameActionReadyReadinessSchema";
-export { GameActionRejectedReadinessSchema } from "~/v0/game/engine/model/GameActionRejectedReadinessSchema";
-export type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
-export { GameActionSchema } from "~/v0/game/engine/model/GameActionSchema";
-export type { GameActionItemRef } from "~/v0/game/engine/model/GameActionItemRefSchema";
-export { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
-export type { GameActionProducerInputStore } from "~/v0/game/engine/model/GameActionProducerInputStore";
-export { GameActionProducerInputStoreSchema } from "~/v0/game/engine/model/GameActionProducerInputStoreSchema";
-export type { GameActionProducerProductLineSetEnabled } from "~/v0/game/engine/model/GameActionProducerProductLineSetEnabled";
-export { GameActionProducerProductLineSetEnabledSchema } from "~/v0/game/engine/model/GameActionProducerProductLineSetEnabledSchema";
-export type { GameActionStoredRequirementStore } from "~/v0/game/engine/model/GameActionStoredRequirementStore";
-export { GameActionStoredRequirementStoreSchema } from "~/v0/game/engine/model/GameActionStoredRequirementStoreSchema";
-export type { GameActionStoredRequirementWithdraw } from "~/v0/game/engine/model/GameActionStoredRequirementWithdraw";
-export { GameActionStoredRequirementWithdrawSchema } from "~/v0/game/engine/model/GameActionStoredRequirementWithdrawSchema";
-export type { GameEvent, GameEventPlacementTarget } from "~/v0/game/engine/model/GameEventSchema";
+export { GameSaveUpgradeJobSchema } from "~/v0/game/upgrade/GameSaveUpgradeJobSchema";
+export { GameSaveUpgradeStateSchema } from "~/v0/game/upgrade/GameSaveUpgradeStateSchema";
+export type { GameActionReadiness } from "~/v0/game/action/GameActionReadinessSchema";
+export { GameActionReadinessSchema } from "~/v0/game/action/GameActionReadinessSchema";
+export { GameActionReadyReadinessSchema } from "~/v0/game/action/GameActionReadyReadinessSchema";
+export { GameActionRejectedReadinessSchema } from "~/v0/game/action/GameActionRejectedReadinessSchema";
+export type { GameAction } from "~/v0/game/action/GameActionSchema";
+export { GameActionSchema } from "~/v0/game/action/GameActionSchema";
+export type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema";
+export { GameActionItemRefSchema } from "~/v0/game/action/GameActionItemRefSchema";
+export type { GameActionProducerInputStore } from "~/v0/game/action/GameActionProducerInputStore";
+export { GameActionProducerInputStoreSchema } from "~/v0/game/action/GameActionProducerInputStoreSchema";
+export type { GameActionProducerProductLineSetEnabled } from "~/v0/game/action/GameActionProducerProductLineSetEnabled";
+export { GameActionProducerProductLineSetEnabledSchema } from "~/v0/game/action/GameActionProducerProductLineSetEnabledSchema";
+export type { GameActionStoredRequirementStore } from "~/v0/game/action/GameActionStoredRequirementStore";
+export { GameActionStoredRequirementStoreSchema } from "~/v0/game/action/GameActionStoredRequirementStoreSchema";
+export type { GameActionStoredRequirementWithdraw } from "~/v0/game/action/GameActionStoredRequirementWithdraw";
+export { GameActionStoredRequirementWithdrawSchema } from "~/v0/game/action/GameActionStoredRequirementWithdrawSchema";
+export type { GameEvent, GameEventPlacementTarget } from "~/v0/game/event/GameEventSchema";
 export { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 export type { GameEngineError as GameEngineErrorType } from "~/v0/game/engine/model/GameEngineError";
 export type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";

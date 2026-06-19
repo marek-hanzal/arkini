@@ -2,7 +2,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import {
 	isGameSaveInventoryInstance,
 	readGameSaveInventorySlotQuantity,
-} from "~/v0/game/engine/model/GameSaveInventorySlot";
+} from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";

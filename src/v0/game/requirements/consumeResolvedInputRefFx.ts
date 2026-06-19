@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameActionResolvedInputRef } from "~/v0/game/engine/model/GameActionResolvedInputRef";
+import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import {
 	isGameSaveInventoryInstance,
 	readGameSaveInventorySlotQuantity,
-} from "~/v0/game/engine/model/GameSaveInventorySlot";
+} from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave, GameSaveInventoryStack } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace consumeResolvedInputRefFx {

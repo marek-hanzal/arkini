@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { GameSaveUpgradeJobSchema } from "~/v0/game/engine/model/GameSaveUpgradeJobSchema";
-import { GameSaveUpgradeStateSchema } from "~/v0/game/engine/model/GameSaveUpgradeStateSchema";
-import { GameItemCreatedReasonSchema } from "~/v0/game/engine/model/GameEventSchema";
+import { GameSaveUpgradeJobSchema } from "~/v0/game/upgrade/GameSaveUpgradeJobSchema";
+import { GameSaveUpgradeStateSchema } from "~/v0/game/upgrade/GameSaveUpgradeStateSchema";
+import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);

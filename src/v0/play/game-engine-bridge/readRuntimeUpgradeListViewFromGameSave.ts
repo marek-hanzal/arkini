@@ -1,5 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { UpgradeCostView } from "~/v0/upgrade/view/UpgradeCostViewSchema";
 import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";

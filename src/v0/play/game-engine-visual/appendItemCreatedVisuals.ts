@@ -1,5 +1,5 @@
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { createGameVisualCreatedGroupId } from "~/v0/play/game-engine-visual/createGameVisualCreatedGroupId";
 import { gameVisualMotionSettlementDelayMs } from "~/v0/play/game-engine-visual/gameVisualMotionSettlementDelayMs";

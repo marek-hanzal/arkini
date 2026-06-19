@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
-import type { GameActionResolvedInputRef } from "~/v0/game/engine/model/GameActionResolvedInputRef";
+import type { GameActionItemRefSchema } from "~/v0/game/action/GameActionItemRefSchema";
+import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace resolveInputRefsFx {

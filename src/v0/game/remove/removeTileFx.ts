@@ -6,9 +6,9 @@ import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRunt
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameActionTileRemove } from "~/v0/game/engine/model/GameActionTileRemove";
+import type { GameActionTileRemove } from "~/v0/game/action/GameActionTileRemove";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace removeTileFx {

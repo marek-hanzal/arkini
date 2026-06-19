@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { GameUpgradeCostInput } from "~/v0/game/engine/model/GameUpgradeCostInput";
-import type { GameUpgradeDefinition } from "~/v0/game/engine/model/GameUpgradeDefinition";
+import type { GameUpgradeCostInput } from "~/v0/game/upgrade/GameUpgradeCostInput";
+import type { GameUpgradeDefinition } from "~/v0/game/upgrade/GameUpgradeDefinition";
 
 export namespace readUpgradeCostInputsFx {
 	export interface Props {

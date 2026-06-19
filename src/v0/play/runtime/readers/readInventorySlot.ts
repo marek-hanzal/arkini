@@ -1,7 +1,7 @@
 import {
 	isGameSaveInventoryInstance,
 	readGameSaveInventorySlotQuantity,
-} from "~/v0/game/engine/model/GameSaveInventorySlot";
+} from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";

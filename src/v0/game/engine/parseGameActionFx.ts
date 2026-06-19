@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { GameActionSchema } from "~/v0/game/engine/model/GameActionSchema";
+import { GameActionSchema } from "~/v0/game/action/GameActionSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 
 export namespace parseGameActionFx {

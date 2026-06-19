@@ -1,4 +1,4 @@
-import type { GamePlacementFailureReason } from "~/v0/game/engine/model/GamePlacementFailureReasonSchema";
+import type { GamePlacementFailureReason } from "~/v0/game/placement/GamePlacementFailureReasonSchema";
 
 export type GameEngineError =
 	| {

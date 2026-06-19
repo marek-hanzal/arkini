@@ -90,7 +90,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-container={container}
 			data-ak-tile-engine-disabled={disabled ? "true" : undefined}
 			className={cn(
-				"ak-tile-engine relative min-w-0 shrink-0 overflow-visible rounded-sm border border-white/[0.12] bg-white/[0.055] p-1",
+				"ak-tile-engine relative min-w-0 shrink-0 overflow-visible p-1",
 				disabled && "pointer-events-none",
 			)}
 			style={

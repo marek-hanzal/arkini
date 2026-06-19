@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import {
@@ -65,6 +66,21 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 		if (!itemDefinition) {
 			return yield* Effect.fail(
 				GameEngineError.configReferenceMissing(`Missing item "${slot.itemId}".`),
+			);
+		}
+
+		if (
+			!isItemStorageAllowed({
+				config,
+				itemId: slot.itemId,
+				location: "board",
+			})
+		) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"storage_restricted",
+					`Item "${slot.itemId}" cannot be placed on board.`,
+				),
 			);
 		}
 

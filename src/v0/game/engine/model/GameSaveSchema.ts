@@ -502,7 +502,8 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if (!config.items[boardItem.itemId]) {
+		const boardItemDefinition = config.items[boardItem.itemId];
+		if (!boardItemDefinition) {
 			addSaveIssue(
 				ctx,
 				[
@@ -512,6 +513,17 @@ const validateGameSaveAgainstConfig = (
 					"itemId",
 				],
 				`Missing item "${boardItem.itemId}".`,
+			);
+		} else if (boardItemDefinition.storage === "inventory") {
+			addSaveIssue(
+				ctx,
+				[
+					"board",
+					"items",
+					itemInstanceId,
+					"itemId",
+				],
+				`Item "${boardItem.itemId}" storage policy forbids board location.`,
 			);
 		}
 
@@ -575,6 +587,19 @@ const validateGameSaveAgainstConfig = (
 				`Missing item "${slot.itemId}".`,
 			);
 			continue;
+		}
+
+		if (item.storage === "board") {
+			addSaveIssue(
+				ctx,
+				[
+					"inventory",
+					"slots",
+					slotIndex,
+					"itemId",
+				],
+				`Item "${slot.itemId}" storage policy forbids inventory location.`,
+			);
 		}
 
 		if ("kind" in slot && slot.kind === "instance") {

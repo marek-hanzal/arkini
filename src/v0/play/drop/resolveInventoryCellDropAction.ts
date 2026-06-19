@@ -1,6 +1,7 @@
 import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/v0/play/drag/DragSource";
@@ -118,6 +119,22 @@ export const resolveInventoryCellDropAction = ({
 				targetBoardItemId: target.boardItemId,
 			},
 			type: "apply-inventory-item-to-board-item",
+		};
+	}
+
+	if (
+		!isItemStorageAllowed({
+			config,
+			itemId: source.itemId,
+			location: "board",
+		})
+	) {
+		return {
+			feedback: {
+				kind: "board-cell",
+				cellKey: cellKey(target.x, target.y),
+			},
+			type: "reject",
 		};
 	}
 

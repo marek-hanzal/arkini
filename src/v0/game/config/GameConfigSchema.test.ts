@@ -39,6 +39,8 @@ type TestProduct = {
 	requirementIds: string[];
 };
 
+type TestItemStorage = "board" | "inventory" | "both";
+
 type TestCraftRecipe = {
 	durationMs: number;
 	inputs: {
@@ -274,9 +276,41 @@ const createValidConfigValue = () => ({
 	},
 });
 
+const setItemStorage = (
+	config: ReturnType<typeof createValidConfigValue>,
+	itemId: keyof ReturnType<typeof createValidConfigValue>["items"],
+	storage: TestItemStorage,
+) => {
+	(
+		config.items[itemId] as ReturnType<
+			typeof createValidConfigValue
+		>["items"][typeof itemId] & {
+			storage: TestItemStorage;
+		}
+	).storage = storage;
+};
+
 describe("GameConfigSchema", () => {
 	it("accepts the minimal valid test config", () => {
 		expect(parseGameConfig(createValidConfigValue()).game.id).toBe("game:test");
+	});
+
+	it("defaults item storage to both", () => {
+		expect(parseGameConfig(createValidConfigValue()).items["item:twig"].storage).toBe("both");
+	});
+
+	it("rejects board-only items in starting inventory", () => {
+		const config = createValidConfigValue();
+		setItemStorage(config, "item:twig", "board");
+
+		expect(() => parseGameConfig(config)).toThrow(/forbids inventory placement/);
+	});
+
+	it("rejects inventory-only items on the starting board", () => {
+		const config = createValidConfigValue();
+		setItemStorage(config, "item:producer", "inventory");
+
+		expect(() => parseGameConfig(config)).toThrow(/forbids board placement/);
 	});
 
 	it("rejects starting inventory stack counts above configured slots", () => {

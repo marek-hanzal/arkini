@@ -81,6 +81,47 @@ describe("applyGameActionFx BoardInventory", () => {
 		]);
 	});
 
+	it("rejects placing inventory-only items on the board", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					storage: "inventory",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runActionEither({
+			action: {
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "storage_restricted",
+			},
+		});
+	});
+
 	it("places an inventory stack around a seeded board cell", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -196,6 +237,7 @@ describe("applyGameActionFx BoardInventory", () => {
 					maxStackSize: 3,
 					name: "Craft Stack",
 					sort: 8,
+					storage: "both",
 					tags: [],
 					tier: 0,
 				},
@@ -309,6 +351,41 @@ describe("applyGameActionFx BoardInventory", () => {
 			left: {
 				_tag: "GameActionRejected",
 				reason: "item_busy",
+			},
+		});
+	});
+
+	it("rejects stashing board-only items into inventory", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:producer": {
+					...baseConfig.items["item:producer"],
+					storage: "board",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.stash",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "storage_restricted",
 			},
 		});
 	});

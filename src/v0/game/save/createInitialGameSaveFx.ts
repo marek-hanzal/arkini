@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { placeInitialInventoryItemFx } from "~/v0/game/placement/placeInitialInventoryItemFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
@@ -20,6 +21,18 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 	let initialItemInstanceIndex = 1;
 
 	for (const entry of config.startingState.board) {
+		if (
+			!isItemStorageAllowed({
+				config,
+				itemId: entry.itemId,
+				location: "board",
+			})
+		) {
+			return yield* Effect.fail(
+				GameEngineError.saveInvalid(`Starting board cannot contain "${entry.itemId}".`),
+			);
+		}
+
 		const cellKey = `${entry.x}:${entry.y}`;
 
 		if (occupiedCells.has(cellKey)) {

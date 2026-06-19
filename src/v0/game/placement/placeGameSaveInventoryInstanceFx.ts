@@ -1,10 +1,13 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace placeGameSaveInventoryInstanceFx {
 	export interface Props {
+		config: GameConfig;
 		events: GameEvent[];
 		itemId: string;
 		itemInstanceId: string;
@@ -20,12 +23,28 @@ export namespace placeGameSaveInventoryInstanceFx {
 
 export const placeGameSaveInventoryInstanceFx = Effect.fn("placeGameSaveInventoryInstanceFx")(
 	function* ({
+		config,
 		events,
 		itemId,
 		itemInstanceId,
 		reason,
 		slots,
 	}: placeGameSaveInventoryInstanceFx.Props) {
+		if (
+			!isItemStorageAllowed({
+				config,
+				itemId,
+				location: "inventory",
+			})
+		) {
+			return yield* Effect.fail(
+				GameEngineError.placementFailed(
+					"storage:inventory-forbidden",
+					`Item "${itemId}" cannot be placed in inventory.`,
+				),
+			);
+		}
+
 		const slotIndex = slots.findIndex((slot) => !slot);
 		if (slotIndex === -1) {
 			return yield* Effect.fail(

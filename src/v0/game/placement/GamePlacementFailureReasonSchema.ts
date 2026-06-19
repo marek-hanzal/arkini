@@ -4,6 +4,7 @@ export const GamePlacementFailureReasonSchema = z.enum([
 	"board:full",
 	"inventory:full",
 	"placement-failed:unknown",
+	"storage:inventory-forbidden",
 ]);
 
 export type GamePlacementFailureReasonSchema = typeof GamePlacementFailureReasonSchema;

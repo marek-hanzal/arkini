@@ -199,6 +199,104 @@ describe("placeGameSaveItemsFx", () => {
 		]);
 	});
 
+	it("places inventory-only output directly into inventory", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					storage: "inventory",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runPlacement({
+			config,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(Object.values(result.save.board.items).map((item) => item.itemId)).toEqual([
+			"item:producer",
+		]);
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(result.events).toMatchObject([
+			{
+				to: {
+					kind: "inventory",
+				},
+				type: "item.created",
+			},
+		]);
+	});
+
+	it("does not hide board-only output in inventory after the board fills", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					storage: "board",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runPlacementEither({
+			config,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GamePlacementFailed",
+				reason: "board:full",
+			},
+		});
+		expect(save.inventory.slots).toEqual([
+			null,
+		]);
+	});
+
 	it("keeps placement atomic when board and inventory cannot fit the whole output", () => {
 		const config = createEngineTestConfig({
 			game: {

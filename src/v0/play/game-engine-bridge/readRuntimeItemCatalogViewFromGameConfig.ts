@@ -125,6 +125,7 @@ const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: strin
 		assetOverlaySrc: overlayAssetSrc,
 		assetRender: asset?.render ?? "plain",
 		maxStackSize: item.maxStackSize,
+		storage: item.storage,
 		tags: [
 			...item.tags,
 		],

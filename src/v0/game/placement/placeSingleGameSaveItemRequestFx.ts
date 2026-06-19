@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanceIdFx";
 import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { BoardCell } from "~/v0/game/board/BoardCell";
@@ -36,8 +37,18 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		let remainingQuantity = item.quantity;
 		let boardPlacedQuantity = 0;
 		let boardRanOutOfSpace = false;
+		const canPlaceOnBoard = isItemStorageAllowed({
+			config,
+			itemId: item.itemId,
+			location: "board",
+		});
+		const canPlaceInInventory = isItemStorageAllowed({
+			config,
+			itemId: item.itemId,
+			location: "inventory",
+		});
 
-		while (remainingQuantity > 0) {
+		while (canPlaceOnBoard && remainingQuantity > 0) {
 			const emptyCell = yield* findFirstEmptyBoardCellFx({
 				config,
 				save,
@@ -72,13 +83,15 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			boardPlacedQuantity += 1;
 		}
 
-		const inventoryPlaced = yield* placeGameSaveInventoryRemainderFx({
-			events,
-			item,
-			maxStackSize: itemDefinition.maxStackSize,
-			remainingQuantity,
-			slots: save.inventory.slots,
-		});
+		const inventoryPlaced = canPlaceInInventory
+			? yield* placeGameSaveInventoryRemainderFx({
+					events,
+					item,
+					maxStackSize: itemDefinition.maxStackSize,
+					remainingQuantity,
+					slots: save.inventory.slots,
+				})
+			: remainingQuantity === 0;
 
 		if (inventoryPlaced) {
 			return {
@@ -87,7 +100,11 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		}
 
 		const reason =
-			boardRanOutOfSpace && boardPlacedQuantity === 0 ? "board:full" : "inventory:full";
+			canPlaceOnBoard &&
+			(!canPlaceInInventory || boardPlacedQuantity === 0) &&
+			boardRanOutOfSpace
+				? "board:full"
+				: "inventory:full";
 
 		return yield* Effect.fail(
 			GameEngineError.placementFailed(reason, "Placement target is full."),

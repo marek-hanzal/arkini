@@ -694,6 +694,7 @@
 			"maxStackSize": 15,
 			"name": "Beam",
 			"sort": 68,
+			"storage": "both",
 			"tags": [
 				"material",
 				"wood"
@@ -707,6 +708,7 @@
 			"maxStackSize": 30,
 			"name": "Beer",
 			"sort": 107,
+			"storage": "both",
 			"tags": [
 				"material",
 				"drink"
@@ -720,6 +722,7 @@
 			"maxStackSize": 5,
 			"name": "Blank Blueprint",
 			"sort": 203,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"blank"
@@ -736,6 +739,7 @@
 			],
 			"name": "Blueprint Draft",
 			"sort": 202,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"fragment"
@@ -752,6 +756,7 @@
 			],
 			"name": "Blueprint Fragment",
 			"sort": 201,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"fragment"
@@ -766,6 +771,7 @@
 			"maxStackSize": 5,
 			"name": "Lumber Camp Blueprint",
 			"sort": 204,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -781,6 +787,7 @@
 			"maxStackSize": 4,
 			"name": "Lumber Camp 2 Blueprint",
 			"sort": 206,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -796,6 +803,7 @@
 			"maxStackSize": 4,
 			"name": "Lumber Camp 3 Blueprint",
 			"sort": 207,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -811,6 +819,7 @@
 			"maxStackSize": 4,
 			"name": "Lumber Camp 4 Blueprint",
 			"sort": 208,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -826,6 +835,7 @@
 			"maxStackSize": 4,
 			"name": "Lumber Camp 5 Blueprint",
 			"sort": 209,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -840,6 +850,7 @@
 			"maxStackSize": 5,
 			"name": "Quarry Blueprint",
 			"sort": 224,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -855,6 +866,7 @@
 			"maxStackSize": 4,
 			"name": "Quarry 2 Blueprint",
 			"sort": 226,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -870,6 +882,7 @@
 			"maxStackSize": 4,
 			"name": "Quarry 3 Blueprint",
 			"sort": 227,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -885,6 +898,7 @@
 			"maxStackSize": 4,
 			"name": "Quarry 4 Blueprint",
 			"sort": 228,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -900,6 +914,7 @@
 			"maxStackSize": 4,
 			"name": "Quarry 5 Blueprint",
 			"sort": 229,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -916,6 +931,7 @@
 			],
 			"name": "Blueprint Scrap",
 			"sort": 200,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"fragment"
@@ -930,6 +946,7 @@
 			"maxStackSize": 5,
 			"name": "Town Hall Blueprint",
 			"sort": 244,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -945,6 +962,7 @@
 			"maxStackSize": 4,
 			"name": "Town Hall 2 Blueprint",
 			"sort": 246,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -960,6 +978,7 @@
 			"maxStackSize": 4,
 			"name": "Town Hall 3 Blueprint",
 			"sort": 247,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -975,6 +994,7 @@
 			"maxStackSize": 4,
 			"name": "Town Hall 4 Blueprint",
 			"sort": 248,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -990,6 +1010,7 @@
 			"maxStackSize": 4,
 			"name": "Town Hall 5 Blueprint",
 			"sort": 249,
+			"storage": "both",
 			"tags": [
 				"blueprint",
 				"craft-target"
@@ -1006,6 +1027,7 @@
 			],
 			"name": "Branch",
 			"sort": 50,
+			"storage": "both",
 			"tags": [
 				"material",
 				"wood"
@@ -1022,6 +1044,7 @@
 			],
 			"name": "Bush",
 			"sort": 34,
+			"storage": "both",
 			"tags": [
 				"material",
 				"plant"
@@ -1035,6 +1058,7 @@
 			"maxStackSize": 40,
 			"name": "Coal",
 			"sort": 105,
+			"storage": "both",
 			"tags": [
 				"material",
 				"fuel"
@@ -1050,6 +1074,7 @@
 			"name": "Coal Mine I",
 			"producerId": "producer:coal-mine-1",
 			"sort": 392,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1067,6 +1092,7 @@
 			],
 			"name": "Coin",
 			"sort": 180,
+			"storage": "both",
 			"tags": [
 				"currency"
 			],
@@ -1079,6 +1105,7 @@
 			"maxStackSize": 20,
 			"name": "Coin Chest",
 			"sort": 186,
+			"storage": "both",
 			"tags": [
 				"currency"
 			],
@@ -1094,6 +1121,7 @@
 			],
 			"name": "Coin Pair",
 			"sort": 182,
+			"storage": "both",
 			"tags": [
 				"currency"
 			],
@@ -1109,6 +1137,7 @@
 			],
 			"name": "Coin Stack",
 			"sort": 184,
+			"storage": "both",
 			"tags": [
 				"currency"
 			],
@@ -1125,6 +1154,7 @@
 			"name": "Common Crate",
 			"sort": 400,
 			"stashId": "stash:crate-1",
+			"storage": "both",
 			"tags": [
 				"producer",
 				"container"
@@ -1142,6 +1172,7 @@
 			"name": "Sturdy Crate",
 			"sort": 410,
 			"stashId": "stash:crate-2",
+			"storage": "both",
 			"tags": [
 				"producer",
 				"container"
@@ -1159,6 +1190,7 @@
 			"name": "Rare Crate",
 			"sort": 420,
 			"stashId": "stash:crate-3",
+			"storage": "both",
 			"tags": [
 				"producer",
 				"container",
@@ -1174,6 +1206,7 @@
 			"name": "Epic Crate",
 			"sort": 430,
 			"stashId": "stash:crate-4",
+			"storage": "both",
 			"tags": [
 				"producer",
 				"container",
@@ -1191,6 +1224,7 @@
 			],
 			"name": "Crystal",
 			"sort": 90,
+			"storage": "both",
 			"tags": [
 				"material",
 				"stone",
@@ -1205,6 +1239,7 @@
 			"maxStackSize": 1,
 			"name": "Epic Key",
 			"sort": 425,
+			"storage": "both",
 			"tags": [
 				"key",
 				"rare"
@@ -1218,6 +1253,7 @@
 			"maxStackSize": 15,
 			"name": "Gem",
 			"sort": 94,
+			"storage": "both",
 			"tags": [
 				"material",
 				"stone",
@@ -1235,6 +1271,7 @@
 			],
 			"name": "Leaf",
 			"sort": 30,
+			"storage": "both",
 			"tags": [
 				"material",
 				"plant"
@@ -1251,6 +1288,7 @@
 			],
 			"name": "Log",
 			"sort": 60,
+			"storage": "both",
 			"tags": [
 				"material",
 				"wood"
@@ -1269,6 +1307,7 @@
 			"name": "Lumber Camp I",
 			"producerId": "producer:lumber-camp-1",
 			"sort": 330,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1288,6 +1327,7 @@
 			"name": "Lumber Camp II",
 			"producerId": "producer:lumber-camp-2",
 			"sort": 340,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1307,6 +1347,7 @@
 			"name": "Lumber Camp III",
 			"producerId": "producer:lumber-camp-3",
 			"sort": 350,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1326,6 +1367,7 @@
 			"name": "Lumber Camp IV",
 			"producerId": "producer:lumber-camp-4",
 			"sort": 354,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1345,6 +1387,7 @@
 			"name": "Lumber Camp V",
 			"producerId": "producer:lumber-camp-5",
 			"sort": 358,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1362,6 +1405,7 @@
 			],
 			"name": "Ore",
 			"sort": 84,
+			"storage": "both",
 			"tags": [
 				"material",
 				"stone"
@@ -1378,6 +1422,7 @@
 			],
 			"name": "Pebble",
 			"sort": 70,
+			"storage": "both",
 			"tags": [
 				"material",
 				"stone"
@@ -1394,6 +1439,7 @@
 			],
 			"name": "Plank",
 			"sort": 66,
+			"storage": "both",
 			"tags": [
 				"material",
 				"wood"
@@ -1412,6 +1458,7 @@
 			"name": "Quarry I",
 			"producerId": "producer:quarry-1",
 			"sort": 360,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1431,6 +1478,7 @@
 			"name": "Quarry II",
 			"producerId": "producer:quarry-2",
 			"sort": 370,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1450,6 +1498,7 @@
 			"name": "Quarry III",
 			"producerId": "producer:quarry-3",
 			"sort": 380,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1469,6 +1518,7 @@
 			"name": "Quarry IV",
 			"producerId": "producer:quarry-4",
 			"sort": 384,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1488,6 +1538,7 @@
 			"name": "Quarry V",
 			"producerId": "producer:quarry-5",
 			"sort": 388,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1503,6 +1554,7 @@
 			"maxStackSize": 15,
 			"name": "Sapling",
 			"sort": 38,
+			"storage": "both",
 			"tags": [
 				"material",
 				"plant"
@@ -1516,6 +1568,7 @@
 			"maxStackSize": 30,
 			"name": "Sausage",
 			"sort": 106,
+			"storage": "both",
 			"tags": [
 				"material",
 				"food"
@@ -1533,6 +1586,7 @@
 			],
 			"name": "Seed",
 			"sort": 10,
+			"storage": "both",
 			"tags": [
 				"material",
 				"plant"
@@ -1550,6 +1604,7 @@
 			],
 			"name": "Sprout",
 			"sort": 20,
+			"storage": "both",
 			"tags": [
 				"material",
 				"plant"
@@ -1567,6 +1622,7 @@
 			],
 			"name": "Stone",
 			"sort": 80,
+			"storage": "both",
 			"tags": [
 				"material",
 				"stone"
@@ -1583,6 +1639,7 @@
 			],
 			"name": "Stone Block",
 			"sort": 82,
+			"storage": "both",
 			"tags": [
 				"material",
 				"stone"
@@ -1601,6 +1658,7 @@
 			"name": "Town Hall I",
 			"producerId": "producer:townhall-1",
 			"sort": 300,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1620,6 +1678,7 @@
 			"name": "Town Hall II",
 			"producerId": "producer:townhall-2",
 			"sort": 310,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1639,6 +1698,7 @@
 			"name": "Town Hall III",
 			"producerId": "producer:townhall-3",
 			"sort": 320,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1658,6 +1718,7 @@
 			"name": "Town Hall IV",
 			"producerId": "producer:townhall-4",
 			"sort": 324,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1677,6 +1738,7 @@
 			"name": "Town Hall V",
 			"producerId": "producer:townhall-5",
 			"sort": 328,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -1692,6 +1754,7 @@
 			"name": "Tree",
 			"producerId": "producer:tree",
 			"sort": 39,
+			"storage": "both",
 			"tags": [
 				"producer",
 				"plant",
@@ -1709,6 +1772,7 @@
 			],
 			"name": "Twig",
 			"sort": 40,
+			"storage": "both",
 			"tags": [
 				"material",
 				"wood"
@@ -1725,6 +1789,7 @@
 			],
 			"name": "Water",
 			"sort": 100,
+			"storage": "both",
 			"tags": [
 				"material",
 				"water"
@@ -1741,6 +1806,7 @@
 			],
 			"name": "Wood Bundle",
 			"sort": 64,
+			"storage": "both",
 			"tags": [
 				"material",
 				"wood"

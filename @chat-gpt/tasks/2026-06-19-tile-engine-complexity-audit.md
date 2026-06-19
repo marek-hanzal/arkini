@@ -141,4 +141,7 @@ Second implementation task completed on `2026-06-19`: `useTileActorMotion.ts` no
 
 Third implementation task completed on `2026-06-19`: `TileEngineActor.tsx` now delegates memo prop comparison to `sameTileEngineActorProps.ts`, feedback debug logging to `useTileActorFeedbackDebug.ts`, and shared active drop feedback equality to `sameTileEngineDropFeedback.ts`.
 
-Future caution: validate in browser before deeper TileEngine cleanup. Next possible TileEngine target is `TileEngineSlot.tsx` long-press extraction; do not split `TileMotionRuntime.ts` just for line count.
+Fourth implementation task completed on `2026-06-19`: `TileEngineSlot.tsx` now delegates long-press pointer timer lifecycle to `useTileSlotLongPress.ts`, feedback debug logging to `useTileSlotFeedbackDebug.ts`, and memo comparison to `sameTileEngineSlotProps.ts`. The slot component is now a compact slot render/drop registration orchestrator.
+
+Future caution: validate in browser before deeper TileEngine cleanup. `TileEngineSlot.tsx` long-press extraction is done. Do not split `TileMotionRuntime.ts` just for line count.
+

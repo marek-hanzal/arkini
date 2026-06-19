@@ -19,11 +19,12 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: split `useTilePointerUp.ts` drop finalization into focused motion/commit/handoff helpers.
 - `2026-06-19`: split `useTileActorMotion.ts` layout motion into `useTileActorLayoutMotion.ts`.
 - `2026-06-19`: split `TileEngineActor.tsx` memo comparison and feedback debug effect into focused helpers.
+- `2026-06-19`: split `TileEngineSlot.tsx` long-press, feedback debug, and memo comparison into focused helpers.
 
 ## Next candidates
 
 1. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item.
 2. Game engine visual plan audit: split event-family visual mappers only if it reduces mental load without hiding the output-event contract.
-3. TileEngine follow-up audit: next likely targets are `TileEngineSlot.tsx` long-press extraction or `createGameEngineVisualPlan.ts` visual-family audit. Validate TileEngine changes in browser before deeper motion runtime cleanup. Do not split `TileMotionRuntime.ts` just for line count.
+3. TileEngine follow-up audit: `TileEngineSlot.tsx` long-press extraction is done. Next likely TileEngine target is browser validation before deeper motion runtime cleanup. Do not split `TileMotionRuntime.ts` just for line count.
 
 Before coding any risky item, inspect source and propose exact files/shape first.

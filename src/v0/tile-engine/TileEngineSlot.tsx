@@ -1,43 +1,10 @@
-import {
-	memo,
-	type PointerEvent as ReactPointerEvent,
-	type ReactNode,
-	type RefObject,
-	useCallback,
-	useEffect,
-	useRef,
-} from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { memo, type ReactNode, type RefObject, useEffect, useRef } from "react";
 import { cn } from "~/v0/ui/cn";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
-import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
-import { sameTileEngineSlot } from "~/v0/tile-engine/sameTileEngineSlot";
-import { sameTileEngineTile } from "~/v0/tile-engine/sameTileEngineTile";
-import { sameTileEngineDropFeedback } from "~/v0/tile-engine/sameTileEngineDropFeedback";
-
-const sameOptionalTileEngineTile = <TTile,>(
-	left: TileEngine.Tile<TTile> | undefined,
-	right: TileEngine.Tile<TTile> | undefined,
-) => {
-	if (!left || !right) return left === right;
-
-	return sameTileEngineTile(left, right);
-};
-
-const sameTileEngineSlotProps = <TTile, TSlot, TDrop>(
-	left: TileEngineSlot.Props<TTile, TSlot, TDrop>,
-	right: TileEngineSlot.Props<TTile, TSlot, TDrop>,
-) =>
-	sameTileEngineSlot(left.slot, right.slot) &&
-	left.index === right.index &&
-	sameOptionalTileEngineTile(left.targetTile, right.targetTile) &&
-	sameTileEngineDropFeedback(left.dropFeedback, right.dropFeedback) &&
-	left.disabled === right.disabled &&
-	left.className === right.className &&
-	left.dragRef === right.dragRef &&
-	left.renderSlot === right.renderSlot &&
-	left.registerDrop === right.registerDrop;
+import { sameTileEngineSlotProps } from "~/v0/tile-engine/sameTileEngineSlotProps";
+import { useTileSlotFeedbackDebug } from "~/v0/tile-engine/useTileSlotFeedbackDebug";
+import { useTileSlotLongPress } from "~/v0/tile-engine/useTileSlotLongPress";
 
 export namespace TileEngineSlot {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrop = unknown> {
@@ -65,61 +32,19 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	registerDrop,
 }: TileEngineSlot.Props<TTile, TSlot, TDrop>) => {
 	const ref = useRef<HTMLDivElement | null>(null);
-	const longTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const activePointerIdRef = useRef<number | null>(null);
 	const binding = dragRef.current?.slot(slot, targetTile);
 	const dropId = binding?.id ?? slot.dropId ?? slot.id;
-	const disabled = engineDisabled || !binding || binding.disabled || slot.disabled;
+	const disabled = Boolean(engineDisabled || !binding || binding.disabled || slot.disabled);
 	const slotFeedback = disabled ? null : dropFeedback;
 	const isOver = Boolean(slotFeedback);
 
-	const clearLongTimer = useCallback(() => {
-		if (!longTimerRef.current) return;
-		clearTimeout(longTimerRef.current);
-		longTimerRef.current = null;
-	}, []);
-
-	const handlePointerDown = useCallback(
-		(event: ReactPointerEvent<HTMLDivElement>) => {
-			if (disabled || !binding?.onLongActivate || event.button !== 0) return;
-			activePointerIdRef.current = event.pointerId;
-			clearLongTimer();
-			longTimerRef.current = setTimeout(() => {
-				if (activePointerIdRef.current !== event.pointerId) return;
-				longTimerRef.current = null;
-				binding.onLongActivate?.();
-			}, TileEngineTiming.longPressMs);
-		},
-		[
-			binding,
-			clearLongTimer,
-			disabled,
-		],
-	);
-
-	const cancelPointerLongPress = useCallback(
-		(event: ReactPointerEvent<HTMLDivElement>) => {
-			if (activePointerIdRef.current !== event.pointerId) return;
-			activePointerIdRef.current = null;
-			clearLongTimer();
-		},
-		[
-			clearLongTimer,
-		],
-	);
-
-	useEffect(
-		() => () => {
-			activePointerIdRef.current = null;
-			clearLongTimer();
-		},
-		[
-			clearLongTimer,
-		],
-	);
+	const longPress = useTileSlotLongPress({
+		disabled,
+		onLongActivate: binding?.onLongActivate,
+	});
 
 	useEffect(() => {
-		if (disabled || !ref.current) return;
+		if (disabled || !binding || !ref.current) return;
 
 		return registerDrop({
 			dropId,
@@ -137,33 +62,14 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 		targetTile,
 	]);
 
-	useEffect(() => {
-		if (!slotFeedback) return;
-
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "slot.feedback.render",
-			detail: {
-				slotId: slot.id,
-				dropId,
-				isOver,
-				feedback: slotFeedback,
-				targetTileId: targetTile?.id,
-				slotDataset: ref.current
-					? {
-							dropFeedback: ref.current.dataset.akTileEngineDropFeedback,
-							dropFeedbackVariant:
-								ref.current.dataset.akTileEngineDropFeedbackVariant,
-						}
-					: null,
-			},
-		});
-	}, [
+	useTileSlotFeedbackDebug({
+		ref,
+		slotId: slot.id,
 		dropId,
-		slot.id,
+		isOver,
 		slotFeedback,
-		targetTile?.id,
-	]);
+		targetTile,
+	});
 
 	return (
 		<div
@@ -173,10 +79,10 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 			data-ak-tile-engine-drop-feedback={slotFeedback?.effect}
 			data-ak-tile-engine-drop-feedback-variant={slotFeedback?.variant}
 			className={cn("ak-tile-engine-slot", className)}
-			onPointerDown={handlePointerDown}
-			onPointerLeave={cancelPointerLongPress}
-			onPointerUp={cancelPointerLongPress}
-			onPointerCancel={cancelPointerLongPress}
+			onPointerDown={longPress.onPointerDown}
+			onPointerLeave={longPress.onPointerLeave}
+			onPointerUp={longPress.onPointerUp}
+			onPointerCancel={longPress.onPointerCancel}
 		>
 			{renderSlot({
 				slot,

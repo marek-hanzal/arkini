@@ -12,6 +12,7 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: board read-model bridge split into focused activation/craft/item readers.
 - `2026-06-19`: reverted `GameSaveSchema` validation split; schema core contracts are not line-count cleanup targets.
 - `2026-06-19`: split future work from now-events; old delayed item-spawn records are now `itemSpawnJobs`.
+- `2026-06-19`: job/event follow-up checked active notes/source naming; active rules now say scheduled/pending means job, event means now/output.
 
 ## Next candidates
 

@@ -74,6 +74,7 @@ export const BoardSurface = memo(
 				data-ui="board surface"
 				className="flex h-full w-full items-center justify-center overflow-hidden"
 				style={{
+					containerType: "size",
 					zIndex: "var(--ak-layer-base-surface)",
 				}}
 			>

@@ -78,12 +78,32 @@ button:focus-visible,
 }
 
 .ak-tile-engine {
+	--ak-tile-engine-frame: calc(0.25rem + 2px);
 	--ak-tile-engine-item-layer: var(--ak-layer-base-tile);
 	--ak-tile-engine-drag-item-layer: var(--ak-layer-base-drag-tile);
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	isolation: isolate;
 	touch-action: none;
+}
+
+.ak-tile-engine[data-ak-tile-engine-container="responsive"] {
+	width: min(
+		100cqw,
+		calc(
+			(100cqh - var(--ak-tile-engine-frame)) *
+			var(--ak-tile-engine-ratio) +
+			var(--ak-tile-engine-frame)
+		)
+	);
+}
+
+.ak-tile-engine[data-ak-tile-engine-container="static"] {
+	width: 100%;
+}
+
+.ak-tile-engine-grid {
+	aspect-ratio: var(--ak-tile-engine-aspect);
 }
 
 .ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] {

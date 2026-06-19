@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
+import { checkTileRemoveReadinessFx } from "~/v0/game/remove/checkTileRemoveReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";

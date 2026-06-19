@@ -31,10 +31,11 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: moved job/id/wake/item-spawn runtime files from `game/engine/fx` into top-level `game/job`; delayed/retry gameplay stays a job domain, not engine-owned Effect plumbing.
 - `2026-06-19`: moved loot/random roll helpers from `game/engine/fx` into top-level `game/loot`; loot rolling is now a game domain, not engine-owned Effect plumbing.
 - `2026-06-19`: moved board move/swap helpers to `game/board`, inventory slot swap helpers to `game/inventory`, and inventory-to-board placement readiness to `game/placement`.
+- `2026-06-19`: moved merge execution/readiness to `game/merge`, remove execution/readiness to `game/remove`, and shared board runtime-state cleanup/status helpers to `game/board`.
 
 ## Next candidates
 
-1. Continue `game/engine/fx` production reshaping domain-by-domain. Next safest coding tasks: merge/remove, config layer extraction, initial save/helper extraction. No behavior changes.
+1. Continue `game/engine/fx` production reshaping domain-by-domain. Next safest coding tasks: config layer extraction, initial save/helper extraction, and final orchestration cleanup. No behavior changes.
 2. Revisit whether `game/engine/fx` should disappear entirely or remain only for true orchestration/cross-domain glue after the remaining clusters move.
 3. TileEngine follow-up: current browser feel is acceptable. Do not split `TileMotionRuntime.ts` just for line count.
 4. GameEventSchema audit: only if event schema starts carrying behavior. It is an intentional output-event contract and should not be split just for line count.

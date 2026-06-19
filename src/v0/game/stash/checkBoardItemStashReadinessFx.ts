@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readBoardItemRuntimeStateStatus } from "~/v0/game/engine/fx/readBoardItemRuntimeStateStatus";
+import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import type { GameActionBoardItemStashSchema } from "~/v0/game/engine/model/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { isGameSaveInventoryStack } from "~/v0/game/engine/model/GameSaveInventorySlot";

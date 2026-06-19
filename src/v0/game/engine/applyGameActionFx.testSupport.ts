@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
-import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { applyGameActionFx } from "~/v0/game/engine/applyGameActionFx";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
 import { withRandomService } from "~/v0/random/logic/withRandomService";

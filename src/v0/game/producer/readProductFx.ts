@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
+import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 
 export namespace readProductFx {

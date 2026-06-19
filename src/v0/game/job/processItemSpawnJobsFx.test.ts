@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
 import {
 	blockedItemSpawnJobRetryDelayMs,
 	processItemSpawnJobsFx,

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
-import { applyConfigLayerFx } from "~/v0/game/engine/fx/applyConfigLayerFx";
-import { buildConfigLayerFx } from "~/v0/game/engine/fx/buildConfigLayerFx";
+import { applyConfigLayerFx } from "~/v0/game/config/applyConfigLayerFx";
+import { buildConfigLayerFx } from "~/v0/game/config/buildConfigLayerFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameConfigFxService } from "~/v0/game/engine/context/GameConfigFx";
+import type { GameConfigFxService } from "~/v0/game/config/GameConfigFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace buildGameConfigServiceFx {

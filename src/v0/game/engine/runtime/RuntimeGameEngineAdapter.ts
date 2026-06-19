@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
-import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
-import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
-import { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
-import { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
+import { applyGameActionFx } from "~/v0/game/engine/applyGameActionFx";
+import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
+import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
+import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";

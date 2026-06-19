@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
+import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

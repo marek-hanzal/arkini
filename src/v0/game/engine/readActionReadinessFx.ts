@@ -1,6 +1,6 @@
 import { Effect, type Effect as EffectType } from "effect";
-import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
-import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
+import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
+import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
 import { checkBoardItemMoveReadinessFx } from "~/v0/game/board/checkBoardItemMoveReadinessFx";
 import { checkBoardItemStashReadinessFx } from "~/v0/game/stash/checkBoardItemStashReadinessFx";
 import { checkBoardItemsSwapReadinessFx } from "~/v0/game/board/checkBoardItemsSwapReadinessFx";
@@ -19,7 +19,7 @@ import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/requirements/c
 import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/requirements/checkStoredRequirementWithdrawReadinessFx";
 import { checkTileRemoveReadinessFx } from "~/v0/game/remove/checkTileRemoveReadinessFx";
 import { checkUpgradeStartReadinessFx } from "~/v0/game/upgrade/checkUpgradeStartReadinessFx";
-import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
+import { parseGameActionFx } from "~/v0/game/engine/parseGameActionFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionReadiness } from "~/v0/game/engine/model/GameActionReadinessSchema";

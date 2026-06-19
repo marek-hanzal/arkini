@@ -1,6 +1,6 @@
 # Game engine domain topology audit
 
-Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer, craft, stash, placement, requirements, upgrade, job, loot, board/inventory, merge, and remove runtime files were moved to top-level game domains without behavior changes.
+Status: completed for `engine/fx` cleanup. `applyGameActionFx.test.ts` was split by domain family; producer, craft, stash, placement, requirements, upgrade, job, loot, board/inventory, merge, remove, config, and save helpers were moved to top-level game domains without behavior changes. `src/v0/game/engine/fx` was removed; action/readiness/tick orchestration now lives directly in `src/v0/game/engine`.
 
 ## Problem
 
@@ -12,11 +12,11 @@ This creates navigation load. The engine is not conceptually one giant `fx` doma
 
 ## Current source shape
 
-- `src/v0/game/engine/fx`: started at 111 files; now 23 files after producer, craft, stash, placement, requirements, upgrade, job, loot, board/inventory, merge, and remove extraction.
+- `src/v0/game/engine/fx`: started at 111 files; now removed after domain extraction and final orchestration flattening.
 - `src/v0/game/engine/model`: 68 files.
 - `src/v0/game/engine/runtime`: 3 files.
 - `src/v0/game/engine/logic`: 4 files.
-- `src/v0/game/engine/context`: 1 file.
+- `src/v0/game/engine/context`: removed; `GameConfigFx` lives in `game/config`.
 
 Big tests are also domain-mixed:
 
@@ -268,7 +268,7 @@ Then move production files domain-by-domain.
 - [x] `merge` extraction into `src/v0/game/merge/`.
 - [x] `remove` extraction into `src/v0/game/remove/`.
 
-Next coding cut: config layer extraction or initial save/helper extraction, whichever forms the cleanest coherent cluster.
+No remaining `engine/fx` coding cut. Future work should focus on model-domain placement only if a concrete pain appears.
 
 ## Recommended sequence
 
@@ -363,7 +363,7 @@ Reason: upgrade lifecycle is a game domain, not engine-owned Effect plumbing. `g
 
 ## Current recommended next coding task
 
-Continue reducing `src/v0/game/engine/fx` by moving the next coherent domain cluster. Candidate clusters: config layer, initial save/helper extraction, and final orchestration shell cleanup. Move files/imports only; no behavior changes.
+The `src/v0/game/engine/fx` cleanup is complete. Do not recreate an `fx` bucket as a primary architecture axis.
 
 
 ## 2026-06-19 update: job domain extraction
@@ -379,3 +379,10 @@ Board move/swap helpers now live in `src/v0/game/board`, inventory slot swap hel
 ## 2026-06-19 update: merge/remove domains extracted
 
 Merge execution/readiness now lives in `src/v0/game/merge`, tile removal execution/readiness now lives in `src/v0/game/remove`, and shared board runtime-state cleanup/status helpers live in `src/v0/game/board`. `game/engine` imports merge/remove for action/readiness orchestration.
+
+
+## 2026-06-19 update: config/save extraction and fx removal
+
+Moved effective config layer/service/context schemas into `src/v0/game/config`, moved save bootstrap/clone/item-instance ID helpers into `src/v0/game/save`, and moved remaining action/readiness/tick orchestration directly into `src/v0/game/engine`.
+
+`src/v0/game/engine/fx` no longer exists. Do not recreate it as a dumping ground for Effect-based files. Effect is an implementation style, not a domain boundary.

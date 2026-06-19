@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
-import type { GameConfigLayer } from "~/v0/game/engine/model/GameConfigLayerSchema";
+import type { GameConfigLayer } from "~/v0/game/config/GameConfigLayerSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace buildConfigLayerFx {

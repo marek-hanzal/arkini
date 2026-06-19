@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
-import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
-import { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
-import { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
+import { applyGameActionFx } from "~/v0/game/engine/applyGameActionFx";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
+import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
+import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
 import { withRandomService } from "~/v0/random/logic/withRandomService";

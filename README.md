@@ -37,7 +37,7 @@ There are no separate static `merges`, `producers`, and `craftRecipes` arrays. L
 
 Effect now belongs to the standalone tick/action engine, not to UI-facing persistence plumbing. React components dispatch typed runtime actions through `GameRuntimeStore`/`RuntimeGameEngineAdapter`; they do not call storage-style mutation hooks, React Query mutations, or old database-flavored `src/v0/**/fx` roots.
 
-The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/v0/game/engine/fx`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/v0/game/engine`, someone has poured concrete into the gearbox again.
+The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/v0/game/engine`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/v0/game/engine`, someone has poured concrete into the gearbox again.
 
 Runtime reads subscribe through `useGameRuntimeSelector` from `src/v0/play/runtime`. Board, inventory, item and upgrade gameplay UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
 

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { parseGameConfig, type GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
 
 const createConfig = (overrides: Partial<GameConfig> = {}) =>
 	parseGameConfig({

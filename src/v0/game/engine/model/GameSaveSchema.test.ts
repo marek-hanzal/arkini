@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
 import { GameSaveConfigSchema, type GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";

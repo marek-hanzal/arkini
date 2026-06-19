@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/placement/checkInventoryItemPlaceReadinessFx";
-import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { createGameItemInstanceIdFx } from "~/v0/game/engine/fx/createGameItemInstanceIdFx";
+import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
+import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanceIdFx";
 import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";

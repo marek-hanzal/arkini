@@ -1,6 +1,6 @@
 import { Effect, type Effect as EffectType } from "effect";
-import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
-import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
+import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
+import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
 import { moveBoardItemFx } from "~/v0/game/board/moveBoardItemFx";
 import { placeInventoryItemOnBoardFx } from "~/v0/game/placement/placeInventoryItemOnBoardFx";
 import { stashBoardItemFx } from "~/v0/game/stash/stashBoardItemFx";
@@ -8,7 +8,7 @@ import { swapBoardItemsFx } from "~/v0/game/board/swapBoardItemsFx";
 import { swapInventorySlotsFx } from "~/v0/game/inventory/swapInventorySlotsFx";
 import { mergeItemFx } from "~/v0/game/merge/mergeItemFx";
 import { openStashFx } from "~/v0/game/stash/openStashFx";
-import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
+import { parseGameActionFx } from "~/v0/game/engine/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/remove/removeTileFx";
 import { setProducerProductLineEnabledFx } from "~/v0/game/producer/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/craft/startCraftFx";

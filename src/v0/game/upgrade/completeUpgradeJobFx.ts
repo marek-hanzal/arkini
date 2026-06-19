@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
+import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

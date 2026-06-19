@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GameConfigLayerProductInputSchema } from "~/v0/game/engine/model/GameConfigLayerProductInputSchema";
+import { GameConfigLayerProductInputSchema } from "~/v0/game/config/GameConfigLayerProductInputSchema";
 
 const IdSchema = z.string().min(1);
 const PositiveIntegerSchema = z.number().int().positive();

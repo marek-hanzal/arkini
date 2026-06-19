@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
+import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";

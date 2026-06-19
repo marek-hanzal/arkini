@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
-import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
+import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
+import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
 import { processCompletedCraftJobsFx } from "~/v0/game/craft/processCompletedCraftJobsFx";
 import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
 import { processCompletedUpgradeJobsFx } from "~/v0/game/upgrade/processCompletedUpgradeJobsFx";

@@ -127,19 +127,11 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
-			const productId = activation.productLines?.find((line) => line.enabled)?.productId;
-
-			if (!productId) {
-				feedback.showError("No enabled product line.");
-				return;
-			}
-
 			void runtimeStore
 				.dispatch({
 					action: {
 						inputRefs: [],
 						producerItemInstanceId: boardItem.id,
-						productId,
 						type: "producer.product.start",
 					},
 				})

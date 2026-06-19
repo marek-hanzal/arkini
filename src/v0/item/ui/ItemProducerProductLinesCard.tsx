@@ -75,9 +75,16 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						>
 							<div className="flex min-w-0 items-start justify-between gap-3">
 								<div className="min-w-0">
-									<p className="truncate text-sm font-bold text-ak-text">
-										{line.name}
-									</p>
+									<div className="flex min-w-0 items-center gap-2">
+										<p className="truncate text-sm font-bold text-ak-text">
+											{line.name}
+										</p>
+										{line.isDefault ? (
+											<span className="shrink-0 rounded-sm bg-ak-primary/15 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ak-primary">
+												Default
+											</span>
+										) : null}
+									</div>
 									<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
 										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
 										{formatMs(line.durationMs)}

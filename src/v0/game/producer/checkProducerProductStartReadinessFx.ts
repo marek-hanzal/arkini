@@ -39,25 +39,26 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			),
 		);
 	}
-	if (!producerDefinition.productIds.includes(action.productId)) {
+	const productId = action.productId ?? producerDefinition.productIds[0];
+	if (!productId || !producerDefinition.productIds.includes(productId)) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
-				`Product "${action.productId}" does not belong to producer "${producerDefinition.type}" on item "${producerItem.itemId}".`,
+				`Product "${action.productId ?? "<default>"}" does not belong to producer "${producerDefinition.type}" on item "${producerItem.itemId}".`,
 			),
 		);
 	}
 
 	const productLineEnabled = yield* readProducerProductLineEnabledFx({
 		producerItemInstanceId: action.producerItemInstanceId,
-		productId: action.productId,
+		productId,
 		save,
 	});
 	if (!productLineEnabled) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"product_line_disabled",
-				`Product line "${action.productId}" is disabled for producer item "${action.producerItemInstanceId}".`,
+				`Product line "${productId}" is disabled for producer item "${action.producerItemInstanceId}".`,
 			),
 		);
 	}
@@ -75,7 +76,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	}
 
 	const product = yield* readProductFx({
-		productId: action.productId,
+		productId,
 	});
 	const storedItems = yield* readStoredRequirementQuantitiesFx({
 		save,
@@ -107,7 +108,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		.exhaustive();
 	const productInputs = readProductInputs({
 		config,
-		productId: action.productId,
+		productId,
 	});
 	if (action.inputRefs.length > 0) {
 		yield* checkActivationInputsFx({
@@ -118,7 +119,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	} else {
 		const storedInputs = yield* readProducerProductStoredInputQuantitiesFx({
 			producerItemInstanceId: action.producerItemInstanceId,
-			productId: action.productId,
+			productId,
 			save,
 		});
 		for (const input of productInputs) {
@@ -138,6 +139,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		producerDefinition,
 		producerItem,
 		product,
+		productId,
 		productInputs,
 	};
 });

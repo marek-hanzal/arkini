@@ -43,22 +43,7 @@ const productLineEnabled = ({
 	targetItemInstanceId: string;
 }) => !(save.producerLines[targetItemInstanceId]?.disabledProductIds ?? []).includes(productId);
 
-const activeProductId = ({
-	productIds,
-	save,
-	targetItemInstanceId,
-}: {
-	productIds: readonly string[];
-	save: GameSave;
-	targetItemInstanceId: string;
-}) =>
-	productIds.find((productId) =>
-		productLineEnabled({
-			productId,
-			save,
-			targetItemInstanceId,
-		}),
-	) ?? productIds[0];
+const defaultProductId = ({ productIds }: { productIds: readonly string[] }) => productIds[0];
 
 const readRuntimeProductLineViewsFromGameSave = ({
 	config,
@@ -85,6 +70,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	return productIds.flatMap((productId) => {
 		const product = config.products[productId];
 		if (!product) return [];
+		const isDefault = productId === productIds[0];
 
 		const requirements = resolveGameRequirements({
 			config,
@@ -167,6 +153,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				}),
 				inProgress: jobs.length > 0,
 				inputItemIds: inputs.map((input) => input.itemId as ItemId),
+				isDefault,
 				inputs,
 				inputsReady,
 				missingRequirementItemIds: missingRequirements as ItemId[],
@@ -199,10 +186,8 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 	const producer = producerId ? config.producers[producerId] : undefined;
 	if (!producerId || !producer) return undefined;
 
-	const selectedProductId = activeProductId({
+	const selectedProductId = defaultProductId({
 		productIds: producer.productIds,
-		save,
-		targetItemInstanceId: boardItem.id,
 	});
 	const selectedProduct = selectedProductId ? config.products[selectedProductId] : undefined;
 

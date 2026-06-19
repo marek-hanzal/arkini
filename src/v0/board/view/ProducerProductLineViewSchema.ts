@@ -7,6 +7,7 @@ const IdSchema = z.string().min(1);
 export const ProducerProductLineViewSchema = z.object({
 	productId: IdSchema,
 	name: z.string().min(1),
+	isDefault: z.boolean(),
 	durationMs: z.number().int().nonnegative(),
 	enabled: z.boolean(),
 	inProgress: z.boolean(),

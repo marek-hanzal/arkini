@@ -3,14 +3,14 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
-import type { GameSave, GameSaveScheduledEvent } from "~/v0/game/engine/model/GameSaveSchema";
+import type { GameSave, GameSaveItemSpawnJob } from "~/v0/game/engine/model/GameSaveSchema";
 
-export namespace processScheduledItemSpawnFx {
+export namespace processItemSpawnJobFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		scheduledEvent: Extract<
-			GameSaveScheduledEvent,
+		itemSpawnJob: Extract<
+			GameSaveItemSpawnJob,
 			{
 				type: "item.spawn";
 			}
@@ -19,14 +19,14 @@ export namespace processScheduledItemSpawnFx {
 	}
 }
 
-export const processScheduledItemSpawnFx = Effect.fn("processScheduledItemSpawnFx")(function* ({
+export const processItemSpawnJobFx = Effect.fn("processItemSpawnJobFx")(function* ({
 	config,
 	save,
-	scheduledEvent,
+	itemSpawnJob,
 	nowMs,
-}: processScheduledItemSpawnFx.Props) {
+}: processItemSpawnJobFx.Props) {
 	const seedCell = readBoardItemCell({
-		itemInstanceId: scheduledEvent.originItemInstanceId,
+		itemInstanceId: itemSpawnJob.originItemInstanceId,
 		save,
 	});
 	const placementEither = yield* Effect.either(
@@ -34,10 +34,10 @@ export const processScheduledItemSpawnFx = Effect.fn("processScheduledItemSpawnF
 			config,
 			items: [
 				{
-					itemId: scheduledEvent.itemId,
-					originItemInstanceId: scheduledEvent.originItemInstanceId,
-					quantity: scheduledEvent.quantity,
-					reason: scheduledEvent.reason,
+					itemId: itemSpawnJob.itemId,
+					originItemInstanceId: itemSpawnJob.originItemInstanceId,
+					quantity: itemSpawnJob.quantity,
+					reason: itemSpawnJob.reason,
 				},
 			],
 			nowMs,
@@ -56,9 +56,9 @@ export const processScheduledItemSpawnFx = Effect.fn("processScheduledItemSpawnF
 			events: [
 				{
 					blockedAtMs: nowMs,
-					itemId: scheduledEvent.itemId,
+					itemId: itemSpawnJob.itemId,
 					reason: error.reason,
-					scheduledEventId: scheduledEvent.id,
+					jobId: itemSpawnJob.id,
 					type: "item.spawn.blocked" as const,
 				},
 			],
@@ -68,7 +68,7 @@ export const processScheduledItemSpawnFx = Effect.fn("processScheduledItemSpawnF
 	}
 
 	const placement = placementEither.right;
-	delete placement.save.scheduledEvents[scheduledEvent.id];
+	delete placement.save.itemSpawnJobs[itemSpawnJob.id];
 	placement.save.updatedAtMs = nowMs;
 
 	return {

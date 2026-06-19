@@ -2,27 +2,27 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
 import {
-	blockedScheduledEventRetryDelayMs,
-	processScheduledGameEventsFx,
-} from "~/v0/game/engine/fx/processScheduledGameEventsFx";
-import { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
+	blockedItemSpawnJobRetryDelayMs,
+	processItemSpawnJobsFx,
+} from "~/v0/game/engine/fx/processItemSpawnJobsFx";
+import { createItemSpawnJobsFx } from "~/v0/game/engine/fx/createItemSpawnJobsFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));
-const runScheduled = (props: processScheduledGameEventsFx.Props) =>
-	Effect.runSync(processScheduledGameEventsFx(props));
-const runScheduleItems = (props: scheduleGameItemSpawnsFx.Props) =>
-	Effect.runSync(scheduleGameItemSpawnsFx(props));
+const runItemSpawn = (props: processItemSpawnJobsFx.Props) =>
+	Effect.runSync(processItemSpawnJobsFx(props));
+const runCreateItemSpawnJobs = (props: createItemSpawnJobsFx.Props) =>
+	Effect.runSync(createItemSpawnJobsFx(props));
 
-describe("processScheduledGameEventsFx", () => {
-	it("emits every due non-exclusive scheduled spawn in one tick", () => {
+describe("processItemSpawnJobsFx", () => {
+	it("emits every due non-exclusive item spawn job in one tick", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
-		runScheduleItems({
+		runCreateItemSpawnJobs({
 			dueAtMs: 100,
 			items: [
 				{
@@ -34,7 +34,7 @@ describe("processScheduledGameEventsFx", () => {
 			save,
 		});
 
-		const result = runScheduled({
+		const result = runItemSpawn({
 			config,
 			nowMs: 250,
 			save,
@@ -45,18 +45,18 @@ describe("processScheduledGameEventsFx", () => {
 			"item.created",
 			"item.created",
 		]);
-		expect(result.save.scheduledEvents).toEqual({});
+		expect(result.save.itemSpawnJobs).toEqual({});
 	});
 
-	it("emits at most one due event per exclusive key in one tick", () => {
+	it("emits at most one due job per exclusive key in one tick", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
-		runScheduleItems({
+		runCreateItemSpawnJobs({
 			dueAtMs: 100,
-			exclusiveKey: "spawn-group:stash-1",
+			exclusiveGroupKey: "spawn-group:stash-1",
 			intervalMs: 100,
 			items: [
 				{
@@ -68,7 +68,7 @@ describe("processScheduledGameEventsFx", () => {
 			save,
 		});
 
-		const lateTick = runScheduled({
+		const lateTick = runItemSpawn({
 			config,
 			nowMs: 1000,
 			save,
@@ -79,19 +79,19 @@ describe("processScheduledGameEventsFx", () => {
 			itemId: "item:twig",
 			type: "item.created",
 		});
-		expect(Object.values(lateTick.save.scheduledEvents)).toHaveLength(2);
+		expect(Object.values(lateTick.save.itemSpawnJobs)).toHaveLength(2);
 
-		const nextTick = runScheduled({
+		const nextTick = runItemSpawn({
 			config,
 			nowMs: 1001,
 			save: lateTick.save,
 		});
 
 		expect(nextTick.events).toHaveLength(1);
-		expect(Object.values(nextTick.save.scheduledEvents)).toHaveLength(1);
+		expect(Object.values(nextTick.save.itemSpawnJobs)).toHaveLength(1);
 	});
 
-	it("keeps blocked scheduled spawns pending", () => {
+	it("keeps blocked item spawn jobs pending", () => {
 		const config = createEngineTestConfig({
 			game: {
 				id: "game:test",
@@ -113,7 +113,7 @@ describe("processScheduledGameEventsFx", () => {
 			itemId: "item:twig",
 			quantity: 3,
 		};
-		const scheduled = runScheduleItems({
+		const itemSpawn = runCreateItemSpawnJobs({
 			dueAtMs: 100,
 			items: [
 				{
@@ -124,9 +124,9 @@ describe("processScheduledGameEventsFx", () => {
 			],
 			save,
 		});
-		const [scheduledEventId] = scheduled.eventIds;
+		const [jobId] = itemSpawn.jobIds;
 
-		const result = runScheduled({
+		const result = runItemSpawn({
 			config,
 			nowMs: 100,
 			save,
@@ -137,16 +137,16 @@ describe("processScheduledGameEventsFx", () => {
 				blockedAtMs: 100,
 				itemId: "item:twig",
 				reason: "board:full",
-				scheduledEventId,
+				jobId,
 				type: "item.spawn.blocked",
 			},
 		]);
-		expect(result.save.scheduledEvents[scheduledEventId]).toMatchObject({
-			dueAtMs: 100 + blockedScheduledEventRetryDelayMs,
+		expect(result.save.itemSpawnJobs[jobId]).toMatchObject({
+			dueAtMs: 100 + blockedItemSpawnJobRetryDelayMs,
 			lastBlockedAtMs: 100,
 		});
 	});
-	it("does not spam the same blocked scheduled spawn on every retry tick", () => {
+	it("does not spam the same blocked item spawn job on every retry tick", () => {
 		const config = createEngineTestConfig({
 			game: {
 				id: "game:test",
@@ -168,7 +168,7 @@ describe("processScheduledGameEventsFx", () => {
 			itemId: "item:twig",
 			quantity: 3,
 		};
-		const scheduled = runScheduleItems({
+		const itemSpawn = runCreateItemSpawnJobs({
 			dueAtMs: 100,
 			items: [
 				{
@@ -179,36 +179,36 @@ describe("processScheduledGameEventsFx", () => {
 			],
 			save,
 		});
-		const [scheduledEventId] = scheduled.eventIds;
+		const [jobId] = itemSpawn.jobIds;
 
-		const first = runScheduled({
+		const first = runItemSpawn({
 			config,
 			nowMs: 100,
 			save,
 		});
-		const second = runScheduled({
+		const second = runItemSpawn({
 			config,
-			nowMs: 100 + blockedScheduledEventRetryDelayMs,
+			nowMs: 100 + blockedItemSpawnJobRetryDelayMs,
 			save: first.save,
 		});
 
 		expect(first.events).toHaveLength(1);
 		expect(second.events).toEqual([]);
-		expect(second.save.scheduledEvents[scheduledEventId]).toMatchObject({
-			dueAtMs: 100 + blockedScheduledEventRetryDelayMs * 2,
-			lastBlockedAtMs: 100 + blockedScheduledEventRetryDelayMs,
+		expect(second.save.itemSpawnJobs[jobId]).toMatchObject({
+			dueAtMs: 100 + blockedItemSpawnJobRetryDelayMs * 2,
+			lastBlockedAtMs: 100 + blockedItemSpawnJobRetryDelayMs,
 		});
 	});
 
-	it("waits with dependent scheduled spawns until exclusive source spawns are processed", () => {
+	it("waits with dependent item spawn jobs until source jobs are processed", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
-		const scheduled = runScheduleItems({
+		const itemSpawn = runCreateItemSpawnJobs({
 			dueAtMs: 100,
-			exclusiveKey: "spawn-group:test",
+			exclusiveGroupKey: "spawn-group:test",
 			items: [
 				{
 					itemId: "item:twig",
@@ -218,22 +218,22 @@ describe("processScheduledGameEventsFx", () => {
 			],
 			save,
 		});
-		const [sourceEventId] = scheduled.eventIds;
-		const dependentEventId = "scheduled-event:dependent";
-		save.scheduledEvents[dependentEventId] = {
-			afterEventIds: [
-				sourceEventId,
+		const [sourceJobId] = itemSpawn.jobIds;
+		const dependentJobId = "item-spawn-job:dependent";
+		save.itemSpawnJobs[dependentJobId] = {
+			afterJobIds: [
+				sourceJobId,
 			],
 			dueAtMs: 100,
-			exclusiveKey: "spawn-group:test",
-			id: dependentEventId,
+			exclusiveGroupKey: "spawn-group:test",
+			id: dependentJobId,
 			itemId: "item:plank",
 			quantity: 1,
 			reason: "debug",
 			type: "item.spawn",
 		};
 
-		const lateTick = runScheduled({
+		const lateTick = runItemSpawn({
 			config,
 			nowMs: 1000,
 			save,
@@ -242,9 +242,9 @@ describe("processScheduledGameEventsFx", () => {
 		expect(lateTick.events.map((event) => event.type)).toEqual([
 			"item.created",
 		]);
-		expect(Object.values(lateTick.save.scheduledEvents)).toHaveLength(1);
+		expect(Object.values(lateTick.save.itemSpawnJobs)).toHaveLength(1);
 
-		const nextTick = runScheduled({
+		const nextTick = runItemSpawn({
 			config,
 			nowMs: 1001,
 			save: lateTick.save,
@@ -256,6 +256,6 @@ describe("processScheduledGameEventsFx", () => {
 		expect(nextTick.events[0]).toMatchObject({
 			itemId: "item:plank",
 		});
-		expect(nextTick.save.scheduledEvents).toEqual({});
+		expect(nextTick.save.itemSpawnJobs).toEqual({});
 	});
 });

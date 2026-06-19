@@ -8,7 +8,6 @@ Deferred or broader tasks. Promote one into `tasks/` when it becomes current wor
 - Legacy manifest cleanup: remove old TS manifest/config/validation fossils after import-graph check.
 - Capability matrix enforcement after the audit decides allowed item combinations.
 - Keep `GameConfigSchema` / `GameSaveSchema` as intentional dense core contracts; do not split them as line-count cleanup.
-- Scheduled job/event formal policy: separate planned jobs from due-now events before refactoring time flow.
 
 ## UI / debug
 

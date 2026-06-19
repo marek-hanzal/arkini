@@ -511,7 +511,7 @@ describe("runGameTickFx", () => {
 			null,
 			null,
 		]);
-		expect(result.save.scheduledEvents).toEqual({});
+		expect(result.save.itemSpawnJobs).toEqual({});
 		expect(result.events).toMatchObject([
 			{
 				jobId: "job:craft",

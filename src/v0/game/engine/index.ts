@@ -11,7 +11,7 @@ export { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 export { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 export { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
 export { processItemSpawnJobsFx } from "~/v0/game/job/processItemSpawnJobsFx";
-export { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
+export { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 export { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
 export { createItemSpawnJobsFx } from "~/v0/game/job/createItemSpawnJobsFx";
 export {

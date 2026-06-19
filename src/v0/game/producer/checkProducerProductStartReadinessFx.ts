@@ -91,22 +91,24 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		targetItemInstanceId: action.producerItemInstanceId,
 	});
 
+	const producerRequirements = resolveGameRequirements({
+		config,
+		requirementIds: producerDefinition.requirementIds,
+	});
+	const productRequirements = resolveGameRequirements({
+		config,
+		requirementIds: product.requirementIds,
+	});
 	yield* checkGameRequirementsFx({
 		config,
-		requirements: resolveGameRequirements({
-			config,
-			requirementIds: producerDefinition.requirementIds,
-		}),
+		requirements: producerRequirements,
 		save,
 		storedItems,
 		targetItemInstanceId: action.producerItemInstanceId,
 	});
 	yield* checkGameRequirementsFx({
 		config,
-		requirements: resolveGameRequirements({
-			config,
-			requirementIds: product.requirementIds,
-		}),
+		requirements: productRequirements,
 		save,
 		storedItems,
 		targetItemInstanceId: action.producerItemInstanceId,
@@ -149,5 +151,9 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		product,
 		productId,
 		productInputs,
+		requirements: [
+			...producerRequirements,
+			...productRequirements,
+		],
 	};
 });

@@ -274,7 +274,7 @@
 						{
 							"producerId": "producer:lumber-camp-1",
 							"requirementIds": [
-								"requirement:lumber-camp-1-near-tree-2"
+								"requirement:lumber-camp-1-near-tree-3"
 							],
 							"type": "producer.requirementIds.set"
 						}

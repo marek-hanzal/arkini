@@ -679,7 +679,7 @@ Central requirement definitions currently support:
 
 - `stored`: an item must be stored inside the target item instance and is not consumed by production
 - `passive`: an item quantity must exist in board, inventory, or both according to scope
-- `proximity`: at least one configured item ID must exist near the producer tile within configured grid distance
+- `proximity`: at least one configured item ID must exist near the producer tile within configured grid distance; it may also slow production through `durationFactor`
 
 Proximity requirements use Chebyshev grid distance:
 
@@ -687,9 +687,17 @@ Proximity requirements use Chebyshev grid distance:
 
 That means `distance: 1` includes all 8 neighboring cells around the producer, including diagonals. This is deliberate. We are building a grid game, not submitting lumber camps to a geometry tribunal.
 
+Proximity can affect producer product duration. Each satisfied proximity requirement uses the nearest matching resource distance and multiplies it by `durationFactor` (missing factor behaves as `1`). The final product duration multiplier is the average of all satisfied proximity requirement multipliers from both the producer and selected product line. This keeps producer-level forest rules and product-specific spatial rules additive without turning one distant tree into a time war crime.
+
+Examples with `durationFactor: 1`:
+
+- nearest tree at distance `1` keeps base product duration
+- nearest tree at distance `2` makes the product take roughly `2×` base duration
+- if both producer and product define proximity rules, their multipliers are averaged
+
 Example:
 
-A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`, where that requirement is a proximity requirement for `item:tree` within distance `1`. A later upgrade may replace the producer requirement IDs with a looser distance `2` requirement, or with an empty list to remove the proximity gate entirely.
+A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`, where that requirement is a proximity requirement for `item:tree` within distance `2`. A later upgrade may replace the producer requirement IDs with a looser distance `3` requirement, or with an empty list to remove the proximity gate entirely.
 
 Stored requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
 

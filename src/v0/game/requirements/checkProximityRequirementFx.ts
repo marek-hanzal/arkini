@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readProximityRequirementMatch } from "~/v0/game/requirements/readProximityRequirementMatch";
 
 export namespace checkProximityRequirementFx {
 	export interface Props {
@@ -36,17 +37,13 @@ export const checkProximityRequirementFx = Effect.fn("checkProximityRequirementF
 		);
 	}
 
-	const acceptedItemIds = new Set(itemIds);
-	const matched = Object.values(save.board.items).some((item) => {
-		if (item.id === target.id || !acceptedItemIds.has(item.itemId)) {
-			return false;
-		}
-
-		const gridDistance = Math.max(Math.abs(item.x - target.x), Math.abs(item.y - target.y));
-		return gridDistance <= distance;
+	const match = readProximityRequirementMatch({
+		itemIds,
+		save,
+		targetItemInstanceId,
 	});
 
-	if (!matched) {
+	if (!match || match.distance > distance) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"missing_requirement",
@@ -54,4 +51,6 @@ export const checkProximityRequirementFx = Effect.fn("checkProximityRequirementF
 			),
 		);
 	}
+
+	return match;
 });

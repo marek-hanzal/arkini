@@ -15,10 +15,11 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: job/event follow-up checked active notes/source naming; active rules now say scheduled/pending means job, event means now/output.
 - `2026-06-19`: removed obsolete `src/v0/manifest` TS manifest tree and moved runtime ID schemas to `game/config`.
 - `2026-06-19`: completed v0 line-count/topology audit; TileEngine is the main future complexity cluster.
+- `2026-06-19`: completed TileEngine complexity audit; next safe cut is `useTilePointerUp.ts` phase extraction.
 
 ## Next candidates
 
-1. TileEngine topology audit: inspect pointer/motion long files and separate inherent DnD complexity from avoidable orchestration sludge.
+1. TileEngine pointer-up phase extraction: split `useTilePointerUp.ts` into behavior-preserving drop finalization helpers without changing the public TileEngine API.
 2. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item.
 3. Game engine visual plan audit: split event-family visual mappers only if it reduces mental load without hiding the output-event contract.
 

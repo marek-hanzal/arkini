@@ -34,6 +34,28 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
+	it("returns ready for the default producer product action when productId is omitted", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const readiness = runReadiness({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toEqual({
+			type: "ready",
+		});
+	});
+
 	it("returns rejected readiness for a missing producer input", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

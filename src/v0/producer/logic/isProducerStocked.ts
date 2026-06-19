@@ -9,6 +9,17 @@ const isRequirementReady = (requirement: ActivationRequirementView) =>
 export function isProducerStocked(activation: ActivationView | undefined) {
 	if (!activation) return false;
 
+	if (activation.kind === "producer") {
+		const defaultLine =
+			activation.productLines?.find((line) => line.isDefault) ?? activation.productLines?.[0];
+		return Boolean(
+			defaultLine?.enabled &&
+				defaultLine.inputsReady &&
+				defaultLine.requirementsReady &&
+				!defaultLine.queueFull,
+		);
+	}
+
 	return (
 		activation.inputs.every((input) => input.stored >= input.quantity) &&
 		activation.requirements.every(isRequirementReady)

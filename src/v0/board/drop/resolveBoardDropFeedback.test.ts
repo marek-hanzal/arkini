@@ -210,6 +210,7 @@ describe("resolveBoardDropFeedback", () => {
 						durationMs: 1000,
 						enabled: true,
 						inProgress: false,
+						isDefault: true,
 						inputItemIds: [
 							"item:twig",
 						],

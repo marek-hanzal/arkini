@@ -51,6 +51,37 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
+	it("starts the first producer product line when productId is omitted", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		const job = readOnlyRecordValue(result.save.producerJobs);
+		expect(job).toMatchObject({
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+		});
+		expect(result.events).toMatchObject([
+			{
+				productId: "product:test",
+				type: "product.started",
+			},
+		]);
+	});
+
 	it("accepts producer proximity requirements from diagonal neighbors", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -435,6 +466,75 @@ describe("applyGameActionFx Producer", () => {
 			save.producerInputs["item-instance:1"]?.productInputs["product:shred"]?.items,
 		).toEqual({
 			"item:twig": 1,
+		});
+	});
+
+	it("stores duplicate producer input into the default line before later matching lines", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			inputs: {
+				...baseConfig.inputs,
+				"input:alt-shred": {
+					name: "Alt shred input",
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"producer:test": {
+					...baseConfig.producers["producer:test"],
+					productIds: [
+						"product:shred",
+						"product:alt-shred",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:alt-shred": {
+					...baseConfig.products["product:shred"],
+					inputRefId: "input:alt-shred",
+					name: "Alt shred",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				producerItemInstanceId: "item-instance:1",
+				type: "producer.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
+			"product:shred": {
+				items: {
+					"item:twig": 1,
+				},
+			},
 		});
 	});
 

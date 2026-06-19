@@ -50,7 +50,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			inputs: checked.productInputs,
 			nextSave,
 			producerItemInstanceId: action.producerItemInstanceId,
-			productId: action.productId,
+			productId: checked.productId,
 		});
 	}
 	const jobId = yield* createGameJobIdFx();
@@ -67,7 +67,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		outputTableId: checked.product.outputTableId ?? null,
 		placement: checked.product.placement,
 		producerItemInstanceId: action.producerItemInstanceId,
-		productId: action.productId,
+		productId: checked.productId,
 		startedAtMs: queuedStartAtMs,
 	};
 	nextSave.updatedAtMs = nowMs;
@@ -79,7 +79,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 				completesAtMs,
 				jobId,
 				producerItemInstanceId: action.producerItemInstanceId,
-				productId: action.productId,
+				productId: checked.productId,
 				startedAtMs: queuedStartAtMs,
 				type: "product.started" as const,
 			},

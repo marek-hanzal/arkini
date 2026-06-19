@@ -27,6 +27,7 @@ const productLine = (
 	durationMs: 1000,
 	enabled: true,
 	inProgress: false,
+	isDefault: true,
 	inputItemIds: [],
 	inputs: [],
 	inputsReady: true,

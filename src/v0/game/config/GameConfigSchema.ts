@@ -37,13 +37,16 @@ import { z } from "zod";
  * - Producer/product requirements are referenced through central `requirements` entries by
  *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
  *   includes diagonals around the target tile.
- * - Producer `productIds` are ordered production lines. Product definitions are owned by
- *   exactly one producer line; upgrades target that producer/product-line definition, not
- *   concrete runtime instances. Producer shells do not own inputs; product lines reference
- *   named input definitions through `inputRefId`. Runtime may still choose between multiple
- *   enabled lines accepting the same dragged item from top to bottom, but their input
- *   definitions must stay separate so product-line upgrades cannot leak across lines.
- *   `maxQueueSize` is a hard per-producer-instance cap covering both running and queued jobs.
+ * - Producer `productIds` are ordered production lines. The first entry is the
+ *   default product line: board-click activation starts it, and generic producer feeding
+ *   tries it before later lines when multiple lines accept the same input. Product
+ *   definitions are owned by exactly one producer line; upgrades target that
+ *   producer/product-line definition, not concrete runtime instances. Producer shells do
+ *   not own inputs; product lines reference named input definitions through `inputRefId`.
+ *   Runtime may still choose between multiple enabled lines accepting the same dragged
+ *   item from top to bottom, but their input definitions must stay separate so
+ *   product-line upgrades cannot leak across lines. `maxQueueSize` is a hard
+ *   per-producer-instance cap covering both running and queued jobs.
  * - Product inputs are stored per product line. Craft inputs are stored per craft
  *   target instance until the player explicitly starts the craft. Completion replaces
  *   the target with exactly one result item.

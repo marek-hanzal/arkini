@@ -71,6 +71,31 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
+	it("marks the first producer product line as the default line", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation?.productLines).toMatchObject([
+			{
+				isDefault: true,
+				productId: "product:test",
+			},
+			{
+				isDefault: false,
+				productId: "product:shred",
+			},
+		]);
+	});
+
 	it("marks producer activation danger when delivery is blocked", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

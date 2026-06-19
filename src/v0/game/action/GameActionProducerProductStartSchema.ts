@@ -7,7 +7,7 @@ export const GameActionProducerProductStartSchema = z
 	.object({
 		inputRefs: z.array(GameActionItemRefSchema),
 		producerItemInstanceId: IdSchema,
-		productId: IdSchema,
+		productId: IdSchema.optional(),
 		type: z.literal("producer.product.start"),
 	})
 	.strict();

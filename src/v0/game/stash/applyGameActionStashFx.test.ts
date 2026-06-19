@@ -200,6 +200,83 @@ describe("applyGameActionFx Stash", () => {
 		]);
 	});
 
+	it("keeps board-only stash output atomic when only part of the output fits", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					storage: "board",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				board: {
+					height: 1,
+					width: 2,
+				},
+				title: "Test",
+			},
+			stashes: {
+				...baseConfig.stashes,
+				"stash:test": {
+					...baseConfig.stashes["stash:test"],
+					inputs: [],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				stashItemInstanceId: "item-instance:1",
+				inputRefs: [],
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "board:full",
+			});
+		}
+		expect(save.stashes).toEqual({});
+		expect(save.board.items).toEqual({
+			"item-instance:1": {
+				id: "item-instance:1",
+				itemId: "item:stash",
+				x: 0,
+				y: 0,
+			},
+		});
+		expect(save.inventory.slots).toEqual([
+			null,
+			null,
+		]);
+	});
+
 	it("rejects a full stash open when only part of the remaining output fits", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

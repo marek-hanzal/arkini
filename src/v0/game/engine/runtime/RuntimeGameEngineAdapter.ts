@@ -4,7 +4,7 @@ import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigSer
 import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
 import { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
 import { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
-import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";

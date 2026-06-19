@@ -4,7 +4,7 @@ import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveR
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
-import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionTileRemove } from "~/v0/game/engine/model/GameActionTileRemove";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";

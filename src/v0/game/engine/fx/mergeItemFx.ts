@@ -3,7 +3,7 @@ import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeRea
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
-import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/engine/model/GameActionItemMerge";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

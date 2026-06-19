@@ -339,3 +339,8 @@ Reason: upgrade lifecycle is a game domain, not engine-owned Effect plumbing. `g
 ## Current recommended next coding task
 
 Continue reducing `src/v0/game/engine/fx` by moving the next coherent domain cluster. Candidate clusters: jobs/item-spawn, board/inventory actions, merge/remove, loot, and ID utilities. Move files/imports only; no behavior changes.
+
+
+## 2026-06-19 update: job domain extraction
+
+Moved generic job helpers, wake calculation, job IDs, and item-spawn job processing to `src/v0/game/job`. `engine/fx` should no longer own delayed/retry gameplay helpers. Remaining likely clusters: board/inventory actions, merge/remove, loot, config layer, orchestration shell.

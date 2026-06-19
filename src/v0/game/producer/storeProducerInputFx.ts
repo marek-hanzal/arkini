@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { checkProducerInputStoreReadinessFx } from "~/v0/game/producer/checkProducerInputStoreReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
-import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerInputStore } from "~/v0/game/engine/model/GameActionProducerInputStore";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";

@@ -4,8 +4,8 @@ import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigSer
 import { processCompletedCraftJobsFx } from "~/v0/game/craft/processCompletedCraftJobsFx";
 import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
 import { processCompletedUpgradeJobsFx } from "~/v0/game/upgrade/processCompletedUpgradeJobsFx";
-import { processItemSpawnJobsFx } from "~/v0/game/engine/fx/processItemSpawnJobsFx";
-import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { processItemSpawnJobsFx } from "~/v0/game/job/processItemSpawnJobsFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";

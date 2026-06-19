@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { compareItemSpawnJobs } from "~/v0/game/engine/fx/compareItemSpawnJobs";
+import { compareItemSpawnJobs } from "~/v0/game/job/compareItemSpawnJobs";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace readDueItemSpawnJobsFx {

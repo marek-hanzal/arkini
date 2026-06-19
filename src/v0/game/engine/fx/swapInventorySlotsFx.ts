@@ -1,8 +1,8 @@
 import { Effect } from "effect";
+import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/engine/fx/checkInventorySlotsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameActionInventorySlotsSwapSchema } from "~/v0/game/engine/model/GameActionInventorySlotsSwapSchema";
-import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -19,17 +19,10 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 	save,
 	nowMs,
 }: swapInventorySlotsFx.Props) {
-	if (
-		action.sourceSlotIndex >= save.inventory.slots.length ||
-		action.targetSlotIndex >= save.inventory.slots.length
-	) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"unsupported_target",
-				"Inventory slot is outside inventory.",
-			),
-		);
-	}
+	yield* checkInventorySlotsSwapReadinessFx({
+		action,
+		save,
+	});
 	if (action.sourceSlotIndex === action.targetSlotIndex) {
 		return {
 			events: [],

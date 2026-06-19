@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { checkBoardItemStashReadinessFx } from "~/v0/game/engine/fx/checkBoardItemStashReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveInventoryInstanceFx } from "~/v0/game/engine/fx/placeGameSaveInventoryInstanceFx";
 import { placeGameSaveInventoryItemsFx } from "~/v0/game/engine/fx/placeGameSaveInventoryItemsFx";
-import { readBoardItemRuntimeStateStatus } from "~/v0/game/engine/fx/readBoardItemRuntimeStateStatus";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
 import type { GameActionBoardItemStashSchema } from "~/v0/game/engine/model/GameActionBoardItemStashSchema";
@@ -27,30 +27,11 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 	save,
 	nowMs,
 }: stashBoardItemFx.Props) {
-	const item = save.board.items[action.boardItemId];
-	if (!item) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("invalid_actor", "Board item does not exist."),
-		);
-	}
-	if (!config.items[item.itemId]) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing item "${item.itemId}".`),
-		);
-	}
-
-	const stateStatus = readBoardItemRuntimeStateStatus({
-		itemInstanceId: item.id,
+	const { item, stateStatus } = yield* checkBoardItemStashReadinessFx({
+		action,
+		config,
 		save,
 	});
-	if (stateStatus.busy) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"item_busy",
-				"Board item has a running job and cannot be moved to inventory.",
-			),
-		);
-	}
 
 	const nextSave = yield* cloneGameSaveFx({
 		save,

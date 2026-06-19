@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/engine/fx/checkInventoryItemPlaceReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { createGameItemInstanceIdFx } from "~/v0/game/engine/fx/createGameItemInstanceIdFx";
 import { findFirstEmptyBoardCellFx } from "~/v0/game/engine/fx/findFirstEmptyBoardCellFx";
@@ -24,74 +25,20 @@ export namespace placeInventoryItemOnBoardFx {
 	}
 }
 
-const assertBoardCellWithinBounds = ({
-	action,
-	config,
-}: {
-	action: GameActionInventoryItemPlaceSchema.Type;
-	config: GameConfig;
-}) =>
-	action.x < config.game.board.width && action.y < config.game.board.height
-		? Effect.succeed(undefined)
-		: Effect.fail(
-				GameEngineError.actionRejected(
-					"unsupported_target",
-					"Board cell is outside board.",
-				),
-			);
-
 export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardFx")(function* ({
 	action,
 	config,
 	save,
 	nowMs,
 }: placeInventoryItemOnBoardFx.Props) {
-	yield* assertBoardCellWithinBounds({
+	yield* checkInventoryItemPlaceReadinessFx({
 		action,
 		config,
+		save,
 	});
 
-	const slot = save.inventory.slots[action.slotIndex];
-	if (!slot) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("input_unavailable", "Inventory slot is empty."),
-		);
-	}
-	if (!config.items[slot.itemId]) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing item "${slot.itemId}".`),
-		);
-	}
-
 	const quantity = action.quantity ?? 1;
-	const slotQuantity = readGameSaveInventorySlotQuantity(slot);
-	if (quantity > slotQuantity) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"input_unavailable",
-				`Inventory slot has ${slotQuantity} item(s), cannot place ${quantity}.`,
-			),
-		);
-	}
-
 	const placementMode = action.placementMode ?? "exact";
-	if (placementMode === "exact" && quantity !== 1) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"unsupported_target",
-				"Exact inventory placement supports a single item only.",
-			),
-		);
-	}
-
-	const occupied = Object.values(save.board.items).find(
-		(entry) => entry.x === action.x && entry.y === action.y,
-	);
-	if (placementMode === "exact" && occupied) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("unsupported_target", "Board cell is occupied."),
-		);
-	}
 
 	const nextSave = yield* cloneGameSaveFx({
 		save,

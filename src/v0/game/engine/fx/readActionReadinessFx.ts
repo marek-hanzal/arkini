@@ -1,10 +1,14 @@
-import { Effect } from "effect";
+import { Effect, type Effect as EffectType } from "effect";
 import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
 import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
-import { match } from "ts-pattern";
+import { checkBoardItemMoveReadinessFx } from "~/v0/game/engine/fx/checkBoardItemMoveReadinessFx";
+import { checkBoardItemStashReadinessFx } from "~/v0/game/engine/fx/checkBoardItemStashReadinessFx";
+import { checkBoardItemsSwapReadinessFx } from "~/v0/game/engine/fx/checkBoardItemsSwapReadinessFx";
 import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
 import { checkCraftInputStoreReadinessFx } from "~/v0/game/engine/fx/checkCraftInputStoreReadinessFx";
 import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkCraftInputWithdrawReadinessFx";
+import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/engine/fx/checkInventoryItemPlaceReadinessFx";
+import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/engine/fx/checkInventorySlotsSwapReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
 import { checkProducerInputStoreReadinessFx } from "~/v0/game/engine/fx/checkProducerInputStoreReadinessFx";
 import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkProducerInputWithdrawReadinessFx";
@@ -16,6 +20,7 @@ import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/engine/fx/c
 import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
 import { checkUpgradeStartReadinessFx } from "~/v0/game/engine/fx/checkUpgradeStartReadinessFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
+import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionReadiness } from "~/v0/game/engine/model/GameActionReadinessSchema";
 import type { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -38,186 +43,124 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 		config,
 		save,
 	});
-	const readinessEffect = Effect.gen(function* () {
-		const parsedAction = yield* parseGameActionFx({
-			action,
-		});
-		yield* match(parsedAction)
-			.with(
-				{
-					type: "board.item.move",
-				},
-				() => Effect.succeed(undefined),
-			)
-			.with(
-				{
-					type: "board.item.stash",
-				},
-				() => Effect.succeed(undefined),
-			)
-			.with(
-				{
-					type: "board.items.swap",
-				},
-				() => Effect.succeed(undefined),
-			)
-			.with(
-				{
-					type: "craft.input.store",
-				},
-				(storeCraftInputAction) =>
+	const readinessEffect: EffectType.Effect<void, GameEngineError, GameConfigFx> = Effect.gen(
+		function* () {
+			const parsedAction = yield* parseGameActionFx({
+				action,
+			});
+			const actionReadinessEffect = matchGameAction<
+				EffectType.Effect<unknown, GameEngineError, GameConfigFx>
+			>(parsedAction, {
+				boardItemMove: (moveAction) =>
+					checkBoardItemMoveReadinessFx({
+						action: moveAction,
+						config: gameConfig.config,
+						save,
+					}),
+				boardItemStash: (stashAction) =>
+					checkBoardItemStashReadinessFx({
+						action: stashAction,
+						config: gameConfig.config,
+						save,
+					}),
+				boardItemsSwap: (swapAction) =>
+					checkBoardItemsSwapReadinessFx({
+						action: swapAction,
+						save,
+					}),
+				craftInputStore: (storeCraftInputAction) =>
 					checkCraftInputStoreReadinessFx({
 						action: storeCraftInputAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "craft.input.withdraw",
-				},
-				(withdrawCraftInputAction) =>
+				craftInputWithdraw: (withdrawCraftInputAction) =>
 					checkCraftInputWithdrawReadinessFx({
 						action: withdrawCraftInputAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "craft.start",
-				},
-				(craftAction) =>
+				craftStart: (craftAction) =>
 					checkCraftStartReadinessFx({
 						action: craftAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "item.merge",
-				},
-				(mergeAction) =>
+				inventoryItemPlace: (placeAction) =>
+					checkInventoryItemPlaceReadinessFx({
+						action: placeAction,
+						config: gameConfig.config,
+						save,
+					}),
+				inventorySlotsSwap: (swapAction) =>
+					checkInventorySlotsSwapReadinessFx({
+						action: swapAction,
+						save,
+					}),
+				itemMerge: (mergeAction) =>
 					checkItemMergeReadinessFx({
 						action: mergeAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "inventory.item.place",
-				},
-				() => Effect.succeed(undefined),
-			)
-			.with(
-				{
-					type: "inventory.slots.swap",
-				},
-				() => Effect.succeed(undefined),
-			)
-			.with(
-				{
-					type: "producer.input.store",
-				},
-				(storeInputAction) =>
+				producerInputStore: (storeInputAction) =>
 					checkProducerInputStoreReadinessFx({
 						action: storeInputAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "producer.input.withdraw",
-				},
-				(withdrawInputAction) =>
+				producerInputWithdraw: (withdrawInputAction) =>
 					checkProducerInputWithdrawReadinessFx({
 						action: withdrawInputAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "producer.product.start",
-				},
-				(startAction) =>
-					checkProducerProductStartReadinessFx({
-						action: startAction,
-						config: gameConfig.config,
-						save,
-					}),
-			)
-			.with(
-				{
-					type: "producer.product_line.set_enabled",
-				},
-				(setEnabledAction) =>
+				producerProductLineSetEnabled: (setEnabledAction) =>
 					checkProducerProductLineSetEnabledReadinessFx({
 						action: setEnabledAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "stash.open",
-				},
-				(openAction) =>
+				producerProductStart: (startAction) =>
+					checkProducerProductStartReadinessFx({
+						action: startAction,
+						config: gameConfig.config,
+						save,
+					}),
+				stashOpen: (openAction) =>
 					checkStashOpenReadinessFx({
 						action: openAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "stored_requirement.store",
-				},
-				(storeAction) =>
+				storedRequirementStore: (storeAction) =>
 					checkStoredRequirementStoreReadinessFx({
 						action: storeAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "stored_requirement.withdraw",
-				},
-				(withdrawAction) =>
+				storedRequirementWithdraw: (withdrawAction) =>
 					checkStoredRequirementWithdrawReadinessFx({
 						action: withdrawAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "tile.remove",
-				},
-				(removeAction) =>
+				tileRemove: (removeAction) =>
 					checkTileRemoveReadinessFx({
 						action: removeAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.with(
-				{
-					type: "upgrade.start",
-				},
-				(upgradeAction) =>
+				upgradeStart: (upgradeAction) =>
 					checkUpgradeStartReadinessFx({
 						action: upgradeAction,
 						config: gameConfig.config,
 						save,
 					}),
-			)
-			.exhaustive();
-	});
+			});
+			yield* actionReadinessEffect;
+		},
+	);
 
 	return yield* Effect.provideService(readinessEffect, GameConfigFx, gameConfig).pipe(
 		Effect.match({

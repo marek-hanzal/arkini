@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { isGameSaveInventoryStack } from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
@@ -24,6 +25,18 @@ export const placeInitialInventoryItemFx = Effect.fn("placeInitialInventoryItemF
 	if (!item) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(`Missing item "${itemId}".`),
+		);
+	}
+
+	if (
+		!isItemStorageAllowed({
+			config,
+			itemId,
+			location: "inventory",
+		})
+	) {
+		return yield* Effect.fail(
+			GameEngineError.saveInvalid(`Starting inventory cannot contain "${itemId}".`),
 		);
 	}
 

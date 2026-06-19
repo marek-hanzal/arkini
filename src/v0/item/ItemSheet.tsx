@@ -161,7 +161,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				) : null}
 				<ItemSummaryCard
 					item={item}
-					storeDisabled={itemAction.isPending}
+					storeDisabled={itemAction.isPending || item.storage === "board"}
 					onStore={storeBoardItem}
 				/>
 				{liveCraft ? (

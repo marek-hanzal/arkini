@@ -22,6 +22,7 @@ describe("applyGameActionFx merge", () => {
 					],
 					name: "Water",
 					sort: 8,
+					storage: "both",
 					tags: [],
 					tier: 0,
 				},

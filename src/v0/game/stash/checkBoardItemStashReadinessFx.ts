@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import type { GameActionBoardItemStashSchema } from "~/v0/game/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -48,6 +49,21 @@ export const checkBoardItemStashReadinessFx = Effect.fn("checkBoardItemStashRead
 		if (!itemDefinition) {
 			return yield* Effect.fail(
 				GameEngineError.configReferenceMissing(`Missing item "${item.itemId}".`),
+			);
+		}
+
+		if (
+			!isItemStorageAllowed({
+				config,
+				itemId: item.itemId,
+				location: "inventory",
+			})
+		) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"storage_restricted",
+					`Item "${item.itemId}" cannot be stored in inventory.`,
+				),
 			);
 		}
 

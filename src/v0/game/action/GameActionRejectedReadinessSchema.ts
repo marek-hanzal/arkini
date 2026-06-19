@@ -23,6 +23,7 @@ export const GameActionRejectedReadinessSchema = z
 					"missing_requirement",
 					"product_line_disabled",
 					"producer_queue_full",
+					"storage_restricted",
 					"stash_depleted",
 					"unsupported_target",
 					"unsupported_requirement",

@@ -15,6 +15,11 @@ export const ViewItemSchema = z.object({
 		])
 		.optional(),
 	maxStackSize: z.number().int().positive(),
+	storage: z.enum([
+		"board",
+		"inventory",
+		"both",
+	]),
 	tags: z.array(z.string()),
 	canProduce: z.boolean(),
 	producerTrigger: z.literal("click").optional(),

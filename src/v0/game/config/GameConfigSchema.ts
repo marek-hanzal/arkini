@@ -27,6 +27,9 @@ import { z } from "zod";
  * - Board tiles never stack. Produced/crafted/dropped items are placed onto empty board
  *   cells first and then into inventory stacks/slots through `board_then_inventory`.
  * - Inventory may stack items up to each item's `maxStackSize`.
+ * - Item `storage` declares where the item may persist: `board`, `inventory`, or
+ *   `both`. Missing storage defaults to `both`. Board-only danger tiles can therefore
+ *   spawn on the board without letting the player launder the problem through inventory.
  * - Merge definitions are explicit source-owned rules. If both drag directions should
  *   work, both source items must reference their own rule. The engine must not invent
  *   reverse merges from target-owned rules.
@@ -146,6 +149,15 @@ const SignedIntegerSchema = z.number().int();
 const PlacementSchema = z.enum([
 	"board_then_inventory",
 ]);
+
+/** Persistent location policy for item definitions. */
+const ItemStoragePolicySchema = z
+	.enum([
+		"board",
+		"inventory",
+		"both",
+	])
+	.default("both");
 
 /** Fixed or ranged output quantity used by loot tables. */
 const QuantitySchema = z.union([
@@ -373,6 +385,7 @@ const ItemDefinitionSchema = z
 		name: z.string().min(1),
 		tier: NonNegativeIntegerSchema,
 		maxStackSize: PositiveIntegerSchema,
+		storage: ItemStoragePolicySchema,
 		description: z.string(),
 		label: z.string().optional(),
 		tags: z.array(z.string().min(1)),
@@ -1179,6 +1192,19 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 
 		const item = value.items[entry.itemId];
+		if (item?.storage === "board") {
+			addIssue(
+				ctx,
+				[
+					"startingState",
+					"inventory",
+					index,
+					"itemId",
+				],
+				`Item "${entry.itemId}" storage policy forbids inventory placement.`,
+			);
+		}
+
 		if (item && entry.quantity > item.maxStackSize) {
 			addIssue(
 				ctx,
@@ -1205,6 +1231,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					"itemId",
 				],
 				`Missing item "${entry.itemId}".`,
+			);
+		} else if (value.items[entry.itemId]?.storage === "inventory") {
+			addIssue(
+				ctx,
+				[
+					"startingState",
+					"board",
+					index,
+					"itemId",
+				],
+				`Item "${entry.itemId}" storage policy forbids board placement.`,
 			);
 		}
 

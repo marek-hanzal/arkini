@@ -98,6 +98,8 @@ A slot cannot contain multiple different item IDs.
 
 Inventory stacking is automatic. When an item enters inventory, the inventory first fills compatible existing stacks up to `maxStackSize`, then creates the next stack only when needed. The player should not be responsible for manually combining split stacks, because inventory normalization is a system responsibility.
 
+Inventory is not a universal hiding place. Item definitions declare `storage`: `board`, `inventory`, or `both`, with `both` as the default. Board-only items, such as future fire/danger tiles, must never be moved into inventory, saved there, or loaded there. Inventory-only items likewise must not be placed onto the board.
+
 ### 4.4 Item
 
 An item is any gameplay entity that can exist on the board or in inventory.
@@ -1086,8 +1088,7 @@ Expected fields:
 - `description`
 - `asset`
 - `maxStackSize`
-- `placeable`
-- `storageRules`
+- `storage`: `board`, `inventory`, or `both`; default `both`
 - `tags`
 - optional producer definition reference
 - optional stash definition reference

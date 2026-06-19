@@ -28,6 +28,7 @@ export const createEngineCraftTableTestConfig = ({
 				maxStackSize: 1,
 				name: "Craft Table",
 				sort: 8,
+				storage: "both",
 				tags: [],
 				tier: 0,
 			},

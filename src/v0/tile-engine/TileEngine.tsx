@@ -10,17 +10,9 @@ import { useTileEngineHandoff } from "~/v0/tile-engine/useTileEngineHandoff";
 import { useTileEngineIndexes } from "~/v0/tile-engine/useTileEngineIndexes";
 import { useTileEngineMotionRequests } from "~/v0/tile-engine/TileEngineMotionRequestStore";
 import { useLatestRef } from "~/v0/react/useLatestRef";
+import { sameTileEngineDropFeedback } from "~/v0/tile-engine/sameTileEngineDropFeedback";
 
 export type { TileEngine as TileEngineNamespace } from "~/v0/tile-engine/TileEngine.types";
-
-const sameActiveDropFeedback = (
-	left: TileEngineType.ActiveDropFeedback | null,
-	right: TileEngineType.ActiveDropFeedback | null,
-) =>
-	left?.dropId === right?.dropId &&
-	left?.effect === right?.effect &&
-	left?.variant === right?.variant &&
-	left?.targetTileId === right?.targetTileId;
 
 const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	id,
@@ -60,7 +52,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	const setActiveDropFeedback = useCallback(
 		(feedback: TileEngineType.ActiveDropFeedback | null) => {
 			setRawActiveDropFeedback((current) =>
-				sameActiveDropFeedback(current, feedback) ? current : feedback,
+				sameTileEngineDropFeedback(current, feedback) ? current : feedback,
 			);
 		},
 		[],

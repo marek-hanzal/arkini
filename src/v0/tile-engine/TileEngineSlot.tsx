@@ -14,15 +14,7 @@ import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 import { sameTileEngineSlot } from "~/v0/tile-engine/sameTileEngineSlot";
 import { sameTileEngineTile } from "~/v0/tile-engine/sameTileEngineTile";
-
-const sameActiveDropFeedback = (
-	left: TileEngine.ActiveDropFeedback | null,
-	right: TileEngine.ActiveDropFeedback | null,
-) =>
-	left?.dropId === right?.dropId &&
-	left?.effect === right?.effect &&
-	left?.variant === right?.variant &&
-	left?.targetTileId === right?.targetTileId;
+import { sameTileEngineDropFeedback } from "~/v0/tile-engine/sameTileEngineDropFeedback";
 
 const sameOptionalTileEngineTile = <TTile,>(
 	left: TileEngine.Tile<TTile> | undefined,
@@ -40,7 +32,7 @@ const sameTileEngineSlotProps = <TTile, TSlot, TDrop>(
 	sameTileEngineSlot(left.slot, right.slot) &&
 	left.index === right.index &&
 	sameOptionalTileEngineTile(left.targetTile, right.targetTile) &&
-	sameActiveDropFeedback(left.dropFeedback, right.dropFeedback) &&
+	sameTileEngineDropFeedback(left.dropFeedback, right.dropFeedback) &&
 	left.disabled === right.disabled &&
 	left.className === right.className &&
 	left.dragRef === right.dragRef &&

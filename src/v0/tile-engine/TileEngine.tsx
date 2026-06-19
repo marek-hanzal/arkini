@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { cn } from "~/v0/ui/cn";
 import { preventNativeTileEngineContextMenu } from "~/v0/tile-engine/preventNativeTileEngineContextMenu";
 import { TileEngineActors } from "~/v0/tile-engine/TileEngineActors";
@@ -22,6 +22,27 @@ const sameActiveDropFeedback = (
 	left?.variant === right?.variant &&
 	left?.targetTileId === right?.targetTileId;
 
+const resolveResponsiveSize = ({
+	columns,
+	height,
+	rowCount,
+	width,
+}: {
+	columns: number;
+	height: number;
+	rowCount: number;
+	width: number;
+}) => {
+	const ratio = columns / Math.max(1, rowCount);
+	const resolvedWidth = Math.min(width, height * ratio);
+	const resolvedHeight = resolvedWidth / ratio;
+
+	return {
+		height: resolvedHeight,
+		width: resolvedWidth,
+	};
+};
+
 const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	id,
 	columns,
@@ -40,9 +61,29 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	renderSlot,
 	renderTile,
 }: TileEngineType.Props<TTile, TSlot, TDrag, TDrop>) => {
+	const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
+	const [responsiveSize, setResponsiveSize] = useState<{
+		height: number;
+		width: number;
+	} | null>(null);
 	const [activeDropId, setRawActiveDropId] = useState<string | null>(null);
 	const [activeDropFeedback, setRawActiveDropFeedback] =
 		useState<TileEngineType.ActiveDropFeedback | null>(null);
+	const setRootNode = useCallback(
+		(node: HTMLDivElement | null) => {
+			setRootElement(node);
+			if (rootRef) {
+				(
+					rootRef as {
+						current: HTMLDivElement | null;
+					}
+				).current = node;
+			}
+		},
+		[
+			rootRef,
+		],
+	);
 	const setActiveDropFeedback = useCallback(
 		(feedback: TileEngineType.ActiveDropFeedback | null) => {
 			setRawActiveDropFeedback((current) =>
@@ -64,10 +105,50 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	const dragRef = useLatestRef(disabled ? undefined : drag);
 	const drops = useTileEngineDrops<TSlot, TTile, TDrop>();
 	const handoff = useTileEngineHandoff();
+	const rowCount = Math.max(1, indexes.rowCount);
+
+	useEffect(() => {
+		if (container !== "responsive" || !rootElement?.parentElement) {
+			setResponsiveSize(null);
+			return;
+		}
+
+		const parent = rootElement.parentElement;
+		let frame = 0;
+		const update = () => {
+			cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(() => {
+				const rect = parent.getBoundingClientRect();
+				if (rect.width <= 0 || rect.height <= 0) return;
+				setResponsiveSize(
+					resolveResponsiveSize({
+						columns,
+						height: rect.height,
+						rowCount,
+						width: rect.width,
+					}),
+				);
+			});
+		};
+
+		update();
+		const observer = new ResizeObserver(update);
+		observer.observe(parent);
+
+		return () => {
+			cancelAnimationFrame(frame);
+			observer.disconnect();
+		};
+	}, [
+		columns,
+		container,
+		rootElement,
+		rowCount,
+	]);
 
 	return (
 		<div
-			ref={rootRef}
+			ref={setRootNode}
 			onContextMenu={preventNativeTileEngineContextMenu}
 			data-ui="tile engine"
 			data-ak-tile-engine-id={id}
@@ -75,19 +156,20 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-container={container}
 			data-ak-tile-engine-disabled={disabled ? "true" : undefined}
 			className={cn(
-				"ak-tile-engine relative min-w-0 overflow-visible",
-				container === "responsive"
-					? "h-full w-auto max-h-full max-w-full"
-					: "h-auto w-full",
+				"ak-tile-engine relative min-w-0 shrink-0 overflow-visible",
+				container === "static" && "h-auto w-full",
 				disabled && "pointer-events-none",
 				className,
 			)}
 			style={{
-				aspectRatio: `${columns}/${Math.max(1, indexes.rowCount)}`,
+				aspectRatio: `${columns}/${rowCount}`,
+				height: container === "responsive" ? (responsiveSize?.height ?? "100%") : undefined,
+				width: container === "responsive" ? (responsiveSize?.width ?? "100%") : undefined,
 			}}
 		>
 			<TileEngineSlots
 				columns={columns}
+				rowCount={rowCount}
 				gapPx={gapPx}
 				slots={slots}
 				tileBySlotId={indexes.tileBySlotId}
@@ -104,7 +186,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				tiles={tiles}
 				slotIndexById={indexes.slotIndexById}
 				columns={columns}
-				rowCount={indexes.rowCount}
+				rowCount={rowCount}
 				gapPx={gapPx}
 				actorLayerClassName={actorLayerClassName}
 				dragRef={dragRef}

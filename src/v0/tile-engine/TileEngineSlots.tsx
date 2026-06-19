@@ -6,6 +6,7 @@ import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 export namespace TileEngineSlots {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrop = unknown> {
 		columns: number;
+		rowCount: number;
 		gapPx: number;
 		slots: readonly TileEngine.Slot<TSlot>[];
 		tileBySlotId: ReadonlyMap<string, TileEngine.Tile<TTile>>;
@@ -21,6 +22,7 @@ export namespace TileEngineSlots {
 
 const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 	columns,
+	rowCount,
 	gapPx,
 	slots,
 	tileBySlotId,
@@ -37,6 +39,7 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 		className="ak-tile-engine-slots grid h-full w-full"
 		style={{
 			gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+			gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`,
 			gap: gapPx,
 		}}
 	>

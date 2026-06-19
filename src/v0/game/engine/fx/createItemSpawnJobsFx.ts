@@ -1,37 +1,37 @@
 import { Effect } from "effect";
-import { createGameScheduledEventIdFx } from "~/v0/game/engine/fx/createGameScheduledEventIdFx";
+import { createGameItemSpawnJobIdFx } from "~/v0/game/engine/fx/createGameItemSpawnJobIdFx";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
-export namespace scheduleGameItemSpawnsFx {
+export namespace createItemSpawnJobsFx {
 	export interface Props {
 		save: GameSave;
 		items: GameSaveItemPlacementRequest[];
 		dueAtMs: number;
-		exclusiveKey?: string;
+		exclusiveGroupKey?: string;
 		intervalMs?: number;
 	}
 }
 
-export const scheduleGameItemSpawnsFx = Effect.fn("scheduleGameItemSpawnsFx")(function* ({
+export const createItemSpawnJobsFx = Effect.fn("createItemSpawnJobsFx")(function* ({
 	save,
 	items,
 	dueAtMs,
-	exclusiveKey,
+	exclusiveGroupKey,
 	intervalMs = 0,
-}: scheduleGameItemSpawnsFx.Props) {
-	let scheduledIndex = 0;
+}: createItemSpawnJobsFx.Props) {
+	let itemSpawnIndex = 0;
 	let lastDueAtMs = dueAtMs;
-	const eventIds: string[] = [];
+	const jobIds: string[] = [];
 
 	for (const item of items) {
 		for (let quantityIndex = 0; quantityIndex < item.quantity; quantityIndex += 1) {
-			const scheduledDueAtMs = dueAtMs + scheduledIndex * intervalMs;
-			lastDueAtMs = scheduledDueAtMs;
-			const id = yield* createGameScheduledEventIdFx();
-			save.scheduledEvents[id] = {
-				dueAtMs: scheduledDueAtMs,
-				exclusiveKey,
+			const itemSpawnDueAtMs = dueAtMs + itemSpawnIndex * intervalMs;
+			lastDueAtMs = itemSpawnDueAtMs;
+			const id = yield* createGameItemSpawnJobIdFx();
+			save.itemSpawnJobs[id] = {
+				dueAtMs: itemSpawnDueAtMs,
+				exclusiveGroupKey,
 				id,
 				itemId: item.itemId,
 				originItemInstanceId: item.originItemInstanceId,
@@ -39,13 +39,13 @@ export const scheduleGameItemSpawnsFx = Effect.fn("scheduleGameItemSpawnsFx")(fu
 				reason: item.reason,
 				type: "item.spawn",
 			};
-			eventIds.push(id);
-			scheduledIndex += 1;
+			jobIds.push(id);
+			itemSpawnIndex += 1;
 		}
 	}
 
 	return {
-		eventIds,
+		jobIds,
 		lastDueAtMs,
 		save,
 	};

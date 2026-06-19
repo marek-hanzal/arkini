@@ -6,4 +6,4 @@ export const createGameItemInstanceId = () => createGameEntityId("item-instance"
 
 export const createGameJobId = () => createGameEntityId("job");
 
-export const createGameScheduledEventId = () => createGameEntityId("scheduled-event");
+export const createGameItemSpawnJobId = () => createGameEntityId("item-spawn-job");

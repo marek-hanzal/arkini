@@ -133,28 +133,27 @@ export const GameSaveStoredRequirementStateSchema = z
 	})
 	.strict();
 
-export const GameSaveScheduledEventBaseSchema = z
+export const GameSaveItemSpawnJobBaseSchema = z
 	.object({
 		id: IdSchema,
 		dueAtMs: NonNegativeIntegerSchema,
-		exclusiveKey: IdSchema.optional(),
-		afterEventIds: z.array(IdSchema).optional(),
+		exclusiveGroupKey: IdSchema.optional(),
+		afterJobIds: z.array(IdSchema).optional(),
 		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
 	})
 	.strict()
 	.refine(
 		(value) =>
-			!value.afterEventIds ||
-			new Set(value.afterEventIds).size === value.afterEventIds.length,
+			!value.afterJobIds || new Set(value.afterJobIds).size === value.afterJobIds.length,
 		{
-			message: "afterEventIds must be unique",
+			message: "afterJobIds must be unique",
 			path: [
-				"afterEventIds",
+				"afterJobIds",
 			],
 		},
 	);
 
-export const GameSaveScheduledEventSchema = GameSaveScheduledEventBaseSchema.extend({
+export const GameSaveItemSpawnJobSchema = GameSaveItemSpawnJobBaseSchema.extend({
 	itemId: IdSchema,
 	originItemInstanceId: IdSchema.optional(),
 	quantity: PositiveIntegerSchema,
@@ -162,16 +161,16 @@ export const GameSaveScheduledEventSchema = GameSaveScheduledEventBaseSchema.ext
 	type: z.literal("item.spawn"),
 })
 	.strict()
-	.refine((value) => !value.exclusiveKey || value.exclusiveKey !== value.id, {
-		message: "exclusiveKey must group events and must not equal event id",
+	.refine((value) => !value.exclusiveGroupKey || value.exclusiveGroupKey !== value.id, {
+		message: "exclusiveGroupKey must group jobs and must not equal job id",
 		path: [
-			"exclusiveKey",
+			"exclusiveGroupKey",
 		],
 	})
-	.refine((value) => !value.afterEventIds?.includes(value.id), {
-		message: "afterEventIds must not contain event id",
+	.refine((value) => !value.afterJobIds?.includes(value.id), {
+		message: "afterJobIds must not contain job id",
 		path: [
-			"afterEventIds",
+			"afterJobIds",
 		],
 	});
 
@@ -200,7 +199,7 @@ export const GameSaveSchema = z
 		upgrades: z.record(IdSchema, GameSaveUpgradeStateSchema),
 		stashes: z.record(IdSchema, GameSaveStashStateSchema),
 		storedRequirements: z.record(IdSchema, GameSaveStoredRequirementStateSchema),
-		scheduledEvents: z.record(IdSchema, GameSaveScheduledEventSchema),
+		itemSpawnJobs: z.record(IdSchema, GameSaveItemSpawnJobSchema),
 	})
 	.strict()
 	.refine((value) => value.updatedAtMs >= value.createdAtMs, {
@@ -1167,28 +1166,28 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
-	for (const [eventId, event] of Object.entries(save.scheduledEvents)) {
-		if (event.id !== eventId) {
+	for (const [jobId, job] of Object.entries(save.itemSpawnJobs)) {
+		if (job.id !== jobId) {
 			addSaveIssue(
 				ctx,
 				[
-					"scheduledEvents",
-					eventId,
+					"itemSpawnJobs",
+					jobId,
 					"id",
 				],
-				`Scheduled event id must match record key "${eventId}".`,
+				`Item spawn job id must match record key "${jobId}".`,
 			);
 		}
 
-		if (!config.items[event.itemId]) {
+		if (!config.items[job.itemId]) {
 			addSaveIssue(
 				ctx,
 				[
-					"scheduledEvents",
-					eventId,
+					"itemSpawnJobs",
+					jobId,
 					"itemId",
 				],
-				`Missing item "${event.itemId}".`,
+				`Missing item "${job.itemId}".`,
 			);
 		}
 	}
@@ -1212,6 +1211,6 @@ export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
 export type GameSaveStoredRequirementState = z.infer<typeof GameSaveStoredRequirementStateSchema>;
 export type GameSaveUpgradeJob = z.infer<typeof GameSaveUpgradeJobSchema>;
 export type GameSaveUpgradeState = z.infer<typeof GameSaveUpgradeStateSchema>;
-export type GameSaveScheduledEvent = z.infer<typeof GameSaveScheduledEventSchema>;
+export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;
 export type GameSave = z.infer<typeof GameSaveSchema>;
 export type GameSaveConfig = z.infer<typeof GameSaveConfigSchema>;

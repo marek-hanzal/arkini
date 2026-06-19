@@ -11,12 +11,10 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: persistence retry safety fixed; failed writes keep latest pending save.
 - `2026-06-19`: board read-model bridge split into focused activation/craft/item readers.
 - `2026-06-19`: reverted `GameSaveSchema` validation split; schema core contracts are not line-count cleanup targets.
+- `2026-06-19`: split future work from now-events; old delayed item-spawn records are now `itemSpawnJobs`.
 
 ## Next candidates
 
-1. Scheduled job/event policy audit: formalize two primitives before refactoring runtime time flow.
-   - Job = planned activity that may reschedule itself and eventually emit events.
-   - Event = concrete occurrence due now and processed through the standard event pipeline.
-2. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item.
+1. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item.
 
 Before coding any risky item, inspect source and propose exact files/shape first.

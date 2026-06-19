@@ -558,7 +558,7 @@ describe("applyGameActionFx", () => {
 			save,
 		});
 
-		expect(result.save.scheduledEvents).toEqual({});
+		expect(result.save.itemSpawnJobs).toEqual({});
 		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
 		expect(result.save.inventory.slots[0]).toEqual({
 			itemId: "item:twig",
@@ -645,7 +645,7 @@ describe("applyGameActionFx", () => {
 		});
 
 		expect(result.save.stashes).toEqual({});
-		expect(result.save.scheduledEvents).toEqual({});
+		expect(result.save.itemSpawnJobs).toEqual({});
 		expect(result.save.board.items).not.toHaveProperty("item-instance:1");
 		expect(
 			findBoardItem(result.save, {
@@ -833,7 +833,7 @@ describe("applyGameActionFx", () => {
 			});
 		}
 		expect(save.stashes).toEqual({});
-		expect(save.scheduledEvents).toEqual({});
+		expect(save.itemSpawnJobs).toEqual({});
 		expect(save.board.items["item-instance:2"]).toMatchObject({
 			itemId: "item:stash",
 		});
@@ -905,7 +905,7 @@ describe("applyGameActionFx", () => {
 			save,
 		});
 
-		expect(result.save.scheduledEvents).toEqual({});
+		expect(result.save.itemSpawnJobs).toEqual({});
 		expect(result.save.board.items["item-instance:2"]).toMatchObject({
 			itemId: "item:empty-stash",
 			x: 1,

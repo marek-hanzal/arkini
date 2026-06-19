@@ -279,7 +279,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	z
 		.object({
 			type: z.literal("item.spawn.blocked"),
-			scheduledEventId: IdSchema,
+			jobId: IdSchema,
 			itemId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
 			blockedAtMs: NonNegativeIntegerSchema,

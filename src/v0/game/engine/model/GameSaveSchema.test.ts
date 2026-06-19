@@ -365,4 +365,53 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.success).toBe(false);
 		expect(result.error?.issues[0]?.message).toContain("must not have editable input state");
 	});
+	it("rejects item spawn job ids that do not match their record key", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.itemSpawnJobs["item-spawn-job:record"] = {
+			dueAtMs: 100,
+			id: "item-spawn-job:different",
+			itemId: "item:twig",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("job id must match record key");
+	});
+
+	it("rejects item spawn jobs for missing items", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.itemSpawnJobs["item-spawn-job:missing"] = {
+			dueAtMs: 100,
+			id: "item-spawn-job:missing",
+			itemId: "item:missing",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain('Missing item "item:missing"');
+	});
 });

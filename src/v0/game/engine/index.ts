@@ -10,10 +10,10 @@ export { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSa
 export { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 export { planEmptyBoardCellsFx } from "~/v0/game/engine/fx/planEmptyBoardCellsFx";
 export { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
-export { processScheduledGameEventsFx } from "~/v0/game/engine/fx/processScheduledGameEventsFx";
+export { processItemSpawnJobsFx } from "~/v0/game/engine/fx/processItemSpawnJobsFx";
 export { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
 export { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
-export { scheduleGameItemSpawnsFx } from "~/v0/game/engine/fx/scheduleGameItemSpawnsFx";
+export { createItemSpawnJobsFx } from "~/v0/game/engine/fx/createItemSpawnJobsFx";
 export {
 	GameEventPlacementTargetSchema,
 	GameEventSchema,
@@ -30,7 +30,7 @@ export {
 	GameSaveProducerLineStateSchema,
 	GameSaveProducerInputStateSchema,
 	GameSaveProducerProductInputStateSchema,
-	GameSaveScheduledEventSchema,
+	GameSaveItemSpawnJobSchema,
 	GameSaveSchema,
 	GameSaveStashStateSchema,
 	GameSaveStoredRequirementStateSchema,
@@ -68,7 +68,7 @@ export type {
 	GameSaveProducerLineState,
 	GameSaveProducerInputState,
 	GameSaveProducerProductInputState,
-	GameSaveScheduledEvent,
+	GameSaveItemSpawnJob,
 	GameSaveStashState,
 	GameSaveStoredRequirementState,
 	GameSaveUpgradeJob,

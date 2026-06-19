@@ -1,8 +1,8 @@
 import { Effect } from "effect";
-import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
+import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkProducerProductStartReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
-import { consumeProducerStoredInputsFx } from "~/v0/game/engine/fx/consumeProducerStoredInputsFx";
+import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProducerStoredInputsFx";
 import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";

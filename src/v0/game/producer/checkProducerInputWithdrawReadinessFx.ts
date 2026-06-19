@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
-import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
+import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerInputWithdraw } from "~/v0/game/engine/model/GameActionProducerInputWithdraw";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

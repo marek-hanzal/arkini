@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { completeProducerJobFx } from "~/v0/game/engine/fx/completeProducerJobFx";
-import { readCompletedProducerJobsFx } from "~/v0/game/engine/fx/readCompletedProducerJobsFx";
+import { completeProducerJobFx } from "~/v0/game/producer/completeProducerJobFx";
+import { readCompletedProducerJobsFx } from "~/v0/game/producer/readCompletedProducerJobsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";

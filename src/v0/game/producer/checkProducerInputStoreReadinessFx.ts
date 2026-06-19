@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
-import { readProducerBoardItemFx } from "~/v0/game/engine/fx/readProducerBoardItemFx";
-import { readProducerProductLineEnabledFx } from "~/v0/game/engine/fx/readProducerProductLineEnabledFx";
-import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/engine/fx/readProducerProductStoredInputQuantitiesFx";
+import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
+import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProducerProductLineEnabledFx";
+import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/engine/fx/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerInputStore } from "~/v0/game/engine/model/GameActionProducerInputStore";

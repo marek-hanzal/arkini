@@ -10,10 +10,10 @@ import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkCra
 import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/engine/fx/checkInventoryItemPlaceReadinessFx";
 import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/engine/fx/checkInventorySlotsSwapReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
-import { checkProducerInputStoreReadinessFx } from "~/v0/game/engine/fx/checkProducerInputStoreReadinessFx";
-import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkProducerInputWithdrawReadinessFx";
-import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/engine/fx/checkProducerProductLineSetEnabledReadinessFx";
-import { checkProducerProductStartReadinessFx } from "~/v0/game/engine/fx/checkProducerProductStartReadinessFx";
+import { checkProducerInputStoreReadinessFx } from "~/v0/game/producer/checkProducerInputStoreReadinessFx";
+import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/producer/checkProducerInputWithdrawReadinessFx";
+import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/producer/checkProducerProductLineSetEnabledReadinessFx";
+import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
 import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementStoreReadinessFx";
 import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementWithdrawReadinessFx";

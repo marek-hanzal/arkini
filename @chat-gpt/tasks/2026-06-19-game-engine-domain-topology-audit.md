@@ -1,6 +1,6 @@
 # Game engine domain topology audit
 
-Status: active audit. First coding step done: `applyGameActionFx.test.ts` was split by domain family without runtime behavior changes.
+Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer runtime files were moved to top-level `game/producer` without behavior changes.
 
 ## Problem
 
@@ -199,18 +199,18 @@ A developer looking for producer behavior must mentally collect files from `star
 
 ## Proposed target shape
 
-Keep `engine` relatively flat at the top, but replace the giant `fx` bucket with shallow domain folders.
+Keep `game` relatively flat at the top. `engine` should remain orchestration glue, not the parent folder for every gameplay domain. Replace the giant `engine/fx` bucket with top-level game domain folders.
 
 Candidate target:
 
 ```txt
-src/v0/game/engine/
-  action/        parse/apply/readiness/match action dispatch shell
+src/v0/game/
+  action/        parse/apply/readiness/match action dispatch shell if it outgrows engine glue
   board/         board move/swap/remove + board readers
-  config/        effective config layer build/apply service
+  config/        compiled config schema/readers and effective config service pieces
   craft/         craft start/store/withdraw/complete/process/readiness/readers
   inventory/     inventory place/swap/stash-to-inventory helpers if not placement
-  jobs/          generic job ordering/wake + itemSpawnJobs + tick orchestration helpers
+  jobs/          generic job ordering/wake + itemSpawnJobs + tick helpers if they become domain-sized
   loot/          quantity/weighted loot rolls
   merge/         merge execution/readiness
   placement/     shared placement planner/apply primitives
@@ -218,13 +218,10 @@ src/v0/game/engine/
   requirements/  passive/stored/input ref/activation input logic
   stash/         stash open/depletion/readiness/readers
   upgrade/       upgrade runtime jobs/costs/start/complete
-  runtime/       RuntimeGameEngineAdapter
-  model/         core contracts; keep dense contracts intact
-  logic/         only tiny pure shared logic if it does not fit domain folders
-  context/       service tags
+  engine/        orchestration only: apply/readiness/tick adapter/model glue
 ```
 
-This is more folders than today, but each folder has a real domain name. That is better than one `fx` megabucket. The folder depth remains one level under `engine`, so it still respects the “flat unless justified” rule.
+This is more top-level folders than today, but each folder has a real domain name. That is better than one `engine/fx` megabucket. Folder depth remains shallow: top-level game domain plus flat files inside it.
 
 ## Alternative lower-risk target
 
@@ -250,7 +247,7 @@ Low behavior risk, immediate navigation win.
 
 Do this before production moves because tests become safer anchors for later refactors.
 
-### Step 2: move producer domain from `fx` to `engine/producer`
+### Step 2: move producer domain from `fx` to top-level `game/producer`
 
 Producer has the clearest domain cluster and the most internal files. It is a good first production move.
 
@@ -266,7 +263,7 @@ Placement is shared and should be explicit. Do this after producer/craft/stash s
 
 ### Step 5: move action shell / readiness orchestration
 
-Only after domain folders exist. `applyGameActionFx` and `readActionReadinessFx` should become small action-shell imports from domain readiness/apply functions.
+Only after domain folders exist. `applyGameActionFx` and `readActionReadinessFx` should remain small engine orchestration imports from domain readiness/apply functions.
 
 ### Step 6: revisit `fx`
 
@@ -278,9 +275,9 @@ The end state should either delete `fx` or leave it only for true cross-domain E
 - No new domain restrictions.
 - `GameConfigSchema` remains the legality gate.
 - `GameSaveSchema` / `GameConfigSchema` stay core dense contracts.
-- Engine folder depth remains shallow.
+- `src/v0/game` domain folder depth remains shallow; do not hide top-level domains under `engine`.
 - Each new domain folder can explain its existence in one sentence.
-- `applyGameActionFx` and `readActionReadinessFx` remain action shell dispatchers, not domain rule containers.
+- `applyGameActionFx` and `readActionReadinessFx` remain engine orchestration dispatchers, not domain rule containers.
 - Tests remain green after every domain move.
 
 ## Completed first coding task
@@ -296,8 +293,14 @@ The end state should either delete `fx` or leave it only for true cross-domain E
 
 The shared test helpers live in `applyGameActionFx.testSupport.ts`.
 
+## Completed second coding task
+
+Producer runtime files and the producer action test moved from `src/v0/game/engine/fx` into top-level `src/v0/game/producer`.
+
+Reason: producer is a game domain, not an engine subfolder. `game/engine` should orchestrate producer behavior, not own it.
+
 ## Current recommended next coding task
 
-Move the producer domain from `src/v0/game/engine/fx` into a shallow `src/v0/game/engine/producer` folder.
+Move the craft domain from `src/v0/game/engine/fx` into top-level `src/v0/game/craft`.
 
-Reason: producer has the clearest domain cluster and now has a dedicated action test anchor. Move files/imports only; no behavior changes.
+Reason: craft is the next coherent domain cluster and already has a dedicated action test anchor. Move files/imports only; no behavior changes.

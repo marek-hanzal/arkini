@@ -17,15 +17,6 @@ interface ButtonProps {
 	onOpen(sheet: Sheet): void;
 }
 
-const toneClassName: Record<Sheet, string> = {
-	dev: "border-ak-border bg-ak-surface text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
-	inventory:
-		"border-ak-border bg-ak-surface text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
-	upgrades:
-		"border-ak-border bg-ak-surface text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
-	item: "border-ak-border bg-ak-surface text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
-};
-
 const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) => (
 	<div
 		data-ui="bottom nav slot"
@@ -39,21 +30,20 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 			aria-label={label}
 			title={label}
 			className={cn(
-				"flex h-full w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-sm border text-[clamp(0.62rem,2.6vw,0.75rem)] font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px",
-				toneClassName[tone],
-				active && "border-ak-border-accent bg-ak-primary-soft text-ak-text",
+				"flex h-full w-full min-w-0 flex-col items-center justify-center gap-1 rounded-sm border border-ak-border bg-ak-surface px-2 py-2 text-center transition-[transform,border-color,background,color,opacity] active:translate-y-px",
+				active
+					? "border-ak-border-accent bg-ak-primary-soft text-ak-text"
+					: "text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
 			)}
 			onClick={() => onOpen(tone)}
 		>
 			<span
-				className="text-[clamp(1.15rem,4.4vw,1.45rem)] leading-none"
+				className="text-[1.15rem] leading-none"
 				aria-hidden="true"
 			>
 				{icon}
 			</span>
-			<span className="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-				{label}
-			</span>
+			<span className="text-[0.7rem] font-bold uppercase tracking-[0.18em]">{label}</span>
 		</button>
 	</div>
 ));
@@ -61,7 +51,7 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => (
 	<nav
 		data-ui="bottom nav"
-		className="absolute inset-x-0 bottom-0 h-[var(--ak-bottom-nav-height)] bg-transparent px-[max(0.65rem,env(safe-area-inset-left))] pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
+		className="absolute inset-x-0 bottom-0 h-[var(--ak-bottom-nav-height)] bg-ak-page px-[max(0.65rem,env(safe-area-inset-left))] pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
 		style={{
 			zIndex: "var(--ak-layer-bottom-nav)",
 		}}

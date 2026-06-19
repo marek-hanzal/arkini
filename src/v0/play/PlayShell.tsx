@@ -153,8 +153,14 @@ const PlayShellContent: FC = () => {
 				data-ui="game screen"
 				className="relative h-full w-full overflow-hidden bg-ak-page pb-[calc(var(--ak-bottom-nav-height)+0.55rem)]"
 			>
-				<main className="flex h-full w-full min-h-0 flex-col overflow-hidden">
-					<div className="min-h-0 flex-1">
+				<main
+					data-ui="play layout"
+					className="flex h-full w-full min-h-0 flex-col overflow-hidden"
+				>
+					<div
+						data-ui="game board area"
+						className="min-h-0 flex-1 overflow-hidden"
+					>
 						<BoardSurface
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}

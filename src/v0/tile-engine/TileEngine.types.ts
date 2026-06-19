@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode, RefObject } from "react";
 export namespace TileEngine {
 	export type Id = string;
 	export type LayerRole = "base" | "overlay";
+	export type Container = "responsive" | "static";
 	export type TileStyle = Omit<CSSProperties, "zIndex">;
 	export type DropAnimation = "parallel-swap" | "parallel-merge";
 	export type DropOutcome =
@@ -161,7 +162,9 @@ export namespace TileEngine {
 		actorLayerClassName?: string;
 		disabled?: boolean;
 		layerRole?: LayerRole;
+		container?: Container;
 		gapPx?: number;
+		rootRef?: RefObject<HTMLDivElement | null>;
 		drag?: DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		renderSlot(props: RenderSlotProps<TSlot>): ReactNode;

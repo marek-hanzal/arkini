@@ -32,7 +32,9 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	actorLayerClassName,
 	disabled = false,
 	layerRole = "base",
+	container = "static",
 	gapPx = TileEngineTiming.defaultGapPx,
+	rootRef,
 	drag,
 	dragConstraintsRef,
 	renderSlot,
@@ -65,15 +67,24 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 
 	return (
 		<div
+			ref={rootRef}
 			onContextMenu={preventNativeTileEngineContextMenu}
+			data-ui="tile engine"
 			data-ak-tile-engine-id={id}
 			data-ak-tile-engine-layer-role={layerRole}
+			data-ak-tile-engine-container={container}
 			data-ak-tile-engine-disabled={disabled ? "true" : undefined}
 			className={cn(
-				"ak-tile-engine relative overflow-visible",
+				"ak-tile-engine relative min-w-0 overflow-visible",
+				container === "responsive"
+					? "h-full w-auto max-h-full max-w-full"
+					: "h-auto w-full",
 				disabled && "pointer-events-none",
 				className,
 			)}
+			style={{
+				aspectRatio: `${columns}/${Math.max(1, indexes.rowCount)}`,
+			}}
 		>
 			<TileEngineSlots
 				columns={columns}

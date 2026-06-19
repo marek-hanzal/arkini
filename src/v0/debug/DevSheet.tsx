@@ -8,42 +8,16 @@ import {
 	isDevScenarioId,
 } from "~/v0/debug/scenario/DevScenarioDefinitions";
 import { useLoadDevScenarioAction } from "~/v0/debug/scenario/useLoadDevScenarioAction";
-import { StatusPill } from "~/v0/debug/ui/StatusPill";
 import { useGameRuntimeSelector } from "~/v0/play/runtime";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
-import { cn } from "~/v0/ui/cn";
+import { UiButton } from "~/v0/ui/UiButton";
+import { UiSection } from "~/v0/ui/UiSection";
 
 export namespace DevSheet {
 	export interface Props {
 		onClose(): void;
 	}
 }
-
-const debugButtonToneClassName: Record<"primary" | "neutral" | "danger", string> = {
-	danger: "border-rose-500/35 bg-rose-950/25 text-rose-200 hover:border-rose-400/55 hover:bg-rose-900/35",
-	neutral:
-		"border-ak-border bg-ak-surface-soft text-ak-text hover:border-ak-border-accent hover:bg-ak-primary-soft",
-	primary: "border-ak-border-accent bg-ak-primary text-white hover:bg-pink-400",
-};
-
-const DebugButton: FC<{
-	children: string;
-	disabled?: boolean;
-	tone?: "primary" | "neutral" | "danger";
-	onClick(): void;
-}> = ({ children, disabled, onClick, tone = "neutral" }) => (
-	<button
-		type="button"
-		disabled={disabled}
-		onClick={onClick}
-		className={cn(
-			"min-h-10 w-full rounded-sm border px-3 py-2 text-xs font-extrabold leading-none transition-[transform,border-color,background,color,opacity] active:translate-y-px disabled:cursor-wait disabled:opacity-45",
-			debugButtonToneClassName[tone],
-		)}
-	>
-		{children}
-	</button>
-);
 
 export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	const loadScenarioAction = useLoadDevScenarioAction();
@@ -138,52 +112,29 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 	return (
 		<section
 			data-ui="dev sheet"
-			className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden"
+			className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden bg-ak-surface"
 		>
 			<SheetHeader
 				title="Developer"
 				onClose={onClose}
 			/>
-			<div className="mx-auto grid min-h-0 w-full max-w-[430px] flex-1 gap-3 overflow-y-auto overscroll-contain px-2 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-				<section className="min-w-0 overflow-hidden rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
-					<div>
-						<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ak-primary">
-							Bug report
-						</p>
-						<h2 className="mt-1 text-base font-semibold text-ak-text">
-							Copy diagnostic dump
-						</h2>
-						<p className="mt-2 text-sm text-ak-text-muted">
-							One JSON packet with browser metadata, runtime diagnostics and the
-							latest debug timeline. Paste it into chat after reproducing a bug.
-						</p>
-					</div>
+			<div className="mx-auto grid min-h-0 w-full max-w-[460px] flex-1 gap-3 overflow-y-auto overscroll-contain px-3 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+				<UiSection
+					eyebrow="Bug report"
+					title="Copy diagnostic dump"
+				>
+					<p className="text-sm leading-6 text-ak-text-muted">
+						One JSON packet with browser metadata, runtime diagnostics and the latest
+						debug timeline. Paste it into chat after reproducing a bug.
+					</p>
 					<div className="mt-3 grid grid-cols-2 gap-2">
-						<DebugButton
+						<UiButton
 							tone="primary"
 							onClick={copyBugReport}
 						>
 							Copy bug report
-						</DebugButton>
-						<DebugButton onClick={clearTimeline}>Clear timeline</DebugButton>
-					</div>
-					<div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-						<StatusPill
-							label="Timeline"
-							value={String(timelineSize)}
-						/>
-						<StatusPill
-							label="Revision"
-							value={String(runtimeRevision)}
-						/>
-						<StatusPill
-							label="Mode"
-							value={import.meta.env.MODE}
-						/>
-						<StatusPill
-							label="DPR"
-							value={String(window.devicePixelRatio)}
-						/>
+						</UiButton>
+						<UiButton onClick={clearTimeline}>Clear timeline</UiButton>
 					</div>
 					{copyState === "copied" ? (
 						<p className="mt-3 text-sm font-semibold text-emerald-300">
@@ -195,25 +146,19 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 							Copy failed. Use window.__ARKINI_BUG_REPORT__.dump() in the console.
 						</p>
 					) : null}
-					<pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-sm border border-ak-border bg-ak-surface-soft p-2 text-[0.65rem] text-ak-text-muted [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+					<pre className="mt-3 max-h-40 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-sm bg-ak-surface px-3 py-2 text-[0.7rem] leading-5 text-ak-text-muted [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 						{dumpPreview}
 					</pre>
-				</section>
+				</UiSection>
 
-				<section className="min-w-0 overflow-hidden rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
-					<div>
-						<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ak-primary">
-							Scenarios
-						</p>
-						<h2 className="mt-1 text-base font-semibold text-ak-text">
-							Load debug save
-						</h2>
-						<p className="mt-2 text-sm text-ak-text-muted">
-							Reset the runtime save into a deterministic state before reproducing an
-							animation bug. The loaded scenario is recorded into the bug report
-							timeline.
-						</p>
-					</div>
+				<UiSection
+					eyebrow="Scenarios"
+					title="Load debug save"
+				>
+					<p className="text-sm leading-6 text-ak-text-muted">
+						Reset the runtime save into a deterministic state before reproducing an
+						animation bug. The loaded scenario is recorded into the bug report timeline.
+					</p>
 					<div
 						data-ui="scenario list"
 						className="mt-3 grid gap-2"
@@ -224,12 +169,12 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 								key={scenario.id}
 								disabled={loadScenarioAction.isPending}
 								onClick={() => loadScenario(scenario.id)}
-								className="min-w-0 rounded-sm border border-ak-border bg-ak-surface-soft px-3 py-2 text-left transition hover:border-ak-border-accent hover:bg-ak-primary-soft disabled:cursor-wait disabled:opacity-60"
+								className="min-w-0 rounded-sm border border-ak-border bg-ak-surface px-3 py-2.5 text-left transition hover:border-ak-border-accent hover:bg-ak-surface-soft disabled:cursor-wait disabled:opacity-60"
 							>
 								<span className="block break-words text-sm font-bold text-ak-text">
 									{scenario.label}
 								</span>
-								<span className="mt-1 block break-words text-xs text-ak-text-muted">
+								<span className="mt-1 block break-words text-sm leading-5 text-ak-text-muted">
 									{scenario.description}
 								</span>
 							</button>
@@ -243,33 +188,30 @@ export const DevSheet: FC<DevSheet.Props> = ({ onClose }) => {
 					) : null}
 					{loadScenarioAction.isError ? (
 						<p className="mt-3 text-sm font-semibold text-rose-300">
-							Scenario load failed. Check the console; naturally, even debugging needs
-							debugging.
+							Scenario load failed. Check the console.
 						</p>
 					) : null}
-				</section>
+				</UiSection>
 
-				<section className="min-w-0 overflow-hidden rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
-					<p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ak-primary">
-						Storage reset
-					</p>
-					<div className="mt-3">
-						<DebugButton
-							tone="danger"
-							disabled={resetState === "pending"}
-							onClick={hardReset}
-						>
-							{resetState === "pending"
-								? "Dropping browser storage…"
-								: "Hard reset storage"}
-						</DebugButton>
-						{resetState === "failed" ? (
-							<p className="mt-3 text-sm text-rose-300">
-								Reset failed. Check the console.
-							</p>
-						) : null}
-					</div>
-				</section>
+				<UiSection
+					eyebrow="Storage reset"
+					title="Nuke local save"
+				>
+					<UiButton
+						tone="danger"
+						disabled={resetState === "pending"}
+						onClick={hardReset}
+					>
+						{resetState === "pending"
+							? "Dropping browser storage…"
+							: "Hard reset storage"}
+					</UiButton>
+					{resetState === "failed" ? (
+						<p className="mt-3 text-sm text-rose-300">
+							Reset failed. Check the console.
+						</p>
+					) : null}
+				</UiSection>
 			</div>
 		</section>
 	);

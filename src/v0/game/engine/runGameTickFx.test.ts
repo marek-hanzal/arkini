@@ -267,6 +267,81 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
+	it("keeps board-only product delivery atomic when only part of the output fits", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					storage: "board",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				board: {
+					height: 1,
+					width: 2,
+				},
+				title: "Test",
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.events).toEqual([
+			{
+				blockedAtMs: 1000,
+				jobId: "job:1",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				reason: "board:full",
+				type: "product.blocked",
+			},
+		]);
+		expect(result.save.producerJobs["job:1"]).toMatchObject({
+			delivery: {
+				items: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+					},
+				],
+				lastBlockedAtMs: 1000,
+				retryAtMs: 2000,
+			},
+		});
+		expect(Object.values(result.save.board.items)).toEqual([
+			expect.objectContaining({
+				itemId: "item:producer",
+			}),
+		]);
+		expect(result.save.inventory.slots).toEqual([
+			null,
+			null,
+		]);
+	});
+
 	it("retries blocked product delivery without rerolling output", () => {
 		const config = createEngineTestConfig({
 			game: {

@@ -4,9 +4,11 @@ import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { appendItemCreatedVisuals } from "~/v0/play/game-engine-visual/appendItemCreatedVisuals";
 import { appendItemMergeVisuals } from "~/v0/play/game-engine-visual/appendItemMergeVisuals";
 import { appendItemReplaceVisuals } from "~/v0/play/game-engine-visual/appendItemReplaceVisuals";
+import { appendProducerInputStoreVisuals } from "~/v0/play/game-engine-visual/appendProducerInputStoreVisuals";
 import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngineVisualPlan";
 import { createGameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { findMergeResultEventIndex } from "~/v0/play/game-engine-visual/findMergeResultEventIndex";
+import { findProducerInputStoredEventIndex } from "~/v0/play/game-engine-visual/findProducerInputStoredEventIndex";
 
 export namespace createGameEngineVisualPlan {
 	export interface Props {
@@ -58,6 +60,26 @@ export const createGameEngineVisualPlan = ({
 							previousBoard,
 							replaced: replacement,
 							source: event,
+						});
+						break;
+					}
+				}
+
+				if (event.reason === "producer-input-store") {
+					const storedIndex = findProducerInputStoredEventIndex({
+						afterIndex: index,
+						events,
+						skipped,
+						source: event,
+					});
+					const stored = events[storedIndex];
+					if (stored?.type === "producer_input.stored") {
+						skipped.add(storedIndex);
+						appendProducerInputStoreVisuals({
+							plan,
+							previousBoard,
+							source: event,
+							stored,
 						});
 						break;
 					}

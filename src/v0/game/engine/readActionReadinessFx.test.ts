@@ -56,6 +56,33 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
+	it("returns ready for a producer product action that can auto-fill from inventory", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const readiness = runReadiness({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toEqual({
+			type: "ready",
+		});
+	});
+
 	it("returns rejected readiness for a missing producer input", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

@@ -32,6 +32,7 @@ const productLine = (
 	inputItemIds: [],
 	inputs: [],
 	inputsReady: true,
+	inputsAvailable: true,
 	missingRequirementItemIds: [],
 	name: "Test product",
 	producerQueuedJobs: 0,

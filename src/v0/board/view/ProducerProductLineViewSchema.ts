@@ -17,6 +17,7 @@ export const ProducerProductLineViewSchema = z.object({
 	queuedJobs: z.number().int().nonnegative(),
 	inputs: z.array(ActivationInputViewSchema),
 	inputsReady: z.boolean(),
+	inputsAvailable: z.boolean(),
 	requirementsReady: z.boolean(),
 	missingRequirementItemIds: z.array(IdSchema),
 	startedAtMs: z.number().int().nonnegative().optional(),

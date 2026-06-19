@@ -60,7 +60,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					});
 					const canStart =
 						line.enabled &&
-						line.inputsReady &&
+						(line.inputsReady || line.inputsAvailable) &&
 						line.requirementsReady &&
 						!line.queueFull;
 					const remainingMs = line.readyAtMs
@@ -91,7 +91,13 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
 										{formatMs(line.durationMs)}
 										{line.inputItemIds.length
-											? ` · ${line.inputsReady ? "input ready" : "needs input"}`
+											? ` · ${
+													line.inputsReady
+														? "input ready"
+														: line.inputsAvailable
+															? "auto-fill ready"
+															: "needs input"
+												}`
 											: " · tap to run"}
 										{line.requirementItemIds.length
 											? ` · ${line.requirementItemIds.length} requirement${line.requirementItemIds.length === 1 ? "" : "s"}`

@@ -313,6 +313,112 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("auto-fills missing producer input from the board before starting the product", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toBeUndefined();
+		expect(result.save.producerInputs).toEqual({});
+		expect(result.events).toMatchObject([
+			{
+				from: {
+					itemInstanceId: "item-instance:2",
+					kind: "board",
+				},
+				itemId: "item:twig",
+				reason: "producer-input-store",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:twig",
+				nextQuantity: 1,
+				previousQuantity: 0,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer_input.stored",
+			},
+			{
+				productId: "product:shred",
+				type: "product.started",
+			},
+		]);
+	});
+
+	it("auto-fills missing producer input from inventory before starting the product", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 2,
+		};
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(result.save.producerInputs).toEqual({});
+		expect(result.events).toMatchObject([
+			{
+				from: {
+					kind: "inventory",
+					nextQuantity: 1,
+					previousQuantity: 2,
+					quantity: 1,
+					slotIndex: 0,
+				},
+				itemId: "item:twig",
+				reason: "producer-input-store",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:twig",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer_input.stored",
+			},
+			{
+				productId: "product:shred",
+				type: "product.started",
+			},
+		]);
+	});
+
 	it("stores producer line input from inventory and later consumes it on product start", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

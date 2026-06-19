@@ -224,6 +224,7 @@ describe("resolveBoardDropFeedback", () => {
 							},
 						],
 						inputsReady: false,
+						inputsAvailable: false,
 						missingRequirementItemIds: [],
 						name: "Test product",
 						producerQueuedJobs: 0,

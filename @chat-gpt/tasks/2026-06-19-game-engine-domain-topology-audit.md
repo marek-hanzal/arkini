@@ -1,6 +1,6 @@
 # Game engine domain topology audit
 
-Status: active audit. No runtime code changed.
+Status: active audit. First coding step done: `applyGameActionFx.test.ts` was split by domain family without runtime behavior changes.
 
 ## Problem
 
@@ -283,8 +283,21 @@ The end state should either delete `fx` or leave it only for true cross-domain E
 - `applyGameActionFx` and `readActionReadinessFx` remain action shell dispatchers, not domain rule containers.
 - Tests remain green after every domain move.
 
+## Completed first coding task
+
+`src/v0/game/engine/fx/applyGameActionFx.test.ts` has been split into domain-family files:
+
+- `applyGameActionProducerFx.test.ts`
+- `applyGameActionCraftFx.test.ts`
+- `applyGameActionStashFx.test.ts`
+- `applyGameActionStoredRequirementFx.test.ts`
+- `applyGameActionMergeRemoveFx.test.ts`
+- `applyGameActionBoardInventoryFx.test.ts`
+
+The shared test helpers live in `applyGameActionFx.testSupport.ts`.
+
 ## Current recommended next coding task
 
-Split `src/v0/game/engine/fx/applyGameActionFx.test.ts` by domain family.
+Move the producer domain from `src/v0/game/engine/fx` into a shallow `src/v0/game/engine/producer` folder.
 
-Reason: this is the largest immediate pain, has low runtime risk, and gives later production folder moves safer test anchors.
+Reason: producer has the clearest domain cluster and now has a dedicated action test anchor. Move files/imports only; no behavior changes.

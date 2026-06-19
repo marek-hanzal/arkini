@@ -21,11 +21,12 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: split `TileEngineActor.tsx` memo comparison and feedback debug effect into focused helpers.
 - `2026-06-19`: split `TileEngineSlot.tsx` long-press, feedback debug, and memo comparison into focused helpers.
 - `2026-06-19`: split `createGameEngineVisualPlan.ts` into event-family visual mappers; visual planning remains a GameEvent output interpreter, not gameplay logic.
+- `2026-06-19`: split giant `applyGameActionFx.test.ts` into domain-family action tests; this anchors future engine domain moves.
 
 ## Next candidates
 
-1. Game engine domain topology cleanup: audit completed in `2026-06-19-game-engine-domain-topology-audit.md`. Next safest coding task is splitting `src/v0/game/engine/fx/applyGameActionFx.test.ts` by domain family before moving production files.
-2. Engine `fx` folder production reshaping: after test split, move one domain at a time from the `fx` megabucket into shallow domain folders. Start with producer, then craft/stash. No behavior changes.
+1. Engine `fx` folder production reshaping: test anchors are now split by domain family. Next safest coding task is moving producer files from the `fx` megabucket into a shallow `engine/producer` folder. No behavior changes.
+2. Continue production reshaping domain-by-domain after producer: craft, stash, placement, action shell/readiness. Keep folder depth shallow and move only coherent domain clusters.
 3. TileEngine follow-up: current browser feel is acceptable. Do not split `TileMotionRuntime.ts` just for line count.
 4. GameEventSchema audit: only if event schema starts carrying behavior. It is an intentional output-event contract and should not be split just for line count.
 

@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { countPassiveItemQuantityFx } from "~/v0/game/requirements/countPassiveItemQuantityFx";
+import { checkProximityRequirementFx } from "~/v0/game/requirements/checkProximityRequirementFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -12,6 +13,7 @@ export namespace checkGameRequirementsFx {
 		save: GameSave;
 		requirements: readonly GameRequirement[];
 		storedItems?: ReadonlyMap<string, number>;
+		targetItemInstanceId?: string;
 	}
 }
 
@@ -20,6 +22,7 @@ export const checkGameRequirementsFx = Effect.fn("checkGameRequirementsFx")(func
 	save,
 	requirements,
 	storedItems,
+	targetItemInstanceId,
 }: checkGameRequirementsFx.Props) {
 	for (const requirement of requirements) {
 		yield* match(requirement)
@@ -68,6 +71,18 @@ export const checkGameRequirementsFx = Effect.fn("checkGameRequirementsFx")(func
 								),
 							);
 						}
+					}),
+			)
+			.with(
+				{
+					type: "proximity",
+				},
+				(proximityRequirement) =>
+					checkProximityRequirementFx({
+						distance: proximityRequirement.distance,
+						itemIds: proximityRequirement.itemIds,
+						save,
+						targetItemInstanceId,
 					}),
 			)
 			.exhaustive();

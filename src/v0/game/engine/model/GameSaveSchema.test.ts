@@ -277,23 +277,24 @@ describe("GameSaveConfigSchema", () => {
 	});
 
 	it("rejects stored requirements above their target capacity", () => {
+		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:key-storage": {
+					capacity: 1,
+					itemId: "item:key",
+					quantity: 1,
+					type: "stored",
+				},
+			},
 			producers: {
+				...baseConfig.producers,
 				"producer:test": {
-					maxQueueSize: 1,
-					productIds: [
-						"product:test",
-						"product:shred",
+					...baseConfig.producers["producer:test"],
+					requirementIds: [
+						"requirement:key-storage",
 					],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:key",
-							quantity: 1,
-							type: "stored",
-						},
-					],
-					type: "producer",
 				},
 			},
 		});

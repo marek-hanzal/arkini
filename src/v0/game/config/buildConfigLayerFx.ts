@@ -30,13 +30,24 @@ export const buildConfigLayerFx = Effect.fn("buildConfigLayerFx")(function* ({
 
 		for (const tier of upgrade.tiers.slice(0, completedTiers)) {
 			for (const effect of tier.effects) {
-				if (effect.type === "producer.maxQueueSize.add") {
+				if (
+					effect.type === "producer.maxQueueSize.add" ||
+					effect.type === "producer.requirementIds.set"
+				) {
 					const baseProducer = config.producers[effect.producerId];
 					if (!baseProducer) {
 						continue;
 					}
 
 					const producerLayer = (layer.producers[effect.producerId] ??= {});
+
+					if (effect.type === "producer.requirementIds.set") {
+						producerLayer.requirementIds = [
+							...effect.requirementIds,
+						];
+						continue;
+					}
+
 					producerLayer.maxQueueSize =
 						(producerLayer.maxQueueSize ?? baseProducer.maxQueueSize) + effect.quantity;
 					continue;
@@ -60,6 +71,12 @@ export const buildConfigLayerFx = Effect.fn("buildConfigLayerFx")(function* ({
 
 				if (effect.type === "product.inputRef.set") {
 					productLayer.inputRefId = effect.inputRefId;
+				}
+
+				if (effect.type === "product.requirementIds.set") {
+					productLayer.requirementIds = [
+						...effect.requirementIds,
+					];
 				}
 
 				if (effect.type === "product.input.quantity.add") {

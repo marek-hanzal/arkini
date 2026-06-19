@@ -2718,7 +2718,7 @@
 			"productIds": [
 				"product:coal-mine-1"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:lumber-camp-1": {
@@ -2726,7 +2726,9 @@
 			"productIds": [
 				"product:lumber-camp-1"
 			],
-			"requirements": [],
+			"requirementIds": [
+				"requirement:lumber-camp-1-near-tree"
+			],
 			"type": "producer"
 		},
 		"producer:lumber-camp-2": {
@@ -2734,7 +2736,7 @@
 			"productIds": [
 				"product:lumber-camp-2"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:lumber-camp-3": {
@@ -2742,7 +2744,7 @@
 			"productIds": [
 				"product:lumber-camp-3"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:lumber-camp-4": {
@@ -2750,7 +2752,7 @@
 			"productIds": [
 				"product:lumber-camp-4"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:lumber-camp-5": {
@@ -2758,7 +2760,7 @@
 			"productIds": [
 				"product:lumber-camp-5"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:quarry-1": {
@@ -2766,7 +2768,7 @@
 			"productIds": [
 				"product:quarry-1"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:quarry-2": {
@@ -2774,7 +2776,7 @@
 			"productIds": [
 				"product:quarry-2"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:quarry-3": {
@@ -2782,7 +2784,7 @@
 			"productIds": [
 				"product:quarry-3"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:quarry-4": {
@@ -2790,7 +2792,7 @@
 			"productIds": [
 				"product:quarry-4"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:quarry-5": {
@@ -2798,7 +2800,7 @@
 			"productIds": [
 				"product:quarry-5"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:townhall-1": {
@@ -2806,7 +2808,7 @@
 			"productIds": [
 				"product:townhall-1"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:townhall-2": {
@@ -2814,7 +2816,7 @@
 			"productIds": [
 				"product:townhall-2"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:townhall-3": {
@@ -2822,7 +2824,7 @@
 			"productIds": [
 				"product:townhall-3"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:townhall-4": {
@@ -2830,7 +2832,7 @@
 			"productIds": [
 				"product:townhall-4"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:townhall-5": {
@@ -2838,7 +2840,7 @@
 			"productIds": [
 				"product:townhall-5"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:tree": {
@@ -2846,7 +2848,7 @@
 			"productIds": [
 				"product:tree"
 			],
-			"requirements": [],
+			"requirementIds": [],
 			"type": "producer"
 		}
 	},
@@ -2857,119 +2859,135 @@
 			"name": "Coal Mine I Production",
 			"outputTableId": "loot:coal-mine-1",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:lumber-camp-1": {
 			"durationMs": 5000,
 			"name": "Lumber Camp I Production",
 			"outputTableId": "loot:lumber-camp-1",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:lumber-camp-2": {
 			"durationMs": 4500,
 			"name": "Lumber Camp II Production",
 			"outputTableId": "loot:lumber-camp-2",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:lumber-camp-3": {
 			"durationMs": 4000,
 			"name": "Lumber Camp III Production",
 			"outputTableId": "loot:lumber-camp-3",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:lumber-camp-4": {
 			"durationMs": 3600,
 			"name": "Lumber Camp IV Production",
 			"outputTableId": "loot:lumber-camp-4",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:lumber-camp-5": {
 			"durationMs": 3200,
 			"name": "Lumber Camp V Production",
 			"outputTableId": "loot:lumber-camp-5",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:quarry-1": {
 			"durationMs": 5500,
 			"name": "Quarry I Production",
 			"outputTableId": "loot:quarry-1",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:quarry-2": {
 			"durationMs": 5000,
 			"name": "Quarry II Production",
 			"outputTableId": "loot:quarry-2",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:quarry-3": {
 			"durationMs": 4500,
 			"name": "Quarry III Production",
 			"outputTableId": "loot:quarry-3",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:quarry-4": {
 			"durationMs": 4100,
 			"name": "Quarry IV Production",
 			"outputTableId": "loot:quarry-4",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:quarry-5": {
 			"durationMs": 3700,
 			"name": "Quarry V Production",
 			"outputTableId": "loot:quarry-5",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:townhall-1": {
 			"durationMs": 3500,
 			"name": "Town Hall I Production",
 			"outputTableId": "loot:townhall-1",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:townhall-2": {
 			"durationMs": 3000,
 			"name": "Town Hall II Production",
 			"outputTableId": "loot:townhall-2",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:townhall-3": {
 			"durationMs": 2500,
 			"name": "Town Hall III Production",
 			"outputTableId": "loot:townhall-3",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:townhall-4": {
 			"durationMs": 2200,
 			"name": "Town Hall IV Production",
 			"outputTableId": "loot:townhall-4",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:townhall-5": {
 			"durationMs": 1900,
 			"name": "Town Hall V Production",
 			"outputTableId": "loot:townhall-5",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"product:tree": {
 			"durationMs": 6200,
 			"name": "Tree Production",
 			"outputTableId": "loot:tree",
 			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
+		}
+	},
+	"requirements": {
+		"requirement:lumber-camp-1-near-tree": {
+			"distance": 1,
+			"itemIds": [
+				"item:tree"
+			],
+			"type": "proximity"
+		},
+		"requirement:lumber-camp-1-near-tree-2": {
+			"distance": 2,
+			"itemIds": [
+				"item:tree"
+			],
+			"type": "proximity"
 		}
 	},
 	"startingState": {
@@ -2993,6 +3011,11 @@
 				"itemId": "item:coal-mine-1",
 				"x": 3,
 				"y": 6
+			},
+			{
+				"itemId": "item:tree",
+				"x": 2,
+				"y": 3
 			}
 		],
 		"inventory": [
@@ -3107,6 +3130,48 @@
 							"productId": "product:lumber-camp-1",
 							"tableId": "loot:lumber-camp-1:better-2",
 							"type": "product.outputTable.set"
+						}
+					]
+				}
+			]
+		},
+		"upgrade:lumber-camp-1-reach": {
+			"code": "lumber-camp-1-reach",
+			"description": "Lets the first lumber camp work with a slightly less clingy forest requirement.",
+			"name": "Lumber Camp I Forest Reach",
+			"sort": 15,
+			"tiers": [
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 1
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"producerId": "producer:lumber-camp-1",
+							"requirementIds": [
+								"requirement:lumber-camp-1-near-tree-2"
+							],
+							"type": "producer.requirementIds.set"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"producerId": "producer:lumber-camp-1",
+							"requirementIds": [],
+							"type": "producer.requirementIds.set"
 						}
 					]
 				}

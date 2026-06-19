@@ -56,11 +56,23 @@ const describeRuntimeUpgradeEffect = ({
 		return `${product?.name ?? effect.productId}: input ${input?.name ?? effect.inputRefId}`;
 	}
 
+	if (effect.type === "product.requirementIds.set") {
+		const product = config.products[effect.productId];
+		return `${product?.name ?? effect.productId}: ${describeRequirementIds(effect.requirementIds)}`;
+	}
+
+	if (effect.type === "producer.requirementIds.set") {
+		return `${effect.producerId}: ${describeRequirementIds(effect.requirementIds)}`;
+	}
+
 	const product = config.products[effect.productId];
 	const item = config.items[effect.itemId];
 	const sign = effect.quantity < 0 ? "-" : "+";
 	return `${product?.name ?? effect.productId}: ${sign}${Math.abs(effect.quantity)} ${item?.name ?? effect.itemId}`;
 };
+
+const describeRequirementIds = (requirementIds: readonly string[]) =>
+	requirementIds.length ? `requirements ${requirementIds.length}` : "requirements removed";
 
 export const readRuntimeUpgradeListViewFromGameSave = ({
 	config,

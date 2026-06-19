@@ -3,6 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
 export namespace readStoredRequirementSlotsFx {
 	export interface Props {
@@ -46,7 +47,12 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 			);
 		}
 
-		requirements.push(...producer.requirements);
+		requirements.push(
+			...resolveGameRequirements({
+				config,
+				requirementIds: producer.requirementIds,
+			}),
+		);
 		for (const productId of producer.productIds) {
 			const product = config.products[productId];
 			if (!product) {
@@ -56,7 +62,12 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 					),
 				);
 			}
-			requirements.push(...product.requirements);
+			requirements.push(
+				...resolveGameRequirements({
+					config,
+					requirementIds: product.requirementIds,
+				}),
+			);
 		}
 	}
 

@@ -28,6 +28,7 @@ export const applyConfigLayerFx = Effect.fn("applyConfigLayerFx")(function* ({
 				{
 					...producer,
 					maxQueueSize: producerLayer.maxQueueSize ?? producer.maxQueueSize,
+					requirementIds: producerLayer.requirementIds ?? producer.requirementIds,
 				},
 			];
 		}),
@@ -50,6 +51,7 @@ export const applyConfigLayerFx = Effect.fn("applyConfigLayerFx")(function* ({
 					durationMs: productLayer.durationMs ?? product.durationMs,
 					inputRefId: productLayer.inputRefId ?? product.inputRefId,
 					outputTableId: productLayer.outputTableId ?? product.outputTableId,
+					requirementIds: productLayer.requirementIds ?? product.requirementIds,
 				},
 			];
 		}),

@@ -13,17 +13,21 @@ describe("applyGameActionFx StoredRequirement", () => {
 	it("stores producer requirements on the producer item before product start", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:producer-axe": {
+					capacity: 1,
+					itemId: "item:axe",
+					quantity: 1,
+					type: "stored",
+				},
+			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
 					...baseConfig.producers["producer:test"],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:axe",
-							quantity: 1,
-							type: "stored",
-						},
+					requirementIds: [
+						"requirement:producer-axe",
 					],
 				},
 			},
@@ -105,17 +109,21 @@ describe("applyGameActionFx StoredRequirement", () => {
 	it("rejects producer products while stored requirements are missing", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:producer-axe": {
+					capacity: 1,
+					itemId: "item:axe",
+					quantity: 1,
+					type: "stored",
+				},
+			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
 					...baseConfig.producers["producer:test"],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:axe",
-							quantity: 1,
-							type: "stored",
-						},
+					requirementIds: [
+						"requirement:producer-axe",
 					],
 				},
 			},
@@ -149,17 +157,21 @@ describe("applyGameActionFx StoredRequirement", () => {
 	it("withdraws stored requirements back into inventory", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:producer-axe": {
+					capacity: 1,
+					itemId: "item:axe",
+					quantity: 1,
+					type: "stored",
+				},
+			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
 					...baseConfig.producers["producer:test"],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:axe",
-							quantity: 1,
-							type: "stored",
-						},
+					requirementIds: [
+						"requirement:producer-axe",
 					],
 				},
 			},

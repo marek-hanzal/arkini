@@ -16,6 +16,14 @@ export const ActivationRequirementViewSchema = z.discriminatedUnion("type", [
 		capacity: z.number().int().nonnegative(),
 		stored: z.number().int().nonnegative(),
 	}),
+	z.object({
+		type: z.literal("proximity"),
+		itemIds: z.array(GameItemIdSchema),
+		distance: z.number().int().positive(),
+		satisfied: z.boolean(),
+		matchedItemId: GameItemIdSchema.optional(),
+		matchedDistance: z.number().int().nonnegative().optional(),
+	}),
 ]);
 
 type ActivationRequirementViewSchema = typeof ActivationRequirementViewSchema;

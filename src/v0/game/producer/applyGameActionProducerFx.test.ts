@@ -51,6 +51,131 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
+	it("accepts producer proximity requirements from diagonal neighbors", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 2,
+					width: 2,
+				},
+			},
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:near-twig": {
+					distance: 1,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"producer:test": {
+					...baseConfig.producers["producer:test"],
+					requirementIds: [
+						"requirement:near-twig",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 1,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result.events).toMatchObject([
+			{
+				type: "product.started",
+			},
+		]);
+	});
+
+	it("rejects missing product proximity requirements", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 2,
+					width: 2,
+				},
+			},
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:near-twig": {
+					distance: 1,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					requirementIds: [
+						"requirement:near-twig",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "missing_requirement",
+			});
+		}
+	});
+
 	it("consumes explicit inventory inputs at product start", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -390,17 +515,21 @@ describe("applyGameActionFx Producer", () => {
 	it("accepts passive requirements from inventory", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:twig-passive": {
+					itemId: "item:twig",
+					quantity: 1,
+					scope: "board_or_inventory",
+					type: "passive",
+				},
+			},
 			products: {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					requirements: [
-						{
-							itemId: "item:twig",
-							quantity: 1,
-							scope: "board_or_inventory",
-							type: "passive",
-						},
+					requirementIds: [
+						"requirement:twig-passive",
 					],
 				},
 			},
@@ -436,17 +565,21 @@ describe("applyGameActionFx Producer", () => {
 	it("fails through the typed error channel when a passive requirement is missing", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:twig-passive": {
+					itemId: "item:twig",
+					quantity: 1,
+					scope: "inventory",
+					type: "passive",
+				},
+			},
 			products: {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					requirements: [
-						{
-							itemId: "item:twig",
-							quantity: 1,
-							scope: "inventory",
-							type: "passive",
-						},
+					requirementIds: [
+						"requirement:twig-passive",
 					],
 				},
 			},

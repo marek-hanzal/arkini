@@ -2,12 +2,14 @@ import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
+import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
 	readRuntimeMissingRequirementItemIdsFromGameSave,
+	readRuntimeRequirementsReadyFromGameSave,
 } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 
 export namespace readRuntimeProducerActivationViewFromGameSave {
@@ -62,7 +64,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	config,
 	maxQueueSize,
 	nowMs,
-	producerRequirements,
+	producerRequirementIds,
 	productIds,
 	save,
 	targetItemInstanceId,
@@ -70,7 +72,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	config: GameConfig;
 	maxQueueSize: number;
 	nowMs: number;
-	producerRequirements: GameConfig["producers"][string]["requirements"];
+	producerRequirementIds: GameConfig["producers"][string]["requirementIds"];
 	productIds: readonly string[];
 	save: GameSave;
 	targetItemInstanceId: string;
@@ -84,14 +86,35 @@ const readRuntimeProductLineViewsFromGameSave = ({
 		const product = config.products[productId];
 		if (!product) return [];
 
-		const requirements = [
-			...producerRequirements,
-			...product.requirements,
-		];
+		const requirements = resolveGameRequirements({
+			config,
+			requirementIds: [
+				...producerRequirementIds,
+				...product.requirementIds,
+			],
+		});
+		const requirementViews = readRuntimeActivationRequirementViewsFromGameSave({
+			requirements,
+			save,
+			targetItemInstanceId,
+		});
 		const requirementItemIds = [
-			...new Set(requirements.map((requirement) => requirement.itemId as ItemId)),
+			...new Set(
+				requirements.flatMap((requirement) =>
+					requirement.type === "proximity"
+						? requirement.itemIds.map((itemId) => itemId as ItemId)
+						: [
+								requirement.itemId as ItemId,
+							],
+				),
+			),
 		];
 		const missingRequirements = readRuntimeMissingRequirementItemIdsFromGameSave({
+			requirements,
+			save,
+			targetItemInstanceId,
+		});
+		const requirementsReady = readRuntimeRequirementsReadyFromGameSave({
 			requirements,
 			save,
 			targetItemInstanceId,
@@ -157,7 +180,8 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				queuedJobs: jobs.length,
 				readyAtMs: activeJob?.completesAtMs,
 				requirementItemIds,
-				requirementsReady: missingRequirements.length === 0,
+				requirements: requirementViews,
+				requirementsReady,
 				startedAtMs: activeJob?.startedAtMs,
 			},
 		];
@@ -196,25 +220,22 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 			config,
 			maxQueueSize: producer.maxQueueSize,
 			nowMs,
-			producerRequirements: producer.requirements,
+			producerRequirementIds: producer.requirementIds,
 			productIds: producer.productIds,
 			save,
 			targetItemInstanceId: boardItem.id,
 		}),
-		requirements: [
-			...readRuntimeActivationRequirementViewsFromGameSave({
-				requirements: producer.requirements,
-				save,
-				targetItemInstanceId: boardItem.id,
+		requirements: readRuntimeActivationRequirementViewsFromGameSave({
+			requirements: resolveGameRequirements({
+				config,
+				requirementIds: [
+					...producer.requirementIds,
+					...(selectedProduct?.requirementIds ?? []),
+				],
 			}),
-			...(selectedProduct
-				? readRuntimeActivationRequirementViewsFromGameSave({
-						requirements: selectedProduct.requirements,
-						save,
-						targetItemInstanceId: boardItem.id,
-					})
-				: []),
-		],
+			save,
+			targetItemInstanceId: boardItem.id,
+		}),
 		trigger: "click",
 	};
 };

@@ -20,6 +20,11 @@
 				"itemId": "item:coal-mine-1",
 				"x": 3,
 				"y": 6
+			},
+			{
+				"itemId": "item:tree",
+				"x": 2,
+				"y": 3
 			}
 		],
 		"inventory": [

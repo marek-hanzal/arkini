@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
+import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProducerProductLineEnabledFx";
@@ -83,15 +84,23 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 
 	yield* checkGameRequirementsFx({
 		config,
-		requirements: producerDefinition.requirements,
+		requirements: resolveGameRequirements({
+			config,
+			requirementIds: producerDefinition.requirementIds,
+		}),
 		save,
 		storedItems,
+		targetItemInstanceId: action.producerItemInstanceId,
 	});
 	yield* checkGameRequirementsFx({
 		config,
-		requirements: product.requirements,
+		requirements: resolveGameRequirements({
+			config,
+			requirementIds: product.requirementIds,
+		}),
 		save,
 		storedItems,
+		targetItemInstanceId: action.producerItemInstanceId,
 	});
 	yield* match(product.placement)
 		.with("board_then_inventory", () => Effect.void)

@@ -15,6 +15,14 @@ type TestActivationRequirement =
 			type: "passive";
 	  };
 
+type TestGameRequirement =
+	| TestActivationRequirement
+	| {
+			distance: number;
+			itemIds: string[];
+			type: "proximity";
+	  };
+
 type TestProductInput = {
 	capacity: number;
 	consume: boolean;
@@ -28,7 +36,7 @@ type TestProduct = {
 	name: string;
 	outputTableId?: string;
 	placement: "board_then_inventory";
-	requirements: TestActivationRequirement[];
+	requirementIds: string[];
 };
 
 type TestCraftRecipe = {
@@ -60,9 +68,19 @@ type TestUpgradeEffect =
 			type: "product.inputRef.set";
 	  }
 	| {
+			productId: string;
+			requirementIds: string[];
+			type: "product.requirementIds.set";
+	  }
+	| {
 			producerId: string;
 			quantity: number;
 			type: "producer.maxQueueSize.add";
+	  }
+	| {
+			producerId: string;
+			requirementIds: string[];
+			type: "producer.requirementIds.set";
 	  };
 
 type TestUpgrade = {
@@ -152,13 +170,14 @@ const createValidConfigValue = () => ({
 		},
 	},
 	merge: {},
+	requirements: {} as Record<string, TestGameRequirement>,
 	producers: {
 		"producer:test": {
 			maxQueueSize: 1,
 			productIds: [
 				"product:test",
 			],
-			requirements: [] as TestActivationRequirement[],
+			requirementIds: [] as string[],
 			type: "producer",
 		},
 	},
@@ -197,7 +216,7 @@ const createValidConfigValue = () => ({
 			name: "Test product",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
-			requirements: [] as TestActivationRequirement[],
+			requirementIds: [] as string[],
 		},
 	} as Record<string, TestProduct>,
 	lootTables: {
@@ -322,7 +341,7 @@ describe("GameConfigSchema", () => {
 				{
 					maxQueueSize: number;
 					productIds: string[];
-					requirements: TestActivationRequirement[];
+					requirementIds: string[];
 					type: string;
 				}
 			>
@@ -331,7 +350,7 @@ describe("GameConfigSchema", () => {
 			productIds: [
 				"product:test",
 			],
-			requirements: [],
+			requirementIds: [],
 			type: "producer",
 		};
 
@@ -451,34 +470,43 @@ describe("GameConfigSchema", () => {
 
 	it("rejects stored requirements with capacity below required quantity", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].requirements.push({
+		config.requirements["requirement:bad-stored"] = {
 			capacity: 1,
 			itemId: "item:twig",
 			quantity: 2,
 			type: "stored",
-		});
+		};
 
 		expect(() => parseGameConfig(config)).toThrow(/Capacity must be >= quantity/);
 	});
 
-	it("rejects duplicate passive requirements in the same scope", () => {
+	it("rejects duplicate requirement ids on product lines", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].requirements.push(
-			{
-				itemId: "item:twig",
-				quantity: 1,
-				scope: "board",
-				type: "passive",
-			},
-			{
-				itemId: "item:twig",
-				quantity: 2,
-				scope: "board",
-				type: "passive",
-			},
+		config.requirements["requirement:twig-passive"] = {
+			itemId: "item:twig",
+			quantity: 1,
+			scope: "board",
+			type: "passive",
+		};
+		config.products["product:test"].requirementIds.push(
+			"requirement:twig-passive",
+			"requirement:twig-passive",
 		);
 
-		expect(() => parseGameConfig(config)).toThrow(/Duplicate requirement/);
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate requirement id/);
+	});
+
+	it("rejects proximity requirements that point at missing items", () => {
+		const config = createValidConfigValue();
+		config.requirements["requirement:near-ghost"] = {
+			distance: 1,
+			itemIds: [
+				"item:ghost",
+			],
+			type: "proximity",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
 	});
 
 	it("rejects upgrade prefixes that reduce product duration to zero", () => {

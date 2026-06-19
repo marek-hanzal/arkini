@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
 import { formatMs } from "~/v0/time/formatMs";
@@ -16,6 +17,23 @@ export namespace ItemProducerProductLinesCard {
 		onWithdrawInput(productId: string, itemId: string): void;
 	}
 }
+
+const readRequirementLabel = (requirement: ActivationRequirementView) => {
+	if (requirement.type === "proximity") {
+		const itemLabel = requirement.itemIds
+			.map((itemId) => itemId.replace(/^item:/, ""))
+			.join(" / ");
+
+		return `${itemLabel} within ${requirement.distance}`;
+	}
+
+	return `${requirement.itemId.replace(/^item:/, "")} ${requirement.stored}/${requirement.quantity}`;
+};
+
+const readRequirementReady = (requirement: ActivationRequirementView) =>
+	requirement.type === "proximity"
+		? requirement.satisfied
+		: requirement.stored >= requirement.quantity;
 
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
 	lines,
@@ -79,6 +97,26 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									{line.enabled ? "On" : "Off"}
 								</UiButton>
 							</div>
+
+							{line.requirements?.length ? (
+								<div className="mt-2.5 grid gap-1.5">
+									{line.requirements.map((requirement, requirementIndex) => (
+										<div
+											key={`${requirementIndex}:${readRequirementLabel(requirement)}`}
+											className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
+										>
+											<span className="min-w-0 truncate font-semibold text-ak-text">
+												{readRequirementLabel(requirement)}
+											</span>
+											<span className="ml-auto shrink-0 text-ak-text-muted">
+												{readRequirementReady(requirement)
+													? "ready"
+													: "missing"}
+											</span>
+										</div>
+									))}
+								</div>
+							) : null}
 
 							{line.inputs.length ? (
 								<div className="mt-2.5 grid gap-1.5">
@@ -151,7 +189,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								{line.queueFull
 									? "Queue full"
 									: !line.requirementsReady
-										? "Drag requirements in"
+										? "Requirements missing"
 										: !line.inputsReady
 											? "Feed items by drag"
 											: "Start"}

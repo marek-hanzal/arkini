@@ -255,6 +255,48 @@
 					]
 				}
 			]
+		},
+		"upgrade:lumber-camp-1-reach": {
+			"code": "lumber-camp-1-reach",
+			"description": "Lets the first lumber camp work with a slightly less clingy forest requirement.",
+			"name": "Lumber Camp I Forest Reach",
+			"sort": 15,
+			"tiers": [
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 1
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"producerId": "producer:lumber-camp-1",
+							"requirementIds": [
+								"requirement:lumber-camp-1-near-tree-2"
+							],
+							"type": "producer.requirementIds.set"
+						}
+					]
+				},
+				{
+					"cost": [
+						{
+							"itemId": "item:coin-stack",
+							"quantity": 2
+						}
+					],
+					"durationMs": 6000,
+					"effects": [
+						{
+							"producerId": "producer:lumber-camp-1",
+							"requirementIds": [],
+							"type": "producer.requirementIds.set"
+						}
+					]
+				}
+			]
 		}
 	}
 }

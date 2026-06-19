@@ -33,8 +33,10 @@ import { z } from "zod";
  * - Activation inputs always say whether they are consumed. Product-line/stash/craft
  *   code must not guess this from context, because guessing is just a bug wearing a hat.
  * - Passive requirements always declare their search scope (`board`, `inventory`, or
- *   `board_or_inventory`). They model global knowledge/permission/ownership gates, not
- *   spatial adjacency or aura rules.
+ *   `board_or_inventory`). They model global knowledge/permission/ownership gates.
+ * - Producer/product requirements are referenced through central `requirements` entries by
+ *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
+ *   includes diagonals around the target tile.
  * - Producer `productIds` are ordered production lines. Product definitions are owned by
  *   exactly one producer line; upgrades target that producer/product-line definition, not
  *   concrete runtime instances. Producer shells do not own inputs; product lines reference
@@ -71,6 +73,19 @@ import { z } from "zod";
  *       "withItemId": "item:twig",
  *       "resultItemId": "item:stick"
  *     }
+ *   },
+ *   "requirements": {
+ *     "requirement:lumber-camp.near-tree": {
+ *       "type": "proximity",
+ *       "itemIds": ["item:tree"],
+ *       "distance": 1
+ *     },
+ *     "requirement:saw-license": {
+ *       "type": "passive",
+ *       "itemId": "item:saw-license",
+ *       "quantity": 1,
+ *       "scope": "board_or_inventory"
+ *     }
  *   }
  * }
  * ```
@@ -84,7 +99,7 @@ import { z } from "zod";
  *       "type": "producer",
  *       "maxQueueSize": 1,
  *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
- *       "requirements": []
+ *       "requirementIds": ["requirement:lumber-camp.near-tree"]
  *     }
  *   },
  *   "inputs": {
@@ -99,9 +114,7 @@ import { z } from "zod";
  *       "durationMs": 5000,
  *       "placement": "board_then_inventory",
  *       "inputRefId": "input:lumber-camp.saw",
- *       "requirements": [
- *         { "type": "passive", "itemId": "item:saw-license", "quantity": 1, "scope": "board_or_inventory" }
- *       ],
+ *       "requirementIds": ["requirement:saw-license"],
  *       "outputTableId": "loot:lumber-camp.saw"
  *     }
  *   }
@@ -212,6 +225,25 @@ const ActivationRequirementSchema = z.array(
 		PassiveItemRequirementSchema,
 	]),
 );
+
+/**
+ * Proximity requirement gates a producer/product by nearby board items.
+ * Distance uses Chebyshev grid radius, so distance 1 includes diagonals.
+ */
+const ProximityItemRequirementSchema = z
+	.object({
+		type: z.literal("proximity"),
+		itemIds: z.array(IdSchema).min(1),
+		distance: PositiveIntegerSchema,
+	})
+	.strict();
+
+/** Central reusable requirement table entry referenced by producer/product requirementIds. */
+const GameRequirementDefinitionSchema = z.discriminatedUnion("type", [
+	StoredItemRequirementSchema,
+	PassiveItemRequirementSchema,
+	ProximityItemRequirementSchema,
+]);
 
 /**
  * Loot output model.
@@ -355,7 +387,7 @@ const ProducerDefinitionSchema = z
 		type: z.literal("producer"),
 		maxQueueSize: PositiveIntegerSchema,
 		productIds: z.array(IdSchema).min(1),
-		requirements: ActivationRequirementSchema,
+		requirementIds: z.array(IdSchema),
 	})
 	.strict();
 
@@ -414,7 +446,7 @@ const ProductDefinitionSchema = z
 		durationMs: PositiveIntegerSchema,
 		placement: PlacementSchema,
 		inputRefId: IdSchema.optional(),
-		requirements: ActivationRequirementSchema,
+		requirementIds: z.array(IdSchema),
 		outputTableId: IdSchema.optional(),
 	})
 	.strict();
@@ -427,6 +459,8 @@ const UpgradeCostDefinitionSchema = z
 	.strict();
 
 /** Upgrade effects intentionally target product lines, not producer tiles. */
+const RequirementIdsReplaceSchema = z.array(IdSchema);
+
 const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
 	z
 		.object({
@@ -459,9 +493,23 @@ const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
+			type: z.literal("product.requirementIds.set"),
+			productId: IdSchema,
+			requirementIds: RequirementIdsReplaceSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("producer.maxQueueSize.add"),
 			producerId: IdSchema,
 			quantity: SignedIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("producer.requirementIds.set"),
+			producerId: IdSchema,
+			requirementIds: RequirementIdsReplaceSchema,
 		})
 		.strict(),
 ]);
@@ -520,6 +568,7 @@ const GameConfigFragmentSchema = z
 		items: z.record(IdSchema, ItemDefinitionSchema).optional(),
 		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
 		inputs: z.record(IdSchema, ProductInputDefinitionSchema).optional(),
+		requirements: z.record(IdSchema, GameRequirementDefinitionSchema).optional(),
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema).optional(),
@@ -540,6 +589,7 @@ const BaseGameConfigSchema = z
 		items: z.record(IdSchema, ItemDefinitionSchema),
 		merge: z.record(IdSchema, MergeDefinitionSchema),
 		inputs: z.record(IdSchema, ProductInputDefinitionSchema),
+		requirements: z.record(IdSchema, GameRequirementDefinitionSchema),
 		producers: z.record(IdSchema, ProducerDefinitionSchema),
 		stashes: z.record(IdSchema, StashDefinitionSchema),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema),
@@ -564,6 +614,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasItem = createRecordGuard(value.items);
 	const hasMerge = createRecordGuard(value.merge);
 	const hasInput = createRecordGuard(value.inputs);
+	const hasRequirement = createRecordGuard(value.requirements);
 	const hasProducer = createRecordGuard(value.producers);
 	const hasProduct = createRecordGuard(value.products);
 	const hasStash = createRecordGuard(value.stashes);
@@ -767,6 +818,18 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		);
 	}
 
+	for (const [requirementId, requirement] of Object.entries(value.requirements)) {
+		validateGameRequirement(
+			ctx,
+			[
+				"requirements",
+				requirementId,
+			],
+			requirement,
+			hasItem,
+		);
+	}
+
 	for (const [producerId, producer] of Object.entries(value.producers)) {
 		validateUniqueStringList(
 			ctx,
@@ -794,15 +857,15 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			}
 		}
 
-		validateItemRequirements(
+		validateRequirementIds(
 			ctx,
 			[
 				"producers",
 				producerId,
-				"requirements",
+				"requirementIds",
 			],
-			producer.requirements,
-			hasItem,
+			producer.requirementIds,
+			hasRequirement,
 		);
 	}
 
@@ -914,15 +977,15 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`Missing input "${product.inputRefId}".`,
 			);
 		}
-		validateItemRequirements(
+		validateRequirementIds(
 			ctx,
 			[
 				"products",
 				productId,
-				"requirements",
+				"requirementIds",
 			],
-			product.requirements,
-			hasItem,
+			product.requirementIds,
+			hasRequirement,
 		);
 
 		if (product.outputTableId && !hasLootTable(product.outputTableId)) {
@@ -959,7 +1022,10 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			}
 
 			for (const [effectIndex, effect] of tier.effects.entries()) {
-				if (effect.type === "producer.maxQueueSize.add") {
+				if (
+					effect.type === "producer.maxQueueSize.add" ||
+					effect.type === "producer.requirementIds.set"
+				) {
 					if (!hasProducer(effect.producerId)) {
 						addIssue(
 							ctx,
@@ -973,6 +1039,22 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 								"producerId",
 							],
 							`Missing producer "${effect.producerId}".`,
+						);
+					}
+					if (effect.type === "producer.requirementIds.set") {
+						validateRequirementIds(
+							ctx,
+							[
+								"upgrades",
+								upgradeId,
+								"tiers",
+								tierIndex,
+								"effects",
+								effectIndex,
+								"requirementIds",
+							],
+							effect.requirementIds,
+							hasRequirement,
 						);
 					}
 					continue;
@@ -1024,6 +1106,23 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 							"inputRefId",
 						],
 						`Missing input "${effect.inputRefId}".`,
+					);
+				}
+
+				if (effect.type === "product.requirementIds.set") {
+					validateRequirementIds(
+						ctx,
+						[
+							"upgrades",
+							upgradeId,
+							"tiers",
+							tierIndex,
+							"effects",
+							effectIndex,
+							"requirementIds",
+						],
+						effect.requirementIds,
+						hasRequirement,
 					);
 				}
 
@@ -1304,9 +1403,11 @@ type EffectiveUpgradeProductState = {
 	durationMs: number;
 	inputRefId?: string;
 	inputQuantities: Record<string, number>;
+	requirementIds: string[];
 };
 type EffectiveUpgradeProducerState = {
 	maxQueueSize: number;
+	requirementIds: string[];
 };
 type EffectiveUpgradeState = {
 	producers: Record<string, EffectiveUpgradeProducerState>;
@@ -1323,6 +1424,9 @@ const createEffectiveUpgradeState = (config: EffectiveUpgradeConfig): EffectiveU
 			producerId,
 			{
 				maxQueueSize: producer.maxQueueSize,
+				requirementIds: [
+					...producer.requirementIds,
+				],
 			},
 		]),
 	),
@@ -1333,6 +1437,9 @@ const createEffectiveUpgradeState = (config: EffectiveUpgradeConfig): EffectiveU
 				durationMs: product.durationMs,
 				inputRefId: product.inputRefId,
 				inputQuantities: {},
+				requirementIds: [
+					...product.requirementIds,
+				],
 			},
 		]),
 	),
@@ -1385,9 +1492,19 @@ const applyEffectiveUpgradeEffect = (
 	path: GameConfigIssuePath,
 	effect: EffectiveUpgradeConfig["upgrades"][string]["tiers"][number]["effects"][number],
 ) => {
-	if (effect.type === "producer.maxQueueSize.add") {
+	if (
+		effect.type === "producer.maxQueueSize.add" ||
+		effect.type === "producer.requirementIds.set"
+	) {
 		const producerState = state.producers[effect.producerId];
 		if (!producerState) return;
+
+		if (effect.type === "producer.requirementIds.set") {
+			producerState.requirementIds = [
+				...effect.requirementIds,
+			];
+			return;
+		}
 
 		producerState.maxQueueSize += effect.quantity;
 		if (producerState.maxQueueSize <= 0) {
@@ -1429,6 +1546,13 @@ const applyEffectiveUpgradeEffect = (
 		productState.inputRefId = effect.inputRefId;
 		validateEffectiveProductInputRefOwnership(ctx, state, path);
 		validateEffectiveProductInputOverrides(ctx, config, productState, effect.productId, path);
+		return;
+	}
+
+	if (effect.type === "product.requirementIds.set") {
+		productState.requirementIds = [
+			...effect.requirementIds,
+		];
 		return;
 	}
 
@@ -1622,6 +1746,76 @@ const validateCraftRecipeInputs = (
 			);
 		}
 	}
+};
+
+const validateRequirementIds = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	requirementIds: readonly string[],
+	hasRequirement: (requirementId: string) => boolean,
+) => {
+	validateUniqueStringList(
+		ctx,
+		path,
+		requirementIds,
+		(value) => `Duplicate requirement id "${value}".`,
+	);
+
+	for (const [index, requirementId] of requirementIds.entries()) {
+		if (!hasRequirement(requirementId)) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+				],
+				`Missing requirement "${requirementId}".`,
+			);
+		}
+	}
+};
+
+const validateGameRequirement = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	requirement: z.infer<typeof GameRequirementDefinitionSchema>,
+	hasItem: (itemId: string) => boolean,
+) => {
+	if (requirement.type === "proximity") {
+		validateUniqueStringList(
+			ctx,
+			[
+				...path,
+				"itemIds",
+			],
+			requirement.itemIds,
+			(value) => `Duplicate proximity item "${value}".`,
+		);
+
+		for (const [index, itemId] of requirement.itemIds.entries()) {
+			if (!hasItem(itemId)) {
+				addIssue(
+					ctx,
+					[
+						...path,
+						"itemIds",
+						index,
+					],
+					`Missing item "${itemId}".`,
+				);
+			}
+		}
+		return;
+	}
+
+	validateItemRequirements(
+		ctx,
+		path,
+		[
+			requirement,
+		],
+		hasItem,
+	);
 };
 
 const validateItemRequirements = (

@@ -12,4 +12,9 @@ export type GameRequirement =
 			itemId: string;
 			quantity: number;
 			scope: GamePassiveRequirementScope;
+	  }
+	| {
+			type: "proximity";
+			itemIds: string[];
+			distance: number;
 	  };

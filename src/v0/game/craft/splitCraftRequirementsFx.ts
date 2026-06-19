@@ -34,6 +34,12 @@ export const splitCraftRequirementsFx = Effect.fn("splitCraftRequirementsFx")(fu
 					return Effect.void;
 				},
 			)
+			.with(
+				{
+					type: "proximity",
+				},
+				() => Effect.void,
+			)
 			.exhaustive();
 	}
 

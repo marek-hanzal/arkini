@@ -3,6 +3,7 @@ import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSc
 import { GameSaveUpgradeJobSchema } from "~/v0/game/upgrade/GameSaveUpgradeJobSchema";
 import { GameSaveUpgradeStateSchema } from "~/v0/game/upgrade/GameSaveUpgradeStateSchema";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
+import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
@@ -318,10 +319,22 @@ const readStoredRequirementSlots = ({
 	if (target.item.producerId) {
 		const producer = config.producers[target.item.producerId];
 		if (producer) {
-			requirements.push(...producer.requirements);
+			requirements.push(
+				...resolveGameRequirements({
+					config,
+					requirementIds: producer.requirementIds,
+				}),
+			);
 			for (const productId of producer.productIds) {
 				const product = config.products[productId];
-				if (product) requirements.push(...product.requirements);
+				if (product) {
+					requirements.push(
+						...resolveGameRequirements({
+							config,
+							requirementIds: product.requirementIds,
+						}),
+					);
+				}
 			}
 		}
 	}

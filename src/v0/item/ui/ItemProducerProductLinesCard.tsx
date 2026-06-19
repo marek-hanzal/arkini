@@ -12,6 +12,7 @@ export namespace ItemProducerProductLinesCard {
 		lines: readonly ProducerProductLineView[];
 		nowMs: number;
 		pending: boolean;
+		onSetDefault(productId: string): void;
 		onSetEnabled(productId: string, enabled: boolean): void;
 		onStart(productId: string): void;
 		onWithdrawInput(productId: string, itemId: string): void;
@@ -39,6 +40,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 	lines,
 	nowMs,
 	pending,
+	onSetDefault,
 	onSetEnabled,
 	onStart,
 	onWithdrawInput,
@@ -96,13 +98,24 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											: ""}
 									</p>
 								</div>
-								<UiButton
-									fullWidth={false}
-									disabled={pending}
-									onClick={() => onSetEnabled(line.productId, !line.enabled)}
-								>
-									{line.enabled ? "On" : "Off"}
-								</UiButton>
+								<div className="flex shrink-0 items-center gap-2">
+									{line.isDefault ? null : (
+										<UiButton
+											fullWidth={false}
+											disabled={pending}
+											onClick={() => onSetDefault(line.productId)}
+										>
+											Make default
+										</UiButton>
+									)}
+									<UiButton
+										fullWidth={false}
+										disabled={pending}
+										onClick={() => onSetEnabled(line.productId, !line.enabled)}
+									>
+										{line.enabled ? "On" : "Off"}
+									</UiButton>
+								</div>
 							</div>
 
 							{line.requirements?.length ? (

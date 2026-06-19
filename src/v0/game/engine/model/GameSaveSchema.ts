@@ -100,6 +100,7 @@ export const GameSaveStashStateSchema = z
 
 export const GameSaveProducerLineStateSchema = z
 	.object({
+		defaultProductId: IdSchema.optional(),
 		disabledProductIds: z.array(IdSchema),
 	})
 	.strict()
@@ -779,6 +780,21 @@ const validateGameSaveAgainstConfig = (
 				`Producer line state target "${producerItemInstanceId}" must reference a producer item.`,
 			);
 			continue;
+		}
+
+		if (
+			lineState.defaultProductId !== undefined &&
+			!producer.productIds.includes(lineState.defaultProductId)
+		) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerLines",
+					producerItemInstanceId,
+					"defaultProductId",
+				],
+				`Default product "${lineState.defaultProductId}" does not belong to producer "${producerId}".`,
+			);
 		}
 
 		for (const [index, productId] of lineState.disabledProductIds.entries()) {

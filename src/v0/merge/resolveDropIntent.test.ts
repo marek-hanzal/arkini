@@ -4,6 +4,7 @@ import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLin
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
+import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 
 const config = createEngineTestConfig();
 
@@ -126,6 +127,53 @@ describe("resolveDropIntent", () => {
 			}),
 		).toEqual({
 			type: "stored-requirement",
+		});
+	});
+
+	it("prefers the default producer product line when multiple lines accept the same input", () => {
+		expect(
+			resolveItemToBoardItemInteractionPlan({
+				config,
+				sourceItemId: "item:twig",
+				targetItem: activationTarget({
+					inputs: [],
+					kind: "producer",
+					productLines: [
+						productLine({
+							inputs: [
+								{
+									capacity: 1,
+									consume: true,
+									itemId: "item:twig",
+									quantity: 1,
+									stored: 0,
+								},
+							],
+							isDefault: false,
+							productId: "product:test",
+						}),
+						productLine({
+							inputs: [
+								{
+									capacity: 1,
+									consume: true,
+									itemId: "item:twig",
+									quantity: 1,
+									stored: 0,
+								},
+							],
+							isDefault: true,
+							productId: "product:shred",
+						}),
+					],
+					requirements: [],
+					trigger: "click",
+				}),
+			}),
+		).toEqual({
+			feedbackVariant: "secondary",
+			productId: "product:shred",
+			type: "producer-input",
 		});
 	});
 

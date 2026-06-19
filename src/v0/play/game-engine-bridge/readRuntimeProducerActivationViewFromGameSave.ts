@@ -6,6 +6,7 @@ import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequi
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
+import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
 	readRuntimeMissingRequirementItemIdsFromGameSave,
@@ -43,8 +44,6 @@ const productLineEnabled = ({
 	targetItemInstanceId: string;
 }) => !(save.producerLines[targetItemInstanceId]?.disabledProductIds ?? []).includes(productId);
 
-const defaultProductId = ({ productIds }: { productIds: readonly string[] }) => productIds[0];
-
 const readRuntimeProductLineViewsFromGameSave = ({
 	config,
 	maxQueueSize,
@@ -66,11 +65,16 @@ const readRuntimeProductLineViewsFromGameSave = ({
 		(job) => job.producerItemInstanceId === targetItemInstanceId,
 	).length;
 	const queueFull = producerQueuedJobs >= maxQueueSize;
+	const selectedDefaultProductId = readProducerDefaultProductId({
+		productIds,
+		producerItemInstanceId: targetItemInstanceId,
+		save,
+	});
 
 	return productIds.flatMap((productId) => {
 		const product = config.products[productId];
 		if (!product) return [];
-		const isDefault = productId === productIds[0];
+		const isDefault = productId === selectedDefaultProductId;
 
 		const requirements = resolveGameRequirements({
 			config,
@@ -186,8 +190,10 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 	const producer = producerId ? config.producers[producerId] : undefined;
 	if (!producerId || !producer) return undefined;
 
-	const selectedProductId = defaultProductId({
+	const selectedProductId = readProducerDefaultProductId({
 		productIds: producer.productIds,
+		producerItemInstanceId: boardItem.id,
+		save,
 	});
 	const selectedProduct = selectedProductId ? config.products[selectedProductId] : undefined;
 

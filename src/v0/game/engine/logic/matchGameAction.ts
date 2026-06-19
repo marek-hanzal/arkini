@@ -21,6 +21,9 @@ export namespace matchGameAction {
 		itemMerge: (action: GameActionOfType<"item.merge">) => Result;
 		producerInputStore: (action: GameActionOfType<"producer.input.store">) => Result;
 		producerInputWithdraw: (action: GameActionOfType<"producer.input.withdraw">) => Result;
+		producerProductLineSetDefault: (
+			action: GameActionOfType<"producer.product_line.set_default">,
+		) => Result;
 		producerProductLineSetEnabled: (
 			action: GameActionOfType<"producer.product_line.set_enabled">,
 		) => Result;
@@ -105,6 +108,12 @@ export const matchGameAction = <Result>(
 				type: "producer.input.withdraw",
 			},
 			cases.producerInputWithdraw,
+		)
+		.with(
+			{
+				type: "producer.product_line.set_default",
+			},
+			cases.producerProductLineSetDefault,
 		)
 		.with(
 			{

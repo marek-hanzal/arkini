@@ -82,6 +82,59 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("starts the saved default producer product line when productId is omitted", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerLines["item-instance:1"] = {
+			defaultProductId: "product:shred",
+			disabledProductIds: [],
+		};
+
+		const result = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				inputRefs: [
+					{
+						itemInstanceId: "item-instance:2",
+						kind: "board",
+					},
+				],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save: {
+				...save,
+				board: {
+					items: {
+						...save.board.items,
+						"item-instance:2": {
+							id: "item-instance:2",
+							itemId: "item:twig",
+							x: 1,
+							y: 0,
+						},
+					},
+				},
+			},
+		});
+
+		const job = readOnlyRecordValue(result.save.producerJobs);
+		expect(job).toMatchObject({
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:shred",
+		});
+		expect(result.events).toContainEqual(
+			expect.objectContaining({
+				productId: "product:shred",
+				type: "product.started",
+			}),
+		);
+	});
+
 	it("accepts producer proximity requirements from diagonal neighbors", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -469,6 +522,79 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
+	it("stores duplicate producer input into the saved default line before earlier lines", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			inputs: {
+				...baseConfig.inputs,
+				"input:alt-shred": {
+					name: "Alt shred input",
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"producer:test": {
+					...baseConfig.producers["producer:test"],
+					productIds: [
+						"product:shred",
+						"product:alt-shred",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:alt-shred": {
+					...baseConfig.products["product:shred"],
+					inputRefId: "input:alt-shred",
+					name: "Alt shred",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+		save.producerLines["item-instance:1"] = {
+			defaultProductId: "product:alt-shred",
+			disabledProductIds: [],
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				producerItemInstanceId: "item-instance:1",
+				type: "producer.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
+			"product:alt-shred": {
+				items: {
+					"item:twig": 1,
+				},
+			},
+		});
+	});
+
 	it("stores duplicate producer input into the default line before later matching lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -794,6 +920,63 @@ describe("applyGameActionFx Producer", () => {
 				reason: "producer_queue_full",
 			});
 		}
+	});
+
+	it("stores a non-first producer product line as the runtime default", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const defaulted = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product_line.set_default",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(defaulted.save.producerLines).toEqual({
+			"item-instance:1": {
+				defaultProductId: "product:shred",
+				disabledProductIds: [],
+			},
+		});
+		expect(defaulted.events).toEqual([
+			{
+				changedAtMs: 100,
+				nextProductId: "product:shred",
+				previousProductId: "product:test",
+				producerItemInstanceId: "item-instance:1",
+				type: "producer.product_line.default_changed",
+			},
+		]);
+
+		const reset = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.set_default",
+			},
+			config,
+			nowMs: 200,
+			save: defaulted.save,
+		});
+
+		expect(reset.save.producerLines).toEqual({});
+		expect(reset.events).toEqual([
+			{
+				changedAtMs: 200,
+				nextProductId: "product:test",
+				previousProductId: "product:shred",
+				producerItemInstanceId: "item-instance:1",
+				type: "producer.product_line.default_changed",
+			},
+		]);
 	});
 
 	it("stores disabled producer product lines in save state", () => {

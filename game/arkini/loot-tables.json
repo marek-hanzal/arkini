@@ -217,6 +217,16 @@
 				}
 			]
 		},
+		"loot:lumber-camp-1-log": {
+			"name": "Lumber Camp I Logs",
+			"output": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:lumber-camp-1:better-1": {
 			"name": "Lumber Camp I Better Finds I",
 			"output": [

@@ -10,7 +10,8 @@
 		},
 		"producer:lumber-camp-1": {
 			"productIds": [
-				"product:lumber-camp-1"
+				"product:lumber-camp-1",
+				"product:lumber-camp-1-log"
 			],
 			"type": "producer",
 			"maxQueueSize": 1,

@@ -82,6 +82,7 @@ export const createGameEngineVisualPlan = ({
 			case "craft_input.withdrawn":
 			case "item.removed":
 			case "item.spawn.blocked":
+			case "producer.product_line.default_changed":
 			case "producer.product_line.enabled_changed":
 			case "producer_input.stored":
 			case "producer_input.withdrawn":

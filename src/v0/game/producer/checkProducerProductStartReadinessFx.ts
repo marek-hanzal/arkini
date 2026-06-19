@@ -5,6 +5,7 @@ import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
+import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProducerProductLineEnabledFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
@@ -39,7 +40,13 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			),
 		);
 	}
-	const productId = action.productId ?? producerDefinition.productIds[0];
+	const productId =
+		action.productId ??
+		readProducerDefaultProductId({
+			productIds: producerDefinition.productIds,
+			producerItemInstanceId: action.producerItemInstanceId,
+			save,
+		});
 	if (!productId || !producerDefinition.productIds.includes(productId)) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

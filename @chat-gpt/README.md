@@ -8,7 +8,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - `backlog/` - planned/deferred tasks worth solving later.
 - `archive/` - completed/obsolete notes and rationale.
 
-Every file in `@chat-gpt` must start with `YYYY-MM-DD-`.
+`README.md` is the only unprefixed anchor file. Every other file in `@chat-gpt` must start with `YYYY-MM-DD-`.
 
 ## Current architecture facts
 

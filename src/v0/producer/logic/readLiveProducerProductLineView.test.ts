@@ -10,6 +10,7 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	inputItemIds: [],
 	inputs: [],
 	inputsReady: true,
+	inputsAvailable: true,
 	name: "Test product",
 	productId: "test.product",
 	producerQueuedJobs: 1,

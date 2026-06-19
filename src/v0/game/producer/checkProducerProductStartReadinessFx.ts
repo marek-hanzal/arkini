@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
+import { planProducerProductAutoFillInputRefsFx } from "~/v0/game/producer/planProducerProductAutoFillInputRefsFx";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
@@ -129,16 +130,16 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			productId,
 			save,
 		});
-		for (const input of productInputs) {
-			const storedQuantity = storedInputs.get(input.itemId) ?? 0;
-			if (storedQuantity < input.quantity) {
-				return yield* Effect.fail(
-					GameEngineError.actionRejected(
-						"input_mismatch",
-						`Product input "${input.itemId}" quantity mismatch (${storedQuantity}/${input.quantity}).`,
-					),
-				);
-			}
+		const needsAutoFill = productInputs.some(
+			(input) => (storedInputs.get(input.itemId) ?? 0) < input.quantity,
+		);
+		if (needsAutoFill) {
+			yield* planProducerProductAutoFillInputRefsFx({
+				inputs: productInputs,
+				producerItemInstanceId: action.producerItemInstanceId,
+				productId,
+				save,
+			});
 		}
 	}
 

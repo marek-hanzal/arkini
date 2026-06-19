@@ -7,6 +7,7 @@ import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSav
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
 	readRuntimeMissingRequirementItemIdsFromGameSave,
@@ -33,6 +34,26 @@ const readRuntimeStoredProductInputQuantityFromGameSave = ({
 	save: GameSave;
 	targetItemInstanceId: string;
 }) => save.producerInputs[targetItemInstanceId]?.productInputs[productId]?.items[itemId] ?? 0;
+
+const readRuntimeProductInputAvailableQuantityFromGameSave = ({
+	itemId,
+	save,
+	targetItemInstanceId,
+}: {
+	itemId: string;
+	save: GameSave;
+	targetItemInstanceId: string;
+}) => {
+	const boardQuantity = Object.values(save.board.items).filter(
+		(item) => item.id !== targetItemInstanceId && item.itemId === itemId,
+	).length;
+	const inventoryQuantity = save.inventory.slots.reduce((total, slot) => {
+		if (!slot || slot.itemId !== itemId) return total;
+		return total + readGameSaveInventorySlotQuantity(slot);
+	}, 0);
+
+	return boardQuantity + inventoryQuantity;
+};
 
 const productLineEnabled = ({
 	productId,
@@ -146,6 +167,16 @@ const readRuntimeProductLineViewsFromGameSave = ({
 			}),
 		);
 		const inputsReady = inputs.every((input) => input.stored >= input.quantity);
+		const inputsAvailable = inputs.every(
+			(input) =>
+				input.stored +
+					readRuntimeProductInputAvailableQuantityFromGameSave({
+						itemId: input.itemId,
+						save,
+						targetItemInstanceId,
+					}) >=
+				input.quantity,
+		);
 
 		return [
 			{
@@ -160,6 +191,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				isDefault,
 				inputs,
 				inputsReady,
+				inputsAvailable,
 				missingRequirementItemIds: missingRequirements as ItemId[],
 				name: product.name,
 				outputTableId: product.outputTableId,

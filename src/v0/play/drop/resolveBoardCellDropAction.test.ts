@@ -434,6 +434,7 @@ describe("resolveBoardCellDropAction", () => {
 						inputItemIds: [],
 						inputs: [],
 						inputsReady: true,
+						inputsAvailable: true,
 						missingRequirementItemIds: [
 							"item:twig",
 						],

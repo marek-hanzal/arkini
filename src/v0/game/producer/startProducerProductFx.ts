@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { autoFillProducerProductInputsFx } from "~/v0/game/producer/autoFillProducerProductInputsFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkProducerProductStartReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
@@ -46,6 +47,14 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		save: consumed.save,
 	});
 	if (action.inputRefs.length === 0) {
+		yield* autoFillProducerProductInputsFx({
+			events: consumed.events,
+			inputs: checked.productInputs,
+			nextSave,
+			nowMs,
+			producerItemInstanceId: action.producerItemInstanceId,
+			productId: checked.productId,
+		});
 		yield* consumeProducerStoredInputsFx({
 			inputs: checked.productInputs,
 			nextSave,

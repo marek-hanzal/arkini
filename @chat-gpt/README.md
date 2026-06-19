@@ -4,11 +4,11 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 
 ## Layout
 
-- `tasks/` - active/current work block. Answer "co dal?" from here.
+- `tasks/` - active/current work block. If it only contains `README.md`, no active GPT task queue is open.
 - `backlog/` - planned/deferred tasks worth solving later.
 - `archive/` - completed/obsolete notes and rationale.
 
-`README.md` is the only unprefixed anchor file. Every other file in `@chat-gpt` must start with `YYYY-MM-DD-`.
+`README.md` files are allowed as unprefixed folder anchors. Every other note file in `@chat-gpt` must start with `YYYY-MM-DD-`.
 
 ## Current architecture facts
 

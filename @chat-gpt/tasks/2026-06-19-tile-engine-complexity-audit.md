@@ -1,6 +1,6 @@
 # TileEngine complexity audit
 
-Status: ready for next implementation pass.
+Status: first implementation pass completed. Keep for next TileEngine follow-up context.
 
 ## Goal
 
@@ -125,15 +125,16 @@ Lower priority than pointer-up.
 
 Do not add nested folders during the first TileEngine pass. `tile-engine` is already a package boundary, and deep folders inside it would probably increase lookup cost. The immediate problem is not folder depth; it is a few files holding multiple lifecycle phases inline.
 
-## Next implementation task
+## Completed first implementation task
 
-Start with `useTilePointerUp.ts` phase extraction. This should be a behavior-preserving cleanup with focused tests around existing drag/drop outcomes where possible.
+`useTilePointerUp.ts` phase extraction was completed on `2026-06-19`. The hook now keeps pointer lifecycle orchestration while drop motion, commit logging, motion ids, and handoff creation live in focused flat helper files.
 
-Acceptance:
+Completed acceptance:
 
-- `useTilePointerUp.ts` drops below the current monolith size by extracting meaningful phase helpers.
-- Behavior stays equivalent.
-- Public `TileEngine` barrel stays unchanged.
-- No Arkini domain imports enter `src/v0/tile-engine`.
-- No nested folders are introduced.
-- Existing TileEngine tests pass.
+- `useTilePointerUp.ts` is reduced from the pointer-up monolith into phase orchestration.
+- Public `TileEngine` barrel/API stayed unchanged.
+- No Arkini domain imports entered `src/v0/tile-engine`.
+- No nested folders were introduced.
+- Existing checks passed.
+
+Future caution: validate in browser before deeper TileEngine cleanup. The next possible target is `useTileActorMotion.ts`; do not split `TileMotionRuntime.ts` just for line count.

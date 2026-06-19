@@ -4,9 +4,9 @@ import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigSer
 import { checkBoardItemMoveReadinessFx } from "~/v0/game/engine/fx/checkBoardItemMoveReadinessFx";
 import { checkBoardItemStashReadinessFx } from "~/v0/game/engine/fx/checkBoardItemStashReadinessFx";
 import { checkBoardItemsSwapReadinessFx } from "~/v0/game/engine/fx/checkBoardItemsSwapReadinessFx";
-import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
-import { checkCraftInputStoreReadinessFx } from "~/v0/game/engine/fx/checkCraftInputStoreReadinessFx";
-import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/engine/fx/checkCraftInputWithdrawReadinessFx";
+import { checkCraftStartReadinessFx } from "~/v0/game/craft/checkCraftStartReadinessFx";
+import { checkCraftInputStoreReadinessFx } from "~/v0/game/craft/checkCraftInputStoreReadinessFx";
+import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/craft/checkCraftInputWithdrawReadinessFx";
 import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/engine/fx/checkInventoryItemPlaceReadinessFx";
 import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/engine/fx/checkInventorySlotsSwapReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";

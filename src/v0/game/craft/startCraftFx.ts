@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { checkCraftStartReadinessFx } from "~/v0/game/engine/fx/checkCraftStartReadinessFx";
+import { checkCraftStartReadinessFx } from "~/v0/game/craft/checkCraftStartReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";

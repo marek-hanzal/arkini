@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { readCraftBoardItemFx } from "~/v0/game/engine/fx/readCraftBoardItemFx";
-import { readCraftInputQuantitiesFx } from "~/v0/game/engine/fx/readCraftInputQuantitiesFx";
+import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
+import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/engine/fx/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftInputStore } from "~/v0/game/engine/model/GameActionCraftInputStore";

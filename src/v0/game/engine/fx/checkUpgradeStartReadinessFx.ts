@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInputsFx";
+import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
 import { readUpgradeCompletedTierCountFx } from "~/v0/game/engine/fx/readUpgradeCompletedTierCountFx";
 import { readUpgradeCostInputsFx } from "~/v0/game/engine/fx/readUpgradeCostInputsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";

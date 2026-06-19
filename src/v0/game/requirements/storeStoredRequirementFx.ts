@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/engine/fx/checkStoredRequirementStoreReadinessFx";
+import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/requirements/checkStoredRequirementStoreReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { consumeResolvedInputRefFx } from "~/v0/game/engine/fx/consumeResolvedInputRefFx";
+import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStoredRequirementStore } from "~/v0/game/engine/model/GameActionStoredRequirementStore";

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { checkItemMergeReadinessFx } from "~/v0/game/engine/fx/checkItemMergeReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/v0/game/engine/fx/removeBoardItemRuntimeState";
-import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
+import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/engine/model/GameActionItemMerge";

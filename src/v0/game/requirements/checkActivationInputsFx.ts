@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import { mergeActivationInputRequirementsFx } from "~/v0/game/engine/fx/mergeActivationInputRequirementsFx";
-import { resolveInputRefsFx } from "~/v0/game/engine/fx/resolveInputRefsFx";
-import { sumResolvedInputRefsFx } from "~/v0/game/engine/fx/sumResolvedInputRefsFx";
+import { mergeActivationInputRequirementsFx } from "~/v0/game/requirements/mergeActivationInputRequirementsFx";
+import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
+import { sumResolvedInputRefsFx } from "~/v0/game/requirements/sumResolvedInputRefsFx";
 import type { GameActivationInput } from "~/v0/game/engine/model/GameActivationInput";
 import type { GameActionItemRefSchema } from "~/v0/game/engine/model/GameActionItemRefSchema";
 import type { GameActionResolvedInputRef } from "~/v0/game/engine/model/GameActionResolvedInputRef";

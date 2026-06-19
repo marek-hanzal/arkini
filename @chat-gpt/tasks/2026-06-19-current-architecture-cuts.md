@@ -26,11 +26,12 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: moved craft runtime files from `game/engine/fx` into top-level `game/craft`; `game/engine` now imports craft as a domain instead of owning it.
 - `2026-06-19`: moved stash runtime files from `game/engine/fx` into top-level `game/stash`; `game/engine` now imports stash as a domain instead of owning it.
 - `2026-06-19`: moved placement runtime files from `game/engine/fx` into top-level `game/placement`; placement is now a shared game domain, not engine-owned Effect plumbing.
+- `2026-06-19`: moved requirements/input-ref/stored-requirement runtime files from `game/engine/fx` into top-level `game/requirements`; requirements are now a shared game domain, not engine-owned Effect plumbing.
 
 ## Next candidates
 
-1. Continue `game/engine/fx` production reshaping domain-by-domain. Next safest coding task: stored requirements extraction into a top-level game domain. No behavior changes.
-2. Continue after stored requirements: upgrades, jobs, board/inventory action helpers. Keep folder depth shallow and move only coherent domain clusters.
+1. Continue `game/engine/fx` production reshaping domain-by-domain. Next safest coding task: upgrades extraction into top-level `game/upgrade`. No behavior changes.
+2. Continue after upgrades: jobs, board/inventory action helpers, merge/remove. Keep folder depth shallow and move only coherent domain clusters.
 3. TileEngine follow-up: current browser feel is acceptable. Do not split `TileMotionRuntime.ts` just for line count.
 4. GameEventSchema audit: only if event schema starts carrying behavior. It is an intentional output-event contract and should not be split just for line count.
 

@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import { checkActivationInputsFx } from "~/v0/game/engine/fx/checkActivationInputsFx";
+import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
-import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
+import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProducerProductLineEnabledFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
+import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

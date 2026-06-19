@@ -216,9 +216,11 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									? "Queue full"
 									: !line.requirementsReady
 										? "Requirements missing"
-										: !line.inputsReady
-											? "Feed items by drag"
-											: "Start"}
+										: line.inputsReady
+											? "Start"
+											: line.inputsAvailable
+												? "Auto-fill & start"
+												: "Feed items by drag"}
 							</UiButton>
 						</div>
 					);

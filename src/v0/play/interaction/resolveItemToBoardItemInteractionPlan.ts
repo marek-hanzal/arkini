@@ -56,17 +56,23 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		targetItem.craft?.canAcceptInputs &&
 			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
 	);
-	const producerInputProductId = [
-		...(targetItem.activation?.productLines ?? []),
-	]
-		.sort((left, right) => Number(right.isDefault) - Number(left.isDefault))
+	const producerInputProductId = (targetItem.activation?.productLines ?? [])
+		.map((line, index) => ({
+			index,
+			line,
+		}))
+		.sort(
+			(left, right) =>
+				Number(right.line.isDefault) - Number(left.line.isDefault) ||
+				left.index - right.index,
+		)
 		.find(
-			(line) =>
+			({ line }) =>
 				line.enabled &&
 				line.inputs.some(
 					(input) => input.itemId === sourceItemId && input.stored < input.capacity,
 				),
-		)?.productId;
+		)?.line.productId;
 	const canSupplyStashInput = Boolean(
 		targetItem.activation?.kind === "stash" &&
 			targetItem.activation.inputs.some(

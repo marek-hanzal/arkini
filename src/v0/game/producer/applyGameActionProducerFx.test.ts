@@ -365,6 +365,83 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("auto-fills only missing producer input when the product line is partially filled", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			inputs: {
+				...baseConfig.inputs,
+				"input:shred": {
+					name: "Shred input",
+					inputs: [
+						{
+							capacity: 2,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 2,
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+		save.producerInputs["item-instance:1"] = {
+			productInputs: {
+				"product:shred": {
+					items: {
+						"item:twig": 1,
+					},
+				},
+			},
+		};
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toBeUndefined();
+		expect(result.save.producerInputs).toEqual({});
+		expect(result.events).toMatchObject([
+			{
+				from: {
+					itemInstanceId: "item-instance:2",
+					kind: "board",
+				},
+				itemId: "item:twig",
+				reason: "producer-input-store",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:twig",
+				nextQuantity: 2,
+				previousQuantity: 1,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer_input.stored",
+			},
+			{
+				productId: "product:shred",
+				type: "product.started",
+			},
+		]);
+	});
+
 	it("auto-fills missing producer input from inventory before starting the product", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -837,6 +914,89 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
 			"product:alt-shred": {
+				items: {
+					"item:twig": 1,
+				},
+			},
+		});
+	});
+
+	it("stores duplicate producer input into the next product line after the default line is full", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			inputs: {
+				...baseConfig.inputs,
+				"input:alt-shred": {
+					name: "Alt shred input",
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"producer:test": {
+					...baseConfig.producers["producer:test"],
+					productIds: [
+						"product:shred",
+						"product:alt-shred",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:alt-shred": {
+					...baseConfig.products["product:shred"],
+					inputRefId: "input:alt-shred",
+					name: "Alt shred",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+		save.producerInputs["item-instance:1"] = {
+			productInputs: {
+				"product:shred": {
+					items: {
+						"item:twig": 1,
+					},
+				},
+			},
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				producerItemInstanceId: "item-instance:1",
+				type: "producer.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
+			"product:alt-shred": {
+				items: {
+					"item:twig": 1,
+				},
+			},
+			"product:shred": {
 				items: {
 					"item:twig": 1,
 				},

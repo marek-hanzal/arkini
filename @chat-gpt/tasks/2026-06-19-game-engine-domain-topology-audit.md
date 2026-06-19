@@ -1,6 +1,6 @@
 # Game engine domain topology audit
 
-Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer, craft, stash, placement, and requirements runtime files were moved to top-level game domains without behavior changes.
+Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer, craft, stash, placement, requirements, upgrade, job, and loot runtime files were moved to top-level game domains without behavior changes.
 
 ## Problem
 
@@ -12,7 +12,7 @@ This creates navigation load. The engine is not conceptually one giant `fx` doma
 
 ## Current source shape
 
-- `src/v0/game/engine/fx`: started at 111 files; now 44 files after producer, craft, stash, placement, requirements, and upgrade extraction.
+- `src/v0/game/engine/fx`: started at 111 files; now 31 files after producer, craft, stash, placement, requirements, upgrade, job, and loot extraction.
 - `src/v0/game/engine/model`: 68 files.
 - `src/v0/game/engine/runtime`: 3 files.
 - `src/v0/game/engine/logic`: 4 files.
@@ -158,6 +158,8 @@ Moved into `src/v0/game/requirements/` as part of the requirements extraction. T
 
 ### Loot / random
 
+Moved to `src/v0/game/loot/`:
+
 - `rollGameQuantityFx.ts`
 - `rollWeightedLootTableEntryFx.ts`
 - `rollLootTableItemsFx.ts`
@@ -242,9 +244,10 @@ Then move production files domain-by-domain.
 - [x] `placement` domain extraction into `src/v0/game/placement/`.
 - [x] `requirements` domain extraction into `src/v0/game/requirements/`.
 - [x] `upgrade` extraction into `src/v0/game/upgrade/`.
-- [ ] `jobs` extraction if the remaining job helpers form a coherent domain-sized cluster.
+- [x] `job` extraction into `src/v0/game/job/`.
+- [x] `loot` extraction into `src/v0/game/loot/`.
 
-Next coding cut: jobs/item-spawn or board/inventory/merge/remove extraction, whichever forms the cleanest coherent cluster.
+Next coding cut: board/inventory/merge/remove extraction, or config layer extraction, whichever forms the cleanest coherent cluster.
 
 ## Recommended sequence
 

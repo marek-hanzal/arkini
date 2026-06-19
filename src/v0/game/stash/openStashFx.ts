@@ -4,7 +4,7 @@ import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivat
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
-import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
+import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import { applyStashDepletionFx } from "~/v0/game/stash/applyStashDepletionFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStashOpen } from "~/v0/game/engine/model/GameActionStashOpen";

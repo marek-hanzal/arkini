@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
-import { rollGameQuantityFx } from "~/v0/game/engine/fx/rollGameQuantityFx";
-import { rollWeightedLootTableEntryFx } from "~/v0/game/engine/fx/rollWeightedLootTableEntryFx";
+import { rollGameQuantityFx } from "~/v0/game/loot/rollGameQuantityFx";
+import { rollWeightedLootTableEntryFx } from "~/v0/game/loot/rollWeightedLootTableEntryFx";
 import type { GameLootTable } from "~/v0/game/engine/model/GameLootTable";
 import type { LootTableRollResult } from "~/v0/game/engine/model/LootTableRollResult";
 

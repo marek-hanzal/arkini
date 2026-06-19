@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 
 export type DropIntent =

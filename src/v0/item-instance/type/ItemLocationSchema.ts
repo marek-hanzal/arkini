@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
 import { InventorySlotIndexSchema } from "~/v0/inventory/schema/InventorySlotIndexSchema";
-import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
+import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 import { ItemLocationKindSchema } from "./ItemLocationKindSchema";
 
 export const ItemLocationSchema = z.discriminatedUnion("kind", [

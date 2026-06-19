@@ -1,5 +1,5 @@
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeItemCatalogViewFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeItemCatalogViewFromGameConfig";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 

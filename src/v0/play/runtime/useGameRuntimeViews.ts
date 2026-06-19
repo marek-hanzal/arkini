@@ -6,7 +6,7 @@ import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeUpgradeListViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeUpgradeListViewFromGameSave";
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
 import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";

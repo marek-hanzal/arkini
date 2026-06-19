@@ -11,7 +11,7 @@ import {
 	useGameRuntimeStore,
 	useGameUpgradeListView,
 } from "~/v0/play/runtime";
-import type { UpgradeId } from "~/v0/manifest/manifestId";
+import type { UpgradeId } from "~/v0/game/config/GameIdSchema";
 
 export namespace UpgradesSheet {
 	export interface Props {

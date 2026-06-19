@@ -1,5 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 
 type MergeDefinition = GameConfig["merge"][string];
 

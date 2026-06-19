@@ -1,4 +1,4 @@
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 
 export interface BoardTransientTile {
 	id: string;

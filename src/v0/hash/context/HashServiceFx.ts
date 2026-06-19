@@ -1,5 +1,5 @@
 import { Context } from "effect";
-import type { GameConfig } from "~/v0/manifest/GameConfig";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
 export interface HashService {
 	sha256(input: string | Uint8Array): Promise<string>;

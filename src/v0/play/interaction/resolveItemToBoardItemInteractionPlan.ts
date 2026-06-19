@@ -5,7 +5,7 @@ import {
 	hasReverseDirectedItemMergeRule,
 	resolveExecutableItemMergeRule,
 } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { ItemToBoardItemInteractionPlan } from "~/v0/play/interaction/ItemToBoardItemInteractionPlan";
 
 export namespace resolveItemToBoardItemInteractionPlan {

@@ -1,7 +1,7 @@
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/engine/model/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 
 export type RuntimeActivationRequirement =
 	| {

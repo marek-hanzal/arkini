@@ -1,5 +1,5 @@
 import type { BoardItemState } from "~/v0/board/view/BoardItemStateSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 
 export namespace DevScenarioDefinition {
 	export interface BoardItem {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GameUpgradeIdSchema } from "~/v0/manifest/GameUpgradeIdSchema";
+import { GameUpgradeIdSchema } from "~/v0/game/config/GameIdSchema";
 import { UpgradeCostViewSchema } from "./UpgradeCostViewSchema";
 
 export const UpgradeViewSchema = z.object({

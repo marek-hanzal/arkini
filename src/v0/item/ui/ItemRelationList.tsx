@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import type { ItemId } from "~/v0/manifest/manifestId";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { UiSection } from "~/v0/ui/UiSection";
 

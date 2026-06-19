@@ -5,8 +5,10 @@ Deferred or broader tasks. Promote one into `tasks/` when it becomes current wor
 ## Architecture / runtime
 
 - Pure vs Effect boundary audit: classify pure helpers vs Effect programs and remove duplicated business decisions. See `2026-06-19-pure-vs-effect-boundary-audit.md`.
-- Legacy manifest cleanup: remove old TS manifest/config/validation fossils after import-graph check.
 - Capability matrix enforcement after the audit decides allowed item combinations.
+- TileEngine topology audit: inspect long pointer/motion files and decide which complexity is inherent vs avoidable.
+- Game engine visual plan audit: consider splitting event-family visual mappers only if the public interpretation contract stays simple.
+- Runtime adapter audit: check whether `RuntimeGameEngineAdapter` is a justified orchestration boundary or carrying too many concerns.
 - Keep `GameConfigSchema` / `GameSaveSchema` as intentional dense core contracts; do not split them as line-count cleanup.
 
 ## UI / debug

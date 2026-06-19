@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
+import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 
 export const ActivationInputViewSchema = z.object({
 	itemId: GameItemIdSchema,

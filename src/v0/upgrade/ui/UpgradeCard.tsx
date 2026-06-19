@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import type { UpgradeId } from "~/v0/manifest/manifestId";
+import type { UpgradeId } from "~/v0/game/config/GameIdSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import type { UpgradeView } from "~/v0/upgrade/view/UpgradeViewSchema";
 import { cn } from "~/v0/ui/cn";

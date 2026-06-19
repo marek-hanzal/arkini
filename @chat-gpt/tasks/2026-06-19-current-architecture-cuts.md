@@ -13,9 +13,13 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: reverted `GameSaveSchema` validation split; schema core contracts are not line-count cleanup targets.
 - `2026-06-19`: split future work from now-events; old delayed item-spawn records are now `itemSpawnJobs`.
 - `2026-06-19`: job/event follow-up checked active notes/source naming; active rules now say scheduled/pending means job, event means now/output.
+- `2026-06-19`: removed obsolete `src/v0/manifest` TS manifest tree and moved runtime ID schemas to `game/config`.
+- `2026-06-19`: completed v0 line-count/topology audit; TileEngine is the main future complexity cluster.
 
 ## Next candidates
 
-1. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item.
+1. TileEngine topology audit: inspect pointer/motion long files and separate inherent DnD complexity from avoidable orchestration sludge.
+2. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item.
+3. Game engine visual plan audit: split event-family visual mappers only if it reduces mental load without hiding the output-event contract.
 
 Before coding any risky item, inspect source and propose exact files/shape first.

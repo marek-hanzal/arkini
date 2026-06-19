@@ -7,8 +7,8 @@ export { runGameEngineEffect } from "~/v0/game/engine/runtime/runGameEngineEffec
 export type { GameEngineRuntimeServiceFx } from "~/v0/game/engine/runtime/runGameEngineEffect";
 export { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
 export { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
-export { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
-export { planEmptyBoardCellsFx } from "~/v0/game/engine/fx/planEmptyBoardCellsFx";
+export { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
+export { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 export { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
 export { processItemSpawnJobsFx } from "~/v0/game/engine/fx/processItemSpawnJobsFx";
 export { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";

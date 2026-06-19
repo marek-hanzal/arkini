@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/producer/producerDeliveryTiming";
 import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import { readProductFx } from "~/v0/game/producer/readProductFx";

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/craft/checkCraftInputWithdrawReadinessFx";
-import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
+import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftInputWithdraw } from "~/v0/game/engine/model/GameActionCraftInputWithdraw";

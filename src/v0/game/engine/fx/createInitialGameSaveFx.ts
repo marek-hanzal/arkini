@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { placeInitialInventoryItemFx } from "~/v0/game/engine/fx/placeInitialInventoryItemFx";
+import { placeInitialInventoryItemFx } from "~/v0/game/placement/placeInitialInventoryItemFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
 

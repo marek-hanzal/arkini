@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { createGameItemInstanceIdFx } from "~/v0/game/engine/fx/createGameItemInstanceIdFx";
-import { findFirstEmptyBoardCellFx } from "~/v0/game/engine/fx/findFirstEmptyBoardCellFx";
-import { placeGameSaveInventoryRemainderFx } from "~/v0/game/engine/fx/placeGameSaveInventoryRemainderFx";
+import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
+import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { BoardCell } from "~/v0/game/engine/model/BoardCell";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";

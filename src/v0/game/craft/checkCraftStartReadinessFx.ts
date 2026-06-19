@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { checkGameRequirementsFx } from "~/v0/game/engine/fx/checkGameRequirementsFx";
-import { readCraftBoardItemFx } from "~/v0/game/engine/fx/readCraftBoardItemFx";
-import { readCraftInputQuantitiesFx } from "~/v0/game/engine/fx/readCraftInputQuantitiesFx";
+import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
+import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/engine/fx/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/engine/model/GameActionCraftStart";

@@ -1,6 +1,6 @@
 # Game engine domain topology audit
 
-Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer runtime files were moved to top-level `game/producer` without behavior changes.
+Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer and craft runtime files were moved to top-level `game/producer` and `game/craft` without behavior changes.
 
 ## Problem
 
@@ -12,7 +12,7 @@ This creates navigation load. The engine is not conceptually one giant `fx` doma
 
 ## Current source shape
 
-- `src/v0/game/engine/fx`: 111 files.
+- `src/v0/game/engine/fx`: started at 111 files; now 86 files after producer and craft extraction.
 - `src/v0/game/engine/model`: 68 files.
 - `src/v0/game/engine/runtime`: 3 files.
 - `src/v0/game/engine/logic`: 4 files.
@@ -299,8 +299,14 @@ Producer runtime files and the producer action test moved from `src/v0/game/engi
 
 Reason: producer is a game domain, not an engine subfolder. `game/engine` should orchestrate producer behavior, not own it.
 
+## Completed third coding task
+
+Craft runtime files and the craft action test moved from `src/v0/game/engine/fx` into top-level `src/v0/game/craft`.
+
+Reason: craft is a game domain, not an engine subfolder. `game/engine` should orchestrate craft behavior, not own it.
+
 ## Current recommended next coding task
 
-Move the craft domain from `src/v0/game/engine/fx` into top-level `src/v0/game/craft`.
+Move the stash domain from `src/v0/game/engine/fx` into top-level `src/v0/game/stash`.
 
-Reason: craft is the next coherent domain cluster and already has a dedicated action test anchor. Move files/imports only; no behavior changes.
+Reason: stash is the next coherent domain cluster and already has a dedicated action test anchor. Move files/imports only; no behavior changes.

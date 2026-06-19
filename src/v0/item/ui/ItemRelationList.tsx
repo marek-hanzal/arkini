@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import type { ItemId } from "~/v0/manifest/manifestId";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import { UiSection } from "~/v0/ui/UiSection";
 
 export namespace ItemRelationList {
 	export interface Relation {
@@ -20,21 +21,23 @@ export const ItemRelationList: FC<ItemRelationList.Props> = ({ title, items, rel
 	if (!relations.length) return null;
 
 	return (
-		<div className="rounded-sm border border-ak-border bg-ak-surface-soft p-3">
-			<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
-				{title}
-			</p>
-			<div className="mt-2 grid gap-1.5">
+		<UiSection title={title}>
+			<div className="grid gap-1.5">
 				{relations.map((relation) => (
 					<div
 						key={relation.key}
-						className="rounded-sm bg-ak-surface break-words px-2 py-1.5 text-xs text-ak-text"
+						className="rounded-sm bg-ak-surface px-2.5 py-2 text-sm text-ak-text-muted"
 					>
-						{items[relation.leftItemId]?.name ?? relation.leftItemId} →{" "}
-						{items[relation.resultItemId]?.name ?? relation.resultItemId}
+						<span className="text-ak-text">
+							{items[relation.leftItemId]?.name ?? relation.leftItemId}
+						</span>{" "}
+						→{" "}
+						<span className="text-ak-text">
+							{items[relation.resultItemId]?.name ?? relation.resultItemId}
+						</span>
 					</div>
 				))}
 			</div>
-		</div>
+		</UiSection>
 	);
 };

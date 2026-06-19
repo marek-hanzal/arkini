@@ -71,20 +71,21 @@ export const BoardSurface = memo(
 
 		return (
 			<div
-				ref={boardDragBoundsRef}
-				data-ui="board root"
-				className="relative"
+				data-ui="board surface"
+				className="flex h-full w-full items-center justify-center overflow-hidden"
 				style={{
 					zIndex: "var(--ak-layer-base-surface)",
 				}}
 			>
 				<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
 					id="board"
+					rootRef={boardDragBoundsRef}
 					columns={boardColumns}
 					slots={boardSlots}
 					tiles={tiles}
 					gapPx={1}
-					className="w-full bg-ak-board"
+					className="bg-ak-board"
+					container="responsive"
 					actorLayerClassName="pointer-events-none"
 					layerRole="base"
 					disabled={disabled}

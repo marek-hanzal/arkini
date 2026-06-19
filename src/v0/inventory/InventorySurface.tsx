@@ -12,7 +12,7 @@ import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 
 export const InventorySurface = memo(
 	({ feedback, feedbackFlags, onClose, placementTarget }: InventorySurfaceType.Props) => {
-		const inventoryDragBoundsRef = useRef<HTMLDivElement | null>(null);
+		const inventoryTileEngineRef = useRef<HTMLDivElement | null>(null);
 		const { drag, slots, tiles } = useInventoryTileEngineModel({
 			feedback,
 			placementTarget,
@@ -34,17 +34,17 @@ export const InventorySurface = memo(
 		return (
 			<div
 				data-ui="inventory root"
-				className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden"
+				className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden bg-ak-surface"
 			>
 				<SheetHeader
 					title="Inventory"
 					onClose={onClose}
 				/>
-				<div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-					<div
-						ref={inventoryDragBoundsRef}
-						className="mx-auto w-full max-w-[430px]"
-					>
+				<div
+					data-ui="inventory body"
+					className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-3 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+				>
+					<div className="mx-auto w-full max-w-[460px]">
 						<TileEngine<
 							InventorySurfaceType.TileData,
 							InventorySurfaceType.SlotData,
@@ -52,15 +52,17 @@ export const InventorySurface = memo(
 							DropTarget
 						>
 							id="inventory"
+							rootRef={inventoryTileEngineRef}
 							columns={inventoryColumns}
 							slots={slots}
 							tiles={tiles}
 							gapPx={1}
-							className="w-full bg-ak-inventory"
+							className="bg-ak-inventory"
+							container="static"
 							layerRole="overlay"
 							actorLayerClassName="pointer-events-none"
 							drag={drag}
-							dragConstraintsRef={inventoryDragBoundsRef}
+							dragConstraintsRef={inventoryTileEngineRef}
 							renderSlot={renderSlot}
 							renderTile={renderInventoryTile}
 						/>

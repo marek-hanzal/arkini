@@ -4,10 +4,10 @@
 	--color-ak-page: #0c0611;
 	--color-ak-surface: #14091a;
 	--color-ak-surface-soft: #1d1027;
-	--color-ak-surface-elevated: #22122d;
+	--color-ak-surface-elevated: #241431;
 	--color-ak-board: #1b0f24;
 	--color-ak-inventory: #21112b;
-	--color-ak-border: #24162d;
+	--color-ak-border: #291a33;
 	--color-ak-border-accent: #ec4899;
 	--color-ak-text: #f6efff;
 	--color-ak-text-muted: #b5a5c7;
@@ -56,9 +56,9 @@ button:focus-visible,
 }
 
 :root {
-	--ak-bottom-nav-height: calc(4.75rem + env(safe-area-inset-bottom));
-	--ak-sheet-width: min(100dvw, 520px);
-	--ak-sheet-max-height: 85dvh;
+	--ak-bottom-nav-height: calc(5.1rem + env(safe-area-inset-bottom));
+	--ak-sheet-width: min(100dvw, 560px);
+	--ak-sheet-max-height: 88dvh;
 
 	--ak-layer-base-surface: 0;
 	--ak-layer-base-tile: 10;

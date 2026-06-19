@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { activationStatusLabel } from "~/v0/item/logic/activationStatusLabel";
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
+import { UiSection } from "~/v0/ui/UiSection";
 
 export namespace ItemActivationCard {
 	export interface Props {
@@ -15,23 +16,22 @@ export const ItemActivationCard: FC<ItemActivationCard.Props> = ({ activation, n
 		activation,
 		nowMs,
 	});
-	const title = activation.kind === "stash" ? "Stash status" : "Producer status";
 
 	return (
-		<div className="rounded-sm border border-ak-border bg-ak-surface-soft p-3">
-			<div className="flex items-center justify-between gap-3">
-				<p className="text-[0.66rem] font-extrabold uppercase tracking-[0.16em] text-ak-primary">
-					{title}
-				</p>
-				<p className="text-xs font-semibold text-ak-primary">
+		<UiSection
+			eyebrow="Status"
+			title={activation.kind === "stash" ? "Stash" : "Producer"}
+			action={
+				<span className="text-sm font-bold text-ak-primary">
 					{activationStatusLabel({
 						activation,
 						nowMs,
 					})}
-				</p>
-			</div>
+				</span>
+			}
+		>
 			{cooldown ? (
-				<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-ak-surface">
+				<div className="h-1.5 overflow-hidden rounded-sm bg-ak-surface-soft">
 					<div
 						className="h-full rounded-sm bg-ak-primary transition-[width] duration-200 ease-linear"
 						style={{
@@ -41,11 +41,11 @@ export const ItemActivationCard: FC<ItemActivationCard.Props> = ({ activation, n
 				</div>
 			) : null}
 			{activation.remainingCharges !== undefined ? (
-				<p className="text-ak-text-muted mt-3 text-xs">
+				<p className="mt-3 text-sm text-ak-text-muted">
 					Charges left:{" "}
 					<strong className="text-ak-text">{activation.remainingCharges}</strong>
 				</p>
 			) : null}
-		</div>
+		</UiSection>
 	);
 };

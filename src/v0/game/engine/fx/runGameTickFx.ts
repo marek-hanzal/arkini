@@ -3,7 +3,7 @@ import { GameConfigFx } from "~/v0/game/engine/context/GameConfigFx";
 import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
 import { processCompletedCraftJobsFx } from "~/v0/game/craft/processCompletedCraftJobsFx";
 import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
-import { processCompletedUpgradeJobsFx } from "~/v0/game/engine/fx/processCompletedUpgradeJobsFx";
+import { processCompletedUpgradeJobsFx } from "~/v0/game/upgrade/processCompletedUpgradeJobsFx";
 import { processItemSpawnJobsFx } from "~/v0/game/engine/fx/processItemSpawnJobsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";

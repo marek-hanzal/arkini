@@ -17,7 +17,7 @@ import { withdrawCraftInputFx } from "~/v0/game/craft/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/v0/game/producer/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/v0/game/producer/withdrawProducerInputFx";
 import { startProducerProductFx } from "~/v0/game/producer/startProducerProductFx";
-import { startUpgradeFx } from "~/v0/game/engine/fx/startUpgradeFx";
+import { startUpgradeFx } from "~/v0/game/upgrade/startUpgradeFx";
 import { storeStoredRequirementFx } from "~/v0/game/requirements/storeStoredRequirementFx";
 import { withdrawStoredRequirementFx } from "~/v0/game/requirements/withdrawStoredRequirementFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";

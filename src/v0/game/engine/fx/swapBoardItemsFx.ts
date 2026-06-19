@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { checkBoardItemsSwapReadinessFx } from "~/v0/game/engine/fx/checkBoardItemsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameActionBoardItemsSwapSchema } from "~/v0/game/engine/model/GameActionBoardItemsSwapSchema";
@@ -29,12 +30,18 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 		} satisfies GameEngineResult;
 	}
 
-	const source = save.board.items[action.sourceBoardItemId];
-	const target = save.board.items[action.targetBoardItemId];
+	const { source, target } = yield* checkBoardItemsSwapReadinessFx({
+		action,
+		save,
+	});
 	if (!source || !target) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("invalid_actor", "Both board items must exist."),
-		);
+		return {
+			events: [],
+			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				save,
+			}),
+			save,
+		} satisfies GameEngineResult;
 	}
 
 	const nextSave = yield* cloneGameSaveFx({

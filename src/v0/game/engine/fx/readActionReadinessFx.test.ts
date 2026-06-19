@@ -240,4 +240,114 @@ describe("readActionReadinessFx", () => {
 
 		expect(save).toEqual(before);
 	});
+	it("rejects board item move readiness when target cell is occupied", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+
+		const readiness = runReadiness({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 1,
+				y: 0,
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toMatchObject({
+			errorTag: "GameActionRejected",
+			reason: "unsupported_target",
+			type: "rejected",
+		});
+	});
+
+	it("rejects inventory item placement readiness from an empty slot", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const readiness = runReadiness({
+			action: {
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toMatchObject({
+			errorTag: "GameActionRejected",
+			reason: "input_unavailable",
+			type: "rejected",
+		});
+	});
+
+	it("rejects board stash readiness when inventory cannot accept the item", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:axe",
+			quantity: 1,
+		};
+		save.inventory.slots[1] = {
+			itemId: "item:rock",
+			quantity: 1,
+		};
+
+		const readiness = runReadiness({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.stash",
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toMatchObject({
+			errorTag: "GameActionRejected",
+			reason: "inventory:full",
+			type: "rejected",
+		});
+	});
+
+	it("rejects inventory slot swap readiness outside inventory bounds", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const readiness = runReadiness({
+			action: {
+				sourceSlotIndex: 0,
+				targetSlotIndex: 99,
+				type: "inventory.slots.swap",
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toMatchObject({
+			errorTag: "GameActionRejected",
+			reason: "unsupported_target",
+			type: "rejected",
+		});
+	});
 });

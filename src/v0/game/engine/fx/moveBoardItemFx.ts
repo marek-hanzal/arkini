@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { checkBoardItemMoveReadinessFx } from "~/v0/game/engine/fx/checkBoardItemMoveReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import type { GameActionBoardItemMoveSchema } from "~/v0/game/engine/model/GameActionBoardItemMoveSchema";
@@ -22,27 +23,11 @@ export const moveBoardItemFx = Effect.fn("moveBoardItemFx")(function* ({
 	save,
 	nowMs,
 }: moveBoardItemFx.Props) {
-	if (action.x >= config.game.board.width || action.y >= config.game.board.height) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("unsupported_target", "Board cell is outside board."),
-		);
-	}
-
-	const item = save.board.items[action.boardItemId];
-	if (!item) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("invalid_actor", "Board item does not exist."),
-		);
-	}
-
-	const occupied = Object.values(save.board.items).find(
-		(entry) => entry.id !== item.id && entry.x === action.x && entry.y === action.y,
-	);
-	if (occupied) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("unsupported_target", "Board cell is occupied."),
-		);
-	}
+	const item = yield* checkBoardItemMoveReadinessFx({
+		action,
+		config,
+		save,
+	});
 
 	const nextSave = yield* cloneGameSaveFx({
 		save,

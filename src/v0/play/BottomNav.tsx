@@ -30,7 +30,7 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 			aria-label={label}
 			title={label}
 			className={cn(
-				"flex h-full w-full min-w-0 flex-col items-center justify-center gap-1 rounded-sm border border-ak-border bg-ak-surface px-2 py-2 text-center transition-[transform,border-color,background,color,opacity] active:translate-y-px",
+				"grid h-full w-full min-w-0 place-items-center rounded-sm border border-ak-border bg-ak-surface transition-[transform,border-color,background,color,opacity] active:translate-y-px",
 				active
 					? "border-ak-border-accent bg-ak-primary-soft text-ak-text"
 					: "text-ak-text-muted hover:border-ak-border-accent hover:bg-ak-surface-soft",
@@ -38,12 +38,14 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 			onClick={() => onOpen(tone)}
 		>
 			<span
-				className="text-[1.15rem] leading-none"
+				className="text-[clamp(1.35rem,6.8dvw,2.25rem)] leading-none"
 				aria-hidden="true"
 			>
 				{icon}
 			</span>
-			<span className="text-[0.7rem] font-bold uppercase tracking-[0.18em]">{label}</span>
+			<span className="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+				{label}
+			</span>
 		</button>
 	</div>
 ));
@@ -51,12 +53,12 @@ const NavButton: FC<ButtonProps> = memo(({ active, label, icon, tone, onOpen }) 
 export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => (
 	<nav
 		data-ui="bottom nav"
-		className="absolute inset-x-0 bottom-0 h-[var(--ak-bottom-nav-height)] bg-ak-page px-[max(0.65rem,env(safe-area-inset-left))] pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
+		className="absolute inset-x-0 bottom-0 h-[var(--ak-bottom-nav-height)] bg-ak-page px-[max(clamp(0.5rem,2.5dvw,0.9rem),env(safe-area-inset-left))] pt-[clamp(0.35rem,1.6dvh,0.7rem)] pb-[calc(clamp(0.35rem,1.6dvh,0.65rem)+env(safe-area-inset-bottom))]"
 		style={{
 			zIndex: "var(--ak-layer-bottom-nav)",
 		}}
 	>
-		<div className="mx-auto grid h-full w-full max-w-[min(100%,520px)] grid-cols-3 gap-2">
+		<div className="mx-auto grid h-full w-full max-w-[min(100%,520px)] grid-cols-3 gap-[clamp(0.45rem,2dvw,0.8rem)]">
 			<NavButton
 				active={activeSheet === "inventory"}
 				label="Inventory"

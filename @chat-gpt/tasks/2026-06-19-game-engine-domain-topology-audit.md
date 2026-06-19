@@ -1,6 +1,6 @@
 # Game engine domain topology audit
 
-Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer and craft runtime files were moved to top-level `game/producer` and `game/craft` without behavior changes.
+Status: active audit. First coding steps done: `applyGameActionFx.test.ts` was split by domain family; producer, craft, and stash runtime files were moved to top-level game domains without behavior changes.
 
 ## Problem
 
@@ -12,7 +12,7 @@ This creates navigation load. The engine is not conceptually one giant `fx` doma
 
 ## Current source shape
 
-- `src/v0/game/engine/fx`: started at 111 files; now 86 files after producer and craft extraction.
+- `src/v0/game/engine/fx`: started at 111 files; now 78 files after producer, craft, and stash extraction.
 - `src/v0/game/engine/model`: 68 files.
 - `src/v0/game/engine/runtime`: 3 files.
 - `src/v0/game/engine/logic`: 4 files.
@@ -239,6 +239,18 @@ This reduces mental load without changing runtime imports.
 
 Then move production files domain-by-domain.
 
+## Domain extraction progress
+
+- [x] `producer` domain extraction into `src/v0/game/producer/`.
+- [x] `craft` domain extraction into `src/v0/game/craft/`.
+- [x] `stash` domain extraction into `src/v0/game/stash/`.
+- [ ] `placement` domain extraction into `src/v0/game/placement/`.
+- [ ] `stored requirements` extraction into a top-level game domain.
+- [ ] `upgrade` extraction into `src/v0/game/upgrade/`.
+- [ ] `jobs` extraction if the remaining job helpers form a coherent domain-sized cluster.
+
+Next coding cut: `placement` domain extraction.
+
 ## Recommended sequence
 
 ### Step 1: split the huge action test file by domain
@@ -305,8 +317,14 @@ Craft runtime files and the craft action test moved from `src/v0/game/engine/fx`
 
 Reason: craft is a game domain, not an engine subfolder. `game/engine` should orchestrate craft behavior, not own it.
 
+## Completed fourth coding task
+
+Stash runtime files and the stash action test moved from `src/v0/game/engine/fx` into top-level `src/v0/game/stash`.
+
+Reason: stash is a game domain, not an engine subfolder. `game/engine` should orchestrate stash behavior, not own it.
+
 ## Current recommended next coding task
 
-Move the stash domain from `src/v0/game/engine/fx` into top-level `src/v0/game/stash`.
+Move placement primitives from `src/v0/game/engine/fx` into top-level `src/v0/game/placement`.
 
-Reason: stash is the next coherent domain cluster and already has a dedicated action test anchor. Move files/imports only; no behavior changes.
+Reason: placement is the next coherent shared domain cluster and is already used by producer/craft/stash/board/inventory flows. Move files/imports only; no behavior changes.

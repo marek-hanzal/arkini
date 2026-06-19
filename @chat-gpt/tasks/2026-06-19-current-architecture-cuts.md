@@ -24,11 +24,12 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: split giant `applyGameActionFx.test.ts` into domain-family action tests; this anchors future game-domain moves.
 - `2026-06-19`: moved producer runtime files from `game/engine/fx` into top-level `game/producer`; `game/engine` now imports producer as a domain instead of owning it.
 - `2026-06-19`: moved craft runtime files from `game/engine/fx` into top-level `game/craft`; `game/engine` now imports craft as a domain instead of owning it.
+- `2026-06-19`: moved stash runtime files from `game/engine/fx` into top-level `game/stash`; `game/engine` now imports stash as a domain instead of owning it.
 
 ## Next candidates
 
-1. Continue `game/engine/fx` production reshaping domain-by-domain. Next safest coding task: move stash files into top-level `game/stash`. No behavior changes.
-2. Continue after stash: placement, stored requirements, upgrades, jobs, board/inventory action helpers. Keep folder depth shallow and move only coherent domain clusters.
+1. Continue `game/engine/fx` production reshaping domain-by-domain. Next safest coding task: move placement files into top-level `game/placement`. No behavior changes.
+2. Continue after placement: stored requirements, upgrades, jobs, board/inventory action helpers. Keep folder depth shallow and move only coherent domain clusters.
 3. TileEngine follow-up: current browser feel is acceptable. Do not split `TileMotionRuntime.ts` just for line count.
 4. GameEventSchema audit: only if event schema starts carrying behavior. It is an intentional output-event contract and should not be split just for line count.
 

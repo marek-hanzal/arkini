@@ -573,6 +573,44 @@ describe("GameConfigSchema", () => {
 		expect(parseGameConfig(config).upgrades["upgrade:test"].tiers[0].effects).toHaveLength(2);
 	});
 
+	it("rejects product input quantity upgrades that target the input ref replaced earlier in the same prefix", () => {
+		const config = createValidConfigValue();
+		(
+			config.inputs as Record<
+				string,
+				{
+					inputs: TestProductInput[];
+					name: string;
+				}
+			>
+		)["input:plank"] = {
+			name: "Plank input",
+			inputs: [
+				{
+					capacity: 2,
+					consume: true,
+					itemId: "item:plank",
+					quantity: 1,
+				},
+			],
+		};
+		config.upgrades["upgrade:test"].tiers[0].effects = [
+			{
+				inputRefId: "input:plank",
+				productId: "product:test",
+				type: "product.inputRef.set",
+			},
+			{
+				itemId: "item:twig",
+				productId: "product:test",
+				quantity: 1,
+				type: "product.input.quantity.add",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/Effective product.*input:plank.*item:twig/);
+	});
+
 	it("keeps structural checks for queue size and non-empty loot output", () => {
 		const config = createValidConfigValue();
 		config.producers["producer:test"].maxQueueSize = 0;

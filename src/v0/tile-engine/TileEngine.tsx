@@ -90,9 +90,8 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-container={container}
 			data-ak-tile-engine-disabled={disabled ? "true" : undefined}
 			className={cn(
-				"ak-tile-engine relative min-w-0 shrink-0 overflow-visible rounded-sm border border-white/[0.04] bg-ak-board p-0.5",
+				"ak-tile-engine relative min-w-0 shrink-0 overflow-visible rounded-sm border border-white/[0.12] bg-white/[0.055] p-1",
 				disabled && "pointer-events-none",
-				className,
 			)}
 			style={
 				{
@@ -103,7 +102,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 		>
 			<div
 				data-ui="tile engine grid"
-				className="ak-tile-engine-grid relative w-full overflow-visible"
+				className={cn("ak-tile-engine-grid relative w-full overflow-visible", className)}
 			>
 				<TileEngineSlots
 					columns={columns}

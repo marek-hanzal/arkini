@@ -19,6 +19,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - TileEngine is generic and must not import Arkini domain modules.
 - `GameConfigSchema` / `GameSaveConfigSchema` are central validation gates.
 - Base config is immutable; save upgrades build an effective overlay config.
+- Job/event split: anything delayed, scheduled, retrying, blocked, or persisted for future processing is a job. `GameEvent` is only an output for something processed now.
 
 ## Hard rules
 
@@ -26,3 +27,4 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Do not add special UI for filling requirements; use core DnD/merge-style interactions.
 - Before non-trivial work, inspect current source and existing library capabilities.
 - Keep active notes short. Archive completed task notes immediately.
+- Do not reintroduce pending/scheduled event queues; future delayed gameplay belongs in explicit job maps/families.

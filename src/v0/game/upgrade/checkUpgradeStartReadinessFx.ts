@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
-import { readUpgradeCompletedTierCountFx } from "~/v0/game/engine/fx/readUpgradeCompletedTierCountFx";
-import { readUpgradeCostInputsFx } from "~/v0/game/engine/fx/readUpgradeCostInputsFx";
+import { readUpgradeCompletedTierCountFx } from "~/v0/game/upgrade/readUpgradeCompletedTierCountFx";
+import { readUpgradeCostInputsFx } from "~/v0/game/upgrade/readUpgradeCostInputsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionUpgradeStartSchema } from "~/v0/game/engine/model/GameActionUpgradeStartSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

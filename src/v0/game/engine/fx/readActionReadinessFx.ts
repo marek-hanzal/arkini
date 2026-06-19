@@ -18,7 +18,7 @@ import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadine
 import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/requirements/checkStoredRequirementStoreReadinessFx";
 import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/requirements/checkStoredRequirementWithdrawReadinessFx";
 import { checkTileRemoveReadinessFx } from "~/v0/game/engine/fx/checkTileRemoveReadinessFx";
-import { checkUpgradeStartReadinessFx } from "~/v0/game/engine/fx/checkUpgradeStartReadinessFx";
+import { checkUpgradeStartReadinessFx } from "~/v0/game/upgrade/checkUpgradeStartReadinessFx";
 import { parseGameActionFx } from "~/v0/game/engine/fx/parseGameActionFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";

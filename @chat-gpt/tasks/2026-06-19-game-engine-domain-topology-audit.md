@@ -12,7 +12,7 @@ This creates navigation load. The engine is not conceptually one giant `fx` doma
 
 ## Current source shape
 
-- `src/v0/game/engine/fx`: started at 111 files; now 52 files after producer, craft, stash, placement, and requirements extraction.
+- `src/v0/game/engine/fx`: started at 111 files; now 44 files after producer, craft, stash, placement, requirements, and upgrade extraction.
 - `src/v0/game/engine/model`: 68 files.
 - `src/v0/game/engine/runtime`: 3 files.
 - `src/v0/game/engine/logic`: 4 files.
@@ -241,10 +241,10 @@ Then move production files domain-by-domain.
 - [x] `stash` domain extraction into `src/v0/game/stash/`.
 - [x] `placement` domain extraction into `src/v0/game/placement/`.
 - [x] `requirements` domain extraction into `src/v0/game/requirements/`.
-- [ ] `upgrade` extraction into `src/v0/game/upgrade/`.
+- [x] `upgrade` extraction into `src/v0/game/upgrade/`.
 - [ ] `jobs` extraction if the remaining job helpers form a coherent domain-sized cluster.
 
-Next coding cut: `upgrade` domain extraction.
+Next coding cut: jobs/item-spawn or board/inventory/merge/remove extraction, whichever forms the cleanest coherent cluster.
 
 ## Recommended sequence
 
@@ -324,8 +324,18 @@ Placement runtime files and the placement test moved from `src/v0/game/engine/fx
 
 Reason: placement is a shared game domain used by producer/craft/stash/jobs/bootstrap/inventory placement flows. `game/engine` should orchestrate placement behavior, not own it.
 
+## Completed sixth coding task
+
+Requirements/input-ref/stored-requirement runtime files and the stored-requirement action test moved from `src/v0/game/engine/fx` into top-level `src/v0/game/requirements`.
+
+Reason: requirements are a shared gameplay subdomain used by producer, craft, stash, upgrade, merge/remove, and stored-requirement behavior.
+
+## Completed seventh coding task
+
+Upgrade runtime files and upgrade lifecycle tests moved from `src/v0/game/engine/fx` into top-level `src/v0/game/upgrade`.
+
+Reason: upgrade lifecycle is a game domain, not engine-owned Effect plumbing. `game/engine` dispatches `upgrade.start` and ticks completed upgrade jobs, but upgrade rules live in `game/upgrade`.
+
 ## Current recommended next coding task
 
-Move stored requirement runtime files from `src/v0/game/engine/fx` into a top-level game domain.
-
-Reason: stored requirements are a reusable gameplay subdomain, not engine-owned Effect plumbing. Move files/imports only; no behavior changes.
+Continue reducing `src/v0/game/engine/fx` by moving the next coherent domain cluster. Candidate clusters: jobs/item-spawn, board/inventory actions, merge/remove, loot, and ID utilities. Move files/imports only; no behavior changes.

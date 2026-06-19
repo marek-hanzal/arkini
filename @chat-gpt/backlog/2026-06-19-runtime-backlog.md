@@ -7,10 +7,8 @@ Deferred or broader tasks. Promote one into `tasks/` when it becomes current wor
 - Pure vs Effect boundary audit: classify pure helpers vs Effect programs and remove duplicated business decisions. See `2026-06-19-pure-vs-effect-boundary-audit.md`.
 - Legacy manifest cleanup: remove old TS manifest/config/validation fossils after import-graph check.
 - Capability matrix enforcement after the audit decides allowed item combinations.
-- Split central schema files by domain while keeping central public validators.
-- Split board read-model bridge into focused domain readers.
-- Persistence retry / flush hardening.
-- Scheduled event simplification or formal policy.
+- Keep `GameConfigSchema` / `GameSaveSchema` as intentional dense core contracts; do not split them as line-count cleanup.
+- Scheduled job/event formal policy: separate planned jobs from due-now events before refactoring time flow.
 
 ## UI / debug
 

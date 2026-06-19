@@ -10,14 +10,13 @@ Status: active task queue for the current cleanup/refactor block.
 - `2026-06-19`: `@chat-gpt` notes reorganized into `tasks/`, `backlog/`, `archive/`.
 - `2026-06-19`: persistence retry safety fixed; failed writes keep latest pending save.
 - `2026-06-19`: board read-model bridge split into focused activation/craft/item readers.
-- `2026-06-19`: complexity scan added; `GameSaveSchema` split so schema shape and save/config validation are separate.
+- `2026-06-19`: reverted `GameSaveSchema` validation split; schema core contracts are not line-count cleanup targets.
 
 ## Next candidates
 
-1. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item. Do not code validation before approving allowed combinations.
-2. GameSave validation domain split: if `GameSaveValidation.ts` becomes painful, mechanically extract board/inventory/producer/craft/upgrade/stash/stored-requirement/scheduled-event validators without behavior changes.
-3. Schema split prep: reduce `GameConfigSchema` mental load without changing public exports.
-4. Scheduled event policy audit: decide which events are live runtime primitive vs legacy complexity.
-5. TileEngine pointer/motion audit: separate inherent DOM/pointer complexity from accidental orchestration complexity.
+1. Scheduled job/event policy audit: formalize two primitives before refactoring runtime time flow.
+   - Job = planned activity that may reschedule itself and eventually emit events.
+   - Event = concrete occurrence due now and processed through the standard event pipeline.
+2. Item capability matrix audit: document and validate allowed combinations such as stackable resource, board actor, producer, stash, craft target, removable item.
 
 Before coding any risky item, inspect source and propose exact files/shape first.

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { createGameItemSpawnJobIdFx } from "~/v0/game/engine/fx/createGameItemSpawnJobIdFx";
+import { createGameItemSpawnJobIdFx } from "~/v0/game/job/createGameItemSpawnJobIdFx";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/engine/model/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

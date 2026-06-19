@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { checkCraftStartReadinessFx } from "~/v0/game/craft/checkCraftStartReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
-import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/engine/model/GameActionCraftStart";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";

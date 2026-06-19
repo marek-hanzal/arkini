@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
-import { processItemSpawnJobFx } from "~/v0/game/engine/fx/processItemSpawnJobFx";
-import { readDueItemSpawnJobsFx } from "~/v0/game/engine/fx/readDueItemSpawnJobsFx";
+import { processItemSpawnJobFx } from "~/v0/game/job/processItemSpawnJobFx";
+import { readDueItemSpawnJobsFx } from "~/v0/game/job/readDueItemSpawnJobsFx";
 import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 

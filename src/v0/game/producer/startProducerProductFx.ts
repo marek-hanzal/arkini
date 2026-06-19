@@ -3,8 +3,8 @@ import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkPr
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProducerStoredInputsFx";
-import { createGameJobIdFx } from "~/v0/game/engine/fx/createGameJobIdFx";
-import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/engine/model/GameActionProducerProductStart";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";

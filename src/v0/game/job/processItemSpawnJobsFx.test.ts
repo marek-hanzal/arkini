@@ -4,8 +4,8 @@ import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSa
 import {
 	blockedItemSpawnJobRetryDelayMs,
 	processItemSpawnJobsFx,
-} from "~/v0/game/engine/fx/processItemSpawnJobsFx";
-import { createItemSpawnJobsFx } from "~/v0/game/engine/fx/createItemSpawnJobsFx";
+} from "~/v0/game/job/processItemSpawnJobsFx";
+import { createItemSpawnJobsFx } from "~/v0/game/job/createItemSpawnJobsFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>

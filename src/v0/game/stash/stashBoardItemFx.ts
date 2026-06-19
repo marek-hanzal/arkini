@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { checkBoardItemStashReadinessFx } from "~/v0/game/engine/fx/checkBoardItemStashReadinessFx";
+import { checkBoardItemStashReadinessFx } from "~/v0/game/stash/checkBoardItemStashReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/engine/fx/cloneGameSaveFx";
 import { placeGameSaveInventoryInstanceFx } from "~/v0/game/engine/fx/placeGameSaveInventoryInstanceFx";
 import { placeGameSaveInventoryItemsFx } from "~/v0/game/engine/fx/placeGameSaveInventoryItemsFx";

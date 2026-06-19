@@ -1,11 +1,11 @@
 import { Effect } from "effect";
-import { checkStashOpenReadinessFx } from "~/v0/game/engine/fx/checkStashOpenReadinessFx";
+import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadinessFx";
 import { consumeActivationInputsFx } from "~/v0/game/engine/fx/consumeActivationInputsFx";
 import { placeGameSaveItemsFx } from "~/v0/game/engine/fx/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
 import { readBoardItemCell } from "~/v0/game/engine/fx/readBoardItemCell";
 import { rollLootTableItemsFx } from "~/v0/game/engine/fx/rollLootTableItemsFx";
-import { applyStashDepletionFx } from "~/v0/game/engine/fx/applyStashDepletionFx";
+import { applyStashDepletionFx } from "~/v0/game/stash/applyStashDepletionFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStashOpen } from "~/v0/game/engine/model/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

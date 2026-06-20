@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
+import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import { readRuntimeItemCatalogViewFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeItemCatalogViewFromGameConfig";
+
+const config = createEngineMergeTestConfig();
 
 describe("readRuntimeItemCatalogViewFromGameConfig", () => {
 	it("surfaces only executable merge relations from the catalog", () => {
-		const catalog = readRuntimeItemCatalogViewFromGameConfig(defaultGameConfig);
+		const catalog = readRuntimeItemCatalogViewFromGameConfig(config);
 
 		expect(catalog["item:water"]?.mergeResults).toContainEqual({
 			resultItemId: "item:sprout",
@@ -19,7 +21,7 @@ describe("readRuntimeItemCatalogViewFromGameConfig", () => {
 	});
 
 	it("keeps directed imprint relations one-way", () => {
-		const catalog = readRuntimeItemCatalogViewFromGameConfig(defaultGameConfig);
+		const catalog = readRuntimeItemCatalogViewFromGameConfig(config);
 
 		expect(catalog["item:lumber-camp-1"]?.mergeResults).toContainEqual({
 			resultItemId: "item:blueprint-lumber-camp",

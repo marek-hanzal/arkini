@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
+import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import {
 	hasReverseDirectedItemMergeRule,
 	resolveExecutableItemMergeRule,
 } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 
+const config = createEngineMergeTestConfig();
+
 describe("resolveExecutableItemMergeRule", () => {
 	it("resolves only source-owned explicit merge rules", () => {
 		expect(
 			resolveExecutableItemMergeRule({
-				config: defaultGameConfig,
+				config,
 				sourceItemId: "item:water",
 				targetItemId: "item:twig",
 			}),
@@ -24,7 +26,7 @@ describe("resolveExecutableItemMergeRule", () => {
 
 		expect(
 			resolveExecutableItemMergeRule({
-				config: defaultGameConfig,
+				config,
 				sourceItemId: "item:twig",
 				targetItemId: "item:water",
 			}),
@@ -34,7 +36,7 @@ describe("resolveExecutableItemMergeRule", () => {
 	it("keeps imprint merges directed", () => {
 		expect(
 			resolveExecutableItemMergeRule({
-				config: defaultGameConfig,
+				config,
 				sourceItemId: "item:lumber-camp-1",
 				targetItemId: "item:blueprint",
 			}),
@@ -50,14 +52,14 @@ describe("resolveExecutableItemMergeRule", () => {
 
 		expect(
 			resolveExecutableItemMergeRule({
-				config: defaultGameConfig,
+				config,
 				sourceItemId: "item:blueprint",
 				targetItemId: "item:lumber-camp-1",
 			}),
 		).toBeUndefined();
 		expect(
 			hasReverseDirectedItemMergeRule({
-				config: defaultGameConfig,
+				config,
 				sourceItemId: "item:blueprint",
 				targetItemId: "item:lumber-camp-1",
 			}),

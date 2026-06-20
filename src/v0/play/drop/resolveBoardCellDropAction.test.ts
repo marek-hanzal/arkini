@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
-import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import { resolveBoardCellDropAction } from "~/v0/play/drop/resolveBoardCellDropAction";
@@ -21,6 +21,7 @@ const boardSource = (item: BoardViewItem) =>
 	}) satisfies DragSource;
 
 const config = createEngineTestConfig();
+const directionalMergeConfig = createEngineMergeTestConfig();
 
 describe("resolveBoardCellDropAction", () => {
 	it("ignores drops onto the source item cell", () => {
@@ -171,7 +172,7 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
-				config: defaultGameConfig,
+				config: directionalMergeConfig,
 				board: rebuildBoardView([
 					twig,
 					water,
@@ -191,7 +192,7 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
-				config: defaultGameConfig,
+				config: directionalMergeConfig,
 				board: rebuildBoardView([
 					twig,
 					water,

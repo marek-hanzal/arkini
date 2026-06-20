@@ -15,6 +15,14 @@
 			],
 			"distance": 3,
 			"durationFactor": 1
+		},
+		"requirement:lumber-camp-1-near-tree-3-efficient": {
+			"type": "proximity",
+			"itemIds": [
+				"item:tree"
+			],
+			"distance": 3,
+			"durationFactor": 0.75
 		}
 	}
 }

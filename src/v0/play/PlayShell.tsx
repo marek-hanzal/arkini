@@ -1,6 +1,7 @@
 import { match } from "ts-pattern";
 import { type FC, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BoardSurface } from "~/v0/board/BoardSurface";
+import { CheatInventorySheet } from "~/v0/debug/CheatInventorySheet";
 import { DevSheet } from "~/v0/debug/DevSheet";
 import { registerDebugBugReport } from "~/v0/debug/DebugBugReport";
 import { InventorySurface } from "~/v0/inventory/InventorySurface";
@@ -122,6 +123,12 @@ const PlayShellContent: FC = () => {
 						type: "upgrades",
 					},
 					() => <UpgradesSheet onClose={closeSheet} />,
+				)
+				.with(
+					{
+						type: "cheat-inventory",
+					},
+					() => <CheatInventorySheet onClose={closeSheet} />,
 				)
 				.with(
 					{

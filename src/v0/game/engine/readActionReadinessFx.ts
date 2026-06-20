@@ -7,6 +7,7 @@ import { checkBoardItemsSwapReadinessFx } from "~/v0/game/board/checkBoardItemsS
 import { checkCraftStartReadinessFx } from "~/v0/game/craft/checkCraftStartReadinessFx";
 import { checkCraftInputStoreReadinessFx } from "~/v0/game/craft/checkCraftInputStoreReadinessFx";
 import { checkCraftInputWithdrawReadinessFx } from "~/v0/game/craft/checkCraftInputWithdrawReadinessFx";
+import { checkDebugItemSpawnReadinessFx } from "~/v0/game/debug/checkDebugItemSpawnReadinessFx";
 import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/placement/checkInventoryItemPlaceReadinessFx";
 import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/inventory/checkInventorySlotsSwapReadinessFx";
 import { checkItemMergeReadinessFx } from "~/v0/game/merge/checkItemMergeReadinessFx";
@@ -84,6 +85,12 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				craftStart: (craftAction) =>
 					checkCraftStartReadinessFx({
 						action: craftAction,
+						config: gameConfig.config,
+						save,
+					}),
+				debugItemSpawn: (spawnAction) =>
+					checkDebugItemSpawnReadinessFx({
+						action: spawnAction,
 						config: gameConfig.config,
 						save,
 					}),

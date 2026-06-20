@@ -13,6 +13,7 @@ import { removeTileFx } from "~/v0/game/remove/removeTileFx";
 import { setProducerProductLineDefaultFx } from "~/v0/game/producer/setProducerProductLineDefaultFx";
 import { setProducerProductLineEnabledFx } from "~/v0/game/producer/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/craft/startCraftFx";
+import { spawnDebugItemFx } from "~/v0/game/debug/spawnDebugItemFx";
 import { storeCraftInputFx } from "~/v0/game/craft/storeCraftInputFx";
 import { withdrawCraftInputFx } from "~/v0/game/craft/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/v0/game/producer/storeProducerInputFx";
@@ -95,6 +96,13 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		craftStart: (craftAction) =>
 			startCraftFx({
 				action: craftAction,
+				config: gameConfig.config,
+				nowMs,
+				save,
+			}),
+		debugItemSpawn: (spawnAction) =>
+			spawnDebugItemFx({
+				action: spawnAction,
 				config: gameConfig.config,
 				nowMs,
 				save,

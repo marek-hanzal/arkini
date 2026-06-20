@@ -1,0 +1,3632 @@
+# Arkini CONFIG.MD
+
+This document describes Arkini game configuration authoring.
+
+The configuration is a JSON data model. It defines game content: game metadata, board size, inventory size, resources, assets, items, merge rules, producer inputs, requirements, producers, products, loot tables, stashes, craft recipes, upgrades, and starting state.
+
+The main rule is ID composition: each entity has a stable ID and other entities reference it by that ID.
+
+Example links:
+
+```json
+{
+  "items": {
+    "item:twig": {
+      "assetId": "asset:item-twig"
+    }
+  },
+  "producers": {
+    "producer:lumber-camp-1": {
+      "productIds": ["product:lumber-camp-1"]
+    }
+  },
+  "products": {
+    "product:lumber-camp-1": {
+      "outputTableId": "loot:lumber-camp-1"
+    }
+  }
+}
+```
+
+## 1. Top-level structure
+
+A compiled `GameConfig` contains these sections:
+
+```json
+{
+  "version": 1,
+  "game": {},
+  "resources": {},
+  "assets": {},
+  "items": {},
+  "merge": {},
+  "inputs": {},
+  "requirements": {},
+  "producers": {},
+  "stashes": {},
+  "craftRecipes": {},
+  "products": {},
+  "lootTables": {},
+  "upgrades": {},
+  "startingState": {}
+}
+```
+
+Source JSON files can be fragments. A fragment can contain one section:
+
+```json
+{
+  "items": {
+    "item:twig": {
+      "...": "..."
+    }
+  }
+}
+```
+
+or multiple sections:
+
+```json
+{
+  "items": {},
+  "merge": {},
+  "lootTables": {}
+}
+```
+
+Fragments are merged into one final config.
+
+## 2. ID conventions
+
+Recommended prefixes:
+
+```txt
+asset:<name>
+item:<name>
+merge:<source>-<target>-<result>
+input:<owner>-<purpose>
+requirement:<owner>-<purpose>
+producer:<name>
+product:<producer>-<line>
+stash:<name>
+craft:<result-or-target>
+loot:<owner>
+upgrade:<owner>-<purpose>
+```
+
+Examples:
+
+```txt
+asset:item-tree
+item:tree
+item:twig
+merge:twig-twig-branch
+input:coal-mine-1-rations
+requirement:lumber-camp-1-near-tree
+producer:lumber-camp-1
+product:lumber-camp-1
+product:lumber-camp-1-log
+stash:crate-4
+craft:lumber-camp
+loot:lumber-camp-1
+upgrade:lumber-camp-1-speed
+```
+
+Keep IDs stable. Rename `name`, `label`, or `description` when display text changes. Do not rename IDs for wording or balance changes.
+
+## 3. Common field meanings
+
+- `quantity`: number of items.
+- `capacity`: how many items can be stored in the input/requirement slot.
+- `durationMs`: time in milliseconds.
+- `sort`: ordering value for UI/debug lists.
+- `tier`: item/content level.
+- `tags`: string labels used to group or describe content.
+- `placement`: output placement rule.
+- `code`: short unique code for the entity, usually without prefix.
+
+Quantity in loot tables can be fixed:
+
+```json
+{
+  "quantity": 2
+}
+```
+
+or a range:
+
+```json
+{
+  "quantity": {
+    "min": 1,
+    "max": 3
+  }
+}
+```
+
+Current placement value:
+
+```txt
+board_then_inventory
+```
+
+This means output tries board placement first, then inventory.
+
+## 4. `version`
+
+Current config format version:
+
+```json
+{
+  "version": 1
+}
+```
+
+## 5. `game`
+
+Defines game metadata, board size, and inventory slots.
+
+```json
+{
+  "game": {
+    "id": "arkini",
+    "title": "Arkini",
+    "board": {
+      "width": 7,
+      "height": 9
+    },
+    "inventory": {
+      "slots": 35
+    }
+  }
+}
+```
+
+When changing board size, update `board.width` and `board.height`:
+
+```json
+{
+  "game": {
+    "id": "arkini",
+    "title": "Arkini",
+    "board": {
+      "width": 7,
+      "height": 11
+    },
+    "inventory": {
+      "slots": 35
+    }
+  }
+}
+```
+
+When changing inventory size, update `inventory.slots`:
+
+```json
+{
+  "game": {
+    "id": "arkini",
+    "title": "Arkini",
+    "board": {
+      "width": 7,
+      "height": 9
+    },
+    "inventory": {
+      "slots": 42
+    }
+  }
+}
+```
+
+## 6. `resources`
+
+Contains resource data used by assets.
+
+```json
+{
+  "resources": {
+    "item-tree": {
+      "data": "data:image/png;base64,..."
+    }
+  }
+}
+```
+
+In source packages, resources are usually generated from PNG files. Assets reference resources by `resourceId`.
+
+## 7. `assets`
+
+Defines visual assets used by items and UI.
+
+Plain item asset:
+
+```json
+{
+  "assets": {
+    "asset:item-log": {
+      "kind": "item",
+      "label": "Log",
+      "resourceId": "item-log",
+      "render": "plain",
+      "sort": 60
+    }
+  }
+}
+```
+
+Fields:
+
+- `kind`: `item` or `ui`.
+- `label`: asset label.
+- `resourceId`: resource ID.
+- `overlayAssetId`: optional asset rendered as overlay.
+- `render`: `plain` or `blueprint`.
+- `sort`: ordering value.
+
+Blueprint asset with overlay:
+
+```json
+{
+  "assets": {
+    "asset:item-blueprint-lumber-camp": {
+      "kind": "item",
+      "label": "Lumber Camp Blueprint",
+      "resourceId": "item-blueprint",
+      "overlayAssetId": "asset:item-lumber-camp",
+      "render": "blueprint",
+      "sort": 116
+    }
+  }
+}
+```
+
+UI asset:
+
+```json
+{
+  "assets": {
+    "asset:ui-coin": {
+      "kind": "ui",
+      "label": "Coin UI Icon",
+      "resourceId": "ui-coin",
+      "render": "plain",
+      "sort": 10
+    }
+  }
+}
+```
+
+Item usage:
+
+```json
+{
+  "items": {
+    "item:log": {
+      "assetId": "asset:item-log"
+    }
+  }
+}
+```
+
+## 8. `items`
+
+Defines all item/tile definitions.
+
+Item shape:
+
+```json
+{
+  "items": {
+    "item:twig": {
+      "assetId": "asset:item-twig",
+      "code": "twig",
+      "name": "Twig",
+      "tier": 1,
+      "maxStackSize": 50,
+      "storage": "both",
+      "description": "Small wood resource.",
+      "label": "I",
+      "tags": ["material", "wood"],
+      "sort": 40,
+      "mergeIds": ["merge:twig-twig-branch"],
+      "producerId": "producer:lumber-camp-1",
+      "stashId": "stash:crate-1",
+      "craftRecipeId": "craft:lumber-camp",
+      "removeBy": [
+        {
+          "itemId": "item:water",
+          "mode": "consume"
+        }
+      ]
+    }
+  }
+}
+```
+
+Fields:
+
+- `assetId`: item asset.
+- `code`: short unique item code.
+- `name`: item display name.
+- `tier`: item level.
+- `maxStackSize`: max stack size in inventory.
+- `storage`: `board`, `inventory`, or `both`. Defaults to `both`.
+- `description`: item text.
+- `label`: short label.
+- `tags`: descriptive labels.
+- `sort`: ordering value.
+- `mergeIds`: merge rules available from this item.
+- `producerId`: producer definition attached to this item.
+- `stashId`: stash definition attached to this item.
+- `craftRecipeId`: craft recipe attached to this item.
+- `removeBy`: removal rules using another item.
+
+Storage values:
+
+```txt
+board
+inventory
+both
+```
+
+### 8.1 Basic resource item
+
+```json
+{
+  "items": {
+    "item:twig": {
+      "assetId": "asset:item-twig",
+      "code": "twig",
+      "name": "Twig",
+      "tier": 1,
+      "maxStackSize": 50,
+      "description": "Small wood resource.",
+      "tags": ["material", "wood"],
+      "sort": 40,
+      "mergeIds": ["merge:twig-twig-branch"]
+    }
+  }
+}
+```
+
+### 8.2 Producer item
+
+```json
+{
+  "items": {
+    "item:lumber-camp-1": {
+      "assetId": "asset:item-lumber-camp",
+      "code": "lumber-camp-1",
+      "name": "Lumber Camp I",
+      "tier": 1,
+      "maxStackSize": 1,
+      "description": "Produces basic wood.",
+      "label": "1",
+      "tags": ["producer", "building", "wood"],
+      "sort": 330,
+      "producerId": "producer:lumber-camp-1"
+    }
+  }
+}
+```
+
+### 8.3 Stash item
+
+```json
+{
+  "items": {
+    "item:crate-4": {
+      "assetId": "asset:item-crate-epic",
+      "code": "crate-4",
+      "name": "Epic Crate",
+      "tier": 4,
+      "maxStackSize": 1,
+      "description": "Epic reward crate.",
+      "tags": ["stash", "crate"],
+      "sort": 430,
+      "stashId": "stash:crate-4"
+    }
+  }
+}
+```
+
+### 8.4 Craft target item
+
+```json
+{
+  "items": {
+    "item:blueprint-lumber-camp": {
+      "assetId": "asset:item-blueprint-lumber-camp",
+      "code": "blueprint-lumber-camp",
+      "name": "Lumber Camp Blueprint",
+      "tier": 4,
+      "maxStackSize": 5,
+      "description": "Craft target for Lumber Camp I.",
+      "tags": ["blueprint", "craft-target"],
+      "sort": 204,
+      "craftRecipeId": "craft:lumber-camp"
+    }
+  }
+}
+```
+
+### 8.5 Board-only item
+
+```json
+{
+  "items": {
+    "item:fire": {
+      "assetId": "asset:item-fire",
+      "code": "fire",
+      "name": "Fire",
+      "tier": 0,
+      "maxStackSize": 1,
+      "storage": "board",
+      "description": "Board danger.",
+      "tags": ["danger"],
+      "sort": 900
+    }
+  }
+}
+```
+
+### 8.6 Inventory-only item
+
+```json
+{
+  "items": {
+    "item:saw-license": {
+      "assetId": "asset:item-saw-license",
+      "code": "saw-license",
+      "name": "Saw License",
+      "tier": 0,
+      "maxStackSize": 1,
+      "storage": "inventory",
+      "description": "Inventory-owned production permission.",
+      "tags": ["license"],
+      "sort": 800
+    }
+  }
+}
+```
+
+### 8.7 Removal rule
+
+```json
+{
+  "items": {
+    "item:boulder": {
+      "assetId": "asset:item-boulder",
+      "code": "boulder",
+      "name": "Boulder",
+      "tier": 0,
+      "maxStackSize": 1,
+      "storage": "board",
+      "description": "Removable blocker.",
+      "tags": ["blocker"],
+      "sort": 910,
+      "removeBy": [
+        {
+          "itemId": "item:pickaxe",
+          "mode": "keep"
+        },
+        {
+          "itemId": "item:bomb",
+          "mode": "consume"
+        }
+      ]
+    }
+  }
+}
+```
+
+Removal modes:
+
+- `keep`: tool item remains.
+- `consume`: tool item is consumed.
+
+## 9. `merge`
+
+Defines explicit merge rules.
+
+```json
+{
+  "merge": {
+    "merge:twig-twig-branch": {
+      "withItemId": "item:twig",
+      "resultItemId": "item:branch",
+      "consumeSource": true,
+      "secret": false
+    }
+  }
+}
+```
+
+Fields:
+
+- `withItemId`: target item.
+- `resultItemId`: resulting item.
+- `consumeSource`: whether source item is consumed.
+- `secret`: whether rule is hidden/discovery.
+
+Merge rules are attached to source items through `items.*.mergeIds`.
+
+Example: `Twig + Twig -> Branch`:
+
+```json
+{
+  "items": {
+    "item:twig": {
+      "assetId": "asset:item-twig",
+      "code": "twig",
+      "name": "Twig",
+      "tier": 1,
+      "maxStackSize": 50,
+      "description": "Small wood resource.",
+      "tags": ["wood"],
+      "sort": 40,
+      "mergeIds": ["merge:twig-twig-branch"]
+    }
+  },
+  "merge": {
+    "merge:twig-twig-branch": {
+      "withItemId": "item:twig",
+      "resultItemId": "item:branch"
+    }
+  }
+}
+```
+
+Secret merge:
+
+```json
+{
+  "merge": {
+    "merge:water-seed-sprout": {
+      "withItemId": "item:seed",
+      "resultItemId": "item:sprout",
+      "secret": true
+    }
+  }
+}
+```
+
+Non-consuming source merge:
+
+```json
+{
+  "merge": {
+    "merge:tool-boulder-stone": {
+      "withItemId": "item:boulder",
+      "resultItemId": "item:stone",
+      "consumeSource": false
+    }
+  }
+}
+```
+
+## 10. `inputs`
+
+Defines named input bundles for product lines.
+
+```json
+{
+  "inputs": {
+    "input:coal-mine-1-rations": {
+      "name": "Coal Mine I Rations",
+      "inputs": [
+        {
+          "itemId": "item:sausage",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        }
+      ]
+    }
+  }
+}
+```
+
+Input bundle fields:
+
+- `name`: input bundle name.
+- `inputs`: input slots.
+
+Input slot fields:
+
+- `itemId`: required item.
+- `quantity`: item count required for one run.
+- `capacity`: item count that can be stored.
+- `consume`: whether the item is consumed.
+
+One-item input:
+
+```json
+{
+  "inputs": {
+    "input:sawmill-log": {
+      "name": "Sawmill Log Input",
+      "inputs": [
+        {
+          "itemId": "item:log",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        }
+      ]
+    }
+  }
+}
+```
+
+Multi-item input:
+
+```json
+{
+  "inputs": {
+    "input:coal-mine-1-rations": {
+      "name": "Coal Mine I Rations",
+      "inputs": [
+        {
+          "itemId": "item:sausage",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        },
+        {
+          "itemId": "item:beer",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        }
+      ]
+    }
+  }
+}
+```
+
+Tool-like input that is not consumed:
+
+```json
+{
+  "inputs": {
+    "input:sawmill-saw": {
+      "name": "Sawmill Saw Input",
+      "inputs": [
+        {
+          "itemId": "item:saw",
+          "quantity": 1,
+          "capacity": 1,
+          "consume": false
+        }
+      ]
+    }
+  }
+}
+```
+
+Product reference:
+
+```json
+{
+  "products": {
+    "product:coal-mine-1": {
+      "name": "Coal Mine I Production",
+      "durationMs": 5200,
+      "placement": "board_then_inventory",
+      "inputRefId": "input:coal-mine-1-rations",
+      "requirementIds": [],
+      "outputTableId": "loot:coal-mine-1"
+    }
+  }
+}
+```
+
+## 11. `requirements`
+
+Defines named requirements.
+
+Requirements are referenced by:
+
+- `producers.*.requirementIds`
+- `products.*.requirementIds`
+- upgrade effect `producer.requirementIds.set`
+- upgrade effect `product.requirementIds.set`
+
+Supported types:
+
+```txt
+stored
+passive
+proximity
+```
+
+### 11.1 Stored requirement
+
+Requires a stored item.
+
+```json
+{
+  "requirements": {
+    "requirement:sawmill-has-saw": {
+      "type": "stored",
+      "itemId": "item:saw",
+      "quantity": 1,
+      "capacity": 1
+    }
+  }
+}
+```
+
+Fields:
+
+- `type`: `stored`.
+- `itemId`: required item.
+- `quantity`: required count.
+- `capacity`: storage capacity.
+
+### 11.2 Passive requirement
+
+Requires an item to exist in a scope.
+
+```json
+{
+  "requirements": {
+    "requirement:has-saw-license": {
+      "type": "passive",
+      "itemId": "item:saw-license",
+      "quantity": 1,
+      "scope": "inventory"
+    }
+  }
+}
+```
+
+Fields:
+
+- `type`: `passive`.
+- `itemId`: required item.
+- `quantity`: required count.
+- `scope`: where to check.
+
+Scopes:
+
+```txt
+board
+inventory
+board_or_inventory
+```
+
+### 11.3 Proximity requirement
+
+Requires nearby board item.
+
+```json
+{
+  "requirements": {
+    "requirement:lumber-camp-1-near-tree": {
+      "type": "proximity",
+      "itemIds": ["item:tree"],
+      "distance": 2,
+      "durationFactor": 1
+    }
+  }
+}
+```
+
+Fields:
+
+- `type`: `proximity`.
+- `itemIds`: accepted nearby item IDs.
+- `distance`: maximum board distance.
+- `durationFactor`: distance penalty for production time.
+
+Distance includes diagonals. Distance `1` means adjacent cells including diagonals.
+
+Multiple accepted resources:
+
+```json
+{
+  "requirements": {
+    "requirement:fishing-hut-near-water": {
+      "type": "proximity",
+      "itemIds": ["item:pond", "item:river", "item:water"],
+      "distance": 1,
+      "durationFactor": 1
+    }
+  }
+}
+```
+
+Bigger reach with lower penalty:
+
+```json
+{
+  "requirements": {
+    "requirement:lumber-camp-1-near-tree-3-efficient": {
+      "type": "proximity",
+      "itemIds": ["item:tree"],
+      "distance": 3,
+      "durationFactor": 0.75
+    }
+  }
+}
+```
+
+Producer usage:
+
+```json
+{
+  "producers": {
+    "producer:lumber-camp-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:lumber-camp-1"],
+      "requirementIds": ["requirement:lumber-camp-1-near-tree"]
+    }
+  }
+}
+```
+
+Product usage:
+
+```json
+{
+  "products": {
+    "product:lumber-camp-1-log": {
+      "name": "Logs",
+      "durationMs": 8500,
+      "placement": "board_then_inventory",
+      "requirementIds": ["requirement:lumber-camp-1-near-tree-3-efficient"],
+      "outputTableId": "loot:lumber-camp-1-log"
+    }
+  }
+}
+```
+
+## 12. `producers`
+
+Defines producer shells.
+
+A producer defines product lines, queue size, and producer-level requirements.
+
+```json
+{
+  "producers": {
+    "producer:lumber-camp-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:lumber-camp-1"],
+      "requirementIds": []
+    }
+  }
+}
+```
+
+Fields:
+
+- `type`: `producer`.
+- `maxQueueSize`: queue size.
+- `productIds`: product lines owned by this producer.
+- `requirementIds`: producer-level requirements.
+
+One product line:
+
+```json
+{
+  "producers": {
+    "producer:quarry-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:quarry-1"],
+      "requirementIds": []
+    }
+  }
+}
+```
+
+Multiple product lines:
+
+```json
+{
+  "producers": {
+    "producer:lumber-camp-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": [
+        "product:lumber-camp-1",
+        "product:lumber-camp-1-log"
+      ],
+      "requirementIds": ["requirement:lumber-camp-1-near-tree"]
+    }
+  }
+}
+```
+
+Bigger queue:
+
+```json
+{
+  "producers": {
+    "producer:kiln-1": {
+      "type": "producer",
+      "maxQueueSize": 3,
+      "productIds": ["product:kiln-1-brick"],
+      "requirementIds": []
+    }
+  }
+}
+```
+
+Item reference:
+
+```json
+{
+  "items": {
+    "item:lumber-camp-1": {
+      "assetId": "asset:item-lumber-camp",
+      "code": "lumber-camp-1",
+      "name": "Lumber Camp I",
+      "tier": 1,
+      "maxStackSize": 1,
+      "description": "Produces basic wood.",
+      "tags": ["producer", "building", "wood"],
+      "sort": 330,
+      "producerId": "producer:lumber-camp-1"
+    }
+  }
+}
+```
+
+## 13. `products`
+
+Defines producer product lines.
+
+A product line defines production name, duration, placement, inputs, requirements, and output.
+
+```json
+{
+  "products": {
+    "product:lumber-camp-1": {
+      "name": "Twigs",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1"
+    }
+  }
+}
+```
+
+Fields:
+
+- `name`: product line name.
+- `durationMs`: base production duration in ms.
+- `placement`: output placement.
+- `inputRefId`: input bundle.
+- `requirementIds`: product-level requirements.
+- `outputTableId`: loot table output.
+
+No-input product:
+
+```json
+{
+  "products": {
+    "product:lumber-camp-1": {
+      "name": "Twigs",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1"
+    }
+  }
+}
+```
+
+Product with inputs:
+
+```json
+{
+  "products": {
+    "product:coal-mine-1": {
+      "name": "Coal Mine I Production",
+      "durationMs": 5200,
+      "placement": "board_then_inventory",
+      "inputRefId": "input:coal-mine-1-rations",
+      "requirementIds": [],
+      "outputTableId": "loot:coal-mine-1"
+    }
+  }
+}
+```
+
+Product-level requirement:
+
+```json
+{
+  "products": {
+    "product:lumber-camp-1-log": {
+      "name": "Logs",
+      "durationMs": 8500,
+      "placement": "board_then_inventory",
+      "requirementIds": ["requirement:lumber-camp-1-near-tree-3-efficient"],
+      "outputTableId": "loot:lumber-camp-1-log"
+    }
+  }
+}
+```
+
+Product without output:
+
+```json
+{
+  "products": {
+    "product:trash-burner-1": {
+      "name": "Burn Trash",
+      "durationMs": 3000,
+      "placement": "board_then_inventory",
+      "inputRefId": "input:trash-burner-1-trash",
+      "requirementIds": []
+    }
+  }
+}
+```
+
+Producer reference:
+
+```json
+{
+  "producers": {
+    "producer:trash-burner-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:trash-burner-1"],
+      "requirementIds": []
+    }
+  }
+}
+```
+
+## 14. `lootTables`
+
+Defines output tables for products and stashes.
+
+```json
+{
+  "lootTables": {
+    "loot:lumber-camp-1": {
+      "name": "Lumber Camp I",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:twig",
+          "quantity": 2
+        }
+      ]
+    }
+  }
+}
+```
+
+Fields:
+
+- `name`: loot table name.
+- `output`: output rules.
+
+Output types:
+
+```txt
+guaranteed
+chance
+weighted
+```
+
+Guaranteed output:
+
+```json
+{
+  "lootTables": {
+    "loot:lumber-camp-1-log": {
+      "name": "Lumber Camp I Logs",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:log",
+          "quantity": 1
+        }
+      ]
+    }
+  }
+}
+```
+
+Chance output:
+
+```json
+{
+  "lootTables": {
+    "loot:lumber-camp-1": {
+      "name": "Lumber Camp I",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:twig",
+          "quantity": 2
+        },
+        {
+          "type": "chance",
+          "itemId": "item:branch",
+          "chance": 0.35,
+          "quantity": 1
+        }
+      ]
+    }
+  }
+}
+```
+
+`chance` uses values from `0` to `1`:
+
+```txt
+0.25 = 25 %
+0.5  = 50 %
+1    = 100 %
+```
+
+Weighted output:
+
+```json
+{
+  "lootTables": {
+    "loot:crate-4": {
+      "name": "Epic Crate",
+      "output": [
+        {
+          "type": "weighted",
+          "rolls": 1,
+          "entries": [
+            {
+              "itemId": "item:wood-bundle",
+              "weight": 25,
+              "quantity": 1
+            },
+            {
+              "itemId": "item:beam",
+              "weight": 15,
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+Random quantity:
+
+```json
+{
+  "lootTables": {
+    "loot:bush": {
+      "name": "Bush",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:leaf",
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+Product reference:
+
+```json
+{
+  "products": {
+    "product:lumber-camp-1": {
+      "name": "Twigs",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1"
+    }
+  }
+}
+```
+
+Stash reference:
+
+```json
+{
+  "stashes": {
+    "stash:crate-4": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:crate-4",
+      "inputs": [],
+      "requirements": [],
+      "charges": 6,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+## 15. `stashes`
+
+Defines openable containers.
+
+A stash has a loot table, charges, optional inputs, optional requirements, and depleted behavior.
+
+```json
+{
+  "stashes": {
+    "stash:crate-4": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:crate-4",
+      "inputs": [],
+      "requirements": [],
+      "charges": 6,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+Fields:
+
+- `type`: `stash`.
+- `placement`: output placement.
+- `outputTableId`: loot table.
+- `inputs`: items required to open.
+- `requirements`: stored/passive requirements.
+- `charges`: number of opens.
+- `onDepleted`: depleted behavior.
+
+Crate without key:
+
+```json
+{
+  "stashes": {
+    "stash:crate-1": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:crate-1",
+      "inputs": [],
+      "requirements": [],
+      "charges": 3,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+Crate with key:
+
+```json
+{
+  "stashes": {
+    "stash:crate-4": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:crate-4",
+      "inputs": [
+        {
+          "itemId": "item:epic-key",
+          "quantity": 1,
+          "capacity": 1,
+          "consume": true
+        }
+      ],
+      "requirements": [],
+      "charges": 6,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+Replace when depleted:
+
+```json
+{
+  "stashes": {
+    "stash:barrel-1": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:barrel-1",
+      "inputs": [],
+      "requirements": [],
+      "charges": 2,
+      "onDepleted": {
+        "replaceWithItemId": "item:empty-barrel"
+      }
+    }
+  }
+}
+```
+
+Stash with stored requirement:
+
+```json
+{
+  "stashes": {
+    "stash:sealed-cache": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:sealed-cache",
+      "inputs": [],
+      "requirements": [
+        {
+          "type": "stored",
+          "itemId": "item:seal-key",
+          "quantity": 1,
+          "capacity": 1
+        }
+      ],
+      "charges": 1,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+Item reference:
+
+```json
+{
+  "items": {
+    "item:crate-4": {
+      "assetId": "asset:item-crate-epic",
+      "code": "crate-4",
+      "name": "Epic Crate",
+      "tier": 4,
+      "maxStackSize": 1,
+      "description": "Epic reward crate.",
+      "tags": ["stash", "crate"],
+      "sort": 430,
+      "stashId": "stash:crate-4"
+    }
+  }
+}
+```
+
+## 16. `craftRecipes`
+
+Defines craft recipes.
+
+A craft recipe has a result item, inputs, optional requirements, and craft duration.
+
+```json
+{
+  "craftRecipes": {
+    "craft:lumber-camp": {
+      "resultItemId": "item:lumber-camp-1",
+      "inputs": [
+        {
+          "itemId": "item:plank",
+          "quantity": 1,
+          "consume": true
+        }
+      ],
+      "requirements": [],
+      "durationMs": 0
+    }
+  }
+}
+```
+
+Fields:
+
+- `resultItemId`: result item.
+- `inputs`: required input items.
+- `requirements`: stored/passive requirements.
+- `durationMs`: craft duration in ms.
+
+Input fields:
+
+- `itemId`: input item.
+- `quantity`: count.
+- `consume`: whether it is consumed.
+
+Blueprint craft:
+
+```json
+{
+  "craftRecipes": {
+    "craft:lumber-camp": {
+      "resultItemId": "item:lumber-camp-1",
+      "inputs": [
+        {
+          "itemId": "item:plank",
+          "quantity": 1,
+          "consume": true
+        },
+        {
+          "itemId": "item:stone-block",
+          "quantity": 1,
+          "consume": true
+        }
+      ],
+      "requirements": [],
+      "durationMs": 0
+    }
+  }
+}
+```
+
+Timed craft:
+
+```json
+{
+  "craftRecipes": {
+    "craft:quarry": {
+      "resultItemId": "item:quarry-1",
+      "inputs": [
+        {
+          "itemId": "item:stone-block",
+          "quantity": 2,
+          "consume": true
+        }
+      ],
+      "requirements": [],
+      "durationMs": 5000
+    }
+  }
+}
+```
+
+Craft with requirement:
+
+```json
+{
+  "craftRecipes": {
+    "craft:sawmill": {
+      "resultItemId": "item:sawmill-1",
+      "inputs": [
+        {
+          "itemId": "item:plank",
+          "quantity": 4,
+          "consume": true
+        }
+      ],
+      "requirements": [
+        {
+          "type": "passive",
+          "itemId": "item:townhall-1",
+          "quantity": 1,
+          "scope": "board"
+        }
+      ],
+      "durationMs": 8000
+    }
+  }
+}
+```
+
+Craft target item reference:
+
+```json
+{
+  "items": {
+    "item:blueprint-lumber-camp": {
+      "assetId": "asset:item-blueprint-lumber-camp",
+      "code": "blueprint-lumber-camp",
+      "name": "Lumber Camp Blueprint",
+      "tier": 4,
+      "maxStackSize": 5,
+      "description": "Craft target for Lumber Camp I.",
+      "tags": ["blueprint", "craft-target"],
+      "sort": 204,
+      "craftRecipeId": "craft:lumber-camp"
+    }
+  }
+}
+```
+
+## 17. `upgrades`
+
+Defines upgrades and tiers.
+
+An upgrade has costs, duration, and effects.
+
+```json
+{
+  "upgrades": {
+    "upgrade:lumber-camp-1-speed": {
+      "code": "lumber-camp-1-speed",
+      "name": "Lumber Camp I Speed",
+      "description": "Reduces production duration.",
+      "sort": 10,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 1
+            }
+          ],
+          "effects": [
+            {
+              "type": "product.duration.add",
+              "productId": "product:lumber-camp-1",
+              "ms": -100
+            }
+          ],
+          "durationMs": 6000
+        }
+      ]
+    }
+  }
+}
+```
+
+Upgrade fields:
+
+- `code`: short unique upgrade code.
+- `name`: upgrade name.
+- `description`: description.
+- `sort`: ordering value.
+- `tiers`: tier list.
+
+Tier fields:
+
+- `cost`: item cost.
+- `effects`: effects applied after tier completion.
+- `durationMs`: upgrade duration in ms.
+
+Cost item:
+
+```json
+{
+  "itemId": "item:coin-stack",
+  "quantity": 1
+}
+```
+
+Supported effects:
+
+```txt
+product.duration.add
+product.outputTable.set
+product.inputRef.set
+product.input.quantity.add
+product.requirementIds.set
+producer.maxQueueSize.add
+producer.requirementIds.set
+```
+
+### 17.1 `product.duration.add`
+
+Changes product base duration.
+
+```json
+{
+  "type": "product.duration.add",
+  "productId": "product:lumber-camp-1",
+  "ms": -100
+}
+```
+
+### 17.2 `product.outputTable.set`
+
+Switches product output table.
+
+```json
+{
+  "type": "product.outputTable.set",
+  "productId": "product:lumber-camp-1",
+  "tableId": "loot:lumber-camp-1:better-1"
+}
+```
+
+### 17.3 `product.inputRef.set`
+
+Switches product input bundle.
+
+```json
+{
+  "type": "product.inputRef.set",
+  "productId": "product:coal-mine-1",
+  "inputRefId": "input:coal-mine-1-rations-efficient"
+}
+```
+
+### 17.4 `product.input.quantity.add`
+
+Changes quantity of one input item on a product.
+
+```json
+{
+  "type": "product.input.quantity.add",
+  "productId": "product:coal-mine-1",
+  "itemId": "item:beer",
+  "quantity": -1
+}
+```
+
+### 17.5 `product.requirementIds.set`
+
+Replaces product-level requirements.
+
+```json
+{
+  "type": "product.requirementIds.set",
+  "productId": "product:lumber-camp-1-log",
+  "requirementIds": ["requirement:lumber-camp-1-near-tree-3-efficient"]
+}
+```
+
+### 17.6 `producer.maxQueueSize.add`
+
+Changes producer queue size.
+
+```json
+{
+  "type": "producer.maxQueueSize.add",
+  "producerId": "producer:lumber-camp-1",
+  "quantity": 1
+}
+```
+
+### 17.7 `producer.requirementIds.set`
+
+Replaces producer-level requirements.
+
+```json
+{
+  "type": "producer.requirementIds.set",
+  "producerId": "producer:lumber-camp-1",
+  "requirementIds": ["requirement:lumber-camp-1-near-tree-3-efficient"]
+}
+```
+
+## 18. `startingState`
+
+Defines initial board and inventory.
+
+```json
+{
+  "startingState": {
+    "board": [
+      {
+        "itemId": "item:townhall-1",
+        "x": 3,
+        "y": 4
+      }
+    ],
+    "inventory": [
+      {
+        "itemId": "item:twig",
+        "quantity": 8
+      }
+    ]
+  }
+}
+```
+
+Board entry:
+
+- `itemId`: board item.
+- `x`: horizontal position.
+- `y`: vertical position.
+
+Inventory entry:
+
+- `itemId`: inventory item.
+- `quantity`: stack quantity.
+
+Starting board:
+
+```json
+{
+  "startingState": {
+    "board": [
+      {
+        "itemId": "item:townhall-1",
+        "x": 3,
+        "y": 4
+      },
+      {
+        "itemId": "item:lumber-camp-1",
+        "x": 1,
+        "y": 4
+      },
+      {
+        "itemId": "item:tree",
+        "x": 2,
+        "y": 3
+      }
+    ],
+    "inventory": []
+  }
+}
+```
+
+Starting inventory:
+
+```json
+{
+  "startingState": {
+    "board": [],
+    "inventory": [
+      {
+        "itemId": "item:blueprint-scrap",
+        "quantity": 10
+      },
+      {
+        "itemId": "item:twig",
+        "quantity": 8
+      },
+      {
+        "itemId": "item:coin-stack",
+        "quantity": 1
+      }
+    ]
+  }
+}
+```
+
+## 19. Validated ID links
+
+Config validation checks references between sections:
+
+```txt
+assets.*.resourceId -> resources
+assets.*.overlayAssetId -> assets
+
+items.*.assetId -> assets
+items.*.mergeIds[] -> merge
+items.*.producerId -> producers
+items.*.stashId -> stashes
+items.*.craftRecipeId -> craftRecipes
+items.*.removeBy[].itemId -> items
+
+merge.*.withItemId -> items
+merge.*.resultItemId -> items
+
+inputs.*.inputs[].itemId -> items
+
+requirements.*.itemId -> items
+requirements.*.itemIds[] -> items
+
+producers.*.productIds[] -> products
+producers.*.requirementIds[] -> requirements
+
+products.*.inputRefId -> inputs
+products.*.requirementIds[] -> requirements
+products.*.outputTableId -> lootTables
+
+stashes.*.outputTableId -> lootTables
+stashes.*.inputs[].itemId -> items
+stashes.*.requirements[].itemId -> items
+stashes.*.onDepleted.replaceWithItemId -> items
+
+craftRecipes.*.resultItemId -> items
+craftRecipes.*.inputs[].itemId -> items
+craftRecipes.*.requirements[].itemId -> items
+
+lootTables.*.output[].itemId -> items
+lootTables.*.output[].entries[].itemId -> items
+
+upgrades.*.tiers[].cost[].itemId -> items
+upgrade effects productId -> products
+upgrade effects producerId -> producers
+upgrade effects tableId -> lootTables
+upgrade effects inputRefId -> inputs
+upgrade effects itemId -> items
+upgrade effects requirementIds[] -> requirements
+
+startingState.board[].itemId -> items
+startingState.inventory[].itemId -> items
+```
+
+Config validation also checks common data mistakes:
+
+- duplicate `item.code`
+- duplicate `upgrade.code`
+- duplicate item tags
+- duplicate item `mergeIds`
+- duplicate producer `productIds`
+- product owned by more than one producer
+- input bundle owned by more than one product line
+- starting board coordinates outside board
+- multiple starting items on the same board cell
+- starting inventory with more stacks than available inventory slots
+- starting inventory quantity above item `maxStackSize`
+- starting state violating item `storage`
+
+## 20. Supported values
+
+```txt
+asset.kind:
+  item
+  ui
+
+asset.render:
+  plain
+  blueprint
+
+item.storage:
+  board
+  inventory
+  both
+
+removeBy.mode:
+  keep
+  consume
+
+placement:
+  board_then_inventory
+
+requirement.type:
+  stored
+  passive
+  proximity
+
+passive.scope:
+  board
+  inventory
+  board_or_inventory
+
+loot output type:
+  guaranteed
+  chance
+  weighted
+
+stash.type:
+  stash
+
+stash.onDepleted:
+  remove
+  { replaceWithItemId: "item:id" }
+
+producer.type:
+  producer
+
+upgrade effect type:
+  product.duration.add
+  product.outputTable.set
+  product.inputRef.set
+  product.input.quantity.add
+  product.requirementIds.set
+  producer.maxQueueSize.add
+  producer.requirementIds.set
+```
+
+# Appendix A: Configuration recipes
+
+This appendix shows common gameplay patterns built only from config sections and ID links.
+
+Each example is intentionally minimal. A full config must include every referenced asset, resource, item, loot table, input, requirement, producer, product, stash, craft recipe, and upgrade.
+
+## A.1 Add a basic resource item
+
+Use `assets` + `items`.
+
+```json
+{
+  "assets": {
+    "asset:item-fiber": {
+      "kind": "item",
+      "label": "Fiber",
+      "resourceId": "item-fiber",
+      "render": "plain",
+      "sort": 1000
+    }
+  },
+  "items": {
+    "item:fiber": {
+      "assetId": "asset:item-fiber",
+      "code": "fiber",
+      "name": "Fiber",
+      "tier": 1,
+      "maxStackSize": 50,
+      "storage": "both",
+      "description": "Basic crafting fiber.",
+      "tags": ["material", "fiber"],
+      "sort": 1000
+    }
+  }
+}
+```
+
+## A.2 Add a board-only item
+
+Use `storage: "board"`.
+
+```json
+{
+  "items": {
+    "item:fire": {
+      "assetId": "asset:item-fire",
+      "code": "fire",
+      "name": "Fire",
+      "tier": 0,
+      "maxStackSize": 1,
+      "storage": "board",
+      "description": "Board danger.",
+      "tags": ["danger"],
+      "sort": 900
+    }
+  }
+}
+```
+
+Typical uses:
+
+```txt
+danger
+obstacle
+resource deposit
+map feature
+board-only building
+```
+
+## A.3 Add an inventory-only item
+
+Use `storage: "inventory"`.
+
+```json
+{
+  "items": {
+    "item:saw-license": {
+      "assetId": "asset:item-saw-license",
+      "code": "saw-license",
+      "name": "Saw License",
+      "tier": 0,
+      "maxStackSize": 1,
+      "storage": "inventory",
+      "description": "Inventory-owned production permission.",
+      "tags": ["license"],
+      "sort": 800
+    }
+  }
+}
+```
+
+## A.4 Remove a board item with a tool
+
+Use `items.*.removeBy`.
+
+```json
+{
+  "items": {
+    "item:boulder": {
+      "assetId": "asset:item-boulder",
+      "code": "boulder",
+      "name": "Boulder",
+      "tier": 0,
+      "maxStackSize": 1,
+      "storage": "board",
+      "description": "Removable blocker.",
+      "tags": ["blocker"],
+      "sort": 910,
+      "removeBy": [
+        {
+          "itemId": "item:pickaxe",
+          "mode": "keep"
+        },
+        {
+          "itemId": "item:bomb",
+          "mode": "consume"
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.5 Add basic merge
+
+Use `items.*.mergeIds` + `merge`.
+
+```json
+{
+  "items": {
+    "item:twig": {
+      "assetId": "asset:item-twig",
+      "code": "twig",
+      "name": "Twig",
+      "tier": 1,
+      "maxStackSize": 50,
+      "description": "Small wood resource.",
+      "tags": ["wood"],
+      "sort": 40,
+      "mergeIds": ["merge:twig-twig-branch"]
+    },
+    "item:branch": {
+      "assetId": "asset:item-branch",
+      "code": "branch",
+      "name": "Branch",
+      "tier": 2,
+      "maxStackSize": 25,
+      "description": "Merged wood resource.",
+      "tags": ["wood"],
+      "sort": 50
+    }
+  },
+  "merge": {
+    "merge:twig-twig-branch": {
+      "withItemId": "item:twig",
+      "resultItemId": "item:branch"
+    }
+  }
+}
+```
+
+## A.6 Add longer merge chain
+
+Each source item gets its own `mergeIds`.
+
+```json
+{
+  "items": {
+    "item:twig": {
+      "assetId": "asset:item-twig",
+      "code": "twig",
+      "name": "Twig",
+      "tier": 1,
+      "maxStackSize": 50,
+      "description": "Small wood resource.",
+      "tags": ["wood"],
+      "sort": 40,
+      "mergeIds": ["merge:twig-twig-branch"]
+    },
+    "item:branch": {
+      "assetId": "asset:item-branch",
+      "code": "branch",
+      "name": "Branch",
+      "tier": 2,
+      "maxStackSize": 25,
+      "description": "Merged wood resource.",
+      "tags": ["wood"],
+      "sort": 50,
+      "mergeIds": ["merge:branch-branch-log"]
+    },
+    "item:log": {
+      "assetId": "asset:item-log",
+      "code": "log",
+      "name": "Log",
+      "tier": 3,
+      "maxStackSize": 20,
+      "description": "Construction wood.",
+      "tags": ["wood"],
+      "sort": 60
+    }
+  },
+  "merge": {
+    "merge:twig-twig-branch": {
+      "withItemId": "item:twig",
+      "resultItemId": "item:branch"
+    },
+    "merge:branch-branch-log": {
+      "withItemId": "item:branch",
+      "resultItemId": "item:log"
+    }
+  }
+}
+```
+
+## A.7 Add secret merge
+
+Use `secret: true`.
+
+```json
+{
+  "items": {
+    "item:water": {
+      "assetId": "asset:item-water",
+      "code": "water",
+      "name": "Water",
+      "tier": 1,
+      "maxStackSize": 20,
+      "description": "Water.",
+      "tags": ["material"],
+      "sort": 120,
+      "mergeIds": ["merge:water-seed-sprout"]
+    }
+  },
+  "merge": {
+    "merge:water-seed-sprout": {
+      "withItemId": "item:seed",
+      "resultItemId": "item:sprout",
+      "secret": true
+    }
+  }
+}
+```
+
+## A.8 Add non-consuming merge source
+
+Use `consumeSource: false`.
+
+```json
+{
+  "merge": {
+    "merge:hammer-rock-stone": {
+      "withItemId": "item:rock",
+      "resultItemId": "item:stone",
+      "consumeSource": false
+    }
+  }
+}
+```
+
+## A.9 Add guaranteed loot
+
+Use `lootTables` with `type: "guaranteed"`.
+
+```json
+{
+  "lootTables": {
+    "loot:lumber-camp-1": {
+      "name": "Lumber Camp I",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:twig",
+          "quantity": 2
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.10 Add chance loot
+
+Use `type: "chance"`.
+
+```json
+{
+  "lootTables": {
+    "loot:bush": {
+      "name": "Bush",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:leaf",
+          "quantity": 1
+        },
+        {
+          "type": "chance",
+          "itemId": "item:berry",
+          "chance": 0.25,
+          "quantity": 1
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.11 Add weighted loot
+
+Use `type: "weighted"`.
+
+```json
+{
+  "lootTables": {
+    "loot:crate-rare": {
+      "name": "Rare Crate",
+      "output": [
+        {
+          "type": "weighted",
+          "rolls": 1,
+          "entries": [
+            {
+              "itemId": "item:coin-stack",
+              "weight": 70,
+              "quantity": 1
+            },
+            {
+              "itemId": "item:gem",
+              "weight": 30,
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.12 Add random quantity loot
+
+Use quantity range.
+
+```json
+{
+  "lootTables": {
+    "loot:bush": {
+      "name": "Bush",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:leaf",
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.13 Add producer item
+
+Attach item to producer through `producerId`.
+
+```json
+{
+  "items": {
+    "item:lumber-camp-1": {
+      "assetId": "asset:item-lumber-camp",
+      "code": "lumber-camp-1",
+      "name": "Lumber Camp I",
+      "tier": 1,
+      "maxStackSize": 1,
+      "description": "Produces basic wood.",
+      "tags": ["producer", "building", "wood"],
+      "sort": 330,
+      "producerId": "producer:lumber-camp-1"
+    }
+  }
+}
+```
+
+## A.14 Add producer with one product line
+
+Use `producers`, `products`, and `lootTables`.
+
+```json
+{
+  "producers": {
+    "producer:lumber-camp-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:lumber-camp-1"],
+      "requirementIds": []
+    }
+  },
+  "products": {
+    "product:lumber-camp-1": {
+      "name": "Twigs",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1"
+    }
+  },
+  "lootTables": {
+    "loot:lumber-camp-1": {
+      "name": "Lumber Camp I",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:twig",
+          "quantity": 2
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.15 Add producer with multiple product lines
+
+Add multiple `productIds`. Order is meaningful.
+
+```json
+{
+  "producers": {
+    "producer:lumber-camp-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": [
+        "product:lumber-camp-1-twigs",
+        "product:lumber-camp-1-logs"
+      ],
+      "requirementIds": ["requirement:lumber-camp-1-near-tree"]
+    }
+  },
+  "products": {
+    "product:lumber-camp-1-twigs": {
+      "name": "Twigs",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1-twigs"
+    },
+    "product:lumber-camp-1-logs": {
+      "name": "Logs",
+      "durationMs": 9000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1-logs"
+    }
+  }
+}
+```
+
+## A.16 Add producer with bigger queue
+
+Set `maxQueueSize`.
+
+```json
+{
+  "producers": {
+    "producer:kiln-1": {
+      "type": "producer",
+      "maxQueueSize": 3,
+      "productIds": ["product:kiln-1-brick"],
+      "requirementIds": []
+    }
+  }
+}
+```
+
+## A.17 Add product with input
+
+Define `inputs` and reference it from product through `inputRefId`.
+
+```json
+{
+  "inputs": {
+    "input:kiln-1-clay": {
+      "name": "Kiln I Clay",
+      "inputs": [
+        {
+          "itemId": "item:clay",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        }
+      ]
+    }
+  },
+  "products": {
+    "product:kiln-1-brick": {
+      "name": "Brick",
+      "durationMs": 7000,
+      "placement": "board_then_inventory",
+      "inputRefId": "input:kiln-1-clay",
+      "requirementIds": [],
+      "outputTableId": "loot:kiln-1-brick"
+    }
+  }
+}
+```
+
+## A.18 Add product with multiple input types
+
+Put multiple slots into one input bundle.
+
+```json
+{
+  "inputs": {
+    "input:coal-mine-1-rations": {
+      "name": "Coal Mine I Rations",
+      "inputs": [
+        {
+          "itemId": "item:sausage",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        },
+        {
+          "itemId": "item:beer",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.19 Add product with non-consumed tool input
+
+Use `consume: false`.
+
+```json
+{
+  "inputs": {
+    "input:sawmill-saw": {
+      "name": "Sawmill Saw",
+      "inputs": [
+        {
+          "itemId": "item:saw",
+          "quantity": 1,
+          "capacity": 1,
+          "consume": false
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.20 Add producer proximity requirement
+
+Define proximity requirement and add it to `producer.requirementIds`.
+
+```json
+{
+  "requirements": {
+    "requirement:lumber-camp-1-near-tree": {
+      "type": "proximity",
+      "itemIds": ["item:tree"],
+      "distance": 2,
+      "durationFactor": 1
+    }
+  },
+  "producers": {
+    "producer:lumber-camp-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:lumber-camp-1"],
+      "requirementIds": ["requirement:lumber-camp-1-near-tree"]
+    }
+  }
+}
+```
+
+## A.21 Add proximity requirement accepting multiple items
+
+Use multiple IDs in `itemIds`.
+
+```json
+{
+  "requirements": {
+    "requirement:fishing-hut-1-near-water": {
+      "type": "proximity",
+      "itemIds": ["item:pond", "item:river", "item:water"],
+      "distance": 1,
+      "durationFactor": 1
+    }
+  }
+}
+```
+
+## A.22 Add remote resource with lower distance penalty
+
+Lower `durationFactor`.
+
+```json
+{
+  "requirements": {
+    "requirement:lumber-camp-1-near-tree-3-efficient": {
+      "type": "proximity",
+      "itemIds": ["item:tree"],
+      "distance": 3,
+      "durationFactor": 0.75
+    }
+  },
+  "producers": {
+    "producer:lumber-camp-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:lumber-camp-1"],
+      "requirementIds": [
+        "requirement:lumber-camp-1-near-tree-3-efficient"
+      ]
+    }
+  }
+}
+```
+
+## A.23 Add requirement for only one product line
+
+Put requirement ID into `products.*.requirementIds`.
+
+```json
+{
+  "products": {
+    "product:lumber-camp-1-log": {
+      "name": "Logs",
+      "durationMs": 8500,
+      "placement": "board_then_inventory",
+      "requirementIds": [
+        "requirement:lumber-camp-1-near-tree-3-efficient"
+      ],
+      "outputTableId": "loot:lumber-camp-1-log"
+    }
+  }
+}
+```
+
+## A.24 Add passive requirement
+
+Use `type: "passive"`.
+
+```json
+{
+  "requirements": {
+    "requirement:has-saw-license": {
+      "type": "passive",
+      "itemId": "item:saw-license",
+      "quantity": 1,
+      "scope": "inventory"
+    }
+  },
+  "products": {
+    "product:sawmill-1-plank": {
+      "name": "Planks",
+      "durationMs": 6000,
+      "placement": "board_then_inventory",
+      "requirementIds": ["requirement:has-saw-license"],
+      "outputTableId": "loot:sawmill-1-plank"
+    }
+  }
+}
+```
+
+## A.25 Add stored requirement
+
+Use `type: "stored"`.
+
+```json
+{
+  "requirements": {
+    "requirement:sawmill-1-has-saw": {
+      "type": "stored",
+      "itemId": "item:saw",
+      "quantity": 1,
+      "capacity": 1
+    }
+  },
+  "producers": {
+    "producer:sawmill-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:sawmill-1-plank"],
+      "requirementIds": ["requirement:sawmill-1-has-saw"]
+    }
+  }
+}
+```
+
+## A.26 Add product without output
+
+Omit `outputTableId`.
+
+```json
+{
+  "inputs": {
+    "input:trash-burner-1-trash": {
+      "name": "Trash Burner Input",
+      "inputs": [
+        {
+          "itemId": "item:trash",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        }
+      ]
+    }
+  },
+  "products": {
+    "product:trash-burner-1": {
+      "name": "Burn Trash",
+      "durationMs": 3000,
+      "placement": "board_then_inventory",
+      "inputRefId": "input:trash-burner-1-trash",
+      "requirementIds": []
+    }
+  }
+}
+```
+
+## A.27 Add basic stash/crate
+
+Item gets `stashId`, stash gets `outputTableId`.
+
+```json
+{
+  "items": {
+    "item:crate-1": {
+      "assetId": "asset:item-crate",
+      "code": "crate-1",
+      "name": "Crate I",
+      "tier": 1,
+      "maxStackSize": 1,
+      "description": "Basic reward crate.",
+      "tags": ["stash", "crate"],
+      "sort": 400,
+      "stashId": "stash:crate-1"
+    }
+  },
+  "stashes": {
+    "stash:crate-1": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:crate-1",
+      "inputs": [],
+      "requirements": [],
+      "charges": 3,
+      "onDepleted": "remove"
+    }
+  },
+  "lootTables": {
+    "loot:crate-1": {
+      "name": "Crate I",
+      "output": [
+        {
+          "type": "weighted",
+          "rolls": 1,
+          "entries": [
+            {
+              "itemId": "item:twig",
+              "weight": 70,
+              "quantity": 2
+            },
+            {
+              "itemId": "item:branch",
+              "weight": 30,
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.28 Add stash with key
+
+Add input to `stashes.*.inputs`.
+
+```json
+{
+  "stashes": {
+    "stash:sealed-crate": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:sealed-crate",
+      "inputs": [
+        {
+          "itemId": "item:rare-key",
+          "quantity": 1,
+          "capacity": 1,
+          "consume": true
+        }
+      ],
+      "requirements": [],
+      "charges": 3,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+## A.29 Add stash with requirement
+
+Use inline `requirements`.
+
+```json
+{
+  "stashes": {
+    "stash:sealed-cache": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:sealed-cache",
+      "inputs": [],
+      "requirements": [
+        {
+          "type": "passive",
+          "itemId": "item:townhall-1",
+          "quantity": 1,
+          "scope": "board"
+        }
+      ],
+      "charges": 1,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+Stored requirement variant:
+
+```json
+{
+  "stashes": {
+    "stash:sealed-cache": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:sealed-cache",
+      "inputs": [],
+      "requirements": [
+        {
+          "type": "stored",
+          "itemId": "item:seal-key",
+          "quantity": 1,
+          "capacity": 1
+        }
+      ],
+      "charges": 1,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+## A.30 Remove stash when depleted
+
+Use `onDepleted: "remove"`.
+
+```json
+{
+  "stashes": {
+    "stash:crate-1": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:crate-1",
+      "inputs": [],
+      "requirements": [],
+      "charges": 3,
+      "onDepleted": "remove"
+    }
+  }
+}
+```
+
+## A.31 Replace stash when depleted
+
+Use `replaceWithItemId`.
+
+```json
+{
+  "stashes": {
+    "stash:barrel-1": {
+      "type": "stash",
+      "placement": "board_then_inventory",
+      "outputTableId": "loot:barrel-1",
+      "inputs": [],
+      "requirements": [],
+      "charges": 2,
+      "onDepleted": {
+        "replaceWithItemId": "item:empty-barrel"
+      }
+    }
+  }
+}
+```
+
+## A.32 Add blueprint craft
+
+Item gets `craftRecipeId`; recipe defines result and inputs.
+
+```json
+{
+  "items": {
+    "item:blueprint-kiln": {
+      "assetId": "asset:item-blueprint-kiln",
+      "code": "blueprint-kiln",
+      "name": "Kiln Blueprint",
+      "tier": 4,
+      "maxStackSize": 5,
+      "description": "Craft target for Kiln I.",
+      "tags": ["blueprint", "craft-target"],
+      "sort": 250,
+      "craftRecipeId": "craft:kiln"
+    },
+    "item:kiln-1": {
+      "assetId": "asset:item-kiln",
+      "code": "kiln-1",
+      "name": "Kiln I",
+      "tier": 1,
+      "maxStackSize": 1,
+      "description": "Turns clay into bricks.",
+      "tags": ["producer", "building"],
+      "sort": 610,
+      "producerId": "producer:kiln-1"
+    }
+  },
+  "craftRecipes": {
+    "craft:kiln": {
+      "resultItemId": "item:kiln-1",
+      "inputs": [
+        {
+          "itemId": "item:stone-block",
+          "quantity": 2,
+          "consume": true
+        },
+        {
+          "itemId": "item:plank",
+          "quantity": 1,
+          "consume": true
+        }
+      ],
+      "requirements": [],
+      "durationMs": 5000
+    }
+  }
+}
+```
+
+## A.33 Add instant craft
+
+Use `durationMs: 0`.
+
+```json
+{
+  "craftRecipes": {
+    "craft:lumber-camp": {
+      "resultItemId": "item:lumber-camp-1",
+      "inputs": [
+        {
+          "itemId": "item:plank",
+          "quantity": 1,
+          "consume": true
+        }
+      ],
+      "requirements": [],
+      "durationMs": 0
+    }
+  }
+}
+```
+
+## A.34 Add craft with requirement
+
+Use inline `requirements`.
+
+```json
+{
+  "craftRecipes": {
+    "craft:sawmill": {
+      "resultItemId": "item:sawmill-1",
+      "inputs": [
+        {
+          "itemId": "item:plank",
+          "quantity": 4,
+          "consume": true
+        }
+      ],
+      "requirements": [
+        {
+          "type": "passive",
+          "itemId": "item:townhall-1",
+          "quantity": 1,
+          "scope": "board"
+        }
+      ],
+      "durationMs": 8000
+    }
+  }
+}
+```
+
+Stored requirement variant:
+
+```json
+{
+  "craftRecipes": {
+    "craft:sawmill": {
+      "resultItemId": "item:sawmill-1",
+      "inputs": [
+        {
+          "itemId": "item:plank",
+          "quantity": 4,
+          "consume": true
+        }
+      ],
+      "requirements": [
+        {
+          "type": "stored",
+          "itemId": "item:tool-kit",
+          "quantity": 1,
+          "capacity": 1
+        }
+      ],
+      "durationMs": 8000
+    }
+  }
+}
+```
+
+## A.35 Add speed upgrade
+
+Use `product.duration.add`.
+
+```json
+{
+  "upgrades": {
+    "upgrade:lumber-camp-1-speed": {
+      "code": "lumber-camp-1-speed",
+      "name": "Lumber Camp I Speed",
+      "description": "Reduces production duration.",
+      "sort": 10,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 1
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "product.duration.add",
+              "productId": "product:lumber-camp-1",
+              "ms": -100
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.36 Add better loot upgrade
+
+Create a new loot table and switch product through `product.outputTable.set`.
+
+```json
+{
+  "lootTables": {
+    "loot:lumber-camp-1:better-1": {
+      "name": "Lumber Camp I Better Output",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:twig",
+          "quantity": 3
+        },
+        {
+          "type": "chance",
+          "itemId": "item:branch",
+          "chance": 0.25,
+          "quantity": 1
+        }
+      ]
+    }
+  },
+  "upgrades": {
+    "upgrade:lumber-camp-1-output": {
+      "code": "lumber-camp-1-output",
+      "name": "Lumber Camp I Output",
+      "description": "Improves wood output.",
+      "sort": 20,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 1
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "product.outputTable.set",
+              "productId": "product:lumber-camp-1",
+              "tableId": "loot:lumber-camp-1:better-1"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.37 Add input bundle upgrade
+
+Use `product.inputRef.set`.
+
+```json
+{
+  "inputs": {
+    "input:coal-mine-1-rations-efficient": {
+      "name": "Coal Mine I Efficient Rations",
+      "inputs": [
+        {
+          "itemId": "item:sausage",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        }
+      ]
+    }
+  },
+  "upgrades": {
+    "upgrade:coal-mine-1-rations": {
+      "code": "coal-mine-1-rations",
+      "name": "Coal Mine I Rations",
+      "description": "Changes required rations.",
+      "sort": 30,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 1
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "product.inputRef.set",
+              "productId": "product:coal-mine-1",
+              "inputRefId": "input:coal-mine-1-rations-efficient"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.38 Add input quantity upgrade
+
+Use `product.input.quantity.add`.
+
+```json
+{
+  "upgrades": {
+    "upgrade:coal-mine-1-beer-efficiency": {
+      "code": "coal-mine-1-beer-efficiency",
+      "name": "Coal Mine I Beer Efficiency",
+      "description": "Changes beer input quantity.",
+      "sort": 31,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 1
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "product.input.quantity.add",
+              "productId": "product:coal-mine-1",
+              "itemId": "item:beer",
+              "quantity": -1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.39 Add product requirement upgrade
+
+Use `product.requirementIds.set`.
+
+```json
+{
+  "requirements": {
+    "requirement:lumber-camp-1-log-near-tree": {
+      "type": "proximity",
+      "itemIds": ["item:tree"],
+      "distance": 2,
+      "durationFactor": 1
+    }
+  },
+  "upgrades": {
+    "upgrade:lumber-camp-1-log-requirements": {
+      "code": "lumber-camp-1-log-requirements",
+      "name": "Lumber Camp I Log Requirements",
+      "description": "Changes log product requirements.",
+      "sort": 40,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 2
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "product.requirementIds.set",
+              "productId": "product:lumber-camp-1-log",
+              "requirementIds": [
+                "requirement:lumber-camp-1-log-near-tree"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.40 Add producer requirement upgrade
+
+Use `producer.requirementIds.set`.
+
+```json
+{
+  "requirements": {
+    "requirement:lumber-camp-1-near-tree-3-efficient": {
+      "type": "proximity",
+      "itemIds": ["item:tree"],
+      "distance": 3,
+      "durationFactor": 0.75
+    }
+  },
+  "upgrades": {
+    "upgrade:lumber-camp-1-forest-logistics": {
+      "code": "lumber-camp-1-forest-logistics",
+      "name": "Lumber Camp I Forest Logistics",
+      "description": "Improves remote forest usage.",
+      "sort": 15,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 1
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "product.duration.add",
+              "productId": "product:lumber-camp-1",
+              "ms": -100
+            }
+          ]
+        },
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 2
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "producer.requirementIds.set",
+              "producerId": "producer:lumber-camp-1",
+              "requirementIds": [
+                "requirement:lumber-camp-1-near-tree-3-efficient"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.41 Add producer queue upgrade
+
+Use `producer.maxQueueSize.add`.
+
+```json
+{
+  "upgrades": {
+    "upgrade:lumber-camp-1-queue": {
+      "code": "lumber-camp-1-queue",
+      "name": "Lumber Camp I Queue",
+      "description": "Increases queue size.",
+      "sort": 50,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 2
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "producer.maxQueueSize.add",
+              "producerId": "producer:lumber-camp-1",
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.42 Add multi-tier upgrade
+
+Add multiple tier objects into `tiers`.
+
+```json
+{
+  "upgrades": {
+    "upgrade:lumber-camp-1-speed": {
+      "code": "lumber-camp-1-speed",
+      "name": "Lumber Camp I Speed",
+      "description": "Reduces production duration.",
+      "sort": 10,
+      "tiers": [
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 1
+            }
+          ],
+          "durationMs": 6000,
+          "effects": [
+            {
+              "type": "product.duration.add",
+              "productId": "product:lumber-camp-1",
+              "ms": -100
+            }
+          ]
+        },
+        {
+          "cost": [
+            {
+              "itemId": "item:coin-stack",
+              "quantity": 2
+            }
+          ],
+          "durationMs": 9000,
+          "effects": [
+            {
+              "type": "product.duration.add",
+              "productId": "product:lumber-camp-1",
+              "ms": -150
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.43 Add starting board
+
+Add entries to `startingState.board`.
+
+```json
+{
+  "startingState": {
+    "board": [
+      {
+        "itemId": "item:townhall-1",
+        "x": 3,
+        "y": 4
+      },
+      {
+        "itemId": "item:lumber-camp-1",
+        "x": 1,
+        "y": 4
+      },
+      {
+        "itemId": "item:tree",
+        "x": 2,
+        "y": 3
+      }
+    ],
+    "inventory": []
+  }
+}
+```
+
+## A.44 Add starting inventory
+
+Add stacks to `startingState.inventory`.
+
+```json
+{
+  "startingState": {
+    "board": [],
+    "inventory": [
+      {
+        "itemId": "item:blueprint-scrap",
+        "quantity": 10
+      },
+      {
+        "itemId": "item:twig",
+        "quantity": 8
+      },
+      {
+        "itemId": "item:coin-stack",
+        "quantity": 1
+      }
+    ]
+  }
+}
+```
+
+## A.45 Add combined starting state
+
+Use board and inventory together.
+
+```json
+{
+  "startingState": {
+    "board": [
+      {
+        "itemId": "item:townhall-1",
+        "x": 3,
+        "y": 4
+      },
+      {
+        "itemId": "item:lumber-camp-1",
+        "x": 1,
+        "y": 4
+      },
+      {
+        "itemId": "item:tree",
+        "x": 2,
+        "y": 3
+      }
+    ],
+    "inventory": [
+      {
+        "itemId": "item:twig",
+        "quantity": 8
+      },
+      {
+        "itemId": "item:water",
+        "quantity": 4
+      }
+    ]
+  }
+}
+```
+
+## A.46 Add blueprint asset with overlay
+
+Use `overlayAssetId` and `render: "blueprint"`.
+
+```json
+{
+  "assets": {
+    "asset:item-blueprint-kiln": {
+      "kind": "item",
+      "label": "Kiln Blueprint",
+      "resourceId": "item-blueprint",
+      "overlayAssetId": "asset:item-kiln",
+      "render": "blueprint",
+      "sort": 250
+    }
+  }
+}
+```
+
+## A.47 Add UI asset
+
+Use `kind: "ui"`.
+
+```json
+{
+  "assets": {
+    "asset:ui-coin": {
+      "kind": "ui",
+      "label": "Coin UI Icon",
+      "resourceId": "ui-coin",
+      "render": "plain",
+      "sort": 10
+    }
+  }
+}
+```
+
+## A.48 Add currency as item
+
+Currency is a normal item with large stack size and currency tag.
+
+```json
+{
+  "items": {
+    "item:coin-stack": {
+      "assetId": "asset:item-coin-stack",
+      "code": "coin-stack",
+      "name": "Coin Stack",
+      "tier": 1,
+      "maxStackSize": 999,
+      "storage": "inventory",
+      "description": "Currency stack.",
+      "tags": ["currency"],
+      "sort": 50
+    }
+  }
+}
+```
+
+Upgrade cost usage:
+
+```json
+{
+  "cost": [
+    {
+      "itemId": "item:coin-stack",
+      "quantity": 2
+    }
+  ]
+}
+```
+
+## A.49 Add resource deposit for proximity
+
+Create board item and use it in proximity requirement.
+
+```json
+{
+  "items": {
+    "item:stone-deposit": {
+      "assetId": "asset:item-stone-deposit",
+      "code": "stone-deposit",
+      "name": "Stone Deposit",
+      "tier": 0,
+      "maxStackSize": 1,
+      "storage": "board",
+      "description": "Board resource deposit.",
+      "tags": ["deposit", "stone"],
+      "sort": 700
+    }
+  },
+  "requirements": {
+    "requirement:quarry-1-near-stone": {
+      "type": "proximity",
+      "itemIds": ["item:stone-deposit"],
+      "distance": 2,
+      "durationFactor": 1
+    }
+  }
+}
+```
+
+## A.50 Add producer using deposit
+
+Attach deposit requirement to producer.
+
+```json
+{
+  "items": {
+    "item:quarry-1": {
+      "assetId": "asset:item-quarry",
+      "code": "quarry-1",
+      "name": "Quarry I",
+      "tier": 1,
+      "maxStackSize": 1,
+      "description": "Produces stone near deposits.",
+      "tags": ["producer", "building", "stone"],
+      "sort": 620,
+      "producerId": "producer:quarry-1"
+    }
+  },
+  "producers": {
+    "producer:quarry-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": ["product:quarry-1-stone"],
+      "requirementIds": ["requirement:quarry-1-near-stone"]
+    }
+  },
+  "products": {
+    "product:quarry-1-stone": {
+      "name": "Stone",
+      "durationMs": 6000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:quarry-1-stone"
+    }
+  },
+  "lootTables": {
+    "loot:quarry-1-stone": {
+      "name": "Quarry I Stone",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:stone",
+          "quantity": 1
+        }
+      ]
+    }
+  }
+}
+```
+
+## A.51 Add alternative product line
+
+Add another product to the same producer.
+
+```json
+{
+  "producers": {
+    "producer:lumber-camp-1": {
+      "type": "producer",
+      "maxQueueSize": 1,
+      "productIds": [
+        "product:lumber-camp-1-twigs",
+        "product:lumber-camp-1-logs"
+      ],
+      "requirementIds": ["requirement:lumber-camp-1-near-tree"]
+    }
+  },
+  "products": {
+    "product:lumber-camp-1-twigs": {
+      "name": "Twigs",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1-twigs"
+    },
+    "product:lumber-camp-1-logs": {
+      "name": "Logs",
+      "durationMs": 9000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1-logs"
+    }
+  }
+}
+```
+
+## A.52 Add product line with own input and own output
+
+Each product line gets its own `inputRefId` and `outputTableId`.
+
+```json
+{
+  "inputs": {
+    "input:lumber-camp-1-log": {
+      "name": "Lumber Camp I Log Input",
+      "inputs": [
+        {
+          "itemId": "item:branch",
+          "quantity": 1,
+          "capacity": 4,
+          "consume": true
+        }
+      ]
+    }
+  },
+  "products": {
+    "product:lumber-camp-1-log": {
+      "name": "Logs",
+      "durationMs": 8500,
+      "placement": "board_then_inventory",
+      "inputRefId": "input:lumber-camp-1-log",
+      "requirementIds": [],
+      "outputTableId": "loot:lumber-camp-1-log"
+    }
+  },
+  "lootTables": {
+    "loot:lumber-camp-1-log": {
+      "name": "Lumber Camp I Logs",
+      "output": [
+        {
+          "type": "guaranteed",
+          "itemId": "item:log",
+          "quantity": 1
+        }
+      ]
+    }
+  }
+}
+```

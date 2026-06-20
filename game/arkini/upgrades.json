@@ -258,8 +258,8 @@
 		},
 		"upgrade:lumber-camp-1-reach": {
 			"code": "lumber-camp-1-reach",
-			"description": "Lets the first lumber camp work with a slightly less clingy forest requirement.",
-			"name": "Lumber Camp I Forest Reach",
+			"description": "Improves the first lumber camp without letting it ignore the forest entirely.",
+			"name": "Lumber Camp I Forest Logistics",
 			"sort": 15,
 			"tiers": [
 				{
@@ -272,11 +272,9 @@
 					"durationMs": 6000,
 					"effects": [
 						{
-							"producerId": "producer:lumber-camp-1",
-							"requirementIds": [
-								"requirement:lumber-camp-1-near-tree-3"
-							],
-							"type": "producer.requirementIds.set"
+							"type": "product.duration.add",
+							"productId": "product:lumber-camp-1",
+							"ms": -100
 						}
 					]
 				},
@@ -290,9 +288,11 @@
 					"durationMs": 6000,
 					"effects": [
 						{
+							"type": "producer.requirementIds.set",
 							"producerId": "producer:lumber-camp-1",
-							"requirementIds": [],
-							"type": "producer.requirementIds.set"
+							"requirementIds": [
+								"requirement:lumber-camp-1-near-tree-3-efficient"
+							]
 						}
 					]
 				}

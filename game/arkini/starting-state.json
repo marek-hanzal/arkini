@@ -1,61 +1,6 @@
 {
 	"startingState": {
-		"board": [
-			{
-				"itemId": "item:townhall-1",
-				"x": 3,
-				"y": 4
-			},
-			{
-				"itemId": "item:lumber-camp-1",
-				"x": 1,
-				"y": 4
-			},
-			{
-				"itemId": "item:quarry-1",
-				"x": 5,
-				"y": 4
-			},
-			{
-				"itemId": "item:coal-mine-1",
-				"x": 3,
-				"y": 6
-			},
-			{
-				"itemId": "item:tree",
-				"x": 2,
-				"y": 3
-			}
-		],
-		"inventory": [
-			{
-				"itemId": "item:blueprint-scrap",
-				"quantity": 10
-			},
-			{
-				"itemId": "item:twig",
-				"quantity": 8
-			},
-			{
-				"itemId": "item:pebble",
-				"quantity": 8
-			},
-			{
-				"itemId": "item:water",
-				"quantity": 4
-			},
-			{
-				"itemId": "item:sausage",
-				"quantity": 3
-			},
-			{
-				"itemId": "item:beer",
-				"quantity": 3
-			},
-			{
-				"itemId": "item:coin-stack",
-				"quantity": 1
-			}
-		]
+		"board": [],
+		"inventory": []
 	}
 }

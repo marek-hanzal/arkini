@@ -157,13 +157,6 @@
 			"resourceId": "item-crystal",
 			"sort": 90
 		},
-		"asset:item-epic-key": {
-			"kind": "item",
-			"label": "Epic Key",
-			"render": "plain",
-			"resourceId": "item-epic-key",
-			"sort": 182
-		},
 		"asset:item-gem": {
 			"kind": "item",
 			"label": "Gem",

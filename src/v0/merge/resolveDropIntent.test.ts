@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
-import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 
 const config = createEngineTestConfig();
+const directionalMergeConfig = createEngineMergeTestConfig();
 
 const boardItem = (props: Omit<BoardViewItem, "state" | "x" | "y">): BoardViewItem => ({
 	...props,
@@ -50,7 +51,7 @@ describe("resolveDropIntent", () => {
 	it("uses only source-owned explicit merge rules", () => {
 		expect(
 			resolveDropIntent({
-				config: defaultGameConfig,
+				config: directionalMergeConfig,
 				sourceItemId: "item:water",
 				targetItem: boardItem({
 					id: "target",
@@ -65,7 +66,7 @@ describe("resolveDropIntent", () => {
 
 		expect(
 			resolveDropIntent({
-				config: defaultGameConfig,
+				config: directionalMergeConfig,
 				sourceItemId: "item:twig",
 				targetItem: boardItem({
 					id: "target",

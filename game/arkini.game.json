@@ -178,6 +178,13 @@
 			"resourceId": "item-grain",
 			"sort": 202
 		},
+		"asset:item:grapes": {
+			"kind": "item",
+			"label": "Grapes",
+			"render": "plain",
+			"resourceId": "item-grapes",
+			"sort": 211
+		},
 		"asset:item:hop-field": {
 			"kind": "item",
 			"label": "Hop Field",
@@ -311,6 +318,13 @@
 			"resourceId": "item-twig",
 			"sort": 40
 		},
+		"asset:item:vineyard": {
+			"kind": "item",
+			"label": "Vineyard",
+			"render": "plain",
+			"resourceId": "item-vineyard",
+			"sort": 210
+		},
 		"asset:item:water": {
 			"kind": "item",
 			"label": "Water",
@@ -324,6 +338,20 @@
 			"render": "plain",
 			"resourceId": "item-wheat-field",
 			"sort": 200
+		},
+		"asset:item:wine-barrel": {
+			"kind": "item",
+			"label": "Wine Barrel",
+			"render": "plain",
+			"resourceId": "item-wine-barrel",
+			"sort": 213
+		},
+		"asset:item:wine-glass": {
+			"kind": "item",
+			"label": "Wine Glass",
+			"render": "plain",
+			"resourceId": "item-wine-glass",
+			"sort": 214
 		},
 		"asset:item:wood-bundle": {
 			"kind": "item",
@@ -394,6 +422,13 @@
 			"render": "plain",
 			"resourceId": "producer-well-t1",
 			"sort": 205
+		},
+		"asset:producer:winery-t1": {
+			"kind": "item",
+			"label": "Winery I",
+			"render": "plain",
+			"resourceId": "producer-winery-t1",
+			"sort": 212
 		}
 	},
 	"craftRecipes": {},

@@ -12,7 +12,7 @@ Example links:
 {
   "items": {
     "item:twig": {
-      "assetId": "asset:item-twig"
+      "assetId": "asset:item:twig"
     }
   },
   "producers": {
@@ -83,7 +83,7 @@ IDs should be short, stable, and obvious from the collection they live in. Do no
 Recommended patterns:
 
 ```txt
-asset:<name>
+asset:<kind>:<name>
 item:<name>
 merge:<source>:<target>:<result>
 input:<owner>:<item>
@@ -112,8 +112,8 @@ Guidelines:
 Examples:
 
 ```txt
-asset:item-tree
-asset:item-log
+asset:item:tree
+asset:item:log
 item:tree
 item:rock
 item:log
@@ -261,7 +261,7 @@ Plain item asset:
 ```json
 {
   "assets": {
-    "asset:item-log": {
+    "asset:item:log": {
       "kind": "item",
       "label": "Log",
       "resourceId": "item-log",
@@ -286,11 +286,11 @@ Blueprint asset with overlay:
 ```json
 {
   "assets": {
-    "asset:item-blueprint-lumber-camp": {
+    "asset:item:blueprint-lumber-camp": {
       "kind": "item",
       "label": "Lumber Camp Blueprint",
       "resourceId": "item-blueprint",
-      "overlayAssetId": "asset:item-lumber-camp",
+      "overlayAssetId": "asset:item:lumber-camp",
       "render": "blueprint",
       "sort": 116
     }
@@ -303,7 +303,7 @@ UI asset:
 ```json
 {
   "assets": {
-    "asset:ui-coin": {
+    "asset:ui:coin": {
       "kind": "ui",
       "label": "Coin UI Icon",
       "resourceId": "ui-coin",
@@ -320,7 +320,7 @@ Item usage:
 {
   "items": {
     "item:log": {
-      "assetId": "asset:item-log"
+      "assetId": "asset:item:log"
     }
   }
 }
@@ -336,7 +336,7 @@ Item shape:
 {
   "items": {
     "item:twig": {
-      "assetId": "asset:item-twig",
+      "assetId": "asset:item:twig",
       "code": "twig",
       "name": "Twig",
       "tier": 1,
@@ -393,7 +393,7 @@ both
 {
   "items": {
     "item:twig": {
-      "assetId": "asset:item-twig",
+      "assetId": "asset:item:twig",
       "code": "twig",
       "name": "Twig",
       "tier": 1,
@@ -413,7 +413,7 @@ both
 {
   "items": {
     "item:lumber-camp-1": {
-      "assetId": "asset:item-lumber-camp",
+      "assetId": "asset:item:lumber-camp",
       "code": "lumber-camp-1",
       "name": "Lumber Camp I",
       "tier": 1,
@@ -434,7 +434,7 @@ both
 {
   "items": {
     "item:crate-4": {
-      "assetId": "asset:item-crate-epic",
+      "assetId": "asset:item:crate-epic",
       "code": "crate-4",
       "name": "Epic Crate",
       "tier": 4,
@@ -454,7 +454,7 @@ both
 {
   "items": {
     "item:blueprint-lumber-camp": {
-      "assetId": "asset:item-blueprint-lumber-camp",
+      "assetId": "asset:item:blueprint-lumber-camp",
       "code": "blueprint-lumber-camp",
       "name": "Lumber Camp Blueprint",
       "tier": 4,
@@ -474,7 +474,7 @@ both
 {
   "items": {
     "item:fire": {
-      "assetId": "asset:item-fire",
+      "assetId": "asset:item:fire",
       "code": "fire",
       "name": "Fire",
       "tier": 0,
@@ -494,7 +494,7 @@ both
 {
   "items": {
     "item:saw-license": {
-      "assetId": "asset:item-saw-license",
+      "assetId": "asset:item:saw-license",
       "code": "saw-license",
       "name": "Saw License",
       "tier": 0,
@@ -514,7 +514,7 @@ both
 {
   "items": {
     "item:boulder": {
-      "assetId": "asset:item-boulder",
+      "assetId": "asset:item:boulder",
       "code": "boulder",
       "name": "Boulder",
       "tier": 0,
@@ -575,7 +575,7 @@ Example: `Twig + Twig -> Branch`:
 {
   "items": {
     "item:twig": {
-      "assetId": "asset:item-twig",
+      "assetId": "asset:item:twig",
       "code": "twig",
       "name": "Twig",
       "tier": 1,
@@ -982,7 +982,7 @@ Item reference:
 {
   "items": {
     "item:lumber-camp-1": {
-      "assetId": "asset:item-lumber-camp",
+      "assetId": "asset:item:lumber-camp",
       "code": "lumber-camp-1",
       "name": "Lumber Camp I",
       "tier": 1,
@@ -1403,7 +1403,7 @@ Item reference:
 {
   "items": {
     "item:crate-4": {
-      "assetId": "asset:item-crate-epic",
+      "assetId": "asset:item:crate-epic",
       "code": "crate-4",
       "name": "Epic Crate",
       "tier": 4,
@@ -1536,7 +1536,7 @@ Craft target item reference:
 {
   "items": {
     "item:blueprint-lumber-camp": {
-      "assetId": "asset:item-blueprint-lumber-camp",
+      "assetId": "asset:item:blueprint-lumber-camp",
       "code": "blueprint-lumber-camp",
       "name": "Lumber Camp Blueprint",
       "tier": 4,
@@ -1933,7 +1933,7 @@ Use `assets` + `items`.
 ```json
 {
   "assets": {
-    "asset:item-fiber": {
+    "asset:item:fiber": {
       "kind": "item",
       "label": "Fiber",
       "resourceId": "item-fiber",
@@ -1943,7 +1943,7 @@ Use `assets` + `items`.
   },
   "items": {
     "item:fiber": {
-      "assetId": "asset:item-fiber",
+      "assetId": "asset:item:fiber",
       "code": "fiber",
       "name": "Fiber",
       "tier": 1,
@@ -1965,7 +1965,7 @@ Use `storage: "board"`.
 {
   "items": {
     "item:fire": {
-      "assetId": "asset:item-fire",
+      "assetId": "asset:item:fire",
       "code": "fire",
       "name": "Fire",
       "tier": 0,
@@ -1997,7 +1997,7 @@ Use `storage: "inventory"`.
 {
   "items": {
     "item:saw-license": {
-      "assetId": "asset:item-saw-license",
+      "assetId": "asset:item:saw-license",
       "code": "saw-license",
       "name": "Saw License",
       "tier": 0,
@@ -2019,7 +2019,7 @@ Use `items.*.removeBy`.
 {
   "items": {
     "item:boulder": {
-      "assetId": "asset:item-boulder",
+      "assetId": "asset:item:boulder",
       "code": "boulder",
       "name": "Boulder",
       "tier": 0,
@@ -2051,7 +2051,7 @@ Use `items.*.mergeIds` + `merge`.
 {
   "items": {
     "item:twig": {
-      "assetId": "asset:item-twig",
+      "assetId": "asset:item:twig",
       "code": "twig",
       "name": "Twig",
       "tier": 1,
@@ -2062,7 +2062,7 @@ Use `items.*.mergeIds` + `merge`.
       "mergeIds": ["merge:twig-twig-branch"]
     },
     "item:branch": {
-      "assetId": "asset:item-branch",
+      "assetId": "asset:item:branch",
       "code": "branch",
       "name": "Branch",
       "tier": 2,
@@ -2089,7 +2089,7 @@ Each source item gets its own `mergeIds`.
 {
   "items": {
     "item:twig": {
-      "assetId": "asset:item-twig",
+      "assetId": "asset:item:twig",
       "code": "twig",
       "name": "Twig",
       "tier": 1,
@@ -2100,7 +2100,7 @@ Each source item gets its own `mergeIds`.
       "mergeIds": ["merge:twig-twig-branch"]
     },
     "item:branch": {
-      "assetId": "asset:item-branch",
+      "assetId": "asset:item:branch",
       "code": "branch",
       "name": "Branch",
       "tier": 2,
@@ -2111,7 +2111,7 @@ Each source item gets its own `mergeIds`.
       "mergeIds": ["merge:branch-branch-log"]
     },
     "item:log": {
-      "assetId": "asset:item-log",
+      "assetId": "asset:item:log",
       "code": "log",
       "name": "Log",
       "tier": 3,
@@ -2142,7 +2142,7 @@ Use `secret: true`.
 {
   "items": {
     "item:water": {
-      "assetId": "asset:item-water",
+      "assetId": "asset:item:water",
       "code": "water",
       "name": "Water",
       "tier": 1,
@@ -2291,7 +2291,7 @@ Attach item to producer through `producerId`.
 {
   "items": {
     "item:lumber-camp-1": {
-      "assetId": "asset:item-lumber-camp",
+      "assetId": "asset:item:lumber-camp",
       "code": "lumber-camp-1",
       "name": "Lumber Camp I",
       "tier": 1,
@@ -2657,7 +2657,7 @@ Item gets `stashId`, stash gets `outputTableId`.
 {
   "items": {
     "item:crate-1": {
-      "assetId": "asset:item-crate",
+      "assetId": "asset:item:crate",
       "code": "crate-1",
       "name": "Crate I",
       "tier": 1,
@@ -2834,7 +2834,7 @@ Item gets `craftRecipeId`; recipe defines result and inputs.
 {
   "items": {
     "item:blueprint-kiln": {
-      "assetId": "asset:item-blueprint-kiln",
+      "assetId": "asset:item:blueprint-kiln",
       "code": "blueprint-kiln",
       "name": "Kiln Blueprint",
       "tier": 4,
@@ -2845,7 +2845,7 @@ Item gets `craftRecipeId`; recipe defines result and inputs.
       "craftRecipeId": "craft:kiln"
     },
     "item:kiln-1": {
-      "assetId": "asset:item-kiln",
+      "assetId": "asset:item:kiln",
       "code": "kiln-1",
       "name": "Kiln I",
       "tier": 1,
@@ -3423,11 +3423,11 @@ Use `overlayAssetId` and `render: "blueprint"`.
 ```json
 {
   "assets": {
-    "asset:item-blueprint-kiln": {
+    "asset:item:blueprint-kiln": {
       "kind": "item",
       "label": "Kiln Blueprint",
       "resourceId": "item-blueprint",
-      "overlayAssetId": "asset:item-kiln",
+      "overlayAssetId": "asset:item:kiln",
       "render": "blueprint",
       "sort": 250
     }
@@ -3442,7 +3442,7 @@ Use `kind: "ui"`.
 ```json
 {
   "assets": {
-    "asset:ui-coin": {
+    "asset:ui:coin": {
       "kind": "ui",
       "label": "Coin UI Icon",
       "resourceId": "ui-coin",
@@ -3461,7 +3461,7 @@ Currency is a normal item with large stack size and currency tag.
 {
   "items": {
     "item:coin-stack": {
-      "assetId": "asset:item-coin-stack",
+      "assetId": "asset:item:coin-stack",
       "code": "coin-stack",
       "name": "Coin Stack",
       "tier": 1,
@@ -3496,7 +3496,7 @@ Create board item and use it in proximity requirement.
 {
   "items": {
     "item:stone-deposit": {
-      "assetId": "asset:item-stone-deposit",
+      "assetId": "asset:item:stone-deposit",
       "code": "stone-deposit",
       "name": "Stone Deposit",
       "tier": 0,
@@ -3526,7 +3526,7 @@ Attach deposit requirement to producer.
 {
   "items": {
     "item:quarry-1": {
-      "assetId": "asset:item-quarry",
+      "assetId": "asset:item:quarry",
       "code": "quarry-1",
       "name": "Quarry I",
       "tier": 1,

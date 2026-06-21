@@ -5,6 +5,8 @@ import { appendItemCreatedVisuals } from "~/v0/play/game-engine-visual/appendIte
 import { appendItemMergeVisuals } from "~/v0/play/game-engine-visual/appendItemMergeVisuals";
 import { appendItemReplaceVisuals } from "~/v0/play/game-engine-visual/appendItemReplaceVisuals";
 import { appendProducerInputStoreVisuals } from "~/v0/play/game-engine-visual/appendProducerInputStoreVisuals";
+import { appendProducerInputStoredFeedback } from "~/v0/play/game-engine-visual/appendProducerInputStoredFeedback";
+import { appendProducerProductCompletedFeedback } from "~/v0/play/game-engine-visual/appendProducerProductCompletedFeedback";
 import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngineVisualPlan";
 import { createGameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { findMergeResultEventIndex } from "~/v0/play/game-engine-visual/findMergeResultEventIndex";
@@ -76,6 +78,10 @@ export const createGameEngineVisualPlan = ({
 					const stored = events[storedIndex];
 					if (stored?.type === "producer_input.stored") {
 						skipped.add(storedIndex);
+						appendProducerInputStoredFeedback({
+							plan,
+							stored,
+						});
 
 						if (
 							shouldAnimateProducerInputStoreVisual({
@@ -108,6 +114,20 @@ export const createGameEngineVisualPlan = ({
 				});
 				break;
 
+			case "producer_input.stored":
+				appendProducerInputStoredFeedback({
+					plan,
+					stored: event,
+				});
+				break;
+
+			case "product.completed":
+				appendProducerProductCompletedFeedback({
+					event,
+					plan,
+				});
+				break;
+
 			case "craft.completed":
 			case "craft.started":
 			case "craft_input.stored":
@@ -116,10 +136,8 @@ export const createGameEngineVisualPlan = ({
 			case "item.spawn.blocked":
 			case "producer.product_line.default_changed":
 			case "producer.product_line.enabled_changed":
-			case "producer_input.stored":
 			case "producer_input.withdrawn":
 			case "product.blocked":
-			case "product.completed":
 			case "product.started":
 			case "stash.depleted":
 			case "stash.opened":

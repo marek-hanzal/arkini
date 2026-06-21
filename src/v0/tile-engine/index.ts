@@ -11,3 +11,4 @@ export type { TileEngine as TileEngineNamespace } from "~/v0/tile-engine/TileEng
 export type { TileEngineMotionRequest } from "~/v0/tile-engine/TileEngineMotionRequest";
 export type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 export type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema";
+export type { TileFeedbackMotionSchema } from "~/v0/tile-engine/TileFeedbackMotionSchema";

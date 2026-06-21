@@ -2,6 +2,7 @@ import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngi
 import type { TileEngineMotionRequest } from "~/v0/tile-engine";
 
 export interface GameEngineVisualPlanDraft {
+	boardFeedbackRequests: TileEngineMotionRequest[];
 	boardEnterRequests: TileEngineMotionRequest[];
 	boardTransientTilePlans: GameEngineVisualPlan["boardTransientTilePlans"] extends readonly (infer T)[]
 		? T[]
@@ -11,6 +12,7 @@ export interface GameEngineVisualPlanDraft {
 }
 
 export const createGameEngineVisualPlanDraft = (): GameEngineVisualPlanDraft => ({
+	boardFeedbackRequests: [],
 	boardEnterRequests: [],
 	boardTransientTilePlans: [],
 	ignoredEventTypes: [],

@@ -324,6 +324,48 @@
 			"render": "plain",
 			"resourceId": "producer-stonemason-t1",
 			"sort": 141
+		},
+		"asset:item:wheat-field": {
+			"kind": "item",
+			"label": "Wheat Field",
+			"render": "plain",
+			"resourceId": "item-wheat-field",
+			"sort": 200
+		},
+		"asset:producer:farm-t1": {
+			"kind": "item",
+			"label": "Farm I",
+			"render": "plain",
+			"resourceId": "producer-farm-t1",
+			"sort": 201
+		},
+		"asset:item:grain": {
+			"kind": "item",
+			"label": "Grain",
+			"render": "plain",
+			"resourceId": "item-grain",
+			"sort": 202
+		},
+		"asset:producer:pig-farm-t1": {
+			"kind": "item",
+			"label": "Pig Farm I",
+			"render": "plain",
+			"resourceId": "producer-pig-farm-t1",
+			"sort": 203
+		},
+		"asset:item:piglet": {
+			"kind": "item",
+			"label": "Piglet",
+			"render": "plain",
+			"resourceId": "item-piglet",
+			"sort": 204
+		},
+		"asset:producer:well-t1": {
+			"kind": "item",
+			"label": "Well I",
+			"render": "plain",
+			"resourceId": "producer-well-t1",
+			"sort": 205
 		}
 	}
 }

@@ -164,6 +164,13 @@
 			"resourceId": "item-gem",
 			"sort": 94
 		},
+		"asset:item:grain": {
+			"kind": "item",
+			"label": "Grain",
+			"render": "plain",
+			"resourceId": "item-grain",
+			"sort": 202
+		},
 		"asset:item:leaf": {
 			"kind": "item",
 			"label": "Leaf",
@@ -198,6 +205,13 @@
 			"render": "plain",
 			"resourceId": "item-pebble",
 			"sort": 70
+		},
+		"asset:item:piglet": {
+			"kind": "item",
+			"label": "Piglet",
+			"render": "plain",
+			"resourceId": "item-piglet",
+			"sort": 204
 		},
 		"asset:item:plank": {
 			"kind": "item",
@@ -290,6 +304,13 @@
 			"resourceId": "item-water",
 			"sort": 100
 		},
+		"asset:item:wheat-field": {
+			"kind": "item",
+			"label": "Wheat Field",
+			"render": "plain",
+			"resourceId": "item-wheat-field",
+			"sort": 200
+		},
 		"asset:item:wood-bundle": {
 			"kind": "item",
 			"label": "Wood Bundle",
@@ -297,12 +318,26 @@
 			"resourceId": "item-wood-bundle",
 			"sort": 64
 		},
+		"asset:producer:farm-t1": {
+			"kind": "item",
+			"label": "Farm I",
+			"render": "plain",
+			"resourceId": "producer-farm-t1",
+			"sort": 201
+		},
 		"asset:producer:lumberjack-t1": {
 			"kind": "item",
 			"label": "Lumberjack I",
 			"render": "plain",
 			"resourceId": "producer-lumberjack-t1",
 			"sort": 130
+		},
+		"asset:producer:pig-farm-t1": {
+			"kind": "item",
+			"label": "Pig Farm I",
+			"render": "plain",
+			"resourceId": "producer-pig-farm-t1",
+			"sort": 203
 		},
 		"asset:producer:quarry-t1": {
 			"kind": "item",
@@ -324,6 +359,13 @@
 			"render": "plain",
 			"resourceId": "producer-stonemason-t1",
 			"sort": 141
+		},
+		"asset:producer:well-t1": {
+			"kind": "item",
+			"label": "Well I",
+			"render": "plain",
+			"resourceId": "producer-well-t1",
+			"sort": 205
 		}
 	},
 	"craftRecipes": {},

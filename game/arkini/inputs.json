@@ -1,3 +1,26 @@
 {
-	"inputs": {}
+	"inputs": {
+		"input:sawmill-t1:log": {
+			"name": "Sawmill log input",
+			"inputs": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:stonemason-t1:stone": {
+			"name": "Stonemason stone input",
+			"inputs": [
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		}
+	}
 }

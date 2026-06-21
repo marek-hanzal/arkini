@@ -1,3 +1,44 @@
 {
-	"producers": {}
+	"producers": {
+		"producer:lumberjack-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:lumberjack-t1:log"
+			],
+			"requirementIds": [
+				"proximity:lumberjack-t1:tree"
+			]
+		},
+		"producer:sawmill-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sawmill-t1:plank"
+			],
+			"requirementIds": [
+				"proximity:sawmill-t1:lumberjack-t1"
+			]
+		},
+		"producer:quarry-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:quarry-t1:stone"
+			],
+			"requirementIds": [
+				"proximity:quarry-t1:rock"
+			]
+		},
+		"producer:stonemason-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:stonemason-t1:stone-block"
+			],
+			"requirementIds": [
+				"proximity:stonemason-t1:quarry-t1"
+			]
+		}
+	}
 }

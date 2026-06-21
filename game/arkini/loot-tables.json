@@ -1,3 +1,44 @@
 {
-	"lootTables": {}
+	"lootTables": {
+		"loot:lumberjack-t1:log": {
+			"name": "Lumberjack logs",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:sawmill-t1:plank": {
+			"name": "Sawmill planks",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:quarry-t1:stone": {
+			"name": "Quarry stone",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:stonemason-t1:stone-block": {
+			"name": "Stonemason stone blocks",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:stone-block",
+					"quantity": 1
+				}
+			]
+		}
+	}
 }

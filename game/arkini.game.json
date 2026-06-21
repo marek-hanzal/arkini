@@ -213,6 +213,13 @@
 			"resourceId": "item-quarry",
 			"sort": 140
 		},
+		"asset:item-rock": {
+			"kind": "item",
+			"label": "Rock",
+			"render": "plain",
+			"resourceId": "item-stone",
+			"sort": 79
+		},
 		"asset:item-sapling": {
 			"kind": "item",
 			"label": "Sapling",
@@ -289,6 +296,34 @@
 			"render": "plain",
 			"resourceId": "item-wood-bundle",
 			"sort": 64
+		},
+		"asset:producer-lumberjack-t1": {
+			"kind": "item",
+			"label": "Lumberjack I",
+			"render": "plain",
+			"resourceId": "item-lumber-camp",
+			"sort": 130
+		},
+		"asset:producer-quarry-t1": {
+			"kind": "item",
+			"label": "Quarry I",
+			"render": "plain",
+			"resourceId": "item-quarry",
+			"sort": 140
+		},
+		"asset:producer-sawmill-t1": {
+			"kind": "item",
+			"label": "Sawmill I",
+			"render": "plain",
+			"resourceId": "item-lumber-camp",
+			"sort": 131
+		},
+		"asset:producer-stonemason-t1": {
+			"kind": "item",
+			"label": "Stonemason I",
+			"render": "plain",
+			"resourceId": "item-quarry",
+			"sort": 141
 		}
 	},
 	"craftRecipes": {},
@@ -303,15 +338,362 @@
 		},
 		"title": "Arkini"
 	},
-	"inputs": {},
-	"items": {},
-	"lootTables": {},
+	"inputs": {
+		"input:sawmill-t1:log": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"name": "Sawmill log input"
+		},
+		"input:stonemason-t1:stone": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Stonemason stone input"
+		}
+	},
+	"items": {
+		"item:log": {
+			"assetId": "asset:item-log",
+			"code": "log",
+			"description": "Basic wood material produced by lumberjacks.",
+			"maxStackSize": 50,
+			"name": "Log",
+			"sort": 100,
+			"storage": "both",
+			"tags": [
+				"material",
+				"wood"
+			],
+			"tier": 0
+		},
+		"item:plank": {
+			"assetId": "asset:item-plank",
+			"code": "plank",
+			"description": "Processed wood material produced by sawmills.",
+			"maxStackSize": 50,
+			"name": "Plank",
+			"sort": 110,
+			"storage": "both",
+			"tags": [
+				"material",
+				"wood"
+			],
+			"tier": 0
+		},
+		"item:rock": {
+			"assetId": "asset:item-rock",
+			"code": "rock",
+			"description": "Movable stone source used by nearby quarries.",
+			"label": "🪨",
+			"maxStackSize": 10,
+			"name": "Rock",
+			"sort": 20,
+			"storage": "both",
+			"tags": [
+				"source",
+				"stone"
+			],
+			"tier": 0
+		},
+		"item:stone": {
+			"assetId": "asset:item-stone",
+			"code": "stone",
+			"description": "Basic stone material produced by quarries.",
+			"maxStackSize": 50,
+			"name": "Stone",
+			"sort": 200,
+			"storage": "both",
+			"tags": [
+				"material",
+				"stone"
+			],
+			"tier": 0
+		},
+		"item:stone-block": {
+			"assetId": "asset:item-stone-block",
+			"code": "stone-block",
+			"description": "Processed stone material produced by stonemasons.",
+			"maxStackSize": 50,
+			"name": "Stone Block",
+			"sort": 210,
+			"storage": "both",
+			"tags": [
+				"material",
+				"stone"
+			],
+			"tier": 0
+		},
+		"item:tree": {
+			"assetId": "asset:item-tree",
+			"code": "tree",
+			"description": "Movable wood source used by nearby lumberjacks.",
+			"label": "🌳",
+			"maxStackSize": 10,
+			"name": "Tree",
+			"sort": 10,
+			"storage": "both",
+			"tags": [
+				"source",
+				"wood"
+			],
+			"tier": 0
+		},
+		"producer:lumberjack-t1": {
+			"assetId": "asset:producer-lumberjack-t1",
+			"code": "lumberjack-t1",
+			"description": "Produces logs when placed near a tree.",
+			"maxStackSize": 1,
+			"name": "Lumberjack I",
+			"producerId": "producer:lumberjack-t1",
+			"sort": 300,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"wood"
+			],
+			"tier": 1
+		},
+		"producer:quarry-t1": {
+			"assetId": "asset:producer-quarry-t1",
+			"code": "quarry-t1",
+			"description": "Produces stone when placed near a rock.",
+			"maxStackSize": 1,
+			"name": "Quarry I",
+			"producerId": "producer:quarry-t1",
+			"sort": 400,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"stone"
+			],
+			"tier": 1
+		},
+		"producer:sawmill-t1": {
+			"assetId": "asset:producer-sawmill-t1",
+			"code": "sawmill-t1",
+			"description": "Turns logs into planks when placed near a lumberjack.",
+			"maxStackSize": 1,
+			"name": "Sawmill I",
+			"producerId": "producer:sawmill-t1",
+			"sort": 310,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"wood"
+			],
+			"tier": 1
+		},
+		"producer:stonemason-t1": {
+			"assetId": "asset:producer-stonemason-t1",
+			"code": "stonemason-t1",
+			"description": "Turns stone into stone blocks when placed near a quarry.",
+			"maxStackSize": 1,
+			"name": "Stonemason I",
+			"producerId": "producer:stonemason-t1",
+			"sort": 410,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"stone"
+			],
+			"tier": 1
+		}
+	},
+	"lootTables": {
+		"loot:lumberjack-t1:log": {
+			"name": "Lumberjack logs",
+			"output": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:quarry-t1:stone": {
+			"name": "Quarry stone",
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:sawmill-t1:plank": {
+			"name": "Sawmill planks",
+			"output": [
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:stonemason-t1:stone-block": {
+			"name": "Stonemason stone blocks",
+			"output": [
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		}
+	},
 	"merge": {},
-	"producers": {},
-	"products": {},
-	"requirements": {},
+	"producers": {
+		"producer:lumberjack-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:lumberjack-t1:log"
+			],
+			"requirementIds": [
+				"proximity:lumberjack-t1:tree"
+			],
+			"type": "producer"
+		},
+		"producer:quarry-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:quarry-t1:stone"
+			],
+			"requirementIds": [
+				"proximity:quarry-t1:rock"
+			],
+			"type": "producer"
+		},
+		"producer:sawmill-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sawmill-t1:plank"
+			],
+			"requirementIds": [
+				"proximity:sawmill-t1:lumberjack-t1"
+			],
+			"type": "producer"
+		},
+		"producer:stonemason-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:stonemason-t1:stone-block"
+			],
+			"requirementIds": [
+				"proximity:stonemason-t1:quarry-t1"
+			],
+			"type": "producer"
+		}
+	},
+	"products": {
+		"product:lumberjack-t1:log": {
+			"durationMs": 5000,
+			"name": "Log",
+			"outputTableId": "loot:lumberjack-t1:log",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:quarry-t1:stone": {
+			"durationMs": 5000,
+			"name": "Stone",
+			"outputTableId": "loot:quarry-t1:stone",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:sawmill-t1:plank": {
+			"durationMs": 5000,
+			"inputRefId": "input:sawmill-t1:log",
+			"name": "Plank",
+			"outputTableId": "loot:sawmill-t1:plank",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:stonemason-t1:stone-block": {
+			"durationMs": 5000,
+			"inputRefId": "input:stonemason-t1:stone",
+			"name": "Stone Block",
+			"outputTableId": "loot:stonemason-t1:stone-block",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		}
+	},
+	"requirements": {
+		"proximity:lumberjack-t1:tree": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:tree"
+			],
+			"type": "proximity"
+		},
+		"proximity:quarry-t1:rock": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:rock"
+			],
+			"type": "proximity"
+		},
+		"proximity:sawmill-t1:lumberjack-t1": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"producer:lumberjack-t1"
+			],
+			"type": "proximity"
+		},
+		"proximity:stonemason-t1:quarry-t1": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"producer:quarry-t1"
+			],
+			"type": "proximity"
+		}
+	},
 	"startingState": {
-		"board": [],
+		"board": [
+			{
+				"itemId": "item:tree",
+				"x": 0,
+				"y": 1
+			},
+			{
+				"itemId": "producer:lumberjack-t1",
+				"x": 1,
+				"y": 1
+			},
+			{
+				"itemId": "producer:sawmill-t1",
+				"x": 3,
+				"y": 1
+			},
+			{
+				"itemId": "item:rock",
+				"x": 0,
+				"y": 5
+			},
+			{
+				"itemId": "producer:quarry-t1",
+				"x": 1,
+				"y": 5
+			},
+			{
+				"itemId": "producer:stonemason-t1",
+				"x": 3,
+				"y": 5
+			}
+		],
 		"inventory": []
 	},
 	"stashes": {},

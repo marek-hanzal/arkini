@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { auditGameConfig, formatGameConfigAuditWarnings } from "./auditGameConfig";
 import { compileDirectory } from "./package";
 
 const main = async () => {
@@ -17,6 +18,12 @@ const main = async () => {
 	console.log(
 		`  ${Object.keys(result.package.items).length} items, ${Object.keys(result.package.resources).length} resources`,
 	);
+
+	const auditWarnings = auditGameConfig(result.package);
+	const warningText = formatGameConfigAuditWarnings(auditWarnings);
+	if (warningText) {
+		console.warn(warningText);
+	}
 };
 
 main().catch((error: unknown) => {

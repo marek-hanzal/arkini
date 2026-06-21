@@ -232,7 +232,14 @@
 			"label": "Sausage",
 			"render": "plain",
 			"resourceId": "item-sausage",
-			"sort": 134
+			"sort": 210
+		},
+		"asset:item:leather": {
+			"kind": "item",
+			"label": "Leather",
+			"render": "plain",
+			"resourceId": "item-leather",
+			"sort": 211
 		},
 		"asset:item:seed": {
 			"kind": "item",
@@ -353,19 +360,47 @@
 			"resourceId": "producer-windmill-t1",
 			"sort": 203
 		},
+		"asset:item:flour": {
+			"kind": "item",
+			"label": "Flour",
+			"render": "plain",
+			"resourceId": "item-flour",
+			"sort": 204
+		},
+		"asset:producer:bakery-t1": {
+			"kind": "item",
+			"label": "Bakery I",
+			"render": "plain",
+			"resourceId": "producer-bakery-t1",
+			"sort": 205
+		},
+		"asset:item:bread": {
+			"kind": "item",
+			"label": "Bread",
+			"render": "plain",
+			"resourceId": "item-bread",
+			"sort": 206
+		},
 		"asset:producer:pig-farm-t1": {
 			"kind": "item",
 			"label": "Pig Farm I",
 			"render": "plain",
 			"resourceId": "producer-pig-farm-t1",
-			"sort": 203
+			"sort": 207
 		},
 		"asset:item:piglet": {
 			"kind": "item",
 			"label": "Piglet",
 			"render": "plain",
 			"resourceId": "item-piglet",
-			"sort": 204
+			"sort": 208
+		},
+		"asset:producer:slaughterhouse-t1": {
+			"kind": "item",
+			"label": "Slaughterhouse I",
+			"render": "plain",
+			"resourceId": "producer-slaughterhouse-t1",
+			"sort": 209
 		},
 		"asset:producer:well-t1": {
 			"kind": "item",

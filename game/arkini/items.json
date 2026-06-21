@@ -181,13 +181,43 @@
 			"tier": 0,
 			"maxStackSize": 50,
 			"storage": "both",
-			"description": "Harvested grain produced by farms and used as pig feed.",
+			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
 			"tags": [
 				"material",
 				"food",
 				"grain"
 			],
 			"sort": 520
+		},
+		"item:flour": {
+			"assetId": "asset:item:flour",
+			"code": "flour",
+			"name": "Flour",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Milled grain produced by windmills and baked into bread.",
+			"tags": [
+				"material",
+				"food",
+				"grain",
+				"flour"
+			],
+			"sort": 530
+		},
+		"item:bread": {
+			"assetId": "asset:item:bread",
+			"code": "bread",
+			"name": "Bread",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Baked food produced by bakeries from flour and water.",
+			"tags": [
+				"food",
+				"bread"
+			],
+			"sort": 540
 		},
 		"item:piglet": {
 			"assetId": "asset:item:piglet",
@@ -196,13 +226,13 @@
 			"tier": 0,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "A small piglet produced by pig farms.",
+			"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
 			"tags": [
 				"animal",
 				"food",
 				"pig"
 			],
-			"sort": 530
+			"sort": 550
 		},
 		"item:sausage": {
 			"assetId": "asset:item:sausage",
@@ -211,13 +241,28 @@
 			"tier": 0,
 			"maxStackSize": 50,
 			"storage": "both",
-			"description": "Food consumed by heavy industry workers. Full sausage production will be wired separately.",
+			"description": "Meat food produced by slaughterhouses from piglets and consumed by heavy industry workers.",
 			"tags": [
 				"food",
 				"meat",
 				"sausage"
 			],
-			"sort": 540
+			"sort": 560
+		},
+		"item:leather": {
+			"assetId": "asset:item:leather",
+			"code": "leather",
+			"name": "Leather",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Processed leather produced as a slaughterhouse byproduct from piglets.",
+			"tags": [
+				"material",
+				"leather",
+				"animal"
+			],
+			"sort": 570
 		},
 		"producer:well-t1": {
 			"assetId": "asset:producer:well-t1",
@@ -251,6 +296,39 @@
 			"sort": 610,
 			"producerId": "producer:farm-t1"
 		},
+		"producer:windmill-t1": {
+			"assetId": "asset:producer:windmill-t1",
+			"code": "windmill-t1",
+			"name": "Windmill I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Mills grain into flour.",
+			"tags": [
+				"producer",
+				"food",
+				"grain",
+				"flour"
+			],
+			"sort": 620,
+			"producerId": "producer:windmill-t1"
+		},
+		"producer:bakery-t1": {
+			"assetId": "asset:producer:bakery-t1",
+			"code": "bakery-t1",
+			"name": "Bakery I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes flour and water to bake bread.",
+			"tags": [
+				"producer",
+				"food",
+				"bread"
+			],
+			"sort": 630,
+			"producerId": "producer:bakery-t1"
+		},
 		"producer:pig-farm-t1": {
 			"assetId": "asset:producer:pig-farm-t1",
 			"code": "pig-farm-t1",
@@ -264,8 +342,25 @@
 				"food",
 				"pig"
 			],
-			"sort": 620,
+			"sort": 640,
 			"producerId": "producer:pig-farm-t1"
+		},
+		"producer:slaughterhouse-t1": {
+			"assetId": "asset:producer:slaughterhouse-t1",
+			"code": "slaughterhouse-t1",
+			"name": "Slaughterhouse I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Processes piglets into sausage and leather.",
+			"tags": [
+				"producer",
+				"food",
+				"meat",
+				"leather"
+			],
+			"sort": 650,
+			"producerId": "producer:slaughterhouse-t1"
 		},
 		"item:hop-field": {
 			"assetId": "asset:item:hop-field",

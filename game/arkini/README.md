@@ -83,31 +83,50 @@ Food line:
 item:wheat-field
 item:water
 item:grain
+item:flour
+item:bread
 item:piglet
+item:sausage
+item:leather
 producer:well-t1
 producer:farm-t1
+producer:windmill-t1
+producer:bakery-t1
 producer:pig-farm-t1
+producer:slaughterhouse-t1
 proximity:farm-t1:wheat-field
 product:well-t1:water
 product:farm-t1:grain
+product:windmill-t1:flour
+product:bakery-t1:bread
 product:pig-farm-t1:piglet
+product:slaughterhouse-t1:sausage-leather
 input:farm-t1:water
+input:windmill-t1:grain
+input:bakery-t1:flour-water
 input:pig-farm-t1:grain-water
+input:slaughterhouse-t1:piglet
 loot:well-t1:water
 loot:farm-t1:grain
+loot:windmill-t1:flour
+loot:bakery-t1:bread
 loot:pig-farm-t1:piglet
+loot:slaughterhouse-t1:sausage-leather
 ```
 
 ### Initial balance placeholder
 
-Use `5000` ms for all first-pass production durations, including food, brewing, and wine lines. Timing balance is not the point of this phase; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
+Most first-pass production durations stay at `5000` ms. The new food processors are slightly longer on purpose: windmill flour takes `6000` ms, while bakery bread and slaughterhouse sausage/leather take `8000` ms. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
 Current processor input buffers use capacity `4`:
 
 - `input:sawmill-t1:log`
 - `input:stonemason-t1:stone`
 - `input:farm-t1:water`
+- `input:windmill-t1:grain`
+- `input:bakery-t1:flour-water`
 - `input:pig-farm-t1:grain-water`
+- `input:slaughterhouse-t1:piglet`
 - `input:brewery-t1:water`
 - `input:brewery-t1:hops-water`
 - `input:brewery-t1:beer-to-barrel`
@@ -151,8 +170,15 @@ The first food production line is wired into gameplay and uses these prepared as
 - `asset:item:wheat-field` -> `game/arkini/assets/item-wheat-field.png`
 - `asset:producer:farm-t1` -> `game/arkini/assets/producer-farm-t1.png`
 - `asset:item:grain` -> `game/arkini/assets/item-grain.png`
+- `asset:producer:windmill-t1` -> `game/arkini/assets/producer-windmill-t1.png`
+- `asset:item:flour` -> `game/arkini/assets/item-flour.png`
+- `asset:producer:bakery-t1` -> `game/arkini/assets/producer-bakery-t1.png`
+- `asset:item:bread` -> `game/arkini/assets/item-bread.png`
 - `asset:producer:pig-farm-t1` -> `game/arkini/assets/producer-pig-farm-t1.png`
 - `asset:item:piglet` -> `game/arkini/assets/item-piglet.png`
+- `asset:producer:slaughterhouse-t1` -> `game/arkini/assets/producer-slaughterhouse-t1.png`
+- `asset:item:sausage` -> `game/arkini/assets/item-sausage.png`
+- `asset:item:leather` -> `game/arkini/assets/item-leather.png`
 - `asset:producer:well-t1` -> `game/arkini/assets/producer-well-t1.png`
 - `asset:item:water` -> `game/arkini/assets/item-water.png`
 
@@ -237,7 +263,7 @@ Prepared item asset IDs:
 
 Heavy industry is authored but not placed onto the starting board. Use cheat inventory to spawn and test it.
 
-`item:sausage` is authored as a food input for this chain; its own production chain is intentionally left for a later gameplay pass.
+`item:sausage` is now produced by the slaughterhouse branch of the food chain instead of being a placeholder. Good, the economy no longer pretends sausages grow in config comments.
 
 Mining producers consume tavern/food outputs and create mine-cart resources:
 

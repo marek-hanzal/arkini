@@ -33,6 +33,34 @@
 				}
 			]
 		},
+		"input:windmill-t1:grain": {
+			"name": "Windmill grain input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:bakery-t1:flour-water": {
+			"name": "Bakery flour and water input",
+			"inputs": [
+				{
+					"itemId": "item:flour",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
 		"input:pig-farm-t1:grain-water": {
 			"name": "Pig farm grain and water input",
 			"inputs": [
@@ -44,6 +72,17 @@
 				},
 				{
 					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:slaughterhouse-t1:piglet": {
+			"name": "Slaughterhouse piglet input",
+			"inputs": [
+				{
+					"itemId": "item:piglet",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true

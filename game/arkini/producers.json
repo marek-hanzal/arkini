@@ -58,11 +58,35 @@
 				"proximity:farm-t1:wheat-field"
 			]
 		},
+		"producer:windmill-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:windmill-t1:flour"
+			],
+			"requirementIds": []
+		},
+		"producer:bakery-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:bakery-t1:bread"
+			],
+			"requirementIds": []
+		},
 		"producer:pig-farm-t1": {
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:pig-farm-t1:piglet"
+			],
+			"requirementIds": []
+		},
+		"producer:slaughterhouse-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:slaughterhouse-t1:sausage-leather"
 			],
 			"requirementIds": []
 		},

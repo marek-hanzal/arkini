@@ -60,12 +60,47 @@
 				}
 			]
 		},
+		"loot:windmill-t1:flour": {
+			"name": "Windmill flour",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:flour",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:bakery-t1:bread": {
+			"name": "Bakery bread",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:bread",
+					"quantity": 1
+				}
+			]
+		},
 		"loot:pig-farm-t1:piglet": {
 			"name": "Pig farm piglets",
 			"output": [
 				{
 					"type": "guaranteed",
 					"itemId": "item:piglet",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:slaughterhouse-t1:sausage-leather": {
+			"name": "Slaughterhouse sausage and leather",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"type": "guaranteed",
+					"itemId": "item:leather",
 					"quantity": 1
 				}
 			]

@@ -212,3 +212,24 @@ proximity:brewery-t1:hop-field
 proximity:winery-t1:vineyard
 ```
 
+### Staged mining and smelting assets
+
+The mining / smelting consumer wave now has prepared art assets, but it is not wired into gameplay JSON yet.
+
+Prepared producer asset IDs:
+
+- `asset:producer:coal-mine-t1` -> `game/arkini/assets/producer-coal-mine-t1.png`
+- `asset:producer:gold-mine-t1` -> `game/arkini/assets/producer-gold-mine-t1.png`
+- `asset:producer:iron-mine-t1` -> `game/arkini/assets/producer-iron-mine-t1.png`
+- `asset:producer:smelter-t1` -> `game/arkini/assets/producer-smelter-t1.png`
+
+Prepared item asset IDs:
+
+- `asset:item:coal` -> `game/arkini/assets/item-coal.png` (updated to the new mine-cart art)
+- `asset:item:gold-ore` -> `game/arkini/assets/item-gold-ore.png`
+- `asset:item:iron-ore` -> `game/arkini/assets/item-iron-ore.png`
+- `asset:item:iron-ingot` -> `game/arkini/assets/item-iron-ingot.png`
+- `asset:item:gold-ingot` -> `game/arkini/assets/item-gold-ingot.png`
+- `asset:item:pollution` -> `game/arkini/assets/item-pollution.png`
+- `asset:item:hops` -> `game/arkini/assets/item-hops.png` (refreshed with the improved hop illustration)
+

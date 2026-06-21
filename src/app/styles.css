@@ -109,6 +109,14 @@ button:focus-visible,
 .ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] {
 	--ak-tile-engine-item-layer: var(--ak-layer-overlay-tile);
 	--ak-tile-engine-drag-item-layer: var(--ak-layer-overlay-drag-tile);
+	touch-action: pan-y;
+}
+
+.ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] .ak-tile-engine-grid,
+.ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] .ak-tile-engine-slot,
+.ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] .ak-tile-engine-actor,
+.ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] .ak-tile-engine-visual {
+	touch-action: pan-y;
 }
 
 .ak-tile-engine-slots {

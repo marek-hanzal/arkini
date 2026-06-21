@@ -29,6 +29,7 @@ export namespace TileEngineActor {
 	}
 
 	export interface Props<TTile = unknown, TSlot = unknown, TDrag = unknown, TDrop = unknown> {
+		layerRole: TileEngine.LayerRole;
 		tile: TileEngine.Tile<TTile>;
 		index: number;
 		columns: number;

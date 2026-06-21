@@ -3,6 +3,7 @@ import { BoardCellCooldownProgress } from "~/v0/board/ui/BoardCellCooldownProgre
 import { BoardCellProgress } from "~/v0/board/ui/BoardCellProgress";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { GameItemView } from "~/v0/item/ui/GameItemView";
+import { cn } from "~/v0/ui/cn";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
@@ -51,7 +52,11 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			data-ui="board item"
 			data-ak-board-item-id={boardItem.id}
 			data-ak-board-tile-ready={producerReady ? "true" : undefined}
-			className="relative h-full w-full overflow-hidden"
+			className={cn(
+				"relative h-full w-full overflow-hidden",
+				producerReady &&
+					"bg-emerald-100/30 outline outline-1 -outline-offset-1 outline-emerald-500/30",
+			)}
 		>
 			<GameItemView
 				item={item}

@@ -24,6 +24,7 @@ export namespace TileEngineActor {
 }
 
 const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
+	layerRole,
 	tile,
 	index,
 	columns,
@@ -137,6 +138,8 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		setHandoffs,
 	});
 
+	const isOverlayLayer = layerRole === "overlay";
+
 	return (
 		<div
 			ref={actorRef}
@@ -146,11 +149,19 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-drop-feedback={dropFeedback?.effect}
 			data-ak-tile-engine-drop-feedback-variant={dropFeedback?.variant}
 			className={cn(
-				"ak-tile-engine-actor pointer-events-auto absolute touch-none select-none will-change-transform",
+				"pointer-events-auto absolute select-none will-change-transform",
+				isOverlayLayer ? "[touch-action:pan-y]" : "touch-none",
 				tile.hidden && "pointer-events-none opacity-0",
 				disabled && "pointer-events-none",
 			)}
 			style={{
+				zIndex: dragging
+					? isOverlayLayer
+						? "var(--ak-layer-overlay-drag-tile)"
+						: "var(--ak-layer-base-drag-tile)"
+					: isOverlayLayer
+						? "var(--ak-layer-overlay-tile)"
+						: "var(--ak-layer-base-tile)",
 				...actorStyle({
 					columns,
 					rowCount,
@@ -166,7 +177,13 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		>
 			<div
 				data-ak-tile-engine-visual="true"
-				className="ak-tile-engine-visual"
+				className={cn(
+					"h-full w-full origin-center transition-[transform,filter,opacity] duration-150 ease-out will-change-[transform,opacity] [backface-visibility:hidden] data-[ak-tile-engine-presence-motion]:transition-none",
+					isOverlayLayer ? "[touch-action:pan-y]" : "touch-none",
+					dropFeedback?.effect === "merge" && "scale-[1.14]",
+					dropFeedback?.effect === "blocked" &&
+						"scale-[0.88] opacity-90 saturate-[0.82] brightness-[0.86]",
+				)}
 			>
 				{renderTile({
 					tile,

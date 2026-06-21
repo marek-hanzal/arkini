@@ -90,7 +90,7 @@ Current processor input buffers use capacity `4`:
 
 Current gameplay definitions now point to dedicated asset IDs and dedicated PNG filenames when possible.
 
-Runtime mirror note: the current app build imports PNGs from `src/assets`, so active authored PNGs from `game/arkini/assets` must be mirrored there until the runtime consumes package resources directly. Yes, this is duplication. No, pretending it is not will not make the placeholder icon disappear.
+Runtime asset note: the app runtime consumes the compiled `game/arkini.assets.json` resource package. Do not mirror authored PNGs into `src/assets`; `game/arkini/assets` is the source input and `game/arkini.assets.json` is the runtime output.
 
 Current first-wave asset IDs:
 

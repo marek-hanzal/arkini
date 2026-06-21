@@ -189,59 +189,59 @@
 				}
 			]
 		},
-		"input:coal-mine-t1:beer-sausage": {
-			"name": "Coal mine beer and sausage input",
+		"input:coal-mine-t1:bread-water": {
+			"name": "Coal mine bread and water input",
 			"inputs": [
 				{
-					"itemId": "item:beer",
-					"quantity": 2,
+					"itemId": "item:bread",
+					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:sausage",
+					"itemId": "item:water",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				}
 			]
 		},
-		"input:iron-mine-t1:beer-sausage": {
-			"name": "Iron mine beer and sausage input",
+		"input:iron-mine-t1:sausage-beer": {
+			"name": "Iron mine sausage and beer input",
 			"inputs": [
 				{
-					"itemId": "item:beer",
-					"quantity": 2,
+					"itemId": "item:sausage",
+					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:sausage",
+					"itemId": "item:beer",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				}
 			]
 		},
-		"input:gold-mine-t1:beer-sausage": {
-			"name": "Gold mine beer and sausage input",
+		"input:gold-mine-t1:bread-wine": {
+			"name": "Gold mine bread and wine input",
 			"inputs": [
 				{
-					"itemId": "item:beer",
-					"quantity": 2,
+					"itemId": "item:bread",
+					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:sausage",
-					"quantity": 2,
+					"itemId": "item:wine-glass",
+					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				}
 			]
 		},
-		"input:smelter-t1:iron-ingot": {
-			"name": "Smelter iron ingot input",
+		"input:smelter-t1:iron-ore-coal-water": {
+			"name": "Smelter iron ore, coal, and water input",
 			"inputs": [
 				{
 					"itemId": "item:iron-ore",
@@ -256,21 +256,15 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:beer",
-					"quantity": 2,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:sausage",
-					"quantity": 2,
+					"itemId": "item:water",
+					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				}
 			]
 		},
-		"input:smelter-t1:gold-ingot": {
-			"name": "Smelter gold ingot input",
+		"input:smelter-t1:gold-ore-coal-water": {
+			"name": "Smelter gold ore, coal, and water input",
 			"inputs": [
 				{
 					"itemId": "item:gold-ore",
@@ -280,19 +274,13 @@
 				},
 				{
 					"itemId": "item:coal",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
 					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:beer",
-					"quantity": 2,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:sausage",
-					"quantity": 2,
 					"capacity": 4,
 					"consume": true
 				}

@@ -145,7 +145,7 @@
 			"name": "Coal Cart",
 			"durationMs": 8000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:coal-mine-t1:beer-sausage",
+			"inputRefId": "input:coal-mine-t1:bread-water",
 			"requirementIds": [],
 			"outputTableId": "loot:coal-mine-t1:coal"
 		},
@@ -153,7 +153,7 @@
 			"name": "Iron Ore Cart",
 			"durationMs": 8000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:iron-mine-t1:beer-sausage",
+			"inputRefId": "input:iron-mine-t1:sausage-beer",
 			"requirementIds": [],
 			"outputTableId": "loot:iron-mine-t1:iron-ore"
 		},
@@ -161,7 +161,7 @@
 			"name": "Gold Ore Cart",
 			"durationMs": 9000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:gold-mine-t1:beer-sausage",
+			"inputRefId": "input:gold-mine-t1:bread-wine",
 			"requirementIds": [],
 			"outputTableId": "loot:gold-mine-t1:gold-ore"
 		},
@@ -169,7 +169,7 @@
 			"name": "Iron Ingot",
 			"durationMs": 10000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:smelter-t1:iron-ingot",
+			"inputRefId": "input:smelter-t1:iron-ore-coal-water",
 			"requirementIds": [],
 			"outputTableId": "loot:smelter-t1:iron-ingot"
 		},
@@ -177,7 +177,7 @@
 			"name": "Gold Ingot",
 			"durationMs": 10000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:smelter-t1:gold-ingot",
+			"inputRefId": "input:smelter-t1:gold-ore-coal-water",
 			"requirementIds": [],
 			"outputTableId": "loot:smelter-t1:gold-ingot"
 		},

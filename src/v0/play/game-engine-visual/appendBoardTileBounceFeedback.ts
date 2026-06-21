@@ -1,5 +1,5 @@
+import { createBoardTileBounceFeedbackRequest } from "~/v0/play/game-engine-visual/createBoardTileBounceFeedbackRequest";
 import type { GameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
-import { TileEngineTiming } from "~/v0/tile-engine";
 
 export namespace appendBoardTileBounceFeedback {
 	export interface Props {
@@ -14,14 +14,10 @@ export const appendBoardTileBounceFeedback = ({
 	plan,
 	tileId,
 }: appendBoardTileBounceFeedback.Props) => {
-	plan.boardFeedbackRequests.push({
-		cleanupDelayMs:
-			TileEngineTiming.feedbackDurationSeconds * 1000 +
-			TileEngineTiming.motionCleanupBufferMs,
-		feedback: {
+	plan.boardFeedbackRequests.push(
+		createBoardTileBounceFeedbackRequest({
 			groupId,
-			kind: "bounce",
-		},
-		tileId,
-	});
+			tileId,
+		}),
+	);
 };

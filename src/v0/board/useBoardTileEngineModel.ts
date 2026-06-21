@@ -3,6 +3,7 @@ import type { BoardCellView } from "~/v0/board/boardCells";
 import { cellKey } from "~/v0/board/cellKey";
 import { resolveBoardDropFeedback } from "~/v0/board/drop/resolveBoardDropFeedback";
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
+import { readProducerMissingResourceHintTileIds } from "~/v0/producer/logic/readProducerMissingResourceHintTileIds";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { useBoardTransientTiles } from "~/v0/board/animation/BoardTransientTileStore";
@@ -10,6 +11,7 @@ import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
+import { registerBoardTileBounceFeedback } from "~/v0/play/game-engine-visual/registerBoardTileBounceFeedback";
 import {
 	useGameBoardView,
 	useGameRuntimeDropActions,
@@ -127,6 +129,18 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
+			const hintTileIds = readProducerMissingResourceHintTileIds({
+				board,
+				config,
+				producerItem: boardItem,
+			});
+			if (hintTileIds.length > 0) {
+				registerBoardTileBounceFeedback({
+					groupId: `producer-missing-resource-hint:${boardItem.id}:${Date.now()}`,
+					tileIds: hintTileIds,
+				});
+			}
+
 			void runtimeStore
 				.dispatch({
 					action: {
@@ -138,6 +152,8 @@ export const useBoardTileEngineModel = ({
 				.catch(feedback.showError);
 		},
 		[
+			board,
+			config,
 			feedback.showError,
 			runtimeStore,
 		],

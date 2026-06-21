@@ -105,11 +105,9 @@ Current first-wave asset IDs:
 
 Current PNG coverage status:
 
-- `item:tree`, `item:log`, `item:plank`, `item:stone`, `item:stone-block`, `producer:lumberjack-t1`, and `producer:quarry-t1` have usable PNG coverage.
-- `item:rock`, `producer:sawmill-t1`, and `producer:stonemason-t1` currently use placeholder-copied PNG files so that every active definition has its own file path.
+- `item:tree`, `item:log`, `item:plank`, `item:stone`, `item:stone-block`, `producer:lumberjack-t1`, `producer:sawmill-t1`, `producer:quarry-t1`, and `producer:stonemason-t1` have usable PNG coverage.
+- `item:rock` currently uses a placeholder-copied PNG file so that every active definition has its own file path.
 
 Generate dedicated art next for:
 
 - `item:rock`
-- `producer:sawmill-t1`
-- `producer:stonemason-t1`

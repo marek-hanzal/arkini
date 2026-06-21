@@ -14,6 +14,13 @@
 			"resourceId": "item-beer",
 			"sort": 136
 		},
+		"asset:item:beer-barrel": {
+			"kind": "item",
+			"label": "Beer Barrel",
+			"render": "plain",
+			"resourceId": "item-beer-barrel",
+			"sort": 208
+		},
 		"asset:item:blueprint": {
 			"kind": "item",
 			"label": "Finished Blueprint",
@@ -171,6 +178,13 @@
 			"resourceId": "item-grain",
 			"sort": 202
 		},
+		"asset:item:hop-field": {
+			"kind": "item",
+			"label": "Hop Field",
+			"render": "plain",
+			"resourceId": "item-hop-field",
+			"sort": 206
+		},
 		"asset:item:leaf": {
 			"kind": "item",
 			"label": "Leaf",
@@ -318,6 +332,13 @@
 			"resourceId": "item-wood-bundle",
 			"sort": 64
 		},
+		"asset:producer:brewery-t1": {
+			"kind": "item",
+			"label": "Brewery I",
+			"render": "plain",
+			"resourceId": "producer-brewery-t1",
+			"sort": 207
+		},
 		"asset:producer:farm-t1": {
 			"kind": "item",
 			"label": "Farm I",
@@ -359,6 +380,13 @@
 			"render": "plain",
 			"resourceId": "producer-stonemason-t1",
 			"sort": 141
+		},
+		"asset:producer:tavern-t1": {
+			"kind": "item",
+			"label": "Tavern I",
+			"render": "plain",
+			"resourceId": "producer-tavern-t1",
+			"sort": 209
 		},
 		"asset:producer:well-t1": {
 			"kind": "item",

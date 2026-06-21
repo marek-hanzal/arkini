@@ -147,3 +147,16 @@ The first food production line is wired into gameplay and uses these prepared as
 - `asset:item:piglet` -> `game/arkini/assets/item-piglet.png`
 - `asset:producer:well-t1` -> `game/arkini/assets/producer-well-t1.png`
 - `asset:item:water` -> `game/arkini/assets/item-water.png`
+
+### Staged next-wave brewing assets
+
+The brewing / tavern production wave now has prepared art assets, but it is not wired into the gameplay JSON yet.
+
+Prepared asset IDs:
+
+- `asset:item:hop-field` -> `game/arkini/assets/item-hop-field.png`
+- `asset:producer:brewery-t1` -> `game/arkini/assets/producer-brewery-t1.png`
+- `asset:item:beer-barrel` -> `game/arkini/assets/item-beer-barrel.png`
+- `asset:producer:tavern-t1` -> `game/arkini/assets/producer-tavern-t1.png`
+
+Existing beer output art already exists as `asset:item:beer`.

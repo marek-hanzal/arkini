@@ -366,6 +366,34 @@
 			"render": "plain",
 			"resourceId": "producer-well-t1",
 			"sort": 205
+		},
+		"asset:item:hop-field": {
+			"kind": "item",
+			"label": "Hop Field",
+			"render": "plain",
+			"resourceId": "item-hop-field",
+			"sort": 206
+		},
+		"asset:producer:brewery-t1": {
+			"kind": "item",
+			"label": "Brewery I",
+			"render": "plain",
+			"resourceId": "producer-brewery-t1",
+			"sort": 207
+		},
+		"asset:item:beer-barrel": {
+			"kind": "item",
+			"label": "Beer Barrel",
+			"render": "plain",
+			"resourceId": "item-beer-barrel",
+			"sort": 208
+		},
+		"asset:producer:tavern-t1": {
+			"kind": "item",
+			"label": "Tavern I",
+			"render": "plain",
+			"resourceId": "producer-tavern-t1",
+			"sort": 209
 		}
 	}
 }

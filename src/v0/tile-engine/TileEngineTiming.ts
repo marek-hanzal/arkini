@@ -7,7 +7,7 @@ export const TileEngineTiming = {
 	snapDurationSeconds: 0.24,
 	rejectDurationSeconds: 0.27,
 	presenceDurationSeconds: 0.42,
-	feedbackDurationSeconds: 0.52,
+	feedbackDurationSeconds: 0.34,
 	motionCleanupBufferMs: 140,
 	moveEase: [
 		0.22,

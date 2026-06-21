@@ -789,6 +789,422 @@
 			],
 			"sort": 1260,
 			"producerId": "producer:goldsmith-t1"
+		},
+		"producer:townhall-t1": {
+			"assetId": "asset:producer:townhall-t1",
+			"code": "townhall-t1",
+			"name": "Town Hall I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Starter civic hub that issues basic settlement blueprints.",
+			"tags": [
+				"producer",
+				"townhall",
+				"civic"
+			],
+			"sort": 51,
+			"producerId": "producer:townhall-t1"
+		},
+		"producer:townhall-t2": {
+			"assetId": "asset:producer:townhall-t2",
+			"code": "townhall-t2",
+			"name": "Town Hall II",
+			"tier": 2,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Food-chain civic hub that issues farming, food, brewing, and wine blueprints.",
+			"tags": [
+				"producer",
+				"townhall",
+				"civic"
+			],
+			"sort": 52,
+			"producerId": "producer:townhall-t2"
+		},
+		"producer:townhall-t3": {
+			"assetId": "asset:producer:townhall-t3",
+			"code": "townhall-t3",
+			"name": "Town Hall III",
+			"tier": 3,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Industrial civic hub that issues mining, smelting, cleanup, and deposit survey plans.",
+			"tags": [
+				"producer",
+				"townhall",
+				"civic"
+			],
+			"sort": 53,
+			"producerId": "producer:townhall-t3"
+		},
+		"producer:townhall-t4": {
+			"assetId": "asset:producer:townhall-t4",
+			"code": "townhall-t4",
+			"name": "Town Hall IV",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Coin-economy civic hub that issues late specialist blueprints.",
+			"tags": [
+				"producer",
+				"townhall",
+				"civic"
+			],
+			"sort": 54,
+			"producerId": "producer:townhall-t4"
+		},
+		"item:blueprint-lumberjack-t1": {
+			"assetId": "asset:item:blueprint-lumberjack-t1",
+			"code": "blueprint-lumberjack-t1",
+			"name": "Lumberjack I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2000,
+			"craftRecipeId": "craft:lumberjack-t1"
+		},
+		"item:blueprint-sawmill-t1": {
+			"assetId": "asset:item:blueprint-sawmill-t1",
+			"code": "blueprint-sawmill-t1",
+			"name": "Sawmill I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Sawmill I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2010,
+			"craftRecipeId": "craft:sawmill-t1"
+		},
+		"item:blueprint-quarry-t1": {
+			"assetId": "asset:item:blueprint-quarry-t1",
+			"code": "blueprint-quarry-t1",
+			"name": "Quarry I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Quarry I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2020,
+			"craftRecipeId": "craft:quarry-t1"
+		},
+		"item:blueprint-stonemason-t1": {
+			"assetId": "asset:item:blueprint-stonemason-t1",
+			"code": "blueprint-stonemason-t1",
+			"name": "Stonemason I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Stonemason I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2030,
+			"craftRecipeId": "craft:stonemason-t1"
+		},
+		"item:blueprint-well-t1": {
+			"assetId": "asset:item:blueprint-well-t1",
+			"code": "blueprint-well-t1",
+			"name": "Well I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Well I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2040,
+			"craftRecipeId": "craft:well-t1"
+		},
+		"item:blueprint-farm-t1": {
+			"assetId": "asset:item:blueprint-farm-t1",
+			"code": "blueprint-farm-t1",
+			"name": "Farm I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Farm I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2050,
+			"craftRecipeId": "craft:farm-t1"
+		},
+		"item:blueprint-windmill-t1": {
+			"assetId": "asset:item:blueprint-windmill-t1",
+			"code": "blueprint-windmill-t1",
+			"name": "Windmill I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Windmill I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2100,
+			"craftRecipeId": "craft:windmill-t1"
+		},
+		"item:blueprint-bakery-t1": {
+			"assetId": "asset:item:blueprint-bakery-t1",
+			"code": "blueprint-bakery-t1",
+			"name": "Bakery I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Bakery I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2110,
+			"craftRecipeId": "craft:bakery-t1"
+		},
+		"item:blueprint-pig-farm-t1": {
+			"assetId": "asset:item:blueprint-pig-farm-t1",
+			"code": "blueprint-pig-farm-t1",
+			"name": "Pig Farm I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Pig Farm I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2120,
+			"craftRecipeId": "craft:pig-farm-t1"
+		},
+		"item:blueprint-slaughterhouse-t1": {
+			"assetId": "asset:item:blueprint-slaughterhouse-t1",
+			"code": "blueprint-slaughterhouse-t1",
+			"name": "Slaughterhouse I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2130,
+			"craftRecipeId": "craft:slaughterhouse-t1"
+		},
+		"item:blueprint-brewery-t1": {
+			"assetId": "asset:item:blueprint-brewery-t1",
+			"code": "blueprint-brewery-t1",
+			"name": "Brewery I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Brewery I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2140,
+			"craftRecipeId": "craft:brewery-t1"
+		},
+		"item:blueprint-tavern-t1": {
+			"assetId": "asset:item:blueprint-tavern-t1",
+			"code": "blueprint-tavern-t1",
+			"name": "Tavern I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Tavern I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2150,
+			"craftRecipeId": "craft:tavern-t1"
+		},
+		"item:blueprint-winery-t1": {
+			"assetId": "asset:item:blueprint-winery-t1",
+			"code": "blueprint-winery-t1",
+			"name": "Winery I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Winery I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2160,
+			"craftRecipeId": "craft:winery-t1"
+		},
+		"item:blueprint-coal-mine-t1": {
+			"assetId": "asset:item:blueprint-coal-mine-t1",
+			"code": "blueprint-coal-mine-t1",
+			"name": "Coal Mine I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Coal Mine I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2200,
+			"craftRecipeId": "craft:coal-mine-t1"
+		},
+		"item:blueprint-iron-mine-t1": {
+			"assetId": "asset:item:blueprint-iron-mine-t1",
+			"code": "blueprint-iron-mine-t1",
+			"name": "Iron Mine I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Iron Mine I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2210,
+			"craftRecipeId": "craft:iron-mine-t1"
+		},
+		"item:blueprint-smelter-t1": {
+			"assetId": "asset:item:blueprint-smelter-t1",
+			"code": "blueprint-smelter-t1",
+			"name": "Smelter I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Smelter I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2220,
+			"craftRecipeId": "craft:smelter-t1"
+		},
+		"item:blueprint-purifier-t1": {
+			"assetId": "asset:item:blueprint-purifier-t1",
+			"code": "blueprint-purifier-t1",
+			"name": "Purifier I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Purifier I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2230,
+			"craftRecipeId": "craft:purifier-t1"
+		},
+		"item:blueprint-gold-mine-t1": {
+			"assetId": "asset:item:blueprint-gold-mine-t1",
+			"code": "blueprint-gold-mine-t1",
+			"name": "Gold Mine I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Gold Mine I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2240,
+			"craftRecipeId": "craft:gold-mine-t1"
+		},
+		"item:blueprint-goldsmith-t1": {
+			"assetId": "asset:item:blueprint-goldsmith-t1",
+			"code": "blueprint-goldsmith-t1",
+			"name": "Goldsmith I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Goldsmith I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2300,
+			"craftRecipeId": "craft:goldsmith-t1"
+		},
+		"item:blueprint-townhall-t2": {
+			"assetId": "asset:item:blueprint-townhall-t2",
+			"code": "blueprint-townhall-t2",
+			"name": "Town Hall II Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Town Hall II.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2060,
+			"craftRecipeId": "craft:townhall-t2"
+		},
+		"item:blueprint-townhall-t3": {
+			"assetId": "asset:item:blueprint-townhall-t3",
+			"code": "blueprint-townhall-t3",
+			"name": "Town Hall III Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Town Hall III.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2170,
+			"craftRecipeId": "craft:townhall-t3"
+		},
+		"item:blueprint-townhall-t4": {
+			"assetId": "asset:item:blueprint-townhall-t4",
+			"code": "blueprint-townhall-t4",
+			"name": "Town Hall IV Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"sort": 2250,
+			"craftRecipeId": "craft:townhall-t4"
 		}
 	}
 }

@@ -254,6 +254,276 @@
 					"quantity": 4
 				}
 			]
+		},
+		"loot:townhall-t1:blueprint-lumberjack-t1": {
+			"name": "Blueprint: Lumberjack I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-lumberjack-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-sawmill-t1": {
+			"name": "Blueprint: Sawmill I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-sawmill-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-quarry-t1": {
+			"name": "Blueprint: Quarry I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-quarry-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-stonemason-t1": {
+			"name": "Blueprint: Stonemason I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-stonemason-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-well-t1": {
+			"name": "Blueprint: Well I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-well-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-farm-t1": {
+			"name": "Blueprint: Farm I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-farm-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-windmill-t1": {
+			"name": "Blueprint: Windmill I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-windmill-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-bakery-t1": {
+			"name": "Blueprint: Bakery I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-pig-farm-t1": {
+			"name": "Blueprint: Pig Farm I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-pig-farm-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-slaughterhouse-t1": {
+			"name": "Blueprint: Slaughterhouse I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-slaughterhouse-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-brewery-t1": {
+			"name": "Blueprint: Brewery I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-brewery-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-tavern-t1": {
+			"name": "Blueprint: Tavern I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-tavern-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-winery-t1": {
+			"name": "Blueprint: Winery I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-winery-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-coal-mine-t1": {
+			"name": "Blueprint: Coal Mine I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-coal-mine-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-iron-mine-t1": {
+			"name": "Blueprint: Iron Mine I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-iron-mine-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-smelter-t1": {
+			"name": "Blueprint: Smelter I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-smelter-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-purifier-t1": {
+			"name": "Blueprint: Purifier I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-purifier-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-gold-mine-t1": {
+			"name": "Blueprint: Gold Mine I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-gold-mine-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-goldsmith-t1": {
+			"name": "Blueprint: Goldsmith I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-goldsmith-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-townhall-t2": {
+			"name": "Blueprint: Town Hall II output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-townhall-t2",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-townhall-t3": {
+			"name": "Blueprint: Town Hall III output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-townhall-t3",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-townhall-t4": {
+			"name": "Blueprint: Town Hall IV output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-townhall-t4",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:hop-field": {
+			"name": "Survey: Hop Field output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:hop-field",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:vineyard": {
+			"name": "Survey: Vineyard output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:vineyard",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:coal-deposit": {
+			"name": "Survey: Coal Deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coal-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:iron-deposit": {
+			"name": "Survey: Iron Deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:iron-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:gold-deposit": {
+			"name": "Survey: Gold Deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:gold-deposit",
+					"quantity": 1
+				}
+			]
 		}
 	}
 }

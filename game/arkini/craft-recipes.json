@@ -1,3 +1,508 @@
 {
-	"craftRecipes": {}
+	"craftRecipes": {
+		"craft:lumberjack-t1": {
+			"resultItemId": "producer:lumberjack-t1",
+			"inputs": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 5000
+		},
+		"craft:sawmill-t1": {
+			"resultItemId": "producer:sawmill-t1",
+			"inputs": [
+				{
+					"itemId": "item:log",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 5000
+		},
+		"craft:quarry-t1": {
+			"resultItemId": "producer:quarry-t1",
+			"inputs": [
+				{
+					"itemId": "item:log",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 5000
+		},
+		"craft:stonemason-t1": {
+			"resultItemId": "producer:stonemason-t1",
+			"inputs": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone",
+					"quantity": 2,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 5000
+		},
+		"craft:well-t1": {
+			"resultItemId": "producer:well-t1",
+			"inputs": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone",
+					"quantity": 2,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 5000
+		},
+		"craft:farm-t1": {
+			"resultItemId": "producer:farm-t1",
+			"inputs": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 5000
+		},
+		"craft:windmill-t1": {
+			"resultItemId": "producer:windmill-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 6000
+		},
+		"craft:bakery-t1": {
+			"resultItemId": "producer:bakery-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:flour",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 8000
+		},
+		"craft:pig-farm-t1": {
+			"resultItemId": "producer:pig-farm-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:grain",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 7000
+		},
+		"craft:slaughterhouse-t1": {
+			"resultItemId": "producer:slaughterhouse-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:piglet",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 8000
+		},
+		"craft:brewery-t1": {
+			"resultItemId": "producer:brewery-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 7000
+		},
+		"craft:tavern-t1": {
+			"resultItemId": "producer:tavern-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 8000
+		},
+		"craft:winery-t1": {
+			"resultItemId": "producer:winery-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 7000
+		},
+		"craft:coal-mine-t1": {
+			"resultItemId": "producer:coal-mine-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 8000
+		},
+		"craft:iron-mine-t1": {
+			"resultItemId": "producer:iron-mine-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 9000
+		},
+		"craft:smelter-t1": {
+			"resultItemId": "producer:smelter-t1",
+			"inputs": [
+				{
+					"itemId": "item:stone-block",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 9000
+		},
+		"craft:purifier-t1": {
+			"resultItemId": "producer:purifier-t1",
+			"inputs": [
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 9000
+		},
+		"craft:gold-mine-t1": {
+			"resultItemId": "producer:gold-mine-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:wine-glass",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 10000
+		},
+		"craft:goldsmith-t1": {
+			"resultItemId": "producer:goldsmith-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 10000
+		},
+		"craft:townhall-t2": {
+			"resultItemId": "producer:townhall-t2",
+			"inputs": [
+				{
+					"itemId": "producer:townhall-t1",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 10000
+		},
+		"craft:townhall-t3": {
+			"resultItemId": "producer:townhall-t3",
+			"inputs": [
+				{
+					"itemId": "producer:townhall-t2",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 12000
+		},
+		"craft:townhall-t4": {
+			"resultItemId": "producer:townhall-t4",
+			"inputs": [
+				{
+					"itemId": "producer:townhall-t3",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 14000
+		}
+	}
 }

@@ -11,7 +11,7 @@ This is a working design note for the current package, kept next to the data it 
 The current gameplay direction is producer-driven rather than merge-chain-driven.
 
 - Producers are the main magic: they generate and transform useful items.
-- Merge should be used mostly where merging is logical or abstract, such as coins, energy/lightning, blueprint fragments, or recipe discovery.
+- Merge should be used mostly where merging is logical or abstract, such as coins, energy/lightning, or recipe discovery.
 - Avoid fake material merge chains such as `twig + twig -> bigger twig` unless there is a strong gameplay reason.
 - Low-level materials are plain semantic items. A log is `item:log`, not `item:log-t1`.
 - Upgrade tiers belong primarily to producers/buildings and their product lines, not to ordinary resources.
@@ -38,6 +38,61 @@ This is intentional for this package pass:
 - do not change runtime/schema just to clean this up during gameplay data authoring
 
 Yes, it is slightly weird. It is also contained, explicit, and better than quietly teaching the content layer that every building is secretly a log with ambitions.
+
+
+### Townhall blueprint progression
+
+Townhall is the civic blueprint vendor and progression spine. The starting board is intentionally small: it contains Town Hall I, one lumberjack/tree pair, one quarry/rock pair, one well, and one wheat field. The player first learns to run producers, feed Town Hall for a concrete blueprint, place that blueprint on the board, feed its craft inputs, and complete it into a real building. Tiny tutorial loop, fewer spreadsheets wearing clown shoes.
+
+Blueprints are concrete from the moment they enter gameplay. There is no blank blueprint and no imprint/bind action. A blueprint is a craft target: it accepts its build resources on the board and completes into its configured building. Construction resources such as planks and stone blocks live in the blueprint craft recipe, not in the Town Hall purchase cost.
+
+Townhall tiers are authored as separate producer buildings:
+
+```txt
+producer:townhall-t1  Starter settlement blueprints
+producer:townhall-t2  Food-chain blueprints
+producer:townhall-t3  Heavy industry and cleanup blueprints
+producer:townhall-t4  Coin-economy specialist blueprints
+```
+
+Townhall products use era-proof inputs, while blueprint craft recipes use construction inputs:
+
+```txt
+Town Hall I
+  Log -> Lumberjack I Blueprint
+  Log -> Sawmill I Blueprint
+  Stone -> Quarry I Blueprint
+  Stone -> Stonemason I Blueprint
+  Water -> Well I Blueprint
+  Water -> Farm I Blueprint
+  Grain -> Town Hall II Blueprint
+
+Town Hall II
+  Grain -> Windmill I Blueprint
+  Flour -> Bakery I Blueprint
+  Grain + Water -> Pig Farm I Blueprint
+  Piglet -> Slaughterhouse I Blueprint
+  Grain + Water -> Brewery I Blueprint
+  Beer Barrel -> Tavern I Blueprint
+  Grain + Water -> Winery I Blueprint
+  Grain + Water -> Hop Field
+  Grain + Water -> Vineyard
+  Bread + Beer + Sausage -> Town Hall III Blueprint
+
+Town Hall III
+  Bread + Water -> Coal Deposit
+  Bread + Water -> Coal Mine I Blueprint
+  Sausage + Beer -> Iron Deposit
+  Sausage + Beer -> Iron Mine I Blueprint
+  Coal + Water -> Smelter I Blueprint
+  Pollution -> Purifier I Blueprint
+  Bread + Wine Glass -> Gold Deposit
+  Bread + Wine Glass -> Gold Mine I Blueprint
+  Iron Ingot + Gold Ingot -> Town Hall IV Blueprint
+
+Town Hall IV
+  Gold Ingot -> Goldsmith I Blueprint
+```
 
 ### Implemented first wave
 

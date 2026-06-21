@@ -12,59 +12,29 @@
 				"y": 1
 			},
 			{
-				"itemId": "producer:sawmill-t1",
-				"x": 3,
-				"y": 1
-			},
-			{
-				"itemId": "item:rock",
-				"x": 0,
-				"y": 5
-			},
-			{
-				"itemId": "producer:quarry-t1",
-				"x": 1,
-				"y": 5
-			},
-			{
-				"itemId": "producer:stonemason-t1",
-				"x": 3,
-				"y": 5
-			},
-			{
 				"itemId": "item:wheat-field",
 				"x": 0,
 				"y": 3
 			},
 			{
-				"itemId": "producer:farm-t1",
-				"x": 1,
-				"y": 3
+				"itemId": "producer:townhall-t1",
+				"x": 3,
+				"y": 4
 			},
 			{
 				"itemId": "producer:well-t1",
-				"x": 3,
-				"y": 3
-			},
-			{
-				"itemId": "producer:pig-farm-t1",
 				"x": 5,
-				"y": 3
+				"y": 4
 			},
 			{
-				"itemId": "item:hop-field",
+				"itemId": "item:rock",
 				"x": 0,
-				"y": 7
+				"y": 6
 			},
 			{
-				"itemId": "producer:brewery-t1",
+				"itemId": "producer:quarry-t1",
 				"x": 1,
-				"y": 7
-			},
-			{
-				"itemId": "producer:tavern-t1",
-				"x": 3,
-				"y": 7
+				"y": 6
 			}
 		],
 		"inventory": []

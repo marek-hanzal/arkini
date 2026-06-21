@@ -313,28 +313,25 @@ A paused inventory timer stores remaining duration or equivalent paused state. W
 
 ## 6. Starting state
 
-The current starting state is based on the existing implementation, with obsolete split inventory merged into the normal inventory.
+The current starting state is tutorial-oriented: it starts with Town Hall I plus a tiny wood/stone/water/source setup so the player can learn production, blueprint acquisition, and blueprint construction before the full economy opens up.
 
 ### 6.1 Starting board
 
 | Item ID | Position |
 | --- | --- |
-| `item:townhall-1` | `x=3, y=4` |
-| `item:lumber-camp-1` | `x=1, y=4` |
-| `item:quarry-1` | `x=5, y=4` |
-| `item:coal-mine-1` | `x=3, y=6` |
+| `item:tree` | `x=0, y=1` |
+| `producer:lumberjack-t1` | `x=1, y=1` |
+| `item:wheat-field` | `x=0, y=3` |
+| `producer:townhall-t1` | `x=3, y=4` |
+| `producer:well-t1` | `x=5, y=4` |
+| `item:rock` | `x=0, y=6` |
+| `producer:quarry-t1` | `x=1, y=6` |
 
 ### 6.2 Starting inventory
 
 | Item ID | Quantity |
 | --- | ---: |
-| `item:blueprint-scrap` | `10` |
-| `item:twig` | `8` |
-| `item:pebble` | `8` |
-| `item:water` | `4` |
-| `item:sausage` | `3` |
-| `item:beer` | `3` |
-| `item:coin-stack` | `1` |
+| none | `0` |
 
 ## 7. Inventory mechanics
 

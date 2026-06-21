@@ -28,50 +28,181 @@
 			"resourceId": "item-blueprint",
 			"sort": 112
 		},
-		"asset:item:blueprint-draft": {
+		"asset:item:blueprint-bakery-t1": {
 			"kind": "item",
-			"label": "Blueprint Draft",
-			"render": "plain",
-			"resourceId": "item-blueprint-draft",
-			"sort": 110
-		},
-		"asset:item:blueprint-fragment": {
-			"kind": "item",
-			"label": "Blueprint Fragment",
-			"render": "plain",
-			"resourceId": "item-blueprint-fragment",
-			"sort": 108
-		},
-		"asset:item:blueprint-lumber-camp": {
-			"kind": "item",
-			"label": "Lumber Camp Blueprint",
-			"overlayAssetId": "asset:item:lumber-camp",
+			"label": "Bakery I Blueprint",
+			"overlayAssetId": "asset:producer:bakery-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint",
-			"sort": 116
+			"sort": 2110
 		},
-		"asset:item:blueprint-quarry": {
+		"asset:item:blueprint-brewery-t1": {
 			"kind": "item",
-			"label": "Quarry Blueprint",
-			"overlayAssetId": "asset:item:quarry",
+			"label": "Brewery I Blueprint",
+			"overlayAssetId": "asset:producer:brewery-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint",
-			"sort": 120
+			"sort": 2140
 		},
-		"asset:item:blueprint-scrap": {
+		"asset:item:blueprint-coal-mine-t1": {
 			"kind": "item",
-			"label": "Blueprint Scrap",
-			"render": "plain",
-			"resourceId": "item-blueprint-scrap",
-			"sort": 106
-		},
-		"asset:item:blueprint-townhall": {
-			"kind": "item",
-			"label": "Town Hall Blueprint",
-			"overlayAssetId": "asset:item:townhall",
+			"label": "Coal Mine I Blueprint",
+			"overlayAssetId": "asset:producer:coal-mine-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint",
-			"sort": 124
+			"sort": 2200
+		},
+		"asset:item:blueprint-farm-t1": {
+			"kind": "item",
+			"label": "Farm I Blueprint",
+			"overlayAssetId": "asset:producer:farm-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2050
+		},
+		"asset:item:blueprint-gold-mine-t1": {
+			"kind": "item",
+			"label": "Gold Mine I Blueprint",
+			"overlayAssetId": "asset:producer:gold-mine-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2240
+		},
+		"asset:item:blueprint-goldsmith-t1": {
+			"kind": "item",
+			"label": "Goldsmith I Blueprint",
+			"overlayAssetId": "asset:producer:goldsmith-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2300
+		},
+		"asset:item:blueprint-iron-mine-t1": {
+			"kind": "item",
+			"label": "Iron Mine I Blueprint",
+			"overlayAssetId": "asset:producer:iron-mine-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2210
+		},
+		"asset:item:blueprint-lumberjack-t1": {
+			"kind": "item",
+			"label": "Lumberjack I Blueprint",
+			"overlayAssetId": "asset:producer:lumberjack-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2000
+		},
+		"asset:item:blueprint-pig-farm-t1": {
+			"kind": "item",
+			"label": "Pig Farm I Blueprint",
+			"overlayAssetId": "asset:producer:pig-farm-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2120
+		},
+		"asset:item:blueprint-purifier-t1": {
+			"kind": "item",
+			"label": "Purifier I Blueprint",
+			"overlayAssetId": "asset:producer:purifier-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2230
+		},
+		"asset:item:blueprint-quarry-t1": {
+			"kind": "item",
+			"label": "Quarry I Blueprint",
+			"overlayAssetId": "asset:producer:quarry-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2020
+		},
+		"asset:item:blueprint-sawmill-t1": {
+			"kind": "item",
+			"label": "Sawmill I Blueprint",
+			"overlayAssetId": "asset:producer:sawmill-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2010
+		},
+		"asset:item:blueprint-slaughterhouse-t1": {
+			"kind": "item",
+			"label": "Slaughterhouse I Blueprint",
+			"overlayAssetId": "asset:producer:slaughterhouse-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2130
+		},
+		"asset:item:blueprint-smelter-t1": {
+			"kind": "item",
+			"label": "Smelter I Blueprint",
+			"overlayAssetId": "asset:producer:smelter-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2220
+		},
+		"asset:item:blueprint-stonemason-t1": {
+			"kind": "item",
+			"label": "Stonemason I Blueprint",
+			"overlayAssetId": "asset:producer:stonemason-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2030
+		},
+		"asset:item:blueprint-tavern-t1": {
+			"kind": "item",
+			"label": "Tavern I Blueprint",
+			"overlayAssetId": "asset:producer:tavern-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2150
+		},
+		"asset:item:blueprint-townhall-t2": {
+			"kind": "item",
+			"label": "Town Hall II Blueprint",
+			"overlayAssetId": "asset:producer:townhall-t2",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2060
+		},
+		"asset:item:blueprint-townhall-t3": {
+			"kind": "item",
+			"label": "Town Hall III Blueprint",
+			"overlayAssetId": "asset:producer:townhall-t3",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2170
+		},
+		"asset:item:blueprint-townhall-t4": {
+			"kind": "item",
+			"label": "Town Hall IV Blueprint",
+			"overlayAssetId": "asset:producer:townhall-t4",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2250
+		},
+		"asset:item:blueprint-well-t1": {
+			"kind": "item",
+			"label": "Well I Blueprint",
+			"overlayAssetId": "asset:producer:well-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2040
+		},
+		"asset:item:blueprint-windmill-t1": {
+			"kind": "item",
+			"label": "Windmill I Blueprint",
+			"overlayAssetId": "asset:producer:windmill-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2100
+		},
+		"asset:item:blueprint-winery-t1": {
+			"kind": "item",
+			"label": "Winery I Blueprint",
+			"overlayAssetId": "asset:producer:winery-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2160
 		},
 		"asset:item:branch": {
 			"kind": "item",
@@ -556,6 +687,34 @@
 			"resourceId": "producer-tavern-t1",
 			"sort": 209
 		},
+		"asset:producer:townhall-t1": {
+			"kind": "item",
+			"label": "Town Hall I",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 126
+		},
+		"asset:producer:townhall-t2": {
+			"kind": "item",
+			"label": "Town Hall II",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 127
+		},
+		"asset:producer:townhall-t3": {
+			"kind": "item",
+			"label": "Town Hall III",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 128
+		},
+		"asset:producer:townhall-t4": {
+			"kind": "item",
+			"label": "Town Hall IV",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 129
+		},
 		"asset:producer:well-t1": {
 			"kind": "item",
 			"label": "Well I",
@@ -578,7 +737,512 @@
 			"sort": 212
 		}
 	},
-	"craftRecipes": {},
+	"craftRecipes": {
+		"craft:bakery-t1": {
+			"durationMs": 8000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:flour",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:bakery-t1"
+		},
+		"craft:brewery-t1": {
+			"durationMs": 7000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:brewery-t1"
+		},
+		"craft:coal-mine-t1": {
+			"durationMs": 8000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:coal-mine-t1"
+		},
+		"craft:farm-t1": {
+			"durationMs": 5000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:farm-t1"
+		},
+		"craft:gold-mine-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:gold-mine-t1"
+		},
+		"craft:goldsmith-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:goldsmith-t1"
+		},
+		"craft:iron-mine-t1": {
+			"durationMs": 9000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:iron-mine-t1"
+		},
+		"craft:lumberjack-t1": {
+			"durationMs": 5000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:lumberjack-t1"
+		},
+		"craft:pig-farm-t1": {
+			"durationMs": 7000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:pig-farm-t1"
+		},
+		"craft:purifier-t1": {
+			"durationMs": 9000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:purifier-t1"
+		},
+		"craft:quarry-t1": {
+			"durationMs": 5000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:quarry-t1"
+		},
+		"craft:sawmill-t1": {
+			"durationMs": 5000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:sawmill-t1"
+		},
+		"craft:slaughterhouse-t1": {
+			"durationMs": 8000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:piglet",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:slaughterhouse-t1"
+		},
+		"craft:smelter-t1": {
+			"durationMs": 9000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:smelter-t1"
+		},
+		"craft:stonemason-t1": {
+			"durationMs": 5000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:stonemason-t1"
+		},
+		"craft:tavern-t1": {
+			"durationMs": 8000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:tavern-t1"
+		},
+		"craft:townhall-t2": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:townhall-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:townhall-t2"
+		},
+		"craft:townhall-t3": {
+			"durationMs": 12000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:townhall-t2",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:townhall-t3"
+		},
+		"craft:townhall-t4": {
+			"durationMs": 14000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:townhall-t3",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:townhall-t4"
+		},
+		"craft:well-t1": {
+			"durationMs": 5000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:well-t1"
+		},
+		"craft:windmill-t1": {
+			"durationMs": 6000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:windmill-t1"
+		},
+		"craft:winery-t1": {
+			"durationMs": 7000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:winery-t1"
+		}
+	},
 	"game": {
 		"board": {
 			"height": 9,
@@ -878,6 +1542,393 @@
 			],
 			"name": "Tavern wine barrel input"
 		},
+		"input:townhall-t1:blueprint-farm-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Farm I input"
+		},
+		"input:townhall-t1:blueprint-lumberjack-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Lumberjack I input"
+		},
+		"input:townhall-t1:blueprint-quarry-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Quarry I input"
+		},
+		"input:townhall-t1:blueprint-sawmill-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Sawmill I input"
+		},
+		"input:townhall-t1:blueprint-stonemason-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Stonemason I input"
+		},
+		"input:townhall-t1:blueprint-townhall-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Town Hall II input"
+		},
+		"input:townhall-t1:blueprint-well-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Well I input"
+		},
+		"input:townhall-t2:blueprint-bakery-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bakery I input"
+		},
+		"input:townhall-t2:blueprint-brewery-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Brewery I input"
+		},
+		"input:townhall-t2:blueprint-pig-farm-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Pig Farm I input"
+		},
+		"input:townhall-t2:blueprint-slaughterhouse-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Slaughterhouse I input"
+		},
+		"input:townhall-t2:blueprint-tavern-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Tavern I input"
+		},
+		"input:townhall-t2:blueprint-townhall-t3": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Town Hall III input"
+		},
+		"input:townhall-t2:blueprint-windmill-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Windmill I input"
+		},
+		"input:townhall-t2:blueprint-winery-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Winery I input"
+		},
+		"input:townhall-t2:hop-field": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Survey: Hop Field input"
+		},
+		"input:townhall-t2:vineyard": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Survey: Vineyard input"
+		},
+		"input:townhall-t3:blueprint-coal-mine-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Coal Mine I input"
+		},
+		"input:townhall-t3:blueprint-gold-mine-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Gold Mine I input"
+		},
+		"input:townhall-t3:blueprint-iron-mine-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Iron Mine I input"
+		},
+		"input:townhall-t3:blueprint-purifier-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pollution",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Purifier I input"
+		},
+		"input:townhall-t3:blueprint-smelter-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Smelter I input"
+		},
+		"input:townhall-t3:blueprint-townhall-t4": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Town Hall IV input"
+		},
+		"input:townhall-t3:coal-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Survey: Coal Deposit input"
+		},
+		"input:townhall-t3:gold-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				}
+			],
+			"name": "Survey: Gold Deposit input"
+		},
+		"input:townhall-t3:iron-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"name": "Survey: Iron Deposit input"
+		},
+		"input:townhall-t4:blueprint-goldsmith-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Goldsmith I input"
+		},
 		"input:windmill-t1:grain": {
 			"inputs": [
 				{
@@ -956,6 +2007,358 @@
 				"material",
 				"food",
 				"beer"
+			],
+			"tier": 0
+		},
+		"item:blueprint-bakery-t1": {
+			"assetId": "asset:item:blueprint-bakery-t1",
+			"code": "blueprint-bakery-t1",
+			"craftRecipeId": "craft:bakery-t1",
+			"description": "Build plan that can be filled with resources to construct Bakery I.",
+			"maxStackSize": 10,
+			"name": "Bakery I Blueprint",
+			"sort": 2110,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-brewery-t1": {
+			"assetId": "asset:item:blueprint-brewery-t1",
+			"code": "blueprint-brewery-t1",
+			"craftRecipeId": "craft:brewery-t1",
+			"description": "Build plan that can be filled with resources to construct Brewery I.",
+			"maxStackSize": 10,
+			"name": "Brewery I Blueprint",
+			"sort": 2140,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-coal-mine-t1": {
+			"assetId": "asset:item:blueprint-coal-mine-t1",
+			"code": "blueprint-coal-mine-t1",
+			"craftRecipeId": "craft:coal-mine-t1",
+			"description": "Build plan that can be filled with resources to construct Coal Mine I.",
+			"maxStackSize": 10,
+			"name": "Coal Mine I Blueprint",
+			"sort": 2200,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-farm-t1": {
+			"assetId": "asset:item:blueprint-farm-t1",
+			"code": "blueprint-farm-t1",
+			"craftRecipeId": "craft:farm-t1",
+			"description": "Build plan that can be filled with resources to construct Farm I.",
+			"maxStackSize": 10,
+			"name": "Farm I Blueprint",
+			"sort": 2050,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-gold-mine-t1": {
+			"assetId": "asset:item:blueprint-gold-mine-t1",
+			"code": "blueprint-gold-mine-t1",
+			"craftRecipeId": "craft:gold-mine-t1",
+			"description": "Build plan that can be filled with resources to construct Gold Mine I.",
+			"maxStackSize": 10,
+			"name": "Gold Mine I Blueprint",
+			"sort": 2240,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-goldsmith-t1": {
+			"assetId": "asset:item:blueprint-goldsmith-t1",
+			"code": "blueprint-goldsmith-t1",
+			"craftRecipeId": "craft:goldsmith-t1",
+			"description": "Build plan that can be filled with resources to construct Goldsmith I.",
+			"maxStackSize": 10,
+			"name": "Goldsmith I Blueprint",
+			"sort": 2300,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-iron-mine-t1": {
+			"assetId": "asset:item:blueprint-iron-mine-t1",
+			"code": "blueprint-iron-mine-t1",
+			"craftRecipeId": "craft:iron-mine-t1",
+			"description": "Build plan that can be filled with resources to construct Iron Mine I.",
+			"maxStackSize": 10,
+			"name": "Iron Mine I Blueprint",
+			"sort": 2210,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-lumberjack-t1": {
+			"assetId": "asset:item:blueprint-lumberjack-t1",
+			"code": "blueprint-lumberjack-t1",
+			"craftRecipeId": "craft:lumberjack-t1",
+			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
+			"maxStackSize": 10,
+			"name": "Lumberjack I Blueprint",
+			"sort": 2000,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-pig-farm-t1": {
+			"assetId": "asset:item:blueprint-pig-farm-t1",
+			"code": "blueprint-pig-farm-t1",
+			"craftRecipeId": "craft:pig-farm-t1",
+			"description": "Build plan that can be filled with resources to construct Pig Farm I.",
+			"maxStackSize": 10,
+			"name": "Pig Farm I Blueprint",
+			"sort": 2120,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-purifier-t1": {
+			"assetId": "asset:item:blueprint-purifier-t1",
+			"code": "blueprint-purifier-t1",
+			"craftRecipeId": "craft:purifier-t1",
+			"description": "Build plan that can be filled with resources to construct Purifier I.",
+			"maxStackSize": 10,
+			"name": "Purifier I Blueprint",
+			"sort": 2230,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-quarry-t1": {
+			"assetId": "asset:item:blueprint-quarry-t1",
+			"code": "blueprint-quarry-t1",
+			"craftRecipeId": "craft:quarry-t1",
+			"description": "Build plan that can be filled with resources to construct Quarry I.",
+			"maxStackSize": 10,
+			"name": "Quarry I Blueprint",
+			"sort": 2020,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-sawmill-t1": {
+			"assetId": "asset:item:blueprint-sawmill-t1",
+			"code": "blueprint-sawmill-t1",
+			"craftRecipeId": "craft:sawmill-t1",
+			"description": "Build plan that can be filled with resources to construct Sawmill I.",
+			"maxStackSize": 10,
+			"name": "Sawmill I Blueprint",
+			"sort": 2010,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-slaughterhouse-t1": {
+			"assetId": "asset:item:blueprint-slaughterhouse-t1",
+			"code": "blueprint-slaughterhouse-t1",
+			"craftRecipeId": "craft:slaughterhouse-t1",
+			"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
+			"maxStackSize": 10,
+			"name": "Slaughterhouse I Blueprint",
+			"sort": 2130,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-smelter-t1": {
+			"assetId": "asset:item:blueprint-smelter-t1",
+			"code": "blueprint-smelter-t1",
+			"craftRecipeId": "craft:smelter-t1",
+			"description": "Build plan that can be filled with resources to construct Smelter I.",
+			"maxStackSize": 10,
+			"name": "Smelter I Blueprint",
+			"sort": 2220,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-stonemason-t1": {
+			"assetId": "asset:item:blueprint-stonemason-t1",
+			"code": "blueprint-stonemason-t1",
+			"craftRecipeId": "craft:stonemason-t1",
+			"description": "Build plan that can be filled with resources to construct Stonemason I.",
+			"maxStackSize": 10,
+			"name": "Stonemason I Blueprint",
+			"sort": 2030,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-tavern-t1": {
+			"assetId": "asset:item:blueprint-tavern-t1",
+			"code": "blueprint-tavern-t1",
+			"craftRecipeId": "craft:tavern-t1",
+			"description": "Build plan that can be filled with resources to construct Tavern I.",
+			"maxStackSize": 10,
+			"name": "Tavern I Blueprint",
+			"sort": 2150,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-townhall-t2": {
+			"assetId": "asset:item:blueprint-townhall-t2",
+			"code": "blueprint-townhall-t2",
+			"craftRecipeId": "craft:townhall-t2",
+			"description": "Build plan that can be filled with resources to construct Town Hall II.",
+			"maxStackSize": 10,
+			"name": "Town Hall II Blueprint",
+			"sort": 2060,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-townhall-t3": {
+			"assetId": "asset:item:blueprint-townhall-t3",
+			"code": "blueprint-townhall-t3",
+			"craftRecipeId": "craft:townhall-t3",
+			"description": "Build plan that can be filled with resources to construct Town Hall III.",
+			"maxStackSize": 10,
+			"name": "Town Hall III Blueprint",
+			"sort": 2170,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-townhall-t4": {
+			"assetId": "asset:item:blueprint-townhall-t4",
+			"code": "blueprint-townhall-t4",
+			"craftRecipeId": "craft:townhall-t4",
+			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
+			"maxStackSize": 10,
+			"name": "Town Hall IV Blueprint",
+			"sort": 2250,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-well-t1": {
+			"assetId": "asset:item:blueprint-well-t1",
+			"code": "blueprint-well-t1",
+			"craftRecipeId": "craft:well-t1",
+			"description": "Build plan that can be filled with resources to construct Well I.",
+			"maxStackSize": 10,
+			"name": "Well I Blueprint",
+			"sort": 2040,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-windmill-t1": {
+			"assetId": "asset:item:blueprint-windmill-t1",
+			"code": "blueprint-windmill-t1",
+			"craftRecipeId": "craft:windmill-t1",
+			"description": "Build plan that can be filled with resources to construct Windmill I.",
+			"maxStackSize": 10,
+			"name": "Windmill I Blueprint",
+			"sort": 2100,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-winery-t1": {
+			"assetId": "asset:item:blueprint-winery-t1",
+			"code": "blueprint-winery-t1",
+			"craftRecipeId": "craft:winery-t1",
+			"description": "Build plan that can be filled with resources to construct Winery I.",
+			"maxStackSize": 10,
+			"name": "Winery I Blueprint",
+			"sort": 2160,
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target"
 			],
 			"tier": 0
 		},
@@ -1671,6 +3074,70 @@
 			],
 			"tier": 1
 		},
+		"producer:townhall-t1": {
+			"assetId": "asset:producer:townhall-t1",
+			"code": "townhall-t1",
+			"description": "Starter civic hub that issues basic settlement blueprints.",
+			"maxStackSize": 1,
+			"name": "Town Hall I",
+			"producerId": "producer:townhall-t1",
+			"sort": 51,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"townhall",
+				"civic"
+			],
+			"tier": 1
+		},
+		"producer:townhall-t2": {
+			"assetId": "asset:producer:townhall-t2",
+			"code": "townhall-t2",
+			"description": "Food-chain civic hub that issues farming, food, brewing, and wine blueprints.",
+			"maxStackSize": 1,
+			"name": "Town Hall II",
+			"producerId": "producer:townhall-t2",
+			"sort": 52,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"townhall",
+				"civic"
+			],
+			"tier": 2
+		},
+		"producer:townhall-t3": {
+			"assetId": "asset:producer:townhall-t3",
+			"code": "townhall-t3",
+			"description": "Industrial civic hub that issues mining, smelting, cleanup, and deposit survey plans.",
+			"maxStackSize": 1,
+			"name": "Town Hall III",
+			"producerId": "producer:townhall-t3",
+			"sort": 53,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"townhall",
+				"civic"
+			],
+			"tier": 3
+		},
+		"producer:townhall-t4": {
+			"assetId": "asset:producer:townhall-t4",
+			"code": "townhall-t4",
+			"description": "Coin-economy civic hub that issues late specialist blueprints.",
+			"maxStackSize": 1,
+			"name": "Town Hall IV",
+			"producerId": "producer:townhall-t4",
+			"sort": 54,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"townhall",
+				"civic"
+			],
+			"tier": 4
+		},
 		"producer:well-t1": {
 			"assetId": "asset:producer:well-t1",
 			"code": "well-t1",
@@ -1927,6 +3394,276 @@
 				}
 			]
 		},
+		"loot:townhall-t1:blueprint-farm-t1": {
+			"name": "Blueprint: Farm I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-farm-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-lumberjack-t1": {
+			"name": "Blueprint: Lumberjack I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-lumberjack-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-quarry-t1": {
+			"name": "Blueprint: Quarry I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-quarry-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-sawmill-t1": {
+			"name": "Blueprint: Sawmill I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-sawmill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-stonemason-t1": {
+			"name": "Blueprint: Stonemason I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-stonemason-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-townhall-t2": {
+			"name": "Blueprint: Town Hall II output",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-well-t1": {
+			"name": "Blueprint: Well I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-well-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-bakery-t1": {
+			"name": "Blueprint: Bakery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-brewery-t1": {
+			"name": "Blueprint: Brewery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-brewery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-pig-farm-t1": {
+			"name": "Blueprint: Pig Farm I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-pig-farm-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-slaughterhouse-t1": {
+			"name": "Blueprint: Slaughterhouse I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-slaughterhouse-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-tavern-t1": {
+			"name": "Blueprint: Tavern I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-tavern-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-townhall-t3": {
+			"name": "Blueprint: Town Hall III output",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-windmill-t1": {
+			"name": "Blueprint: Windmill I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-windmill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-winery-t1": {
+			"name": "Blueprint: Winery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-winery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:hop-field": {
+			"name": "Survey: Hop Field output",
+			"output": [
+				{
+					"itemId": "item:hop-field",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:vineyard": {
+			"name": "Survey: Vineyard output",
+			"output": [
+				{
+					"itemId": "item:vineyard",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-coal-mine-t1": {
+			"name": "Blueprint: Coal Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-coal-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-gold-mine-t1": {
+			"name": "Blueprint: Gold Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-gold-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-iron-mine-t1": {
+			"name": "Blueprint: Iron Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-iron-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-purifier-t1": {
+			"name": "Blueprint: Purifier I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-purifier-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-smelter-t1": {
+			"name": "Blueprint: Smelter I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-smelter-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-townhall-t4": {
+			"name": "Blueprint: Town Hall IV output",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:coal-deposit": {
+			"name": "Survey: Coal Deposit output",
+			"output": [
+				{
+					"itemId": "item:coal-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:gold-deposit": {
+			"name": "Survey: Gold Deposit output",
+			"output": [
+				{
+					"itemId": "item:gold-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:iron-deposit": {
+			"name": "Survey: Iron Deposit output",
+			"output": [
+				{
+					"itemId": "item:iron-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-goldsmith-t1": {
+			"name": "Blueprint: Goldsmith I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-goldsmith-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:well-t1:water": {
 			"name": "Well water",
 			"output": [
@@ -2131,6 +3868,61 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:townhall-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:townhall-t1:blueprint-lumberjack-t1",
+				"product:townhall-t1:blueprint-sawmill-t1",
+				"product:townhall-t1:blueprint-quarry-t1",
+				"product:townhall-t1:blueprint-stonemason-t1",
+				"product:townhall-t1:blueprint-well-t1",
+				"product:townhall-t1:blueprint-farm-t1",
+				"product:townhall-t1:blueprint-townhall-t2"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:townhall-t2": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:townhall-t2:blueprint-windmill-t1",
+				"product:townhall-t2:blueprint-bakery-t1",
+				"product:townhall-t2:blueprint-pig-farm-t1",
+				"product:townhall-t2:blueprint-slaughterhouse-t1",
+				"product:townhall-t2:hop-field",
+				"product:townhall-t2:blueprint-brewery-t1",
+				"product:townhall-t2:blueprint-tavern-t1",
+				"product:townhall-t2:vineyard",
+				"product:townhall-t2:blueprint-winery-t1",
+				"product:townhall-t2:blueprint-townhall-t3"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:townhall-t3": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:townhall-t3:coal-deposit",
+				"product:townhall-t3:blueprint-coal-mine-t1",
+				"product:townhall-t3:iron-deposit",
+				"product:townhall-t3:blueprint-iron-mine-t1",
+				"product:townhall-t3:blueprint-smelter-t1",
+				"product:townhall-t3:blueprint-purifier-t1",
+				"product:townhall-t3:gold-deposit",
+				"product:townhall-t3:blueprint-gold-mine-t1",
+				"product:townhall-t3:blueprint-townhall-t4"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:townhall-t4": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:townhall-t4:blueprint-goldsmith-t1"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:well-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -2325,6 +4117,222 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t1:blueprint-farm-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-farm-t1",
+			"name": "Blueprint: Farm I",
+			"outputTableId": "loot:townhall-t1:blueprint-farm-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-lumberjack-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-lumberjack-t1",
+			"name": "Blueprint: Lumberjack I",
+			"outputTableId": "loot:townhall-t1:blueprint-lumberjack-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-quarry-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-quarry-t1",
+			"name": "Blueprint: Quarry I",
+			"outputTableId": "loot:townhall-t1:blueprint-quarry-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-sawmill-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-sawmill-t1",
+			"name": "Blueprint: Sawmill I",
+			"outputTableId": "loot:townhall-t1:blueprint-sawmill-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-stonemason-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-stonemason-t1",
+			"name": "Blueprint: Stonemason I",
+			"outputTableId": "loot:townhall-t1:blueprint-stonemason-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-townhall-t2": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-townhall-t2",
+			"name": "Blueprint: Town Hall II",
+			"outputTableId": "loot:townhall-t1:blueprint-townhall-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-well-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-well-t1",
+			"name": "Blueprint: Well I",
+			"outputTableId": "loot:townhall-t1:blueprint-well-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-bakery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-bakery-t1",
+			"name": "Blueprint: Bakery I",
+			"outputTableId": "loot:townhall-t2:blueprint-bakery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-brewery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-brewery-t1",
+			"name": "Blueprint: Brewery I",
+			"outputTableId": "loot:townhall-t2:blueprint-brewery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-pig-farm-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-pig-farm-t1",
+			"name": "Blueprint: Pig Farm I",
+			"outputTableId": "loot:townhall-t2:blueprint-pig-farm-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-slaughterhouse-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-slaughterhouse-t1",
+			"name": "Blueprint: Slaughterhouse I",
+			"outputTableId": "loot:townhall-t2:blueprint-slaughterhouse-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-tavern-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-tavern-t1",
+			"name": "Blueprint: Tavern I",
+			"outputTableId": "loot:townhall-t2:blueprint-tavern-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-townhall-t3": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-townhall-t3",
+			"name": "Blueprint: Town Hall III",
+			"outputTableId": "loot:townhall-t2:blueprint-townhall-t3",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-windmill-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-windmill-t1",
+			"name": "Blueprint: Windmill I",
+			"outputTableId": "loot:townhall-t2:blueprint-windmill-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-winery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-winery-t1",
+			"name": "Blueprint: Winery I",
+			"outputTableId": "loot:townhall-t2:blueprint-winery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:hop-field": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:hop-field",
+			"name": "Survey: Hop Field",
+			"outputTableId": "loot:townhall-t2:hop-field",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:vineyard": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:vineyard",
+			"name": "Survey: Vineyard",
+			"outputTableId": "loot:townhall-t2:vineyard",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-coal-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-coal-mine-t1",
+			"name": "Blueprint: Coal Mine I",
+			"outputTableId": "loot:townhall-t3:blueprint-coal-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-gold-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-gold-mine-t1",
+			"name": "Blueprint: Gold Mine I",
+			"outputTableId": "loot:townhall-t3:blueprint-gold-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-iron-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-iron-mine-t1",
+			"name": "Blueprint: Iron Mine I",
+			"outputTableId": "loot:townhall-t3:blueprint-iron-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-purifier-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-purifier-t1",
+			"name": "Blueprint: Purifier I",
+			"outputTableId": "loot:townhall-t3:blueprint-purifier-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-smelter-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-smelter-t1",
+			"name": "Blueprint: Smelter I",
+			"outputTableId": "loot:townhall-t3:blueprint-smelter-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-townhall-t4": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-townhall-t4",
+			"name": "Blueprint: Town Hall IV",
+			"outputTableId": "loot:townhall-t3:blueprint-townhall-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:coal-deposit": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:coal-deposit",
+			"name": "Survey: Coal Deposit",
+			"outputTableId": "loot:townhall-t3:coal-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:gold-deposit": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:gold-deposit",
+			"name": "Survey: Gold Deposit",
+			"outputTableId": "loot:townhall-t3:gold-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:iron-deposit": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:iron-deposit",
+			"name": "Survey: Iron Deposit",
+			"outputTableId": "loot:townhall-t3:iron-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-goldsmith-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-goldsmith-t1",
+			"name": "Blueprint: Goldsmith I",
+			"outputTableId": "loot:townhall-t4:blueprint-goldsmith-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:well-t1:water": {
 			"durationMs": 5000,
 			"name": "Water",
@@ -2460,59 +4468,29 @@
 				"y": 1
 			},
 			{
-				"itemId": "producer:sawmill-t1",
-				"x": 3,
-				"y": 1
-			},
-			{
-				"itemId": "item:rock",
-				"x": 0,
-				"y": 5
-			},
-			{
-				"itemId": "producer:quarry-t1",
-				"x": 1,
-				"y": 5
-			},
-			{
-				"itemId": "producer:stonemason-t1",
-				"x": 3,
-				"y": 5
-			},
-			{
 				"itemId": "item:wheat-field",
 				"x": 0,
 				"y": 3
 			},
 			{
-				"itemId": "producer:farm-t1",
-				"x": 1,
-				"y": 3
+				"itemId": "producer:townhall-t1",
+				"x": 3,
+				"y": 4
 			},
 			{
 				"itemId": "producer:well-t1",
-				"x": 3,
-				"y": 3
-			},
-			{
-				"itemId": "producer:pig-farm-t1",
 				"x": 5,
-				"y": 3
+				"y": 4
 			},
 			{
-				"itemId": "item:hop-field",
+				"itemId": "item:rock",
 				"x": 0,
-				"y": 7
+				"y": 6
 			},
 			{
-				"itemId": "producer:brewery-t1",
+				"itemId": "producer:quarry-t1",
 				"x": 1,
-				"y": 7
-			},
-			{
-				"itemId": "producer:tavern-t1",
-				"x": 3,
-				"y": 7
+				"y": 6
 			}
 		],
 		"inventory": []

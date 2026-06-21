@@ -346,6 +346,13 @@
 			"resourceId": "item-grain",
 			"sort": 202
 		},
+		"asset:producer:windmill-t1": {
+			"kind": "item",
+			"label": "Windmill I",
+			"render": "plain",
+			"resourceId": "producer-windmill-t1",
+			"sort": 203
+		},
 		"asset:producer:pig-farm-t1": {
 			"kind": "item",
 			"label": "Pig Farm I",

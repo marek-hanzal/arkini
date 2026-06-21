@@ -493,6 +493,13 @@
 			"resourceId": "producer-well-t1",
 			"sort": 205
 		},
+		"asset:producer:windmill-t1": {
+			"kind": "item",
+			"label": "Windmill I",
+			"render": "plain",
+			"resourceId": "producer-windmill-t1",
+			"sort": 203
+		},
 		"asset:producer:winery-t1": {
 			"kind": "item",
 			"label": "Winery I",

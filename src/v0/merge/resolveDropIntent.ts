@@ -8,7 +8,6 @@ export type DropIntent =
 	| {
 			type: "merge";
 			resultItemId?: ItemId;
-			directed: boolean;
 	  }
 	| {
 			type: "craft-input";
@@ -54,7 +53,6 @@ export const resolveDropIntent = ({
 				type: "merge",
 			},
 			(plan) => ({
-				directed: plan.directed,
 				resultItemId: plan.resultItemId as ItemId | undefined,
 				type: "merge" as const,
 			}),

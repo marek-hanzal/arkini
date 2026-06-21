@@ -359,7 +359,6 @@ const MergeDefinitionSchema = z
 	.object({
 		withItemId: IdSchema,
 		resultItemId: IdSchema,
-		consumeSource: z.boolean().optional(),
 		secret: z.boolean().optional(),
 	})
 	.strict();

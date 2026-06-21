@@ -8,7 +8,6 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/action/GameActionItemMerge";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace mergeItemFx {
@@ -31,27 +30,21 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		config,
 		save,
 	});
-	const shouldConsumeSource = checked.merge.consumeSource !== false;
-	const consumed = shouldConsumeSource
-		? yield* consumeActivationInputsFx({
-				inputRefs: [
-					action.sourceRef,
-				],
-				inputs: [
-					{
-						consume: true,
-						itemId: checked.source.itemId,
-						quantity: 1,
-					},
-				],
-				nowMs,
-				reason: "merge-source",
-				save,
-			})
-		: {
-				events: [] satisfies GameEvent[],
-				save,
-			};
+	const consumed = yield* consumeActivationInputsFx({
+		inputRefs: [
+			action.sourceRef,
+		],
+		inputs: [
+			{
+				consume: true,
+				itemId: checked.source.itemId,
+				quantity: 1,
+			},
+		],
+		nowMs,
+		reason: "merge-source",
+		save,
+	});
 	const nextSave = yield* cloneGameSaveFx({
 		save: consumed.save,
 	});

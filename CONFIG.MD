@@ -553,7 +553,6 @@ Defines explicit merge rules.
     "merge:twig-twig-branch": {
       "withItemId": "item:twig",
       "resultItemId": "item:branch",
-      "consumeSource": true,
       "secret": false
     }
   }
@@ -564,7 +563,6 @@ Fields:
 
 - `withItemId`: target item.
 - `resultItemId`: resulting item.
-- `consumeSource`: whether source item is consumed.
 - `secret`: whether rule is hidden/discovery.
 
 Merge rules are attached to source items through `items.*.mergeIds`.
@@ -609,19 +607,7 @@ Secret merge:
 }
 ```
 
-Non-consuming source merge:
-
-```json
-{
-  "merge": {
-    "merge:tool-boulder-stone": {
-      "withItemId": "item:boulder",
-      "resultItemId": "item:stone",
-      "consumeSource": false
-    }
-  }
-}
-```
+All merges consume the dragged source item and replace the target item with the result. Non-consuming merge/imprint behavior is intentionally not part of GameConfig.
 
 ## 10. `inputs`
 
@@ -2163,17 +2149,21 @@ Use `secret: true`.
 }
 ```
 
-## A.8 Add non-consuming merge source
+## A.8 Add one-way merge rule
 
-Use `consumeSource: false`.
+Attach the merge ID to the item that must be dragged. The dragged source is consumed and the target is replaced by the result.
 
 ```json
 {
+  "items": {
+    "item:hammer-charge": {
+      "mergeIds": ["merge:hammer-charge-rock-stone"]
+    }
+  },
   "merge": {
-    "merge:hammer-rock-stone": {
+    "merge:hammer-charge-rock-stone": {
       "withItemId": "item:rock",
-      "resultItemId": "item:stone",
-      "consumeSource": false
+      "resultItemId": "item:stone"
     }
   }
 }

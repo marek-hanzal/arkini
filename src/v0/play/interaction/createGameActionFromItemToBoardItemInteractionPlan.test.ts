@@ -11,7 +11,6 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 		expect(
 			createGameActionFromItemToBoardItemInteractionPlan({
 				plan: {
-					directed: false,
 					type: "merge",
 				},
 				sourceRef,

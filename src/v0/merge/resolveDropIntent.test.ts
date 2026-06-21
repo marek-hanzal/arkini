@@ -59,7 +59,6 @@ describe("resolveDropIntent", () => {
 				}),
 			}),
 		).toEqual({
-			directed: false,
 			resultItemId: "item:sprout",
 			type: "merge",
 		});
@@ -88,7 +87,6 @@ describe("resolveDropIntent", () => {
 				}),
 			}),
 		).toEqual({
-			directed: false,
 			resultItemId: "item:plank",
 			type: "merge",
 		});

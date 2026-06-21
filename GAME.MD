@@ -43,8 +43,8 @@ These rules define how the game should be interpreted when implementation detail
 | Inventory capacity upgrades | not part of current gameplay |
 | Merge role | basic mechanic, not complete core loop |
 | Main economy source | click-triggered producers, finite stashes, crafting, construction |
-| Blueprint binding | completed blank blueprint + target entity creates bound blueprint |
-| Blueprint target consumption | target entity is not consumed |
+| Blueprint model | concrete target-specific blueprint items |
+| Blueprint acquisition | specific blueprint is acquired directly through gameplay |
 | Craft/construction location | board or inventory, with active progress only on board |
 | Upgrade targeting | concrete entity-specific targets |
 | Loot table model | named loot table entities referenced by items/producers/upgrades |
@@ -122,8 +122,7 @@ Examples:
 - coin stack
 - sprout
 - bush
-- completed blank blueprint
-- bound blueprint
+- concrete building blueprint
 - lumber camp
 - quarry
 - coal mine
@@ -257,21 +256,9 @@ Producer product lines and stashes reference loot tables by ID. Upgrades switch 
 
 ### 4.14 Blueprint
 
-A blueprint is a craft/construction entity used to create or upgrade structures/entities.
+A blueprint is a concrete craft/construction entity used to create or upgrade a specific structure/entity.
 
-A completed blank blueprint is generic. It becomes specific only when it is bound to a target entity.
-
-Binding creates a new item ID.
-
-Example:
-
-- completed blank blueprint + lumber camp -> lumber camp blueprint
-
-The original lumber camp remains in the game after binding.
-
-### 4.15 Bound blueprint
-
-A bound blueprint is a blueprint that already knows what it constructs or improves.
+Blueprints are target-specific from the moment they enter gameplay. There is no blank blueprint imprint/binding step.
 
 Examples:
 
@@ -280,7 +267,13 @@ Examples:
 - townhall blueprint
 - lumber camp level 2 blueprint
 
-A bound blueprint is just a craftable item with a recipe and optional completion timer. The exact recipe is data, not special hardcoded blueprint behavior.
+A blueprint is just a craftable item with a recipe and optional completion timer. The exact recipe is data, not special hardcoded blueprint behavior.
+
+### 4.15 Specific building blueprint
+
+A specific building blueprint already knows what it constructs or improves.
+
+It may be acquired through loot, barter, quests, producer outputs, or any other explicit config path. The challenge is acquiring the correct blueprint, not binding a generic one later.
 
 ### 4.16 Craft/construction progress
 
@@ -290,7 +283,7 @@ This mechanic applies to blueprints, building construction, growth, and similar 
 
 Examples:
 
-- bound blueprint becoming a lumber camp
+- concrete blueprint becoming a lumber camp
 - lumber camp level 2 blueprint becoming lumber camp level 2
 - watered sprout becoming a sapling after a timer
 
@@ -475,14 +468,14 @@ Dragging a board item to an empty valid board cell moves the item.
 
 Dragging a board item to an occupied board cell attempts the first valid behavior in this order:
 
-1. source-owned merge or blueprint binding
+1. source-owned merge
 2. stored requirement deposit
 3. craft/construction/growth input deposit
 4. producer product-line input deposit
 5. stash open with the dragged item as a consumable input, when the stash definition accepts that input
 6. swap board item positions
 
-A reverse-directed merge is intentionally not invented. If the target item has a merge rule for the dragged item but the dragged source item does not own the matching rule, the drop is rejected instead of swapped. The player must drag in the configured direction. Directional rules are data, not vibes in a trench coat.
+A reverse-directed merge is intentionally not invented. If the dragged source item does not own a matching merge rule, merge is not considered and later interaction rules may still apply, including swap. Directional rules are data, not vibes in a trench coat.
 
 Producer product-line input deposit respects runtime line priority: the current default product line is filled first, then later enabled lines in configured order. If the default line is full, the next enabled line with capacity receives the item. Disabled lines are skipped.
 
@@ -490,7 +483,7 @@ Stash consumable inputs are open-time inputs, not persistent stash input storage
 
 If none of merge, stored requirement deposit, craft feed, producer feed, or stash-open input is valid, occupied-cell drag/drop swaps the two board items.
 
-Game data must avoid ambiguous source-target pairs. The same source item and target item pair must not be both a merge/binding pair and an input-feed pair. If a pair matches multiple active behaviors, the game definition is invalid unless an explicit rule documents the intended priority.
+Game data must avoid ambiguous source-target pairs. The same source item and target item pair must not be both a merge pair and an input-feed pair. If a pair matches multiple active behaviors, the game definition is invalid unless an explicit rule documents the intended priority.
 
 ### 8.4 Inventory drag/drop
 
@@ -513,7 +506,6 @@ The item detail must show every gameplay-relevant piece of information available
 - item identity, kind, tags, and description
 - merge chain participation
 - valid merge outputs
-- blueprint binding rules
 - craft/construction/growth requirements
 - deposited inputs
 - remaining inputs
@@ -639,17 +631,11 @@ Default rule:
 - items waiting for construction/growth/craft completion cannot be merged
 - items with stored item-owned inputs or stored requirements cannot be merged
 
-### 9.5 Blueprint binding as merge-like interaction
+### 9.5 Blueprint imprinting is not supported
 
-Blueprint binding is a special merge-like interaction:
+Blueprints are not bound or imprinted through board drag/drop.
 
-- completed blank blueprint + target entity -> bound blueprint for target entity
-- binding creates a new item ID
-- target entity is not consumed
-- completed blank blueprint is transformed into the bound blueprint in its own source cell
-- target entity remains in its original cell
-
-This must be explicitly represented in data and tests so it does not get mixed with generic merge-chain behavior. The bound blueprint replaces the source blank blueprint. The target entity remains unchanged.
+A build blueprint must already be a concrete target-specific item, such as `item:blueprint-lumberjack-t1`, before it can enter the construction/craft flow. Dragging a building onto a blueprint does not create a new blueprint and does not have special non-consuming merge behavior.
 
 ## 10. Producers
 
@@ -889,43 +875,24 @@ Do not patch drop rates directly inside upgrade logic. Probability changes belon
 
 ### 13.1 Blueprint purpose
 
-Blueprints turn abstract construction progress into concrete target construction.
+Blueprints turn construction progress into concrete target construction.
 
-They allow the player to prepare a generic completed blueprint first, then bind it to a target entity later.
+A blueprint is acquired already target-specific. It may represent a building, upgrade, or other future constructed entity.
 
-### 13.2 Blank blueprint lifecycle
+### 13.2 Blueprint lifecycle
 
 Blueprint lifecycle:
 
-1. Player obtains or creates blueprint components.
-2. Player completes a blank blueprint through merge, craft, or construction progress.
-3. Completed blank blueprint is generic and has no target.
-4. Player binds the completed blank blueprint to a target entity.
-5. Binding creates a bound blueprint item ID.
-6. Bound blueprint has craft/construction requirements.
-7. Completing bound blueprint produces, upgrades, or unlocks the target result.
+1. Player obtains a concrete target-specific blueprint through gameplay.
+2. The blueprint accepts its configured craft/construction inputs.
+3. The blueprint runs its optional completion timer.
+4. Completion produces, upgrades, or unlocks the configured target result.
 
-### 13.3 Binding blueprint to entity
+There is no blank blueprint completion step and no later bind/imprint action.
 
-Binding rule:
+### 13.3 Concrete blueprint as craftable item
 
-- completed blank blueprint + target entity -> bound blueprint for that target
-- target entity remains and does not disappear
-- blank blueprint becomes target-specific
-- the result is a new item ID
-- the bound blueprint replaces the source blank blueprint in its source cell
-- the target entity remains in its original cell
-
-Example:
-
-- completed blank blueprint + `item:lumber-camp-1` -> `item:blueprint-lumber-camp-1`
-- `item:lumber-camp-1` still exists after binding
-
-Implementation details such as `imprint` or `consumeSource: false` are not the mechanic. The mechanic is: bind blueprint, replace the source blueprint with the specific blueprint, keep the target entity unchanged.
-
-### 13.4 Bound blueprint as craftable item
-
-A bound blueprint is a craftable item.
+A concrete blueprint is a craftable item.
 
 It defines a recipe and optional completion timer. It is not a special hardcoded building-tier system.
 
@@ -945,7 +912,7 @@ This mechanic applies to blueprints, building construction, growth, and similar 
 
 Examples:
 
-- bound blueprint becoming a building
+- concrete blueprint becoming a building
 - watered sprout becoming a sapling
 - sapling becoming a tree
 
@@ -1101,7 +1068,7 @@ The game should define feedback/animation rules for at least:
 - inventory slot swap
 - board -> inventory storage
 - inventory -> board placement
-- successful merge/binding
+- successful merge
 - invalid merge/feed attempt
 - craft/construction/growth input deposit
 - craft/construction/growth timer start
@@ -1136,11 +1103,10 @@ Until a concrete animation spec exists, implementation should choose minimal loc
 
 ### 16.4 Current merge/feed animation rules
 
-Same-item board merge, mixed consumption, blueprint imprinting, producer drops, stash dumps, and inventory placement all use the same visual rule: the final board/inventory item actor is the real actor. There is no separate duplicate overlay representation for the same item. Cells/slots provide geometry and feedback; items live in stable item layers and animate transform/priority there.
+Same-item board merge, mixed consumption, producer drops, stash dumps, and inventory placement all use the same visual rule: the final board/inventory item actor is the real actor. There is no separate duplicate overlay representation for the same item. Cells/slots provide geometry and feedback; items live in stable item layers and animate transform/priority there.
 
 Newly committed actors may be staged from a source rectangle through `useVisualItemMotions`. During that transient phase they can render above their source with raised priority, then settle back to normal priority when Motion completes. Drag/drop keeps the active source hidden until the durable command and query invalidation settle, preventing the source actor from reappearing on its old slot and then animating a second time.
 
-Blueprint binding remains separate from consumption. It commits the blueprint binding first and then keeps the non-consumed dragged building tied to its own item actor so the player can see that the building survived.
 
 ## 17. Economy validation rules
 
@@ -1180,7 +1146,6 @@ Expected fields:
 - optional producer definition reference
 - optional stash definition reference
 - optional craft/construction definition reference
-- optional blueprint binding rules
 - optional `removeBy` rules for board/tile removal
 
 ### 18.2 Item instance state
@@ -1236,7 +1201,6 @@ Expected fields:
 - `id`
 - `withItemId`
 - `resultItemId`
-- `consumeSource`, if needed
 - `secret`, if needed
 
 Merge is always a two-item interaction. Anything more complex belongs to producers, stashes, craft recipes or another explicit mechanic, not a fake variable-input merge rule.
@@ -1297,8 +1261,7 @@ Expected fields:
 Expected fields:
 
 - `id`
-- `targetEntityId`, for bound blueprints
-- `bindingRules`
+- concrete target/result reference
 - craft/construction reference
 - completion result
 
@@ -1388,10 +1351,8 @@ These are intentionally not finalized yet.
 4. What are the exact named loot tables and their probabilities?
 5. What are the exact blueprint recipes for each building/tier?
 6. Which craft/construction/growth items use timers, and what are their durations?
-7. Can a bound blueprint ever be rebound to another target?
 8. Are upgrade tiers strictly linear, or can some branches exist?
 9. Can merge chains require more than two input items?
-10. Can special merges use non-consuming participants besides blueprint binding?
 
 Until these questions are answered, implementation should choose the simplest explicit behavior and document it here before coding.
 
@@ -1462,7 +1423,7 @@ A gameplay implementation should provide tests or validation for:
 17. inventory-to-inventory drag never triggers merge/feed/production
 18. board drag moves item to empty cell
 19. board drag swaps incompatible occupied cells
-20. board drag performs valid merge/binding before swap
+20. board drag performs valid merge before swap
 21. board drag feeds craft/construction/growth before swap
 22. board drag feeds producer product-line input storage before swap
 23. board drag can open keyed stashes with open-time consumable inputs
@@ -1497,10 +1458,10 @@ A gameplay implementation should provide tests or validation for:
 52. stash open-time input requirement, for keyed/locked stashes
 53. stash activation rejects when full generated output cannot fit
 54. stash output uses deterministic nearest-free-cell placement from stash origin
-55. blank blueprint completion
-56. blank blueprint binding to target entity
-57. target entity not consumed by blueprint binding
-58. bound blueprint receiving construction inputs
+55. concrete blueprint item can enter craft/construction flow
+56. concrete blueprint receiving construction inputs
+57. concrete blueprint completion produces configured target
+58. blank blueprint imprinting is absent from config/runtime
 59. craft/construction timer starts only after explicit start action
 60. craft/construction timer pauses in inventory
 61. craft/construction completion on board
@@ -1521,7 +1482,7 @@ A gameplay implementation should provide tests or validation for:
 76. global upgrade timers advance while the app is closed
 77. zero-output loot tables are rejected as invalid data
 78. ambiguous source-target interaction definitions are rejected as invalid data
-79. blueprint binding replaces the source blueprint and keeps the target entity in place
+79. blueprint imprinting/binding behavior is absent from board drag/drop
 80. craft completion replaces the progress item in the same board cell
 81. stateful source items are rejected as inputs unless nested storage is fully ejected first
 82. nested producer/craft storage ejection rejects the input action when board and inventory cannot fit the nested contents

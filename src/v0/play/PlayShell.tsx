@@ -59,9 +59,6 @@ const PlayShellContent: FC = () => {
 			pulseMergeCell() {
 				// Merge is fully communicated by tile animation; no persistent cell flash.
 			},
-			pulseImprintCell() {
-				// Directed merge/imprint uses the same animation-only feedback path.
-			},
 			pulseBoardCellFeedback(key, variant) {
 				if (key) feedbackFlags.pulse(`board:feedback:${variant}:${key}`);
 			},

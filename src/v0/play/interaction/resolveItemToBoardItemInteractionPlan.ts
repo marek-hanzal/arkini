@@ -1,10 +1,7 @@
 import { match, P } from "ts-pattern";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import {
-	hasReverseDirectedItemMergeRule,
-	resolveExecutableItemMergeRule,
-} from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
+import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { ItemToBoardItemInteractionPlan } from "~/v0/play/interaction/ItemToBoardItemInteractionPlan";
 
@@ -22,11 +19,6 @@ export const resolveItemToBoardItemInteractionPlan = ({
 	targetItem,
 }: resolveItemToBoardItemInteractionPlan.Props): ItemToBoardItemInteractionPlan => {
 	const mergeRule = resolveExecutableItemMergeRule({
-		config,
-		sourceItemId,
-		targetItemId: targetItem.itemId,
-	});
-	const reverseDirectedMerge = hasReverseDirectedItemMergeRule({
 		config,
 		sourceItemId,
 		targetItemId: targetItem.itemId,
@@ -87,22 +79,12 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		canSupplyStoredRequirement,
 		mergeRule,
 		producerInputProductId,
-		reverseDirectedMerge,
 	})
-		.with(
-			{
-				reverseDirectedMerge: true,
-			},
-			() => ({
-				type: "reject" as const,
-			}),
-		)
 		.with(
 			{
 				canMerge: true,
 			},
 			({ mergeRule }) => ({
-				directed: mergeRule?.directed ?? false,
 				resultItemId: mergeRule?.merge.resultItemId,
 				type: "merge" as const,
 			}),

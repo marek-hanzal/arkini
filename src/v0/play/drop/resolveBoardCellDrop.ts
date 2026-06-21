@@ -71,9 +71,6 @@ export const resolveBoardCellDrop = ({
 
 	return acceptDrop(async () => {
 		await actions.applyBoardItemToBoardItem(action.input);
-		if (action.feedback?.kind === "imprint-cell") {
-			feedback.pulseImprintCell(action.feedback.cellKey);
-		}
 		if (action.feedback?.kind === "merge-cell") {
 			feedback.pulseMergeCell(action.feedback.cellKey);
 		}

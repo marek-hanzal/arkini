@@ -54,10 +54,7 @@ const readUsedInMerges = ({ config, itemId }: { config: GameConfig; itemId: stri
 			sourceItemId: itemId,
 			targetItemId: sourceItemId,
 		});
-		if (
-			!executable.directed &&
-			reverseExecutable?.merge.resultItemId === executable.merge.resultItemId
-		) {
+		if (reverseExecutable?.merge.resultItemId === executable.merge.resultItemId) {
 			return [];
 		}
 

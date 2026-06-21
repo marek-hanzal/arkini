@@ -37,7 +37,7 @@ export type BoardCellDropAction =
 			type: "merge-board-items";
 			animation: "parallel-merge";
 			feedback?: {
-				kind: "merge-cell" | "imprint-cell";
+				kind: "merge-cell";
 				cellKey: string;
 			};
 			input: {
@@ -145,7 +145,7 @@ export const resolveBoardCellDropAction = ({
 			type: "merge-board-items",
 			animation: "parallel-merge",
 			feedback: {
-				kind: plan.directed ? "imprint-cell" : "merge-cell",
+				kind: "merge-cell",
 				cellKey: targetCellKey,
 			},
 			input: {

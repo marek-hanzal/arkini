@@ -429,6 +429,13 @@
 			"render": "plain",
 			"resourceId": "item-wine-glass",
 			"sort": 214
+		},
+		"asset:item:hops": {
+			"kind": "item",
+			"label": "Hops",
+			"render": "plain",
+			"resourceId": "item-hop-field",
+			"sort": 215
 		}
 	}
 }

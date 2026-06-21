@@ -192,6 +192,13 @@
 			"resourceId": "item-hop-field",
 			"sort": 206
 		},
+		"asset:item:hops": {
+			"kind": "item",
+			"label": "Hops",
+			"render": "plain",
+			"resourceId": "item-hop-field",
+			"sort": 215
+		},
 		"asset:item:leaf": {
 			"kind": "item",
 			"label": "Leaf",
@@ -455,6 +462,23 @@
 			],
 			"name": "Brewery beer to barrel input"
 		},
+		"input:brewery-t1:hops-water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:hops",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Brewery hops and water input"
+		},
 		"input:brewery-t1:water": {
 			"inputs": [
 				{
@@ -464,7 +488,7 @@
 					"quantity": 1
 				}
 			],
-			"name": "Brewery water input"
+			"name": "Brewery water to hops input"
 		},
 		"input:farm-t1:water": {
 			"inputs": [
@@ -526,6 +550,56 @@
 				}
 			],
 			"name": "Tavern beer barrel input"
+		},
+		"input:tavern-t1:wine-barrel": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-barrel",
+					"quantity": 1
+				}
+			],
+			"name": "Tavern wine barrel input"
+		},
+		"input:winery-t1:grapes-water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grapes",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Winery grapes and water input"
+		},
+		"input:winery-t1:water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Winery water to grapes input"
+		},
+		"input:winery-t1:wine-glass-to-barrel": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 4
+				}
+			],
+			"name": "Winery wine glasses to barrel input"
 		}
 	},
 	"items": {
@@ -573,6 +647,22 @@
 			],
 			"tier": 0
 		},
+		"item:grapes": {
+			"assetId": "asset:item:grapes",
+			"code": "grapes",
+			"description": "Harvested grapes produced by wineries when supplied with water near a vineyard.",
+			"maxStackSize": 50,
+			"name": "Grapes",
+			"sort": 905,
+			"storage": "both",
+			"tags": [
+				"material",
+				"food",
+				"wine",
+				"grapes"
+			],
+			"tier": 0
+		},
 		"item:hop-field": {
 			"assetId": "asset:item:hop-field",
 			"code": "hop-field",
@@ -583,6 +673,22 @@
 			"storage": "both",
 			"tags": [
 				"source",
+				"food",
+				"beer",
+				"hops"
+			],
+			"tier": 0
+		},
+		"item:hops": {
+			"assetId": "asset:item:hops",
+			"code": "hops",
+			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
+			"maxStackSize": 50,
+			"name": "Hops",
+			"sort": 705,
+			"storage": "both",
+			"tags": [
+				"material",
 				"food",
 				"beer",
 				"hops"
@@ -688,6 +794,22 @@
 			],
 			"tier": 0
 		},
+		"item:vineyard": {
+			"assetId": "asset:item:vineyard",
+			"code": "vineyard",
+			"description": "Movable vineyard source used by nearby wineries.",
+			"maxStackSize": 10,
+			"name": "Vineyard",
+			"sort": 900,
+			"storage": "both",
+			"tags": [
+				"source",
+				"food",
+				"wine",
+				"grapes"
+			],
+			"tier": 0
+		},
 		"item:water": {
 			"assetId": "asset:item:water",
 			"code": "water",
@@ -718,10 +840,39 @@
 			],
 			"tier": 0
 		},
+		"item:wine-barrel": {
+			"assetId": "asset:item:wine-barrel",
+			"code": "wine-barrel",
+			"description": "A barrel of wine produced by wineries and served by taverns.",
+			"maxStackSize": 20,
+			"name": "Wine Barrel",
+			"sort": 910,
+			"storage": "both",
+			"tags": [
+				"material",
+				"food",
+				"wine"
+			],
+			"tier": 0
+		},
+		"item:wine-glass": {
+			"assetId": "asset:item:wine-glass",
+			"code": "wine-glass",
+			"description": "A single glass of wine served by taverns.",
+			"maxStackSize": 50,
+			"name": "Wine Glass",
+			"sort": 920,
+			"storage": "both",
+			"tags": [
+				"food",
+				"wine"
+			],
+			"tier": 0
+		},
 		"producer:brewery-t1": {
 			"assetId": "asset:producer:brewery-t1",
 			"code": "brewery-t1",
-			"description": "Turns water into beer barrels when placed near a hop field.",
+			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
 			"maxStackSize": 1,
 			"name": "Brewery I",
 			"producerId": "producer:brewery-t1",
@@ -857,11 +1008,27 @@
 				"water"
 			],
 			"tier": 1
+		},
+		"producer:winery-t1": {
+			"assetId": "asset:producer:winery-t1",
+			"code": "winery-t1",
+			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
+			"maxStackSize": 1,
+			"name": "Winery I",
+			"producerId": "producer:winery-t1",
+			"sort": 1000,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"wine"
+			],
+			"tier": 1
 		}
 	},
 	"lootTables": {
 		"loot:brewery-t1:beer-barrel": {
-			"name": "Brewery beer barrels",
+			"name": "Brewery beer barrels from hops and water",
 			"output": [
 				{
 					"itemId": "item:beer-barrel",
@@ -875,6 +1042,16 @@
 			"output": [
 				{
 					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:brewery-t1:hops": {
+			"name": "Brewery hops",
+			"output": [
+				{
+					"itemId": "item:hops",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -950,11 +1127,51 @@
 				}
 			]
 		},
+		"loot:tavern-t1:wine-glass": {
+			"name": "Tavern wine glasses",
+			"output": [
+				{
+					"itemId": "item:wine-glass",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:well-t1:water": {
 			"name": "Well water",
 			"output": [
 				{
 					"itemId": "item:water",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:winery-t1:grapes": {
+			"name": "Winery grapes",
+			"output": [
+				{
+					"itemId": "item:grapes",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:winery-t1:wine-barrel": {
+			"name": "Winery wine barrels",
+			"output": [
+				{
+					"itemId": "item:wine-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:winery-t1:wine-barrel-from-wine-glasses": {
+			"name": "Winery wine barrels from glasses",
+			"output": [
+				{
+					"itemId": "item:wine-barrel",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -966,6 +1183,7 @@
 		"producer:brewery-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:brewery-t1:hops",
 				"product:brewery-t1:beer-barrel",
 				"product:brewery-t1:beer-barrel-from-beer"
 			],
@@ -1035,7 +1253,8 @@
 		"producer:tavern-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:tavern-t1:beer"
+				"product:tavern-t1:beer",
+				"product:tavern-t1:wine-glass"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -1047,12 +1266,24 @@
 			],
 			"requirementIds": [],
 			"type": "producer"
+		},
+		"producer:winery-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:winery-t1:grapes",
+				"product:winery-t1:wine-barrel",
+				"product:winery-t1:wine-barrel-from-wine-glasses"
+			],
+			"requirementIds": [
+				"proximity:winery-t1:vineyard"
+			],
+			"type": "producer"
 		}
 	},
 	"products": {
 		"product:brewery-t1:beer-barrel": {
 			"durationMs": 5000,
-			"inputRefId": "input:brewery-t1:water",
+			"inputRefId": "input:brewery-t1:hops-water",
 			"name": "Beer Barrel",
 			"outputTableId": "loot:brewery-t1:beer-barrel",
 			"placement": "board_then_inventory",
@@ -1063,6 +1294,14 @@
 			"inputRefId": "input:brewery-t1:beer-to-barrel",
 			"name": "Beer Barrel",
 			"outputTableId": "loot:brewery-t1:beer-barrel-from-beer",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:brewery-t1:hops": {
+			"durationMs": 5000,
+			"inputRefId": "input:brewery-t1:water",
+			"name": "Hops",
+			"outputTableId": "loot:brewery-t1:hops",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -1120,10 +1359,42 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:tavern-t1:wine-glass": {
+			"durationMs": 5000,
+			"inputRefId": "input:tavern-t1:wine-barrel",
+			"name": "Wine Glass",
+			"outputTableId": "loot:tavern-t1:wine-glass",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:well-t1:water": {
 			"durationMs": 5000,
 			"name": "Water",
 			"outputTableId": "loot:well-t1:water",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:winery-t1:grapes": {
+			"durationMs": 5000,
+			"inputRefId": "input:winery-t1:water",
+			"name": "Grapes",
+			"outputTableId": "loot:winery-t1:grapes",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:winery-t1:wine-barrel": {
+			"durationMs": 5000,
+			"inputRefId": "input:winery-t1:grapes-water",
+			"name": "Wine Barrel",
+			"outputTableId": "loot:winery-t1:wine-barrel",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:winery-t1:wine-barrel-from-wine-glasses": {
+			"durationMs": 5000,
+			"inputRefId": "input:winery-t1:wine-glass-to-barrel",
+			"name": "Wine Barrel",
+			"outputTableId": "loot:winery-t1:wine-barrel-from-wine-glasses",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		}
@@ -1174,6 +1445,14 @@
 			"durationFactor": 1,
 			"itemIds": [
 				"producer:quarry-t1"
+			],
+			"type": "proximity"
+		},
+		"proximity:winery-t1:vineyard": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:vineyard"
 			],
 			"type": "proximity"
 		}

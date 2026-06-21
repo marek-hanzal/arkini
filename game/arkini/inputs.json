@@ -51,7 +51,7 @@
 			]
 		},
 		"input:brewery-t1:water": {
-			"name": "Brewery water input",
+			"name": "Brewery water to hops input",
 			"inputs": [
 				{
 					"itemId": "item:water",
@@ -77,6 +77,73 @@
 			"inputs": [
 				{
 					"itemId": "item:beer",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:brewery-t1:hops-water": {
+			"name": "Brewery hops and water input",
+			"inputs": [
+				{
+					"itemId": "item:hops",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:winery-t1:water": {
+			"name": "Winery water to grapes input",
+			"inputs": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:winery-t1:grapes-water": {
+			"name": "Winery grapes and water input",
+			"inputs": [
+				{
+					"itemId": "item:grapes",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:tavern-t1:wine-barrel": {
+			"name": "Tavern wine barrel input",
+			"inputs": [
+				{
+					"itemId": "item:wine-barrel",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:winery-t1:wine-glass-to-barrel": {
+			"name": "Winery wine glasses to barrel input",
+			"inputs": [
+				{
+					"itemId": "item:wine-glass",
 					"quantity": 4,
 					"capacity": 4,
 					"consume": true

@@ -71,7 +71,7 @@
 			]
 		},
 		"loot:brewery-t1:beer-barrel": {
-			"name": "Brewery beer barrels",
+			"name": "Brewery beer barrels from hops and water",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -96,6 +96,56 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:beer-barrel",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:brewery-t1:hops": {
+			"name": "Brewery hops",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:hops",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:winery-t1:grapes": {
+			"name": "Winery grapes",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:grapes",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:winery-t1:wine-barrel": {
+			"name": "Winery wine barrels",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:wine-barrel",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:tavern-t1:wine-glass": {
+			"name": "Tavern wine glasses",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:wine-glass",
+					"quantity": 4
+				}
+			]
+		},
+		"loot:winery-t1:wine-barrel-from-wine-glasses": {
+			"name": "Winery wine barrels from glasses",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:wine-barrel",
 					"quantity": 1
 				}
 			]

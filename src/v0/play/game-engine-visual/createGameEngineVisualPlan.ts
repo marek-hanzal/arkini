@@ -9,6 +9,7 @@ import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngi
 import { createGameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { findMergeResultEventIndex } from "~/v0/play/game-engine-visual/findMergeResultEventIndex";
 import { findProducerInputStoredEventIndex } from "~/v0/play/game-engine-visual/findProducerInputStoredEventIndex";
+import { shouldAnimateProducerInputStoreVisual } from "~/v0/play/game-engine-visual/shouldAnimateProducerInputStoreVisual";
 
 export namespace createGameEngineVisualPlan {
 	export interface Props {
@@ -75,12 +76,21 @@ export const createGameEngineVisualPlan = ({
 					const stored = events[storedIndex];
 					if (stored?.type === "producer_input.stored") {
 						skipped.add(storedIndex);
-						appendProducerInputStoreVisuals({
-							plan,
-							previousBoard,
-							source: event,
-							stored,
-						});
+
+						if (
+							shouldAnimateProducerInputStoreVisual({
+								events,
+								stored,
+							})
+						) {
+							appendProducerInputStoreVisuals({
+								plan,
+								previousBoard,
+								source: event,
+								stored,
+							});
+						}
+
 						break;
 					}
 				}

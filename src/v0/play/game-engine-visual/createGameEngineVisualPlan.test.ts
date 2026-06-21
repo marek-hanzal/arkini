@@ -205,7 +205,7 @@ describe("createGameEngineVisualPlan", () => {
 		});
 	});
 
-	it("maps board producer input storage to a transient tile flying into the producer", () => {
+	it("does not duplicate the direct board producer input drop animation", () => {
 		const previousBoard = boardView([
 			{
 				id: "producer",
@@ -253,6 +253,70 @@ describe("createGameEngineVisualPlan", () => {
 					quantity: 1,
 					storedAtMs: 1,
 					type: "producer_input.stored",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardTransientTilePlans).toHaveLength(0);
+	});
+
+	it("maps auto-filled board producer input storage to a transient tile flying into the producer", () => {
+		const previousBoard = boardView([
+			{
+				id: "producer",
+				itemId: "item:producer",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+			{
+				id: "source",
+				itemId: "item:twig",
+				state: {},
+				x: 1,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "producer",
+					itemId: "item:producer",
+					state: {},
+					x: 0,
+					y: 0,
+				},
+			]),
+			currentInventory: undefined,
+			events: [
+				{
+					from: {
+						itemInstanceId: "source",
+						kind: "board",
+					},
+					itemId: "item:twig",
+					reason: "producer-input-store",
+					type: "item.consumed",
+				},
+				{
+					itemId: "item:twig",
+					nextQuantity: 1,
+					previousQuantity: 0,
+					producerItemInstanceId: "producer",
+					productId: "product:test",
+					quantity: 1,
+					storedAtMs: 1,
+					type: "producer_input.stored",
+				},
+				{
+					completesAtMs: 1000,
+					jobId: "job:1",
+					producerItemInstanceId: "producer",
+					productId: "product:test",
+					startedAtMs: 1,
+					type: "product.started",
 				},
 			] satisfies GameEvent[],
 			previousBoard,

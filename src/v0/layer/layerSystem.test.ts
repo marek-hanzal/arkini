@@ -81,6 +81,16 @@ describe("global layer system", () => {
 		expect(offenders).toEqual([]);
 	});
 
+	it("allows overlay TileEngine vertical pan gestures for sheet scrolling", () => {
+		const styles = readFileSync(stylePath, "utf8");
+
+		expect(styles).toContain('.ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] {');
+		expect(styles).toContain("touch-action: pan-y;");
+		expect(styles).toContain(
+			'.ak-tile-engine[data-ak-tile-engine-layer-role="overlay"] .ak-tile-engine-actor',
+		);
+	});
+
 	it("keeps TileEngine presence CSS keyed by marker presence", () => {
 		const styles = readFileSync(stylePath, "utf8");
 

@@ -30,6 +30,26 @@
 				"itemId": "producer:stonemason-t1",
 				"x": 3,
 				"y": 5
+			},
+			{
+				"itemId": "item:wheat-field",
+				"x": 0,
+				"y": 3
+			},
+			{
+				"itemId": "producer:farm-t1",
+				"x": 1,
+				"y": 3
+			},
+			{
+				"itemId": "producer:well-t1",
+				"x": 3,
+				"y": 3
+			},
+			{
+				"itemId": "producer:pig-farm-t1",
+				"x": 5,
+				"y": 3
 			}
 		],
 		"inventory": []

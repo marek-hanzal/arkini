@@ -143,6 +143,114 @@
 			],
 			"sort": 410,
 			"producerId": "producer:stonemason-t1"
+		},
+		"item:wheat-field": {
+			"assetId": "asset:item:wheat-field",
+			"code": "wheat-field",
+			"name": "Wheat Field",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable grain source used by nearby farms.",
+			"tags": [
+				"source",
+				"food",
+				"grain"
+			],
+			"sort": 500
+		},
+		"item:water": {
+			"assetId": "asset:item:water",
+			"code": "water",
+			"name": "Water",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Basic water resource produced by wells and consumed by farms.",
+			"tags": [
+				"material",
+				"food",
+				"water"
+			],
+			"sort": 510
+		},
+		"item:grain": {
+			"assetId": "asset:item:grain",
+			"code": "grain",
+			"name": "Grain",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Harvested grain produced by farms and used as pig feed.",
+			"tags": [
+				"material",
+				"food",
+				"grain"
+			],
+			"sort": 520
+		},
+		"item:piglet": {
+			"assetId": "asset:item:piglet",
+			"code": "piglet",
+			"name": "Piglet",
+			"tier": 0,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A small piglet produced by pig farms.",
+			"tags": [
+				"animal",
+				"food",
+				"pig"
+			],
+			"sort": 530
+		},
+		"producer:well-t1": {
+			"assetId": "asset:producer:well-t1",
+			"code": "well-t1",
+			"name": "Well I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Produces water.",
+			"tags": [
+				"producer",
+				"food",
+				"water"
+			],
+			"sort": 600,
+			"producerId": "producer:well-t1"
+		},
+		"producer:farm-t1": {
+			"assetId": "asset:producer:farm-t1",
+			"code": "farm-t1",
+			"name": "Farm I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes water and produces grain when placed near a wheat field.",
+			"tags": [
+				"producer",
+				"food",
+				"grain"
+			],
+			"sort": 610,
+			"producerId": "producer:farm-t1"
+		},
+		"producer:pig-farm-t1": {
+			"assetId": "asset:producer:pig-farm-t1",
+			"code": "pig-farm-t1",
+			"name": "Pig Farm I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes grain and water to produce piglets.",
+			"tags": [
+				"producer",
+				"food",
+				"pig"
+			],
+			"sort": 620,
+			"producerId": "producer:pig-farm-t1"
 		}
 	}
 }

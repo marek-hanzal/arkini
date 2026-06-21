@@ -39,6 +39,36 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:well-t1:water": {
+			"name": "Well water",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:farm-t1:grain": {
+			"name": "Farm grain",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:pig-farm-t1:piglet": {
+			"name": "Pig farm piglets",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:piglet",
+					"quantity": 1
+				}
+			]
 		}
 	}
 }

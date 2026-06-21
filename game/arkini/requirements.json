@@ -31,6 +31,14 @@
 			],
 			"distance": 2,
 			"durationFactor": 1
+		},
+		"proximity:farm-t1:wheat-field": {
+			"type": "proximity",
+			"itemIds": [
+				"item:wheat-field"
+			],
+			"distance": 2,
+			"durationFactor": 1
 		}
 	}
 }

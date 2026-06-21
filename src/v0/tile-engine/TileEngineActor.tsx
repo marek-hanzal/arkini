@@ -6,6 +6,7 @@ import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/Ti
 import { useTileActorDrag } from "~/v0/tile-engine/useTileActorDrag";
 import { useTileActorEnterMotion } from "~/v0/tile-engine/useTileActorEnterMotion";
 import { useTileActorExitMotion } from "~/v0/tile-engine/useTileActorExitMotion";
+import { useTileActorFeedbackMotion } from "~/v0/tile-engine/useTileActorFeedbackMotion";
 import { useTileActorMotion } from "~/v0/tile-engine/useTileActorMotion";
 import { useTileActorTap } from "~/v0/tile-engine/useTileActorTap";
 import { useTileActorTimers } from "~/v0/tile-engine/useTileActorTimers";
@@ -32,6 +33,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	gapPx,
 	enter,
 	exit,
+	feedback,
 	dragRef,
 	dragDisabled,
 	dragConstraintsRef,
@@ -91,6 +93,11 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	useTileActorExitMotion({
 		actorRef,
 		exit,
+		tileId: tile.id,
+	});
+	useTileActorFeedbackMotion({
+		actorRef,
+		feedback,
 		tileId: tile.id,
 	});
 

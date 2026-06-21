@@ -35,6 +35,7 @@ export const GameRuntimeVisualEffects: FC<GameRuntimeVisualEffects.Props> = ({ s
 
 				if (
 					plan.boardEnterRequests.length === 0 &&
+					plan.boardFeedbackRequests.length === 0 &&
 					plan.boardTransientTilePlans.length === 0 &&
 					plan.inventoryEnterRequests.length === 0
 				) {

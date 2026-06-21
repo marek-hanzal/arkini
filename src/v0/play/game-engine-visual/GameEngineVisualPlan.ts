@@ -9,6 +9,7 @@ export interface GameEngineVisualTransientTilePlan {
 }
 
 export interface GameEngineVisualPlan {
+	boardFeedbackRequests: readonly TileEngineMotionRequest[];
 	boardEnterRequests: readonly TileEngineMotionRequest[];
 	boardTransientTilePlans: readonly GameEngineVisualTransientTilePlan[];
 	ignoredEventTypes: readonly string[];

@@ -17,6 +17,16 @@ describe("applyGameEngineVisualPlan", () => {
 	it("registers transient exit and board enter requests from one visual plan", () => {
 		vi.useFakeTimers();
 		const plan: GameEngineVisualPlan = {
+			boardFeedbackRequests: [
+				{
+					cleanupDelayMs: 100,
+					feedback: {
+						groupId: "group:1",
+						kind: "bounce",
+					},
+					tileId: "target",
+				},
+			],
 			boardEnterRequests: [
 				{
 					cleanupDelayMs: 100,
@@ -66,6 +76,9 @@ describe("applyGameEngineVisualPlan", () => {
 		});
 		expect(readTileEngineMotionRequests("board").get("target")?.enter).toMatchObject({
 			kind: "replace-in",
+		});
+		expect(readTileEngineMotionRequests("board").get("target")?.feedback).toMatchObject({
+			kind: "bounce",
 		});
 
 		vi.advanceTimersByTime(100);

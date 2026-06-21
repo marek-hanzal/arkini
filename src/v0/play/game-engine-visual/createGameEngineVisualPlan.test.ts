@@ -183,6 +183,7 @@ describe("createGameEngineVisualPlan", () => {
 			previousBoard,
 		});
 
+		expect(plan.boardFeedbackRequests).toHaveLength(0);
 		expect(plan.boardTransientTilePlans).toHaveLength(1);
 		expect(plan.boardTransientTilePlans[0]).toMatchObject({
 			request: {
@@ -259,6 +260,13 @@ describe("createGameEngineVisualPlan", () => {
 		});
 
 		expect(plan.boardTransientTilePlans).toHaveLength(0);
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
+		expect(plan.boardFeedbackRequests[0]).toMatchObject({
+			feedback: {
+				kind: "bounce",
+			},
+			tileId: "producer",
+		});
 	});
 
 	it("maps auto-filled board producer input storage to a transient tile flying into the producer", () => {
@@ -322,6 +330,13 @@ describe("createGameEngineVisualPlan", () => {
 			previousBoard,
 		});
 
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
+		expect(plan.boardFeedbackRequests[0]).toMatchObject({
+			feedback: {
+				kind: "bounce",
+			},
+			tileId: "producer",
+		});
 		expect(plan.boardTransientTilePlans).toHaveLength(1);
 		expect(plan.boardTransientTilePlans[0]).toMatchObject({
 			request: {
@@ -334,6 +349,47 @@ describe("createGameEngineVisualPlan", () => {
 				itemId: "item:twig",
 				slotId: "1:0",
 			},
+		});
+	});
+
+	it("maps product completion to producer bounce feedback", () => {
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "producer",
+					itemId: "item:producer",
+					state: {},
+					x: 0,
+					y: 0,
+				},
+			]),
+			currentInventory: undefined,
+			events: [
+				{
+					completedAtMs: 1000,
+					jobId: "job:1",
+					producerItemInstanceId: "producer",
+					productId: "product:test",
+					type: "product.completed",
+				},
+			] satisfies GameEvent[],
+			previousBoard: boardView([
+				{
+					id: "producer",
+					itemId: "item:producer",
+					state: {},
+					x: 0,
+					y: 0,
+				},
+			]),
+		});
+
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
+		expect(plan.boardFeedbackRequests[0]).toMatchObject({
+			feedback: {
+				kind: "bounce",
+			},
+			tileId: "producer",
 		});
 	});
 

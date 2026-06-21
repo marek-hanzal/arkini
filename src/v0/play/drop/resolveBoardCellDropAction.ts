@@ -157,11 +157,14 @@ export const resolveBoardCellDropAction = ({
 
 	return {
 		type: "apply-board-item-to-board-item",
-		feedback: {
-			cellKey: targetCellKey,
-			kind: "cell-feedback",
-			variant: plan.feedbackVariant,
-		},
+		feedback:
+			plan.type === "producer-input"
+				? undefined
+				: {
+						cellKey: targetCellKey,
+						kind: "cell-feedback",
+						variant: plan.feedbackVariant,
+					},
 		input: {
 			sourceBoardItemId: source.boardItemId,
 			targetBoardItemId: targetItem.id,

@@ -75,6 +75,7 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 					tile={tile}
 					enter={motion?.enter}
 					exit={motion?.exit}
+					feedback={motion?.feedback}
 					index={index}
 					columns={columns}
 					rowCount={rowCount}

@@ -108,7 +108,7 @@ export const resolveInventoryCellDropAction = ({
 
 		return {
 			feedback:
-				plan.type === "merge"
+				plan.type === "merge" || plan.type === "producer-input"
 					? undefined
 					: {
 							cellKey: cellKey(target.x, target.y),

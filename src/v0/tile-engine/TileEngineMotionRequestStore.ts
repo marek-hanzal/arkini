@@ -29,7 +29,8 @@ const storeEngineMotionMap = (engineId: string, motions: MutableMotionMap) => {
 	notify();
 };
 
-const isEmptyMotion = (motion: TileEngineMotionSchema.Type) => !motion.enter && !motion.exit;
+const isEmptyMotion = (motion: TileEngineMotionSchema.Type) =>
+	!motion.enter && !motion.exit && !motion.feedback;
 
 const clearTileEngineMotionRequest = ({
 	engineId,
@@ -38,10 +39,11 @@ const clearTileEngineMotionRequest = ({
 	tileId,
 }: {
 	engineId: string;
-	kind: "enter" | "exit";
+	kind: "enter" | "exit" | "feedback";
 	motion:
 		| NonNullable<TileEngineMotionSchema.Type["enter"]>
-		| NonNullable<TileEngineMotionSchema.Type["exit"]>;
+		| NonNullable<TileEngineMotionSchema.Type["exit"]>
+		| NonNullable<TileEngineMotionSchema.Type["feedback"]>;
 	tileId: string;
 }) => {
 	const current = motionsByEngineId.get(engineId);
@@ -83,7 +85,7 @@ const scheduleTileEngineMotionRequestCleanup = ({
 }) => {
 	if (cleanupDelayMs === undefined) return;
 
-	const { enter, exit, tileId } = request;
+	const { enter, exit, feedback, tileId } = request;
 	globalThis.setTimeout(() => {
 		if (enter) {
 			clearTileEngineMotionRequest({
@@ -98,6 +100,14 @@ const scheduleTileEngineMotionRequestCleanup = ({
 				engineId,
 				kind: "exit",
 				motion: exit,
+				tileId,
+			});
+		}
+		if (feedback) {
+			clearTileEngineMotionRequest({
+				engineId,
+				kind: "feedback",
+				motion: feedback,
 				tileId,
 			});
 		}
@@ -133,7 +143,7 @@ export const registerTileEngineMotionRequests = ({
 	const motions = cloneEngineMotionMap(engineId);
 	let changed = false;
 	for (const request of requests) {
-		if (!request.enter && !request.exit) continue;
+		if (!request.enter && !request.exit && !request.feedback) continue;
 
 		const current = motions.get(request.tileId) ?? {};
 		motions.set(request.tileId, {
@@ -146,6 +156,11 @@ export const registerTileEngineMotionRequests = ({
 			...(request.exit
 				? {
 						exit: request.exit,
+					}
+				: {}),
+			...(request.feedback
+				? {
+						feedback: request.feedback,
 					}
 				: {}),
 		});
@@ -191,9 +206,15 @@ export const clearTileEngineMotionRequestsByGroup = ({
 			...motion,
 			enter: motion.enter?.groupId === groupId ? undefined : motion.enter,
 			exit: motion.exit?.groupId === groupId ? undefined : motion.exit,
+			feedback: motion.feedback?.groupId === groupId ? undefined : motion.feedback,
 		};
 
-		if (next.enter === motion.enter && next.exit === motion.exit) continue;
+		if (
+			next.enter === motion.enter &&
+			next.exit === motion.exit &&
+			next.feedback === motion.feedback
+		)
+			continue;
 
 		changed = true;
 		if (isEmptyMotion(next)) {

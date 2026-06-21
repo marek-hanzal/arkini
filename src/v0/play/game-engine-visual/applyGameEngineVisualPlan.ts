@@ -22,6 +22,7 @@ export const applyGameEngineVisualPlan = ({ plan }: applyGameEngineVisualPlan.Pr
 		requests: [
 			...plan.boardTransientTilePlans.map((entry) => entry.request),
 			...plan.boardEnterRequests,
+			...plan.boardFeedbackRequests,
 		],
 	});
 	registerTileEngineMotionRequests({

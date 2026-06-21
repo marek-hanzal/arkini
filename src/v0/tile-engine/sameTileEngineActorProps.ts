@@ -13,6 +13,7 @@ export const sameTileEngineActorProps = <TTile, TSlot, TDrag, TDrop>(
 	left.gapPx === right.gapPx &&
 	left.enter === right.enter &&
 	left.exit === right.exit &&
+	left.feedback === right.feedback &&
 	left.dragRef === right.dragRef &&
 	left.dragDisabled === right.dragDisabled &&
 	left.dragConstraintsRef === right.dragConstraintsRef &&

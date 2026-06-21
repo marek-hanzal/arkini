@@ -86,12 +86,30 @@ Current processor input buffers use capacity `4`:
 - `input:sawmill-t1:log`
 - `input:stonemason-t1:stone`
 
-### Placeholder assets
+### Asset alignment and current art gaps
 
-Some definitions reuse existing PNG resources until bespoke production art exists.
+Current gameplay definitions now point to dedicated asset IDs and dedicated PNG filenames when possible.
 
-- `asset:item-rock` uses the existing `item-stone` resource.
-- `asset:producer-lumberjack-t1` uses the existing `item-lumber-camp` resource.
-- `asset:producer-sawmill-t1` uses the existing `item-lumber-camp` resource.
-- `asset:producer-quarry-t1` uses the existing `item-quarry` resource.
-- `asset:producer-stonemason-t1` uses the existing `item-quarry` resource.
+Current first-wave asset IDs:
+
+- `asset:item:tree` -> `game/arkini/assets/item-tree.png`
+- `asset:item:rock` -> `game/arkini/assets/item-rock.png`
+- `asset:item:log` -> `game/arkini/assets/item-log.png`
+- `asset:item:plank` -> `game/arkini/assets/item-plank.png`
+- `asset:item:stone` -> `game/arkini/assets/item-stone.png`
+- `asset:item:stone-block` -> `game/arkini/assets/item-stone-block.png`
+- `asset:producer:lumberjack-t1` -> `game/arkini/assets/producer-lumberjack-t1.png`
+- `asset:producer:sawmill-t1` -> `game/arkini/assets/producer-sawmill-t1.png`
+- `asset:producer:quarry-t1` -> `game/arkini/assets/producer-quarry-t1.png`
+- `asset:producer:stonemason-t1` -> `game/arkini/assets/producer-stonemason-t1.png`
+
+Current PNG coverage status:
+
+- `item:tree`, `item:log`, `item:plank`, `item:stone`, `item:stone-block`, `producer:lumberjack-t1`, and `producer:quarry-t1` have usable PNG coverage.
+- `item:rock`, `producer:sawmill-t1`, and `producer:stonemason-t1` currently use placeholder-copied PNG files so that every active definition has its own file path.
+
+Generate dedicated art next for:
+
+- `item:rock`
+- `producer:sawmill-t1`
+- `producer:stonemason-t1`

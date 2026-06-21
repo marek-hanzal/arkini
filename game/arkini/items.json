@@ -1,7 +1,7 @@
 {
 	"items": {
 		"item:tree": {
-			"assetId": "asset:item-tree",
+			"assetId": "asset:item:tree",
 			"code": "tree",
 			"name": "Tree",
 			"tier": 0,
@@ -16,7 +16,7 @@
 			"sort": 10
 		},
 		"item:rock": {
-			"assetId": "asset:item-rock",
+			"assetId": "asset:item:rock",
 			"code": "rock",
 			"name": "Rock",
 			"tier": 0,
@@ -31,7 +31,7 @@
 			"sort": 20
 		},
 		"item:log": {
-			"assetId": "asset:item-log",
+			"assetId": "asset:item:log",
 			"code": "log",
 			"name": "Log",
 			"tier": 0,
@@ -45,7 +45,7 @@
 			"sort": 100
 		},
 		"item:plank": {
-			"assetId": "asset:item-plank",
+			"assetId": "asset:item:plank",
 			"code": "plank",
 			"name": "Plank",
 			"tier": 0,
@@ -59,7 +59,7 @@
 			"sort": 110
 		},
 		"item:stone": {
-			"assetId": "asset:item-stone",
+			"assetId": "asset:item:stone",
 			"code": "stone",
 			"name": "Stone",
 			"tier": 0,
@@ -73,7 +73,7 @@
 			"sort": 200
 		},
 		"item:stone-block": {
-			"assetId": "asset:item-stone-block",
+			"assetId": "asset:item:stone-block",
 			"code": "stone-block",
 			"name": "Stone Block",
 			"tier": 0,
@@ -87,7 +87,7 @@
 			"sort": 210
 		},
 		"producer:lumberjack-t1": {
-			"assetId": "asset:producer-lumberjack-t1",
+			"assetId": "asset:producer:lumberjack-t1",
 			"code": "lumberjack-t1",
 			"name": "Lumberjack I",
 			"tier": 1,
@@ -102,7 +102,7 @@
 			"producerId": "producer:lumberjack-t1"
 		},
 		"producer:sawmill-t1": {
-			"assetId": "asset:producer-sawmill-t1",
+			"assetId": "asset:producer:sawmill-t1",
 			"code": "sawmill-t1",
 			"name": "Sawmill I",
 			"tier": 1,
@@ -117,7 +117,7 @@
 			"producerId": "producer:sawmill-t1"
 		},
 		"producer:quarry-t1": {
-			"assetId": "asset:producer-quarry-t1",
+			"assetId": "asset:producer:quarry-t1",
 			"code": "quarry-t1",
 			"name": "Quarry I",
 			"tier": 1,
@@ -132,7 +132,7 @@
 			"producerId": "producer:quarry-t1"
 		},
 		"producer:stonemason-t1": {
-			"assetId": "asset:producer-stonemason-t1",
+			"assetId": "asset:producer:stonemason-t1",
 			"code": "stonemason-t1",
 			"name": "Stonemason I",
 			"tier": 1,

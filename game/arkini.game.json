@@ -171,6 +171,20 @@
 			"resourceId": "item-gem",
 			"sort": 94
 		},
+		"asset:item:gold-ingot": {
+			"kind": "item",
+			"label": "Gold Ingot",
+			"render": "plain",
+			"resourceId": "item-gold-ingot",
+			"sort": 223
+		},
+		"asset:item:gold-ore": {
+			"kind": "item",
+			"label": "Gold Ore",
+			"render": "plain",
+			"resourceId": "item-gold-ore",
+			"sort": 220
+		},
 		"asset:item:grain": {
 			"kind": "item",
 			"label": "Grain",
@@ -198,6 +212,20 @@
 			"render": "plain",
 			"resourceId": "item-hops",
 			"sort": 215
+		},
+		"asset:item:iron-ingot": {
+			"kind": "item",
+			"label": "Iron Ingot",
+			"render": "plain",
+			"resourceId": "item-iron-ingot",
+			"sort": 222
+		},
+		"asset:item:iron-ore": {
+			"kind": "item",
+			"label": "Iron Ore",
+			"render": "plain",
+			"resourceId": "item-iron-ore",
+			"sort": 221
 		},
 		"asset:item:leaf": {
 			"kind": "item",
@@ -247,6 +275,13 @@
 			"render": "plain",
 			"resourceId": "item-plank",
 			"sort": 66
+		},
+		"asset:item:pollution": {
+			"kind": "item",
+			"label": "Pollution",
+			"render": "plain",
+			"resourceId": "item-pollution",
+			"sort": 224
 		},
 		"asset:item:quarry": {
 			"kind": "item",
@@ -374,12 +409,33 @@
 			"resourceId": "producer-brewery-t1",
 			"sort": 207
 		},
+		"asset:producer:coal-mine-t1": {
+			"kind": "item",
+			"label": "Coal Mine I",
+			"render": "plain",
+			"resourceId": "producer-coal-mine-t1",
+			"sort": 216
+		},
 		"asset:producer:farm-t1": {
 			"kind": "item",
 			"label": "Farm I",
 			"render": "plain",
 			"resourceId": "producer-farm-t1",
 			"sort": 201
+		},
+		"asset:producer:gold-mine-t1": {
+			"kind": "item",
+			"label": "Gold Mine I",
+			"render": "plain",
+			"resourceId": "producer-gold-mine-t1",
+			"sort": 217
+		},
+		"asset:producer:iron-mine-t1": {
+			"kind": "item",
+			"label": "Iron Mine I",
+			"render": "plain",
+			"resourceId": "producer-iron-mine-t1",
+			"sort": 218
 		},
 		"asset:producer:lumberjack-t1": {
 			"kind": "item",
@@ -408,6 +464,13 @@
 			"render": "plain",
 			"resourceId": "producer-sawmill-t1",
 			"sort": 131
+		},
+		"asset:producer:smelter-t1": {
+			"kind": "item",
+			"label": "Smelter I",
+			"render": "plain",
+			"resourceId": "producer-smelter-t1",
+			"sort": 219
 		},
 		"asset:producer:stonemason-t1": {
 			"kind": "item",

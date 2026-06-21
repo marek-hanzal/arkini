@@ -507,6 +507,13 @@
 			"resourceId": "producer-smelter-t1",
 			"sort": 219
 		},
+		"asset:producer:purifier-t1": {
+			"kind": "item",
+			"label": "Purifier I",
+			"render": "plain",
+			"resourceId": "producer-purifier-t1",
+			"sort": 220
+		},
 		"asset:item:gold-ore": {
 			"kind": "item",
 			"label": "Gold Ore Cart",

@@ -155,6 +155,15 @@
 				"product:smelter-t1:gold-ingot"
 			],
 			"requirementIds": []
+		},
+		"producer:purifier-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:purifier-t1:pollution",
+				"product:purifier-t1:pollution-bulk"
+			],
+			"requirementIds": []
 		}
 	}
 }

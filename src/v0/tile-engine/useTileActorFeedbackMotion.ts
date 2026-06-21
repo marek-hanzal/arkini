@@ -54,13 +54,14 @@ export const useTileActorFeedbackMotion = ({
 			keyframes: {
 				transform: [
 					"translate3d(0px, 0px, 0px) scale(1)",
-					"translate3d(0px, -1px, 0px) scale(1.1)",
-					"translate3d(0px, 0px, 0px) scale(0.97)",
+					"translate3d(0px, -3px, 0px) scale(1.22)",
+					"translate3d(0px, 1px, 0px) scale(0.93)",
+					"translate3d(0px, -1px, 0px) scale(1.06)",
 					"translate3d(0px, 0px, 0px) scale(1)",
 				],
 			},
 			delay: delayMs / 1000,
-			duration: (durationMs ?? 260) / 1000,
+			duration: (durationMs ?? TileEngineTiming.feedbackDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
 			meta: {
 				feedbackKind: kind,

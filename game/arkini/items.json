@@ -682,7 +682,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes beer and sausage to mine coal carts from a nearby coal deposit.",
+			"description": "Consumes bread and water to mine coal carts from a nearby coal deposit.",
 			"tags": [
 				"producer",
 				"industry",
@@ -699,7 +699,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes beer and sausage to mine iron ore carts from a nearby iron deposit.",
+			"description": "Consumes sausage and beer to mine iron ore carts from a nearby iron deposit.",
 			"tags": [
 				"producer",
 				"industry",
@@ -716,7 +716,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes beer and extra sausage to mine gold ore carts from a nearby gold deposit.",
+			"description": "Consumes bread and wine to mine gold ore carts from a nearby gold deposit.",
 			"tags": [
 				"producer",
 				"industry",
@@ -733,7 +733,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes ore, coal, beer, and sausage to produce metal ingots and pollution.",
+			"description": "Consumes ore, coal fuel, and water to produce metal ingots and pollution.",
 			"tags": [
 				"producer",
 				"industry",

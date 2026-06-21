@@ -647,22 +647,22 @@
 			],
 			"name": "Brewery water to hops input"
 		},
-		"input:coal-mine-t1:beer-sausage": {
+		"input:coal-mine-t1:bread-water": {
 			"inputs": [
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 2
+					"itemId": "item:bread",
+					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sausage",
+					"itemId": "item:water",
 					"quantity": 1
 				}
 			],
-			"name": "Coal mine beer and sausage input"
+			"name": "Coal mine bread and water input"
 		},
 		"input:farm-t1:water": {
 			"inputs": [
@@ -675,22 +675,22 @@
 			],
 			"name": "Farm water input"
 		},
-		"input:gold-mine-t1:beer-sausage": {
+		"input:gold-mine-t1:bread-wine": {
 			"inputs": [
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 2
+					"itemId": "item:bread",
+					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 2
+					"itemId": "item:wine-glass",
+					"quantity": 1
 				}
 			],
-			"name": "Gold mine beer and sausage input"
+			"name": "Gold mine bread and wine input"
 		},
 		"input:goldsmith-t1:gold-wine-bread-coal": {
 			"inputs": [
@@ -721,22 +721,22 @@
 			],
 			"name": "Goldsmith gold, wine, bread, and coal input"
 		},
-		"input:iron-mine-t1:beer-sausage": {
+		"input:iron-mine-t1:sausage-beer": {
 			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 2
-				},
 				{
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:sausage",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
 				}
 			],
-			"name": "Iron mine beer and sausage input"
+			"name": "Iron mine sausage and beer input"
 		},
 		"input:pig-farm-t1:grain-water": {
 			"inputs": [
@@ -799,7 +799,7 @@
 			],
 			"name": "Slaughterhouse piglet input"
 		},
-		"input:smelter-t1:gold-ingot": {
+		"input:smelter-t1:gold-ore-coal-water": {
 			"inputs": [
 				{
 					"capacity": 4,
@@ -811,24 +811,18 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 2
 				}
 			],
-			"name": "Smelter gold ingot input"
+			"name": "Smelter gold ore, coal, and water input"
 		},
-		"input:smelter-t1:iron-ingot": {
+		"input:smelter-t1:iron-ore-coal-water": {
 			"inputs": [
 				{
 					"capacity": 4,
@@ -845,17 +839,11 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 2
+					"itemId": "item:water",
+					"quantity": 1
 				}
 			],
-			"name": "Smelter iron ingot input"
+			"name": "Smelter iron ore, coal, and water input"
 		},
 		"input:stonemason-t1:stone": {
 			"inputs": [
@@ -1460,7 +1448,7 @@
 		"producer:coal-mine-t1": {
 			"assetId": "asset:producer:coal-mine-t1",
 			"code": "coal-mine-t1",
-			"description": "Consumes beer and sausage to mine coal carts from a nearby coal deposit.",
+			"description": "Consumes bread and water to mine coal carts from a nearby coal deposit.",
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
 			"producerId": "producer:coal-mine-t1",
@@ -1493,7 +1481,7 @@
 		"producer:gold-mine-t1": {
 			"assetId": "asset:producer:gold-mine-t1",
 			"code": "gold-mine-t1",
-			"description": "Consumes beer and extra sausage to mine gold ore carts from a nearby gold deposit.",
+			"description": "Consumes bread and wine to mine gold ore carts from a nearby gold deposit.",
 			"maxStackSize": 1,
 			"name": "Gold Mine I",
 			"producerId": "producer:gold-mine-t1",
@@ -1527,7 +1515,7 @@
 		"producer:iron-mine-t1": {
 			"assetId": "asset:producer:iron-mine-t1",
 			"code": "iron-mine-t1",
-			"description": "Consumes beer and sausage to mine iron ore carts from a nearby iron deposit.",
+			"description": "Consumes sausage and beer to mine iron ore carts from a nearby iron deposit.",
 			"maxStackSize": 1,
 			"name": "Iron Mine I",
 			"producerId": "producer:iron-mine-t1",
@@ -1639,7 +1627,7 @@
 		"producer:smelter-t1": {
 			"assetId": "asset:producer:smelter-t1",
 			"code": "smelter-t1",
-			"description": "Consumes ore, coal, beer, and sausage to produce metal ingots and pollution.",
+			"description": "Consumes ore, coal fuel, and water to produce metal ingots and pollution.",
 			"maxStackSize": 1,
 			"name": "Smelter I",
 			"producerId": "producer:smelter-t1",
@@ -2207,7 +2195,7 @@
 		},
 		"product:coal-mine-t1:coal": {
 			"durationMs": 8000,
-			"inputRefId": "input:coal-mine-t1:beer-sausage",
+			"inputRefId": "input:coal-mine-t1:bread-water",
 			"name": "Coal Cart",
 			"outputTableId": "loot:coal-mine-t1:coal",
 			"placement": "board_then_inventory",
@@ -2223,7 +2211,7 @@
 		},
 		"product:gold-mine-t1:gold-ore": {
 			"durationMs": 9000,
-			"inputRefId": "input:gold-mine-t1:beer-sausage",
+			"inputRefId": "input:gold-mine-t1:bread-wine",
 			"name": "Gold Ore Cart",
 			"outputTableId": "loot:gold-mine-t1:gold-ore",
 			"placement": "board_then_inventory",
@@ -2239,7 +2227,7 @@
 		},
 		"product:iron-mine-t1:iron-ore": {
 			"durationMs": 8000,
-			"inputRefId": "input:iron-mine-t1:beer-sausage",
+			"inputRefId": "input:iron-mine-t1:sausage-beer",
 			"name": "Iron Ore Cart",
 			"outputTableId": "loot:iron-mine-t1:iron-ore",
 			"placement": "board_then_inventory",
@@ -2299,7 +2287,7 @@
 		},
 		"product:smelter-t1:gold-ingot": {
 			"durationMs": 10000,
-			"inputRefId": "input:smelter-t1:gold-ingot",
+			"inputRefId": "input:smelter-t1:gold-ore-coal-water",
 			"name": "Gold Ingot",
 			"outputTableId": "loot:smelter-t1:gold-ingot",
 			"placement": "board_then_inventory",
@@ -2307,7 +2295,7 @@
 		},
 		"product:smelter-t1:iron-ingot": {
 			"durationMs": 10000,
-			"inputRefId": "input:smelter-t1:iron-ingot",
+			"inputRefId": "input:smelter-t1:iron-ore-coal-water",
 			"name": "Iron Ingot",
 			"outputTableId": "loot:smelter-t1:iron-ingot",
 			"placement": "board_then_inventory",

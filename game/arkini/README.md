@@ -274,23 +274,23 @@ Mining producers consume tavern/food outputs, require nearby deposits just like 
 ```txt
 producer:coal-mine-t1
   requires nearby Coal Deposit
-  2 Beer + 1 Sausage -> Coal Cart
+  Bread + Water -> Coal Cart
 
 producer:iron-mine-t1
   requires nearby Iron Deposit
-  2 Beer + 1 Sausage -> Iron Ore Cart
+  Sausage + Beer -> Iron Ore Cart
 
 producer:gold-mine-t1
   requires nearby Gold Deposit
-  2 Beer + 2 Sausage -> Gold Ore Cart
+  Bread + Wine Glass -> Gold Ore Cart
 ```
 
-The smelter consumes ore, coal fuel, beer, and sausage for every ingot:
+The smelter consumes ore, coal fuel, and water for every ingot. Worker provisions stay in the mines; the furnace gets actual fuel and cooling because apparently metallurgy is not catering.
 
 ```txt
 producer:smelter-t1
-  Iron Ore Cart + Coal Cart + 2 Beer + 2 Sausage -> Iron Ingot + Pollution
-  Gold Ore Cart + Coal Cart + 2 Beer + 2 Sausage -> Gold Ingot + Pollution
+  Iron Ore Cart + Coal Cart + Water -> Iron Ingot + Pollution
+  Gold Ore Cart + 2 Coal Cart + Water -> Gold Ingot + Pollution
 ```
 
 The purifier is a delayed sink for board-only pollution. It intentionally has no output table; the product consumes pollution and finishes without spawning anything. It has a single-cleanup line plus a bulk quality-of-life line:

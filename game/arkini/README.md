@@ -179,3 +179,7 @@ loot:tavern-t1:beer
 ```
 
 Tavern output note: one `item:beer-barrel` produces four `item:beer` outputs. This keeps the tavern as a serving splitter instead of another generic one-in-one-out box, because apparently even JSON deserves a social life.
+
+### Brewery reverse barrel line
+
+The brewery has a secondary reverse product line: `4× Beer -> 1× Beer Barrel`. The water-to-barrel line remains first/default, so normal click activation keeps prioritizing fresh barrel production.

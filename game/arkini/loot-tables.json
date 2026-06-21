@@ -89,6 +89,16 @@
 					"quantity": 4
 				}
 			]
+		},
+		"loot:brewery-t1:beer-barrel-from-beer": {
+			"name": "Brewery beer barrels from beers",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				}
+			]
 		}
 	}
 }

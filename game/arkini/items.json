@@ -1,3 +1,150 @@
 {
-	"items": {}
+	"items": {
+		"item:tree": {
+			"assetId": "asset:item-tree",
+			"code": "tree",
+			"name": "Tree",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable wood source used by nearby lumberjacks.",
+			"label": "🌳",
+			"tags": [
+				"source",
+				"wood"
+			],
+			"sort": 10
+		},
+		"item:rock": {
+			"assetId": "asset:item-rock",
+			"code": "rock",
+			"name": "Rock",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable stone source used by nearby quarries.",
+			"label": "🪨",
+			"tags": [
+				"source",
+				"stone"
+			],
+			"sort": 20
+		},
+		"item:log": {
+			"assetId": "asset:item-log",
+			"code": "log",
+			"name": "Log",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Basic wood material produced by lumberjacks.",
+			"tags": [
+				"material",
+				"wood"
+			],
+			"sort": 100
+		},
+		"item:plank": {
+			"assetId": "asset:item-plank",
+			"code": "plank",
+			"name": "Plank",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Processed wood material produced by sawmills.",
+			"tags": [
+				"material",
+				"wood"
+			],
+			"sort": 110
+		},
+		"item:stone": {
+			"assetId": "asset:item-stone",
+			"code": "stone",
+			"name": "Stone",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Basic stone material produced by quarries.",
+			"tags": [
+				"material",
+				"stone"
+			],
+			"sort": 200
+		},
+		"item:stone-block": {
+			"assetId": "asset:item-stone-block",
+			"code": "stone-block",
+			"name": "Stone Block",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Processed stone material produced by stonemasons.",
+			"tags": [
+				"material",
+				"stone"
+			],
+			"sort": 210
+		},
+		"producer:lumberjack-t1": {
+			"assetId": "asset:producer-lumberjack-t1",
+			"code": "lumberjack-t1",
+			"name": "Lumberjack I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Produces logs when placed near a tree.",
+			"tags": [
+				"producer",
+				"wood"
+			],
+			"sort": 300,
+			"producerId": "producer:lumberjack-t1"
+		},
+		"producer:sawmill-t1": {
+			"assetId": "asset:producer-sawmill-t1",
+			"code": "sawmill-t1",
+			"name": "Sawmill I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Turns logs into planks when placed near a lumberjack.",
+			"tags": [
+				"producer",
+				"wood"
+			],
+			"sort": 310,
+			"producerId": "producer:sawmill-t1"
+		},
+		"producer:quarry-t1": {
+			"assetId": "asset:producer-quarry-t1",
+			"code": "quarry-t1",
+			"name": "Quarry I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Produces stone when placed near a rock.",
+			"tags": [
+				"producer",
+				"stone"
+			],
+			"sort": 400,
+			"producerId": "producer:quarry-t1"
+		},
+		"producer:stonemason-t1": {
+			"assetId": "asset:producer-stonemason-t1",
+			"code": "stonemason-t1",
+			"name": "Stonemason I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Turns stone into stone blocks when placed near a quarry.",
+			"tags": [
+				"producer",
+				"stone"
+			],
+			"sort": 410,
+			"producerId": "producer:stonemason-t1"
+		}
+	}
 }

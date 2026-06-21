@@ -213,6 +213,13 @@
 			"resourceId": "item-quarry",
 			"sort": 140
 		},
+		"asset:item-rock": {
+			"kind": "item",
+			"label": "Rock",
+			"render": "plain",
+			"resourceId": "item-stone",
+			"sort": 79
+		},
 		"asset:item-sapling": {
 			"kind": "item",
 			"label": "Sapling",
@@ -289,6 +296,34 @@
 			"render": "plain",
 			"resourceId": "item-wood-bundle",
 			"sort": 64
+		},
+		"asset:producer-lumberjack-t1": {
+			"kind": "item",
+			"label": "Lumberjack I",
+			"render": "plain",
+			"resourceId": "item-lumber-camp",
+			"sort": 130
+		},
+		"asset:producer-quarry-t1": {
+			"kind": "item",
+			"label": "Quarry I",
+			"render": "plain",
+			"resourceId": "item-quarry",
+			"sort": 140
+		},
+		"asset:producer-sawmill-t1": {
+			"kind": "item",
+			"label": "Sawmill I",
+			"render": "plain",
+			"resourceId": "item-lumber-camp",
+			"sort": 131
+		},
+		"asset:producer-stonemason-t1": {
+			"kind": "item",
+			"label": "Stonemason I",
+			"render": "plain",
+			"resourceId": "item-quarry",
+			"sort": 141
 		}
 	}
 }

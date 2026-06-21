@@ -26,9 +26,22 @@ Everything is movable and storable by default unless a concrete mechanic says ot
 - Source items like `tree` and `rock` are normal movable/storable items, not permanent terrain.
 - Board-only restrictions are reserved for explicit danger/blocker mechanics, such as future fire, fog, enemies, or other hazards.
 
-### First production pairs
+### Current compatibility note
 
-The first package pass should focus on two simple logical production pairs.
+The current config schema still stores every placeable board tile in the `items` table. Producer tiles therefore appear in `items.json` with `producer:*` IDs and a matching `producerId` field.
+
+This is intentional for this package pass:
+
+- do not create `item:lumberjack-t1` / `item:sawmill-t1` style producer aliases
+- keep the real producer identity as `producer:<name>-t<tier>`
+- treat the `items.json` entry as the current placeable tile shell required by the config contract
+- do not change runtime/schema just to clean this up during gameplay data authoring
+
+Yes, it is slightly weird. It is also contained, explicit, and better than quietly teaching the content layer that every building is secretly a log with ambitions.
+
+### Implemented first wave
+
+The package currently contains two simple logical production pairs.
 
 Wood pair:
 
@@ -67,3 +80,18 @@ loot:stonemason-t1:stone-block
 ### Initial balance placeholder
 
 Use `5000` ms for all first-pass production durations. Timing balance is not the point of this phase; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
+
+Current processor input buffers use capacity `4`:
+
+- `input:sawmill-t1:log`
+- `input:stonemason-t1:stone`
+
+### Placeholder assets
+
+Some definitions reuse existing PNG resources until bespoke production art exists.
+
+- `asset:item-rock` uses the existing `item-stone` resource.
+- `asset:producer-lumberjack-t1` uses the existing `item-lumber-camp` resource.
+- `asset:producer-sawmill-t1` uses the existing `item-lumber-camp` resource.
+- `asset:producer-quarry-t1` uses the existing `item-quarry` resource.
+- `asset:producer-stonemason-t1` uses the existing `item-quarry` resource.

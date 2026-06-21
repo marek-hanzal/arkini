@@ -1,3 +1,34 @@
 {
-	"products": {}
+	"products": {
+		"product:lumberjack-t1:log": {
+			"name": "Log",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:lumberjack-t1:log"
+		},
+		"product:sawmill-t1:plank": {
+			"name": "Plank",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:sawmill-t1:log",
+			"requirementIds": [],
+			"outputTableId": "loot:sawmill-t1:plank"
+		},
+		"product:quarry-t1:stone": {
+			"name": "Stone",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:quarry-t1:stone"
+		},
+		"product:stonemason-t1:stone-block": {
+			"name": "Stone Block",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:stonemason-t1:stone",
+			"requirementIds": [],
+			"outputTableId": "loot:stonemason-t1:stone-block"
+		}
+	}
 }

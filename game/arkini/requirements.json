@@ -1,3 +1,36 @@
 {
-	"requirements": {}
+	"requirements": {
+		"proximity:lumberjack-t1:tree": {
+			"type": "proximity",
+			"itemIds": [
+				"item:tree"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		},
+		"proximity:sawmill-t1:lumberjack-t1": {
+			"type": "proximity",
+			"itemIds": [
+				"producer:lumberjack-t1"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		},
+		"proximity:quarry-t1:rock": {
+			"type": "proximity",
+			"itemIds": [
+				"item:rock"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		},
+		"proximity:stonemason-t1:quarry-t1": {
+			"type": "proximity",
+			"itemIds": [
+				"producer:quarry-t1"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		}
+	}
 }

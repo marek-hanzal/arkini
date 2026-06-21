@@ -41,7 +41,7 @@ Yes, it is slightly weird. It is also contained, explicit, and better than quiet
 
 ### Implemented first wave
 
-The package currently contains wood, stone, food, brewing, and wine production lines.
+The package currently contains wood, stone, food, brewing, wine, heavy industry, cleanup, and basic coin economy production lines.
 
 Wood pair:
 
@@ -308,4 +308,17 @@ Heavy industry asset IDs:
 - `asset:item:iron-ingot` -> `game/arkini/assets/item-iron-ingot.png`
 - `asset:item:gold-ingot` -> `game/arkini/assets/item-gold-ingot.png`
 - `asset:item:pollution` -> `game/arkini/assets/item-pollution.png`
+- `asset:producer:goldsmith-t1` -> `game/arkini/assets/producer-goldsmith-t1.png`
+- `asset:item:coin` -> `game/arkini/assets/item-coin.png`
+
+### Coin economy gameplay
+
+The goldsmith turns late food/wine comfort plus coal fuel into raw currency. It is authored as a simple producer, not a merge chain, because apparently even medieval capitalism needs a tiny furnace and a snack break.
+
+```txt
+producer:goldsmith-t1
+  Wine Glass + Bread + Coal Cart -> 4 Coin
+```
+
+This currently introduces `item:coin` as the first playable currency item. Higher coin merge tiers already have asset slots prepared, but this pass intentionally wires only the basic coin output.
 

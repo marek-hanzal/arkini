@@ -164,6 +164,14 @@
 				"product:purifier-t1:pollution-bulk"
 			],
 			"requirementIds": []
+		},
+		"producer:goldsmith-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:goldsmith-t1:coins"
+			],
+			"requirementIds": []
 		}
 	}
 }

@@ -458,6 +458,13 @@
 			"resourceId": "producer-gold-mine-t1",
 			"sort": 217
 		},
+		"asset:producer:goldsmith-t1": {
+			"kind": "item",
+			"label": "Goldsmith I",
+			"render": "plain",
+			"resourceId": "producer-goldsmith-t1",
+			"sort": 225
+		},
 		"asset:producer:iron-mine-t1": {
 			"kind": "item",
 			"label": "Iron Mine I",
@@ -663,6 +670,29 @@
 				}
 			],
 			"name": "Gold mine beer and sausage input"
+		},
+		"input:goldsmith-t1:wine-bread-coal": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				}
+			],
+			"name": "Goldsmith wine, bread, and coal input"
 		},
 		"input:iron-mine-t1:beer-sausage": {
 			"inputs": [
@@ -941,6 +971,20 @@
 				"industry",
 				"fuel",
 				"coal"
+			],
+			"tier": 0
+		},
+		"item:coin": {
+			"assetId": "asset:item:coin",
+			"code": "coin",
+			"description": "A basic currency output minted by goldsmiths.",
+			"maxStackSize": 100,
+			"name": "Coin",
+			"sort": 1250,
+			"storage": "both",
+			"tags": [
+				"currency",
+				"coin"
 			],
 			"tier": 0
 		},
@@ -1388,6 +1432,23 @@
 			],
 			"tier": 1
 		},
+		"producer:goldsmith-t1": {
+			"assetId": "asset:producer:goldsmith-t1",
+			"code": "goldsmith-t1",
+			"description": "Consumes wine, bread, and coal to mint coins.",
+			"maxStackSize": 1,
+			"name": "Goldsmith I",
+			"producerId": "producer:goldsmith-t1",
+			"sort": 1260,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"economy",
+				"goldsmith",
+				"coin"
+			],
+			"tier": 1
+		},
 		"producer:iron-mine-t1": {
 			"assetId": "asset:producer:iron-mine-t1",
 			"code": "iron-mine-t1",
@@ -1668,6 +1729,16 @@
 				}
 			]
 		},
+		"loot:goldsmith-t1:coins": {
+			"name": "Goldsmith coins",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:iron-mine-t1:iron-ore": {
 			"name": "Iron mine iron ore carts",
 			"output": [
@@ -1892,6 +1963,14 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:goldsmith-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:goldsmith-t1:coins"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:iron-mine-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -2066,6 +2145,14 @@
 			"inputRefId": "input:gold-mine-t1:beer-sausage",
 			"name": "Gold Ore Cart",
 			"outputTableId": "loot:gold-mine-t1:gold-ore",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:goldsmith-t1:coins": {
+			"durationMs": 12000,
+			"inputRefId": "input:goldsmith-t1:wine-bread-coal",
+			"name": "Coins",
+			"outputTableId": "loot:goldsmith-t1:coins",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

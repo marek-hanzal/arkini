@@ -194,6 +194,14 @@
 			"placement": "board_then_inventory",
 			"inputRefId": "input:purifier-t1:pollution-bulk",
 			"requirementIds": []
+		},
+		"product:goldsmith-t1:coins": {
+			"name": "Coins",
+			"durationMs": 12000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:goldsmith-t1:wine-bread-coal",
+			"requirementIds": [],
+			"outputTableId": "loot:goldsmith-t1:coins"
 		}
 	}
 }

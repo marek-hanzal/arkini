@@ -72,6 +72,8 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	const handoff = useTileEngineHandoff();
 	const rowCount = Math.max(1, indexes.rowCount);
 
+	const isOverlayLayer = layerRole === "overlay";
+
 	return (
 		<div
 			ref={setRootNode}
@@ -82,7 +84,11 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-container={container}
 			data-ak-tile-engine-disabled={disabled ? "true" : undefined}
 			className={cn(
-				"ak-tile-engine relative min-w-0 shrink-0 overflow-visible p-1",
+				"relative min-w-0 shrink-0 overflow-visible p-1 [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] isolate",
+				isOverlayLayer ? "[touch-action:pan-y]" : "touch-none",
+				container === "responsive"
+					? "w-[min(100cqw,calc((100cqh-0.5rem)*var(--ak-tile-engine-ratio)+0.5rem))]"
+					: "w-full",
 				disabled && "pointer-events-none",
 			)}
 			style={
@@ -94,9 +100,14 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 		>
 			<div
 				data-ui="tile engine grid"
-				className={cn("ak-tile-engine-grid relative w-full overflow-visible", className)}
+				className={cn(
+					"relative w-full overflow-visible aspect-[var(--ak-tile-engine-aspect)]",
+					isOverlayLayer ? "[touch-action:pan-y]" : "touch-none",
+					className,
+				)}
 			>
 				<TileEngineSlots
+					layerRole={layerRole}
 					columns={columns}
 					rowCount={rowCount}
 					gapPx={gapPx}
@@ -112,6 +123,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 				/>
 
 				<TileEngineActors
+					layerRole={layerRole}
 					tiles={tiles}
 					slotIndexById={indexes.slotIndexById}
 					columns={columns}

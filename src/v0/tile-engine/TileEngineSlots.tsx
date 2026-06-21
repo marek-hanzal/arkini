@@ -1,10 +1,12 @@
 import { memo, type ReactNode, type RefObject } from "react";
+import { cn } from "~/v0/ui/cn";
 import { TileEngineSlot } from "~/v0/tile-engine/TileEngineSlot";
 import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
 export namespace TileEngineSlots {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrop = unknown> {
+		layerRole: TileEngine.LayerRole;
 		columns: number;
 		rowCount: number;
 		gapPx: number;
@@ -21,6 +23,7 @@ export namespace TileEngineSlots {
 }
 
 const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
+	layerRole,
 	columns,
 	rowCount,
 	gapPx,
@@ -36,8 +39,12 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 }: TileEngineSlots.Props<TTile, TSlot, TDrop>) => (
 	<div
 		data-ak-tile-engine-slots=""
-		className="ak-tile-engine-slots grid h-full w-full"
+		className={cn(
+			"grid h-full w-full",
+			layerRole === "overlay" ? "[touch-action:pan-y]" : "touch-none",
+		)}
 		style={{
+			zIndex: "var(--ak-layer-base-surface)",
 			gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
 			gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`,
 			gap: gapPx,
@@ -53,6 +60,7 @@ const TileEngineSlotsComponent = <TTile, TSlot, TDrop>({
 			return (
 				<TileEngineSlot
 					key={slot.id}
+					layerRole={layerRole}
 					slot={slot}
 					index={index}
 					targetTile={tileBySlotId.get(slot.id)}

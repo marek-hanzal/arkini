@@ -8,6 +8,7 @@ import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
 export namespace TileEngineActors {
 	export interface Props<TTile = unknown, TSlot = unknown, TDrag = unknown, TDrop = unknown> {
+		layerRole: TileEngine.LayerRole;
 		tiles: readonly TileEngine.Tile<TTile>[];
 		slotIndexById: ReadonlyMap<string, number>;
 		columns: number;
@@ -30,6 +31,7 @@ export namespace TileEngineActors {
 }
 
 const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
+	layerRole,
 	tiles,
 	slotIndexById,
 	columns,
@@ -50,10 +52,13 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	renderTile,
 }: TileEngineActors.Props<TTile, TSlot, TDrag, TDrop>) => (
 	<div
-		className={cn(
-			"ak-tile-engine-actors pointer-events-none absolute inset-0",
-			actorLayerClassName,
-		)}
+		className={cn("pointer-events-none absolute inset-0", actorLayerClassName)}
+		style={{
+			zIndex:
+				layerRole === "overlay"
+					? "var(--ak-layer-overlay-tile)"
+					: "var(--ak-layer-base-tile)",
+		}}
 	>
 		{tiles.map((tile) => {
 			const index = slotIndexById.get(tile.slotId);
@@ -66,6 +71,7 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 			return (
 				<TileEngineActor
 					key={tile.id}
+					layerRole={layerRole}
 					tile={tile}
 					enter={motion?.enter}
 					exit={motion?.exit}

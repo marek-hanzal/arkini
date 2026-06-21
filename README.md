@@ -21,7 +21,6 @@ Item definitions drive behavior. An item may define:
 
 - normal merge rules, for example `seed + seed -> sprout`
 - mixed/secret merge rules, for example `twig + water -> sprout`
-- non-consuming source merge rules, used when a known building imprints a blank blueprint without deleting the original
 - click producers with batch output: guaranteed drops, chance drops, and weighted rolls
 - optional producer input inventories; producers can require stored consumables before they work
 - finite crates that exhaust all charges through their single-tap stash action
@@ -64,7 +63,7 @@ Rules for this layer:
 
 ## Gameplay model
 
-The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint scraps are generic now: scraps merge into fragments, fragments into drafts, drafts into a blank blueprint. A known building can then be dragged onto that blank blueprint to create a specific build blueprint without consuming the original building. Finished specific blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
+The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint imprinting is gone: build blueprints are concrete target-specific items acquired directly through gameplay. Finished specific blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
 
 - Board size comes from `GameConfig.game.board`, currently 7×9.
 - Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.

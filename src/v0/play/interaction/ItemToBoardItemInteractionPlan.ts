@@ -8,7 +8,6 @@ export type ItemToBoardItemInteractionPlan =
 			type: "swap";
 	  }
 	| {
-			directed: boolean;
 			resultItemId?: string;
 			type: "merge";
 	  }

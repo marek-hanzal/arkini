@@ -18,25 +18,10 @@ describe("readRuntimeItemCatalogViewFromGameConfig", () => {
 			secret: true,
 			targetItemId: "item:twig",
 		});
-	});
-
-	it("keeps directed imprint relations one-way", () => {
-		const catalog = readRuntimeItemCatalogViewFromGameConfig(config);
-
-		expect(catalog["item:lumber-camp-1"]?.mergeResults).toContainEqual({
-			resultItemId: "item:blueprint-lumber-camp",
+		expect(catalog["item:twig"]?.usedInMerges).toContainEqual({
+			resultItemId: "item:sprout",
 			secret: true,
-			withItemId: "item:blueprint",
-		});
-		expect(catalog["item:lumber-camp-1"]?.usedInMerges ?? []).not.toContainEqual({
-			resultItemId: "item:blueprint-lumber-camp",
-			secret: true,
-			targetItemId: "item:blueprint",
-		});
-		expect(catalog["item:blueprint"]?.usedInMerges).toContainEqual({
-			resultItemId: "item:blueprint-lumber-camp",
-			secret: true,
-			targetItemId: "item:lumber-camp-1",
+			targetItemId: "item:water",
 		});
 	});
 });

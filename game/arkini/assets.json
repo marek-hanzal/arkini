@@ -548,6 +548,13 @@
 			"render": "plain",
 			"resourceId": "item-pollution",
 			"sort": 224
+		},
+		"asset:producer:goldsmith-t1": {
+			"kind": "item",
+			"label": "Goldsmith I",
+			"render": "plain",
+			"resourceId": "producer-goldsmith-t1",
+			"sort": 225
 		}
 	}
 }

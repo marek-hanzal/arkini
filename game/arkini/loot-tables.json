@@ -244,6 +244,16 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:goldsmith-t1:coins": {
+			"name": "Goldsmith coins",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			]
 		}
 	}
 }

@@ -710,6 +710,37 @@
 			],
 			"sort": 1240,
 			"producerId": "producer:purifier-t1"
+		},
+		"item:coin": {
+			"assetId": "asset:item:coin",
+			"code": "coin",
+			"name": "Coin",
+			"tier": 0,
+			"maxStackSize": 100,
+			"storage": "both",
+			"description": "A basic currency output minted by goldsmiths.",
+			"tags": [
+				"currency",
+				"coin"
+			],
+			"sort": 1250
+		},
+		"producer:goldsmith-t1": {
+			"assetId": "asset:producer:goldsmith-t1",
+			"code": "goldsmith-t1",
+			"name": "Goldsmith I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes wine, bread, and coal to mint coins.",
+			"tags": [
+				"producer",
+				"economy",
+				"goldsmith",
+				"coin"
+			],
+			"sort": 1260,
+			"producerId": "producer:goldsmith-t1"
 		}
 	}
 }

@@ -1,5 +1,6 @@
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
@@ -25,30 +26,73 @@ const readSelectedProductLine = ({
 	return productLines.find((line) => line.isDefault) ?? productLines[0];
 };
 
-const lineNeedsResourceHint = (line: ProducerProductLineView) =>
-	line.enabled &&
-	!line.queueFull &&
-	((!line.inputsReady && !line.inputsAvailable) || !line.requirementsReady);
+const readBoardItemQuantity = ({
+	board,
+	itemId,
+	producerItemId,
+}: {
+	board: BoardView;
+	itemId: string;
+	producerItemId: string;
+}) =>
+	board.items.filter(
+		(boardItem) => boardItem.id !== producerItemId && boardItem.itemId === itemId,
+	).length;
 
-const addRequirementItemIds = ({
+const addUnsatisfiedRequirementItemIds = ({
 	itemIds,
 	line,
 }: {
 	itemIds: Set<string>;
 	line: ProducerProductLineView;
 }) => {
-	for (const requirement of line.requirements ?? []) {
+	if (!line.requirements) {
+		for (const itemId of line.missingRequirementItemIds) itemIds.add(itemId);
+		return;
+	}
+
+	for (const requirement of line.requirements) {
 		if (requirement.type === "stored") continue;
 
 		if (requirement.type === "proximity") {
+			if (requirement.satisfied) continue;
 			for (const itemId of requirement.itemIds) itemIds.add(itemId);
 			continue;
 		}
 
+		if (requirement.stored >= requirement.quantity) continue;
 		itemIds.add(requirement.itemId);
 	}
+};
 
-	for (const itemId of line.requirementItemIds) itemIds.add(itemId);
+const readRequirementSatisfied = (requirement: ActivationRequirementView) => {
+	if (requirement.type === "proximity") return requirement.satisfied;
+
+	return requirement.stored >= requirement.quantity;
+};
+
+const readInputItemIdsMissingOnBoard = ({
+	board,
+	line,
+	producerItemId,
+}: {
+	board: BoardView;
+	line: ProducerProductLineView;
+	producerItemId: string;
+}) => {
+	const itemIds = new Set<string>();
+	for (const input of line.inputs) {
+		const boardQuantity = readBoardItemQuantity({
+			board,
+			itemId: input.itemId,
+			producerItemId,
+		});
+		if (input.stored + boardQuantity >= input.quantity) continue;
+
+		itemIds.add(input.itemId);
+	}
+
+	return itemIds;
 };
 
 const addLootOutputItemIds = ({
@@ -99,6 +143,14 @@ const readProducedItemIds = ({
 	return itemIds;
 };
 
+const lineHasUnsatisfiedRequirement = (line: ProducerProductLineView) => {
+	if (line.requirements) {
+		return line.requirements.some((requirement) => !readRequirementSatisfied(requirement));
+	}
+
+	return line.missingRequirementItemIds.length > 0 || !line.requirementsReady;
+};
+
 export const readProducerMissingResourceHintTileIds = ({
 	board,
 	config,
@@ -109,15 +161,22 @@ export const readProducerMissingResourceHintTileIds = ({
 		producerItem,
 		productId,
 	});
-	if (!line || !lineNeedsResourceHint(line)) return [];
+	if (!line || !line.enabled || line.queueFull) return [];
 
 	const requirementItemIds = new Set<string>();
-	addRequirementItemIds({
+	addUnsatisfiedRequirementItemIds({
 		itemIds: requirementItemIds,
 		line,
 	});
 
-	const inputItemIds = new Set(line.inputItemIds);
+	const inputItemIds = readInputItemIdsMissingOnBoard({
+		board,
+		line,
+		producerItemId: producerItem.id,
+	});
+	if (requirementItemIds.size === 0 && inputItemIds.size === 0) return [];
+	if (!lineHasUnsatisfiedRequirement(line) && inputItemIds.size === 0) return [];
+
 	const tileIds: string[] = [];
 	for (const boardItem of board.items) {
 		if (requirementItemIds.has(boardItem.itemId)) {

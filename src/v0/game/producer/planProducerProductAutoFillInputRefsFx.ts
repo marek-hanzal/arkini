@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
-import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
@@ -73,15 +72,6 @@ export const planProducerProductAutoFillInputRefsFx = Effect.fn(
 				slotIndex,
 			});
 			missingQuantity -= quantity;
-		}
-
-		if (missingQuantity > 0) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected(
-					"input_mismatch",
-					`Product input "${input.itemId}" cannot be auto-filled. Missing ${missingQuantity}/${input.quantity}.`,
-				),
-			);
 		}
 	}
 

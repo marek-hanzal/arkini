@@ -7,6 +7,8 @@ import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProduce
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
+import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
+import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -20,6 +22,25 @@ export namespace startProducerProductFx {
 		nowMs: number;
 	}
 }
+
+const readProducerStoredInputsReadyFx = Effect.fn("readProducerStoredInputsReadyFx")(function* ({
+	inputs,
+	save,
+	producerItemInstanceId,
+	productId,
+}: {
+	inputs: readonly GameActivationInput[];
+	save: GameSave;
+	producerItemInstanceId: string;
+	productId: string;
+}) {
+	const storedInputs = yield* readProducerProductStoredInputQuantitiesFx({
+		producerItemInstanceId,
+		productId,
+		save,
+	});
+	return inputs.every((input) => (storedInputs.get(input.itemId) ?? 0) >= input.quantity);
+});
 
 export const startProducerProductFx = Effect.fn("startProducerProductFx")(function* ({
 	config,
@@ -56,6 +77,22 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			producerItemInstanceId: action.producerItemInstanceId,
 			productId: checked.productId,
 		});
+		const inputsReady = yield* readProducerStoredInputsReadyFx({
+			inputs: checked.productInputs,
+			producerItemInstanceId: action.producerItemInstanceId,
+			productId: checked.productId,
+			save: nextSave,
+		});
+		if (!inputsReady) {
+			if (consumed.events.length > 0) nextSave.updatedAtMs = nowMs;
+			return {
+				events: consumed.events,
+				nextWakeAtMs: yield* readNextWakeAtMsFx({
+					save: nextSave,
+				}),
+				save: nextSave,
+			} satisfies GameEngineResult;
+		}
 		yield* consumeProducerStoredInputsFx({
 			inputs: checked.productInputs,
 			nextSave,

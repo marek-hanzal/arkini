@@ -83,7 +83,7 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
-	it("returns rejected readiness for a missing producer input", () => {
+	it("returns ready for a producer product action that can partially auto-fill later", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -101,10 +101,8 @@ describe("readActionReadinessFx", () => {
 			save,
 		});
 
-		expect(readiness).toMatchObject({
-			errorTag: "GameActionRejected",
-			reason: "input_mismatch",
-			type: "rejected",
+		expect(readiness).toEqual({
+			type: "ready",
 		});
 	});
 

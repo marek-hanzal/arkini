@@ -50,6 +50,21 @@
 				"itemId": "producer:pig-farm-t1",
 				"x": 5,
 				"y": 3
+			},
+			{
+				"itemId": "item:hop-field",
+				"x": 0,
+				"y": 7
+			},
+			{
+				"itemId": "producer:brewery-t1",
+				"x": 1,
+				"y": 7
+			},
+			{
+				"itemId": "producer:tavern-t1",
+				"x": 3,
+				"y": 7
 			}
 		],
 		"inventory": []

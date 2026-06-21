@@ -148,9 +148,9 @@ The first food production line is wired into gameplay and uses these prepared as
 - `asset:producer:well-t1` -> `game/arkini/assets/producer-well-t1.png`
 - `asset:item:water` -> `game/arkini/assets/item-water.png`
 
-### Staged next-wave brewing assets
+### Brewing production assets
 
-The brewing / tavern production wave now has prepared art assets, but it is not wired into the gameplay JSON yet.
+The brewing / tavern production wave is wired into gameplay JSON.
 
 Prepared asset IDs:
 
@@ -160,3 +160,22 @@ Prepared asset IDs:
 - `asset:producer:tavern-t1` -> `game/arkini/assets/producer-tavern-t1.png`
 
 Existing beer output art already exists as `asset:item:beer`.
+
+Brewing pair:
+
+```txt
+item:hop-field
+item:beer-barrel
+item:beer
+producer:brewery-t1
+producer:tavern-t1
+proximity:brewery-t1:hop-field
+product:brewery-t1:beer-barrel
+product:tavern-t1:beer
+input:brewery-t1:water
+input:tavern-t1:beer-barrel
+loot:brewery-t1:beer-barrel
+loot:tavern-t1:beer
+```
+
+Tavern output note: one `item:beer-barrel` produces four `item:beer` outputs. This keeps the tavern as a serving splitter instead of another generic one-in-one-out box, because apparently even JSON deserves a social life.

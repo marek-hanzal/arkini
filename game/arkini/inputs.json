@@ -49,6 +49,28 @@
 					"consume": true
 				}
 			]
+		},
+		"input:brewery-t1:water": {
+			"name": "Brewery water input",
+			"inputs": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:tavern-t1:beer-barrel": {
+			"name": "Tavern beer barrel input",
+			"inputs": [
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
 		}
 	}
 }

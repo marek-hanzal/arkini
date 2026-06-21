@@ -251,6 +251,83 @@
 			],
 			"sort": 620,
 			"producerId": "producer:pig-farm-t1"
+		},
+		"item:hop-field": {
+			"assetId": "asset:item:hop-field",
+			"code": "hop-field",
+			"name": "Hop Field",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable hop source used by nearby breweries.",
+			"tags": [
+				"source",
+				"food",
+				"beer",
+				"hops"
+			],
+			"sort": 700
+		},
+		"item:beer-barrel": {
+			"assetId": "asset:item:beer-barrel",
+			"code": "beer-barrel",
+			"name": "Beer Barrel",
+			"tier": 0,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A barrel of beer produced by breweries and served by taverns.",
+			"tags": [
+				"material",
+				"food",
+				"beer"
+			],
+			"sort": 710
+		},
+		"item:beer": {
+			"assetId": "asset:item:beer",
+			"code": "beer",
+			"name": "Beer",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "A single mug of beer served by taverns.",
+			"tags": [
+				"food",
+				"beer"
+			],
+			"sort": 720
+		},
+		"producer:brewery-t1": {
+			"assetId": "asset:producer:brewery-t1",
+			"code": "brewery-t1",
+			"name": "Brewery I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Turns water into beer barrels when placed near a hop field.",
+			"tags": [
+				"producer",
+				"food",
+				"beer"
+			],
+			"sort": 800,
+			"producerId": "producer:brewery-t1"
+		},
+		"producer:tavern-t1": {
+			"assetId": "asset:producer:tavern-t1",
+			"code": "tavern-t1",
+			"name": "Tavern I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Serves beer barrels as individual beers.",
+			"tags": [
+				"producer",
+				"food",
+				"beer"
+			],
+			"sort": 810,
+			"producerId": "producer:tavern-t1"
 		}
 	}
 }

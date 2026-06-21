@@ -394,6 +394,41 @@
 			"render": "plain",
 			"resourceId": "producer-tavern-t1",
 			"sort": 209
+		},
+		"asset:item:vineyard": {
+			"kind": "item",
+			"label": "Vineyard",
+			"render": "plain",
+			"resourceId": "item-vineyard",
+			"sort": 210
+		},
+		"asset:item:grapes": {
+			"kind": "item",
+			"label": "Grapes",
+			"render": "plain",
+			"resourceId": "item-grapes",
+			"sort": 211
+		},
+		"asset:producer:winery-t1": {
+			"kind": "item",
+			"label": "Winery I",
+			"render": "plain",
+			"resourceId": "producer-winery-t1",
+			"sort": 212
+		},
+		"asset:item:wine-barrel": {
+			"kind": "item",
+			"label": "Wine Barrel",
+			"render": "plain",
+			"resourceId": "item-wine-barrel",
+			"sort": 213
+		},
+		"asset:item:wine-glass": {
+			"kind": "item",
+			"label": "Wine Glass",
+			"render": "plain",
+			"resourceId": "item-wine-glass",
+			"sort": 214
 		}
 	}
 }

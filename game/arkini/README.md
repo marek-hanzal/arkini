@@ -183,3 +183,16 @@ Tavern output note: one `item:beer-barrel` produces four `item:beer` outputs. Th
 ### Brewery reverse barrel line
 
 The brewery has a secondary reverse product line: `4× Beer -> 1× Beer Barrel`. The water-to-barrel line remains first/default, so normal click activation keeps prioritizing fresh barrel production.
+
+### Staged next-wave wine assets
+
+The wine production wave now has prepared art assets, but it is not wired into the gameplay JSON yet.
+
+Prepared asset IDs:
+
+- `asset:item:vineyard` -> `game/arkini/assets/item-vineyard.png`
+- `asset:item:grapes` -> `game/arkini/assets/item-grapes.png`
+- `asset:producer:winery-t1` -> `game/arkini/assets/producer-winery-t1.png`
+- `asset:item:wine-barrel` -> `game/arkini/assets/item-wine-barrel.png`
+- `asset:item:wine-glass` -> `game/arkini/assets/item-wine-glass.png`
+

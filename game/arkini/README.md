@@ -163,7 +163,7 @@ The brewing and wine production waves are wired into gameplay JSON. Wine content
 Brewing asset IDs:
 
 - `asset:item:hop-field` -> `game/arkini/assets/item-hop-field.png`
-- `asset:item:hops` -> `game/arkini/assets/item-hop-field.png` (temporary shared resource until dedicated hop cone art exists)
+- `asset:item:hops` -> `game/arkini/assets/item-hops.png`
 - `asset:producer:brewery-t1` -> `game/arkini/assets/producer-brewery-t1.png`
 - `asset:item:beer-barrel` -> `game/arkini/assets/item-beer-barrel.png`
 - `asset:producer:tavern-t1` -> `game/arkini/assets/producer-tavern-t1.png`

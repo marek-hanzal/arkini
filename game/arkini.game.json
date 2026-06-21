@@ -196,7 +196,7 @@
 			"kind": "item",
 			"label": "Hops",
 			"render": "plain",
-			"resourceId": "item-hop-field",
+			"resourceId": "item-hops",
 			"sort": 215
 		},
 		"asset:item:leaf": {

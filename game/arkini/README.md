@@ -258,6 +258,9 @@ Prepared item asset IDs:
 - `asset:item:iron-ingot` -> `game/arkini/assets/item-iron-ingot.png`
 - `asset:item:gold-ingot` -> `game/arkini/assets/item-gold-ingot.png`
 - `asset:item:pollution` -> `game/arkini/assets/item-pollution.png`
+- `asset:item:coal-deposit` -> `game/arkini/assets/item-coal-deposit.png`
+- `asset:item:iron-deposit` -> `game/arkini/assets/item-iron-deposit.png`
+- `asset:item:gold-deposit` -> `game/arkini/assets/item-gold-deposit.png`
 - `asset:item:hops` -> `game/arkini/assets/item-hops.png` (refreshed with the improved hop illustration)
 
 ### Heavy industry gameplay
@@ -266,16 +269,19 @@ Heavy industry is authored but not placed onto the starting board. Use cheat inv
 
 `item:sausage` is now produced by the slaughterhouse branch of the food chain instead of being a placeholder. Good, the economy no longer pretends sausages grow in config comments.
 
-Mining producers consume tavern/food outputs and create mine-cart resources:
+Mining producers consume tavern/food outputs, require nearby deposits just like lumberjacks require trees, and create mine-cart resources:
 
 ```txt
 producer:coal-mine-t1
+  requires nearby Coal Deposit
   2 Beer + 1 Sausage -> Coal Cart
 
 producer:iron-mine-t1
+  requires nearby Iron Deposit
   2 Beer + 1 Sausage -> Iron Ore Cart
 
 producer:gold-mine-t1
+  requires nearby Gold Deposit
   2 Beer + 2 Sausage -> Gold Ore Cart
 ```
 
@@ -308,6 +314,9 @@ Heavy industry asset IDs:
 - `asset:item:iron-ingot` -> `game/arkini/assets/item-iron-ingot.png`
 - `asset:item:gold-ingot` -> `game/arkini/assets/item-gold-ingot.png`
 - `asset:item:pollution` -> `game/arkini/assets/item-pollution.png`
+- `asset:item:coal-deposit` -> `game/arkini/assets/item-coal-deposit.png`
+- `asset:item:iron-deposit` -> `game/arkini/assets/item-iron-deposit.png`
+- `asset:item:gold-deposit` -> `game/arkini/assets/item-gold-deposit.png`
 - `asset:producer:goldsmith-t1` -> `game/arkini/assets/producer-goldsmith-t1.png`
 - `asset:item:coin` -> `game/arkini/assets/item-coin.png`
 

@@ -444,6 +444,27 @@
 			"resourceId": "item-vineyard",
 			"sort": 210
 		},
+		"asset:item:coal-deposit": {
+			"kind": "item",
+			"label": "Coal Deposit",
+			"render": "plain",
+			"resourceId": "item-coal-deposit",
+			"sort": 211
+		},
+		"asset:item:iron-deposit": {
+			"kind": "item",
+			"label": "Iron Deposit",
+			"render": "plain",
+			"resourceId": "item-iron-deposit",
+			"sort": 212
+		},
+		"asset:item:gold-deposit": {
+			"kind": "item",
+			"label": "Gold Deposit",
+			"render": "plain",
+			"resourceId": "item-gold-deposit",
+			"sort": 213
+		},
 		"asset:item:grapes": {
 			"kind": "item",
 			"label": "Grapes",

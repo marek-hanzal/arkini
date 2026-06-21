@@ -471,6 +471,54 @@
 			],
 			"sort": 900
 		},
+		"item:coal-deposit": {
+			"assetId": "asset:item:coal-deposit",
+			"code": "coal-deposit",
+			"name": "Coal Deposit",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable coal source used by nearby coal mines.",
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"coal"
+			],
+			"sort": 1150
+		},
+		"item:iron-deposit": {
+			"assetId": "asset:item:iron-deposit",
+			"code": "iron-deposit",
+			"name": "Iron Deposit",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable iron source used by nearby iron mines.",
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"iron"
+			],
+			"sort": 1160
+		},
+		"item:gold-deposit": {
+			"assetId": "asset:item:gold-deposit",
+			"code": "gold-deposit",
+			"name": "Gold Deposit",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable gold source used by nearby gold mines.",
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"gold"
+			],
+			"sort": 1170
+		},
 		"item:grapes": {
 			"assetId": "asset:item:grapes",
 			"code": "grapes",
@@ -634,7 +682,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes beer and sausage to mine coal carts.",
+			"description": "Consumes beer and sausage to mine coal carts from a nearby coal deposit.",
 			"tags": [
 				"producer",
 				"industry",
@@ -651,7 +699,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes beer and sausage to mine iron ore carts.",
+			"description": "Consumes beer and sausage to mine iron ore carts from a nearby iron deposit.",
 			"tags": [
 				"producer",
 				"industry",
@@ -668,7 +716,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes beer and extra sausage to mine gold ore carts.",
+			"description": "Consumes beer and extra sausage to mine gold ore carts from a nearby gold deposit.",
 			"tags": [
 				"producer",
 				"industry",

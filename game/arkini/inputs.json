@@ -297,6 +297,28 @@
 					"consume": true
 				}
 			]
+		},
+		"input:purifier-t1:pollution": {
+			"name": "Purifier pollution input",
+			"inputs": [
+				{
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:purifier-t1:pollution-bulk": {
+			"name": "Purifier bulk pollution input",
+			"inputs": [
+				{
+					"itemId": "item:pollution",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true
+				}
+			]
 		}
 	}
 }

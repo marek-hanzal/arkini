@@ -248,6 +248,7 @@ Prepared producer asset IDs:
 - `asset:producer:gold-mine-t1` -> `game/arkini/assets/producer-gold-mine-t1.png`
 - `asset:producer:iron-mine-t1` -> `game/arkini/assets/producer-iron-mine-t1.png`
 - `asset:producer:smelter-t1` -> `game/arkini/assets/producer-smelter-t1.png`
+- `asset:producer:purifier-t1` -> `game/arkini/assets/producer-purifier-t1.png`
 
 Prepared item asset IDs:
 
@@ -286,12 +287,21 @@ producer:smelter-t1
   Gold Ore Cart + Coal Cart + 2 Beer + 2 Sausage -> Gold Ingot + Pollution
 ```
 
+The purifier is a delayed sink for board-only pollution. It intentionally has no output table; the product consumes pollution and finishes without spawning anything. It has a single-cleanup line plus a bulk quality-of-life line:
+
+```txt
+producer:purifier-t1
+  1 Pollution -> nothing
+  4 Pollution -> nothing
+```
+
 Heavy industry asset IDs:
 
 - `asset:producer:coal-mine-t1` -> `game/arkini/assets/producer-coal-mine-t1.png`
 - `asset:producer:iron-mine-t1` -> `game/arkini/assets/producer-iron-mine-t1.png`
 - `asset:producer:gold-mine-t1` -> `game/arkini/assets/producer-gold-mine-t1.png`
 - `asset:producer:smelter-t1` -> `game/arkini/assets/producer-smelter-t1.png`
+- `asset:producer:purifier-t1` -> `game/arkini/assets/producer-purifier-t1.png`
 - `asset:item:coal` -> `game/arkini/assets/item-coal.png`
 - `asset:item:iron-ore` -> `game/arkini/assets/item-iron-ore.png`
 - `asset:item:gold-ore` -> `game/arkini/assets/item-gold-ore.png`

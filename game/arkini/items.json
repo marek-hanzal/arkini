@@ -693,6 +693,23 @@
 			],
 			"sort": 1230,
 			"producerId": "producer:smelter-t1"
+		},
+		"producer:purifier-t1": {
+			"assetId": "asset:producer:purifier-t1",
+			"code": "purifier-t1",
+			"name": "Purifier I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes board pollution without producing output.",
+			"tags": [
+				"producer",
+				"industry",
+				"purifier",
+				"pollution"
+			],
+			"sort": 1240,
+			"producerId": "producer:purifier-t1"
 		}
 	}
 }

@@ -180,6 +180,20 @@
 			"inputRefId": "input:smelter-t1:gold-ingot",
 			"requirementIds": [],
 			"outputTableId": "loot:smelter-t1:gold-ingot"
+		},
+		"product:purifier-t1:pollution": {
+			"name": "Purify Pollution",
+			"durationMs": 6000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:purifier-t1:pollution",
+			"requirementIds": []
+		},
+		"product:purifier-t1:pollution-bulk": {
+			"name": "Purify Pollution x4",
+			"durationMs": 18000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:purifier-t1:pollution-bulk",
+			"requirementIds": []
 		}
 	}
 }

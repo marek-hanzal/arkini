@@ -479,6 +479,13 @@
 			"resourceId": "producer-pig-farm-t1",
 			"sort": 207
 		},
+		"asset:producer:purifier-t1": {
+			"kind": "item",
+			"label": "Purifier I",
+			"render": "plain",
+			"resourceId": "producer-purifier-t1",
+			"sort": 220
+		},
 		"asset:producer:quarry-t1": {
 			"kind": "item",
 			"label": "Quarry I",
@@ -690,6 +697,28 @@
 				}
 			],
 			"name": "Pig farm grain and water input"
+		},
+		"input:purifier-t1:pollution": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pollution",
+					"quantity": 1
+				}
+			],
+			"name": "Purifier pollution input"
+		},
+		"input:purifier-t1:pollution-bulk": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pollution",
+					"quantity": 4
+				}
+			],
+			"name": "Purifier bulk pollution input"
 		},
 		"input:sawmill-t1:log": {
 			"inputs": [
@@ -1407,6 +1436,23 @@
 			],
 			"tier": 1
 		},
+		"producer:purifier-t1": {
+			"assetId": "asset:producer:purifier-t1",
+			"code": "purifier-t1",
+			"description": "Consumes board pollution without producing output.",
+			"maxStackSize": 1,
+			"name": "Purifier I",
+			"producerId": "producer:purifier-t1",
+			"sort": 1240,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"industry",
+				"purifier",
+				"pollution"
+			],
+			"tier": 1
+		},
 		"producer:quarry-t1": {
 			"assetId": "asset:producer:quarry-t1",
 			"code": "quarry-t1",
@@ -1872,6 +1918,15 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:purifier-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:purifier-t1:pollution",
+				"product:purifier-t1:pollution-bulk"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:quarry-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -2034,6 +2089,20 @@
 			"inputRefId": "input:pig-farm-t1:grain-water",
 			"name": "Piglet",
 			"outputTableId": "loot:pig-farm-t1:piglet",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:purifier-t1:pollution": {
+			"durationMs": 6000,
+			"inputRefId": "input:purifier-t1:pollution",
+			"name": "Purify Pollution",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:purifier-t1:pollution-bulk": {
+			"durationMs": 18000,
+			"inputRefId": "input:purifier-t1:pollution-bulk",
+			"name": "Purify Pollution x4",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

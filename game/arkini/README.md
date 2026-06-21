@@ -233,3 +233,43 @@ Prepared item asset IDs:
 - `asset:item:pollution` -> `game/arkini/assets/item-pollution.png`
 - `asset:item:hops` -> `game/arkini/assets/item-hops.png` (refreshed with the improved hop illustration)
 
+### Heavy industry gameplay
+
+Heavy industry is authored but not placed onto the starting board. Use cheat inventory to spawn and test it.
+
+`item:sausage` is authored as a food input for this chain; its own production chain is intentionally left for a later gameplay pass.
+
+Mining producers consume tavern/food outputs and create mine-cart resources:
+
+```txt
+producer:coal-mine-t1
+  2 Beer + 1 Sausage -> Coal Cart
+
+producer:iron-mine-t1
+  2 Beer + 1 Sausage -> Iron Ore Cart
+
+producer:gold-mine-t1
+  2 Beer + 2 Sausage -> Gold Ore Cart
+```
+
+The smelter consumes ore, coal fuel, beer, and sausage for every ingot:
+
+```txt
+producer:smelter-t1
+  Iron Ore Cart + Coal Cart + 2 Beer + 2 Sausage -> Iron Ingot + Pollution
+  Gold Ore Cart + Coal Cart + 2 Beer + 2 Sausage -> Gold Ingot + Pollution
+```
+
+Heavy industry asset IDs:
+
+- `asset:producer:coal-mine-t1` -> `game/arkini/assets/producer-coal-mine-t1.png`
+- `asset:producer:iron-mine-t1` -> `game/arkini/assets/producer-iron-mine-t1.png`
+- `asset:producer:gold-mine-t1` -> `game/arkini/assets/producer-gold-mine-t1.png`
+- `asset:producer:smelter-t1` -> `game/arkini/assets/producer-smelter-t1.png`
+- `asset:item:coal` -> `game/arkini/assets/item-coal.png`
+- `asset:item:iron-ore` -> `game/arkini/assets/item-iron-ore.png`
+- `asset:item:gold-ore` -> `game/arkini/assets/item-gold-ore.png`
+- `asset:item:iron-ingot` -> `game/arkini/assets/item-iron-ingot.png`
+- `asset:item:gold-ingot` -> `game/arkini/assets/item-gold-ingot.png`
+- `asset:item:pollution` -> `game/arkini/assets/item-pollution.png`
+

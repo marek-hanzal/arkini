@@ -149,6 +149,66 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:coal-mine-t1:coal": {
+			"name": "Coal mine coal carts",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coal",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:iron-mine-t1:iron-ore": {
+			"name": "Iron mine iron ore carts",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:iron-ore",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:gold-mine-t1:gold-ore": {
+			"name": "Gold mine gold ore carts",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:gold-ore",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:smelter-t1:iron-ingot": {
+			"name": "Smelter iron ingots",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"type": "guaranteed",
+					"itemId": "item:pollution",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:smelter-t1:gold-ingot": {
+			"name": "Smelter gold ingots",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"type": "guaranteed",
+					"itemId": "item:pollution",
+					"quantity": 1
+				}
+			]
 		}
 	}
 }

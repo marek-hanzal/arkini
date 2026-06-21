@@ -149,6 +149,115 @@
 					"consume": true
 				}
 			]
+		},
+		"input:coal-mine-t1:beer-sausage": {
+			"name": "Coal mine beer and sausage input",
+			"inputs": [
+				{
+					"itemId": "item:beer",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:iron-mine-t1:beer-sausage": {
+			"name": "Iron mine beer and sausage input",
+			"inputs": [
+				{
+					"itemId": "item:beer",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:gold-mine-t1:beer-sausage": {
+			"name": "Gold mine beer and sausage input",
+			"inputs": [
+				{
+					"itemId": "item:beer",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:smelter-t1:iron-ingot": {
+			"name": "Smelter iron ingot input",
+			"inputs": [
+				{
+					"itemId": "item:iron-ore",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:smelter-t1:gold-ingot": {
+			"name": "Smelter gold ingot input",
+			"inputs": [
+				{
+					"itemId": "item:gold-ore",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				}
+			]
 		}
 	}
 }

@@ -13,6 +13,7 @@ export default defineConfig({
 		fileParallelism: false,
 		isolate: false,
 		include: [
+			"cli/**/*.test.ts",
 			"src/**/*.test.ts",
 			"src/**/*.test.tsx",
 		],

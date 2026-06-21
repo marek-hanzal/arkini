@@ -528,6 +528,105 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("leaves an incomplete producer product idle when auto-fill finds no inputs", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.producerInputs).toEqual({});
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.events).toEqual([]);
+	});
+
+	it("auto-fills available producer inputs without starting an incomplete product", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			inputs: {
+				...baseConfig.inputs,
+				"input:shred": {
+					name: "Shred input",
+					inputs: [
+						{
+							capacity: 2,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 2,
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toBeUndefined();
+		expect(result.save.producerInputs).toEqual({
+			"item-instance:1": {
+				productInputs: {
+					"product:shred": {
+						items: {
+							"item:twig": 1,
+						},
+					},
+				},
+			},
+		});
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.events).toMatchObject([
+			{
+				from: {
+					itemInstanceId: "item-instance:2",
+					kind: "board",
+				},
+				itemId: "item:twig",
+				reason: "producer-input-store",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:twig",
+				nextQuantity: 1,
+				previousQuantity: 0,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer_input.stored",
+			},
+		]);
+	});
+
 	it("auto-fills only missing producer input when the product line is partially filled", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

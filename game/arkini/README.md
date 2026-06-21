@@ -112,3 +112,17 @@ Current PNG coverage status:
 Current first-wave art gaps:
 
 - none
+
+### Staged next-wave food assets
+
+The next food production wave now has prepared art assets, but it is not wired into the gameplay JSON yet.
+
+Prepared asset IDs:
+
+- `asset:item:wheat-field` -> `game/arkini/assets/item-wheat-field.png`
+- `asset:producer:farm-t1` -> `game/arkini/assets/producer-farm-t1.png`
+- `asset:item:grain` -> `game/arkini/assets/item-grain.png`
+- `asset:producer:pig-farm-t1` -> `game/arkini/assets/producer-pig-farm-t1.png`
+- `asset:item:piglet` -> `game/arkini/assets/item-piglet.png`
+- `asset:producer:well-t1` -> `game/arkini/assets/producer-well-t1.png`
+- `asset:item:water` -> `game/arkini/assets/item-water.png` (replaced with the new bucket art)

@@ -313,11 +313,11 @@ Heavy industry asset IDs:
 
 ### Coin economy gameplay
 
-The goldsmith turns late food/wine comfort plus coal fuel into raw currency. It is authored as a simple producer, not a merge chain, because apparently even medieval capitalism needs a tiny furnace and a snack break.
+The goldsmith turns refined gold plus late food/wine comfort and coal fuel into raw currency. It is authored as a simple producer, not a merge chain, because apparently even medieval capitalism needs a tiny furnace, a snack break, and actual gold. Wild concept.
 
 ```txt
 producer:goldsmith-t1
-  Wine Glass + Bread + Coal Cart -> 4 Coin
+  Gold Ingot + Wine Glass + Bread + Coal Cart -> 4 Coin
 ```
 
 This currently introduces `item:coin` as the first playable currency item. Higher coin merge tiers already have asset slots prepared, but this pass intentionally wires only the basic coin output.

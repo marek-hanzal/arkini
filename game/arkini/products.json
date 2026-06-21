@@ -199,7 +199,7 @@
 			"name": "Coins",
 			"durationMs": 12000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:goldsmith-t1:wine-bread-coal",
+			"inputRefId": "input:goldsmith-t1:gold-wine-bread-coal",
 			"requirementIds": [],
 			"outputTableId": "loot:goldsmith-t1:coins"
 		}

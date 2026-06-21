@@ -47,6 +47,14 @@
 			],
 			"distance": 2,
 			"durationFactor": 1
+		},
+		"proximity:winery-t1:vineyard": {
+			"type": "proximity",
+			"itemIds": [
+				"item:vineyard"
+			],
+			"distance": 2,
+			"durationFactor": 1
 		}
 	}
 }

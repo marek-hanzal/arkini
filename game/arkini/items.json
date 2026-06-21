@@ -304,7 +304,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Turns water into beer barrels when placed near a hop field.",
+			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
 			"tags": [
 				"producer",
 				"food",
@@ -328,6 +328,99 @@
 			],
 			"sort": 810,
 			"producerId": "producer:tavern-t1"
+		},
+		"item:hops": {
+			"assetId": "asset:item:hops",
+			"code": "hops",
+			"name": "Hops",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
+			"tags": [
+				"material",
+				"food",
+				"beer",
+				"hops"
+			],
+			"sort": 705
+		},
+		"item:vineyard": {
+			"assetId": "asset:item:vineyard",
+			"code": "vineyard",
+			"name": "Vineyard",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable vineyard source used by nearby wineries.",
+			"tags": [
+				"source",
+				"food",
+				"wine",
+				"grapes"
+			],
+			"sort": 900
+		},
+		"item:grapes": {
+			"assetId": "asset:item:grapes",
+			"code": "grapes",
+			"name": "Grapes",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Harvested grapes produced by wineries when supplied with water near a vineyard.",
+			"tags": [
+				"material",
+				"food",
+				"wine",
+				"grapes"
+			],
+			"sort": 905
+		},
+		"item:wine-barrel": {
+			"assetId": "asset:item:wine-barrel",
+			"code": "wine-barrel",
+			"name": "Wine Barrel",
+			"tier": 0,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A barrel of wine produced by wineries and served by taverns.",
+			"tags": [
+				"material",
+				"food",
+				"wine"
+			],
+			"sort": 910
+		},
+		"item:wine-glass": {
+			"assetId": "asset:item:wine-glass",
+			"code": "wine-glass",
+			"name": "Wine Glass",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "A single glass of wine served by taverns.",
+			"tags": [
+				"food",
+				"wine"
+			],
+			"sort": 920
+		},
+		"producer:winery-t1": {
+			"assetId": "asset:producer:winery-t1",
+			"code": "winery-t1",
+			"name": "Winery I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
+			"tags": [
+				"producer",
+				"food",
+				"wine"
+			],
+			"sort": 1000,
+			"producerId": "producer:winery-t1"
 		}
 	}
 }

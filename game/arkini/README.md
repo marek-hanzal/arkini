@@ -41,7 +41,7 @@ Yes, it is slightly weird. It is also contained, explicit, and better than quiet
 
 ### Implemented first wave
 
-The package currently contains two simple logical production pairs plus a first food line.
+The package currently contains wood, stone, food, brewing, and wine production lines.
 
 Wood pair:
 
@@ -100,7 +100,7 @@ loot:pig-farm-t1:piglet
 
 ### Initial balance placeholder
 
-Use `5000` ms for all first-pass production durations, including the food line. Timing balance is not the point of this phase; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
+Use `5000` ms for all first-pass production durations, including food, brewing, and wine lines. Timing balance is not the point of this phase; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
 Current processor input buffers use capacity `4`:
 
@@ -108,6 +108,14 @@ Current processor input buffers use capacity `4`:
 - `input:stonemason-t1:stone`
 - `input:farm-t1:water`
 - `input:pig-farm-t1:grain-water`
+- `input:brewery-t1:water`
+- `input:brewery-t1:hops-water`
+- `input:brewery-t1:beer-to-barrel`
+- `input:tavern-t1:beer-barrel`
+- `input:tavern-t1:wine-barrel`
+- `input:winery-t1:water`
+- `input:winery-t1:grapes-water`
+- `input:winery-t1:wine-glass-to-barrel`
 
 ### Asset alignment and current art gaps
 
@@ -148,51 +156,59 @@ The first food production line is wired into gameplay and uses these prepared as
 - `asset:producer:well-t1` -> `game/arkini/assets/producer-well-t1.png`
 - `asset:item:water` -> `game/arkini/assets/item-water.png`
 
-### Brewing production assets
+### Brewing and wine asset IDs
 
-The brewing / tavern production wave is wired into gameplay JSON.
+The brewing and wine production waves are wired into gameplay JSON. Wine content is not placed onto the starting board; use cheat inventory to spawn and test it.
 
-Prepared asset IDs:
+Brewing asset IDs:
 
 - `asset:item:hop-field` -> `game/arkini/assets/item-hop-field.png`
+- `asset:item:hops` -> `game/arkini/assets/item-hop-field.png` (temporary shared resource until dedicated hop cone art exists)
 - `asset:producer:brewery-t1` -> `game/arkini/assets/producer-brewery-t1.png`
 - `asset:item:beer-barrel` -> `game/arkini/assets/item-beer-barrel.png`
 - `asset:producer:tavern-t1` -> `game/arkini/assets/producer-tavern-t1.png`
+- `asset:item:beer` already exists from the base item set
 
-Existing beer output art already exists as `asset:item:beer`.
-
-Brewing pair:
-
-```txt
-item:hop-field
-item:beer-barrel
-item:beer
-producer:brewery-t1
-producer:tavern-t1
-proximity:brewery-t1:hop-field
-product:brewery-t1:beer-barrel
-product:tavern-t1:beer
-input:brewery-t1:water
-input:tavern-t1:beer-barrel
-loot:brewery-t1:beer-barrel
-loot:tavern-t1:beer
-```
-
-Tavern output note: one `item:beer-barrel` produces four `item:beer` outputs. This keeps the tavern as a serving splitter instead of another generic one-in-one-out box, because apparently even JSON deserves a social life.
-
-### Brewery reverse barrel line
-
-The brewery has a secondary reverse product line: `4× Beer -> 1× Beer Barrel`. The water-to-barrel line remains first/default, so normal click activation keeps prioritizing fresh barrel production.
-
-### Staged next-wave wine assets
-
-The wine production wave now has prepared art assets, but it is not wired into the gameplay JSON yet.
-
-Prepared asset IDs:
+Wine asset IDs:
 
 - `asset:item:vineyard` -> `game/arkini/assets/item-vineyard.png`
 - `asset:item:grapes` -> `game/arkini/assets/item-grapes.png`
 - `asset:producer:winery-t1` -> `game/arkini/assets/producer-winery-t1.png`
 - `asset:item:wine-barrel` -> `game/arkini/assets/item-wine-barrel.png`
 - `asset:item:wine-glass` -> `game/arkini/assets/item-wine-glass.png`
+
+### Wine chain and updated brewing flow
+
+The wine chain is authored but not placed onto the starting board. Use cheat inventory to spawn these items/producers during testing.
+
+Brewing now works in two producer steps:
+
+```txt
+producer:brewery-t1
+  Water -> Hops
+  Hops + Water -> Beer Barrel
+  4 Beer -> Beer Barrel
+
+producer:tavern-t1
+  Beer Barrel -> 4 Beer
+```
+
+Wine mirrors the same shape:
+
+```txt
+producer:winery-t1
+  Water -> Grapes
+  Grapes + Water -> Wine Barrel
+  4 Wine Glass -> Wine Barrel
+
+producer:tavern-t1
+  Wine Barrel -> 4 Wine Glass
+```
+
+Passive proximity sources:
+
+```txt
+proximity:brewery-t1:hop-field
+proximity:winery-t1:vineyard
+```
 

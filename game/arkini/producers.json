@@ -70,6 +70,7 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:brewery-t1:hops",
 				"product:brewery-t1:beer-barrel",
 				"product:brewery-t1:beer-barrel-from-beer"
 			],
@@ -81,9 +82,22 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:tavern-t1:beer"
+				"product:tavern-t1:beer",
+				"product:tavern-t1:wine-glass"
 			],
 			"requirementIds": []
+		},
+		"producer:winery-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:winery-t1:grapes",
+				"product:winery-t1:wine-barrel",
+				"product:winery-t1:wine-barrel-from-wine-glasses"
+			],
+			"requirementIds": [
+				"proximity:winery-t1:vineyard"
+			]
 		}
 	}
 }

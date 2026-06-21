@@ -320,9 +320,15 @@
 				}
 			]
 		},
-		"input:goldsmith-t1:wine-bread-coal": {
-			"name": "Goldsmith wine, bread, and coal input",
+		"input:goldsmith-t1:gold-wine-bread-coal": {
+			"name": "Goldsmith gold, wine, bread, and coal input",
 			"inputs": [
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
 				{
 					"itemId": "item:wine-glass",
 					"quantity": 1,

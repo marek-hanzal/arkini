@@ -671,8 +671,14 @@
 			],
 			"name": "Gold mine beer and sausage input"
 		},
-		"input:goldsmith-t1:wine-bread-coal": {
+		"input:goldsmith-t1:gold-wine-bread-coal": {
 			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
 				{
 					"capacity": 4,
 					"consume": true,
@@ -692,7 +698,7 @@
 					"quantity": 1
 				}
 			],
-			"name": "Goldsmith wine, bread, and coal input"
+			"name": "Goldsmith gold, wine, bread, and coal input"
 		},
 		"input:iron-mine-t1:beer-sausage": {
 			"inputs": [
@@ -1435,7 +1441,7 @@
 		"producer:goldsmith-t1": {
 			"assetId": "asset:producer:goldsmith-t1",
 			"code": "goldsmith-t1",
-			"description": "Consumes wine, bread, and coal to mint coins.",
+			"description": "Consumes gold ingots, wine, bread, and coal to mint coins.",
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
 			"producerId": "producer:goldsmith-t1",
@@ -2150,7 +2156,7 @@
 		},
 		"product:goldsmith-t1:coins": {
 			"durationMs": 12000,
-			"inputRefId": "input:goldsmith-t1:wine-bread-coal",
+			"inputRefId": "input:goldsmith-t1:gold-wine-bread-coal",
 			"name": "Coins",
 			"outputTableId": "loot:goldsmith-t1:coins",
 			"placement": "board_then_inventory",

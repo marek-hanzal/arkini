@@ -732,7 +732,7 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes wine, bread, and coal to mint coins.",
+			"description": "Consumes gold ingots, wine, bread, and coal to mint coins.",
 			"tags": [
 				"producer",
 				"economy",

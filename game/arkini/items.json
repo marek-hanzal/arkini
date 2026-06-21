@@ -8,7 +8,6 @@
 			"maxStackSize": 10,
 			"storage": "both",
 			"description": "Movable wood source used by nearby lumberjacks.",
-			"label": "🌳",
 			"tags": [
 				"source",
 				"wood"
@@ -23,7 +22,6 @@
 			"maxStackSize": 10,
 			"storage": "both",
 			"description": "Movable stone source used by nearby quarries.",
-			"label": "🪨",
 			"tags": [
 				"source",
 				"stone"

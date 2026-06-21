@@ -65,6 +65,24 @@
 				"product:pig-farm-t1:piglet"
 			],
 			"requirementIds": []
+		},
+		"producer:brewery-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:brewery-t1:beer-barrel"
+			],
+			"requirementIds": [
+				"proximity:brewery-t1:hop-field"
+			]
+		},
+		"producer:tavern-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:tavern-t1:beer"
+			],
+			"requirementIds": []
 		}
 	}
 }

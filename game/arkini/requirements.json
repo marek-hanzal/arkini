@@ -39,6 +39,14 @@
 			],
 			"distance": 2,
 			"durationFactor": 1
+		},
+		"proximity:brewery-t1:hop-field": {
+			"type": "proximity",
+			"itemIds": [
+				"item:hop-field"
+			],
+			"distance": 2,
+			"durationFactor": 1
 		}
 	}
 }

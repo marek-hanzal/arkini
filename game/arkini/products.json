@@ -52,6 +52,22 @@
 			"inputRefId": "input:pig-farm-t1:grain-water",
 			"requirementIds": [],
 			"outputTableId": "loot:pig-farm-t1:piglet"
+		},
+		"product:brewery-t1:beer-barrel": {
+			"name": "Beer Barrel",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:brewery-t1:water",
+			"requirementIds": [],
+			"outputTableId": "loot:brewery-t1:beer-barrel"
+		},
+		"product:tavern-t1:beer": {
+			"name": "Beer",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:tavern-t1:beer-barrel",
+			"requirementIds": [],
+			"outputTableId": "loot:tavern-t1:beer"
 		}
 	}
 }

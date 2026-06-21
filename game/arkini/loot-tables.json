@@ -69,6 +69,26 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:brewery-t1:beer-barrel": {
+			"name": "Brewery beer barrels",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:tavern-t1:beer": {
+			"name": "Tavern beers",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:beer",
+					"quantity": 4
+				}
+			]
 		}
 	}
 }

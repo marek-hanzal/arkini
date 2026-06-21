@@ -1,6 +1,5 @@
 import { memo, type FC } from "react";
 import { GameItemContent } from "~/v0/item/ui/GameItemContent";
-import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 
 export namespace GameItemView {
@@ -18,14 +17,12 @@ export namespace GameItemView {
 		variant: Variant;
 		sizeVariant?: SizeVariant;
 		quantity?: number;
-		activation?: BoardViewItem["activation"];
 		overlaySize?: GameItemView.OverlaySize;
-		activationNowMs?: number;
 	}
 }
 
 export const GameItemView: FC<GameItemView.Props> = memo(
-	({ item, variant, sizeVariant, quantity, activation, overlaySize, activationNowMs }) => {
+	({ item, variant, sizeVariant, quantity, overlaySize }) => {
 		const resolvedSizeVariant =
 			sizeVariant ?? (variant === "inventory" ? "inventory" : "board");
 
@@ -48,8 +45,6 @@ export const GameItemView: FC<GameItemView.Props> = memo(
 				<GameItemContent
 					item={item}
 					quantity={quantity}
-					activation={activation}
-					activationNowMs={activationNowMs}
 				/>
 			</div>
 		);

@@ -35,7 +35,10 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 		craft: boardItem?.craft,
 		nowMs,
 	});
-	const producerReady = isProducerReady(boardItem?.activation, nowMs);
+	const activationReady = isProducerReady(boardItem?.activation, nowMs);
+	const craftReady = Boolean(liveCraft?.complete);
+	const hasReadyState = Boolean(boardItem?.activation || liveCraft);
+	const tileReady = !hasReadyState || activationReady || craftReady;
 	const producerCooldown = readProducerCooldown({
 		activation: boardItem?.activation,
 		nowMs,
@@ -51,18 +54,16 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 		<div
 			data-ui="board item"
 			data-ak-board-item-id={boardItem.id}
-			data-ak-board-tile-ready={producerReady ? "true" : undefined}
+			data-ak-board-tile-ready={tileReady ? "true" : undefined}
+			data-ak-board-tile-dimmed={!tileReady ? "true" : undefined}
 			className={cn(
-				"relative h-full w-full overflow-hidden",
-				producerReady &&
-					"bg-emerald-100/30 outline outline-1 -outline-offset-1 outline-emerald-500/30",
+				"relative h-full w-full overflow-hidden transition-opacity duration-200 ease-out",
+				tileReady ? "opacity-100" : "opacity-[0.68]",
 			)}
 		>
 			<GameItemView
 				item={item}
 				variant="board"
-				activation={boardItem.activation}
-				activationNowMs={nowMs}
 			/>
 			<BoardCellProgress progress={liveCraft?.progress} />
 			<BoardCellCooldownProgress

@@ -55,6 +55,30 @@
 			],
 			"distance": 2,
 			"durationFactor": 1
+		},
+		"proximity:coal-mine-t1:coal-deposit": {
+			"type": "proximity",
+			"itemIds": [
+				"item:coal-deposit"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		},
+		"proximity:iron-mine-t1:iron-deposit": {
+			"type": "proximity",
+			"itemIds": [
+				"item:iron-deposit"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		},
+		"proximity:gold-mine-t1:gold-deposit": {
+			"type": "proximity",
+			"itemIds": [
+				"item:gold-deposit"
+			],
+			"distance": 2,
+			"durationFactor": 1
 		}
 	}
 }

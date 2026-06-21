@@ -101,6 +101,13 @@
 			"resourceId": "item-coal",
 			"sort": 132
 		},
+		"asset:item:coal-deposit": {
+			"kind": "item",
+			"label": "Coal Deposit",
+			"render": "plain",
+			"resourceId": "item-coal-deposit",
+			"sort": 211
+		},
 		"asset:item:coal-mine": {
 			"kind": "item",
 			"label": "Coal Mine",
@@ -185,6 +192,13 @@
 			"resourceId": "item-gem",
 			"sort": 94
 		},
+		"asset:item:gold-deposit": {
+			"kind": "item",
+			"label": "Gold Deposit",
+			"render": "plain",
+			"resourceId": "item-gold-deposit",
+			"sort": 213
+		},
 		"asset:item:gold-ingot": {
 			"kind": "item",
 			"label": "Gold Ingot",
@@ -226,6 +240,13 @@
 			"render": "plain",
 			"resourceId": "item-hops",
 			"sort": 215
+		},
+		"asset:item:iron-deposit": {
+			"kind": "item",
+			"label": "Iron Deposit",
+			"render": "plain",
+			"resourceId": "item-iron-deposit",
+			"sort": 212
 		},
 		"asset:item:iron-ingot": {
 			"kind": "item",
@@ -980,6 +1001,22 @@
 			],
 			"tier": 0
 		},
+		"item:coal-deposit": {
+			"assetId": "asset:item:coal-deposit",
+			"code": "coal-deposit",
+			"description": "Movable coal source used by nearby coal mines.",
+			"maxStackSize": 10,
+			"name": "Coal Deposit",
+			"sort": 1150,
+			"storage": "both",
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"coal"
+			],
+			"tier": 0
+		},
 		"item:coin": {
 			"assetId": "asset:item:coin",
 			"code": "coin",
@@ -1007,6 +1044,22 @@
 				"food",
 				"grain",
 				"flour"
+			],
+			"tier": 0
+		},
+		"item:gold-deposit": {
+			"assetId": "asset:item:gold-deposit",
+			"code": "gold-deposit",
+			"description": "Movable gold source used by nearby gold mines.",
+			"maxStackSize": 10,
+			"name": "Gold Deposit",
+			"sort": 1170,
+			"storage": "both",
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"gold"
 			],
 			"tier": 0
 		},
@@ -1102,6 +1155,22 @@
 				"food",
 				"beer",
 				"hops"
+			],
+			"tier": 0
+		},
+		"item:iron-deposit": {
+			"assetId": "asset:item:iron-deposit",
+			"code": "iron-deposit",
+			"description": "Movable iron source used by nearby iron mines.",
+			"maxStackSize": 10,
+			"name": "Iron Deposit",
+			"sort": 1160,
+			"storage": "both",
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"iron"
 			],
 			"tier": 0
 		},
@@ -1391,7 +1460,7 @@
 		"producer:coal-mine-t1": {
 			"assetId": "asset:producer:coal-mine-t1",
 			"code": "coal-mine-t1",
-			"description": "Consumes beer and sausage to mine coal carts.",
+			"description": "Consumes beer and sausage to mine coal carts from a nearby coal deposit.",
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
 			"producerId": "producer:coal-mine-t1",
@@ -1424,7 +1493,7 @@
 		"producer:gold-mine-t1": {
 			"assetId": "asset:producer:gold-mine-t1",
 			"code": "gold-mine-t1",
-			"description": "Consumes beer and extra sausage to mine gold ore carts.",
+			"description": "Consumes beer and extra sausage to mine gold ore carts from a nearby gold deposit.",
 			"maxStackSize": 1,
 			"name": "Gold Mine I",
 			"producerId": "producer:gold-mine-t1",
@@ -1458,7 +1527,7 @@
 		"producer:iron-mine-t1": {
 			"assetId": "asset:producer:iron-mine-t1",
 			"code": "iron-mine-t1",
-			"description": "Consumes beer and sausage to mine iron ore carts.",
+			"description": "Consumes beer and sausage to mine iron ore carts from a nearby iron deposit.",
 			"maxStackSize": 1,
 			"name": "Iron Mine I",
 			"producerId": "producer:iron-mine-t1",
@@ -1948,7 +2017,9 @@
 			"productIds": [
 				"product:coal-mine-t1:coal"
 			],
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:coal-mine-t1:coal-deposit"
+			],
 			"type": "producer"
 		},
 		"producer:farm-t1": {
@@ -1966,7 +2037,9 @@
 			"productIds": [
 				"product:gold-mine-t1:gold-ore"
 			],
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:gold-mine-t1:gold-deposit"
+			],
 			"type": "producer"
 		},
 		"producer:goldsmith-t1": {
@@ -1982,7 +2055,9 @@
 			"productIds": [
 				"product:iron-mine-t1:iron-ore"
 			],
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:iron-mine-t1:iron-deposit"
+			],
 			"type": "producer"
 		},
 		"producer:lumberjack-t1": {
@@ -2311,11 +2386,35 @@
 			],
 			"type": "proximity"
 		},
+		"proximity:coal-mine-t1:coal-deposit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:coal-deposit"
+			],
+			"type": "proximity"
+		},
 		"proximity:farm-t1:wheat-field": {
 			"distance": 2,
 			"durationFactor": 1,
 			"itemIds": [
 				"item:wheat-field"
+			],
+			"type": "proximity"
+		},
+		"proximity:gold-mine-t1:gold-deposit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:gold-deposit"
+			],
+			"type": "proximity"
+		},
+		"proximity:iron-mine-t1:iron-deposit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:iron-deposit"
 			],
 			"type": "proximity"
 		},

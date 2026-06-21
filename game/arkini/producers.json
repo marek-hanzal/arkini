@@ -129,7 +129,9 @@
 			"productIds": [
 				"product:coal-mine-t1:coal"
 			],
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:coal-mine-t1:coal-deposit"
+			]
 		},
 		"producer:iron-mine-t1": {
 			"type": "producer",
@@ -137,7 +139,9 @@
 			"productIds": [
 				"product:iron-mine-t1:iron-ore"
 			],
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:iron-mine-t1:iron-deposit"
+			]
 		},
 		"producer:gold-mine-t1": {
 			"type": "producer",
@@ -145,7 +149,9 @@
 			"productIds": [
 				"product:gold-mine-t1:gold-ore"
 			],
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:gold-mine-t1:gold-deposit"
+			]
 		},
 		"producer:smelter-t1": {
 			"type": "producer",

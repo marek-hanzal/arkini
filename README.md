@@ -120,8 +120,7 @@ Centralized hooks are banned unless the domain is explicitly the runtime, such a
 
 ```txt
 src/app/                         App entry, router and global styles.
-src/assets/                      Static source assets used by compiled game packages and UI.
-src/v0/                         Active client play runtime. v0 should be self-contained except asset imports.
+src/v0/                         Active client play runtime. v0 should consume compiled game package resources, not mirrored PNG folders.
 src/v0/game/config/             Canonical compiled JSON config schema, ID value schemas, config readers.
 game/arkini/                    Source JSON game package compiled into canonical runtime config/assets.
 src/v0/game/                    Active GameConfig Effect service and derived lookup helpers.

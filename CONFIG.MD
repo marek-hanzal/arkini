@@ -1763,16 +1763,12 @@ Starting inventory:
     "board": [],
     "inventory": [
       {
-        "itemId": "item:blueprint-scrap",
-        "quantity": 10
-      },
-      {
         "itemId": "item:twig",
         "quantity": 8
       },
       {
-        "itemId": "item:coin-stack",
-        "quantity": 1
+        "itemId": "item:water",
+        "quantity": 4
       }
     ]
   }
@@ -3352,16 +3348,12 @@ Add stacks to `startingState.inventory`.
     "board": [],
     "inventory": [
       {
-        "itemId": "item:blueprint-scrap",
-        "quantity": 10
-      },
-      {
         "itemId": "item:twig",
         "quantity": 8
       },
       {
-        "itemId": "item:coin-stack",
-        "quantity": 1
+        "itemId": "item:water",
+        "quantity": 4
       }
     ]
   }

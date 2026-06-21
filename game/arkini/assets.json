@@ -21,51 +21,6 @@
 			"resourceId": "item-blueprint",
 			"sort": 112
 		},
-		"asset:item:blueprint-draft": {
-			"kind": "item",
-			"label": "Blueprint Draft",
-			"render": "plain",
-			"resourceId": "item-blueprint-draft",
-			"sort": 110
-		},
-		"asset:item:blueprint-fragment": {
-			"kind": "item",
-			"label": "Blueprint Fragment",
-			"render": "plain",
-			"resourceId": "item-blueprint-fragment",
-			"sort": 108
-		},
-		"asset:item:blueprint-lumber-camp": {
-			"kind": "item",
-			"label": "Lumber Camp Blueprint",
-			"overlayAssetId": "asset:item:lumber-camp",
-			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 116
-		},
-		"asset:item:blueprint-quarry": {
-			"kind": "item",
-			"label": "Quarry Blueprint",
-			"overlayAssetId": "asset:item:quarry",
-			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 120
-		},
-		"asset:item:blueprint-scrap": {
-			"kind": "item",
-			"label": "Blueprint Scrap",
-			"render": "plain",
-			"resourceId": "item-blueprint-scrap",
-			"sort": 106
-		},
-		"asset:item:blueprint-townhall": {
-			"kind": "item",
-			"label": "Town Hall Blueprint",
-			"overlayAssetId": "asset:item:townhall",
-			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 124
-		},
 		"asset:item:branch": {
 			"kind": "item",
 			"label": "Branch",
@@ -576,6 +531,210 @@
 			"render": "plain",
 			"resourceId": "producer-goldsmith-t1",
 			"sort": 225
+		},
+		"asset:producer:townhall-t1": {
+			"kind": "item",
+			"label": "Town Hall I",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 126
+		},
+		"asset:producer:townhall-t2": {
+			"kind": "item",
+			"label": "Town Hall II",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 127
+		},
+		"asset:producer:townhall-t3": {
+			"kind": "item",
+			"label": "Town Hall III",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 128
+		},
+		"asset:producer:townhall-t4": {
+			"kind": "item",
+			"label": "Town Hall IV",
+			"render": "plain",
+			"resourceId": "item-townhall",
+			"sort": 129
+		},
+		"asset:item:blueprint-lumberjack-t1": {
+			"kind": "item",
+			"label": "Lumberjack I Blueprint",
+			"overlayAssetId": "asset:producer:lumberjack-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2000
+		},
+		"asset:item:blueprint-sawmill-t1": {
+			"kind": "item",
+			"label": "Sawmill I Blueprint",
+			"overlayAssetId": "asset:producer:sawmill-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2010
+		},
+		"asset:item:blueprint-quarry-t1": {
+			"kind": "item",
+			"label": "Quarry I Blueprint",
+			"overlayAssetId": "asset:producer:quarry-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2020
+		},
+		"asset:item:blueprint-stonemason-t1": {
+			"kind": "item",
+			"label": "Stonemason I Blueprint",
+			"overlayAssetId": "asset:producer:stonemason-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2030
+		},
+		"asset:item:blueprint-well-t1": {
+			"kind": "item",
+			"label": "Well I Blueprint",
+			"overlayAssetId": "asset:producer:well-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2040
+		},
+		"asset:item:blueprint-farm-t1": {
+			"kind": "item",
+			"label": "Farm I Blueprint",
+			"overlayAssetId": "asset:producer:farm-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2050
+		},
+		"asset:item:blueprint-windmill-t1": {
+			"kind": "item",
+			"label": "Windmill I Blueprint",
+			"overlayAssetId": "asset:producer:windmill-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2100
+		},
+		"asset:item:blueprint-bakery-t1": {
+			"kind": "item",
+			"label": "Bakery I Blueprint",
+			"overlayAssetId": "asset:producer:bakery-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2110
+		},
+		"asset:item:blueprint-pig-farm-t1": {
+			"kind": "item",
+			"label": "Pig Farm I Blueprint",
+			"overlayAssetId": "asset:producer:pig-farm-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2120
+		},
+		"asset:item:blueprint-slaughterhouse-t1": {
+			"kind": "item",
+			"label": "Slaughterhouse I Blueprint",
+			"overlayAssetId": "asset:producer:slaughterhouse-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2130
+		},
+		"asset:item:blueprint-brewery-t1": {
+			"kind": "item",
+			"label": "Brewery I Blueprint",
+			"overlayAssetId": "asset:producer:brewery-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2140
+		},
+		"asset:item:blueprint-tavern-t1": {
+			"kind": "item",
+			"label": "Tavern I Blueprint",
+			"overlayAssetId": "asset:producer:tavern-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2150
+		},
+		"asset:item:blueprint-winery-t1": {
+			"kind": "item",
+			"label": "Winery I Blueprint",
+			"overlayAssetId": "asset:producer:winery-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2160
+		},
+		"asset:item:blueprint-coal-mine-t1": {
+			"kind": "item",
+			"label": "Coal Mine I Blueprint",
+			"overlayAssetId": "asset:producer:coal-mine-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2200
+		},
+		"asset:item:blueprint-iron-mine-t1": {
+			"kind": "item",
+			"label": "Iron Mine I Blueprint",
+			"overlayAssetId": "asset:producer:iron-mine-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2210
+		},
+		"asset:item:blueprint-smelter-t1": {
+			"kind": "item",
+			"label": "Smelter I Blueprint",
+			"overlayAssetId": "asset:producer:smelter-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2220
+		},
+		"asset:item:blueprint-purifier-t1": {
+			"kind": "item",
+			"label": "Purifier I Blueprint",
+			"overlayAssetId": "asset:producer:purifier-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2230
+		},
+		"asset:item:blueprint-gold-mine-t1": {
+			"kind": "item",
+			"label": "Gold Mine I Blueprint",
+			"overlayAssetId": "asset:producer:gold-mine-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2240
+		},
+		"asset:item:blueprint-goldsmith-t1": {
+			"kind": "item",
+			"label": "Goldsmith I Blueprint",
+			"overlayAssetId": "asset:producer:goldsmith-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2300
+		},
+		"asset:item:blueprint-townhall-t2": {
+			"kind": "item",
+			"label": "Town Hall II Blueprint",
+			"overlayAssetId": "asset:producer:townhall-t2",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2060
+		},
+		"asset:item:blueprint-townhall-t3": {
+			"kind": "item",
+			"label": "Town Hall III Blueprint",
+			"overlayAssetId": "asset:producer:townhall-t3",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2170
+		},
+		"asset:item:blueprint-townhall-t4": {
+			"kind": "item",
+			"label": "Town Hall IV Blueprint",
+			"overlayAssetId": "asset:producer:townhall-t4",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"sort": 2250
 		}
 	}
 }

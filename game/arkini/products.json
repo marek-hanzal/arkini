@@ -29,6 +29,29 @@
 			"inputRefId": "input:stonemason-t1:stone",
 			"requirementIds": [],
 			"outputTableId": "loot:stonemason-t1:stone-block"
+		},
+		"product:well-t1:water": {
+			"name": "Water",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:well-t1:water"
+		},
+		"product:farm-t1:grain": {
+			"name": "Grain",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:farm-t1:water",
+			"requirementIds": [],
+			"outputTableId": "loot:farm-t1:grain"
+		},
+		"product:pig-farm-t1:piglet": {
+			"name": "Piglet",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:pig-farm-t1:grain-water",
+			"requirementIds": [],
+			"outputTableId": "loot:pig-farm-t1:piglet"
 		}
 	}
 }

@@ -381,6 +381,34 @@
 		"title": "Arkini"
 	},
 	"inputs": {
+		"input:farm-t1:water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Farm water input"
+		},
+		"input:pig-farm-t1:grain-water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Pig farm grain and water input"
+		},
 		"input:sawmill-t1:log": {
 			"inputs": [
 				{
@@ -405,6 +433,21 @@
 		}
 	},
 	"items": {
+		"item:grain": {
+			"assetId": "asset:item:grain",
+			"code": "grain",
+			"description": "Harvested grain produced by farms and used as pig feed.",
+			"maxStackSize": 50,
+			"name": "Grain",
+			"sort": 520,
+			"storage": "both",
+			"tags": [
+				"material",
+				"food",
+				"grain"
+			],
+			"tier": 0
+		},
 		"item:log": {
 			"assetId": "asset:item:log",
 			"code": "log",
@@ -416,6 +459,21 @@
 			"tags": [
 				"material",
 				"wood"
+			],
+			"tier": 0
+		},
+		"item:piglet": {
+			"assetId": "asset:item:piglet",
+			"code": "piglet",
+			"description": "A small piglet produced by pig farms.",
+			"maxStackSize": 20,
+			"name": "Piglet",
+			"sort": 530,
+			"storage": "both",
+			"tags": [
+				"animal",
+				"food",
+				"pig"
 			],
 			"tier": 0
 		},
@@ -489,6 +547,52 @@
 			],
 			"tier": 0
 		},
+		"item:water": {
+			"assetId": "asset:item:water",
+			"code": "water",
+			"description": "Basic water resource produced by wells and consumed by farms.",
+			"maxStackSize": 50,
+			"name": "Water",
+			"sort": 510,
+			"storage": "both",
+			"tags": [
+				"material",
+				"food",
+				"water"
+			],
+			"tier": 0
+		},
+		"item:wheat-field": {
+			"assetId": "asset:item:wheat-field",
+			"code": "wheat-field",
+			"description": "Movable grain source used by nearby farms.",
+			"maxStackSize": 10,
+			"name": "Wheat Field",
+			"sort": 500,
+			"storage": "both",
+			"tags": [
+				"source",
+				"food",
+				"grain"
+			],
+			"tier": 0
+		},
+		"producer:farm-t1": {
+			"assetId": "asset:producer:farm-t1",
+			"code": "farm-t1",
+			"description": "Consumes water and produces grain when placed near a wheat field.",
+			"maxStackSize": 1,
+			"name": "Farm I",
+			"producerId": "producer:farm-t1",
+			"sort": 610,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"grain"
+			],
+			"tier": 1
+		},
 		"producer:lumberjack-t1": {
 			"assetId": "asset:producer:lumberjack-t1",
 			"code": "lumberjack-t1",
@@ -501,6 +605,22 @@
 			"tags": [
 				"producer",
 				"wood"
+			],
+			"tier": 1
+		},
+		"producer:pig-farm-t1": {
+			"assetId": "asset:producer:pig-farm-t1",
+			"code": "pig-farm-t1",
+			"description": "Consumes grain and water to produce piglets.",
+			"maxStackSize": 1,
+			"name": "Pig Farm I",
+			"producerId": "producer:pig-farm-t1",
+			"sort": 620,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"pig"
 			],
 			"tier": 1
 		},
@@ -548,14 +668,50 @@
 				"stone"
 			],
 			"tier": 1
+		},
+		"producer:well-t1": {
+			"assetId": "asset:producer:well-t1",
+			"code": "well-t1",
+			"description": "Produces water.",
+			"maxStackSize": 1,
+			"name": "Well I",
+			"producerId": "producer:well-t1",
+			"sort": 600,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"water"
+			],
+			"tier": 1
 		}
 	},
 	"lootTables": {
+		"loot:farm-t1:grain": {
+			"name": "Farm grain",
+			"output": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:lumberjack-t1:log": {
 			"name": "Lumberjack logs",
 			"output": [
 				{
 					"itemId": "item:log",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:pig-farm-t1:piglet": {
+			"name": "Pig farm piglets",
+			"output": [
+				{
+					"itemId": "item:piglet",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -590,10 +746,30 @@
 					"type": "guaranteed"
 				}
 			]
+		},
+		"loot:well-t1:water": {
+			"name": "Well water",
+			"output": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		}
 	},
 	"merge": {},
 	"producers": {
+		"producer:farm-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:farm-t1:grain"
+			],
+			"requirementIds": [
+				"proximity:farm-t1:wheat-field"
+			],
+			"type": "producer"
+		},
 		"producer:lumberjack-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -602,6 +778,14 @@
 			"requirementIds": [
 				"proximity:lumberjack-t1:tree"
 			],
+			"type": "producer"
+		},
+		"producer:pig-farm-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:pig-farm-t1:piglet"
+			],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:quarry-t1": {
@@ -633,13 +817,37 @@
 				"proximity:stonemason-t1:quarry-t1"
 			],
 			"type": "producer"
+		},
+		"producer:well-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:well-t1:water"
+			],
+			"requirementIds": [],
+			"type": "producer"
 		}
 	},
 	"products": {
+		"product:farm-t1:grain": {
+			"durationMs": 5000,
+			"inputRefId": "input:farm-t1:water",
+			"name": "Grain",
+			"outputTableId": "loot:farm-t1:grain",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:lumberjack-t1:log": {
 			"durationMs": 5000,
 			"name": "Log",
 			"outputTableId": "loot:lumberjack-t1:log",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:pig-farm-t1:piglet": {
+			"durationMs": 5000,
+			"inputRefId": "input:pig-farm-t1:grain-water",
+			"name": "Piglet",
+			"outputTableId": "loot:pig-farm-t1:piglet",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -665,9 +873,24 @@
 			"outputTableId": "loot:stonemason-t1:stone-block",
 			"placement": "board_then_inventory",
 			"requirementIds": []
+		},
+		"product:well-t1:water": {
+			"durationMs": 5000,
+			"name": "Water",
+			"outputTableId": "loot:well-t1:water",
+			"placement": "board_then_inventory",
+			"requirementIds": []
 		}
 	},
 	"requirements": {
+		"proximity:farm-t1:wheat-field": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:wheat-field"
+			],
+			"type": "proximity"
+		},
 		"proximity:lumberjack-t1:tree": {
 			"distance": 2,
 			"durationFactor": 1,
@@ -732,6 +955,26 @@
 				"itemId": "producer:stonemason-t1",
 				"x": 3,
 				"y": 5
+			},
+			{
+				"itemId": "item:wheat-field",
+				"x": 0,
+				"y": 3
+			},
+			{
+				"itemId": "producer:farm-t1",
+				"x": 1,
+				"y": 3
+			},
+			{
+				"itemId": "producer:well-t1",
+				"x": 3,
+				"y": 3
+			},
+			{
+				"itemId": "producer:pig-farm-t1",
+				"x": 5,
+				"y": 3
 			}
 		],
 		"inventory": []

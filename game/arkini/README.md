@@ -41,7 +41,7 @@ Yes, it is slightly weird. It is also contained, explicit, and better than quiet
 
 ### Implemented first wave
 
-The package currently contains two simple logical production pairs.
+The package currently contains two simple logical production pairs plus a first food line.
 
 Wood pair:
 
@@ -77,14 +77,37 @@ loot:quarry-t1:stone
 loot:stonemason-t1:stone-block
 ```
 
+Food line:
+
+```txt
+item:wheat-field
+item:water
+item:grain
+item:piglet
+producer:well-t1
+producer:farm-t1
+producer:pig-farm-t1
+proximity:farm-t1:wheat-field
+product:well-t1:water
+product:farm-t1:grain
+product:pig-farm-t1:piglet
+input:farm-t1:water
+input:pig-farm-t1:grain-water
+loot:well-t1:water
+loot:farm-t1:grain
+loot:pig-farm-t1:piglet
+```
+
 ### Initial balance placeholder
 
-Use `5000` ms for all first-pass production durations. Timing balance is not the point of this phase; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
+Use `5000` ms for all first-pass production durations, including the food line. Timing balance is not the point of this phase; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
 Current processor input buffers use capacity `4`:
 
 - `input:sawmill-t1:log`
 - `input:stonemason-t1:stone`
+- `input:farm-t1:water`
+- `input:pig-farm-t1:grain-water`
 
 ### Asset alignment and current art gaps
 
@@ -113,11 +136,9 @@ Current first-wave art gaps:
 
 - none
 
-### Staged next-wave food assets
+### Food line asset IDs
 
-The next food production wave now has prepared art assets, but it is not wired into the gameplay JSON yet.
-
-Prepared asset IDs:
+The first food production line is wired into gameplay and uses these prepared asset IDs:
 
 - `asset:item:wheat-field` -> `game/arkini/assets/item-wheat-field.png`
 - `asset:producer:farm-t1` -> `game/arkini/assets/producer-farm-t1.png`
@@ -125,4 +146,4 @@ Prepared asset IDs:
 - `asset:producer:pig-farm-t1` -> `game/arkini/assets/producer-pig-farm-t1.png`
 - `asset:item:piglet` -> `game/arkini/assets/item-piglet.png`
 - `asset:producer:well-t1` -> `game/arkini/assets/producer-well-t1.png`
-- `asset:item:water` -> `game/arkini/assets/item-water.png` (replaced with the new bucket art)
+- `asset:item:water` -> `game/arkini/assets/item-water.png`

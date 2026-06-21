@@ -39,6 +39,32 @@
 			"requirementIds": [
 				"proximity:stonemason-t1:quarry-t1"
 			]
+		},
+		"producer:well-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:well-t1:water"
+			],
+			"requirementIds": []
+		},
+		"producer:farm-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:farm-t1:grain"
+			],
+			"requirementIds": [
+				"proximity:farm-t1:wheat-field"
+			]
+		},
+		"producer:pig-farm-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:pig-farm-t1:piglet"
+			],
+			"requirementIds": []
 		}
 	}
 }

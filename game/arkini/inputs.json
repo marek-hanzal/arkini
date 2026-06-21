@@ -21,6 +21,34 @@
 					"consume": true
 				}
 			]
+		},
+		"input:farm-t1:water": {
+			"name": "Farm water input",
+			"inputs": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:pig-farm-t1:grain-water": {
+			"name": "Pig farm grain and water input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
 		}
 	}
 }

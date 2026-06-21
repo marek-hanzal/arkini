@@ -70,7 +70,8 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:brewery-t1:beer-barrel"
+				"product:brewery-t1:beer-barrel",
+				"product:brewery-t1:beer-barrel-from-beer"
 			],
 			"requirementIds": [
 				"proximity:brewery-t1:hop-field"

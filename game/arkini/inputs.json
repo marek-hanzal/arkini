@@ -71,6 +71,17 @@
 					"consume": true
 				}
 			]
+		},
+		"input:brewery-t1:beer-to-barrel": {
+			"name": "Brewery beer to barrel input",
+			"inputs": [
+				{
+					"itemId": "item:beer",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true
+				}
+			]
 		}
 	}
 }

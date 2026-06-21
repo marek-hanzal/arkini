@@ -68,6 +68,14 @@
 			"inputRefId": "input:tavern-t1:beer-barrel",
 			"requirementIds": [],
 			"outputTableId": "loot:tavern-t1:beer"
+		},
+		"product:brewery-t1:beer-barrel-from-beer": {
+			"name": "Beer Barrel",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:brewery-t1:beer-to-barrel",
+			"requirementIds": [],
+			"outputTableId": "loot:brewery-t1:beer-barrel-from-beer"
 		}
 	}
 }

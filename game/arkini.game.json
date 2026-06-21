@@ -409,6 +409,17 @@
 		"title": "Arkini"
 	},
 	"inputs": {
+		"input:brewery-t1:beer-to-barrel": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 4
+				}
+			],
+			"name": "Brewery beer to barrel input"
+		},
 		"input:brewery-t1:water": {
 			"inputs": [
 				{
@@ -824,6 +835,16 @@
 				}
 			]
 		},
+		"loot:brewery-t1:beer-barrel-from-beer": {
+			"name": "Brewery beer barrels from beers",
+			"output": [
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:farm-t1:grain": {
 			"name": "Farm grain",
 			"output": [
@@ -910,7 +931,8 @@
 		"producer:brewery-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:brewery-t1:beer-barrel"
+				"product:brewery-t1:beer-barrel",
+				"product:brewery-t1:beer-barrel-from-beer"
 			],
 			"requirementIds": [
 				"proximity:brewery-t1:hop-field"
@@ -998,6 +1020,14 @@
 			"inputRefId": "input:brewery-t1:water",
 			"name": "Beer Barrel",
 			"outputTableId": "loot:brewery-t1:beer-barrel",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:brewery-t1:beer-barrel-from-beer": {
+			"durationMs": 5000,
+			"inputRefId": "input:brewery-t1:beer-to-barrel",
+			"name": "Beer Barrel",
+			"outputTableId": "loot:brewery-t1:beer-barrel-from-beer",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

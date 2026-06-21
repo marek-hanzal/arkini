@@ -80,6 +80,13 @@
 			"resourceId": "item-branch",
 			"sort": 50
 		},
+		"asset:item:bread": {
+			"kind": "item",
+			"label": "Bread",
+			"render": "plain",
+			"resourceId": "item-bread",
+			"sort": 206
+		},
 		"asset:item:bush": {
 			"kind": "item",
 			"label": "Bush",
@@ -164,6 +171,13 @@
 			"resourceId": "item-crystal",
 			"sort": 90
 		},
+		"asset:item:flour": {
+			"kind": "item",
+			"label": "Flour",
+			"render": "plain",
+			"resourceId": "item-flour",
+			"sort": 204
+		},
 		"asset:item:gem": {
 			"kind": "item",
 			"label": "Gem",
@@ -234,6 +248,13 @@
 			"resourceId": "item-leaf",
 			"sort": 30
 		},
+		"asset:item:leather": {
+			"kind": "item",
+			"label": "Leather",
+			"render": "plain",
+			"resourceId": "item-leather",
+			"sort": 211
+		},
 		"asset:item:log": {
 			"kind": "item",
 			"label": "Log",
@@ -267,7 +288,7 @@
 			"label": "Piglet",
 			"render": "plain",
 			"resourceId": "item-piglet",
-			"sort": 204
+			"sort": 208
 		},
 		"asset:item:plank": {
 			"kind": "item",
@@ -309,7 +330,7 @@
 			"label": "Sausage",
 			"render": "plain",
 			"resourceId": "item-sausage",
-			"sort": 134
+			"sort": 210
 		},
 		"asset:item:seed": {
 			"kind": "item",
@@ -402,6 +423,13 @@
 			"resourceId": "item-wood-bundle",
 			"sort": 64
 		},
+		"asset:producer:bakery-t1": {
+			"kind": "item",
+			"label": "Bakery I",
+			"render": "plain",
+			"resourceId": "producer-bakery-t1",
+			"sort": 205
+		},
 		"asset:producer:brewery-t1": {
 			"kind": "item",
 			"label": "Brewery I",
@@ -449,7 +477,7 @@
 			"label": "Pig Farm I",
 			"render": "plain",
 			"resourceId": "producer-pig-farm-t1",
-			"sort": 203
+			"sort": 207
 		},
 		"asset:producer:quarry-t1": {
 			"kind": "item",
@@ -464,6 +492,13 @@
 			"render": "plain",
 			"resourceId": "producer-sawmill-t1",
 			"sort": 131
+		},
+		"asset:producer:slaughterhouse-t1": {
+			"kind": "item",
+			"label": "Slaughterhouse I",
+			"render": "plain",
+			"resourceId": "producer-slaughterhouse-t1",
+			"sort": 209
 		},
 		"asset:producer:smelter-t1": {
 			"kind": "item",
@@ -521,6 +556,23 @@
 		"title": "Arkini"
 	},
 	"inputs": {
+		"input:bakery-t1:flour-water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Bakery flour and water input"
+		},
 		"input:brewery-t1:beer-to-barrel": {
 			"inputs": [
 				{
@@ -650,6 +702,17 @@
 			],
 			"name": "Sawmill log input"
 		},
+		"input:slaughterhouse-t1:piglet": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet",
+					"quantity": 1
+				}
+			],
+			"name": "Slaughterhouse piglet input"
+		},
 		"input:smelter-t1:gold-ingot": {
 			"inputs": [
 				{
@@ -741,6 +804,17 @@
 			],
 			"name": "Tavern wine barrel input"
 		},
+		"input:windmill-t1:grain": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"name": "Windmill grain input"
+		},
 		"input:winery-t1:grapes-water": {
 			"inputs": [
 				{
@@ -811,6 +885,20 @@
 			],
 			"tier": 0
 		},
+		"item:bread": {
+			"assetId": "asset:item:bread",
+			"code": "bread",
+			"description": "Baked food produced by bakeries from flour and water.",
+			"maxStackSize": 50,
+			"name": "Bread",
+			"sort": 540,
+			"storage": "both",
+			"tags": [
+				"food",
+				"bread"
+			],
+			"tier": 0
+		},
 		"item:coal": {
 			"assetId": "asset:item:coal",
 			"code": "coal",
@@ -824,6 +912,22 @@
 				"industry",
 				"fuel",
 				"coal"
+			],
+			"tier": 0
+		},
+		"item:flour": {
+			"assetId": "asset:item:flour",
+			"code": "flour",
+			"description": "Milled grain produced by windmills and baked into bread.",
+			"maxStackSize": 50,
+			"name": "Flour",
+			"sort": 530,
+			"storage": "both",
+			"tags": [
+				"material",
+				"food",
+				"grain",
+				"flour"
 			],
 			"tier": 0
 		},
@@ -862,7 +966,7 @@
 		"item:grain": {
 			"assetId": "asset:item:grain",
 			"code": "grain",
-			"description": "Harvested grain produced by farms and used as pig feed.",
+			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
 			"maxStackSize": 50,
 			"name": "Grain",
 			"sort": 520,
@@ -954,6 +1058,21 @@
 			],
 			"tier": 0
 		},
+		"item:leather": {
+			"assetId": "asset:item:leather",
+			"code": "leather",
+			"description": "Processed leather produced as a slaughterhouse byproduct from piglets.",
+			"maxStackSize": 50,
+			"name": "Leather",
+			"sort": 570,
+			"storage": "both",
+			"tags": [
+				"material",
+				"leather",
+				"animal"
+			],
+			"tier": 0
+		},
 		"item:log": {
 			"assetId": "asset:item:log",
 			"code": "log",
@@ -971,10 +1090,10 @@
 		"item:piglet": {
 			"assetId": "asset:item:piglet",
 			"code": "piglet",
-			"description": "A small piglet produced by pig farms.",
+			"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
 			"maxStackSize": 20,
 			"name": "Piglet",
-			"sort": 530,
+			"sort": 550,
 			"storage": "both",
 			"tags": [
 				"animal",
@@ -1029,10 +1148,10 @@
 		"item:sausage": {
 			"assetId": "asset:item:sausage",
 			"code": "sausage",
-			"description": "Food consumed by heavy industry workers. Full sausage production will be wired separately.",
+			"description": "Meat food produced by slaughterhouses from piglets and consumed by heavy industry workers.",
 			"maxStackSize": 50,
 			"name": "Sausage",
-			"sort": 540,
+			"sort": 560,
 			"storage": "both",
 			"tags": [
 				"food",
@@ -1158,6 +1277,22 @@
 			],
 			"tier": 0
 		},
+		"producer:bakery-t1": {
+			"assetId": "asset:producer:bakery-t1",
+			"code": "bakery-t1",
+			"description": "Consumes flour and water to bake bread.",
+			"maxStackSize": 1,
+			"name": "Bakery I",
+			"producerId": "producer:bakery-t1",
+			"sort": 630,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"bread"
+			],
+			"tier": 1
+		},
 		"producer:brewery-t1": {
 			"assetId": "asset:producer:brewery-t1",
 			"code": "brewery-t1",
@@ -1263,7 +1398,7 @@
 			"maxStackSize": 1,
 			"name": "Pig Farm I",
 			"producerId": "producer:pig-farm-t1",
-			"sort": 620,
+			"sort": 640,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -1299,6 +1434,23 @@
 			"tags": [
 				"producer",
 				"wood"
+			],
+			"tier": 1
+		},
+		"producer:slaughterhouse-t1": {
+			"assetId": "asset:producer:slaughterhouse-t1",
+			"code": "slaughterhouse-t1",
+			"description": "Processes piglets into sausage and leather.",
+			"maxStackSize": 1,
+			"name": "Slaughterhouse I",
+			"producerId": "producer:slaughterhouse-t1",
+			"sort": 650,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"meat",
+				"leather"
 			],
 			"tier": 1
 		},
@@ -1365,6 +1517,23 @@
 			],
 			"tier": 1
 		},
+		"producer:windmill-t1": {
+			"assetId": "asset:producer:windmill-t1",
+			"code": "windmill-t1",
+			"description": "Mills grain into flour.",
+			"maxStackSize": 1,
+			"name": "Windmill I",
+			"producerId": "producer:windmill-t1",
+			"sort": 620,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"grain",
+				"flour"
+			],
+			"tier": 1
+		},
 		"producer:winery-t1": {
 			"assetId": "asset:producer:winery-t1",
 			"code": "winery-t1",
@@ -1383,6 +1552,16 @@
 		}
 	},
 	"lootTables": {
+		"loot:bakery-t1:bread": {
+			"name": "Bakery bread",
+			"output": [
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:brewery-t1:beer-barrel": {
 			"name": "Brewery beer barrels from hops and water",
 			"output": [
@@ -1493,6 +1672,21 @@
 				}
 			]
 		},
+		"loot:slaughterhouse-t1:sausage-leather": {
+			"name": "Slaughterhouse sausage and leather",
+			"output": [
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:smelter-t1:gold-ingot": {
 			"name": "Smelter gold ingots",
 			"output": [
@@ -1563,6 +1757,16 @@
 				}
 			]
 		},
+		"loot:windmill-t1:flour": {
+			"name": "Windmill flour",
+			"output": [
+				{
+					"itemId": "item:flour",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:winery-t1:grapes": {
 			"name": "Winery grapes",
 			"output": [
@@ -1596,6 +1800,14 @@
 	},
 	"merge": {},
 	"producers": {
+		"producer:bakery-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:bakery-t1:bread"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:brewery-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -1680,6 +1892,14 @@
 			],
 			"type": "producer"
 		},
+		"producer:slaughterhouse-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:slaughterhouse-t1:sausage-leather"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:smelter-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -1716,6 +1936,14 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:windmill-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:windmill-t1:flour"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:winery-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -1730,6 +1958,14 @@
 		}
 	},
 	"products": {
+		"product:bakery-t1:bread": {
+			"durationMs": 8000,
+			"inputRefId": "input:bakery-t1:flour-water",
+			"name": "Bread",
+			"outputTableId": "loot:bakery-t1:bread",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:brewery-t1:beer-barrel": {
 			"durationMs": 5000,
 			"inputRefId": "input:brewery-t1:hops-water",
@@ -1816,6 +2052,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:slaughterhouse-t1:sausage-leather": {
+			"durationMs": 8000,
+			"inputRefId": "input:slaughterhouse-t1:piglet",
+			"name": "Sausage + Leather",
+			"outputTableId": "loot:slaughterhouse-t1:sausage-leather",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:smelter-t1:gold-ingot": {
 			"durationMs": 10000,
 			"inputRefId": "input:smelter-t1:gold-ingot",
@@ -1860,6 +2104,14 @@
 			"durationMs": 5000,
 			"name": "Water",
 			"outputTableId": "loot:well-t1:water",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:windmill-t1:flour": {
+			"durationMs": 6000,
+			"inputRefId": "input:windmill-t1:grain",
+			"name": "Flour",
+			"outputTableId": "loot:windmill-t1:flour",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

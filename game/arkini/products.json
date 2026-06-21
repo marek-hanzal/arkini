@@ -45,6 +45,22 @@
 			"requirementIds": [],
 			"outputTableId": "loot:farm-t1:grain"
 		},
+		"product:windmill-t1:flour": {
+			"name": "Flour",
+			"durationMs": 6000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:windmill-t1:grain",
+			"requirementIds": [],
+			"outputTableId": "loot:windmill-t1:flour"
+		},
+		"product:bakery-t1:bread": {
+			"name": "Bread",
+			"durationMs": 8000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:bakery-t1:flour-water",
+			"requirementIds": [],
+			"outputTableId": "loot:bakery-t1:bread"
+		},
 		"product:pig-farm-t1:piglet": {
 			"name": "Piglet",
 			"durationMs": 5000,
@@ -52,6 +68,14 @@
 			"inputRefId": "input:pig-farm-t1:grain-water",
 			"requirementIds": [],
 			"outputTableId": "loot:pig-farm-t1:piglet"
+		},
+		"product:slaughterhouse-t1:sausage-leather": {
+			"name": "Sausage + Leather",
+			"durationMs": 8000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:slaughterhouse-t1:piglet",
+			"requirementIds": [],
+			"outputTableId": "loot:slaughterhouse-t1:sausage-leather"
 		},
 		"product:brewery-t1:beer-barrel": {
 			"name": "Beer Barrel",

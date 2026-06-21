@@ -78,38 +78,56 @@ Fragments are merged into one final config.
 
 ## 2. ID conventions
 
-Recommended prefixes:
+IDs should be short, stable, and obvious from the collection they live in. Do not repeat information that the collection name already provides. A resource item named `log` should be `item:log`, not `item:wood-t1:resource:log`, because humans already lost enough dignity to JSON.
+
+Recommended patterns:
 
 ```txt
 asset:<name>
 item:<name>
-merge:<source>-<target>-<result>
-input:<owner>-<purpose>
-requirement:<owner>-<purpose>
-producer:<name>
-product:<producer>-<line>
+merge:<source>:<target>:<result>
+input:<owner>:<item>
+producer:<name>-t<tier>
+product:<producer>:<output-item>
+proximity:<owner>:<target>
 stash:<name>
 craft:<result-or-target>
-loot:<owner>
-upgrade:<owner>-<purpose>
+loot:<owner>:<output-item>
+upgrade:<owner>:<purpose>
 ```
+
+Guidelines:
+
+- Use lowercase ASCII and kebab-case names.
+- Use `:` to separate semantic segments.
+- Keep low-level resource/source item IDs plain: `item:tree`, `item:rock`, `item:log`, `item:plank`, `item:stone`, `item:stone-block`.
+- Do not add tiers to ordinary resources unless the thing is truly a different semantic material. Prefer `item:hardwood-log` over `item:log-t2`.
+- Use tiers for upgradeable producers/buildings: `producer:lumberjack-t1`, `producer:sawmill-t1`.
+- Product IDs should show who makes what: `product:lumberjack-t1:log`.
+- Input IDs should show who consumes what: `input:sawmill-t1:log`.
+- Proximity IDs do not need a `requirement:` prefix. Proximity is already a requirement type, so use `proximity:lumberjack-t1:tree`.
+- Loot IDs do not need `output` in the ID. Loot is already output-like, so use `loot:lumberjack-t1:log`.
+- Do not rename IDs for balance changes, wording changes, labels, duration changes, or proximity distance changes.
 
 Examples:
 
 ```txt
 asset:item-tree
+asset:item-log
 item:tree
-item:twig
-merge:twig-twig-branch
-input:coal-mine-1-rations
-requirement:lumber-camp-1-near-tree
-producer:lumber-camp-1
-product:lumber-camp-1
-product:lumber-camp-1-log
-stash:crate-4
-craft:lumber-camp
-loot:lumber-camp-1
-upgrade:lumber-camp-1-speed
+item:rock
+item:log
+item:plank
+producer:lumberjack-t1
+producer:sawmill-t1
+product:lumberjack-t1:log
+product:sawmill-t1:plank
+input:sawmill-t1:log
+proximity:lumberjack-t1:tree
+proximity:sawmill-t1:lumberjack-t1
+loot:lumberjack-t1:log
+loot:sawmill-t1:plank
+upgrade:lumberjack-t1:speed
 ```
 
 Keep IDs stable. Rename `name`, `label`, or `description` when display text changes. Do not rename IDs for wording or balance changes.

@@ -204,6 +204,21 @@
 			],
 			"sort": 530
 		},
+		"item:sausage": {
+			"assetId": "asset:item:sausage",
+			"code": "sausage",
+			"name": "Sausage",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Food consumed by heavy industry workers. Full sausage production will be wired separately.",
+			"tags": [
+				"food",
+				"meat",
+				"sausage"
+			],
+			"sort": 540
+		},
 		"producer:well-t1": {
 			"assetId": "asset:producer:well-t1",
 			"code": "well-t1",
@@ -421,6 +436,168 @@
 			],
 			"sort": 1000,
 			"producerId": "producer:winery-t1"
+		},
+		"item:coal": {
+			"assetId": "asset:item:coal",
+			"code": "coal",
+			"name": "Coal Cart",
+			"tier": 0,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A mining cart loaded with coal. Used as fuel by smelters.",
+			"tags": [
+				"material",
+				"industry",
+				"fuel",
+				"coal"
+			],
+			"sort": 1100
+		},
+		"item:iron-ore": {
+			"assetId": "asset:item:iron-ore",
+			"code": "iron-ore",
+			"name": "Iron Ore Cart",
+			"tier": 0,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
+			"tags": [
+				"material",
+				"industry",
+				"ore",
+				"iron"
+			],
+			"sort": 1110
+		},
+		"item:gold-ore": {
+			"assetId": "asset:item:gold-ore",
+			"code": "gold-ore",
+			"name": "Gold Ore Cart",
+			"tier": 0,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A mining cart loaded with gold ore. Smelters refine it into gold ingots.",
+			"tags": [
+				"material",
+				"industry",
+				"ore",
+				"gold"
+			],
+			"sort": 1120
+		},
+		"item:iron-ingot": {
+			"assetId": "asset:item:iron-ingot",
+			"code": "iron-ingot",
+			"name": "Iron Ingot",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Refined iron produced by smelters from iron ore and coal.",
+			"tags": [
+				"material",
+				"industry",
+				"ingot",
+				"iron"
+			],
+			"sort": 1130
+		},
+		"item:gold-ingot": {
+			"assetId": "asset:item:gold-ingot",
+			"code": "gold-ingot",
+			"name": "Gold Ingot",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Refined gold produced by smelters from gold ore and coal.",
+			"tags": [
+				"material",
+				"industry",
+				"ingot",
+				"gold"
+			],
+			"sort": 1140
+		},
+		"item:pollution": {
+			"assetId": "asset:item:pollution",
+			"code": "pollution",
+			"name": "Pollution",
+			"tier": 0,
+			"maxStackSize": 1,
+			"storage": "board",
+			"description": "Dirty industrial pollution emitted by smelting. It stays on the board and must be dealt with there.",
+			"tags": [
+				"danger",
+				"industry",
+				"pollution"
+			],
+			"sort": 1150
+		},
+		"producer:coal-mine-t1": {
+			"assetId": "asset:producer:coal-mine-t1",
+			"code": "coal-mine-t1",
+			"name": "Coal Mine I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes beer and sausage to mine coal carts.",
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"coal"
+			],
+			"sort": 1200,
+			"producerId": "producer:coal-mine-t1"
+		},
+		"producer:iron-mine-t1": {
+			"assetId": "asset:producer:iron-mine-t1",
+			"code": "iron-mine-t1",
+			"name": "Iron Mine I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes beer and sausage to mine iron ore carts.",
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"iron"
+			],
+			"sort": 1210,
+			"producerId": "producer:iron-mine-t1"
+		},
+		"producer:gold-mine-t1": {
+			"assetId": "asset:producer:gold-mine-t1",
+			"code": "gold-mine-t1",
+			"name": "Gold Mine I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes beer and extra sausage to mine gold ore carts.",
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"gold"
+			],
+			"sort": 1220,
+			"producerId": "producer:gold-mine-t1"
+		},
+		"producer:smelter-t1": {
+			"assetId": "asset:producer:smelter-t1",
+			"code": "smelter-t1",
+			"name": "Smelter I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes ore, coal, beer, and sausage to produce metal ingots and pollution.",
+			"tags": [
+				"producer",
+				"industry",
+				"smelter"
+			],
+			"sort": 1230,
+			"producerId": "producer:smelter-t1"
 		}
 	}
 }

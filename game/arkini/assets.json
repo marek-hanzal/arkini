@@ -82,7 +82,7 @@
 		},
 		"asset:item:coal": {
 			"kind": "item",
-			"label": "Coal",
+			"label": "Coal Cart",
 			"render": "plain",
 			"resourceId": "item-coal",
 			"sort": 132
@@ -467,14 +467,14 @@
 		},
 		"asset:item:gold-ore": {
 			"kind": "item",
-			"label": "Gold Ore",
+			"label": "Gold Ore Cart",
 			"render": "plain",
 			"resourceId": "item-gold-ore",
 			"sort": 220
 		},
 		"asset:item:iron-ore": {
 			"kind": "item",
-			"label": "Iron Ore",
+			"label": "Iron Ore Cart",
 			"render": "plain",
 			"resourceId": "item-iron-ore",
 			"sort": 221

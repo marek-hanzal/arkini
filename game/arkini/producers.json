@@ -98,6 +98,39 @@
 			"requirementIds": [
 				"proximity:winery-t1:vineyard"
 			]
+		},
+		"producer:coal-mine-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:coal-mine-t1:coal"
+			],
+			"requirementIds": []
+		},
+		"producer:iron-mine-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:iron-mine-t1:iron-ore"
+			],
+			"requirementIds": []
+		},
+		"producer:gold-mine-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:gold-mine-t1:gold-ore"
+			],
+			"requirementIds": []
+		},
+		"producer:smelter-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:smelter-t1:iron-ingot",
+				"product:smelter-t1:gold-ingot"
+			],
+			"requirementIds": []
 		}
 	}
 }

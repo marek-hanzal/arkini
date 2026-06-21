@@ -89,7 +89,7 @@
 		},
 		"asset:item:coal": {
 			"kind": "item",
-			"label": "Coal",
+			"label": "Coal Cart",
 			"render": "plain",
 			"resourceId": "item-coal",
 			"sort": 132
@@ -180,7 +180,7 @@
 		},
 		"asset:item:gold-ore": {
 			"kind": "item",
-			"label": "Gold Ore",
+			"label": "Gold Ore Cart",
 			"render": "plain",
 			"resourceId": "item-gold-ore",
 			"sort": 220
@@ -222,7 +222,7 @@
 		},
 		"asset:item:iron-ore": {
 			"kind": "item",
-			"label": "Iron Ore",
+			"label": "Iron Ore Cart",
 			"render": "plain",
 			"resourceId": "item-iron-ore",
 			"sort": 221
@@ -553,6 +553,23 @@
 			],
 			"name": "Brewery water to hops input"
 		},
+		"input:coal-mine-t1:beer-sausage": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				}
+			],
+			"name": "Coal mine beer and sausage input"
+		},
 		"input:farm-t1:water": {
 			"inputs": [
 				{
@@ -563,6 +580,40 @@
 				}
 			],
 			"name": "Farm water input"
+		},
+		"input:gold-mine-t1:beer-sausage": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 2
+				}
+			],
+			"name": "Gold mine beer and sausage input"
+		},
+		"input:iron-mine-t1:beer-sausage": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				}
+			],
+			"name": "Iron mine beer and sausage input"
 		},
 		"input:pig-farm-t1:grain-water": {
 			"inputs": [
@@ -591,6 +642,64 @@
 				}
 			],
 			"name": "Sawmill log input"
+		},
+		"input:smelter-t1:gold-ingot": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:gold-ore",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 2
+				}
+			],
+			"name": "Smelter gold ingot input"
+		},
+		"input:smelter-t1:iron-ingot": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ore",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 2
+				}
+			],
+			"name": "Smelter iron ingot input"
 		},
 		"input:stonemason-t1:stone": {
 			"inputs": [
@@ -695,6 +804,54 @@
 			],
 			"tier": 0
 		},
+		"item:coal": {
+			"assetId": "asset:item:coal",
+			"code": "coal",
+			"description": "A mining cart loaded with coal. Used as fuel by smelters.",
+			"maxStackSize": 20,
+			"name": "Coal Cart",
+			"sort": 1100,
+			"storage": "both",
+			"tags": [
+				"material",
+				"industry",
+				"fuel",
+				"coal"
+			],
+			"tier": 0
+		},
+		"item:gold-ingot": {
+			"assetId": "asset:item:gold-ingot",
+			"code": "gold-ingot",
+			"description": "Refined gold produced by smelters from gold ore and coal.",
+			"maxStackSize": 50,
+			"name": "Gold Ingot",
+			"sort": 1140,
+			"storage": "both",
+			"tags": [
+				"material",
+				"industry",
+				"ingot",
+				"gold"
+			],
+			"tier": 0
+		},
+		"item:gold-ore": {
+			"assetId": "asset:item:gold-ore",
+			"code": "gold-ore",
+			"description": "A mining cart loaded with gold ore. Smelters refine it into gold ingots.",
+			"maxStackSize": 20,
+			"name": "Gold Ore Cart",
+			"sort": 1120,
+			"storage": "both",
+			"tags": [
+				"material",
+				"industry",
+				"ore",
+				"gold"
+			],
+			"tier": 0
+		},
 		"item:grain": {
 			"assetId": "asset:item:grain",
 			"code": "grain",
@@ -758,6 +915,38 @@
 			],
 			"tier": 0
 		},
+		"item:iron-ingot": {
+			"assetId": "asset:item:iron-ingot",
+			"code": "iron-ingot",
+			"description": "Refined iron produced by smelters from iron ore and coal.",
+			"maxStackSize": 50,
+			"name": "Iron Ingot",
+			"sort": 1130,
+			"storage": "both",
+			"tags": [
+				"material",
+				"industry",
+				"ingot",
+				"iron"
+			],
+			"tier": 0
+		},
+		"item:iron-ore": {
+			"assetId": "asset:item:iron-ore",
+			"code": "iron-ore",
+			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
+			"maxStackSize": 20,
+			"name": "Iron Ore Cart",
+			"sort": 1110,
+			"storage": "both",
+			"tags": [
+				"material",
+				"industry",
+				"ore",
+				"iron"
+			],
+			"tier": 0
+		},
 		"item:log": {
 			"assetId": "asset:item:log",
 			"code": "log",
@@ -801,6 +990,21 @@
 			],
 			"tier": 0
 		},
+		"item:pollution": {
+			"assetId": "asset:item:pollution",
+			"code": "pollution",
+			"description": "Dirty industrial pollution emitted by smelting. It stays on the board and must be dealt with there.",
+			"maxStackSize": 1,
+			"name": "Pollution",
+			"sort": 1150,
+			"storage": "board",
+			"tags": [
+				"danger",
+				"industry",
+				"pollution"
+			],
+			"tier": 0
+		},
 		"item:rock": {
 			"assetId": "asset:item:rock",
 			"code": "rock",
@@ -812,6 +1016,21 @@
 			"tags": [
 				"source",
 				"stone"
+			],
+			"tier": 0
+		},
+		"item:sausage": {
+			"assetId": "asset:item:sausage",
+			"code": "sausage",
+			"description": "Food consumed by heavy industry workers. Full sausage production will be wired separately.",
+			"maxStackSize": 50,
+			"name": "Sausage",
+			"sort": 540,
+			"storage": "both",
+			"tags": [
+				"food",
+				"meat",
+				"sausage"
 			],
 			"tier": 0
 		},
@@ -948,6 +1167,23 @@
 			],
 			"tier": 1
 		},
+		"producer:coal-mine-t1": {
+			"assetId": "asset:producer:coal-mine-t1",
+			"code": "coal-mine-t1",
+			"description": "Consumes beer and sausage to mine coal carts.",
+			"maxStackSize": 1,
+			"name": "Coal Mine I",
+			"producerId": "producer:coal-mine-t1",
+			"sort": 1200,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"coal"
+			],
+			"tier": 1
+		},
 		"producer:farm-t1": {
 			"assetId": "asset:producer:farm-t1",
 			"code": "farm-t1",
@@ -961,6 +1197,40 @@
 				"producer",
 				"food",
 				"grain"
+			],
+			"tier": 1
+		},
+		"producer:gold-mine-t1": {
+			"assetId": "asset:producer:gold-mine-t1",
+			"code": "gold-mine-t1",
+			"description": "Consumes beer and extra sausage to mine gold ore carts.",
+			"maxStackSize": 1,
+			"name": "Gold Mine I",
+			"producerId": "producer:gold-mine-t1",
+			"sort": 1220,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"gold"
+			],
+			"tier": 1
+		},
+		"producer:iron-mine-t1": {
+			"assetId": "asset:producer:iron-mine-t1",
+			"code": "iron-mine-t1",
+			"description": "Consumes beer and sausage to mine iron ore carts.",
+			"maxStackSize": 1,
+			"name": "Iron Mine I",
+			"producerId": "producer:iron-mine-t1",
+			"sort": 1210,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"iron"
 			],
 			"tier": 1
 		},
@@ -1022,6 +1292,22 @@
 			"tags": [
 				"producer",
 				"wood"
+			],
+			"tier": 1
+		},
+		"producer:smelter-t1": {
+			"assetId": "asset:producer:smelter-t1",
+			"code": "smelter-t1",
+			"description": "Consumes ore, coal, beer, and sausage to produce metal ingots and pollution.",
+			"maxStackSize": 1,
+			"name": "Smelter I",
+			"producerId": "producer:smelter-t1",
+			"sort": 1230,
+			"storage": "both",
+			"tags": [
+				"producer",
+				"industry",
+				"smelter"
 			],
 			"tier": 1
 		},
@@ -1120,11 +1406,41 @@
 				}
 			]
 		},
+		"loot:coal-mine-t1:coal": {
+			"name": "Coal mine coal carts",
+			"output": [
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:farm-t1:grain": {
 			"name": "Farm grain",
 			"output": [
 				{
 					"itemId": "item:grain",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:gold-mine-t1:gold-ore": {
+			"name": "Gold mine gold ore carts",
+			"output": [
+				{
+					"itemId": "item:gold-ore",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:iron-mine-t1:iron-ore": {
+			"name": "Iron mine iron ore carts",
+			"output": [
+				{
+					"itemId": "item:iron-ore",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -1165,6 +1481,36 @@
 			"output": [
 				{
 					"itemId": "item:plank",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:smelter-t1:gold-ingot": {
+			"name": "Smelter gold ingots",
+			"output": [
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:smelter-t1:iron-ingot": {
+			"name": "Smelter iron ingots",
+			"output": [
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -1255,6 +1601,14 @@
 			],
 			"type": "producer"
 		},
+		"producer:coal-mine-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:coal-mine-t1:coal"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:farm-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -1263,6 +1617,22 @@
 			"requirementIds": [
 				"proximity:farm-t1:wheat-field"
 			],
+			"type": "producer"
+		},
+		"producer:gold-mine-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:gold-mine-t1:gold-ore"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:iron-mine-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:iron-mine-t1:iron-ore"
+			],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:lumberjack-t1": {
@@ -1301,6 +1671,15 @@
 			"requirementIds": [
 				"proximity:sawmill-t1:lumberjack-t1"
 			],
+			"type": "producer"
+		},
+		"producer:smelter-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:smelter-t1:iron-ingot",
+				"product:smelter-t1:gold-ingot"
+			],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:stonemason-t1": {
@@ -1368,11 +1747,35 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:coal-mine-t1:coal": {
+			"durationMs": 8000,
+			"inputRefId": "input:coal-mine-t1:beer-sausage",
+			"name": "Coal Cart",
+			"outputTableId": "loot:coal-mine-t1:coal",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:farm-t1:grain": {
 			"durationMs": 5000,
 			"inputRefId": "input:farm-t1:water",
 			"name": "Grain",
 			"outputTableId": "loot:farm-t1:grain",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:gold-mine-t1:gold-ore": {
+			"durationMs": 9000,
+			"inputRefId": "input:gold-mine-t1:beer-sausage",
+			"name": "Gold Ore Cart",
+			"outputTableId": "loot:gold-mine-t1:gold-ore",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:iron-mine-t1:iron-ore": {
+			"durationMs": 8000,
+			"inputRefId": "input:iron-mine-t1:beer-sausage",
+			"name": "Iron Ore Cart",
+			"outputTableId": "loot:iron-mine-t1:iron-ore",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -1403,6 +1806,22 @@
 			"inputRefId": "input:sawmill-t1:log",
 			"name": "Plank",
 			"outputTableId": "loot:sawmill-t1:plank",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:smelter-t1:gold-ingot": {
+			"durationMs": 10000,
+			"inputRefId": "input:smelter-t1:gold-ingot",
+			"name": "Gold Ingot",
+			"outputTableId": "loot:smelter-t1:gold-ingot",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:smelter-t1:iron-ingot": {
+			"durationMs": 10000,
+			"inputRefId": "input:smelter-t1:iron-ingot",
+			"name": "Iron Ingot",
+			"outputTableId": "loot:smelter-t1:iron-ingot",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

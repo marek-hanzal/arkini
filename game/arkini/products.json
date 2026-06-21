@@ -116,6 +116,46 @@
 			"inputRefId": "input:winery-t1:wine-glass-to-barrel",
 			"requirementIds": [],
 			"outputTableId": "loot:winery-t1:wine-barrel-from-wine-glasses"
+		},
+		"product:coal-mine-t1:coal": {
+			"name": "Coal Cart",
+			"durationMs": 8000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:coal-mine-t1:beer-sausage",
+			"requirementIds": [],
+			"outputTableId": "loot:coal-mine-t1:coal"
+		},
+		"product:iron-mine-t1:iron-ore": {
+			"name": "Iron Ore Cart",
+			"durationMs": 8000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:iron-mine-t1:beer-sausage",
+			"requirementIds": [],
+			"outputTableId": "loot:iron-mine-t1:iron-ore"
+		},
+		"product:gold-mine-t1:gold-ore": {
+			"name": "Gold Ore Cart",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:gold-mine-t1:beer-sausage",
+			"requirementIds": [],
+			"outputTableId": "loot:gold-mine-t1:gold-ore"
+		},
+		"product:smelter-t1:iron-ingot": {
+			"name": "Iron Ingot",
+			"durationMs": 10000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:smelter-t1:iron-ingot",
+			"requirementIds": [],
+			"outputTableId": "loot:smelter-t1:iron-ingot"
+		},
+		"product:smelter-t1:gold-ingot": {
+			"name": "Gold Ingot",
+			"durationMs": 10000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:smelter-t1:gold-ingot",
+			"requirementIds": [],
+			"outputTableId": "loot:smelter-t1:gold-ingot"
 		}
 	}
 }

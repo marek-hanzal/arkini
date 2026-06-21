@@ -52,11 +52,18 @@ export const useTileActorFeedbackMotion = ({
 			scope,
 			element,
 			keyframes: {
+				filter: [
+					"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
+					"brightness(1.22) drop-shadow(0 10px 14px rgb(168 85 247 / 0.32))",
+					"brightness(1.12) drop-shadow(0 5px 8px rgb(168 85 247 / 0.22))",
+					"brightness(1.16) drop-shadow(0 7px 10px rgb(168 85 247 / 0.26))",
+					"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
+				],
 				transform: [
 					"translate3d(0px, 0px, 0px) scale(1)",
-					"translate3d(0px, -3px, 0px) scale(1.22)",
-					"translate3d(0px, 1px, 0px) scale(0.93)",
-					"translate3d(0px, -1px, 0px) scale(1.06)",
+					"translate3d(0px, -6px, 0px) scale(1.34)",
+					"translate3d(0px, 2px, 0px) scale(0.9)",
+					"translate3d(0px, -2px, 0px) scale(1.12)",
 					"translate3d(0px, 0px, 0px) scale(1)",
 				],
 			},
@@ -71,6 +78,7 @@ export const useTileActorFeedbackMotion = ({
 			},
 		}).then((result) => {
 			if (result.status !== "completed") return;
+			element.style.filter = "";
 			element.style.transform = "";
 			DebugTimeline.record({
 				scope: "tile-engine",

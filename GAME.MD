@@ -902,6 +902,14 @@ Example pattern:
 
 The exact recipe belongs to economy design and central data, not to special gameplay branching.
 
+### 13.4 Era gate blueprint
+
+A progression blueprint may require ownership of an entire era before it can complete.
+
+The current Town Hall model uses this for era advancement: crafting the next Town Hall consumes the current Town Hall tier and passively requires every physical building/place from the current era. These requirements use `board_or_inventory`, because the game cares that the player owns the infrastructure, not whether every building is staged on the board for a tiny zoning hearing.
+
+Higher Town Hall tiers do not need to re-issue lower-era blueprints if the upgrade gate already proves the old era has been physically built. Players who want duplicate older buildings should build them before upgrading; failing to do so may slow later economy, but must not soft-lock progression.
+
 ## 14. Craft / construction / growth progress
 
 ### 14.1 Purpose

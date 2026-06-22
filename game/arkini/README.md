@@ -55,6 +55,10 @@ producer:townhall-t3  Heavy industry and cleanup blueprints
 producer:townhall-t4  Coin-economy specialist blueprints
 ```
 
+Townhall upgrades are one-way era gates. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
+
+Higher Town Hall tiers do not re-issue lower-era blueprints. If the player wants duplicate lower-era infrastructure, they should build it before upgrading. Missing duplicates should slow later economy, not soft-lock progression.
+
 Townhall products use era-proof inputs, while blueprint craft recipes use construction inputs:
 
 ```txt

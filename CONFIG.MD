@@ -187,7 +187,7 @@ Defines game metadata, board size, and inventory slots.
     "title": "Arkini",
     "board": {
       "width": 7,
-      "height": 9
+      "height": 11
     },
     "inventory": {
       "slots": 35
@@ -223,7 +223,7 @@ When changing inventory size, update `inventory.slots`:
     "title": "Arkini",
     "board": {
       "width": 7,
-      "height": 9
+      "height": 11
     },
     "inventory": {
       "slots": 42

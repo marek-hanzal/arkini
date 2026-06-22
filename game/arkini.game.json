@@ -596,25 +596,25 @@
 			"kind": "item",
 			"label": "Town Hall I",
 			"render": "plain",
-			"resourceId": "item-townhall"
+			"resourceId": "producer-townhall-t1"
 		},
 		"asset:producer:townhall-t2": {
 			"kind": "item",
 			"label": "Town Hall II",
 			"render": "plain",
-			"resourceId": "item-townhall"
+			"resourceId": "producer-townhall-t2"
 		},
 		"asset:producer:townhall-t3": {
 			"kind": "item",
 			"label": "Town Hall III",
 			"render": "plain",
-			"resourceId": "item-townhall"
+			"resourceId": "producer-townhall-t3"
 		},
 		"asset:producer:townhall-t4": {
 			"kind": "item",
 			"label": "Town Hall IV",
 			"render": "plain",
-			"resourceId": "item-townhall"
+			"resourceId": "producer-townhall-t4"
 		},
 		"asset:producer:well-t1": {
 			"kind": "item",

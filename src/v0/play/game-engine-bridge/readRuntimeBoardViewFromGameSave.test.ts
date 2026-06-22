@@ -144,6 +144,86 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
+	it("shows active producer product hindrances in the runtime view", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					hinderedBy: [
+						{
+							distance: 2,
+							durationFactor: 0.5,
+							itemIds: [
+								"item:twig",
+							],
+							type: "proximity",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+		const line = board.byId["item-instance:1"]?.activation?.productLines?.find(
+			(line) => line.productId === "product:test",
+		);
+
+		expect(line).toMatchObject({
+			durationMs: 3000,
+			hindrances: [
+				{
+					durationMultiplier: 3,
+					matches: [
+						{
+							distance: 1,
+						},
+						{
+							distance: 2,
+						},
+					],
+					type: "proximity",
+				},
+			],
+		});
+	});
+
 	it("marks the saved producer product line as the default line", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

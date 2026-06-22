@@ -213,6 +213,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				) : null}
 				{boardItem.activation?.productLines?.length ? (
 					<ItemProducerProductLinesCard
+						items={items}
 						lines={boardItem.activation.productLines}
 						nowMs={nowMs}
 						pending={itemAction.isPending}

@@ -45,6 +45,9 @@ const productLineCanStart = (line: ProducerProductLineView) =>
 	line.requirementsReady &&
 	(line.inputsReady || line.inputsAvailable);
 
+const craftExclusiveReady = (craft: NonNullable<BoardViewItem["craft"]>) =>
+	craft.exclusiveTo.every((rule) => !rule.blocked);
+
 const craftInputFillable = (craft: NonNullable<BoardViewItem["craft"]>) =>
 	craft.inputs.some((input) => {
 		const delivered = craft.delivered[input.itemId] ?? 0;
@@ -68,7 +71,7 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (liveCraft?.phase === "collecting_inputs") {
-		if (requirementsReady(liveCraft.requirements)) {
+		if (requirementsReady(liveCraft.requirements) && craftExclusiveReady(liveCraft)) {
 			const inputsReady = liveCraft.inputProgress >= 1;
 			const inputsFillable = craftInputFillable(liveCraft);
 

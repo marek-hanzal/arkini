@@ -3,6 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+import { readGameSaveExclusiveConflicts } from "~/v0/game/exclusivity/readGameSaveExclusiveConflicts";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 
 export namespace readRuntimeCraftViewFromGameSave {
@@ -68,8 +69,27 @@ export const readRuntimeCraftViewFromGameSave = ({
 			: readyAtMs !== undefined
 				? "waiting"
 				: "collecting_inputs";
+	const exclusiveConflicts = readGameSaveExclusiveConflicts({
+		config,
+		ignoredBoardItemInstanceIds: new Set([
+			boardItem.id,
+		]),
+		itemId: recipe.resultItemId,
+		save,
+	});
+	const exclusiveConflictSet = new Set(exclusiveConflicts);
+	const exclusiveChoiceItemIds = new Set([
+		...(config.items[recipe.resultItemId]?.exclusiveToIds ?? []),
+		...exclusiveConflicts,
+	]);
+	const exclusiveTo = [
+		...exclusiveChoiceItemIds,
+	].map((itemId) => ({
+		blocked: exclusiveConflictSet.has(itemId),
+		itemId: itemId as ItemId,
+	}));
 	const acceptedInputItemIds =
-		phase === "collecting_inputs"
+		phase === "collecting_inputs" && exclusiveConflicts.length === 0
 			? recipe.inputs.flatMap((input) =>
 					(delivered[input.itemId] ?? 0) < input.quantity
 						? [
@@ -85,6 +105,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 		complete: phase === "ready",
 		delivered,
 		durationMs: recipe.durationMs,
+		exclusiveTo,
 		id: recipeId,
 		inputProgress,
 		inputs: recipe.inputs.map((input) => ({

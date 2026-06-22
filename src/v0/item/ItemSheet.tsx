@@ -41,6 +41,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	});
 	const actionError = itemAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
+	const craftHasRules = Boolean(liveCraft?.requirements?.length || liveCraft?.exclusiveTo.length);
 	const relations = useMemo(
 		() => ({
 			mergeResults: (item?.mergeResults ?? []).map((rule) => ({
@@ -80,6 +81,11 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 			</section>
 		);
 	}
+
+	const itemExclusiveTo = item.exclusiveToIds.map((itemId) => ({
+		blocked: false,
+		itemId,
+	}));
 
 	const setProductLineEnabled = (productId: string, enabled: boolean) => {
 		void itemAction.run({
@@ -164,8 +170,16 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					storeDisabled={itemAction.isPending || item.storage === "board"}
 					onStore={storeBoardItem}
 				/>
-				{liveCraft?.requirements?.length ? (
+				{itemExclusiveTo.length ? (
 					<ItemRequirementRulesCard
+						exclusiveTo={itemExclusiveTo}
+						items={items}
+						title="Choice"
+					/>
+				) : null}
+				{craftHasRules && liveCraft ? (
+					<ItemRequirementRulesCard
+						exclusiveTo={liveCraft.exclusiveTo}
 						items={items}
 						requirements={liveCraft.requirements}
 						title="Craft rules"

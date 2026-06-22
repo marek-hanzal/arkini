@@ -14,6 +14,7 @@ export type GameEngineError =
 			readonly _tag: "GameActionRejected";
 			readonly reason:
 				| "input_mismatch"
+				| "exclusive_conflict"
 				| "input_unavailable"
 				| "invalid_actor"
 				| "invalid_merge"

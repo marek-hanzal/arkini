@@ -297,6 +297,94 @@ describe("placeGameSaveItemsFx", () => {
 		]);
 	});
 
+	it("rejects placement when the new item is exclusive to owned items", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					exclusiveToIds: [
+						"item:twig",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runPlacementEither({
+			config,
+			items: [
+				{
+					itemId: "item:plank",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GamePlacementFailed",
+				reason: "exclusive:conflict",
+			},
+		});
+	});
+
+	it("rejects placement when owned items are exclusive to the new item", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					exclusiveToIds: [
+						"item:plank",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runPlacementEither({
+			config,
+			items: [
+				{
+					itemId: "item:plank",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GamePlacementFailed",
+				reason: "exclusive:conflict",
+			},
+		});
+	});
+
 	it("keeps placement atomic when board and inventory cannot fit the whole output", () => {
 		const config = createEngineTestConfig({
 			game: {

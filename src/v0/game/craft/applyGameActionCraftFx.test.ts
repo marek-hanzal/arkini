@@ -151,6 +151,60 @@ describe("applyGameActionFx Craft", () => {
 		]);
 	});
 
+	it("rejects craft input investment when the result is exclusive to owned items", () => {
+		const baseConfig = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		config.items["item:plank"] = {
+			...baseConfig.items["item:plank"],
+			exclusiveToIds: [
+				"item:key",
+			],
+		};
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+		save.inventory.slots[1] = {
+			itemId: "item:key",
+			quantity: 1,
+		};
+
+		const result = runActionEither({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "exclusive_conflict",
+			},
+		});
+		expect(save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+	});
+
 	it("withdraws one stored craft input through producer-style board placement", () => {
 		const config = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,

@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
+import type { ExclusiveItemRuleView } from "~/v0/board/view/ExclusiveItemRuleViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { UiSection } from "~/v0/ui/UiSection";
 
@@ -8,6 +9,7 @@ export namespace ItemRequirementRulesCard {
 	export interface Props {
 		title: string;
 		requirements?: readonly ActivationRequirementView[];
+		exclusiveTo?: readonly ExclusiveItemRuleView[];
 		inputs?: readonly ActivationInputView[];
 		items: ItemCatalogView;
 	}
@@ -45,6 +47,11 @@ const readRequirementLabel = (requirement: ActivationRequirementView, items: Ite
 	return `${itemLabel} · ${distanceLabel}${matchedDistance}${durationEffect}`;
 };
 
+const readExclusiveChoiceLabel = (rule: ExclusiveItemRuleView, items: ItemCatalogView) =>
+	rule.blocked
+		? `Blocked: cannot coexist with ${items[rule.itemId]?.name ?? rule.itemId}`
+		: `Choice: will block ${items[rule.itemId]?.name ?? rule.itemId}`;
+
 const readInputSatisfied = (input: ActivationInputView) => input.stored >= input.quantity;
 
 const readInputLabel = (input: ActivationInputView, items: ItemCatalogView) => {
@@ -56,6 +63,7 @@ const readInputLabel = (input: ActivationInputView, items: ItemCatalogView) => {
 };
 
 export const ItemRequirementRulesCard: FC<ItemRequirementRulesCard.Props> = ({
+	exclusiveTo = [],
 	items,
 	inputs = [],
 	requirements = [],
@@ -65,15 +73,23 @@ export const ItemRequirementRulesCard: FC<ItemRequirementRulesCard.Props> = ({
 		(requirement) => !readRequirementSatisfied(requirement),
 	);
 	const rows = [
+		...exclusiveTo.map((rule) => ({
+			key: `exclusive:${rule.itemId}`,
+			label: readExclusiveChoiceLabel(rule, items),
+			satisfied: !rule.blocked,
+			tone: rule.blocked ? "danger" : "warning",
+		})),
 		...openRequirements.map((requirement, index) => ({
 			key: `requirement:${index}`,
 			label: readRequirementLabel(requirement, items),
 			satisfied: false,
+			tone: "danger",
 		})),
 		...inputs.map((input) => ({
 			key: `input:${input.itemId}`,
 			label: readInputLabel(input, items),
 			satisfied: readInputSatisfied(input),
+			tone: readInputSatisfied(input) ? "success" : "danger",
 		})),
 	];
 
@@ -89,9 +105,15 @@ export const ItemRequirementRulesCard: FC<ItemRequirementRulesCard.Props> = ({
 					>
 						<span
 							aria-hidden="true"
-							className={row.satisfied ? "text-emerald-300" : "text-rose-300"}
+							className={
+								row.tone === "warning"
+									? "text-amber-300"
+									: row.satisfied
+										? "text-emerald-300"
+										: "text-rose-300"
+							}
 						>
-							{row.satisfied ? "✓" : "✕"}
+							{row.tone === "warning" ? "⚠" : row.satisfied ? "✓" : "✕"}
 						</span>
 						<span className="min-w-0 break-words">{row.label}</span>
 					</div>

@@ -341,6 +341,7 @@ Item shape:
       "producerId": "producer:lumber-camp-1",
       "stashId": "stash:crate-1",
       "craftRecipeId": "craft:lumber-camp",
+      "exclusiveToIds": ["item:church-t1"],
       "removeBy": [
         {
           "itemId": "item:water",
@@ -367,6 +368,7 @@ Fields:
 - `producerId`: producer definition attached to this item.
 - `stashId`: stash definition attached to this item.
 - `craftRecipeId`: craft recipe attached to this item.
+- `exclusiveToIds`: directional hard-coexistence blockers. If this item exists or is about to be created, it cannot coexist with any owned item in this list. The list is explicit and not automatically symmetric.
 - `removeBy`: removal rules using another item.
 
 Storage values:
@@ -492,7 +494,31 @@ both
 }
 ```
 
-### 8.7 Removal rule
+### 8.7 Exclusive path item
+
+`exclusiveToIds` marks a directional hard path-choice constraint. If item A lists item B, A cannot be created or owned while B is owned. The reverse is not implied in config; B only declares its own allergy if B lists A. Runtime still checks both the new item and already-owned items so no action may leave the save containing a declared conflict. Use this for branches such as faith versus engineering, where a building choice deliberately closes another path.
+
+The UI must surface the choice before resource investment, usually on the blueprint/craft target that will create the exclusive building. A valid choice warning is still shown; it is not hidden like a fulfilled normal requirement. If the target item is already owned, the rule is a hard failure.
+
+```json
+{
+  "items": {
+    "producer:engineers-guild-t1": {
+      "assetId": "asset:item:engineers-guild-t1",
+      "code": "engineers-guild-t1",
+      "name": "Engineers Guild I",
+      "tier": 1,
+      "maxStackSize": 1,
+      "description": "Unlocks engineering choices.",
+      "tags": ["building", "engineering"],
+      "producerId": "producer:engineers-guild-t1",
+      "exclusiveToIds": ["producer:church-t1"]
+    }
+  }
+}
+```
+
+### 8.8 Removal rule
 
 ```json
 {
@@ -1695,6 +1721,7 @@ items.*.mergeIds[] -> merge
 items.*.producerId -> producers
 items.*.stashId -> stashes
 items.*.craftRecipeId -> craftRecipes
+items.*.exclusiveToIds[] -> items
 items.*.removeBy[].itemId -> items
 
 merge.*.withItemId -> items
@@ -1744,6 +1771,7 @@ Config validation also checks common data mistakes:
 - starting board coordinates outside board
 - multiple starting items on the same board cell
 - starting inventory with more stacks than available inventory slots
+- exclusive item conflicts in saves, where an owned item coexists with an item listed in its `exclusiveToIds`
 - starting inventory quantity above item `maxStackSize`
 - starting state violating item `storage`
 

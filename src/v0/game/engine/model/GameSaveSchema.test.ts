@@ -43,6 +43,42 @@ describe("GameSaveConfigSchema", () => {
 		).not.toThrow();
 	});
 
+	it("rejects saves with directional exclusive item conflicts", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					exclusiveToIds: [
+						"item:twig",
+					],
+				},
+			},
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.inventory.slots[0] = {
+			itemId: "item:plank",
+			quantity: 1,
+		};
+		invalidSave.inventory.slots[1] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("cannot coexist");
+	});
+
 	it("rejects duplicate occupied board cells", () => {
 		const config = createEngineTestConfig();
 		const save = createInitialSave({

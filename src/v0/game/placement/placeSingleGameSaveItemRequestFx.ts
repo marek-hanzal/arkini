@@ -3,6 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanceIdFx";
 import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
+import { readGameSaveExclusiveConflicts } from "~/v0/game/exclusivity/readGameSaveExclusiveConflicts";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { BoardCell } from "~/v0/game/board/BoardCell";
@@ -31,6 +32,20 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		if (!itemDefinition) {
 			return yield* Effect.fail(
 				GameEngineError.configReferenceMissing(`Missing item "${item.itemId}".`),
+			);
+		}
+
+		const exclusiveConflicts = readGameSaveExclusiveConflicts({
+			config,
+			itemId: item.itemId,
+			save,
+		});
+		if (exclusiveConflicts.length > 0) {
+			return yield* Effect.fail(
+				GameEngineError.placementFailed(
+					"exclusive:conflict",
+					`Item "${item.itemId}" cannot coexist with "${exclusiveConflicts.join('", "')}".`,
+				),
 			);
 		}
 

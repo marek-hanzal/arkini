@@ -119,6 +119,7 @@ const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: strin
 			config,
 			itemId,
 		}),
+		exclusiveToIds: (item.exclusiveToIds ?? []) as ItemId[],
 		mergeResults: readMergeResults({
 			config,
 			itemId,

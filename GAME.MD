@@ -743,7 +743,7 @@ A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`
 
 Stored requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
 
-Production hindrances are negative OR effects on producers or product lines. They do not prevent production from starting. If any hindrance is active, production duration is multiplied by the strongest active slowdown. Passive hindrances react to item presence in a configured scope. Proximity hindrances react to nearby board items; closer hindrances are worse. Example: pollution within radius `2` near a farm can slow grain production without making the farm invalid.
+Production hindrances are negative effects on producers or product lines. They do not prevent production from starting. Every active hindrance instance applies a duration penalty, and active penalties stack multiplicatively. Passive hindrances react to item presence in a configured scope. Proximity hindrances react to every matching nearby board item; closer hindrances are worse. Example: each pollution tile within radius `2` near a farm slows grain production without making the farm invalid.
 
 
 ### 10.8 Producer input storage and auto-fill

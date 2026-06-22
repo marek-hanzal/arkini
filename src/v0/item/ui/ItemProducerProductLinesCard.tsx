@@ -1,14 +1,17 @@
 import type { FC } from "react";
+import type { ActivationHindranceView } from "~/v0/board/view/ActivationHindranceViewSchema";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
 import { formatMs } from "~/v0/time/formatMs";
+import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { cn } from "~/v0/ui/cn";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiSection } from "~/v0/ui/UiSection";
 
 export namespace ItemProducerProductLinesCard {
 	export interface Props {
+		items: ItemCatalogView;
 		lines: readonly ProducerProductLineView[];
 		nowMs: number;
 		pending: boolean;
@@ -21,10 +24,13 @@ export namespace ItemProducerProductLinesCard {
 
 const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "");
 
-const readRequirementLabel = (requirement: ActivationRequirementView) => {
+const readItemName = (itemId: string, items: ItemCatalogView) =>
+	items[itemId]?.name ?? itemId.replace(/^item:/, "").replace(/^producer:/, "");
+
+const readRequirementLabel = (requirement: ActivationRequirementView, items: ItemCatalogView) => {
 	if (requirement.type === "proximity") {
 		const itemLabel = requirement.itemIds
-			.map((itemId) => itemId.replace(/^item:/, ""))
+			.map((itemId) => readItemName(itemId, items))
 			.join(" / ");
 		const matchedDistance =
 			requirement.matchedDistance === undefined
@@ -38,7 +44,7 @@ const readRequirementLabel = (requirement: ActivationRequirementView) => {
 		return `${itemLabel} within ${requirement.distance}${matchedDistance}${durationEffect}`;
 	}
 
-	return `${requirement.itemId.replace(/^item:/, "")} ${requirement.stored}/${requirement.quantity}`;
+	return `${readItemName(requirement.itemId, items)} ${requirement.stored}/${requirement.quantity}`;
 };
 
 const readRequirementReady = (requirement: ActivationRequirementView) =>
@@ -52,7 +58,24 @@ const readInputFillableQuantity = (input: ProducerProductLineView["inputs"][numb
 const readInputsPartiallyAvailable = (line: ProducerProductLineView) =>
 	!line.inputsReady && line.inputs.some((input) => readInputFillableQuantity(input) > 0);
 
+const readHindrancesMultiplier = (hindrances: readonly ActivationHindranceView[]) =>
+	hindrances.reduce((total, hindrance) => total * hindrance.durationMultiplier, 1);
+
+const readHindranceLabel = (hindrance: ActivationHindranceView, items: ItemCatalogView) => {
+	if (hindrance.type === "passive") {
+		return `${readItemName(hindrance.itemId, items)} · ${hindrance.activeQuantity} active · ${hindrance.activeStacks} stack${hindrance.activeStacks === 1 ? "" : "s"} · ${formatMultiplier(hindrance.durationMultiplier)}× time`;
+	}
+
+	const itemLabel = hindrance.itemIds.map((itemId) => readItemName(itemId, items)).join(" / ");
+	const matchLabel = hindrance.matches
+		.map((match) => `${readItemName(match.itemId, items)} at ${match.distance}`)
+		.join(", ");
+
+	return `${itemLabel} within ${hindrance.distance} · ${hindrance.matches.length} active · ${formatMultiplier(hindrance.durationMultiplier)}× time · ${matchLabel}`;
+};
+
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
+	items,
 	lines,
 	nowMs,
 	pending,
@@ -74,6 +97,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						line: baseLine,
 						nowMs,
 					});
+					const activeHindrances = line.hindrances ?? [];
+					const hindranceMultiplier = readHindrancesMultiplier(activeHindrances);
 					const inputsPartiallyAvailable = readInputsPartiallyAvailable(line);
 					const canRunAction =
 						line.enabled &&
@@ -107,6 +132,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
 										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
 										{formatMs(line.durationMs)}
+										{hindranceMultiplier > 1
+											? ` · hindered ${formatMultiplier(hindranceMultiplier)}×`
+											: ""}
 										{line.inputItemIds.length
 											? ` · ${
 													line.inputsReady
@@ -141,6 +169,22 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								</div>
 							</div>
 
+							{activeHindrances.length ? (
+								<div className="mt-2.5 grid gap-1.5">
+									{activeHindrances.map((hindrance, hindranceIndex) => (
+										<div
+											key={`${hindranceIndex}:${readHindranceLabel(hindrance, items)}`}
+											className="flex min-w-0 items-start gap-2 rounded-sm bg-rose-500/10 px-2.5 py-2 text-xs text-ak-text-muted"
+										>
+											<span className="shrink-0 text-rose-300">⚠</span>
+											<span className="min-w-0 break-words font-semibold text-ak-text">
+												{readHindranceLabel(hindrance, items)}
+											</span>
+										</div>
+									))}
+								</div>
+							) : null}
+
 							{line.requirements?.some(
 								(requirement) => !readRequirementReady(requirement),
 							) ? (
@@ -149,11 +193,11 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 										.filter((requirement) => !readRequirementReady(requirement))
 										.map((requirement, requirementIndex) => (
 											<div
-												key={`${requirementIndex}:${readRequirementLabel(requirement)}`}
+												key={`${requirementIndex}:${readRequirementLabel(requirement, items)}`}
 												className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
 											>
 												<span className="min-w-0 truncate font-semibold text-ak-text">
-													{readRequirementLabel(requirement)}
+													{readRequirementLabel(requirement, items)}
 												</span>
 												<span className="ml-auto shrink-0 text-ak-text-muted">
 													{readRequirementReady(requirement)
@@ -173,7 +217,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
 										>
 											<span className="min-w-0 truncate font-semibold text-ak-text">
-												{input.itemId.replace(/^item:/, "")}
+												{readItemName(input.itemId, items)}
 											</span>
 											<span className="text-ak-text-muted ml-auto shrink-0 tabular-nums">
 												{input.stored}/{input.quantity}

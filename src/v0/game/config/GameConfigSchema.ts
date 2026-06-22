@@ -40,7 +40,7 @@ import { z } from "zod";
  * - Producer/product requirements are referenced through central `requirements` entries by
  *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
  *   includes diagonals around the target tile. Producer/product `hinderedBy` entries are
- *   negative OR conditions: any active hindrance may slow the selected product without
+ *   negative production effects: every active hindrance instance may slow the selected product without
  *   preventing start.
  * - Producer `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
@@ -260,9 +260,10 @@ const ProximityItemRequirementSchema = z
 	.strict();
 
 /**
- * Negative production hindrance. Hindrances are OR-ed: one active hindrance is enough to
- * slow the producer/product. Passive hindrances react to item presence in a scope;
- * proximity hindrances react to nearby board items and get stronger when closer.
+ * Negative production hindrance. Hindrances do not gate production. Every active
+ * hindrance instance applies a duration penalty, and active penalties stack. Passive
+ * hindrances react to item presence in a scope; proximity hindrances react to nearby
+ * board items and get stronger when closer.
  */
 const PassiveItemHindranceSchema = z
 	.object({

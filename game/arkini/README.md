@@ -177,7 +177,7 @@ loot:slaughterhouse-t1:sausage-leather
 
 Most first-pass production durations stay at `5000` ms. The new food processors are slightly longer on purpose: windmill flour takes `6000` ms, while bakery bread and slaughterhouse sausage/leather take `8000` ms. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
-Farm grain and pig-farm piglet production have product-level pollution hindrances: nearby `item:pollution` within proximity `2` slows those product lines. Brewery now has a producer-level pollution hindrance with proximity `2`, and winery has a producer-level pollution hindrance with proximity `3`, so every production line on those buildings reacts to nearby pollution. Tiny ecological disaster, very charming.
+Farm grain and pig-farm piglet production have product-level pollution hindrances: every nearby `item:pollution` within proximity `2` stacks a slowdown on those product lines. Brewery has a producer-level pollution hindrance with proximity `2`, and winery has a producer-level pollution hindrance with proximity `3`, so every production line on those buildings reacts to nearby pollution. Tiny ecological disaster, very charming.
 
 Current processor input buffers use capacity `4`:
 

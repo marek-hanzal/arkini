@@ -5,6 +5,7 @@ import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
+import { readRuntimeActivationHindranceViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationHindranceViewsFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
@@ -208,6 +209,11 @@ const readRuntimeProductLineViewsFromGameSave = ({
 					targetItemInstanceId,
 				}),
 				inProgress: jobs.length > 0,
+				hindrances: readRuntimeActivationHindranceViewsFromGameSave({
+					hindrances,
+					save,
+					targetItemInstanceId,
+				}),
 				inputItemIds: inputs.map((input) => input.itemId as ItemId),
 				isDefault,
 				inputs,

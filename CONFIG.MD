@@ -898,7 +898,7 @@ Product usage:
 
 `hinderedBy` defines negative production effects on producers or product lines.
 
-Unlike `requirementIds`, hindrances do not gate the action. They are OR conditions: if any hindrance is active, production can still start, but the active hindrance slows the duration. If multiple hindrances are active, the strongest slowdown wins instead of stacking every penalty into a spreadsheet-shaped crime scene.
+Unlike `requirementIds`, hindrances do not gate the action. Every active hindrance instance applies a duration penalty, and active penalties stack multiplicatively. Production can still start, but multiple nearby hazards can turn a nice little farm into a bureaucratic waiting room with crops.
 
 Supported hindrance types:
 

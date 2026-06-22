@@ -363,7 +363,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("slows product duration by the nearest active proximity hindrance", () => {
+	it("stacks product duration penalties from every active proximity hindrance", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -401,6 +401,11 @@ describe("applyGameActionFx Producer", () => {
 						x: 1,
 						y: 0,
 					},
+					{
+						itemId: "item:twig",
+						x: 2,
+						y: 0,
+					},
 				],
 				inventory: [],
 			},
@@ -424,12 +429,12 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			completesAtMs: 2000,
+			completesAtMs: 3000,
 			startedAtMs: 0,
 		});
 	});
 
-	it("uses OR semantics for active hindrances and keeps only the strongest slowdown", () => {
+	it("stacks active passive hindrance duration penalties", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			products: {
@@ -461,6 +466,11 @@ describe("applyGameActionFx Producer", () => {
 						x: 0,
 						y: 0,
 					},
+					{
+						itemId: "item:rock",
+						x: 1,
+						y: 0,
+					},
 				],
 				inventory: [
 					{
@@ -489,7 +499,7 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			completesAtMs: 1500,
+			completesAtMs: 3000,
 			startedAtMs: 0,
 		});
 	});

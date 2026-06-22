@@ -90,6 +90,30 @@
 			"render": "plain",
 			"resourceId": "item-crate-sturdy"
 		},
+		"asset:item:hero-chest-t1": {
+			"kind": "item",
+			"label": "Hero Chest I",
+			"render": "plain",
+			"resourceId": "item-hero-chest-t1"
+		},
+		"asset:item:hero-chest-t2": {
+			"kind": "item",
+			"label": "Hero Chest II",
+			"render": "plain",
+			"resourceId": "item-hero-chest-t2"
+		},
+		"asset:item:hero-chest-t3": {
+			"kind": "item",
+			"label": "Hero Chest III",
+			"render": "plain",
+			"resourceId": "item-hero-chest-t3"
+		},
+		"asset:item:hero-chest-t4": {
+			"kind": "item",
+			"label": "Hero Chest IV",
+			"render": "plain",
+			"resourceId": "item-hero-chest-t4"
+		},
 		"asset:item:crystal": {
 			"kind": "item",
 			"label": "Crystal",

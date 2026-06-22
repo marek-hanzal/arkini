@@ -62,6 +62,13 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (liveCraft?.phase === "collecting_inputs") {
+		if (liveCraft.inputProgress > 0 && liveCraft.inputProgress < 1) {
+			return {
+				type: "open-detail",
+				boardItemId: boardItem.id,
+			};
+		}
+
 		if (requirementsReady(liveCraft.requirements)) {
 			return {
 				type: "start-craft",

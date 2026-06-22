@@ -64,4 +64,18 @@ describe("isProducerStocked", () => {
 			),
 		).toBe(true);
 	});
+
+	it("treats default producer product line with auto-fill availability as stocked", () => {
+		expect(
+			isProducerStocked(
+				producerActivation([
+					productLine({
+						inputsAvailable: true,
+						inputsReady: false,
+						isDefault: true,
+					}),
+				]),
+			),
+		).toBe(true);
+	});
 });

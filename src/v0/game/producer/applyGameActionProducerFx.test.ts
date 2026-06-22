@@ -1639,6 +1639,45 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("unsets the runtime default when the selected producer product line is clicked again", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const defaulted = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.set_default",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+		const unset = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.set_default",
+			},
+			config,
+			nowMs: 200,
+			save: defaulted.save,
+		});
+
+		expect(unset.save.producerLines).toEqual({});
+		expect(unset.events).toEqual([
+			{
+				changedAtMs: 200,
+				nextProductId: undefined,
+				previousProductId: "product:test",
+				producerItemInstanceId: "item-instance:1",
+				type: "producer.product_line.default_changed",
+			},
+		]);
+	});
+
 	it("stores disabled producer product lines in save state", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

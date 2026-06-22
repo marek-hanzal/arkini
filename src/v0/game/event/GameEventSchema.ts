@@ -263,7 +263,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("producer.product_line.default_changed"),
 			producerItemInstanceId: IdSchema,
 			previousProductId: IdSchema.optional(),
-			nextProductId: IdSchema,
+			nextProductId: IdSchema.optional(),
 			changedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),

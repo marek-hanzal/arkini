@@ -61,11 +61,14 @@ export const ItemRequirementRulesCard: FC<ItemRequirementRulesCard.Props> = ({
 	requirements = [],
 	title,
 }) => {
+	const openRequirements = requirements.filter(
+		(requirement) => !readRequirementSatisfied(requirement),
+	);
 	const rows = [
-		...requirements.map((requirement, index) => ({
+		...openRequirements.map((requirement, index) => ({
 			key: `requirement:${index}`,
 			label: readRequirementLabel(requirement, items),
-			satisfied: readRequirementSatisfied(requirement),
+			satisfied: false,
 		})),
 		...inputs.map((input) => ({
 			key: `input:${input.itemId}`,

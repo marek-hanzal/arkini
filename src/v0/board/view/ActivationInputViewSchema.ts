@@ -7,6 +7,7 @@ export const ActivationInputViewSchema = z.object({
 	capacity: z.number().int().nonnegative(),
 	consume: z.boolean(),
 	stored: z.number().int().nonnegative(),
+	available: z.number().int().nonnegative().optional(),
 });
 
 type ActivationInputViewSchema = typeof ActivationInputViewSchema;

@@ -29,32 +29,28 @@ export const setProducerProductLineDefaultFx = Effect.fn("setProducerProductLine
 			producerItemInstanceId: action.producerItemInstanceId,
 			save,
 		});
-		if (previousProductId === action.productId) {
-			return {
-				events: [],
-				nextWakeAtMs: yield* readNextWakeAtMsFx({
-					save,
-				}),
-				save,
-			} satisfies GameEngineResult;
-		}
-
 		const nextSave = yield* cloneGameSaveFx({
 			save,
 		});
 		const previousState = nextSave.producerLines[action.producerItemInstanceId];
 		const nextDisabledProductIds = previousState?.disabledProductIds ?? [];
-		nextSave.producerLines[action.producerItemInstanceId] = {
-			defaultProductId: action.productId,
-			disabledProductIds: nextDisabledProductIds,
-		};
+		const nextProductId = previousProductId === action.productId ? undefined : action.productId;
+
+		if (nextProductId || nextDisabledProductIds.length > 0) {
+			nextSave.producerLines[action.producerItemInstanceId] = {
+				defaultProductId: nextProductId,
+				disabledProductIds: nextDisabledProductIds,
+			};
+		} else {
+			delete nextSave.producerLines[action.producerItemInstanceId];
+		}
 		nextSave.updatedAtMs = nowMs;
 
 		return {
 			events: [
 				{
 					changedAtMs: nowMs,
-					nextProductId: action.productId,
+					nextProductId,
 					previousProductId,
 					producerItemInstanceId: action.producerItemInstanceId,
 					type: "producer.product_line.default_changed" as const,

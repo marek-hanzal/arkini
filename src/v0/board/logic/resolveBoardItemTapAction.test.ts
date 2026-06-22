@@ -167,6 +167,27 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
+	it("opens detail for partially filled crafts instead of no-op starting", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					craft: craft({
+						delivered: {
+							"item:water": 1,
+						},
+						inputProgress: 0.5,
+						phase: "collecting_inputs",
+						readyAtMs: undefined,
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-detail",
+		});
+	});
+
 	it("activates stashes with exhaust mode", () => {
 		expect(
 			resolveBoardItemTapAction({

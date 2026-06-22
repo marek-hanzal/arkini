@@ -64,7 +64,7 @@ Rules for this layer:
 
 The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint imprinting is gone: build blueprints are concrete target-specific items acquired directly through gameplay. Finished specific blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
 
-- Board size comes from `GameConfig.game.board`, currently 7×9.
+- Board size comes from `GameConfig.game.board`, currently 7×11.
 - Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.
 - Board and inventory use zero-gap square cells to avoid DnD blind spots.
 - Merging happens on the board only. Dropping onto a non-mergeable occupied board cell swaps the two board items instead of rejecting the action.

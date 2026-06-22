@@ -35,7 +35,7 @@ These rules define how the game should be interpreted when implementation detail
 
 | Concept | Value |
 | --- | --- |
-| Board size | `7 x 9` |
+| Board size | `7 x 11` |
 | Board slot count | `63` |
 | Inventory size | `7 x 5` |
 | Inventory slot count | `35` |
@@ -56,7 +56,7 @@ These rules define how the game should be interpreted when implementation detail
 
 The board is the primary visible grid where the player places items and interacts with active gameplay entities.
 
-The current board size is `7 x 9` cells.
+The current board size is `7 x 11` cells.
 
 An item may be on the board when it occupies one board cell. If multi-cell items are introduced later, their footprint must be defined in the central game configuration.
 

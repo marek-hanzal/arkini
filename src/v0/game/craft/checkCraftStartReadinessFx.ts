@@ -5,6 +5,7 @@ import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readSt
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace checkCraftStartReadinessFx {
@@ -48,6 +49,14 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		requirements: target.recipe.requirements,
 		save,
 		storedItems: storedRequirementItems,
+	});
+	yield* checkItemExclusiveOwnershipFx({
+		config,
+		ignoredBoardItemInstanceIds: new Set([
+			action.targetItemInstanceId,
+		]),
+		itemId: target.recipe.resultItemId,
+		save,
 	});
 
 	return {

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
+import { readGameSaveExclusiveConflicts } from "~/v0/game/exclusivity/readGameSaveExclusiveConflicts";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
@@ -385,6 +386,103 @@ const readEffectiveProductInputSlots = ({
 	return config.inputs[inputRefId]?.inputs ?? [];
 };
 
+const validateExclusiveItemOwnership = (
+	ctx: z.RefinementCtx,
+	save: GameSave,
+	config: GameConfig,
+) => {
+	const entries: {
+		itemId: string;
+		path: (string | number)[];
+	}[] = [];
+
+	for (const [itemInstanceId, boardItem] of Object.entries(save.board.items)) {
+		entries.push({
+			itemId: boardItem.itemId,
+			path: [
+				"board",
+				"items",
+				itemInstanceId,
+				"itemId",
+			],
+		});
+	}
+
+	for (const [slotIndex, slot] of save.inventory.slots.entries()) {
+		if (!slot) continue;
+		entries.push({
+			itemId: slot.itemId,
+			path: [
+				"inventory",
+				"slots",
+				slotIndex,
+				"itemId",
+			],
+		});
+	}
+
+	for (const [producerItemInstanceId, state] of Object.entries(save.producerInputs)) {
+		for (const [productId, productState] of Object.entries(state.productInputs)) {
+			for (const itemId of Object.keys(productState.items)) {
+				entries.push({
+					itemId,
+					path: [
+						"producerInputs",
+						producerItemInstanceId,
+						"productInputs",
+						productId,
+						"items",
+						itemId,
+					],
+				});
+			}
+		}
+	}
+
+	for (const [targetItemInstanceId, state] of Object.entries(save.craftInputs)) {
+		for (const itemId of Object.keys(state.items)) {
+			entries.push({
+				itemId,
+				path: [
+					"craftInputs",
+					targetItemInstanceId,
+					"items",
+					itemId,
+				],
+			});
+		}
+	}
+
+	for (const [targetItemInstanceId, state] of Object.entries(save.storedRequirements)) {
+		for (const itemId of Object.keys(state.items)) {
+			entries.push({
+				itemId,
+				path: [
+					"storedRequirements",
+					targetItemInstanceId,
+					"items",
+					itemId,
+				],
+			});
+		}
+	}
+
+	for (const entry of entries) {
+		const conflicts = readGameSaveExclusiveConflicts({
+			config,
+			itemId: entry.itemId,
+			save,
+		});
+		if (conflicts.length === 0) continue;
+
+		addSaveIssue(
+			ctx,
+			entry.path,
+			`Item "${entry.itemId}" cannot coexist with "${conflicts.join('", "')}".`,
+		);
+	}
+};
+
 const validateGameSaveAgainstConfig = (
 	ctx: z.RefinementCtx,
 	save: GameSave,
@@ -571,6 +669,8 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 	}
+
+	validateExclusiveItemOwnership(ctx, save, config);
 
 	const producerJobCountByProducerItemInstanceId = new Map<string, number>();
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {

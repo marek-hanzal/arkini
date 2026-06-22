@@ -501,6 +501,7 @@ The item detail must show every gameplay-relevant piece of information available
 - merge chain participation
 - valid merge outputs
 - craft/construction/growth requirements
+- path-choice warnings and exclusive branch conflicts before the player invests resources
 - deposited inputs
 - remaining inputs
 - active, ready, or paused timers
@@ -775,6 +776,14 @@ A product line can start when:
 Starting production consumes configured input quantities immediately. Persistent/stored requirements are never consumed by production. If validation fails, activation is rejected without consuming inputs or changing job state.
 
 Output capacity is checked at completion time, not start time. If completion output cannot fit, the job becomes blocked and preserves its rolled delivery for retry.
+
+### 10.10 Exclusive path choices
+
+Items may define directional `exclusiveToIds`. This is a hard coexistence constraint, not a slowdown. If item A lists item B, A cannot be created or owned while B is owned. The reverse is not implied in config; asymmetric design is allowed. Runtime still checks both the item being created and already-owned items so an action cannot create a save where any owned item violates its declared exclusivity.
+
+This rule is intended for branch choices such as faith versus engineering. The player must see the choice early enough to make an informed decision. For construction flows this means the blueprint/craft target must show the warning before any resources are invested. If the exclusive target is already owned, the craft cannot accept manual inputs, auto-fill inputs, partial-fill inputs, start, or complete. Final creation and save validation also enforce the same rule, because UI-only truth is how tiny civilizations die screaming.
+
+Choice warnings are not hidden just because they are currently valid. Fulfilled normal requirements may be hidden, but an exclusive choice remains visible as a warning until the item exists or the player leaves that path alone.
 
 ## 11. Stashes
 
@@ -1072,6 +1081,7 @@ The economy should be validated using these rules:
 8. Inventory capacity must be considered when adding new chains or producers.
 9. Stateful items must preserve state through all allowed movement.
 10. No important economy behavior should live only in UI interaction code.
+11. Exclusive branch constraints must be enforced by config/save validation and runtime creation guards, not only by detail-sheet warnings.
 11. Existing `GameConfig` economy data is inspiration until a dedicated economy pass rewrites it to match this document.
 12. No successful loot table activation may produce zero output.
 14. No source-target item pair may match multiple interaction behaviors unless explicitly documented.

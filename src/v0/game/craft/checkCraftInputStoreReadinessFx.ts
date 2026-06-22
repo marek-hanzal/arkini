@@ -5,6 +5,7 @@ import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftInputStore } from "~/v0/game/action/GameActionCraftInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace checkCraftInputStoreReadinessFx {
@@ -59,6 +60,15 @@ export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreRe
 				),
 			);
 		}
+
+		yield* checkItemExclusiveOwnershipFx({
+			config,
+			ignoredBoardItemInstanceIds: new Set([
+				action.targetItemInstanceId,
+			]),
+			itemId: target.recipe.resultItemId,
+			save,
+		});
 
 		const inputSlot = target.recipe.inputs.find((input) => input.itemId === resolvedRef.itemId);
 		if (!inputSlot) {

@@ -431,6 +431,7 @@ const ItemDefinitionSchema = z
 		producerId: IdSchema.optional(),
 		stashId: IdSchema.optional(),
 		craftRecipeId: IdSchema.optional(),
+		exclusiveToIds: z.array(IdSchema).optional(),
 		removeBy: z.array(RemoveByDefinitionSchema).optional(),
 	})
 	.strict();
@@ -672,6 +673,45 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			item.tags,
 			(value) => `Duplicate tag "${value}".`,
 		);
+		validateUniqueStringList(
+			ctx,
+			[
+				"items",
+				itemId,
+				"exclusiveToIds",
+			],
+			item.exclusiveToIds ?? [],
+			(value) => `Duplicate exclusive item "${value}".`,
+		);
+
+		for (const [index, exclusiveItemId] of (item.exclusiveToIds ?? []).entries()) {
+			if (exclusiveItemId === itemId) {
+				addIssue(
+					ctx,
+					[
+						"items",
+						itemId,
+						"exclusiveToIds",
+						index,
+					],
+					`Item "${itemId}" cannot be exclusive to itself.`,
+				);
+				continue;
+			}
+
+			if (!hasItem(exclusiveItemId)) {
+				addIssue(
+					ctx,
+					[
+						"items",
+						itemId,
+						"exclusiveToIds",
+						index,
+					],
+					`Missing item "${exclusiveItemId}".`,
+				);
+			}
+		}
 
 		for (const [index, mergeId] of (item.mergeIds ?? []).entries()) {
 			if (!hasMerge(mergeId)) {

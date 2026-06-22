@@ -24,6 +24,7 @@ export const ViewItemSchema = z.object({
 	canProduce: z.boolean(),
 	producerTrigger: z.literal("click").optional(),
 	canMerge: z.boolean(),
+	exclusiveToIds: z.array(GameItemIdSchema),
 	mergeResults: z
 		.array(
 			z.object({

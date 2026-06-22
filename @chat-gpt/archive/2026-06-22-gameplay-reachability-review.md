@@ -222,3 +222,17 @@ If leather is supposed to matter soon, add a consumer later. It does not block t
 Yes: with deliberate play, the current config can build everything from the starting board up to `producer:goldsmith-t1`, and can produce `item:coin` after that.
 
 No: the current config is not soft-lock proof. The main hole is one-way townhall tier upgrades. If the player upgrades before generating some tier-specific branches, especially winery/vineyard before Townhall III, later progression can be cut off.
+
+## Follow-up resolution: era ownership gates
+
+This review's initial recommendation to let higher Town Halls inherit lower-tier blueprint products was superseded by the final gameplay decision.
+
+Current rule:
+
+- Town Hall upgrade crafts remain one-way and consume the current Town Hall tier.
+- Each Town Hall tier issues only its own era products and does not re-issue older blueprints.
+- Crafting the next Town Hall requires ownership of every physical building/place unlocked by the current era.
+- Ownership uses passive `board_or_inventory` requirements, so the player may keep era buildings on the board or in inventory.
+- Players who want duplicate lower-era buildings should build them before upgrading. Failing to do so should slow their later economy, not soft-lock progression.
+
+This keeps the board clean, prevents soft-locks, and makes era completion explicit without forcing the player to place everything on the board for a fake municipal inspection. Tiny mercy from the machine.

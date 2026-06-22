@@ -189,7 +189,7 @@ export const CheatInventorySheet = memo(({ onClose }: CheatInventorySheet.Props)
 	return (
 		<div
 			data-ui="cheat inventory root"
-			className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden bg-ak-surface"
+			className="flex h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden bg-ak-surface"
 		>
 			<SheetHeader
 				title="Cheat Inventory"

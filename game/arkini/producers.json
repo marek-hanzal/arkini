@@ -100,6 +100,16 @@
 			],
 			"requirementIds": [
 				"proximity:brewery-t1:hop-field"
+			],
+			"blockedBy": [
+				{
+					"type": "proximity",
+					"itemIds": [
+						"item:pollution"
+					],
+					"distance": 2,
+					"durationFactor": 0.5
+				}
 			]
 		},
 		"producer:tavern-t1": {
@@ -121,6 +131,16 @@
 			],
 			"requirementIds": [
 				"proximity:winery-t1:vineyard"
+			],
+			"blockedBy": [
+				{
+					"type": "proximity",
+					"itemIds": [
+						"item:pollution"
+					],
+					"distance": 3,
+					"durationFactor": 0.5
+				}
 			]
 		},
 		"producer:coal-mine-t1": {

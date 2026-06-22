@@ -167,7 +167,7 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("opens detail for partially filled crafts instead of no-op starting", () => {
+	it("starts partial craft auto-fill before opening detail when resources are available", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
@@ -176,6 +176,42 @@ describe("resolveBoardItemTapAction", () => {
 							"item:water": 1,
 						},
 						inputProgress: 0.5,
+						inputs: [
+							{
+								available: 1,
+								itemId: "item:water" as const,
+								quantity: 2,
+							},
+						],
+						phase: "collecting_inputs",
+						readyAtMs: undefined,
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			recipeId: "craft:twig",
+			type: "start-craft",
+		});
+	});
+
+	it("opens detail for partially filled crafts when no resources are available", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					craft: craft({
+						delivered: {
+							"item:water": 1,
+						},
+						inputProgress: 0.5,
+						inputs: [
+							{
+								available: 0,
+								itemId: "item:water" as const,
+								quantity: 2,
+							},
+						],
 						phase: "collecting_inputs",
 						readyAtMs: undefined,
 					}),

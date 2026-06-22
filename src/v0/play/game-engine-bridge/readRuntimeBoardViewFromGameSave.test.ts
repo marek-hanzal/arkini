@@ -288,9 +288,81 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:twig": 1,
 			},
 			inputProgress: 0.5,
+			inputs: [
+				{
+					available: 0,
+					itemId: "item:twig",
+					quantity: 2,
+				},
+			],
 			phase: "collecting_inputs",
 			progress: 0.5,
 		});
+	});
+
+	it("shows available craft input resources from board and inventory", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					assetId: "asset:test",
+					code: "craft-table",
+					craftRecipeId: "craft:plank",
+					description: "Craft table",
+					maxStackSize: 1,
+					name: "Craft Table",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.craft?.inputs).toMatchObject([
+			{
+				available: 2,
+				itemId: "item:twig",
+				quantity: 2,
+			},
+		]);
 	});
 
 	it("marks craft inputs complete without auto-starting the craft", () => {

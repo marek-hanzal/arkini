@@ -23,7 +23,7 @@ const readSelectedProductLine = ({
 	const productLines = producerItem.activation?.productLines ?? [];
 	if (productId) return productLines.find((line) => line.productId === productId);
 
-	return productLines.find((line) => line.isDefault) ?? productLines[0];
+	return productLines.find((line) => line.isDefault);
 };
 
 const readBoardItemQuantity = ({

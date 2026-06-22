@@ -5,6 +5,7 @@ import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { GameItemView } from "~/v0/item/ui/GameItemView";
 import { cn } from "~/v0/ui/cn";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
+import { hasProducerDefaultProductLine } from "~/v0/producer/logic/hasProducerDefaultProductLine";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
 import { readProducerBoardProgress } from "~/v0/producer/logic/readProducerBoardProgress";
@@ -37,7 +38,12 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 	});
 	const activationReady = isProducerReady(boardItem?.activation, nowMs);
 	const craftReady = Boolean(liveCraft?.complete);
-	const hasReadyState = Boolean(boardItem?.activation || liveCraft);
+	const hasProducerDefault = hasProducerDefaultProductLine(boardItem?.activation);
+	const hasActivationReadyState =
+		boardItem?.activation?.kind === "producer"
+			? hasProducerDefault
+			: Boolean(boardItem?.activation);
+	const hasReadyState = hasActivationReadyState || Boolean(liveCraft);
 	const tileReady = !hasReadyState || activationReady || craftReady;
 	const producerCooldown = readProducerCooldown({
 		activation: boardItem?.activation,

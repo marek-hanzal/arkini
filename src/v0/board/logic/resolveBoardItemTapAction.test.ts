@@ -30,7 +30,10 @@ const craft = (overrides: Partial<NonNullable<BoardViewItem["craft"]>> = {}) => 
 	...overrides,
 });
 
-const activation = (kind: NonNullable<BoardViewItem["activation"]>["kind"]) => ({
+const activation = (
+	kind: NonNullable<BoardViewItem["activation"]>["kind"],
+	overrides: Partial<NonNullable<BoardViewItem["activation"]>> = {},
+) => ({
 	cooldownMs: undefined,
 	cooldownUntil: undefined,
 	cooldownUntilMs: undefined,
@@ -39,6 +42,28 @@ const activation = (kind: NonNullable<BoardViewItem["activation"]>["kind"]) => (
 	remainingCharges: undefined,
 	requirements: [],
 	trigger: "click" as const,
+	...overrides,
+});
+
+const productLine = (isDefault: boolean) => ({
+	durationMs: 1000,
+	enabled: true,
+	inProgress: false,
+	inputItemIds: [],
+	inputs: [],
+	inputsAvailable: true,
+	inputsReady: true,
+	isDefault,
+	missingRequirementItemIds: [],
+	name: "Product",
+	producerQueuedJobs: 0,
+	productId: "product:test",
+	progress: undefined,
+	queueFull: false,
+	queueSize: 1,
+	queuedJobs: 0,
+	requirementItemIds: [],
+	requirementsReady: true,
 });
 
 describe("resolveBoardItemTapAction", () => {
@@ -60,11 +85,15 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("activates producers with single mode", () => {
+	it("activates producers with explicit default product line", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
-					activation: activation("producer"),
+					activation: activation("producer", {
+						productLines: [
+							productLine(true),
+						],
+					}),
 				}),
 				nowMs: 0,
 			}),
@@ -72,6 +101,46 @@ describe("resolveBoardItemTapAction", () => {
 			activation: "single",
 			boardItemId: "board:item",
 			type: "activate",
+		});
+	});
+
+	it("returns no action for producers without explicit default product line", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("producer", {
+						productLines: [
+							productLine(false),
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			type: "none",
+		});
+	});
+
+	it("starts craft input collection before considering activation", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("producer", {
+						productLines: [
+							productLine(true),
+						],
+					}),
+					craft: craft({
+						phase: "collecting_inputs",
+						readyAtMs: undefined,
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			recipeId: "craft:twig",
+			type: "start-craft",
 		});
 	});
 

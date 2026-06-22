@@ -26,7 +26,6 @@ const createConfigValue = () => ({
 			label: "Item",
 			render: "plain",
 			resourceId: "resource:item",
-			sort: 1,
 		},
 	},
 	items: {
@@ -37,7 +36,6 @@ const createConfigValue = () => ({
 			maxStackSize: 1,
 			name: "Producer",
 			producerId: "producer:test",
-			sort: 1,
 			tags: [],
 			tier: 0,
 		},
@@ -47,7 +45,6 @@ const createConfigValue = () => ({
 			description: "Fuel",
 			maxStackSize: 10,
 			name: "Fuel",
-			sort: 2,
 			tags: [],
 			tier: 0,
 		},
@@ -57,7 +54,6 @@ const createConfigValue = () => ({
 			description: "Pollution",
 			maxStackSize: 1,
 			name: "Pollution",
-			sort: 3,
 			storage: "board",
 			tags: [
 				"danger",

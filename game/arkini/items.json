@@ -11,8 +11,7 @@
 			"tags": [
 				"source",
 				"wood"
-			],
-			"sort": 10
+			]
 		},
 		"item:rock": {
 			"assetId": "asset:item:rock",
@@ -25,8 +24,7 @@
 			"tags": [
 				"source",
 				"stone"
-			],
-			"sort": 20
+			]
 		},
 		"item:log": {
 			"assetId": "asset:item:log",
@@ -39,8 +37,7 @@
 			"tags": [
 				"material",
 				"wood"
-			],
-			"sort": 100
+			]
 		},
 		"item:plank": {
 			"assetId": "asset:item:plank",
@@ -53,8 +50,7 @@
 			"tags": [
 				"material",
 				"wood"
-			],
-			"sort": 110
+			]
 		},
 		"item:stone": {
 			"assetId": "asset:item:stone",
@@ -67,8 +63,7 @@
 			"tags": [
 				"material",
 				"stone"
-			],
-			"sort": 200
+			]
 		},
 		"item:stone-block": {
 			"assetId": "asset:item:stone-block",
@@ -81,8 +76,7 @@
 			"tags": [
 				"material",
 				"stone"
-			],
-			"sort": 210
+			]
 		},
 		"producer:lumberjack-t1": {
 			"assetId": "asset:producer:lumberjack-t1",
@@ -96,7 +90,6 @@
 				"producer",
 				"wood"
 			],
-			"sort": 300,
 			"producerId": "producer:lumberjack-t1"
 		},
 		"producer:sawmill-t1": {
@@ -111,7 +104,6 @@
 				"producer",
 				"wood"
 			],
-			"sort": 310,
 			"producerId": "producer:sawmill-t1"
 		},
 		"producer:quarry-t1": {
@@ -126,7 +118,6 @@
 				"producer",
 				"stone"
 			],
-			"sort": 400,
 			"producerId": "producer:quarry-t1"
 		},
 		"producer:stonemason-t1": {
@@ -141,7 +132,6 @@
 				"producer",
 				"stone"
 			],
-			"sort": 410,
 			"producerId": "producer:stonemason-t1"
 		},
 		"item:wheat-field": {
@@ -156,8 +146,7 @@
 				"source",
 				"food",
 				"grain"
-			],
-			"sort": 500
+			]
 		},
 		"item:water": {
 			"assetId": "asset:item:water",
@@ -171,8 +160,7 @@
 				"material",
 				"food",
 				"water"
-			],
-			"sort": 510
+			]
 		},
 		"item:grain": {
 			"assetId": "asset:item:grain",
@@ -186,8 +174,7 @@
 				"material",
 				"food",
 				"grain"
-			],
-			"sort": 520
+			]
 		},
 		"item:flour": {
 			"assetId": "asset:item:flour",
@@ -202,8 +189,7 @@
 				"food",
 				"grain",
 				"flour"
-			],
-			"sort": 530
+			]
 		},
 		"item:bread": {
 			"assetId": "asset:item:bread",
@@ -216,8 +202,7 @@
 			"tags": [
 				"food",
 				"bread"
-			],
-			"sort": 540
+			]
 		},
 		"item:piglet": {
 			"assetId": "asset:item:piglet",
@@ -231,8 +216,7 @@
 				"animal",
 				"food",
 				"pig"
-			],
-			"sort": 550
+			]
 		},
 		"item:sausage": {
 			"assetId": "asset:item:sausage",
@@ -246,8 +230,7 @@
 				"food",
 				"meat",
 				"sausage"
-			],
-			"sort": 560
+			]
 		},
 		"item:leather": {
 			"assetId": "asset:item:leather",
@@ -261,8 +244,7 @@
 				"material",
 				"leather",
 				"animal"
-			],
-			"sort": 570
+			]
 		},
 		"producer:well-t1": {
 			"assetId": "asset:producer:well-t1",
@@ -277,7 +259,6 @@
 				"food",
 				"water"
 			],
-			"sort": 600,
 			"producerId": "producer:well-t1"
 		},
 		"producer:farm-t1": {
@@ -293,7 +274,6 @@
 				"food",
 				"grain"
 			],
-			"sort": 610,
 			"producerId": "producer:farm-t1"
 		},
 		"producer:windmill-t1": {
@@ -310,7 +290,6 @@
 				"grain",
 				"flour"
 			],
-			"sort": 620,
 			"producerId": "producer:windmill-t1"
 		},
 		"producer:bakery-t1": {
@@ -326,7 +305,6 @@
 				"food",
 				"bread"
 			],
-			"sort": 630,
 			"producerId": "producer:bakery-t1"
 		},
 		"producer:pig-farm-t1": {
@@ -342,7 +320,6 @@
 				"food",
 				"pig"
 			],
-			"sort": 640,
 			"producerId": "producer:pig-farm-t1"
 		},
 		"producer:slaughterhouse-t1": {
@@ -359,7 +336,6 @@
 				"meat",
 				"leather"
 			],
-			"sort": 650,
 			"producerId": "producer:slaughterhouse-t1"
 		},
 		"item:hop-field": {
@@ -375,8 +351,7 @@
 				"food",
 				"beer",
 				"hops"
-			],
-			"sort": 700
+			]
 		},
 		"item:beer-barrel": {
 			"assetId": "asset:item:beer-barrel",
@@ -390,8 +365,7 @@
 				"material",
 				"food",
 				"beer"
-			],
-			"sort": 710
+			]
 		},
 		"item:beer": {
 			"assetId": "asset:item:beer",
@@ -404,8 +378,7 @@
 			"tags": [
 				"food",
 				"beer"
-			],
-			"sort": 720
+			]
 		},
 		"producer:brewery-t1": {
 			"assetId": "asset:producer:brewery-t1",
@@ -420,7 +393,6 @@
 				"food",
 				"beer"
 			],
-			"sort": 800,
 			"producerId": "producer:brewery-t1"
 		},
 		"producer:tavern-t1": {
@@ -436,7 +408,6 @@
 				"food",
 				"beer"
 			],
-			"sort": 810,
 			"producerId": "producer:tavern-t1"
 		},
 		"item:hops": {
@@ -452,8 +423,7 @@
 				"food",
 				"beer",
 				"hops"
-			],
-			"sort": 705
+			]
 		},
 		"item:vineyard": {
 			"assetId": "asset:item:vineyard",
@@ -468,8 +438,7 @@
 				"food",
 				"wine",
 				"grapes"
-			],
-			"sort": 900
+			]
 		},
 		"item:coal-deposit": {
 			"assetId": "asset:item:coal-deposit",
@@ -484,8 +453,7 @@
 				"industry",
 				"mine",
 				"coal"
-			],
-			"sort": 1150
+			]
 		},
 		"item:iron-deposit": {
 			"assetId": "asset:item:iron-deposit",
@@ -500,8 +468,7 @@
 				"industry",
 				"mine",
 				"iron"
-			],
-			"sort": 1160
+			]
 		},
 		"item:gold-deposit": {
 			"assetId": "asset:item:gold-deposit",
@@ -516,8 +483,7 @@
 				"industry",
 				"mine",
 				"gold"
-			],
-			"sort": 1170
+			]
 		},
 		"item:grapes": {
 			"assetId": "asset:item:grapes",
@@ -532,8 +498,7 @@
 				"food",
 				"wine",
 				"grapes"
-			],
-			"sort": 905
+			]
 		},
 		"item:wine-barrel": {
 			"assetId": "asset:item:wine-barrel",
@@ -547,8 +512,7 @@
 				"material",
 				"food",
 				"wine"
-			],
-			"sort": 910
+			]
 		},
 		"item:wine-glass": {
 			"assetId": "asset:item:wine-glass",
@@ -561,8 +525,7 @@
 			"tags": [
 				"food",
 				"wine"
-			],
-			"sort": 920
+			]
 		},
 		"producer:winery-t1": {
 			"assetId": "asset:producer:winery-t1",
@@ -577,7 +540,6 @@
 				"food",
 				"wine"
 			],
-			"sort": 1000,
 			"producerId": "producer:winery-t1"
 		},
 		"item:coal": {
@@ -593,8 +555,7 @@
 				"industry",
 				"fuel",
 				"coal"
-			],
-			"sort": 1100
+			]
 		},
 		"item:iron-ore": {
 			"assetId": "asset:item:iron-ore",
@@ -609,8 +570,7 @@
 				"industry",
 				"ore",
 				"iron"
-			],
-			"sort": 1110
+			]
 		},
 		"item:gold-ore": {
 			"assetId": "asset:item:gold-ore",
@@ -625,8 +585,7 @@
 				"industry",
 				"ore",
 				"gold"
-			],
-			"sort": 1120
+			]
 		},
 		"item:iron-ingot": {
 			"assetId": "asset:item:iron-ingot",
@@ -641,8 +600,7 @@
 				"industry",
 				"ingot",
 				"iron"
-			],
-			"sort": 1130
+			]
 		},
 		"item:gold-ingot": {
 			"assetId": "asset:item:gold-ingot",
@@ -657,8 +615,7 @@
 				"industry",
 				"ingot",
 				"gold"
-			],
-			"sort": 1140
+			]
 		},
 		"item:pollution": {
 			"assetId": "asset:item:pollution",
@@ -672,8 +629,7 @@
 				"danger",
 				"industry",
 				"pollution"
-			],
-			"sort": 1150
+			]
 		},
 		"producer:coal-mine-t1": {
 			"assetId": "asset:producer:coal-mine-t1",
@@ -689,7 +645,6 @@
 				"mine",
 				"coal"
 			],
-			"sort": 1200,
 			"producerId": "producer:coal-mine-t1"
 		},
 		"producer:iron-mine-t1": {
@@ -706,7 +661,6 @@
 				"mine",
 				"iron"
 			],
-			"sort": 1210,
 			"producerId": "producer:iron-mine-t1"
 		},
 		"producer:gold-mine-t1": {
@@ -723,7 +677,6 @@
 				"mine",
 				"gold"
 			],
-			"sort": 1220,
 			"producerId": "producer:gold-mine-t1"
 		},
 		"producer:smelter-t1": {
@@ -739,7 +692,6 @@
 				"industry",
 				"smelter"
 			],
-			"sort": 1230,
 			"producerId": "producer:smelter-t1"
 		},
 		"producer:purifier-t1": {
@@ -756,7 +708,6 @@
 				"purifier",
 				"pollution"
 			],
-			"sort": 1240,
 			"producerId": "producer:purifier-t1"
 		},
 		"item:coin": {
@@ -770,8 +721,7 @@
 			"tags": [
 				"currency",
 				"coin"
-			],
-			"sort": 1250
+			]
 		},
 		"producer:goldsmith-t1": {
 			"assetId": "asset:producer:goldsmith-t1",
@@ -787,7 +737,6 @@
 				"goldsmith",
 				"coin"
 			],
-			"sort": 1260,
 			"producerId": "producer:goldsmith-t1"
 		},
 		"producer:townhall-t1": {
@@ -803,7 +752,6 @@
 				"townhall",
 				"civic"
 			],
-			"sort": 51,
 			"producerId": "producer:townhall-t1"
 		},
 		"producer:townhall-t2": {
@@ -819,7 +767,6 @@
 				"townhall",
 				"civic"
 			],
-			"sort": 52,
 			"producerId": "producer:townhall-t2"
 		},
 		"producer:townhall-t3": {
@@ -835,7 +782,6 @@
 				"townhall",
 				"civic"
 			],
-			"sort": 53,
 			"producerId": "producer:townhall-t3"
 		},
 		"producer:townhall-t4": {
@@ -851,7 +797,6 @@
 				"townhall",
 				"civic"
 			],
-			"sort": 54,
 			"producerId": "producer:townhall-t4"
 		},
 		"item:blueprint-lumberjack-t1": {
@@ -867,7 +812,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2000,
 			"craftRecipeId": "craft:lumberjack-t1"
 		},
 		"item:blueprint-sawmill-t1": {
@@ -883,7 +827,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2010,
 			"craftRecipeId": "craft:sawmill-t1"
 		},
 		"item:blueprint-quarry-t1": {
@@ -899,7 +842,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2020,
 			"craftRecipeId": "craft:quarry-t1"
 		},
 		"item:blueprint-stonemason-t1": {
@@ -915,7 +857,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2030,
 			"craftRecipeId": "craft:stonemason-t1"
 		},
 		"item:blueprint-well-t1": {
@@ -931,7 +872,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2040,
 			"craftRecipeId": "craft:well-t1"
 		},
 		"item:blueprint-farm-t1": {
@@ -947,7 +887,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2050,
 			"craftRecipeId": "craft:farm-t1"
 		},
 		"item:blueprint-windmill-t1": {
@@ -963,7 +902,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2100,
 			"craftRecipeId": "craft:windmill-t1"
 		},
 		"item:blueprint-bakery-t1": {
@@ -979,7 +917,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2110,
 			"craftRecipeId": "craft:bakery-t1"
 		},
 		"item:blueprint-pig-farm-t1": {
@@ -995,7 +932,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2120,
 			"craftRecipeId": "craft:pig-farm-t1"
 		},
 		"item:blueprint-slaughterhouse-t1": {
@@ -1011,7 +947,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2130,
 			"craftRecipeId": "craft:slaughterhouse-t1"
 		},
 		"item:blueprint-brewery-t1": {
@@ -1027,7 +962,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2140,
 			"craftRecipeId": "craft:brewery-t1"
 		},
 		"item:blueprint-tavern-t1": {
@@ -1043,7 +977,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2150,
 			"craftRecipeId": "craft:tavern-t1"
 		},
 		"item:blueprint-winery-t1": {
@@ -1059,7 +992,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2160,
 			"craftRecipeId": "craft:winery-t1"
 		},
 		"item:blueprint-coal-mine-t1": {
@@ -1075,7 +1007,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2200,
 			"craftRecipeId": "craft:coal-mine-t1"
 		},
 		"item:blueprint-iron-mine-t1": {
@@ -1091,7 +1022,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2210,
 			"craftRecipeId": "craft:iron-mine-t1"
 		},
 		"item:blueprint-smelter-t1": {
@@ -1107,7 +1037,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2220,
 			"craftRecipeId": "craft:smelter-t1"
 		},
 		"item:blueprint-purifier-t1": {
@@ -1123,7 +1052,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2230,
 			"craftRecipeId": "craft:purifier-t1"
 		},
 		"item:blueprint-gold-mine-t1": {
@@ -1139,7 +1067,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2240,
 			"craftRecipeId": "craft:gold-mine-t1"
 		},
 		"item:blueprint-goldsmith-t1": {
@@ -1155,7 +1082,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2300,
 			"craftRecipeId": "craft:goldsmith-t1"
 		},
 		"item:blueprint-townhall-t2": {
@@ -1171,7 +1097,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2060,
 			"craftRecipeId": "craft:townhall-t2"
 		},
 		"item:blueprint-townhall-t3": {
@@ -1187,7 +1112,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2170,
 			"craftRecipeId": "craft:townhall-t3"
 		},
 		"item:blueprint-townhall-t4": {
@@ -1203,7 +1127,6 @@
 				"building",
 				"craft-target"
 			],
-			"sort": 2250,
 			"craftRecipeId": "craft:townhall-t4"
 		}
 	}

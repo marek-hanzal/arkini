@@ -97,7 +97,7 @@ describe("applyGameActionFx Craft", () => {
 			},
 		]);
 
-		const earlyStart = runActionEither({
+		const started = runAction({
 			action: {
 				recipeId: "craft:plank",
 				targetItemInstanceId: "item-instance:1",
@@ -107,58 +107,44 @@ describe("applyGameActionFx Craft", () => {
 			nowMs: 150,
 			save: firstDeposit.save,
 		});
-		expect(earlyStart._tag).toBe("Left");
-		if (earlyStart._tag === "Left") {
-			expect(earlyStart.left).toMatchObject({
-				_tag: "GameActionRejected",
-				reason: "input_unavailable",
-			});
-		}
 
-		const secondDeposit = runAction({
-			action: {
-				inputRef: {
-					kind: "inventory",
-					quantity: 1,
-					slotIndex: 0,
-				},
-				targetItemInstanceId: "item-instance:1",
-				type: "craft.input.store",
-			},
-			config,
-			nowMs: 200,
-			save: firstDeposit.save,
-		});
-
-		expect(secondDeposit.save.inventory.slots[0]).toBeNull();
-		expect(secondDeposit.save.craftInputs["item-instance:1"]?.items).toEqual({
-			"item:twig": 2,
-		});
-
-		const started = runAction({
-			action: {
-				recipeId: "craft:plank",
-				targetItemInstanceId: "item-instance:1",
-				type: "craft.start",
-			},
-			config,
-			nowMs: 300,
-			save: secondDeposit.save,
-		});
+		expect(started.save.inventory.slots[0]).toBeNull();
 
 		expect(started.save.craftInputs).toEqual({});
 		expect(readOnlyRecordValue(started.save.craftJobs)).toMatchObject({
-			completesAtMs: 1300,
+			completesAtMs: 1150,
 			recipeId: "craft:plank",
 			targetItemInstanceId: "item-instance:1",
-			startedAtMs: 300,
+			startedAtMs: 150,
 		});
 		expect(started.events).toEqual([
 			{
-				completesAtMs: 1300,
+				from: {
+					kind: "inventory",
+					nextQuantity: 0,
+					previousQuantity: 1,
+					quantity: 1,
+					slotIndex: 0,
+				},
+				itemId: "item:twig",
+				reason: "craft-input-auto-fill",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:twig",
+				nextQuantity: 2,
+				previousQuantity: 1,
+				quantity: 1,
+				recipeId: "craft:plank",
+				storedAtMs: 150,
+				targetItemInstanceId: "item-instance:1",
+				type: "craft_input.stored",
+			},
+			{
+				completesAtMs: 1150,
 				jobId: readOnlyRecordValue(started.save.craftJobs).id,
 				recipeId: "craft:plank",
-				startedAtMs: 300,
+				startedAtMs: 150,
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.started",
 			},

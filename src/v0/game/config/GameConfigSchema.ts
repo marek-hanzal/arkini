@@ -40,10 +40,9 @@ import { z } from "zod";
  * - Producer/product requirements are referenced through central `requirements` entries by
  *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
  *   includes diagonals around the target tile.
- * - Producer `productIds` are ordered production lines. The first entry is the
- *   initial default product line. Runtime board-click activation and generic producer
- *   feeding use the current runtime default (which falls back to the first line until a
- *   player changes it). Product
+ * - Producer `productIds` are ordered production lines. Runtime board-click activation
+ *   only uses an explicitly selected default product line. Without a user-selected
+ *   default, clicking a producer tile is intentionally a noop. Product
  *   definitions are owned by exactly one producer line; upgrades target that
  *   producer/product-line definition, not concrete runtime instances. Producer shells do
  *   not own inputs; product lines reference named input definitions through `inputRefId`.
@@ -71,7 +70,6 @@ import { z } from "zod";
  *       "maxStackSize": 32,
  *       "description": "A tiny piece of future infrastructure.",
  *       "tags": ["wood"],
- *       "sort": 10,
  *       "mergeIds": ["merge:twig-to-stick"]
  *     }
  *   },
@@ -350,7 +348,6 @@ const AssetDefinitionSchema = z
 				"blueprint",
 			])
 			.optional(),
-		sort: NonNegativeIntegerSchema,
 	})
 	.strict();
 
@@ -392,7 +389,6 @@ const ItemDefinitionSchema = z
 		description: z.string(),
 		label: z.string().optional(),
 		tags: z.array(z.string().min(1)),
-		sort: NonNegativeIntegerSchema,
 		mergeIds: z.array(IdSchema).optional(),
 		producerId: IdSchema.optional(),
 		stashId: IdSchema.optional(),
@@ -547,7 +543,6 @@ const UpgradeDefinitionSchema = z
 		code: z.string().min(1),
 		name: z.string().min(1),
 		description: z.string(),
-		sort: NonNegativeIntegerSchema,
 		tiers: z.array(UpgradeTierDefinitionSchema).min(1),
 	})
 	.strict();

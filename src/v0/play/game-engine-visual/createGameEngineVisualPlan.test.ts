@@ -305,7 +305,7 @@ describe("createGameEngineVisualPlan", () => {
 						kind: "board",
 					},
 					itemId: "item:twig",
-					reason: "producer-input-store",
+					reason: "producer-input-auto-fill",
 					type: "item.consumed",
 				},
 				{

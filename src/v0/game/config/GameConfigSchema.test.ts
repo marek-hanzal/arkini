@@ -90,7 +90,6 @@ type TestUpgrade = {
 	code: string;
 	description: string;
 	name: string;
-	sort: number;
 	tiers: {
 		cost: {
 			itemId: string;
@@ -128,13 +127,11 @@ const createValidConfigValue = () => ({
 			label: "Item",
 			render: "plain",
 			resourceId: "resource:item",
-			sort: 1,
 		},
 		"asset:ui": {
 			kind: "ui",
 			label: "UI",
 			resourceId: "resource:ui",
-			sort: 2,
 		},
 	},
 	items: {
@@ -145,7 +142,6 @@ const createValidConfigValue = () => ({
 			maxStackSize: 1,
 			name: "Producer",
 			producerId: "producer:test",
-			sort: 1,
 			tags: [],
 			tier: 0,
 		},
@@ -155,7 +151,6 @@ const createValidConfigValue = () => ({
 			description: "Twig",
 			maxStackSize: 3,
 			name: "Twig",
-			sort: 2,
 			tags: [
 				"wood",
 			],
@@ -167,7 +162,6 @@ const createValidConfigValue = () => ({
 			description: "Plank",
 			maxStackSize: 2,
 			name: "Plank",
-			sort: 3,
 			tags: [],
 			tier: 1,
 		},
@@ -239,7 +233,6 @@ const createValidConfigValue = () => ({
 			code: "test-upgrade",
 			description: "Upgrade",
 			name: "Upgrade",
-			sort: 1,
 			tiers: [
 				{
 					cost: [

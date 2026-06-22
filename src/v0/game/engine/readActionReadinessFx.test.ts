@@ -34,7 +34,7 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
-	it("returns ready for the default producer product action when productId is omitted", () => {
+	it("returns rejected readiness for default producer product action when no default is selected", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -51,8 +51,9 @@ describe("readActionReadinessFx", () => {
 			save,
 		});
 
-		expect(readiness).toEqual({
-			type: "ready",
+		expect(readiness).toMatchObject({
+			reason: "invalid_actor",
+			type: "rejected",
 		});
 	});
 

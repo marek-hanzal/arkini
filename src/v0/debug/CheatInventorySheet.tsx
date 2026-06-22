@@ -1,3 +1,4 @@
+import Fuse from "fuse.js";
 import { memo, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameItemView } from "~/v0/item/ui/GameItemView";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
@@ -116,6 +117,7 @@ export const CheatInventorySheet = memo(({ onClose }: CheatInventorySheet.Props)
 	const action = useGameAction();
 	const [lastResult, setLastResult] = useState<string | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
+	const [searchQuery, setSearchQuery] = useState("");
 
 	const items = useMemo(
 		() =>
@@ -129,6 +131,35 @@ export const CheatInventorySheet = memo(({ onClose }: CheatInventorySheet.Props)
 			catalog,
 		],
 	);
+
+	const fuse = useMemo(
+		() =>
+			new Fuse(items, {
+				includeScore: true,
+				keys: [
+					"id",
+					"name",
+					"description",
+					"label",
+					"tags",
+					"storage",
+				],
+				threshold: 0.34,
+			}),
+		[
+			items,
+		],
+	);
+	const visibleItems = useMemo(() => {
+		const trimmedQuery = searchQuery.trim();
+		if (!trimmedQuery) return items;
+
+		return fuse.search(trimmedQuery).map((result) => result.item);
+	}, [
+		fuse,
+		items,
+		searchQuery,
+	]);
 
 	const spawnItem = useCallback(
 		async (item: ViewItem, location: SpawnLocation) => {
@@ -165,8 +196,22 @@ export const CheatInventorySheet = memo(({ onClose }: CheatInventorySheet.Props)
 				onClose={onClose}
 			/>
 
-			<div className="border-b border-ak-border bg-ak-surface-soft px-3 py-2 text-center text-xs font-bold leading-snug text-ak-text-muted">
-				Single click spawns one item on board. Double click adds one item to game inventory.
+			<div className="space-y-2 border-b border-ak-border bg-ak-surface-soft px-3 py-2 text-xs font-bold leading-snug text-ak-text-muted">
+				<p className="text-center">
+					Single click spawns one item on board. Double click adds one item to game
+					inventory.
+				</p>
+				<label className="block">
+					<span className="sr-only">Search cheat inventory</span>
+					<input
+						type="search"
+						data-ui="cheat inventory search"
+						className="h-10 w-full rounded-sm border border-ak-border bg-ak-surface px-3 text-sm font-semibold text-ak-text outline-none transition-[border-color,box-shadow] placeholder:text-ak-text-muted/70 focus:border-ak-border-accent focus-visible:outline-ak-focus"
+						placeholder="Search items…"
+						value={searchQuery}
+						onChange={(event) => setSearchQuery(event.currentTarget.value)}
+					/>
+				</label>
 			</div>
 
 			{lastError ? (
@@ -183,16 +228,22 @@ export const CheatInventorySheet = memo(({ onClose }: CheatInventorySheet.Props)
 				data-ui="cheat inventory body"
 				className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-3 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
 			>
-				<div className="mx-auto grid w-full max-w-[520px] grid-cols-[repeat(auto-fill,minmax(4.75rem,1fr))] gap-2">
-					{items.map((item) => (
-						<CheatItemButton
-							key={item.id}
-							disabled={action.isPending}
-							item={item}
-							onSpawn={(location) => spawnItem(item, location)}
-						/>
-					))}
-				</div>
+				{visibleItems.length === 0 ? (
+					<p className="mx-auto max-w-[520px] rounded-sm border border-ak-border bg-ak-surface-soft px-3 py-4 text-center text-sm font-bold text-ak-text-muted">
+						No cheat items match “{searchQuery.trim()}”.
+					</p>
+				) : (
+					<div className="mx-auto grid w-full max-w-[520px] grid-cols-[repeat(auto-fill,minmax(4.75rem,1fr))] gap-2">
+						{visibleItems.map((item) => (
+							<CheatItemButton
+								key={item.id}
+								disabled={action.isPending}
+								item={item}
+								onSpawn={(location) => spawnItem(item, location)}
+							/>
+						))}
+					</div>
+				)}
 			</div>
 		</div>
 	);

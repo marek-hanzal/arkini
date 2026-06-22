@@ -474,7 +474,7 @@ Dragging a board item to an occupied board cell attempts the first valid behavio
 
 A reverse-directed merge is intentionally not invented. If the dragged source item does not own a matching merge rule, merge is not considered and later interaction rules may still apply, including swap. Directional rules are data, not vibes in a trench coat.
 
-Producer product-line input deposit respects runtime line priority: the current default product line is filled first, then later enabled lines in configured order. If the default line is full, the next enabled line with capacity receives the item. Disabled lines are skipped.
+Producer product-line input deposit respects runtime line priority: an explicitly selected default product line is filled first, then later enabled lines in configured order. If the default line is full, the next enabled line with capacity receives the item. Disabled lines are skipped.
 
 Stash consumable inputs are open-time inputs, not persistent stash input storage. Dragging a matching key/item onto a stash attempts to open the stash with that input immediately. Persistent stash gates use stored requirements instead.
 
@@ -648,7 +648,7 @@ A producer is triggered by single-click on the board or by an explicit product-l
 
 There are no automatic producers in current gameplay. A producer that can start does nothing until the player activates it.
 
-Single-click on the board starts the current runtime default product line. If the player has not selected a default line for that concrete producer instance, the first configured product line is the default.
+Single-click on the board starts the current runtime default product line only when the player explicitly selected one for that concrete producer instance. Without an explicit default, the click is a noop.
 
 Item detail may show all product lines and can start any enabled line directly.
 

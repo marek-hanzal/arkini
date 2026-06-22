@@ -137,7 +137,6 @@ Keep IDs stable. Rename `name`, `label`, or `description` when display text chan
 - `quantity`: number of items.
 - `capacity`: how many items can be stored in the input/requirement slot.
 - `durationMs`: time in milliseconds.
-- `sort`: ordering value for UI/debug lists.
 - `tier`: item/content level.
 - `tags`: string labels used to group or describe content.
 - `placement`: output placement rule.
@@ -266,7 +265,6 @@ Plain item asset:
       "label": "Log",
       "resourceId": "item-log",
       "render": "plain",
-      "sort": 60
     }
   }
 }
@@ -279,7 +277,6 @@ Fields:
 - `resourceId`: resource ID.
 - `overlayAssetId`: optional asset rendered as overlay.
 - `render`: `plain` or `blueprint`.
-- `sort`: ordering value.
 
 Blueprint asset with overlay:
 
@@ -292,7 +289,6 @@ Blueprint asset with overlay:
       "resourceId": "item-blueprint",
       "overlayAssetId": "asset:item:lumber-camp",
       "render": "blueprint",
-      "sort": 116
     }
   }
 }
@@ -308,7 +304,6 @@ UI asset:
       "label": "Coin UI Icon",
       "resourceId": "ui-coin",
       "render": "plain",
-      "sort": 10
     }
   }
 }
@@ -345,7 +340,6 @@ Item shape:
       "description": "Small wood resource.",
       "label": "I",
       "tags": ["material", "wood"],
-      "sort": 40,
       "mergeIds": ["merge:twig-twig-branch"],
       "producerId": "producer:lumber-camp-1",
       "stashId": "stash:crate-1",
@@ -372,7 +366,6 @@ Fields:
 - `description`: item text.
 - `label`: short label.
 - `tags`: descriptive labels.
-- `sort`: ordering value.
 - `mergeIds`: merge rules available from this item.
 - `producerId`: producer definition attached to this item.
 - `stashId`: stash definition attached to this item.
@@ -400,7 +393,6 @@ both
       "maxStackSize": 50,
       "description": "Small wood resource.",
       "tags": ["material", "wood"],
-      "sort": 40,
       "mergeIds": ["merge:twig-twig-branch"]
     }
   }
@@ -421,7 +413,6 @@ both
       "description": "Produces basic wood.",
       "label": "1",
       "tags": ["producer", "building", "wood"],
-      "sort": 330,
       "producerId": "producer:lumber-camp-1"
     }
   }
@@ -441,7 +432,6 @@ both
       "maxStackSize": 1,
       "description": "Epic reward crate.",
       "tags": ["stash", "crate"],
-      "sort": 430,
       "stashId": "stash:crate-4"
     }
   }
@@ -461,7 +451,6 @@ both
       "maxStackSize": 5,
       "description": "Craft target for Lumber Camp I.",
       "tags": ["blueprint", "craft-target"],
-      "sort": 204,
       "craftRecipeId": "craft:lumber-camp"
     }
   }
@@ -482,7 +471,6 @@ both
       "storage": "board",
       "description": "Board danger.",
       "tags": ["danger"],
-      "sort": 900
     }
   }
 }
@@ -502,7 +490,6 @@ both
       "storage": "inventory",
       "description": "Inventory-owned production permission.",
       "tags": ["license"],
-      "sort": 800
     }
   }
 }
@@ -522,7 +509,6 @@ both
       "storage": "board",
       "description": "Removable blocker.",
       "tags": ["blocker"],
-      "sort": 910,
       "removeBy": [
         {
           "itemId": "item:pickaxe",
@@ -580,7 +566,6 @@ Example: `Twig + Twig -> Branch`:
       "maxStackSize": 50,
       "description": "Small wood resource.",
       "tags": ["wood"],
-      "sort": 40,
       "mergeIds": ["merge:twig-twig-branch"]
     }
   },
@@ -975,7 +960,6 @@ Item reference:
       "maxStackSize": 1,
       "description": "Produces basic wood.",
       "tags": ["producer", "building", "wood"],
-      "sort": 330,
       "producerId": "producer:lumber-camp-1"
     }
   }
@@ -1396,7 +1380,6 @@ Item reference:
       "maxStackSize": 1,
       "description": "Epic reward crate.",
       "tags": ["stash", "crate"],
-      "sort": 430,
       "stashId": "stash:crate-4"
     }
   }
@@ -1529,7 +1512,6 @@ Craft target item reference:
       "maxStackSize": 5,
       "description": "Craft target for Lumber Camp I.",
       "tags": ["blueprint", "craft-target"],
-      "sort": 204,
       "craftRecipeId": "craft:lumber-camp"
     }
   }
@@ -1549,7 +1531,6 @@ An upgrade has costs, duration, and effects.
       "code": "lumber-camp-1-speed",
       "name": "Lumber Camp I Speed",
       "description": "Reduces production duration.",
-      "sort": 10,
       "tiers": [
         {
           "cost": [
@@ -1578,7 +1559,6 @@ Upgrade fields:
 - `code`: short unique upgrade code.
 - `name`: upgrade name.
 - `description`: description.
-- `sort`: ordering value.
 - `tiers`: tier list.
 
 Tier fields:
@@ -1920,7 +1900,6 @@ Use `assets` + `items`.
       "label": "Fiber",
       "resourceId": "item-fiber",
       "render": "plain",
-      "sort": 1000
     }
   },
   "items": {
@@ -1933,7 +1912,6 @@ Use `assets` + `items`.
       "storage": "both",
       "description": "Basic crafting fiber.",
       "tags": ["material", "fiber"],
-      "sort": 1000
     }
   }
 }
@@ -1955,7 +1933,6 @@ Use `storage: "board"`.
       "storage": "board",
       "description": "Board danger.",
       "tags": ["danger"],
-      "sort": 900
     }
   }
 }
@@ -1987,7 +1964,6 @@ Use `storage: "inventory"`.
       "storage": "inventory",
       "description": "Inventory-owned production permission.",
       "tags": ["license"],
-      "sort": 800
     }
   }
 }
@@ -2009,7 +1985,6 @@ Use `items.*.removeBy`.
       "storage": "board",
       "description": "Removable blocker.",
       "tags": ["blocker"],
-      "sort": 910,
       "removeBy": [
         {
           "itemId": "item:pickaxe",
@@ -2040,7 +2015,6 @@ Use `items.*.mergeIds` + `merge`.
       "maxStackSize": 50,
       "description": "Small wood resource.",
       "tags": ["wood"],
-      "sort": 40,
       "mergeIds": ["merge:twig-twig-branch"]
     },
     "item:branch": {
@@ -2051,7 +2025,6 @@ Use `items.*.mergeIds` + `merge`.
       "maxStackSize": 25,
       "description": "Merged wood resource.",
       "tags": ["wood"],
-      "sort": 50
     }
   },
   "merge": {
@@ -2078,7 +2051,6 @@ Each source item gets its own `mergeIds`.
       "maxStackSize": 50,
       "description": "Small wood resource.",
       "tags": ["wood"],
-      "sort": 40,
       "mergeIds": ["merge:twig-twig-branch"]
     },
     "item:branch": {
@@ -2089,7 +2061,6 @@ Each source item gets its own `mergeIds`.
       "maxStackSize": 25,
       "description": "Merged wood resource.",
       "tags": ["wood"],
-      "sort": 50,
       "mergeIds": ["merge:branch-branch-log"]
     },
     "item:log": {
@@ -2100,7 +2071,6 @@ Each source item gets its own `mergeIds`.
       "maxStackSize": 20,
       "description": "Construction wood.",
       "tags": ["wood"],
-      "sort": 60
     }
   },
   "merge": {
@@ -2131,7 +2101,6 @@ Use `secret: true`.
       "maxStackSize": 20,
       "description": "Water.",
       "tags": ["material"],
-      "sort": 120,
       "mergeIds": ["merge:water-seed-sprout"]
     }
   },
@@ -2284,7 +2253,6 @@ Attach item to producer through `producerId`.
       "maxStackSize": 1,
       "description": "Produces basic wood.",
       "tags": ["producer", "building", "wood"],
-      "sort": 330,
       "producerId": "producer:lumber-camp-1"
     }
   }
@@ -2650,7 +2618,6 @@ Item gets `stashId`, stash gets `outputTableId`.
       "maxStackSize": 1,
       "description": "Basic reward crate.",
       "tags": ["stash", "crate"],
-      "sort": 400,
       "stashId": "stash:crate-1"
     }
   },
@@ -2827,7 +2794,6 @@ Item gets `craftRecipeId`; recipe defines result and inputs.
       "maxStackSize": 5,
       "description": "Craft target for Kiln I.",
       "tags": ["blueprint", "craft-target"],
-      "sort": 250,
       "craftRecipeId": "craft:kiln"
     },
     "item:kiln-1": {
@@ -2838,7 +2804,6 @@ Item gets `craftRecipeId`; recipe defines result and inputs.
       "maxStackSize": 1,
       "description": "Turns clay into bricks.",
       "tags": ["producer", "building"],
-      "sort": 610,
       "producerId": "producer:kiln-1"
     }
   },
@@ -2956,7 +2921,6 @@ Use `product.duration.add`.
       "code": "lumber-camp-1-speed",
       "name": "Lumber Camp I Speed",
       "description": "Reduces production duration.",
-      "sort": 10,
       "tiers": [
         {
           "cost": [
@@ -3009,7 +2973,6 @@ Create a new loot table and switch product through `product.outputTable.set`.
       "code": "lumber-camp-1-output",
       "name": "Lumber Camp I Output",
       "description": "Improves wood output.",
-      "sort": 20,
       "tiers": [
         {
           "cost": [
@@ -3057,7 +3020,6 @@ Use `product.inputRef.set`.
       "code": "coal-mine-1-rations",
       "name": "Coal Mine I Rations",
       "description": "Changes required rations.",
-      "sort": 30,
       "tiers": [
         {
           "cost": [
@@ -3092,7 +3054,6 @@ Use `product.input.quantity.add`.
       "code": "coal-mine-1-beer-efficiency",
       "name": "Coal Mine I Beer Efficiency",
       "description": "Changes beer input quantity.",
-      "sort": 31,
       "tiers": [
         {
           "cost": [
@@ -3136,7 +3097,6 @@ Use `product.requirementIds.set`.
       "code": "lumber-camp-1-log-requirements",
       "name": "Lumber Camp I Log Requirements",
       "description": "Changes log product requirements.",
-      "sort": 40,
       "tiers": [
         {
           "cost": [
@@ -3181,7 +3141,6 @@ Use `producer.requirementIds.set`.
       "code": "lumber-camp-1-forest-logistics",
       "name": "Lumber Camp I Forest Logistics",
       "description": "Improves remote forest usage.",
-      "sort": 15,
       "tiers": [
         {
           "cost": [
@@ -3234,7 +3193,6 @@ Use `producer.maxQueueSize.add`.
       "code": "lumber-camp-1-queue",
       "name": "Lumber Camp I Queue",
       "description": "Increases queue size.",
-      "sort": 50,
       "tiers": [
         {
           "cost": [
@@ -3269,7 +3227,6 @@ Add multiple tier objects into `tiers`.
       "code": "lumber-camp-1-speed",
       "name": "Lumber Camp I Speed",
       "description": "Reduces production duration.",
-      "sort": 10,
       "tiers": [
         {
           "cost": [
@@ -3411,7 +3368,6 @@ Use `overlayAssetId` and `render: "blueprint"`.
       "resourceId": "item-blueprint",
       "overlayAssetId": "asset:item:kiln",
       "render": "blueprint",
-      "sort": 250
     }
   }
 }
@@ -3429,7 +3385,6 @@ Use `kind: "ui"`.
       "label": "Coin UI Icon",
       "resourceId": "ui-coin",
       "render": "plain",
-      "sort": 10
     }
   }
 }
@@ -3451,7 +3406,6 @@ Currency is a normal item with large stack size and currency tag.
       "storage": "inventory",
       "description": "Currency stack.",
       "tags": ["currency"],
-      "sort": 50
     }
   }
 }
@@ -3486,7 +3440,6 @@ Create board item and use it in proximity requirement.
       "storage": "board",
       "description": "Board resource deposit.",
       "tags": ["deposit", "stone"],
-      "sort": 700
     }
   },
   "requirements": {
@@ -3515,7 +3468,6 @@ Attach deposit requirement to producer.
       "maxStackSize": 1,
       "description": "Produces stone near deposits.",
       "tags": ["producer", "building", "stone"],
-      "sort": 620,
       "producerId": "producer:quarry-1"
     }
   },

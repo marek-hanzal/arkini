@@ -46,7 +46,6 @@ describe("upgrade runtime", () => {
 					code: "test-speed",
 					description: "Test speed upgrade",
 					name: "Test Speed",
-					sort: 1,
 					tiers: [
 						{
 							cost: [
@@ -136,7 +135,6 @@ describe("upgrade runtime", () => {
 					code: "test-speed",
 					description: "Test speed upgrade",
 					name: "Test Speed",
-					sort: 1,
 					tiers: [
 						{
 							cost: [
@@ -234,7 +232,6 @@ describe("upgrade runtime", () => {
 					code: "test-loot",
 					description: "Test loot upgrade",
 					name: "Test Loot",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],
@@ -338,7 +335,6 @@ describe("upgrade runtime", () => {
 					code: "shred-output",
 					description: "Shred output",
 					name: "Shred Output",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],
@@ -418,7 +414,6 @@ describe("upgrade runtime", () => {
 					code: "test-queue",
 					description: "Test queue upgrade",
 					name: "Test Queue",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],
@@ -520,7 +515,6 @@ describe("upgrade runtime", () => {
 					code: "expensive-shred",
 					description: "Expensive shred",
 					name: "Expensive Shred",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],

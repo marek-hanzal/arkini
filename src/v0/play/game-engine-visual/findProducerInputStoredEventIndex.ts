@@ -26,6 +26,10 @@ export const findProducerInputStoredEventIndex = ({
 		(candidate, candidateIndex) =>
 			candidateIndex > afterIndex &&
 			!skipped.has(candidateIndex) &&
-			candidate.type === "producer_input.stored" &&
-			candidate.itemId === source.itemId,
+			((source.reason === "producer-input-auto-fill" &&
+				candidate.type === "producer_input.stored" &&
+				candidate.itemId === source.itemId) ||
+				(source.reason === "craft-input-auto-fill" &&
+					candidate.type === "craft_input.stored" &&
+					candidate.itemId === source.itemId)),
 	);

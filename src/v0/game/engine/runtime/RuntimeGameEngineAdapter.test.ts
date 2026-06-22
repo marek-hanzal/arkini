@@ -107,7 +107,6 @@ describe("RuntimeGameEngineAdapter", () => {
 					code: "test-queue",
 					description: "Test queue upgrade",
 					name: "Test Queue",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],

@@ -3,7 +3,7 @@ import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 type StoredEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored";
+		type: "producer_input.stored" | "craft_input.stored";
 	}
 >;
 
@@ -15,12 +15,5 @@ export namespace shouldAnimateProducerInputStoreVisual {
 }
 
 export const shouldAnimateProducerInputStoreVisual = ({
-	events,
 	stored,
-}: shouldAnimateProducerInputStoreVisual.Props) =>
-	events.some(
-		(event) =>
-			event.type === "product.started" &&
-			event.producerItemInstanceId === stored.producerItemInstanceId &&
-			event.productId === stored.productId,
-	);
+}: shouldAnimateProducerInputStoreVisual.Props) => stored.quantity > 0;

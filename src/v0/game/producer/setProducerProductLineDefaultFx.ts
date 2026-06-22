@@ -43,23 +43,11 @@ export const setProducerProductLineDefaultFx = Effect.fn("setProducerProductLine
 			save,
 		});
 		const previousState = nextSave.producerLines[action.producerItemInstanceId];
-		const nextDefaultProductId =
-			action.productId === checked.producerDefinition.productIds[0]
-				? undefined
-				: action.productId;
 		const nextDisabledProductIds = previousState?.disabledProductIds ?? [];
-		if (nextDisabledProductIds.length === 0 && !nextDefaultProductId) {
-			delete nextSave.producerLines[action.producerItemInstanceId];
-		} else {
-			nextSave.producerLines[action.producerItemInstanceId] = {
-				disabledProductIds: nextDisabledProductIds,
-				...(nextDefaultProductId
-					? {
-							defaultProductId: nextDefaultProductId,
-						}
-					: {}),
-			};
-		}
+		nextSave.producerLines[action.producerItemInstanceId] = {
+			defaultProductId: action.productId,
+			disabledProductIds: nextDisabledProductIds,
+		};
 		nextSave.updatedAtMs = nowMs;
 
 		return {

@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
-import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
@@ -38,22 +37,6 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 				`Craft target "${action.targetItemInstanceId}" already has running craft job "${runningCraftJob.id}".`,
 			),
 		);
-	}
-
-	const storedInputs = yield* readCraftInputQuantitiesFx({
-		save,
-		targetItemInstanceId: action.targetItemInstanceId,
-	});
-	for (const input of target.recipe.inputs) {
-		const storedQuantity = storedInputs.get(input.itemId) ?? 0;
-		if (storedQuantity < input.quantity) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected(
-					"input_unavailable",
-					`Craft input "${input.itemId}" is incomplete (${storedQuantity}/${input.quantity}).`,
-				),
-			);
-		}
 	}
 
 	const storedRequirementItems = yield* readStoredRequirementQuantitiesFx({

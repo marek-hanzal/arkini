@@ -83,7 +83,8 @@ export const readRuntimeUpgradeListViewFromGameSave = ({
 
 	const upgrades = Object.entries(config.upgrades)
 		.sort(
-			([, left], [, right]) => left.sort - right.sort || left.name.localeCompare(right.name),
+			([leftId, left], [rightId, right]) =>
+				left.name.localeCompare(right.name) || leftId.localeCompare(rightId),
 		)
 		.map(([upgradeId, upgrade]): UpgradeView => {
 			const completed = save.upgrades[upgradeId]?.completedTiers ?? 0;

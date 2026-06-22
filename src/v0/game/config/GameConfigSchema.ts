@@ -39,7 +39,9 @@ import { z } from "zod";
  *   `board_or_inventory`). They model global knowledge/permission/ownership gates.
  * - Producer/product requirements are referenced through central `requirements` entries by
  *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
- *   includes diagonals around the target tile.
+ *   includes diagonals around the target tile. Producer/product `blockedBy` entries are
+ *   negative OR conditions: any active blocker may slow the selected product without
+ *   preventing start.
  * - Producer `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
@@ -105,7 +107,10 @@ import { z } from "zod";
  *       "type": "producer",
  *       "maxQueueSize": 1,
  *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
- *       "requirementIds": ["requirement:lumber-camp.near-tree"]
+ *       "requirementIds": ["requirement:lumber-camp.near-tree"],
+ *       "blockedBy": [
+ *         { "type": "proximity", "itemIds": ["item:pollution"], "distance": 2, "durationFactor": 0.5 }
+ *       ]
  *     }
  *   },
  *   "inputs": {
@@ -121,6 +126,7 @@ import { z } from "zod";
  *       "placement": "board_then_inventory",
  *       "inputRefId": "input:lumber-camp.saw",
  *       "requirementIds": ["requirement:saw-license"],
+ *       "blockedBy": [],
  *       "outputTableId": "loot:lumber-camp.saw"
  *     }
  *   }
@@ -255,6 +261,41 @@ const ProximityItemRequirementSchema = z
 		durationFactor: z.number().min(0).optional(),
 	})
 	.strict();
+
+/**
+ * Negative production blocker. Blockers are OR-ed: one active blocker is enough to
+ * slow the producer/product. Passive blockers react to item presence in a scope;
+ * proximity blockers react to nearby board items and get stronger when closer.
+ */
+const PassiveItemBlockerSchema = z
+	.object({
+		type: z.literal("passive"),
+		itemId: IdSchema,
+		quantity: PositiveIntegerSchema,
+		scope: z.enum([
+			"board",
+			"inventory",
+			"board_or_inventory",
+		]),
+		durationFactor: z.number().min(0).optional(),
+	})
+	.strict();
+
+const ProximityItemBlockerSchema = z
+	.object({
+		type: z.literal("proximity"),
+		itemIds: z.array(IdSchema).min(1),
+		distance: PositiveIntegerSchema,
+		durationFactor: z.number().min(0).optional(),
+	})
+	.strict();
+
+const GameBlockerDefinitionSchema = z.discriminatedUnion("type", [
+	PassiveItemBlockerSchema,
+	ProximityItemBlockerSchema,
+]);
+
+const GameBlockersSchema = z.array(GameBlockerDefinitionSchema);
 
 /** Central reusable requirement table entry referenced by producer/product requirementIds. */
 const GameRequirementDefinitionSchema = z.discriminatedUnion("type", [
@@ -404,6 +445,7 @@ const ProducerDefinitionSchema = z
 		maxQueueSize: PositiveIntegerSchema,
 		productIds: z.array(IdSchema).min(1),
 		requirementIds: z.array(IdSchema),
+		blockedBy: GameBlockersSchema.optional(),
 	})
 	.strict();
 
@@ -463,6 +505,7 @@ const ProductDefinitionSchema = z
 		placement: PlacementSchema,
 		inputRefId: IdSchema.optional(),
 		requirementIds: z.array(IdSchema),
+		blockedBy: GameBlockersSchema.optional(),
 		outputTableId: IdSchema.optional(),
 	})
 	.strict();
@@ -882,6 +925,16 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			producer.requirementIds,
 			hasRequirement,
 		);
+		validateGameBlockers(
+			ctx,
+			[
+				"producers",
+				producerId,
+				"blockedBy",
+			],
+			producer.blockedBy ?? [],
+			hasItem,
+		);
 	}
 
 	for (const [stashId, stash] of Object.entries(value.stashes)) {
@@ -1001,6 +1054,16 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			],
 			product.requirementIds,
 			hasRequirement,
+		);
+		validateGameBlockers(
+			ctx,
+			[
+				"products",
+				productId,
+				"blockedBy",
+			],
+			product.blockedBy ?? [],
+			hasItem,
 		);
 
 		if (product.outputTableId && !hasLootTable(product.outputTableId)) {
@@ -1907,6 +1970,67 @@ const validateItemRequirements = (
 				],
 				`Capacity must be >= quantity (${requirement.quantity}).`,
 			);
+		}
+	}
+};
+
+const validateGameBlockers = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	blockers: readonly z.infer<typeof GameBlockerDefinitionSchema>[],
+	hasItem: (itemId: string) => boolean,
+) => {
+	validateUniqueStringList(
+		ctx,
+		path,
+		blockers.map((blocker) =>
+			blocker.type === "passive"
+				? `${blocker.type}:${blocker.itemId}:${blocker.scope}`
+				: `${blocker.type}:${blocker.itemIds.join("|")}:${blocker.distance}`,
+		),
+		(value) => `Duplicate blocker "${value}".`,
+	);
+
+	for (const [index, blocker] of blockers.entries()) {
+		if (blocker.type === "passive") {
+			if (!hasItem(blocker.itemId)) {
+				addIssue(
+					ctx,
+					[
+						...path,
+						index,
+						"itemId",
+					],
+					`Missing item "${blocker.itemId}".`,
+				);
+			}
+			continue;
+		}
+
+		validateUniqueStringList(
+			ctx,
+			[
+				...path,
+				index,
+				"itemIds",
+			],
+			blocker.itemIds,
+			(value) => `Duplicate blocker item "${value}".`,
+		);
+
+		for (const [itemIndex, itemId] of blocker.itemIds.entries()) {
+			if (!hasItem(itemId)) {
+				addIssue(
+					ctx,
+					[
+						...path,
+						index,
+						"itemIds",
+						itemIndex,
+					],
+					`Missing item "${itemId}".`,
+				);
+			}
 		}
 	}
 };

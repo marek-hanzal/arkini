@@ -3815,6 +3815,16 @@
 			"requirementIds": []
 		},
 		"product:farm-t1:grain": {
+			"blockedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
 			"durationMs": 5000,
 			"inputRefId": "input:farm-t1:water",
 			"name": "Grain",
@@ -3854,6 +3864,16 @@
 			"requirementIds": []
 		},
 		"product:pig-farm-t1:piglet": {
+			"blockedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
 			"durationMs": 5000,
 			"inputRefId": "input:pig-farm-t1:grain-water",
 			"name": "Piglet",

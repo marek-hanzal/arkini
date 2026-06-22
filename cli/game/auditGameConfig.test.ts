@@ -140,6 +140,32 @@ describe("auditGameConfig", () => {
 		]);
 	});
 
+	it("does not warn about produced items used as blockers", () => {
+		const config = createConfigValue();
+		const warnings = auditGameConfig(
+			parseGameConfig({
+				...config,
+				products: {
+					...config.products,
+					"product:test": {
+						...config.products["product:test"],
+						blockedBy: [
+							{
+								distance: 2,
+								itemIds: [
+									"item:pollution",
+								],
+								type: "proximity",
+							},
+						],
+					},
+				},
+			}),
+		);
+
+		expect(warnings).toEqual([]);
+	});
+
 	it("formats warnings for CLI output", () => {
 		const warnings = auditGameConfig(parseGameConfig(createConfigValue()));
 

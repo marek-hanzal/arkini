@@ -24,6 +24,21 @@ type TestGameRequirement =
 			type: "proximity";
 	  };
 
+type TestGameBlocker =
+	| {
+			durationFactor?: number;
+			itemId: string;
+			quantity: number;
+			scope: "board" | "inventory" | "board_or_inventory";
+			type: "passive";
+	  }
+	| {
+			distance: number;
+			durationFactor?: number;
+			itemIds: string[];
+			type: "proximity";
+	  };
+
 type TestProductInput = {
 	capacity: number;
 	consume: boolean;
@@ -32,6 +47,7 @@ type TestProductInput = {
 };
 
 type TestProduct = {
+	blockedBy?: TestGameBlocker[];
 	durationMs: number;
 	inputRefId?: string;
 	name: string;
@@ -170,6 +186,7 @@ const createValidConfigValue = () => ({
 	requirements: {} as Record<string, TestGameRequirement>,
 	producers: {
 		"producer:test": {
+			blockedBy: [] as TestGameBlocker[],
 			maxQueueSize: 1,
 			productIds: [
 				"product:test",
@@ -208,6 +225,7 @@ const createValidConfigValue = () => ({
 	},
 	products: {
 		"product:test": {
+			blockedBy: [] as TestGameBlocker[],
 			durationMs: 1000,
 			inputRefId: "input:test",
 			name: "Test product",
@@ -536,6 +554,36 @@ describe("GameConfigSchema", () => {
 		};
 
 		expect(() => parseGameConfig(config)).toThrow(/durationFactor/);
+	});
+
+	it("rejects negative blocker duration factors", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].blockedBy = [
+			{
+				distance: 1,
+				durationFactor: -1,
+				itemIds: [
+					"item:twig",
+				],
+				type: "proximity",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/durationFactor/);
+	});
+
+	it("rejects blockers that point at missing items", () => {
+		const config = createValidConfigValue();
+		config.producers["producer:test"].blockedBy = [
+			{
+				itemId: "item:ghost",
+				quantity: 1,
+				scope: "board_or_inventory",
+				type: "passive",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
 	});
 
 	it("rejects proximity requirements that point at missing items", () => {

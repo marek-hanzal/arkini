@@ -70,6 +70,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	config,
 	maxQueueSize,
 	nowMs,
+	producerBlockedBy,
 	producerRequirementIds,
 	productIds,
 	save,
@@ -78,6 +79,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	config: GameConfig;
 	maxQueueSize: number;
 	nowMs: number;
+	producerBlockedBy: NonNullable<GameConfig["producers"][string]["blockedBy"]>;
 	producerRequirementIds: GameConfig["producers"][string]["requirementIds"];
 	productIds: readonly string[];
 	save: GameSave;
@@ -105,6 +107,10 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				...product.requirementIds,
 			],
 		});
+		const blockers = [
+			...producerBlockedBy,
+			...(product.blockedBy ?? []),
+		];
 		const requirementViews = readRuntimeActivationRequirementViewsFromGameSave({
 			requirements,
 			save,
@@ -145,6 +151,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 		const durationMs = activeJob
 			? activeJob.completesAtMs - activeJob.startedAtMs
 			: readProducerProductDurationMs({
+					blockers,
 					product,
 					producerItemInstanceId: targetItemInstanceId,
 					requirements,
@@ -252,6 +259,7 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 			config,
 			maxQueueSize: producer.maxQueueSize,
 			nowMs,
+			producerBlockedBy: producer.blockedBy ?? [],
 			producerRequirementIds: producer.requirementIds,
 			productIds: producer.productIds,
 			save,

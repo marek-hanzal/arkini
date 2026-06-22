@@ -36,10 +36,10 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	collectMergeUsage(config, usage, itemFlow);
 	collectInputUsage(config, itemFlow);
 	collectRequirementUsage(config, itemFlow);
-	collectProducerUsage(config, usage);
+	collectProducerUsage(config, usage, itemFlow);
 	collectStashUsage(config, usage, itemFlow);
 	collectCraftRecipeUsage(config, itemFlow);
-	collectProductUsage(config, usage);
+	collectProductUsage(config, usage, itemFlow);
 	collectLootTableUsage(config, itemFlow);
 	collectUpgradeUsage(config, usage, itemFlow);
 	collectStartingStateUsage(config, itemFlow);
@@ -150,7 +150,7 @@ const collectRequirementUsage = (config: GameConfig, itemFlow: ItemFlowIndex) =>
 	}
 };
 
-const collectProducerUsage = (config: GameConfig, usage: UsageIndex) => {
+const collectProducerUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const producer of Object.values(config.producers)) {
 		for (const productId of producer.productIds) {
 			usage.products.add(productId);
@@ -158,6 +158,7 @@ const collectProducerUsage = (config: GameConfig, usage: UsageIndex) => {
 		for (const requirementId of producer.requirementIds) {
 			usage.requirements.add(requirementId);
 		}
+		collectBlockerItemUsage(producer.blockedBy ?? [], itemFlow);
 	}
 };
 
@@ -191,7 +192,7 @@ const collectCraftRecipeUsage = (config: GameConfig, itemFlow: ItemFlowIndex) =>
 	}
 };
 
-const collectProductUsage = (config: GameConfig, usage: UsageIndex) => {
+const collectProductUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const product of Object.values(config.products)) {
 		if (product.inputRefId) {
 			usage.inputs.add(product.inputRefId);
@@ -201,6 +202,23 @@ const collectProductUsage = (config: GameConfig, usage: UsageIndex) => {
 		}
 		for (const requirementId of product.requirementIds) {
 			usage.requirements.add(requirementId);
+		}
+		collectBlockerItemUsage(product.blockedBy ?? [], itemFlow);
+	}
+};
+
+const collectBlockerItemUsage = (
+	blockers: readonly NonNullable<GameConfig["products"][string]["blockedBy"]>[number][],
+	itemFlow: ItemFlowIndex,
+) => {
+	for (const blocker of blockers) {
+		if (blocker.type === "passive") {
+			itemFlow.consumedItemIds.add(blocker.itemId);
+			continue;
+		}
+
+		for (const itemId of blocker.itemIds) {
+			itemFlow.consumedItemIds.add(itemId);
 		}
 	}
 };
@@ -299,7 +317,7 @@ const readTerminalItemWarnings = (
 			code: "terminal-item",
 			id: itemId,
 			section: "items",
-			message: `${itemId} is produced or starts in the save, but no configured input, requirement, merge, removal rule, craft, stash, or upgrade consumes it.`,
+			message: `${itemId} is produced or starts in the save, but no configured input, requirement, blocker, merge, removal rule, craft, stash, or upgrade consumes it.`,
 		}));
 
 const readUnusedRecordWarnings = (

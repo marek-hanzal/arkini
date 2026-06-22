@@ -173,6 +173,8 @@ loot:slaughterhouse-t1:sausage-leather
 
 Most first-pass production durations stay at `5000` ms. The new food processors are slightly longer on purpose: windmill flour takes `6000` ms, while bakery bread and slaughterhouse sausage/leather take `8000` ms. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
+Farm grain and pig-farm piglet production now have a first blocker example: nearby `item:pollution` within proximity `2` slows the product line. The blocker is intentionally product-level so the producer shell stays reusable and the negative effect is visible where the actual duration lives.
+
 Current processor input buffers use capacity `4`:
 
 - `input:sawmill-t1:log`

@@ -873,6 +873,85 @@ Product usage:
 }
 ```
 
+## 11.4 Production blockers
+
+`blockedBy` defines negative production effects on producers or product lines.
+
+Unlike `requirementIds`, blockers do not gate the action. They are OR conditions: if any blocker is active, production can still start, but the active blocker slows the duration. If multiple blockers are active, the strongest slowdown wins instead of stacking every penalty into a spreadsheet-shaped crime scene.
+
+Supported blocker types:
+
+```txt
+passive
+proximity
+```
+
+Passive blocker example:
+
+```json
+{
+  "products": {
+    "product:farm-1:grain": {
+      "name": "Grain",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "blockedBy": [
+        {
+          "type": "passive",
+          "itemId": "item:pollution",
+          "quantity": 1,
+          "scope": "board",
+          "durationFactor": 1
+        }
+      ],
+      "outputTableId": "loot:farm-1:grain"
+    }
+  }
+}
+```
+
+Proximity blocker example:
+
+```json
+{
+  "products": {
+    "product:farm-1:grain": {
+      "name": "Grain",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "blockedBy": [
+        {
+          "type": "proximity",
+          "itemIds": ["item:pollution"],
+          "distance": 2,
+          "durationFactor": 0.5
+        }
+      ],
+      "outputTableId": "loot:farm-1:grain"
+    }
+  }
+}
+```
+
+Fields:
+
+- `type`: `passive` or `proximity`.
+- `itemId`: passive blocker item.
+- `itemIds`: accepted proximity blocker item IDs.
+- `quantity`: required passive blocker count.
+- `scope`: passive blocker search scope.
+- `distance`: maximum board distance for proximity blocker.
+- `durationFactor`: slowdown strength. Missing value behaves as `1`.
+
+For proximity blockers, closer is worse. The multiplier is based on proximity strength inside the configured radius, so pollution at distance `1` hurts more than pollution at distance `2`. Production is never sped up by a blocker.
+
+Blockers can live on:
+
+- `producers.*.blockedBy`, affecting every product line on that producer
+- `products.*.blockedBy`, affecting only that product line
+
 ## 12. `producers`
 
 Defines producer shells.
@@ -898,6 +977,7 @@ Fields:
 - `maxQueueSize`: queue size.
 - `productIds`: product lines owned by this producer.
 - `requirementIds`: producer-level requirements.
+- `blockedBy`: optional producer-level blockers. Any active blocker slows every product line on this producer.
 
 One product line:
 
@@ -970,7 +1050,7 @@ Item reference:
 
 Defines producer product lines.
 
-A product line defines production name, duration, placement, inputs, requirements, and output.
+A product line defines production name, duration, placement, inputs, requirements, optional blockers, and output.
 
 ```json
 {
@@ -993,6 +1073,7 @@ Fields:
 - `placement`: output placement.
 - `inputRefId`: input bundle.
 - `requirementIds`: product-level requirements.
+- `blockedBy`: optional product-level blockers. Any active blocker slows this product line.
 - `outputTableId`: loot table output.
 
 No-input product:
@@ -1780,9 +1861,13 @@ requirements.*.itemIds[] -> items
 
 producers.*.productIds[] -> products
 producers.*.requirementIds[] -> requirements
+producers.*.blockedBy[].itemId -> items
+producers.*.blockedBy[].itemIds[] -> items
 
 products.*.inputRefId -> inputs
 products.*.requirementIds[] -> requirements
+products.*.blockedBy[].itemId -> items
+products.*.blockedBy[].itemIds[] -> items
 products.*.outputTableId -> lootTables
 
 stashes.*.outputTableId -> lootTables
@@ -2432,7 +2517,35 @@ Use `consume: false`.
 }
 ```
 
-## A.20 Add producer proximity requirement
+## A.20 Add pollution slowdown to a producer product
+
+Use `blockedBy` on the product line. This does not prevent production. It only slows it while the blocker is active.
+
+```json
+{
+  "products": {
+    "product:farm-1:grain": {
+      "name": "Grain",
+      "durationMs": 5000,
+      "placement": "board_then_inventory",
+      "requirementIds": [],
+      "blockedBy": [
+        {
+          "type": "proximity",
+          "itemIds": ["item:pollution"],
+          "distance": 2,
+          "durationFactor": 0.5
+        }
+      ],
+      "outputTableId": "loot:farm-1:grain"
+    }
+  }
+}
+```
+
+Use producer-level `blockedBy` when every line on the building should be affected. Use product-level `blockedBy` when only one concrete production line should care, because apparently we enjoy having precise tools instead of one giant hammer.
+
+## A.21 Add producer proximity requirement
 
 Define proximity requirement and add it to `producer.requirementIds`.
 
@@ -2457,7 +2570,7 @@ Define proximity requirement and add it to `producer.requirementIds`.
 }
 ```
 
-## A.21 Add proximity requirement accepting multiple items
+## A.22 Add proximity requirement accepting multiple items
 
 Use multiple IDs in `itemIds`.
 
@@ -2474,7 +2587,7 @@ Use multiple IDs in `itemIds`.
 }
 ```
 
-## A.22 Add remote resource with lower distance penalty
+## A.23 Add remote resource with lower distance penalty
 
 Lower `durationFactor`.
 
@@ -2501,7 +2614,7 @@ Lower `durationFactor`.
 }
 ```
 
-## A.23 Add requirement for only one product line
+## A.24 Add requirement for only one product line
 
 Put requirement ID into `products.*.requirementIds`.
 
@@ -2521,7 +2634,7 @@ Put requirement ID into `products.*.requirementIds`.
 }
 ```
 
-## A.24 Add passive requirement
+## A.25 Add passive requirement
 
 Use `type: "passive"`.
 
@@ -2547,7 +2660,7 @@ Use `type: "passive"`.
 }
 ```
 
-## A.25 Add stored requirement
+## A.26 Add stored requirement
 
 Use `type: "stored"`.
 
@@ -2572,7 +2685,7 @@ Use `type: "stored"`.
 }
 ```
 
-## A.26 Add product without output
+## A.27 Add product without output
 
 Omit `outputTableId`.
 
@@ -2603,7 +2716,7 @@ Omit `outputTableId`.
 }
 ```
 
-## A.27 Add basic stash/crate
+## A.28 Add basic stash/crate
 
 Item gets `stashId`, stash gets `outputTableId`.
 
@@ -2658,7 +2771,7 @@ Item gets `stashId`, stash gets `outputTableId`.
 }
 ```
 
-## A.28 Add stash with key
+## A.29 Add stash with key
 
 Add input to `stashes.*.inputs`.
 
@@ -2685,7 +2798,7 @@ Add input to `stashes.*.inputs`.
 }
 ```
 
-## A.29 Add stash with requirement
+## A.30 Add stash with requirement
 
 Use inline `requirements`.
 
@@ -2737,7 +2850,7 @@ Stored requirement variant:
 }
 ```
 
-## A.30 Remove stash when depleted
+## A.31 Remove stash when depleted
 
 Use `onDepleted: "remove"`.
 
@@ -2757,7 +2870,7 @@ Use `onDepleted: "remove"`.
 }
 ```
 
-## A.31 Replace stash when depleted
+## A.32 Replace stash when depleted
 
 Use `replaceWithItemId`.
 
@@ -2779,7 +2892,7 @@ Use `replaceWithItemId`.
 }
 ```
 
-## A.32 Add blueprint craft
+## A.33 Add blueprint craft
 
 Item gets `craftRecipeId`; recipe defines result and inputs.
 
@@ -2829,7 +2942,7 @@ Item gets `craftRecipeId`; recipe defines result and inputs.
 }
 ```
 
-## A.33 Add instant craft
+## A.34 Add instant craft
 
 Use `durationMs: 0`.
 
@@ -2852,7 +2965,7 @@ Use `durationMs: 0`.
 }
 ```
 
-## A.34 Add craft with requirement
+## A.35 Add craft with requirement
 
 Use inline `requirements`.
 
@@ -2910,7 +3023,7 @@ Stored requirement variant:
 }
 ```
 
-## A.35 Add speed upgrade
+## A.36 Add speed upgrade
 
 Use `product.duration.add`.
 
@@ -2944,7 +3057,7 @@ Use `product.duration.add`.
 }
 ```
 
-## A.36 Add better loot upgrade
+## A.37 Add better loot upgrade
 
 Create a new loot table and switch product through `product.outputTable.set`.
 
@@ -2996,7 +3109,7 @@ Create a new loot table and switch product through `product.outputTable.set`.
 }
 ```
 
-## A.37 Add input bundle upgrade
+## A.38 Add input bundle upgrade
 
 Use `product.inputRef.set`.
 
@@ -3043,7 +3156,7 @@ Use `product.inputRef.set`.
 }
 ```
 
-## A.38 Add input quantity upgrade
+## A.39 Add input quantity upgrade
 
 Use `product.input.quantity.add`.
 
@@ -3078,7 +3191,7 @@ Use `product.input.quantity.add`.
 }
 ```
 
-## A.39 Add product requirement upgrade
+## A.40 Add product requirement upgrade
 
 Use `product.requirementIds.set`.
 
@@ -3122,7 +3235,7 @@ Use `product.requirementIds.set`.
 }
 ```
 
-## A.40 Add producer requirement upgrade
+## A.41 Add producer requirement upgrade
 
 Use `producer.requirementIds.set`.
 
@@ -3182,7 +3295,7 @@ Use `producer.requirementIds.set`.
 }
 ```
 
-## A.41 Add producer queue upgrade
+## A.42 Add producer queue upgrade
 
 Use `producer.maxQueueSize.add`.
 
@@ -3216,7 +3329,7 @@ Use `producer.maxQueueSize.add`.
 }
 ```
 
-## A.42 Add multi-tier upgrade
+## A.43 Add multi-tier upgrade
 
 Add multiple tier objects into `tiers`.
 
@@ -3266,7 +3379,7 @@ Add multiple tier objects into `tiers`.
 }
 ```
 
-## A.43 Add starting board
+## A.44 Add starting board
 
 Add entries to `startingState.board`.
 
@@ -3295,7 +3408,7 @@ Add entries to `startingState.board`.
 }
 ```
 
-## A.44 Add starting inventory
+## A.45 Add starting inventory
 
 Add stacks to `startingState.inventory`.
 
@@ -3317,7 +3430,7 @@ Add stacks to `startingState.inventory`.
 }
 ```
 
-## A.45 Add combined starting state
+## A.46 Add combined starting state
 
 Use board and inventory together.
 
@@ -3355,7 +3468,7 @@ Use board and inventory together.
 }
 ```
 
-## A.46 Add blueprint asset with overlay
+## A.47 Add blueprint asset with overlay
 
 Use `overlayAssetId` and `render: "blueprint"`.
 
@@ -3373,7 +3486,7 @@ Use `overlayAssetId` and `render: "blueprint"`.
 }
 ```
 
-## A.47 Add UI asset
+## A.48 Add UI asset
 
 Use `kind: "ui"`.
 
@@ -3390,7 +3503,7 @@ Use `kind: "ui"`.
 }
 ```
 
-## A.48 Add currency as item
+## A.49 Add currency as item
 
 Currency is a normal item with large stack size and currency tag.
 
@@ -3424,7 +3537,7 @@ Upgrade cost usage:
 }
 ```
 
-## A.49 Add resource deposit for proximity
+## A.50 Add resource deposit for proximity
 
 Create board item and use it in proximity requirement.
 
@@ -3453,7 +3566,7 @@ Create board item and use it in proximity requirement.
 }
 ```
 
-## A.50 Add producer using deposit
+## A.51 Add producer using deposit
 
 Attach deposit requirement to producer.
 
@@ -3503,7 +3616,7 @@ Attach deposit requirement to producer.
 }
 ```
 
-## A.51 Add alternative product line
+## A.52 Add alternative product line
 
 Add another product to the same producer.
 
@@ -3539,7 +3652,7 @@ Add another product to the same producer.
 }
 ```
 
-## A.52 Add product line with own input and own output
+## A.53 Add product line with own input and own output
 
 Each product line gets its own `inputRefId` and `outputTableId`.
 

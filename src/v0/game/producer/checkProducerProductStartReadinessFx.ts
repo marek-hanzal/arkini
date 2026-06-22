@@ -146,6 +146,10 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	}
 
 	return {
+		blockers: [
+			...(producerDefinition.blockedBy ?? []),
+			...(product.blockedBy ?? []),
+		],
 		producerDefinition,
 		producerItem,
 		product,

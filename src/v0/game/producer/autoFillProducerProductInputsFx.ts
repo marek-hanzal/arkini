@@ -79,7 +79,7 @@ export const autoFillProducerProductInputsFx = Effect.fn("autoFillProducerProduc
 			yield* consumeResolvedInputRefFx({
 				events,
 				nextSave,
-				reason: "producer-input-store",
+				reason: "producer-input-auto-fill",
 				ref,
 			});
 			storeProducerResolvedInput({

@@ -173,7 +173,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		]);
 	});
 
-	it("marks the first producer product line as the default line", () => {
+	it("does not mark a producer product line as default until save selects one", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -188,7 +188,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 
 		expect(board.byId["item-instance:1"]?.activation?.productLines).toMatchObject([
 			{
-				isDefault: true,
+				isDefault: false,
 				productId: "product:test",
 			},
 			{
@@ -247,7 +247,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
-					sort: 8,
 					storage: "both",
 					tags: [],
 					tier: 0,
@@ -306,7 +305,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
-					sort: 8,
 					storage: "both",
 					tags: [],
 					tier: 0,

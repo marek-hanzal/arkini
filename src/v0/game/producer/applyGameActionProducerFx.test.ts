@@ -51,14 +51,14 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
-	it("starts the first producer product line when productId is omitted", () => {
+	it("rejects default producer product action when no default line is selected", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
 
-		const result = runAction({
+		const result = runActionEither({
 			action: {
 				producerItemInstanceId: "item-instance:1",
 				inputRefs: [],
@@ -69,17 +69,13 @@ describe("applyGameActionFx Producer", () => {
 			save,
 		});
 
-		const job = readOnlyRecordValue(result.save.producerJobs);
-		expect(job).toMatchObject({
-			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
-		});
-		expect(result.events).toMatchObject([
-			{
-				productId: "product:test",
-				type: "product.started",
-			},
-		]);
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "invalid_actor",
+			});
+		}
 	});
 
 	it("starts the saved default producer product line when productId is omitted", () => {
@@ -510,7 +506,7 @@ describe("applyGameActionFx Producer", () => {
 					kind: "board",
 				},
 				itemId: "item:twig",
-				reason: "producer-input-store",
+				reason: "producer-input-auto-fill",
 				type: "item.consumed",
 			},
 			{
@@ -613,7 +609,7 @@ describe("applyGameActionFx Producer", () => {
 					kind: "board",
 				},
 				itemId: "item:twig",
-				reason: "producer-input-store",
+				reason: "producer-input-auto-fill",
 				type: "item.consumed",
 			},
 			{
@@ -686,7 +682,7 @@ describe("applyGameActionFx Producer", () => {
 					kind: "board",
 				},
 				itemId: "item:twig",
-				reason: "producer-input-store",
+				reason: "producer-input-auto-fill",
 				type: "item.consumed",
 			},
 			{
@@ -742,7 +738,7 @@ describe("applyGameActionFx Producer", () => {
 					slotIndex: 0,
 				},
 				itemId: "item:twig",
-				reason: "producer-input-store",
+				reason: "producer-input-auto-fill",
 				type: "item.consumed",
 			},
 			{
@@ -1478,7 +1474,7 @@ describe("applyGameActionFx Producer", () => {
 			{
 				changedAtMs: 100,
 				nextProductId: "product:shred",
-				previousProductId: "product:test",
+				previousProductId: undefined,
 				producerItemInstanceId: "item-instance:1",
 				type: "producer.product_line.default_changed",
 			},
@@ -1495,7 +1491,12 @@ describe("applyGameActionFx Producer", () => {
 			save: defaulted.save,
 		});
 
-		expect(reset.save.producerLines).toEqual({});
+		expect(reset.save.producerLines).toEqual({
+			"item-instance:1": {
+				defaultProductId: "product:test",
+				disabledProductIds: [],
+			},
+		});
 		expect(reset.events).toEqual([
 			{
 				changedAtMs: 200,

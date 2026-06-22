@@ -18,5 +18,5 @@ export const readProducerDefaultProductId = ({
 		return savedDefaultProductId;
 	}
 
-	return productIds[0];
+	return undefined;
 };

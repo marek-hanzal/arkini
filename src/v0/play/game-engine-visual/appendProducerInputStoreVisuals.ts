@@ -16,7 +16,7 @@ type ConsumedEvent = Extract<
 type StoredEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored";
+		type: "producer_input.stored" | "craft_input.stored";
 	}
 >;
 
@@ -29,6 +29,11 @@ export namespace appendProducerInputStoreVisuals {
 	}
 }
 
+const readTargetItemInstanceId = (stored: StoredEvent) =>
+	stored.type === "producer_input.stored"
+		? stored.producerItemInstanceId
+		: stored.targetItemInstanceId;
+
 export const appendProducerInputStoreVisuals = ({
 	plan,
 	previousBoard,
@@ -38,17 +43,18 @@ export const appendProducerInputStoreVisuals = ({
 	if (source.from.kind !== "board") return;
 
 	const previousSource = previousBoard?.byId[source.from.itemInstanceId];
-	const producer = previousBoard?.byId[stored.producerItemInstanceId];
-	if (!previousSource || !producer) return;
+	const targetItemInstanceId = readTargetItemInstanceId(stored);
+	const target = previousBoard?.byId[targetItemInstanceId];
+	if (!previousSource || !target) return;
 
 	const motion = GameVisualMotion.merge({
-		cause: "producer",
-		groupId: `engine:producer-input-store:${source.from.itemInstanceId}:${stored.producerItemInstanceId}:${stored.itemId}`,
+		cause: stored.type === "producer_input.stored" ? "producer" : "craft",
+		groupId: `engine:input-store:${source.from.itemInstanceId}:${targetItemInstanceId}:${stored.itemId}`,
 	});
 	const cleanupDelayMs = gameVisualMotionSettlementDelayMs(motion);
 	const tile: BoardTransientTile = {
 		groupId: motion.groupId,
-		id: `transient:producer-input-store:${motion.groupId}:source:${previousSource.id}`,
+		id: `transient:input-store:${motion.groupId}:source:${previousSource.id}`,
 		itemId: source.itemId as BoardTransientTile["itemId"],
 		slotId: cellKey(previousSource.x, previousSource.y),
 	};
@@ -59,7 +65,7 @@ export const appendProducerInputStoreVisuals = ({
 		request: {
 			cleanupDelayMs,
 			exit: toTileEngineExitMotion(motion, {
-				toTileId: stored.producerItemInstanceId,
+				toTileId: targetItemInstanceId,
 			}),
 			tileId: tile.id,
 		},

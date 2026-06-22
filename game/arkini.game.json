@@ -4,737 +4,635 @@
 			"kind": "item",
 			"label": "Beam",
 			"render": "plain",
-			"resourceId": "item-beam",
-			"sort": 68
+			"resourceId": "item-beam"
 		},
 		"asset:item:beer": {
 			"kind": "item",
 			"label": "Beer",
 			"render": "plain",
-			"resourceId": "item-beer",
-			"sort": 136
+			"resourceId": "item-beer"
 		},
 		"asset:item:beer-barrel": {
 			"kind": "item",
 			"label": "Beer Barrel",
 			"render": "plain",
-			"resourceId": "item-beer-barrel",
-			"sort": 208
+			"resourceId": "item-beer-barrel"
 		},
 		"asset:item:blueprint": {
 			"kind": "item",
 			"label": "Finished Blueprint",
 			"render": "plain",
-			"resourceId": "item-blueprint",
-			"sort": 112
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-bakery-t1": {
 			"kind": "item",
 			"label": "Bakery I Blueprint",
 			"overlayAssetId": "asset:producer:bakery-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2110
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-brewery-t1": {
 			"kind": "item",
 			"label": "Brewery I Blueprint",
 			"overlayAssetId": "asset:producer:brewery-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2140
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-coal-mine-t1": {
 			"kind": "item",
 			"label": "Coal Mine I Blueprint",
 			"overlayAssetId": "asset:producer:coal-mine-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2200
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-farm-t1": {
 			"kind": "item",
 			"label": "Farm I Blueprint",
 			"overlayAssetId": "asset:producer:farm-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2050
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-gold-mine-t1": {
 			"kind": "item",
 			"label": "Gold Mine I Blueprint",
 			"overlayAssetId": "asset:producer:gold-mine-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2240
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-goldsmith-t1": {
 			"kind": "item",
 			"label": "Goldsmith I Blueprint",
 			"overlayAssetId": "asset:producer:goldsmith-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2300
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-iron-mine-t1": {
 			"kind": "item",
 			"label": "Iron Mine I Blueprint",
 			"overlayAssetId": "asset:producer:iron-mine-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2210
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-lumberjack-t1": {
 			"kind": "item",
 			"label": "Lumberjack I Blueprint",
 			"overlayAssetId": "asset:producer:lumberjack-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2000
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-pig-farm-t1": {
 			"kind": "item",
 			"label": "Pig Farm I Blueprint",
 			"overlayAssetId": "asset:producer:pig-farm-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2120
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-purifier-t1": {
 			"kind": "item",
 			"label": "Purifier I Blueprint",
 			"overlayAssetId": "asset:producer:purifier-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2230
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-quarry-t1": {
 			"kind": "item",
 			"label": "Quarry I Blueprint",
 			"overlayAssetId": "asset:producer:quarry-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2020
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-sawmill-t1": {
 			"kind": "item",
 			"label": "Sawmill I Blueprint",
 			"overlayAssetId": "asset:producer:sawmill-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2010
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-slaughterhouse-t1": {
 			"kind": "item",
 			"label": "Slaughterhouse I Blueprint",
 			"overlayAssetId": "asset:producer:slaughterhouse-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2130
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-smelter-t1": {
 			"kind": "item",
 			"label": "Smelter I Blueprint",
 			"overlayAssetId": "asset:producer:smelter-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2220
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-stonemason-t1": {
 			"kind": "item",
 			"label": "Stonemason I Blueprint",
 			"overlayAssetId": "asset:producer:stonemason-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2030
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-tavern-t1": {
 			"kind": "item",
 			"label": "Tavern I Blueprint",
 			"overlayAssetId": "asset:producer:tavern-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2150
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-townhall-t2": {
 			"kind": "item",
 			"label": "Town Hall II Blueprint",
 			"overlayAssetId": "asset:producer:townhall-t2",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2060
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-townhall-t3": {
 			"kind": "item",
 			"label": "Town Hall III Blueprint",
 			"overlayAssetId": "asset:producer:townhall-t3",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2170
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-townhall-t4": {
 			"kind": "item",
 			"label": "Town Hall IV Blueprint",
 			"overlayAssetId": "asset:producer:townhall-t4",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2250
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-well-t1": {
 			"kind": "item",
 			"label": "Well I Blueprint",
 			"overlayAssetId": "asset:producer:well-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2040
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-windmill-t1": {
 			"kind": "item",
 			"label": "Windmill I Blueprint",
 			"overlayAssetId": "asset:producer:windmill-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2100
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-winery-t1": {
 			"kind": "item",
 			"label": "Winery I Blueprint",
 			"overlayAssetId": "asset:producer:winery-t1",
 			"render": "blueprint",
-			"resourceId": "item-blueprint",
-			"sort": 2160
+			"resourceId": "item-blueprint"
 		},
 		"asset:item:branch": {
 			"kind": "item",
 			"label": "Branch",
 			"render": "plain",
-			"resourceId": "item-branch",
-			"sort": 50
+			"resourceId": "item-branch"
 		},
 		"asset:item:bread": {
 			"kind": "item",
 			"label": "Bread",
 			"render": "plain",
-			"resourceId": "item-bread",
-			"sort": 206
+			"resourceId": "item-bread"
 		},
 		"asset:item:bush": {
 			"kind": "item",
 			"label": "Bush",
 			"render": "plain",
-			"resourceId": "item-bush",
-			"sort": 34
+			"resourceId": "item-bush"
 		},
 		"asset:item:coal": {
 			"kind": "item",
 			"label": "Coal Cart",
 			"render": "plain",
-			"resourceId": "item-coal",
-			"sort": 132
+			"resourceId": "item-coal"
 		},
 		"asset:item:coal-deposit": {
 			"kind": "item",
 			"label": "Coal Deposit",
 			"render": "plain",
-			"resourceId": "item-coal-deposit",
-			"sort": 211
+			"resourceId": "item-coal-deposit"
 		},
 		"asset:item:coal-mine": {
 			"kind": "item",
 			"label": "Coal Mine",
 			"render": "plain",
-			"resourceId": "item-coal-mine",
-			"sort": 138
+			"resourceId": "item-coal-mine"
 		},
 		"asset:item:coin": {
 			"kind": "item",
 			"label": "Coin",
 			"render": "plain",
-			"resourceId": "item-coin",
-			"sort": 101
+			"resourceId": "item-coin"
 		},
 		"asset:item:coin-chest": {
 			"kind": "item",
 			"label": "Coin Chest",
 			"render": "plain",
-			"resourceId": "item-coin-chest",
-			"sort": 104
+			"resourceId": "item-coin-chest"
 		},
 		"asset:item:coin-pair": {
 			"kind": "item",
 			"label": "Coin Pair",
 			"render": "plain",
-			"resourceId": "item-coin-pair",
-			"sort": 102
+			"resourceId": "item-coin-pair"
 		},
 		"asset:item:coin-stack": {
 			"kind": "item",
 			"label": "Coin Stack",
 			"render": "plain",
-			"resourceId": "item-coin-stack",
-			"sort": 103
+			"resourceId": "item-coin-stack"
 		},
 		"asset:item:crate": {
 			"kind": "item",
 			"label": "Common Crate",
 			"render": "plain",
-			"resourceId": "item-crate",
-			"sort": 150
+			"resourceId": "item-crate"
 		},
 		"asset:item:crate-epic": {
 			"kind": "item",
 			"label": "Epic Crate",
 			"render": "plain",
-			"resourceId": "item-crate-epic",
-			"sort": 180
+			"resourceId": "item-crate-epic"
 		},
 		"asset:item:crate-rare": {
 			"kind": "item",
 			"label": "Rare Crate",
 			"render": "plain",
-			"resourceId": "item-crate-rare",
-			"sort": 170
+			"resourceId": "item-crate-rare"
 		},
 		"asset:item:crate-sturdy": {
 			"kind": "item",
 			"label": "Sturdy Crate",
 			"render": "plain",
-			"resourceId": "item-crate-sturdy",
-			"sort": 160
+			"resourceId": "item-crate-sturdy"
 		},
 		"asset:item:crystal": {
 			"kind": "item",
 			"label": "Crystal",
 			"render": "plain",
-			"resourceId": "item-crystal",
-			"sort": 90
+			"resourceId": "item-crystal"
 		},
 		"asset:item:flour": {
 			"kind": "item",
 			"label": "Flour",
 			"render": "plain",
-			"resourceId": "item-flour",
-			"sort": 204
+			"resourceId": "item-flour"
 		},
 		"asset:item:gem": {
 			"kind": "item",
 			"label": "Gem",
 			"render": "plain",
-			"resourceId": "item-gem",
-			"sort": 94
+			"resourceId": "item-gem"
 		},
 		"asset:item:gold-deposit": {
 			"kind": "item",
 			"label": "Gold Deposit",
 			"render": "plain",
-			"resourceId": "item-gold-deposit",
-			"sort": 213
+			"resourceId": "item-gold-deposit"
 		},
 		"asset:item:gold-ingot": {
 			"kind": "item",
 			"label": "Gold Ingot",
 			"render": "plain",
-			"resourceId": "item-gold-ingot",
-			"sort": 223
+			"resourceId": "item-gold-ingot"
 		},
 		"asset:item:gold-ore": {
 			"kind": "item",
 			"label": "Gold Ore Cart",
 			"render": "plain",
-			"resourceId": "item-gold-ore",
-			"sort": 220
+			"resourceId": "item-gold-ore"
 		},
 		"asset:item:grain": {
 			"kind": "item",
 			"label": "Grain",
 			"render": "plain",
-			"resourceId": "item-grain",
-			"sort": 202
+			"resourceId": "item-grain"
 		},
 		"asset:item:grapes": {
 			"kind": "item",
 			"label": "Grapes",
 			"render": "plain",
-			"resourceId": "item-grapes",
-			"sort": 211
+			"resourceId": "item-grapes"
 		},
 		"asset:item:hop-field": {
 			"kind": "item",
 			"label": "Hop Field",
 			"render": "plain",
-			"resourceId": "item-hop-field",
-			"sort": 206
+			"resourceId": "item-hop-field"
 		},
 		"asset:item:hops": {
 			"kind": "item",
 			"label": "Hops",
 			"render": "plain",
-			"resourceId": "item-hops",
-			"sort": 215
+			"resourceId": "item-hops"
 		},
 		"asset:item:iron-deposit": {
 			"kind": "item",
 			"label": "Iron Deposit",
 			"render": "plain",
-			"resourceId": "item-iron-deposit",
-			"sort": 212
+			"resourceId": "item-iron-deposit"
 		},
 		"asset:item:iron-ingot": {
 			"kind": "item",
 			"label": "Iron Ingot",
 			"render": "plain",
-			"resourceId": "item-iron-ingot",
-			"sort": 222
+			"resourceId": "item-iron-ingot"
 		},
 		"asset:item:iron-ore": {
 			"kind": "item",
 			"label": "Iron Ore Cart",
 			"render": "plain",
-			"resourceId": "item-iron-ore",
-			"sort": 221
+			"resourceId": "item-iron-ore"
 		},
 		"asset:item:leaf": {
 			"kind": "item",
 			"label": "Leaf",
 			"render": "plain",
-			"resourceId": "item-leaf",
-			"sort": 30
+			"resourceId": "item-leaf"
 		},
 		"asset:item:leather": {
 			"kind": "item",
 			"label": "Leather",
 			"render": "plain",
-			"resourceId": "item-leather",
-			"sort": 211
+			"resourceId": "item-leather"
 		},
 		"asset:item:log": {
 			"kind": "item",
 			"label": "Log",
 			"render": "plain",
-			"resourceId": "item-log",
-			"sort": 60
+			"resourceId": "item-log"
 		},
 		"asset:item:lumber-camp": {
 			"kind": "item",
 			"label": "Lumber Camp",
 			"render": "plain",
-			"resourceId": "item-lumber-camp",
-			"sort": 130
+			"resourceId": "item-lumber-camp"
 		},
 		"asset:item:ore": {
 			"kind": "item",
 			"label": "Ore",
 			"render": "plain",
-			"resourceId": "item-ore",
-			"sort": 84
+			"resourceId": "item-ore"
 		},
 		"asset:item:pebble": {
 			"kind": "item",
 			"label": "Pebble",
 			"render": "plain",
-			"resourceId": "item-pebble",
-			"sort": 70
+			"resourceId": "item-pebble"
 		},
 		"asset:item:piglet": {
 			"kind": "item",
 			"label": "Piglet",
 			"render": "plain",
-			"resourceId": "item-piglet",
-			"sort": 208
+			"resourceId": "item-piglet"
 		},
 		"asset:item:plank": {
 			"kind": "item",
 			"label": "Plank",
 			"render": "plain",
-			"resourceId": "item-plank",
-			"sort": 66
+			"resourceId": "item-plank"
 		},
 		"asset:item:pollution": {
 			"kind": "item",
 			"label": "Pollution",
 			"render": "plain",
-			"resourceId": "item-pollution",
-			"sort": 224
+			"resourceId": "item-pollution"
 		},
 		"asset:item:quarry": {
 			"kind": "item",
 			"label": "Quarry",
 			"render": "plain",
-			"resourceId": "item-quarry",
-			"sort": 140
+			"resourceId": "item-quarry"
 		},
 		"asset:item:rock": {
 			"kind": "item",
 			"label": "Rock",
 			"render": "plain",
-			"resourceId": "item-rock",
-			"sort": 79
+			"resourceId": "item-rock"
 		},
 		"asset:item:sapling": {
 			"kind": "item",
 			"label": "Sapling",
 			"render": "plain",
-			"resourceId": "item-sapling",
-			"sort": 38
+			"resourceId": "item-sapling"
 		},
 		"asset:item:sausage": {
 			"kind": "item",
 			"label": "Sausage",
 			"render": "plain",
-			"resourceId": "item-sausage",
-			"sort": 210
+			"resourceId": "item-sausage"
 		},
 		"asset:item:seed": {
 			"kind": "item",
 			"label": "Seed",
 			"render": "plain",
-			"resourceId": "item-seed",
-			"sort": 10
+			"resourceId": "item-seed"
 		},
 		"asset:item:sprout": {
 			"kind": "item",
 			"label": "Sprout",
 			"render": "plain",
-			"resourceId": "item-sprout",
-			"sort": 20
+			"resourceId": "item-sprout"
 		},
 		"asset:item:stone": {
 			"kind": "item",
 			"label": "Stone",
 			"render": "plain",
-			"resourceId": "item-stone",
-			"sort": 80
+			"resourceId": "item-stone"
 		},
 		"asset:item:stone-block": {
 			"kind": "item",
 			"label": "Stone Block",
 			"render": "plain",
-			"resourceId": "item-stone-block",
-			"sort": 82
+			"resourceId": "item-stone-block"
 		},
 		"asset:item:townhall": {
 			"kind": "item",
 			"label": "Town Hall",
 			"render": "plain",
-			"resourceId": "item-townhall",
-			"sort": 125
+			"resourceId": "item-townhall"
 		},
 		"asset:item:tree": {
 			"kind": "item",
 			"label": "Tree",
 			"render": "plain",
-			"resourceId": "item-tree",
-			"sort": 39
+			"resourceId": "item-tree"
 		},
 		"asset:item:twig": {
 			"kind": "item",
 			"label": "Twig",
 			"render": "plain",
-			"resourceId": "item-twig",
-			"sort": 40
+			"resourceId": "item-twig"
 		},
 		"asset:item:vineyard": {
 			"kind": "item",
 			"label": "Vineyard",
 			"render": "plain",
-			"resourceId": "item-vineyard",
-			"sort": 210
+			"resourceId": "item-vineyard"
 		},
 		"asset:item:water": {
 			"kind": "item",
 			"label": "Water",
 			"render": "plain",
-			"resourceId": "item-water",
-			"sort": 100
+			"resourceId": "item-water"
 		},
 		"asset:item:wheat-field": {
 			"kind": "item",
 			"label": "Wheat Field",
 			"render": "plain",
-			"resourceId": "item-wheat-field",
-			"sort": 200
+			"resourceId": "item-wheat-field"
 		},
 		"asset:item:wine-barrel": {
 			"kind": "item",
 			"label": "Wine Barrel",
 			"render": "plain",
-			"resourceId": "item-wine-barrel",
-			"sort": 213
+			"resourceId": "item-wine-barrel"
 		},
 		"asset:item:wine-glass": {
 			"kind": "item",
 			"label": "Wine Glass",
 			"render": "plain",
-			"resourceId": "item-wine-glass",
-			"sort": 214
+			"resourceId": "item-wine-glass"
 		},
 		"asset:item:wood-bundle": {
 			"kind": "item",
 			"label": "Wood Bundle",
 			"render": "plain",
-			"resourceId": "item-wood-bundle",
-			"sort": 64
+			"resourceId": "item-wood-bundle"
 		},
 		"asset:producer:bakery-t1": {
 			"kind": "item",
 			"label": "Bakery I",
 			"render": "plain",
-			"resourceId": "producer-bakery-t1",
-			"sort": 205
+			"resourceId": "producer-bakery-t1"
 		},
 		"asset:producer:brewery-t1": {
 			"kind": "item",
 			"label": "Brewery I",
 			"render": "plain",
-			"resourceId": "producer-brewery-t1",
-			"sort": 207
+			"resourceId": "producer-brewery-t1"
 		},
 		"asset:producer:coal-mine-t1": {
 			"kind": "item",
 			"label": "Coal Mine I",
 			"render": "plain",
-			"resourceId": "producer-coal-mine-t1",
-			"sort": 216
+			"resourceId": "producer-coal-mine-t1"
 		},
 		"asset:producer:farm-t1": {
 			"kind": "item",
 			"label": "Farm I",
 			"render": "plain",
-			"resourceId": "producer-farm-t1",
-			"sort": 201
+			"resourceId": "producer-farm-t1"
 		},
 		"asset:producer:gold-mine-t1": {
 			"kind": "item",
 			"label": "Gold Mine I",
 			"render": "plain",
-			"resourceId": "producer-gold-mine-t1",
-			"sort": 217
+			"resourceId": "producer-gold-mine-t1"
 		},
 		"asset:producer:goldsmith-t1": {
 			"kind": "item",
 			"label": "Goldsmith I",
 			"render": "plain",
-			"resourceId": "producer-goldsmith-t1",
-			"sort": 225
+			"resourceId": "producer-goldsmith-t1"
 		},
 		"asset:producer:iron-mine-t1": {
 			"kind": "item",
 			"label": "Iron Mine I",
 			"render": "plain",
-			"resourceId": "producer-iron-mine-t1",
-			"sort": 218
+			"resourceId": "producer-iron-mine-t1"
 		},
 		"asset:producer:lumberjack-t1": {
 			"kind": "item",
 			"label": "Lumberjack I",
 			"render": "plain",
-			"resourceId": "producer-lumberjack-t1",
-			"sort": 130
+			"resourceId": "producer-lumberjack-t1"
 		},
 		"asset:producer:pig-farm-t1": {
 			"kind": "item",
 			"label": "Pig Farm I",
 			"render": "plain",
-			"resourceId": "producer-pig-farm-t1",
-			"sort": 207
+			"resourceId": "producer-pig-farm-t1"
 		},
 		"asset:producer:purifier-t1": {
 			"kind": "item",
 			"label": "Purifier I",
 			"render": "plain",
-			"resourceId": "producer-purifier-t1",
-			"sort": 220
+			"resourceId": "producer-purifier-t1"
 		},
 		"asset:producer:quarry-t1": {
 			"kind": "item",
 			"label": "Quarry I",
 			"render": "plain",
-			"resourceId": "producer-quarry-t1",
-			"sort": 140
+			"resourceId": "producer-quarry-t1"
 		},
 		"asset:producer:sawmill-t1": {
 			"kind": "item",
 			"label": "Sawmill I",
 			"render": "plain",
-			"resourceId": "producer-sawmill-t1",
-			"sort": 131
+			"resourceId": "producer-sawmill-t1"
 		},
 		"asset:producer:slaughterhouse-t1": {
 			"kind": "item",
 			"label": "Slaughterhouse I",
 			"render": "plain",
-			"resourceId": "producer-slaughterhouse-t1",
-			"sort": 209
+			"resourceId": "producer-slaughterhouse-t1"
 		},
 		"asset:producer:smelter-t1": {
 			"kind": "item",
 			"label": "Smelter I",
 			"render": "plain",
-			"resourceId": "producer-smelter-t1",
-			"sort": 219
+			"resourceId": "producer-smelter-t1"
 		},
 		"asset:producer:stonemason-t1": {
 			"kind": "item",
 			"label": "Stonemason I",
 			"render": "plain",
-			"resourceId": "producer-stonemason-t1",
-			"sort": 141
+			"resourceId": "producer-stonemason-t1"
 		},
 		"asset:producer:tavern-t1": {
 			"kind": "item",
 			"label": "Tavern I",
 			"render": "plain",
-			"resourceId": "producer-tavern-t1",
-			"sort": 209
+			"resourceId": "producer-tavern-t1"
 		},
 		"asset:producer:townhall-t1": {
 			"kind": "item",
 			"label": "Town Hall I",
 			"render": "plain",
-			"resourceId": "item-townhall",
-			"sort": 126
+			"resourceId": "item-townhall"
 		},
 		"asset:producer:townhall-t2": {
 			"kind": "item",
 			"label": "Town Hall II",
 			"render": "plain",
-			"resourceId": "item-townhall",
-			"sort": 127
+			"resourceId": "item-townhall"
 		},
 		"asset:producer:townhall-t3": {
 			"kind": "item",
 			"label": "Town Hall III",
 			"render": "plain",
-			"resourceId": "item-townhall",
-			"sort": 128
+			"resourceId": "item-townhall"
 		},
 		"asset:producer:townhall-t4": {
 			"kind": "item",
 			"label": "Town Hall IV",
 			"render": "plain",
-			"resourceId": "item-townhall",
-			"sort": 129
+			"resourceId": "item-townhall"
 		},
 		"asset:producer:well-t1": {
 			"kind": "item",
 			"label": "Well I",
 			"render": "plain",
-			"resourceId": "producer-well-t1",
-			"sort": 205
+			"resourceId": "producer-well-t1"
 		},
 		"asset:producer:windmill-t1": {
 			"kind": "item",
 			"label": "Windmill I",
 			"render": "plain",
-			"resourceId": "producer-windmill-t1",
-			"sort": 203
+			"resourceId": "producer-windmill-t1"
 		},
 		"asset:producer:winery-t1": {
 			"kind": "item",
 			"label": "Winery I",
 			"render": "plain",
-			"resourceId": "producer-winery-t1",
-			"sort": 212
+			"resourceId": "producer-winery-t1"
 		}
 	},
 	"craftRecipes": {
@@ -1987,7 +1885,6 @@
 			"description": "A single mug of beer served by taverns.",
 			"maxStackSize": 50,
 			"name": "Beer",
-			"sort": 720,
 			"storage": "both",
 			"tags": [
 				"food",
@@ -2001,7 +1898,6 @@
 			"description": "A barrel of beer produced by breweries and served by taverns.",
 			"maxStackSize": 20,
 			"name": "Beer Barrel",
-			"sort": 710,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2017,7 +1913,6 @@
 			"description": "Build plan that can be filled with resources to construct Bakery I.",
 			"maxStackSize": 10,
 			"name": "Bakery I Blueprint",
-			"sort": 2110,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2033,7 +1928,6 @@
 			"description": "Build plan that can be filled with resources to construct Brewery I.",
 			"maxStackSize": 10,
 			"name": "Brewery I Blueprint",
-			"sort": 2140,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2049,7 +1943,6 @@
 			"description": "Build plan that can be filled with resources to construct Coal Mine I.",
 			"maxStackSize": 10,
 			"name": "Coal Mine I Blueprint",
-			"sort": 2200,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2065,7 +1958,6 @@
 			"description": "Build plan that can be filled with resources to construct Farm I.",
 			"maxStackSize": 10,
 			"name": "Farm I Blueprint",
-			"sort": 2050,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2081,7 +1973,6 @@
 			"description": "Build plan that can be filled with resources to construct Gold Mine I.",
 			"maxStackSize": 10,
 			"name": "Gold Mine I Blueprint",
-			"sort": 2240,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2097,7 +1988,6 @@
 			"description": "Build plan that can be filled with resources to construct Goldsmith I.",
 			"maxStackSize": 10,
 			"name": "Goldsmith I Blueprint",
-			"sort": 2300,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2113,7 +2003,6 @@
 			"description": "Build plan that can be filled with resources to construct Iron Mine I.",
 			"maxStackSize": 10,
 			"name": "Iron Mine I Blueprint",
-			"sort": 2210,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2129,7 +2018,6 @@
 			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
 			"maxStackSize": 10,
 			"name": "Lumberjack I Blueprint",
-			"sort": 2000,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2145,7 +2033,6 @@
 			"description": "Build plan that can be filled with resources to construct Pig Farm I.",
 			"maxStackSize": 10,
 			"name": "Pig Farm I Blueprint",
-			"sort": 2120,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2161,7 +2048,6 @@
 			"description": "Build plan that can be filled with resources to construct Purifier I.",
 			"maxStackSize": 10,
 			"name": "Purifier I Blueprint",
-			"sort": 2230,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2177,7 +2063,6 @@
 			"description": "Build plan that can be filled with resources to construct Quarry I.",
 			"maxStackSize": 10,
 			"name": "Quarry I Blueprint",
-			"sort": 2020,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2193,7 +2078,6 @@
 			"description": "Build plan that can be filled with resources to construct Sawmill I.",
 			"maxStackSize": 10,
 			"name": "Sawmill I Blueprint",
-			"sort": 2010,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2209,7 +2093,6 @@
 			"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
 			"maxStackSize": 10,
 			"name": "Slaughterhouse I Blueprint",
-			"sort": 2130,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2225,7 +2108,6 @@
 			"description": "Build plan that can be filled with resources to construct Smelter I.",
 			"maxStackSize": 10,
 			"name": "Smelter I Blueprint",
-			"sort": 2220,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2241,7 +2123,6 @@
 			"description": "Build plan that can be filled with resources to construct Stonemason I.",
 			"maxStackSize": 10,
 			"name": "Stonemason I Blueprint",
-			"sort": 2030,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2257,7 +2138,6 @@
 			"description": "Build plan that can be filled with resources to construct Tavern I.",
 			"maxStackSize": 10,
 			"name": "Tavern I Blueprint",
-			"sort": 2150,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2273,7 +2153,6 @@
 			"description": "Build plan that can be filled with resources to construct Town Hall II.",
 			"maxStackSize": 10,
 			"name": "Town Hall II Blueprint",
-			"sort": 2060,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2289,7 +2168,6 @@
 			"description": "Build plan that can be filled with resources to construct Town Hall III.",
 			"maxStackSize": 10,
 			"name": "Town Hall III Blueprint",
-			"sort": 2170,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2305,7 +2183,6 @@
 			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
 			"maxStackSize": 10,
 			"name": "Town Hall IV Blueprint",
-			"sort": 2250,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2321,7 +2198,6 @@
 			"description": "Build plan that can be filled with resources to construct Well I.",
 			"maxStackSize": 10,
 			"name": "Well I Blueprint",
-			"sort": 2040,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2337,7 +2213,6 @@
 			"description": "Build plan that can be filled with resources to construct Windmill I.",
 			"maxStackSize": 10,
 			"name": "Windmill I Blueprint",
-			"sort": 2100,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2353,7 +2228,6 @@
 			"description": "Build plan that can be filled with resources to construct Winery I.",
 			"maxStackSize": 10,
 			"name": "Winery I Blueprint",
-			"sort": 2160,
 			"storage": "both",
 			"tags": [
 				"blueprint",
@@ -2368,7 +2242,6 @@
 			"description": "Baked food produced by bakeries from flour and water.",
 			"maxStackSize": 50,
 			"name": "Bread",
-			"sort": 540,
 			"storage": "both",
 			"tags": [
 				"food",
@@ -2382,7 +2255,6 @@
 			"description": "A mining cart loaded with coal. Used as fuel by smelters.",
 			"maxStackSize": 20,
 			"name": "Coal Cart",
-			"sort": 1100,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2398,7 +2270,6 @@
 			"description": "Movable coal source used by nearby coal mines.",
 			"maxStackSize": 10,
 			"name": "Coal Deposit",
-			"sort": 1150,
 			"storage": "both",
 			"tags": [
 				"source",
@@ -2414,7 +2285,6 @@
 			"description": "A basic currency output minted by goldsmiths.",
 			"maxStackSize": 100,
 			"name": "Coin",
-			"sort": 1250,
 			"storage": "both",
 			"tags": [
 				"currency",
@@ -2428,7 +2298,6 @@
 			"description": "Milled grain produced by windmills and baked into bread.",
 			"maxStackSize": 50,
 			"name": "Flour",
-			"sort": 530,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2444,7 +2313,6 @@
 			"description": "Movable gold source used by nearby gold mines.",
 			"maxStackSize": 10,
 			"name": "Gold Deposit",
-			"sort": 1170,
 			"storage": "both",
 			"tags": [
 				"source",
@@ -2460,7 +2328,6 @@
 			"description": "Refined gold produced by smelters from gold ore and coal.",
 			"maxStackSize": 50,
 			"name": "Gold Ingot",
-			"sort": 1140,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2476,7 +2343,6 @@
 			"description": "A mining cart loaded with gold ore. Smelters refine it into gold ingots.",
 			"maxStackSize": 20,
 			"name": "Gold Ore Cart",
-			"sort": 1120,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2492,7 +2358,6 @@
 			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
 			"maxStackSize": 50,
 			"name": "Grain",
-			"sort": 520,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2507,7 +2372,6 @@
 			"description": "Harvested grapes produced by wineries when supplied with water near a vineyard.",
 			"maxStackSize": 50,
 			"name": "Grapes",
-			"sort": 905,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2523,7 +2387,6 @@
 			"description": "Movable hop source used by nearby breweries.",
 			"maxStackSize": 10,
 			"name": "Hop Field",
-			"sort": 700,
 			"storage": "both",
 			"tags": [
 				"source",
@@ -2539,7 +2402,6 @@
 			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
 			"maxStackSize": 50,
 			"name": "Hops",
-			"sort": 705,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2555,7 +2417,6 @@
 			"description": "Movable iron source used by nearby iron mines.",
 			"maxStackSize": 10,
 			"name": "Iron Deposit",
-			"sort": 1160,
 			"storage": "both",
 			"tags": [
 				"source",
@@ -2571,7 +2432,6 @@
 			"description": "Refined iron produced by smelters from iron ore and coal.",
 			"maxStackSize": 50,
 			"name": "Iron Ingot",
-			"sort": 1130,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2587,7 +2447,6 @@
 			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
 			"maxStackSize": 20,
 			"name": "Iron Ore Cart",
-			"sort": 1110,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2603,7 +2462,6 @@
 			"description": "Processed leather produced as a slaughterhouse byproduct from piglets.",
 			"maxStackSize": 50,
 			"name": "Leather",
-			"sort": 570,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2618,7 +2476,6 @@
 			"description": "Basic wood material produced by lumberjacks.",
 			"maxStackSize": 50,
 			"name": "Log",
-			"sort": 100,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2632,7 +2489,6 @@
 			"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
 			"maxStackSize": 20,
 			"name": "Piglet",
-			"sort": 550,
 			"storage": "both",
 			"tags": [
 				"animal",
@@ -2647,7 +2503,6 @@
 			"description": "Processed wood material produced by sawmills.",
 			"maxStackSize": 50,
 			"name": "Plank",
-			"sort": 110,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2661,7 +2516,6 @@
 			"description": "Dirty industrial pollution emitted by smelting. It stays on the board and must be dealt with there.",
 			"maxStackSize": 1,
 			"name": "Pollution",
-			"sort": 1150,
 			"storage": "board",
 			"tags": [
 				"danger",
@@ -2676,7 +2530,6 @@
 			"description": "Movable stone source used by nearby quarries.",
 			"maxStackSize": 10,
 			"name": "Rock",
-			"sort": 20,
 			"storage": "both",
 			"tags": [
 				"source",
@@ -2690,7 +2543,6 @@
 			"description": "Meat food produced by slaughterhouses from piglets and consumed by heavy industry workers.",
 			"maxStackSize": 50,
 			"name": "Sausage",
-			"sort": 560,
 			"storage": "both",
 			"tags": [
 				"food",
@@ -2705,7 +2557,6 @@
 			"description": "Basic stone material produced by quarries.",
 			"maxStackSize": 50,
 			"name": "Stone",
-			"sort": 200,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2719,7 +2570,6 @@
 			"description": "Processed stone material produced by stonemasons.",
 			"maxStackSize": 50,
 			"name": "Stone Block",
-			"sort": 210,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2733,7 +2583,6 @@
 			"description": "Movable wood source used by nearby lumberjacks.",
 			"maxStackSize": 10,
 			"name": "Tree",
-			"sort": 10,
 			"storage": "both",
 			"tags": [
 				"source",
@@ -2747,7 +2596,6 @@
 			"description": "Movable vineyard source used by nearby wineries.",
 			"maxStackSize": 10,
 			"name": "Vineyard",
-			"sort": 900,
 			"storage": "both",
 			"tags": [
 				"source",
@@ -2763,7 +2611,6 @@
 			"description": "Basic water resource produced by wells and consumed by farms.",
 			"maxStackSize": 50,
 			"name": "Water",
-			"sort": 510,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2778,7 +2625,6 @@
 			"description": "Movable grain source used by nearby farms.",
 			"maxStackSize": 10,
 			"name": "Wheat Field",
-			"sort": 500,
 			"storage": "both",
 			"tags": [
 				"source",
@@ -2793,7 +2639,6 @@
 			"description": "A barrel of wine produced by wineries and served by taverns.",
 			"maxStackSize": 20,
 			"name": "Wine Barrel",
-			"sort": 910,
 			"storage": "both",
 			"tags": [
 				"material",
@@ -2808,7 +2653,6 @@
 			"description": "A single glass of wine served by taverns.",
 			"maxStackSize": 50,
 			"name": "Wine Glass",
-			"sort": 920,
 			"storage": "both",
 			"tags": [
 				"food",
@@ -2823,7 +2667,6 @@
 			"maxStackSize": 1,
 			"name": "Bakery I",
 			"producerId": "producer:bakery-t1",
-			"sort": 630,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2839,7 +2682,6 @@
 			"maxStackSize": 1,
 			"name": "Brewery I",
 			"producerId": "producer:brewery-t1",
-			"sort": 800,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2855,7 +2697,6 @@
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
 			"producerId": "producer:coal-mine-t1",
-			"sort": 1200,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2872,7 +2713,6 @@
 			"maxStackSize": 1,
 			"name": "Farm I",
 			"producerId": "producer:farm-t1",
-			"sort": 610,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2888,7 +2728,6 @@
 			"maxStackSize": 1,
 			"name": "Gold Mine I",
 			"producerId": "producer:gold-mine-t1",
-			"sort": 1220,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2905,7 +2744,6 @@
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
 			"producerId": "producer:goldsmith-t1",
-			"sort": 1260,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2922,7 +2760,6 @@
 			"maxStackSize": 1,
 			"name": "Iron Mine I",
 			"producerId": "producer:iron-mine-t1",
-			"sort": 1210,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2939,7 +2776,6 @@
 			"maxStackSize": 1,
 			"name": "Lumberjack I",
 			"producerId": "producer:lumberjack-t1",
-			"sort": 300,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2954,7 +2790,6 @@
 			"maxStackSize": 1,
 			"name": "Pig Farm I",
 			"producerId": "producer:pig-farm-t1",
-			"sort": 640,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2970,7 +2805,6 @@
 			"maxStackSize": 1,
 			"name": "Purifier I",
 			"producerId": "producer:purifier-t1",
-			"sort": 1240,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2987,7 +2821,6 @@
 			"maxStackSize": 1,
 			"name": "Quarry I",
 			"producerId": "producer:quarry-t1",
-			"sort": 400,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3002,7 +2835,6 @@
 			"maxStackSize": 1,
 			"name": "Sawmill I",
 			"producerId": "producer:sawmill-t1",
-			"sort": 310,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3017,7 +2849,6 @@
 			"maxStackSize": 1,
 			"name": "Slaughterhouse I",
 			"producerId": "producer:slaughterhouse-t1",
-			"sort": 650,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3034,7 +2865,6 @@
 			"maxStackSize": 1,
 			"name": "Smelter I",
 			"producerId": "producer:smelter-t1",
-			"sort": 1230,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3050,7 +2880,6 @@
 			"maxStackSize": 1,
 			"name": "Stonemason I",
 			"producerId": "producer:stonemason-t1",
-			"sort": 410,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3065,7 +2894,6 @@
 			"maxStackSize": 1,
 			"name": "Tavern I",
 			"producerId": "producer:tavern-t1",
-			"sort": 810,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3081,7 +2909,6 @@
 			"maxStackSize": 1,
 			"name": "Town Hall I",
 			"producerId": "producer:townhall-t1",
-			"sort": 51,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3097,7 +2924,6 @@
 			"maxStackSize": 1,
 			"name": "Town Hall II",
 			"producerId": "producer:townhall-t2",
-			"sort": 52,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3113,7 +2939,6 @@
 			"maxStackSize": 1,
 			"name": "Town Hall III",
 			"producerId": "producer:townhall-t3",
-			"sort": 53,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3129,7 +2954,6 @@
 			"maxStackSize": 1,
 			"name": "Town Hall IV",
 			"producerId": "producer:townhall-t4",
-			"sort": 54,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3145,7 +2969,6 @@
 			"maxStackSize": 1,
 			"name": "Well I",
 			"producerId": "producer:well-t1",
-			"sort": 600,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3161,7 +2984,6 @@
 			"maxStackSize": 1,
 			"name": "Windmill I",
 			"producerId": "producer:windmill-t1",
-			"sort": 620,
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3178,7 +3000,6 @@
 			"maxStackSize": 1,
 			"name": "Winery I",
 			"producerId": "producer:winery-t1",
-			"sort": 1000,
 			"storage": "both",
 			"tags": [
 				"producer",

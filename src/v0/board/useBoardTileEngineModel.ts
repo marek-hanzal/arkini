@@ -111,6 +111,19 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
+			if (action.type === "start-craft") {
+				void runtimeStore
+					.dispatch({
+						action: {
+							recipeId: action.recipeId,
+							targetItemInstanceId: action.boardItemId,
+							type: "craft.start",
+						},
+					})
+					.catch(feedback.showError);
+				return;
+			}
+
 			if (action.type !== "activate") return;
 
 			const activation = boardItem.activation;

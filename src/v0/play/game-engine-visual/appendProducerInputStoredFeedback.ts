@@ -5,7 +5,7 @@ import type { GameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/Gam
 type StoredEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored";
+		type: "producer_input.stored" | "craft_input.stored";
 	}
 >;
 
@@ -16,12 +16,17 @@ export namespace appendProducerInputStoredFeedback {
 	}
 }
 
+const readTargetItemInstanceId = (stored: StoredEvent) =>
+	stored.type === "producer_input.stored"
+		? stored.producerItemInstanceId
+		: stored.targetItemInstanceId;
+
 export const appendProducerInputStoredFeedback = ({
 	plan,
 	stored,
 }: appendProducerInputStoredFeedback.Props) =>
 	appendBoardTileBounceFeedback({
-		groupId: `engine:producer-input-feedback:${stored.producerItemInstanceId}:${stored.productId}:${stored.itemId}:${stored.storedAtMs}`,
+		groupId: `engine:input-feedback:${readTargetItemInstanceId(stored)}:${stored.itemId}:${stored.storedAtMs}`,
 		plan,
-		tileId: stored.producerItemInstanceId,
+		tileId: readTargetItemInstanceId(stored),
 	});

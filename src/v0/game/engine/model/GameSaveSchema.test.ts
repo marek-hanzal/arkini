@@ -34,7 +34,6 @@ const createQueueUpgradeConfig = () =>
 				code: "queue",
 				description: "Queue upgrade",
 				name: "Queue",
-				sort: 1,
 				tiers: [
 					{
 						cost: [

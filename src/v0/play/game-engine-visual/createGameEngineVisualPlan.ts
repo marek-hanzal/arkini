@@ -68,7 +68,10 @@ export const createGameEngineVisualPlan = ({
 					}
 				}
 
-				if (event.reason === "producer-input-store") {
+				if (
+					event.reason === "producer-input-auto-fill" ||
+					event.reason === "craft-input-auto-fill"
+				) {
 					const storedIndex = findProducerInputStoredEventIndex({
 						afterIndex: index,
 						events,
@@ -76,7 +79,10 @@ export const createGameEngineVisualPlan = ({
 						source: event,
 					});
 					const stored = events[storedIndex];
-					if (stored?.type === "producer_input.stored") {
+					if (
+						stored?.type === "producer_input.stored" ||
+						stored?.type === "craft_input.stored"
+					) {
 						skipped.add(storedIndex);
 						appendProducerInputStoredFeedback({
 							plan,
@@ -115,6 +121,7 @@ export const createGameEngineVisualPlan = ({
 				break;
 
 			case "producer_input.stored":
+			case "craft_input.stored":
 				appendProducerInputStoredFeedback({
 					plan,
 					stored: event,
@@ -130,7 +137,6 @@ export const createGameEngineVisualPlan = ({
 
 			case "craft.completed":
 			case "craft.started":
-			case "craft_input.stored":
 			case "craft_input.withdrawn":
 			case "item.removed":
 			case "item.spawn.blocked":

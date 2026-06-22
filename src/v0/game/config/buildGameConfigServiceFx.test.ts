@@ -34,7 +34,6 @@ describe("buildGameConfigServiceFx", () => {
 					code: "test-speed",
 					description: "Test speed upgrade",
 					name: "Test Speed",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],
@@ -98,7 +97,6 @@ describe("buildGameConfigServiceFx", () => {
 					code: "plank-input",
 					description: "Switch product input to plank",
 					name: "Plank Input",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],
@@ -193,7 +191,6 @@ describe("buildGameConfigServiceFx", () => {
 					code: "requirements",
 					description: "Replace requirements",
 					name: "Requirements",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],
@@ -271,7 +268,6 @@ describe("buildGameConfigServiceFx", () => {
 					code: "test-twig-cost",
 					description: "Raise test product twig input cost",
 					name: "Test Twig Cost",
-					sort: 1,
 					tiers: [
 						{
 							cost: [],

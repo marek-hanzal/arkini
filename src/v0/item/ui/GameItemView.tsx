@@ -32,7 +32,7 @@ export const GameItemView: FC<GameItemView.Props> = memo(
 				data-ak-item-view
 				data-ak-item-variant={variant}
 				data-ak-item-size-variant={resolvedSizeVariant}
-				className="relative h-full w-full select-none p-[13%]"
+				className="relative h-full w-full select-none p-[5%]"
 				style={
 					variant === "drag" && overlaySize
 						? {

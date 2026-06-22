@@ -236,7 +236,6 @@ describe("applyGameActionFx BoardInventory", () => {
 					description: "Stackable craft target",
 					maxStackSize: 3,
 					name: "Craft Stack",
-					sort: 8,
 					storage: "both",
 					tags: [],
 					tier: 0,

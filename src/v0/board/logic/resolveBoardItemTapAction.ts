@@ -14,6 +14,11 @@ export namespace resolveBoardItemTapAction {
 				boardItemId: string;
 		  }
 		| {
+				type: "start-craft";
+				boardItemId: string;
+				recipeId: string;
+		  }
+		| {
 				type: "activate";
 				activation: ActivationModeSchema.Type;
 				boardItemId: string;
@@ -39,10 +44,29 @@ export const resolveBoardItemTapAction = ({
 		};
 	}
 
-	if (boardItem.activation) {
+	if (liveCraft?.phase === "collecting_inputs") {
+		return {
+			type: "start-craft",
+			boardItemId: boardItem.id,
+			recipeId: liveCraft.id,
+		};
+	}
+
+	if (boardItem.activation?.kind === "stash") {
 		return {
 			type: "activate",
-			activation: boardItem.activation.kind === "stash" ? "exhaust" : "single",
+			activation: "exhaust",
+			boardItemId: boardItem.id,
+		};
+	}
+
+	if (
+		boardItem.activation?.kind === "producer" &&
+		boardItem.activation.productLines?.some((line) => line.isDefault)
+	) {
+		return {
+			type: "activate",
+			activation: "single",
 			boardItemId: boardItem.id,
 		};
 	}

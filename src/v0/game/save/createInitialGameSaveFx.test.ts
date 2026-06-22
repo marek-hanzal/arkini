@@ -28,7 +28,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				label: "Test",
 				render: "plain",
 				resourceId: "resource:test",
-				sort: 1,
 			},
 		},
 		items: {
@@ -39,7 +38,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				maxStackSize: 1,
 				name: "Producer",
 				producerId: "producer:test",
-				sort: 1,
 				tags: [],
 				tier: 0,
 			},
@@ -49,7 +47,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				description: "Twig",
 				maxStackSize: 5,
 				name: "Twig",
-				sort: 2,
 				tags: [],
 				tier: 0,
 			},

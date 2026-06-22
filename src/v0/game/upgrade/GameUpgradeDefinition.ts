@@ -4,6 +4,5 @@ export interface GameUpgradeDefinition {
 	code: string;
 	description: string;
 	name: string;
-	sort: number;
 	tiers: readonly GameUpgradeTierDefinition[];
 }

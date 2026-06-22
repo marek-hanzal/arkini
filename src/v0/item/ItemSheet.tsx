@@ -1,8 +1,8 @@
 import { type FC, useMemo } from "react";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { ItemActivationCard } from "~/v0/item/ui/ItemActivationCard";
-import { ItemActivationInputsCard } from "~/v0/item/ui/ItemActivationInputsCard";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
+import { ItemRequirementRulesCard } from "~/v0/item/ui/ItemRequirementRulesCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
 import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
@@ -164,6 +164,13 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					storeDisabled={itemAction.isPending || item.storage === "board"}
 					onStore={storeBoardItem}
 				/>
+				{liveCraft?.requirements?.length ? (
+					<ItemRequirementRulesCard
+						items={items}
+						requirements={liveCraft.requirements}
+						title="Craft rules"
+					/>
+				) : null}
 				{liveCraft ? (
 					<ItemCraftCard
 						craft={liveCraft}
@@ -173,10 +180,21 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						onWithdrawInput={withdrawCraftInput}
 					/>
 				) : null}
-				{boardItem.activation ? (
+				{boardItem.activation?.kind === "stash" ? (
 					<ItemActivationCard
 						activation={boardItem.activation}
 						nowMs={nowMs}
+					/>
+				) : null}
+				{boardItem.activation?.inputs.length ||
+				boardItem.activation?.requirements.length ? (
+					<ItemRequirementRulesCard
+						inputs={boardItem.activation.inputs}
+						items={items}
+						requirements={boardItem.activation.requirements}
+						title={
+							boardItem.activation.kind === "stash" ? "Stash rules" : "Producer rules"
+						}
 					/>
 				) : null}
 				{boardItem.activation?.productLines?.length ? (
@@ -188,13 +206,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						onSetEnabled={setProductLineEnabled}
 						onStart={startProductLine}
 						onWithdrawInput={withdrawProductLineInput}
-					/>
-				) : null}
-				{boardItem.activation?.inputs.length ||
-				boardItem.activation?.requirements.length ? (
-					<ItemActivationInputsCard
-						activation={boardItem.activation}
-						items={items}
 					/>
 				) : null}
 				<ItemRelationList

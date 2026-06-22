@@ -103,7 +103,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 					? "Running"
 					: canStart
 						? "Start craft"
-						: "Drag inputs in"}
+						: "Auto-fill or drag inputs"}
 			</UiButton>
 		</UiSection>
 	);

@@ -45,7 +45,7 @@ const activation = (
 	...overrides,
 });
 
-const productLine = (isDefault: boolean) => ({
+const productLine = (isDefault: boolean, overrides = {}) => ({
 	durationMs: 1000,
 	enabled: true,
 	inProgress: false,
@@ -64,6 +64,7 @@ const productLine = (isDefault: boolean) => ({
 	queuedJobs: 0,
 	requirementItemIds: [],
 	requirementsReady: true,
+	...overrides,
 });
 
 describe("resolveBoardItemTapAction", () => {
@@ -104,7 +105,7 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("returns no action for producers without explicit default product line", () => {
+	it("opens detail for producers without explicit default product line", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
@@ -117,7 +118,29 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			type: "none",
+			boardItemId: "board:item",
+			type: "open-detail",
+		});
+	});
+
+	it("opens detail for producers with default product line that cannot start", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("producer", {
+						productLines: [
+							productLine(true, {
+								inputsAvailable: false,
+								inputsReady: false,
+							}),
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-detail",
 		});
 	});
 
@@ -159,14 +182,41 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("returns no action for passive items", () => {
+	it("opens detail for passive items", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem(),
 				nowMs: 0,
 			}),
 		).toEqual({
-			type: "none",
+			boardItemId: "board:item",
+			type: "open-detail",
+		});
+	});
+
+	it("opens detail for crafts with missing requirements", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					craft: craft({
+						phase: "collecting_inputs",
+						readyAtMs: undefined,
+						requirements: [
+							{
+								capacity: 1,
+								itemId: "item:water",
+								quantity: 1,
+								stored: 0,
+								type: "passive",
+							},
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-detail",
 		});
 	});
 });

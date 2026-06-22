@@ -1,6 +1,8 @@
 import type { ActivationModeSchema } from "~/v0/activation/type/ActivationModeSchema";
-import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
+import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
+import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
 export namespace resolveBoardItemTapAction {
 	export interface Props {
@@ -24,9 +26,24 @@ export namespace resolveBoardItemTapAction {
 				boardItemId: string;
 		  }
 		| {
-				type: "none";
+				type: "open-detail";
+				boardItemId: string;
 		  };
 }
+
+const requirementReady = (requirement: ActivationRequirementView) => {
+	if (requirement.type === "proximity") return requirement.satisfied;
+	return requirement.stored >= requirement.quantity;
+};
+
+const requirementsReady = (requirements: readonly ActivationRequirementView[] | undefined) =>
+	(requirements ?? []).every(requirementReady);
+
+const productLineCanStart = (line: ProducerProductLineView) =>
+	line.enabled &&
+	!line.queueFull &&
+	line.requirementsReady &&
+	(line.inputsReady || line.inputsAvailable);
 
 export const resolveBoardItemTapAction = ({
 	boardItem,
@@ -45,10 +62,16 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (liveCraft?.phase === "collecting_inputs") {
+		if (requirementsReady(liveCraft.requirements)) {
+			return {
+				type: "start-craft",
+				boardItemId: boardItem.id,
+				recipeId: liveCraft.id,
+			};
+		}
 		return {
-			type: "start-craft",
+			type: "open-detail",
 			boardItemId: boardItem.id,
-			recipeId: liveCraft.id,
 		};
 	}
 
@@ -60,18 +83,23 @@ export const resolveBoardItemTapAction = ({
 		};
 	}
 
-	if (
-		boardItem.activation?.kind === "producer" &&
-		boardItem.activation.productLines?.some((line) => line.isDefault)
-	) {
+	if (boardItem.activation?.kind === "producer") {
+		const defaultLine = boardItem.activation.productLines?.find((line) => line.isDefault);
+		if (defaultLine && productLineCanStart(defaultLine)) {
+			return {
+				type: "activate",
+				activation: "single",
+				boardItemId: boardItem.id,
+			};
+		}
 		return {
-			type: "activate",
-			activation: "single",
+			type: "open-detail",
 			boardItemId: boardItem.id,
 		};
 	}
 
 	return {
-		type: "none",
+		type: "open-detail",
+		boardItemId: boardItem.id,
 	};
 };

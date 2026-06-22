@@ -20,6 +20,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - TileEngine is generic and must not import Arkini domain modules.
 - `GameConfigSchema` / `GameSaveConfigSchema` are central validation gates.
 - `GameConfig` is the primary gameplay contract: if config validation accepts an item/capability combination, the engine/runtime must support and honor it deterministically.
+- Producer/product `blockedBy` entries are negative OR effects: active blockers slow duration, they do not gate or block product start.
 - Base config is immutable; save upgrades build an effective overlay config.
 - Job/event split: anything delayed, scheduled, retrying, blocked, or persisted for future processing is a job. `GameEvent` is only an output for something processed now.
 

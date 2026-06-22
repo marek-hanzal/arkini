@@ -746,6 +746,9 @@ A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`
 
 Stored requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
 
+Production blockers are negative OR effects on producers or product lines. They do not prevent production from starting. If any blocker is active, production duration is multiplied by the strongest active slowdown. Passive blockers react to item presence in a configured scope. Proximity blockers react to nearby board items; closer blockers are worse. Example: pollution within radius `2` near a farm can slow grain production without making the farm invalid.
+
+
 ### 10.8 Producer input storage and auto-fill
 
 Producer product-line input storage exists to store required production input items per concrete producer instance and product line.

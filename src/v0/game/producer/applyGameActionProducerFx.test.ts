@@ -363,6 +363,137 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
+	it("slows product duration by the nearest active proximity blocker", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					blockedBy: [
+						{
+							distance: 2,
+							durationFactor: 0.5,
+							itemIds: [
+								"item:twig",
+							],
+							type: "proximity",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		const job = readOnlyRecordValue(result.save.producerJobs);
+		expect(job).toMatchObject({
+			completesAtMs: 2000,
+			startedAtMs: 0,
+		});
+	});
+
+	it("uses OR semantics for active blockers and keeps only the strongest slowdown", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					blockedBy: [
+						{
+							durationFactor: 1,
+							itemId: "item:rock",
+							quantity: 1,
+							scope: "board_or_inventory",
+							type: "passive",
+						},
+						{
+							durationFactor: 0.5,
+							itemId: "item:twig",
+							quantity: 1,
+							scope: "inventory",
+							type: "passive",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		const job = readOnlyRecordValue(result.save.producerJobs);
+		expect(job).toMatchObject({
+			completesAtMs: 1500,
+			startedAtMs: 0,
+		});
+	});
+
 	it("rejects missing product proximity requirements", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

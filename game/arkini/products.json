@@ -43,7 +43,17 @@
 			"placement": "board_then_inventory",
 			"inputRefId": "input:farm-t1:water",
 			"requirementIds": [],
-			"outputTableId": "loot:farm-t1:grain"
+			"outputTableId": "loot:farm-t1:grain",
+			"blockedBy": [
+				{
+					"type": "proximity",
+					"itemIds": [
+						"item:pollution"
+					],
+					"distance": 2,
+					"durationFactor": 0.5
+				}
+			]
 		},
 		"product:windmill-t1:flour": {
 			"name": "Flour",
@@ -67,7 +77,17 @@
 			"placement": "board_then_inventory",
 			"inputRefId": "input:pig-farm-t1:grain-water",
 			"requirementIds": [],
-			"outputTableId": "loot:pig-farm-t1:piglet"
+			"outputTableId": "loot:pig-farm-t1:piglet",
+			"blockedBy": [
+				{
+					"type": "proximity",
+					"itemIds": [
+						"item:pollution"
+					],
+					"distance": 2,
+					"durationFactor": 0.5
+				}
+			]
 		},
 		"product:slaughterhouse-t1:sausage-leather": {
 			"name": "Sausage + Leather",

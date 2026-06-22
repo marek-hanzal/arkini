@@ -11,6 +11,7 @@ export const CraftProgressViewSchema = z.object({
 		z.object({
 			itemId: GameItemIdSchema,
 			quantity: z.number().int().nonnegative(),
+			available: z.number().int().nonnegative().optional(),
 		}),
 	),
 	delivered: z.record(z.string(), z.number().int().nonnegative()),

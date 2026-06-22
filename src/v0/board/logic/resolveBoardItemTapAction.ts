@@ -45,6 +45,12 @@ const productLineCanStart = (line: ProducerProductLineView) =>
 	line.requirementsReady &&
 	(line.inputsReady || line.inputsAvailable);
 
+const craftInputFillable = (craft: NonNullable<BoardViewItem["craft"]>) =>
+	craft.inputs.some((input) => {
+		const delivered = craft.delivered[input.itemId] ?? 0;
+		return delivered < input.quantity && (input.available ?? 0) > 0;
+	});
+
 export const resolveBoardItemTapAction = ({
 	boardItem,
 	nowMs,
@@ -62,20 +68,19 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (liveCraft?.phase === "collecting_inputs") {
-		if (liveCraft.inputProgress > 0 && liveCraft.inputProgress < 1) {
-			return {
-				type: "open-detail",
-				boardItemId: boardItem.id,
-			};
+		if (requirementsReady(liveCraft.requirements)) {
+			const inputsReady = liveCraft.inputProgress >= 1;
+			const inputsFillable = craftInputFillable(liveCraft);
+
+			if (inputsReady || inputsFillable) {
+				return {
+					type: "start-craft",
+					boardItemId: boardItem.id,
+					recipeId: liveCraft.id,
+				};
+			}
 		}
 
-		if (requirementsReady(liveCraft.requirements)) {
-			return {
-				type: "start-craft",
-				boardItemId: boardItem.id,
-				recipeId: liveCraft.id,
-			};
-		}
 		return {
 			type: "open-detail",
 			boardItemId: boardItem.id,

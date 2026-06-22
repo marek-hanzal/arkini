@@ -78,6 +78,9 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 								)}
 							>
 								{delivered}/{input.quantity}
+								{delivered < input.quantity && input.available
+									? ` · +${Math.min(input.quantity - delivered, input.available)} available`
+									: ""}
 							</span>
 							{canWithdraw ? (
 								<UiButton

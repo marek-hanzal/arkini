@@ -39,8 +39,8 @@ import { z } from "zod";
  *   `board_or_inventory`). They model global knowledge/permission/ownership gates.
  * - Producer/product requirements are referenced through central `requirements` entries by
  *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
- *   includes diagonals around the target tile. Producer/product `blockedBy` entries are
- *   negative OR conditions: any active blocker may slow the selected product without
+ *   includes diagonals around the target tile. Producer/product `hinderedBy` entries are
+ *   negative OR conditions: any active hindrance may slow the selected product without
  *   preventing start.
  * - Producer `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
@@ -106,7 +106,7 @@ import { z } from "zod";
  *       "maxQueueSize": 1,
  *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
  *       "requirementIds": ["requirement:lumber-camp.near-tree"],
- *       "blockedBy": [
+ *       "hinderedBy": [
  *         { "type": "proximity", "itemIds": ["item:pollution"], "distance": 2, "durationFactor": 0.5 }
  *       ]
  *     }
@@ -124,7 +124,7 @@ import { z } from "zod";
  *       "placement": "board_then_inventory",
  *       "inputRefId": "input:lumber-camp.saw",
  *       "requirementIds": ["requirement:saw-license"],
- *       "blockedBy": [],
+ *       "hinderedBy": [],
  *       "outputTableId": "loot:lumber-camp.saw"
  *     }
  *   }
@@ -260,11 +260,11 @@ const ProximityItemRequirementSchema = z
 	.strict();
 
 /**
- * Negative production blocker. Blockers are OR-ed: one active blocker is enough to
- * slow the producer/product. Passive blockers react to item presence in a scope;
- * proximity blockers react to nearby board items and get stronger when closer.
+ * Negative production hindrance. Hindrances are OR-ed: one active hindrance is enough to
+ * slow the producer/product. Passive hindrances react to item presence in a scope;
+ * proximity hindrances react to nearby board items and get stronger when closer.
  */
-const PassiveItemBlockerSchema = z
+const PassiveItemHindranceSchema = z
 	.object({
 		type: z.literal("passive"),
 		itemId: IdSchema,
@@ -278,7 +278,7 @@ const PassiveItemBlockerSchema = z
 	})
 	.strict();
 
-const ProximityItemBlockerSchema = z
+const ProximityItemHindranceSchema = z
 	.object({
 		type: z.literal("proximity"),
 		itemIds: z.array(IdSchema).min(1),
@@ -287,12 +287,12 @@ const ProximityItemBlockerSchema = z
 	})
 	.strict();
 
-const GameBlockerDefinitionSchema = z.discriminatedUnion("type", [
-	PassiveItemBlockerSchema,
-	ProximityItemBlockerSchema,
+const GameHindranceDefinitionSchema = z.discriminatedUnion("type", [
+	PassiveItemHindranceSchema,
+	ProximityItemHindranceSchema,
 ]);
 
-const GameBlockersSchema = z.array(GameBlockerDefinitionSchema);
+const GameHindrancesSchema = z.array(GameHindranceDefinitionSchema);
 
 /** Central reusable requirement table entry referenced by producer/product requirementIds. */
 const GameRequirementDefinitionSchema = z.discriminatedUnion("type", [
@@ -443,7 +443,7 @@ const ProducerDefinitionSchema = z
 		maxQueueSize: PositiveIntegerSchema,
 		productIds: z.array(IdSchema).min(1),
 		requirementIds: z.array(IdSchema),
-		blockedBy: GameBlockersSchema.optional(),
+		hinderedBy: GameHindrancesSchema.optional(),
 	})
 	.strict();
 
@@ -503,7 +503,7 @@ const ProductDefinitionSchema = z
 		placement: PlacementSchema,
 		inputRefId: IdSchema.optional(),
 		requirementIds: z.array(IdSchema),
-		blockedBy: GameBlockersSchema.optional(),
+		hinderedBy: GameHindrancesSchema.optional(),
 		outputTableId: IdSchema.optional(),
 	})
 	.strict();
@@ -869,14 +869,14 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			producer.requirementIds,
 			hasRequirement,
 		);
-		validateGameBlockers(
+		validateGameHindrances(
 			ctx,
 			[
 				"producers",
 				producerId,
-				"blockedBy",
+				"hinderedBy",
 			],
-			producer.blockedBy ?? [],
+			producer.hinderedBy ?? [],
 			hasItem,
 		);
 	}
@@ -999,14 +999,14 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			product.requirementIds,
 			hasRequirement,
 		);
-		validateGameBlockers(
+		validateGameHindrances(
 			ctx,
 			[
 				"products",
 				productId,
-				"blockedBy",
+				"hinderedBy",
 			],
-			product.blockedBy ?? [],
+			product.hinderedBy ?? [],
 			hasItem,
 		);
 
@@ -1499,26 +1499,26 @@ const validateItemRequirements = (
 	}
 };
 
-const validateGameBlockers = (
+const validateGameHindrances = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	blockers: readonly z.infer<typeof GameBlockerDefinitionSchema>[],
+	hindrances: readonly z.infer<typeof GameHindranceDefinitionSchema>[],
 	hasItem: (itemId: string) => boolean,
 ) => {
 	validateUniqueStringList(
 		ctx,
 		path,
-		blockers.map((blocker) =>
-			blocker.type === "passive"
-				? `${blocker.type}:${blocker.itemId}:${blocker.scope}`
-				: `${blocker.type}:${blocker.itemIds.join("|")}:${blocker.distance}`,
+		hindrances.map((hindrance) =>
+			hindrance.type === "passive"
+				? `${hindrance.type}:${hindrance.itemId}:${hindrance.scope}`
+				: `${hindrance.type}:${hindrance.itemIds.join("|")}:${hindrance.distance}`,
 		),
-		(value) => `Duplicate blocker "${value}".`,
+		(value) => `Duplicate hindrance "${value}".`,
 	);
 
-	for (const [index, blocker] of blockers.entries()) {
-		if (blocker.type === "passive") {
-			if (!hasItem(blocker.itemId)) {
+	for (const [index, hindrance] of hindrances.entries()) {
+		if (hindrance.type === "passive") {
+			if (!hasItem(hindrance.itemId)) {
 				addIssue(
 					ctx,
 					[
@@ -1526,7 +1526,7 @@ const validateGameBlockers = (
 						index,
 						"itemId",
 					],
-					`Missing item "${blocker.itemId}".`,
+					`Missing item "${hindrance.itemId}".`,
 				);
 			}
 			continue;
@@ -1539,11 +1539,11 @@ const validateGameBlockers = (
 				index,
 				"itemIds",
 			],
-			blocker.itemIds,
-			(value) => `Duplicate blocker item "${value}".`,
+			hindrance.itemIds,
+			(value) => `Duplicate hindrance item "${value}".`,
 		);
 
-		for (const [itemIndex, itemId] of blocker.itemIds.entries()) {
+		for (const [itemIndex, itemId] of hindrance.itemIds.entries()) {
 			if (!hasItem(itemId)) {
 				addIssue(
 					ctx,

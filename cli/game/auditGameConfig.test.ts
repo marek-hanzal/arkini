@@ -139,7 +139,7 @@ describe("auditGameConfig", () => {
 		]);
 	});
 
-	it("does not warn about produced items used as blockers", () => {
+	it("does not warn about produced items used as hindrances", () => {
 		const config = createConfigValue();
 		const warnings = auditGameConfig(
 			parseGameConfig({
@@ -148,7 +148,7 @@ describe("auditGameConfig", () => {
 					...config.products,
 					"product:test": {
 						...config.products["product:test"],
-						blockedBy: [
+						hinderedBy: [
 							{
 								distance: 2,
 								itemIds: [

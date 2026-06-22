@@ -3688,7 +3688,7 @@
 			"type": "producer"
 		},
 		"producer:brewery-t1": {
-			"blockedBy": [
+			"hinderedBy": [
 				{
 					"distance": 2,
 					"durationFactor": 0.5,
@@ -3912,7 +3912,7 @@
 			"type": "producer"
 		},
 		"producer:winery-t1": {
-			"blockedBy": [
+			"hinderedBy": [
 				{
 					"distance": 3,
 					"durationFactor": 0.5,
@@ -3976,7 +3976,8 @@
 			"requirementIds": []
 		},
 		"product:farm-t1:grain": {
-			"blockedBy": [
+			"durationMs": 5000,
+			"hinderedBy": [
 				{
 					"distance": 2,
 					"durationFactor": 0.5,
@@ -3986,7 +3987,6 @@
 					"type": "proximity"
 				}
 			],
-			"durationMs": 5000,
 			"inputRefId": "input:farm-t1:water",
 			"name": "Grain",
 			"outputTableId": "loot:farm-t1:grain",
@@ -4025,7 +4025,8 @@
 			"requirementIds": []
 		},
 		"product:pig-farm-t1:piglet": {
-			"blockedBy": [
+			"durationMs": 5000,
+			"hinderedBy": [
 				{
 					"distance": 2,
 					"durationFactor": 0.5,
@@ -4035,7 +4036,6 @@
 					"type": "proximity"
 				}
 			],
-			"durationMs": 5000,
 			"inputRefId": "input:pig-farm-t1:grain-water",
 			"name": "Piglet",
 			"outputTableId": "loot:pig-farm-t1:piglet",

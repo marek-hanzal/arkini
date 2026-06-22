@@ -162,7 +162,7 @@ const collectProducerUsage = (config: GameConfig, usage: UsageIndex, itemFlow: I
 		for (const requirementId of producer.requirementIds) {
 			usage.requirements.add(requirementId);
 		}
-		collectBlockerItemUsage(producer.blockedBy ?? [], itemFlow);
+		collectHindranceItemUsage(producer.hinderedBy ?? [], itemFlow);
 	}
 };
 
@@ -207,21 +207,21 @@ const collectProductUsage = (config: GameConfig, usage: UsageIndex, itemFlow: It
 		for (const requirementId of product.requirementIds) {
 			usage.requirements.add(requirementId);
 		}
-		collectBlockerItemUsage(product.blockedBy ?? [], itemFlow);
+		collectHindranceItemUsage(product.hinderedBy ?? [], itemFlow);
 	}
 };
 
-const collectBlockerItemUsage = (
-	blockers: readonly NonNullable<GameConfig["products"][string]["blockedBy"]>[number][],
+const collectHindranceItemUsage = (
+	hindrances: readonly NonNullable<GameConfig["products"][string]["hinderedBy"]>[number][],
 	itemFlow: ItemFlowIndex,
 ) => {
-	for (const blocker of blockers) {
-		if (blocker.type === "passive") {
-			itemFlow.consumedItemIds.add(blocker.itemId);
+	for (const hindrance of hindrances) {
+		if (hindrance.type === "passive") {
+			itemFlow.consumedItemIds.add(hindrance.itemId);
 			continue;
 		}
 
-		for (const itemId of blocker.itemIds) {
+		for (const itemId of hindrance.itemIds) {
 			itemFlow.consumedItemIds.add(itemId);
 		}
 	}
@@ -277,7 +277,7 @@ const readTerminalItemWarnings = (
 			code: "terminal-item",
 			id: itemId,
 			section: "items",
-			message: `${itemId} is produced or starts in the save, but no configured input, requirement, blocker, exclusive rule, merge, removal rule, craft, or stash references it.`,
+			message: `${itemId} is produced or starts in the save, but no configured input, requirement, hindrance, exclusive rule, merge, removal rule, craft, or stash references it.`,
 		}));
 
 const readUnusedRecordWarnings = (

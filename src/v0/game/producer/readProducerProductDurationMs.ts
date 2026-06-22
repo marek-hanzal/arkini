@@ -1,5 +1,5 @@
-import type { GameBlocker } from "~/v0/game/blockers/GameBlocker";
-import { readGameBlockersDurationMultiplier } from "~/v0/game/blockers/readGameBlockerDurationMultiplier";
+import type { GameHindrance } from "~/v0/game/hindrances/GameHindrance";
+import { readGameHindrancesDurationMultiplier } from "~/v0/game/hindrances/readGameHindranceDurationMultiplier";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
@@ -7,7 +7,7 @@ import { readProximityRequirementsDurationMultiplier } from "~/v0/game/requireme
 
 export namespace readProducerProductDurationMs {
 	export interface Props {
-		blockers: readonly GameBlocker[];
+		hindrances: readonly GameHindrance[];
 		product: GameConfig["products"][string];
 		producerItemInstanceId: string;
 		requirements: readonly GameRequirement[];
@@ -16,7 +16,7 @@ export namespace readProducerProductDurationMs {
 }
 
 export const readProducerProductDurationMs = ({
-	blockers,
+	hindrances,
 	product,
 	producerItemInstanceId,
 	requirements,
@@ -31,8 +31,8 @@ export const readProducerProductDurationMs = ({
 					save,
 					targetItemInstanceId: producerItemInstanceId,
 				}) *
-				readGameBlockersDurationMultiplier({
-					blockers,
+				readGameHindrancesDurationMultiplier({
+					hindrances,
 					save,
 					targetItemInstanceId: producerItemInstanceId,
 				}),

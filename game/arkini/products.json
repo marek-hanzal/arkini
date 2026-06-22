@@ -44,7 +44,7 @@
 			"inputRefId": "input:farm-t1:water",
 			"requirementIds": [],
 			"outputTableId": "loot:farm-t1:grain",
-			"blockedBy": [
+			"hinderedBy": [
 				{
 					"type": "proximity",
 					"itemIds": [
@@ -78,7 +78,7 @@
 			"inputRefId": "input:pig-farm-t1:grain-water",
 			"requirementIds": [],
 			"outputTableId": "loot:pig-farm-t1:piglet",
-			"blockedBy": [
+			"hinderedBy": [
 				{
 					"type": "proximity",
 					"itemIds": [

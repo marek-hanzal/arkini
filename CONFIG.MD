@@ -368,7 +368,7 @@ Fields:
 - `producerId`: producer definition attached to this item.
 - `stashId`: stash definition attached to this item.
 - `craftRecipeId`: craft recipe attached to this item.
-- `exclusiveToIds`: directional hard-coexistence blockers. If this item exists or is about to be created, it cannot coexist with any owned item in this list. The list is explicit and not automatically symmetric.
+- `exclusiveToIds`: directional hard-coexistence constraints. If this item exists or is about to be created, it cannot coexist with any owned item in this list. The list is explicit and not automatically symmetric.
 - `removeBy`: removal rules using another item.
 
 Storage values:
@@ -530,8 +530,8 @@ The UI must surface the choice before resource investment, usually on the bluepr
       "tier": 0,
       "maxStackSize": 1,
       "storage": "board",
-      "description": "Removable blocker.",
-      "tags": ["blocker"],
+      "description": "Removable obstacle.",
+      "tags": ["obstacle"],
       "removeBy": [
         {
           "itemId": "item:pickaxe",
@@ -894,20 +894,20 @@ Product usage:
 }
 ```
 
-## 11.4 Production blockers
+## 11.4 Production hindrances
 
-`blockedBy` defines negative production effects on producers or product lines.
+`hinderedBy` defines negative production effects on producers or product lines.
 
-Unlike `requirementIds`, blockers do not gate the action. They are OR conditions: if any blocker is active, production can still start, but the active blocker slows the duration. If multiple blockers are active, the strongest slowdown wins instead of stacking every penalty into a spreadsheet-shaped crime scene.
+Unlike `requirementIds`, hindrances do not gate the action. They are OR conditions: if any hindrance is active, production can still start, but the active hindrance slows the duration. If multiple hindrances are active, the strongest slowdown wins instead of stacking every penalty into a spreadsheet-shaped crime scene.
 
-Supported blocker types:
+Supported hindrance types:
 
 ```txt
 passive
 proximity
 ```
 
-Passive blocker example:
+Passive hindrance example:
 
 ```json
 {
@@ -917,7 +917,7 @@ Passive blocker example:
       "durationMs": 5000,
       "placement": "board_then_inventory",
       "requirementIds": [],
-      "blockedBy": [
+      "hinderedBy": [
         {
           "type": "passive",
           "itemId": "item:pollution",
@@ -932,7 +932,7 @@ Passive blocker example:
 }
 ```
 
-Proximity blocker example:
+Proximity hindrance example:
 
 ```json
 {
@@ -942,7 +942,7 @@ Proximity blocker example:
       "durationMs": 5000,
       "placement": "board_then_inventory",
       "requirementIds": [],
-      "blockedBy": [
+      "hinderedBy": [
         {
           "type": "proximity",
           "itemIds": ["item:pollution"],
@@ -959,19 +959,19 @@ Proximity blocker example:
 Fields:
 
 - `type`: `passive` or `proximity`.
-- `itemId`: passive blocker item.
-- `itemIds`: accepted proximity blocker item IDs.
-- `quantity`: required passive blocker count.
-- `scope`: passive blocker search scope.
-- `distance`: maximum board distance for proximity blocker.
+- `itemId`: passive hindrance item.
+- `itemIds`: accepted proximity hindrance item IDs.
+- `quantity`: required passive hindrance count.
+- `scope`: passive hindrance search scope.
+- `distance`: maximum board distance for proximity hindrance.
 - `durationFactor`: slowdown strength. Missing value behaves as `1`.
 
-For proximity blockers, closer is worse. The multiplier is based on proximity strength inside the configured radius, so pollution at distance `1` hurts more than pollution at distance `2`. Production is never sped up by a blocker.
+For proximity hindrances, closer is worse. The multiplier is based on proximity strength inside the configured radius, so pollution at distance `1` hurts more than pollution at distance `2`. Production is never sped up by a hindrance.
 
-Blockers can live on:
+Hindrances can live on:
 
-- `producers.*.blockedBy`, affecting every product line on that producer
-- `products.*.blockedBy`, affecting only that product line
+- `producers.*.hinderedBy`, affecting every product line on that producer
+- `products.*.hinderedBy`, affecting only that product line
 
 ## 12. `producers`
 
@@ -998,7 +998,7 @@ Fields:
 - `maxQueueSize`: queue size.
 - `productIds`: product lines owned by this producer.
 - `requirementIds`: producer-level requirements.
-- `blockedBy`: optional producer-level blockers. Any active blocker slows every product line on this producer.
+- `hinderedBy`: optional producer-level hindrances. Any active hindrance slows every product line on this producer.
 
 One product line:
 
@@ -1071,7 +1071,7 @@ Item reference:
 
 Defines producer product lines.
 
-A product line defines production name, duration, placement, inputs, requirements, optional blockers, and output.
+A product line defines production name, duration, placement, inputs, requirements, optional hindrances, and output.
 
 ```json
 {
@@ -1094,7 +1094,7 @@ Fields:
 - `placement`: output placement.
 - `inputRefId`: input bundle.
 - `requirementIds`: product-level requirements.
-- `blockedBy`: optional product-level blockers. Any active blocker slows this product line.
+- `hinderedBy`: optional product-level hindrances. Any active hindrance slows this product line.
 - `outputTableId`: loot table output.
 
 No-input product:
@@ -1734,13 +1734,13 @@ requirements.*.itemIds[] -> items
 
 producers.*.productIds[] -> products
 producers.*.requirementIds[] -> requirements
-producers.*.blockedBy[].itemId -> items
-producers.*.blockedBy[].itemIds[] -> items
+producers.*.hinderedBy[].itemId -> items
+producers.*.hinderedBy[].itemIds[] -> items
 
 products.*.inputRefId -> inputs
 products.*.requirementIds[] -> requirements
-products.*.blockedBy[].itemId -> items
-products.*.blockedBy[].itemIds[] -> items
+products.*.hinderedBy[].itemId -> items
+products.*.hinderedBy[].itemIds[] -> items
 products.*.outputTableId -> lootTables
 
 stashes.*.outputTableId -> lootTables
@@ -1925,8 +1925,8 @@ Use `items.*.removeBy`.
       "tier": 0,
       "maxStackSize": 1,
       "storage": "board",
-      "description": "Removable blocker.",
-      "tags": ["blocker"],
+      "description": "Removable obstacle.",
+      "tags": ["obstacle"],
       "removeBy": [
         {
           "itemId": "item:pickaxe",
@@ -2376,7 +2376,7 @@ Use `consume: false`.
 
 ## A.20 Add pollution slowdown to a producer product
 
-Use `blockedBy` on the product line. This does not prevent production. It only slows it while the blocker is active.
+Use `hinderedBy` on the product line. This does not prevent production. It only slows it while the hindrance is active.
 
 ```json
 {
@@ -2386,7 +2386,7 @@ Use `blockedBy` on the product line. This does not prevent production. It only s
       "durationMs": 5000,
       "placement": "board_then_inventory",
       "requirementIds": [],
-      "blockedBy": [
+      "hinderedBy": [
         {
           "type": "proximity",
           "itemIds": ["item:pollution"],
@@ -2400,7 +2400,7 @@ Use `blockedBy` on the product line. This does not prevent production. It only s
 }
 ```
 
-Use producer-level `blockedBy` when every line on the building should be affected. Use product-level `blockedBy` when only one concrete production line should care, because apparently we enjoy having precise tools instead of one giant hammer.
+Use producer-level `hinderedBy` when every line on the building should be affected. Use product-level `hinderedBy` when only one concrete production line should care, because apparently we enjoy having precise tools instead of one giant hammer.
 
 ## A.21 Add producer proximity requirement
 

@@ -124,6 +124,11 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
+			if (action.type === "open-detail") {
+				onOpenItem(action.boardItemId);
+				return;
+			}
+
 			if (action.type !== "activate") return;
 
 			const activation = boardItem.activation;
@@ -168,6 +173,7 @@ export const useBoardTileEngineModel = ({
 			board,
 			config,
 			feedback.showError,
+			onOpenItem,
 			runtimeStore,
 		],
 	);

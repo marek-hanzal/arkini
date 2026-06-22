@@ -12,7 +12,6 @@ import { BottomSheet } from "~/v0/play/sheet/BottomSheet";
 import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import type { Sheet } from "~/v0/play/sheet/Sheet";
 import { useFeedbackFlags } from "~/v0/play/feedback/useFeedbackFlags";
-import { UpgradesSheet } from "~/v0/upgrade/UpgradesSheet";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import { GameRuntimeProvider, useGameRuntimeStore } from "~/v0/play/runtime";
 
@@ -114,12 +113,6 @@ const PlayShellContent: FC = () => {
 							placementTarget={sheet.placementTarget}
 						/>
 					),
-				)
-				.with(
-					{
-						type: "upgrades",
-					},
-					() => <UpgradesSheet onClose={closeSheet} />,
 				)
 				.with(
 					{

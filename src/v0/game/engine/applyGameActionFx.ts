@@ -19,7 +19,6 @@ import { withdrawCraftInputFx } from "~/v0/game/craft/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/v0/game/producer/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/v0/game/producer/withdrawProducerInputFx";
 import { startProducerProductFx } from "~/v0/game/producer/startProducerProductFx";
-import { startUpgradeFx } from "~/v0/game/upgrade/startUpgradeFx";
 import { storeStoredRequirementFx } from "~/v0/game/requirements/storeStoredRequirementFx";
 import { withdrawStoredRequirementFx } from "~/v0/game/requirements/withdrawStoredRequirementFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
@@ -49,7 +48,6 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 	});
 	const gameConfig = yield* buildGameConfigServiceFx({
 		config,
-		save,
 	});
 
 	const result: EffectType.Effect<
@@ -186,13 +184,6 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		tileRemove: (removeAction) =>
 			removeTileFx({
 				action: removeAction,
-				config: gameConfig.config,
-				nowMs,
-				save,
-			}),
-		upgradeStart: (upgradeAction) =>
-			startUpgradeFx({
-				action: upgradeAction,
 				config: gameConfig.config,
 				nowMs,
 				save,

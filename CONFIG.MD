@@ -2,7 +2,7 @@
 
 This document describes Arkini game configuration authoring.
 
-The configuration is a JSON data model. It defines game content: game metadata, board size, inventory size, resources, assets, items, merge rules, producer inputs, requirements, producers, products, loot tables, stashes, craft recipes, upgrades, and starting state.
+The configuration is a JSON data model. It defines game content: game metadata, board size, inventory size, resources, assets, items, merge rules, producer inputs, requirements, producers, products, loot tables, stashes, craft recipes, and starting state.
 
 The main rule is ID composition: each entity has a stable ID and other entities reference it by that ID.
 
@@ -47,7 +47,6 @@ A compiled `GameConfig` contains these sections:
   "craftRecipes": {},
   "products": {},
   "lootTables": {},
-  "upgrades": {},
   "startingState": {}
 }
 ```
@@ -93,7 +92,6 @@ proximity:<owner>:<target>
 stash:<name>
 craft:<result-or-target>
 loot:<owner>:<output-item>
-upgrade:<owner>:<purpose>
 ```
 
 Guidelines:
@@ -127,7 +125,6 @@ proximity:lumberjack-t1:tree
 proximity:sawmill-t1:lumberjack-t1
 loot:lumberjack-t1:log
 loot:sawmill-t1:plank
-upgrade:lumberjack-t1:speed
 ```
 
 Keep IDs stable. Rename `name`, `label`, or `description` when display text changes. Do not rename IDs for wording or balance changes.
@@ -719,8 +716,6 @@ Requirements are referenced by:
 
 - `producers.*.requirementIds`
 - `products.*.requirementIds`
-- upgrade effect `producer.requirementIds.set`
-- upgrade effect `product.requirementIds.set`
 
 Supported types:
 
@@ -1599,160 +1594,11 @@ Craft target item reference:
 }
 ```
 
-## 17. `upgrades`
+## 17. Global upgrades are intentionally absent
 
-Defines upgrades and tiers.
+Global/world-wide upgrades are not part of Arkini config anymore. A better building is represented as another concrete item/producer tier, usually produced by a craft recipe that consumes the previous tier plus materials.
 
-An upgrade has costs, duration, and effects.
-
-```json
-{
-  "upgrades": {
-    "upgrade:lumber-camp-1-speed": {
-      "code": "lumber-camp-1-speed",
-      "name": "Lumber Camp I Speed",
-      "description": "Reduces production duration.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 1
-            }
-          ],
-          "effects": [
-            {
-              "type": "product.duration.add",
-              "productId": "product:lumber-camp-1",
-              "ms": -100
-            }
-          ],
-          "durationMs": 6000
-        }
-      ]
-    }
-  }
-}
-```
-
-Upgrade fields:
-
-- `code`: short unique upgrade code.
-- `name`: upgrade name.
-- `description`: description.
-- `tiers`: tier list.
-
-Tier fields:
-
-- `cost`: item cost.
-- `effects`: effects applied after tier completion.
-- `durationMs`: upgrade duration in ms.
-
-Cost item:
-
-```json
-{
-  "itemId": "item:coin-stack",
-  "quantity": 1
-}
-```
-
-Supported effects:
-
-```txt
-product.duration.add
-product.outputTable.set
-product.inputRef.set
-product.input.quantity.add
-product.requirementIds.set
-producer.maxQueueSize.add
-producer.requirementIds.set
-```
-
-### 17.1 `product.duration.add`
-
-Changes product base duration.
-
-```json
-{
-  "type": "product.duration.add",
-  "productId": "product:lumber-camp-1",
-  "ms": -100
-}
-```
-
-### 17.2 `product.outputTable.set`
-
-Switches product output table.
-
-```json
-{
-  "type": "product.outputTable.set",
-  "productId": "product:lumber-camp-1",
-  "tableId": "loot:lumber-camp-1:better-1"
-}
-```
-
-### 17.3 `product.inputRef.set`
-
-Switches product input bundle.
-
-```json
-{
-  "type": "product.inputRef.set",
-  "productId": "product:coal-mine-1",
-  "inputRefId": "input:coal-mine-1-rations-efficient"
-}
-```
-
-### 17.4 `product.input.quantity.add`
-
-Changes quantity of one input item on a product.
-
-```json
-{
-  "type": "product.input.quantity.add",
-  "productId": "product:coal-mine-1",
-  "itemId": "item:beer",
-  "quantity": -1
-}
-```
-
-### 17.5 `product.requirementIds.set`
-
-Replaces product-level requirements.
-
-```json
-{
-  "type": "product.requirementIds.set",
-  "productId": "product:lumber-camp-1-log",
-  "requirementIds": ["requirement:lumber-camp-1-near-tree-3-efficient"]
-}
-```
-
-### 17.6 `producer.maxQueueSize.add`
-
-Changes producer queue size.
-
-```json
-{
-  "type": "producer.maxQueueSize.add",
-  "producerId": "producer:lumber-camp-1",
-  "quantity": 1
-}
-```
-
-### 17.7 `producer.requirementIds.set`
-
-Replaces producer-level requirements.
-
-```json
-{
-  "type": "producer.requirementIds.set",
-  "producerId": "producer:lumber-camp-1",
-  "requirementIds": ["requirement:lumber-camp-1-near-tree-3-efficient"]
-}
-```
+Do not add top-level `upgrades`, upgrade jobs, upgrade effects, or save-driven config patches. The loaded JSON config is the hard source of truth.
 
 ## 18. `startingState`
 
@@ -1882,13 +1728,6 @@ craftRecipes.*.requirements[].itemId -> items
 lootTables.*.output[].itemId -> items
 lootTables.*.output[].entries[].itemId -> items
 
-upgrades.*.tiers[].cost[].itemId -> items
-upgrade effects productId -> products
-upgrade effects producerId -> producers
-upgrade effects tableId -> lootTables
-upgrade effects inputRefId -> inputs
-upgrade effects itemId -> items
-upgrade effects requirementIds[] -> requirements
 
 startingState.board[].itemId -> items
 startingState.inventory[].itemId -> items
@@ -1897,7 +1736,6 @@ startingState.inventory[].itemId -> items
 Config validation also checks common data mistakes:
 
 - duplicate `item.code`
-- duplicate `upgrade.code`
 - duplicate item tags
 - duplicate item `mergeIds`
 - duplicate producer `productIds`
@@ -1956,22 +1794,13 @@ stash.onDepleted:
 
 producer.type:
   producer
-
-upgrade effect type:
-  product.duration.add
-  product.outputTable.set
-  product.inputRef.set
-  product.input.quantity.add
-  product.requirementIds.set
-  producer.maxQueueSize.add
-  producer.requirementIds.set
 ```
 
 # Appendix A: Configuration recipes
 
 This appendix shows common gameplay patterns built only from config sections and ID links.
 
-Each example is intentionally minimal. A full config must include every referenced asset, resource, item, loot table, input, requirement, producer, product, stash, craft recipe, and upgrade.
+Each example is intentionally minimal. A full config must include every referenced asset, resource, item, loot table, input, requirement, producer, product, stash, and craft recipe.
 
 ## A.1 Add a basic resource item
 
@@ -3023,363 +2852,7 @@ Stored requirement variant:
 }
 ```
 
-## A.36 Add speed upgrade
-
-Use `product.duration.add`.
-
-```json
-{
-  "upgrades": {
-    "upgrade:lumber-camp-1-speed": {
-      "code": "lumber-camp-1-speed",
-      "name": "Lumber Camp I Speed",
-      "description": "Reduces production duration.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 1
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "product.duration.add",
-              "productId": "product:lumber-camp-1",
-              "ms": -100
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
-## A.37 Add better loot upgrade
-
-Create a new loot table and switch product through `product.outputTable.set`.
-
-```json
-{
-  "lootTables": {
-    "loot:lumber-camp-1:better-1": {
-      "name": "Lumber Camp I Better Output",
-      "output": [
-        {
-          "type": "guaranteed",
-          "itemId": "item:twig",
-          "quantity": 3
-        },
-        {
-          "type": "chance",
-          "itemId": "item:branch",
-          "chance": 0.25,
-          "quantity": 1
-        }
-      ]
-    }
-  },
-  "upgrades": {
-    "upgrade:lumber-camp-1-output": {
-      "code": "lumber-camp-1-output",
-      "name": "Lumber Camp I Output",
-      "description": "Improves wood output.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 1
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "product.outputTable.set",
-              "productId": "product:lumber-camp-1",
-              "tableId": "loot:lumber-camp-1:better-1"
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
-## A.38 Add input bundle upgrade
-
-Use `product.inputRef.set`.
-
-```json
-{
-  "inputs": {
-    "input:coal-mine-1-rations-efficient": {
-      "name": "Coal Mine I Efficient Rations",
-      "inputs": [
-        {
-          "itemId": "item:sausage",
-          "quantity": 1,
-          "capacity": 4,
-          "consume": true
-        }
-      ]
-    }
-  },
-  "upgrades": {
-    "upgrade:coal-mine-1-rations": {
-      "code": "coal-mine-1-rations",
-      "name": "Coal Mine I Rations",
-      "description": "Changes required rations.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 1
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "product.inputRef.set",
-              "productId": "product:coal-mine-1",
-              "inputRefId": "input:coal-mine-1-rations-efficient"
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
-## A.39 Add input quantity upgrade
-
-Use `product.input.quantity.add`.
-
-```json
-{
-  "upgrades": {
-    "upgrade:coal-mine-1-beer-efficiency": {
-      "code": "coal-mine-1-beer-efficiency",
-      "name": "Coal Mine I Beer Efficiency",
-      "description": "Changes beer input quantity.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 1
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "product.input.quantity.add",
-              "productId": "product:coal-mine-1",
-              "itemId": "item:beer",
-              "quantity": -1
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
-## A.40 Add product requirement upgrade
-
-Use `product.requirementIds.set`.
-
-```json
-{
-  "requirements": {
-    "requirement:lumber-camp-1-log-near-tree": {
-      "type": "proximity",
-      "itemIds": ["item:tree"],
-      "distance": 2,
-      "durationFactor": 1
-    }
-  },
-  "upgrades": {
-    "upgrade:lumber-camp-1-log-requirements": {
-      "code": "lumber-camp-1-log-requirements",
-      "name": "Lumber Camp I Log Requirements",
-      "description": "Changes log product requirements.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 2
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "product.requirementIds.set",
-              "productId": "product:lumber-camp-1-log",
-              "requirementIds": [
-                "requirement:lumber-camp-1-log-near-tree"
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
-## A.41 Add producer requirement upgrade
-
-Use `producer.requirementIds.set`.
-
-```json
-{
-  "requirements": {
-    "requirement:lumber-camp-1-near-tree-3-efficient": {
-      "type": "proximity",
-      "itemIds": ["item:tree"],
-      "distance": 3,
-      "durationFactor": 0.75
-    }
-  },
-  "upgrades": {
-    "upgrade:lumber-camp-1-forest-logistics": {
-      "code": "lumber-camp-1-forest-logistics",
-      "name": "Lumber Camp I Forest Logistics",
-      "description": "Improves remote forest usage.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 1
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "product.duration.add",
-              "productId": "product:lumber-camp-1",
-              "ms": -100
-            }
-          ]
-        },
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 2
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "producer.requirementIds.set",
-              "producerId": "producer:lumber-camp-1",
-              "requirementIds": [
-                "requirement:lumber-camp-1-near-tree-3-efficient"
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
-## A.42 Add producer queue upgrade
-
-Use `producer.maxQueueSize.add`.
-
-```json
-{
-  "upgrades": {
-    "upgrade:lumber-camp-1-queue": {
-      "code": "lumber-camp-1-queue",
-      "name": "Lumber Camp I Queue",
-      "description": "Increases queue size.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 2
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "producer.maxQueueSize.add",
-              "producerId": "producer:lumber-camp-1",
-              "quantity": 1
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
-## A.43 Add multi-tier upgrade
-
-Add multiple tier objects into `tiers`.
-
-```json
-{
-  "upgrades": {
-    "upgrade:lumber-camp-1-speed": {
-      "code": "lumber-camp-1-speed",
-      "name": "Lumber Camp I Speed",
-      "description": "Reduces production duration.",
-      "tiers": [
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 1
-            }
-          ],
-          "durationMs": 6000,
-          "effects": [
-            {
-              "type": "product.duration.add",
-              "productId": "product:lumber-camp-1",
-              "ms": -100
-            }
-          ]
-        },
-        {
-          "cost": [
-            {
-              "itemId": "item:coin-stack",
-              "quantity": 2
-            }
-          ],
-          "durationMs": 9000,
-          "effects": [
-            {
-              "type": "product.duration.add",
-              "productId": "product:lumber-camp-1",
-              "ms": -150
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
-## A.44 Add starting board
+## A.36 Add starting board
 
 Add entries to `startingState.board`.
 
@@ -3408,7 +2881,7 @@ Add entries to `startingState.board`.
 }
 ```
 
-## A.45 Add starting inventory
+## A.37 Add starting inventory
 
 Add stacks to `startingState.inventory`.
 
@@ -3524,18 +2997,6 @@ Currency is a normal item with large stack size and currency tag.
 }
 ```
 
-Upgrade cost usage:
-
-```json
-{
-  "cost": [
-    {
-      "itemId": "item:coin-stack",
-      "quantity": 2
-    }
-  ]
-}
-```
 
 ## A.50 Add resource deposit for proximity
 

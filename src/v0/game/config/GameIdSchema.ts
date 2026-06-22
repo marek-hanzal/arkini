@@ -13,7 +13,6 @@ export const GameItemIdSchema = GameIdSchema;
 export const GameLootTableIdSchema = GameIdSchema;
 export const GameMergeDefinitionIdSchema = GameIdSchema;
 export const GameResourceIdSchema = GameIdSchema;
-export const GameUpgradeIdSchema = GameIdSchema;
 
 export namespace GameAssetIdSchema {
 	export type Type = z.infer<typeof GameAssetIdSchema>;
@@ -39,10 +38,6 @@ export namespace GameResourceIdSchema {
 	export type Type = z.infer<typeof GameResourceIdSchema>;
 }
 
-export namespace GameUpgradeIdSchema {
-	export type Type = z.infer<typeof GameUpgradeIdSchema>;
-}
-
 export namespace gameId {
 	export type Asset = GameAssetIdSchema.Type;
 	export type CraftRecipe = GameCraftRecipeIdSchema.Type;
@@ -50,7 +45,6 @@ export namespace gameId {
 	export type LootTable = GameLootTableIdSchema.Type;
 	export type MergeDefinition = GameMergeDefinitionIdSchema.Type;
 	export type Resource = GameResourceIdSchema.Type;
-	export type Upgrade = GameUpgradeIdSchema.Type;
 }
 
 export type AssetId = gameId.Asset;
@@ -59,4 +53,3 @@ export type ItemId = gameId.Item;
 export type LootTableId = gameId.LootTable;
 export type MergeDefinitionId = gameId.MergeDefinition;
 export type ResourceId = gameId.Resource;
-export type UpgradeId = gameId.Upgrade;

@@ -18,7 +18,6 @@ import { GameActionStashOpenSchema } from "~/v0/game/action/GameActionStashOpenS
 import { GameActionStoredRequirementStoreSchema } from "~/v0/game/action/GameActionStoredRequirementStoreSchema";
 import { GameActionStoredRequirementWithdrawSchema } from "~/v0/game/action/GameActionStoredRequirementWithdrawSchema";
 import { GameActionTileRemoveSchema } from "~/v0/game/action/GameActionTileRemoveSchema";
-import { GameActionUpgradeStartSchema } from "~/v0/game/action/GameActionUpgradeStartSchema";
 
 export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionBoardItemMoveSchema,
@@ -40,7 +39,6 @@ export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionStoredRequirementStoreSchema,
 	GameActionStoredRequirementWithdrawSchema,
 	GameActionTileRemoveSchema,
-	GameActionUpgradeStartSchema,
 ]);
 
 export type GameActionSchema = typeof GameActionSchema;

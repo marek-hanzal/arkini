@@ -13,7 +13,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 ## Direction
 
-Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, upgrades, and runtime/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
+Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, and runtime/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
 The game has one gameplay source of truth: compiled JSON parsed by `src/v0/game/config/GameConfigSchema.ts`. Source fragments live under `game/arkini`; the browser/runtime consumes the compiled canonical config. Runtime ID value schemas are generic strings in `GameIdSchema`; cross-reference truth belongs to `GameConfigSchema` / `GameSaveConfigSchema`, not stale TS enum mirrors.
 
@@ -26,10 +26,9 @@ Item definitions drive behavior. An item may define:
 - finite crates that exhaust all charges through their single-tap stash action
 - optional item display labels, for reused building art with tiny level numbers
 - collectible board items that can be tapped into a limited player inventory
-- tiered global upgrades with item costs, timed upgrade jobs, and effects such as producer speed or loot-table swaps
 - craft recipes with visible board progress, used by blueprints, growth, and any future item that wants continual construction
 
-There are no separate static `merges`, `producers`, and `craftRecipes` arrays. Loot tables and upgrades are top-level config sections because they are reusable game-wide progression data; everything else is derived into indexes over the config.
+There are no separate static `merges`, `producers`, and `craftRecipes` arrays. Loot tables are top-level config sections because they are reusable game-wide generation data; everything else is derived into indexes over the config.
 
 
 ## Logic and Effect boundary
@@ -38,7 +37,7 @@ Effect now belongs to the standalone tick/action engine, not to UI-facing persis
 
 The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/v0/game/engine`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/v0/game/engine`, someone has poured concrete into the gearbox again.
 
-Runtime reads subscribe through `useGameRuntimeSelector` from `src/v0/play/runtime`. Board, inventory, item and upgrade gameplay UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
+Runtime reads subscribe through `useGameRuntimeSelector` from `src/v0/play/runtime`. Board, inventory, item and debug gameplay UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
 
 Time-sensitive runtime updates are handled by the runtime auto-ticker and engine `nextWakeAtMs`. Randomness is provided through `RandomServiceFx`; gameplay rolling must not call `Math.random()` directly.
 
@@ -75,11 +74,10 @@ The current content direction is Settlers-like: small producers create raw goods
 - Inventory items go to the first empty board cell by double-click/tap inside inventory.
 - Build menu is gone. Buildings and other advanced outputs are created through board craft: merge input items into a craft target, fill its progress, then transform it into the result.
 - Craft progress lives on the board item instance and is rendered as a bottom-up fill on the tile. Blueprint construction, seed growth, and future production chains all use the same generic `craft` data model. Deposited craft materials live in the runtime `GameSave`, scoped to the concrete target board item instance. No SQL row cosplay, no hidden global bucket.
-- Runtime item storage is the `GameSave` document: board items, inventory stacks, producer jobs, stash charges, stored requirements, craft jobs and upgrade jobs live in one explicit save object owned by the runtime engine.
+- Runtime item storage is the `GameSave` document: board items, inventory stacks, producer jobs, stash charges, stored requirements and craft jobs live in one explicit save object owned by the runtime engine.
 - Collectible valuables are real board items first. Coins merge through `Coin -> Coin Pair -> Coin Stack -> Coin Chest`, then single tap into the limited player inventory instead of the material inventory. Long press still opens their detail.
 - Player inventory is slot-based and stack-limited like the material inventory. It is the sink for special progression items such as coins and future hard-gems, not a scalar wallet pretending to be design.
-- Upgrades are tiered definitions in `GameConfig`. Buying an upgrade spends player inventory items immediately, starts a timed runtime job, and applies the tier only after the timer finishes. A save stores owned level plus pending target/ready timestamps.
-- Producer speed upgrades add cooldown deltas. Better-loot upgrades swap the effective producer loot table rather than mutating random weights in place, because percentage soup is how balance turns into swamp gas. Building level upgrades no longer happen by merging two buildings directly; higher-level buildings are crafted through upgrade blueprints that consume materials plus at least two previous-level buildings.
+- Global/world-wide upgrades are gone. Better buildings are concrete item/producer tiers produced by craft recipes that consume the previous tier plus materials. The loaded JSON config is the source of truth; saves do not patch config through overlays.
 - Producers and stashes can hold activation storage. Consumable inputs are spent only after the complete rolled output placement plan succeeds. Persistent requirements use the same nested storage but are not consumed, so a future quarry worker can stay assigned while beer and sausage vanish into the traditional productivity furnace. Item detail shows both stored/needed inputs and requirements, and withdrawal is board-first with inventory fallback.
 - Producers can produce multiple outputs in one cycle. Guaranteed outputs, probability outputs, and weighted rolls are resolved into one batch.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
@@ -98,9 +96,9 @@ XState is no longer part of the runtime. The app has two main state buckets: the
 
 ## React data subscriptions
 
-Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/v0/play/runtime`. Board, inventory, item, upgrade and debug runtime UI must read from `GameRuntimeStore`, not from React Query, SQL rows, or parallel caches wearing a fake mustache.
+Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/v0/play/runtime`. Board, inventory, item and debug runtime UI must read from `GameRuntimeStore`, not from React Query, SQL rows, or parallel caches wearing a fake mustache.
 
-Concrete gameplay actions use runtime commands such as `useGameAction` and `useGameRuntimeDropActions`. Do not add new gameplay `useMutation` hooks for board/inventory/producer/stash/craft/upgrade state. If the action changes `GameSave`, it belongs to the runtime adapter.
+Concrete gameplay actions use runtime commands such as `useGameAction` and `useGameRuntimeDropActions`. Do not add new gameplay `useMutation` hooks for board/inventory/producer/stash/craft state. If the action changes `GameSave`, it belongs to the runtime adapter.
 
 Components should stay boring: render props, wire callbacks, and shut up. If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
 
@@ -109,9 +107,9 @@ Components should stay boring: render props, wire callbacks, and shut up. If a c
 
 The active `src/v0` runtime should remain the template for new code. Do not add generic buckets such as `src/v0/shared`, `src/v0/query`, `src/v0/mutation`, or `src/v0/play/schema`. If something feels shared, name the owning domain first. If no domain owns it, the design is probably still mushy.
 
-Types and schemas live with the domain they describe: board schemas in `board/view`, inventory schemas in `inventory/view`, upgrade schemas in `upgrade/view`, canonical game config schemas in `game/config`, action contracts in `game/action`, output event contracts in `game/event`, and the dense save contract in `game/engine/model`. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
+Types and schemas live with the domain they describe: board schemas in `board/view`, inventory schemas in `inventory/view`, canonical game config schemas in `game/config`, action contracts in `game/action`, output event contracts in `game/event`, and the dense save contract in `game/engine/model`. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
 
-Standalone model files are preferred over mixed `types.ts` piles. Inventory planning rows, placement plans, activation definitions, upgrade definitions, and service contracts should live as one exported concept per file unless a file is intentionally a tiny namespace wrapper around the same concept.
+Standalone model files are preferred over mixed `types.ts` piles. Inventory planning rows, placement plans, activation definitions and service contracts should live as one exported concept per file unless a file is intentionally a tiny namespace wrapper around the same concept.
 
 Centralized hooks are banned unless the domain is explicitly the runtime, such as `tile-engine`. A hook named after a broad concept like game/session/runtime is guilty until proven tiny. Prefer concrete action hooks, domain query options, and small components over one hook that returns a sack of callbacks like a cursed Santa.
 

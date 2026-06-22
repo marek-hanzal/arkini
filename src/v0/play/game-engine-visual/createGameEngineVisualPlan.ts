@@ -149,8 +149,6 @@ export const createGameEngineVisualPlan = ({
 			case "stash.opened":
 			case "stored_requirement.stored":
 			case "stored_requirement.withdrawn":
-			case "upgrade.completed":
-			case "upgrade.started":
 				plan.ignoredEventTypes.push(event.type);
 				break;
 

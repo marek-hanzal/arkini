@@ -27,8 +27,6 @@ export const GameActionRejectedReadinessSchema = z
 					"stash_depleted",
 					"unsupported_target",
 					"unsupported_requirement",
-					"upgrade_complete",
-					"upgrade_in_progress",
 				]),
 				GamePlacementFailureReasonSchema,
 			])

@@ -22,7 +22,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - `GameConfig` is the primary gameplay contract: if config validation accepts an item/capability combination, the engine/runtime must support and honor it deterministically.
 - Producer/product `blockedBy` entries are negative OR effects: active blockers slow duration, they do not gate or block product start.
 - Townhall era progression is one-way: the next Town Hall craft consumes the current Town Hall and requires ownership of every physical building/place unlocked by the current era via passive `board_or_inventory` requirements. Higher Town Halls do not inherit older blueprint products.
-- Base config is immutable; save upgrades build an effective overlay config.
+- Loaded JSON `GameConfig` is the canonical immutable source of truth. There is no save-driven config overlay/layer and no global upgrade patch system.
 - Job/event split: anything delayed, scheduled, retrying, blocked, or persisted for future processing is a job. `GameEvent` is only an output for something processed now.
 
 ## Hard rules

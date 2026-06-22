@@ -15,7 +15,6 @@ export const readNextWakeAtMsFx = Effect.fn("readNextWakeAtMsFx")(function* ({
 		...Object.values(save.itemSpawnJobs).map((job) => job.dueAtMs),
 		...Object.values(save.producerJobs).map(readProducerJobWakeAtMs),
 		...Object.values(save.craftJobs).map((job) => job.completesAtMs),
-		...Object.values(save.upgradeJobs).map((job) => job.completesAtMs),
 	];
 
 	if (wakeTimes.length === 0) {

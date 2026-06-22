@@ -9,8 +9,7 @@ export type GameVisualMotionCause =
 	| "inventory"
 	| "merge"
 	| "producer"
-	| "stash"
-	| "upgrade";
+	| "stash";
 
 export type GameVisualMotionEffect = "fade-in" | "merge" | "replace";
 

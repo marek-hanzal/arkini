@@ -69,53 +69,6 @@ type TestCraftRecipe = {
 	resultItemId: string;
 };
 
-type TestUpgradeEffect =
-	| {
-			ms: number;
-			productId: string;
-			type: "product.duration.add";
-	  }
-	| {
-			itemId: string;
-			productId: string;
-			quantity: number;
-			type: "product.input.quantity.add";
-	  }
-	| {
-			inputRefId: string;
-			productId: string;
-			type: "product.inputRef.set";
-	  }
-	| {
-			productId: string;
-			requirementIds: string[];
-			type: "product.requirementIds.set";
-	  }
-	| {
-			producerId: string;
-			quantity: number;
-			type: "producer.maxQueueSize.add";
-	  }
-	| {
-			producerId: string;
-			requirementIds: string[];
-			type: "producer.requirementIds.set";
-	  };
-
-type TestUpgrade = {
-	code: string;
-	description: string;
-	name: string;
-	tiers: {
-		cost: {
-			itemId: string;
-			quantity: number;
-		}[];
-		durationMs: number;
-		effects: TestUpgradeEffect[];
-	}[];
-};
-
 const createValidConfigValue = () => ({
 	version: 1,
 	game: {
@@ -246,31 +199,6 @@ const createValidConfigValue = () => ({
 			],
 		},
 	},
-	upgrades: {
-		"upgrade:test": {
-			code: "test-upgrade",
-			description: "Upgrade",
-			name: "Upgrade",
-			tiers: [
-				{
-					cost: [
-						{
-							itemId: "item:twig",
-							quantity: 1,
-						},
-					],
-					durationMs: 1000,
-					effects: [
-						{
-							ms: -100,
-							productId: "product:test",
-							type: "product.duration.add",
-						},
-					],
-				},
-			],
-		},
-	} as Record<string, TestUpgrade>,
 	startingState: {
 		board: [
 			{
@@ -361,15 +289,11 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/must have kind/);
 	});
 
-	it("rejects duplicate item and upgrade authoring codes", () => {
+	it("rejects duplicate item authoring codes", () => {
 		const config = createValidConfigValue();
 		config.items["item:plank"].code = "twig";
-		config.upgrades["upgrade:test-2"] = {
-			...config.upgrades["upgrade:test"],
-			code: "test-upgrade",
-		};
 
-		expect(() => parseGameConfig(config)).toThrow(/Duplicate item code|Duplicate upgrade code/);
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate item code/);
 	});
 
 	it("rejects duplicate producer product lines", () => {
@@ -412,44 +336,6 @@ describe("GameConfigSchema", () => {
 		config.producers["producer:test"].productIds.push("product:second");
 
 		expect(() => parseGameConfig(config)).toThrow(/Input ref.*input:test.*owned/);
-	});
-
-	it("rejects upgrade prefixes that make product input refs shared", () => {
-		const config = createValidConfigValue();
-		(
-			config.inputs as Record<
-				string,
-				{
-					inputs: TestProductInput[];
-					name: string;
-				}
-			>
-		)["input:second"] = {
-			name: "Second input",
-			inputs: [
-				{
-					capacity: 2,
-					consume: true,
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-		};
-		config.products["product:second"] = {
-			...config.products["product:test"],
-			inputRefId: "input:second",
-			name: "Second product",
-		};
-		config.producers["producer:test"].productIds.push("product:second");
-		config.upgrades["upgrade:test"].tiers[0].effects = [
-			{
-				inputRefId: "input:second",
-				productId: "product:test",
-				type: "product.inputRef.set",
-			},
-		];
-
-		expect(() => parseGameConfig(config)).toThrow(/Effective input ref.*input:second.*owned/);
 	});
 
 	it("allows separate product input refs to accept the same item", () => {
@@ -597,136 +483,6 @@ describe("GameConfigSchema", () => {
 		};
 
 		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
-	});
-
-	it("rejects upgrade prefixes that reduce product duration to zero", () => {
-		const config = createValidConfigValue();
-		config.upgrades["upgrade:test"].tiers[0].effects = [
-			{
-				ms: -1000,
-				productId: "product:test",
-				type: "product.duration.add",
-			},
-		];
-
-		expect(() => parseGameConfig(config)).toThrow(/durationMs must stay > 0/);
-	});
-
-	it("rejects upgrade prefixes that reduce product input quantity to zero", () => {
-		const config = createValidConfigValue();
-		config.upgrades["upgrade:test"].tiers[0].effects = [
-			{
-				itemId: "item:twig",
-				productId: "product:test",
-				quantity: -1,
-				type: "product.input.quantity.add",
-			},
-		];
-
-		expect(() => parseGameConfig(config)).toThrow(/quantity must stay > 0/);
-	});
-
-	it("rejects upgrade prefixes that raise product input quantity above capacity", () => {
-		const config = createValidConfigValue();
-		config.upgrades["upgrade:test"].tiers[0].effects = [
-			{
-				itemId: "item:twig",
-				productId: "product:test",
-				quantity: 2,
-				type: "product.input.quantity.add",
-			},
-		];
-
-		expect(() => parseGameConfig(config)).toThrow(/quantity must stay <= capacity \(2\)/);
-	});
-
-	it("rejects upgrade prefixes that reduce producer queue size below one", () => {
-		const config = createValidConfigValue();
-		config.upgrades["upgrade:test"].tiers[0].effects = [
-			{
-				producerId: "producer:test",
-				quantity: -1,
-				type: "producer.maxQueueSize.add",
-			},
-		];
-
-		expect(() => parseGameConfig(config)).toThrow(/maxQueueSize must stay > 0/);
-	});
-
-	it("validates product input quantity upgrades against the effective input ref", () => {
-		const config = createValidConfigValue();
-		(
-			config.inputs as Record<
-				string,
-				{
-					inputs: TestProductInput[];
-					name: string;
-				}
-			>
-		)["input:plank"] = {
-			name: "Plank input",
-			inputs: [
-				{
-					capacity: 2,
-					consume: true,
-					itemId: "item:plank",
-					quantity: 1,
-				},
-			],
-		};
-		config.upgrades["upgrade:test"].tiers[0].effects = [
-			{
-				inputRefId: "input:plank",
-				productId: "product:test",
-				type: "product.inputRef.set",
-			},
-			{
-				itemId: "item:plank",
-				productId: "product:test",
-				quantity: 1,
-				type: "product.input.quantity.add",
-			},
-		];
-
-		expect(parseGameConfig(config).upgrades["upgrade:test"].tiers[0].effects).toHaveLength(2);
-	});
-
-	it("rejects product input quantity upgrades that target the input ref replaced earlier in the same prefix", () => {
-		const config = createValidConfigValue();
-		(
-			config.inputs as Record<
-				string,
-				{
-					inputs: TestProductInput[];
-					name: string;
-				}
-			>
-		)["input:plank"] = {
-			name: "Plank input",
-			inputs: [
-				{
-					capacity: 2,
-					consume: true,
-					itemId: "item:plank",
-					quantity: 1,
-				},
-			],
-		};
-		config.upgrades["upgrade:test"].tiers[0].effects = [
-			{
-				inputRefId: "input:plank",
-				productId: "product:test",
-				type: "product.inputRef.set",
-			},
-			{
-				itemId: "item:twig",
-				productId: "product:test",
-				quantity: 1,
-				type: "product.input.quantity.add",
-			},
-		];
-
-		expect(() => parseGameConfig(config)).toThrow(/Effective product.*input:plank.*item:twig/);
 	});
 
 	it("keeps structural checks for queue size and non-empty loot output", () => {

@@ -10,7 +10,7 @@ It is intentionally written as an LLM-optimized source of truth. When game logic
 
 Arkini is a client-only offline merge/economy game played on a grid.
 
-The player collects items, merges low-tier items into better items, feeds producers, opens finite stashes, builds or crafts incomplete objects, stores surplus in inventory, and spends currency items on upgrades. Progress is mostly driven by producers, stashes, and craft/construction requirements. Merge is important, but it is not the whole core loop.
+The player collects items, merges low-tier items into better items, feeds producers, opens finite stashes, builds or crafts incomplete objects, stores surplus in inventory, and spends materials on construction and tier progression. Progress is mostly driven by producers, stashes, and craft/construction requirements. Merge is important, but it is not the whole core loop.
 
 ## 2. Canonical design rules
 
@@ -18,7 +18,7 @@ These rules define how the game should be interpreted when implementation detail
 
 1. `GAME.MD` is the source of truth for gameplay semantics.
 2. All gameplay entities should be data-driven from a central game configuration.
-3. Game definitions must describe items, merge chains, producers, stashes, loot tables, blueprints, craft/construction requirements, upgrades, grid sizes, inventory sizes, starting state, and other game rules.
+3. Game definitions must describe items, merge chains, producers, stashes, loot tables, blueprints, craft/construction requirements, building tiers, grid sizes, inventory sizes, starting state, and other game rules.
 4. The game is client-only and must be able to run offline in the browser.
 5. Saved state is not considered backwards-compatible unless a migration explicitly supports it.
 6. If the game crashes during startup or runtime because local storage is corrupt or incompatible, the first recovery action is a full browser-storage hard reset followed by reload. Do not build soft recovery mazes for prototype saves.
@@ -29,7 +29,7 @@ These rules define how the game should be interpreted when implementation detail
 11. Names and IDs must be stable enough to be referenced by saves, tests, migrations, and this document.
 12. Economy logic should be validated from this document and central game data, not by reverse-engineering UI code.
 13. Inventory is passive storage. Active timers, production, growth, and craft progress do not advance while an item is stored in inventory.
-14. Active board timers and global timers use real-world wall-clock time. If the app is closed and later reopened, eligible active timers may already be complete.
+14. Active board timers use real-world wall-clock time. If the app is closed and later reopened, eligible active timers may already be complete.
 
 ## 3. Current fixed constants
 
@@ -40,14 +40,14 @@ These rules define how the game should be interpreted when implementation detail
 | Inventory size | `7 x 5` |
 | Inventory slot count | `35` |
 | Inventory model | one canonical player inventory |
-| Inventory capacity upgrades | not part of current gameplay |
+| Inventory capacity changes | not part of current gameplay |
 | Merge role | basic mechanic, not complete core loop |
 | Main economy source | click-triggered producers, finite stashes, crafting, construction |
 | Blueprint model | concrete target-specific blueprint items |
 | Blueprint acquisition | specific blueprint is acquired directly through gameplay |
 | Craft/construction location | board or inventory, with active progress only on board |
-| Upgrade targeting | concrete entity-specific targets |
-| Loot table model | named loot table entities referenced by items/producers/upgrades |
+| Building tier progression | physical item/producer tiers, not global config patches |
+| Loot table model | named loot table entities referenced by products and stashes |
 | Time model | real-world wall-clock time for active board/global timers |
 
 ## 4. Vocabulary
@@ -130,7 +130,7 @@ Examples:
 
 ### 4.5 Currency item
 
-A currency item is an item used as upgrade payment or other rare progression payment.
+A currency item is an item used as rare progression payment, sink currency, or future trade material.
 
 Examples:
 
@@ -168,7 +168,7 @@ Stateless items may stack only when their item definition allows it through `max
 
 Merge is the mechanic where compatible board items are combined into a better or more advanced item.
 
-Merge is a basic mechanic, but it is not the whole core game. The main long-term economy comes from producers, stashes, feeding producers, construction/craft progress, and upgrades.
+Merge is a basic mechanic, but it is not the whole core game. The main long-term economy comes from producers, stashes, feeding producers, construction/craft progress, and craft/construction progression.
 
 ### 4.9 Merge chain
 
@@ -195,7 +195,7 @@ A producer is an infinite or long-lived gameplay entity that generates items whe
 
 A producer is player-started and then runs a timed product job. Producers do not automatically start new jobs without player activation, but already started jobs may finish later through the tick/runtime job system.
 
-A producer does not use a separate generic cooldown model. Product lines define their own durations, queue behavior, inputs, requirements, and outputs. Upgrades may modify product duration, queue size, requirements, inputs, and output table references.
+A producer does not use a separate generic cooldown model. Product lines define their own durations, queue behavior, inputs, requirements, and outputs. Those rules are defined by the concrete producer/product tier in config; they are not patched by save-driven global upgrades.
 
 Examples:
 
@@ -252,11 +252,11 @@ Loot tables should have stable IDs, for example:
 - `loot:lumber-camp-1:better-1`
 - `loot:quarry-1`
 
-Producer product lines and stashes reference loot tables by ID. Upgrades switch active output table IDs by ID instead of mutating probability numbers inside scattered item definitions.
+Producer product lines and stashes reference loot tables by ID. Better output should be modeled as another product/building tier with its own named loot table instead of mutating probability numbers inside scattered item definitions.
 
 ### 4.14 Blueprint
 
-A blueprint is a concrete craft/construction entity used to create or upgrade a specific structure/entity.
+A blueprint is a concrete craft/construction entity used to create a specific structure/entity or replace it with a higher physical tier.
 
 Blueprints are target-specific from the moment they enter gameplay. There is no blank blueprint imprint/binding step.
 
@@ -287,19 +287,17 @@ Examples:
 - lumber camp level 2 blueprint becoming lumber camp level 2
 - watered sprout becoming a sapling after a timer
 
-### 4.17 Upgrade
+### 4.17 Building tier progression
 
-An upgrade is a global progression effect that modifies a specific entity or mechanic.
+A building tier progression is a physical replacement of one concrete building/item tier with another. The usual model is a blueprint/craft recipe that consumes the previous tier plus materials and produces the next tier.
 
-Upgrades are data-driven and target concrete entities. For example, an upgrade may target `item:lumber-camp-1`, a concrete product line, or a requirement set and change product duration, queue size, input references, requirement IDs, duration-factor penalties, or active loot table.
-
-Global upgrades have a timer. Paying the cost starts the upgrade. The upgrade becomes active only when its real-world ready time has been reached.
+Global/world-wide upgrade effects are intentionally not part of gameplay. If a farm should become better, define `farm-t2`. If a producer needs different duration, inputs, requirements, blockers, queue size, or loot, define those rules on the concrete higher-tier producer/product.
 
 ## 5. Time model
 
 Arkini uses real-world wall-clock time as the single source of truth for active timers.
 
-If the app is closed, reloaded, suspended, or reopened later, every timer that was allowed to run keeps advancing according to wall-clock elapsed time. If the player returns after a month, every eligible board timer, producer job, stash timer, craft/construction/growth timer, and global upgrade timer may be ready.
+If the app is closed, reloaded, suspended, or reopened later, every timer that was allowed to run keeps advancing according to wall-clock elapsed time. If the player returns after a month, every eligible board timer, producer job, stash timer, and craft/construction/growth timer may be ready.
 
 Changing the device clock can affect timers. This is accepted for current gameplay because Arkini is client-only/offline and does not try to punish offline players.
 
@@ -307,7 +305,6 @@ Location still matters:
 
 - board items are active and their timers can advance
 - inventory items are passive and their timers are paused
-- global upgrade timers are active independently of board/inventory location
 
 A paused inventory timer stores remaining duration or equivalent paused state. When the item returns to the board, it resumes from that preserved state using wall-clock time again.
 
@@ -339,7 +336,7 @@ The current starting state is tutorial-oriented: it starts with Town Hall I plus
 
 There is exactly one player inventory.
 
-All player-owned stored items go into this inventory, including currency items. Any implementation table, state slice, UI panel, or upgrade referring to a separate player inventory is obsolete and must be removed or migrated into the normal inventory model.
+All player-owned stored items go into this inventory, including currency items. Any implementation table, state slice, UI panel, or mechanic referring to a separate player inventory is obsolete and must be removed or migrated into the normal inventory model.
 
 Item-owned input storage, such as producer product-line inputs, craft inputs, and stored requirements, is allowed because it belongs to the target item instance and is not player storage.
 
@@ -365,7 +362,7 @@ Buildings currently use `maxStackSize = 1` unless a future design explicitly say
 
 A pure stateless producer may stack only if its item definition allows it. A producer with queued/running jobs, stored inputs, blocked delivery, or any other state cannot stack.
 
-When an item enters inventory from board, withdrawal, production overflow, stash output, upgrade refund, or any future source, the inventory must normalize placement automatically:
+When an item enters inventory from board, withdrawal, production overflow, stash output, or any future source, the inventory must normalize placement automatically:
 
 1. fill existing compatible stacks first
 2. create a new stack only after compatible stacks are full
@@ -419,7 +416,7 @@ Inventory-to-inventory drag/drop is an organization action only.
 
 Dragging an inventory slot onto another inventory slot swaps their contents.
 
-Dragging inside inventory must not trigger merge, craft input deposit, producer input deposit, stash opening, production, upgrade payment, or any other active gameplay behavior.
+Dragging inside inventory must not trigger merge, craft input deposit, producer input deposit, stash opening, production, or any other active gameplay behavior.
 
 Dragging an inventory item out to the board is a board interaction and may place the item onto an empty board cell or apply it to an occupied board item through the same interaction plan as board-source feeding/merge.
 
@@ -486,7 +483,7 @@ Game data must avoid ambiguous source-target pairs. The same source item and tar
 
 Inventory-to-inventory drag/drop swaps inventory slots and does nothing else.
 
-Inventory is passive. Dragging inside inventory must not merge items, feed craft, feed producer, feed stash, start timers, collect output, or pay upgrades.
+Inventory is passive. Dragging inside inventory must not merge items, feed craft, feed producer, feed stash, start timers, or collect output.
 
 Inventory-to-board drag/drop is different: dragging an inventory item onto an empty board cell attempts `inventory.item.place`, while dragging it onto an occupied board item applies the same source-to-board-item interaction plan used by board drag/drop. This can merge, fill stored requirements, feed craft, feed producer product-line inputs, or open a keyed stash if the data allows it. Invalid inventory-to-board interactions are rejected, not swapped.
 
@@ -513,7 +510,6 @@ The item detail must show every gameplay-relevant piece of information available
 - stash remaining charges or depletion state
 - active loot table ID
 - possible loot drops and their rules/probabilities, when known to the player
-- upgrade effects that currently affect the item
 - explicit actions available from the detail
 
 Item detail is gameplay UI. If a mechanic exists and the player can reasonably inspect it, the detail is the canonical place to expose it.
@@ -553,7 +549,7 @@ Do not add item-specific double-click exceptions. If a special behavior is neede
 
 Any gameplay action that consumes a source item as input must preserve or explicitly handle source state.
 
-Default rule: a stateful item cannot be consumed as input. This applies to craft inputs, producer inputs, stash inputs, and upgrade costs. Merge has its own stricter stateful-item rejection unless an explicit merge rule defines otherwise.
+Default rule: a stateful item cannot be consumed as input. This applies to craft inputs, producer inputs, and stash inputs. Merge has its own stricter stateful-item rejection unless an explicit merge rule defines otherwise.
 
 Exception: if the only runtime state is withdrawable nested storage, such as stored producer inputs or craft inputs, the game may empty that storage before consuming the source item. Emptying uses board-first, inventory-fallback placement. If every nested item cannot be placed, the input action is rejected and the source item remains unchanged.
 
@@ -660,7 +656,7 @@ Each producer definition has `maxQueueSize`. This is a per-producer-instance lim
 
 Jobs for one producer instance run sequentially. Starting a second job while the first is running queues it after the previous job's completion time instead of running it in parallel.
 
-Product duration may be changed by upgrades and by proximity requirement duration multipliers. The computed duration is captured when the job starts. Moving a resource after job start does not retroactively change that running job.
+Product duration may be changed by concrete product tier data, requirements, blockers, and proximity duration multipliers. The computed duration is captured when the job starts. Moving a resource after job start does not retroactively change that running job.
 
 Because inventory is passive, producer jobs require the producer item to be on the board. A producer item with a running job cannot be moved into inventory by normal storage.
 
@@ -742,7 +738,7 @@ Examples with `durationFactor: 1`:
 
 Example:
 
-A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`, where that requirement is a proximity requirement for `item:tree` within distance `2`. A later upgrade may replace the producer requirement IDs with a looser distance `3` requirement with lower `durationFactor`, or with an empty list to remove the proximity gate entirely.
+A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`, where that requirement is a proximity requirement for `item:tree` within distance `2`. A later concrete building tier may define looser requirement IDs, lower duration penalties, or no proximity gate at all.
 
 Stored requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
 
@@ -843,13 +839,13 @@ A producer or stash references its active loot table by ID.
 Preferred ID pattern:
 
 - `loot:<entity-id>` for base table
-- `loot:<entity-id>:better-1` for upgraded table
-- `loot:<entity-id>:better-2` for next upgraded table
+- `loot:<entity-id>:better-1` for a higher-tier table
+- `loot:<entity-id>:better-2` for a later higher-tier table
 
 Example:
 
 - `item:lumber-camp-1` references `loot:lumber-camp-1`
-- an upgrade switches it to `loot:lumber-camp-1:better-1`
+- a higher-tier product references `loot:lumber-camp-1:better-1`
 
 ### 12.2 Loot table definition
 
@@ -865,11 +861,11 @@ A loot table must define:
 - duplicate behavior
 - validation that every successful roll produces at least one output item
 
-### 12.3 Loot table upgrades
+### 12.3 Higher-tier loot tables
 
-Loot table upgrades switch the active loot table ID.
+Higher-tier producers/products may reference different named loot tables.
 
-Do not patch drop rates directly inside upgrade logic. Probability changes belong in named loot tables.
+Do not patch drop rates directly inside runtime logic. Probability changes belong in named loot tables attached to concrete product tiers.
 
 ## 13. Blueprint mechanics
 
@@ -877,7 +873,7 @@ Do not patch drop rates directly inside upgrade logic. Probability changes belon
 
 Blueprints turn construction progress into concrete target construction.
 
-A blueprint is acquired already target-specific. It may represent a building, upgrade, or other future constructed entity.
+A blueprint is acquired already target-specific. It may represent a building, higher-tier replacement, or other future constructed entity.
 
 ### 13.2 Blueprint lifecycle
 
@@ -886,7 +882,7 @@ Blueprint lifecycle:
 1. Player obtains a concrete target-specific blueprint through gameplay.
 2. The blueprint accepts its configured craft/construction inputs.
 3. The blueprint runs its optional completion timer.
-4. Completion produces, upgrades, or unlocks the configured target result.
+4. Completion produces or unlocks the configured target result.
 
 There is no blank blueprint completion step and no later bind/imprint action.
 
@@ -908,7 +904,7 @@ A progression blueprint may require ownership of an entire era before it can com
 
 The current Town Hall model uses this for era advancement: crafting the next Town Hall consumes the current Town Hall tier and passively requires every physical building/place from the current era. These requirements use `board_or_inventory`, because the game cares that the player owns the infrastructure, not whether every building is staged on the board for a tiny zoning hearing.
 
-Higher Town Hall tiers do not need to re-issue lower-era blueprints if the upgrade gate already proves the old era has been physically built. Players who want duplicate older buildings should build them before upgrading; failing to do so may slow later economy, but must not soft-lock progression.
+Higher Town Hall tiers do not need to re-issue lower-era blueprints if the era gate already proves the old era has been physically built. Players who want duplicate older buildings should build them before moving to the next era; failing to do so may slow later economy, but must not soft-lock progression.
 
 ## 14. Craft / construction / growth progress
 
@@ -988,72 +984,18 @@ This includes:
 
 State loss during movement is a gameplay bug.
 
-## 15. Upgrade system
+## 15. Building tier progression
 
-### 15.1 Upgrade purpose
+Arkini does not have global/world-wide upgrades. There is no top-level upgrade config, no upgrade job map, no save-driven config overlay, and no runtime upgrade effect that patches product or producer rules.
 
-Upgrades are global progression modifiers.
+Progression to a better building is modeled as a concrete physical tier:
 
-They make specific entities better or unlock more advanced behavior.
+1. The player acquires a target-specific blueprint or craft target.
+2. The craft recipe consumes required materials and usually the previous building tier.
+3. Completion replaces the old tier with the new concrete item/producer tier.
+4. The new tier carries its own config: product lines, requirements, blockers, durations, queue size, loot tables, art, and labels.
 
-### 15.2 Upgrade targeting
-
-Each upgrade targets a concrete entity or exact mechanic scope.
-
-Examples:
-
-- `product:lumber-camp-1` duration
-- `product:lumber-camp-1` output table
-- `producer:coal-mine-1` queue size or requirement set
-
-This keeps upgrade data explicit and avoids unclear global behavior.
-
-### 15.3 Upgrade lifecycle
-
-Upgrade lifecycle:
-
-1. Player pays explicit item costs.
-2. Upgrade starts.
-3. Upgrade has `durationMs` and a real-world ready time.
-4. Upgrade is inactive while the timer is running.
-5. Upgrade becomes active when the real-world ready time has been reached.
-6. Active upgrade effects are permanent for the save unless a future rule says otherwise.
-
-### 15.4 Supported upgrade effect types
-
-Current implementation-supported effect types are:
-
-- `product.duration.add`
-- `product.outputTable.set`
-- `product.inputRef.set`
-- `product.input.quantity.add`
-- `product.requirementIds.set`
-- `producer.maxQueueSize.add`
-- `producer.requirementIds.set`
-
-Requirement ID upgrade effects are replacement operations. They do not merge with current IDs. Setting `requirementIds: []` intentionally removes all requirements for that target. This applies both to producer/building-wide requirements and concrete product-line requirements.
-
-Inventory size is fixed at `7 x 5`. No current upgrade should change normal inventory size. Any existing player-inventory capacity upgrade is obsolete and should be removed with the split inventory system.
-
-### 15.5 Loot table upgrades
-
-Loot table upgrades should switch active loot table IDs by tier.
-
-Preferred model:
-
-- producer starts with `loot:lumber-camp-1`
-- upgrade changes producer to `loot:lumber-camp-1:better-1`
-- next upgrade changes producer to `loot:lumber-camp-1:better-2`
-
-Avoid scattering probability patches throughout logic. Probability changes belong in named loot tables.
-
-### 15.6 Upgrade costs
-
-Upgrades cost explicit stateless item stacks or explicitly allowed stateless item instances.
-
-Currency items such as coins are normal items stored in normal inventory and may be used as upgrade costs.
-
-Stateful items cannot be used as upgrade payment unless a future mechanic explicitly defines safe state handling. Default upgrade costs should be stateless stackable items.
+This keeps gameplay readable. The player owns `farm-t2`, not an invisible save overlay that secretly mutates `farm-t1`. Capacity or world-scale mechanics may be introduced later as explicit systems, but not through a generic global upgrade patch layer.
 
 ## 16. Feedback and animation specification
 
@@ -1091,7 +1033,7 @@ The game should define feedback/animation rules for at least:
 - stash output blocked by insufficient placement capacity
 - input withdrawal
 - inventory full / board full failure
-- upgrade start and completion
+- craft/tier completion
 
 ### 16.3 Animation data shape
 
@@ -1121,18 +1063,17 @@ Newly committed actors may be staged from a source rectangle through `useVisualI
 The economy should be validated using these rules:
 
 1. Every required input item must have at least one defined source.
-2. Every producer product-line or stash output must be useful in at least one merge chain, craft requirement, construction requirement, upgrade, or future unlock path.
+2. Every producer product-line or stash output must be useful in at least one merge chain, craft requirement, construction requirement, building tier recipe, or future unlock path.
 3. Merge chains must not create unrelated materials without an explicit transformation system.
 4. Producer product-line inputs, stash open-time inputs, and stored requirements must be satisfiable from existing sources.
 5. Producer product-line input capacity must be high enough to support intended cycles.
-6. Upgrades must target concrete entities and must not rely on implicit string matching or UI assumptions.
-7. Loot table changes must be traceable through named upgrade tiers.
-8. Currency item sources and sinks must be balanced intentionally.
-9. Inventory capacity must be considered when adding new chains or producers.
-10. Stateful items must preserve state through all allowed movement.
-11. No important economy behavior should live only in UI interaction code.
-12. Existing `GameConfig` economy data is inspiration until a dedicated economy pass rewrites it to match this document.
-13. No successful loot table activation may produce zero output.
+6. Loot table changes must be traceable through named product/building tiers.
+7. Currency item sources and sinks must be balanced intentionally.
+8. Inventory capacity must be considered when adding new chains or producers.
+9. Stateful items must preserve state through all allowed movement.
+10. No important economy behavior should live only in UI interaction code.
+11. Existing `GameConfig` economy data is inspiration until a dedicated economy pass rewrites it to match this document.
+12. No successful loot table activation may produce zero output.
 14. No source-target item pair may match multiple interaction behaviors unless explicitly documented.
 
 ## 18. Data model expectations
@@ -1231,7 +1172,6 @@ Expected fields:
 - auto-fill source priority rules
 - output placement rules
 - blocked delivery retry behavior
-- upgrade targets
 
 ### 18.7 Stash definition
 
@@ -1286,19 +1226,6 @@ Expected fields:
 - allowed locations
 - timer pause/resume behavior
 
-### 18.11 Upgrade definition
-
-Expected fields:
-
-- `id`
-- `name`
-- `targetEntityId`
-- `targetProperty`
-- `tier`
-- `cost`
-- `durationMs`
-- `effect`
-- `nextUpgradeId`, if linear
 
 ## 19. Current example chains and entities
 
@@ -1359,7 +1286,6 @@ These are intentionally not finalized yet.
 4. What are the exact named loot tables and their probabilities?
 5. What are the exact blueprint recipes for each building/tier?
 6. Which craft/construction/growth items use timers, and what are their durations?
-8. Are upgrade tiers strictly linear, or can some branches exist?
 9. Can merge chains require more than two input items?
 
 Until these questions are answered, implementation should choose the simplest explicit behavior and document it here before coding.
@@ -1400,9 +1326,9 @@ These concepts are not part of canonical gameplay and should be removed during c
 8. Double-click exhaust/open/collect behavior. Double-click is inventory placement only.
 9. `doubleClickBehavior: "exhaust"`. It is replaced by single-click stash exhaust/open.
 10. Mixed `producer.mode` finite/infinite model. Finite entities are `stash`; infinite/long-lived entities are `producer`.
-11. Player-inventory capacity upgrade.
-12. Inventory capacity upgrade as current gameplay. Inventory size is fixed at `7 x 5`.
-13. Any upgrade, UI, schema, or copy that implies a wallet/currency layer separate from normal inventory.
+11. Player-inventory capacity mechanics as a separate storage layer.
+12. Inventory capacity changes as current gameplay. Inventory size is fixed at `7 x 5`.
+13. Any global upgrade UI, schema, or copy that implies save-driven config patching.
 14. Resource/currency storage outside item inventory unless a future mechanic explicitly reintroduces it here.
 15. Inline base producer output definitions once named loot tables are introduced for all loot-producing producer/stash outputs.
 
@@ -1476,18 +1402,12 @@ A gameplay implementation should provide tests or validation for:
 62. item detail shows merge information
 63. item detail shows craft/construction/growth progress and timers
 64. item detail shows producer/stash state, inputs, charges, and loot information
-65. upgrade cost payment from normal inventory
-66. upgrade timer lifecycle
-67. upgrade reducing product duration
-68. upgrade replacing producer/product requirement IDs
-69. upgrade switching producer product loot table ID
 70. obsolete `playerInventory` concepts are absent from gameplay logic
 71. obsolete `collect` behavior is absent from gameplay logic
 72. obsolete double-click exhaust behavior is absent from gameplay logic
 73. save compatibility behavior when game definition version changes
 74. board timers advance while the app is closed
 75. inventory timers do not advance while the app is closed
-76. global upgrade timers advance while the app is closed
 77. zero-output loot tables are rejected as invalid data
 78. ambiguous source-target interaction definitions are rejected as invalid data
 79. blueprint imprinting/binding behavior is absent from board drag/drop

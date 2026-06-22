@@ -1,13 +1,6 @@
-import type {
-	GameSaveCraftJob,
-	GameSaveProducerJob,
-	GameSaveUpgradeJob,
-} from "~/v0/game/engine/model/GameSaveSchema";
+import type { GameSaveCraftJob, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 
-type TimedJob = Pick<
-	GameSaveProducerJob | GameSaveCraftJob | GameSaveUpgradeJob,
-	"completesAtMs" | "id"
->;
+type TimedJob = Pick<GameSaveProducerJob | GameSaveCraftJob, "completesAtMs" | "id">;
 
 export namespace compareGameTimedJobs {
 	export interface Props {

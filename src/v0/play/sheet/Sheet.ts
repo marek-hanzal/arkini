@@ -1,1 +1,1 @@
-export type Sheet = "inventory" | "upgrades" | "cheat-inventory" | "dev" | "item";
+export type Sheet = "inventory" | "cheat-inventory" | "dev" | "item";

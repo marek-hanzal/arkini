@@ -27,35 +27,6 @@ const createCraftJob = (id: string, targetItemInstanceId: string) => ({
 	targetItemInstanceId,
 });
 
-const createQueueUpgradeConfig = () =>
-	createEngineTestConfig({
-		upgrades: {
-			"upgrade:queue": {
-				code: "queue",
-				description: "Queue upgrade",
-				name: "Queue",
-				tiers: [
-					{
-						cost: [
-							{
-								itemId: "item:twig",
-								quantity: 1,
-							},
-						],
-						durationMs: 0,
-						effects: [
-							{
-								producerId: "producer:test",
-								quantity: 1,
-								type: "producer.maxQueueSize.add",
-							},
-						],
-					},
-				],
-			},
-		},
-	});
-
 describe("GameSaveConfigSchema", () => {
 	it("accepts a valid save for its config", () => {
 		const config = createEngineTestConfig();
@@ -335,27 +306,6 @@ describe("GameSaveConfigSchema", () => {
 
 		expect(result.success).toBe(false);
 		expect(result.error?.issues[0]?.message).toContain("maxQueueSize");
-	});
-
-	it("accepts producer queues unlocked by completed queue upgrades", () => {
-		const config = createQueueUpgradeConfig();
-		const save = createInitialSave({
-			config,
-			nowMs: 0,
-		});
-		const upgradedSave = cloneSave(save);
-		upgradedSave.upgrades["upgrade:queue"] = {
-			completedTiers: 1,
-		};
-		upgradedSave.producerJobs["job:1"] = createProducerJob("job:1");
-		upgradedSave.producerJobs["job:2"] = createProducerJob("job:2");
-
-		expect(() =>
-			GameSaveConfigSchema.parse({
-				config,
-				save: upgradedSave,
-			}),
-		).not.toThrow();
 	});
 
 	it("rejects stored requirements above their target capacity", () => {

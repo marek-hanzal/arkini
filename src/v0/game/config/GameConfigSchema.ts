@@ -15,12 +15,12 @@ import { z } from "zod";
  * after compile/merge the engine must only see this single shape:
  *
  * ```txt
- * resources -> assets -> items -> merge/inputs/producers/products/stashes/craft/loot/upgrades
+ * resources -> assets -> items -> merge/inputs/producers/products/stashes/craft/loot
  * ```
  *
  * The package contains static game truth only. Mutable save state such as occupied
  * board slots, producer line progress, disabled production lines, running craft jobs
- * or upgrade progress belongs to the save/runtime engine state, not here.
+ * belong to the save/runtime engine state, not here.
  *
  * Important gameplay contracts represented by this schema:
  *
@@ -45,13 +45,11 @@ import { z } from "zod";
  * - Producer `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
- *   definitions are owned by exactly one producer line; upgrades target that
- *   producer/product-line definition, not concrete runtime instances. Producer shells do
- *   not own inputs; product lines reference named input definitions through `inputRefId`.
+ *   definitions are owned by exactly one producer line. Producer shells do not own
+ *   inputs; product lines reference named input definitions through `inputRefId`.
  *   Runtime may still choose between multiple enabled lines accepting the same dragged
- *   item from top to bottom, but their input definitions must stay separate so
- *   product-line upgrades cannot leak across lines. `maxQueueSize` is a hard
- *   per-producer-instance cap covering both running and queued jobs.
+ *   item from top to bottom. `maxQueueSize` is a hard per-producer-instance cap
+ *   covering both running and queued jobs.
  * - Product inputs are stored per product line. Craft inputs are stored per craft
  *   target instance until the player explicitly starts the craft. Completion replaces
  *   the target with exactly one result item.
@@ -144,7 +142,6 @@ import { z } from "zod";
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
-const SignedIntegerSchema = z.number().int();
 /**
  * Output placement policy.
  *
@@ -510,86 +507,6 @@ const ProductDefinitionSchema = z
 	})
 	.strict();
 
-const UpgradeCostDefinitionSchema = z
-	.object({
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
-	})
-	.strict();
-
-/** Upgrade effects intentionally target product lines, not producer tiles. */
-const RequirementIdsReplaceSchema = z.array(IdSchema);
-
-const UpgradeEffectDefinitionSchema = z.discriminatedUnion("type", [
-	z
-		.object({
-			type: z.literal("product.duration.add"),
-			productId: IdSchema,
-			ms: SignedIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("product.outputTable.set"),
-			productId: IdSchema,
-			tableId: IdSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("product.inputRef.set"),
-			productId: IdSchema,
-			inputRefId: IdSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("product.input.quantity.add"),
-			productId: IdSchema,
-			itemId: IdSchema,
-			quantity: SignedIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("product.requirementIds.set"),
-			productId: IdSchema,
-			requirementIds: RequirementIdsReplaceSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("producer.maxQueueSize.add"),
-			producerId: IdSchema,
-			quantity: SignedIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("producer.requirementIds.set"),
-			producerId: IdSchema,
-			requirementIds: RequirementIdsReplaceSchema,
-		})
-		.strict(),
-]);
-
-const UpgradeTierDefinitionSchema = z
-	.object({
-		cost: z.array(UpgradeCostDefinitionSchema),
-		effects: z.array(UpgradeEffectDefinitionSchema),
-		durationMs: NonNegativeIntegerSchema,
-	})
-	.strict();
-
-const UpgradeDefinitionSchema = z
-	.object({
-		code: z.string().min(1),
-		name: z.string().min(1),
-		description: z.string(),
-		tiers: z.array(UpgradeTierDefinitionSchema).min(1),
-	})
-	.strict();
-
 /** New-game seed. Board entries are individual tiles; inventory entries may stack. */
 const StartingStateDefinitionSchema = z
 	.object({
@@ -632,7 +549,6 @@ const GameConfigFragmentSchema = z
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema).optional(),
 		products: z.record(IdSchema, ProductDefinitionSchema).optional(),
 		lootTables: z.record(IdSchema, LootTableDefinitionSchema).optional(),
-		upgrades: z.record(IdSchema, UpgradeDefinitionSchema).optional(),
 		startingState: StartingStateDefinitionSchema.optional(),
 	})
 	.strict();
@@ -653,7 +569,6 @@ const BaseGameConfigSchema = z
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema),
 		products: z.record(IdSchema, ProductDefinitionSchema),
 		lootTables: z.record(IdSchema, LootTableDefinitionSchema),
-		upgrades: z.record(IdSchema, UpgradeDefinitionSchema),
 		startingState: StartingStateDefinitionSchema,
 	})
 	.strict();
@@ -663,8 +578,7 @@ const BaseGameConfigSchema = z
  *
  * Structural Zod validation catches malformed sections. This refinement catches the
  * problems that actually ruin content work: missing referenced items/assets/resources,
- * broken product/loot links, invalid starting board coordinates and upgrade effects
- * pointing at products or inputs that do not exist.
+ * broken product/loot links, invalid starting board coordinates and broken product-line ownership.
  */
 export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) => {
 	const hasResource = createRecordGuard(value.resources);
@@ -688,16 +602,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		"code",
 		(value) => `Duplicate item code "${value}".`,
 	);
-	validateUniqueRecordField(
-		ctx,
-		[
-			"upgrades",
-		],
-		value.upgrades,
-		"code",
-		(value) => `Duplicate upgrade code "${value}".`,
-	);
-
 	for (const [assetId, asset] of Object.entries(value.assets)) {
 		if (!hasResource(asset.resourceId)) {
 			addIssue(
@@ -1079,153 +983,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
-	for (const [upgradeId, upgrade] of Object.entries(value.upgrades)) {
-		for (const [tierIndex, tier] of upgrade.tiers.entries()) {
-			for (const [costIndex, cost] of tier.cost.entries()) {
-				if (!hasItem(cost.itemId)) {
-					addIssue(
-						ctx,
-						[
-							"upgrades",
-							upgradeId,
-							"tiers",
-							tierIndex,
-							"cost",
-							costIndex,
-							"itemId",
-						],
-						`Missing item "${cost.itemId}".`,
-					);
-				}
-			}
-
-			for (const [effectIndex, effect] of tier.effects.entries()) {
-				if (
-					effect.type === "producer.maxQueueSize.add" ||
-					effect.type === "producer.requirementIds.set"
-				) {
-					if (!hasProducer(effect.producerId)) {
-						addIssue(
-							ctx,
-							[
-								"upgrades",
-								upgradeId,
-								"tiers",
-								tierIndex,
-								"effects",
-								effectIndex,
-								"producerId",
-							],
-							`Missing producer "${effect.producerId}".`,
-						);
-					}
-					if (effect.type === "producer.requirementIds.set") {
-						validateRequirementIds(
-							ctx,
-							[
-								"upgrades",
-								upgradeId,
-								"tiers",
-								tierIndex,
-								"effects",
-								effectIndex,
-								"requirementIds",
-							],
-							effect.requirementIds,
-							hasRequirement,
-						);
-					}
-					continue;
-				}
-
-				if (!hasProduct(effect.productId)) {
-					addIssue(
-						ctx,
-						[
-							"upgrades",
-							upgradeId,
-							"tiers",
-							tierIndex,
-							"effects",
-							effectIndex,
-							"productId",
-						],
-						`Missing product "${effect.productId}".`,
-					);
-					continue;
-				}
-
-				if (effect.type === "product.outputTable.set" && !hasLootTable(effect.tableId)) {
-					addIssue(
-						ctx,
-						[
-							"upgrades",
-							upgradeId,
-							"tiers",
-							tierIndex,
-							"effects",
-							effectIndex,
-							"tableId",
-						],
-						`Missing loot table "${effect.tableId}".`,
-					);
-				}
-
-				if (effect.type === "product.inputRef.set" && !hasInput(effect.inputRefId)) {
-					addIssue(
-						ctx,
-						[
-							"upgrades",
-							upgradeId,
-							"tiers",
-							tierIndex,
-							"effects",
-							effectIndex,
-							"inputRefId",
-						],
-						`Missing input "${effect.inputRefId}".`,
-					);
-				}
-
-				if (effect.type === "product.requirementIds.set") {
-					validateRequirementIds(
-						ctx,
-						[
-							"upgrades",
-							upgradeId,
-							"tiers",
-							tierIndex,
-							"effects",
-							effectIndex,
-							"requirementIds",
-						],
-						effect.requirementIds,
-						hasRequirement,
-					);
-				}
-
-				if (effect.type === "product.input.quantity.add" && !hasItem(effect.itemId)) {
-					addIssue(
-						ctx,
-						[
-							"upgrades",
-							upgradeId,
-							"tiers",
-							tierIndex,
-							"effects",
-							effectIndex,
-							"itemId",
-						],
-						`Missing item "${effect.itemId}".`,
-					);
-				}
-			}
-		}
-	}
-
 	validateProductLineOwnership(ctx, value);
-	validateEffectiveUpgradePrefixes(ctx, value);
-
 	if (value.startingState.inventory.length > value.game.inventory.slots) {
 		addIssue(
 			ctx,
@@ -1430,7 +1188,10 @@ const validateUniqueRecordField = <
 	}
 };
 
-const validateProductLineOwnership = (ctx: z.RefinementCtx, config: EffectiveUpgradeConfig) => {
+const validateProductLineOwnership = (
+	ctx: z.RefinementCtx,
+	config: z.infer<typeof BaseGameConfigSchema>,
+) => {
 	const ownerByProductId = new Map<string, string>();
 
 	for (const [producerId, producer] of Object.entries(config.producers)) {
@@ -1498,282 +1259,6 @@ const validateProductInputRefOwnership = (
 
 		productIdByInputRefId.set(inputRefId, productId);
 	}
-};
-
-type EffectiveUpgradeConfig = z.infer<typeof BaseGameConfigSchema>;
-type EffectiveUpgradeProductState = {
-	durationMs: number;
-	inputRefId?: string;
-	inputQuantities: Record<string, number>;
-	requirementIds: string[];
-};
-type EffectiveUpgradeProducerState = {
-	maxQueueSize: number;
-	requirementIds: string[];
-};
-type EffectiveUpgradeState = {
-	producers: Record<string, EffectiveUpgradeProducerState>;
-	products: Record<string, EffectiveUpgradeProductState>;
-};
-type UpgradeSequenceEntry = readonly [
-	upgradeId: string,
-	upgrade: EffectiveUpgradeConfig["upgrades"][string],
-];
-
-const createEffectiveUpgradeState = (config: EffectiveUpgradeConfig): EffectiveUpgradeState => ({
-	producers: Object.fromEntries(
-		Object.entries(config.producers).map(([producerId, producer]) => [
-			producerId,
-			{
-				maxQueueSize: producer.maxQueueSize,
-				requirementIds: [
-					...producer.requirementIds,
-				],
-			},
-		]),
-	),
-	products: Object.fromEntries(
-		Object.entries(config.products).map(([productId, product]) => [
-			productId,
-			{
-				durationMs: product.durationMs,
-				inputRefId: product.inputRefId,
-				inputQuantities: {},
-				requirementIds: [
-					...product.requirementIds,
-				],
-			},
-		]),
-	),
-});
-
-const validateEffectiveUpgradePrefixes = (ctx: z.RefinementCtx, config: EffectiveUpgradeConfig) => {
-	const upgradeEntries = Object.entries(config.upgrades).sort(([left], [right]) =>
-		left.localeCompare(right),
-	) satisfies UpgradeSequenceEntry[];
-
-	validateEffectiveUpgradeSequence(ctx, config, upgradeEntries);
-
-	if (upgradeEntries.length <= 1) return;
-
-	for (const entry of upgradeEntries) {
-		validateEffectiveUpgradeSequence(ctx, config, [
-			entry,
-		]);
-	}
-};
-
-const validateEffectiveUpgradeSequence = (
-	ctx: z.RefinementCtx,
-	config: EffectiveUpgradeConfig,
-	upgradeEntries: readonly UpgradeSequenceEntry[],
-) => {
-	const state = createEffectiveUpgradeState(config);
-
-	for (const [upgradeId, upgrade] of upgradeEntries) {
-		for (const [tierIndex, tier] of upgrade.tiers.entries()) {
-			for (const [effectIndex, effect] of tier.effects.entries()) {
-				const path = [
-					"upgrades",
-					upgradeId,
-					"tiers",
-					tierIndex,
-					"effects",
-					effectIndex,
-				];
-				applyEffectiveUpgradeEffect(ctx, config, state, path, effect);
-			}
-		}
-	}
-};
-
-const applyEffectiveUpgradeEffect = (
-	ctx: z.RefinementCtx,
-	config: EffectiveUpgradeConfig,
-	state: EffectiveUpgradeState,
-	path: GameConfigIssuePath,
-	effect: EffectiveUpgradeConfig["upgrades"][string]["tiers"][number]["effects"][number],
-) => {
-	if (
-		effect.type === "producer.maxQueueSize.add" ||
-		effect.type === "producer.requirementIds.set"
-	) {
-		const producerState = state.producers[effect.producerId];
-		if (!producerState) return;
-
-		if (effect.type === "producer.requirementIds.set") {
-			producerState.requirementIds = [
-				...effect.requirementIds,
-			];
-			return;
-		}
-
-		producerState.maxQueueSize += effect.quantity;
-		if (producerState.maxQueueSize <= 0) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"quantity",
-				],
-				`Effective producer "${effect.producerId}" maxQueueSize must stay > 0 after upgrade prefixes.`,
-			);
-		}
-		return;
-	}
-
-	const productState = state.products[effect.productId];
-	if (!productState) return;
-
-	if (effect.type === "product.duration.add") {
-		productState.durationMs += effect.ms;
-		if (productState.durationMs <= 0) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"ms",
-				],
-				`Effective product "${effect.productId}" durationMs must stay > 0 after upgrade prefixes.`,
-			);
-		}
-		return;
-	}
-
-	if (effect.type === "product.outputTable.set") {
-		return;
-	}
-
-	if (effect.type === "product.inputRef.set") {
-		productState.inputRefId = effect.inputRefId;
-		validateEffectiveProductInputRefOwnership(ctx, state, path);
-		validateEffectiveProductInputOverrides(ctx, config, productState, effect.productId, path);
-		return;
-	}
-
-	if (effect.type === "product.requirementIds.set") {
-		productState.requirementIds = [
-			...effect.requirementIds,
-		];
-		return;
-	}
-
-	const inputRefId = productState.inputRefId;
-	const input = readEffectiveProductInputSlot({
-		config,
-		inputRefId,
-		itemId: effect.itemId,
-	});
-	if (!input) {
-		addIssue(
-			ctx,
-			[
-				...path,
-				"itemId",
-			],
-			inputRefId
-				? `Effective product "${effect.productId}" inputRef "${inputRefId}" has no input "${effect.itemId}".`
-				: `Effective product "${effect.productId}" has no inputRef for input quantity upgrades.`,
-		);
-		return;
-	}
-
-	const currentQuantity = productState.inputQuantities[effect.itemId] ?? input.quantity;
-	productState.inputQuantities[effect.itemId] = currentQuantity + effect.quantity;
-	validateEffectiveProductInputOverrides(ctx, config, productState, effect.productId, path);
-};
-
-const validateEffectiveProductInputRefOwnership = (
-	ctx: z.RefinementCtx,
-	state: EffectiveUpgradeState,
-	path: GameConfigIssuePath,
-) => {
-	const productIdByInputRefId = new Map<string, string>();
-
-	for (const [productId, productState] of Object.entries(state.products)) {
-		if (!productState.inputRefId) {
-			continue;
-		}
-
-		const previousProductId = productIdByInputRefId.get(productState.inputRefId);
-		if (previousProductId) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"inputRefId",
-				],
-				`Effective input ref "${productState.inputRefId}" must be owned by exactly one product line after upgrade prefixes. First used by "${previousProductId}"; also used by "${productId}".`,
-			);
-			continue;
-		}
-
-		productIdByInputRefId.set(productState.inputRefId, productId);
-	}
-};
-
-const validateEffectiveProductInputOverrides = (
-	ctx: z.RefinementCtx,
-	config: EffectiveUpgradeConfig,
-	productState: EffectiveUpgradeProductState,
-	productId: string,
-	path: GameConfigIssuePath,
-) => {
-	for (const [itemId, quantity] of Object.entries(productState.inputQuantities)) {
-		const input = readEffectiveProductInputSlot({
-			config,
-			inputRefId: productState.inputRefId,
-			itemId,
-		});
-		if (!input) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"itemId",
-				],
-				productState.inputRefId
-					? `Effective product "${productId}" inputRef "${productState.inputRefId}" has no input "${itemId}" after upgrade prefixes.`
-					: `Effective product "${productId}" has no inputRef for input quantity upgrades.`,
-			);
-			continue;
-		}
-
-		if (quantity <= 0) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"quantity",
-				],
-				`Effective product "${productId}" input "${itemId}" quantity must stay > 0 after upgrade prefixes.`,
-			);
-		}
-
-		if (quantity > input.capacity) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"quantity",
-				],
-				`Effective product "${productId}" input "${itemId}" quantity must stay <= capacity (${input.capacity}) after upgrade prefixes.`,
-			);
-		}
-	}
-};
-
-const readEffectiveProductInputSlot = ({
-	config,
-	inputRefId,
-	itemId,
-}: {
-	config: EffectiveUpgradeConfig;
-	inputRefId: string | undefined;
-	itemId: string;
-}) => {
-	if (!inputRefId) return undefined;
-	return config.inputs[inputRefId]?.inputs.find((input) => input.itemId === itemId);
 };
 
 const validateItemInputs = (

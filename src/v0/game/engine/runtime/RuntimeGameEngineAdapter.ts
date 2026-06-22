@@ -64,7 +64,7 @@ export class RuntimeGameEngineAdapter {
 	readonly config: GameConfig;
 	private readonly listeners = new Set<GameEngineRuntimeListener>();
 	private readonly random?: RandomService;
-	private effectiveConfig: GameConfig;
+	private runtimeConfig: GameConfig;
 	private lastEvents: readonly GameEvent[] = [];
 	private nextWakeAtMs: number | null = null;
 	private save: GameSave;
@@ -73,10 +73,7 @@ export class RuntimeGameEngineAdapter {
 		this.config = config;
 		this.random = random;
 		this.save = initialSave;
-		this.effectiveConfig = buildEffectiveConfig({
-			config,
-			save: initialSave,
-		});
+		this.runtimeConfig = buildRuntimeConfig(config);
 		this.nextWakeAtMs = nextWakeAtMs;
 	}
 
@@ -117,7 +114,7 @@ export class RuntimeGameEngineAdapter {
 
 	readSnapshot(): GameEngineRuntimeSnapshot {
 		return {
-			config: this.effectiveConfig,
+			config: this.runtimeConfig,
 			lastEvents: this.lastEvents,
 			nextWakeAtMs: this.nextWakeAtMs,
 			save: this.save,
@@ -222,10 +219,7 @@ export class RuntimeGameEngineAdapter {
 
 	private commit(result: GameEngineResult) {
 		this.save = result.save;
-		this.effectiveConfig = buildEffectiveConfig({
-			config: this.config,
-			save: result.save,
-		});
+		this.runtimeConfig = buildRuntimeConfig(this.config);
 		this.lastEvents = result.events;
 		this.nextWakeAtMs = result.nextWakeAtMs;
 
@@ -235,11 +229,10 @@ export class RuntimeGameEngineAdapter {
 	}
 }
 
-const buildEffectiveConfig = ({ config, save }: { config: GameConfig; save: GameSave }) =>
+const buildRuntimeConfig = (config: GameConfig) =>
 	Effect.runSync(
 		buildGameConfigServiceFx({
 			config,
-			save,
 		}),
 	).config;
 

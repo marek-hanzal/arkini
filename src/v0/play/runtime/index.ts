@@ -14,7 +14,6 @@ export {
 	useGameInventoryView,
 	useGameItemCatalogView,
 	useGameItemView,
-	useGameUpgradeListView,
 } from "~/v0/play/runtime/useGameRuntimeViews";
 export { useGameRuntimeDropActions } from "~/v0/play/runtime/useGameRuntimeDropActions";
 export { GameRuntimeVisualEffects } from "~/v0/play/runtime/GameRuntimeVisualEffects";

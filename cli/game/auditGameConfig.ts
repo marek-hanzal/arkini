@@ -41,7 +41,6 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	collectCraftRecipeUsage(config, itemFlow);
 	collectProductUsage(config, usage, itemFlow);
 	collectLootTableUsage(config, itemFlow);
-	collectUpgradeUsage(config, usage, itemFlow);
 	collectStartingStateUsage(config, itemFlow);
 
 	return [
@@ -238,50 +237,6 @@ const collectLootTableUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
 	}
 };
 
-const collectUpgradeUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
-	for (const upgrade of Object.values(config.upgrades)) {
-		for (const tier of upgrade.tiers) {
-			for (const cost of tier.cost) {
-				usage.items.add(cost.itemId);
-				itemFlow.consumedItemIds.add(cost.itemId);
-			}
-
-			for (const effect of tier.effects) {
-				if (
-					effect.type === "producer.maxQueueSize.add" ||
-					effect.type === "producer.requirementIds.set"
-				) {
-					usage.producers.add(effect.producerId);
-					if (effect.type === "producer.requirementIds.set") {
-						for (const requirementId of effect.requirementIds) {
-							usage.requirements.add(requirementId);
-						}
-					}
-					continue;
-				}
-
-				usage.products.add(effect.productId);
-
-				if (effect.type === "product.outputTable.set") {
-					usage.lootTables.add(effect.tableId);
-				}
-				if (effect.type === "product.inputRef.set") {
-					usage.inputs.add(effect.inputRefId);
-				}
-				if (effect.type === "product.requirementIds.set") {
-					for (const requirementId of effect.requirementIds) {
-						usage.requirements.add(requirementId);
-					}
-				}
-				if (effect.type === "product.input.quantity.add") {
-					usage.items.add(effect.itemId);
-					itemFlow.consumedItemIds.add(effect.itemId);
-				}
-			}
-		}
-	}
-};
-
 const collectStartingStateUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
 	for (const entry of config.startingState.board) {
 		itemFlow.producedItemIds.add(entry.itemId);
@@ -317,7 +272,7 @@ const readTerminalItemWarnings = (
 			code: "terminal-item",
 			id: itemId,
 			section: "items",
-			message: `${itemId} is produced or starts in the save, but no configured input, requirement, blocker, merge, removal rule, craft, stash, or upgrade consumes it.`,
+			message: `${itemId} is produced or starts in the save, but no configured input, requirement, blocker, merge, removal rule, craft, or stash references it.`,
 		}));
 
 const readUnusedRecordWarnings = (

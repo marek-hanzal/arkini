@@ -3547,6 +3547,16 @@
 			"type": "producer"
 		},
 		"producer:brewery-t1": {
+			"blockedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:brewery-t1:hops",
@@ -3761,6 +3771,16 @@
 			"type": "producer"
 		},
 		"producer:winery-t1": {
+			"blockedBy": [
+				{
+					"distance": 3,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:winery-t1:grapes",

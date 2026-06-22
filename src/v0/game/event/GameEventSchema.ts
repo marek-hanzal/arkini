@@ -30,7 +30,6 @@ export const GameItemConsumedReasonSchema = z.enum([
 	"board-stash",
 	"remove-tool",
 	"merge-source",
-	"upgrade-cost",
 ]);
 
 export const GameBoardItemChangeReasonSchema = z.enum([
@@ -194,35 +193,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			completesAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
-	z
-		.object({
-			type: z.literal("producer.product_line.default_changed"),
-			producerItemInstanceId: IdSchema,
-			previousProductId: IdSchema.optional(),
-			nextProductId: IdSchema,
-			changedAtMs: NonNegativeIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("producer.product_line.enabled_changed"),
-			producerItemInstanceId: IdSchema,
-			productId: IdSchema,
-			previousEnabled: z.boolean(),
-			nextEnabled: z.boolean(),
-			changedAtMs: NonNegativeIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("upgrade.started"),
-			jobId: IdSchema,
-			upgradeId: IdSchema,
-			tierIndex: NonNegativeIntegerSchema,
-			startedAtMs: NonNegativeIntegerSchema,
-			completesAtMs: NonNegativeIntegerSchema,
-		})
-		.strict(),
+
 	z
 		.object({
 			type: z.literal("craft.started"),
@@ -239,15 +210,6 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
-			completedAtMs: NonNegativeIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("upgrade.completed"),
-			jobId: IdSchema,
-			upgradeId: IdSchema,
-			tierIndex: NonNegativeIntegerSchema,
 			completedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
@@ -294,6 +256,25 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			itemId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
 			blockedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("producer.product_line.default_changed"),
+			producerItemInstanceId: IdSchema,
+			previousProductId: IdSchema.optional(),
+			nextProductId: IdSchema,
+			changedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("producer.product_line.enabled_changed"),
+			producerItemInstanceId: IdSchema,
+			productId: IdSchema,
+			previousEnabled: z.boolean(),
+			nextEnabled: z.boolean(),
+			changedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
 ]);

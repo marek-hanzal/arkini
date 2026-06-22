@@ -20,7 +20,6 @@ import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadine
 import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/requirements/checkStoredRequirementStoreReadinessFx";
 import { checkStoredRequirementWithdrawReadinessFx } from "~/v0/game/requirements/checkStoredRequirementWithdrawReadinessFx";
 import { checkTileRemoveReadinessFx } from "~/v0/game/remove/checkTileRemoveReadinessFx";
-import { checkUpgradeStartReadinessFx } from "~/v0/game/upgrade/checkUpgradeStartReadinessFx";
 import { parseGameActionFx } from "~/v0/game/engine/parseGameActionFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -43,7 +42,6 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 }: readActionReadinessFx.Props) {
 	const gameConfig = yield* buildGameConfigServiceFx({
 		config,
-		save,
 	});
 	const readinessEffect: EffectType.Effect<void, GameEngineError, GameConfigFx> = Effect.gen(
 		function* () {
@@ -162,12 +160,6 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				tileRemove: (removeAction) =>
 					checkTileRemoveReadinessFx({
 						action: removeAction,
-						config: gameConfig.config,
-						save,
-					}),
-				upgradeStart: (upgradeAction) =>
-					checkUpgradeStartReadinessFx({
-						action: upgradeAction,
 						config: gameConfig.config,
 						save,
 					}),

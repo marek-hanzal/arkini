@@ -87,7 +87,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				],
 			},
 		},
-		upgrades: {},
 		startingState: {
 			board: [
 				{

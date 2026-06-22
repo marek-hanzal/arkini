@@ -3,7 +3,6 @@ import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
 import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
 import { processCompletedCraftJobsFx } from "~/v0/game/craft/processCompletedCraftJobsFx";
 import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
-import { processCompletedUpgradeJobsFx } from "~/v0/game/upgrade/processCompletedUpgradeJobsFx";
 import { processItemSpawnJobsFx } from "~/v0/game/job/processItemSpawnJobsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -26,7 +25,6 @@ export const runGameTickFx = Effect.fn("runGameTickFx")(function* ({
 }: runGameTickFx.Props) {
 	const gameConfig = yield* buildGameConfigServiceFx({
 		config,
-		save,
 	});
 
 	const result = Effect.gen(function* () {
@@ -56,14 +54,6 @@ export const runGameTickFx = Effect.fn("runGameTickFx")(function* ({
 		});
 		nextSave = craftJobs.save;
 		events.push(...craftJobs.events);
-
-		const upgradeJobs = yield* processCompletedUpgradeJobsFx({
-			config: gameConfig.config,
-			nowMs,
-			save: nextSave,
-		});
-		nextSave = upgradeJobs.save;
-		events.push(...upgradeJobs.events);
 
 		return {
 			events,

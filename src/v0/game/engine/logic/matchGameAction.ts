@@ -35,7 +35,6 @@ export namespace matchGameAction {
 			action: GameActionOfType<"stored_requirement.withdraw">,
 		) => Result;
 		tileRemove: (action: GameActionOfType<"tile.remove">) => Result;
-		upgradeStart: (action: GameActionOfType<"upgrade.start">) => Result;
 	}
 }
 
@@ -157,11 +156,5 @@ export const matchGameAction = <Result>(
 				type: "tile.remove",
 			},
 			cases.tileRemove,
-		)
-		.with(
-			{
-				type: "upgrade.start",
-			},
-			cases.upgradeStart,
 		)
 		.exhaustive();

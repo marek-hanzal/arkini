@@ -36,7 +36,7 @@ describe("defaultGameConfig", () => {
 		);
 	};
 
-	it("requires complete era ownership before townhall upgrades", () => {
+	it("requires complete era ownership before townhall tier progression", () => {
 		expectPassiveOwnedRequirements("craft:townhall-t2", [
 			"producer:lumberjack-t1",
 			"producer:sawmill-t1",

@@ -1,7 +1,5 @@
 import { z } from "zod";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { GameSaveUpgradeJobSchema } from "~/v0/game/upgrade/GameSaveUpgradeJobSchema";
-import { GameSaveUpgradeStateSchema } from "~/v0/game/upgrade/GameSaveUpgradeStateSchema";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
@@ -197,8 +195,6 @@ export const GameSaveSchema = z
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
 		craftInputs: z.record(IdSchema, GameSaveCraftInputStateSchema),
-		upgradeJobs: z.record(IdSchema, GameSaveUpgradeJobSchema),
-		upgrades: z.record(IdSchema, GameSaveUpgradeStateSchema),
 		stashes: z.record(IdSchema, GameSaveStashStateSchema),
 		storedRequirements: z.record(IdSchema, GameSaveStoredRequirementStateSchema),
 		itemSpawnJobs: z.record(IdSchema, GameSaveItemSpawnJobSchema),
@@ -374,74 +370,6 @@ const readStoredRequirementCapacity = ({
 	return Math.max(...matchingSlots.map((requirement) => requirement.capacity));
 };
 
-const readEffectiveProducerMaxQueueSize = ({
-	config,
-	producerId,
-	save,
-}: {
-	config: GameConfig;
-	producerId: string;
-	save: GameSave;
-}) => {
-	let maxQueueSize = config.producers[producerId]?.maxQueueSize;
-	if (typeof maxQueueSize !== "number") return undefined;
-
-	for (const [upgradeId, upgrade] of Object.entries(config.upgrades).sort(([left], [right]) =>
-		left.localeCompare(right),
-	)) {
-		const completedTiers = Math.min(
-			save.upgrades[upgradeId]?.completedTiers ?? 0,
-			upgrade.tiers.length,
-		);
-
-		for (const tier of upgrade.tiers.slice(0, completedTiers)) {
-			for (const effect of tier.effects) {
-				if (
-					effect.type !== "producer.maxQueueSize.add" ||
-					effect.producerId !== producerId
-				) {
-					continue;
-				}
-
-				maxQueueSize += effect.quantity;
-			}
-		}
-	}
-
-	return maxQueueSize;
-};
-
-const readEffectiveProductInputRefId = ({
-	config,
-	productId,
-	save,
-}: {
-	config: GameConfig;
-	productId: string;
-	save: GameSave;
-}) => {
-	let inputRefId = config.products[productId]?.inputRefId;
-
-	for (const [upgradeId, upgrade] of Object.entries(config.upgrades).sort(([left], [right]) =>
-		left.localeCompare(right),
-	)) {
-		const completedTiers = Math.min(
-			save.upgrades[upgradeId]?.completedTiers ?? 0,
-			upgrade.tiers.length,
-		);
-
-		for (const tier of upgrade.tiers.slice(0, completedTiers)) {
-			for (const effect of tier.effects) {
-				if (effect.type === "product.inputRef.set" && effect.productId === productId) {
-					inputRefId = effect.inputRefId;
-				}
-			}
-		}
-	}
-
-	return inputRefId;
-};
-
 const readEffectiveProductInputSlots = ({
 	config,
 	productId,
@@ -451,11 +379,7 @@ const readEffectiveProductInputSlots = ({
 	productId: string;
 	save: GameSave;
 }) => {
-	const inputRefId = readEffectiveProductInputRefId({
-		config,
-		productId,
-		save,
-	});
+	const inputRefId = config.products[productId]?.inputRefId;
 	if (!inputRefId) return [];
 
 	return config.inputs[inputRefId]?.inputs ?? [];
@@ -771,11 +695,7 @@ const validateGameSaveAgainstConfig = (
 		});
 		const producerId = target?.item.producerId;
 		if (!producerId) continue;
-		const maxQueueSize = readEffectiveProducerMaxQueueSize({
-			config,
-			producerId,
-			save,
-		});
+		const maxQueueSize = config.producers[producerId]?.maxQueueSize;
 		if (maxQueueSize !== undefined && jobCount > maxQueueSize) {
 			addSaveIssue(
 				ctx,
@@ -1038,87 +958,6 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
-	const runningUpgradeJobs = new Set<string>();
-	for (const [jobId, job] of Object.entries(save.upgradeJobs)) {
-		if (job.id !== jobId) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgradeJobs",
-					jobId,
-					"id",
-				],
-				`Upgrade job id must match record key "${jobId}".`,
-			);
-		}
-
-		const upgrade = config.upgrades[job.upgradeId];
-		if (!upgrade) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgradeJobs",
-					jobId,
-					"upgradeId",
-				],
-				`Missing upgrade "${job.upgradeId}".`,
-			);
-			continue;
-		}
-
-		if (job.tierIndex >= upgrade.tiers.length) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgradeJobs",
-					jobId,
-					"tierIndex",
-				],
-				`tierIndex must be < upgrade tier count (${upgrade.tiers.length}).`,
-			);
-		}
-
-		if (runningUpgradeJobs.has(job.upgradeId)) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgradeJobs",
-					jobId,
-				],
-				`Upgrade "${job.upgradeId}" already has a running job.`,
-			);
-		} else {
-			runningUpgradeJobs.add(job.upgradeId);
-		}
-	}
-
-	for (const [upgradeId, state] of Object.entries(save.upgrades)) {
-		const upgrade = config.upgrades[upgradeId];
-		if (!upgrade) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgrades",
-					upgradeId,
-				],
-				`Missing upgrade "${upgradeId}".`,
-			);
-			continue;
-		}
-
-		if (state.completedTiers > upgrade.tiers.length) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgrades",
-					upgradeId,
-					"completedTiers",
-				],
-				`completedTiers must be <= upgrade tier count (${upgrade.tiers.length}).`,
-			);
-		}
-	}
-
 	for (const [stashItemInstanceId, state] of Object.entries(save.stashes)) {
 		const target = readItemInstanceDefinition({
 			config,
@@ -1263,8 +1102,6 @@ export type GameSaveCraftInputState = z.infer<typeof GameSaveCraftInputStateSche
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
 export type GameSaveStoredRequirementState = z.infer<typeof GameSaveStoredRequirementStateSchema>;
-export type GameSaveUpgradeJob = z.infer<typeof GameSaveUpgradeJobSchema>;
-export type GameSaveUpgradeState = z.infer<typeof GameSaveUpgradeStateSchema>;
 export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;
 export type GameSave = z.infer<typeof GameSaveSchema>;
 export type GameSaveConfig = z.infer<typeof GameSaveConfigSchema>;

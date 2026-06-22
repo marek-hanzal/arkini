@@ -110,7 +110,6 @@ const createConfigValue = () => ({
 			],
 		},
 	},
-	upgrades: {},
 	startingState: {
 		board: [
 			{

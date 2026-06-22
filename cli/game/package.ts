@@ -20,7 +20,6 @@ const collectionKeys = [
 	"craftRecipes",
 	"products",
 	"lootTables",
-	"upgrades",
 ] as const;
 
 type CollectionKey = (typeof collectionKeys)[number];
@@ -285,7 +284,6 @@ const createEmptyPackage = (): GameConfig => ({
 	craftRecipes: {},
 	products: {},
 	lootTables: {},
-	upgrades: {},
 	startingState: undefined as never,
 });
 

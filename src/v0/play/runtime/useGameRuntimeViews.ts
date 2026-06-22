@@ -7,9 +7,7 @@ import type { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
-import { readRuntimeUpgradeListViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeUpgradeListViewFromGameSave";
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
-import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
 import {
 	readBoardFirstEmptyCell,
 	readBoardItem,
@@ -106,22 +104,6 @@ export const useGameInventorySlot = (slotIndex: number): InventorySlot => {
 
 export const useGameBoardFirstEmptyCell = (): BoardCellSchema.Type | undefined =>
 	useGameRuntimeSelector(readBoardFirstEmptyCell, sameBoardCell);
-
-export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView => {
-	const selector = useCallback(
-		(state: GameRuntimeState) =>
-			readRuntimeUpgradeListViewFromGameSave({
-				config: state.runtime.config,
-				nowMs,
-				save: state.runtime.save,
-			}),
-		[
-			nowMs,
-		],
-	);
-
-	return useGameRuntimeSelector(selector);
-};
 
 export const useGameItemCatalogView = (): ItemCatalogView =>
 	useGameRuntimeSelector(readItemCatalogView);

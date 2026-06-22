@@ -203,7 +203,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				],
 			},
 		},
-		upgrades: {},
 		startingState: {
 			board: [
 				{

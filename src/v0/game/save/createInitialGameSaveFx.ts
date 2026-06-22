@@ -82,8 +82,6 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		producerJobs: {},
 		producerLines: {},
 		producerInputs: {},
-		upgradeJobs: {},
-		upgrades: {},
 		itemSpawnJobs: {},
 		stashes: {},
 		storedRequirements: {},

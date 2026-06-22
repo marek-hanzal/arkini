@@ -101,7 +101,7 @@
 			"requirementIds": [
 				"proximity:brewery-t1:hop-field"
 			],
-			"blockedBy": [
+			"hinderedBy": [
 				{
 					"type": "proximity",
 					"itemIds": [
@@ -132,7 +132,7 @@
 			"requirementIds": [
 				"proximity:winery-t1:vineyard"
 			],
-			"blockedBy": [
+			"hinderedBy": [
 				{
 					"type": "proximity",
 					"itemIds": [

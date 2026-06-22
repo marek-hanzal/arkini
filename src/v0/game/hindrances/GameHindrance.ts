@@ -1,6 +1,6 @@
 import type { GamePassiveRequirementScope } from "~/v0/game/requirements/GamePassiveRequirementScope";
 
-export type GameBlocker =
+export type GameHindrance =
 	| {
 			type: "passive";
 			itemId: string;

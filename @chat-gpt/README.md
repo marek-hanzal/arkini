@@ -20,7 +20,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - TileEngine is generic and must not import Arkini domain modules.
 - `GameConfigSchema` / `GameSaveConfigSchema` are central validation gates.
 - `GameConfig` is the primary gameplay contract: if config validation accepts an item/capability combination, the engine/runtime must support and honor it deterministically.
-- Producer/product `blockedBy` entries are negative OR effects: active blockers slow duration, they do not gate or block product start.
+- Producer/product `hinderedBy` entries are negative OR effects: active hindrances slow duration, they do not gate or block product start.
 - Townhall era progression is one-way: the next Town Hall craft consumes the current Town Hall and requires ownership of every physical building/place unlocked by the current era via passive `board_or_inventory` requirements. Higher Town Halls do not inherit older blueprint products.
 - Loaded JSON `GameConfig` is the canonical immutable source of truth. There is no save-driven config overlay/layer and no global upgrade patch system.
 - Item-level `exclusiveToIds` is directional and explicit, never auto-symmetric. It is a hard ownership/creation constraint for path choices. UI must warn early on blueprints/craft targets before resource investment.

@@ -1,12 +1,12 @@
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import { readProximityRequirementMatch } from "~/v0/game/requirements/readProximityRequirementMatch";
-import type { GameBlocker } from "~/v0/game/blockers/GameBlocker";
+import type { GameHindrance } from "~/v0/game/hindrances/GameHindrance";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GamePassiveRequirementScope } from "~/v0/game/requirements/GamePassiveRequirementScope";
 
-const defaultBlockerDurationFactor = 1;
+const defaultHindranceDurationFactor = 1;
 
-const readPassiveBlockerItemQuantity = ({
+const readPassiveHindranceItemQuantity = ({
 	itemId,
 	save,
 	scope,
@@ -32,60 +32,60 @@ const readPassiveBlockerItemQuantity = ({
 	return quantity;
 };
 
-export namespace readGameBlockerDurationMultiplier {
+export namespace readGameHindranceDurationMultiplier {
 	export interface Props {
-		blocker: GameBlocker;
+		hindrance: GameHindrance;
 		save: GameSave;
 		targetItemInstanceId: string;
 	}
 }
 
-export const readGameBlockerDurationMultiplier = ({
-	blocker,
+export const readGameHindranceDurationMultiplier = ({
+	hindrance,
 	save,
 	targetItemInstanceId,
-}: readGameBlockerDurationMultiplier.Props): number | undefined => {
-	if (blocker.type === "passive") {
-		const quantity = readPassiveBlockerItemQuantity({
-			itemId: blocker.itemId,
+}: readGameHindranceDurationMultiplier.Props): number | undefined => {
+	if (hindrance.type === "passive") {
+		const quantity = readPassiveHindranceItemQuantity({
+			itemId: hindrance.itemId,
 			save,
-			scope: blocker.scope,
+			scope: hindrance.scope,
 		});
-		if (quantity < blocker.quantity) return undefined;
+		if (quantity < hindrance.quantity) return undefined;
 
-		return Math.max(1, 1 + (blocker.durationFactor ?? defaultBlockerDurationFactor));
+		return Math.max(1, 1 + (hindrance.durationFactor ?? defaultHindranceDurationFactor));
 	}
 
 	const match = readProximityRequirementMatch({
-		itemIds: blocker.itemIds,
+		itemIds: hindrance.itemIds,
 		save,
 		targetItemInstanceId,
 	});
-	if (!match || match.distance > blocker.distance) return undefined;
+	if (!match || match.distance > hindrance.distance) return undefined;
 
-	const proximityStrength = blocker.distance - match.distance + 1;
+	const proximityStrength = hindrance.distance - match.distance + 1;
 	return Math.max(
 		1,
-		1 + proximityStrength * (blocker.durationFactor ?? defaultBlockerDurationFactor),
+		1 + proximityStrength * (hindrance.durationFactor ?? defaultHindranceDurationFactor),
 	);
 };
 
-export namespace readGameBlockersDurationMultiplier {
+export namespace readGameHindrancesDurationMultiplier {
 	export interface Props {
-		blockers: readonly GameBlocker[];
+		hindrances: readonly GameHindrance[];
 		save: GameSave;
 		targetItemInstanceId: string;
 	}
 }
 
-export const readGameBlockersDurationMultiplier = ({
-	blockers,
+export const readGameHindrancesDurationMultiplier = ({
+	hindrances,
 	save,
 	targetItemInstanceId,
-}: readGameBlockersDurationMultiplier.Props): number => {
-	const multipliers = blockers.flatMap((blocker) => {
-		const multiplier = readGameBlockerDurationMultiplier({
-			blocker,
+}: readGameHindrancesDurationMultiplier.Props): number => {
+	const multipliers = hindrances.flatMap((hindrance) => {
+		const multiplier = readGameHindranceDurationMultiplier({
+			hindrance,
 			save,
 			targetItemInstanceId,
 		});

@@ -70,7 +70,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	config,
 	maxQueueSize,
 	nowMs,
-	producerBlockedBy,
+	producerHinderedBy,
 	producerRequirementIds,
 	productIds,
 	save,
@@ -79,7 +79,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	config: GameConfig;
 	maxQueueSize: number;
 	nowMs: number;
-	producerBlockedBy: NonNullable<GameConfig["producers"][string]["blockedBy"]>;
+	producerHinderedBy: NonNullable<GameConfig["producers"][string]["hinderedBy"]>;
 	producerRequirementIds: GameConfig["producers"][string]["requirementIds"];
 	productIds: readonly string[];
 	save: GameSave;
@@ -107,9 +107,9 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				...product.requirementIds,
 			],
 		});
-		const blockers = [
-			...producerBlockedBy,
-			...(product.blockedBy ?? []),
+		const hindrances = [
+			...producerHinderedBy,
+			...(product.hinderedBy ?? []),
 		];
 		const requirementViews = readRuntimeActivationRequirementViewsFromGameSave({
 			requirements,
@@ -151,7 +151,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 		const durationMs = activeJob
 			? activeJob.completesAtMs - activeJob.startedAtMs
 			: readProducerProductDurationMs({
-					blockers,
+					hindrances,
 					product,
 					producerItemInstanceId: targetItemInstanceId,
 					requirements,
@@ -264,7 +264,7 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 			config,
 			maxQueueSize: producer.maxQueueSize,
 			nowMs,
-			producerBlockedBy: producer.blockedBy ?? [],
+			producerHinderedBy: producer.hinderedBy ?? [],
 			producerRequirementIds: producer.requirementIds,
 			productIds: producer.productIds,
 			save,

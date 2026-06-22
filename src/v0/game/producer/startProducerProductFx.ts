@@ -108,7 +108,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			.map((job) => job.completesAtMs),
 	);
 	const durationMs = readProducerProductDurationMs({
-		blockers: checked.blockers,
+		hindrances: checked.hindrances,
 		product: checked.product,
 		producerItemInstanceId: action.producerItemInstanceId,
 		requirements: checked.requirements,

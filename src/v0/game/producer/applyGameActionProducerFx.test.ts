@@ -363,7 +363,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("slows product duration by the nearest active proximity blocker", () => {
+	it("slows product duration by the nearest active proximity hindrance", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -377,7 +377,7 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					blockedBy: [
+					hinderedBy: [
 						{
 							distance: 2,
 							durationFactor: 0.5,
@@ -429,14 +429,14 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("uses OR semantics for active blockers and keeps only the strongest slowdown", () => {
+	it("uses OR semantics for active hindrances and keeps only the strongest slowdown", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			products: {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					blockedBy: [
+					hinderedBy: [
 						{
 							durationFactor: 1,
 							itemId: "item:rock",

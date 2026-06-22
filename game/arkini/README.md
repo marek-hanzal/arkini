@@ -24,7 +24,7 @@ Everything is movable and storable by default unless a concrete mechanic says ot
 - Board proximity only counts things currently placed on the board.
 - Items in inventory do not satisfy board proximity requirements.
 - Source items like `tree` and `rock` are normal movable/storable items, not permanent terrain.
-- Board-only restrictions are reserved for explicit danger/blocker mechanics, such as future fire, fog, enemies, or other hazards.
+- Board-only restrictions are reserved for explicit danger/hindrance mechanics, such as future fire, fog, enemies, or other hazards.
 
 ### Current compatibility note
 
@@ -177,7 +177,7 @@ loot:slaughterhouse-t1:sausage-leather
 
 Most first-pass production durations stay at `5000` ms. The new food processors are slightly longer on purpose: windmill flour takes `6000` ms, while bakery bread and slaughterhouse sausage/leather take `8000` ms. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
-Farm grain and pig-farm piglet production have product-level pollution blockers: nearby `item:pollution` within proximity `2` slows those product lines. Brewery now has a producer-level pollution blocker with proximity `2`, and winery has a producer-level pollution blocker with proximity `3`, so every production line on those buildings reacts to nearby pollution. Tiny ecological disaster, very charming.
+Farm grain and pig-farm piglet production have product-level pollution hindrances: nearby `item:pollution` within proximity `2` slows those product lines. Brewery now has a producer-level pollution hindrance with proximity `2`, and winery has a producer-level pollution hindrance with proximity `3`, so every production line on those buildings reacts to nearby pollution. Tiny ecological disaster, very charming.
 
 Current processor input buffers use capacity `4`:
 

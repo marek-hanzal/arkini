@@ -24,7 +24,7 @@ type TestGameRequirement =
 			type: "proximity";
 	  };
 
-type TestGameBlocker =
+type TestGameHindrance =
 	| {
 			durationFactor?: number;
 			itemId: string;
@@ -47,7 +47,7 @@ type TestProductInput = {
 };
 
 type TestProduct = {
-	blockedBy?: TestGameBlocker[];
+	hinderedBy?: TestGameHindrance[];
 	durationMs: number;
 	inputRefId?: string;
 	name: string;
@@ -139,7 +139,7 @@ const createValidConfigValue = () => ({
 	requirements: {} as Record<string, TestGameRequirement>,
 	producers: {
 		"producer:test": {
-			blockedBy: [] as TestGameBlocker[],
+			hinderedBy: [] as TestGameHindrance[],
 			maxQueueSize: 1,
 			productIds: [
 				"product:test",
@@ -178,7 +178,7 @@ const createValidConfigValue = () => ({
 	},
 	products: {
 		"product:test": {
-			blockedBy: [] as TestGameBlocker[],
+			hinderedBy: [] as TestGameHindrance[],
 			durationMs: 1000,
 			inputRefId: "input:test",
 			name: "Test product",
@@ -456,9 +456,9 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/durationFactor/);
 	});
 
-	it("rejects negative blocker duration factors", () => {
+	it("rejects negative hindrance duration factors", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].blockedBy = [
+		config.products["product:test"].hinderedBy = [
 			{
 				distance: 1,
 				durationFactor: -1,
@@ -472,9 +472,9 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/durationFactor/);
 	});
 
-	it("rejects blockers that point at missing items", () => {
+	it("rejects hindrances that point at missing items", () => {
 		const config = createValidConfigValue();
-		config.producers["producer:test"].blockedBy = [
+		config.producers["producer:test"].hinderedBy = [
 			{
 				itemId: "item:ghost",
 				quantity: 1,

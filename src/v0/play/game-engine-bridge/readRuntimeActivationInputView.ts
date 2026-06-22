@@ -10,11 +10,13 @@ export namespace readRuntimeActivationInputView {
 			quantity: number;
 		};
 		stored: number;
+		available?: number;
 	}
 }
 
 export const readRuntimeActivationInputView = ({
 	input,
+	available,
 	stored,
 }: readRuntimeActivationInputView.Props): ActivationInputView => ({
 	capacity: input.capacity,
@@ -22,4 +24,5 @@ export const readRuntimeActivationInputView = ({
 	itemId: input.itemId as ItemId,
 	quantity: input.quantity,
 	stored,
+	available,
 });

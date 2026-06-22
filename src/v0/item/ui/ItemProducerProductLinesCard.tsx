@@ -46,6 +46,12 @@ const readRequirementReady = (requirement: ActivationRequirementView) =>
 		? requirement.satisfied
 		: requirement.stored >= requirement.quantity;
 
+const readInputFillableQuantity = (input: ProducerProductLineView["inputs"][number]) =>
+	Math.min(Math.max(0, input.quantity - input.stored), input.available ?? 0);
+
+const readInputsPartiallyAvailable = (line: ProducerProductLineView) =>
+	!line.inputsReady && line.inputs.some((input) => readInputFillableQuantity(input) > 0);
+
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
 	lines,
 	nowMs,
@@ -68,9 +74,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						line: baseLine,
 						nowMs,
 					});
-					const canStart =
+					const inputsPartiallyAvailable = readInputsPartiallyAvailable(line);
+					const canRunAction =
 						line.enabled &&
-						(line.inputsReady || line.inputsAvailable) &&
+						(line.inputsReady || line.inputsAvailable || inputsPartiallyAvailable) &&
 						line.requirementsReady &&
 						!line.queueFull;
 					const remainingMs = line.readyAtMs
@@ -106,7 +113,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 														? "input ready"
 														: line.inputsAvailable
 															? "auto-fill ready"
-															: "needs input"
+															: inputsPartiallyAvailable
+																? "partial fill ready"
+																: "needs input"
 												}`
 											: " · tap to run"}
 										{line.requirementItemIds.length
@@ -115,15 +124,13 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									</p>
 								</div>
 								<div className="flex shrink-0 items-center gap-2">
-									{line.isDefault ? null : (
-										<UiButton
-											fullWidth={false}
-											disabled={pending}
-											onClick={() => onSetDefault(line.productId)}
-										>
-											Make default
-										</UiButton>
-									)}
+									<UiButton
+										fullWidth={false}
+										disabled={pending}
+										onClick={() => onSetDefault(line.productId)}
+									>
+										{line.isDefault ? "Unset default" : "Make default"}
+									</UiButton>
 									<UiButton
 										fullWidth={false}
 										disabled={pending}
@@ -134,23 +141,27 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								</div>
 							</div>
 
-							{line.requirements?.length ? (
+							{line.requirements?.some(
+								(requirement) => !readRequirementReady(requirement),
+							) ? (
 								<div className="mt-2.5 grid gap-1.5">
-									{line.requirements.map((requirement, requirementIndex) => (
-										<div
-											key={`${requirementIndex}:${readRequirementLabel(requirement)}`}
-											className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
-										>
-											<span className="min-w-0 truncate font-semibold text-ak-text">
-												{readRequirementLabel(requirement)}
-											</span>
-											<span className="ml-auto shrink-0 text-ak-text-muted">
-												{readRequirementReady(requirement)
-													? "ready"
-													: "missing"}
-											</span>
-										</div>
-									))}
+									{line.requirements
+										.filter((requirement) => !readRequirementReady(requirement))
+										.map((requirement, requirementIndex) => (
+											<div
+												key={`${requirementIndex}:${readRequirementLabel(requirement)}`}
+												className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
+											>
+												<span className="min-w-0 truncate font-semibold text-ak-text">
+													{readRequirementLabel(requirement)}
+												</span>
+												<span className="ml-auto shrink-0 text-ak-text-muted">
+													{readRequirementReady(requirement)
+														? "ready"
+														: "missing"}
+												</span>
+											</div>
+										))}
 								</div>
 							) : null}
 
@@ -166,6 +177,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											</span>
 											<span className="text-ak-text-muted ml-auto shrink-0 tabular-nums">
 												{input.stored}/{input.quantity}
+												{readInputFillableQuantity(input) > 0
+													? ` · +${readInputFillableQuantity(input)} available`
+													: ""}
 												{input.capacity > input.quantity
 													? ` · cap ${input.capacity}`
 													: ""}
@@ -217,8 +231,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 							) : null}
 
 							<UiButton
-								disabled={!canStart || pending}
-								tone={canStart ? "primary" : "secondary"}
+								disabled={!canRunAction || pending}
+								tone={canRunAction ? "primary" : "secondary"}
 								className="mt-2.5"
 								onClick={() => onStart(line.productId)}
 							>
@@ -230,7 +244,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											? "Start"
 											: line.inputsAvailable
 												? "Auto-fill & start"
-												: "Feed items by drag"}
+												: inputsPartiallyAvailable
+													? "Partial fill"
+													: "Feed items by drag"}
 							</UiButton>
 						</div>
 					);

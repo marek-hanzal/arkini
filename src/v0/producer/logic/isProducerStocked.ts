@@ -13,7 +13,7 @@ export function isProducerStocked(activation: ActivationView | undefined) {
 		const defaultLine = activation.productLines?.find((line) => line.isDefault);
 		return Boolean(
 			defaultLine?.enabled &&
-				defaultLine.inputsReady &&
+				(defaultLine.inputsReady || defaultLine.inputsAvailable) &&
 				defaultLine.requirementsReady &&
 				!defaultLine.queueFull,
 		);

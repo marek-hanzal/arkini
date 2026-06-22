@@ -173,6 +173,11 @@ const readRuntimeProductLineViewsFromGameSave = ({
 			productId,
 		}).map((input) =>
 			readRuntimeActivationInputView({
+				available: readRuntimeProductInputAvailableQuantityFromGameSave({
+					itemId: input.itemId,
+					save,
+					targetItemInstanceId,
+				}),
 				input,
 				stored: readRuntimeStoredProductInputQuantityFromGameSave({
 					itemId: input.itemId,

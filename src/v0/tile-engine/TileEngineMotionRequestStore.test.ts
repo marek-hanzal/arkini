@@ -50,7 +50,7 @@ describe("TileEngineMotionRequestStore", () => {
 		expect(readTileEngineMotionRequests("board").get("tile:one")?.enter).toBeUndefined();
 	});
 
-	it("coalesces feedback requests on the same tile into repeated pulses", () => {
+	it("keeps a single feedback request on a tile for a batched visual update", () => {
 		vi.useFakeTimers();
 
 		registerTileEngineMotionRequests({
@@ -62,7 +62,7 @@ describe("TileEngineMotionRequestStore", () => {
 						groupId: "feedback:one",
 						kind: "bounce" as const,
 					},
-					tileId: "stash",
+					tileId: "producer",
 				},
 				{
 					cleanupDelayMs: 10,
@@ -70,15 +70,18 @@ describe("TileEngineMotionRequestStore", () => {
 						groupId: "feedback:two",
 						kind: "bounce" as const,
 					},
-					tileId: "stash",
+					tileId: "producer",
 				},
 			],
 		});
 
-		expect(readTileEngineMotionRequests("board").get("stash")?.feedback).toMatchObject({
+		expect(readTileEngineMotionRequests("board").get("producer")?.feedback).toMatchObject({
 			groupId: "feedback:two",
-			pulseCount: 2,
+			kind: "bounce",
 		});
+		expect(
+			readTileEngineMotionRequests("board").get("producer")?.feedback?.pulseCount,
+		).toBeUndefined();
 	});
 
 	it("settles feedback requests independently from enter requests", () => {

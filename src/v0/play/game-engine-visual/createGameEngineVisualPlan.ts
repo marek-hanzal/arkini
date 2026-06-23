@@ -4,14 +4,14 @@ import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { appendItemCreatedVisuals } from "~/v0/play/game-engine-visual/appendItemCreatedVisuals";
 import { appendItemMergeVisuals } from "~/v0/play/game-engine-visual/appendItemMergeVisuals";
 import { appendItemReplaceVisuals } from "~/v0/play/game-engine-visual/appendItemReplaceVisuals";
-import { appendProducerInputStoreVisuals } from "~/v0/play/game-engine-visual/appendProducerInputStoreVisuals";
-import { appendProducerInputStoredFeedback } from "~/v0/play/game-engine-visual/appendProducerInputStoredFeedback";
+import { appendActivationInputStoreVisuals } from "~/v0/play/game-engine-visual/appendActivationInputStoreVisuals";
+import { appendActivationInputTargetFeedback } from "~/v0/play/game-engine-visual/appendActivationInputTargetFeedback";
 import { appendProducerProductCompletedFeedback } from "~/v0/play/game-engine-visual/appendProducerProductCompletedFeedback";
 import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngineVisualPlan";
 import { createGameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { findMergeResultEventIndex } from "~/v0/play/game-engine-visual/findMergeResultEventIndex";
-import { findProducerInputStoredEventIndex } from "~/v0/play/game-engine-visual/findProducerInputStoredEventIndex";
-import { shouldAnimateProducerInputStoreVisual } from "~/v0/play/game-engine-visual/shouldAnimateProducerInputStoreVisual";
+import { findActivationInputTargetEventIndex } from "~/v0/play/game-engine-visual/findActivationInputTargetEventIndex";
+import { shouldAnimateActivationInputStoreVisual } from "~/v0/play/game-engine-visual/shouldAnimateActivationInputStoreVisual";
 
 export namespace createGameEngineVisualPlan {
 	export interface Props {
@@ -70,36 +70,37 @@ export const createGameEngineVisualPlan = ({
 
 				if (
 					event.reason === "producer-input-auto-fill" ||
-					event.reason === "craft-input-auto-fill"
+					event.reason === "craft-input-auto-fill" ||
+					event.reason === "stash-input-auto-fill"
 				) {
-					const storedIndex = findProducerInputStoredEventIndex({
+					const targetIndex = findActivationInputTargetEventIndex({
 						afterIndex: index,
 						events,
 						skipped,
 						source: event,
 					});
-					const stored = events[storedIndex];
+					const target = events[targetIndex];
 					if (
-						stored?.type === "producer_input.stored" ||
-						stored?.type === "craft_input.stored"
+						target?.type === "producer_input.stored" ||
+						target?.type === "craft_input.stored" ||
+						target?.type === "stash.opened"
 					) {
-						skipped.add(storedIndex);
-						appendProducerInputStoredFeedback({
+						if (target.type !== "stash.opened") skipped.add(targetIndex);
+						appendActivationInputTargetFeedback({
 							plan,
-							stored,
+							target,
 						});
 
 						if (
-							shouldAnimateProducerInputStoreVisual({
-								events,
-								stored,
+							shouldAnimateActivationInputStoreVisual({
+								target,
 							})
 						) {
-							appendProducerInputStoreVisuals({
+							appendActivationInputStoreVisuals({
 								plan,
 								previousBoard,
 								source: event,
-								stored,
+								target,
 							});
 						}
 
@@ -122,9 +123,9 @@ export const createGameEngineVisualPlan = ({
 
 			case "producer_input.stored":
 			case "craft_input.stored":
-				appendProducerInputStoredFeedback({
+				appendActivationInputTargetFeedback({
 					plan,
-					stored: event,
+					target: event,
 				});
 				break;
 

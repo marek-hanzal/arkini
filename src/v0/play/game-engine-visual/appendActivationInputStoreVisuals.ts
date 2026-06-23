@@ -13,43 +13,50 @@ type ConsumedEvent = Extract<
 		type: "item.consumed";
 	}
 >;
-type StoredEvent = Extract<
+type TargetEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored" | "craft_input.stored";
+		type: "producer_input.stored" | "craft_input.stored" | "stash.opened";
 	}
 >;
 
-export namespace appendProducerInputStoreVisuals {
+export namespace appendActivationInputStoreVisuals {
 	export interface Props {
 		plan: GameEngineVisualPlanDraft;
 		previousBoard: BoardView | undefined;
 		source: ConsumedEvent;
-		stored: StoredEvent;
+		target: TargetEvent;
 	}
 }
 
-const readTargetItemInstanceId = (stored: StoredEvent) =>
-	stored.type === "producer_input.stored"
-		? stored.producerItemInstanceId
-		: stored.targetItemInstanceId;
+const readTargetItemInstanceId = (target: TargetEvent) => {
+	if (target.type === "producer_input.stored") return target.producerItemInstanceId;
+	if (target.type === "craft_input.stored") return target.targetItemInstanceId;
+	return target.stashItemInstanceId;
+};
 
-export const appendProducerInputStoreVisuals = ({
+const readTargetCause = (target: TargetEvent): GameVisualMotion["cause"] => {
+	if (target.type === "producer_input.stored") return "producer";
+	if (target.type === "craft_input.stored") return "craft";
+	return "stash";
+};
+
+export const appendActivationInputStoreVisuals = ({
 	plan,
 	previousBoard,
 	source,
-	stored,
-}: appendProducerInputStoreVisuals.Props) => {
+	target,
+}: appendActivationInputStoreVisuals.Props) => {
 	if (source.from.kind !== "board") return;
 
 	const previousSource = previousBoard?.byId[source.from.itemInstanceId];
-	const targetItemInstanceId = readTargetItemInstanceId(stored);
-	const target = previousBoard?.byId[targetItemInstanceId];
-	if (!previousSource || !target) return;
+	const targetItemInstanceId = readTargetItemInstanceId(target);
+	const targetBoardItem = previousBoard?.byId[targetItemInstanceId];
+	if (!previousSource || !targetBoardItem) return;
 
 	const motion = GameVisualMotion.merge({
-		cause: stored.type === "producer_input.stored" ? "producer" : "craft",
-		groupId: `engine:input-store:${source.from.itemInstanceId}:${targetItemInstanceId}:${stored.itemId}`,
+		cause: readTargetCause(target),
+		groupId: `engine:input-store:${source.from.itemInstanceId}:${targetItemInstanceId}:${source.itemId}`,
 	});
 	const cleanupDelayMs = gameVisualMotionSettlementDelayMs(motion);
 	const tile: BoardTransientTile = {

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { emptyInventoryStateJson } from "~/v0/inventory/logic/emptyInventoryStateJson";
 import { resolveInventorySlotTapAction } from "~/v0/inventory/logic/resolveInventorySlotTapAction";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 
@@ -14,7 +13,7 @@ const stack = (): NonNullable<InventorySlot["stack"]> => ({
 	quantity: 1,
 	state: {},
 	stateful: false,
-	stateJson: emptyInventoryStateJson,
+	stateJson: "{}",
 });
 
 describe("resolveInventorySlotTapAction", () => {

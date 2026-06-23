@@ -1,8 +1,8 @@
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import { readProximityRequirementDurationMultiplier } from "~/v0/game/requirements/readProximityRequirementsDurationMultiplier";
+import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGameSaveItemQuantityByScope";
 import { readProximityRequirementMatch } from "~/v0/game/requirements/readProximityRequirementMatch";
 
 export type RuntimeActivationRequirement =
@@ -48,32 +48,6 @@ export namespace readRuntimeActivationRequirementViewsFromGameSave {
 	}
 }
 
-const readRuntimePassiveItemQuantityFromGameSave = ({
-	itemId,
-	save,
-	scope,
-}: {
-	itemId: string;
-	save: GameSave;
-	scope: "board" | "inventory" | "board_or_inventory";
-}) => {
-	let quantity = 0;
-
-	if (scope === "board" || scope === "board_or_inventory") {
-		quantity += Object.values(save.board.items).filter((item) => item.itemId === itemId).length;
-	}
-
-	if (scope === "inventory" || scope === "board_or_inventory") {
-		quantity += save.inventory.slots.reduce(
-			(total, slot) =>
-				total + (slot?.itemId === itemId ? readGameSaveInventorySlotQuantity(slot) : 0),
-			0,
-		);
-	}
-
-	return quantity;
-};
-
 const readRuntimeStoredRequirementViewFromGameSave = ({
 	requirement,
 	save,
@@ -114,7 +88,7 @@ const readRuntimePassiveRequirementViewFromGameSave = ({
 	capacity: requirement.quantity,
 	itemId: requirement.itemId as ItemId,
 	quantity: requirement.quantity,
-	stored: readRuntimePassiveItemQuantityFromGameSave({
+	stored: readGameSaveItemQuantityByScope({
 		itemId: requirement.itemId,
 		save,
 		scope: requirement.scope,
@@ -222,7 +196,7 @@ export const readRuntimeMissingRequirementItemIdsFromGameSave = ({
 				return [];
 			}
 
-			return readRuntimePassiveItemQuantityFromGameSave({
+			return readGameSaveItemQuantityByScope({
 				itemId: requirement.itemId as ItemId,
 				save,
 				scope: requirement.scope,

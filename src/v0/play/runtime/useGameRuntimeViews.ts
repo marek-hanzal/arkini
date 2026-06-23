@@ -50,9 +50,7 @@ const sameInventorySlot = (left: InventorySlot, right: InventorySlot) => {
 		left.slotIndex === right.slotIndex &&
 		leftStack?.id === rightStack?.id &&
 		leftStack?.itemId === rightStack?.itemId &&
-		leftStack?.quantity === rightStack?.quantity &&
-		leftStack?.stateJson === rightStack?.stateJson &&
-		leftStack?.stateful === rightStack?.stateful
+		leftStack?.quantity === rightStack?.quantity
 	);
 };
 

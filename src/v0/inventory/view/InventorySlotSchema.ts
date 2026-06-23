@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { BoardItemStateSchema } from "~/v0/board/view/BoardItemStateSchema";
 import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 
 export const InventorySlotSchema = z.object({
@@ -9,9 +8,6 @@ export const InventorySlotSchema = z.object({
 			id: z.string().min(1),
 			itemId: GameItemIdSchema,
 			quantity: z.number().int().positive(),
-			state: BoardItemStateSchema,
-			stateJson: z.string(),
-			stateful: z.boolean(),
 		})
 		.optional(),
 });

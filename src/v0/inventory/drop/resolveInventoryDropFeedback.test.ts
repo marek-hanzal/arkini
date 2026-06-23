@@ -16,9 +16,6 @@ const source = {
 			id: "stack:source",
 			itemId: "item:twig",
 			quantity: 1,
-			state: {},
-			stateJson: "{}",
-			stateful: false,
 		},
 	},
 } satisfies DragSource;

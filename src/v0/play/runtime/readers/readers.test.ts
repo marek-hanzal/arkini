@@ -69,7 +69,6 @@ describe("runtime readers", () => {
 				id: "runtime:inventory:1:item:twig",
 				itemId: "item:twig",
 				quantity: 2,
-				stateful: false,
 			},
 		});
 	});

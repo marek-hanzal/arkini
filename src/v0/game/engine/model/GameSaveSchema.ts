@@ -8,7 +8,7 @@ const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
 
-export const GameSaveBoardItemSchema = z
+const GameSaveBoardItemSchema = z
 	.object({
 		id: IdSchema,
 		itemId: IdSchema,
@@ -17,14 +17,14 @@ export const GameSaveBoardItemSchema = z
 	})
 	.strict();
 
-export const GameSaveInventoryStackSchema = z
+const GameSaveInventoryStackSchema = z
 	.object({
 		itemId: IdSchema,
 		quantity: PositiveIntegerSchema,
 	})
 	.strict();
 
-export const GameSaveInventoryInstanceSchema = z
+const GameSaveInventoryInstanceSchema = z
 	.object({
 		id: IdSchema,
 		itemId: IdSchema,
@@ -32,20 +32,20 @@ export const GameSaveInventoryInstanceSchema = z
 	})
 	.strict();
 
-export const GameSaveInventorySlotSchema = z.union([
+const GameSaveInventorySlotSchema = z.union([
 	GameSaveInventoryStackSchema,
 	GameSaveInventoryInstanceSchema,
 	z.null(),
 ]);
 
-export const GameSaveProducerDeliveryItemSchema = z
+const GameSaveProducerDeliveryItemSchema = z
 	.object({
 		itemId: IdSchema,
 		quantity: PositiveIntegerSchema,
 	})
 	.strict();
 
-export const GameSaveProducerDeliverySchema = z
+const GameSaveProducerDeliverySchema = z
 	.object({
 		items: z.array(GameSaveProducerDeliveryItemSchema).min(1),
 		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
@@ -53,7 +53,7 @@ export const GameSaveProducerDeliverySchema = z
 	})
 	.strict();
 
-export const GameSaveProducerJobSchema = z
+const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
 		delivery: GameSaveProducerDeliverySchema.optional(),
@@ -75,7 +75,7 @@ export const GameSaveProducerJobSchema = z
 		],
 	});
 
-export const GameSaveCraftJobSchema = z
+const GameSaveCraftJobSchema = z
 	.object({
 		id: IdSchema,
 		recipeId: IdSchema,
@@ -91,49 +91,49 @@ export const GameSaveCraftJobSchema = z
 		],
 	});
 
-export const GameSaveStashStateSchema = z
+const GameSaveStashStateSchema = z
 	.object({
 		remainingCharges: NonNegativeIntegerSchema,
 	})
 	.strict();
 
-export const GameSaveStashInputStateSchema = z
+const GameSaveStashInputStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
 	})
 	.strict();
 
-export const GameSaveProducerLineStateSchema = z
+const GameSaveProducerLineStateSchema = z
 	.object({
 		defaultProductId: IdSchema.optional(),
 	})
 	.strict();
 
-export const GameSaveProducerProductInputStateSchema = z
+const GameSaveProducerProductInputStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
 	})
 	.strict();
 
-export const GameSaveProducerInputStateSchema = z
+const GameSaveProducerInputStateSchema = z
 	.object({
 		productInputs: z.record(IdSchema, GameSaveProducerProductInputStateSchema),
 	})
 	.strict();
 
-export const GameSaveCraftInputStateSchema = z
+const GameSaveCraftInputStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
 	})
 	.strict();
 
-export const GameSaveStoredRequirementStateSchema = z
+const GameSaveStoredRequirementStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
 	})
 	.strict();
 
-export const GameSaveItemSpawnJobBaseSchema = z
+const GameSaveItemSpawnJobBaseSchema = z
 	.object({
 		id: IdSchema,
 		dueAtMs: NonNegativeIntegerSchema,
@@ -153,7 +153,7 @@ export const GameSaveItemSpawnJobBaseSchema = z
 		},
 	);
 
-export const GameSaveItemSpawnJobSchema = GameSaveItemSpawnJobBaseSchema.extend({
+const GameSaveItemSpawnJobSchema = GameSaveItemSpawnJobBaseSchema.extend({
 	itemId: IdSchema,
 	originItemInstanceId: IdSchema.optional(),
 	quantity: PositiveIntegerSchema,
@@ -174,7 +174,7 @@ export const GameSaveItemSpawnJobSchema = GameSaveItemSpawnJobBaseSchema.extend(
 		],
 	});
 
-export const GameSaveSchema = z
+const GameSaveSchema = z
 	.object({
 		version: z.literal(1),
 		gameId: IdSchema,
@@ -1241,18 +1241,7 @@ export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema
 export type GameSaveInventoryInstance = z.infer<typeof GameSaveInventoryInstanceSchema>;
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveProducerDeliveryItem = z.infer<typeof GameSaveProducerDeliveryItemSchema>;
-export type GameSaveProducerDelivery = z.infer<typeof GameSaveProducerDeliverySchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
-export type GameSaveProducerLineState = z.infer<typeof GameSaveProducerLineStateSchema>;
-export type GameSaveProducerProductInputState = z.infer<
-	typeof GameSaveProducerProductInputStateSchema
->;
-export type GameSaveProducerInputState = z.infer<typeof GameSaveProducerInputStateSchema>;
-export type GameSaveCraftInputState = z.infer<typeof GameSaveCraftInputStateSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
-export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
-export type GameSaveStashInputState = z.infer<typeof GameSaveStashInputStateSchema>;
-export type GameSaveStoredRequirementState = z.infer<typeof GameSaveStoredRequirementStateSchema>;
 export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;
 export type GameSave = z.infer<typeof GameSaveSchema>;
-export type GameSaveConfig = z.infer<typeof GameSaveConfigSchema>;

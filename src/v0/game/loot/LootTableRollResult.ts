@@ -1,4 +1,4 @@
-export interface LootTableItemRoll {
+interface LootTableItemRoll {
 	itemId: string;
 	quantity: number;
 }

@@ -3,7 +3,7 @@ import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 
 const PositiveIntegerSchema = z.number().int().positive();
 
-export const GameActionDebugItemSpawnLocationSchema = z.enum([
+const GameActionDebugItemSpawnLocationSchema = z.enum([
 	"board",
 	"inventory",
 ]);

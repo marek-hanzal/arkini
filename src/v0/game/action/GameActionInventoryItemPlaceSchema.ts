@@ -3,7 +3,7 @@ import { z } from "zod";
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
 
-export const GameActionInventoryItemPlacePlacementModeSchema = z.enum([
+const GameActionInventoryItemPlacePlacementModeSchema = z.enum([
 	"exact",
 	"nearest_by_manhattan",
 ]);

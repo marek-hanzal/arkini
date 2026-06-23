@@ -16,7 +16,7 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"debug",
 ]);
 
-export const GameItemConsumedReasonSchema = z.enum([
+const GameItemConsumedReasonSchema = z.enum([
 	"product-input",
 	"producer-input-store",
 	"producer-input-auto-fill",
@@ -33,14 +33,14 @@ export const GameItemConsumedReasonSchema = z.enum([
 	"merge-source",
 ]);
 
-export const GameBoardItemChangeReasonSchema = z.enum([
+const GameBoardItemChangeReasonSchema = z.enum([
 	"stash-depleted",
 	"tile-remove",
 	"merge-result",
 	"craft-result",
 ]);
 
-export const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
+const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
 	z
 		.object({
 			kind: z.literal("board"),
@@ -60,7 +60,7 @@ export const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
 		.strict(),
 ]);
 
-export const GameEventSchema = z.discriminatedUnion("type", [
+const GameEventSchema = z.discriminatedUnion("type", [
 	z
 		.object({
 			type: z.literal("item.created"),
@@ -282,5 +282,4 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 ]);
 
-export type GameEventPlacementTarget = z.infer<typeof GameEventPlacementTargetSchema>;
 export type GameEvent = z.infer<typeof GameEventSchema>;

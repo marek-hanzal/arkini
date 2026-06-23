@@ -11,7 +11,7 @@ const readHindranceDurationFactor = (hindrance: GameHindrance) =>
 const multiply = (values: readonly number[]) =>
 	values.reduce((total, value) => total * Math.max(1, value), 1);
 
-export namespace readGameHindranceDurationMultipliers {
+namespace readGameHindranceDurationMultipliers {
 	export interface Props {
 		hindrance: GameHindrance;
 		save: GameSave;
@@ -19,7 +19,7 @@ export namespace readGameHindranceDurationMultipliers {
 	}
 }
 
-export const readGameHindranceDurationMultipliers = ({
+const readGameHindranceDurationMultipliers = ({
 	hindrance,
 	save,
 	targetItemInstanceId,

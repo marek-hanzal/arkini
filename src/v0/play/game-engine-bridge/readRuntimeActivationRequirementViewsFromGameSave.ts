@@ -25,7 +25,7 @@ export type RuntimeActivationRequirement =
 			type: "proximity";
 	  };
 
-export namespace readRuntimeStoredRequirementQuantityFromGameSave {
+namespace readRuntimeStoredRequirementQuantityFromGameSave {
 	export interface Props {
 		itemId: string;
 		save: GameSave;
@@ -33,7 +33,7 @@ export namespace readRuntimeStoredRequirementQuantityFromGameSave {
 	}
 }
 
-export const readRuntimeStoredRequirementQuantityFromGameSave = ({
+const readRuntimeStoredRequirementQuantityFromGameSave = ({
 	itemId,
 	save,
 	targetItemInstanceId,

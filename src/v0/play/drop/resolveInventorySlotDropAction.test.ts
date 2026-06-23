@@ -1,13 +1,24 @@
 import { describe, expect, it } from "vitest";
+import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import { resolveInventorySlotDropAction } from "~/v0/play/drop/resolveInventorySlotDropAction";
+
+const slot = (slotIndex: number) =>
+	({
+		slotIndex,
+		stack: {
+			id: `stack-${slotIndex}`,
+			itemId: "item:twig",
+			quantity: 1,
+		},
+	}) satisfies InventorySlot;
 
 const source = (slotIndex: number) =>
 	({
 		kind: "inventory",
-		slotIndex,
 		itemId: "item:twig",
-		slot: {} as never,
+		slot: slot(slotIndex),
+		slotIndex,
 	}) satisfies DragSource;
 
 describe("resolveInventorySlotDropAction", () => {

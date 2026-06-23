@@ -195,7 +195,8 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:goldsmith-t1:coins"
+				"product:goldsmith-t1:coins",
+				"product:goldsmith-t1:blueprint-heroes-guild-t1"
 			],
 			"requirementIds": []
 		},
@@ -251,6 +252,17 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:townhall-t4:blueprint-goldsmith-t1"
+			],
+			"requirementIds": []
+		},
+		"producer:heroes-guild-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:heroes-guild-t1:hero-chest-t1",
+				"product:heroes-guild-t1:hero-chest-t2",
+				"product:heroes-guild-t1:hero-chest-t3",
+				"product:heroes-guild-t1:hero-chest-t4"
 			],
 			"requirementIds": []
 		}

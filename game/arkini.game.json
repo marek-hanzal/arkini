@@ -66,6 +66,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-heroes-guild-t1": {
+			"kind": "item",
+			"label": "Heroes Guild I Blueprint",
+			"overlayAssetId": "asset:producer:heroes-guild-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-iron-mine-t1": {
 			"kind": "item",
 			"label": "Iron Mine I Blueprint",
@@ -262,30 +269,6 @@
 			"render": "plain",
 			"resourceId": "item-crate-sturdy"
 		},
-		"asset:item:hero-chest-t1": {
-			"kind": "item",
-			"label": "Hero Chest I",
-			"render": "plain",
-			"resourceId": "item-hero-chest-t1"
-		},
-		"asset:item:hero-chest-t2": {
-			"kind": "item",
-			"label": "Hero Chest II",
-			"render": "plain",
-			"resourceId": "item-hero-chest-t2"
-		},
-		"asset:item:hero-chest-t3": {
-			"kind": "item",
-			"label": "Hero Chest III",
-			"render": "plain",
-			"resourceId": "item-hero-chest-t3"
-		},
-		"asset:item:hero-chest-t4": {
-			"kind": "item",
-			"label": "Hero Chest IV",
-			"render": "plain",
-			"resourceId": "item-hero-chest-t4"
-		},
 		"asset:item:crystal": {
 			"kind": "item",
 			"label": "Crystal",
@@ -333,6 +316,54 @@
 			"label": "Grapes",
 			"render": "plain",
 			"resourceId": "item-grapes"
+		},
+		"asset:item:hero-chest-t1": {
+			"kind": "item",
+			"label": "Hero Chest I",
+			"render": "plain",
+			"resourceId": "item-hero-chest-t1"
+		},
+		"asset:item:hero-chest-t2": {
+			"kind": "item",
+			"label": "Hero Chest II",
+			"render": "plain",
+			"resourceId": "item-hero-chest-t2"
+		},
+		"asset:item:hero-chest-t3": {
+			"kind": "item",
+			"label": "Hero Chest III",
+			"render": "plain",
+			"resourceId": "item-hero-chest-t3"
+		},
+		"asset:item:hero-chest-t4": {
+			"kind": "item",
+			"label": "Hero Chest IV",
+			"render": "plain",
+			"resourceId": "item-hero-chest-t4"
+		},
+		"asset:item:hero-key-t1": {
+			"kind": "item",
+			"label": "Hero Key I",
+			"render": "plain",
+			"resourceId": "item-coin"
+		},
+		"asset:item:hero-key-t2": {
+			"kind": "item",
+			"label": "Hero Key II",
+			"render": "plain",
+			"resourceId": "item-coin-pair"
+		},
+		"asset:item:hero-key-t3": {
+			"kind": "item",
+			"label": "Hero Key III",
+			"render": "plain",
+			"resourceId": "item-coin-stack"
+		},
+		"asset:item:hero-key-t4": {
+			"kind": "item",
+			"label": "Hero Key IV",
+			"render": "plain",
+			"resourceId": "item-coin-chest"
 		},
 		"asset:item:hop-field": {
 			"kind": "item",
@@ -555,6 +586,12 @@
 			"label": "Goldsmith I",
 			"render": "plain",
 			"resourceId": "producer-goldsmith-t1"
+		},
+		"asset:producer:heroes-guild-t1": {
+			"kind": "item",
+			"label": "Heroes Guild I",
+			"render": "plain",
+			"resourceId": "producer-heroes-guild-t1"
 		},
 		"asset:producer:iron-mine-t1": {
 			"kind": "item",
@@ -806,6 +843,40 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:goldsmith-t1"
+		},
+		"craft:heroes-guild-t1": {
+			"durationMs": 20000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:goldsmith-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:heroes-guild-t1"
 		},
 		"craft:iron-mine-t1": {
 			"durationMs": 9000,
@@ -1419,6 +1490,17 @@
 			],
 			"name": "Gold mine bread and wine input"
 		},
+		"input:goldsmith-t1:blueprint-heroes-guild-t1": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Heroes Guild I input"
+		},
 		"input:goldsmith-t1:gold-wine-bread-coal": {
 			"inputs": [
 				{
@@ -1447,6 +1529,116 @@
 				}
 			],
 			"name": "Goldsmith gold, wine, bread, and coal input"
+		},
+		"input:heroes-guild-t1:hero-chest-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				}
+			],
+			"name": "Heroes Guild short expedition payment"
+		},
+		"input:heroes-guild-t1:hero-chest-t2": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				}
+			],
+			"name": "Heroes Guild sturdy expedition payment"
+		},
+		"input:heroes-guild-t1:hero-chest-t3": {
+			"inputs": [
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				}
+			],
+			"name": "Heroes Guild rare expedition payment"
+		},
+		"input:heroes-guild-t1:hero-chest-t4": {
+			"inputs": [
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-barrel",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 2
+				}
+			],
+			"name": "Heroes Guild epic expedition payment"
 		},
 		"input:iron-mine-t1:sausage-beer": {
 			"inputs": [
@@ -2161,6 +2353,23 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-heroes-guild-t1": {
+			"assetId": "asset:item:blueprint-heroes-guild-t1",
+			"code": "blueprint-heroes-guild-t1",
+			"craftRecipeId": "craft:heroes-guild-t1",
+			"description": "Build plan that can be filled with late-era resources to construct Heroes Guild I.",
+			"maxStackSize": 10,
+			"name": "Heroes Guild I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"hero",
+				"guild"
+			],
+			"tier": 0
+		},
 		"item:blueprint-iron-mine-t1": {
 			"assetId": "asset:item:blueprint-iron-mine-t1",
 			"code": "blueprint-iron-mine-t1",
@@ -2546,6 +2755,126 @@
 			],
 			"tier": 0
 		},
+		"item:hero-chest-t1": {
+			"assetId": "asset:item:hero-chest-t1",
+			"code": "hero-chest-t1",
+			"description": "Locked chest returned from a short heroes guild expedition. Open it with a Hero Key I.",
+			"maxStackSize": 1,
+			"name": "Hero Chest I",
+			"stashId": "stash:hero-chest-t1",
+			"storage": "both",
+			"tags": [
+				"chest",
+				"hero",
+				"locked",
+				"stash"
+			],
+			"tier": 1
+		},
+		"item:hero-chest-t2": {
+			"assetId": "asset:item:hero-chest-t2",
+			"code": "hero-chest-t2",
+			"description": "Locked chest returned from a tougher heroes guild expedition. Open it with a Hero Key II.",
+			"maxStackSize": 1,
+			"name": "Hero Chest II",
+			"stashId": "stash:hero-chest-t2",
+			"storage": "both",
+			"tags": [
+				"chest",
+				"hero",
+				"locked",
+				"stash"
+			],
+			"tier": 2
+		},
+		"item:hero-chest-t3": {
+			"assetId": "asset:item:hero-chest-t3",
+			"code": "hero-chest-t3",
+			"description": "Locked chest returned from a dangerous heroes guild expedition. Open it with a Hero Key III.",
+			"maxStackSize": 1,
+			"name": "Hero Chest III",
+			"stashId": "stash:hero-chest-t3",
+			"storage": "both",
+			"tags": [
+				"chest",
+				"hero",
+				"locked",
+				"stash"
+			],
+			"tier": 3
+		},
+		"item:hero-chest-t4": {
+			"assetId": "asset:item:hero-chest-t4",
+			"code": "hero-chest-t4",
+			"description": "Locked chest returned from the longest heroes guild expedition. Open it with a Hero Key IV.",
+			"maxStackSize": 1,
+			"name": "Hero Chest IV",
+			"stashId": "stash:hero-chest-t4",
+			"storage": "both",
+			"tags": [
+				"chest",
+				"hero",
+				"locked",
+				"stash"
+			],
+			"tier": 4
+		},
+		"item:hero-key-t1": {
+			"assetId": "asset:item:hero-key-t1",
+			"code": "hero-key-t1",
+			"description": "Temporary cheat-only key used to open Hero Chest I.",
+			"maxStackSize": 20,
+			"name": "Hero Key I",
+			"storage": "both",
+			"tags": [
+				"key",
+				"hero",
+				"cheat-source"
+			],
+			"tier": 1
+		},
+		"item:hero-key-t2": {
+			"assetId": "asset:item:hero-key-t2",
+			"code": "hero-key-t2",
+			"description": "Temporary cheat-only key used to open Hero Chest II.",
+			"maxStackSize": 20,
+			"name": "Hero Key II",
+			"storage": "both",
+			"tags": [
+				"key",
+				"hero",
+				"cheat-source"
+			],
+			"tier": 2
+		},
+		"item:hero-key-t3": {
+			"assetId": "asset:item:hero-key-t3",
+			"code": "hero-key-t3",
+			"description": "Temporary cheat-only key used to open Hero Chest III.",
+			"maxStackSize": 20,
+			"name": "Hero Key III",
+			"storage": "both",
+			"tags": [
+				"key",
+				"hero",
+				"cheat-source"
+			],
+			"tier": 3
+		},
+		"item:hero-key-t4": {
+			"assetId": "asset:item:hero-key-t4",
+			"code": "hero-key-t4",
+			"description": "Temporary cheat-only key used to open Hero Chest IV.",
+			"maxStackSize": 20,
+			"name": "Hero Key IV",
+			"storage": "both",
+			"tags": [
+				"key",
+				"hero",
+				"cheat-source"
+			],
+			"tier": 4
+		},
 		"item:hop-field": {
 			"assetId": "asset:item:hop-field",
 			"code": "hop-field",
@@ -2918,6 +3247,22 @@
 			],
 			"tier": 1
 		},
+		"producer:heroes-guild-t1": {
+			"assetId": "asset:producer:heroes-guild-t1",
+			"code": "heroes-guild-t1",
+			"description": "Late-era guild that sends paid heroes on long expeditions and returns locked hero chests.",
+			"maxStackSize": 1,
+			"name": "Heroes Guild I",
+			"producerId": "producer:heroes-guild-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"hero",
+				"guild",
+				"expedition"
+			],
+			"tier": 4
+		},
 		"producer:iron-mine-t1": {
 			"assetId": "asset:producer:iron-mine-t1",
 			"code": "iron-mine-t1",
@@ -3245,12 +3590,165 @@
 				}
 			]
 		},
+		"loot:goldsmith-t1:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:goldsmith-t1:coins": {
 			"name": "Goldsmith coins",
 			"output": [
 				{
 					"itemId": "item:coin",
 					"quantity": 4,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:hero-chest-t1:open": {
+			"name": "Hero Chest I contents",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 4,
+						"min": 2
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.25,
+					"itemId": "item:leather",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:hero-chest-t2:open": {
+			"name": "Hero Chest II contents",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 8,
+						"min": 4
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.25,
+					"itemId": "item:gold-ore",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:hero-chest-t3:open": {
+			"name": "Hero Chest III contents",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 14,
+						"min": 8
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.2,
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:hero-chest-t4:open": {
+			"name": "Hero Chest IV contents",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 28,
+						"min": 16
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.45,
+					"itemId": "item:gold-ingot",
+					"quantity": {
+						"max": 2,
+						"min": 1
+					},
+					"type": "chance"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:hero-chest-t1": {
+			"name": "Heroes Guild Hero Chest I expedition",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:hero-chest-t1",
+							"weight": 90
+						},
+						{
+							"itemId": "item:hero-chest-t2",
+							"weight": 10
+						}
+					],
+					"type": "weighted"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:hero-chest-t2": {
+			"name": "Heroes Guild Hero Chest II expedition",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:hero-chest-t2",
+							"weight": 90
+						},
+						{
+							"itemId": "item:hero-chest-t3",
+							"weight": 10
+						}
+					],
+					"type": "weighted"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:hero-chest-t3": {
+			"name": "Heroes Guild Hero Chest III expedition",
+			"output": [
+				{
+					"entries": [
+						{
+							"itemId": "item:hero-chest-t3",
+							"weight": 90
+						},
+						{
+							"itemId": "item:hero-chest-t4",
+							"weight": 10
+						}
+					],
+					"type": "weighted"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:hero-chest-t4": {
+			"name": "Heroes Guild Hero Chest IV expedition",
+			"output": [
+				{
+					"itemId": "item:hero-chest-t4",
+					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3766,7 +4264,19 @@
 		"producer:goldsmith-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:goldsmith-t1:coins"
+				"product:goldsmith-t1:coins",
+				"product:goldsmith-t1:blueprint-heroes-guild-t1"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:heroes-guild-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:heroes-guild-t1:hero-chest-t1",
+				"product:heroes-guild-t1:hero-chest-t2",
+				"product:heroes-guild-t1:hero-chest-t3",
+				"product:heroes-guild-t1:hero-chest-t4"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -4025,11 +4535,51 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:goldsmith-t1:blueprint-heroes-guild-t1": {
+			"durationMs": 5000,
+			"inputRefId": "input:goldsmith-t1:blueprint-heroes-guild-t1",
+			"name": "Blueprint: Heroes Guild I",
+			"outputTableId": "loot:goldsmith-t1:blueprint-heroes-guild-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:goldsmith-t1:coins": {
 			"durationMs": 12000,
 			"inputRefId": "input:goldsmith-t1:gold-wine-bread-coal",
 			"name": "Coins",
 			"outputTableId": "loot:goldsmith-t1:coins",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:hero-chest-t1": {
+			"durationMs": 120000,
+			"inputRefId": "input:heroes-guild-t1:hero-chest-t1",
+			"name": "Hero Chest I",
+			"outputTableId": "loot:heroes-guild-t1:hero-chest-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:hero-chest-t2": {
+			"durationMs": 180000,
+			"inputRefId": "input:heroes-guild-t1:hero-chest-t2",
+			"name": "Hero Chest II",
+			"outputTableId": "loot:heroes-guild-t1:hero-chest-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:hero-chest-t3": {
+			"durationMs": 300000,
+			"inputRefId": "input:heroes-guild-t1:hero-chest-t3",
+			"name": "Hero Chest III",
+			"outputTableId": "loot:heroes-guild-t1:hero-chest-t3",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:hero-chest-t4": {
+			"durationMs": 600000,
+			"inputRefId": "input:heroes-guild-t1:hero-chest-t4",
+			"name": "Hero Chest IV",
+			"outputTableId": "loot:heroes-guild-t1:hero-chest-t4",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -4521,6 +5071,71 @@
 		],
 		"inventory": []
 	},
-	"stashes": {},
+	"stashes": {
+		"stash:hero-chest-t1": {
+			"charges": 1,
+			"inputs": [
+				{
+					"capacity": 1,
+					"consume": true,
+					"itemId": "item:hero-key-t1",
+					"quantity": 1
+				}
+			],
+			"onDepleted": "remove",
+			"outputTableId": "loot:hero-chest-t1:open",
+			"placement": "board_then_inventory",
+			"requirements": [],
+			"type": "stash"
+		},
+		"stash:hero-chest-t2": {
+			"charges": 1,
+			"inputs": [
+				{
+					"capacity": 1,
+					"consume": true,
+					"itemId": "item:hero-key-t2",
+					"quantity": 1
+				}
+			],
+			"onDepleted": "remove",
+			"outputTableId": "loot:hero-chest-t2:open",
+			"placement": "board_then_inventory",
+			"requirements": [],
+			"type": "stash"
+		},
+		"stash:hero-chest-t3": {
+			"charges": 1,
+			"inputs": [
+				{
+					"capacity": 1,
+					"consume": true,
+					"itemId": "item:hero-key-t3",
+					"quantity": 1
+				}
+			],
+			"onDepleted": "remove",
+			"outputTableId": "loot:hero-chest-t3:open",
+			"placement": "board_then_inventory",
+			"requirements": [],
+			"type": "stash"
+		},
+		"stash:hero-chest-t4": {
+			"charges": 1,
+			"inputs": [
+				{
+					"capacity": 1,
+					"consume": true,
+					"itemId": "item:hero-key-t4",
+					"quantity": 1
+				}
+			],
+			"onDepleted": "remove",
+			"outputTableId": "loot:hero-chest-t4:open",
+			"placement": "board_then_inventory",
+			"requirements": [],
+			"type": "stash"
+		}
+	},
 	"version": 1
 }

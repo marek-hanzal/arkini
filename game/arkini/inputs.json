@@ -723,6 +723,127 @@
 					"consume": true
 				}
 			]
+		},
+		"input:goldsmith-t1:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I input",
+			"inputs": [
+				{
+					"itemId": "item:coin",
+					"quantity": 8,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:heroes-guild-t1:hero-chest-t1": {
+			"name": "Heroes Guild short expedition payment",
+			"inputs": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:heroes-guild-t1:hero-chest-t2": {
+			"name": "Heroes Guild sturdy expedition payment",
+			"inputs": [
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:heroes-guild-t1:hero-chest-t3": {
+			"name": "Heroes Guild rare expedition payment",
+			"inputs": [
+				{
+					"itemId": "item:coin",
+					"quantity": 4,
+					"capacity": 12,
+					"consume": true
+				},
+				{
+					"itemId": "item:wine-glass",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:heroes-guild-t1:hero-chest-t4": {
+			"name": "Heroes Guild epic expedition payment",
+			"inputs": [
+				{
+					"itemId": "item:coin",
+					"quantity": 8,
+					"capacity": 20,
+					"consume": true
+				},
+				{
+					"itemId": "item:wine-barrel",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				}
+			]
 		}
 	}
 }

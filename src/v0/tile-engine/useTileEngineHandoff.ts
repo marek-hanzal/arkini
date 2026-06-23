@@ -9,34 +9,42 @@ export namespace useTileEngineHandoff {
 	}
 }
 
-const handoffKey = (tileId: string, slotId: string) => `${tileId}::${slotId}`;
+const matchesHandoff = ({
+	handoff,
+	slotId,
+	tileId,
+}: {
+	handoff: TileEngineActor.Handoff;
+	slotId: string;
+	tileId: string;
+}) => handoff.tileId === tileId && handoff.targetSlotId === slotId;
 
 export const useTileEngineHandoff = (): useTileEngineHandoff.Result => {
-	const handoffRef = useRef<Map<string, TileEngineActor.Handoff>>(new Map());
+	const handoffsRef = useRef<TileEngineActor.Handoff[]>([]);
 
 	const setHandoff = useCallback((handoff: TileEngineActor.Handoff | null) => {
-		handoffRef.current = handoff
-			? new Map([
-					[
-						handoffKey(handoff.tileId, handoff.targetSlotId),
-						handoff,
-					],
-				])
-			: new Map();
+		handoffsRef.current = handoff
+			? [
+					handoff,
+				]
+			: [];
 	}, []);
 	const setHandoffs = useCallback((handoffs: readonly TileEngineActor.Handoff[]) => {
-		handoffRef.current = new Map(
-			handoffs.map((handoff) => [
-				handoffKey(handoff.tileId, handoff.targetSlotId),
-				handoff,
-			]),
-		);
+		handoffsRef.current = [
+			...handoffs,
+		];
 	}, []);
 	const consumeHandoff = useCallback((tileId: string, slotId: string) => {
-		const key = handoffKey(tileId, slotId);
-		if (!handoffRef.current.has(key)) return false;
+		const index = handoffsRef.current.findIndex((handoff) =>
+			matchesHandoff({
+				handoff,
+				slotId,
+				tileId,
+			}),
+		);
+		if (index === -1) return false;
 
-		handoffRef.current.delete(key);
+		handoffsRef.current.splice(index, 1);
 		return true;
 	}, []);
 

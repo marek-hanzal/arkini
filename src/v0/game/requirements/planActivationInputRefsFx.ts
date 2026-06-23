@@ -51,7 +51,7 @@ export const planActivationInputRefsFx = Effect.fn("planActivationInputRefsFx")(
 }: planActivationInputRefsFx.Props) {
 	const inputRefs: GameActionItemRef[] = [];
 	const reservedBoardItemIds = new Set<string>();
-	const reservedInventorySlotQuantities = new Map<number, number>();
+	const reservedInventorySlotQuantities: number[] = [];
 
 	for (const input of inputs) {
 		let missingQuantity =
@@ -88,12 +88,12 @@ export const planActivationInputRefsFx = Effect.fn("planActivationInputRefsFx")(
 			if (missingQuantity <= 0) break;
 			if (!slot || slot.itemId !== input.itemId) continue;
 
-			const reservedQuantity = reservedInventorySlotQuantities.get(slotIndex) ?? 0;
+			const reservedQuantity = reservedInventorySlotQuantities[slotIndex] ?? 0;
 			const availableQuantity = readGameSaveInventorySlotQuantity(slot) - reservedQuantity;
 			const quantity = Math.min(missingQuantity, availableQuantity);
 			if (quantity <= 0) continue;
 
-			reservedInventorySlotQuantities.set(slotIndex, reservedQuantity + quantity);
+			reservedInventorySlotQuantities[slotIndex] = reservedQuantity + quantity;
 			inputRefs.push({
 				kind: "inventory",
 				quantity,

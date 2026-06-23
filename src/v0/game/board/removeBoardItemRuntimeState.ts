@@ -8,6 +8,7 @@ export const removeBoardItemRuntimeState = ({
 	save: GameSave;
 }) => {
 	delete save.stashes[itemInstanceId];
+	delete save.stashInputs[itemInstanceId];
 	delete save.producerLines[itemInstanceId];
 	delete save.craftInputs[itemInstanceId];
 	delete save.storedRequirements[itemInstanceId];

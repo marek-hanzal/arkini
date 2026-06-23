@@ -32,7 +32,7 @@ const matchesTargetEvent = ({
 	}
 
 	if (source.reason === "stash-input-auto-fill") {
-		return candidate.type === "stash.opened";
+		return candidate.type === "stash_input.stored" && candidate.itemId === source.itemId;
 	}
 
 	return false;
@@ -47,7 +47,7 @@ export const findActivationInputTargetEventIndex = ({
 	events.findIndex(
 		(candidate, candidateIndex) =>
 			candidateIndex > afterIndex &&
-			(source.reason === "stash-input-auto-fill" || !skipped.has(candidateIndex)) &&
+			(!skipped.has(candidateIndex)) &&
 			matchesTargetEvent({
 				candidate,
 				source,

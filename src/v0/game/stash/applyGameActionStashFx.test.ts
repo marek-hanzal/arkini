@@ -79,6 +79,11 @@ describe("applyGameActionFx Stash", () => {
 				type: "item.consumed",
 			},
 			{
+				itemId: "item:key",
+				stashItemInstanceId: "item-instance:2",
+				type: "stash_input.stored",
+			},
+			{
 				remainingCharges: 0,
 				stashItemInstanceId: "item-instance:2",
 				type: "stash.opened",
@@ -154,6 +159,11 @@ describe("applyGameActionFx Stash", () => {
 				type: "item.consumed",
 			},
 			{
+				itemId: "item:key",
+				stashItemInstanceId: "item-instance:1",
+				type: "stash_input.stored",
+			},
+			{
 				stashItemInstanceId: "item-instance:1",
 				type: "stash.opened",
 			},
@@ -226,6 +236,70 @@ describe("applyGameActionFx Stash", () => {
 		});
 	});
 
+	it("partially auto-fills stash inputs without opening the stash yet", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			stashes: {
+				...baseConfig.stashes,
+				"stash:test": {
+					...baseConfig.stashes["stash:test"],
+					inputs: [
+						{
+							capacity: 2,
+							consume: true,
+							itemId: "item:key",
+							quantity: 2,
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:key",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				stashItemInstanceId: "item-instance:1",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items).toHaveProperty("item-instance:1");
+		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
+		expect(result.save.stashInputs).toEqual({
+			"item-instance:1": {
+				items: {
+					"item:key": 1,
+				},
+			},
+		});
+		expect(result.events.map((event) => event.type)).toEqual([
+			"item.consumed",
+			"stash_input.stored",
+		]);
+	});
+
 	it("opens every remaining stash charge in one atomic sequential-placement batch", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -290,6 +364,7 @@ describe("applyGameActionFx Stash", () => {
 		});
 		expect(result.events.map((event) => event.type)).toEqual([
 			"item.consumed",
+			"stash_input.stored",
 			"stash.opened",
 			"item.created",
 			"item.created",

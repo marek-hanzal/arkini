@@ -5,7 +5,7 @@ import type { GameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/Gam
 type TargetEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored" | "craft_input.stored" | "stash.opened";
+		type: "producer_input.stored" | "craft_input.stored" | "stash_input.stored";
 	}
 >;
 
@@ -22,13 +22,8 @@ const readTargetItemInstanceId = (target: TargetEvent) => {
 	return target.stashItemInstanceId;
 };
 
-const readFeedbackGroupId = (target: TargetEvent) => {
-	if (target.type === "stash.opened") {
-		return `engine:input-feedback:${target.stashItemInstanceId}:${target.stashId}:${target.openedAtMs}`;
-	}
-
-	return `engine:input-feedback:${readTargetItemInstanceId(target)}:${target.itemId}:${target.storedAtMs}`;
-};
+const readFeedbackGroupId = (target: TargetEvent) =>
+	`engine:input-feedback:${readTargetItemInstanceId(target)}:${target.itemId}:${target.storedAtMs}`;
 
 export const appendActivationInputTargetFeedback = ({
 	plan,

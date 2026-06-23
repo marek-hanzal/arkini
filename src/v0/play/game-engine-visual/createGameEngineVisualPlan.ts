@@ -7,6 +7,7 @@ import { appendItemReplaceVisuals } from "~/v0/play/game-engine-visual/appendIte
 import { appendActivationInputStoreVisuals } from "~/v0/play/game-engine-visual/appendActivationInputStoreVisuals";
 import { appendActivationInputTargetFeedback } from "~/v0/play/game-engine-visual/appendActivationInputTargetFeedback";
 import { appendProducerProductCompletedFeedback } from "~/v0/play/game-engine-visual/appendProducerProductCompletedFeedback";
+import { appendStashDepletedRetainedTile } from "~/v0/play/game-engine-visual/appendStashDepletedRetainedTile";
 import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngineVisualPlan";
 import { createGameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { findMergeResultEventIndex } from "~/v0/play/game-engine-visual/findMergeResultEventIndex";
@@ -83,9 +84,9 @@ export const createGameEngineVisualPlan = ({
 					if (
 						target?.type === "producer_input.stored" ||
 						target?.type === "craft_input.stored" ||
-						target?.type === "stash.opened"
+						target?.type === "stash_input.stored"
 					) {
-						if (target.type !== "stash.opened") skipped.add(targetIndex);
+						skipped.add(targetIndex);
 						appendActivationInputTargetFeedback({
 							plan,
 							target,
@@ -123,6 +124,7 @@ export const createGameEngineVisualPlan = ({
 
 			case "producer_input.stored":
 			case "craft_input.stored":
+			case "stash_input.stored":
 				appendActivationInputTargetFeedback({
 					plan,
 					target: event,
@@ -136,10 +138,18 @@ export const createGameEngineVisualPlan = ({
 				});
 				break;
 
+			case "item.removed":
+				appendStashDepletedRetainedTile({
+					currentBoard,
+					event,
+					plan,
+					previousBoard,
+				});
+				plan.ignoredEventTypes.push(event.type);
+				break;
 			case "craft.completed":
 			case "craft.started":
 			case "craft_input.withdrawn":
-			case "item.removed":
 			case "item.spawn.blocked":
 			case "producer.product_line.default_changed":
 			case "producer.product_line.enabled_changed":

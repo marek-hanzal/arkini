@@ -43,6 +43,8 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 	const stash = stashId ? config.stashes[stashId] : undefined;
 	if (!stashId || !stash) return undefined;
 
+	const storedInputs = save.stashInputs[boardItem.id]?.items ?? {};
+
 	return {
 		inputs: stash.inputs.map((input) =>
 			readRuntimeActivationInputView({
@@ -52,7 +54,7 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 					targetItemInstanceId: boardItem.id,
 				}),
 				input,
-				stored: 0,
+				stored: storedInputs[input.itemId] ?? 0,
 			}),
 		),
 		kind: "stash",

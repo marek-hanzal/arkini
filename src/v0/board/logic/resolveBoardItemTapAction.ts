@@ -46,12 +46,14 @@ const productLineCanStart = (line: ProducerProductLineView) =>
 	line.requirementsReady &&
 	(line.inputsReady || line.inputsAvailable);
 
-const activationInputsAvailable = (inputs: readonly ActivationInputView[]) =>
-	inputs.every(
-		(input) =>
-			input.stored >= input.quantity ||
-			input.stored + (input.available ?? 0) >= input.quantity,
-	);
+const activationInputsReady = (inputs: readonly ActivationInputView[]) =>
+	inputs.every((input) => input.stored >= input.quantity);
+
+const activationInputsFillable = (inputs: readonly ActivationInputView[]) =>
+	inputs.some((input) => {
+		const missingQuantity = input.quantity - input.stored;
+		return missingQuantity > 0 && Math.min(missingQuantity, input.available ?? 0) > 0;
+	});
 
 const craftExclusiveReady = (craft: NonNullable<BoardViewItem["craft"]>) =>
 	craft.exclusiveTo.every((rule) => !rule.blocked);
@@ -101,7 +103,8 @@ export const resolveBoardItemTapAction = ({
 	if (boardItem.activation?.kind === "stash") {
 		if (
 			requirementsReady(boardItem.activation.requirements) &&
-			activationInputsAvailable(boardItem.activation.inputs)
+			(activationInputsReady(boardItem.activation.inputs) ||
+				activationInputsFillable(boardItem.activation.inputs))
 		) {
 			return {
 				type: "activate",

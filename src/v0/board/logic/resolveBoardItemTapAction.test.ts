@@ -266,6 +266,32 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
+	it("auto-activates stashes when inputs can be partially filled", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("stash", {
+						inputs: [
+							{
+								available: 1,
+								capacity: 2,
+								consume: true,
+								itemId: "item:key",
+								quantity: 2,
+								stored: 0,
+							},
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			activation: "exhaust",
+			boardItemId: "board:item",
+			type: "activate",
+		});
+	});
+
 	it("opens detail for stashes with missing inputs", () => {
 		expect(
 			resolveBoardItemTapAction({

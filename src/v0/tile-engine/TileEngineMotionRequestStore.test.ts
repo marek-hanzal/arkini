@@ -50,6 +50,37 @@ describe("TileEngineMotionRequestStore", () => {
 		expect(readTileEngineMotionRequests("board").get("tile:one")?.enter).toBeUndefined();
 	});
 
+	it("coalesces feedback requests on the same tile into repeated pulses", () => {
+		vi.useFakeTimers();
+
+		registerTileEngineMotionRequests({
+			engineId: "board",
+			requests: [
+				{
+					cleanupDelayMs: 10,
+					feedback: {
+						groupId: "feedback:one",
+						kind: "bounce" as const,
+					},
+					tileId: "stash",
+				},
+				{
+					cleanupDelayMs: 10,
+					feedback: {
+						groupId: "feedback:two",
+						kind: "bounce" as const,
+					},
+					tileId: "stash",
+				},
+			],
+		});
+
+		expect(readTileEngineMotionRequests("board").get("stash")?.feedback).toMatchObject({
+			groupId: "feedback:two",
+			pulseCount: 2,
+		});
+	});
+
 	it("settles feedback requests independently from enter requests", () => {
 		vi.useFakeTimers();
 		const enter = {

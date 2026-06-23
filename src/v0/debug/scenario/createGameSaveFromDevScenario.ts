@@ -83,6 +83,7 @@ export const createGameSaveFromDevScenario = ({
 		producerLines: {},
 		itemSpawnJobs: {},
 		stashes: {},
+		stashInputs: {},
 		storedRequirements: {},
 		updatedAtMs: nowMs,
 		version: 1,

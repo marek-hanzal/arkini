@@ -8,6 +8,7 @@ export const TileFeedbackMotionSchema = z.object({
 		.optional(),
 	delayMs: z.number().nonnegative().optional(),
 	durationMs: z.number().nonnegative().optional(),
+	pulseCount: z.number().int().positive().optional(),
 	groupId: z.string().min(1).optional(),
 });
 

@@ -29,6 +29,7 @@ export const useTileActorFeedbackMotion = ({
 	const durationMs = feedback?.durationMs;
 	const groupId = feedback?.groupId;
 	const hasFeedback = Boolean(feedback);
+	const pulseCount = feedback?.pulseCount ?? 1;
 
 	useLayoutEffect(() => {
 		if (!hasFeedback) return;
@@ -48,29 +49,38 @@ export const useTileActorFeedbackMotion = ({
 		});
 
 		const scope = tileFeedbackMotionScope(tileId);
+		const filterPattern = [
+			"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
+			"brightness(1.32) drop-shadow(0 13px 18px rgb(168 85 247 / 0.42))",
+			"brightness(1.08) drop-shadow(0 3px 6px rgb(168 85 247 / 0.2))",
+			"brightness(1.26) drop-shadow(0 10px 14px rgb(168 85 247 / 0.34))",
+			"brightness(1.1) drop-shadow(0 4px 7px rgb(168 85 247 / 0.18))",
+			"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
+		];
+		const transformPattern = [
+			"translate3d(0px, 0px, 0px) scale(1)",
+			"translate3d(0px, -8px, 0px) scale(1.4)",
+			"translate3d(0px, 3px, 0px) scale(0.88)",
+			"translate3d(0px, -4px, 0px) scale(1.2)",
+			"translate3d(0px, 1px, 0px) scale(0.97)",
+			"translate3d(0px, 0px, 0px) scale(1)",
+		];
+		const expandPulsePattern = (pattern: readonly string[]) =>
+			Array.from({
+				length: pulseCount,
+			}).flatMap((_, index) => (index === 0 ? pattern : pattern.slice(1)));
+
 		void startTileStyleMotion({
 			scope,
 			element,
 			keyframes: {
-				filter: [
-					"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
-					"brightness(1.32) drop-shadow(0 13px 18px rgb(168 85 247 / 0.42))",
-					"brightness(1.08) drop-shadow(0 3px 6px rgb(168 85 247 / 0.2))",
-					"brightness(1.26) drop-shadow(0 10px 14px rgb(168 85 247 / 0.34))",
-					"brightness(1.1) drop-shadow(0 4px 7px rgb(168 85 247 / 0.18))",
-					"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
-				],
-				transform: [
-					"translate3d(0px, 0px, 0px) scale(1)",
-					"translate3d(0px, -8px, 0px) scale(1.4)",
-					"translate3d(0px, 3px, 0px) scale(0.88)",
-					"translate3d(0px, -4px, 0px) scale(1.2)",
-					"translate3d(0px, 1px, 0px) scale(0.97)",
-					"translate3d(0px, 0px, 0px) scale(1)",
-				],
+				filter: expandPulsePattern(filterPattern),
+				transform: expandPulsePattern(transformPattern),
 			},
 			delay: delayMs / 1000,
-			duration: (durationMs ?? TileEngineTiming.feedbackDurationSeconds * 1000) / 1000,
+			duration:
+				((durationMs ?? TileEngineTiming.feedbackDurationSeconds * 1000) * pulseCount) /
+				1000,
 			ease: TileEngineTiming.moveEase,
 			meta: {
 				feedbackKind: kind,
@@ -102,6 +112,7 @@ export const useTileActorFeedbackMotion = ({
 		groupId,
 		hasFeedback,
 		kind,
+		pulseCount,
 		tileId,
 	]);
 };

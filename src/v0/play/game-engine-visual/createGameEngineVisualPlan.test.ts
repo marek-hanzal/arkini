@@ -392,6 +392,16 @@ describe("createGameEngineVisualPlan", () => {
 					type: "item.consumed",
 				},
 				{
+					itemId: "item:key",
+					nextQuantity: 1,
+					previousQuantity: 0,
+					quantity: 1,
+					stashId: "stash:chest",
+					stashItemInstanceId: "stash",
+					storedAtMs: 1,
+					type: "stash_input.stored",
+				},
+				{
 					openedAtMs: 1,
 					remainingCharges: 0,
 					stashId: "stash:chest",
@@ -464,6 +474,16 @@ describe("createGameEngineVisualPlan", () => {
 					type: "item.consumed",
 				},
 				{
+					itemId: "item:key",
+					nextQuantity: 1,
+					previousQuantity: 0,
+					quantity: 1,
+					stashId: "stash:chest",
+					stashItemInstanceId: "stash",
+					storedAtMs: 1,
+					type: "stash_input.stored",
+				},
+				{
 					openedAtMs: 1,
 					remainingCharges: 0,
 					stashId: "stash:chest",
@@ -474,8 +494,94 @@ describe("createGameEngineVisualPlan", () => {
 			previousBoard,
 		});
 
-		expect(plan.boardFeedbackRequests).toHaveLength(0);
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
+		expect(plan.boardFeedbackRequests[0]).toMatchObject({
+			feedback: {
+				kind: "bounce",
+			},
+			tileId: "stash",
+		});
 		expect(plan.boardTransientTilePlans).toHaveLength(0);
+	});
+
+	it("retains a depleted stash tile until its board outputs finish animating", () => {
+		const previousBoard = boardView([
+			{
+				id: "stash",
+				itemId: "item:chest",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "output",
+					itemId: "item:twig",
+					state: {},
+					x: 1,
+					y: 0,
+				},
+			]),
+			currentInventory: undefined,
+			events: [
+				{
+					openedAtMs: 1,
+					remainingCharges: 0,
+					stashId: "stash:chest",
+					stashItemInstanceId: "stash",
+					type: "stash.opened",
+				},
+				{
+					itemId: "item:twig",
+					originItemInstanceId: "stash",
+					reason: "stash-output",
+					to: {
+						itemInstanceId: "output",
+						kind: "board",
+						x: 1,
+						y: 0,
+					},
+					type: "item.created",
+				},
+				{
+					depletedAtMs: 1,
+					stashId: "stash:chest",
+					stashItemInstanceId: "stash",
+					type: "stash.depleted",
+				},
+				{
+					itemId: "item:chest",
+					itemInstanceId: "stash",
+					reason: "stash-depleted",
+					removedAtMs: 1,
+					type: "item.removed",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardEnterRequests).toHaveLength(1);
+		expect(plan.boardTransientTilePlans).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					request: expect.objectContaining({
+						exit: expect.objectContaining({
+							delayMs: expect.any(Number),
+							kind: "merge-out",
+						}),
+						tileId: "stash",
+					}),
+					tile: expect.objectContaining({
+						id: "stash",
+						itemId: "item:chest",
+						slotId: "0:0",
+					}),
+				}),
+			]),
+		);
 	});
 
 	it("maps product completion to producer bounce feedback", () => {

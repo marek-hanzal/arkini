@@ -3,7 +3,7 @@ import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 type TargetEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored" | "craft_input.stored" | "stash.opened";
+		type: "producer_input.stored" | "craft_input.stored" | "stash_input.stored";
 	}
 >;
 
@@ -16,4 +16,4 @@ export namespace shouldAnimateActivationInputStoreVisual {
 export const shouldAnimateActivationInputStoreVisual = ({
 	target,
 }: shouldAnimateActivationInputStoreVisual.Props) =>
-	target.type === "stash.opened" || target.quantity > 0;
+	target.quantity > 0;

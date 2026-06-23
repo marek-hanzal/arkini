@@ -162,6 +162,18 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 
 	z
 		.object({
+			type: z.literal("stash_input.stored"),
+			stashItemInstanceId: IdSchema,
+			stashId: IdSchema,
+			itemId: IdSchema,
+			quantity: PositiveIntegerSchema,
+			previousQuantity: NonNegativeIntegerSchema,
+			nextQuantity: PositiveIntegerSchema,
+			storedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("craft_input.stored"),
 			targetItemInstanceId: IdSchema,
 			recipeId: IdSchema,

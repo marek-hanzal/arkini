@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+import { readStashInputQuantitiesFx } from "~/v0/game/stash/readStashInputQuantitiesFx";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 
 export namespace planStashAutoFillInputRefsFx {
@@ -22,11 +23,15 @@ const sortBoardInputCandidates = (items: readonly GameSave["board"]["items"][str
 export const planStashAutoFillInputRefsFx = Effect.fn("planStashAutoFillInputRefsFx")(
 	function* ({ inputs, save, stashItemInstanceId }: planStashAutoFillInputRefsFx.Props) {
 		const inputRefs: GameActionItemRef[] = [];
+		const storedInputs = yield* readStashInputQuantitiesFx({
+			save,
+			stashItemInstanceId,
+		});
 		const reservedBoardItemIds = new Set<string>();
 		const reservedInventorySlotQuantities = new Map<number, number>();
 
 		for (const input of inputs) {
-			let missingQuantity = input.quantity;
+			let missingQuantity = input.quantity - (storedInputs.get(input.itemId) ?? 0);
 			if (missingQuantity <= 0) continue;
 
 			for (const boardItem of sortBoardInputCandidates(Object.values(save.board.items))) {

@@ -97,6 +97,12 @@ export const GameSaveStashStateSchema = z
 	})
 	.strict();
 
+export const GameSaveStashInputStateSchema = z
+	.object({
+		items: z.record(IdSchema, PositiveIntegerSchema),
+	})
+	.strict();
+
 export const GameSaveProducerLineStateSchema = z
 	.object({
 		defaultProductId: IdSchema.optional(),
@@ -197,6 +203,7 @@ export const GameSaveSchema = z
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
 		craftInputs: z.record(IdSchema, GameSaveCraftInputStateSchema),
 		stashes: z.record(IdSchema, GameSaveStashStateSchema),
+		stashInputs: z.record(IdSchema, GameSaveStashInputStateSchema).default({}),
 		storedRequirements: z.record(IdSchema, GameSaveStoredRequirementStateSchema),
 		itemSpawnJobs: z.record(IdSchema, GameSaveItemSpawnJobSchema),
 	})
@@ -446,6 +453,20 @@ const validateExclusiveItemOwnership = (
 				path: [
 					"craftInputs",
 					targetItemInstanceId,
+					"items",
+					itemId,
+				],
+			});
+		}
+	}
+
+	for (const [stashItemInstanceId, state] of Object.entries(save.stashInputs)) {
+		for (const itemId of Object.keys(state.items)) {
+			entries.push({
+				itemId,
+				path: [
+					"stashInputs",
+					stashItemInstanceId,
 					"items",
 					itemId,
 				],
@@ -1091,6 +1112,57 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	for (const [stashItemInstanceId, state] of Object.entries(save.stashInputs)) {
+		const target = readItemInstanceDefinition({
+			config,
+			itemInstanceId: stashItemInstanceId,
+			save,
+		});
+		const stashId = target?.item.stashId;
+		const stash = stashId ? config.stashes[stashId] : undefined;
+		if (!target || !stashId || !stash) {
+			addSaveIssue(
+				ctx,
+				[
+					"stashInputs",
+					stashItemInstanceId,
+				],
+				`Stash input state target "${stashItemInstanceId}" must reference a stash item.`,
+			);
+			continue;
+		}
+
+		for (const [itemId, quantity] of Object.entries(state.items)) {
+			const inputSlot = stash.inputs.find((input) => input.itemId === itemId);
+			if (!inputSlot) {
+				addSaveIssue(
+					ctx,
+					[
+						"stashInputs",
+						stashItemInstanceId,
+						"items",
+						itemId,
+					],
+					`Stash "${stashId}" has no input "${itemId}".`,
+				);
+				continue;
+			}
+
+			if (quantity > inputSlot.capacity) {
+				addSaveIssue(
+					ctx,
+					[
+						"stashInputs",
+						stashItemInstanceId,
+						"items",
+						itemId,
+					],
+					`Stash input quantity must be <= input capacity (${inputSlot.capacity}).`,
+				);
+			}
+		}
+	}
+
 	for (const [targetItemInstanceId, state] of Object.entries(save.storedRequirements)) {
 		const target = readItemInstanceDefinition({
 			config,
@@ -1201,6 +1273,7 @@ export type GameSaveProducerInputState = z.infer<typeof GameSaveProducerInputSta
 export type GameSaveCraftInputState = z.infer<typeof GameSaveCraftInputStateSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
+export type GameSaveStashInputState = z.infer<typeof GameSaveStashInputStateSchema>;
 export type GameSaveStoredRequirementState = z.infer<typeof GameSaveStoredRequirementStateSchema>;
 export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;
 export type GameSave = z.infer<typeof GameSaveSchema>;

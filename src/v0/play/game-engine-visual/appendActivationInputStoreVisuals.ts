@@ -16,7 +16,7 @@ type ConsumedEvent = Extract<
 type TargetEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored" | "craft_input.stored" | "stash.opened";
+		type: "producer_input.stored" | "craft_input.stored" | "stash_input.stored";
 	}
 >;
 

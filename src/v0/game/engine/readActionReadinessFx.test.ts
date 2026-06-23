@@ -267,6 +267,59 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
+	it("returns ready for stash partial auto-fill readiness", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			stashes: {
+				...baseConfig.stashes,
+				"stash:test": {
+					...baseConfig.stashes["stash:test"],
+					inputs: [
+						{
+							capacity: 2,
+							consume: true,
+							itemId: "item:key",
+							quantity: 2,
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const readiness = runReadiness({
+			action: {
+				inputRefs: [],
+				stashItemInstanceId: "item-instance:1",
+				type: "stash.open",
+			},
+			config,
+			save,
+		});
+
+		expect(readiness).toEqual({
+			type: "ready",
+		});
+	});
+
 	it("does not mutate save while reading readiness", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

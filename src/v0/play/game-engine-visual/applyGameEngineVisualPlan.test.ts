@@ -84,4 +84,43 @@ describe("applyGameEngineVisualPlan", () => {
 		vi.advanceTimersByTime(100);
 		expect(readBoardTransientTiles()).toEqual([]);
 	});
+
+	it("keeps producer income batch feedback to one bounce request", () => {
+		vi.useFakeTimers();
+		const plan: GameEngineVisualPlan = {
+			boardFeedbackRequests: [
+				{
+					cleanupDelayMs: 100,
+					feedback: {
+						groupId: "producer-feedback:wood",
+						kind: "bounce",
+					},
+					tileId: "producer",
+				},
+				{
+					cleanupDelayMs: 100,
+					feedback: {
+						groupId: "producer-feedback:water",
+						kind: "bounce",
+					},
+					tileId: "producer",
+				},
+			],
+			boardEnterRequests: [],
+			boardTransientTilePlans: [],
+			ignoredEventTypes: [],
+			inventoryEnterRequests: [],
+		};
+
+		applyGameEngineVisualPlan({
+			plan,
+		});
+
+		const feedback = readTileEngineMotionRequests("board").get("producer")?.feedback;
+		expect(feedback).toMatchObject({
+			groupId: "producer-feedback:water",
+			kind: "bounce",
+		});
+		expect(feedback?.pulseCount).toBeUndefined();
+	});
 });

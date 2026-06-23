@@ -2,7 +2,6 @@ import { useSyncExternalStore } from "react";
 import { DebugTimeline } from "~/v0/debug/DebugTimeline";
 import type { TileEngineMotionSchema } from "~/v0/tile-engine/TileEngineMotionSchema";
 import type { TileEngineMotionRequest } from "~/v0/tile-engine/TileEngineMotionRequest";
-import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 
 type MotionMap = ReadonlyMap<string, TileEngineMotionSchema.Type>;
 type MutableMotionMap = Map<string, TileEngineMotionSchema.Type>;
@@ -132,64 +131,6 @@ export const useTileEngineMotionRequests = (engineId: string): MotionMap =>
 		() => readTileEngineMotionRequests(engineId),
 	);
 
-const feedbackTotalDurationMs = (feedback: NonNullable<TileEngineMotionSchema.Type["feedback"]>) =>
-	(feedback.durationMs ?? TileEngineTiming.feedbackDurationSeconds * 1000) *
-	(feedback.pulseCount ?? 1);
-
-const isFeedbackOnlyRequest = (request: TileEngineMotionRequest) =>
-	Boolean(request.feedback) && !request.enter && !request.exit;
-
-const mergeFeedbackRequests = (
-	current: TileEngineMotionRequest,
-	request: TileEngineMotionRequest,
-): TileEngineMotionRequest => {
-	if (!current.feedback || !request.feedback) return current;
-
-	const feedback = {
-		...request.feedback,
-		pulseCount: (current.feedback.pulseCount ?? 1) + (request.feedback.pulseCount ?? 1),
-	};
-	const feedbackCleanupDelayMs =
-		(feedback.delayMs ?? 0) +
-		feedbackTotalDurationMs(feedback) +
-		TileEngineTiming.motionCleanupBufferMs;
-
-	return {
-		...current,
-		cleanupDelayMs: Math.max(
-			current.cleanupDelayMs ?? 0,
-			request.cleanupDelayMs ?? 0,
-			feedbackCleanupDelayMs,
-		),
-		feedback,
-	};
-};
-
-const normalizeTileEngineMotionRequests = (
-	requests: readonly TileEngineMotionRequest[],
-): readonly TileEngineMotionRequest[] => {
-	const normalized: TileEngineMotionRequest[] = [];
-	const feedbackRequestIndexByTileId = new Map<string, number>();
-
-	for (const request of requests) {
-		if (!isFeedbackOnlyRequest(request)) {
-			normalized.push(request);
-			continue;
-		}
-
-		const currentIndex = feedbackRequestIndexByTileId.get(request.tileId);
-		if (currentIndex === undefined) {
-			feedbackRequestIndexByTileId.set(request.tileId, normalized.length);
-			normalized.push(request);
-			continue;
-		}
-
-		normalized[currentIndex] = mergeFeedbackRequests(normalized[currentIndex], request);
-	}
-
-	return normalized;
-};
-
 export const registerTileEngineMotionRequests = ({
 	engineId,
 	requests,
@@ -199,10 +140,9 @@ export const registerTileEngineMotionRequests = ({
 }) => {
 	if (requests.length === 0) return;
 
-	const normalizedRequests = normalizeTileEngineMotionRequests(requests);
 	const motions = cloneEngineMotionMap(engineId);
 	let changed = false;
-	for (const request of normalizedRequests) {
+	for (const request of requests) {
 		if (!request.enter && !request.exit && !request.feedback) continue;
 
 		const current = motions.get(request.tileId) ?? {};
@@ -234,13 +174,13 @@ export const registerTileEngineMotionRequests = ({
 		event: "motion.request.register",
 		detail: {
 			engineId,
-			count: normalizedRequests.length,
-			requests: normalizedRequests,
+			count: requests.length,
+			requests,
 		},
 	});
 	storeEngineMotionMap(engineId, motions);
 
-	for (const request of normalizedRequests) {
+	for (const request of requests) {
 		scheduleTileEngineMotionRequestCleanup({
 			cleanupDelayMs: request.cleanupDelayMs,
 			engineId,

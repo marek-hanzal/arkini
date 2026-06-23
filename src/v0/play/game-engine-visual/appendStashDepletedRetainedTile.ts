@@ -24,6 +24,8 @@ const readMotionStartMs = (delayMs: number | undefined) => Math.max(0, delayMs ?
 const readMotionEndMs = (cleanupDelayMs: number | undefined) =>
 	Math.max(0, (cleanupDelayMs ?? 0) - TileEngineTiming.motionCleanupBufferMs);
 
+const stashExitDurationMs = 1;
+
 const readRetainedTileExitDelayMs = ({
 	plan,
 	stashItemInstanceId,
@@ -35,9 +37,6 @@ const readRetainedTileExitDelayMs = ({
 		...plan.boardEnterRequests
 			.filter((request) => request.enter?.fromTileId === stashItemInstanceId)
 			.map((request) => readMotionStartMs(request.enter?.delayMs)),
-		...plan.boardFeedbackRequests
-			.filter((request) => request.tileId === stashItemInstanceId)
-			.map((request) => readMotionEndMs(request.cleanupDelayMs)),
 		...plan.boardTransientTilePlans
 			.filter((entry) => entry.request.exit?.toTileId === stashItemInstanceId)
 			.map((entry) => readMotionEndMs(entry.cleanupDelayMs)),
@@ -62,7 +61,7 @@ export const appendStashDepletedRetainedTile = ({
 		plan,
 		stashItemInstanceId: event.itemInstanceId,
 	});
-	const durationMs = 260;
+	const durationMs = stashExitDurationMs;
 	const groupId = `engine:stash-retain:${event.itemInstanceId}:${event.removedAtMs}`;
 	const cleanupDelayMs = delayMs + durationMs + TileEngineTiming.motionCleanupBufferMs;
 	const tile: BoardTransientTile = {

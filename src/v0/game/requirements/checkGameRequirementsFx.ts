@@ -6,13 +6,17 @@ import { checkProximityRequirementFx } from "~/v0/game/requirements/checkProximi
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import {
+	type GameItemQuantityIndex,
+	readGameItemQuantity,
+} from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkGameRequirementsFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
 		requirements: readonly GameRequirement[];
-		storedItems?: ReadonlyMap<string, number>;
+		storedItems?: GameItemQuantityIndex;
 		targetItemInstanceId?: string;
 	}
 }
@@ -62,7 +66,10 @@ export const checkGameRequirementsFx = Effect.fn("checkGameRequirementsFx")(func
 							);
 						}
 
-						const availableQuantity = storedItems.get(storedRequirement.itemId) ?? 0;
+						const availableQuantity = readGameItemQuantity({
+							itemId: storedRequirement.itemId,
+							quantities: storedItems,
+						});
 						if (availableQuantity < storedRequirement.quantity) {
 							return yield* Effect.fail(
 								GameEngineError.actionRejected(

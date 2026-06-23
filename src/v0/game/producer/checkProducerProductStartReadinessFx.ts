@@ -14,6 +14,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkProducerProductStartReadinessFx {
 	export interface Props {
@@ -118,7 +119,11 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			save,
 		});
 		const needsAutoFill = productInputs.some(
-			(input) => (storedInputs.get(input.itemId) ?? 0) < input.quantity,
+			(input) =>
+				readGameItemQuantity({
+					itemId: input.itemId,
+					quantities: storedInputs,
+				}) < input.quantity,
 		);
 		if (needsAutoFill) {
 			yield* planProducerProductAutoFillInputRefsFx({

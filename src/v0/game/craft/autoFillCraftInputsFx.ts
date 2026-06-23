@@ -7,6 +7,7 @@ import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuanti
 import { planCraftAutoFillInputRefsFx } from "~/v0/game/craft/planCraftAutoFillInputRefsFx";
 import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace autoFillCraftInputsFx {
 	export interface Props {
@@ -92,5 +93,11 @@ export const autoFillCraftInputsFx = Effect.fn("autoFillCraftInputsFx")(function
 		save: nextSave,
 		targetItemInstanceId,
 	});
-	return inputs.every((input) => (storedInputs.get(input.itemId) ?? 0) >= input.quantity);
+	return inputs.every(
+		(input) =>
+			readGameItemQuantity({
+				itemId: input.itemId,
+				quantities: storedInputs,
+			}) >= input.quantity,
+	);
 });

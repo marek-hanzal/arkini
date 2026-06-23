@@ -6,6 +6,7 @@ import { readStoredRequirementSlotsFx } from "~/v0/game/requirements/readStoredR
 import type { GameActionStoredRequirementWithdraw } from "~/v0/game/action/GameActionStoredRequirementWithdraw";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkStoredRequirementWithdrawReadinessFx {
 	export interface Props {
@@ -31,7 +32,10 @@ export const checkStoredRequirementWithdrawReadinessFx = Effect.fn(
 		save,
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
-	const previousQuantity = storedItems.get(action.itemId) ?? 0;
+	const previousQuantity = readGameItemQuantity({
+		itemId: action.itemId,
+		quantities: storedItems,
+	});
 	if (previousQuantity < action.quantity) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

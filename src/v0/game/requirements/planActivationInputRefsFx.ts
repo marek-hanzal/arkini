@@ -3,6 +3,10 @@ import type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema
 import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+import {
+	type GameItemQuantityIndex,
+	readGameItemQuantity,
+} from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace planActivationInputRefsFx {
 	export interface InputRequirement {
@@ -14,7 +18,7 @@ export namespace planActivationInputRefsFx {
 		excludedBoardItemIds?: ReadonlySet<string>;
 		inputs: readonly InputRequirement[];
 		save: GameSave;
-		storedInputQuantities: ReadonlyMap<string, number>;
+		storedInputQuantities: GameItemQuantityIndex;
 	}
 }
 
@@ -50,7 +54,12 @@ export const planActivationInputRefsFx = Effect.fn("planActivationInputRefsFx")(
 	const reservedInventorySlotQuantities = new Map<number, number>();
 
 	for (const input of inputs) {
-		let missingQuantity = input.quantity - (storedInputQuantities.get(input.itemId) ?? 0);
+		let missingQuantity =
+			input.quantity -
+			readGameItemQuantity({
+				itemId: input.itemId,
+				quantities: storedInputQuantities,
+			});
 		if (missingQuantity <= 0) continue;
 
 		for (const boardItem of sortBoardInputCandidates(Object.values(save.board.items))) {

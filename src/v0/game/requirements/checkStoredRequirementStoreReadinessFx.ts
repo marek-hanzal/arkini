@@ -8,6 +8,7 @@ import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameActionStoredRequirementStore } from "~/v0/game/action/GameActionStoredRequirementStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkStoredRequirementStoreReadinessFx {
 	export interface Props {
@@ -74,7 +75,10 @@ export const checkStoredRequirementStoreReadinessFx = Effect.fn(
 		save,
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
-	const previousQuantity = storedItems.get(resolvedRef.itemId) ?? 0;
+	const previousQuantity = readGameItemQuantity({
+		itemId: resolvedRef.itemId,
+		quantities: storedItems,
+	});
 	const nextQuantity = previousQuantity + resolvedRef.quantity;
 	if (nextQuantity > slot.capacity) {
 		return yield* Effect.fail(

@@ -1,20 +1,15 @@
 import { Effect } from "effect";
-import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
-import { planStashAutoFillInputRefsFx } from "~/v0/game/stash/planStashAutoFillInputRefsFx";
-import { readStashBoardItemFx } from "~/v0/game/stash/readStashBoardItemFx";
-import { readStashRemainingChargesFx } from "~/v0/game/stash/readStashRemainingChargesFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import { applyStashDepletionFx } from "~/v0/game/stash/applyStashDepletionFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
-import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import { storeStashResolvedInput } from "~/v0/game/stash/storeStashResolvedInput";
-import { checkStashResolvedInputsFitFx } from "~/v0/game/stash/checkStashResolvedInputsFitFx";
 import { readStashInputsReady } from "~/v0/game/stash/readStashInputsReady";
+import { resolveStashOpenInputRefsFx } from "~/v0/game/stash/resolveStashOpenInputRefsFx";
+import { readStashOpenCoreFx } from "~/v0/game/stash/readStashOpenCoreFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStashOpen } from "~/v0/game/action/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -38,73 +33,19 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	action,
 	nowMs,
 }: openStashFx.Props) {
-	const stashItem = yield* readStashBoardItemFx({
+	const { lootTable, remainingCharges, stash, stashId, stashItem } = yield* readStashOpenCoreFx({
 		config,
 		save,
 		stashItemInstanceId: action.stashItemInstanceId,
-	});
-	const stashId = config.items[stashItem.itemId]?.stashId;
-	const stash = stashId ? config.stashes[stashId] : undefined;
-	if (!stashId || !stash) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(
-				`Stash item "${stashItem.itemId}" references missing stash.`,
-			),
-		);
-	}
-	const lootTable = config.lootTables[stash.outputTableId];
-	if (!lootTable) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing loot table "${stash.outputTableId}".`),
-		);
-	}
-
-	const remainingCharges = yield* readStashRemainingChargesFx({
-		config,
-		save,
-		stashId,
-		stashItemInstanceId: action.stashItemInstanceId,
-	});
-	if (remainingCharges <= 0) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"stash_depleted",
-				`Stash "${action.stashItemInstanceId}" has no charges left.`,
-			),
-		);
-	}
-
-	const storedItems = yield* readStoredRequirementQuantitiesFx({
-		save,
-		targetItemInstanceId: action.stashItemInstanceId,
-	});
-	yield* checkGameRequirementsFx({
-		requirements: stash.requirements,
-		save,
-		storedItems,
-		targetItemInstanceId: action.stashItemInstanceId,
 	});
 
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
 	const events: GameEvent[] = [];
-	const shouldAutoFillInputs = action.inputRefs.length === 0 && Boolean(stash.inputs.length);
-	const inputRefs = shouldAutoFillInputs
-		? yield* planStashAutoFillInputRefsFx({
-				inputs: stash.inputs,
-				save: nextSave,
-				stashItemInstanceId: action.stashItemInstanceId,
-			})
-		: action.inputRefs;
-	const resolvedRefs = yield* resolveInputRefsFx({
-		inputRefs,
-		save: nextSave,
-	});
-
-	yield* checkStashResolvedInputsFitFx({
+	const { resolvedRefs, shouldAutoFillInputs } = yield* resolveStashOpenInputRefsFx({
+		inputRefs: action.inputRefs,
 		inputs: stash.inputs,
-		resolvedRefs,
 		save: nextSave,
 		stashItemInstanceId: action.stashItemInstanceId,
 	});

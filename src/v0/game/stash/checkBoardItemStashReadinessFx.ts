@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
+import { readGameConfigItemDefinitionFx } from "~/v0/game/config/readGameConfigItemDefinitionFx";
 import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import type { GameActionBoardItemStashSchema } from "~/v0/game/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -45,12 +46,10 @@ export const checkBoardItemStashReadinessFx = Effect.fn("checkBoardItemStashRead
 			);
 		}
 
-		const itemDefinition = config.items[item.itemId];
-		if (!itemDefinition) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(`Missing item "${item.itemId}".`),
-			);
-		}
+		const itemDefinition = yield* readGameConfigItemDefinitionFx({
+			config,
+			itemId: item.itemId,
+		});
 
 		if (
 			!isItemStorageAllowed({

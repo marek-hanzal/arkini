@@ -9,5 +9,4 @@ const BoardViewSchema = z.object({
 	firstEmptyCell: BoardCellSchema.optional(),
 });
 
-
 export type BoardView = z.infer<typeof BoardViewSchema>;

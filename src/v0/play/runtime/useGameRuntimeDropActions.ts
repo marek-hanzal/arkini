@@ -5,6 +5,7 @@ import type { DropActions } from "~/v0/play/drop/DropActions";
 import { createGameActionFromItemToBoardItemInteractionPlan } from "~/v0/play/interaction/createGameActionFromItemToBoardItemInteractionPlan";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 import { useGameRuntimeStore } from "~/v0/play/runtime/GameRuntimeContext";
+import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 import { readBoardView } from "~/v0/play/runtime/readers/readBoardView";
 
 const createFallbackMergeAction = ({
@@ -19,86 +20,81 @@ const createFallbackMergeAction = ({
 	type: "item.merge",
 });
 
+const dispatchItemToBoardItemAction = ({
+	resolveSourceItemId,
+	sourceRef,
+	store,
+	targetBoardItemId,
+}: {
+	resolveSourceItemId(): string | undefined;
+	sourceRef: GameActionItemRef;
+	store: GameRuntimeStore;
+	targetBoardItemId: string;
+}) => {
+	const snapshot = store.getSnapshot();
+	const { config } = snapshot.runtime;
+	const sourceItemId = resolveSourceItemId();
+	const target = readBoardView(snapshot).byId[targetBoardItemId];
+
+	if (!sourceItemId || !target) {
+		return store.dispatch({
+			action: createFallbackMergeAction({
+				sourceRef,
+				targetItemInstanceId: targetBoardItemId,
+			}),
+		});
+	}
+
+	const action = createGameActionFromItemToBoardItemInteractionPlan({
+		plan: resolveItemToBoardItemInteractionPlan({
+			config,
+			sourceItemId,
+			targetItem: target,
+		}),
+		sourceRef,
+		targetItemInstanceId: target.id,
+	});
+
+	return store.dispatch({
+		action:
+			action ??
+			createFallbackMergeAction({
+				sourceRef,
+				targetItemInstanceId: target.id,
+			}),
+	});
+};
+
 export const useGameRuntimeDropActions = (): DropActions => {
 	const store = useGameRuntimeStore();
 
 	return useMemo(
 		() => ({
 			applyBoardItemToBoardItem(input) {
-				const snapshot = store.getSnapshot();
-				const { config, save } = snapshot.runtime;
-				const source = save.board.items[input.sourceBoardItemId];
-				const target = readBoardView(snapshot).byId[input.targetBoardItemId];
-				const sourceRef = {
-					kind: "board" as const,
-					itemInstanceId: input.sourceBoardItemId,
-				};
-
-				if (!source || !target) {
-					return store.dispatch({
-						action: createFallbackMergeAction({
-							sourceRef,
-							targetItemInstanceId: input.targetBoardItemId,
-						}),
-					});
-				}
-
-				const action = createGameActionFromItemToBoardItemInteractionPlan({
-					plan: resolveItemToBoardItemInteractionPlan({
-						config,
-						sourceItemId: source.itemId,
-						targetItem: target,
-					}),
-					sourceRef,
-					targetItemInstanceId: target.id,
-				});
-
-				return store.dispatch({
-					action:
-						action ??
-						createFallbackMergeAction({
-							sourceRef,
-							targetItemInstanceId: target.id,
-						}),
+				return dispatchItemToBoardItemAction({
+					resolveSourceItemId: () =>
+						store.getSnapshot().runtime.save.board.items[input.sourceBoardItemId]
+							?.itemId,
+					sourceRef: {
+						kind: "board",
+						itemInstanceId: input.sourceBoardItemId,
+					},
+					store,
+					targetBoardItemId: input.targetBoardItemId,
 				});
 			},
 			applyInventoryItemToBoardItem(input) {
-				const snapshot = store.getSnapshot();
-				const { config, save } = snapshot.runtime;
-				const source = save.inventory.slots[input.sourceSlotIndex];
-				const target = readBoardView(snapshot).byId[input.targetBoardItemId];
-				const sourceRef = {
-					kind: "inventory" as const,
-					quantity: 1,
-					slotIndex: input.sourceSlotIndex,
-				};
-
-				if (!source || !target) {
-					return store.dispatch({
-						action: createFallbackMergeAction({
-							sourceRef,
-							targetItemInstanceId: input.targetBoardItemId,
-						}),
-					});
-				}
-
-				const action = createGameActionFromItemToBoardItemInteractionPlan({
-					plan: resolveItemToBoardItemInteractionPlan({
-						config,
-						sourceItemId: source.itemId,
-						targetItem: target,
-					}),
-					sourceRef,
-					targetItemInstanceId: target.id,
-				});
-
-				return store.dispatch({
-					action:
-						action ??
-						createFallbackMergeAction({
-							sourceRef,
-							targetItemInstanceId: target.id,
-						}),
+				return dispatchItemToBoardItemAction({
+					resolveSourceItemId: () =>
+						store.getSnapshot().runtime.save.inventory.slots[input.sourceSlotIndex]
+							?.itemId,
+					sourceRef: {
+						kind: "inventory",
+						quantity: 1,
+						slotIndex: input.sourceSlotIndex,
+					},
+					store,
+					targetBoardItemId: input.targetBoardItemId,
 				});
 			},
 			moveBoardItem(input) {

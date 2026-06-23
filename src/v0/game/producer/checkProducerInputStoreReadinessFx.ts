@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
-import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
+import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import { readProducerProductIdsByPriority } from "~/v0/game/producer/readProducerProductIdsByPriority";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
@@ -20,20 +20,13 @@ export namespace checkProducerInputStoreReadinessFx {
 
 export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputStoreReadinessFx")(
 	function* ({ config, save, action }: checkProducerInputStoreReadinessFx.Props) {
-		const producerItem = yield* readProducerBoardItemFx({
-			config,
-			producerItemInstanceId: action.producerItemInstanceId,
-			save,
-		});
-		const producerId = config.items[producerItem.itemId]?.producerId ?? "";
-		const producerDefinition = config.producers[producerId];
-		if (!producerDefinition) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(
-					`Producer item "${producerItem.itemId}" references missing producer.`,
-				),
-			);
-		}
+		const { producerDefinition, producerId, producerItem } = yield* readProducerRuntimeTargetFx(
+			{
+				config,
+				producerItemInstanceId: action.producerItemInstanceId,
+				save,
+			},
+		);
 
 		const resolvedRefs = yield* resolveInputRefsFx({
 			inputRefs: [

@@ -25,6 +25,20 @@ export namespace completeProducerJobFx {
 	}
 }
 
+const createProductCompletedEvent = ({
+	job,
+	nowMs,
+}: {
+	job: GameSaveProducerJob;
+	nowMs: number;
+}) => ({
+	completedAtMs: nowMs,
+	jobId: job.id,
+	producerItemInstanceId: job.producerItemInstanceId,
+	productId: job.productId,
+	type: "product.completed" as const,
+});
+
 const toPlacementRequests = ({
 	items,
 	producerItemInstanceId,
@@ -72,13 +86,10 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 		return {
 			events: [
-				{
-					completedAtMs: nowMs,
-					jobId: liveJob.id,
-					producerItemInstanceId: liveJob.producerItemInstanceId,
-					productId: liveJob.productId,
-					type: "product.completed" as const,
-				},
+				createProductCompletedEvent({
+					job: liveJob,
+					nowMs,
+				}),
 			],
 			save: nextSave,
 			type: "completed" as const,
@@ -112,13 +123,10 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 		return {
 			events: [
-				{
-					completedAtMs: nowMs,
-					jobId: liveJob.id,
-					producerItemInstanceId: liveJob.producerItemInstanceId,
-					productId: liveJob.productId,
-					type: "product.completed" as const,
-				},
+				createProductCompletedEvent({
+					job: liveJob,
+					nowMs,
+				}),
 			],
 			save: nextSave,
 			type: "completed" as const,
@@ -187,13 +195,10 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 	return {
 		events: [
-			{
-				completedAtMs: nowMs,
-				jobId: liveJob.id,
-				producerItemInstanceId: liveJob.producerItemInstanceId,
-				productId: liveJob.productId,
-				type: "product.completed" as const,
-			},
+			createProductCompletedEvent({
+				job: liveJob,
+				nowMs,
+			}),
 			...placementResult.events,
 		],
 		save: placementResult.save,

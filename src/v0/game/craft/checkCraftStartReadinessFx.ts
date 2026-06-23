@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
+import { checkCraftTargetIdleFx } from "~/v0/game/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
-import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -28,17 +28,10 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
 
-	const runningCraftJob = Object.values(save.craftJobs).find(
-		(job) => job.targetItemInstanceId === action.targetItemInstanceId,
-	);
-	if (runningCraftJob) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"craft_in_progress",
-				`Craft target "${action.targetItemInstanceId}" already has running craft job "${runningCraftJob.id}".`,
-			),
-		);
-	}
+	yield* checkCraftTargetIdleFx({
+		save,
+		targetItemInstanceId: action.targetItemInstanceId,
+	});
 
 	const storedRequirementItems = yield* readStoredRequirementQuantitiesFx({
 		save,

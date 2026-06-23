@@ -10,36 +10,16 @@ import { useTilePointerMove } from "~/v0/tile-engine/useTilePointerMove";
 import { useTilePointerUp } from "~/v0/tile-engine/useTilePointerUp";
 
 export namespace useTileActorDrag {
-	export interface Props<TTile = unknown, TSlot = unknown, TDrag = unknown, TDrop = unknown> {
-		actorRef: RefObject<HTMLDivElement | null>;
-		dragSessionRef: RefObject<TileEngineActor.DragSession<TDrag> | null>;
-		tileRef: RefObject<TileEngine.Tile<TTile>>;
+	export interface Props<TTile = unknown, TSlot = unknown, TDrag = unknown, TDrop = unknown>
+		extends Omit<useTilePointerUp.Props<TTile, TSlot, TDrag, TDrop>, "finishDrag"> {
 		bindingRef: RefObject<TileEngine.DragBinding<TDrag> | undefined>;
 		disabledRef: RefObject<boolean>;
 		dragging: boolean;
 		setDragging: Dispatch<SetStateAction<boolean>>;
-		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, TDrag, TDrop> | undefined>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		longTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
 		clearTimers(): void;
-		clearLongTimer(): void;
-		handleTap(event: { clientX: number; clientY: number }): void;
-		animateBack(): Promise<boolean>;
-		animateToTarget(
-			targetRect: TileEngine.Rect | null,
-			meta?: {
-				motionId?: string;
-				animation?: TileEngine.DropAnimation;
-				role?: "source" | "target";
-				fromSlotId?: string;
-				toSlotId?: string;
-			},
-		): Promise<boolean>;
-		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
-		setActiveDropId(dropId: string | null): void;
 		setActiveDropFeedback(feedback: TileEngine.ActiveDropFeedback | null): void;
-		setHandoff(handoff: TileEngineActor.Handoff | null): void;
-		setHandoffs(handoffs: readonly TileEngineActor.Handoff[]): void;
 	}
 }
 

@@ -504,7 +504,7 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardTransientTilePlans).toHaveLength(0);
 	});
 
-	it("retains a depleted stash tile until its board outputs finish animating", () => {
+	it("retains a depleted stash tile until the last board output starts", () => {
 		const previousBoard = boardView([
 			{
 				id: "stash",
@@ -518,10 +518,24 @@ describe("createGameEngineVisualPlan", () => {
 		const plan = createGameEngineVisualPlan({
 			currentBoard: boardView([
 				{
-					id: "output",
+					id: "output:1",
 					itemId: "item:twig",
 					state: {},
 					x: 1,
+					y: 0,
+				},
+				{
+					id: "output:2",
+					itemId: "item:stone",
+					state: {},
+					x: 2,
+					y: 0,
+				},
+				{
+					id: "output:3",
+					itemId: "item:log",
+					state: {},
+					x: 3,
 					y: 0,
 				},
 			]),
@@ -539,9 +553,33 @@ describe("createGameEngineVisualPlan", () => {
 					originItemInstanceId: "stash",
 					reason: "stash-output",
 					to: {
-						itemInstanceId: "output",
+						itemInstanceId: "output:1",
 						kind: "board",
 						x: 1,
+						y: 0,
+					},
+					type: "item.created",
+				},
+				{
+					itemId: "item:stone",
+					originItemInstanceId: "stash",
+					reason: "stash-output",
+					to: {
+						itemInstanceId: "output:2",
+						kind: "board",
+						x: 2,
+						y: 0,
+					},
+					type: "item.created",
+				},
+				{
+					itemId: "item:log",
+					originItemInstanceId: "stash",
+					reason: "stash-output",
+					to: {
+						itemInstanceId: "output:3",
+						kind: "board",
+						x: 3,
 						y: 0,
 					},
 					type: "item.created",
@@ -563,25 +601,29 @@ describe("createGameEngineVisualPlan", () => {
 			previousBoard,
 		});
 
-		expect(plan.boardEnterRequests).toHaveLength(1);
-		expect(plan.boardTransientTilePlans).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					request: expect.objectContaining({
-						exit: expect.objectContaining({
-							delayMs: expect.any(Number),
-							kind: "merge-out",
-						}),
-						tileId: "stash",
-					}),
-					tile: expect.objectContaining({
-						id: "stash",
-						itemId: "item:chest",
-						slotId: "0:0",
-					}),
-				}),
-			]),
+		expect(plan.boardEnterRequests).toHaveLength(3);
+		expect(plan.boardTransientTilePlans).toHaveLength(1);
+
+		const outputStartDelayMs = Math.max(
+			...plan.boardEnterRequests.map((request) => request.enter?.delayMs ?? 0),
 		);
+		const lastOutputCleanupDelayMs = Math.max(
+			...plan.boardEnterRequests.map((request) => request.cleanupDelayMs ?? 0),
+		);
+		const retainedStash = plan.boardTransientTilePlans[0];
+		expect(retainedStash?.request).toMatchObject({
+			exit: expect.objectContaining({
+				delayMs: outputStartDelayMs,
+				kind: "merge-out",
+			}),
+			tileId: "stash",
+		});
+		expect(retainedStash?.cleanupDelayMs).toBeLessThan(lastOutputCleanupDelayMs);
+		expect(retainedStash?.tile).toMatchObject({
+			id: "stash",
+			itemId: "item:chest",
+			slotId: "0:0",
+		});
 	});
 
 	it("maps product completion to producer bounce feedback", () => {

@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
+import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { DropActions } from "~/v0/play/drop/DropActions";
@@ -15,6 +19,42 @@ const rect = {
 } satisfies TileEngine.Rect;
 
 const config = createEngineTestConfig();
+
+const emptyBoard = {
+	byCellKey: {},
+	byId: {},
+	firstEmptyCell: {
+		x: 0,
+		y: 0,
+	},
+	items: [],
+} satisfies BoardView;
+
+const emptyInventory = {
+	bySlotIndex: {},
+	firstEmptySlotIndex: 0,
+	slots: [],
+	stacksByItemId: {},
+} satisfies InventoryView;
+
+const inventorySlot = (slotIndex: number) =>
+	({
+		slotIndex,
+		stack: {
+			id: `stack-${slotIndex}`,
+			itemId: "item:twig",
+			quantity: 1,
+		},
+	}) satisfies InventorySlot;
+
+const boardItem = ({ id, x, y }: { id: string; x: number; y: number }) =>
+	({
+		id,
+		itemId: "item:twig",
+		state: {},
+		x,
+		y,
+	}) satisfies BoardViewItem;
 
 describe("resolveDrop animation contract", () => {
 	it("preserves parallel swap runtime animation when wrapping commits with error feedback", async () => {
@@ -34,15 +74,15 @@ describe("resolveDrop animation contract", () => {
 		const outcome = resolveDrop({
 			actions,
 			config,
-			board: {} as never,
+			board: emptyBoard,
 			feedback,
-			inventory: {} as never,
+			inventory: emptyInventory,
 			context: {
 				dragRect: rect,
 				source: {
 					kind: "inventory",
 					itemId: "item:twig",
-					slot: {} as never,
+					slot: inventorySlot(0),
 					slotIndex: 0,
 				} satisfies DragSource,
 				sourceTile: {
@@ -98,13 +138,17 @@ describe("resolveDrop animation contract", () => {
 		const outcome = resolveDrop({
 			actions,
 			config,
-			board: {} as never,
+			board: emptyBoard,
 			feedback,
-			inventory: {} as never,
+			inventory: emptyInventory,
 			context: {
 				dragRect: rect,
 				source: {
-					boardItem: {} as never,
+					boardItem: boardItem({
+						id: "board-item",
+						x: 0,
+						y: 0,
+					}),
 					boardItemId: "board-item",
 					itemId: "item:twig",
 					kind: "board",
@@ -147,24 +191,28 @@ describe("resolveDrop animation contract", () => {
 			actions,
 			config,
 			feedback,
-			inventory: {} as never,
+			inventory: emptyInventory,
 			board: {
+				...emptyBoard,
 				byId: {
-					target: {
+					target: boardItem({
 						id: "target",
-						itemId: "item:twig",
 						x: 1,
 						y: 0,
-					},
+					}),
 				},
-			} as never,
+			},
 			context: {
 				dragRect: rect,
 				source: {
 					kind: "board",
 					boardItemId: "source",
 					itemId: "item:twig",
-					boardItem: {} as never,
+					boardItem: boardItem({
+						id: "source",
+						x: 0,
+						y: 0,
+					}),
 				} satisfies DragSource,
 				sourceTile: {
 					id: "source",

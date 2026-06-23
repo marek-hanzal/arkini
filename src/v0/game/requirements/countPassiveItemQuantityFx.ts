@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
-import type { GamePassiveRequirementScope } from "~/v0/game/requirements/GamePassiveRequirementScope";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import type { GamePassiveRequirementScope } from "~/v0/game/requirements/GamePassiveRequirementScope";
+import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGameSaveItemQuantityByScope";
 
 export namespace countPassiveItemQuantityFx {
 	export interface Props {
@@ -11,24 +11,8 @@ export namespace countPassiveItemQuantityFx {
 	}
 }
 
-export const countPassiveItemQuantityFx = Effect.fn("countPassiveItemQuantityFx")(function* ({
-	itemId,
-	save,
-	scope,
-}: countPassiveItemQuantityFx.Props) {
-	let quantity = 0;
-
-	if (scope === "board" || scope === "board_or_inventory") {
-		quantity += Object.values(save.board.items).filter((item) => item.itemId === itemId).length;
-	}
-
-	if (scope === "inventory" || scope === "board_or_inventory") {
-		quantity += save.inventory.slots.reduce(
-			(total, slot) =>
-				total + (slot?.itemId === itemId ? readGameSaveInventorySlotQuantity(slot) : 0),
-			0,
-		);
-	}
-
-	return quantity;
+export const countPassiveItemQuantityFx = Effect.fn("countPassiveItemQuantityFx")(function* (
+	props: countPassiveItemQuantityFx.Props,
+) {
+	return readGameSaveItemQuantityByScope(props);
 });

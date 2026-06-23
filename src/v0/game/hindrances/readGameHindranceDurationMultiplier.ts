@@ -1,36 +1,9 @@
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import { readProximityRequirementMatches } from "~/v0/game/requirements/readProximityRequirementMatch";
 import type { GameHindrance } from "~/v0/game/hindrances/GameHindrance";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import type { GamePassiveRequirementScope } from "~/v0/game/requirements/GamePassiveRequirementScope";
+import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGameSaveItemQuantityByScope";
 
 const defaultHindranceDurationFactor = 1;
-
-export const readPassiveHindranceItemQuantity = ({
-	itemId,
-	save,
-	scope,
-}: {
-	itemId: string;
-	save: GameSave;
-	scope: GamePassiveRequirementScope;
-}) => {
-	let quantity = 0;
-
-	if (scope === "board" || scope === "board_or_inventory") {
-		quantity += Object.values(save.board.items).filter((item) => item.itemId === itemId).length;
-	}
-
-	if (scope === "inventory" || scope === "board_or_inventory") {
-		quantity += save.inventory.slots.reduce(
-			(total, slot) =>
-				total + (slot?.itemId === itemId ? readGameSaveInventorySlotQuantity(slot) : 0),
-			0,
-		);
-	}
-
-	return quantity;
-};
 
 const readHindranceDurationFactor = (hindrance: GameHindrance) =>
 	hindrance.durationFactor ?? defaultHindranceDurationFactor;
@@ -52,7 +25,7 @@ export const readGameHindranceDurationMultipliers = ({
 	targetItemInstanceId,
 }: readGameHindranceDurationMultipliers.Props): number[] => {
 	if (hindrance.type === "passive") {
-		const quantity = readPassiveHindranceItemQuantity({
+		const quantity = readGameSaveItemQuantityByScope({
 			itemId: hindrance.itemId,
 			save,
 			scope: hindrance.scope,

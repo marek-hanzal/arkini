@@ -2,10 +2,8 @@ import type { ActivationHindranceView } from "~/v0/board/view/ActivationHindranc
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameHindrance } from "~/v0/game/hindrances/GameHindrance";
-import {
-	readGameHindranceDurationMultiplier,
-	readPassiveHindranceItemQuantity,
-} from "~/v0/game/hindrances/readGameHindranceDurationMultiplier";
+import { readGameHindranceDurationMultiplier } from "~/v0/game/hindrances/readGameHindranceDurationMultiplier";
+import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGameSaveItemQuantityByScope";
 import { readProximityRequirementMatches } from "~/v0/game/requirements/readProximityRequirementMatch";
 
 export namespace readRuntimeActivationHindranceViewsFromGameSave {
@@ -30,7 +28,7 @@ const readRuntimePassiveHindranceViewFromGameSave = ({
 	save: GameSave;
 	targetItemInstanceId: string;
 }): ActivationHindranceView | undefined => {
-	const activeQuantity = readPassiveHindranceItemQuantity({
+	const activeQuantity = readGameSaveItemQuantityByScope({
 		itemId: hindrance.itemId,
 		save,
 		scope: hindrance.scope,

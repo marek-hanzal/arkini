@@ -66,6 +66,7 @@ export class RuntimeGameEngineAdapter {
 	private readonly random?: RandomService;
 	private runtimeConfig: GameConfig;
 	private lastEvents: readonly GameEvent[] = [];
+	private mutationQueue: Promise<void> = Promise.resolve();
 	private nextWakeAtMs: number | null = null;
 	private save: GameSave;
 
@@ -152,21 +153,23 @@ export class RuntimeGameEngineAdapter {
 		action,
 		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.DispatchProps): Promise<GameEngineResult> {
-		const result = await runGameEngineEffect(
-			applyGameActionFx({
-				action,
-				config: this.config,
-				nowMs,
-				save: this.save,
-			}),
-			{
-				random: this.random,
-			},
-		);
+		return this.enqueueMutation(async () => {
+			const result = await runGameEngineEffect(
+				applyGameActionFx({
+					action,
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			);
 
-		this.commit(result);
+			this.commit(result);
 
-		return result;
+			return result;
+		});
 	}
 
 	async replaceSave({
@@ -174,47 +177,61 @@ export class RuntimeGameEngineAdapter {
 		nowMs = Date.now(),
 		save,
 	}: RuntimeGameEngineAdapter.ReplaceSaveProps): Promise<GameEngineResult> {
-		const nextWakeAtMs = await runGameEngineEffect(
-			readNextWakeAtMsFx({
-				save,
-			}),
-			{
-				random: this.random,
-			},
-		);
+		return this.enqueueMutation(async () => {
+			const nextWakeAtMs = await runGameEngineEffect(
+				readNextWakeAtMsFx({
+					save,
+				}),
+				{
+					random: this.random,
+				},
+			);
 
-		const result = {
-			events: [
-				...events,
-			],
-			nextWakeAtMs,
-			save: {
-				...save,
-				updatedAtMs: nowMs,
-			},
-		} satisfies GameEngineResult;
-		this.commit(result);
+			const result = {
+				events: [
+					...events,
+				],
+				nextWakeAtMs,
+				save: {
+					...save,
+					updatedAtMs: nowMs,
+				},
+			} satisfies GameEngineResult;
+			this.commit(result);
 
-		return result;
+			return result;
+		});
 	}
 
 	async tick({
 		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.TickProps = {}): Promise<GameEngineResult> {
-		const result = await runGameEngineEffect(
-			runGameTickFx({
-				config: this.config,
-				nowMs,
-				save: this.save,
-			}),
-			{
-				random: this.random,
-			},
+		return this.enqueueMutation(async () => {
+			const result = await runGameEngineEffect(
+				runGameTickFx({
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			);
+
+			this.commit(result);
+
+			return result;
+		});
+	}
+
+	private enqueueMutation<T>(run: () => Promise<T>): Promise<T> {
+		const queued = this.mutationQueue.then(run, run);
+		this.mutationQueue = queued.then(
+			() => undefined,
+			() => undefined,
 		);
 
-		this.commit(result);
-
-		return result;
+		return queued;
 	}
 
 	private commit(result: GameEngineResult) {

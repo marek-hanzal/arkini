@@ -345,25 +345,25 @@
 			"kind": "item",
 			"label": "Hero Key I",
 			"render": "plain",
-			"resourceId": "item-coin"
+			"resourceId": "item-hero-key-t1"
 		},
 		"asset:item:hero-key-t2": {
 			"kind": "item",
 			"label": "Hero Key II",
 			"render": "plain",
-			"resourceId": "item-coin-pair"
+			"resourceId": "item-hero-key-t2"
 		},
 		"asset:item:hero-key-t3": {
 			"kind": "item",
 			"label": "Hero Key III",
 			"render": "plain",
-			"resourceId": "item-coin-stack"
+			"resourceId": "item-hero-key-t3"
 		},
 		"asset:item:hero-key-t4": {
 			"kind": "item",
 			"label": "Hero Key IV",
 			"render": "plain",
-			"resourceId": "item-coin-chest"
+			"resourceId": "item-hero-key-t4"
 		},
 		"asset:item:hop-field": {
 			"kind": "item",

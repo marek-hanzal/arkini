@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { emptyGameItemQuantityIndex } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace readStashInputQuantitiesFx {
 	export interface Props {
@@ -12,5 +13,5 @@ export const readStashInputQuantitiesFx = Effect.fn("readStashInputQuantitiesFx"
 	save,
 	stashItemInstanceId,
 }: readStashInputQuantitiesFx.Props) {
-	return new Map(Object.entries(save.stashInputs[stashItemInstanceId]?.items ?? {}));
+	return save.stashInputs[stashItemInstanceId]?.items ?? emptyGameItemQuantityIndex;
 });

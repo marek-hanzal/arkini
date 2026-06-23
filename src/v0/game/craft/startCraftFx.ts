@@ -10,6 +10,7 @@ import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace startCraftFx {
 	export interface Props {
@@ -33,7 +34,13 @@ const readCraftStoredInputsReadyFx = Effect.fn("readCraftStoredInputsReadyFx")(f
 		save,
 		targetItemInstanceId,
 	});
-	return inputs.every((input) => (storedInputs.get(input.itemId) ?? 0) >= input.quantity);
+	return inputs.every(
+		(input) =>
+			readGameItemQuantity({
+				itemId: input.itemId,
+				quantities: storedInputs,
+			}) >= input.quantity,
+	);
 });
 
 export const startCraftFx = Effect.fn("startCraftFx")(function* ({

@@ -36,7 +36,7 @@ describe("planActivationInputRefsFx", () => {
 					},
 				],
 				save,
-				storedInputQuantities: new Map(),
+				storedInputQuantities: {},
 			}),
 		);
 

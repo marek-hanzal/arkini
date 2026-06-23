@@ -8,6 +8,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerInputStore } from "~/v0/game/action/GameActionProducerInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkProducerInputStoreReadinessFx {
 	export interface Props {
@@ -91,7 +92,10 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 				productId,
 				save,
 			});
-			const previousQuantity = storedInputs.get(resolvedRef.itemId) ?? 0;
+			const previousQuantity = readGameItemQuantity({
+				itemId: resolvedRef.itemId,
+				quantities: storedInputs,
+			});
 			const nextQuantity = previousQuantity + resolvedRef.quantity;
 			if (nextQuantity > inputSlot.capacity) {
 				continue;

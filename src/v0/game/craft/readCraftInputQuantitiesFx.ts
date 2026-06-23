@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { emptyGameItemQuantityIndex } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace readCraftInputQuantitiesFx {
 	export interface Props {
@@ -12,5 +13,5 @@ export const readCraftInputQuantitiesFx = Effect.fn("readCraftInputQuantitiesFx"
 	save,
 	targetItemInstanceId,
 }: readCraftInputQuantitiesFx.Props) {
-	return new Map(Object.entries(save.craftInputs[targetItemInstanceId]?.items ?? {}));
+	return save.craftInputs[targetItemInstanceId]?.items ?? emptyGameItemQuantityIndex;
 });

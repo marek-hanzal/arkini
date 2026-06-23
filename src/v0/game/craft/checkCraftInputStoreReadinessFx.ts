@@ -7,6 +7,7 @@ import type { GameActionCraftInputStore } from "~/v0/game/action/GameActionCraft
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkCraftInputStoreReadinessFx {
 	export interface Props {
@@ -84,7 +85,10 @@ export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreRe
 			save,
 			targetItemInstanceId: action.targetItemInstanceId,
 		});
-		const previousQuantity = storedInputs.get(resolvedRef.itemId) ?? 0;
+		const previousQuantity = readGameItemQuantity({
+			itemId: resolvedRef.itemId,
+			quantities: storedInputs,
+		});
 		const nextQuantity = previousQuantity + resolvedRef.quantity;
 		if (nextQuantity > inputSlot.quantity) {
 			return yield* Effect.fail(

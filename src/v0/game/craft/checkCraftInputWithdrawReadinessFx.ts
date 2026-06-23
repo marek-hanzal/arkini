@@ -5,6 +5,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftInputWithdraw } from "~/v0/game/action/GameActionCraftInputWithdraw";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkCraftInputWithdrawReadinessFx {
 	export interface Props {
@@ -47,7 +48,10 @@ export const checkCraftInputWithdrawReadinessFx = Effect.fn("checkCraftInputWith
 			save,
 			targetItemInstanceId: action.targetItemInstanceId,
 		});
-		const previousQuantity = storedInputs.get(action.itemId) ?? 0;
+		const previousQuantity = readGameItemQuantity({
+			itemId: action.itemId,
+			quantities: storedInputs,
+		});
 		if (previousQuantity < action.quantity) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(

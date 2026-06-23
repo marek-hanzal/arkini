@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { emptyGameItemQuantityIndex } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace readProducerProductStoredInputQuantitiesFx {
 	export interface Props {
@@ -16,9 +17,8 @@ export const readProducerProductStoredInputQuantitiesFx = Effect.fn(
 	producerItemInstanceId,
 	productId,
 }: readProducerProductStoredInputQuantitiesFx.Props) {
-	return new Map(
-		Object.entries(
-			save.producerInputs[producerItemInstanceId]?.productInputs[productId]?.items ?? {},
-		),
+	return (
+		save.producerInputs[producerItemInstanceId]?.productInputs[productId]?.items ??
+		emptyGameItemQuantityIndex
 	);
 });

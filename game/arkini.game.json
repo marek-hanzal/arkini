@@ -1490,17 +1490,6 @@
 			],
 			"name": "Gold mine bread and wine input"
 		},
-		"input:goldsmith-t1:blueprint-heroes-guild-t1": {
-			"inputs": [
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 8
-				}
-			],
-			"name": "Blueprint: Heroes Guild I input"
-		},
 		"input:goldsmith-t1:gold-wine-bread-coal": {
 			"inputs": [
 				{
@@ -2233,6 +2222,34 @@
 				}
 			],
 			"name": "Winery wine glasses to barrel input"
+		},
+		"input:townhall-t4:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I input",
+			"inputs": [
+				{
+					"itemId": "item:coin",
+					"quantity": 8,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:goldsmith-t1:hero-key-t3": {
+			"name": "Goldsmith Hero Key III input",
+			"inputs": [
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"capacity": 8,
+					"consume": true
+				}
+			]
 		}
 	},
 	"items": {
@@ -3590,16 +3607,6 @@
 				}
 			]
 		},
-		"loot:goldsmith-t1:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I output",
-			"output": [
-				{
-					"itemId": "item:blueprint-heroes-guild-t1",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
 		"loot:goldsmith-t1:coins": {
 			"name": "Goldsmith coins",
 			"output": [
@@ -4197,6 +4204,26 @@
 					"type": "guaranteed"
 				}
 			]
+		},
+		"loot:townhall-t4:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:goldsmith-t1:hero-key-t3": {
+			"name": "Goldsmith Hero Key III output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:hero-key-t3",
+					"quantity": 1
+				}
+			]
 		}
 	},
 	"merge": {},
@@ -4265,7 +4292,7 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:goldsmith-t1:coins",
-				"product:goldsmith-t1:blueprint-heroes-guild-t1"
+				"product:goldsmith-t1:hero-key-t3"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -4424,7 +4451,8 @@
 		"producer:townhall-t4": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:townhall-t4:blueprint-goldsmith-t1"
+				"product:townhall-t4:blueprint-goldsmith-t1",
+				"product:townhall-t4:blueprint-heroes-guild-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -4532,14 +4560,6 @@
 			"inputRefId": "input:gold-mine-t1:bread-wine",
 			"name": "Gold Ore Cart",
 			"outputTableId": "loot:gold-mine-t1:gold-ore",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:goldsmith-t1:blueprint-heroes-guild-t1": {
-			"durationMs": 5000,
-			"inputRefId": "input:goldsmith-t1:blueprint-heroes-guild-t1",
-			"name": "Blueprint: Heroes Guild I",
-			"outputTableId": "loot:goldsmith-t1:blueprint-heroes-guild-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -4947,6 +4967,22 @@
 			"outputTableId": "loot:winery-t1:wine-barrel-from-wine-glasses",
 			"placement": "board_then_inventory",
 			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-heroes-guild-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-heroes-guild-t1"
+		},
+		"product:goldsmith-t1:hero-key-t3": {
+			"name": "Hero Key III",
+			"durationMs": 20000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:goldsmith-t1:hero-key-t3",
+			"requirementIds": [],
+			"outputTableId": "loot:goldsmith-t1:hero-key-t3"
 		}
 	},
 	"requirements": {

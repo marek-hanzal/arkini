@@ -3,6 +3,14 @@ import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestCo
 import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
 import { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 import { readBoardView } from "~/v0/play/runtime/readers";
+import {
+	readBoardTransientTiles,
+	upsertBoardTransientTiles,
+} from "~/v0/board/animation/BoardTransientTileStore";
+import {
+	readTileEngineMotionRequests,
+	registerTileEngineMotionRequests,
+} from "~/v0/tile-engine/TileEngineMotionRequestStore";
 
 const createStore = async () => {
 	const config = createEngineTestConfig();
@@ -74,5 +82,67 @@ describe("GameRuntimeStore", () => {
 
 		unsubscribe();
 		store.destroy();
+	});
+
+	it("clears transient visual stores on save replacement", async () => {
+		const store = await createStore();
+		upsertBoardTransientTiles([
+			{
+				groupId: "group:test",
+				id: "transient:test",
+				itemId: "item:twig",
+				slotId: "slot:test",
+			},
+		]);
+		registerTileEngineMotionRequests({
+			engineId: "board",
+			requests: [
+				{
+					feedback: {
+						groupId: "group:test",
+						kind: "bounce",
+					},
+					tileId: "item-instance:1",
+				},
+			],
+		});
+
+		await store.replaceSave({
+			nowMs: 10,
+			save: store.adapter.readSave(),
+		});
+
+		expect(readBoardTransientTiles()).toEqual([]);
+		expect(readTileEngineMotionRequests("board").size).toBe(0);
+		store.destroy();
+	});
+
+	it("clears transient visual stores on destroy", async () => {
+		const store = await createStore();
+		upsertBoardTransientTiles([
+			{
+				groupId: "group:test",
+				id: "transient:test",
+				itemId: "item:twig",
+				slotId: "slot:test",
+			},
+		]);
+		registerTileEngineMotionRequests({
+			engineId: "board",
+			requests: [
+				{
+					enter: {
+						groupId: "group:test",
+						kind: "pop-in",
+					},
+					tileId: "item-instance:1",
+				},
+			],
+		});
+
+		store.destroy();
+
+		expect(readBoardTransientTiles()).toEqual([]);
+		expect(readTileEngineMotionRequests("board").size).toBe(0);
 	});
 });

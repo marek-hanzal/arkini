@@ -5,6 +5,7 @@ import {
 	RuntimeGameEngineAdapter,
 	type GameEngineRuntimeSnapshot,
 } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
+import { clearGameRuntimeVisualStores } from "~/v0/play/runtime/clearGameRuntimeVisualStores";
 
 export interface GameRuntimeState {
 	nowMs: number;
@@ -123,6 +124,7 @@ export class GameRuntimeStore {
 	}
 
 	async replaceSave({ save, nowMs = Date.now() }: GameRuntimeStore.ReplaceSaveProps) {
+		clearGameRuntimeVisualStores();
 		return this.adapter.replaceSave({
 			nowMs,
 			save,
@@ -130,6 +132,7 @@ export class GameRuntimeStore {
 	}
 
 	destroy() {
+		clearGameRuntimeVisualStores();
 		this.unsubscribeAdapter();
 		this.listeners.clear();
 		this.updateListeners.clear();

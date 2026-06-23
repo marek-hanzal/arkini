@@ -109,10 +109,10 @@ describe("RuntimeGameEngineAdapter", () => {
 
 		await adapter.dispatch({
 			action: {
-				enabled: false,
+				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
-				type: "producer.product_line.set_enabled",
+				type: "producer.product.start",
 			},
 			nowMs: 100,
 		});
@@ -126,7 +126,7 @@ describe("RuntimeGameEngineAdapter", () => {
 		});
 
 		expect(readiness).toMatchObject({
-			reason: "product_line_disabled",
+			reason: "producer_queue_full",
 			type: "rejected",
 		});
 	});

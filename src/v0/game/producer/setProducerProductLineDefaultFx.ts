@@ -32,14 +32,11 @@ export const setProducerProductLineDefaultFx = Effect.fn("setProducerProductLine
 		const nextSave = yield* cloneGameSaveFx({
 			save,
 		});
-		const previousState = nextSave.producerLines[action.producerItemInstanceId];
-		const nextDisabledProductIds = previousState?.disabledProductIds ?? [];
 		const nextProductId = previousProductId === action.productId ? undefined : action.productId;
 
-		if (nextProductId || nextDisabledProductIds.length > 0) {
+		if (nextProductId) {
 			nextSave.producerLines[action.producerItemInstanceId] = {
 				defaultProductId: nextProductId,
-				disabledProductIds: nextDisabledProductIds,
 			};
 		} else {
 			delete nextSave.producerLines[action.producerItemInstanceId];

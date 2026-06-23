@@ -471,7 +471,7 @@ Dragging a board item to an occupied board cell attempts the first valid behavio
 
 A reverse-directed merge is intentionally not invented. If the dragged source item does not own a matching merge rule, merge is not considered and later interaction rules may still apply, including swap. Directional rules are data, not vibes in a trench coat.
 
-Producer product-line input deposit respects runtime line priority: an explicitly selected default product line is filled first, then later enabled lines in configured order. If the default line is full, the next enabled line with capacity receives the item. Disabled lines are skipped.
+Producer product-line input deposit respects runtime line priority: an explicitly selected default product line is filled first, then later product lines in configured order. If the default line is full, feeding continues to the next matching line with capacity.
 
 Stash consumable inputs are open-time inputs, not persistent stash input storage. Dragging a matching key/item onto a stash attempts to open the stash with that input immediately. Persistent stash gates use stored requirements instead.
 
@@ -647,7 +647,7 @@ There are no automatic producers in current gameplay. A producer that can start 
 
 Single-click on the board starts the current runtime default product line only when the player explicitly selected one for that concrete producer instance. Without an explicit default, the click is a noop.
 
-Item detail may show all product lines and can start any enabled line directly.
+Item detail may show all product lines and can start any line directly.
 
 ### 10.3 Producer product jobs and queue
 
@@ -665,19 +665,17 @@ Because inventory is passive, producer jobs require the producer item to be on t
 
 A producer owns ordered product lines through `productIds`. Each product line defines its own duration, optional input reference, requirements, placement, and optional output table.
 
-Product lines are enabled by default. Runtime save state may store disabled product lines per concrete producer item instance. Disabled lines cannot be started and cannot receive dragged producer inputs.
-
-Runtime save state may also store a default product line per concrete producer item instance. The default affects:
+Runtime save state may store a default product line per concrete producer item instance. The default affects:
 
 - board single-click activation
-- generic producer feeding when multiple enabled lines accept the same item
+- generic producer feeding when multiple lines accept the same item
 
 Producer feeding priority is:
 
-1. current default product line, if enabled and it accepts the item with available capacity
-2. the next enabled product line in configured order with available capacity
+1. current default product line, if it accepts the item with available capacity
+2. the next product line in configured order with available capacity
 
-If the default line is full, feeding continues to the next matching enabled line.
+If the default line is full, feeding continues to the next matching line.
 
 ### 10.5 Producer loot output and sink products
 
@@ -754,7 +752,7 @@ Producer input storage is item-instance state. It makes that producer instance s
 
 A product line may contain more input items than one production cycle requires, up to configured capacity.
 
-The player may feed producer inputs by dragging matching items onto the producer. The engine selects the target product line using default-line priority and enabled-line capacity rules.
+The player may feed producer inputs by dragging matching items onto the producer. The engine selects the target product line using default-line priority, configured order, and remaining input capacity.
 
 The player may also start a product line with empty or partially filled inputs. In that case, the engine auto-fills only the missing quantities before starting the product. Auto-fill searches board items first in deterministic scan order, excluding the producer itself, then inventory slots in slot order. Board-sourced auto-fill emits visual producer-input movement; inventory-sourced auto-fill has no board flight animation because the item is already hidden in inventory, the coward.
 
@@ -768,10 +766,9 @@ A product line can start when:
 
 1. the producer item is on the board
 2. the product line belongs to the producer
-3. the product line is enabled
-4. the producer queue has room
-5. all producer-level and product-level requirements pass
-6. every consumable input is already stored or can be auto-filled from board/inventory
+3. the producer queue has room
+4. all producer-level and product-level requirements pass
+5. every consumable input is already stored or can be auto-filled from board/inventory
 
 Starting production consumes configured input quantities immediately. Persistent/stored requirements are never consumed by production. If validation fails, activation is rejected without consuming inputs or changing job state.
 
@@ -1381,47 +1378,46 @@ A gameplay implementation should provide tests or validation for:
 31. producer product duration timing on board
 32. producer queue size and sequential queued start/completion timing
 33. producer default product-line selection
-34. disabled producer product lines cannot start or receive generic feed
-35. producer proximity requirements affect duration through `durationFactor`
-36. producer proximity effects average across producer-level and product-level proximity requirements
-37. producer loot table rolls from named table ID
-38. producer generating multiple items
-39. producer generating duplicate item outputs when allowed
-40. producer input deposit
-41. producer auto-fill consumes board sources before inventory sources
-42. producer input withdrawal from item detail
-43. withdrawal places to board first, then inventory
-44. withdrawal keeps remaining stored items when board and inventory cannot fit them
-45. producer production blocked by missing inputs
-46. producer production consumes required inputs only for production that actually starts
-47. producer blocked delivery preserves rolled output and retries without rerolling
-48. producer output uses deterministic nearest-free-cell placement from producer origin
-49. sink product lines with no output table complete without spawning output
-50. stash finite depletion
-51. stash single open releases all remaining charges
-52. stash open-time input requirement, for keyed/locked stashes
-53. stash activation rejects when full generated output cannot fit
-54. stash output uses deterministic nearest-free-cell placement from stash origin
-55. concrete blueprint item can enter craft/construction flow
-56. concrete blueprint receiving construction inputs
-57. concrete blueprint completion produces configured target
-58. blank blueprint imprinting is absent from config/runtime
-59. craft/construction timer starts only after explicit start action
-60. craft/construction timer pauses in inventory
-61. craft/construction completion on board
-62. item detail shows merge information
-63. item detail shows craft/construction/growth progress and timers
-64. item detail shows producer/stash state, inputs, charges, and loot information
-70. obsolete `playerInventory` concepts are absent from gameplay logic
-71. obsolete `collect` behavior is absent from gameplay logic
-72. obsolete double-click exhaust behavior is absent from gameplay logic
-73. save compatibility behavior when game definition version changes
-74. board timers advance while the app is closed
-75. inventory timers do not advance while the app is closed
-77. zero-output loot tables are rejected as invalid data
-78. ambiguous source-target interaction definitions are rejected as invalid data
-79. blueprint imprinting/binding behavior is absent from board drag/drop
-80. craft completion replaces the progress item in the same board cell
-81. stateful source items are rejected as inputs unless nested storage is fully ejected first
-82. nested producer/craft storage ejection rejects the input action when board and inventory cannot fit the nested contents
-83. tile `removeBy` rules support `keep` and `consume` modes when surfaced by gameplay actions
+34. producer proximity requirements affect duration through `durationFactor`
+35. producer proximity effects average across producer-level and product-level proximity requirements
+36. producer loot table rolls from named table ID
+37. producer generating multiple items
+38. producer generating duplicate item outputs when allowed
+39. producer input deposit
+40. producer auto-fill consumes board sources before inventory sources
+41. producer input withdrawal from item detail
+42. withdrawal places to board first, then inventory
+43. withdrawal keeps remaining stored items when board and inventory cannot fit them
+44. producer production blocked by missing inputs
+45. producer production consumes required inputs only for production that actually starts
+46. producer blocked delivery preserves rolled output and retries without rerolling
+47. producer output uses deterministic nearest-free-cell placement from producer origin
+48. sink product lines with no output table complete without spawning output
+49. stash finite depletion
+50. stash single open releases all remaining charges
+51. stash open-time input requirement, for keyed/locked stashes
+52. stash activation rejects when full generated output cannot fit
+53. stash output uses deterministic nearest-free-cell placement from stash origin
+54. concrete blueprint item can enter craft/construction flow
+55. concrete blueprint receiving construction inputs
+56. concrete blueprint completion produces configured target
+57. blank blueprint imprinting is absent from config/runtime
+58. craft/construction timer starts only after explicit start action
+59. craft/construction timer pauses in inventory
+60. craft/construction completion on board
+61. item detail shows merge information
+62. item detail shows craft/construction/growth progress and timers
+63. item detail shows producer/stash state, inputs, charges, and loot information
+64. obsolete `playerInventory` concepts are absent from gameplay logic
+65. obsolete `collect` behavior is absent from gameplay logic
+66. obsolete double-click exhaust behavior is absent from gameplay logic
+67. save compatibility behavior when game definition version changes
+68. board timers advance while the app is closed
+69. inventory timers do not advance while the app is closed
+70. zero-output loot tables are rejected as invalid data
+71. ambiguous source-target interaction definitions are rejected as invalid data
+72. blueprint imprinting/binding behavior is absent from board drag/drop
+73. craft completion replaces the progress item in the same board cell
+74. stateful source items are rejected as inputs unless nested storage is fully ejected first
+75. nested producer/craft storage ejection rejects the input action when board and inventory cannot fit the nested contents
+76. tile `removeBy` rules support `keep` and `consume` modes when surfaced by gameplay actions

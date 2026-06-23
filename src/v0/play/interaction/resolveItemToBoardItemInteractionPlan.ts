@@ -33,9 +33,8 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				requirement.itemId === sourceItemId &&
 				requirement.stored < requirement.capacity,
 		) ||
-			targetItem.activation?.productLines?.some(
-				(line) =>
-					line.enabled && line.missingRequirementItemIds.includes(sourceItemId as ItemId),
+			targetItem.activation?.productLines?.some((line) =>
+				line.missingRequirementItemIds.includes(sourceItemId as ItemId),
 			) ||
 			targetItem.craft?.requirements?.some(
 				(requirement) =>
@@ -58,12 +57,10 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				Number(right.line.isDefault) - Number(left.line.isDefault) ||
 				left.index - right.index,
 		)
-		.find(
-			({ line }) =>
-				line.enabled &&
-				line.inputs.some(
-					(input) => input.itemId === sourceItemId && input.stored < input.capacity,
-				),
+		.find(({ line }) =>
+			line.inputs.some(
+				(input) => input.itemId === sourceItemId && input.stored < input.capacity,
+			),
 		)?.line.productId;
 	const canSupplyStashInput = Boolean(
 		targetItem.activation?.kind === "stash" &&

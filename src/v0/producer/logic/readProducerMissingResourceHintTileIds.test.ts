@@ -47,7 +47,6 @@ const config = {
 
 const line = (overrides: Partial<ProducerProductLineView>): ProducerProductLineView => ({
 	durationMs: 1000,
-	enabled: true,
 	inProgress: false,
 	inputItemIds: [],
 	inputs: [],

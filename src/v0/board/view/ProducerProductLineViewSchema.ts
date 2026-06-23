@@ -10,7 +10,6 @@ export const ProducerProductLineViewSchema = z.object({
 	name: z.string().min(1),
 	isDefault: z.boolean(),
 	durationMs: z.number().int().nonnegative(),
-	enabled: z.boolean(),
 	inProgress: z.boolean(),
 	producerQueuedJobs: z.number().int().nonnegative(),
 	queueFull: z.boolean(),

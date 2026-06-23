@@ -15,5 +15,4 @@ export namespace shouldAnimateActivationInputStoreVisual {
 
 export const shouldAnimateActivationInputStoreVisual = ({
 	target,
-}: shouldAnimateActivationInputStoreVisual.Props) =>
-	target.quantity > 0;
+}: shouldAnimateActivationInputStoreVisual.Props) => target.quantity > 0;

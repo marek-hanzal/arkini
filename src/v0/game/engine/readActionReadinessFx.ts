@@ -14,7 +14,6 @@ import { checkItemMergeReadinessFx } from "~/v0/game/merge/checkItemMergeReadine
 import { checkProducerInputStoreReadinessFx } from "~/v0/game/producer/checkProducerInputStoreReadinessFx";
 import { checkProducerInputWithdrawReadinessFx } from "~/v0/game/producer/checkProducerInputWithdrawReadinessFx";
 import { checkProducerProductLineSetDefaultReadinessFx } from "~/v0/game/producer/checkProducerProductLineSetDefaultReadinessFx";
-import { checkProducerProductLineSetEnabledReadinessFx } from "~/v0/game/producer/checkProducerProductLineSetEnabledReadinessFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkProducerProductStartReadinessFx";
 import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadinessFx";
 import { checkStoredRequirementStoreReadinessFx } from "~/v0/game/requirements/checkStoredRequirementStoreReadinessFx";
@@ -124,12 +123,6 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				producerProductLineSetDefault: (setDefaultAction) =>
 					checkProducerProductLineSetDefaultReadinessFx({
 						action: setDefaultAction,
-						config: gameConfig.config,
-						save,
-					}),
-				producerProductLineSetEnabled: (setEnabledAction) =>
-					checkProducerProductLineSetEnabledReadinessFx({
-						action: setEnabledAction,
 						config: gameConfig.config,
 						save,
 					}),

@@ -232,7 +232,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 		save.producerLines["item-instance:1"] = {
 			defaultProductId: "product:shred",
-			disabledProductIds: [],
 		};
 
 		const board = readRuntimeBoardViewFromGameSave({

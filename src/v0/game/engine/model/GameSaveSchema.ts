@@ -106,15 +106,8 @@ export const GameSaveStashInputStateSchema = z
 export const GameSaveProducerLineStateSchema = z
 	.object({
 		defaultProductId: IdSchema.optional(),
-		disabledProductIds: z.array(IdSchema),
 	})
-	.strict()
-	.refine((value) => new Set(value.disabledProductIds).size === value.disabledProductIds.length, {
-		message: "disabledProductIds must be unique",
-		path: [
-			"disabledProductIds",
-		],
-	});
+	.strict();
 
 export const GameSaveProducerProductInputStateSchema = z
 	.object({
@@ -861,21 +854,6 @@ const validateGameSaveAgainstConfig = (
 				],
 				`Default product "${lineState.defaultProductId}" does not belong to producer "${producerId}".`,
 			);
-		}
-
-		for (const [index, productId] of lineState.disabledProductIds.entries()) {
-			if (!producer.productIds.includes(productId)) {
-				addSaveIssue(
-					ctx,
-					[
-						"producerLines",
-						producerItemInstanceId,
-						"disabledProductIds",
-						index,
-					],
-					`Disabled product "${productId}" does not belong to producer "${producerId}".`,
-				);
-			}
 		}
 	}
 

@@ -87,15 +87,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		itemId,
 	}));
 
-	const setProductLineEnabled = (productId: string, enabled: boolean) => {
-		void itemAction.run({
-			enabled,
-			producerItemInstanceId: boardItem.id,
-			productId,
-			type: "producer.product_line.set_enabled",
-		});
-	};
-
 	const setDefaultProductLine = (productId: string) => {
 		void itemAction.run({
 			producerItemInstanceId: boardItem.id,
@@ -218,7 +209,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						nowMs={nowMs}
 						pending={itemAction.isPending}
 						onSetDefault={setDefaultProductLine}
-						onSetEnabled={setProductLineEnabled}
 						onStart={startProductLine}
 						onWithdrawInput={withdrawProductLineInput}
 					/>

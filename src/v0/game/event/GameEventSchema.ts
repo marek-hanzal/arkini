@@ -280,16 +280,6 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 			changedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
-	z
-		.object({
-			type: z.literal("producer.product_line.enabled_changed"),
-			producerItemInstanceId: IdSchema,
-			productId: IdSchema,
-			previousEnabled: z.boolean(),
-			nextEnabled: z.boolean(),
-			changedAtMs: NonNegativeIntegerSchema,
-		})
-		.strict(),
 ]);
 
 export type GameEventPlacementTarget = z.infer<typeof GameEventPlacementTargetSchema>;

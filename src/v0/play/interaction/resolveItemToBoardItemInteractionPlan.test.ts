@@ -11,7 +11,6 @@ const productLine = (
 
 	return {
 		durationMs: 1000,
-		enabled: true,
 		inProgress: false,
 		inputItemIds: [
 			"item:twig",

@@ -17,7 +17,6 @@ describe("readProducerBoardProgress", () => {
 				activation: producerActivation([
 					{
 						durationMs: 1000,
-						enabled: true,
 						inProgress: true,
 						isDefault: true,
 						inputItemIds: [],
@@ -50,7 +49,6 @@ describe("readProducerBoardProgress", () => {
 				activation: producerActivation([
 					{
 						durationMs: 1000,
-						enabled: true,
 						inProgress: true,
 						isDefault: true,
 						inputItemIds: [],
@@ -81,7 +79,6 @@ describe("readProducerBoardProgress", () => {
 				activation: producerActivation([
 					{
 						durationMs: 1000,
-						enabled: true,
 						inProgress: true,
 						isDefault: true,
 						inputItemIds: [],

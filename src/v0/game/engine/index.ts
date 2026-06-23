@@ -45,8 +45,6 @@ export type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema
 export { GameActionItemRefSchema } from "~/v0/game/action/GameActionItemRefSchema";
 export type { GameActionProducerInputStore } from "~/v0/game/action/GameActionProducerInputStore";
 export { GameActionProducerInputStoreSchema } from "~/v0/game/action/GameActionProducerInputStoreSchema";
-export type { GameActionProducerProductLineSetEnabled } from "~/v0/game/action/GameActionProducerProductLineSetEnabled";
-export { GameActionProducerProductLineSetEnabledSchema } from "~/v0/game/action/GameActionProducerProductLineSetEnabledSchema";
 export type { GameActionStoredRequirementStore } from "~/v0/game/action/GameActionStoredRequirementStore";
 export { GameActionStoredRequirementStoreSchema } from "~/v0/game/action/GameActionStoredRequirementStoreSchema";
 export type { GameActionStoredRequirementWithdraw } from "~/v0/game/action/GameActionStoredRequirementWithdraw";

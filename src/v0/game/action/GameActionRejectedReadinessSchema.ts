@@ -22,7 +22,6 @@ export const GameActionRejectedReadinessSchema = z
 					"item_busy",
 					"craft_in_progress",
 					"missing_requirement",
-					"product_line_disabled",
 					"producer_queue_full",
 					"storage_restricted",
 					"stash_depleted",

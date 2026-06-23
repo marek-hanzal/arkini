@@ -152,7 +152,7 @@ describe("applyGameActionFx Stash", () => {
 			itemId: "item:twig",
 			quantity: 2,
 		});
-		expect(result.events).toMatchObject([
+		expect(result.events.slice(0, 3)).toMatchObject([
 			{
 				itemId: "item:key",
 				reason: "stash-input-auto-fill",

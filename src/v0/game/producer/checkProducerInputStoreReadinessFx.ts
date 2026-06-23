@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import { readProducerProductIdsByPriority } from "~/v0/game/producer/readProducerProductIdsByPriority";
-import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProducerProductLineEnabledFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -79,15 +78,6 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 				);
 			}
 
-			const enabled = yield* readProducerProductLineEnabledFx({
-				producerItemInstanceId: action.producerItemInstanceId,
-				productId,
-				save,
-			});
-			if (!enabled) {
-				continue;
-			}
-
 			const inputSlot = readProductInputs({
 				config,
 				productId,
@@ -121,7 +111,7 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"input_mismatch",
-				`Producer input "${resolvedRef.itemId}" is not accepted by any enabled product line with capacity.`,
+				`Producer input "${resolvedRef.itemId}" is not accepted by any product line with capacity.`,
 			),
 		);
 	},

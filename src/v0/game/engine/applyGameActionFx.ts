@@ -11,7 +11,6 @@ import { openStashFx } from "~/v0/game/stash/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/remove/removeTileFx";
 import { setProducerProductLineDefaultFx } from "~/v0/game/producer/setProducerProductLineDefaultFx";
-import { setProducerProductLineEnabledFx } from "~/v0/game/producer/setProducerProductLineEnabledFx";
 import { startCraftFx } from "~/v0/game/craft/startCraftFx";
 import { spawnDebugItemFx } from "~/v0/game/debug/spawnDebugItemFx";
 import { storeCraftInputFx } from "~/v0/game/craft/storeCraftInputFx";
@@ -142,13 +141,6 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		producerProductLineSetDefault: (setDefaultAction) =>
 			setProducerProductLineDefaultFx({
 				action: setDefaultAction,
-				config: gameConfig.config,
-				nowMs,
-				save,
-			}),
-		producerProductLineSetEnabled: (setEnabledAction) =>
-			setProducerProductLineEnabledFx({
-				action: setEnabledAction,
 				config: gameConfig.config,
 				nowMs,
 				save,

@@ -8,8 +8,9 @@ export namespace readStashInputQuantitiesFx {
 	}
 }
 
-export const readStashInputQuantitiesFx = Effect.fn("readStashInputQuantitiesFx")(
-	function* ({ save, stashItemInstanceId }: readStashInputQuantitiesFx.Props) {
-		return new Map(Object.entries(save.stashInputs[stashItemInstanceId]?.items ?? {}));
-	},
-);
+export const readStashInputQuantitiesFx = Effect.fn("readStashInputQuantitiesFx")(function* ({
+	save,
+	stashItemInstanceId,
+}: readStashInputQuantitiesFx.Props) {
+	return new Map(Object.entries(save.stashInputs[stashItemInstanceId]?.items ?? {}));
+});

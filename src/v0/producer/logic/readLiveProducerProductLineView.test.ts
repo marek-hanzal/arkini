@@ -4,7 +4,6 @@ import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLivePro
 
 const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerProductLineView => ({
 	durationMs: 1000,
-	enabled: true,
 	inProgress: true,
 	isDefault: true,
 	inputItemIds: [],

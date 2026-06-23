@@ -208,7 +208,6 @@ describe("resolveBoardDropFeedback", () => {
 				productLines: [
 					{
 						durationMs: 1000,
-						enabled: true,
 						inProgress: false,
 						isDefault: true,
 						inputItemIds: [

@@ -5,7 +5,6 @@ import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLin
 import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
 import { formatMs } from "~/v0/time/formatMs";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { cn } from "~/v0/ui/cn";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiSection } from "~/v0/ui/UiSection";
 
@@ -16,7 +15,6 @@ export namespace ItemProducerProductLinesCard {
 		nowMs: number;
 		pending: boolean;
 		onSetDefault(productId: string): void;
-		onSetEnabled(productId: string, enabled: boolean): void;
 		onStart(productId: string): void;
 		onWithdrawInput(productId: string, itemId: string): void;
 	}
@@ -80,7 +78,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 	nowMs,
 	pending,
 	onSetDefault,
-	onSetEnabled,
 	onStart,
 	onWithdrawInput,
 }) => {
@@ -101,7 +98,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					const hindranceMultiplier = readHindrancesMultiplier(activeHindrances);
 					const inputsPartiallyAvailable = readInputsPartiallyAvailable(line);
 					const canRunAction =
-						line.enabled &&
 						(line.inputsReady || line.inputsAvailable || inputsPartiallyAvailable) &&
 						line.requirementsReady &&
 						!line.queueFull;
@@ -112,10 +108,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					return (
 						<div
 							key={line.productId}
-							className={cn(
-								"min-w-0 rounded-sm border border-ak-border bg-ak-surface p-3",
-								!line.enabled && "opacity-75",
-							)}
+							className="min-w-0 rounded-sm border border-ak-border bg-ak-surface p-3"
 						>
 							<div className="flex min-w-0 items-start justify-between gap-3">
 								<div className="min-w-0">
@@ -158,13 +151,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 										onClick={() => onSetDefault(line.productId)}
 									>
 										{line.isDefault ? "Unset default" : "Make default"}
-									</UiButton>
-									<UiButton
-										fullWidth={false}
-										disabled={pending}
-										onClick={() => onSetEnabled(line.productId, !line.enabled)}
-									>
-										{line.enabled ? "On" : "Off"}
 									</UiButton>
 								</div>
 							</div>

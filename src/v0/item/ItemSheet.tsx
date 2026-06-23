@@ -75,7 +75,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					title="Nothing selected"
 					onClose={onClose}
 				/>
-				<div className="mx-auto min-h-0 w-full max-w-[460px] flex-1 overflow-y-auto overscroll-contain px-3 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+				<div className="mx-auto min-h-0 w-full max-w-[520px] flex-1 overflow-y-auto overscroll-contain px-3 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 					<p className="text-sm text-ak-text-muted">Select a board item first.</p>
 				</div>
 			</section>
@@ -150,7 +150,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				title={item.name}
 				onClose={onClose}
 			/>
-			<div className="mx-auto min-h-0 w-full max-w-[460px] flex-1 space-y-3 overflow-y-auto overscroll-contain px-3 py-3 text-sm text-ak-text [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+			<div className="mx-auto min-h-0 w-full max-w-[520px] flex-1 space-y-3 overflow-y-auto overscroll-contain px-3 py-3 text-sm text-ak-text [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 				{actionErrorMessage ? (
 					<div className="rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-semibold text-rose-100">
 						{actionErrorMessage}

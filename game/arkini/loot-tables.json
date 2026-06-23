@@ -597,13 +597,19 @@
 					"itemId": "item:coin",
 					"quantity": {
 						"min": 2,
-						"max": 4
+						"max": 3
 					}
 				},
 				{
 					"type": "chance",
-					"itemId": "item:leather",
-					"chance": 0.25,
+					"itemId": "item:ruby",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:emerald",
+					"chance": 0.2,
 					"quantity": 1
 				}
 			]
@@ -615,13 +621,19 @@
 					"type": "guaranteed",
 					"itemId": "item:coin",
 					"quantity": {
-						"min": 4,
-						"max": 8
+						"min": 3,
+						"max": 5
 					}
 				},
 				{
 					"type": "chance",
-					"itemId": "item:gold-ore",
+					"itemId": "item:emerald",
+					"chance": 0.3,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:sapphire",
 					"chance": 0.25,
 					"quantity": 1
 				}
@@ -634,14 +646,20 @@
 					"type": "guaranteed",
 					"itemId": "item:coin",
 					"quantity": {
-						"min": 8,
-						"max": 14
+						"min": 5,
+						"max": 8
 					}
 				},
 				{
 					"type": "chance",
-					"itemId": "item:gold-ingot",
-					"chance": 0.2,
+					"itemId": "item:sapphire",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:topaz",
+					"chance": 0.25,
 					"quantity": 1
 				}
 			]
@@ -653,18 +671,27 @@
 					"type": "guaranteed",
 					"itemId": "item:coin",
 					"quantity": {
-						"min": 16,
-						"max": 28
+						"min": 8,
+						"max": 12
 					}
 				},
 				{
 					"type": "chance",
-					"itemId": "item:gold-ingot",
-					"chance": 0.45,
-					"quantity": {
-						"min": 1,
-						"max": 2
-					}
+					"itemId": "item:topaz",
+					"chance": 0.4,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:aquamarine",
+					"chance": 0.3,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:treasure-chest",
+					"chance": 0.08,
+					"quantity": 1
 				}
 			]
 		},

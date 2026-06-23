@@ -1226,6 +1226,91 @@
 			],
 			"stashId": "stash:chest-t4"
 		},
+		"item:ruby": {
+			"assetId": "asset:item:ruby",
+			"code": "ruby",
+			"name": "Ruby",
+			"tier": 1,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A polished red gemstone recovered from low-tier hero loot.",
+			"tags": [
+				"treasure",
+				"gem",
+				"ruby"
+			]
+		},
+		"item:emerald": {
+			"assetId": "asset:item:emerald",
+			"code": "emerald",
+			"name": "Emerald",
+			"tier": 1,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A polished green gemstone prepared for later treasure recipes.",
+			"tags": [
+				"treasure",
+				"gem",
+				"emerald"
+			]
+		},
+		"item:sapphire": {
+			"assetId": "asset:item:sapphire",
+			"code": "sapphire",
+			"name": "Sapphire",
+			"tier": 2,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A polished blue gemstone from better guild rewards.",
+			"tags": [
+				"treasure",
+				"gem",
+				"sapphire"
+			]
+		},
+		"item:topaz": {
+			"assetId": "asset:item:topaz",
+			"code": "topaz",
+			"name": "Topaz",
+			"tier": 3,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A polished amber gemstone from high-tier treasure chests.",
+			"tags": [
+				"treasure",
+				"gem",
+				"topaz"
+			]
+		},
+		"item:aquamarine": {
+			"assetId": "asset:item:aquamarine",
+			"code": "aquamarine",
+			"name": "Aquamarine",
+			"tier": 4,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "A polished cyan gemstone reserved for late-game treasure economy.",
+			"tags": [
+				"treasure",
+				"gem",
+				"aquamarine"
+			]
+		},
+		"item:treasure-chest": {
+			"assetId": "asset:item:treasure-chest",
+			"code": "treasure-chest",
+			"name": "Treasure Chest",
+			"tier": 4,
+			"maxStackSize": 5,
+			"storage": "both",
+			"description": "An open chest packed with gold and gems. For now, it is a rare trophy reward.",
+			"tags": [
+				"treasure",
+				"chest",
+				"gem",
+				"gold"
+			]
+		},
 		"item:key-t1": {
 			"assetId": "asset:item:key-t1",
 			"code": "key-t1",

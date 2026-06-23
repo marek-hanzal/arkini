@@ -1,5 +1,11 @@
 {
 	"assets": {
+		"asset:item:aquamarine": {
+			"kind": "item",
+			"label": "Aquamarine",
+			"render": "plain",
+			"resourceId": "item-aquamarine"
+		},
 		"asset:item:axe": {
 			"kind": "item",
 			"label": "Axe",
@@ -312,6 +318,12 @@
 			"render": "plain",
 			"resourceId": "item-crystal"
 		},
+		"asset:item:emerald": {
+			"kind": "item",
+			"label": "Emerald",
+			"render": "plain",
+			"resourceId": "item-emerald"
+		},
 		"asset:item:flour": {
 			"kind": "item",
 			"label": "Flour",
@@ -486,11 +498,23 @@
 			"render": "plain",
 			"resourceId": "item-rock"
 		},
+		"asset:item:ruby": {
+			"kind": "item",
+			"label": "Ruby",
+			"render": "plain",
+			"resourceId": "item-ruby"
+		},
 		"asset:item:sapling": {
 			"kind": "item",
 			"label": "Sapling",
 			"render": "plain",
 			"resourceId": "item-sapling"
+		},
+		"asset:item:sapphire": {
+			"kind": "item",
+			"label": "Sapphire",
+			"render": "plain",
+			"resourceId": "item-sapphire"
 		},
 		"asset:item:sausage": {
 			"kind": "item",
@@ -528,11 +552,23 @@
 			"render": "plain",
 			"resourceId": "item-sword"
 		},
+		"asset:item:topaz": {
+			"kind": "item",
+			"label": "Topaz",
+			"render": "plain",
+			"resourceId": "item-topaz"
+		},
 		"asset:item:townhall": {
 			"kind": "item",
 			"label": "Town Hall",
 			"render": "plain",
 			"resourceId": "item-townhall"
+		},
+		"asset:item:treasure-chest": {
+			"kind": "item",
+			"label": "Treasure Chest",
+			"render": "plain",
+			"resourceId": "item-treasure-chest"
 		},
 		"asset:item:tree": {
 			"kind": "item",
@@ -2457,6 +2493,20 @@
 		}
 	},
 	"items": {
+		"item:aquamarine": {
+			"assetId": "asset:item:aquamarine",
+			"code": "aquamarine",
+			"description": "A polished cyan gemstone reserved for late-game treasure economy.",
+			"maxStackSize": 20,
+			"name": "Aquamarine",
+			"storage": "both",
+			"tags": [
+				"treasure",
+				"gem",
+				"aquamarine"
+			],
+			"tier": 4
+		},
 		"item:axe": {
 			"assetId": "asset:item:axe",
 			"code": "axe",
@@ -2982,6 +3032,20 @@
 			],
 			"tier": 0
 		},
+		"item:emerald": {
+			"assetId": "asset:item:emerald",
+			"code": "emerald",
+			"description": "A polished green gemstone prepared for later treasure recipes.",
+			"maxStackSize": 20,
+			"name": "Emerald",
+			"storage": "both",
+			"tags": [
+				"treasure",
+				"gem",
+				"emerald"
+			],
+			"tier": 1
+		},
 		"item:flour": {
 			"assetId": "asset:item:flour",
 			"code": "flour",
@@ -3311,6 +3375,34 @@
 			],
 			"tier": 0
 		},
+		"item:ruby": {
+			"assetId": "asset:item:ruby",
+			"code": "ruby",
+			"description": "A polished red gemstone recovered from low-tier hero loot.",
+			"maxStackSize": 20,
+			"name": "Ruby",
+			"storage": "both",
+			"tags": [
+				"treasure",
+				"gem",
+				"ruby"
+			],
+			"tier": 1
+		},
+		"item:sapphire": {
+			"assetId": "asset:item:sapphire",
+			"code": "sapphire",
+			"description": "A polished blue gemstone from better guild rewards.",
+			"maxStackSize": 20,
+			"name": "Sapphire",
+			"storage": "both",
+			"tags": [
+				"treasure",
+				"gem",
+				"sapphire"
+			],
+			"tier": 2
+		},
 		"item:sausage": {
 			"assetId": "asset:item:sausage",
 			"code": "sausage",
@@ -3365,6 +3457,35 @@
 				"hero"
 			],
 			"tier": 2
+		},
+		"item:topaz": {
+			"assetId": "asset:item:topaz",
+			"code": "topaz",
+			"description": "A polished amber gemstone from high-tier treasure chests.",
+			"maxStackSize": 20,
+			"name": "Topaz",
+			"storage": "both",
+			"tags": [
+				"treasure",
+				"gem",
+				"topaz"
+			],
+			"tier": 3
+		},
+		"item:treasure-chest": {
+			"assetId": "asset:item:treasure-chest",
+			"code": "treasure-chest",
+			"description": "An open chest packed with gold and gems. For now, it is a rare trophy reward.",
+			"maxStackSize": 5,
+			"name": "Treasure Chest",
+			"storage": "both",
+			"tags": [
+				"treasure",
+				"chest",
+				"gem",
+				"gold"
+			],
+			"tier": 4
 		},
 		"item:tree": {
 			"assetId": "asset:item:tree",
@@ -3917,14 +4038,20 @@
 				{
 					"itemId": "item:coin",
 					"quantity": {
-						"max": 4,
+						"max": 3,
 						"min": 2
 					},
 					"type": "guaranteed"
 				},
 				{
-					"chance": 0.25,
-					"itemId": "item:leather",
+					"chance": 0.35,
+					"itemId": "item:ruby",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.2,
+					"itemId": "item:emerald",
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -3936,14 +4063,20 @@
 				{
 					"itemId": "item:coin",
 					"quantity": {
-						"max": 8,
-						"min": 4
+						"max": 5,
+						"min": 3
 					},
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.3,
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
 					"chance": 0.25,
-					"itemId": "item:gold-ore",
+					"itemId": "item:sapphire",
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -3955,14 +4088,20 @@
 				{
 					"itemId": "item:coin",
 					"quantity": {
-						"max": 14,
-						"min": 8
+						"max": 8,
+						"min": 5
 					},
 					"type": "guaranteed"
 				},
 				{
-					"chance": 0.2,
-					"itemId": "item:gold-ingot",
+					"chance": 0.35,
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.25,
+					"itemId": "item:topaz",
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -3974,18 +4113,27 @@
 				{
 					"itemId": "item:coin",
 					"quantity": {
-						"max": 28,
-						"min": 16
+						"max": 12,
+						"min": 8
 					},
 					"type": "guaranteed"
 				},
 				{
-					"chance": 0.45,
-					"itemId": "item:gold-ingot",
-					"quantity": {
-						"max": 2,
-						"min": 1
-					},
+					"chance": 0.4,
+					"itemId": "item:topaz",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:aquamarine",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:treasure-chest",
+					"quantity": 1,
 					"type": "chance"
 				}
 			]

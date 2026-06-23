@@ -23,6 +23,8 @@ const collectionKeys = [
 ] as const;
 
 type CollectionKey = (typeof collectionKeys)[number];
+type MergedGameConfig = Omit<GameConfig, "game" | "startingState"> &
+	Partial<Pick<GameConfig, "game" | "startingState">>;
 type FileSource = {
 	path: string;
 	json: unknown;
@@ -118,7 +120,7 @@ export const validateSources = async (paths: readonly string[]) => {
 	return validatePackage(packageValue);
 };
 
-export const mergeSources = (sources: readonly FileSource[]): GameConfig => {
+export const mergeSources = (sources: readonly FileSource[]): MergedGameConfig => {
 	const output = createEmptyPackage();
 	const sourceByKey = new Map<string, string>();
 
@@ -270,9 +272,8 @@ const isDirectory = async (path: string) => {
 	}
 };
 
-const createEmptyPackage = (): GameConfig => ({
+const createEmptyPackage = (): MergedGameConfig => ({
 	version: 1,
-	game: undefined as never,
 	resources: {},
 	assets: {},
 	items: {},
@@ -284,7 +285,6 @@ const createEmptyPackage = (): GameConfig => ({
 	craftRecipes: {},
 	products: {},
 	lootTables: {},
-	startingState: undefined as never,
 });
 
 const assignSingleton = <T>(

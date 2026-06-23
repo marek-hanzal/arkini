@@ -57,9 +57,13 @@ const readInputSatisfied = (input: ActivationInputView) => input.stored >= input
 const readInputLabel = (input: ActivationInputView, items: ItemCatalogView) => {
 	const itemLabel = items[input.itemId]?.name ?? input.itemId;
 	const capacityLabel = input.capacity > input.quantity ? ` · cap ${input.capacity}` : "";
+	const availableLabel =
+		input.stored < input.quantity && input.available
+			? ` · +${input.available} available`
+			: "";
 	const consumeLabel = input.consume ? " · consumed at start" : " · returned or kept";
 
-	return `${itemLabel} · ${input.stored}/${input.quantity}${capacityLabel}${consumeLabel}`;
+	return `${itemLabel} · ${input.stored}/${input.quantity}${capacityLabel}${availableLabel}${consumeLabel}`;
 };
 
 export const ItemRequirementRulesCard: FC<ItemRequirementRulesCard.Props> = ({

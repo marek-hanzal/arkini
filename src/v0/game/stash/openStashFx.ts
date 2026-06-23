@@ -2,6 +2,8 @@ import { Effect } from "effect";
 import { checkStashOpenReadinessFx } from "~/v0/game/stash/checkStashOpenReadinessFx";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
+import { planStashAutoFillInputRefsFx } from "~/v0/game/stash/planStashAutoFillInputRefsFx";
+import { readStashBoardItemFx } from "~/v0/game/stash/readStashBoardItemFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
@@ -28,8 +30,27 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	action,
 	nowMs,
 }: openStashFx.Props) {
+	const stashItem = yield* readStashBoardItemFx({
+		config,
+		save,
+		stashItemInstanceId: action.stashItemInstanceId,
+	});
+	const stashId = config.items[stashItem.itemId]?.stashId;
+	const stash = stashId ? config.stashes[stashId] : undefined;
+	const inputRefs =
+		action.inputRefs.length === 0 && stash?.inputs.length
+			? yield* planStashAutoFillInputRefsFx({
+					inputs: stash.inputs,
+					save,
+					stashItemInstanceId: action.stashItemInstanceId,
+				})
+			: action.inputRefs;
+	const effectiveAction: GameActionStashOpen = {
+		...action,
+		inputRefs,
+	};
 	const checked = yield* checkStashOpenReadinessFx({
-		action,
+		action: effectiveAction,
 		config,
 		save,
 	});
@@ -43,7 +64,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	}
 
 	const consumed = yield* consumeActivationInputsFx({
-		inputRefs: action.inputRefs,
+		inputRefs: effectiveAction.inputRefs,
 		inputs: checked.stash.inputs,
 		nowMs,
 		reason: "stash-input",

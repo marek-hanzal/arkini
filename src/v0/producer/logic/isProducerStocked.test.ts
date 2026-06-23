@@ -78,4 +78,44 @@ describe("isProducerStocked", () => {
 			),
 		).toBe(true);
 	});
+
+	it("treats stash inputs with auto-fill availability as stocked", () => {
+		expect(
+			isProducerStocked({
+				inputs: [
+					{
+						available: 1,
+						capacity: 1,
+						consume: true,
+						itemId: "item:key",
+						quantity: 1,
+						stored: 0,
+					},
+				],
+				kind: "stash",
+				requirements: [],
+				trigger: "click",
+			}),
+		).toBe(true);
+	});
+
+	it("treats stash inputs without auto-fill availability as missing", () => {
+		expect(
+			isProducerStocked({
+				inputs: [
+					{
+						available: 0,
+						capacity: 1,
+						consume: true,
+						itemId: "item:key",
+						quantity: 1,
+						stored: 0,
+					},
+				],
+				kind: "stash",
+				requirements: [],
+				trigger: "click",
+			}),
+		).toBe(false);
+	});
 });

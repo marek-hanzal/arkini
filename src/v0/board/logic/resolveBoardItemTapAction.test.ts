@@ -240,6 +240,57 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
+	it("auto-activates stashes when inputs are available", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("stash", {
+						inputs: [
+							{
+								available: 1,
+								capacity: 1,
+								consume: true,
+								itemId: "item:key",
+								quantity: 1,
+								stored: 0,
+							},
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			activation: "exhaust",
+			boardItemId: "board:item",
+			type: "activate",
+		});
+	});
+
+	it("opens detail for stashes with missing inputs", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("stash", {
+						inputs: [
+							{
+								available: 0,
+								capacity: 1,
+								consume: true,
+								itemId: "item:key",
+								quantity: 1,
+								stored: 0,
+							},
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-detail",
+		});
+	});
+
 	it("opens detail for passive items", () => {
 		expect(
 			resolveBoardItemTapAction({

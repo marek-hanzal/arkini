@@ -20,7 +20,10 @@ export function isProducerStocked(activation: ActivationView | undefined) {
 	}
 
 	return (
-		activation.inputs.every((input) => input.stored >= input.quantity) &&
-		activation.requirements.every(isRequirementReady)
+		activation.inputs.every(
+			(input) =>
+				input.stored >= input.quantity ||
+				input.stored + (input.available ?? 0) >= input.quantity,
+		) && activation.requirements.every(isRequirementReady)
 	);
 }

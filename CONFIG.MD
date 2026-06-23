@@ -2630,7 +2630,7 @@ Item gets `stashId`, stash gets `outputTableId`.
 
 ## A.29 Add stash with key
 
-Add input to `stashes.*.inputs`.
+Add input to `stashes.*.inputs`. Open-time stash inputs can be supplied by dragging a matching item onto the stash or auto-filled from board/inventory on stash click. If the required inputs are missing, the click should open detail instead of failing noisily.
 
 ```json
 {

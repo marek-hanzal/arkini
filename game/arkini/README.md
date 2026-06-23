@@ -417,7 +417,7 @@ producer:heroes-guild-t1
   8 Coin + Wine Barrel + Beer Barrel + 2 Sausage + 2 Bread -> Hero Chest IV, 10 min
 ```
 
-Hero chests are finite stashes. Each chest tier requires a matching Hero Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Hero Key III is currently produced by Goldsmith I from a Gold Ingot plus 3 Coin. Other key tiers are intentionally cheat-only placeholders for now; all four key tiers already have dedicated key art.
+Hero chests are finite stashes. Each chest tier requires a matching Hero Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Chest clicks auto-fill the matching key from board/inventory when available; if the key is missing, the chest opens its detail instead of throwing an action error. Hero Key III is currently produced by Goldsmith I from a Gold Ingot plus 3 Coin. Other key tiers are intentionally cheat-only placeholders for now; all four key tiers already have dedicated key art.
 
 Hero guild asset IDs:
 

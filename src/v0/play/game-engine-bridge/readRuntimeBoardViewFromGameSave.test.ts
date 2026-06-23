@@ -445,6 +445,57 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		]);
 	});
 
+	it("shows available stash input resources from board and inventory", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:key",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation?.inputs).toMatchObject([
+			{
+				available: 2,
+				itemId: "item:key",
+				quantity: 1,
+			},
+		]);
+	});
+
 	it("marks craft inputs complete without auto-starting the craft", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

@@ -1,6 +1,7 @@
 import type { ActivationModeSchema } from "~/v0/activation/type/ActivationModeSchema";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
+import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
@@ -44,6 +45,13 @@ const productLineCanStart = (line: ProducerProductLineView) =>
 	!line.queueFull &&
 	line.requirementsReady &&
 	(line.inputsReady || line.inputsAvailable);
+
+const activationInputsAvailable = (inputs: readonly ActivationInputView[]) =>
+	inputs.every(
+		(input) =>
+			input.stored >= input.quantity ||
+			input.stored + (input.available ?? 0) >= input.quantity,
+	);
 
 const craftExclusiveReady = (craft: NonNullable<BoardViewItem["craft"]>) =>
 	craft.exclusiveTo.every((rule) => !rule.blocked);
@@ -91,9 +99,19 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (boardItem.activation?.kind === "stash") {
+		if (
+			requirementsReady(boardItem.activation.requirements) &&
+			activationInputsAvailable(boardItem.activation.inputs)
+		) {
+			return {
+				type: "activate",
+				activation: "exhaust",
+				boardItemId: boardItem.id,
+			};
+		}
+
 		return {
-			type: "activate",
-			activation: "exhaust",
+			type: "open-detail",
 			boardItemId: boardItem.id,
 		};
 	}

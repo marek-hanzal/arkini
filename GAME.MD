@@ -795,7 +795,7 @@ Stashes cover chests, crates, finite caches, reward containers, and similar enti
 
 ### 11.2 Stash trigger
 
-A stash is opened/collected by single-click when its requirements are satisfied.
+A stash is opened/collected by single-click when its requirements are satisfied and any open-time inputs are either already supplied by the click action or available for auto-fill from board/inventory. If required inputs are missing, single-click opens the stash detail instead of raising an action error.
 
 A board stash may also be opened by dragging a matching consumable input onto it, when the stash definition accepts that input. This is an immediate open attempt, not persistent stash input deposit.
 
@@ -825,7 +825,7 @@ Example:
 
 An epic chest may require a key.
 
-Consumable stash inputs are currently supplied at open time. The input item is consumed only if the whole stash open succeeds. If placement fails, the input remains unchanged.
+Consumable stash inputs are supplied at open time. Single-click may auto-fill these inputs from board/inventory. The input item is consumed only if the whole stash open succeeds. If placement fails, the input remains unchanged.
 
 If a stash needs a persistent non-consumed gate, it should use stored requirements. Stored requirements must be present to satisfy the gate, but they are not consumed when the stash opens unless a future rule explicitly says otherwise.
 

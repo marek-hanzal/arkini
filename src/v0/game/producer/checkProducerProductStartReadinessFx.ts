@@ -86,14 +86,12 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		requirementIds: product.requirementIds,
 	});
 	yield* checkGameRequirementsFx({
-		config,
 		requirements: producerRequirements,
 		save,
 		storedItems,
 		targetItemInstanceId: action.producerItemInstanceId,
 	});
 	yield* checkGameRequirementsFx({
-		config,
 		requirements: productRequirements,
 		save,
 		storedItems,

@@ -79,10 +79,10 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		targetItemInstanceId: action.stashItemInstanceId,
 	});
 	yield* checkGameRequirementsFx({
-		config,
 		requirements: stash.requirements,
 		save,
 		storedItems,
+		targetItemInstanceId: action.stashItemInstanceId,
 	});
 
 	const nextSave = yield* cloneGameSaveFx({

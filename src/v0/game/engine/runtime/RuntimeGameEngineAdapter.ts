@@ -137,6 +137,8 @@ export class RuntimeGameEngineAdapter {
 	async readiness({
 		action,
 	}: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
+		await this.mutationQueue;
+
 		return runGameEngineEffect(
 			readActionReadinessFx({
 				action,

@@ -30,15 +30,15 @@ export const applyGameEngineVisualPlan = ({ plan }: applyGameEngineVisualPlan.Pr
 		requests: plan.inventoryEnterRequests,
 	});
 
-	const cleanupByGroup = new Map<string, number>();
+	const cleanupDelayMsByGroup: Record<string, number> = {};
 	for (const entry of plan.boardTransientTilePlans) {
-		cleanupByGroup.set(
-			entry.groupId,
-			Math.max(cleanupByGroup.get(entry.groupId) ?? 0, entry.cleanupDelayMs),
+		cleanupDelayMsByGroup[entry.groupId] = Math.max(
+			cleanupDelayMsByGroup[entry.groupId] ?? 0,
+			entry.cleanupDelayMs,
 		);
 	}
 
-	for (const [groupId, cleanupDelayMs] of cleanupByGroup) {
+	for (const [groupId, cleanupDelayMs] of Object.entries(cleanupDelayMsByGroup)) {
 		DebugTimeline.record({
 			detail: {
 				cleanupDelayMs,

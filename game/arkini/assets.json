@@ -126,6 +126,42 @@
 			"render": "plain",
 			"resourceId": "item-gem"
 		},
+		"asset:item:ruby": {
+			"kind": "item",
+			"label": "Ruby",
+			"render": "plain",
+			"resourceId": "item-ruby"
+		},
+		"asset:item:emerald": {
+			"kind": "item",
+			"label": "Emerald",
+			"render": "plain",
+			"resourceId": "item-emerald"
+		},
+		"asset:item:sapphire": {
+			"kind": "item",
+			"label": "Sapphire",
+			"render": "plain",
+			"resourceId": "item-sapphire"
+		},
+		"asset:item:topaz": {
+			"kind": "item",
+			"label": "Topaz",
+			"render": "plain",
+			"resourceId": "item-topaz"
+		},
+		"asset:item:aquamarine": {
+			"kind": "item",
+			"label": "Aquamarine",
+			"render": "plain",
+			"resourceId": "item-aquamarine"
+		},
+		"asset:item:treasure-chest": {
+			"kind": "item",
+			"label": "Treasure Chest",
+			"render": "plain",
+			"resourceId": "item-treasure-chest"
+		},
 		"asset:item:leaf": {
 			"kind": "item",
 			"label": "Leaf",

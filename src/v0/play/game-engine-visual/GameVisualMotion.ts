@@ -3,13 +3,7 @@ const gameVisualFadeDurationMs = 420;
 const gameVisualMergeDurationMs = 390;
 const gameVisualReplaceDurationMs = 420;
 
-type GameVisualMotionCause =
-	| "activation"
-	| "craft"
-	| "inventory"
-	| "merge"
-	| "producer"
-	| "stash";
+type GameVisualMotionCause = "activation" | "craft" | "inventory" | "merge" | "producer" | "stash";
 
 type GameVisualMotionEffect = "fade-in" | "merge" | "replace";
 

@@ -1,0 +1,27 @@
+import { Effect } from "effect";
+import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+
+export namespace checkCraftTargetIdleFx {
+	export interface Props {
+		save: GameSave;
+		targetItemInstanceId: string;
+	}
+}
+
+export const checkCraftTargetIdleFx = Effect.fn("checkCraftTargetIdleFx")(function* ({
+	save,
+	targetItemInstanceId,
+}: checkCraftTargetIdleFx.Props) {
+	const runningCraftJob = Object.values(save.craftJobs).find(
+		(job) => job.targetItemInstanceId === targetItemInstanceId,
+	);
+	if (!runningCraftJob) return;
+
+	return yield* Effect.fail(
+		GameEngineError.actionRejected(
+			"craft_in_progress",
+			`Craft target "${targetItemInstanceId}" already has running craft job "${runningCraftJob.id}".`,
+		),
+	);
+});

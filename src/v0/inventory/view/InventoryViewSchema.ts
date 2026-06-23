@@ -8,5 +8,4 @@ const InventoryViewSchema = z.object({
 	firstEmptySlotIndex: z.number().int().nonnegative().optional(),
 });
 
-
 export type InventoryView = z.infer<typeof InventoryViewSchema>;

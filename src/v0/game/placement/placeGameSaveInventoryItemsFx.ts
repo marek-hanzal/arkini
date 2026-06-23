@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
+import { readGameConfigItemDefinitionFx } from "~/v0/game/config/readGameConfigItemDefinitionFx";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
@@ -30,12 +31,10 @@ export const placeGameSaveInventoryItemsFx = Effect.fn("placeGameSaveInventoryIt
 	const events: GameEvent[] = [];
 
 	for (const item of items) {
-		const itemDefinition = config.items[item.itemId];
-		if (!itemDefinition) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(`Missing item "${item.itemId}".`),
-			);
-		}
+		const itemDefinition = yield* readGameConfigItemDefinitionFx({
+			config,
+			itemId: item.itemId,
+		});
 
 		if (
 			!isItemStorageAllowed({

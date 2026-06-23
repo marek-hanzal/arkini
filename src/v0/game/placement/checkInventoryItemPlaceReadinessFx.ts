@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
+import { readGameConfigItemDefinitionFx } from "~/v0/game/config/readGameConfigItemDefinitionFx";
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import {
@@ -62,12 +63,10 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			);
 		}
 
-		const itemDefinition = config.items[slot.itemId];
-		if (!itemDefinition) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(`Missing item "${slot.itemId}".`),
-			);
-		}
+		const itemDefinition = yield* readGameConfigItemDefinitionFx({
+			config,
+			itemId: slot.itemId,
+		});
 
 		if (
 			!isItemStorageAllowed({

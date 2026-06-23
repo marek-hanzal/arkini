@@ -7,5 +7,4 @@ const GameActionReadinessSchema = z.discriminatedUnion("type", [
 	GameActionRejectedReadinessSchema,
 ]);
 
-
 export type GameActionReadiness = z.infer<typeof GameActionReadinessSchema>;

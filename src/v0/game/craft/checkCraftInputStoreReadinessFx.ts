@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { checkCraftTargetIdleFx } from "~/v0/game/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
@@ -25,17 +26,10 @@ export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreRe
 			targetItemInstanceId: action.targetItemInstanceId,
 		});
 
-		const runningCraftJob = Object.values(save.craftJobs).find(
-			(job) => job.targetItemInstanceId === action.targetItemInstanceId,
-		);
-		if (runningCraftJob) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected(
-					"craft_in_progress",
-					`Craft target "${action.targetItemInstanceId}" already has running craft job "${runningCraftJob.id}".`,
-				),
-			);
-		}
+		yield* checkCraftTargetIdleFx({
+			save,
+			targetItemInstanceId: action.targetItemInstanceId,
+		});
 
 		const resolvedRefs = yield* resolveInputRefsFx({
 			inputRefs: [

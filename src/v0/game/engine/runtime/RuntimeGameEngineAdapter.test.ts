@@ -159,6 +159,44 @@ describe("RuntimeGameEngineAdapter", () => {
 		});
 	});
 
+	it("waits for queued mutations before reading readiness", async () => {
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createConcurrencyTestConfig(),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		let releaseMutation: (() => void) | undefined;
+		(
+			adapter as unknown as {
+				mutationQueue: Promise<void>;
+			}
+		).mutationQueue = new Promise((resolve) => {
+			releaseMutation = resolve;
+		});
+		let resolved = false;
+		const readinessPromise = adapter
+			.readiness({
+				action: {
+					boardItemId: "item-instance:1",
+					type: "board.item.move",
+					x: 2,
+					y: 0,
+				},
+			})
+			.then((readiness) => {
+				resolved = true;
+				return readiness;
+			});
+
+		await Promise.resolve();
+		expect(resolved).toBe(false);
+
+		releaseMutation?.();
+		await expect(readinessPromise).resolves.toMatchObject({
+			type: "ready",
+		});
+	});
+
 	it("serializes concurrent dispatches so independent board updates are not lost", async () => {
 		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createConcurrencyTestConfig(),

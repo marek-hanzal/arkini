@@ -96,9 +96,10 @@ Town Hall III
 
 Town Hall IV
   Gold Ingot -> Goldsmith I Blueprint
+  8 Coin -> Heroes Guild I Blueprint
 
 Goldsmith I
-  8 Coin -> Heroes Guild I Blueprint
+  Gold Ingot + 3 Coin -> Hero Key III
 ```
 
 ### Implemented first wave
@@ -391,16 +392,17 @@ The goldsmith turns refined gold plus late food/wine comfort and coal fuel into 
 ```txt
 producer:goldsmith-t1
   Gold Ingot + Wine Glass + Bread + Coal Cart -> 4 Coin
+  Gold Ingot + 3 Coin -> Hero Key III
 ```
 
-This currently introduces `item:coin` as the first playable currency item. Higher coin merge tiers already have asset slots prepared, but this pass intentionally wires only the basic coin output.
+This currently introduces `item:coin` as the first playable currency item and gives the goldsmith the first non-cheat hero key hook. Higher coin merge tiers already have asset slots prepared, but this pass intentionally wires only the basic coin output.
 
 ### Heroes guild expedition loop
 
-Heroes Guild I is currently the first post-goldsmith building. The goldsmith sells its blueprint for coins, so the player must reach actual coin production before the guild branch exists. The guild is intentionally a producer with long product lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked hero chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
+Heroes Guild I is currently the first post-goldsmith building. Its blueprint comes from Town Hall IV, like every other building blueprint, and costs coins so the player must reach actual coin production before the guild branch exists. The guild is intentionally a producer with long product lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked hero chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
 
 ```txt
-producer:goldsmith-t1
+producer:townhall-t4
   8 Coin -> Heroes Guild I Blueprint
 
 craft:heroes-guild-t1
@@ -415,7 +417,7 @@ producer:heroes-guild-t1
   8 Coin + Wine Barrel + Beer Barrel + 2 Sausage + 2 Bread -> Hero Chest IV, 10 min
 ```
 
-Hero chests are finite stashes. Each chest tier requires a matching Hero Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Hero keys are intentionally cheat-only placeholders for now; dedicated key acquisition and key art can come later without blocking the chest loop.
+Hero chests are finite stashes. Each chest tier requires a matching Hero Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Hero Key III is currently produced by Goldsmith I from a Gold Ingot plus 3 Coin. Other key tiers are intentionally cheat-only placeholders for now; dedicated key acquisition and key art can come later without blocking the chest loop.
 
 Hero guild asset IDs:
 

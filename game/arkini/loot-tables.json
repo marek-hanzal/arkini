@@ -525,16 +525,6 @@
 				}
 			]
 		},
-		"loot:goldsmith-t1:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-heroes-guild-t1",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:heroes-guild-t1:hero-chest-t1": {
 			"name": "Heroes Guild Hero Chest I expedition",
 			"output": [
@@ -675,6 +665,26 @@
 						"min": 1,
 						"max": 2
 					}
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:goldsmith-t1:hero-key-t3": {
+			"name": "Goldsmith Hero Key III output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:hero-key-t3",
+					"quantity": 1
 				}
 			]
 		}

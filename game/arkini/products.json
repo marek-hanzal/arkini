@@ -486,6 +486,46 @@
 			"inputRefId": "input:goldsmith-t1:key-t3",
 			"requirementIds": [],
 			"outputTableId": "loot:goldsmith-t1:key-t3"
+		},
+		"product:blacksmith-t1:axe": {
+			"name": "Axe",
+			"durationMs": 15000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:blacksmith-t1:axe",
+			"requirementIds": [],
+			"outputTableId": "loot:blacksmith-t1:axe"
+		},
+		"product:blacksmith-t1:sword": {
+			"name": "Sword",
+			"durationMs": 25000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:blacksmith-t1:sword",
+			"requirementIds": [],
+			"outputTableId": "loot:blacksmith-t1:sword"
+		},
+		"product:blacksmith-t1:leather-armor": {
+			"name": "Leather Armor",
+			"durationMs": 30000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:blacksmith-t1:leather-armor",
+			"requirementIds": [],
+			"outputTableId": "loot:blacksmith-t1:leather-armor"
+		},
+		"product:blacksmith-t1:iron-armor": {
+			"name": "Iron Armor",
+			"durationMs": 45000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:blacksmith-t1:iron-armor",
+			"requirementIds": [],
+			"outputTableId": "loot:blacksmith-t1:iron-armor"
+		},
+		"product:townhall-t4:blueprint-blacksmith-t1": {
+			"name": "Blueprint: Blacksmith I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-blacksmith-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-blacksmith-t1"
 		}
 	}
 }

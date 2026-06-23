@@ -1,8 +1,29 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
+
+const readRuntimeStashInputAvailableQuantityFromGameSave = ({
+	itemId,
+	save,
+	targetItemInstanceId,
+}: {
+	itemId: string;
+	save: GameSave;
+	targetItemInstanceId: string;
+}) => {
+	const boardQuantity = Object.values(save.board.items).filter(
+		(item) => item.id !== targetItemInstanceId && item.itemId === itemId,
+	).length;
+	const inventoryQuantity = save.inventory.slots.reduce((total, slot) => {
+		if (!slot || slot.itemId !== itemId) return total;
+		return total + readGameSaveInventorySlotQuantity(slot);
+	}, 0);
+
+	return boardQuantity + inventoryQuantity;
+};
 
 export namespace readRuntimeStashActivationViewFromGameSave {
 	export interface Props {
@@ -25,6 +46,11 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 	return {
 		inputs: stash.inputs.map((input) =>
 			readRuntimeActivationInputView({
+				available: readRuntimeStashInputAvailableQuantityFromGameSave({
+					itemId: input.itemId,
+					save,
+					targetItemInstanceId: boardItem.id,
+				}),
 				input,
 				stored: 0,
 			}),

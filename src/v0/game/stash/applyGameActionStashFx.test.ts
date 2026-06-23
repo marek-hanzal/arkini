@@ -104,6 +104,128 @@ describe("applyGameActionFx Stash", () => {
 		]);
 	});
 
+	it("auto-fills stash input refs from inventory when opening a stash", () => {
+		const config = createEngineTestConfig({
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:producer",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				stashItemInstanceId: "item-instance:1",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 2,
+		});
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:key",
+				reason: "stash-input",
+				type: "item.consumed",
+			},
+			{
+				stashItemInstanceId: "item-instance:1",
+				type: "stash.opened",
+			},
+		]);
+	});
+
+	it("auto-fills stash input refs from board before inventory", () => {
+		const config = createEngineTestConfig({
+			game: {
+				board: {
+					height: 1,
+					width: 3,
+				},
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				title: "Test",
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:key",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				stashItemInstanceId: "item-instance:1",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:key",
+			quantity: 1,
+		});
+		expect(result.events[0]).toMatchObject({
+			from: {
+				itemInstanceId: "item-instance:2",
+				kind: "board",
+			},
+			itemId: "item:key",
+			reason: "stash-input",
+			type: "item.consumed",
+		});
+	});
+
 	it("opens every remaining stash charge in one atomic sequential-placement batch", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

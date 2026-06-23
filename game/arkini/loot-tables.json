@@ -525,72 +525,72 @@
 				}
 			]
 		},
-		"loot:heroes-guild-t1:hero-chest-t1": {
-			"name": "Heroes Guild Hero Chest I expedition",
+		"loot:heroes-guild-t1:chest-t1": {
+			"name": "Heroes Guild Chest I expedition",
 			"output": [
 				{
 					"type": "weighted",
 					"entries": [
 						{
-							"itemId": "item:hero-chest-t1",
+							"itemId": "item:chest-t1",
 							"weight": 90
 						},
 						{
-							"itemId": "item:hero-chest-t2",
+							"itemId": "item:chest-t2",
 							"weight": 10
 						}
 					]
 				}
 			]
 		},
-		"loot:heroes-guild-t1:hero-chest-t2": {
-			"name": "Heroes Guild Hero Chest II expedition",
+		"loot:heroes-guild-t1:chest-t2": {
+			"name": "Heroes Guild Chest II expedition",
 			"output": [
 				{
 					"type": "weighted",
 					"entries": [
 						{
-							"itemId": "item:hero-chest-t2",
+							"itemId": "item:chest-t2",
 							"weight": 90
 						},
 						{
-							"itemId": "item:hero-chest-t3",
+							"itemId": "item:chest-t3",
 							"weight": 10
 						}
 					]
 				}
 			]
 		},
-		"loot:heroes-guild-t1:hero-chest-t3": {
-			"name": "Heroes Guild Hero Chest III expedition",
+		"loot:heroes-guild-t1:chest-t3": {
+			"name": "Heroes Guild Chest III expedition",
 			"output": [
 				{
 					"type": "weighted",
 					"entries": [
 						{
-							"itemId": "item:hero-chest-t3",
+							"itemId": "item:chest-t3",
 							"weight": 90
 						},
 						{
-							"itemId": "item:hero-chest-t4",
+							"itemId": "item:chest-t4",
 							"weight": 10
 						}
 					]
 				}
 			]
 		},
-		"loot:heroes-guild-t1:hero-chest-t4": {
-			"name": "Heroes Guild Hero Chest IV expedition",
+		"loot:heroes-guild-t1:chest-t4": {
+			"name": "Heroes Guild Chest IV expedition",
 			"output": [
 				{
 					"type": "guaranteed",
-					"itemId": "item:hero-chest-t4",
+					"itemId": "item:chest-t4",
 					"quantity": 1
 				}
 			]
 		},
-		"loot:hero-chest-t1:open": {
-			"name": "Hero Chest I contents",
+		"loot:chest-t1:open": {
+			"name": "Chest I contents",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -608,8 +608,8 @@
 				}
 			]
 		},
-		"loot:hero-chest-t2:open": {
-			"name": "Hero Chest II contents",
+		"loot:chest-t2:open": {
+			"name": "Chest II contents",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -627,8 +627,8 @@
 				}
 			]
 		},
-		"loot:hero-chest-t3:open": {
-			"name": "Hero Chest III contents",
+		"loot:chest-t3:open": {
+			"name": "Chest III contents",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -646,8 +646,8 @@
 				}
 			]
 		},
-		"loot:hero-chest-t4:open": {
-			"name": "Hero Chest IV contents",
+		"loot:chest-t4:open": {
+			"name": "Chest IV contents",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -678,12 +678,12 @@
 				}
 			]
 		},
-		"loot:goldsmith-t1:hero-key-t3": {
-			"name": "Goldsmith Hero Key III output",
+		"loot:goldsmith-t1:key-t3": {
+			"name": "Goldsmith Key III output",
 			"output": [
 				{
 					"type": "guaranteed",
-					"itemId": "item:hero-key-t3",
+					"itemId": "item:key-t3",
 					"quantity": 1
 				}
 			]

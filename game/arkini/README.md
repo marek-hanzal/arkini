@@ -99,7 +99,7 @@ Town Hall IV
   8 Coin -> Heroes Guild I Blueprint
 
 Goldsmith I
-  Gold Ingot + 3 Coin -> Hero Key III
+  Gold Ingot + 3 Coin -> Key III
 ```
 
 ### Implemented first wave
@@ -392,14 +392,14 @@ The goldsmith turns refined gold plus late food/wine comfort and coal fuel into 
 ```txt
 producer:goldsmith-t1
   Gold Ingot + Wine Glass + Bread + Coal Cart -> 4 Coin
-  Gold Ingot + 3 Coin -> Hero Key III
+  Gold Ingot + 3 Coin -> Key III
 ```
 
-This currently introduces `item:coin` as the first playable currency item and gives the goldsmith the first non-cheat hero key hook. Higher coin merge tiers already have asset slots prepared, but this pass intentionally wires only the basic coin output.
+This currently introduces `item:coin` as the first playable currency item and gives the goldsmith the first non-cheat key hook. Higher coin merge tiers already have asset slots prepared, but this pass intentionally wires only the basic coin output.
 
 ### Heroes guild expedition loop
 
-Heroes Guild I is currently the first post-goldsmith building. Its blueprint comes from Town Hall IV, like every other building blueprint, and costs coins so the player must reach actual coin production before the guild branch exists. The guild is intentionally a producer with long product lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked hero chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
+Heroes Guild I is currently the first post-goldsmith building. Its blueprint comes from Town Hall IV, like every other building blueprint, and costs coins so the player must reach actual coin production before the guild branch exists. The guild is intentionally a producer with long product lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
 
 ```txt
 producer:townhall-t4
@@ -411,24 +411,24 @@ craft:heroes-guild-t1
   -> Heroes Guild I
 
 producer:heroes-guild-t1
-  1 Coin + Beer + Bread -> Hero Chest I, 10% chance Hero Chest II instead, 2 min
-  2 Coin + Beer Barrel + Sausage -> Hero Chest II, 10% chance Hero Chest III instead, 3 min
-  4 Coin + 2 Wine Glass + Sausage + Bread -> Hero Chest III, 10% chance Hero Chest IV instead, 5 min
-  8 Coin + Wine Barrel + Beer Barrel + 2 Sausage + 2 Bread -> Hero Chest IV, 10 min
+  1 Coin + Beer + Bread -> Chest I, 10% chance Chest II instead, 2 min
+  2 Coin + Beer Barrel + Sausage -> Chest II, 10% chance Chest III instead, 3 min
+  4 Coin + 2 Wine Glass + Sausage + Bread -> Chest III, 10% chance Chest IV instead, 5 min
+  8 Coin + Wine Barrel + Beer Barrel + 2 Sausage + 2 Bread -> Chest IV, 10 min
 ```
 
-Hero chests are finite stashes. Each chest tier requires a matching Hero Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Chest clicks auto-fill the matching key from board/inventory when available; if the key is missing, the chest opens its detail instead of throwing an action error. Hero Key III is currently produced by Goldsmith I from a Gold Ingot plus 3 Coin. Other key tiers are intentionally cheat-only placeholders for now; all four key tiers already have dedicated key art.
+Guild chests are finite stashes. Each chest tier requires a matching Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Chest clicks auto-fill the matching key from board/inventory when available; if the key is missing, the chest opens its detail instead of throwing an action error. Key III is currently produced by Goldsmith I from a Gold Ingot plus 3 Coin. Other key tiers are intentionally cheat-only placeholders for now; all four key tiers already have dedicated key art.
 
-Hero guild asset IDs:
+Guild branch asset IDs:
 
 - `asset:producer:heroes-guild-t1` -> `game/arkini/assets/producer-heroes-guild-t1.png`
 - `asset:item:blueprint-heroes-guild-t1` -> blueprint render over the guild asset
-- `asset:item:hero-chest-t1` -> `game/arkini/assets/item-hero-chest-t1.png`
-- `asset:item:hero-chest-t2` -> `game/arkini/assets/item-hero-chest-t2.png`
-- `asset:item:hero-chest-t3` -> `game/arkini/assets/item-hero-chest-t3.png`
-- `asset:item:hero-chest-t4` -> `game/arkini/assets/item-hero-chest-t4.png`
-- `asset:item:hero-key-t1` -> `game/arkini/assets/item-hero-key-t1.png`
-- `asset:item:hero-key-t2` -> `game/arkini/assets/item-hero-key-t2.png`
-- `asset:item:hero-key-t3` -> `game/arkini/assets/item-hero-key-t3.png`
-- `asset:item:hero-key-t4` -> `game/arkini/assets/item-hero-key-t4.png`
+- `asset:item:chest-t1` -> `game/arkini/assets/item-chest-t1.png`
+- `asset:item:chest-t2` -> `game/arkini/assets/item-chest-t2.png`
+- `asset:item:chest-t3` -> `game/arkini/assets/item-chest-t3.png`
+- `asset:item:chest-t4` -> `game/arkini/assets/item-chest-t4.png`
+- `asset:item:key-t1` -> `game/arkini/assets/item-key-t1.png`
+- `asset:item:key-t2` -> `game/arkini/assets/item-key-t2.png`
+- `asset:item:key-t3` -> `game/arkini/assets/item-key-t3.png`
+- `asset:item:key-t4` -> `game/arkini/assets/item-key-t4.png`
 

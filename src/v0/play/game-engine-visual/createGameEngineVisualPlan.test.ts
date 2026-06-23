@@ -356,7 +356,7 @@ describe("createGameEngineVisualPlan", () => {
 		const previousBoard = boardView([
 			{
 				id: "stash",
-				itemId: "item:hero-chest",
+				itemId: "item:chest",
 				state: {},
 				x: 0,
 				y: 0,
@@ -374,7 +374,7 @@ describe("createGameEngineVisualPlan", () => {
 			currentBoard: boardView([
 				{
 					id: "stash",
-					itemId: "item:hero-chest",
+					itemId: "item:chest",
 					state: {},
 					x: 0,
 					y: 0,
@@ -394,7 +394,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					openedAtMs: 1,
 					remainingCharges: 0,
-					stashId: "stash:hero-chest",
+					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					type: "stash.opened",
 				},
@@ -428,7 +428,7 @@ describe("createGameEngineVisualPlan", () => {
 		const previousBoard = boardView([
 			{
 				id: "stash",
-				itemId: "item:hero-chest",
+				itemId: "item:chest",
 				state: {},
 				x: 0,
 				y: 0,
@@ -446,7 +446,7 @@ describe("createGameEngineVisualPlan", () => {
 			currentBoard: boardView([
 				{
 					id: "stash",
-					itemId: "item:hero-chest",
+					itemId: "item:chest",
 					state: {},
 					x: 0,
 					y: 0,
@@ -466,7 +466,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					openedAtMs: 1,
 					remainingCharges: 0,
-					stashId: "stash:hero-chest",
+					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					type: "stash.opened",
 				},

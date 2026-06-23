@@ -724,7 +724,7 @@
 				}
 			]
 		},
-		"input:heroes-guild-t1:hero-chest-t1": {
+		"input:heroes-guild-t1:chest-t1": {
 			"name": "Heroes Guild short expedition payment",
 			"inputs": [
 				{
@@ -747,7 +747,7 @@
 				}
 			]
 		},
-		"input:heroes-guild-t1:hero-chest-t2": {
+		"input:heroes-guild-t1:chest-t2": {
 			"name": "Heroes Guild sturdy expedition payment",
 			"inputs": [
 				{
@@ -770,7 +770,7 @@
 				}
 			]
 		},
-		"input:heroes-guild-t1:hero-chest-t3": {
+		"input:heroes-guild-t1:chest-t3": {
 			"name": "Heroes Guild rare expedition payment",
 			"inputs": [
 				{
@@ -799,7 +799,7 @@
 				}
 			]
 		},
-		"input:heroes-guild-t1:hero-chest-t4": {
+		"input:heroes-guild-t1:chest-t4": {
 			"name": "Heroes Guild epic expedition payment",
 			"inputs": [
 				{
@@ -845,8 +845,8 @@
 				}
 			]
 		},
-		"input:goldsmith-t1:hero-key-t3": {
-			"name": "Goldsmith Hero Key III input",
+		"input:goldsmith-t1:key-t3": {
+			"name": "Goldsmith Key III input",
 			"inputs": [
 				{
 					"itemId": "item:gold-ingot",

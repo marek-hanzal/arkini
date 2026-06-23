@@ -1,12 +1,12 @@
 {
 	"stashes": {
-		"stash:hero-chest-t1": {
+		"stash:chest-t1": {
 			"type": "stash",
 			"placement": "board_then_inventory",
-			"outputTableId": "loot:hero-chest-t1:open",
+			"outputTableId": "loot:chest-t1:open",
 			"inputs": [
 				{
-					"itemId": "item:hero-key-t1",
+					"itemId": "item:key-t1",
 					"quantity": 1,
 					"capacity": 1,
 					"consume": true
@@ -16,13 +16,13 @@
 			"charges": 1,
 			"onDepleted": "remove"
 		},
-		"stash:hero-chest-t2": {
+		"stash:chest-t2": {
 			"type": "stash",
 			"placement": "board_then_inventory",
-			"outputTableId": "loot:hero-chest-t2:open",
+			"outputTableId": "loot:chest-t2:open",
 			"inputs": [
 				{
-					"itemId": "item:hero-key-t2",
+					"itemId": "item:key-t2",
 					"quantity": 1,
 					"capacity": 1,
 					"consume": true
@@ -32,13 +32,13 @@
 			"charges": 1,
 			"onDepleted": "remove"
 		},
-		"stash:hero-chest-t3": {
+		"stash:chest-t3": {
 			"type": "stash",
 			"placement": "board_then_inventory",
-			"outputTableId": "loot:hero-chest-t3:open",
+			"outputTableId": "loot:chest-t3:open",
 			"inputs": [
 				{
-					"itemId": "item:hero-key-t3",
+					"itemId": "item:key-t3",
 					"quantity": 1,
 					"capacity": 1,
 					"consume": true
@@ -48,13 +48,13 @@
 			"charges": 1,
 			"onDepleted": "remove"
 		},
-		"stash:hero-chest-t4": {
+		"stash:chest-t4": {
 			"type": "stash",
 			"placement": "board_then_inventory",
-			"outputTableId": "loot:hero-chest-t4:open",
+			"outputTableId": "loot:chest-t4:open",
 			"inputs": [
 				{
-					"itemId": "item:hero-key-t4",
+					"itemId": "item:key-t4",
 					"quantity": 1,
 					"capacity": 1,
 					"consume": true

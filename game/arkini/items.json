@@ -1136,7 +1136,7 @@
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Late-era guild that sends paid heroes on long expeditions and returns locked hero chests.",
+			"description": "Late-era guild that sends paid heroes on long expeditions and returns locked chests.",
 			"tags": [
 				"producer",
 				"hero",
@@ -1162,123 +1162,119 @@
 			],
 			"craftRecipeId": "craft:heroes-guild-t1"
 		},
-		"item:hero-chest-t1": {
-			"assetId": "asset:item:hero-chest-t1",
-			"code": "hero-chest-t1",
-			"name": "Hero Chest I",
+		"item:chest-t1": {
+			"assetId": "asset:item:chest-t1",
+			"code": "chest-t1",
+			"name": "Chest I",
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Locked chest returned from a short heroes guild expedition. Open it with a Hero Key I.",
+			"description": "Locked chest returned from a short heroes guild expedition. Open it with a Key I.",
 			"tags": [
 				"chest",
-				"hero",
 				"locked",
-				"stash"
+				"stash",
+				"guild"
 			],
-			"stashId": "stash:hero-chest-t1"
+			"stashId": "stash:chest-t1"
 		},
-		"item:hero-chest-t2": {
-			"assetId": "asset:item:hero-chest-t2",
-			"code": "hero-chest-t2",
-			"name": "Hero Chest II",
+		"item:chest-t2": {
+			"assetId": "asset:item:chest-t2",
+			"code": "chest-t2",
+			"name": "Chest II",
 			"tier": 2,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Locked chest returned from a tougher heroes guild expedition. Open it with a Hero Key II.",
+			"description": "Locked chest returned from a tougher heroes guild expedition. Open it with a Key II.",
 			"tags": [
 				"chest",
-				"hero",
 				"locked",
-				"stash"
+				"stash",
+				"guild"
 			],
-			"stashId": "stash:hero-chest-t2"
+			"stashId": "stash:chest-t2"
 		},
-		"item:hero-chest-t3": {
-			"assetId": "asset:item:hero-chest-t3",
-			"code": "hero-chest-t3",
-			"name": "Hero Chest III",
+		"item:chest-t3": {
+			"assetId": "asset:item:chest-t3",
+			"code": "chest-t3",
+			"name": "Chest III",
 			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Locked chest returned from a dangerous heroes guild expedition. Open it with a Hero Key III.",
+			"description": "Locked chest returned from a dangerous heroes guild expedition. Open it with a Key III.",
 			"tags": [
 				"chest",
-				"hero",
 				"locked",
-				"stash"
+				"stash",
+				"guild"
 			],
-			"stashId": "stash:hero-chest-t3"
+			"stashId": "stash:chest-t3"
 		},
-		"item:hero-chest-t4": {
-			"assetId": "asset:item:hero-chest-t4",
-			"code": "hero-chest-t4",
-			"name": "Hero Chest IV",
+		"item:chest-t4": {
+			"assetId": "asset:item:chest-t4",
+			"code": "chest-t4",
+			"name": "Chest IV",
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Locked chest returned from the longest heroes guild expedition. Open it with a Hero Key IV.",
+			"description": "Locked chest returned from the longest heroes guild expedition. Open it with a Key IV.",
 			"tags": [
 				"chest",
-				"hero",
 				"locked",
-				"stash"
+				"stash",
+				"guild"
 			],
-			"stashId": "stash:hero-chest-t4"
+			"stashId": "stash:chest-t4"
 		},
-		"item:hero-key-t1": {
-			"assetId": "asset:item:hero-key-t1",
-			"code": "hero-key-t1",
-			"name": "Hero Key I",
+		"item:key-t1": {
+			"assetId": "asset:item:key-t1",
+			"code": "key-t1",
+			"name": "Key I",
 			"tier": 1,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Temporary cheat-only key used to open Hero Chest I.",
+			"description": "Temporary cheat-only key used to open Chest I.",
 			"tags": [
 				"key",
-				"hero",
 				"cheat-source"
 			]
 		},
-		"item:hero-key-t2": {
-			"assetId": "asset:item:hero-key-t2",
-			"code": "hero-key-t2",
-			"name": "Hero Key II",
+		"item:key-t2": {
+			"assetId": "asset:item:key-t2",
+			"code": "key-t2",
+			"name": "Key II",
 			"tier": 2,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Temporary cheat-only key used to open Hero Chest II.",
+			"description": "Temporary cheat-only key used to open Chest II.",
 			"tags": [
 				"key",
-				"hero",
 				"cheat-source"
 			]
 		},
-		"item:hero-key-t3": {
-			"assetId": "asset:item:hero-key-t3",
-			"code": "hero-key-t3",
-			"name": "Hero Key III",
+		"item:key-t3": {
+			"assetId": "asset:item:key-t3",
+			"code": "key-t3",
+			"name": "Key III",
 			"tier": 3,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Temporary cheat-only key used to open Hero Chest III.",
+			"description": "Crafted key used to open Chest III.",
 			"tags": [
 				"key",
-				"hero",
-				"cheat-source"
+				"goldsmith"
 			]
 		},
-		"item:hero-key-t4": {
-			"assetId": "asset:item:hero-key-t4",
-			"code": "hero-key-t4",
-			"name": "Hero Key IV",
+		"item:key-t4": {
+			"assetId": "asset:item:key-t4",
+			"code": "key-t4",
+			"name": "Key IV",
 			"tier": 4,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Temporary cheat-only key used to open Hero Chest IV.",
+			"description": "Temporary cheat-only key used to open Chest IV.",
 			"tags": [
 				"key",
-				"hero",
 				"cheat-source"
 			]
 		}

@@ -1,10 +1,12 @@
-import type { FC } from "react";
+import type { FC, ReactNode } from "react";
 import type { ActivationHindranceView } from "~/v0/board/view/ActivationHindranceViewSchema";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
+import { ItemInlineAssetGroup } from "~/v0/item/ui/ItemInlineAssetGroup";
+import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
 import { formatMs } from "~/v0/time/formatMs";
-import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiSection } from "~/v0/ui/UiSection";
 
@@ -25,26 +27,6 @@ const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "
 const readItemName = (itemId: string, items: ItemCatalogView) =>
 	items[itemId]?.name ?? itemId.replace(/^item:/, "").replace(/^producer:/, "");
 
-const readRequirementLabel = (requirement: ActivationRequirementView, items: ItemCatalogView) => {
-	if (requirement.type === "proximity") {
-		const itemLabel = requirement.itemIds
-			.map((itemId) => readItemName(itemId, items))
-			.join(" / ");
-		const matchedDistance =
-			requirement.matchedDistance === undefined
-				? ""
-				: ` · nearest ${requirement.matchedDistance}`;
-		const durationEffect =
-			requirement.durationMultiplier === undefined || requirement.durationMultiplier <= 1
-				? ""
-				: ` · ${formatMultiplier(requirement.durationMultiplier)}× time`;
-
-		return `${itemLabel} within ${requirement.distance}${matchedDistance}${durationEffect}`;
-	}
-
-	return `${readItemName(requirement.itemId, items)} ${requirement.stored}/${requirement.quantity}`;
-};
-
 const readRequirementReady = (requirement: ActivationRequirementView) =>
 	requirement.type === "proximity"
 		? requirement.satisfied
@@ -59,17 +41,128 @@ const readInputsPartiallyAvailable = (line: ProducerProductLineView) =>
 const readHindrancesMultiplier = (hindrances: readonly ActivationHindranceView[]) =>
 	hindrances.reduce((total, hindrance) => total * hindrance.durationMultiplier, 1);
 
-const readHindranceLabel = (hindrance: ActivationHindranceView, items: ItemCatalogView) => {
-	if (hindrance.type === "passive") {
-		return `${readItemName(hindrance.itemId, items)} · ${hindrance.activeQuantity} active · ${hindrance.activeStacks} stack${hindrance.activeStacks === 1 ? "" : "s"} · ${formatMultiplier(hindrance.durationMultiplier)}× time`;
+const readRunButtonLabel = ({
+	canRunAction,
+	inputsPartiallyAvailable,
+	line,
+}: {
+	line: ProducerProductLineView;
+	inputsPartiallyAvailable: boolean;
+	canRunAction: boolean;
+}) => {
+	if (line.queueFull) return "Queue full";
+	if (!line.requirementsReady) return "Requirements missing";
+	if (!canRunAction) return "Feed items by drag";
+	if (line.inputsReady) return "Start";
+	if (line.inputsAvailable) return "Auto-fill & start";
+	if (inputsPartiallyAvailable) return "Partial fill";
+	return "Feed items by drag";
+};
+
+const renderRequirementAsset = (
+	requirement: ActivationRequirementView,
+	items: ItemCatalogView,
+): ReactNode => {
+	if (requirement.type === "proximity") {
+		return (
+			<ItemInlineAssetGroup
+				itemIds={requirement.itemIds}
+				items={items}
+				assetClassName="h-7 w-7"
+			/>
+		);
 	}
 
-	const itemLabel = hindrance.itemIds.map((itemId) => readItemName(itemId, items)).join(" / ");
+	return (
+		<ItemInlineAsset
+			item={items[requirement.itemId]}
+			className="h-9 w-9"
+		/>
+	);
+};
+
+const readRequirementLabel = (requirement: ActivationRequirementView, items: ItemCatalogView) => {
+	if (requirement.type === "proximity") {
+		return requirement.itemIds.map((itemId) => readItemName(itemId, items)).join(" / ");
+	}
+
+	return readItemName(requirement.itemId, items);
+};
+
+const readRequirementMeta = (requirement: ActivationRequirementView) => {
+	if (requirement.type === "stored") {
+		return `${requirement.stored}/${requirement.quantity} stored${
+			requirement.capacity > requirement.quantity ? ` · cap ${requirement.capacity}` : ""
+		}`;
+	}
+
+	if (requirement.type === "passive") {
+		return `${requirement.stored}/${requirement.quantity} available`;
+	}
+
+	const nearestLabel =
+		requirement.matchedDistance === undefined
+			? undefined
+			: `nearest ${requirement.matchedDistance}`;
+	const durationLabel =
+		requirement.durationMultiplier === undefined || requirement.durationMultiplier <= 1
+			? undefined
+			: `${formatMultiplier(requirement.durationMultiplier)}× time`;
+	return [
+		`within ${requirement.distance}`,
+		nearestLabel,
+		durationLabel,
+	]
+		.filter(Boolean)
+		.join(" · ");
+};
+
+const renderHindranceAsset = (hindrance: ActivationHindranceView, items: ItemCatalogView) => {
+	if (hindrance.type === "passive") {
+		return (
+			<ItemInlineAsset
+				item={items[hindrance.itemId]}
+				className="h-9 w-9"
+			/>
+		);
+	}
+
+	return (
+		<ItemInlineAssetGroup
+			itemIds={hindrance.itemIds}
+			items={items}
+			assetClassName="h-7 w-7"
+		/>
+	);
+};
+
+const readHindranceLabel = (hindrance: ActivationHindranceView, items: ItemCatalogView) => {
+	if (hindrance.type === "passive") {
+		return readItemName(hindrance.itemId, items);
+	}
+
+	return hindrance.itemIds.map((itemId) => readItemName(itemId, items)).join(" / ");
+};
+
+const readHindranceMeta = (hindrance: ActivationHindranceView, items: ItemCatalogView) => {
+	if (hindrance.type === "passive") {
+		return `${hindrance.activeQuantity} active · ${hindrance.activeStacks} stack${
+			hindrance.activeStacks === 1 ? "" : "s"
+		} · ${formatMultiplier(hindrance.durationMultiplier)}× time`;
+	}
+
 	const matchLabel = hindrance.matches
 		.map((match) => `${readItemName(match.itemId, items)} at ${match.distance}`)
 		.join(", ");
 
-	return `${itemLabel} within ${hindrance.distance} · ${hindrance.matches.length} active · ${formatMultiplier(hindrance.durationMultiplier)}× time · ${matchLabel}`;
+	return [
+		`within ${hindrance.distance}`,
+		`${hindrance.matches.length} active`,
+		`${formatMultiplier(hindrance.durationMultiplier)}× time`,
+		matchLabel,
+	]
+		.filter(Boolean)
+		.join(" · ");
 };
 
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
@@ -104,54 +197,47 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					const remainingMs = line.readyAtMs
 						? Math.max(0, line.readyAtMs - nowMs)
 						: undefined;
+					const runButtonLabel = readRunButtonLabel({
+						canRunAction,
+						inputsPartiallyAvailable,
+						line,
+					});
 
 					return (
 						<div
 							key={line.productId}
 							className="min-w-0 rounded-sm border border-ak-border bg-ak-surface p-3"
 						>
-							<div className="flex min-w-0 items-start justify-between gap-3">
-								<div className="min-w-0">
-									<div className="flex min-w-0 items-center gap-2">
-										<p className="truncate text-sm font-bold text-ak-text">
+							<div className="min-w-0">
+								<div className="flex min-w-0 items-start gap-2">
+									<div className="min-w-0 flex-1">
+										<p className="break-words text-base font-bold leading-6 text-ak-text">
 											{line.name}
 										</p>
-										{line.isDefault ? (
-											<span className="shrink-0 rounded-sm bg-ak-primary/15 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ak-primary">
-												Default
-											</span>
-										) : null}
+										<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
+											Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
+											{formatMs(line.durationMs)}
+											{hindranceMultiplier > 1
+												? ` · hindered ${formatMultiplier(hindranceMultiplier)}×`
+												: ""}
+											{line.inputItemIds.length
+												? ` · ${
+														line.inputsReady
+															? "input ready"
+															: line.inputsAvailable
+																? "auto-fill ready"
+																: inputsPartiallyAvailable
+																	? "partial fill ready"
+																	: "needs input"
+													}`
+												: " · tap to run"}
+										</p>
 									</div>
-									<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
-										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
-										{formatMs(line.durationMs)}
-										{hindranceMultiplier > 1
-											? ` · hindered ${formatMultiplier(hindranceMultiplier)}×`
-											: ""}
-										{line.inputItemIds.length
-											? ` · ${
-													line.inputsReady
-														? "input ready"
-														: line.inputsAvailable
-															? "auto-fill ready"
-															: inputsPartiallyAvailable
-																? "partial fill ready"
-																: "needs input"
-												}`
-											: " · tap to run"}
-										{line.requirementItemIds.length
-											? ` · ${line.requirementItemIds.length} requirement${line.requirementItemIds.length === 1 ? "" : "s"}`
-											: ""}
-									</p>
-								</div>
-								<div className="flex shrink-0 items-center gap-2">
-									<UiButton
-										fullWidth={false}
-										disabled={pending}
-										onClick={() => onSetDefault(line.productId)}
-									>
-										{line.isDefault ? "Unset default" : "Make default"}
-									</UiButton>
+									{line.isDefault ? (
+										<span className="shrink-0 rounded-sm bg-ak-primary/15 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ak-primary">
+											Default
+										</span>
+									) : null}
 								</div>
 							</div>
 
@@ -160,77 +246,96 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									{activeHindrances.map((hindrance, hindranceIndex) => (
 										<div
 											key={`${hindranceIndex}:${readHindranceLabel(hindrance, items)}`}
-											className="flex min-w-0 items-start gap-2 rounded-sm bg-rose-500/10 px-2.5 py-2 text-xs text-ak-text-muted"
+											className="flex min-w-0 items-start gap-2 rounded-sm bg-rose-500/10 px-2.5 py-2 text-xs"
 										>
-											<span className="shrink-0 text-rose-300">⚠</span>
-											<span className="min-w-0 break-words font-semibold text-ak-text">
-												{readHindranceLabel(hindrance, items)}
-											</span>
+											{renderHindranceAsset(hindrance, items)}
+											<div className="min-w-0 flex-1">
+												<p className="break-words font-semibold text-ak-text">
+													{readHindranceLabel(hindrance, items)}
+												</p>
+												<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
+													{readHindranceMeta(hindrance, items)}
+												</p>
+											</div>
+											<span className="mt-0.5 shrink-0 text-rose-300">⚠</span>
 										</div>
 									))}
 								</div>
 							) : null}
 
-							{line.requirements?.some(
-								(requirement) => !readRequirementReady(requirement),
-							) ? (
+							{line.requirements?.length ? (
 								<div className="mt-2.5 grid gap-1.5">
-									{line.requirements
-										.filter((requirement) => !readRequirementReady(requirement))
-										.map((requirement, requirementIndex) => (
+									{line.requirements.map((requirement, requirementIndex) => {
+										const ready = readRequirementReady(requirement);
+										return (
 											<div
 												key={`${requirementIndex}:${readRequirementLabel(requirement, items)}`}
-												className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
+												className="flex min-w-0 items-start gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
 											>
-												<span className="min-w-0 truncate font-semibold text-ak-text">
-													{readRequirementLabel(requirement, items)}
-												</span>
-												<span className="ml-auto shrink-0 text-ak-text-muted">
-													{readRequirementReady(requirement)
-														? "ready"
-														: "missing"}
+												{renderRequirementAsset(requirement, items)}
+												<div className="min-w-0 flex-1">
+													<p className="break-words font-semibold text-ak-text">
+														{readRequirementLabel(requirement, items)}
+													</p>
+													<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
+														{readRequirementMeta(requirement)}
+													</p>
+												</div>
+												<span className="mt-0.5 shrink-0 text-ak-text-muted">
+													{ready ? "ready" : "missing"}
 												</span>
 											</div>
-										))}
+										);
+									})}
 								</div>
 							) : null}
 
 							{line.inputs.length ? (
 								<div className="mt-2.5 grid gap-1.5">
-									{line.inputs.map((input) => (
-										<div
-											key={input.itemId}
-											className="flex min-w-0 items-center justify-between gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
-										>
-											<span className="min-w-0 truncate font-semibold text-ak-text">
-												{readItemName(input.itemId, items)}
-											</span>
-											<span className="text-ak-text-muted ml-auto shrink-0 tabular-nums">
-												{input.stored}/{input.quantity}
-												{readInputFillableQuantity(input) > 0
-													? ` · +${readInputFillableQuantity(input)} available`
-													: ""}
-												{input.capacity > input.quantity
-													? ` · cap ${input.capacity}`
-													: ""}
-											</span>
-											{input.stored > 0 ? (
-												<UiButton
-													data-ui="withdraw action"
-													fullWidth={false}
-													disabled={pending}
-													onClick={() =>
-														onWithdrawInput(
-															line.productId,
-															input.itemId,
-														)
-													}
-												>
-													Withdraw
-												</UiButton>
-											) : null}
-										</div>
-									))}
+									{line.inputs.map((input) => {
+										const inputItem = items[input.itemId];
+										return (
+											<div
+												key={input.itemId}
+												className="flex min-w-0 items-center gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
+											>
+												<ItemInlineAsset
+													item={inputItem}
+													className="h-9 w-9"
+												/>
+												<div className="min-w-0 flex-1">
+													<p className="break-words font-semibold text-ak-text">
+														{inputItem?.name ??
+															readItemName(input.itemId, items)}
+													</p>
+													<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
+														{input.stored}/{input.quantity}
+														{readInputFillableQuantity(input) > 0
+															? ` · +${readInputFillableQuantity(input)} available`
+															: ""}
+														{input.capacity > input.quantity
+															? ` · cap ${input.capacity}`
+															: ""}
+													</p>
+												</div>
+												{input.stored > 0 ? (
+													<UiButton
+														data-ui="withdraw action"
+														fullWidth={false}
+														disabled={pending}
+														onClick={() =>
+															onWithdrawInput(
+																line.productId,
+																input.itemId,
+															)
+														}
+													>
+														Withdraw
+													</UiButton>
+												) : null}
+											</div>
+										);
+									})}
 								</div>
 							) : null}
 
@@ -260,24 +365,23 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								</div>
 							) : null}
 
-							<UiButton
-								disabled={!canRunAction || pending}
-								tone={canRunAction ? "primary" : "secondary"}
-								className="mt-2.5"
-								onClick={() => onStart(line.productId)}
-							>
-								{line.queueFull
-									? "Queue full"
-									: !line.requirementsReady
-										? "Requirements missing"
-										: line.inputsReady
-											? "Start"
-											: line.inputsAvailable
-												? "Auto-fill & start"
-												: inputsPartiallyAvailable
-													? "Partial fill"
-													: "Feed items by drag"}
-							</UiButton>
+							<div className="mt-2.5 grid grid-cols-3 gap-2">
+								<UiButton
+									disabled={!canRunAction || pending}
+									tone={canRunAction ? "primary" : "secondary"}
+									className="col-span-2"
+									onClick={() => onStart(line.productId)}
+								>
+									{runButtonLabel}
+								</UiButton>
+								<UiButton
+									fullWidth
+									disabled={pending}
+									onClick={() => onSetDefault(line.productId)}
+								>
+									{line.isDefault ? "Un-default" : "Default"}
+								</UiButton>
+							</div>
 						</div>
 					);
 				})}

@@ -86,7 +86,6 @@ describe("applyGameActionFx Producer", () => {
 		});
 		save.producerLines["item-instance:1"] = {
 			defaultProductId: "product:shred",
-			disabledProductIds: [],
 		};
 
 		const result = runAction({
@@ -1150,7 +1149,6 @@ describe("applyGameActionFx Producer", () => {
 		};
 		save.producerLines["item-instance:1"] = {
 			defaultProductId: "product:alt-shred",
-			disabledProductIds: [],
 		};
 
 		const result = runAction({
@@ -1246,7 +1244,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("stores duplicate producer input into the first enabled product line with capacity", () => {
+	it("stores duplicate producer input into the first product line with remaining capacity", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			inputs: {
@@ -1290,10 +1288,14 @@ describe("applyGameActionFx Producer", () => {
 			itemId: "item:twig",
 			quantity: 1,
 		};
-		save.producerLines["item-instance:1"] = {
-			disabledProductIds: [
-				"product:shred",
-			],
+		save.producerInputs["item-instance:1"] = {
+			productInputs: {
+				"product:shred": {
+					items: {
+						"item:twig": 1,
+					},
+				},
+			},
 		};
 
 		const result = runAction({
@@ -1313,6 +1315,11 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
 			"product:alt-shred": {
+				items: {
+					"item:twig": 1,
+				},
+			},
+			"product:shred": {
 				items: {
 					"item:twig": 1,
 				},
@@ -1608,7 +1615,6 @@ describe("applyGameActionFx Producer", () => {
 		expect(defaulted.save.producerLines).toEqual({
 			"item-instance:1": {
 				defaultProductId: "product:shred",
-				disabledProductIds: [],
 			},
 		});
 		expect(defaulted.events).toEqual([
@@ -1635,7 +1641,6 @@ describe("applyGameActionFx Producer", () => {
 		expect(reset.save.producerLines).toEqual({
 			"item-instance:1": {
 				defaultProductId: "product:test",
-				disabledProductIds: [],
 			},
 		});
 		expect(reset.events).toEqual([
@@ -1684,125 +1689,6 @@ describe("applyGameActionFx Producer", () => {
 				previousProductId: "product:test",
 				producerItemInstanceId: "item-instance:1",
 				type: "producer.product_line.default_changed",
-			},
-		]);
-	});
-
-	it("stores disabled producer product lines in save state", () => {
-		const config = createEngineTestConfig();
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-
-		const disabled = runAction({
-			action: {
-				enabled: false,
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.set_enabled",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		expect(disabled.save.producerLines).toEqual({
-			"item-instance:1": {
-				disabledProductIds: [
-					"product:test",
-				],
-			},
-		});
-		expect(disabled.events).toEqual([
-			{
-				changedAtMs: 100,
-				nextEnabled: false,
-				previousEnabled: true,
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.enabled_changed",
-			},
-		]);
-	});
-
-	it("blocks starting disabled producer product lines", () => {
-		const config = createEngineTestConfig();
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-		const disabled = runAction({
-			action: {
-				enabled: false,
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.set_enabled",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		const result = runActionEither({
-			action: {
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				inputRefs: [],
-				type: "producer.product.start",
-			},
-			config,
-			nowMs: 200,
-			save: disabled.save,
-		});
-
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") {
-			expect(result.left).toMatchObject({
-				_tag: "GameActionRejected",
-				reason: "product_line_disabled",
-			});
-		}
-	});
-
-	it("re-enables producer product lines by removing empty line state", () => {
-		const config = createEngineTestConfig();
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-		const disabled = runAction({
-			action: {
-				enabled: false,
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.set_enabled",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-		const enabled = runAction({
-			action: {
-				enabled: true,
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.set_enabled",
-			},
-			config,
-			nowMs: 200,
-			save: disabled.save,
-		});
-
-		expect(enabled.save.producerLines).toEqual({});
-		expect(enabled.events).toEqual([
-			{
-				changedAtMs: 200,
-				nextEnabled: true,
-				previousEnabled: false,
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.enabled_changed",
 			},
 		]);
 	});

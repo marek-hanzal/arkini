@@ -165,7 +165,7 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
-	it("completes already running producer jobs even when the product line is later disabled", () => {
+	it("completes already running producer jobs while producer line state exists", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -181,9 +181,7 @@ describe("runGameTickFx", () => {
 			startedAtMs: 0,
 		};
 		save.producerLines["item-instance:1"] = {
-			disabledProductIds: [
-				"product:test",
-			],
+			defaultProductId: "product:test",
 		};
 
 		const result = runTick({

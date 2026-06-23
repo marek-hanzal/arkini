@@ -55,9 +55,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	const lootTable = config.lootTables[stash.outputTableId];
 	if (!lootTable) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(
-				`Missing loot table "${stash.outputTableId}".`,
-			),
+			GameEngineError.configReferenceMissing(`Missing loot table "${stash.outputTableId}".`),
 		);
 	}
 

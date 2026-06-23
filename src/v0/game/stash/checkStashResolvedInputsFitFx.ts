@@ -16,41 +16,39 @@ export namespace checkStashResolvedInputsFitFx {
 	}
 }
 
-export const checkStashResolvedInputsFitFx = Effect.fn("checkStashResolvedInputsFitFx")(
-	function* ({
-		inputs,
-		resolvedRefs,
-		save,
-		stashItemInstanceId,
-	}: checkStashResolvedInputsFitFx.Props) {
-		const selectedByItemId = readStashSelectedInputQuantities(resolvedRefs);
+export const checkStashResolvedInputsFitFx = Effect.fn("checkStashResolvedInputsFitFx")(function* ({
+	inputs,
+	resolvedRefs,
+	save,
+	stashItemInstanceId,
+}: checkStashResolvedInputsFitFx.Props) {
+	const selectedByItemId = readStashSelectedInputQuantities(resolvedRefs);
 
-		for (const [itemId, selectedQuantity] of selectedByItemId) {
-			const input = inputs.find((candidate) => candidate.itemId === itemId);
-			if (!input) {
-				return yield* Effect.fail(
-					GameEngineError.actionRejected(
-						"input_mismatch",
-						`Input "${itemId}" is not required by this stash.`,
-					),
-				);
-			}
-
-			const nextQuantity =
-				readStashStoredInputQuantity({
-					itemId,
-					save,
-					stashItemInstanceId,
-				}) + selectedQuantity;
-			const capacity = readStashInputCapacity(input);
-			if (nextQuantity > capacity) {
-				return yield* Effect.fail(
-					GameEngineError.actionRejected(
-						"input_mismatch",
-						`Input "${itemId}" overfills this stash (${nextQuantity}/${capacity}).`,
-					),
-				);
-			}
+	for (const [itemId, selectedQuantity] of selectedByItemId) {
+		const input = inputs.find((candidate) => candidate.itemId === itemId);
+		if (!input) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"input_mismatch",
+					`Input "${itemId}" is not required by this stash.`,
+				),
+			);
 		}
-	},
-);
+
+		const nextQuantity =
+			readStashStoredInputQuantity({
+				itemId,
+				save,
+				stashItemInstanceId,
+			}) + selectedQuantity;
+		const capacity = readStashInputCapacity(input);
+		if (nextQuantity > capacity) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"input_mismatch",
+					`Input "${itemId}" overfills this stash (${nextQuantity}/${capacity}).`,
+				),
+			);
+		}
+	}
+});

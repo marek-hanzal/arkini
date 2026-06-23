@@ -47,7 +47,7 @@ export const findActivationInputTargetEventIndex = ({
 	events.findIndex(
 		(candidate, candidateIndex) =>
 			candidateIndex > afterIndex &&
-			(!skipped.has(candidateIndex)) &&
+			!skipped.has(candidateIndex) &&
 			matchesTargetEvent({
 				candidate,
 				source,

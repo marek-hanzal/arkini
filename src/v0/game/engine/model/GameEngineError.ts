@@ -22,7 +22,6 @@ export type GameEngineError =
 				| "craft_in_progress"
 				| "missing_requirement"
 				| GamePlacementFailureReason
-				| "product_line_disabled"
 				| "producer_queue_full"
 				| "storage_restricted"
 				| "stash_depleted"

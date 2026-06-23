@@ -132,9 +132,7 @@ export const useTileEngineMotionRequests = (engineId: string): MotionMap =>
 		() => readTileEngineMotionRequests(engineId),
 	);
 
-const feedbackTotalDurationMs = (
-	feedback: NonNullable<TileEngineMotionSchema.Type["feedback"]>,
-) =>
+const feedbackTotalDurationMs = (feedback: NonNullable<TileEngineMotionSchema.Type["feedback"]>) =>
 	(feedback.durationMs ?? TileEngineTiming.feedbackDurationSeconds * 1000) *
 	(feedback.pulseCount ?? 1);
 
@@ -149,8 +147,7 @@ const mergeFeedbackRequests = (
 
 	const feedback = {
 		...request.feedback,
-		pulseCount:
-			(current.feedback.pulseCount ?? 1) + (request.feedback.pulseCount ?? 1),
+		pulseCount: (current.feedback.pulseCount ?? 1) + (request.feedback.pulseCount ?? 1),
 	};
 	const feedbackCleanupDelayMs =
 		(feedback.delayMs ?? 0) +
@@ -187,10 +184,7 @@ const normalizeTileEngineMotionRequests = (
 			continue;
 		}
 
-		normalized[currentIndex] = mergeFeedbackRequests(
-			normalized[currentIndex],
-			request,
-		);
+		normalized[currentIndex] = mergeFeedbackRequests(normalized[currentIndex], request);
 	}
 
 	return normalized;

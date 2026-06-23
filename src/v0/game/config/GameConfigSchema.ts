@@ -19,7 +19,7 @@ import { z } from "zod";
  * ```
  *
  * The package contains static game truth only. Mutable save state such as occupied
- * board slots, producer line progress, disabled production lines, running craft jobs
+ * board slots, producer line progress, selected default product lines, running craft jobs
  * belong to the save/runtime engine state, not here.
  *
  * Important gameplay contracts represented by this schema:
@@ -47,8 +47,8 @@ import { z } from "zod";
  *   default, clicking a producer tile is intentionally a noop. Product
  *   definitions are owned by exactly one producer line. Producer shells do not own
  *   inputs; product lines reference named input definitions through `inputRefId`.
- *   Runtime may still choose between multiple enabled lines accepting the same dragged
- *   item from top to bottom. `maxQueueSize` is a hard per-producer-instance cap
+ *   Runtime may still choose between multiple product lines accepting the same dragged
+ *   item by default-line priority, then configured order. `maxQueueSize` is a hard per-producer-instance cap
  *   covering both running and queued jobs.
  * - Product inputs are stored per product line. Craft inputs are stored per craft
  *   target instance until the player explicitly starts the craft. Completion replaces
@@ -494,8 +494,7 @@ const LootTableDefinitionSchema = z
 /**
  * Producer product line.
  *
- * Product lines are enabled by default by static contract. Player-disabled lines belong
- * to save state. Missing `outputTableId` means a valid delayed sink/destructor product.
+ * Missing `outputTableId` means a valid delayed sink/destructor product.
  */
 const ProductDefinitionSchema = z
 	.object({

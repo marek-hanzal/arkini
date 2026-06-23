@@ -25,9 +25,6 @@ export namespace matchGameAction {
 		producerProductLineSetDefault: (
 			action: GameActionOfType<"producer.product_line.set_default">,
 		) => Result;
-		producerProductLineSetEnabled: (
-			action: GameActionOfType<"producer.product_line.set_enabled">,
-		) => Result;
 		producerProductStart: (action: GameActionOfType<"producer.product.start">) => Result;
 		stashOpen: (action: GameActionOfType<"stash.open">) => Result;
 		storedRequirementStore: (action: GameActionOfType<"stored_requirement.store">) => Result;
@@ -120,12 +117,6 @@ export const matchGameAction = <Result>(
 				type: "producer.product_line.set_default",
 			},
 			cases.producerProductLineSetDefault,
-		)
-		.with(
-			{
-				type: "producer.product_line.set_enabled",
-			},
-			cases.producerProductLineSetEnabled,
 		)
 		.with(
 			{

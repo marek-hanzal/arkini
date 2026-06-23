@@ -8,7 +8,6 @@ import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequi
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
-import { readProducerProductLineEnabledFx } from "~/v0/game/producer/readProducerProductLineEnabledFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -53,20 +52,6 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			GameEngineError.actionRejected(
 				"invalid_actor",
 				`Product "${action.productId ?? "<default>"}" does not belong to producer "${producerDefinition.type}" on item "${producerItem.itemId}".`,
-			),
-		);
-	}
-
-	const productLineEnabled = yield* readProducerProductLineEnabledFx({
-		producerItemInstanceId: action.producerItemInstanceId,
-		productId,
-		save,
-	});
-	if (!productLineEnabled) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"product_line_disabled",
-				`Product line "${productId}" is disabled for producer item "${action.producerItemInstanceId}".`,
 			),
 		);
 	}

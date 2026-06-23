@@ -51,10 +51,7 @@ const checkSelectedInputsCanProgressOrOpen = ({
 	);
 	if (hasProgress || readyAfterSelection) return undefined;
 
-	return GameEngineError.actionRejected(
-		"input_mismatch",
-		"Stash inputs are missing.",
-	);
+	return GameEngineError.actionRejected("input_mismatch", "Stash inputs are missing.");
 };
 
 export const checkStashOpenReadinessFx = Effect.fn("checkStashOpenReadinessFx")(function* ({

@@ -27,7 +27,6 @@ const productLine = (
 	overrides: Partial<ProducerProductLineView> = {},
 ): ProducerProductLineView => ({
 	durationMs: 1000,
-	enabled: true,
 	inProgress: false,
 	isDefault: true,
 	inputItemIds: [],
@@ -240,35 +239,6 @@ describe("resolveDropIntent", () => {
 			}),
 		).toEqual({
 			type: "stored-requirement",
-		});
-	});
-
-	it("ignores disabled product-line missing requirements", () => {
-		expect(
-			resolveDropIntent({
-				config,
-				sourceItemId: "item:twig",
-				targetItem: activationTarget({
-					inputs: [],
-					kind: "producer",
-					productLines: [
-						productLine({
-							enabled: false,
-							missingRequirementItemIds: [
-								"item:twig",
-							],
-							requirementItemIds: [
-								"item:twig",
-							],
-							requirementsReady: false,
-						}),
-					],
-					requirements: [],
-					trigger: "click",
-				}),
-			}),
-		).toEqual({
-			type: "swap",
 		});
 	});
 

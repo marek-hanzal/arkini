@@ -41,10 +41,7 @@ const requirementsReady = (requirements: readonly ActivationRequirementView[] | 
 	(requirements ?? []).every(requirementReady);
 
 const productLineCanStart = (line: ProducerProductLineView) =>
-	line.enabled &&
-	!line.queueFull &&
-	line.requirementsReady &&
-	(line.inputsReady || line.inputsAvailable);
+	!line.queueFull && line.requirementsReady && (line.inputsReady || line.inputsAvailable);
 
 const activationInputsReady = (inputs: readonly ActivationInputView[]) =>
 	inputs.every((input) => input.stored >= input.quantity);

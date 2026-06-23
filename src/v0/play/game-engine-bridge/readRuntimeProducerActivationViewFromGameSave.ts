@@ -57,16 +57,6 @@ const readRuntimeProductInputAvailableQuantityFromGameSave = ({
 	return boardQuantity + inventoryQuantity;
 };
 
-const productLineEnabled = ({
-	productId,
-	save,
-	targetItemInstanceId,
-}: {
-	productId: string;
-	save: GameSave;
-	targetItemInstanceId: string;
-}) => !(save.producerLines[targetItemInstanceId]?.disabledProductIds ?? []).includes(productId);
-
 const readRuntimeProductLineViewsFromGameSave = ({
 	config,
 	maxQueueSize,
@@ -203,11 +193,6 @@ const readRuntimeProductLineViewsFromGameSave = ({
 		return [
 			{
 				durationMs,
-				enabled: productLineEnabled({
-					productId,
-					save,
-					targetItemInstanceId,
-				}),
 				inProgress: jobs.length > 0,
 				hindrances: readRuntimeActivationHindranceViewsFromGameSave({
 					hindrances,

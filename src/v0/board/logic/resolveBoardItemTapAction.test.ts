@@ -48,7 +48,6 @@ const activation = (
 
 const productLine = (isDefault: boolean, overrides = {}) => ({
 	durationMs: 1000,
-	enabled: true,
 	inProgress: false,
 	inputItemIds: [],
 	inputs: [],

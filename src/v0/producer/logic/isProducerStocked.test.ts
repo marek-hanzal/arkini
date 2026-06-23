@@ -6,7 +6,6 @@ const productLine = (
 	overrides: Partial<NonNullable<ActivationView["productLines"]>[number]> = {},
 ) => ({
 	durationMs: 1000,
-	enabled: true,
 	inProgress: false,
 	inputItemIds: [],
 	inputs: [],

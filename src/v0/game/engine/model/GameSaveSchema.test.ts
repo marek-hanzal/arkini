@@ -111,7 +111,6 @@ describe("GameSaveConfigSchema", () => {
 		const invalidSave = cloneSave(save);
 		invalidSave.producerLines["item-instance:1"] = {
 			defaultProductId: "product:missing",
-			disabledProductIds: [],
 		};
 
 		const result = GameSaveConfigSchema.safeParse({

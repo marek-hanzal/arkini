@@ -161,6 +161,16 @@ npm run check
 
 This runs `format:check`, dependency-cruiser boundaries, TypeScript, and Vitest. Run `npm run build` separately for the production bundle. `npm run dc` can be run alone when changing imports or architecture boundaries. `npm run test` runs the focused Vitest suite.
 
+Optional code hygiene passes live outside the hard check gate:
+
+```bash
+npm run audit:dead
+npm run audit:dupes
+npm run audit:optional
+```
+
+`audit:dead` runs Knip with a zero exit code for findings. `audit:dupes` runs jscpd with a zero duplicate exit code. They are meant to be annoying local searchlights, not CI guillotines. Do not wire them into `npm run check` unless we deliberately decide to start failing builds on dead exports or copy-paste.
+
 ## Formatting
 
 Code formatting is owned by Biome. The config is intentionally formatter-only: `biome format` is allowed to rewrite code shape, but Biome linting and assist actions are disabled. Do not sneak lint rules into `biome.json`; lint creep is how a formatter becomes a tiny annoying government.

@@ -16,7 +16,10 @@
 		"format:check": "biome format .",
 		"game:compile": "tsx cli/game/compile.ts",
 		"game:validate": "tsx cli/game/validate.ts",
-		"game:validate:default": "npm run game:validate -- game/arkini"
+		"game:validate:default": "npm run game:validate -- game/arkini",
+		"audit:dead": "knip --no-exit-code",
+		"audit:dupes": "jscpd --config jscpd.json --exitCode 0",
+		"audit:optional": "npm run audit:dead && npm run audit:dupes"
 	},
 	"dependencies": {
 		"@paralleldrive/cuid2": "^3.3.0",
@@ -39,6 +42,8 @@
 		"@vitejs/plugin-react": "6.0.2",
 		"dependency-cruiser": "17.4.2",
 		"fake-indexeddb": "^6.2.5",
+		"jscpd": "5.0.11",
+		"knip": "6.18.0",
 		"tailwindcss": "4.3.0",
 		"tsx": "4.22.4",
 		"typescript": "6.0.3",

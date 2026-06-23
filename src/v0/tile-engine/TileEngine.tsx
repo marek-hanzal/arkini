@@ -12,8 +12,6 @@ import { useTileEngineMotionRequests } from "~/v0/tile-engine/TileEngineMotionRe
 import { useLatestRef } from "~/v0/react/useLatestRef";
 import { sameTileEngineDropFeedback } from "~/v0/tile-engine/sameTileEngineDropFeedback";
 
-export type { TileEngine as TileEngineNamespace } from "~/v0/tile-engine/TileEngine.types";
-
 const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	id,
 	columns,

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameActivationInputRequirement } from "~/v0/game/requirements/GameActivationInputRequirement";
 
-export type GameActivationInputRequirementIndex = Readonly<
+type GameActivationInputRequirementIndex = Readonly<
 	Record<string, GameActivationInputRequirement | undefined>
 >;
 

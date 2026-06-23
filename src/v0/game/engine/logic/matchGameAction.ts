@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import type { GameAction } from "~/v0/game/action/GameActionSchema";
 
-export type GameActionOfType<Type extends GameAction["type"]> = Extract<
+type GameActionOfType<Type extends GameAction["type"]> = Extract<
 	GameAction,
 	{
 		type: Type;

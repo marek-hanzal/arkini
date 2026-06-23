@@ -5,7 +5,7 @@ import { readProximityRequirementDurationMultiplier } from "~/v0/game/requiremen
 import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGameSaveItemQuantityByScope";
 import { readProximityRequirementMatch } from "~/v0/game/requirements/readProximityRequirementMatch";
 
-export type RuntimeActivationRequirement =
+type RuntimeActivationRequirement =
 	| {
 			capacity: number;
 			itemId: string;

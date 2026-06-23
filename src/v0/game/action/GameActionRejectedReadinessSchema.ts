@@ -34,9 +34,3 @@ export const GameActionRejectedReadinessSchema = z
 		type: z.literal("rejected"),
 	})
 	.strict();
-
-export type GameActionRejectedReadinessSchema = typeof GameActionRejectedReadinessSchema;
-
-export namespace GameActionRejectedReadinessSchema {
-	export type Type = z.infer<typeof GameActionRejectedReadinessSchema>;
-}

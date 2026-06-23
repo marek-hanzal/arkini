@@ -1,4 +1,4 @@
-export type ItemInteractionFeedbackVariant = "primary" | "secondary";
+type ItemInteractionFeedbackVariant = "primary" | "secondary";
 
 export type ItemToBoardItemInteractionPlan =
 	| {

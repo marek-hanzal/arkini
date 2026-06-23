@@ -1,7 +1,7 @@
 import type { BoardTransientTile } from "~/v0/board/animation/BoardTransientTile";
 import type { TileEngineMotionRequest } from "~/v0/tile-engine";
 
-export interface GameEngineVisualTransientTilePlan {
+interface GameEngineVisualTransientTilePlan {
 	cleanupDelayMs: number;
 	groupId: string;
 	request: TileEngineMotionRequest;

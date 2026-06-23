@@ -1,4 +1,4 @@
-export namespace TilePresenceMotionMarker {
+namespace TilePresenceMotionMarker {
 	export interface CreateTokenProps {
 		kind: "enter" | "exit";
 		groupId?: string;

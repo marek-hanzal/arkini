@@ -3,17 +3,17 @@ import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { UiSection } from "~/v0/ui/UiSection";
 
-export namespace ItemRelationList {
-	export interface Relation {
-		key: string;
-		leftItemId: ItemId;
-		resultItemId: ItemId;
-	}
+interface ItemRelation {
+	key: string;
+	leftItemId: ItemId;
+	resultItemId: ItemId;
+}
 
+export namespace ItemRelationList {
 	export interface Props {
 		title: string;
 		items: ItemCatalogView;
-		relations: Relation[];
+		relations: ItemRelation[];
 	}
 }
 

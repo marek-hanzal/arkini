@@ -1,7 +1,7 @@
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 
-export interface GameRuntimeSaveStorage {
+interface GameRuntimeSaveStorage {
 	save(save: GameSave): Promise<void>;
 }
 

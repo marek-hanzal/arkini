@@ -417,7 +417,7 @@ producer:heroes-guild-t1
   8 Coin + Wine Barrel + Beer Barrel + 2 Sausage + 2 Bread -> Hero Chest IV, 10 min
 ```
 
-Hero chests are finite stashes. Each chest tier requires a matching Hero Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Hero Key III is currently produced by Goldsmith I from a Gold Ingot plus 3 Coin. Other key tiers are intentionally cheat-only placeholders for now; dedicated key acquisition and key art can come later without blocking the chest loop.
+Hero chests are finite stashes. Each chest tier requires a matching Hero Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Hero Key III is currently produced by Goldsmith I from a Gold Ingot plus 3 Coin. Other key tiers are intentionally cheat-only placeholders for now; all four key tiers already have dedicated key art.
 
 Hero guild asset IDs:
 
@@ -427,4 +427,8 @@ Hero guild asset IDs:
 - `asset:item:hero-chest-t2` -> `game/arkini/assets/item-hero-chest-t2.png`
 - `asset:item:hero-chest-t3` -> `game/arkini/assets/item-hero-chest-t3.png`
 - `asset:item:hero-chest-t4` -> `game/arkini/assets/item-hero-chest-t4.png`
+- `asset:item:hero-key-t1` -> `game/arkini/assets/item-hero-key-t1.png`
+- `asset:item:hero-key-t2` -> `game/arkini/assets/item-hero-key-t2.png`
+- `asset:item:hero-key-t3` -> `game/arkini/assets/item-hero-key-t3.png`
+- `asset:item:hero-key-t4` -> `game/arkini/assets/item-hero-key-t4.png`
 

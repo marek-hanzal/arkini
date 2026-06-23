@@ -1,0 +1,18 @@
+{
+	"$schema": "https://unpkg.com/knip@6/schema.json",
+	"entry": [
+		"src/app/main.tsx",
+		"cli/game/compile.ts",
+		"cli/game/validate.ts",
+		"vite.config.ts",
+		"vitest.config.ts"
+	],
+	"project": [
+		"src/**/*.{ts,tsx}",
+		"cli/**/*.ts",
+		"*.{ts,tsx}"
+	],
+	"ignore": [
+		"src/vite-env.d.ts"
+	]
+}

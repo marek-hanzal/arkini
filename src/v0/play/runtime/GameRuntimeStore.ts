@@ -162,4 +162,3 @@ export class GameRuntimeStore {
 	}
 }
 
-export type GameRuntimeDispatchResult = GameEngineResult;

@@ -1,8 +1,8 @@
 import { type RefObject, useCallback, useEffect, useRef } from "react";
 
-export namespace useTileActorTimers {
-	export type TimerRef = RefObject<ReturnType<typeof setTimeout> | null>;
+type TimerRef = RefObject<ReturnType<typeof setTimeout> | null>;
 
+export namespace useTileActorTimers {
 	export interface Result {
 		singleTimerRef: TimerRef;
 		longTimerRef: TimerRef;

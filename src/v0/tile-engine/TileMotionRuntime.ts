@@ -6,7 +6,7 @@ import {
 } from "~/v0/tile-engine/TileVisualSnapshot";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
-export namespace TileMotionRuntime {
+namespace TileMotionRuntime {
 	export type Status = "completed" | "cancelled";
 	export type StyleKeyframes = Record<string, unknown>;
 

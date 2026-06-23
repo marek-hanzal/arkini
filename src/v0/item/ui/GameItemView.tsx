@@ -3,9 +3,8 @@ import { GameItemContent } from "~/v0/item/ui/GameItemContent";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 
 export namespace GameItemView {
-	export type Variant = "board" | "inventory" | "drag";
-
-	export type SizeVariant = "board" | "inventory";
+	type Variant = "board" | "inventory" | "drag";
+	type SizeVariant = "board" | "inventory";
 
 	export interface OverlaySize {
 		width: number;

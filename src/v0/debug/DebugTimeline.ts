@@ -7,14 +7,8 @@ export namespace DebugTimeline {
 		detail?: unknown;
 	}
 
-	export interface RecordProps {
-		scope: string;
-		event: string;
-		detail?: unknown;
-	}
-
 	export interface Api {
-		record(props: RecordProps): void;
+		record(props: { scope: string; event: string; detail?: unknown }): void;
 		entries(): readonly Entry[];
 		dump(): string;
 		clear(): void;

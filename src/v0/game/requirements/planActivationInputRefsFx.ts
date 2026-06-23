@@ -8,15 +8,15 @@ import {
 	readGameItemQuantity,
 } from "~/v0/game/quantity/GameItemQuantityIndex";
 
-export namespace planActivationInputRefsFx {
-	export interface InputRequirement {
-		itemId: string;
-		quantity: number;
-	}
+interface ActivationInputRequirement {
+	itemId: string;
+	quantity: number;
+}
 
+export namespace planActivationInputRefsFx {
 	export interface Props {
 		excludedBoardItemIds?: ReadonlySet<string>;
-		inputs: readonly InputRequirement[];
+		inputs: readonly ActivationInputRequirement[];
 		save: GameSave;
 		storedInputQuantities: GameItemQuantityIndex;
 	}

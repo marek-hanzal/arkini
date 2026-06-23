@@ -7,6 +7,7 @@ import type { GameActionItemRefSchema } from "~/v0/game/action/GameActionItemRef
 import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkActivationInputsFx {
 	export interface Props {
@@ -32,8 +33,9 @@ export const checkActivationInputsFx = Effect.fn("checkActivationInputsFx")(func
 		refs: resolvedRefs,
 	});
 
-	for (const [itemId, selectedQuantity] of selectedByItemId) {
-		if (!requiredByItemId.has(itemId)) {
+	for (const [itemId, selectedQuantity] of Object.entries(selectedByItemId)) {
+		const required = requiredByItemId[itemId];
+		if (!required) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"input_mismatch",
@@ -41,8 +43,7 @@ export const checkActivationInputsFx = Effect.fn("checkActivationInputsFx")(func
 				),
 			);
 		}
-		const required = requiredByItemId.get(itemId);
-		if (required && selectedQuantity !== required.quantity) {
+		if (selectedQuantity !== required.quantity) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"input_mismatch",
@@ -52,8 +53,12 @@ export const checkActivationInputsFx = Effect.fn("checkActivationInputsFx")(func
 		}
 	}
 
-	for (const [itemId, required] of requiredByItemId) {
-		const selectedQuantity = selectedByItemId.get(itemId) ?? 0;
+	for (const [itemId, required] of Object.entries(requiredByItemId)) {
+		if (!required) continue;
+		const selectedQuantity = readGameItemQuantity({
+			itemId,
+			quantities: selectedByItemId,
+		});
 		if (selectedQuantity !== required.quantity) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
@@ -65,10 +70,8 @@ export const checkActivationInputsFx = Effect.fn("checkActivationInputsFx")(func
 	}
 
 	const consumedItemIds = new Set(
-		[
-			...requiredByItemId,
-		]
-			.filter(([, requirement]) => requirement.consume)
+		Object.entries(requiredByItemId)
+			.filter(([, requirement]) => requirement?.consume)
 			.map(([itemId]) => itemId),
 	);
 

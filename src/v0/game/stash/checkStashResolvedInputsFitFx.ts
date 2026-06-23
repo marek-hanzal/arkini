@@ -24,7 +24,7 @@ export const checkStashResolvedInputsFitFx = Effect.fn("checkStashResolvedInputs
 }: checkStashResolvedInputsFitFx.Props) {
 	const selectedByItemId = readStashSelectedInputQuantities(resolvedRefs);
 
-	for (const [itemId, selectedQuantity] of selectedByItemId) {
+	for (const [itemId, selectedQuantity] of Object.entries(selectedByItemId)) {
 		const input = inputs.find((candidate) => candidate.itemId === itemId);
 		if (!input) {
 			return yield* Effect.fail(

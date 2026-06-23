@@ -15,6 +15,7 @@ import type { GameActionStashOpen } from "~/v0/game/action/GameActionStashOpen";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkStashOpenReadinessFx {
 	export interface Props {
@@ -46,7 +47,10 @@ const checkSelectedInputsCanProgressOrOpen = ({
 				save,
 				stashItemInstanceId,
 			}) +
-				(selectedByItemId.get(input.itemId) ?? 0) >=
+				readGameItemQuantity({
+					itemId: input.itemId,
+					quantities: selectedByItemId,
+				}) >=
 			input.quantity,
 	);
 	if (hasProgress || readyAfterSelection) return undefined;

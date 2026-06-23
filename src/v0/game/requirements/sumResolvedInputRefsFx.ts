@@ -1,18 +1,19 @@
 import { Effect } from "effect";
 import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
+import type { GameItemQuantityIndex } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace sumResolvedInputRefsFx {
 	export interface Props {
-		refs: GameActionResolvedInputRef[];
+		refs: readonly GameActionResolvedInputRef[];
 	}
 }
 
 export const sumResolvedInputRefsFx = Effect.fn("sumResolvedInputRefsFx")(function* ({
 	refs,
 }: sumResolvedInputRefsFx.Props) {
-	const map = new Map<string, number>();
+	const quantities: Record<string, number> = {};
 	for (const ref of refs) {
-		map.set(ref.itemId, (map.get(ref.itemId) ?? 0) + ref.quantity);
+		quantities[ref.itemId] = (quantities[ref.itemId] ?? 0) + ref.quantity;
 	}
-	return map;
+	return quantities satisfies GameItemQuantityIndex;
 });

@@ -41,7 +41,7 @@ of politely asking every grid cell to participate in the drama.
 
 The public barrel exports:
 
-- `TileEngine` and `TileEngineDropTarget` components;
+- `TileEngine` component;
 - the `TileEngineNamespace` namespace type for slots, tiles, drag/drop configs and render props;
 - `TileEngineTiming` for adapter cleanup windows that must match engine presence timing;
 - motion request types and registry functions used by adapter code.

@@ -114,7 +114,7 @@ const scheduleTileEngineMotionRequestCleanup = ({
 	}, cleanupDelayMs);
 };
 
-export const subscribeTileEngineMotionRequests = (listener: () => void) => {
+const subscribeTileEngineMotionRequests = (listener: () => void) => {
 	listeners.add(listener);
 	return () => {
 		listeners.delete(listener);
@@ -189,7 +189,7 @@ export const registerTileEngineMotionRequests = ({
 	}
 };
 
-export const clearTileEngineMotionRequestsByGroup = ({
+const clearTileEngineMotionRequestsByGroup = ({
 	engineId,
 	groupId,
 }: {

@@ -19,6 +19,8 @@ export namespace appendStashDepletedRetainedTile {
 	}
 }
 
+const readMotionStartMs = (delayMs: number | undefined) => Math.max(0, delayMs ?? 0);
+
 const readMotionEndMs = (cleanupDelayMs: number | undefined) =>
 	Math.max(0, (cleanupDelayMs ?? 0) - TileEngineTiming.motionCleanupBufferMs);
 
@@ -29,10 +31,10 @@ const readRetainedTileExitDelayMs = ({
 	plan: GameEngineVisualPlanDraft;
 	stashItemInstanceId: string;
 }) => {
-	const linkedRequestEndMs = [
+	const linkedMotionMilestonesMs = [
 		...plan.boardEnterRequests
 			.filter((request) => request.enter?.fromTileId === stashItemInstanceId)
-			.map((request) => readMotionEndMs(request.cleanupDelayMs)),
+			.map((request) => readMotionStartMs(request.enter?.delayMs)),
 		...plan.boardFeedbackRequests
 			.filter((request) => request.tileId === stashItemInstanceId)
 			.map((request) => readMotionEndMs(request.cleanupDelayMs)),
@@ -41,7 +43,7 @@ const readRetainedTileExitDelayMs = ({
 			.map((entry) => readMotionEndMs(entry.cleanupDelayMs)),
 	];
 
-	return linkedRequestEndMs.length ? Math.max(...linkedRequestEndMs) : 0;
+	return linkedMotionMilestonesMs.length ? Math.max(...linkedMotionMilestonesMs) : 0;
 };
 
 export const appendStashDepletedRetainedTile = ({

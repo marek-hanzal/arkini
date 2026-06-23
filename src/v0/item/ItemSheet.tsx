@@ -1,6 +1,6 @@
 import { type FC, useMemo } from "react";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
-import { ItemActivationCard } from "~/v0/item/ui/ItemActivationCard";
+import { ItemStashDropsCard } from "~/v0/item/ui/ItemStashDropsCard";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
 import { ItemRequirementRulesCard } from "~/v0/item/ui/ItemRequirementRulesCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
@@ -186,10 +186,9 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					/>
 				) : null}
 				{boardItem.activation?.kind === "stash" ? (
-					<ItemActivationCard
-						activation={boardItem.activation}
+					<ItemStashDropsCard
+						drops={boardItem.activation.drops}
 						items={items}
-						nowMs={nowMs}
 					/>
 				) : null}
 				{boardItem.activation?.inputs.length ||

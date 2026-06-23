@@ -18,7 +18,7 @@
 		"game:validate": "tsx cli/game/validate.ts",
 		"game:validate:default": "npm run game:validate -- game/arkini",
 		"audit:dead": "knip --no-exit-code",
-		"audit:dupes": "jscpd --config jscpd.json --exitCode 0",
+		"audit:dupes": "jscpd --config jscpd.json --exit-code 0",
 		"audit:optional": "npm run audit:dead && npm run audit:dupes"
 	},
 	"dependencies": {

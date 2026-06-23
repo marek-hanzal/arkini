@@ -12,9 +12,6 @@ const inventory = rebuildInventoryView([
 			id: "stack-0",
 			itemId: "item:twig",
 			quantity: 2,
-			state: {},
-			stateJson: "{}",
-			stateful: false,
 		},
 	},
 	{

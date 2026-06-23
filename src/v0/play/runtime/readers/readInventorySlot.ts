@@ -6,8 +6,6 @@ import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 
-const emptyStateJson = "{}";
-
 export const readInventorySlot = ({
 	slotIndex,
 	state,
@@ -26,9 +24,6 @@ export const readInventorySlot = ({
 						: `runtime:inventory:${slotIndex}:${stack.itemId}`,
 					itemId: stack.itemId as ItemId,
 					quantity: readGameSaveInventorySlotQuantity(stack),
-					state: {},
-					stateful: isGameSaveInventoryInstance(stack),
-					stateJson: emptyStateJson,
 				}
 			: undefined,
 	};

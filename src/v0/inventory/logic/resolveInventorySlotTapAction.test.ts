@@ -11,9 +11,6 @@ const stack = (): NonNullable<InventorySlot["stack"]> => ({
 	id: "stack:twig",
 	itemId: "item:twig",
 	quantity: 1,
-	state: {},
-	stateful: false,
-	stateJson: "{}",
 });
 
 describe("resolveInventorySlotTapAction", () => {

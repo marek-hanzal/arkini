@@ -16,8 +16,6 @@ export namespace readRuntimeInventoryViewFromGameSave {
 	}
 }
 
-const emptyStateJson = "{}";
-
 export const readRuntimeInventoryViewFromGameSave = ({
 	config,
 	save,
@@ -39,9 +37,6 @@ export const readRuntimeInventoryViewFromGameSave = ({
 									: `runtime:inventory:${slotIndex}:${stack.itemId}`,
 								itemId: stack.itemId as ItemId,
 								quantity: readGameSaveInventorySlotQuantity(stack),
-								state: {},
-								stateful: isGameSaveInventoryInstance(stack),
-								stateJson: emptyStateJson,
 							}
 						: undefined,
 				};

@@ -12,7 +12,6 @@ export type {
 } from "~/v0/game/storage/GameSaveStorage";
 export {
 	createDefaultDexieGameSaveStorage,
-	defaultDexieGameSaveDatabaseName,
 	DexieGameSaveStorage,
 	wipeDefaultDexieGameSaveStorage,
 } from "~/v0/game/storage/DexieGameSaveStorage";

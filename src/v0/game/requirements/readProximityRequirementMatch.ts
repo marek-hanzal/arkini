@@ -13,7 +13,7 @@ export namespace readProximityRequirementMatch {
 	}
 }
 
-export const readGridDistance = (left: GameSaveBoardItem, right: GameSaveBoardItem) =>
+const readGridDistance = (left: GameSaveBoardItem, right: GameSaveBoardItem) =>
 	Math.max(Math.abs(left.x - right.x), Math.abs(left.y - right.y));
 
 export namespace readProximityRequirementMatches {

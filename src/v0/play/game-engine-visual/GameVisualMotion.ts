@@ -1,9 +1,9 @@
-export const gameVisualSequenceDelayMs = 200;
-export const gameVisualFadeDurationMs = 420;
-export const gameVisualMergeDurationMs = 390;
-export const gameVisualReplaceDurationMs = 420;
+const gameVisualSequenceDelayMs = 200;
+const gameVisualFadeDurationMs = 420;
+const gameVisualMergeDurationMs = 390;
+const gameVisualReplaceDurationMs = 420;
 
-export type GameVisualMotionCause =
+type GameVisualMotionCause =
 	| "activation"
 	| "craft"
 	| "inventory"
@@ -11,7 +11,7 @@ export type GameVisualMotionCause =
 	| "producer"
 	| "stash";
 
-export type GameVisualMotionEffect = "fade-in" | "merge" | "replace";
+type GameVisualMotionEffect = "fade-in" | "merge" | "replace";
 
 export interface GameVisualMotion {
 	cause: GameVisualMotionCause;

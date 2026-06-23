@@ -12,7 +12,6 @@ import {
 	readBoardFirstEmptyCell,
 	readBoardItem,
 	readBoardView,
-	readInventorySlot,
 	readInventoryView,
 	readItemCatalogView,
 	readItemView,
@@ -83,21 +82,6 @@ export const useGameBoardItem = (boardItemId: string): BoardViewItem | null => {
 	);
 
 	return useGameRuntimeSelector(selector, sameBoardItem);
-};
-
-export const useGameInventorySlot = (slotIndex: number): InventorySlot => {
-	const selector = useCallback(
-		(state: GameRuntimeState) =>
-			readInventorySlot({
-				slotIndex,
-				state,
-			}),
-		[
-			slotIndex,
-		],
-	);
-
-	return useGameRuntimeSelector(selector, sameInventorySlot);
 };
 
 export const useGameBoardFirstEmptyCell = (): BoardCellSchema.Type | undefined =>

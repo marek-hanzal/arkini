@@ -1,13 +1,11 @@
 import type { DevScenarioId } from "~/v0/debug/scenario/DevScenarioDefinitions";
 
-export namespace DevScenarioRuntime {
-	export interface LastLoadedScenario {
-		scenarioId: DevScenarioId;
-		loadedAtIso: string;
-	}
+interface LastLoadedDevScenario {
+	scenarioId: DevScenarioId;
+	loadedAtIso: string;
 }
 
-let lastLoadedScenario: DevScenarioRuntime.LastLoadedScenario | undefined;
+let lastLoadedScenario: LastLoadedDevScenario | undefined;
 
 export const setLastLoadedDevScenario = (scenarioId: DevScenarioId) => {
 	lastLoadedScenario = {

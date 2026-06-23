@@ -548,4 +548,90 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			progress: 1,
 		});
 	});
+	it("shows stash drop previews with probabilities", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			lootTables: {
+				...baseConfig.lootTables,
+				"loot:test": {
+					name: "Test loot",
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: {
+								min: 1,
+								max: 3,
+							},
+							type: "guaranteed",
+						},
+						{
+							chance: 0.25,
+							itemId: "item:plank",
+							type: "chance",
+						},
+						{
+							entries: [
+								{
+									itemId: "item:axe",
+									weight: 1,
+								},
+								{
+									itemId: "item:key",
+									quantity: 2,
+									weight: 3,
+								},
+							],
+							rolls: 2,
+							type: "weighted",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation?.drops).toMatchObject([
+			{
+				chanceLabel: "100%",
+				itemId: "item:twig",
+				quantityLabel: "1-3",
+			},
+			{
+				chanceLabel: "25%",
+				itemId: "item:plank",
+				quantityLabel: "1",
+			},
+			{
+				chanceLabel: "25%/roll",
+				itemId: "item:axe",
+				quantityLabel: "1",
+				rollLabel: "2 rolls",
+			},
+			{
+				chanceLabel: "75%/roll",
+				itemId: "item:key",
+				quantityLabel: "2",
+				rollLabel: "2 rolls",
+			},
+		]);
+	});
 });

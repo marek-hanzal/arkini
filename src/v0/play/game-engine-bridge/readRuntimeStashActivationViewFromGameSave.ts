@@ -4,6 +4,7 @@ import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSav
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
+import { readRuntimeLootDropViewsFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromGameConfig";
 
 export namespace readRuntimeStashActivationViewFromGameSave {
 	export interface Props {
@@ -37,6 +38,10 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 				stored: storedInputs[input.itemId] ?? 0,
 			}),
 		),
+		drops: readRuntimeLootDropViewsFromGameConfig({
+			config,
+			lootTableId: stash.outputTableId,
+		}),
 		kind: "stash",
 		remainingCharges: save.stashes[boardItem.id]?.remainingCharges ?? stash.charges,
 		requirements: readRuntimeActivationRequirementViewsFromGameSave({

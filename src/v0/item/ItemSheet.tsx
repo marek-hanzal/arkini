@@ -188,6 +188,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				{boardItem.activation?.kind === "stash" ? (
 					<ItemActivationCard
 						activation={boardItem.activation}
+						items={items}
 						nowMs={nowMs}
 					/>
 				) : null}

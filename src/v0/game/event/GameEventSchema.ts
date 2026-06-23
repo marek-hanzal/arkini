@@ -21,6 +21,7 @@ export const GameItemConsumedReasonSchema = z.enum([
 	"producer-input-store",
 	"producer-input-auto-fill",
 	"stash-input",
+	"stash-input-auto-fill",
 	"craft-input",
 	"craft-input-store",
 	"craft-input-auto-fill",

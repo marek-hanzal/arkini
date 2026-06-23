@@ -150,7 +150,7 @@ describe("applyGameActionFx Stash", () => {
 		expect(result.events).toMatchObject([
 			{
 				itemId: "item:key",
-				reason: "stash-input",
+				reason: "stash-input-auto-fill",
 				type: "item.consumed",
 			},
 			{
@@ -221,7 +221,7 @@ describe("applyGameActionFx Stash", () => {
 				kind: "board",
 			},
 			itemId: "item:key",
-			reason: "stash-input",
+			reason: "stash-input-auto-fill",
 			type: "item.consumed",
 		});
 	});

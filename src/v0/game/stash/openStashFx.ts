@@ -37,8 +37,9 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	});
 	const stashId = config.items[stashItem.itemId]?.stashId;
 	const stash = stashId ? config.stashes[stashId] : undefined;
+	const shouldAutoFillInputs = action.inputRefs.length === 0 && Boolean(stash?.inputs.length);
 	const inputRefs =
-		action.inputRefs.length === 0 && stash?.inputs.length
+		shouldAutoFillInputs && stash
 			? yield* planStashAutoFillInputRefsFx({
 					inputs: stash.inputs,
 					save,
@@ -67,7 +68,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		inputRefs: effectiveAction.inputRefs,
 		inputs: checked.stash.inputs,
 		nowMs,
-		reason: "stash-input",
+		reason: shouldAutoFillInputs ? "stash-input-auto-fill" : "stash-input",
 		save,
 	});
 	const placementRequests: GameSaveItemPlacementRequest[] = [];

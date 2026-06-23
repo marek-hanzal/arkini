@@ -352,6 +352,132 @@ describe("createGameEngineVisualPlan", () => {
 		});
 	});
 
+	it("maps auto-filled board stash input to a transient tile flying into the stash", () => {
+		const previousBoard = boardView([
+			{
+				id: "stash",
+				itemId: "item:hero-chest",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+			{
+				id: "source",
+				itemId: "item:key",
+				state: {},
+				x: 1,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "stash",
+					itemId: "item:hero-chest",
+					state: {},
+					x: 0,
+					y: 0,
+				},
+			]),
+			currentInventory: undefined,
+			events: [
+				{
+					from: {
+						itemInstanceId: "source",
+						kind: "board",
+					},
+					itemId: "item:key",
+					reason: "stash-input-auto-fill",
+					type: "item.consumed",
+				},
+				{
+					openedAtMs: 1,
+					remainingCharges: 0,
+					stashId: "stash:hero-chest",
+					stashItemInstanceId: "stash",
+					type: "stash.opened",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
+		expect(plan.boardFeedbackRequests[0]).toMatchObject({
+			feedback: {
+				kind: "bounce",
+			},
+			tileId: "stash",
+		});
+		expect(plan.boardTransientTilePlans).toHaveLength(1);
+		expect(plan.boardTransientTilePlans[0]).toMatchObject({
+			request: {
+				exit: {
+					kind: "fly-to-tile",
+					toTileId: "stash",
+				},
+			},
+			tile: {
+				itemId: "item:key",
+				slotId: "1:0",
+			},
+		});
+	});
+
+	it("does not animate manually dragged stash inputs twice", () => {
+		const previousBoard = boardView([
+			{
+				id: "stash",
+				itemId: "item:hero-chest",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+			{
+				id: "source",
+				itemId: "item:key",
+				state: {},
+				x: 1,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "stash",
+					itemId: "item:hero-chest",
+					state: {},
+					x: 0,
+					y: 0,
+				},
+			]),
+			currentInventory: undefined,
+			events: [
+				{
+					from: {
+						itemInstanceId: "source",
+						kind: "board",
+					},
+					itemId: "item:key",
+					reason: "stash-input",
+					type: "item.consumed",
+				},
+				{
+					openedAtMs: 1,
+					remainingCharges: 0,
+					stashId: "stash:hero-chest",
+					stashItemInstanceId: "stash",
+					type: "stash.opened",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardFeedbackRequests).toHaveLength(0);
+		expect(plan.boardTransientTilePlans).toHaveLength(0);
+	});
+
 	it("maps product completion to producer bounce feedback", () => {
 		const plan = createGameEngineVisualPlan({
 			currentBoard: boardView([

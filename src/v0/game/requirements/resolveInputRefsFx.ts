@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionItemRefSchema } from "~/v0/game/action/GameActionItemRefSchema";
 import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
+import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -46,6 +47,20 @@ export const resolveInputRefsFx = Effect.fn("resolveInputRefsFx")(function* ({
 								),
 							);
 						}
+
+						const stateStatus = readBoardItemRuntimeStateStatus({
+							itemInstanceId: boardRef.itemInstanceId,
+							save,
+						});
+						if (stateStatus.busy || stateStatus.preservable) {
+							return yield* Effect.fail(
+								GameEngineError.actionRejected(
+									"item_busy",
+									`Board input "${boardRef.itemInstanceId}" has runtime state and cannot be consumed as input.`,
+								),
+							);
+						}
+
 						seen.add(key);
 						resolved.push({
 							kind: "board",

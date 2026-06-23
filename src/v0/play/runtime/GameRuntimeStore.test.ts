@@ -7,10 +7,7 @@ import {
 	readBoardTransientTiles,
 	upsertBoardTransientTiles,
 } from "~/v0/board/animation/BoardTransientTileStore";
-import {
-	readTileEngineMotionRequests,
-	registerTileEngineMotionRequests,
-} from "~/v0/tile-engine/TileEngineMotionRequestStore";
+import { readTileEngineMotionRequests, registerTileEngineMotionRequests } from "~/v0/tile-engine";
 
 const createStore = async () => {
 	const config = createEngineTestConfig();

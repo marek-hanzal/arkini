@@ -438,6 +438,46 @@
 			"inputRefId": "input:townhall-t3:gold-deposit",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t3:gold-deposit"
+		},
+		"product:goldsmith-t1:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:goldsmith-t1:blueprint-heroes-guild-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:goldsmith-t1:blueprint-heroes-guild-t1"
+		},
+		"product:heroes-guild-t1:hero-chest-t1": {
+			"name": "Hero Chest I",
+			"durationMs": 120000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:heroes-guild-t1:hero-chest-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:heroes-guild-t1:hero-chest-t1"
+		},
+		"product:heroes-guild-t1:hero-chest-t2": {
+			"name": "Hero Chest II",
+			"durationMs": 180000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:heroes-guild-t1:hero-chest-t2",
+			"requirementIds": [],
+			"outputTableId": "loot:heroes-guild-t1:hero-chest-t2"
+		},
+		"product:heroes-guild-t1:hero-chest-t3": {
+			"name": "Hero Chest III",
+			"durationMs": 300000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:heroes-guild-t1:hero-chest-t3",
+			"requirementIds": [],
+			"outputTableId": "loot:heroes-guild-t1:hero-chest-t3"
+		},
+		"product:heroes-guild-t1:hero-chest-t4": {
+			"name": "Hero Chest IV",
+			"durationMs": 600000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:heroes-guild-t1:hero-chest-t4",
+			"requirementIds": [],
+			"outputTableId": "loot:heroes-guild-t1:hero-chest-t4"
 		}
 	}
 }

@@ -524,6 +524,159 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:goldsmith-t1:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:heroes-guild-t1:hero-chest-t1": {
+			"name": "Heroes Guild Hero Chest I expedition",
+			"output": [
+				{
+					"type": "weighted",
+					"entries": [
+						{
+							"itemId": "item:hero-chest-t1",
+							"weight": 90
+						},
+						{
+							"itemId": "item:hero-chest-t2",
+							"weight": 10
+						}
+					]
+				}
+			]
+		},
+		"loot:heroes-guild-t1:hero-chest-t2": {
+			"name": "Heroes Guild Hero Chest II expedition",
+			"output": [
+				{
+					"type": "weighted",
+					"entries": [
+						{
+							"itemId": "item:hero-chest-t2",
+							"weight": 90
+						},
+						{
+							"itemId": "item:hero-chest-t3",
+							"weight": 10
+						}
+					]
+				}
+			]
+		},
+		"loot:heroes-guild-t1:hero-chest-t3": {
+			"name": "Heroes Guild Hero Chest III expedition",
+			"output": [
+				{
+					"type": "weighted",
+					"entries": [
+						{
+							"itemId": "item:hero-chest-t3",
+							"weight": 90
+						},
+						{
+							"itemId": "item:hero-chest-t4",
+							"weight": 10
+						}
+					]
+				}
+			]
+		},
+		"loot:heroes-guild-t1:hero-chest-t4": {
+			"name": "Heroes Guild Hero Chest IV expedition",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:hero-chest-t4",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:hero-chest-t1:open": {
+			"name": "Hero Chest I contents",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": {
+						"min": 2,
+						"max": 4
+					}
+				},
+				{
+					"type": "chance",
+					"itemId": "item:leather",
+					"chance": 0.25,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:hero-chest-t2:open": {
+			"name": "Hero Chest II contents",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": {
+						"min": 4,
+						"max": 8
+					}
+				},
+				{
+					"type": "chance",
+					"itemId": "item:gold-ore",
+					"chance": 0.25,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:hero-chest-t3:open": {
+			"name": "Hero Chest III contents",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": {
+						"min": 8,
+						"max": 14
+					}
+				},
+				{
+					"type": "chance",
+					"itemId": "item:gold-ingot",
+					"chance": 0.2,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:hero-chest-t4:open": {
+			"name": "Hero Chest IV contents",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": {
+						"min": 16,
+						"max": 28
+					}
+				},
+				{
+					"type": "chance",
+					"itemId": "item:gold-ingot",
+					"chance": 0.45,
+					"quantity": {
+						"min": 1,
+						"max": 2
+					}
+				}
+			]
 		}
 	}
 }

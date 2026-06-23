@@ -96,6 +96,9 @@ Town Hall III
 
 Town Hall IV
   Gold Ingot -> Goldsmith I Blueprint
+
+Goldsmith I
+  8 Coin -> Heroes Guild I Blueprint
 ```
 
 ### Implemented first wave
@@ -391,4 +394,35 @@ producer:goldsmith-t1
 ```
 
 This currently introduces `item:coin` as the first playable currency item. Higher coin merge tiers already have asset slots prepared, but this pass intentionally wires only the basic coin output.
+
+### Heroes guild expedition loop
+
+Heroes Guild I is currently the first post-goldsmith building. The goldsmith sells its blueprint for coins, so the player must reach actual coin production before the guild branch exists. The guild is intentionally a producer with long product lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked hero chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
+
+```txt
+producer:goldsmith-t1
+  8 Coin -> Heroes Guild I Blueprint
+
+craft:heroes-guild-t1
+  4 Plank + 4 Stone Block + 2 Gold Ingot + 8 Coin
+  requires owning Goldsmith I
+  -> Heroes Guild I
+
+producer:heroes-guild-t1
+  1 Coin + Beer + Bread -> Hero Chest I, 10% chance Hero Chest II instead, 2 min
+  2 Coin + Beer Barrel + Sausage -> Hero Chest II, 10% chance Hero Chest III instead, 3 min
+  4 Coin + 2 Wine Glass + Sausage + Bread -> Hero Chest III, 10% chance Hero Chest IV instead, 5 min
+  8 Coin + Wine Barrel + Beer Barrel + 2 Sausage + 2 Bread -> Hero Chest IV, 10 min
+```
+
+Hero chests are finite stashes. Each chest tier requires a matching Hero Key tier as an open-time input, consumes that key, releases its loot, and then removes itself. Hero keys are intentionally cheat-only placeholders for now; dedicated key acquisition and key art can come later without blocking the chest loop.
+
+Hero guild asset IDs:
+
+- `asset:producer:heroes-guild-t1` -> `game/arkini/assets/producer-heroes-guild-t1.png`
+- `asset:item:blueprint-heroes-guild-t1` -> blueprint render over the guild asset
+- `asset:item:hero-chest-t1` -> `game/arkini/assets/item-hero-chest-t1.png`
+- `asset:item:hero-chest-t2` -> `game/arkini/assets/item-hero-chest-t2.png`
+- `asset:item:hero-chest-t3` -> `game/arkini/assets/item-hero-chest-t3.png`
+- `asset:item:hero-chest-t4` -> `game/arkini/assets/item-hero-chest-t4.png`
 

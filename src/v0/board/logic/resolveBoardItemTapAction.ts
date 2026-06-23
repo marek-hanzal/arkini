@@ -1,4 +1,3 @@
-import type { ActivationModeSchema } from "~/v0/activation/type/ActivationModeSchema";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
@@ -23,7 +22,7 @@ export namespace resolveBoardItemTapAction {
 		  }
 		| {
 				type: "activate";
-				activation: ActivationModeSchema.Type;
+				activation: "single" | "exhaust";
 				boardItemId: string;
 		  }
 		| {

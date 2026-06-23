@@ -1,9 +1,5 @@
-import {
-	isGameSaveInventoryInstance,
-	readGameSaveInventorySlotQuantity,
-} from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
-import type { ItemId } from "~/v0/game/config/GameIdSchema";
+import { readRuntimeInventorySlotFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeInventorySlotFromGameSave";
 import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 
 export const readInventorySlot = ({
@@ -12,19 +8,8 @@ export const readInventorySlot = ({
 }: {
 	slotIndex: number;
 	state: GameRuntimeState;
-}): InventorySlot => {
-	const stack = state.runtime.save.inventory.slots[slotIndex];
-
-	return {
+}): InventorySlot =>
+	readRuntimeInventorySlotFromGameSave({
+		save: state.runtime.save,
 		slotIndex,
-		stack: stack
-			? {
-					id: isGameSaveInventoryInstance(stack)
-						? stack.id
-						: `runtime:inventory:${slotIndex}:${stack.itemId}`,
-					itemId: stack.itemId as ItemId,
-					quantity: readGameSaveInventorySlotQuantity(stack),
-				}
-			: undefined,
-	};
-};
+	});

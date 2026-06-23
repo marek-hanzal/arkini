@@ -1,13 +1,8 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import {
-	isGameSaveInventoryInstance,
-	readGameSaveInventorySlotQuantity,
-} from "~/v0/game/inventory/GameSaveInventorySlot";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
-import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
+import { readRuntimeInventorySlotFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeInventorySlotFromGameSave";
 
 export namespace readRuntimeInventoryViewFromGameSave {
 	export interface Props {
@@ -25,21 +20,10 @@ export const readRuntimeInventoryViewFromGameSave = ({
 			{
 				length: config.game.inventory.slots,
 			},
-			(_, slotIndex): InventorySlot => {
-				const stack = save.inventory.slots[slotIndex];
-
-				return {
+			(_, slotIndex) =>
+				readRuntimeInventorySlotFromGameSave({
+					save,
 					slotIndex,
-					stack: stack
-						? {
-								id: isGameSaveInventoryInstance(stack)
-									? stack.id
-									: `runtime:inventory:${slotIndex}:${stack.itemId}`,
-								itemId: stack.itemId as ItemId,
-								quantity: readGameSaveInventorySlotQuantity(stack),
-							}
-						: undefined,
-				};
-			},
+				}),
 		),
 	);

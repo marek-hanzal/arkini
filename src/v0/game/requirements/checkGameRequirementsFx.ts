@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { countPassiveItemQuantityFx } from "~/v0/game/requirements/countPassiveItemQuantityFx";
 import { checkProximityRequirementFx } from "~/v0/game/requirements/checkProximityRequirementFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -13,16 +12,14 @@ import {
 
 export namespace checkGameRequirementsFx {
 	export interface Props {
-		config: GameConfig;
 		save: GameSave;
 		requirements: readonly GameRequirement[];
 		storedItems?: GameItemQuantityIndex;
-		targetItemInstanceId?: string;
+		targetItemInstanceId: string;
 	}
 }
 
 export const checkGameRequirementsFx = Effect.fn("checkGameRequirementsFx")(function* ({
-	config,
 	save,
 	requirements,
 	storedItems,
@@ -94,6 +91,4 @@ export const checkGameRequirementsFx = Effect.fn("checkGameRequirementsFx")(func
 			)
 			.exhaustive();
 	}
-
-	void config;
 });

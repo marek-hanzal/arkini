@@ -45,10 +45,10 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
 	yield* checkGameRequirementsFx({
-		config,
 		requirements: target.recipe.requirements,
 		save,
 		storedItems: storedRequirementItems,
+		targetItemInstanceId: action.targetItemInstanceId,
 	});
 	yield* checkItemExclusiveOwnershipFx({
 		config,

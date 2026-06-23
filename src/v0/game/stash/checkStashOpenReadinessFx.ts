@@ -103,10 +103,10 @@ export const checkStashOpenReadinessFx = Effect.fn("checkStashOpenReadinessFx")(
 		targetItemInstanceId: action.stashItemInstanceId,
 	});
 	yield* checkGameRequirementsFx({
-		config,
 		requirements: stash.requirements,
 		save,
 		storedItems,
+		targetItemInstanceId: action.stashItemInstanceId,
 	});
 	yield* match(stash.placement)
 		.with("board_then_inventory", () => Effect.void)

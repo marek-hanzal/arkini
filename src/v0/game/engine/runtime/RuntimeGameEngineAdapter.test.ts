@@ -3,6 +3,34 @@ import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEn
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
 
+const createConcurrencyTestConfig = () => {
+	const base = createEngineTestConfig();
+	return createEngineTestConfig({
+		game: {
+			...base.game,
+			board: {
+				height: 1,
+				width: 4,
+			},
+		},
+		startingState: {
+			board: [
+				{
+					itemId: "item:twig",
+					x: 0,
+					y: 0,
+				},
+				{
+					itemId: "item:rock",
+					x: 1,
+					y: 0,
+				},
+			],
+			inventory: [],
+		},
+	});
+};
+
 describe("RuntimeGameEngineAdapter", () => {
 	it("bootstraps a save from the config starting state", async () => {
 		const adapter = await RuntimeGameEngineAdapter.create({
@@ -129,5 +157,93 @@ describe("RuntimeGameEngineAdapter", () => {
 			reason: "producer_queue_full",
 			type: "rejected",
 		});
+	});
+
+	it("serializes concurrent dispatches so independent board updates are not lost", async () => {
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createConcurrencyTestConfig(),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+
+		await Promise.all([
+			adapter.dispatch({
+				action: {
+					boardItemId: "item-instance:1",
+					type: "board.item.move",
+					x: 2,
+					y: 0,
+				},
+				nowMs: 10,
+			}),
+			adapter.dispatch({
+				action: {
+					boardItemId: "item-instance:2",
+					type: "board.item.move",
+					x: 3,
+					y: 0,
+				},
+				nowMs: 20,
+			}),
+		]);
+
+		expect(adapter.readSnapshot().save.board.items).toMatchObject({
+			"item-instance:1": {
+				x: 2,
+				y: 0,
+			},
+			"item-instance:2": {
+				x: 3,
+				y: 0,
+			},
+		});
+	});
+
+	it("serializes replaceSave after an in-flight dispatch", async () => {
+		const config = createConcurrencyTestConfig();
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config,
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		const replacement = {
+			...adapter.readSave(),
+			board: {
+				items: {
+					"item-instance:reset": {
+						id: "item-instance:reset",
+						itemId: "item:plank",
+						x: 0,
+						y: 0,
+					},
+				},
+			},
+		};
+
+		await Promise.all([
+			adapter.dispatch({
+				action: {
+					boardItemId: "item-instance:1",
+					type: "board.item.move",
+					x: 2,
+					y: 0,
+				},
+				nowMs: 10,
+			}),
+			adapter.replaceSave({
+				nowMs: 20,
+				save: replacement,
+			}),
+		]);
+
+		expect(adapter.readSnapshot().save.board.items).toEqual({
+			"item-instance:reset": {
+				id: "item-instance:reset",
+				itemId: "item:plank",
+				x: 0,
+				y: 0,
+			},
+		});
+		expect(adapter.readSnapshot().save.updatedAtMs).toBe(20);
 	});
 });

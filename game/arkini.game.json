@@ -1,5 +1,11 @@
 {
 	"assets": {
+		"asset:item:axe": {
+			"kind": "item",
+			"label": "Axe",
+			"render": "plain",
+			"resourceId": "item-axe"
+		},
 		"asset:item:beam": {
 			"kind": "item",
 			"label": "Beam",
@@ -28,6 +34,13 @@
 			"kind": "item",
 			"label": "Bakery I Blueprint",
 			"overlayAssetId": "asset:producer:bakery-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-blacksmith-t1": {
+			"kind": "item",
+			"label": "Blacksmith I Blueprint",
+			"overlayAssetId": "asset:producer:blacksmith-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -203,6 +216,30 @@
 			"render": "plain",
 			"resourceId": "item-bush"
 		},
+		"asset:item:chest-t1": {
+			"kind": "item",
+			"label": "Chest I",
+			"render": "plain",
+			"resourceId": "item-chest-t1"
+		},
+		"asset:item:chest-t2": {
+			"kind": "item",
+			"label": "Chest II",
+			"render": "plain",
+			"resourceId": "item-chest-t2"
+		},
+		"asset:item:chest-t3": {
+			"kind": "item",
+			"label": "Chest III",
+			"render": "plain",
+			"resourceId": "item-chest-t3"
+		},
+		"asset:item:chest-t4": {
+			"kind": "item",
+			"label": "Chest IV",
+			"render": "plain",
+			"resourceId": "item-chest-t4"
+		},
 		"asset:item:coal": {
 			"kind": "item",
 			"label": "Coal Cart",
@@ -317,29 +354,41 @@
 			"render": "plain",
 			"resourceId": "item-grapes"
 		},
-		"asset:item:chest-t1": {
+		"asset:item:hop-field": {
 			"kind": "item",
-			"label": "Chest I",
+			"label": "Hop Field",
 			"render": "plain",
-			"resourceId": "item-chest-t1"
+			"resourceId": "item-hop-field"
 		},
-		"asset:item:chest-t2": {
+		"asset:item:hops": {
 			"kind": "item",
-			"label": "Chest II",
+			"label": "Hops",
 			"render": "plain",
-			"resourceId": "item-chest-t2"
+			"resourceId": "item-hops"
 		},
-		"asset:item:chest-t3": {
+		"asset:item:iron-armor": {
 			"kind": "item",
-			"label": "Chest III",
+			"label": "Iron Armor",
 			"render": "plain",
-			"resourceId": "item-chest-t3"
+			"resourceId": "item-iron-armor"
 		},
-		"asset:item:chest-t4": {
+		"asset:item:iron-deposit": {
 			"kind": "item",
-			"label": "Chest IV",
+			"label": "Iron Deposit",
 			"render": "plain",
-			"resourceId": "item-chest-t4"
+			"resourceId": "item-iron-deposit"
+		},
+		"asset:item:iron-ingot": {
+			"kind": "item",
+			"label": "Iron Ingot",
+			"render": "plain",
+			"resourceId": "item-iron-ingot"
+		},
+		"asset:item:iron-ore": {
+			"kind": "item",
+			"label": "Iron Ore Cart",
+			"render": "plain",
+			"resourceId": "item-iron-ore"
 		},
 		"asset:item:key-t1": {
 			"kind": "item",
@@ -365,36 +414,6 @@
 			"render": "plain",
 			"resourceId": "item-key-t4"
 		},
-		"asset:item:hop-field": {
-			"kind": "item",
-			"label": "Hop Field",
-			"render": "plain",
-			"resourceId": "item-hop-field"
-		},
-		"asset:item:hops": {
-			"kind": "item",
-			"label": "Hops",
-			"render": "plain",
-			"resourceId": "item-hops"
-		},
-		"asset:item:iron-deposit": {
-			"kind": "item",
-			"label": "Iron Deposit",
-			"render": "plain",
-			"resourceId": "item-iron-deposit"
-		},
-		"asset:item:iron-ingot": {
-			"kind": "item",
-			"label": "Iron Ingot",
-			"render": "plain",
-			"resourceId": "item-iron-ingot"
-		},
-		"asset:item:iron-ore": {
-			"kind": "item",
-			"label": "Iron Ore Cart",
-			"render": "plain",
-			"resourceId": "item-iron-ore"
-		},
 		"asset:item:leaf": {
 			"kind": "item",
 			"label": "Leaf",
@@ -406,6 +425,12 @@
 			"label": "Leather",
 			"render": "plain",
 			"resourceId": "item-leather"
+		},
+		"asset:item:leather-armor": {
+			"kind": "item",
+			"label": "Leather Armor",
+			"render": "plain",
+			"resourceId": "item-leather-armor"
 		},
 		"asset:item:log": {
 			"kind": "item",
@@ -497,6 +522,12 @@
 			"render": "plain",
 			"resourceId": "item-stone-block"
 		},
+		"asset:item:sword": {
+			"kind": "item",
+			"label": "Sword",
+			"render": "plain",
+			"resourceId": "item-sword"
+		},
 		"asset:item:townhall": {
 			"kind": "item",
 			"label": "Town Hall",
@@ -556,6 +587,12 @@
 			"label": "Bakery I",
 			"render": "plain",
 			"resourceId": "producer-bakery-t1"
+		},
+		"asset:producer:blacksmith-t1": {
+			"kind": "item",
+			"label": "Blacksmith I",
+			"render": "plain",
+			"resourceId": "producer-blacksmith-t1"
 		},
 		"asset:producer:brewery-t1": {
 			"kind": "item",
@@ -723,6 +760,40 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:bakery-t1"
+		},
+		"craft:blacksmith-t1": {
+			"durationMs": 16000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:smelter-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:blacksmith-t1"
 		},
 		"craft:brewery-t1": {
 			"durationMs": 7000,
@@ -1406,6 +1477,110 @@
 			],
 			"name": "Bakery flour and water input"
 		},
+		"input:blacksmith-t1:axe": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				}
+			],
+			"name": "Blacksmith axe materials"
+		},
+		"input:blacksmith-t1:iron-armor": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 4
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blacksmith iron armor materials"
+		},
+		"input:blacksmith-t1:leather-armor": {
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 3
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Blacksmith leather armor materials"
+		},
+		"input:blacksmith-t1:sword": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blacksmith precision sword materials"
+		},
 		"input:brewery-t1:beer-to-barrel": {
 			"inputs": [
 				{
@@ -1519,18 +1694,29 @@
 			],
 			"name": "Goldsmith gold, wine, bread, and coal input"
 		},
+		"input:goldsmith-t1:key-t3": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Goldsmith Key III input"
+		},
 		"input:heroes-guild-t1:chest-t1": {
 			"inputs": [
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:beer",
+					"itemId": "item:axe",
 					"quantity": 1
 				},
 				{
@@ -1538,22 +1724,28 @@
 					"consume": true,
 					"itemId": "item:bread",
 					"quantity": 1
-				}
-			],
-			"name": "Heroes Guild short expedition payment"
-		},
-		"input:heroes-guild-t1:chest-t2": {
-			"inputs": [
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer-barrel",
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"name": "Heroes Guild level I expedition gear"
+		},
+		"input:heroes-guild-t1:chest-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:axe",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather-armor",
 					"quantity": 1
 				},
 				{
@@ -1561,17 +1753,29 @@
 					"consume": true,
 					"itemId": "item:sausage",
 					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
 				}
 			],
-			"name": "Heroes Guild sturdy expedition payment"
+			"name": "Heroes Guild level II expedition gear"
 		},
 		"input:heroes-guild-t1:chest-t3": {
 			"inputs": [
 				{
-					"capacity": 12,
+					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 4
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
 				},
 				{
 					"capacity": 4,
@@ -1580,27 +1784,27 @@
 					"quantity": 2
 				},
 				{
-					"capacity": 4,
+					"capacity": 12,
 					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:coin",
+					"quantity": 4
 				}
 			],
-			"name": "Heroes Guild rare expedition payment"
+			"name": "Heroes Guild level III expedition gear"
 		},
 		"input:heroes-guild-t1:chest-t4": {
 			"inputs": [
 				{
-					"capacity": 20,
+					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 8
+					"itemId": "item:sword",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
 				},
 				{
 					"capacity": 4,
@@ -1615,19 +1819,13 @@
 					"quantity": 1
 				},
 				{
-					"capacity": 4,
+					"capacity": 20,
 					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 2
+					"itemId": "item:coin",
+					"quantity": 8
 				}
 			],
-			"name": "Heroes Guild epic expedition payment"
+			"name": "Heroes Guild level IV expedition gear"
 		},
 		"input:iron-mine-t1:sausage-beer": {
 			"inputs": [
@@ -2162,6 +2360,29 @@
 			],
 			"name": "Survey: Iron Deposit input"
 		},
+		"input:townhall-t4:blueprint-blacksmith-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Blacksmith I input"
+		},
 		"input:townhall-t4:blueprint-goldsmith-t1": {
 			"inputs": [
 				{
@@ -2172,6 +2393,17 @@
 				}
 			],
 			"name": "Blueprint: Goldsmith I input"
+		},
+		"input:townhall-t4:blueprint-heroes-guild-t1": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Heroes Guild I input"
 		},
 		"input:windmill-t1:grain": {
 			"inputs": [
@@ -2222,37 +2454,24 @@
 				}
 			],
 			"name": "Winery wine glasses to barrel input"
-		},
-		"input:townhall-t4:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I input",
-			"inputs": [
-				{
-					"itemId": "item:coin",
-					"quantity": 8,
-					"capacity": 8,
-					"consume": true
-				}
-			]
-		},
-		"input:goldsmith-t1:key-t3": {
-			"name": "Goldsmith Key III input",
-			"inputs": [
-				{
-					"itemId": "item:gold-ingot",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:coin",
-					"quantity": 3,
-					"capacity": 8,
-					"consume": true
-				}
-			]
 		}
 	},
 	"items": {
+		"item:axe": {
+			"assetId": "asset:item:axe",
+			"code": "axe",
+			"description": "Reliable expedition weapon forged from iron with a sturdy wooden haft.",
+			"maxStackSize": 20,
+			"name": "Axe",
+			"storage": "both",
+			"tags": [
+				"equipment",
+				"weapon",
+				"blacksmith",
+				"hero"
+			],
+			"tier": 1
+		},
 		"item:beer": {
 			"assetId": "asset:item:beer",
 			"code": "beer",
@@ -2292,6 +2511,22 @@
 				"blueprint",
 				"building",
 				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-blacksmith-t1": {
+			"assetId": "asset:item:blueprint-blacksmith-t1",
+			"code": "blueprint-blacksmith-t1",
+			"craftRecipeId": "craft:blacksmith-t1",
+			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
+			"maxStackSize": 10,
+			"name": "Blacksmith I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"blacksmith"
 			],
 			"tier": 0
 		},
@@ -2640,6 +2875,70 @@
 			],
 			"tier": 0
 		},
+		"item:chest-t1": {
+			"assetId": "asset:item:chest-t1",
+			"code": "chest-t1",
+			"description": "Locked chest returned from a short heroes guild expedition. Open it with a Key I.",
+			"maxStackSize": 1,
+			"name": "Chest I",
+			"stashId": "stash:chest-t1",
+			"storage": "both",
+			"tags": [
+				"chest",
+				"locked",
+				"stash",
+				"guild"
+			],
+			"tier": 1
+		},
+		"item:chest-t2": {
+			"assetId": "asset:item:chest-t2",
+			"code": "chest-t2",
+			"description": "Locked chest returned from a tougher heroes guild expedition. Open it with a Key II.",
+			"maxStackSize": 1,
+			"name": "Chest II",
+			"stashId": "stash:chest-t2",
+			"storage": "both",
+			"tags": [
+				"chest",
+				"locked",
+				"stash",
+				"guild"
+			],
+			"tier": 2
+		},
+		"item:chest-t3": {
+			"assetId": "asset:item:chest-t3",
+			"code": "chest-t3",
+			"description": "Locked chest returned from a dangerous heroes guild expedition. Open it with a Key III.",
+			"maxStackSize": 1,
+			"name": "Chest III",
+			"stashId": "stash:chest-t3",
+			"storage": "both",
+			"tags": [
+				"chest",
+				"locked",
+				"stash",
+				"guild"
+			],
+			"tier": 3
+		},
+		"item:chest-t4": {
+			"assetId": "asset:item:chest-t4",
+			"code": "chest-t4",
+			"description": "Locked chest returned from the longest heroes guild expedition. Open it with a Key IV.",
+			"maxStackSize": 1,
+			"name": "Chest IV",
+			"stashId": "stash:chest-t4",
+			"storage": "both",
+			"tags": [
+				"chest",
+				"locked",
+				"stash",
+				"guild"
+			],
+			"tier": 4
+		},
 		"item:coal": {
 			"assetId": "asset:item:coal",
 			"code": "coal",
@@ -2772,69 +3071,96 @@
 			],
 			"tier": 0
 		},
-		"item:chest-t1": {
-			"assetId": "asset:item:chest-t1",
-			"code": "chest-t1",
-			"description": "Locked chest returned from a short heroes guild expedition. Open it with a Key I.",
-			"maxStackSize": 1,
-			"name": "Chest I",
-			"stashId": "stash:chest-t1",
+		"item:hop-field": {
+			"assetId": "asset:item:hop-field",
+			"code": "hop-field",
+			"description": "Movable hop source used by nearby breweries.",
+			"maxStackSize": 10,
+			"name": "Hop Field",
 			"storage": "both",
 			"tags": [
-				"chest",
-				"locked",
-				"stash",
-				"guild"
+				"source",
+				"food",
+				"beer",
+				"hops"
 			],
-			"tier": 1
+			"tier": 0
 		},
-		"item:chest-t2": {
-			"assetId": "asset:item:chest-t2",
-			"code": "chest-t2",
-			"description": "Locked chest returned from a tougher heroes guild expedition. Open it with a Key II.",
-			"maxStackSize": 1,
-			"name": "Chest II",
-			"stashId": "stash:chest-t2",
+		"item:hops": {
+			"assetId": "asset:item:hops",
+			"code": "hops",
+			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
+			"maxStackSize": 50,
+			"name": "Hops",
 			"storage": "both",
 			"tags": [
-				"chest",
-				"locked",
-				"stash",
-				"guild"
+				"material",
+				"food",
+				"beer",
+				"hops"
 			],
-			"tier": 2
+			"tier": 0
 		},
-		"item:chest-t3": {
-			"assetId": "asset:item:chest-t3",
-			"code": "chest-t3",
-			"description": "Locked chest returned from a dangerous heroes guild expedition. Open it with a Key III.",
-			"maxStackSize": 1,
-			"name": "Chest III",
-			"stashId": "stash:chest-t3",
+		"item:iron-armor": {
+			"assetId": "asset:item:iron-armor",
+			"code": "iron-armor",
+			"description": "Heavy iron armor issued to heroes before dangerous late expeditions.",
+			"maxStackSize": 10,
+			"name": "Iron Armor",
 			"storage": "both",
 			"tags": [
-				"chest",
-				"locked",
-				"stash",
-				"guild"
+				"equipment",
+				"armor",
+				"blacksmith",
+				"hero",
+				"iron"
 			],
 			"tier": 3
 		},
-		"item:chest-t4": {
-			"assetId": "asset:item:chest-t4",
-			"code": "chest-t4",
-			"description": "Locked chest returned from the longest heroes guild expedition. Open it with a Key IV.",
-			"maxStackSize": 1,
-			"name": "Chest IV",
-			"stashId": "stash:chest-t4",
+		"item:iron-deposit": {
+			"assetId": "asset:item:iron-deposit",
+			"code": "iron-deposit",
+			"description": "Movable iron source used by nearby iron mines.",
+			"maxStackSize": 10,
+			"name": "Iron Deposit",
 			"storage": "both",
 			"tags": [
-				"chest",
-				"locked",
-				"stash",
-				"guild"
+				"source",
+				"industry",
+				"mine",
+				"iron"
 			],
-			"tier": 4
+			"tier": 0
+		},
+		"item:iron-ingot": {
+			"assetId": "asset:item:iron-ingot",
+			"code": "iron-ingot",
+			"description": "Refined iron produced by smelters from iron ore and coal.",
+			"maxStackSize": 50,
+			"name": "Iron Ingot",
+			"storage": "both",
+			"tags": [
+				"material",
+				"industry",
+				"ingot",
+				"iron"
+			],
+			"tier": 0
+		},
+		"item:iron-ore": {
+			"assetId": "asset:item:iron-ore",
+			"code": "iron-ore",
+			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
+			"maxStackSize": 20,
+			"name": "Iron Ore Cart",
+			"storage": "both",
+			"tags": [
+				"material",
+				"industry",
+				"ore",
+				"iron"
+			],
+			"tier": 0
 		},
 		"item:key-t1": {
 			"assetId": "asset:item:key-t1",
@@ -2888,81 +3214,6 @@
 			],
 			"tier": 4
 		},
-		"item:hop-field": {
-			"assetId": "asset:item:hop-field",
-			"code": "hop-field",
-			"description": "Movable hop source used by nearby breweries.",
-			"maxStackSize": 10,
-			"name": "Hop Field",
-			"storage": "both",
-			"tags": [
-				"source",
-				"food",
-				"beer",
-				"hops"
-			],
-			"tier": 0
-		},
-		"item:hops": {
-			"assetId": "asset:item:hops",
-			"code": "hops",
-			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
-			"maxStackSize": 50,
-			"name": "Hops",
-			"storage": "both",
-			"tags": [
-				"material",
-				"food",
-				"beer",
-				"hops"
-			],
-			"tier": 0
-		},
-		"item:iron-deposit": {
-			"assetId": "asset:item:iron-deposit",
-			"code": "iron-deposit",
-			"description": "Movable iron source used by nearby iron mines.",
-			"maxStackSize": 10,
-			"name": "Iron Deposit",
-			"storage": "both",
-			"tags": [
-				"source",
-				"industry",
-				"mine",
-				"iron"
-			],
-			"tier": 0
-		},
-		"item:iron-ingot": {
-			"assetId": "asset:item:iron-ingot",
-			"code": "iron-ingot",
-			"description": "Refined iron produced by smelters from iron ore and coal.",
-			"maxStackSize": 50,
-			"name": "Iron Ingot",
-			"storage": "both",
-			"tags": [
-				"material",
-				"industry",
-				"ingot",
-				"iron"
-			],
-			"tier": 0
-		},
-		"item:iron-ore": {
-			"assetId": "asset:item:iron-ore",
-			"code": "iron-ore",
-			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
-			"maxStackSize": 20,
-			"name": "Iron Ore Cart",
-			"storage": "both",
-			"tags": [
-				"material",
-				"industry",
-				"ore",
-				"iron"
-			],
-			"tier": 0
-		},
 		"item:leather": {
 			"assetId": "asset:item:leather",
 			"code": "leather",
@@ -2976,6 +3227,22 @@
 				"animal"
 			],
 			"tier": 0
+		},
+		"item:leather-armor": {
+			"assetId": "asset:item:leather-armor",
+			"code": "leather-armor",
+			"description": "Flexible leather armor prepared on a training dummy for early expeditions.",
+			"maxStackSize": 10,
+			"name": "Leather Armor",
+			"storage": "both",
+			"tags": [
+				"equipment",
+				"armor",
+				"blacksmith",
+				"hero",
+				"leather"
+			],
+			"tier": 2
 		},
 		"item:log": {
 			"assetId": "asset:item:log",
@@ -3084,6 +3351,21 @@
 			],
 			"tier": 0
 		},
+		"item:sword": {
+			"assetId": "asset:item:sword",
+			"code": "sword",
+			"description": "Precise expedition weapon that needs extra iron, finishing coal, and a leather grip.",
+			"maxStackSize": 20,
+			"name": "Sword",
+			"storage": "both",
+			"tags": [
+				"equipment",
+				"weapon",
+				"blacksmith",
+				"hero"
+			],
+			"tier": 2
+		},
 		"item:tree": {
 			"assetId": "asset:item:tree",
 			"code": "tree",
@@ -3181,6 +3463,22 @@
 				"bread"
 			],
 			"tier": 1
+		},
+		"producer:blacksmith-t1": {
+			"assetId": "asset:producer:blacksmith-t1",
+			"code": "blacksmith-t1",
+			"description": "Forges expedition weapons and armor from iron, leather, coal, and wood.",
+			"maxStackSize": 1,
+			"name": "Blacksmith I",
+			"producerId": "producer:blacksmith-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"blacksmith",
+				"equipment",
+				"hero"
+			],
+			"tier": 4
 		},
 		"producer:brewery-t1": {
 			"assetId": "asset:producer:brewery-t1",
@@ -3543,6 +3841,46 @@
 				}
 			]
 		},
+		"loot:blacksmith-t1:axe": {
+			"name": "Blacksmith axe output",
+			"output": [
+				{
+					"itemId": "item:axe",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:blacksmith-t1:iron-armor": {
+			"name": "Blacksmith iron armor output",
+			"output": [
+				{
+					"itemId": "item:iron-armor",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:blacksmith-t1:leather-armor": {
+			"name": "Blacksmith leather armor output",
+			"output": [
+				{
+					"itemId": "item:leather-armor",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:blacksmith-t1:sword": {
+			"name": "Blacksmith sword output",
+			"output": [
+				{
+					"itemId": "item:sword",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:brewery-t1:beer-barrel": {
 			"name": "Brewery beer barrels from hops and water",
 			"output": [
@@ -3569,46 +3907,6 @@
 				{
 					"itemId": "item:hops",
 					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:coal-mine-t1:coal": {
-			"name": "Coal mine coal carts",
-			"output": [
-				{
-					"itemId": "item:coal",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:farm-t1:grain": {
-			"name": "Farm grain",
-			"output": [
-				{
-					"itemId": "item:grain",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:gold-mine-t1:gold-ore": {
-			"name": "Gold mine gold ore carts",
-			"output": [
-				{
-					"itemId": "item:gold-ore",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:goldsmith-t1:coins": {
-			"name": "Goldsmith coins",
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": 4,
 					"type": "guaranteed"
 				}
 			]
@@ -3689,6 +3987,56 @@
 						"min": 1
 					},
 					"type": "chance"
+				}
+			]
+		},
+		"loot:coal-mine-t1:coal": {
+			"name": "Coal mine coal carts",
+			"output": [
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:farm-t1:grain": {
+			"name": "Farm grain",
+			"output": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:gold-mine-t1:gold-ore": {
+			"name": "Gold mine gold ore carts",
+			"output": [
+				{
+					"itemId": "item:gold-ore",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:goldsmith-t1:coins": {
+			"name": "Goldsmith coins",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:goldsmith-t1:key-t3": {
+			"name": "Goldsmith Key III output",
+			"output": [
+				{
+					"itemId": "item:key-t3",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -4141,11 +4489,31 @@
 				}
 			]
 		},
+		"loot:townhall-t4:blueprint-blacksmith-t1": {
+			"name": "Blueprint: Blacksmith I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-blacksmith-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t4:blueprint-goldsmith-t1": {
 			"name": "Blueprint: Goldsmith I output",
 			"output": [
 				{
 					"itemId": "item:blueprint-goldsmith-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-heroes-guild-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -4200,26 +4568,6 @@
 					"type": "guaranteed"
 				}
 			]
-		},
-		"loot:townhall-t4:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-heroes-guild-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:goldsmith-t1:key-t3": {
-			"name": "Goldsmith Key III output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:key-t3",
-					"quantity": 1
-				}
-			]
 		}
 	},
 	"merge": {},
@@ -4228,6 +4576,17 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:bakery-t1:bread"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:blacksmith-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:blacksmith-t1:axe",
+				"product:blacksmith-t1:sword",
+				"product:blacksmith-t1:leather-armor",
+				"product:blacksmith-t1:iron-armor"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -4448,6 +4807,7 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:townhall-t4:blueprint-goldsmith-t1",
+				"product:townhall-t4:blueprint-blacksmith-t1",
 				"product:townhall-t4:blueprint-heroes-guild-t1"
 			],
 			"requirementIds": [],
@@ -4498,6 +4858,38 @@
 			"inputRefId": "input:bakery-t1:flour-water",
 			"name": "Bread",
 			"outputTableId": "loot:bakery-t1:bread",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:blacksmith-t1:axe": {
+			"durationMs": 15000,
+			"inputRefId": "input:blacksmith-t1:axe",
+			"name": "Axe",
+			"outputTableId": "loot:blacksmith-t1:axe",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:blacksmith-t1:iron-armor": {
+			"durationMs": 45000,
+			"inputRefId": "input:blacksmith-t1:iron-armor",
+			"name": "Iron Armor",
+			"outputTableId": "loot:blacksmith-t1:iron-armor",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:blacksmith-t1:leather-armor": {
+			"durationMs": 30000,
+			"inputRefId": "input:blacksmith-t1:leather-armor",
+			"name": "Leather Armor",
+			"outputTableId": "loot:blacksmith-t1:leather-armor",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:blacksmith-t1:sword": {
+			"durationMs": 25000,
+			"inputRefId": "input:blacksmith-t1:sword",
+			"name": "Sword",
+			"outputTableId": "loot:blacksmith-t1:sword",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -4564,6 +4956,14 @@
 			"inputRefId": "input:goldsmith-t1:gold-wine-bread-coal",
 			"name": "Coins",
 			"outputTableId": "loot:goldsmith-t1:coins",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:goldsmith-t1:key-t3": {
+			"durationMs": 20000,
+			"inputRefId": "input:goldsmith-t1:key-t3",
+			"name": "Key III",
+			"outputTableId": "loot:goldsmith-t1:key-t3",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -4917,11 +5317,27 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t4:blueprint-blacksmith-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-blacksmith-t1",
+			"name": "Blueprint: Blacksmith I",
+			"outputTableId": "loot:townhall-t4:blueprint-blacksmith-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t4:blueprint-goldsmith-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t4:blueprint-goldsmith-t1",
 			"name": "Blueprint: Goldsmith I",
 			"outputTableId": "loot:townhall-t4:blueprint-goldsmith-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-heroes-guild-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-heroes-guild-t1",
+			"name": "Blueprint: Heroes Guild I",
+			"outputTableId": "loot:townhall-t4:blueprint-heroes-guild-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -4963,22 +5379,6 @@
 			"outputTableId": "loot:winery-t1:wine-barrel-from-wine-glasses",
 			"placement": "board_then_inventory",
 			"requirementIds": []
-		},
-		"product:townhall-t4:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-heroes-guild-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-heroes-guild-t1"
-		},
-		"product:goldsmith-t1:key-t3": {
-			"name": "Key III",
-			"durationMs": 20000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:goldsmith-t1:key-t3",
-			"requirementIds": [],
-			"outputTableId": "loot:goldsmith-t1:key-t3"
 		}
 	},
 	"requirements": {

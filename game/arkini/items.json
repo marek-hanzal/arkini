@@ -1277,6 +1277,100 @@
 				"key",
 				"cheat-source"
 			]
+		},
+		"item:axe": {
+			"assetId": "asset:item:axe",
+			"code": "axe",
+			"name": "Axe",
+			"tier": 1,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Reliable expedition weapon forged from iron with a sturdy wooden haft.",
+			"tags": [
+				"equipment",
+				"weapon",
+				"blacksmith",
+				"hero"
+			]
+		},
+		"item:sword": {
+			"assetId": "asset:item:sword",
+			"code": "sword",
+			"name": "Sword",
+			"tier": 2,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Precise expedition weapon that needs extra iron, finishing coal, and a leather grip.",
+			"tags": [
+				"equipment",
+				"weapon",
+				"blacksmith",
+				"hero"
+			]
+		},
+		"item:leather-armor": {
+			"assetId": "asset:item:leather-armor",
+			"code": "leather-armor",
+			"name": "Leather Armor",
+			"tier": 2,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Flexible leather armor prepared on a training dummy for early expeditions.",
+			"tags": [
+				"equipment",
+				"armor",
+				"blacksmith",
+				"hero",
+				"leather"
+			]
+		},
+		"item:iron-armor": {
+			"assetId": "asset:item:iron-armor",
+			"code": "iron-armor",
+			"name": "Iron Armor",
+			"tier": 3,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Heavy iron armor issued to heroes before dangerous late expeditions.",
+			"tags": [
+				"equipment",
+				"armor",
+				"blacksmith",
+				"hero",
+				"iron"
+			]
+		},
+		"producer:blacksmith-t1": {
+			"assetId": "asset:producer:blacksmith-t1",
+			"code": "blacksmith-t1",
+			"name": "Blacksmith I",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Forges expedition weapons and armor from iron, leather, coal, and wood.",
+			"tags": [
+				"producer",
+				"blacksmith",
+				"equipment",
+				"hero"
+			],
+			"producerId": "producer:blacksmith-t1"
+		},
+		"item:blueprint-blacksmith-t1": {
+			"assetId": "asset:item:blueprint-blacksmith-t1",
+			"code": "blueprint-blacksmith-t1",
+			"name": "Blacksmith I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"blacksmith"
+			],
+			"craftRecipeId": "craft:blacksmith-t1"
 		}
 	}
 }

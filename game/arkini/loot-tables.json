@@ -687,6 +687,56 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:blacksmith-t1:axe": {
+			"name": "Blacksmith axe output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:axe",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:blacksmith-t1:sword": {
+			"name": "Blacksmith sword output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:sword",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:blacksmith-t1:leather-armor": {
+			"name": "Blacksmith leather armor output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:leather-armor",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:blacksmith-t1:iron-armor": {
+			"name": "Blacksmith iron armor output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-blacksmith-t1": {
+			"name": "Blueprint: Blacksmith I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-blacksmith-t1",
+					"quantity": 1
+				}
+			]
 		}
 	}
 }

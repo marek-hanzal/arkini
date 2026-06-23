@@ -694,6 +694,43 @@
 			"label": "Key IV",
 			"render": "plain",
 			"resourceId": "item-key-t4"
+		},
+		"asset:item:sword": {
+			"kind": "item",
+			"label": "Sword",
+			"render": "plain",
+			"resourceId": "item-sword"
+		},
+		"asset:item:axe": {
+			"kind": "item",
+			"label": "Axe",
+			"render": "plain",
+			"resourceId": "item-axe"
+		},
+		"asset:item:leather-armor": {
+			"kind": "item",
+			"label": "Leather Armor",
+			"render": "plain",
+			"resourceId": "item-leather-armor"
+		},
+		"asset:item:iron-armor": {
+			"kind": "item",
+			"label": "Iron Armor",
+			"render": "plain",
+			"resourceId": "item-iron-armor"
+		},
+		"asset:producer:blacksmith-t1": {
+			"kind": "item",
+			"label": "Blacksmith I",
+			"render": "plain",
+			"resourceId": "producer-blacksmith-t1"
+		},
+		"asset:item:blueprint-blacksmith-t1": {
+			"kind": "item",
+			"label": "Blacksmith I Blueprint",
+			"overlayAssetId": "asset:producer:blacksmith-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
 		}
 	}
 }

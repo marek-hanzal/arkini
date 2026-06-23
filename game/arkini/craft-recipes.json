@@ -678,6 +678,40 @@
 				}
 			],
 			"durationMs": 20000
+		},
+		"craft:blacksmith-t1": {
+			"resultItemId": "producer:blacksmith-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 2,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:smelter-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 16000
 		}
 	}
 }

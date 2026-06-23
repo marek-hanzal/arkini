@@ -725,10 +725,16 @@
 			]
 		},
 		"input:heroes-guild-t1:chest-t1": {
-			"name": "Heroes Guild short expedition payment",
+			"name": "Heroes Guild level I expedition gear",
 			"inputs": [
 				{
-					"itemId": "item:coin",
+					"itemId": "item:axe",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
@@ -738,26 +744,20 @@
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
-				},
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
 				}
 			]
 		},
 		"input:heroes-guild-t1:chest-t2": {
-			"name": "Heroes Guild sturdy expedition payment",
+			"name": "Heroes Guild level II expedition gear",
 			"inputs": [
 				{
-					"itemId": "item:coin",
-					"quantity": 2,
-					"capacity": 8,
+					"itemId": "item:axe",
+					"quantity": 1,
+					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:beer-barrel",
+					"itemId": "item:leather-armor",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
@@ -767,16 +767,28 @@
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
 				}
 			]
 		},
 		"input:heroes-guild-t1:chest-t3": {
-			"name": "Heroes Guild rare expedition payment",
+			"name": "Heroes Guild level III expedition gear",
 			"inputs": [
 				{
-					"itemId": "item:coin",
-					"quantity": 4,
-					"capacity": 12,
+					"itemId": "item:sword",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-armor",
+					"quantity": 1,
+					"capacity": 4,
 					"consume": true
 				},
 				{
@@ -786,26 +798,26 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:sausage",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
+					"itemId": "item:coin",
+					"quantity": 4,
+					"capacity": 12,
 					"consume": true
 				}
 			]
 		},
 		"input:heroes-guild-t1:chest-t4": {
-			"name": "Heroes Guild epic expedition payment",
+			"name": "Heroes Guild level IV expedition gear",
 			"inputs": [
 				{
-					"itemId": "item:coin",
-					"quantity": 8,
-					"capacity": 20,
+					"itemId": "item:sword",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-armor",
+					"quantity": 1,
+					"capacity": 4,
 					"consume": true
 				},
 				{
@@ -821,15 +833,9 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:sausage",
-					"quantity": 2,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:bread",
-					"quantity": 2,
-					"capacity": 4,
+					"itemId": "item:coin",
+					"quantity": 8,
+					"capacity": 20,
 					"consume": true
 				}
 			]
@@ -858,6 +864,133 @@
 					"itemId": "item:coin",
 					"quantity": 3,
 					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:blacksmith-t1:axe": {
+			"name": "Blacksmith axe materials",
+			"inputs": [
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:blacksmith-t1:sword": {
+			"name": "Blacksmith precision sword materials",
+			"inputs": [
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:blacksmith-t1:leather-armor": {
+			"name": "Blacksmith leather armor materials",
+			"inputs": [
+				{
+					"itemId": "item:leather",
+					"quantity": 3,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:blacksmith-t1:iron-armor": {
+			"name": "Blacksmith iron armor materials",
+			"inputs": [
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 4,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-blacksmith-t1": {
+			"name": "Blueprint: Blacksmith I input",
+			"inputs": [
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 2,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"capacity": 4,
 					"consume": true
 				}
 			]

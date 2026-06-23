@@ -120,7 +120,7 @@ export const validateSources = async (paths: readonly string[]) => {
 	return validatePackage(packageValue);
 };
 
-export const mergeSources = (sources: readonly FileSource[]): MergedGameConfig => {
+const mergeSources = (sources: readonly FileSource[]): MergedGameConfig => {
 	const output = createEmptyPackage();
 	const sourceByKey = new Map<string, string>();
 
@@ -177,7 +177,7 @@ export const mergeSources = (sources: readonly FileSource[]): MergedGameConfig =
 	return output;
 };
 
-export const validatePackage = (value: unknown): GameConfig => {
+const validatePackage = (value: unknown): GameConfig => {
 	try {
 		return parseGameConfig(value);
 	} catch (error) {
@@ -185,7 +185,7 @@ export const validatePackage = (value: unknown): GameConfig => {
 	}
 };
 
-export const readJsonSources = async (paths: readonly string[]) => {
+const readJsonSources = async (paths: readonly string[]) => {
 	const sortedPaths = [
 		...paths,
 	].sort((left, right) => left.localeCompare(right));

@@ -1,4 +1,4 @@
-import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
+import { isBoardItemConsumableAsInput } from "~/v0/game/requirements/isBoardItemConsumableAsInput";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 
@@ -10,20 +10,6 @@ export namespace readRuntimeActivationInputAvailableQuantityFromGameSave {
 	}
 }
 
-const isConsumableBoardInput = ({
-	itemInstanceId,
-	save,
-}: {
-	itemInstanceId: string;
-	save: GameSave;
-}) => {
-	const status = readBoardItemRuntimeStateStatus({
-		itemInstanceId,
-		save,
-	});
-	return !status.busy && !status.preservable;
-};
-
 export const readRuntimeActivationInputAvailableQuantityFromGameSave = ({
 	itemId,
 	save,
@@ -33,7 +19,7 @@ export const readRuntimeActivationInputAvailableQuantityFromGameSave = ({
 		(item) =>
 			item.id !== targetItemInstanceId &&
 			item.itemId === itemId &&
-			isConsumableBoardInput({
+			isBoardItemConsumableAsInput({
 				itemInstanceId: item.id,
 				save,
 			}),

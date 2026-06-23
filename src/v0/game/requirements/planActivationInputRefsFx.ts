@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema";
-import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+import { isBoardItemConsumableAsInput } from "~/v0/game/requirements/isBoardItemConsumableAsInput";
 import {
 	type GameItemQuantityIndex,
 	readGameItemQuantity,
@@ -29,20 +29,6 @@ const sortBoardInputCandidates = (items: readonly GameSave["board"]["items"][str
 		(left, right) => left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),
 	);
 
-const isBoardInputConsumable = ({
-	itemInstanceId,
-	save,
-}: {
-	itemInstanceId: string;
-	save: GameSave;
-}) => {
-	const status = readBoardItemRuntimeStateStatus({
-		itemInstanceId,
-		save,
-	});
-	return !status.busy && !status.preservable;
-};
-
 export const planActivationInputRefsFx = Effect.fn("planActivationInputRefsFx")(function* ({
 	excludedBoardItemIds = new Set(),
 	inputs,
@@ -68,7 +54,7 @@ export const planActivationInputRefsFx = Effect.fn("planActivationInputRefsFx")(
 			if (boardItem.itemId !== input.itemId) continue;
 			if (reservedBoardItemIds.has(boardItem.id)) continue;
 			if (
-				!isBoardInputConsumable({
+				!isBoardItemConsumableAsInput({
 					itemInstanceId: boardItem.id,
 					save,
 				})

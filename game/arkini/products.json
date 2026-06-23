@@ -439,37 +439,37 @@
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t3:gold-deposit"
 		},
-		"product:heroes-guild-t1:hero-chest-t1": {
-			"name": "Hero Chest I",
+		"product:heroes-guild-t1:chest-t1": {
+			"name": "Chest I",
 			"durationMs": 120000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:heroes-guild-t1:hero-chest-t1",
+			"inputRefId": "input:heroes-guild-t1:chest-t1",
 			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:hero-chest-t1"
+			"outputTableId": "loot:heroes-guild-t1:chest-t1"
 		},
-		"product:heroes-guild-t1:hero-chest-t2": {
-			"name": "Hero Chest II",
+		"product:heroes-guild-t1:chest-t2": {
+			"name": "Chest II",
 			"durationMs": 180000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:heroes-guild-t1:hero-chest-t2",
+			"inputRefId": "input:heroes-guild-t1:chest-t2",
 			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:hero-chest-t2"
+			"outputTableId": "loot:heroes-guild-t1:chest-t2"
 		},
-		"product:heroes-guild-t1:hero-chest-t3": {
-			"name": "Hero Chest III",
+		"product:heroes-guild-t1:chest-t3": {
+			"name": "Chest III",
 			"durationMs": 300000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:heroes-guild-t1:hero-chest-t3",
+			"inputRefId": "input:heroes-guild-t1:chest-t3",
 			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:hero-chest-t3"
+			"outputTableId": "loot:heroes-guild-t1:chest-t3"
 		},
-		"product:heroes-guild-t1:hero-chest-t4": {
-			"name": "Hero Chest IV",
+		"product:heroes-guild-t1:chest-t4": {
+			"name": "Chest IV",
 			"durationMs": 600000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:heroes-guild-t1:hero-chest-t4",
+			"inputRefId": "input:heroes-guild-t1:chest-t4",
 			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:hero-chest-t4"
+			"outputTableId": "loot:heroes-guild-t1:chest-t4"
 		},
 		"product:townhall-t4:blueprint-heroes-guild-t1": {
 			"name": "Blueprint: Heroes Guild I",
@@ -479,13 +479,13 @@
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t4:blueprint-heroes-guild-t1"
 		},
-		"product:goldsmith-t1:hero-key-t3": {
-			"name": "Hero Key III",
+		"product:goldsmith-t1:key-t3": {
+			"name": "Key III",
 			"durationMs": 20000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:goldsmith-t1:hero-key-t3",
+			"inputRefId": "input:goldsmith-t1:key-t3",
 			"requirementIds": [],
-			"outputTableId": "loot:goldsmith-t1:hero-key-t3"
+			"outputTableId": "loot:goldsmith-t1:key-t3"
 		}
 	}
 }

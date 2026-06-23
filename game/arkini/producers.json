@@ -196,7 +196,7 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:goldsmith-t1:coins",
-				"product:goldsmith-t1:hero-key-t3"
+				"product:goldsmith-t1:key-t3"
 			],
 			"requirementIds": []
 		},
@@ -260,10 +260,10 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:heroes-guild-t1:hero-chest-t1",
-				"product:heroes-guild-t1:hero-chest-t2",
-				"product:heroes-guild-t1:hero-chest-t3",
-				"product:heroes-guild-t1:hero-chest-t4"
+				"product:heroes-guild-t1:chest-t1",
+				"product:heroes-guild-t1:chest-t2",
+				"product:heroes-guild-t1:chest-t3",
+				"product:heroes-guild-t1:chest-t4"
 			],
 			"requirementIds": []
 		}

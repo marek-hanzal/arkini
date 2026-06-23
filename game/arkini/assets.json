@@ -90,29 +90,29 @@
 			"render": "plain",
 			"resourceId": "item-crate-sturdy"
 		},
-		"asset:item:hero-chest-t1": {
+		"asset:item:chest-t1": {
 			"kind": "item",
-			"label": "Hero Chest I",
+			"label": "Chest I",
 			"render": "plain",
-			"resourceId": "item-hero-chest-t1"
+			"resourceId": "item-chest-t1"
 		},
-		"asset:item:hero-chest-t2": {
+		"asset:item:chest-t2": {
 			"kind": "item",
-			"label": "Hero Chest II",
+			"label": "Chest II",
 			"render": "plain",
-			"resourceId": "item-hero-chest-t2"
+			"resourceId": "item-chest-t2"
 		},
-		"asset:item:hero-chest-t3": {
+		"asset:item:chest-t3": {
 			"kind": "item",
-			"label": "Hero Chest III",
+			"label": "Chest III",
 			"render": "plain",
-			"resourceId": "item-hero-chest-t3"
+			"resourceId": "item-chest-t3"
 		},
-		"asset:item:hero-chest-t4": {
+		"asset:item:chest-t4": {
 			"kind": "item",
-			"label": "Hero Chest IV",
+			"label": "Chest IV",
 			"render": "plain",
-			"resourceId": "item-hero-chest-t4"
+			"resourceId": "item-chest-t4"
 		},
 		"asset:item:crystal": {
 			"kind": "item",
@@ -671,29 +671,29 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
-		"asset:item:hero-key-t1": {
+		"asset:item:key-t1": {
 			"kind": "item",
-			"label": "Hero Key I",
+			"label": "Key I",
 			"render": "plain",
-			"resourceId": "item-hero-key-t1"
+			"resourceId": "item-key-t1"
 		},
-		"asset:item:hero-key-t2": {
+		"asset:item:key-t2": {
 			"kind": "item",
-			"label": "Hero Key II",
+			"label": "Key II",
 			"render": "plain",
-			"resourceId": "item-hero-key-t2"
+			"resourceId": "item-key-t2"
 		},
-		"asset:item:hero-key-t3": {
+		"asset:item:key-t3": {
 			"kind": "item",
-			"label": "Hero Key III",
+			"label": "Key III",
 			"render": "plain",
-			"resourceId": "item-hero-key-t3"
+			"resourceId": "item-key-t3"
 		},
-		"asset:item:hero-key-t4": {
+		"asset:item:key-t4": {
 			"kind": "item",
-			"label": "Hero Key IV",
+			"label": "Key IV",
 			"render": "plain",
-			"resourceId": "item-hero-key-t4"
+			"resourceId": "item-key-t4"
 		}
 	}
 }

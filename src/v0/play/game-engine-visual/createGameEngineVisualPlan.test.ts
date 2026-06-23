@@ -626,6 +626,80 @@ describe("createGameEngineVisualPlan", () => {
 		});
 	});
 
+	it("does not let stash feedback hold a depleted stash tile on board", () => {
+		const previousBoard = boardView([
+			{
+				id: "stash",
+				itemId: "item:chest",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "output:1",
+					itemId: "item:twig",
+					state: {},
+					x: 1,
+					y: 0,
+				},
+			]),
+			currentInventory: undefined,
+			events: [
+				{
+					itemId: "item:key",
+					nextQuantity: 1,
+					previousQuantity: 0,
+					quantity: 1,
+					stashId: "stash:chest",
+					stashItemInstanceId: "stash",
+					storedAtMs: 1,
+					type: "stash_input.stored",
+				},
+				{
+					itemId: "item:twig",
+					originItemInstanceId: "stash",
+					reason: "stash-output",
+					to: {
+						itemInstanceId: "output:1",
+						kind: "board",
+						x: 1,
+						y: 0,
+					},
+					type: "item.created",
+				},
+				{
+					depletedAtMs: 1,
+					stashId: "stash:chest",
+					stashItemInstanceId: "stash",
+					type: "stash.depleted",
+				},
+				{
+					itemId: "item:chest",
+					itemInstanceId: "stash",
+					reason: "stash-depleted",
+					removedAtMs: 1,
+					type: "item.removed",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
+		expect(plan.boardFeedbackRequests[0]?.cleanupDelayMs).toBeGreaterThan(1000);
+
+		const retainedStash = plan.boardTransientTilePlans[0];
+		expect(retainedStash?.request.exit).toMatchObject({
+			delayMs: 0,
+			durationMs: 1,
+			kind: "merge-out",
+		});
+		expect(retainedStash?.cleanupDelayMs).toBeLessThan(200);
+	});
+
 	it("maps product completion to producer bounce feedback", () => {
 		const plan = createGameEngineVisualPlan({
 			currentBoard: boardView([

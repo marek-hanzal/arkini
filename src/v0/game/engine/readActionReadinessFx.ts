@@ -1,6 +1,5 @@
 import { Effect, type Effect as EffectType } from "effect";
 import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
-import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
 import { checkBoardItemMoveReadinessFx } from "~/v0/game/board/checkBoardItemMoveReadinessFx";
 import { checkBoardItemStashReadinessFx } from "~/v0/game/stash/checkBoardItemStashReadinessFx";
 import { checkBoardItemsSwapReadinessFx } from "~/v0/game/board/checkBoardItemsSwapReadinessFx";
@@ -39,9 +38,6 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 	save,
 	action,
 }: readActionReadinessFx.Props) {
-	const gameConfig = yield* buildGameConfigServiceFx({
-		config,
-	});
 	const readinessEffect: EffectType.Effect<void, GameEngineError, GameConfigFx> = Effect.gen(
 		function* () {
 			const parsedAction = yield* parseGameActionFx({
@@ -53,13 +49,13 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				boardItemMove: (moveAction) =>
 					checkBoardItemMoveReadinessFx({
 						action: moveAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				boardItemStash: (stashAction) =>
 					checkBoardItemStashReadinessFx({
 						action: stashAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				boardItemsSwap: (swapAction) =>
@@ -70,31 +66,31 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				craftInputStore: (storeCraftInputAction) =>
 					checkCraftInputStoreReadinessFx({
 						action: storeCraftInputAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				craftInputWithdraw: (withdrawCraftInputAction) =>
 					checkCraftInputWithdrawReadinessFx({
 						action: withdrawCraftInputAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				craftStart: (craftAction) =>
 					checkCraftStartReadinessFx({
 						action: craftAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				debugItemSpawn: (spawnAction) =>
 					checkDebugItemSpawnReadinessFx({
 						action: spawnAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				inventoryItemPlace: (placeAction) =>
 					checkInventoryItemPlaceReadinessFx({
 						action: placeAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				inventorySlotsSwap: (swapAction) =>
@@ -105,55 +101,55 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 				itemMerge: (mergeAction) =>
 					checkItemMergeReadinessFx({
 						action: mergeAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				producerInputStore: (storeInputAction) =>
 					checkProducerInputStoreReadinessFx({
 						action: storeInputAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				producerInputWithdraw: (withdrawInputAction) =>
 					checkProducerInputWithdrawReadinessFx({
 						action: withdrawInputAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				producerProductLineSetDefault: (setDefaultAction) =>
 					checkProducerProductLineSetDefaultReadinessFx({
 						action: setDefaultAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				producerProductStart: (startAction) =>
 					checkProducerProductStartReadinessFx({
 						action: startAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				stashOpen: (openAction) =>
 					checkStashOpenReadinessFx({
 						action: openAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				storedRequirementStore: (storeAction) =>
 					checkStoredRequirementStoreReadinessFx({
 						action: storeAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				storedRequirementWithdraw: (withdrawAction) =>
 					checkStoredRequirementWithdrawReadinessFx({
 						action: withdrawAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 				tileRemove: (removeAction) =>
 					checkTileRemoveReadinessFx({
 						action: removeAction,
-						config: gameConfig.config,
+						config,
 						save,
 					}),
 			});
@@ -161,7 +157,9 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 		},
 	);
 
-	return yield* Effect.provideService(readinessEffect, GameConfigFx, gameConfig).pipe(
+	return yield* Effect.provideService(readinessEffect, GameConfigFx, {
+		config,
+	}).pipe(
 		Effect.match({
 			onFailure: (error: GameEngineError) =>
 				({

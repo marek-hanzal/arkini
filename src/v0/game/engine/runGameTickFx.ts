@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
-import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
 import { processCompletedCraftJobsFx } from "~/v0/game/craft/processCompletedCraftJobsFx";
 import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
 import { processItemSpawnJobsFx } from "~/v0/game/job/processItemSpawnJobsFx";
@@ -23,16 +22,12 @@ export const runGameTickFx = Effect.fn("runGameTickFx")(function* ({
 	save,
 	nowMs,
 }: runGameTickFx.Props) {
-	const gameConfig = yield* buildGameConfigServiceFx({
-		config,
-	});
-
 	const result = Effect.gen(function* () {
 		let nextSave = save;
 		const events: GameEvent[] = [];
 
 		const itemSpawnBeforeJobs = yield* processItemSpawnJobsFx({
-			config: gameConfig.config,
+			config,
 			nowMs,
 			save: nextSave,
 		});
@@ -40,7 +35,7 @@ export const runGameTickFx = Effect.fn("runGameTickFx")(function* ({
 		events.push(...itemSpawnBeforeJobs.events);
 
 		const producerJobs = yield* processCompletedProducerJobsFx({
-			config: gameConfig.config,
+			config,
 			nowMs,
 			save: nextSave,
 		});
@@ -48,7 +43,7 @@ export const runGameTickFx = Effect.fn("runGameTickFx")(function* ({
 		events.push(...producerJobs.events);
 
 		const craftJobs = yield* processCompletedCraftJobsFx({
-			config: gameConfig.config,
+			config,
 			nowMs,
 			save: nextSave,
 		});
@@ -64,5 +59,7 @@ export const runGameTickFx = Effect.fn("runGameTickFx")(function* ({
 		} satisfies GameEngineResult;
 	});
 
-	return yield* Effect.provideService(result, GameConfigFx, gameConfig);
+	return yield* Effect.provideService(result, GameConfigFx, {
+		config,
+	});
 });

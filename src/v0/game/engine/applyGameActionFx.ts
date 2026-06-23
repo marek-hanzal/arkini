@@ -1,6 +1,5 @@
 import { Effect, type Effect as EffectType } from "effect";
 import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
-import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
 import { moveBoardItemFx } from "~/v0/game/board/moveBoardItemFx";
 import { placeInventoryItemOnBoardFx } from "~/v0/game/placement/placeInventoryItemOnBoardFx";
 import { stashBoardItemFx } from "~/v0/game/stash/stashBoardItemFx";
@@ -45,10 +44,6 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 	const parsedAction = yield* parseGameActionFx({
 		action,
 	});
-	const gameConfig = yield* buildGameConfigServiceFx({
-		config,
-	});
-
 	const result: EffectType.Effect<
 		GameEngineResult,
 		GameEngineError,
@@ -59,14 +54,14 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		boardItemMove: (moveAction) =>
 			moveBoardItemFx({
 				action: moveAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		boardItemStash: (stashAction) =>
 			stashBoardItemFx({
 				action: stashAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
@@ -79,35 +74,35 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		craftInputStore: (storeCraftInputAction) =>
 			storeCraftInputFx({
 				action: storeCraftInputAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		craftInputWithdraw: (withdrawCraftInputAction) =>
 			withdrawCraftInputFx({
 				action: withdrawCraftInputAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		craftStart: (craftAction) =>
 			startCraftFx({
 				action: craftAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		debugItemSpawn: (spawnAction) =>
 			spawnDebugItemFx({
 				action: spawnAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		inventoryItemPlace: (placeAction) =>
 			placeInventoryItemOnBoardFx({
 				action: placeAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
@@ -120,67 +115,69 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		itemMerge: (mergeAction) =>
 			mergeItemFx({
 				action: mergeAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		producerInputStore: (storeInputAction) =>
 			storeProducerInputFx({
 				action: storeInputAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		producerInputWithdraw: (withdrawInputAction) =>
 			withdrawProducerInputFx({
 				action: withdrawInputAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		producerProductLineSetDefault: (setDefaultAction) =>
 			setProducerProductLineDefaultFx({
 				action: setDefaultAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		producerProductStart: (startAction) =>
 			startProducerProductFx({
 				action: startAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		stashOpen: (openAction) =>
 			openStashFx({
 				action: openAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		storedRequirementStore: (storeAction) =>
 			storeStoredRequirementFx({
 				action: storeAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		storedRequirementWithdraw: (withdrawAction) =>
 			withdrawStoredRequirementFx({
 				action: withdrawAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 		tileRemove: (removeAction) =>
 			removeTileFx({
 				action: removeAction,
-				config: gameConfig.config,
+				config,
 				nowMs,
 				save,
 			}),
 	});
 
-	return yield* Effect.provideService(result, GameConfigFx, gameConfig);
+	return yield* Effect.provideService(result, GameConfigFx, {
+		config,
+	});
 });

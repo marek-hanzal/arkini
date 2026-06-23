@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { applyGameActionFx } from "~/v0/game/engine/applyGameActionFx";
-import { buildGameConfigServiceFx } from "~/v0/game/config/buildGameConfigServiceFx";
 import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
 import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
 import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
@@ -64,7 +63,6 @@ export class RuntimeGameEngineAdapter {
 	readonly config: GameConfig;
 	private readonly listeners = new Set<GameEngineRuntimeListener>();
 	private readonly random?: RandomService;
-	private runtimeConfig: GameConfig;
 	private lastEvents: readonly GameEvent[] = [];
 	private mutationQueue: Promise<void> = Promise.resolve();
 	private nextWakeAtMs: number | null = null;
@@ -74,7 +72,6 @@ export class RuntimeGameEngineAdapter {
 		this.config = config;
 		this.random = random;
 		this.save = initialSave;
-		this.runtimeConfig = buildRuntimeConfig(config);
 		this.nextWakeAtMs = nextWakeAtMs;
 	}
 
@@ -115,7 +112,7 @@ export class RuntimeGameEngineAdapter {
 
 	readSnapshot(): GameEngineRuntimeSnapshot {
 		return {
-			config: this.runtimeConfig,
+			config: this.config,
 			lastEvents: this.lastEvents,
 			nextWakeAtMs: this.nextWakeAtMs,
 			save: this.save,
@@ -238,7 +235,6 @@ export class RuntimeGameEngineAdapter {
 
 	private commit(result: GameEngineResult) {
 		this.save = result.save;
-		this.runtimeConfig = buildRuntimeConfig(this.config);
 		this.lastEvents = result.events;
 		this.nextWakeAtMs = result.nextWakeAtMs;
 
@@ -247,13 +243,6 @@ export class RuntimeGameEngineAdapter {
 		}
 	}
 }
-
-const buildRuntimeConfig = (config: GameConfig) =>
-	Effect.runSync(
-		buildGameConfigServiceFx({
-			config,
-		}),
-	).config;
 
 interface RequiredAdapterOptions {
 	config: GameConfig;

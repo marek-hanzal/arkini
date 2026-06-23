@@ -2,8 +2,8 @@ import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema"
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import { readGameSaveExclusiveConflicts } from "~/v0/game/exclusivity/readGameSaveExclusiveConflicts";
+import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 
 export namespace readRuntimeCraftViewFromGameSave {
@@ -14,26 +14,6 @@ export namespace readRuntimeCraftViewFromGameSave {
 		save: GameSave;
 	}
 }
-
-const readRuntimeCraftInputAvailableQuantityFromGameSave = ({
-	itemId,
-	save,
-	targetItemInstanceId,
-}: {
-	itemId: string;
-	save: GameSave;
-	targetItemInstanceId: string;
-}) => {
-	const boardQuantity = Object.values(save.board.items).filter(
-		(item) => item.id !== targetItemInstanceId && item.itemId === itemId,
-	).length;
-	const inventoryQuantity = save.inventory.slots.reduce((total, slot) => {
-		if (!slot || slot.itemId !== itemId) return total;
-		return total + readGameSaveInventorySlotQuantity(slot);
-	}, 0);
-
-	return boardQuantity + inventoryQuantity;
-};
 
 export const readRuntimeCraftViewFromGameSave = ({
 	boardItem,
@@ -109,7 +89,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 		id: recipeId,
 		inputProgress,
 		inputs: recipe.inputs.map((input) => ({
-			available: readRuntimeCraftInputAvailableQuantityFromGameSave({
+			available: readRuntimeActivationInputAvailableQuantityFromGameSave({
 				itemId: input.itemId,
 				save,
 				targetItemInstanceId: boardItem.id,

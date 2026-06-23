@@ -9,7 +9,7 @@ import { readRuntimeActivationHindranceViewsFromGameSave } from "~/v0/play/game-
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
-import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
 	readRuntimeMissingRequirementItemIdsFromGameSave,
@@ -36,26 +36,6 @@ const readRuntimeStoredProductInputQuantityFromGameSave = ({
 	save: GameSave;
 	targetItemInstanceId: string;
 }) => save.producerInputs[targetItemInstanceId]?.productInputs[productId]?.items[itemId] ?? 0;
-
-const readRuntimeProductInputAvailableQuantityFromGameSave = ({
-	itemId,
-	save,
-	targetItemInstanceId,
-}: {
-	itemId: string;
-	save: GameSave;
-	targetItemInstanceId: string;
-}) => {
-	const boardQuantity = Object.values(save.board.items).filter(
-		(item) => item.id !== targetItemInstanceId && item.itemId === itemId,
-	).length;
-	const inventoryQuantity = save.inventory.slots.reduce((total, slot) => {
-		if (!slot || slot.itemId !== itemId) return total;
-		return total + readGameSaveInventorySlotQuantity(slot);
-	}, 0);
-
-	return boardQuantity + inventoryQuantity;
-};
 
 const readRuntimeProductLineViewsFromGameSave = ({
 	config,
@@ -164,7 +144,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 			productId,
 		}).map((input) =>
 			readRuntimeActivationInputView({
-				available: readRuntimeProductInputAvailableQuantityFromGameSave({
+				available: readRuntimeActivationInputAvailableQuantityFromGameSave({
 					itemId: input.itemId,
 					save,
 					targetItemInstanceId,
@@ -182,7 +162,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 		const inputsAvailable = inputs.every(
 			(input) =>
 				input.stored +
-					readRuntimeProductInputAvailableQuantityFromGameSave({
+					readRuntimeActivationInputAvailableQuantityFromGameSave({
 						itemId: input.itemId,
 						save,
 						targetItemInstanceId,

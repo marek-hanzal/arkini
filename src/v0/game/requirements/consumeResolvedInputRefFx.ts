@@ -37,6 +37,10 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 			},
 			(boardRef) => {
 				delete nextSave.board.items[boardRef.itemInstanceId];
+				removeBoardItemRuntimeState({
+					itemInstanceId: boardRef.itemInstanceId,
+					save: nextSave,
+				});
 				events.push({
 					from: {
 						kind: "board",

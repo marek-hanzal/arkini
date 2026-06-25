@@ -131,7 +131,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"blacksmith"
+				"blacksmith",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:blacksmith-t1"
 		},
@@ -269,7 +270,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:goldsmith-t1"
 		},
@@ -286,7 +288,8 @@
 				"building",
 				"craft-target",
 				"hero",
-				"guild"
+				"guild",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:heroes-guild-t1"
 		},
@@ -573,7 +576,8 @@
 				"blueprint",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:VI"
 			],
 			"craftRecipeId": "craft:university"
 		},
@@ -1508,7 +1512,8 @@
 				"producer",
 				"blacksmith",
 				"equipment",
-				"hero"
+				"hero",
+				"era:VII"
 			],
 			"producerId": "producer:blacksmith-t1"
 		},
@@ -1649,7 +1654,8 @@
 				"producer",
 				"economy",
 				"goldsmith",
-				"coin"
+				"coin",
+				"era:VII"
 			],
 			"producerId": "producer:goldsmith-t1"
 		},
@@ -1665,7 +1671,8 @@
 				"producer",
 				"hero",
 				"guild",
-				"expedition"
+				"expedition",
+				"era:VII"
 			],
 			"producerId": "producer:heroes-guild-t1"
 		},
@@ -1707,7 +1714,7 @@
 			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Trade producer that converts processed food and drink into coins. Future market tiers should upgrade this building, not create separate market buildings.",
+			"description": "First trade producer that converts processed food and drink into coins.",
 			"tags": [
 				"producer",
 				"trade",
@@ -1928,7 +1935,7 @@
 			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Food processing and early industry civic hub that issues milling, baking, tavern, education, and mining plans.",
+			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, cookhouse, brewing, wine, market, and Era IV plans.",
 			"tags": [
 				"producer",
 				"townhall",
@@ -1944,11 +1951,12 @@
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Coin-economy civic hub that issues late specialist blueprints.",
+			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
 			"tags": [
 				"producer",
 				"townhall",
-				"civic"
+				"civic",
+				"era:IV"
 			],
 			"producerId": "producer:townhall-t4"
 		},
@@ -1964,7 +1972,8 @@
 				"producer",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:VI"
 			],
 			"producerId": "producer:university"
 		},
@@ -2324,6 +2333,177 @@
 				"era:III"
 			],
 			"craftRecipeId": "craft:cookhouse-t1"
+		},
+		"item:paper": {
+			"assetId": "asset:item:paper",
+			"code": "paper",
+			"name": "Paper",
+			"tier": 4,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Processed writing material used by schools, civic offices, surveyors, and improved trade.",
+			"tags": [
+				"resource",
+				"paper",
+				"civic",
+				"era:IV"
+			]
+		},
+		"item:building-permit": {
+			"assetId": "asset:item:building-permit",
+			"code": "building-permit",
+			"name": "Building Permit",
+			"tier": 4,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Official construction authorization produced by the Civic Office and used as the Era IV master item.",
+			"tags": [
+				"resource",
+				"master",
+				"permit",
+				"civic",
+				"era:IV"
+			]
+		},
+		"producer:paper-mill-t1": {
+			"assetId": "asset:producer:paper-mill-t1",
+			"code": "paper-mill-t1",
+			"name": "Paper Mill I",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Civic workshop that turns planks and water into paper for education and permits.",
+			"tags": [
+				"producer",
+				"building",
+				"paper",
+				"civic",
+				"era:IV"
+			],
+			"producerId": "producer:paper-mill-t1"
+		},
+		"producer:civic-office-t1": {
+			"assetId": "asset:producer:civic-office-t1",
+			"code": "civic-office-t1",
+			"name": "Civic Office I",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
+			"tags": [
+				"producer",
+				"building",
+				"civic",
+				"permit",
+				"era:IV"
+			],
+			"producerId": "producer:civic-office-t1"
+		},
+		"producer:surveyor-camp-t1": {
+			"assetId": "asset:producer:surveyor-camp-t1",
+			"code": "surveyor-camp-t1",
+			"name": "Surveyor Camp I",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Survey producer that uses permits and knowledge to discover clay and sand deposits for advanced construction.",
+			"tags": [
+				"producer",
+				"building",
+				"survey",
+				"civic",
+				"era:IV"
+			],
+			"producerId": "producer:surveyor-camp-t1"
+		},
+		"producer:market-t2": {
+			"assetId": "asset:producer:market-t2",
+			"code": "market-t2",
+			"name": "Market II",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
+			"tags": [
+				"producer",
+				"trade",
+				"market",
+				"civic",
+				"era:IV"
+			],
+			"producerId": "producer:market-t2"
+		},
+		"item:blueprint-paper-mill-t1": {
+			"assetId": "asset:item:blueprint-paper-mill-t1",
+			"code": "blueprint-paper-mill-t1",
+			"name": "Paper Mill I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Paper Mill I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"paper",
+				"civic",
+				"era:IV"
+			],
+			"craftRecipeId": "craft:paper-mill-t1"
+		},
+		"item:blueprint-civic-office-t1": {
+			"assetId": "asset:item:blueprint-civic-office-t1",
+			"code": "blueprint-civic-office-t1",
+			"name": "Civic Office I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Civic Office I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"civic",
+				"permit",
+				"era:IV"
+			],
+			"craftRecipeId": "craft:civic-office-t1"
+		},
+		"item:blueprint-surveyor-camp-t1": {
+			"assetId": "asset:item:blueprint-surveyor-camp-t1",
+			"code": "blueprint-surveyor-camp-t1",
+			"name": "Surveyor Camp I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Surveyor Camp I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"survey",
+				"civic",
+				"era:IV"
+			],
+			"craftRecipeId": "craft:surveyor-camp-t1"
+		},
+		"item:blueprint-market-t2": {
+			"assetId": "asset:item:blueprint-market-t2",
+			"code": "blueprint-market-t2",
+			"name": "Market II Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can upgrade Market into Market II.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"market",
+				"trade",
+				"era:IV"
+			],
+			"craftRecipeId": "craft:market-t2"
 		}
 	}
 }

@@ -97,6 +97,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-civic-office-t1": {
+			"kind": "item",
+			"label": "Civic Office I Blueprint",
+			"overlayAssetId": "asset:producer:civic-office-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-clay-pit": {
 			"kind": "item",
 			"label": "Clay Pit Blueprint",
@@ -188,6 +195,20 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-market-t2": {
+			"kind": "item",
+			"label": "Market II Blueprint",
+			"overlayAssetId": "asset:producer:market-t2",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-paper-mill-t1": {
+			"kind": "item",
+			"label": "Paper Mill I Blueprint",
+			"overlayAssetId": "asset:producer:paper-mill-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-pig-farm-t1": {
 			"kind": "item",
 			"label": "Pig Farm I Blueprint",
@@ -262,6 +283,13 @@
 			"kind": "item",
 			"label": "Stonemason I Blueprint",
 			"overlayAssetId": "asset:producer:stonemason-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-surveyor-camp-t1": {
+			"kind": "item",
+			"label": "Surveyor Camp I Blueprint",
+			"overlayAssetId": "asset:producer:surveyor-camp-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -352,6 +380,12 @@
 			"label": "Bricks",
 			"render": "plain",
 			"resourceId": "item-bricks"
+		},
+		"asset:item:building-permit": {
+			"kind": "item",
+			"label": "Building Permit",
+			"render": "plain",
+			"resourceId": "item-building-permit"
 		},
 		"asset:item:bush": {
 			"kind": "item",
@@ -665,6 +699,12 @@
 			"render": "plain",
 			"resourceId": "item-ore"
 		},
+		"asset:item:paper": {
+			"kind": "item",
+			"label": "Paper",
+			"render": "plain",
+			"resourceId": "item-paper"
+		},
 		"asset:item:pebble": {
 			"kind": "item",
 			"label": "Pebble",
@@ -893,6 +933,12 @@
 			"render": "plain",
 			"resourceId": "producer-chicken-coop-t1"
 		},
+		"asset:producer:civic-office-t1": {
+			"kind": "item",
+			"label": "Civic Office I",
+			"render": "plain",
+			"resourceId": "producer-civic-office-t1"
+		},
 		"asset:producer:clay-pit": {
 			"kind": "item",
 			"label": "Clay Pit",
@@ -971,6 +1017,18 @@
 			"render": "plain",
 			"resourceId": "producer-market-t1"
 		},
+		"asset:producer:market-t2": {
+			"kind": "item",
+			"label": "Market II",
+			"render": "plain",
+			"resourceId": "producer-market-t2"
+		},
+		"asset:producer:paper-mill-t1": {
+			"kind": "item",
+			"label": "Paper Mill I",
+			"render": "plain",
+			"resourceId": "producer-paper-mill-t1"
+		},
 		"asset:producer:pig-farm-t1": {
 			"kind": "item",
 			"label": "Pig Farm I",
@@ -1036,6 +1094,12 @@
 			"label": "Stonemason I",
 			"render": "plain",
 			"resourceId": "producer-stonemason-t1"
+		},
+		"asset:producer:surveyor-camp-t1": {
+			"kind": "item",
+			"label": "Surveyor Camp I",
+			"render": "plain",
+			"resourceId": "producer-surveyor-camp-t1"
 		},
 		"asset:producer:tavern-t1": {
 			"kind": "item",
@@ -1270,6 +1334,33 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:chicken-coop-t1"
+		},
+		"craft:civic-office-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:civic-office-t1"
 		},
 		"craft:coal-mine-t1": {
 			"durationMs": 8000,
@@ -1523,6 +1614,67 @@
 			"requirements": [],
 			"resultItemId": "producer:market-t1"
 		},
+		"craft:market-t2": {
+			"durationMs": 12000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:market-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:civic-office-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:market-t2"
+		},
+		"craft:paper-mill-t1": {
+			"durationMs": 8000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:paper-mill-t1"
+		},
 		"craft:pig-farm-t1": {
 			"durationMs": 7000,
 			"inputs": [
@@ -1607,27 +1759,25 @@
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 2
+					"quantity": 3
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
 					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:bread",
+					"itemId": "item:coin",
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:townhall-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
+			"requirements": [],
 			"resultItemId": "producer:school"
 		},
 		"craft:sheep-pasture-t1": {
@@ -1717,6 +1867,38 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:stonemason-t1"
+		},
+		"craft:surveyor-camp-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:surveyor-camp-t1"
 		},
 		"craft:tavern-t1": {
 			"durationMs": 8000,
@@ -2324,6 +2506,29 @@
 			],
 			"name": "Chicken coop grain and water input"
 		},
+		"input:civic-office-t1:building-permit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Civic Office permit inputs"
+		},
 		"input:coal-mine-t1:bread-water": {
 			"inputs": [
 				{
@@ -2660,6 +2865,45 @@
 			],
 			"name": "Market wine glass trade input"
 		},
+		"input:market-t2:coin-from-feast": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				}
+			],
+			"name": "Market II feast trade input"
+		},
+		"input:market-t2:coin-from-paper": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				}
+			],
+			"name": "Market II paper trade input"
+		},
+		"input:paper-mill-t1:paper": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Paper Mill paper inputs"
+		},
 		"input:pig-farm-t1:grain-water": {
 			"inputs": [
 				{
@@ -2715,17 +2959,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
+					"itemId": "item:paper",
 					"quantity": 1
 				},
 				{
-					"capacity": 4,
+					"capacity": 8,
 					"consume": true,
-					"itemId": "item:water",
+					"itemId": "item:coin",
 					"quantity": 1
 				}
 			],
-			"name": "School basic lesson supplies"
+			"name": "School paper lesson inputs"
 		},
 		"input:sheep-pasture-t1:grain-water": {
 			"inputs": [
@@ -2811,6 +3055,52 @@
 				}
 			],
 			"name": "Stonemason stone input"
+		},
+		"input:surveyor-camp-t1:clay-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Surveyor Camp clay survey inputs"
+		},
+		"input:surveyor-camp-t1:sand-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Surveyor Camp sand survey inputs"
 		},
 		"input:tavern-t1:beer-barrel": {
 			"inputs": [
@@ -3341,91 +3631,114 @@
 			],
 			"name": "Survey: Vineyard input"
 		},
-		"input:townhall-t4:blueprint-blacksmith-t1": {
+		"input:townhall-t4:blueprint-civic-office-t1": {
 			"inputs": [
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:iron-ingot",
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Civic Office I input"
+		},
+		"input:townhall-t4:blueprint-market-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
 					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
 				}
 			],
-			"name": "Blueprint: Blacksmith I input"
+			"name": "Blueprint: Market II input"
 		},
-		"input:townhall-t4:blueprint-goldsmith-t1": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Goldsmith I input"
-		},
-		"input:townhall-t4:blueprint-heroes-guild-t1": {
+		"input:townhall-t4:blueprint-paper-mill-t1": {
 			"inputs": [
 				{
 					"capacity": 8,
 					"consume": true,
 					"itemId": "item:coin",
-					"quantity": 8
+					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 2
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
 				}
 			],
-			"name": "Blueprint: Heroes Guild I input"
+			"name": "Blueprint: Paper Mill I input"
 		},
-		"input:townhall-t4:blueprint-university": {
+		"input:townhall-t4:blueprint-school": {
 			"inputs": [
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 2
+					"itemId": "item:paper",
+					"quantity": 1
 				},
 				{
-					"capacity": 12,
+					"capacity": 8,
 					"consume": true,
 					"itemId": "item:coin",
-					"quantity": 4
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: School input"
+		},
+		"input:townhall-t4:blueprint-surveyor-camp-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-glass",
+					"itemId": "item:basic-knowledge",
 					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
 				}
 			],
-			"name": "Blueprint: University input"
+			"name": "Blueprint: Surveyor Camp I input"
 		},
 		"input:university:advanced-knowledge": {
 			"inputs": [
@@ -3672,7 +3985,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"blacksmith"
+				"blacksmith",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -3736,6 +4050,24 @@
 				"building",
 				"craft-target",
 				"era:II"
+			],
+			"tier": 0
+		},
+		"item:blueprint-civic-office-t1": {
+			"assetId": "asset:item:blueprint-civic-office-t1",
+			"code": "blueprint-civic-office-t1",
+			"craftRecipeId": "craft:civic-office-t1",
+			"description": "Build plan that can be filled with resources to construct Civic Office I.",
+			"maxStackSize": 10,
+			"name": "Civic Office I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"civic",
+				"permit",
+				"era:IV"
 			],
 			"tier": 0
 		},
@@ -3874,7 +4206,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -3891,7 +4224,8 @@
 				"building",
 				"craft-target",
 				"hero",
-				"guild"
+				"guild",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -3941,6 +4275,42 @@
 				"market",
 				"trade",
 				"era:III"
+			],
+			"tier": 0
+		},
+		"item:blueprint-market-t2": {
+			"assetId": "asset:item:blueprint-market-t2",
+			"code": "blueprint-market-t2",
+			"craftRecipeId": "craft:market-t2",
+			"description": "Build plan that can upgrade Market into Market II.",
+			"maxStackSize": 10,
+			"name": "Market II Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"market",
+				"trade",
+				"era:IV"
+			],
+			"tier": 0
+		},
+		"item:blueprint-paper-mill-t1": {
+			"assetId": "asset:item:blueprint-paper-mill-t1",
+			"code": "blueprint-paper-mill-t1",
+			"craftRecipeId": "craft:paper-mill-t1",
+			"description": "Build plan that can be filled with resources to construct Paper Mill I.",
+			"maxStackSize": 10,
+			"name": "Paper Mill I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"paper",
+				"civic",
+				"era:IV"
 			],
 			"tier": 0
 		},
@@ -4118,6 +4488,24 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-surveyor-camp-t1": {
+			"assetId": "asset:item:blueprint-surveyor-camp-t1",
+			"code": "blueprint-surveyor-camp-t1",
+			"craftRecipeId": "craft:surveyor-camp-t1",
+			"description": "Build plan that can be filled with resources to construct Surveyor Camp I.",
+			"maxStackSize": 10,
+			"name": "Surveyor Camp I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"survey",
+				"civic",
+				"era:IV"
+			],
+			"tier": 0
+		},
 		"item:blueprint-tavern-t1": {
 			"assetId": "asset:item:blueprint-tavern-t1",
 			"code": "blueprint-tavern-t1",
@@ -4194,7 +4582,8 @@
 				"blueprint",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -4305,6 +4694,22 @@
 				"clay"
 			],
 			"tier": 3
+		},
+		"item:building-permit": {
+			"assetId": "asset:item:building-permit",
+			"code": "building-permit",
+			"description": "Official construction authorization produced by the Civic Office and used as the Era IV master item.",
+			"maxStackSize": 20,
+			"name": "Building Permit",
+			"storage": "both",
+			"tags": [
+				"resource",
+				"master",
+				"permit",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
 		},
 		"item:cheese": {
 			"assetId": "asset:item:cheese",
@@ -4868,6 +5273,21 @@
 			],
 			"tier": 4
 		},
+		"item:paper": {
+			"assetId": "asset:item:paper",
+			"code": "paper",
+			"description": "Processed writing material used by schools, civic offices, surveyors, and improved trade.",
+			"maxStackSize": 50,
+			"name": "Paper",
+			"storage": "both",
+			"tags": [
+				"resource",
+				"paper",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
+		},
 		"item:piglet": {
 			"assetId": "asset:item:piglet",
 			"code": "piglet",
@@ -5245,7 +5665,8 @@
 				"producer",
 				"blacksmith",
 				"equipment",
-				"hero"
+				"hero",
+				"era:VII"
 			],
 			"tier": 4
 		},
@@ -5311,6 +5732,23 @@
 				"era:II"
 			],
 			"tier": 1
+		},
+		"producer:civic-office-t1": {
+			"assetId": "asset:producer:civic-office-t1",
+			"code": "civic-office-t1",
+			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
+			"maxStackSize": 1,
+			"name": "Civic Office I",
+			"producerId": "producer:civic-office-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"civic",
+				"permit",
+				"era:IV"
+			],
+			"tier": 4
 		},
 		"producer:clay-pit": {
 			"assetId": "asset:producer:clay-pit",
@@ -5450,7 +5888,8 @@
 				"producer",
 				"economy",
 				"goldsmith",
-				"coin"
+				"coin",
+				"era:VII"
 			],
 			"tier": 1
 		},
@@ -5466,7 +5905,8 @@
 				"producer",
 				"hero",
 				"guild",
-				"expedition"
+				"expedition",
+				"era:VII"
 			],
 			"tier": 4
 		},
@@ -5504,7 +5944,7 @@
 		"producer:market-t1": {
 			"assetId": "asset:producer:market-t1",
 			"code": "market-t1",
-			"description": "Trade producer that converts processed food and drink into coins. Future market tiers should upgrade this building, not create separate market buildings.",
+			"description": "First trade producer that converts processed food and drink into coins.",
 			"maxStackSize": 1,
 			"name": "Market",
 			"producerId": "producer:market-t1",
@@ -5516,6 +5956,40 @@
 				"era:III"
 			],
 			"tier": 3
+		},
+		"producer:market-t2": {
+			"assetId": "asset:producer:market-t2",
+			"code": "market-t2",
+			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
+			"maxStackSize": 1,
+			"name": "Market II",
+			"producerId": "producer:market-t2",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"trade",
+				"market",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"producer:paper-mill-t1": {
+			"assetId": "asset:producer:paper-mill-t1",
+			"code": "paper-mill-t1",
+			"description": "Civic workshop that turns planks and water into paper for education and permits.",
+			"maxStackSize": 1,
+			"name": "Paper Mill I",
+			"producerId": "producer:paper-mill-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"paper",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
 		},
 		"producer:pig-farm-t1": {
 			"assetId": "asset:producer:pig-farm-t1",
@@ -5690,6 +6164,23 @@
 			],
 			"tier": 1
 		},
+		"producer:surveyor-camp-t1": {
+			"assetId": "asset:producer:surveyor-camp-t1",
+			"code": "surveyor-camp-t1",
+			"description": "Survey producer that uses permits and knowledge to discover clay and sand deposits for advanced construction.",
+			"maxStackSize": 1,
+			"name": "Surveyor Camp I",
+			"producerId": "producer:surveyor-camp-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"survey",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
+		},
 		"producer:tavern-t1": {
 			"assetId": "asset:producer:tavern-t1",
 			"code": "tavern-t1",
@@ -5741,7 +6232,7 @@
 		"producer:townhall-t3": {
 			"assetId": "asset:producer:townhall-t3",
 			"code": "townhall-t3",
-			"description": "Food processing and early industry civic hub that issues milling, baking, tavern, education, and mining plans.",
+			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, cookhouse, brewing, wine, market, and Era IV plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall III",
 			"producerId": "producer:townhall-t3",
@@ -5757,7 +6248,7 @@
 		"producer:townhall-t4": {
 			"assetId": "asset:producer:townhall-t4",
 			"code": "townhall-t4",
-			"description": "Coin-economy civic hub that issues late specialist blueprints.",
+			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall IV",
 			"producerId": "producer:townhall-t4",
@@ -5765,7 +6256,8 @@
 			"tags": [
 				"producer",
 				"townhall",
-				"civic"
+				"civic",
+				"era:IV"
 			],
 			"tier": 4
 		},
@@ -5781,7 +6273,8 @@
 				"producer",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:VI"
 			],
 			"tier": 4
 		},
@@ -6094,6 +6587,16 @@
 				}
 			]
 		},
+		"loot:civic-office-t1:building-permit": {
+			"name": "Civic Office building permit output",
+			"output": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:coal-mine-t1:coal": {
 			"name": "Coal mine coal carts",
 			"output": [
@@ -6308,6 +6811,36 @@
 				}
 			]
 		},
+		"loot:market-t2:coin-from-feast": {
+			"name": "Market II coins from feast",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 5,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t2:coin-from-paper": {
+			"name": "Market II coins from paper",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:paper-mill-t1:paper": {
+			"name": "Paper Mill paper output",
+			"output": [
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:pig-farm-t1:piglet": {
 			"name": "Pig farm piglets",
 			"output": [
@@ -6408,6 +6941,26 @@
 			"output": [
 				{
 					"itemId": "item:stone-block",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:clay-deposit": {
+			"name": "Surveyor Camp clay deposit output",
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:sand-deposit": {
+			"name": "Surveyor Camp sand deposit output",
+			"output": [
+				{
+					"itemId": "item:sand-deposit",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -6703,41 +7256,51 @@
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-blacksmith-t1": {
-			"name": "Blueprint: Blacksmith I output",
+		"loot:townhall-t4:blueprint-civic-office-t1": {
+			"name": "Town Hall IV Civic Office I blueprint output",
 			"output": [
 				{
-					"itemId": "item:blueprint-blacksmith-t1",
+					"itemId": "item:blueprint-civic-office-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-goldsmith-t1": {
-			"name": "Blueprint: Goldsmith I output",
+		"loot:townhall-t4:blueprint-market-t2": {
+			"name": "Town Hall IV Market II blueprint output",
 			"output": [
 				{
-					"itemId": "item:blueprint-goldsmith-t1",
+					"itemId": "item:blueprint-market-t2",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I output",
+		"loot:townhall-t4:blueprint-paper-mill-t1": {
+			"name": "Town Hall IV Paper Mill I blueprint output",
 			"output": [
 				{
-					"itemId": "item:blueprint-heroes-guild-t1",
+					"itemId": "item:blueprint-paper-mill-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-university": {
-			"name": "Blueprint: University output",
+		"loot:townhall-t4:blueprint-school": {
+			"name": "Town Hall IV School blueprint output",
 			"output": [
 				{
-					"itemId": "item:blueprint-university",
+					"itemId": "item:blueprint-school",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-surveyor-camp-t1": {
+			"name": "Town Hall IV Surveyor Camp I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-surveyor-camp-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -6902,6 +7465,14 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:civic-office-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:civic-office-t1:building-permit"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:coal-mine-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -7001,6 +7572,23 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:market-t2": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:market-t2:coin-from-paper",
+				"product:market-t2:coin-from-feast"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:paper-mill-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:paper-mill-t1:paper"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:pig-farm-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -7081,6 +7669,15 @@
 			],
 			"type": "producer"
 		},
+		"producer:surveyor-camp-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:surveyor-camp-t1:clay-deposit",
+				"product:surveyor-camp-t1:sand-deposit"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:tavern-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -7141,10 +7738,11 @@
 		"producer:townhall-t4": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:townhall-t4:blueprint-university",
-				"product:townhall-t4:blueprint-goldsmith-t1",
-				"product:townhall-t4:blueprint-blacksmith-t1",
-				"product:townhall-t4:blueprint-heroes-guild-t1"
+				"product:townhall-t4:blueprint-paper-mill-t1",
+				"product:townhall-t4:blueprint-school",
+				"product:townhall-t4:blueprint-civic-office-t1",
+				"product:townhall-t4:blueprint-market-t2",
+				"product:townhall-t4:blueprint-surveyor-camp-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -7323,6 +7921,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:civic-office-t1:building-permit": {
+			"durationMs": 10000,
+			"inputRefId": "input:civic-office-t1:building-permit",
+			"name": "Building Permit",
+			"outputTableId": "loot:civic-office-t1:building-permit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:coal-mine-t1:coal": {
 			"durationMs": 8000,
 			"inputRefId": "input:coal-mine-t1:bread-water",
@@ -7484,6 +8090,30 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:market-t2:coin-from-feast": {
+			"durationMs": 5000,
+			"inputRefId": "input:market-t2:coin-from-feast",
+			"name": "Better Coins from Feast",
+			"outputTableId": "loot:market-t2:coin-from-feast",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t2:coin-from-paper": {
+			"durationMs": 3500,
+			"inputRefId": "input:market-t2:coin-from-paper",
+			"name": "Coins from Paper",
+			"outputTableId": "loot:market-t2:coin-from-paper",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:paper-mill-t1:paper": {
+			"durationMs": 7000,
+			"inputRefId": "input:paper-mill-t1:paper",
+			"name": "Paper",
+			"outputTableId": "loot:paper-mill-t1:paper",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:pig-farm-t1:piglet": {
 			"durationMs": 5000,
 			"hinderedBy": [
@@ -7586,6 +8216,22 @@
 			"inputRefId": "input:stonemason-t1:stone",
 			"name": "Stone Block",
 			"outputTableId": "loot:stonemason-t1:stone-block",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:surveyor-camp-t1:clay-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:surveyor-camp-t1:clay-deposit",
+			"name": "Survey: Clay Deposit",
+			"outputTableId": "loot:surveyor-camp-t1:clay-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:surveyor-camp-t1:sand-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:surveyor-camp-t1:sand-deposit",
+			"name": "Survey: Sand Deposit",
+			"outputTableId": "loot:surveyor-camp-t1:sand-deposit",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -7821,35 +8467,43 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t4:blueprint-blacksmith-t1": {
+		"product:townhall-t4:blueprint-civic-office-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-blacksmith-t1",
-			"name": "Blueprint: Blacksmith I",
-			"outputTableId": "loot:townhall-t4:blueprint-blacksmith-t1",
+			"inputRefId": "input:townhall-t4:blueprint-civic-office-t1",
+			"name": "Blueprint: Civic Office I",
+			"outputTableId": "loot:townhall-t4:blueprint-civic-office-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t4:blueprint-goldsmith-t1": {
+		"product:townhall-t4:blueprint-market-t2": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-goldsmith-t1",
-			"name": "Blueprint: Goldsmith I",
-			"outputTableId": "loot:townhall-t4:blueprint-goldsmith-t1",
+			"inputRefId": "input:townhall-t4:blueprint-market-t2",
+			"name": "Blueprint: Market II",
+			"outputTableId": "loot:townhall-t4:blueprint-market-t2",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t4:blueprint-heroes-guild-t1": {
+		"product:townhall-t4:blueprint-paper-mill-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-heroes-guild-t1",
-			"name": "Blueprint: Heroes Guild I",
-			"outputTableId": "loot:townhall-t4:blueprint-heroes-guild-t1",
+			"inputRefId": "input:townhall-t4:blueprint-paper-mill-t1",
+			"name": "Blueprint: Paper Mill I",
+			"outputTableId": "loot:townhall-t4:blueprint-paper-mill-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t4:blueprint-university": {
+		"product:townhall-t4:blueprint-school": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-university",
-			"name": "Blueprint: University",
-			"outputTableId": "loot:townhall-t4:blueprint-university",
+			"inputRefId": "input:townhall-t4:blueprint-school",
+			"name": "Blueprint: School",
+			"outputTableId": "loot:townhall-t4:blueprint-school",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-surveyor-camp-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-surveyor-camp-t1",
+			"name": "Blueprint: Surveyor Camp I",
+			"outputTableId": "loot:townhall-t4:blueprint-surveyor-camp-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

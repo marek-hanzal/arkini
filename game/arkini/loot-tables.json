@@ -315,16 +315,6 @@
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-goldsmith-t1": {
-			"name": "Blueprint: Goldsmith I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-goldsmith-t1",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:townhall-t1:blueprint-townhall-t2": {
 			"name": "Blueprint: Town Hall II output",
 			"output": [
@@ -525,16 +515,6 @@
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-heroes-guild-t1",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:goldsmith-t1:key-t3": {
 			"name": "Goldsmith Key III output",
 			"output": [
@@ -581,16 +561,6 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:iron-armor",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-blacksmith-t1": {
-			"name": "Blueprint: Blacksmith I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-blacksmith-t1",
 					"quantity": 1
 				}
 			]
@@ -651,16 +621,6 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:master-knowledge",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-university": {
-			"name": "Blueprint: University output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-university",
 					"quantity": 1
 				}
 			]
@@ -961,6 +921,116 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-market-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:paper-mill-t1:paper": {
+			"name": "Paper Mill paper output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:civic-office-t1:building-permit": {
+			"name": "Civic Office building permit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:building-permit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:clay-deposit": {
+			"name": "Surveyor Camp clay deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:clay-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:sand-deposit": {
+			"name": "Surveyor Camp sand deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:sand-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t2:coin-from-paper": {
+			"name": "Market II coins from paper",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t2:coin-from-feast": {
+			"name": "Market II coins from feast",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 5
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-paper-mill-t1": {
+			"name": "Town Hall IV Paper Mill I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-paper-mill-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-school": {
+			"name": "Town Hall IV School blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-school",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-civic-office-t1": {
+			"name": "Town Hall IV Civic Office I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-civic-office-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-market-t2": {
+			"name": "Town Hall IV Market II blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-market-t2",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-surveyor-camp-t1": {
+			"name": "Town Hall IV Surveyor Camp I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-surveyor-camp-t1",
 					"quantity": 1
 				}
 			]

@@ -409,23 +409,6 @@
 				}
 			]
 		},
-		"input:townhall-t4:blueprint-goldsmith-t1": {
-			"name": "Blueprint: Goldsmith I input",
-			"inputs": [
-				{
-					"itemId": "item:gold-ingot",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:master-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:townhall-t1:blueprint-townhall-t2": {
 			"name": "Blueprint: Town Hall II input",
 			"inputs": [
@@ -623,23 +606,6 @@
 				}
 			]
 		},
-		"input:townhall-t4:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I input",
-			"inputs": [
-				{
-					"itemId": "item:coin",
-					"quantity": 8,
-					"capacity": 8,
-					"consume": true
-				},
-				{
-					"itemId": "item:master-knowledge",
-					"quantity": 2,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:goldsmith-t1:key-t3": {
 			"name": "Goldsmith Key III input",
 			"inputs": [
@@ -761,48 +727,19 @@
 				}
 			]
 		},
-		"input:townhall-t4:blueprint-blacksmith-t1": {
-			"name": "Blueprint: Blacksmith I input",
-			"inputs": [
-				{
-					"itemId": "item:iron-ingot",
-					"quantity": 2,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:coal",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:leather",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:master-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:school:basic-knowledge": {
-			"name": "School basic lesson supplies",
+			"name": "School paper lesson inputs",
 			"inputs": [
 				{
-					"itemId": "item:bread",
+					"itemId": "item:paper",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:water",
+					"itemId": "item:coin",
 					"quantity": 1,
-					"capacity": 4,
+					"capacity": 8,
 					"consume": true
 				}
 			]
@@ -882,29 +819,6 @@
 					"itemId": "item:coin",
 					"quantity": 2,
 					"capacity": 8,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t4:blueprint-university": {
-			"name": "Blueprint: University input",
-			"inputs": [
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 2,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:coin",
-					"quantity": 4,
-					"capacity": 12,
-					"consume": true
-				},
-				{
-					"itemId": "item:wine-glass",
-					"quantity": 1,
-					"capacity": 4,
 					"consume": true
 				}
 			]
@@ -1433,6 +1347,223 @@
 					"itemId": "item:plank",
 					"quantity": 1,
 					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:paper-mill-t1:paper": {
+			"name": "Paper Mill paper inputs",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:civic-office-t1:building-permit": {
+			"name": "Civic Office permit inputs",
+			"inputs": [
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:surveyor-camp-t1:clay-deposit": {
+			"name": "Surveyor Camp clay survey inputs",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:surveyor-camp-t1:sand-deposit": {
+			"name": "Surveyor Camp sand survey inputs",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t2:coin-from-paper": {
+			"name": "Market II paper trade input",
+			"inputs": [
+				{
+					"itemId": "item:paper",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t2:coin-from-feast": {
+			"name": "Market II feast trade input",
+			"inputs": [
+				{
+					"itemId": "item:feast",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-paper-mill-t1": {
+			"name": "Blueprint: Paper Mill I input",
+			"inputs": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-school": {
+			"name": "Blueprint: School input",
+			"inputs": [
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-civic-office-t1": {
+			"name": "Blueprint: Civic Office I input",
+			"inputs": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-market-t2": {
+			"name": "Blueprint: Market II input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:feast",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-surveyor-camp-t1": {
+			"name": "Blueprint: Surveyor Camp I input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 8,
 					"consume": true
 				}
 			]

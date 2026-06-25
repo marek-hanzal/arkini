@@ -23,9 +23,11 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Producer/product `hinderedBy` entries are negative production effects: every active hindrance instance slows duration, active penalties stack, and they do not gate or block product start.
 - Townhall era progression is one-way: the next Town Hall craft consumes the current Town Hall and requires ownership of every physical building/place unlocked by the current era via passive `board_or_inventory` requirements. Higher Town Halls do not inherit older blueprint products.
 - Do not add storage buildings; storage is handled by inventory plus passive storage through producer input capacity.
+- Building Permit is an Era IV gameplay item/master produced by Civic Office and used for advanced construction/survey/market progression.
+- Market progression is tiered by real building upgrades, starting with Market I in Era III and Market II in Era IV; use new market tiers for new capabilities instead of treating Market as a single eternal building.
 - Loaded JSON `GameConfig` is the canonical immutable source of truth. There is no save-driven config overlay/layer and no global upgrade patch system.
 - Item-level `exclusiveToIds` is directional and explicit, never auto-symmetric. It is a hard ownership/creation constraint for path choices. UI must warn early on blueprints/craft targets before resource investment.
-- Heroes Guild I is the current post-goldsmith test branch: Town Hall IV sells its blueprint for coins, guild expeditions consume coins plus food/drink, return tiered locked chests, and chests open as keyed stashes. Stash clicks auto-fill or partially fill open-time inputs from board/inventory when available, every stored input uses shared activation-input target feedback, board auto-fill animates into the stash through TileEngine, missing inputs open detail instead of surfacing an action error, and a depleted stash tile is visually retained until its output motions finish. Goldsmith produces Key III; other key tiers are cheat-only acquisition placeholders for now, but all four key tiers have dedicated key art.
+- Heroes Guild / Goldsmith / Blacksmith / University definitions are currently prepared late-era content, not connected to the current townhall progression. Town Hall IV is now civic administration, paper, permits, surveys, and Market II.
 - Job/event split: anything delayed, scheduled, retrying, blocked, or persisted for future processing is a job. `GameEvent` is only an output for something processed now.
 
 ## Hard rules

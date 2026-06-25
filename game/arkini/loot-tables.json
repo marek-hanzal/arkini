@@ -1284,6 +1284,96 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:construction-yard-t1:blueprint-academy": {
+			"name": "Blueprint: Academy output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-academy",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-coal-mine-t1": {
+			"name": "Blueprint: Coal Mine I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-coal-mine-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-iron-mine-t1": {
+			"name": "Blueprint: Iron Mine I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-iron-mine-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-gold-mine-t1": {
+			"name": "Blueprint: Gold Mine I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-gold-mine-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-smelter-t1": {
+			"name": "Blueprint: Smelter I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-smelter-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-purifier-t1": {
+			"name": "Blueprint: Purifier I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-purifier-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:coal-deposit": {
+			"name": "Surveyor Camp coal deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coal-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:iron-deposit": {
+			"name": "Surveyor Camp iron deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:iron-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:gold-deposit": {
+			"name": "Surveyor Camp gold deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:gold-deposit",
+					"quantity": 1
+				}
+			]
 		}
 	}
 }

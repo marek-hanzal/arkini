@@ -53,6 +53,7 @@ producer:townhall-t1  Era I construction foundation blueprints
 producer:townhall-t2  Era II raw food and livestock blueprints
 producer:townhall-t3  Era III food processing and first trade blueprints
 producer:townhall-t4  Era IV civic administration, Market II, Era V textile/clothing, and Era VI advanced construction plans
+producer:academy      Era VII industrial knowledge, mining, metallurgy, and pollution cleanup plans
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
@@ -112,13 +113,30 @@ Town Hall IV
   Building Permit + Luxury Clothing + Sand + Paper -> Glassworks Blueprint
   Building Permit + Luxury Clothing + Clay + Paper -> Roof Tile Factory Blueprint
   Building Permit + Luxury Clothing + Bricks + Glass + Roof Tiles + Coin -> Construction Yard I Blueprint
+
+Construction Yard I
+  Construction Bundle + Building Permit + Basic Knowledge + Paper + Coin -> Academy Blueprint
+
+Academy
+  Paper + Coin -> Basic Knowledge
+  Basic Knowledge + Paper + Coin + Construction Bundle -> Advanced Knowledge
+  Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Coal Mine I Blueprint
+  Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Iron Mine I Blueprint
+  Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Gold Mine I Blueprint
+  Advanced Knowledge + Construction Bundle + Building Permit + Bricks + Charcoal + Coin -> Smelter I Blueprint
+  Advanced Knowledge + Construction Bundle + Building Permit + Glass + Charcoal + Coin -> Purifier I Blueprint
+
+Surveyor Camp I
+  Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Coal Deposit
+  Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Iron Deposit
+  Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Gold Deposit
 ```
 
 Market is a tiered trade building line. Market I starts first trade in Era III; Market II is a new Era IV building upgrade with stronger trade options, civic-era possibilities, and later luxury/textile trades.
 
 ### Implemented first wave
 
-The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, surveys, an improved Market II trade step, Era V textile/clothing production, and Era VI advanced construction materials. Later heavy industry definitions still exist in the package, but they are intentionally not connected to the townhall progression yet.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, surveys, an improved Market II trade step, Era V textile/clothing production, Era VI advanced construction materials, and Era VII mining/metallurgy through Academy-driven industrial plans.
 
 Wood pair:
 
@@ -207,6 +225,18 @@ Era VI advanced construction materials
   Glassworks + Sand + Charcoal -> Glass
   Roof Tile Factory + Clay + Charcoal + Water -> Roof Tiles
   Construction Yard I + Bricks + Glass + Roof Tiles + Building Permit + Luxury Clothing + Coin -> Construction Bundle
+
+Era VII mining and metallurgy
+  Construction Yard I + Construction Bundle + Building Permit + Basic Knowledge + Paper + Coin -> Academy Blueprint
+  Academy + Basic Knowledge + Paper + Coin + Construction Bundle -> Advanced Knowledge
+  Surveyor Camp I + Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Coal Deposit
+  Surveyor Camp I + Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Iron Deposit
+  Surveyor Camp I + Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Gold Deposit
+  Academy + Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Mine Blueprints
+  Academy + Advanced Knowledge + Construction Bundle + Building Permit + Bricks/Glass + Charcoal + Coin -> Smelter/Purifier Blueprints
+  Mines + crew supplies + nearby deposit -> Coal / Iron Ore / Gold Ore
+  Smelter + Ore + Coal + Water -> Ingot + Pollution
+  Purifier + Pollution + Water + Charcoal -> nothing
 ```
 
 ### Initial balance placeholder
@@ -288,7 +318,7 @@ The advanced construction pass adds dedicated 128x128 transparent PNG coverage f
 
 Existing prepared construction assets are now connected into Era VI: Clay Pit, Sand Pit, Brickyard, Glassworks, Roof Tile Factory, Clay, Sand, Bricks, Glass, and Roof Tiles.
 
-`Construction Bundle` is the current Era VI master item and intentionally points at the next heavy expansion step.
+`Construction Bundle` is the Era VI master item and now points into Academy-driven Era VII industry.
 
 ### Asset alignment and current art gaps
 
@@ -440,7 +470,7 @@ Prepared item asset IDs:
 
 ### Heavy industry gameplay
 
-Heavy industry is authored but not placed onto the starting board. Use cheat inventory to spawn and test it.
+Heavy industry is connected as Era VII progression through Construction Yard, Academy, and Surveyor Camp. Use cheat inventory to stress-test it without replaying half of civilization every time, because we are not monsters on purpose.
 
 `item:sausage` is now produced by the slaughterhouse branch of the food chain instead of being a placeholder. Good, the economy no longer pretends sausages grow in config comments.
 
@@ -449,15 +479,15 @@ Mining producers consume tavern/food outputs, require nearby deposits just like 
 ```txt
 producer:coal-mine-t1
   requires nearby Coal Deposit
-  Bread + Water -> Coal Cart
+  Bread + Water + Common Clothing -> Coal Cart
 
 producer:iron-mine-t1
   requires nearby Iron Deposit
-  Sausage + Beer -> Iron Ore Cart
+  Sausage + Beer + Common Clothing -> Iron Ore Cart
 
 producer:gold-mine-t1
   requires nearby Gold Deposit
-  Bread + Wine Glass -> Gold Ore Cart
+  Bread + Wine Glass + Luxury Clothing -> Gold Ore Cart
 ```
 
 The smelter consumes ore, coal fuel, and water for every ingot. Worker provisions stay in the mines; the furnace gets actual fuel and cooling because apparently metallurgy is not catering.
@@ -472,8 +502,8 @@ The purifier is a delayed sink for board-only pollution. It intentionally has no
 
 ```txt
 producer:purifier-t1
-  1 Pollution -> nothing
-  4 Pollution -> nothing
+  1 Pollution + Water + Charcoal -> nothing
+  4 Pollution + 4 Water + 2 Charcoal -> nothing
 ```
 
 Heavy industry asset IDs:

@@ -1290,7 +1290,7 @@
 	},
 	"craftRecipes": {
 		"craft:academy": {
-			"durationMs": 14000,
+			"durationMs": 16000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1299,13 +1299,13 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 2
+					"itemId": "item:construction-bundle",
+					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
+					"itemId": "item:building-permit",
+					"quantity": 1
 				},
 				{
 					"consume": true,
@@ -1314,13 +1314,18 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 1
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
 				}
 			],
 			"requirements": [
 				{
-					"itemId": "producer:townhall-t3",
+					"itemId": "producer:construction-yard-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -1578,30 +1583,48 @@
 			"resultItemId": "producer:clay-pit"
 		},
 		"craft:coal-mine-t1": {
-			"durationMs": 8000,
+			"durationMs": 11000,
 			"inputs": [
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 2
+					"quantity": 3
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 2
+					"quantity": 4
 				},
 				{
 					"consume": true,
-					"itemId": "item:bread",
+					"itemId": "item:construction-bundle",
 					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
-			"requirements": [],
+			"requirements": [
+				{
+					"itemId": "item:coal-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
 			"resultItemId": "producer:coal-mine-t1"
 		},
 		"craft:construction-yard-t1": {
@@ -1815,7 +1838,7 @@
 			"resultItemId": "producer:glassworks"
 		},
 		"craft:gold-mine-t1": {
-			"durationMs": 10000,
+			"durationMs": 13000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1825,20 +1848,43 @@
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 4
+					"quantity": 5
 				},
 				{
 					"consume": true,
-					"itemId": "item:bread",
+					"itemId": "item:construction-bundle",
 					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:wine-glass",
+					"itemId": "item:building-permit",
 					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
 				}
 			],
-			"requirements": [],
+			"requirements": [
+				{
+					"itemId": "item:gold-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
 			"resultItemId": "producer:gold-mine-t1"
 		},
 		"craft:goldsmith-t1": {
@@ -1903,7 +1949,7 @@
 			"resultItemId": "producer:heroes-guild-t1"
 		},
 		"craft:iron-mine-t1": {
-			"durationMs": 9000,
+			"durationMs": 12000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1913,20 +1959,38 @@
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 3
+					"quantity": 4
 				},
 				{
 					"consume": true,
-					"itemId": "item:sausage",
+					"itemId": "item:construction-bundle",
 					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:beer",
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
-			"requirements": [],
+			"requirements": [
+				{
+					"itemId": "item:iron-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
 			"resultItemId": "producer:iron-mine-t1"
 		},
 		"craft:lumberjack-t1": {
@@ -2057,11 +2121,21 @@
 			"resultItemId": "producer:pig-farm-t1"
 		},
 		"craft:purifier-t1": {
-			"durationMs": 9000,
+			"durationMs": 12000,
 			"inputs": [
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass",
 					"quantity": 2
 				},
 				{
@@ -2071,11 +2145,28 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
-			"requirements": [],
+			"requirements": [
+				{
+					"itemId": "producer:smelter-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
 			"resultItemId": "producer:purifier-t1"
 		},
 		"craft:quarry-t1": {
@@ -2263,7 +2354,7 @@
 			"resultItemId": "producer:slaughterhouse-t1"
 		},
 		"craft:smelter-t1": {
-			"durationMs": 9000,
+			"durationMs": 13000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2272,16 +2363,44 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:coal",
+					"itemId": "item:bricks",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
 					"quantity": 2
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
-			"requirements": [],
+			"requirements": [
+				{
+					"itemId": "producer:coal-mine-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
 			"resultItemId": "producer:smelter-t1"
 		},
 		"craft:stonemason-t1": {
@@ -2824,15 +2943,27 @@
 		"input:academy:advanced-knowledge": {
 			"inputs": [
 				{
-					"capacity": 4,
+					"capacity": 8,
 					"consume": true,
 					"itemId": "item:basic-knowledge",
 					"quantity": 2
 				},
 				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				},
+				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer",
+					"itemId": "item:construction-bundle",
 					"quantity": 1
 				}
 			],
@@ -2841,13 +2972,188 @@
 		"input:academy:basic-knowledge": {
 			"inputs": [
 				{
-					"capacity": 4,
+					"capacity": 8,
 					"consume": true,
-					"itemId": "item:bread",
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
 					"quantity": 1
 				}
 			],
 			"name": "Academy basic lesson supplies"
+		},
+		"input:academy:blueprint-coal-mine-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Coal Mine I input"
+		},
+		"input:academy:blueprint-gold-mine-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Blueprint: Gold Mine I input"
+		},
+		"input:academy:blueprint-iron-mine-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Iron Mine I input"
+		},
+		"input:academy:blueprint-purifier-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Blueprint: Purifier I input"
+		},
+		"input:academy:blueprint-smelter-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Smelter I input"
 		},
 		"input:bakery-t1:flour-water": {
 			"inputs": [
@@ -3124,9 +3430,50 @@
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
 				}
 			],
-			"name": "Coal mine bread and water input"
+			"name": "Coal mine crew supplies"
+		},
+		"input:construction-yard-t1:blueprint-academy": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Academy input"
 		},
 		"input:construction-yard-t1:construction-bundle": {
 			"inputs": [
@@ -3279,9 +3626,15 @@
 					"consume": true,
 					"itemId": "item:wine-glass",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
 				}
 			],
-			"name": "Gold mine bread and wine input"
+			"name": "Gold mine crew supplies"
 		},
 		"input:goldsmith-t1:gold-wine-bread-coal": {
 			"inputs": [
@@ -3458,9 +3811,15 @@
 					"consume": true,
 					"itemId": "item:beer",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
 				}
 			],
-			"name": "Iron mine sausage and beer input"
+			"name": "Iron mine crew supplies"
 		},
 		"input:market-t1:coin-from-beer": {
 			"inputs": [
@@ -3613,9 +3972,21 @@
 					"consume": true,
 					"itemId": "item:pollution",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
 				}
 			],
-			"name": "Purifier pollution input"
+			"name": "Purifier single pollution cleanup input"
 		},
 		"input:purifier-t1:pollution-bulk": {
 			"inputs": [
@@ -3624,9 +3995,21 @@
 					"consume": true,
 					"itemId": "item:pollution",
 					"quantity": 4
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 4
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
 				}
 			],
-			"name": "Purifier bulk pollution input"
+			"name": "Purifier bulk pollution cleanup input"
 		},
 		"input:roof-tile-factory:roof-tiles": {
 			"inputs": [
@@ -3786,6 +4169,93 @@
 				}
 			],
 			"name": "Surveyor Camp clay survey inputs"
+		},
+		"input:surveyor-camp-t1:coal-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Surveyor Camp coal deposit inputs"
+		},
+		"input:surveyor-camp-t1:gold-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Surveyor Camp gold deposit inputs"
+		},
+		"input:surveyor-camp-t1:iron-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Surveyor Camp iron deposit inputs"
 		},
 		"input:surveyor-camp-t1:sand-deposit": {
 			"inputs": [
@@ -4940,14 +5410,16 @@
 		"item:advanced-knowledge": {
 			"assetId": "asset:item:advanced-knowledge",
 			"code": "advanced-knowledge",
-			"description": "Organized technical knowledge produced by academies and used to unlock industrial plans.",
+			"description": "Master industrial knowledge produced by academies and used to unlock mining, metallurgy, and pollution cleanup.",
 			"maxStackSize": 50,
 			"name": "Advanced Knowledge",
 			"storage": "both",
 			"tags": [
 				"knowledge",
 				"education",
-				"research"
+				"research",
+				"era:VII",
+				"master"
 			],
 			"tier": 3
 		},
@@ -5036,7 +5508,8 @@
 				"blueprint",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -5069,7 +5542,7 @@
 				"building",
 				"craft-target",
 				"blacksmith",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 0
 		},
@@ -5202,7 +5675,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -5333,7 +5807,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -5349,7 +5824,7 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 0
 		},
@@ -5367,7 +5842,7 @@
 				"craft-target",
 				"hero",
 				"guild",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 0
 		},
@@ -5382,7 +5857,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -5483,7 +5959,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -5616,7 +6093,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"tier": 0
 		},
@@ -6050,9 +6528,10 @@
 				"material",
 				"industry",
 				"fuel",
-				"coal"
+				"coal",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:coal-deposit": {
 			"assetId": "asset:item:coal-deposit",
@@ -6065,9 +6544,10 @@
 				"source",
 				"industry",
 				"mine",
-				"coal"
+				"coal",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:coin": {
 			"assetId": "asset:item:coin",
@@ -6241,9 +6721,10 @@
 				"source",
 				"industry",
 				"mine",
-				"gold"
+				"gold",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:gold-ingot": {
 			"assetId": "asset:item:gold-ingot",
@@ -6256,9 +6737,10 @@
 				"material",
 				"industry",
 				"ingot",
-				"gold"
+				"gold",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:gold-ore": {
 			"assetId": "asset:item:gold-ore",
@@ -6271,9 +6753,10 @@
 				"material",
 				"industry",
 				"ore",
-				"gold"
+				"gold",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:grain": {
 			"assetId": "asset:item:grain",
@@ -6365,9 +6848,10 @@
 				"source",
 				"industry",
 				"mine",
-				"iron"
+				"iron",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:iron-ingot": {
 			"assetId": "asset:item:iron-ingot",
@@ -6380,9 +6864,10 @@
 				"material",
 				"industry",
 				"ingot",
-				"iron"
+				"iron",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:iron-ore": {
 			"assetId": "asset:item:iron-ore",
@@ -6395,9 +6880,10 @@
 				"material",
 				"industry",
 				"ore",
-				"iron"
+				"iron",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:key-t1": {
 			"assetId": "asset:item:key-t1",
@@ -6625,9 +7111,10 @@
 			"tags": [
 				"danger",
 				"industry",
-				"pollution"
+				"pollution",
+				"era:VII"
 			],
-			"tier": 0
+			"tier": 7
 		},
 		"item:raw-hide": {
 			"assetId": "asset:item:raw-hide",
@@ -6941,7 +7428,7 @@
 		"producer:academy": {
 			"assetId": "asset:producer:academy",
 			"code": "academy",
-			"description": "Education building that can produce Basic Knowledge cheaply and turn it into Advanced Knowledge.",
+			"description": "Industrial education hub that converts civic knowledge into advanced knowledge and issues mining and metallurgy plans.",
 			"maxStackSize": 1,
 			"name": "Academy",
 			"producerId": "producer:academy",
@@ -6950,9 +7437,10 @@
 				"producer",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:VII"
 			],
-			"tier": 3
+			"tier": 7
 		},
 		"producer:bakery-t1": {
 			"assetId": "asset:producer:bakery-t1",
@@ -6983,7 +7471,7 @@
 				"blacksmith",
 				"equipment",
 				"hero",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 4
 		},
@@ -7106,7 +7594,7 @@
 		"producer:coal-mine-t1": {
 			"assetId": "asset:producer:coal-mine-t1",
 			"code": "coal-mine-t1",
-			"description": "Consumes bread and water to mine coal carts from a nearby coal deposit.",
+			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
 			"producerId": "producer:coal-mine-t1",
@@ -7115,9 +7603,10 @@
 				"producer",
 				"industry",
 				"mine",
-				"coal"
+				"coal",
+				"era:VII"
 			],
-			"tier": 1
+			"tier": 7
 		},
 		"producer:coal-power-plant": {
 			"assetId": "asset:producer:coal-power-plant",
@@ -7238,7 +7727,7 @@
 		"producer:gold-mine-t1": {
 			"assetId": "asset:producer:gold-mine-t1",
 			"code": "gold-mine-t1",
-			"description": "Consumes bread and wine to mine gold ore carts from a nearby gold deposit.",
+			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
 			"maxStackSize": 1,
 			"name": "Gold Mine I",
 			"producerId": "producer:gold-mine-t1",
@@ -7247,9 +7736,10 @@
 				"producer",
 				"industry",
 				"mine",
-				"gold"
+				"gold",
+				"era:VII"
 			],
-			"tier": 1
+			"tier": 7
 		},
 		"producer:goldsmith-t1": {
 			"assetId": "asset:producer:goldsmith-t1",
@@ -7264,7 +7754,7 @@
 				"economy",
 				"goldsmith",
 				"coin",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 1
 		},
@@ -7281,14 +7771,14 @@
 				"hero",
 				"guild",
 				"expedition",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 4
 		},
 		"producer:iron-mine-t1": {
 			"assetId": "asset:producer:iron-mine-t1",
 			"code": "iron-mine-t1",
-			"description": "Consumes sausage and beer to mine iron ore carts from a nearby iron deposit.",
+			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
 			"maxStackSize": 1,
 			"name": "Iron Mine I",
 			"producerId": "producer:iron-mine-t1",
@@ -7297,9 +7787,10 @@
 				"producer",
 				"industry",
 				"mine",
-				"iron"
+				"iron",
+				"era:VII"
 			],
-			"tier": 1
+			"tier": 7
 		},
 		"producer:lumberjack-t1": {
 			"assetId": "asset:producer:lumberjack-t1",
@@ -7385,7 +7876,7 @@
 		"producer:purifier-t1": {
 			"assetId": "asset:producer:purifier-t1",
 			"code": "purifier-t1",
-			"description": "Consumes board pollution without producing output.",
+			"description": "Expensive industrial cleanup producer that consumes board pollution together with water and charcoal.",
 			"maxStackSize": 1,
 			"name": "Purifier I",
 			"producerId": "producer:purifier-t1",
@@ -7394,9 +7885,10 @@
 				"producer",
 				"industry",
 				"purifier",
-				"pollution"
+				"pollution",
+				"era:VII"
 			],
-			"tier": 1
+			"tier": 7
 		},
 		"producer:quarry-t1": {
 			"assetId": "asset:producer:quarry-t1",
@@ -7516,7 +8008,7 @@
 		"producer:smelter-t1": {
 			"assetId": "asset:producer:smelter-t1",
 			"code": "smelter-t1",
-			"description": "Consumes ore, coal fuel, and water to produce metal ingots and pollution.",
+			"description": "Refines ore with coal and water into metal ingots, while dumping board-only pollution.",
 			"maxStackSize": 1,
 			"name": "Smelter I",
 			"producerId": "producer:smelter-t1",
@@ -7524,9 +8016,10 @@
 			"tags": [
 				"producer",
 				"industry",
-				"smelter"
+				"smelter",
+				"era:VII"
 			],
-			"tier": 1
+			"tier": 7
 		},
 		"producer:stonemason-t1": {
 			"assetId": "asset:producer:stonemason-t1",
@@ -7811,6 +8304,56 @@
 				}
 			]
 		},
+		"loot:academy:blueprint-coal-mine-t1": {
+			"name": "Blueprint: Coal Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-coal-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-gold-mine-t1": {
+			"name": "Blueprint: Gold Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-gold-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-iron-mine-t1": {
+			"name": "Blueprint: Iron Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-iron-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-purifier-t1": {
+			"name": "Blueprint: Purifier I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-purifier-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-smelter-t1": {
+			"name": "Blueprint: Smelter I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-smelter-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:bakery-t1:bread": {
 			"name": "Bakery bread",
 			"output": [
@@ -8062,6 +8605,16 @@
 			"output": [
 				{
 					"itemId": "item:coal",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:construction-yard-t1:blueprint-academy": {
+			"name": "Blueprint: Academy output",
+			"output": [
+				{
+					"itemId": "item:blueprint-academy",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -8481,6 +9034,36 @@
 			"output": [
 				{
 					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:coal-deposit": {
+			"name": "Surveyor Camp coal deposit output",
+			"output": [
+				{
+					"itemId": "item:coal-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:gold-deposit": {
+			"name": "Surveyor Camp gold deposit output",
+			"output": [
+				{
+					"itemId": "item:gold-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:surveyor-camp-t1:iron-deposit": {
+			"name": "Surveyor Camp iron deposit output",
+			"output": [
+				{
+					"itemId": "item:iron-deposit",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -9083,7 +9666,12 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:academy:basic-knowledge",
-				"product:academy:advanced-knowledge"
+				"product:academy:advanced-knowledge",
+				"product:academy:blueprint-coal-mine-t1",
+				"product:academy:blueprint-iron-mine-t1",
+				"product:academy:blueprint-gold-mine-t1",
+				"product:academy:blueprint-smelter-t1",
+				"product:academy:blueprint-purifier-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -9194,7 +9782,8 @@
 		"producer:construction-yard-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:construction-yard-t1:construction-bundle"
+				"product:construction-yard-t1:construction-bundle",
+				"product:construction-yard-t1:blueprint-academy"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -9429,7 +10018,10 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:surveyor-camp-t1:clay-deposit",
-				"product:surveyor-camp-t1:sand-deposit"
+				"product:surveyor-camp-t1:sand-deposit",
+				"product:surveyor-camp-t1:coal-deposit",
+				"product:surveyor-camp-t1:iron-deposit",
+				"product:surveyor-camp-t1:gold-deposit"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -9598,7 +10190,7 @@
 	},
 	"products": {
 		"product:academy:advanced-knowledge": {
-			"durationMs": 20000,
+			"durationMs": 22000,
 			"inputRefId": "input:academy:advanced-knowledge",
 			"name": "Advanced Knowledge",
 			"outputTableId": "loot:academy:advanced-knowledge",
@@ -9610,6 +10202,46 @@
 			"inputRefId": "input:academy:basic-knowledge",
 			"name": "Basic Knowledge",
 			"outputTableId": "loot:academy:basic-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-coal-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-coal-mine-t1",
+			"name": "Blueprint: Coal Mine I",
+			"outputTableId": "loot:academy:blueprint-coal-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-gold-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-gold-mine-t1",
+			"name": "Blueprint: Gold Mine I",
+			"outputTableId": "loot:academy:blueprint-gold-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-iron-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-iron-mine-t1",
+			"name": "Blueprint: Iron Mine I",
+			"outputTableId": "loot:academy:blueprint-iron-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-purifier-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-purifier-t1",
+			"name": "Blueprint: Purifier I",
+			"outputTableId": "loot:academy:blueprint-purifier-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-smelter-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-smelter-t1",
+			"name": "Blueprint: Smelter I",
+			"outputTableId": "loot:academy:blueprint-smelter-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -9750,6 +10382,14 @@
 			"inputRefId": "input:coal-mine-t1:bread-water",
 			"name": "Coal Cart",
 			"outputTableId": "loot:coal-mine-t1:coal",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:construction-yard-t1:blueprint-academy": {
+			"durationMs": 2000,
+			"inputRefId": "input:construction-yard-t1:blueprint-academy",
+			"name": "Blueprint: Academy",
+			"outputTableId": "loot:construction-yard-t1:blueprint-academy",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -10095,6 +10735,30 @@
 			"inputRefId": "input:surveyor-camp-t1:clay-deposit",
 			"name": "Survey: Clay Deposit",
 			"outputTableId": "loot:surveyor-camp-t1:clay-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:surveyor-camp-t1:coal-deposit": {
+			"durationMs": 10000,
+			"inputRefId": "input:surveyor-camp-t1:coal-deposit",
+			"name": "Survey: Coal Deposit",
+			"outputTableId": "loot:surveyor-camp-t1:coal-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:surveyor-camp-t1:gold-deposit": {
+			"durationMs": 12000,
+			"inputRefId": "input:surveyor-camp-t1:gold-deposit",
+			"name": "Survey: Gold Deposit",
+			"outputTableId": "loot:surveyor-camp-t1:gold-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:surveyor-camp-t1:iron-deposit": {
+			"durationMs": 10000,
+			"inputRefId": "input:surveyor-camp-t1:iron-deposit",
+			"name": "Survey: Iron Deposit",
+			"outputTableId": "loot:surveyor-camp-t1:iron-deposit",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

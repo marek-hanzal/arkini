@@ -111,6 +111,55 @@ describe("defaultGameConfig", () => {
 		});
 	});
 
+	it("wires era VII industrial knowledge and metallurgy progression", () => {
+		expect(defaultGameConfig.items["item:advanced-knowledge"].tags).toContain("master");
+		expect(defaultGameConfig.items["item:advanced-knowledge"].tags).toContain("era:VII");
+
+		expect(defaultGameConfig.producers["producer:construction-yard-t1"].productIds).toEqual([
+			"product:construction-yard-t1:construction-bundle",
+			"product:construction-yard-t1:blueprint-academy",
+		]);
+
+		expect(defaultGameConfig.producers["producer:academy"].productIds).toEqual([
+			"product:academy:basic-knowledge",
+			"product:academy:advanced-knowledge",
+			"product:academy:blueprint-coal-mine-t1",
+			"product:academy:blueprint-iron-mine-t1",
+			"product:academy:blueprint-gold-mine-t1",
+			"product:academy:blueprint-smelter-t1",
+			"product:academy:blueprint-purifier-t1",
+		]);
+
+		expect(defaultGameConfig.producers["producer:surveyor-camp-t1"].productIds).toEqual([
+			"product:surveyor-camp-t1:clay-deposit",
+			"product:surveyor-camp-t1:sand-deposit",
+			"product:surveyor-camp-t1:coal-deposit",
+			"product:surveyor-camp-t1:iron-deposit",
+			"product:surveyor-camp-t1:gold-deposit",
+		]);
+
+		expect(defaultGameConfig.inputs["input:purifier-t1:pollution"].inputs).toEqual([
+			{
+				capacity: 4,
+				consume: true,
+				itemId: "item:pollution",
+				quantity: 1,
+			},
+			{
+				capacity: 4,
+				consume: true,
+				itemId: "item:water",
+				quantity: 1,
+			},
+			{
+				capacity: 4,
+				consume: true,
+				itemId: "item:charcoal",
+				quantity: 1,
+			},
+		]);
+	});
+
 	it("requires complete era ownership before townhall tier progression", () => {
 		expectPassiveOwnedRequirements("craft:townhall-t2", [
 			"producer:lumberjack-t1",

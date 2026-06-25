@@ -7,11 +7,13 @@
 			"tier": 3,
 			"maxStackSize": 50,
 			"storage": "both",
-			"description": "Organized technical knowledge produced by academies and used to unlock industrial plans.",
+			"description": "Master industrial knowledge produced by academies and used to unlock mining, metallurgy, and pollution cleanup.",
 			"tags": [
 				"knowledge",
 				"education",
-				"research"
+				"research",
+				"era:VII",
+				"master"
 			]
 		},
 		"item:aquamarine": {
@@ -99,7 +101,8 @@
 				"blueprint",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:academy"
 		},
@@ -132,7 +135,7 @@
 				"building",
 				"craft-target",
 				"blacksmith",
-				"era:VII"
+				"era:VIII"
 			],
 			"craftRecipeId": "craft:blacksmith-t1"
 		},
@@ -199,7 +202,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:coal-mine-t1"
 		},
@@ -264,7 +268,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:gold-mine-t1"
 		},
@@ -280,7 +285,7 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VII"
+				"era:VIII"
 			],
 			"craftRecipeId": "craft:goldsmith-t1"
 		},
@@ -298,7 +303,7 @@
 				"craft-target",
 				"hero",
 				"guild",
-				"era:VII"
+				"era:VIII"
 			],
 			"craftRecipeId": "craft:heroes-guild-t1"
 		},
@@ -313,7 +318,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:iron-mine-t1"
 		},
@@ -378,7 +384,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:purifier-t1"
 		},
@@ -495,7 +502,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:VII"
 			],
 			"craftRecipeId": "craft:smelter-t1"
 		},
@@ -788,7 +796,7 @@
 			"assetId": "asset:item:coal",
 			"code": "coal",
 			"name": "Coal Cart",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 20,
 			"storage": "both",
 			"description": "A mining cart loaded with coal. Used as fuel by smelters.",
@@ -796,14 +804,15 @@
 				"material",
 				"industry",
 				"fuel",
-				"coal"
+				"coal",
+				"era:VII"
 			]
 		},
 		"item:coal-deposit": {
 			"assetId": "asset:item:coal-deposit",
 			"code": "coal-deposit",
 			"name": "Coal Deposit",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 10,
 			"storage": "both",
 			"description": "Movable coal source used by nearby coal mines.",
@@ -811,7 +820,8 @@
 				"source",
 				"industry",
 				"mine",
-				"coal"
+				"coal",
+				"era:VII"
 			]
 		},
 		"item:coin": {
@@ -892,7 +902,7 @@
 			"assetId": "asset:item:gold-deposit",
 			"code": "gold-deposit",
 			"name": "Gold Deposit",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 10,
 			"storage": "both",
 			"description": "Movable gold source used by nearby gold mines.",
@@ -900,14 +910,15 @@
 				"source",
 				"industry",
 				"mine",
-				"gold"
+				"gold",
+				"era:VII"
 			]
 		},
 		"item:gold-ingot": {
 			"assetId": "asset:item:gold-ingot",
 			"code": "gold-ingot",
 			"name": "Gold Ingot",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 50,
 			"storage": "both",
 			"description": "Refined gold produced by smelters from gold ore and coal.",
@@ -915,14 +926,15 @@
 				"material",
 				"industry",
 				"ingot",
-				"gold"
+				"gold",
+				"era:VII"
 			]
 		},
 		"item:gold-ore": {
 			"assetId": "asset:item:gold-ore",
 			"code": "gold-ore",
 			"name": "Gold Ore Cart",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 20,
 			"storage": "both",
 			"description": "A mining cart loaded with gold ore. Smelters refine it into gold ingots.",
@@ -930,7 +942,8 @@
 				"material",
 				"industry",
 				"ore",
-				"gold"
+				"gold",
+				"era:VII"
 			]
 		},
 		"item:grain": {
@@ -1016,7 +1029,7 @@
 			"assetId": "asset:item:iron-deposit",
 			"code": "iron-deposit",
 			"name": "Iron Deposit",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 10,
 			"storage": "both",
 			"description": "Movable iron source used by nearby iron mines.",
@@ -1024,14 +1037,15 @@
 				"source",
 				"industry",
 				"mine",
-				"iron"
+				"iron",
+				"era:VII"
 			]
 		},
 		"item:iron-ingot": {
 			"assetId": "asset:item:iron-ingot",
 			"code": "iron-ingot",
 			"name": "Iron Ingot",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 50,
 			"storage": "both",
 			"description": "Refined iron produced by smelters from iron ore and coal.",
@@ -1039,14 +1053,15 @@
 				"material",
 				"industry",
 				"ingot",
-				"iron"
+				"iron",
+				"era:VII"
 			]
 		},
 		"item:iron-ore": {
 			"assetId": "asset:item:iron-ore",
 			"code": "iron-ore",
 			"name": "Iron Ore Cart",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 20,
 			"storage": "both",
 			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
@@ -1054,7 +1069,8 @@
 				"material",
 				"industry",
 				"ore",
-				"iron"
+				"iron",
+				"era:VII"
 			]
 		},
 		"item:key-t1": {
@@ -1216,14 +1232,15 @@
 			"assetId": "asset:item:pollution",
 			"code": "pollution",
 			"name": "Pollution",
-			"tier": 0,
+			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "board",
 			"description": "Dirty industrial pollution emitted by smelting. It stays on the board and must be dealt with there.",
 			"tags": [
 				"danger",
 				"industry",
-				"pollution"
+				"pollution",
+				"era:VII"
 			]
 		},
 		"item:rock": {
@@ -1495,15 +1512,16 @@
 			"assetId": "asset:producer:academy",
 			"code": "academy",
 			"name": "Academy",
-			"tier": 3,
+			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Education building that can produce Basic Knowledge cheaply and turn it into Advanced Knowledge.",
+			"description": "Industrial education hub that converts civic knowledge into advanced knowledge and issues mining and metallurgy plans.",
 			"tags": [
 				"producer",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:VII"
 			],
 			"producerId": "producer:academy"
 		},
@@ -1536,7 +1554,7 @@
 				"blacksmith",
 				"equipment",
 				"hero",
-				"era:VII"
+				"era:VIII"
 			],
 			"producerId": "producer:blacksmith-t1"
 		},
@@ -1594,15 +1612,16 @@
 			"assetId": "asset:producer:coal-mine-t1",
 			"code": "coal-mine-t1",
 			"name": "Coal Mine I",
-			"tier": 1,
+			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes bread and water to mine coal carts from a nearby coal deposit.",
+			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
 			"tags": [
 				"producer",
 				"industry",
 				"mine",
-				"coal"
+				"coal",
+				"era:VII"
 			],
 			"producerId": "producer:coal-mine-t1"
 		},
@@ -1659,15 +1678,16 @@
 			"assetId": "asset:producer:gold-mine-t1",
 			"code": "gold-mine-t1",
 			"name": "Gold Mine I",
-			"tier": 1,
+			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes bread and wine to mine gold ore carts from a nearby gold deposit.",
+			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
 			"tags": [
 				"producer",
 				"industry",
 				"mine",
-				"gold"
+				"gold",
+				"era:VII"
 			],
 			"producerId": "producer:gold-mine-t1"
 		},
@@ -1684,7 +1704,7 @@
 				"economy",
 				"goldsmith",
 				"coin",
-				"era:VII"
+				"era:VIII"
 			],
 			"producerId": "producer:goldsmith-t1"
 		},
@@ -1701,7 +1721,7 @@
 				"hero",
 				"guild",
 				"expedition",
-				"era:VII"
+				"era:VIII"
 			],
 			"producerId": "producer:heroes-guild-t1"
 		},
@@ -1709,15 +1729,16 @@
 			"assetId": "asset:producer:iron-mine-t1",
 			"code": "iron-mine-t1",
 			"name": "Iron Mine I",
-			"tier": 1,
+			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes sausage and beer to mine iron ore carts from a nearby iron deposit.",
+			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
 			"tags": [
 				"producer",
 				"industry",
 				"mine",
-				"iron"
+				"iron",
+				"era:VII"
 			],
 			"producerId": "producer:iron-mine-t1"
 		},
@@ -1772,15 +1793,16 @@
 			"assetId": "asset:producer:purifier-t1",
 			"code": "purifier-t1",
 			"name": "Purifier I",
-			"tier": 1,
+			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes board pollution without producing output.",
+			"description": "Expensive industrial cleanup producer that consumes board pollution together with water and charcoal.",
 			"tags": [
 				"producer",
 				"industry",
 				"purifier",
-				"pollution"
+				"pollution",
+				"era:VII"
 			],
 			"producerId": "producer:purifier-t1"
 		},
@@ -1887,14 +1909,15 @@
 			"assetId": "asset:producer:smelter-t1",
 			"code": "smelter-t1",
 			"name": "Smelter I",
-			"tier": 1,
+			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes ore, coal fuel, and water to produce metal ingots and pollution.",
+			"description": "Refines ore with coal and water into metal ingots, while dumping board-only pollution.",
 			"tags": [
 				"producer",
 				"industry",
-				"smelter"
+				"smelter",
+				"era:VII"
 			],
 			"producerId": "producer:smelter-t1"
 		},

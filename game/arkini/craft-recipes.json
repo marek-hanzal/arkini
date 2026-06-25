@@ -266,27 +266,45 @@
 			"inputs": [
 				{
 					"itemId": "item:plank",
-					"quantity": 2,
+					"quantity": 3,
 					"consume": true
 				},
 				{
 					"itemId": "item:stone-block",
-					"quantity": 2,
+					"quantity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:bread",
+					"itemId": "item:construction-bundle",
 					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:water",
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1,
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"durationMs": 8000
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "item:coal-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 11000
 		},
 		"craft:iron-mine-t1": {
 			"resultItemId": "producer:iron-mine-t1",
@@ -298,22 +316,40 @@
 				},
 				{
 					"itemId": "item:stone-block",
-					"quantity": 3,
+					"quantity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:sausage",
+					"itemId": "item:construction-bundle",
 					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:beer",
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1,
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"durationMs": 9000
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "item:iron-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 12000
 		},
 		"craft:smelter-t1": {
 			"resultItemId": "producer:smelter-t1",
@@ -324,24 +360,62 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:coal",
+					"itemId": "item:bricks",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
 					"quantity": 2,
 					"consume": true
 				},
 				{
-					"itemId": "item:water",
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1,
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"durationMs": 9000
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:coal-mine-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 13000
 		},
 		"craft:purifier-t1": {
 			"resultItemId": "producer:purifier-t1",
 			"inputs": [
 				{
 					"itemId": "item:stone-block",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
 					"quantity": 2,
 					"consume": true
 				},
@@ -351,13 +425,30 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:water",
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1,
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"durationMs": 9000
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:smelter-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 12000
 		},
 		"craft:gold-mine-t1": {
 			"resultItemId": "producer:gold-mine-t1",
@@ -369,22 +460,45 @@
 				},
 				{
 					"itemId": "item:stone-block",
-					"quantity": 4,
+					"quantity": 5,
 					"consume": true
 				},
 				{
-					"itemId": "item:bread",
+					"itemId": "item:construction-bundle",
 					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:wine-glass",
+					"itemId": "item:building-permit",
 					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"durationMs": 10000
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "item:gold-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 13000
 		},
 		"craft:goldsmith-t1": {
 			"resultItemId": "producer:goldsmith-t1",
@@ -749,13 +863,13 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:plank",
-					"quantity": 2,
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:stone-block",
-					"quantity": 2,
+					"itemId": "item:building-permit",
+					"quantity": 1,
 					"consume": true
 				},
 				{
@@ -764,20 +878,25 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:beer",
-					"quantity": 1,
+					"itemId": "item:paper",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
 					"consume": true
 				}
 			],
 			"requirements": [
 				{
 					"type": "passive",
-					"itemId": "producer:townhall-t3",
+					"itemId": "producer:construction-yard-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				}
 			],
-			"durationMs": 14000
+			"durationMs": 16000
 		},
 		"craft:university": {
 			"resultItemId": "producer:university",

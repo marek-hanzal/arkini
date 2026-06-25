@@ -218,6 +218,7 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:townhall-t2:blueprint-school",
 				"product:townhall-t2:blueprint-windmill-t1",
 				"product:townhall-t2:blueprint-bakery-t1",
 				"product:townhall-t2:blueprint-pig-farm-t1",
@@ -235,6 +236,7 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:townhall-t3:blueprint-academy",
 				"product:townhall-t3:coal-deposit",
 				"product:townhall-t3:blueprint-coal-mine-t1",
 				"product:townhall-t3:iron-deposit",
@@ -251,6 +253,7 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:townhall-t4:blueprint-university",
 				"product:townhall-t4:blueprint-goldsmith-t1",
 				"product:townhall-t4:blueprint-blacksmith-t1",
 				"product:townhall-t4:blueprint-heroes-guild-t1"
@@ -276,6 +279,33 @@
 				"product:blacksmith-t1:sword",
 				"product:blacksmith-t1:leather-armor",
 				"product:blacksmith-t1:iron-armor"
+			],
+			"requirementIds": []
+		},
+		"producer:school": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:school:basic-knowledge"
+			],
+			"requirementIds": []
+		},
+		"producer:academy": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:academy:basic-knowledge",
+				"product:academy:advanced-knowledge"
+			],
+			"requirementIds": []
+		},
+		"producer:university": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:university:basic-knowledge",
+				"product:university:advanced-knowledge",
+				"product:university:master-knowledge"
 			],
 			"requirementIds": []
 		}

@@ -764,6 +764,96 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:school:basic-knowledge": {
+			"name": "School basic knowledge output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:basic-knowledge": {
+			"name": "Academy basic knowledge output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				}
+			]
+		},
+		"loot:academy:advanced-knowledge": {
+			"name": "Academy advanced knowledge output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:university:basic-knowledge": {
+			"name": "University basic knowledge output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:basic-knowledge",
+					"quantity": 3
+				}
+			]
+		},
+		"loot:university:advanced-knowledge": {
+			"name": "University advanced knowledge output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				}
+			]
+		},
+		"loot:university:master-knowledge": {
+			"name": "University master knowledge output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-school": {
+			"name": "Blueprint: School output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-school",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-academy": {
+			"name": "Blueprint: Academy output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-academy",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-university": {
+			"name": "Blueprint: University output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-university",
+					"quantity": 1
+				}
+			]
 		}
 	}
 }

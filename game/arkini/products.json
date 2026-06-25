@@ -526,6 +526,78 @@
 			"inputRefId": "input:townhall-t4:blueprint-blacksmith-t1",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t4:blueprint-blacksmith-t1"
+		},
+		"product:school:basic-knowledge": {
+			"name": "Basic Knowledge",
+			"durationMs": 12000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:school:basic-knowledge",
+			"requirementIds": [],
+			"outputTableId": "loot:school:basic-knowledge"
+		},
+		"product:academy:basic-knowledge": {
+			"name": "Basic Knowledge",
+			"durationMs": 8000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:basic-knowledge",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:basic-knowledge"
+		},
+		"product:academy:advanced-knowledge": {
+			"name": "Advanced Knowledge",
+			"durationMs": 20000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:advanced-knowledge",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:advanced-knowledge"
+		},
+		"product:university:basic-knowledge": {
+			"name": "Basic Knowledge",
+			"durationMs": 6000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:university:basic-knowledge",
+			"requirementIds": [],
+			"outputTableId": "loot:university:basic-knowledge"
+		},
+		"product:university:advanced-knowledge": {
+			"name": "Advanced Knowledge",
+			"durationMs": 14000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:university:advanced-knowledge",
+			"requirementIds": [],
+			"outputTableId": "loot:university:advanced-knowledge"
+		},
+		"product:university:master-knowledge": {
+			"name": "Master Knowledge",
+			"durationMs": 32000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:university:master-knowledge",
+			"requirementIds": [],
+			"outputTableId": "loot:university:master-knowledge"
+		},
+		"product:townhall-t2:blueprint-school": {
+			"name": "Blueprint: School",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t2:blueprint-school",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t2:blueprint-school"
+		},
+		"product:townhall-t3:blueprint-academy": {
+			"name": "Blueprint: Academy",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:blueprint-academy",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-academy"
+		},
+		"product:townhall-t4:blueprint-university": {
+			"name": "Blueprint: University",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-university",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-university"
 		}
 	}
 }

@@ -54,7 +54,8 @@
 			"tags": [
 				"knowledge",
 				"education",
-				"research"
+				"research",
+				"era:IV"
 			]
 		},
 		"item:beer": {
@@ -323,17 +324,20 @@
 		"item:blueprint-market-t1": {
 			"assetId": "asset:item:blueprint-market-t1",
 			"code": "blueprint-market-t1",
-			"name": "Market I Blueprint",
+			"name": "Market Blueprint",
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Prepared build plan for Market I. Crafting and trade rules will be connected later.",
+			"description": "Build plan that can be filled with resources to construct the Market.",
 			"tags": [
 				"blueprint",
 				"building",
+				"craft-target",
 				"market",
-				"trade"
-			]
+				"trade",
+				"era:III"
+			],
+			"craftRecipeId": "craft:market-t1"
 		},
 		"item:blueprint-pig-farm-t1": {
 			"assetId": "asset:item:blueprint-pig-farm-t1",
@@ -442,7 +446,7 @@
 				"building",
 				"education",
 				"knowledge",
-				"era:III"
+				"era:IV"
 			],
 			"craftRecipeId": "craft:school"
 		},
@@ -552,7 +556,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"craftRecipeId": "craft:townhall-t4"
 		},
@@ -794,10 +799,12 @@
 			"tier": 0,
 			"maxStackSize": 100,
 			"storage": "both",
-			"description": "A basic currency output minted by goldsmiths.",
+			"description": "Basic currency produced by markets from processed food and drink, and later by specialist economy buildings.",
 			"tags": [
 				"currency",
-				"coin"
+				"coin",
+				"trade",
+				"era:III"
 			]
 		},
 		"item:emerald": {
@@ -1696,17 +1703,18 @@
 		"producer:market-t1": {
 			"assetId": "asset:producer:market-t1",
 			"code": "market-t1",
-			"name": "Market I",
-			"tier": 4,
+			"name": "Market",
+			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Prepared trading building shell for future market gameplay.",
+			"description": "Trade producer that converts processed food and drink into coins. Future market tiers should upgrade this building, not create separate market buildings.",
 			"tags": [
-				"building",
-				"market",
+				"producer",
 				"trade",
-				"producer"
-			]
+				"market",
+				"era:III"
+			],
+			"producerId": "producer:market-t1"
 		},
 		"producer:pig-farm-t1": {
 			"assetId": "asset:producer:pig-farm-t1",
@@ -1814,7 +1822,7 @@
 				"building",
 				"education",
 				"knowledge",
-				"era:III"
+				"era:IV"
 			],
 			"producerId": "producer:school"
 		},
@@ -2222,6 +2230,100 @@
 				"era:II"
 			],
 			"producerId": "producer:vegetable-garden-t1"
+		},
+		"item:cheese": {
+			"assetId": "asset:item:cheese",
+			"code": "cheese",
+			"name": "Cheese",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Processed dairy food produced from milk and used by cookhouses and markets.",
+			"tags": [
+				"food",
+				"dairy",
+				"cheese",
+				"era:III"
+			]
+		},
+		"item:feast": {
+			"assetId": "asset:item:feast",
+			"code": "feast",
+			"name": "Feast",
+			"tier": 0,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Hearty processed food platter that proves Era III food production is complete.",
+			"tags": [
+				"food",
+				"master",
+				"feast",
+				"era:III"
+			]
+		},
+		"producer:dairy-t1": {
+			"assetId": "asset:producer:dairy-t1",
+			"code": "dairy-t1",
+			"name": "Dairy I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Processes milk into cheese.",
+			"tags": [
+				"producer",
+				"food",
+				"dairy",
+				"era:III"
+			],
+			"producerId": "producer:dairy-t1"
+		},
+		"item:blueprint-dairy-t1": {
+			"assetId": "asset:item:blueprint-dairy-t1",
+			"code": "blueprint-dairy-t1",
+			"name": "Dairy I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Dairy I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:III"
+			],
+			"craftRecipeId": "craft:dairy-t1"
+		},
+		"producer:cookhouse-t1": {
+			"assetId": "asset:producer:cookhouse-t1",
+			"code": "cookhouse-t1",
+			"name": "Cookhouse I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Combines processed food into feasts.",
+			"tags": [
+				"producer",
+				"food",
+				"cooking",
+				"era:III"
+			],
+			"producerId": "producer:cookhouse-t1"
+		},
+		"item:blueprint-cookhouse-t1": {
+			"assetId": "asset:item:blueprint-cookhouse-t1",
+			"code": "blueprint-cookhouse-t1",
+			"name": "Cookhouse I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Cookhouse I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:III"
+			],
+			"craftRecipeId": "craft:cookhouse-t1"
 		}
 	}
 }

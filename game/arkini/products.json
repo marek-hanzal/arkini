@@ -271,46 +271,6 @@
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t2:blueprint-pig-farm-t1"
 		},
-		"product:townhall-t3:blueprint-coal-mine-t1": {
-			"name": "Blueprint: Coal Mine I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-coal-mine-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-coal-mine-t1"
-		},
-		"product:townhall-t3:blueprint-iron-mine-t1": {
-			"name": "Blueprint: Iron Mine I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-iron-mine-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-iron-mine-t1"
-		},
-		"product:townhall-t3:blueprint-smelter-t1": {
-			"name": "Blueprint: Smelter I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-smelter-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-smelter-t1"
-		},
-		"product:townhall-t3:blueprint-purifier-t1": {
-			"name": "Blueprint: Purifier I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-purifier-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-purifier-t1"
-		},
-		"product:townhall-t3:blueprint-gold-mine-t1": {
-			"name": "Blueprint: Gold Mine I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-gold-mine-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-gold-mine-t1"
-		},
 		"product:townhall-t4:blueprint-goldsmith-t1": {
 			"name": "Blueprint: Goldsmith I",
 			"durationMs": 2000,
@@ -342,30 +302,6 @@
 			"inputRefId": "input:townhall-t3:blueprint-townhall-t4",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t3:blueprint-townhall-t4"
-		},
-		"product:townhall-t3:coal-deposit": {
-			"name": "Survey: Coal Deposit",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:coal-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:coal-deposit"
-		},
-		"product:townhall-t3:iron-deposit": {
-			"name": "Survey: Iron Deposit",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:iron-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:iron-deposit"
-		},
-		"product:townhall-t3:gold-deposit": {
-			"name": "Survey: Gold Deposit",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:gold-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:gold-deposit"
 		},
 		"product:heroes-guild-t1:chest-t1": {
 			"name": "Chest I",
@@ -503,14 +439,6 @@
 			"requirementIds": [],
 			"outputTableId": "loot:university:master-knowledge"
 		},
-		"product:townhall-t3:blueprint-academy": {
-			"name": "Blueprint: Academy",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-academy",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-academy"
-		},
 		"product:townhall-t4:blueprint-university": {
 			"name": "Blueprint: University",
 			"durationMs": 2000,
@@ -518,14 +446,6 @@
 			"inputRefId": "input:townhall-t4:blueprint-university",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t4:blueprint-university"
-		},
-		"product:townhall-t3:blueprint-school": {
-			"name": "Blueprint: School",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-school",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-school"
 		},
 		"product:townhall-t3:blueprint-windmill-t1": {
 			"name": "Blueprint: Windmill I",
@@ -718,6 +638,94 @@
 					"durationFactor": 0.5
 				}
 			]
+		},
+		"product:dairy-t1:cheese": {
+			"name": "Cheese",
+			"durationMs": 7000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:dairy-t1:cheese",
+			"inputRefId": "input:dairy-t1:milk"
+		},
+		"product:cookhouse-t1:feast": {
+			"name": "Feast",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:cookhouse-t1:feast",
+			"inputRefId": "input:cookhouse-t1:feast"
+		},
+		"product:market-t1:coin-from-bread": {
+			"name": "Coins from Bread",
+			"durationMs": 4000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t1:coin-from-bread",
+			"inputRefId": "input:market-t1:coin-from-bread"
+		},
+		"product:market-t1:coin-from-sausage": {
+			"name": "Coins from Sausage",
+			"durationMs": 4000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t1:coin-from-sausage",
+			"inputRefId": "input:market-t1:coin-from-sausage"
+		},
+		"product:market-t1:coin-from-cheese": {
+			"name": "Coins from Cheese",
+			"durationMs": 4000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t1:coin-from-cheese",
+			"inputRefId": "input:market-t1:coin-from-cheese"
+		},
+		"product:market-t1:coin-from-beer": {
+			"name": "Coins from Beer",
+			"durationMs": 4000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t1:coin-from-beer",
+			"inputRefId": "input:market-t1:coin-from-beer"
+		},
+		"product:market-t1:coin-from-wine-glass": {
+			"name": "Coins from Wine Glass",
+			"durationMs": 4000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t1:coin-from-wine-glass",
+			"inputRefId": "input:market-t1:coin-from-wine-glass"
+		},
+		"product:market-t1:coin-from-feast": {
+			"name": "Coins from Feast",
+			"durationMs": 6000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t1:coin-from-feast",
+			"inputRefId": "input:market-t1:coin-from-feast"
+		},
+		"product:townhall-t3:blueprint-dairy-t1": {
+			"name": "Blueprint: Dairy I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-dairy-t1",
+			"inputRefId": "input:townhall-t3:blueprint-dairy-t1"
+		},
+		"product:townhall-t3:blueprint-cookhouse-t1": {
+			"name": "Blueprint: Cookhouse I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-cookhouse-t1",
+			"inputRefId": "input:townhall-t3:blueprint-cookhouse-t1"
+		},
+		"product:townhall-t3:blueprint-market-t1": {
+			"name": "Blueprint: Market",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-market-t1",
+			"inputRefId": "input:townhall-t3:blueprint-market-t1"
 		}
 	}
 }

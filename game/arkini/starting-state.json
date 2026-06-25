@@ -12,11 +12,6 @@
 				"y": 1
 			},
 			{
-				"itemId": "item:wheat-field",
-				"x": 0,
-				"y": 3
-			},
-			{
 				"itemId": "producer:townhall-t1",
 				"x": 3,
 				"y": 4

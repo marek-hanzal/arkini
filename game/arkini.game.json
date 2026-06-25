@@ -1493,7 +1493,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:grain",
+					"itemId": "item:water",
 					"quantity": 1
 				}
 			],
@@ -1524,12 +1524,6 @@
 				},
 				{
 					"itemId": "producer:well-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:farm-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -2387,17 +2381,6 @@
 			],
 			"name": "Tavern wine barrel input"
 		},
-		"input:townhall-t1:blueprint-farm-t1": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Farm I input"
-		},
 		"input:townhall-t1:blueprint-lumberjack-t1": {
 			"inputs": [
 				{
@@ -2447,7 +2430,19 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
 					"quantity": 1
 				}
 			],
@@ -3318,7 +3313,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -3410,7 +3406,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -3470,7 +3467,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -3516,7 +3514,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -3577,7 +3576,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -3607,7 +3607,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -3684,7 +3685,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -3993,7 +3995,8 @@
 			"tags": [
 				"material",
 				"food",
-				"grain"
+				"grain",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -4194,7 +4197,8 @@
 			"storage": "both",
 			"tags": [
 				"material",
-				"wood"
+				"wood",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -4249,7 +4253,8 @@
 			"storage": "both",
 			"tags": [
 				"material",
-				"wood"
+				"wood",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -4276,7 +4281,8 @@
 			"storage": "both",
 			"tags": [
 				"source",
-				"stone"
+				"stone",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -4375,7 +4381,8 @@
 			"storage": "both",
 			"tags": [
 				"material",
-				"stone"
+				"stone",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -4388,7 +4395,8 @@
 			"storage": "both",
 			"tags": [
 				"material",
-				"stone"
+				"stone",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -4445,7 +4453,8 @@
 			"storage": "both",
 			"tags": [
 				"source",
-				"wood"
+				"wood",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -4474,7 +4483,8 @@
 			"tags": [
 				"material",
 				"food",
-				"water"
+				"water",
+				"era:I"
 			],
 			"tier": 0
 		},
@@ -4488,7 +4498,8 @@
 			"tags": [
 				"source",
 				"food",
-				"grain"
+				"grain",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -4654,7 +4665,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"grain"
+				"grain",
+				"era:II"
 			],
 			"tier": 1
 		},
@@ -4747,7 +4759,8 @@
 			"storage": "both",
 			"tags": [
 				"producer",
-				"wood"
+				"wood",
+				"era:I"
 			],
 			"tier": 1
 		},
@@ -4807,7 +4820,8 @@
 			"storage": "both",
 			"tags": [
 				"producer",
-				"stone"
+				"stone",
+				"era:I"
 			],
 			"tier": 1
 		},
@@ -4852,7 +4866,8 @@
 			"storage": "both",
 			"tags": [
 				"producer",
-				"wood"
+				"wood",
+				"era:I"
 			],
 			"tier": 1
 		},
@@ -4913,7 +4928,8 @@
 			"storage": "both",
 			"tags": [
 				"producer",
-				"stone"
+				"stone",
+				"era:I"
 			],
 			"tier": 1
 		},
@@ -4943,7 +4959,8 @@
 			"tags": [
 				"producer",
 				"townhall",
-				"civic"
+				"civic",
+				"era:I"
 			],
 			"tier": 1
 		},
@@ -5035,7 +5052,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"water"
+				"water",
+				"era:I"
 			],
 			"tier": 1
 		},
@@ -5523,16 +5541,6 @@
 				{
 					"itemId": "item:wine-glass",
 					"quantity": 4,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t1:blueprint-farm-t1": {
-			"name": "Blueprint: Farm I output",
-			"output": [
-				{
-					"itemId": "item:blueprint-farm-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -6139,7 +6147,6 @@
 				"product:townhall-t1:blueprint-quarry-t1",
 				"product:townhall-t1:blueprint-stonemason-t1",
 				"product:townhall-t1:blueprint-well-t1",
-				"product:townhall-t1:blueprint-farm-t1",
 				"product:townhall-t1:blueprint-townhall-t2"
 			],
 			"requirementIds": [],
@@ -6518,14 +6525,6 @@
 			"inputRefId": "input:tavern-t1:wine-barrel",
 			"name": "Wine Glass",
 			"outputTableId": "loot:tavern-t1:wine-glass",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t1:blueprint-farm-t1": {
-			"durationMs": 2000,
-			"inputRefId": "input:townhall-t1:blueprint-farm-t1",
-			"name": "Blueprint: Farm I",
-			"outputTableId": "loot:townhall-t1:blueprint-farm-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -6934,11 +6933,6 @@
 				"itemId": "producer:lumberjack-t1",
 				"x": 1,
 				"y": 1
-			},
-			{
-				"itemId": "item:wheat-field",
-				"x": 0,
-				"y": 3
 			},
 			{
 				"itemId": "producer:townhall-t1",

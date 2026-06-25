@@ -305,16 +305,6 @@
 				}
 			]
 		},
-		"loot:townhall-t1:blueprint-farm-t1": {
-			"name": "Blueprint: Farm I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-farm-t1",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:townhall-t2:blueprint-windmill-t1": {
 			"name": "Blueprint: Windmill I output",
 			"output": [

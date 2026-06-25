@@ -36,6 +36,13 @@
 			"render": "plain",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-academy": {
+			"kind": "item",
+			"label": "Academy Blueprint",
+			"overlayAssetId": "asset:producer:academy",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-bakery-t1": {
 			"kind": "item",
 			"label": "Bakery I Blueprint",
@@ -134,6 +141,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-school": {
+			"kind": "item",
+			"label": "School Blueprint",
+			"overlayAssetId": "asset:producer:school",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-slaughterhouse-t1": {
 			"kind": "item",
 			"label": "Slaughterhouse I Blueprint",
@@ -180,6 +194,13 @@
 			"kind": "item",
 			"label": "Town Hall IV Blueprint",
 			"overlayAssetId": "asset:producer:townhall-t4",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-university": {
+			"kind": "item",
+			"label": "University Blueprint",
+			"overlayAssetId": "asset:producer:university",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -618,6 +639,12 @@
 			"render": "plain",
 			"resourceId": "item-wood-bundle"
 		},
+		"asset:producer:academy": {
+			"kind": "item",
+			"label": "Academy",
+			"render": "plain",
+			"resourceId": "producer-academy"
+		},
 		"asset:producer:bakery-t1": {
 			"kind": "item",
 			"label": "Bakery I",
@@ -702,6 +729,12 @@
 			"render": "plain",
 			"resourceId": "producer-sawmill-t1"
 		},
+		"asset:producer:school": {
+			"kind": "item",
+			"label": "School",
+			"render": "plain",
+			"resourceId": "producer-school"
+		},
 		"asset:producer:slaughterhouse-t1": {
 			"kind": "item",
 			"label": "Slaughterhouse I",
@@ -749,6 +782,12 @@
 			"label": "Town Hall IV",
 			"render": "plain",
 			"resourceId": "producer-townhall-t4"
+		},
+		"asset:producer:university": {
+			"kind": "item",
+			"label": "University",
+			"render": "plain",
+			"resourceId": "producer-university"
 		},
 		"asset:producer:well-t1": {
 			"kind": "item",
@@ -2549,6 +2588,21 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-academy": {
+			"assetId": "asset:item:blueprint-academy",
+			"code": "blueprint-academy",
+			"description": "Build plan prepared for a future Academy construction flow.",
+			"maxStackSize": 10,
+			"name": "Academy Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"education",
+				"knowledge"
+			],
+			"tier": 0
+		},
 		"item:blueprint-bakery-t1": {
 			"assetId": "asset:item:blueprint-bakery-t1",
 			"code": "blueprint-bakery-t1",
@@ -2762,6 +2816,21 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-school": {
+			"assetId": "asset:item:blueprint-school",
+			"code": "blueprint-school",
+			"description": "Build plan prepared for a future School construction flow.",
+			"maxStackSize": 10,
+			"name": "School Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"education",
+				"knowledge"
+			],
+			"tier": 0
+		},
 		"item:blueprint-slaughterhouse-t1": {
 			"assetId": "asset:item:blueprint-slaughterhouse-t1",
 			"code": "blueprint-slaughterhouse-t1",
@@ -2864,6 +2933,21 @@
 				"blueprint",
 				"building",
 				"craft-target"
+			],
+			"tier": 0
+		},
+		"item:blueprint-university": {
+			"assetId": "asset:item:blueprint-university",
+			"code": "blueprint-university",
+			"description": "Build plan prepared for a future University construction flow.",
+			"maxStackSize": 10,
+			"name": "University Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"education",
+				"knowledge"
 			],
 			"tier": 0
 		},
@@ -3570,6 +3654,20 @@
 			],
 			"tier": 0
 		},
+		"producer:academy": {
+			"assetId": "asset:producer:academy",
+			"code": "academy",
+			"description": "Advanced education building prepared for future Advanced Knowledge production.",
+			"maxStackSize": 1,
+			"name": "Academy",
+			"storage": "both",
+			"tags": [
+				"building",
+				"education",
+				"knowledge"
+			],
+			"tier": 3
+		},
 		"producer:bakery-t1": {
 			"assetId": "asset:producer:bakery-t1",
 			"code": "bakery-t1",
@@ -3784,6 +3882,20 @@
 			],
 			"tier": 1
 		},
+		"producer:school": {
+			"assetId": "asset:producer:school",
+			"code": "school",
+			"description": "Basic education building prepared for future Basic Knowledge production.",
+			"maxStackSize": 1,
+			"name": "School",
+			"storage": "both",
+			"tags": [
+				"building",
+				"education",
+				"knowledge"
+			],
+			"tier": 2
+		},
 		"producer:slaughterhouse-t1": {
 			"assetId": "asset:producer:slaughterhouse-t1",
 			"code": "slaughterhouse-t1",
@@ -3901,6 +4013,20 @@
 				"producer",
 				"townhall",
 				"civic"
+			],
+			"tier": 4
+		},
+		"producer:university": {
+			"assetId": "asset:producer:university",
+			"code": "university",
+			"description": "Master education building prepared for future Master Knowledge production.",
+			"maxStackSize": 1,
+			"name": "University",
+			"storage": "both",
+			"tags": [
+				"building",
+				"education",
+				"knowledge"
 			],
 			"tier": 4
 		},

@@ -89,14 +89,6 @@
 				}
 			]
 		},
-		"product:slaughterhouse-t1:sausage-leather": {
-			"name": "Sausage + Leather",
-			"durationMs": 8000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:slaughterhouse-t1:piglet",
-			"requirementIds": [],
-			"outputTableId": "loot:slaughterhouse-t1:sausage-leather"
-		},
 		"product:brewery-t1:beer-barrel": {
 			"name": "Beer Barrel",
 			"durationMs": 5000,
@@ -782,6 +774,102 @@
 			"inputRefId": "input:townhall-t4:blueprint-surveyor-camp-t1",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t4:blueprint-surveyor-camp-t1"
+		},
+		"product:slaughterhouse-t1:sausage-raw-hide": {
+			"name": "Sausage + Raw Hide",
+			"durationMs": 8000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:slaughterhouse-t1:piglet",
+			"requirementIds": [],
+			"outputTableId": "loot:slaughterhouse-t1:sausage-raw-hide"
+		},
+		"product:tannery-t1:leather": {
+			"name": "Leather",
+			"durationMs": 8000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:tannery-t1:leather",
+			"requirementIds": [],
+			"outputTableId": "loot:tannery-t1:leather"
+		},
+		"product:weaver-hut-t1:common-cloth": {
+			"name": "Common Cloth",
+			"durationMs": 7000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:weaver-hut-t1:common-cloth",
+			"requirementIds": [],
+			"outputTableId": "loot:weaver-hut-t1:common-cloth"
+		},
+		"product:dye-workshop-t1:luxury-cloth": {
+			"name": "Luxury Cloth",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:dye-workshop-t1:luxury-cloth",
+			"requirementIds": [],
+			"outputTableId": "loot:dye-workshop-t1:luxury-cloth"
+		},
+		"product:tailor-workshop-t1:common-clothing": {
+			"name": "Common Clothing",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:tailor-workshop-t1:common-clothing",
+			"requirementIds": [],
+			"outputTableId": "loot:tailor-workshop-t1:common-clothing"
+		},
+		"product:tailor-workshop-t1:luxury-clothing": {
+			"name": "Luxury Clothing",
+			"durationMs": 12000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:tailor-workshop-t1:luxury-clothing",
+			"requirementIds": [],
+			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing"
+		},
+		"product:market-t2:coin-from-common-clothing": {
+			"name": "Coins from Common Clothing",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:market-t2:coin-from-common-clothing",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t2:coin-from-common-clothing"
+		},
+		"product:market-t2:coin-from-luxury-clothing": {
+			"name": "Coins from Luxury Clothing",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:market-t2:coin-from-luxury-clothing",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t2:coin-from-luxury-clothing"
+		},
+		"product:townhall-t4:blueprint-tannery-t1": {
+			"name": "Blueprint: Tannery I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-tannery-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-tannery-t1"
+		},
+		"product:townhall-t4:blueprint-weaver-hut-t1": {
+			"name": "Blueprint: Weaver Hut I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-weaver-hut-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-weaver-hut-t1"
+		},
+		"product:townhall-t4:blueprint-dye-workshop-t1": {
+			"name": "Blueprint: Dye Workshop I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-dye-workshop-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1"
+		},
+		"product:townhall-t4:blueprint-tailor-workshop-t1": {
+			"name": "Blueprint: Tailor Workshop I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-tailor-workshop-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-tailor-workshop-t1"
 		}
 	}
 }

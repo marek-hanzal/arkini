@@ -90,21 +90,6 @@
 				}
 			]
 		},
-		"loot:slaughterhouse-t1:sausage-leather": {
-			"name": "Slaughterhouse sausage and leather",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:sausage",
-					"quantity": 1
-				},
-				{
-					"type": "guaranteed",
-					"itemId": "item:leather",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:brewery-t1:beer-barrel": {
 			"name": "Brewery beer barrels from hops and water",
 			"output": [
@@ -1031,6 +1016,131 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-surveyor-camp-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:slaughterhouse-t1:sausage-raw-hide": {
+			"name": "Slaughterhouse sausage and raw hide",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"type": "guaranteed",
+					"itemId": "item:raw-hide",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:tannery-t1:leather": {
+			"name": "Tannery leather",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:leather",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:weaver-hut-t1:common-cloth": {
+			"name": "Weaver Hut common cloth",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:dye-workshop-t1:luxury-cloth": {
+			"name": "Dye Workshop luxury cloth",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:luxury-cloth",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:tailor-workshop-t1:common-clothing": {
+			"name": "Tailor Workshop common clothing",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:tailor-workshop-t1:luxury-clothing": {
+			"name": "Tailor Workshop luxury clothing",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t2:coin-from-common-clothing": {
+			"name": "Market II coins from common clothing",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			]
+		},
+		"loot:market-t2:coin-from-luxury-clothing": {
+			"name": "Market II coins from luxury clothing",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 6
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-tannery-t1": {
+			"name": "Town Hall IV Tannery I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-tannery-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-weaver-hut-t1": {
+			"name": "Town Hall IV Weaver Hut I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-weaver-hut-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-dye-workshop-t1": {
+			"name": "Town Hall IV Dye Workshop I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-dye-workshop-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-tailor-workshop-t1": {
+			"name": "Town Hall IV Tailor Workshop I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-tailor-workshop-t1",
 					"quantity": 1
 				}
 			]

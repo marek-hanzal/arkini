@@ -139,6 +139,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-dye-workshop-t1": {
+			"kind": "item",
+			"label": "Dye Workshop I Blueprint",
+			"overlayAssetId": "asset:producer:dye-workshop-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-farm-t1": {
 			"kind": "item",
 			"label": "Farm I Blueprint",
@@ -293,6 +300,20 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-tailor-workshop-t1": {
+			"kind": "item",
+			"label": "Tailor Workshop I Blueprint",
+			"overlayAssetId": "asset:producer:tailor-workshop-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-tannery-t1": {
+			"kind": "item",
+			"label": "Tannery I Blueprint",
+			"overlayAssetId": "asset:producer:tannery-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-tavern-t1": {
 			"kind": "item",
 			"label": "Tavern I Blueprint",
@@ -339,6 +360,13 @@
 			"kind": "item",
 			"label": "Water Power Plant Blueprint",
 			"overlayAssetId": "asset:producer:water-power-plant",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-weaver-hut-t1": {
+			"kind": "item",
+			"label": "Weaver Hut I Blueprint",
+			"overlayAssetId": "asset:producer:weaver-hut-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -476,6 +504,18 @@
 			"label": "Coin Stack",
 			"render": "plain",
 			"resourceId": "item-coin-stack"
+		},
+		"asset:item:common-cloth": {
+			"kind": "item",
+			"label": "Common Cloth",
+			"render": "plain",
+			"resourceId": "item-common-cloth"
+		},
+		"asset:item:common-clothing": {
+			"kind": "item",
+			"label": "Common Clothing",
+			"render": "plain",
+			"resourceId": "item-common-clothing"
 		},
 		"asset:item:crate": {
 			"kind": "item",
@@ -675,6 +715,18 @@
 			"render": "plain",
 			"resourceId": "item-lumber-camp"
 		},
+		"asset:item:luxury-cloth": {
+			"kind": "item",
+			"label": "Luxury Cloth",
+			"render": "plain",
+			"resourceId": "item-luxury-cloth"
+		},
+		"asset:item:luxury-clothing": {
+			"kind": "item",
+			"label": "Luxury Clothing",
+			"render": "plain",
+			"resourceId": "item-luxury-clothing"
+		},
 		"asset:item:master-knowledge": {
 			"kind": "item",
 			"label": "Master Knowledge",
@@ -734,6 +786,12 @@
 			"label": "Quarry",
 			"render": "plain",
 			"resourceId": "item-quarry"
+		},
+		"asset:item:raw-hide": {
+			"kind": "item",
+			"label": "Raw Hide",
+			"render": "plain",
+			"resourceId": "item-raw-hide"
 		},
 		"asset:item:rock": {
 			"kind": "item",
@@ -969,6 +1027,12 @@
 			"render": "plain",
 			"resourceId": "producer-dairy-t1"
 		},
+		"asset:producer:dye-workshop-t1": {
+			"kind": "item",
+			"label": "Dye Workshop I",
+			"render": "plain",
+			"resourceId": "producer-dye-workshop-t1"
+		},
 		"asset:producer:farm-t1": {
 			"kind": "item",
 			"label": "Farm I",
@@ -1101,6 +1165,18 @@
 			"render": "plain",
 			"resourceId": "producer-surveyor-camp-t1"
 		},
+		"asset:producer:tailor-workshop-t1": {
+			"kind": "item",
+			"label": "Tailor Workshop I",
+			"render": "plain",
+			"resourceId": "producer-tailor-workshop-t1"
+		},
+		"asset:producer:tannery-t1": {
+			"kind": "item",
+			"label": "Tannery I",
+			"render": "plain",
+			"resourceId": "producer-tannery-t1"
+		},
 		"asset:producer:tavern-t1": {
 			"kind": "item",
 			"label": "Tavern I",
@@ -1148,6 +1224,12 @@
 			"label": "Water Power Plant",
 			"render": "plain",
 			"resourceId": "producer-water-power-plant"
+		},
+		"asset:producer:weaver-hut-t1": {
+			"kind": "item",
+			"label": "Weaver Hut I",
+			"render": "plain",
+			"resourceId": "producer-weaver-hut-t1"
 		},
 		"asset:producer:well-t1": {
 			"kind": "item",
@@ -1437,6 +1519,45 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:dairy-t1"
+		},
+		"craft:dye-workshop-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:weaver-hut-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:dye-workshop-t1"
 		},
 		"craft:farm-t1": {
 			"durationMs": 5000,
@@ -1900,6 +2021,83 @@
 			"requirements": [],
 			"resultItemId": "producer:surveyor-camp-t1"
 		},
+		"craft:tailor-workshop-t1": {
+			"durationMs": 11000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:tannery-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:weaver-hut-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:tailor-workshop-t1"
+		},
+		"craft:tannery-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:tannery-t1"
+		},
 		"craft:tavern-t1": {
 			"durationMs": 8000,
 			"inputs": [
@@ -2209,6 +2407,33 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:vegetable-garden-t1"
+		},
+		"craft:weaver-hut-t1": {
+			"durationMs": 9000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:wool",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:weaver-hut-t1"
 		},
 		"craft:well-t1": {
 			"durationMs": 5000,
@@ -2592,6 +2817,29 @@
 			],
 			"name": "Dairy milk input"
 		},
+		"input:dye-workshop-t1:luxury-cloth": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Dye Workshop luxury cloth input"
+		},
 		"input:farm-t1:water": {
 			"inputs": [
 				{
@@ -2865,6 +3113,17 @@
 			],
 			"name": "Market wine glass trade input"
 		},
+		"input:market-t2:coin-from-common-clothing": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				}
+			],
+			"name": "Market II common clothing trade input"
+		},
 		"input:market-t2:coin-from-feast": {
 			"inputs": [
 				{
@@ -2875,6 +3134,17 @@
 				}
 			],
 			"name": "Market II feast trade input"
+		},
+		"input:market-t2:coin-from-luxury-clothing": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				}
+			],
+			"name": "Market II luxury clothing trade input"
 		},
 		"input:market-t2:coin-from-paper": {
 			"inputs": [
@@ -3101,6 +3371,63 @@
 				}
 			],
 			"name": "Surveyor Camp sand survey inputs"
+		},
+		"input:tailor-workshop-t1:common-clothing": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				}
+			],
+			"name": "Tailor Workshop common clothing input"
+		},
+		"input:tailor-workshop-t1:luxury-clothing": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Tailor Workshop luxury clothing input"
+		},
+		"input:tannery-t1:leather": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:raw-hide",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Tannery leather input"
 		},
 		"input:tavern-t1:beer-barrel": {
 			"inputs": [
@@ -3654,6 +3981,35 @@
 			],
 			"name": "Blueprint: Civic Office I input"
 		},
+		"input:townhall-t4:blueprint-dye-workshop-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Dye Workshop I input"
+		},
 		"input:townhall-t4:blueprint-market-t2": {
 			"inputs": [
 				{
@@ -3740,6 +4096,81 @@
 			],
 			"name": "Blueprint: Surveyor Camp I input"
 		},
+		"input:townhall-t4:blueprint-tailor-workshop-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Tailor Workshop I input"
+		},
+		"input:townhall-t4:blueprint-tannery-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:raw-hide",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Tannery I input"
+		},
+		"input:townhall-t4:blueprint-weaver-hut-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Weaver Hut I input"
+		},
 		"input:university:advanced-knowledge": {
 			"inputs": [
 				{
@@ -3801,6 +4232,17 @@
 				}
 			],
 			"name": "Vegetable garden water input"
+		},
+		"input:weaver-hut-t1:common-cloth": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool",
+					"quantity": 1
+				}
+			],
+			"name": "Weaver Hut wool input"
 		},
 		"input:windmill-t1:grain": {
 			"inputs": [
@@ -4146,6 +4588,24 @@
 				"building",
 				"craft-target",
 				"era:III"
+			],
+			"tier": 0
+		},
+		"item:blueprint-dye-workshop-t1": {
+			"assetId": "asset:item:blueprint-dye-workshop-t1",
+			"code": "blueprint-dye-workshop-t1",
+			"craftRecipeId": "craft:dye-workshop-t1",
+			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
+			"maxStackSize": 10,
+			"name": "Dye Workshop I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"dye",
+				"textile",
+				"era:V"
 			],
 			"tier": 0
 		},
@@ -4506,6 +4966,42 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-tailor-workshop-t1": {
+			"assetId": "asset:item:blueprint-tailor-workshop-t1",
+			"code": "blueprint-tailor-workshop-t1",
+			"craftRecipeId": "craft:tailor-workshop-t1",
+			"description": "Build plan that can be filled with resources to construct Tailor Workshop I.",
+			"maxStackSize": 10,
+			"name": "Tailor Workshop I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"clothing",
+				"textile",
+				"era:V"
+			],
+			"tier": 0
+		},
+		"item:blueprint-tannery-t1": {
+			"assetId": "asset:item:blueprint-tannery-t1",
+			"code": "blueprint-tannery-t1",
+			"craftRecipeId": "craft:tannery-t1",
+			"description": "Build plan that can be filled with resources to construct Tannery I.",
+			"maxStackSize": 10,
+			"name": "Tannery I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"leather",
+				"textile",
+				"era:V"
+			],
+			"tier": 0
+		},
 		"item:blueprint-tavern-t1": {
 			"assetId": "asset:item:blueprint-tavern-t1",
 			"code": "blueprint-tavern-t1",
@@ -4616,6 +5112,24 @@
 				"power",
 				"energy",
 				"water"
+			],
+			"tier": 0
+		},
+		"item:blueprint-weaver-hut-t1": {
+			"assetId": "asset:item:blueprint-weaver-hut-t1",
+			"code": "blueprint-weaver-hut-t1",
+			"craftRecipeId": "craft:weaver-hut-t1",
+			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
+			"maxStackSize": 10,
+			"name": "Weaver Hut I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cloth",
+				"textile",
+				"era:V"
 			],
 			"tier": 0
 		},
@@ -4863,6 +5377,35 @@
 				"era:III"
 			],
 			"tier": 0
+		},
+		"item:common-cloth": {
+			"assetId": "asset:item:common-cloth",
+			"code": "common-cloth",
+			"description": "Plain woven cloth produced from wool by weaver huts.",
+			"maxStackSize": 50,
+			"name": "Common Cloth",
+			"storage": "both",
+			"tags": [
+				"material",
+				"cloth",
+				"textile",
+				"era:V"
+			],
+			"tier": 5
+		},
+		"item:common-clothing": {
+			"assetId": "asset:item:common-clothing",
+			"code": "common-clothing",
+			"description": "Practical clothing sewn from common cloth and leather.",
+			"maxStackSize": 30,
+			"name": "Common Clothing",
+			"storage": "both",
+			"tags": [
+				"clothing",
+				"textile",
+				"era:V"
+			],
+			"tier": 5
 		},
 		"item:egg": {
 			"assetId": "asset:item:egg",
@@ -5189,7 +5732,7 @@
 		"item:leather": {
 			"assetId": "asset:item:leather",
 			"code": "leather",
-			"description": "Processed leather produced as a slaughterhouse byproduct from piglets.",
+			"description": "Processed leather prepared by tanneries from raw hide and used by clothing and equipment chains.",
 			"maxStackSize": 50,
 			"name": "Leather",
 			"storage": "both",
@@ -5197,9 +5740,10 @@
 				"material",
 				"leather",
 				"animal",
-				"era:III"
+				"textile",
+				"era:V"
 			],
-			"tier": 0
+			"tier": 5
 		},
 		"item:leather-armor": {
 			"assetId": "asset:item:leather-armor",
@@ -5230,6 +5774,38 @@
 				"era:I"
 			],
 			"tier": 0
+		},
+		"item:luxury-cloth": {
+			"assetId": "asset:item:luxury-cloth",
+			"code": "luxury-cloth",
+			"description": "Refined dyed cloth used for high-status clothing and later civic luxuries.",
+			"maxStackSize": 30,
+			"name": "Luxury Cloth",
+			"storage": "both",
+			"tags": [
+				"material",
+				"cloth",
+				"luxury",
+				"textile",
+				"era:V"
+			],
+			"tier": 5
+		},
+		"item:luxury-clothing": {
+			"assetId": "asset:item:luxury-clothing",
+			"code": "luxury-clothing",
+			"description": "Prestige clothing sewn from luxury cloth, leather, and coins.",
+			"maxStackSize": 20,
+			"name": "Luxury Clothing",
+			"storage": "both",
+			"tags": [
+				"clothing",
+				"luxury",
+				"master",
+				"textile",
+				"era:V"
+			],
+			"tier": 5
 		},
 		"item:master-knowledge": {
 			"assetId": "asset:item:master-knowledge",
@@ -5330,6 +5906,22 @@
 				"pollution"
 			],
 			"tier": 0
+		},
+		"item:raw-hide": {
+			"assetId": "asset:item:raw-hide",
+			"code": "raw-hide",
+			"description": "Untreated animal hide produced by slaughterhouses and processed by tanneries into leather.",
+			"maxStackSize": 50,
+			"name": "Raw Hide",
+			"storage": "both",
+			"tags": [
+				"material",
+				"animal",
+				"hide",
+				"textile",
+				"era:V"
+			],
+			"tier": 5
 		},
 		"item:rock": {
 			"assetId": "asset:item:rock",
@@ -5829,6 +6421,24 @@
 			],
 			"tier": 1
 		},
+		"producer:dye-workshop-t1": {
+			"assetId": "asset:producer:dye-workshop-t1",
+			"code": "dye-workshop-t1",
+			"description": "Textile producer that dyes common cloth into luxury cloth.",
+			"maxStackSize": 1,
+			"name": "Dye Workshop I",
+			"producerId": "producer:dye-workshop-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"dye",
+				"cloth",
+				"textile",
+				"era:V"
+			],
+			"tier": 5
+		},
 		"producer:farm-t1": {
 			"assetId": "asset:producer:farm-t1",
 			"code": "farm-t1",
@@ -6181,6 +6791,40 @@
 			],
 			"tier": 4
 		},
+		"producer:tailor-workshop-t1": {
+			"assetId": "asset:producer:tailor-workshop-t1",
+			"code": "tailor-workshop-t1",
+			"description": "Clothing producer that sews common and luxury clothing.",
+			"maxStackSize": 1,
+			"name": "Tailor Workshop I",
+			"producerId": "producer:tailor-workshop-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"clothing",
+				"textile",
+				"era:V"
+			],
+			"tier": 5
+		},
+		"producer:tannery-t1": {
+			"assetId": "asset:producer:tannery-t1",
+			"code": "tannery-t1",
+			"description": "Leatherworking producer that turns raw hide and water into leather.",
+			"maxStackSize": 1,
+			"name": "Tannery I",
+			"producerId": "producer:tannery-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"leather",
+				"textile",
+				"era:V"
+			],
+			"tier": 5
+		},
 		"producer:tavern-t1": {
 			"assetId": "asset:producer:tavern-t1",
 			"code": "tavern-t1",
@@ -6307,6 +6951,23 @@
 				"power",
 				"energy",
 				"water"
+			],
+			"tier": 5
+		},
+		"producer:weaver-hut-t1": {
+			"assetId": "asset:producer:weaver-hut-t1",
+			"code": "weaver-hut-t1",
+			"description": "Textile producer that weaves wool into common cloth.",
+			"maxStackSize": 1,
+			"name": "Weaver Hut I",
+			"producerId": "producer:weaver-hut-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"cloth",
+				"textile",
+				"era:V"
 			],
 			"tier": 5
 		},
@@ -6627,6 +7288,16 @@
 				}
 			]
 		},
+		"loot:dye-workshop-t1:luxury-cloth": {
+			"name": "Dye Workshop luxury cloth",
+			"output": [
+				{
+					"itemId": "item:luxury-cloth",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:farm-t1:grain": {
 			"name": "Farm grain",
 			"output": [
@@ -6811,12 +7482,32 @@
 				}
 			]
 		},
+		"loot:market-t2:coin-from-common-clothing": {
+			"name": "Market II coins from common clothing",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:market-t2:coin-from-feast": {
 			"name": "Market II coins from feast",
 			"output": [
 				{
 					"itemId": "item:coin",
 					"quantity": 5,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t2:coin-from-luxury-clothing": {
+			"name": "Market II coins from luxury clothing",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 6,
 					"type": "guaranteed"
 				}
 			]
@@ -6891,8 +7582,8 @@
 				}
 			]
 		},
-		"loot:slaughterhouse-t1:sausage-leather": {
-			"name": "Slaughterhouse sausage and leather",
+		"loot:slaughterhouse-t1:sausage-raw-hide": {
+			"name": "Slaughterhouse sausage and raw hide",
 			"output": [
 				{
 					"itemId": "item:sausage",
@@ -6900,7 +7591,7 @@
 					"type": "guaranteed"
 				},
 				{
-					"itemId": "item:leather",
+					"itemId": "item:raw-hide",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -6961,6 +7652,36 @@
 			"output": [
 				{
 					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tailor-workshop-t1:common-clothing": {
+			"name": "Tailor Workshop common clothing",
+			"output": [
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tailor-workshop-t1:luxury-clothing": {
+			"name": "Tailor Workshop luxury clothing",
+			"output": [
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tannery-t1:leather": {
+			"name": "Tannery leather",
+			"output": [
+				{
+					"itemId": "item:leather",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -7266,6 +7987,16 @@
 				}
 			]
 		},
+		"loot:townhall-t4:blueprint-dye-workshop-t1": {
+			"name": "Town Hall IV Dye Workshop I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-dye-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t4:blueprint-market-t2": {
 			"name": "Town Hall IV Market II blueprint output",
 			"output": [
@@ -7306,6 +8037,36 @@
 				}
 			]
 		},
+		"loot:townhall-t4:blueprint-tailor-workshop-t1": {
+			"name": "Town Hall IV Tailor Workshop I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-tailor-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-tannery-t1": {
+			"name": "Town Hall IV Tannery I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-tannery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-weaver-hut-t1": {
+			"name": "Town Hall IV Weaver Hut I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-weaver-hut-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:university:advanced-knowledge": {
 			"name": "University advanced knowledge output",
 			"output": [
@@ -7341,6 +8102,16 @@
 			"output": [
 				{
 					"itemId": "item:vegetables",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:weaver-hut-t1:common-cloth": {
+			"name": "Weaver Hut common cloth",
+			"output": [
+				{
+					"itemId": "item:common-cloth",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -7499,6 +8270,14 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:dye-workshop-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:dye-workshop-t1:luxury-cloth"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:farm-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -7576,7 +8355,9 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:market-t2:coin-from-paper",
-				"product:market-t2:coin-from-feast"
+				"product:market-t2:coin-from-feast",
+				"product:market-t2:coin-from-common-clothing",
+				"product:market-t2:coin-from-luxury-clothing"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -7645,7 +8426,7 @@
 		"producer:slaughterhouse-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:slaughterhouse-t1:sausage-leather"
+				"product:slaughterhouse-t1:sausage-raw-hide"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -7674,6 +8455,23 @@
 			"productIds": [
 				"product:surveyor-camp-t1:clay-deposit",
 				"product:surveyor-camp-t1:sand-deposit"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:tailor-workshop-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:tailor-workshop-t1:common-clothing",
+				"product:tailor-workshop-t1:luxury-clothing"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:tannery-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:tannery-t1:leather"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -7742,7 +8540,11 @@
 				"product:townhall-t4:blueprint-school",
 				"product:townhall-t4:blueprint-civic-office-t1",
 				"product:townhall-t4:blueprint-market-t2",
-				"product:townhall-t4:blueprint-surveyor-camp-t1"
+				"product:townhall-t4:blueprint-surveyor-camp-t1",
+				"product:townhall-t4:blueprint-tannery-t1",
+				"product:townhall-t4:blueprint-weaver-hut-t1",
+				"product:townhall-t4:blueprint-dye-workshop-t1",
+				"product:townhall-t4:blueprint-tailor-workshop-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -7761,6 +8563,14 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:vegetable-garden-t1:vegetables"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:weaver-hut-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:weaver-hut-t1:common-cloth"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -7953,6 +8763,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:dye-workshop-t1:luxury-cloth": {
+			"durationMs": 9000,
+			"inputRefId": "input:dye-workshop-t1:luxury-cloth",
+			"name": "Luxury Cloth",
+			"outputTableId": "loot:dye-workshop-t1:luxury-cloth",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:farm-t1:grain": {
 			"durationMs": 5000,
 			"hinderedBy": [
@@ -8090,11 +8908,27 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:market-t2:coin-from-common-clothing": {
+			"durationMs": 5000,
+			"inputRefId": "input:market-t2:coin-from-common-clothing",
+			"name": "Coins from Common Clothing",
+			"outputTableId": "loot:market-t2:coin-from-common-clothing",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:market-t2:coin-from-feast": {
 			"durationMs": 5000,
 			"inputRefId": "input:market-t2:coin-from-feast",
 			"name": "Better Coins from Feast",
 			"outputTableId": "loot:market-t2:coin-from-feast",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t2:coin-from-luxury-clothing": {
+			"durationMs": 5000,
+			"inputRefId": "input:market-t2:coin-from-luxury-clothing",
+			"name": "Coins from Luxury Clothing",
+			"outputTableId": "loot:market-t2:coin-from-luxury-clothing",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -8187,11 +9021,11 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:slaughterhouse-t1:sausage-leather": {
+		"product:slaughterhouse-t1:sausage-raw-hide": {
 			"durationMs": 8000,
 			"inputRefId": "input:slaughterhouse-t1:piglet",
-			"name": "Sausage + Leather",
-			"outputTableId": "loot:slaughterhouse-t1:sausage-leather",
+			"name": "Sausage + Raw Hide",
+			"outputTableId": "loot:slaughterhouse-t1:sausage-raw-hide",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -8232,6 +9066,30 @@
 			"inputRefId": "input:surveyor-camp-t1:sand-deposit",
 			"name": "Survey: Sand Deposit",
 			"outputTableId": "loot:surveyor-camp-t1:sand-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tailor-workshop-t1:common-clothing": {
+			"durationMs": 9000,
+			"inputRefId": "input:tailor-workshop-t1:common-clothing",
+			"name": "Common Clothing",
+			"outputTableId": "loot:tailor-workshop-t1:common-clothing",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tailor-workshop-t1:luxury-clothing": {
+			"durationMs": 12000,
+			"inputRefId": "input:tailor-workshop-t1:luxury-clothing",
+			"name": "Luxury Clothing",
+			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tannery-t1:leather": {
+			"durationMs": 8000,
+			"inputRefId": "input:tannery-t1:leather",
+			"name": "Leather",
+			"outputTableId": "loot:tannery-t1:leather",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -8475,6 +9333,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t4:blueprint-dye-workshop-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-dye-workshop-t1",
+			"name": "Blueprint: Dye Workshop I",
+			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t4:blueprint-market-t2": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t4:blueprint-market-t2",
@@ -8504,6 +9370,30 @@
 			"inputRefId": "input:townhall-t4:blueprint-surveyor-camp-t1",
 			"name": "Blueprint: Surveyor Camp I",
 			"outputTableId": "loot:townhall-t4:blueprint-surveyor-camp-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-tailor-workshop-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-tailor-workshop-t1",
+			"name": "Blueprint: Tailor Workshop I",
+			"outputTableId": "loot:townhall-t4:blueprint-tailor-workshop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-tannery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-tannery-t1",
+			"name": "Blueprint: Tannery I",
+			"outputTableId": "loot:townhall-t4:blueprint-tannery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-weaver-hut-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-weaver-hut-t1",
+			"name": "Blueprint: Weaver Hut I",
+			"outputTableId": "loot:townhall-t4:blueprint-weaver-hut-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -8546,6 +9436,14 @@
 			"inputRefId": "input:vegetable-garden-t1:water",
 			"name": "Vegetables",
 			"outputTableId": "loot:vegetable-garden-t1:vegetables",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:weaver-hut-t1:common-cloth": {
+			"durationMs": 7000,
+			"inputRefId": "input:weaver-hut-t1:common-cloth",
+			"name": "Common Cloth",
+			"outputTableId": "loot:weaver-hut-t1:common-cloth",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

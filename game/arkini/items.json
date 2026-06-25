@@ -1094,15 +1094,16 @@
 			"assetId": "asset:item:leather",
 			"code": "leather",
 			"name": "Leather",
-			"tier": 0,
+			"tier": 5,
 			"maxStackSize": 50,
 			"storage": "both",
-			"description": "Processed leather produced as a slaughterhouse byproduct from piglets.",
+			"description": "Processed leather prepared by tanneries from raw hide and used by clothing and equipment chains.",
 			"tags": [
 				"material",
 				"leather",
 				"animal",
-				"era:III"
+				"textile",
+				"era:V"
 			]
 		},
 		"item:leather-armor": {
@@ -2504,6 +2505,224 @@
 				"era:IV"
 			],
 			"craftRecipeId": "craft:market-t2"
+		},
+		"item:raw-hide": {
+			"assetId": "asset:item:raw-hide",
+			"code": "raw-hide",
+			"name": "Raw Hide",
+			"tier": 5,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Untreated animal hide produced by slaughterhouses and processed by tanneries into leather.",
+			"tags": [
+				"material",
+				"animal",
+				"hide",
+				"textile",
+				"era:V"
+			]
+		},
+		"item:common-cloth": {
+			"assetId": "asset:item:common-cloth",
+			"code": "common-cloth",
+			"name": "Common Cloth",
+			"tier": 5,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Plain woven cloth produced from wool by weaver huts.",
+			"tags": [
+				"material",
+				"cloth",
+				"textile",
+				"era:V"
+			]
+		},
+		"item:luxury-cloth": {
+			"assetId": "asset:item:luxury-cloth",
+			"code": "luxury-cloth",
+			"name": "Luxury Cloth",
+			"tier": 5,
+			"maxStackSize": 30,
+			"storage": "both",
+			"description": "Refined dyed cloth used for high-status clothing and later civic luxuries.",
+			"tags": [
+				"material",
+				"cloth",
+				"luxury",
+				"textile",
+				"era:V"
+			]
+		},
+		"item:common-clothing": {
+			"assetId": "asset:item:common-clothing",
+			"code": "common-clothing",
+			"name": "Common Clothing",
+			"tier": 5,
+			"maxStackSize": 30,
+			"storage": "both",
+			"description": "Practical clothing sewn from common cloth and leather.",
+			"tags": [
+				"clothing",
+				"textile",
+				"era:V"
+			]
+		},
+		"item:luxury-clothing": {
+			"assetId": "asset:item:luxury-clothing",
+			"code": "luxury-clothing",
+			"name": "Luxury Clothing",
+			"tier": 5,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Prestige clothing sewn from luxury cloth, leather, and coins.",
+			"tags": [
+				"clothing",
+				"luxury",
+				"master",
+				"textile",
+				"era:V"
+			]
+		},
+		"producer:tannery-t1": {
+			"assetId": "asset:producer:tannery-t1",
+			"code": "tannery-t1",
+			"name": "Tannery I",
+			"tier": 5,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Leatherworking producer that turns raw hide and water into leather.",
+			"tags": [
+				"producer",
+				"building",
+				"leather",
+				"textile",
+				"era:V"
+			],
+			"producerId": "producer:tannery-t1"
+		},
+		"producer:weaver-hut-t1": {
+			"assetId": "asset:producer:weaver-hut-t1",
+			"code": "weaver-hut-t1",
+			"name": "Weaver Hut I",
+			"tier": 5,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Textile producer that weaves wool into common cloth.",
+			"tags": [
+				"producer",
+				"building",
+				"cloth",
+				"textile",
+				"era:V"
+			],
+			"producerId": "producer:weaver-hut-t1"
+		},
+		"producer:dye-workshop-t1": {
+			"assetId": "asset:producer:dye-workshop-t1",
+			"code": "dye-workshop-t1",
+			"name": "Dye Workshop I",
+			"tier": 5,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Textile producer that dyes common cloth into luxury cloth.",
+			"tags": [
+				"producer",
+				"building",
+				"dye",
+				"cloth",
+				"textile",
+				"era:V"
+			],
+			"producerId": "producer:dye-workshop-t1"
+		},
+		"producer:tailor-workshop-t1": {
+			"assetId": "asset:producer:tailor-workshop-t1",
+			"code": "tailor-workshop-t1",
+			"name": "Tailor Workshop I",
+			"tier": 5,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Clothing producer that sews common and luxury clothing.",
+			"tags": [
+				"producer",
+				"building",
+				"clothing",
+				"textile",
+				"era:V"
+			],
+			"producerId": "producer:tailor-workshop-t1"
+		},
+		"item:blueprint-tannery-t1": {
+			"assetId": "asset:item:blueprint-tannery-t1",
+			"code": "blueprint-tannery-t1",
+			"name": "Tannery I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Tannery I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"leather",
+				"textile",
+				"era:V"
+			],
+			"craftRecipeId": "craft:tannery-t1"
+		},
+		"item:blueprint-weaver-hut-t1": {
+			"assetId": "asset:item:blueprint-weaver-hut-t1",
+			"code": "blueprint-weaver-hut-t1",
+			"name": "Weaver Hut I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cloth",
+				"textile",
+				"era:V"
+			],
+			"craftRecipeId": "craft:weaver-hut-t1"
+		},
+		"item:blueprint-dye-workshop-t1": {
+			"assetId": "asset:item:blueprint-dye-workshop-t1",
+			"code": "blueprint-dye-workshop-t1",
+			"name": "Dye Workshop I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"dye",
+				"textile",
+				"era:V"
+			],
+			"craftRecipeId": "craft:dye-workshop-t1"
+		},
+		"item:blueprint-tailor-workshop-t1": {
+			"assetId": "asset:item:blueprint-tailor-workshop-t1",
+			"code": "blueprint-tailor-workshop-t1",
+			"name": "Tailor Workshop I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Tailor Workshop I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"clothing",
+				"textile",
+				"era:V"
+			],
+			"craftRecipeId": "craft:tailor-workshop-t1"
 		}
 	}
 }

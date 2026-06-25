@@ -86,7 +86,7 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:slaughterhouse-t1:sausage-leather"
+				"product:slaughterhouse-t1:sausage-raw-hide"
 			],
 			"requirementIds": []
 		},
@@ -256,7 +256,11 @@
 				"product:townhall-t4:blueprint-school",
 				"product:townhall-t4:blueprint-civic-office-t1",
 				"product:townhall-t4:blueprint-market-t2",
-				"product:townhall-t4:blueprint-surveyor-camp-t1"
+				"product:townhall-t4:blueprint-surveyor-camp-t1",
+				"product:townhall-t4:blueprint-tannery-t1",
+				"product:townhall-t4:blueprint-weaver-hut-t1",
+				"product:townhall-t4:blueprint-dye-workshop-t1",
+				"product:townhall-t4:blueprint-tailor-workshop-t1"
 			],
 			"requirementIds": []
 		},
@@ -400,7 +404,42 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:market-t2:coin-from-paper",
-				"product:market-t2:coin-from-feast"
+				"product:market-t2:coin-from-feast",
+				"product:market-t2:coin-from-common-clothing",
+				"product:market-t2:coin-from-luxury-clothing"
+			],
+			"requirementIds": []
+		},
+		"producer:tannery-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:tannery-t1:leather"
+			],
+			"requirementIds": []
+		},
+		"producer:weaver-hut-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:weaver-hut-t1:common-cloth"
+			],
+			"requirementIds": []
+		},
+		"producer:dye-workshop-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:dye-workshop-t1:luxury-cloth"
+			],
+			"requirementIds": []
+		},
+		"producer:tailor-workshop-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:tailor-workshop-t1:common-clothing",
+				"product:tailor-workshop-t1:luxury-clothing"
 			],
 			"requirementIds": []
 		}

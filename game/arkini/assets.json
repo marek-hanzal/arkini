@@ -767,6 +767,45 @@
 			"overlayAssetId": "asset:producer:blacksmith-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
+		},
+		"asset:producer:school": {
+			"kind": "item",
+			"label": "School",
+			"render": "plain",
+			"resourceId": "producer-school"
+		},
+		"asset:producer:academy": {
+			"kind": "item",
+			"label": "Academy",
+			"render": "plain",
+			"resourceId": "producer-academy"
+		},
+		"asset:producer:university": {
+			"kind": "item",
+			"label": "University",
+			"render": "plain",
+			"resourceId": "producer-university"
+		},
+		"asset:item:blueprint-school": {
+			"kind": "item",
+			"label": "School Blueprint",
+			"overlayAssetId": "asset:producer:school",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-academy": {
+			"kind": "item",
+			"label": "Academy Blueprint",
+			"overlayAssetId": "asset:producer:academy",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-university": {
+			"kind": "item",
+			"label": "University Blueprint",
+			"overlayAssetId": "asset:producer:university",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
 		}
 	}
 }

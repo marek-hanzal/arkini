@@ -1456,6 +1456,93 @@
 				"blacksmith"
 			],
 			"craftRecipeId": "craft:blacksmith-t1"
+		},
+		"producer:school": {
+			"assetId": "asset:producer:school",
+			"code": "school",
+			"name": "School",
+			"tier": 2,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Basic education building prepared for future Basic Knowledge production.",
+			"tags": [
+				"building",
+				"education",
+				"knowledge"
+			]
+		},
+		"producer:academy": {
+			"assetId": "asset:producer:academy",
+			"code": "academy",
+			"name": "Academy",
+			"tier": 3,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Advanced education building prepared for future Advanced Knowledge production.",
+			"tags": [
+				"building",
+				"education",
+				"knowledge"
+			]
+		},
+		"producer:university": {
+			"assetId": "asset:producer:university",
+			"code": "university",
+			"name": "University",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Master education building prepared for future Master Knowledge production.",
+			"tags": [
+				"building",
+				"education",
+				"knowledge"
+			]
+		},
+		"item:blueprint-school": {
+			"assetId": "asset:item:blueprint-school",
+			"code": "blueprint-school",
+			"name": "School Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan prepared for a future School construction flow.",
+			"tags": [
+				"blueprint",
+				"building",
+				"education",
+				"knowledge"
+			]
+		},
+		"item:blueprint-academy": {
+			"assetId": "asset:item:blueprint-academy",
+			"code": "blueprint-academy",
+			"name": "Academy Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan prepared for a future Academy construction flow.",
+			"tags": [
+				"blueprint",
+				"building",
+				"education",
+				"knowledge"
+			]
+		},
+		"item:blueprint-university": {
+			"assetId": "asset:item:blueprint-university",
+			"code": "blueprint-university",
+			"name": "University Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan prepared for a future University construction flow.",
+			"tags": [
+				"blueprint",
+				"building",
+				"education",
+				"knowledge"
+			]
 		}
 	}
 }

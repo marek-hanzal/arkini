@@ -1244,6 +1244,280 @@
 				}
 			],
 			"durationMs": 11000
+		},
+		"craft:charcoal-burner-t1": {
+			"resultItemId": "producer:charcoal-burner-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:log",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 10000
+		},
+		"craft:clay-pit": {
+			"resultItemId": "producer:clay-pit",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 10000
+		},
+		"craft:sand-pit": {
+			"resultItemId": "producer:sand-pit",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 10000
+		},
+		"craft:brickyard": {
+			"resultItemId": "producer:brickyard",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:clay-pit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 11000
+		},
+		"craft:glassworks": {
+			"resultItemId": "producer:glassworks",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:sand",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:sand-pit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 12000
+		},
+		"craft:roof-tile-factory": {
+			"resultItemId": "producer:roof-tile-factory",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:clay-pit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:brickyard",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 11000
+		},
+		"craft:construction-yard-t1": {
+			"resultItemId": "producer:construction-yard-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:brickyard",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:glassworks",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:roof-tile-factory",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 14000
 		}
 	}
 }

@@ -1784,6 +1784,335 @@
 					"consume": true
 				}
 			]
+		},
+		"input:charcoal-burner-t1:charcoal": {
+			"name": "Charcoal inputs",
+			"inputs": [
+				{
+					"itemId": "item:log",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:clay-pit:clay": {
+			"name": "Clay extraction inputs",
+			"inputs": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:brickyard:bricks": {
+			"name": "Brick firing inputs",
+			"inputs": [
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:glassworks:glass": {
+			"name": "Glassmaking inputs",
+			"inputs": [
+				{
+					"itemId": "item:sand",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:roof-tile-factory:roof-tiles": {
+			"name": "Roof tile inputs",
+			"inputs": [
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:construction-yard-t1:construction-bundle": {
+			"name": "Construction bundle inputs",
+			"inputs": [
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-charcoal-burner-t1": {
+			"name": "Blueprint: Charcoal Burner I input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:log",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-clay-pit": {
+			"name": "Blueprint: Clay Pit input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-sand-pit": {
+			"name": "Blueprint: Sand Pit input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-brickyard": {
+			"name": "Blueprint: Brickyard input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-glassworks": {
+			"name": "Blueprint: Glassworks input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sand",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-roof-tile-factory": {
+			"name": "Blueprint: Roof Tile Factory input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-construction-yard-t1": {
+			"name": "Blueprint: Construction Yard I input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"capacity": 12,
+					"consume": true
+				}
+			]
 		}
 	}
 }

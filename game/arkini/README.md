@@ -52,7 +52,7 @@ Townhall tiers are authored as separate producer buildings:
 producer:townhall-t1  Era I construction foundation blueprints
 producer:townhall-t2  Era II raw food and livestock blueprints
 producer:townhall-t3  Era III food processing and first trade blueprints
-producer:townhall-t4  Era IV civic administration, Market II, and Era V textile/clothing plans
+producer:townhall-t4  Era IV civic administration, Market II, Era V textile/clothing, and Era VI advanced construction plans
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
@@ -105,13 +105,20 @@ Town Hall IV
   Building Permit + Wool + Paper -> Weaver Hut I Blueprint
   Building Permit + Common Cloth + Vegetables + Paper -> Dye Workshop I Blueprint
   Building Permit + Common Cloth + Leather + Paper -> Tailor Workshop I Blueprint
+  Building Permit + Luxury Clothing + Log + Paper -> Charcoal Burner I Blueprint
+  Building Permit + Luxury Clothing + Paper -> Clay Pit Blueprint
+  Building Permit + Luxury Clothing + Paper -> Sand Pit Blueprint
+  Building Permit + Luxury Clothing + Clay + Paper -> Brickyard Blueprint
+  Building Permit + Luxury Clothing + Sand + Paper -> Glassworks Blueprint
+  Building Permit + Luxury Clothing + Clay + Paper -> Roof Tile Factory Blueprint
+  Building Permit + Luxury Clothing + Bricks + Glass + Roof Tiles + Coin -> Construction Yard I Blueprint
 ```
 
 Market is a tiered trade building line. Market I starts first trade in Era III; Market II is a new Era IV building upgrade with stronger trade options, civic-era possibilities, and later luxury/textile trades.
 
 ### Implemented first wave
 
-The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, surveys, an improved Market II trade step, and Era V textile/clothing production. Later heavy industry definitions still exist in the package, but they are intentionally not connected to the townhall progression yet.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, surveys, an improved Market II trade step, Era V textile/clothing production, and Era VI advanced construction materials. Later heavy industry definitions still exist in the package, but they are intentionally not connected to the townhall progression yet.
 
 Wood pair:
 
@@ -192,6 +199,14 @@ Era V textile and clothing
   Tailor Workshop I + Luxury Cloth + Leather + Coin -> Luxury Clothing
   Market II + Common Clothing -> Coin
   Market II + Luxury Clothing -> more Coin
+Era VI advanced construction materials
+  Charcoal Burner I + Log -> Charcoal
+  Clay Pit + Water + nearby Clay Deposit -> Clay
+  Sand Pit + nearby Sand Deposit -> Sand
+  Brickyard + Clay + Charcoal + Water -> Bricks
+  Glassworks + Sand + Charcoal -> Glass
+  Roof Tile Factory + Clay + Charcoal + Water -> Roof Tiles
+  Construction Yard I + Bricks + Glass + Roof Tiles + Building Permit + Luxury Clothing + Coin -> Construction Bundle
 ```
 
 ### Initial balance placeholder
@@ -239,6 +254,12 @@ Current processor input buffers use capacity `4`:
 - `input:market-t2:coin-from-luxury-clothing`
 - `input:surveyor-camp-t1:clay-deposit`
 - `input:surveyor-camp-t1:sand-deposit`
+- `input:charcoal-burner-t1:charcoal`
+- `input:clay-pit:clay`
+- `input:brickyard:bricks`
+- `input:glassworks:glass`
+- `input:roof-tile-factory:roof-tiles`
+- `input:construction-yard-t1:construction-bundle`
 
 ### Era V textile asset IDs
 
@@ -255,6 +276,19 @@ The textile and clothing pass adds dedicated 128x128 transparent PNG coverage fo
 - `asset:item:luxury-clothing` -> `game/arkini/assets/item-luxury-clothing.png`
 
 `Luxury Clothing` is the current Era V master item. It is also sellable through Market II so the chain stays useful before the next era consumes it.
+
+### Era VI advanced construction asset IDs
+
+The advanced construction pass adds dedicated 128x128 transparent PNG coverage for the new charcoal and construction-yard pieces:
+
+- `asset:producer:charcoal-burner-t1` -> `game/arkini/assets/producer-charcoal-burner-t1.png`
+- `asset:producer:construction-yard-t1` -> `game/arkini/assets/producer-construction-yard-t1.png`
+- `asset:item:charcoal` -> `game/arkini/assets/item-charcoal.png`
+- `asset:item:construction-bundle` -> `game/arkini/assets/item-construction-bundle.png`
+
+Existing prepared construction assets are now connected into Era VI: Clay Pit, Sand Pit, Brickyard, Glassworks, Roof Tile Factory, Clay, Sand, Bricks, Glass, and Roof Tiles.
+
+`Construction Bundle` is the current Era VI master item and intentionally points at the next heavy expansion step.
 
 ### Asset alignment and current art gaps
 

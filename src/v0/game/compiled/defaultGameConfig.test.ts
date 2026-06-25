@@ -47,6 +47,13 @@ describe("defaultGameConfig", () => {
 			"product:townhall-t4:blueprint-weaver-hut-t1",
 			"product:townhall-t4:blueprint-dye-workshop-t1",
 			"product:townhall-t4:blueprint-tailor-workshop-t1",
+			"product:townhall-t4:blueprint-charcoal-burner-t1",
+			"product:townhall-t4:blueprint-clay-pit",
+			"product:townhall-t4:blueprint-sand-pit",
+			"product:townhall-t4:blueprint-brickyard",
+			"product:townhall-t4:blueprint-glassworks",
+			"product:townhall-t4:blueprint-roof-tile-factory",
+			"product:townhall-t4:blueprint-construction-yard-t1",
 		]);
 
 		expect(defaultGameConfig.items["item:building-permit"].tags).toContain("master");
@@ -79,6 +86,29 @@ describe("defaultGameConfig", () => {
 			"product:tailor-workshop-t1:common-clothing",
 			"product:tailor-workshop-t1:luxury-clothing",
 		]);
+	});
+
+	it("wires era VI advanced construction progression", () => {
+		expect(defaultGameConfig.items["item:construction-bundle"].tags).toContain("master");
+		expect(defaultGameConfig.items["item:construction-bundle"].tags).toContain("era:VI");
+
+		expect(defaultGameConfig.producers["producer:charcoal-burner-t1"].productIds).toEqual([
+			"product:charcoal-burner-t1:charcoal",
+		]);
+		expect(defaultGameConfig.producers["producer:clay-pit"].requirementIds).toEqual([
+			"proximity:clay-pit:clay-deposit",
+		]);
+		expect(defaultGameConfig.producers["producer:sand-pit"].requirementIds).toEqual([
+			"proximity:sand-pit:sand-deposit",
+		]);
+
+		expect(
+			defaultGameConfig.lootTables["loot:construction-yard-t1:construction-bundle"].output,
+		).toContainEqual({
+			itemId: "item:construction-bundle",
+			quantity: 1,
+			type: "guaranteed",
+		});
 	});
 
 	it("requires complete era ownership before townhall tier progression", () => {

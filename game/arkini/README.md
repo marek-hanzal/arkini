@@ -52,7 +52,7 @@ Townhall tiers are authored as separate producer buildings:
 producer:townhall-t1  Era I construction foundation blueprints
 producer:townhall-t2  Era II raw food and livestock blueprints
 producer:townhall-t3  Era III food processing and first trade blueprints
-producer:townhall-t4  Era IV civic administration, paper, permits, surveys, and Market II
+producer:townhall-t4  Era IV civic administration, Market II, and Era V textile/clothing plans
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
@@ -101,13 +101,17 @@ Town Hall IV
   Basic Knowledge + Paper + Coin -> Civic Office I Blueprint
   Building Permit + Feast + 2 Coin -> Market II Blueprint
   Building Permit + Basic Knowledge + 2 Coin -> Surveyor Camp I Blueprint
+  Building Permit + Raw Hide + Paper -> Tannery I Blueprint
+  Building Permit + Wool + Paper -> Weaver Hut I Blueprint
+  Building Permit + Common Cloth + Vegetables + Paper -> Dye Workshop I Blueprint
+  Building Permit + Common Cloth + Leather + Paper -> Tailor Workshop I Blueprint
 ```
 
-Market is a tiered trade building line. Market I starts first trade in Era III; Market II is a new Era IV building upgrade with stronger trade options and new civic-era possibilities.
+Market is a tiered trade building line. Market I starts first trade in Era III; Market II is a new Era IV building upgrade with stronger trade options, civic-era possibilities, and later luxury/textile trades.
 
 ### Implemented first wave
 
-The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, surveys, and an improved Market II trade step. Later heavy industry definitions still exist in the package, but they are intentionally not connected to the townhall progression yet.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, surveys, an improved Market II trade step, and Era V textile/clothing production. Later heavy industry definitions still exist in the package, but they are intentionally not connected to the townhall progression yet.
 
 Wood pair:
 
@@ -159,7 +163,7 @@ Era II raw food
 Era III processing
   Windmill I + Grain -> Flour
   Bakery I + Flour + Water -> Bread
-  Slaughterhouse I + Piglet -> Sausage + Leather
+  Slaughterhouse I + Piglet -> Sausage + Raw Hide
   Dairy I + Milk -> Cheese
   Cookhouse I + Bread + Sausage + Cheese + Vegetables + Egg -> Feast
   Brewery I + Water near Hop Field -> Hops
@@ -178,11 +182,21 @@ Era IV civic administration
   Market II + Feast -> more Coin
   Surveyor Camp I + Building Permit + Basic Knowledge + Coin -> Clay Deposit
   Surveyor Camp I + Building Permit + Basic Knowledge + Coin -> Sand Deposit
+
+Era V textile and clothing
+  Slaughterhouse I + Piglet -> Sausage + Raw Hide
+  Tannery I + Raw Hide + Water -> Leather
+  Weaver Hut I + Wool -> Common Cloth
+  Dye Workshop I + Common Cloth + Vegetables + Water -> Luxury Cloth
+  Tailor Workshop I + Common Cloth + Leather -> Common Clothing
+  Tailor Workshop I + Luxury Cloth + Leather + Coin -> Luxury Clothing
+  Market II + Common Clothing -> Coin
+  Market II + Luxury Clothing -> more Coin
 ```
 
 ### Initial balance placeholder
 
-Most first-pass production durations stay in the `5000` to `9000` ms range. Windmill flour takes `6000` ms, bakery bread and slaughterhouse sausage/leather take `8000` ms, dairy cheese takes `7000` ms, cookhouse feast takes `9000` ms, and market trades are intentionally short conversions. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
+Most first-pass production durations stay in the `5000` to `9000` ms range. Windmill flour takes `6000` ms, bakery bread and slaughterhouse sausage/raw-hide and tannery leather take `8000` ms, dairy cheese takes `7000` ms, cookhouse feast takes `9000` ms, and market trades are intentionally short conversions. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
 Farm grain and pig-farm piglet production have product-level pollution hindrances: every nearby `item:pollution` within proximity `2` stacks a slowdown on those product lines. Brewery has a producer-level pollution hindrance with proximity `2`, and winery has a producer-level pollution hindrance with proximity `3`, so every production line on those buildings reacts to nearby pollution. Tiny ecological disaster, very charming.
 
@@ -195,6 +209,11 @@ Current processor input buffers use capacity `4`:
 - `input:bakery-t1:flour-water`
 - `input:pig-farm-t1:grain-water`
 - `input:slaughterhouse-t1:piglet`
+- `input:tannery-t1:leather`
+- `input:weaver-hut-t1:common-cloth`
+- `input:dye-workshop-t1:luxury-cloth`
+- `input:tailor-workshop-t1:common-clothing`
+- `input:tailor-workshop-t1:luxury-clothing`
 - `input:brewery-t1:water`
 - `input:brewery-t1:hops-water`
 - `input:brewery-t1:beer-to-barrel`
@@ -216,8 +235,26 @@ Current processor input buffers use capacity `4`:
 - `input:civic-office-t1:building-permit`
 - `input:market-t2:coin-from-paper`
 - `input:market-t2:coin-from-feast`
+- `input:market-t2:coin-from-common-clothing`
+- `input:market-t2:coin-from-luxury-clothing`
 - `input:surveyor-camp-t1:clay-deposit`
 - `input:surveyor-camp-t1:sand-deposit`
+
+### Era V textile asset IDs
+
+The textile and clothing pass adds dedicated 128x128 transparent PNG coverage for all new textile producers and products:
+
+- `asset:producer:tannery-t1` -> `game/arkini/assets/producer-tannery-t1.png`
+- `asset:producer:weaver-hut-t1` -> `game/arkini/assets/producer-weaver-hut-t1.png`
+- `asset:producer:dye-workshop-t1` -> `game/arkini/assets/producer-dye-workshop-t1.png`
+- `asset:producer:tailor-workshop-t1` -> `game/arkini/assets/producer-tailor-workshop-t1.png`
+- `asset:item:raw-hide` -> `game/arkini/assets/item-raw-hide.png`
+- `asset:item:common-cloth` -> `game/arkini/assets/item-common-cloth.png`
+- `asset:item:luxury-cloth` -> `game/arkini/assets/item-luxury-cloth.png`
+- `asset:item:common-clothing` -> `game/arkini/assets/item-common-clothing.png`
+- `asset:item:luxury-clothing` -> `game/arkini/assets/item-luxury-clothing.png`
+
+`Luxury Clothing` is the current Era V master item. It is also sellable through Market II so the chain stays useful before the next era consumes it.
 
 ### Asset alignment and current art gaps
 
@@ -444,10 +481,10 @@ This currently introduces `item:coin` as the first playable currency item and gi
 
 ### Heroes guild expedition loop
 
-Heroes Guild I is currently the first post-goldsmith building. Its blueprint comes from Town Hall IV, like every other building blueprint, and costs coins so the player must reach actual coin production before the guild branch exists. The guild is intentionally a producer with long product lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
+Heroes Guild I is prepared late-era content but is not connected to the current townhall progression. When it comes back, it should remain a producer with long product lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
 
 ```txt
-producer:townhall-t4
+future late-era blueprint source
   8 Coin -> Heroes Guild I Blueprint
 
 craft:heroes-guild-t1

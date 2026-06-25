@@ -1567,6 +1567,223 @@
 					"consume": true
 				}
 			]
+		},
+		"input:tannery-t1:leather": {
+			"name": "Tannery leather input",
+			"inputs": [
+				{
+					"itemId": "item:raw-hide",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:weaver-hut-t1:common-cloth": {
+			"name": "Weaver Hut wool input",
+			"inputs": [
+				{
+					"itemId": "item:wool",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:dye-workshop-t1:luxury-cloth": {
+			"name": "Dye Workshop luxury cloth input",
+			"inputs": [
+				{
+					"itemId": "item:common-cloth",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:vegetables",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:tailor-workshop-t1:common-clothing": {
+			"name": "Tailor Workshop common clothing input",
+			"inputs": [
+				{
+					"itemId": "item:common-cloth",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:tailor-workshop-t1:luxury-clothing": {
+			"name": "Tailor Workshop luxury clothing input",
+			"inputs": [
+				{
+					"itemId": "item:luxury-cloth",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t2:coin-from-common-clothing": {
+			"name": "Market II common clothing trade input",
+			"inputs": [
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t2:coin-from-luxury-clothing": {
+			"name": "Market II luxury clothing trade input",
+			"inputs": [
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-tannery-t1": {
+			"name": "Blueprint: Tannery I input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:raw-hide",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-weaver-hut-t1": {
+			"name": "Blueprint: Weaver Hut I input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:wool",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-dye-workshop-t1": {
+			"name": "Blueprint: Dye Workshop I input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:common-cloth",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:vegetables",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t4:blueprint-tailor-workshop-t1": {
+			"name": "Blueprint: Tailor Workshop I input",
+			"inputs": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:common-cloth",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
 		}
 	}
 }

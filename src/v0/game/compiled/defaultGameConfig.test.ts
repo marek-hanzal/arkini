@@ -43,6 +43,10 @@ describe("defaultGameConfig", () => {
 			"product:townhall-t4:blueprint-civic-office-t1",
 			"product:townhall-t4:blueprint-market-t2",
 			"product:townhall-t4:blueprint-surveyor-camp-t1",
+			"product:townhall-t4:blueprint-tannery-t1",
+			"product:townhall-t4:blueprint-weaver-hut-t1",
+			"product:townhall-t4:blueprint-dye-workshop-t1",
+			"product:townhall-t4:blueprint-tailor-workshop-t1",
 		]);
 
 		expect(defaultGameConfig.items["item:building-permit"].tags).toContain("master");
@@ -53,6 +57,28 @@ describe("defaultGameConfig", () => {
 			itemId: "producer:market-t1",
 			quantity: 1,
 		});
+	});
+
+	it("wires era V textile and clothing progression", () => {
+		expect(defaultGameConfig.producers["producer:slaughterhouse-t1"].productIds).toEqual([
+			"product:slaughterhouse-t1:sausage-raw-hide",
+		]);
+
+		expect(
+			defaultGameConfig.lootTables["loot:slaughterhouse-t1:sausage-raw-hide"].output,
+		).toContainEqual({
+			itemId: "item:raw-hide",
+			quantity: 1,
+			type: "guaranteed",
+		});
+
+		expect(defaultGameConfig.items["item:luxury-clothing"].tags).toContain("master");
+		expect(defaultGameConfig.items["item:luxury-clothing"].tags).toContain("era:V");
+
+		expect(defaultGameConfig.producers["producer:tailor-workshop-t1"].productIds).toEqual([
+			"product:tailor-workshop-t1:common-clothing",
+			"product:tailor-workshop-t1:luxury-clothing",
+		]);
 	});
 
 	it("requires complete era ownership before townhall tier progression", () => {

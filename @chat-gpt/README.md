@@ -25,6 +25,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Do not add storage buildings; storage is handled by inventory plus passive storage through producer input capacity.
 - Building Permit is an Era IV gameplay item/master produced by Civic Office and used for advanced construction/survey/market progression.
 - Market progression is tiered by real building upgrades, starting with Market I in Era III and Market II in Era IV; use new market tiers for new capabilities instead of treating Market as a single eternal building.
+- Era V is textile/clothing production: Raw Hide -> Leather, Wool -> Common Cloth -> Luxury Cloth, then Common Clothing and Luxury Clothing. Do not use Work Clothes as a specific item.
 - Loaded JSON `GameConfig` is the canonical immutable source of truth. There is no save-driven config overlay/layer and no global upgrade patch system.
 - Item-level `exclusiveToIds` is directional and explicit, never auto-symmetric. It is a hard ownership/creation constraint for path choices. UI must warn early on blueprints/craft targets before resource investment.
 - Heroes Guild / Goldsmith / Blacksmith / University definitions are currently prepared late-era content, not connected to the current townhall progression. Town Hall IV is now civic administration, paper, permits, surveys, and Market II.

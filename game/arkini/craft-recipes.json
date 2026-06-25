@@ -1101,6 +1101,149 @@
 			],
 			"requirements": [],
 			"durationMs": 10000
+		},
+		"craft:tannery-t1": {
+			"resultItemId": "producer:tannery-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 10000
+		},
+		"craft:weaver-hut-t1": {
+			"resultItemId": "producer:weaver-hut-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:wool",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 9000
+		},
+		"craft:dye-workshop-t1": {
+			"resultItemId": "producer:dye-workshop-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:vegetables",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:weaver-hut-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 10000
+		},
+		"craft:tailor-workshop-t1": {
+			"resultItemId": "producer:tailor-workshop-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:common-cloth",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:tannery-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:weaver-hut-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 11000
 		}
 	}
 }

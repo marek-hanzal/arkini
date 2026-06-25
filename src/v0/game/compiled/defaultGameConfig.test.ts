@@ -43,7 +43,6 @@ describe("defaultGameConfig", () => {
 			"producer:quarry-t1",
 			"producer:stonemason-t1",
 			"producer:well-t1",
-			"producer:farm-t1",
 		]);
 
 		expectPassiveOwnedRequirements("craft:townhall-t3", [

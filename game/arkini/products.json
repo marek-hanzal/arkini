@@ -263,14 +263,6 @@
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t1:blueprint-well-t1"
 		},
-		"product:townhall-t1:blueprint-farm-t1": {
-			"name": "Blueprint: Farm I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t1:blueprint-farm-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t1:blueprint-farm-t1"
-		},
 		"product:townhall-t2:blueprint-windmill-t1": {
 			"name": "Blueprint: Windmill I",
 			"durationMs": 2000,

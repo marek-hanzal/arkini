@@ -432,7 +432,7 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:grain",
+					"itemId": "item:water",
 					"quantity": 1,
 					"consume": true
 				}
@@ -465,12 +465,6 @@
 				{
 					"type": "passive",
 					"itemId": "producer:well-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:farm-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				}

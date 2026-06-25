@@ -392,17 +392,6 @@
 				}
 			]
 		},
-		"input:townhall-t1:blueprint-farm-t1": {
-			"name": "Blueprint: Farm I input",
-			"inputs": [
-				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:townhall-t2:blueprint-windmill-t1": {
 			"name": "Blueprint: Windmill I input",
 			"inputs": [
@@ -670,7 +659,19 @@
 			"name": "Blueprint: Town Hall II input",
 			"inputs": [
 				{
-					"itemId": "item:grain",
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true

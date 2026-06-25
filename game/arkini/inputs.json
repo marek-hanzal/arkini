@@ -190,7 +190,7 @@
 			]
 		},
 		"input:coal-mine-t1:bread-water": {
-			"name": "Coal mine bread and water input",
+			"name": "Coal mine crew supplies",
 			"inputs": [
 				{
 					"itemId": "item:bread",
@@ -203,11 +203,17 @@
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
+				},
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
 				}
 			]
 		},
 		"input:iron-mine-t1:sausage-beer": {
-			"name": "Iron mine sausage and beer input",
+			"name": "Iron mine crew supplies",
 			"inputs": [
 				{
 					"itemId": "item:sausage",
@@ -220,11 +226,17 @@
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
+				},
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
 				}
 			]
 		},
 		"input:gold-mine-t1:bread-wine": {
-			"name": "Gold mine bread and wine input",
+			"name": "Gold mine crew supplies",
 			"inputs": [
 				{
 					"itemId": "item:bread",
@@ -234,6 +246,12 @@
 				},
 				{
 					"itemId": "item:wine-glass",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
@@ -287,10 +305,22 @@
 			]
 		},
 		"input:purifier-t1:pollution": {
-			"name": "Purifier pollution input",
+			"name": "Purifier single pollution cleanup input",
 			"inputs": [
 				{
 					"itemId": "item:pollution",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
@@ -298,12 +328,24 @@
 			]
 		},
 		"input:purifier-t1:pollution-bulk": {
-			"name": "Purifier bulk pollution input",
+			"name": "Purifier bulk pollution cleanup input",
 			"inputs": [
 				{
 					"itemId": "item:pollution",
 					"quantity": 4,
 					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 4,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"capacity": 8,
 					"consume": true
 				}
 			]
@@ -748,9 +790,15 @@
 			"name": "Academy basic lesson supplies",
 			"inputs": [
 				{
-					"itemId": "item:bread",
+					"itemId": "item:paper",
 					"quantity": 1,
-					"capacity": 4,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"capacity": 12,
 					"consume": true
 				}
 			]
@@ -761,11 +809,23 @@
 				{
 					"itemId": "item:basic-knowledge",
 					"quantity": 2,
-					"capacity": 4,
+					"capacity": 8,
 					"consume": true
 				},
 				{
-					"itemId": "item:beer",
+					"itemId": "item:paper",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 12,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
@@ -2109,6 +2169,297 @@
 				{
 					"itemId": "item:coin",
 					"quantity": 3,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:construction-yard-t1:blueprint-academy": {
+			"name": "Blueprint: Academy input",
+			"inputs": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-coal-mine-t1": {
+			"name": "Blueprint: Coal Mine I input",
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-iron-mine-t1": {
+			"name": "Blueprint: Iron Mine I input",
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-gold-mine-t1": {
+			"name": "Blueprint: Gold Mine I input",
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 4,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-smelter-t1": {
+			"name": "Blueprint: Smelter I input",
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-purifier-t1": {
+			"name": "Blueprint: Purifier I input",
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 4,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:surveyor-camp-t1:coal-deposit": {
+			"name": "Surveyor Camp coal deposit inputs",
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:surveyor-camp-t1:iron-deposit": {
+			"name": "Surveyor Camp iron deposit inputs",
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:surveyor-camp-t1:gold-deposit": {
+			"name": "Surveyor Camp gold deposit inputs",
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 4,
 					"capacity": 12,
 					"consume": true
 				}

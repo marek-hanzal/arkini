@@ -377,7 +377,7 @@
 		},
 		"product:academy:advanced-knowledge": {
 			"name": "Advanced Knowledge",
-			"durationMs": 20000,
+			"durationMs": 22000,
 			"placement": "board_then_inventory",
 			"inputRefId": "input:academy:advanced-knowledge",
 			"requirementIds": [],
@@ -981,6 +981,78 @@
 			"inputRefId": "input:townhall-t4:blueprint-construction-yard-t1",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t4:blueprint-construction-yard-t1"
+		},
+		"product:construction-yard-t1:blueprint-academy": {
+			"name": "Blueprint: Academy",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:construction-yard-t1:blueprint-academy",
+			"requirementIds": [],
+			"outputTableId": "loot:construction-yard-t1:blueprint-academy"
+		},
+		"product:academy:blueprint-coal-mine-t1": {
+			"name": "Blueprint: Coal Mine I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-coal-mine-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-coal-mine-t1"
+		},
+		"product:academy:blueprint-iron-mine-t1": {
+			"name": "Blueprint: Iron Mine I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-iron-mine-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-iron-mine-t1"
+		},
+		"product:academy:blueprint-gold-mine-t1": {
+			"name": "Blueprint: Gold Mine I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-gold-mine-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-gold-mine-t1"
+		},
+		"product:academy:blueprint-smelter-t1": {
+			"name": "Blueprint: Smelter I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-smelter-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-smelter-t1"
+		},
+		"product:academy:blueprint-purifier-t1": {
+			"name": "Blueprint: Purifier I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-purifier-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-purifier-t1"
+		},
+		"product:surveyor-camp-t1:coal-deposit": {
+			"name": "Survey: Coal Deposit",
+			"durationMs": 10000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:surveyor-camp-t1:coal-deposit",
+			"requirementIds": [],
+			"outputTableId": "loot:surveyor-camp-t1:coal-deposit"
+		},
+		"product:surveyor-camp-t1:iron-deposit": {
+			"name": "Survey: Iron Deposit",
+			"durationMs": 10000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:surveyor-camp-t1:iron-deposit",
+			"requirementIds": [],
+			"outputTableId": "loot:surveyor-camp-t1:iron-deposit"
+		},
+		"product:surveyor-camp-t1:gold-deposit": {
+			"name": "Survey: Gold Deposit",
+			"durationMs": 12000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:surveyor-camp-t1:gold-deposit",
+			"requirementIds": [],
+			"outputTableId": "loot:surveyor-camp-t1:gold-deposit"
 		}
 	}
 }

@@ -306,7 +306,12 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:academy:basic-knowledge",
-				"product:academy:advanced-knowledge"
+				"product:academy:advanced-knowledge",
+				"product:academy:blueprint-coal-mine-t1",
+				"product:academy:blueprint-iron-mine-t1",
+				"product:academy:blueprint-gold-mine-t1",
+				"product:academy:blueprint-smelter-t1",
+				"product:academy:blueprint-purifier-t1"
 			],
 			"requirementIds": []
 		},
@@ -402,7 +407,10 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:surveyor-camp-t1:clay-deposit",
-				"product:surveyor-camp-t1:sand-deposit"
+				"product:surveyor-camp-t1:sand-deposit",
+				"product:surveyor-camp-t1:coal-deposit",
+				"product:surveyor-camp-t1:iron-deposit",
+				"product:surveyor-camp-t1:gold-deposit"
 			],
 			"requirementIds": []
 		},
@@ -512,7 +520,8 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:construction-yard-t1:construction-bundle"
+				"product:construction-yard-t1:construction-bundle",
+				"product:construction-yard-t1:blueprint-academy"
 			],
 			"requirementIds": []
 		}

@@ -718,28 +718,26 @@
 			"inputs": [
 				{
 					"itemId": "item:plank",
-					"quantity": 2,
+					"quantity": 3,
 					"consume": true
 				},
 				{
 					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
 					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:bread",
+					"itemId": "item:coin",
 					"quantity": 1,
 					"consume": true
 				}
 			],
-			"requirements": [
-				{
-					"type": "passive",
-					"itemId": "producer:townhall-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			],
+			"requirements": [],
 			"durationMs": 10000
 		},
 		"craft:academy": {
@@ -983,6 +981,126 @@
 			],
 			"requirements": [],
 			"durationMs": 9000
+		},
+		"craft:paper-mill-t1": {
+			"resultItemId": "producer:paper-mill-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 8000
+		},
+		"craft:civic-office-t1": {
+			"resultItemId": "producer:civic-office-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 10000
+		},
+		"craft:market-t2": {
+			"resultItemId": "producer:market-t2",
+			"inputs": [
+				{
+					"itemId": "producer:market-t1",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:civic-office-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 12000
+		},
+		"craft:surveyor-camp-t1": {
+			"resultItemId": "producer:surveyor-camp-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 2,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 10000
 		}
 	}
 }

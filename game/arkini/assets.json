@@ -1102,6 +1102,70 @@
 			"overlayAssetId": "asset:producer:cookhouse-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
+		},
+		"asset:item:paper": {
+			"kind": "item",
+			"label": "Paper",
+			"render": "plain",
+			"resourceId": "item-paper"
+		},
+		"asset:item:building-permit": {
+			"kind": "item",
+			"label": "Building Permit",
+			"render": "plain",
+			"resourceId": "item-building-permit"
+		},
+		"asset:producer:paper-mill-t1": {
+			"kind": "item",
+			"label": "Paper Mill I",
+			"render": "plain",
+			"resourceId": "producer-paper-mill-t1"
+		},
+		"asset:producer:civic-office-t1": {
+			"kind": "item",
+			"label": "Civic Office I",
+			"render": "plain",
+			"resourceId": "producer-civic-office-t1"
+		},
+		"asset:producer:surveyor-camp-t1": {
+			"kind": "item",
+			"label": "Surveyor Camp I",
+			"render": "plain",
+			"resourceId": "producer-surveyor-camp-t1"
+		},
+		"asset:producer:market-t2": {
+			"kind": "item",
+			"label": "Market II",
+			"render": "plain",
+			"resourceId": "producer-market-t2"
+		},
+		"asset:item:blueprint-paper-mill-t1": {
+			"kind": "item",
+			"label": "Paper Mill I Blueprint",
+			"overlayAssetId": "asset:producer:paper-mill-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-civic-office-t1": {
+			"kind": "item",
+			"label": "Civic Office I Blueprint",
+			"overlayAssetId": "asset:producer:civic-office-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-surveyor-camp-t1": {
+			"kind": "item",
+			"label": "Surveyor Camp I Blueprint",
+			"overlayAssetId": "asset:producer:surveyor-camp-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-market-t2": {
+			"kind": "item",
+			"label": "Market II Blueprint",
+			"overlayAssetId": "asset:producer:market-t2",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
 		}
 	}
 }

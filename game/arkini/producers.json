@@ -252,10 +252,11 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:townhall-t4:blueprint-university",
-				"product:townhall-t4:blueprint-goldsmith-t1",
-				"product:townhall-t4:blueprint-blacksmith-t1",
-				"product:townhall-t4:blueprint-heroes-guild-t1"
+				"product:townhall-t4:blueprint-paper-mill-t1",
+				"product:townhall-t4:blueprint-school",
+				"product:townhall-t4:blueprint-civic-office-t1",
+				"product:townhall-t4:blueprint-market-t2",
+				"product:townhall-t4:blueprint-surveyor-camp-t1"
 			],
 			"requirementIds": []
 		},
@@ -366,6 +367,40 @@
 				"product:market-t1:coin-from-beer",
 				"product:market-t1:coin-from-wine-glass",
 				"product:market-t1:coin-from-feast"
+			],
+			"requirementIds": []
+		},
+		"producer:paper-mill-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:paper-mill-t1:paper"
+			],
+			"requirementIds": []
+		},
+		"producer:civic-office-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:civic-office-t1:building-permit"
+			],
+			"requirementIds": []
+		},
+		"producer:surveyor-camp-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:surveyor-camp-t1:clay-deposit",
+				"product:surveyor-camp-t1:sand-deposit"
+			],
+			"requirementIds": []
+		},
+		"producer:market-t2": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:market-t2:coin-from-paper",
+				"product:market-t2:coin-from-feast"
 			],
 			"requirementIds": []
 		}

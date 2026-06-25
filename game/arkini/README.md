@@ -52,7 +52,7 @@ Townhall tiers are authored as separate producer buildings:
 producer:townhall-t1  Era I construction foundation blueprints
 producer:townhall-t2  Era II raw food and livestock blueprints
 producer:townhall-t3  Era III food processing and first trade blueprints
-producer:townhall-t4  Later specialist blueprints
+producer:townhall-t4  Era IV civic administration, paper, permits, surveys, and Market II
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
@@ -94,13 +94,20 @@ Town Hall III
   Grain + Water + Plank -> Winery I Blueprint
   Bread + Sausage + Plank -> Market Blueprint
   Feast + 2 Coin + Plank + Stone Block -> Town Hall IV Blueprint
+
+Town Hall IV
+  Coin + Water + Plank -> Paper Mill I Blueprint
+  Paper + Coin -> School Blueprint
+  Basic Knowledge + Paper + Coin -> Civic Office I Blueprint
+  Building Permit + Feast + 2 Coin -> Market II Blueprint
+  Building Permit + Basic Knowledge + 2 Coin -> Surveyor Camp I Blueprint
 ```
 
-Market is a single trade building line. Future stronger market behavior should upgrade the same Market producer/tier rather than introduce separate Market II / Market III buildings.
+Market is a tiered trade building line. Market I starts first trade in Era III; Market II is a new Era IV building upgrade with stronger trade options and new civic-era possibilities.
 
 ### Implemented first wave
 
-The package currently contains wood, stone, food, brewing, wine, heavy industry, cleanup, and basic coin economy production lines.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, surveys, and an improved Market II trade step. Later heavy industry definitions still exist in the package, but they are intentionally not connected to the townhall progression yet.
 
 Wood pair:
 
@@ -161,7 +168,16 @@ Era III processing
   Winery I + Water near Vineyard -> Grapes
   Winery I + Grapes + Water -> Wine Barrel
   Tavern I + Wine Barrel -> Wine Glass
-  Market + processed food/drink -> Coin
+  Market I + processed food/drink -> Coin
+
+Era IV civic administration
+  Paper Mill I + Plank + Water -> Paper
+  School + Paper + Coin -> Basic Knowledge
+  Civic Office I + Paper + Basic Knowledge + Coin -> Building Permit
+  Market II + Paper -> Coin
+  Market II + Feast -> more Coin
+  Surveyor Camp I + Building Permit + Basic Knowledge + Coin -> Clay Deposit
+  Surveyor Camp I + Building Permit + Basic Knowledge + Coin -> Sand Deposit
 ```
 
 ### Initial balance placeholder
@@ -195,6 +211,13 @@ Current processor input buffers use capacity `4`:
 - `input:market-t1:coin-from-beer`
 - `input:market-t1:coin-from-wine-glass`
 - `input:market-t1:coin-from-feast`
+- `input:paper-mill-t1:paper`
+- `input:school:basic-knowledge`
+- `input:civic-office-t1:building-permit`
+- `input:market-t2:coin-from-paper`
+- `input:market-t2:coin-from-feast`
+- `input:surveyor-camp-t1:clay-deposit`
+- `input:surveyor-camp-t1:sand-deposit`
 
 ### Asset alignment and current art gaps
 
@@ -256,6 +279,12 @@ The first food production line is wired into gameplay and uses these prepared as
 - `asset:producer:cookhouse-t1` -> `game/arkini/assets/producer-cookhouse-t1.png`
 - `asset:producer:market-t1` -> `game/arkini/assets/producer-market-t1.png`
 - `asset:item:coin` -> `game/arkini/assets/item-coin.png`
+- `asset:item:paper` -> `game/arkini/assets/item-paper.png`
+- `asset:item:building-permit` -> `game/arkini/assets/item-building-permit.png`
+- `asset:producer:paper-mill-t1` -> `game/arkini/assets/producer-paper-mill-t1.png`
+- `asset:producer:civic-office-t1` -> `game/arkini/assets/producer-civic-office-t1.png`
+- `asset:producer:surveyor-camp-t1` -> `game/arkini/assets/producer-surveyor-camp-t1.png`
+- `asset:producer:market-t2` -> `game/arkini/assets/producer-market-t2.png`
 
 ### Brewing and wine asset IDs
 
@@ -394,6 +423,12 @@ Heavy industry asset IDs:
 - `asset:item:gold-deposit` -> `game/arkini/assets/item-gold-deposit.png`
 - `asset:producer:goldsmith-t1` -> `game/arkini/assets/producer-goldsmith-t1.png`
 - `asset:item:coin` -> `game/arkini/assets/item-coin.png`
+- `asset:item:paper` -> `game/arkini/assets/item-paper.png`
+- `asset:item:building-permit` -> `game/arkini/assets/item-building-permit.png`
+- `asset:producer:paper-mill-t1` -> `game/arkini/assets/producer-paper-mill-t1.png`
+- `asset:producer:civic-office-t1` -> `game/arkini/assets/producer-civic-office-t1.png`
+- `asset:producer:surveyor-camp-t1` -> `game/arkini/assets/producer-surveyor-camp-t1.png`
+- `asset:producer:market-t2` -> `game/arkini/assets/producer-market-t2.png`
 
 ### Coin economy gameplay
 

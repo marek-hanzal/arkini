@@ -36,6 +36,25 @@ describe("defaultGameConfig", () => {
 		);
 	};
 
+	it("wires era IV civic progression through permits and Market II", () => {
+		expect(defaultGameConfig.producers["producer:townhall-t4"].productIds).toEqual([
+			"product:townhall-t4:blueprint-paper-mill-t1",
+			"product:townhall-t4:blueprint-school",
+			"product:townhall-t4:blueprint-civic-office-t1",
+			"product:townhall-t4:blueprint-market-t2",
+			"product:townhall-t4:blueprint-surveyor-camp-t1",
+		]);
+
+		expect(defaultGameConfig.items["item:building-permit"].tags).toContain("master");
+		expect(defaultGameConfig.items["item:building-permit"].tags).toContain("era:IV");
+
+		expect(defaultGameConfig.craftRecipes["craft:market-t2"].inputs).toContainEqual({
+			consume: true,
+			itemId: "producer:market-t1",
+			quantity: 1,
+		});
+	});
+
 	it("requires complete era ownership before townhall tier progression", () => {
 		expectPassiveOwnedRequirements("craft:townhall-t2", [
 			"producer:lumberjack-t1",

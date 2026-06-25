@@ -271,14 +271,6 @@
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t2:blueprint-pig-farm-t1"
 		},
-		"product:townhall-t4:blueprint-goldsmith-t1": {
-			"name": "Blueprint: Goldsmith I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-goldsmith-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-goldsmith-t1"
-		},
 		"product:townhall-t1:blueprint-townhall-t2": {
 			"name": "Blueprint: Town Hall II",
 			"durationMs": 2000,
@@ -335,14 +327,6 @@
 			"requirementIds": [],
 			"outputTableId": "loot:heroes-guild-t1:chest-t4"
 		},
-		"product:townhall-t4:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-heroes-guild-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-heroes-guild-t1"
-		},
 		"product:goldsmith-t1:key-t3": {
 			"name": "Key III",
 			"durationMs": 20000,
@@ -382,14 +366,6 @@
 			"inputRefId": "input:blacksmith-t1:iron-armor",
 			"requirementIds": [],
 			"outputTableId": "loot:blacksmith-t1:iron-armor"
-		},
-		"product:townhall-t4:blueprint-blacksmith-t1": {
-			"name": "Blueprint: Blacksmith I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-blacksmith-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-blacksmith-t1"
 		},
 		"product:school:basic-knowledge": {
 			"name": "Basic Knowledge",
@@ -438,14 +414,6 @@
 			"inputRefId": "input:university:master-knowledge",
 			"requirementIds": [],
 			"outputTableId": "loot:university:master-knowledge"
-		},
-		"product:townhall-t4:blueprint-university": {
-			"name": "Blueprint: University",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-university",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-university"
 		},
 		"product:townhall-t3:blueprint-windmill-t1": {
 			"name": "Blueprint: Windmill I",
@@ -726,6 +694,94 @@
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t3:blueprint-market-t1",
 			"inputRefId": "input:townhall-t3:blueprint-market-t1"
+		},
+		"product:paper-mill-t1:paper": {
+			"name": "Paper",
+			"durationMs": 7000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:paper-mill-t1:paper",
+			"requirementIds": [],
+			"outputTableId": "loot:paper-mill-t1:paper"
+		},
+		"product:civic-office-t1:building-permit": {
+			"name": "Building Permit",
+			"durationMs": 10000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:civic-office-t1:building-permit",
+			"requirementIds": [],
+			"outputTableId": "loot:civic-office-t1:building-permit"
+		},
+		"product:surveyor-camp-t1:clay-deposit": {
+			"name": "Survey: Clay Deposit",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:surveyor-camp-t1:clay-deposit",
+			"requirementIds": [],
+			"outputTableId": "loot:surveyor-camp-t1:clay-deposit"
+		},
+		"product:surveyor-camp-t1:sand-deposit": {
+			"name": "Survey: Sand Deposit",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:surveyor-camp-t1:sand-deposit",
+			"requirementIds": [],
+			"outputTableId": "loot:surveyor-camp-t1:sand-deposit"
+		},
+		"product:market-t2:coin-from-paper": {
+			"name": "Coins from Paper",
+			"durationMs": 3500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:market-t2:coin-from-paper",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t2:coin-from-paper"
+		},
+		"product:market-t2:coin-from-feast": {
+			"name": "Better Coins from Feast",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:market-t2:coin-from-feast",
+			"requirementIds": [],
+			"outputTableId": "loot:market-t2:coin-from-feast"
+		},
+		"product:townhall-t4:blueprint-paper-mill-t1": {
+			"name": "Blueprint: Paper Mill I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-paper-mill-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-paper-mill-t1"
+		},
+		"product:townhall-t4:blueprint-school": {
+			"name": "Blueprint: School",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-school",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-school"
+		},
+		"product:townhall-t4:blueprint-civic-office-t1": {
+			"name": "Blueprint: Civic Office I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-civic-office-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-civic-office-t1"
+		},
+		"product:townhall-t4:blueprint-market-t2": {
+			"name": "Blueprint: Market II",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-market-t2",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-market-t2"
+		},
+		"product:townhall-t4:blueprint-surveyor-camp-t1": {
+			"name": "Blueprint: Surveyor Camp I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-surveyor-camp-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-surveyor-camp-t1"
 		}
 	}
 }

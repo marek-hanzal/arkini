@@ -97,6 +97,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-coal-power-plant": {
+			"kind": "item",
+			"label": "Coal Power Plant Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:coal-power-plant"
+		},
 		"asset:item:blueprint-farm-t1": {
 			"kind": "item",
 			"label": "Farm I Blueprint",
@@ -258,6 +265,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-water-power-plant": {
+			"kind": "item",
+			"label": "Water Power Plant Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:water-power-plant"
+		},
 		"asset:item:blueprint-well-t1": {
 			"kind": "item",
 			"label": "Well I Blueprint",
@@ -416,6 +430,12 @@
 			"label": "Emerald",
 			"render": "plain",
 			"resourceId": "item-emerald"
+		},
+		"asset:item:energy": {
+			"kind": "item",
+			"label": "Energy",
+			"render": "plain",
+			"resourceId": "item-energy"
 		},
 		"asset:item:flour": {
 			"kind": "item",
@@ -789,6 +809,12 @@
 			"render": "plain",
 			"resourceId": "producer-coal-mine-t1"
 		},
+		"asset:producer:coal-power-plant": {
+			"kind": "item",
+			"label": "Coal Power Plant",
+			"render": "plain",
+			"resourceId": "producer-coal-power-plant"
+		},
 		"asset:producer:farm-t1": {
 			"kind": "item",
 			"label": "Farm I",
@@ -932,6 +958,12 @@
 			"label": "University",
 			"render": "plain",
 			"resourceId": "producer-university"
+		},
+		"asset:producer:water-power-plant": {
+			"kind": "item",
+			"label": "Water Power Plant",
+			"render": "plain",
+			"resourceId": "producer-water-power-plant"
 		},
 		"asset:producer:well-t1": {
 			"kind": "item",

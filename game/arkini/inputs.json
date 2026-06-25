@@ -392,40 +392,6 @@
 				}
 			]
 		},
-		"input:townhall-t2:blueprint-windmill-t1": {
-			"name": "Blueprint: Windmill I input",
-			"inputs": [
-				{
-					"itemId": "item:grain",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t2:blueprint-bakery-t1": {
-			"name": "Blueprint: Bakery I input",
-			"inputs": [
-				{
-					"itemId": "item:flour",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:townhall-t2:blueprint-pig-farm-t1": {
 			"name": "Blueprint: Pig Farm I input",
 			"inputs": [
@@ -437,92 +403,6 @@
 				},
 				{
 					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t2:blueprint-slaughterhouse-t1": {
-			"name": "Blueprint: Slaughterhouse I input",
-			"inputs": [
-				{
-					"itemId": "item:piglet",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t2:blueprint-brewery-t1": {
-			"name": "Blueprint: Brewery I input",
-			"inputs": [
-				{
-					"itemId": "item:grain",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t2:blueprint-tavern-t1": {
-			"name": "Blueprint: Tavern I input",
-			"inputs": [
-				{
-					"itemId": "item:beer-barrel",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t2:blueprint-winery-t1": {
-			"name": "Blueprint: Winery I input",
-			"inputs": [
-				{
-					"itemId": "item:grain",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
@@ -682,26 +562,26 @@
 			"name": "Blueprint: Town Hall III input",
 			"inputs": [
 				{
-					"itemId": "item:bread",
+					"itemId": "item:food-supply",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:beer",
+					"itemId": "item:wool",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:sausage",
+					"itemId": "item:plank",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 2,
+					"itemId": "item:stone-block",
+					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				}
@@ -725,52 +605,6 @@
 				{
 					"itemId": "item:advanced-knowledge",
 					"quantity": 2,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t2:hop-field": {
-			"name": "Survey: Hop Field input",
-			"inputs": [
-				{
-					"itemId": "item:grain",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t2:vineyard": {
-			"name": "Survey: Vineyard input",
-			"inputs": [
-				{
-					"itemId": "item:grain",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				}
@@ -1224,23 +1058,6 @@
 				}
 			]
 		},
-		"input:townhall-t2:blueprint-school": {
-			"name": "Blueprint: School input",
-			"inputs": [
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:plank",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:townhall-t3:blueprint-academy": {
 			"name": "Blueprint: Academy input",
 			"inputs": [
@@ -1275,6 +1092,376 @@
 				},
 				{
 					"itemId": "item:wine-glass",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:cattle-farm-t1:grain-water": {
+			"name": "Cattle farm grain and water input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:chicken-coop-t1:grain-water": {
+			"name": "Chicken coop grain and water input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:sheep-pasture-t1:grain-water": {
+			"name": "Sheep pasture grain and water input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:vegetable-garden-t1:water": {
+			"name": "Vegetable garden water input",
+			"inputs": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-school": {
+			"name": "Blueprint: School input",
+			"inputs": [
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-windmill-t1": {
+			"name": "Blueprint: Windmill I input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-bakery-t1": {
+			"name": "Blueprint: Bakery I input",
+			"inputs": [
+				{
+					"itemId": "item:flour",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-slaughterhouse-t1": {
+			"name": "Blueprint: Slaughterhouse I input",
+			"inputs": [
+				{
+					"itemId": "item:piglet",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:hop-field": {
+			"name": "Survey: Hop Field input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-brewery-t1": {
+			"name": "Blueprint: Brewery I input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-tavern-t1": {
+			"name": "Blueprint: Tavern I input",
+			"inputs": [
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:vineyard": {
+			"name": "Survey: Vineyard input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-winery-t1": {
+			"name": "Blueprint: Winery I input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t2:wheat-field": {
+			"name": "Survey: Wheat Field input",
+			"inputs": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t2:blueprint-farm-t1": {
+			"name": "Blueprint: Farm I input",
+			"inputs": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t2:blueprint-cattle-farm-t1": {
+			"name": "Blueprint: Cattle Farm I input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t2:blueprint-chicken-coop-t1": {
+			"name": "Blueprint: Chicken Coop I input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t2:blueprint-sheep-pasture-t1": {
+			"name": "Blueprint: Sheep Pasture I input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t2:blueprint-vegetable-garden-t1": {
+			"name": "Blueprint: Vegetable Garden I input",
+			"inputs": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t2:food-supply": {
+			"name": "Food Supply input",
+			"inputs": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:piglet",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:milk",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:egg",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:vegetables",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true

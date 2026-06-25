@@ -67,7 +67,8 @@
 			"description": "A single mug of beer served by taverns.",
 			"tags": [
 				"food",
-				"beer"
+				"beer",
+				"era:III"
 			]
 		},
 		"item:beer-barrel": {
@@ -81,7 +82,8 @@
 			"tags": [
 				"material",
 				"food",
-				"beer"
+				"beer",
+				"era:III"
 			]
 		},
 		"item:blueprint-academy": {
@@ -111,7 +113,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"craftRecipeId": "craft:bakery-t1"
 		},
@@ -142,7 +145,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"craftRecipeId": "craft:brewery-t1"
 		},
@@ -342,7 +346,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:II"
 			],
 			"craftRecipeId": "craft:pig-farm-t1"
 		},
@@ -436,7 +441,8 @@
 				"blueprint",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:III"
 			],
 			"craftRecipeId": "craft:school"
 		},
@@ -451,7 +457,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"craftRecipeId": "craft:slaughterhouse-t1"
 		},
@@ -497,7 +504,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"craftRecipeId": "craft:tavern-t1"
 		},
@@ -528,7 +536,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:II"
 			],
 			"craftRecipeId": "craft:townhall-t3"
 		},
@@ -606,7 +615,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"craftRecipeId": "craft:windmill-t1"
 		},
@@ -621,7 +631,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"craftRecipeId": "craft:winery-t1"
 		},
@@ -635,7 +646,8 @@
 			"description": "Baked food produced by bakeries from flour and water.",
 			"tags": [
 				"food",
-				"bread"
+				"bread",
+				"era:III"
 			]
 		},
 		"item:bricks": {
@@ -828,7 +840,8 @@
 				"material",
 				"food",
 				"grain",
-				"flour"
+				"flour",
+				"era:III"
 			]
 		},
 		"item:glass": {
@@ -917,7 +930,8 @@
 				"material",
 				"food",
 				"wine",
-				"grapes"
+				"grapes",
+				"era:III"
 			]
 		},
 		"item:hop-field": {
@@ -932,7 +946,8 @@
 				"source",
 				"food",
 				"beer",
-				"hops"
+				"hops",
+				"era:III"
 			]
 		},
 		"item:hops": {
@@ -947,7 +962,8 @@
 				"material",
 				"food",
 				"beer",
-				"hops"
+				"hops",
+				"era:III"
 			]
 		},
 		"item:iron-armor": {
@@ -1074,7 +1090,8 @@
 			"tags": [
 				"material",
 				"leather",
-				"animal"
+				"animal",
+				"era:III"
 			]
 		},
 		"item:leather-armor": {
@@ -1146,7 +1163,8 @@
 			"tags": [
 				"animal",
 				"food",
-				"pig"
+				"pig",
+				"era:II"
 			]
 		},
 		"item:plank": {
@@ -1274,7 +1292,8 @@
 			"tags": [
 				"food",
 				"meat",
-				"sausage"
+				"sausage",
+				"era:III"
 			]
 		},
 		"item:stone": {
@@ -1375,7 +1394,8 @@
 				"source",
 				"food",
 				"wine",
-				"grapes"
+				"grapes",
+				"era:III"
 			]
 		},
 		"item:water": {
@@ -1419,7 +1439,8 @@
 			"tags": [
 				"material",
 				"food",
-				"wine"
+				"wine",
+				"era:III"
 			]
 		},
 		"item:wine-glass": {
@@ -1432,7 +1453,8 @@
 			"description": "A single glass of wine served by taverns.",
 			"tags": [
 				"food",
-				"wine"
+				"wine",
+				"era:III"
 			]
 		},
 		"producer:academy": {
@@ -1462,7 +1484,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"bread"
+				"bread",
+				"era:III"
 			],
 			"producerId": "producer:bakery-t1"
 		},
@@ -1493,7 +1516,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"beer"
+				"beer",
+				"era:III"
 			],
 			"producerId": "producer:brewery-t1"
 		},
@@ -1695,7 +1719,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"pig"
+				"pig",
+				"era:II"
 			],
 			"producerId": "producer:pig-farm-t1"
 		},
@@ -1788,7 +1813,8 @@
 				"producer",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:III"
 			],
 			"producerId": "producer:school"
 		},
@@ -1804,7 +1830,8 @@
 				"producer",
 				"food",
 				"meat",
-				"leather"
+				"leather",
+				"era:III"
 			],
 			"producerId": "producer:slaughterhouse-t1"
 		},
@@ -1849,7 +1876,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"beer"
+				"beer",
+				"era:III"
 			],
 			"producerId": "producer:tavern-t1"
 		},
@@ -1876,11 +1904,12 @@
 			"tier": 2,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Food-chain civic hub that issues farming, food, brewing, and wine blueprints.",
+			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
 			"tags": [
 				"producer",
 				"townhall",
-				"civic"
+				"civic",
+				"era:II"
 			],
 			"producerId": "producer:townhall-t2"
 		},
@@ -1891,11 +1920,12 @@
 			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Industrial civic hub that issues mining, smelting, cleanup, and deposit survey plans.",
+			"description": "Food processing and early industry civic hub that issues milling, baking, tavern, education, and mining plans.",
 			"tags": [
 				"producer",
 				"townhall",
-				"civic"
+				"civic",
+				"era:III"
 			],
 			"producerId": "producer:townhall-t3"
 		},
@@ -1974,7 +2004,8 @@
 				"producer",
 				"food",
 				"grain",
-				"flour"
+				"flour",
+				"era:III"
 			],
 			"producerId": "producer:windmill-t1"
 		},
@@ -1989,9 +2020,208 @@
 			"tags": [
 				"producer",
 				"food",
-				"wine"
+				"wine",
+				"era:III"
 			],
 			"producerId": "producer:winery-t1"
+		},
+		"item:blueprint-cattle-farm-t1": {
+			"assetId": "asset:item:blueprint-cattle-farm-t1",
+			"code": "blueprint-cattle-farm-t1",
+			"name": "Cattle Farm I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Cattle Farm I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			],
+			"craftRecipeId": "craft:cattle-farm-t1"
+		},
+		"item:blueprint-chicken-coop-t1": {
+			"assetId": "asset:item:blueprint-chicken-coop-t1",
+			"code": "blueprint-chicken-coop-t1",
+			"name": "Chicken Coop I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Chicken Coop I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			],
+			"craftRecipeId": "craft:chicken-coop-t1"
+		},
+		"item:blueprint-sheep-pasture-t1": {
+			"assetId": "asset:item:blueprint-sheep-pasture-t1",
+			"code": "blueprint-sheep-pasture-t1",
+			"name": "Sheep Pasture I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Sheep Pasture I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			],
+			"craftRecipeId": "craft:sheep-pasture-t1"
+		},
+		"item:blueprint-vegetable-garden-t1": {
+			"assetId": "asset:item:blueprint-vegetable-garden-t1",
+			"code": "blueprint-vegetable-garden-t1",
+			"name": "Vegetable Garden I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Vegetable Garden I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			],
+			"craftRecipeId": "craft:vegetable-garden-t1"
+		},
+		"item:milk": {
+			"assetId": "asset:item:milk",
+			"code": "milk",
+			"name": "Milk",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Fresh milk produced by cattle farms for base food supply chains.",
+			"tags": [
+				"food",
+				"dairy",
+				"era:II"
+			]
+		},
+		"item:egg": {
+			"assetId": "asset:item:egg",
+			"code": "egg",
+			"name": "Egg",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Fresh eggs produced by chicken coops for base food supply chains.",
+			"tags": [
+				"food",
+				"egg",
+				"era:II"
+			]
+		},
+		"item:wool": {
+			"assetId": "asset:item:wool",
+			"code": "wool",
+			"name": "Wool",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Raw wool produced by sheep pastures and used as early settlement material.",
+			"tags": [
+				"material",
+				"animal",
+				"era:II"
+			]
+		},
+		"item:vegetables": {
+			"assetId": "asset:item:vegetables",
+			"code": "vegetables",
+			"name": "Vegetables",
+			"tier": 0,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
+			"tags": [
+				"food",
+				"vegetable",
+				"era:II"
+			]
+		},
+		"item:food-supply": {
+			"assetId": "asset:item:food-supply",
+			"code": "food-supply",
+			"name": "Food Supply",
+			"tier": 0,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Packed base food supply prepared from grain, animal produce, and vegetables. Era II master item.",
+			"tags": [
+				"food",
+				"master",
+				"era:II"
+			]
+		},
+		"producer:cattle-farm-t1": {
+			"assetId": "asset:producer:cattle-farm-t1",
+			"code": "cattle-farm-t1",
+			"name": "Cattle Farm I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes grain and water to produce milk.",
+			"tags": [
+				"producer",
+				"food",
+				"dairy",
+				"era:II"
+			],
+			"producerId": "producer:cattle-farm-t1"
+		},
+		"producer:chicken-coop-t1": {
+			"assetId": "asset:producer:chicken-coop-t1",
+			"code": "chicken-coop-t1",
+			"name": "Chicken Coop I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes grain and water to produce eggs.",
+			"tags": [
+				"producer",
+				"food",
+				"egg",
+				"era:II"
+			],
+			"producerId": "producer:chicken-coop-t1"
+		},
+		"producer:sheep-pasture-t1": {
+			"assetId": "asset:producer:sheep-pasture-t1",
+			"code": "sheep-pasture-t1",
+			"name": "Sheep Pasture I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes grain and water to produce wool.",
+			"tags": [
+				"producer",
+				"animal",
+				"wool",
+				"era:II"
+			],
+			"producerId": "producer:sheep-pasture-t1"
+		},
+		"producer:vegetable-garden-t1": {
+			"assetId": "asset:producer:vegetable-garden-t1",
+			"code": "vegetable-garden-t1",
+			"name": "Vegetable Garden I",
+			"tier": 1,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Consumes water to produce vegetables.",
+			"tags": [
+				"producer",
+				"food",
+				"vegetable",
+				"era:II"
+			],
+			"producerId": "producer:vegetable-garden-t1"
 		}
 	}
 }

@@ -217,16 +217,14 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:townhall-t2:blueprint-school",
-				"product:townhall-t2:blueprint-windmill-t1",
-				"product:townhall-t2:blueprint-bakery-t1",
+				"product:townhall-t2:wheat-field",
+				"product:townhall-t2:blueprint-farm-t1",
 				"product:townhall-t2:blueprint-pig-farm-t1",
-				"product:townhall-t2:blueprint-slaughterhouse-t1",
-				"product:townhall-t2:hop-field",
-				"product:townhall-t2:blueprint-brewery-t1",
-				"product:townhall-t2:blueprint-tavern-t1",
-				"product:townhall-t2:vineyard",
-				"product:townhall-t2:blueprint-winery-t1",
+				"product:townhall-t2:blueprint-cattle-farm-t1",
+				"product:townhall-t2:blueprint-chicken-coop-t1",
+				"product:townhall-t2:blueprint-sheep-pasture-t1",
+				"product:townhall-t2:blueprint-vegetable-garden-t1",
+				"product:townhall-t2:food-supply",
 				"product:townhall-t2:blueprint-townhall-t3"
 			],
 			"requirementIds": []
@@ -235,6 +233,15 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:townhall-t3:blueprint-school",
+				"product:townhall-t3:blueprint-windmill-t1",
+				"product:townhall-t3:blueprint-bakery-t1",
+				"product:townhall-t3:blueprint-slaughterhouse-t1",
+				"product:townhall-t3:hop-field",
+				"product:townhall-t3:blueprint-brewery-t1",
+				"product:townhall-t3:blueprint-tavern-t1",
+				"product:townhall-t3:vineyard",
+				"product:townhall-t3:blueprint-winery-t1",
 				"product:townhall-t3:blueprint-academy",
 				"product:townhall-t3:coal-deposit",
 				"product:townhall-t3:blueprint-coal-mine-t1",
@@ -305,6 +312,38 @@
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",
 				"product:university:master-knowledge"
+			],
+			"requirementIds": []
+		},
+		"producer:cattle-farm-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:cattle-farm-t1:milk"
+			],
+			"requirementIds": []
+		},
+		"producer:chicken-coop-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:chicken-coop-t1:egg"
+			],
+			"requirementIds": []
+		},
+		"producer:sheep-pasture-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sheep-pasture-t1:wool"
+			],
+			"requirementIds": []
+		},
+		"producer:vegetable-garden-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:vegetable-garden-t1:vegetables"
 			],
 			"requirementIds": []
 		}

@@ -305,72 +305,12 @@
 				}
 			]
 		},
-		"loot:townhall-t2:blueprint-windmill-t1": {
-			"name": "Blueprint: Windmill I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-windmill-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-bakery-t1": {
-			"name": "Blueprint: Bakery I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-bakery-t1",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:townhall-t2:blueprint-pig-farm-t1": {
 			"name": "Blueprint: Pig Farm I output",
 			"output": [
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-pig-farm-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-slaughterhouse-t1": {
-			"name": "Blueprint: Slaughterhouse I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-slaughterhouse-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-brewery-t1": {
-			"name": "Blueprint: Brewery I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-brewery-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-tavern-t1": {
-			"name": "Blueprint: Tavern I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-tavern-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-winery-t1": {
-			"name": "Blueprint: Winery I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-winery-t1",
 					"quantity": 1
 				}
 			]
@@ -461,26 +401,6 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-townhall-t4",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:hop-field": {
-			"name": "Survey: Hop Field output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:hop-field",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:vineyard": {
-			"name": "Survey: Vineyard output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:vineyard",
 					"quantity": 1
 				}
 			]
@@ -815,16 +735,6 @@
 				}
 			]
 		},
-		"loot:townhall-t2:blueprint-school": {
-			"name": "Blueprint: School output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-school",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:townhall-t3:blueprint-academy": {
 			"name": "Blueprint: Academy output",
 			"output": [
@@ -841,6 +751,206 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-university",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-school": {
+			"name": "Blueprint: School output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-school",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-windmill-t1": {
+			"name": "Blueprint: Windmill I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-windmill-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-bakery-t1": {
+			"name": "Blueprint: Bakery I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-slaughterhouse-t1": {
+			"name": "Blueprint: Slaughterhouse I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-slaughterhouse-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:hop-field": {
+			"name": "Survey: Hop Field output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:hop-field",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-brewery-t1": {
+			"name": "Blueprint: Brewery I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-brewery-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-tavern-t1": {
+			"name": "Blueprint: Tavern I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-tavern-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:vineyard": {
+			"name": "Survey: Vineyard output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:vineyard",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-winery-t1": {
+			"name": "Blueprint: Winery I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-winery-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:wheat-field": {
+			"name": "Survey: Wheat Field output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:wheat-field",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-farm-t1": {
+			"name": "Blueprint: Farm I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-farm-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-cattle-farm-t1": {
+			"name": "Blueprint: Cattle Farm I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-cattle-farm-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-chicken-coop-t1": {
+			"name": "Blueprint: Chicken Coop I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-chicken-coop-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-sheep-pasture-t1": {
+			"name": "Blueprint: Sheep Pasture I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-sheep-pasture-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-vegetable-garden-t1": {
+			"name": "Blueprint: Vegetable Garden I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-vegetable-garden-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t2:food-supply": {
+			"name": "Food Supply output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:food-supply",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:cattle-farm-t1:milk": {
+			"name": "Cattle farm milk",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:milk",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:chicken-coop-t1:egg": {
+			"name": "Chicken coop eggs",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:egg",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:sheep-pasture-t1:wool": {
+			"name": "Sheep pasture wool",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:wool",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:vegetable-garden-t1:vegetables": {
+			"name": "Vegetable garden vegetables",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:vegetables",
 					"quantity": 1
 				}
 			]

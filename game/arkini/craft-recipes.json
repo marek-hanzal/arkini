@@ -490,17 +490,12 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:bread",
+					"itemId": "item:food-supply",
 					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:beer",
-					"quantity": 1,
-					"consume": true
-				},
-				{
-					"itemId": "item:sausage",
+					"itemId": "item:wool",
 					"quantity": 1,
 					"consume": true
 				}
@@ -508,13 +503,13 @@
 			"requirements": [
 				{
 					"type": "passive",
-					"itemId": "producer:windmill-t1",
+					"itemId": "item:wheat-field",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:bakery-t1",
+					"itemId": "producer:farm-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
@@ -526,37 +521,25 @@
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:slaughterhouse-t1",
+					"itemId": "producer:cattle-farm-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "item:hop-field",
+					"itemId": "producer:chicken-coop-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:brewery-t1",
+					"itemId": "producer:sheep-pasture-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:tavern-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				},
-				{
-					"type": "passive",
-					"itemId": "item:vineyard",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:winery-t1",
+					"itemId": "producer:vegetable-garden-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				}
@@ -813,6 +796,94 @@
 				}
 			],
 			"durationMs": 18000
+		},
+		"craft:cattle-farm-t1": {
+			"resultItemId": "producer:cattle-farm-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 7000
+		},
+		"craft:chicken-coop-t1": {
+			"resultItemId": "producer:chicken-coop-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 6000
+		},
+		"craft:sheep-pasture-t1": {
+			"resultItemId": "producer:sheep-pasture-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 7000
+		},
+		"craft:vegetable-garden-t1": {
+			"resultItemId": "producer:vegetable-garden-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 2,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 6000
 		}
 	}
 }

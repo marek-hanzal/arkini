@@ -83,6 +83,20 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-cattle-farm-t1": {
+			"kind": "item",
+			"label": "Cattle Farm I Blueprint",
+			"overlayAssetId": "asset:producer:cattle-farm-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-chicken-coop-t1": {
+			"kind": "item",
+			"label": "Chicken Coop I Blueprint",
+			"overlayAssetId": "asset:producer:chicken-coop-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-clay-pit": {
 			"kind": "item",
 			"label": "Clay Pit Blueprint",
@@ -209,6 +223,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-sheep-pasture-t1": {
+			"kind": "item",
+			"label": "Sheep Pasture I Blueprint",
+			"overlayAssetId": "asset:producer:sheep-pasture-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-slaughterhouse-t1": {
 			"kind": "item",
 			"label": "Slaughterhouse I Blueprint",
@@ -262,6 +283,13 @@
 			"kind": "item",
 			"label": "University Blueprint",
 			"overlayAssetId": "asset:producer:university",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-vegetable-garden-t1": {
+			"kind": "item",
+			"label": "Vegetable Garden I Blueprint",
+			"overlayAssetId": "asset:producer:vegetable-garden-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -425,6 +453,12 @@
 			"render": "plain",
 			"resourceId": "item-crystal"
 		},
+		"asset:item:egg": {
+			"kind": "item",
+			"label": "Egg",
+			"render": "plain",
+			"resourceId": "item-egg"
+		},
 		"asset:item:emerald": {
 			"kind": "item",
 			"label": "Emerald",
@@ -442,6 +476,12 @@
 			"label": "Flour",
 			"render": "plain",
 			"resourceId": "item-flour"
+		},
+		"asset:item:food-supply": {
+			"kind": "item",
+			"label": "Food Supply",
+			"render": "plain",
+			"resourceId": "item-food-supply"
 		},
 		"asset:item:gem": {
 			"kind": "item",
@@ -580,6 +620,12 @@
 			"label": "Master Knowledge",
 			"render": "plain",
 			"resourceId": "item-master-knowledge"
+		},
+		"asset:item:milk": {
+			"kind": "item",
+			"label": "Milk",
+			"render": "plain",
+			"resourceId": "item-milk"
 		},
 		"asset:item:nails": {
 			"kind": "item",
@@ -731,6 +777,12 @@
 			"render": "plain",
 			"resourceId": "item-twig"
 		},
+		"asset:item:vegetables": {
+			"kind": "item",
+			"label": "Vegetables",
+			"render": "plain",
+			"resourceId": "item-vegetables"
+		},
 		"asset:item:vineyard": {
 			"kind": "item",
 			"label": "Vineyard",
@@ -767,6 +819,12 @@
 			"render": "plain",
 			"resourceId": "item-wood-bundle"
 		},
+		"asset:item:wool": {
+			"kind": "item",
+			"label": "Wool",
+			"render": "plain",
+			"resourceId": "item-wool"
+		},
 		"asset:producer:academy": {
 			"kind": "item",
 			"label": "Academy",
@@ -796,6 +854,18 @@
 			"label": "Brickyard",
 			"render": "plain",
 			"resourceId": "producer-brickyard"
+		},
+		"asset:producer:cattle-farm-t1": {
+			"kind": "item",
+			"label": "Cattle Farm I",
+			"render": "plain",
+			"resourceId": "producer-cattle-farm-t1"
+		},
+		"asset:producer:chicken-coop-t1": {
+			"kind": "item",
+			"label": "Chicken Coop I",
+			"render": "plain",
+			"resourceId": "producer-chicken-coop-t1"
 		},
 		"asset:producer:clay-pit": {
 			"kind": "item",
@@ -905,6 +975,12 @@
 			"render": "plain",
 			"resourceId": "producer-school"
 		},
+		"asset:producer:sheep-pasture-t1": {
+			"kind": "item",
+			"label": "Sheep Pasture I",
+			"render": "plain",
+			"resourceId": "producer-sheep-pasture-t1"
+		},
 		"asset:producer:slaughterhouse-t1": {
 			"kind": "item",
 			"label": "Slaughterhouse I",
@@ -958,6 +1034,12 @@
 			"label": "University",
 			"render": "plain",
 			"resourceId": "producer-university"
+		},
+		"asset:producer:vegetable-garden-t1": {
+			"kind": "item",
+			"label": "Vegetable Garden I",
+			"render": "plain",
+			"resourceId": "producer-vegetable-garden-t1"
 		},
 		"asset:producer:water-power-plant": {
 			"kind": "item",
@@ -1106,6 +1188,50 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:brewery-t1"
+		},
+		"craft:cattle-farm-t1": {
+			"durationMs": 7000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:cattle-farm-t1"
+		},
+		"craft:chicken-coop-t1": {
+			"durationMs": 6000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:chicken-coop-t1"
 		},
 		"craft:coal-mine-t1": {
 			"durationMs": 8000,
@@ -1390,6 +1516,33 @@
 			],
 			"resultItemId": "producer:school"
 		},
+		"craft:sheep-pasture-t1": {
+			"durationMs": 7000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:sheep-pasture-t1"
+		},
 		"craft:slaughterhouse-t1": {
 			"durationMs": 8000,
 			"inputs": [
@@ -1551,29 +1704,24 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:bread",
+					"itemId": "item:food-supply",
 					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:sausage",
+					"itemId": "item:wool",
 					"quantity": 1
 				}
 			],
 			"requirements": [
 				{
-					"itemId": "producer:windmill-t1",
+					"itemId": "item:wheat-field",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
 				},
 				{
-					"itemId": "producer:bakery-t1",
+					"itemId": "producer:farm-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -1585,37 +1733,25 @@
 					"type": "passive"
 				},
 				{
-					"itemId": "producer:slaughterhouse-t1",
+					"itemId": "producer:cattle-farm-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
 				},
 				{
-					"itemId": "item:hop-field",
+					"itemId": "producer:chicken-coop-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
 				},
 				{
-					"itemId": "producer:brewery-t1",
+					"itemId": "producer:sheep-pasture-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
 				},
 				{
-					"itemId": "producer:tavern-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "item:vineyard",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:winery-t1",
+					"itemId": "producer:vegetable-garden-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -1737,6 +1873,23 @@
 				}
 			],
 			"resultItemId": "producer:university"
+		},
+		"craft:vegetable-garden-t1": {
+			"durationMs": 6000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 2
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:vegetable-garden-t1"
 		},
 		"craft:well-t1": {
 			"durationMs": 5000,
@@ -1999,6 +2152,40 @@
 				}
 			],
 			"name": "Brewery water to hops input"
+		},
+		"input:cattle-farm-t1:grain-water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Cattle farm grain and water input"
+		},
+		"input:chicken-coop-t1:grain-water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Chicken coop grain and water input"
 		},
 		"input:coal-mine-t1:bread-water": {
 			"inputs": [
@@ -2291,6 +2478,23 @@
 			],
 			"name": "School basic lesson supplies"
 		},
+		"input:sheep-pasture-t1:grain-water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Sheep pasture grain and water input"
+		},
 		"input:slaughterhouse-t1:piglet": {
 			"inputs": [
 				{
@@ -2459,24 +2663,7 @@
 			],
 			"name": "Blueprint: Well I input"
 		},
-		"input:townhall-t2:blueprint-bakery-t1": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:flour",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Bakery I input"
-		},
-		"input:townhall-t2:blueprint-brewery-t1": {
+		"input:townhall-t2:blueprint-cattle-farm-t1": {
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2493,11 +2680,45 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
+					"itemId": "item:plank",
 					"quantity": 1
 				}
 			],
-			"name": "Blueprint: Brewery I input"
+			"name": "Blueprint: Cattle Farm I input"
+		},
+		"input:townhall-t2:blueprint-chicken-coop-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Chicken Coop I input"
+		},
+		"input:townhall-t2:blueprint-farm-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Farm I input"
 		},
 		"input:townhall-t2:blueprint-pig-farm-t1": {
 			"inputs": [
@@ -2512,22 +2733,22 @@
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Pig Farm I input"
 		},
-		"input:townhall-t2:blueprint-school": {
+		"input:townhall-t2:blueprint-sheep-pasture-t1": {
 			"inputs": [
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
 					"quantity": 1
 				},
 				{
@@ -2537,10 +2758,62 @@
 					"quantity": 1
 				}
 			],
-			"name": "Blueprint: School input"
+			"name": "Blueprint: Sheep Pasture I input"
 		},
-		"input:townhall-t2:blueprint-slaughterhouse-t1": {
+		"input:townhall-t2:blueprint-townhall-t3": {
 			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:food-supply",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Town Hall III input"
+		},
+		"input:townhall-t2:blueprint-vegetable-garden-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Vegetable Garden I input"
+		},
+		"input:townhall-t2:food-supply": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
 				{
 					"capacity": 4,
 					"consume": true,
@@ -2550,143 +2823,34 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
+					"itemId": "item:milk",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:egg",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables",
 					"quantity": 1
 				}
 			],
-			"name": "Blueprint: Slaughterhouse I input"
+			"name": "Food Supply input"
 		},
-		"input:townhall-t2:blueprint-tavern-t1": {
+		"input:townhall-t2:wheat-field": {
 			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:beer-barrel",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Tavern I input"
-		},
-		"input:townhall-t2:blueprint-townhall-t3": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 2
-				}
-			],
-			"name": "Blueprint: Town Hall III input"
-		},
-		"input:townhall-t2:blueprint-windmill-t1": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Windmill I input"
-		},
-		"input:townhall-t2:blueprint-winery-t1": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
 				{
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
 				}
 			],
-			"name": "Blueprint: Winery I input"
-		},
-		"input:townhall-t2:hop-field": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				}
-			],
-			"name": "Survey: Hop Field input"
-		},
-		"input:townhall-t2:vineyard": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				}
-			],
-			"name": "Survey: Vineyard input"
+			"name": "Survey: Wheat Field input"
 		},
 		"input:townhall-t3:blueprint-academy": {
 			"inputs": [
@@ -2704,6 +2868,46 @@
 				}
 			],
 			"name": "Blueprint: Academy input"
+		},
+		"input:townhall-t3:blueprint-bakery-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bakery I input"
+		},
+		"input:townhall-t3:blueprint-brewery-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Brewery I input"
 		},
 		"input:townhall-t3:blueprint-coal-mine-t1": {
 			"inputs": [
@@ -2791,6 +2995,40 @@
 			],
 			"name": "Blueprint: Purifier I input"
 		},
+		"input:townhall-t3:blueprint-school": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: School input"
+		},
+		"input:townhall-t3:blueprint-slaughterhouse-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Slaughterhouse I input"
+		},
 		"input:townhall-t3:blueprint-smelter-t1": {
 			"inputs": [
 				{
@@ -2814,6 +3052,23 @@
 			],
 			"name": "Blueprint: Smelter I input"
 		},
+		"input:townhall-t3:blueprint-tavern-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Tavern I input"
+		},
 		"input:townhall-t3:blueprint-townhall-t4": {
 			"inputs": [
 				{
@@ -2836,6 +3091,46 @@
 				}
 			],
 			"name": "Blueprint: Town Hall IV input"
+		},
+		"input:townhall-t3:blueprint-windmill-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Windmill I input"
+		},
+		"input:townhall-t3:blueprint-winery-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Winery I input"
 		},
 		"input:townhall-t3:coal-deposit": {
 			"inputs": [
@@ -2883,6 +3178,23 @@
 			],
 			"name": "Survey: Gold Deposit input"
 		},
+		"input:townhall-t3:hop-field": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Survey: Hop Field input"
+		},
 		"input:townhall-t3:iron-deposit": {
 			"inputs": [
 				{
@@ -2905,6 +3217,23 @@
 				}
 			],
 			"name": "Survey: Iron Deposit input"
+		},
+		"input:townhall-t3:vineyard": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Survey: Vineyard input"
 		},
 		"input:townhall-t4:blueprint-blacksmith-t1": {
 			"inputs": [
@@ -3043,6 +3372,17 @@
 			],
 			"name": "University master research materials"
 		},
+		"input:vegetable-garden-t1:water": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Vegetable garden water input"
+		},
 		"input:windmill-t1:grain": {
 			"inputs": [
 				{
@@ -3161,7 +3501,8 @@
 			"storage": "both",
 			"tags": [
 				"food",
-				"beer"
+				"beer",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3175,7 +3516,8 @@
 			"tags": [
 				"material",
 				"food",
-				"beer"
+				"beer",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3206,7 +3548,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3237,7 +3580,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3253,6 +3597,38 @@
 				"building",
 				"construction",
 				"clay"
+			],
+			"tier": 0
+		},
+		"item:blueprint-cattle-farm-t1": {
+			"assetId": "asset:item:blueprint-cattle-farm-t1",
+			"code": "blueprint-cattle-farm-t1",
+			"craftRecipeId": "craft:cattle-farm-t1",
+			"description": "Build plan that can be filled with resources to construct Cattle Farm I.",
+			"maxStackSize": 10,
+			"name": "Cattle Farm I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			],
+			"tier": 0
+		},
+		"item:blueprint-chicken-coop-t1": {
+			"assetId": "asset:item:blueprint-chicken-coop-t1",
+			"code": "blueprint-chicken-coop-t1",
+			"craftRecipeId": "craft:chicken-coop-t1",
+			"description": "Build plan that can be filled with resources to construct Chicken Coop I.",
+			"maxStackSize": 10,
+			"name": "Chicken Coop I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -3437,7 +3813,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -3531,7 +3908,24 @@
 				"blueprint",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:III"
+			],
+			"tier": 0
+		},
+		"item:blueprint-sheep-pasture-t1": {
+			"assetId": "asset:item:blueprint-sheep-pasture-t1",
+			"code": "blueprint-sheep-pasture-t1",
+			"craftRecipeId": "craft:sheep-pasture-t1",
+			"description": "Build plan that can be filled with resources to construct Sheep Pasture I.",
+			"maxStackSize": 10,
+			"name": "Sheep Pasture I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -3546,7 +3940,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3592,7 +3987,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3623,7 +4019,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -3655,6 +4052,22 @@
 				"building",
 				"education",
 				"knowledge"
+			],
+			"tier": 0
+		},
+		"item:blueprint-vegetable-garden-t1": {
+			"assetId": "asset:item:blueprint-vegetable-garden-t1",
+			"code": "blueprint-vegetable-garden-t1",
+			"craftRecipeId": "craft:vegetable-garden-t1",
+			"description": "Build plan that can be filled with resources to construct Vegetable Garden I.",
+			"maxStackSize": 10,
+			"name": "Vegetable Garden I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -3701,7 +4114,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3716,7 +4130,8 @@
 			"tags": [
 				"blueprint",
 				"building",
-				"craft-target"
+				"craft-target",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3729,7 +4144,8 @@
 			"storage": "both",
 			"tags": [
 				"food",
-				"bread"
+				"bread",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -3883,6 +4299,20 @@
 			],
 			"tier": 0
 		},
+		"item:egg": {
+			"assetId": "asset:item:egg",
+			"code": "egg",
+			"description": "Fresh eggs produced by chicken coops for base food supply chains.",
+			"maxStackSize": 50,
+			"name": "Egg",
+			"storage": "both",
+			"tags": [
+				"food",
+				"egg",
+				"era:II"
+			],
+			"tier": 0
+		},
 		"item:emerald": {
 			"assetId": "asset:item:emerald",
 			"code": "emerald",
@@ -3922,7 +4352,22 @@
 				"material",
 				"food",
 				"grain",
-				"flour"
+				"flour",
+				"era:III"
+			],
+			"tier": 0
+		},
+		"item:food-supply": {
+			"assetId": "asset:item:food-supply",
+			"code": "food-supply",
+			"description": "Packed base food supply prepared from grain, animal produce, and vegetables. Era II master item.",
+			"maxStackSize": 20,
+			"name": "Food Supply",
+			"storage": "both",
+			"tags": [
+				"food",
+				"master",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -4011,7 +4456,8 @@
 				"material",
 				"food",
 				"wine",
-				"grapes"
+				"grapes",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -4026,7 +4472,8 @@
 				"source",
 				"food",
 				"beer",
-				"hops"
+				"hops",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -4041,7 +4488,8 @@
 				"material",
 				"food",
 				"beer",
-				"hops"
+				"hops",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -4168,7 +4616,8 @@
 			"tags": [
 				"material",
 				"leather",
-				"animal"
+				"animal",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -4216,6 +4665,20 @@
 			],
 			"tier": 4
 		},
+		"item:milk": {
+			"assetId": "asset:item:milk",
+			"code": "milk",
+			"description": "Fresh milk produced by cattle farms for base food supply chains.",
+			"maxStackSize": 50,
+			"name": "Milk",
+			"storage": "both",
+			"tags": [
+				"food",
+				"dairy",
+				"era:II"
+			],
+			"tier": 0
+		},
 		"item:nails": {
 			"assetId": "asset:item:nails",
 			"code": "nails",
@@ -4240,7 +4703,8 @@
 			"tags": [
 				"animal",
 				"food",
-				"pig"
+				"pig",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -4368,7 +4832,8 @@
 			"tags": [
 				"food",
 				"meat",
-				"sausage"
+				"sausage",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -4458,6 +4923,20 @@
 			],
 			"tier": 0
 		},
+		"item:vegetables": {
+			"assetId": "asset:item:vegetables",
+			"code": "vegetables",
+			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
+			"maxStackSize": 50,
+			"name": "Vegetables",
+			"storage": "both",
+			"tags": [
+				"food",
+				"vegetable",
+				"era:II"
+			],
+			"tier": 0
+		},
 		"item:vineyard": {
 			"assetId": "asset:item:vineyard",
 			"code": "vineyard",
@@ -4469,7 +4948,8 @@
 				"source",
 				"food",
 				"wine",
-				"grapes"
+				"grapes",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -4513,7 +4993,8 @@
 			"tags": [
 				"material",
 				"food",
-				"wine"
+				"wine",
+				"era:III"
 			],
 			"tier": 0
 		},
@@ -4526,7 +5007,22 @@
 			"storage": "both",
 			"tags": [
 				"food",
-				"wine"
+				"wine",
+				"era:III"
+			],
+			"tier": 0
+		},
+		"item:wool": {
+			"assetId": "asset:item:wool",
+			"code": "wool",
+			"description": "Raw wool produced by sheep pastures and used as early settlement material.",
+			"maxStackSize": 50,
+			"name": "Wool",
+			"storage": "both",
+			"tags": [
+				"material",
+				"animal",
+				"era:II"
 			],
 			"tier": 0
 		},
@@ -4557,7 +5053,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"bread"
+				"bread",
+				"era:III"
 			],
 			"tier": 1
 		},
@@ -4588,7 +5085,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"beer"
+				"beer",
+				"era:III"
 			],
 			"tier": 1
 		},
@@ -4606,6 +5104,38 @@
 				"clay"
 			],
 			"tier": 3
+		},
+		"producer:cattle-farm-t1": {
+			"assetId": "asset:producer:cattle-farm-t1",
+			"code": "cattle-farm-t1",
+			"description": "Consumes grain and water to produce milk.",
+			"maxStackSize": 1,
+			"name": "Cattle Farm I",
+			"producerId": "producer:cattle-farm-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"dairy",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"producer:chicken-coop-t1": {
+			"assetId": "asset:producer:chicken-coop-t1",
+			"code": "chicken-coop-t1",
+			"description": "Consumes grain and water to produce eggs.",
+			"maxStackSize": 1,
+			"name": "Chicken Coop I",
+			"producerId": "producer:chicken-coop-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"egg",
+				"era:II"
+			],
+			"tier": 1
 		},
 		"producer:clay-pit": {
 			"assetId": "asset:producer:clay-pit",
@@ -4790,7 +5320,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"pig"
+				"pig",
+				"era:II"
 			],
 			"tier": 1
 		},
@@ -4883,9 +5414,26 @@
 				"producer",
 				"building",
 				"education",
-				"knowledge"
+				"knowledge",
+				"era:III"
 			],
 			"tier": 2
+		},
+		"producer:sheep-pasture-t1": {
+			"assetId": "asset:producer:sheep-pasture-t1",
+			"code": "sheep-pasture-t1",
+			"description": "Consumes grain and water to produce wool.",
+			"maxStackSize": 1,
+			"name": "Sheep Pasture I",
+			"producerId": "producer:sheep-pasture-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"animal",
+				"wool",
+				"era:II"
+			],
+			"tier": 1
 		},
 		"producer:slaughterhouse-t1": {
 			"assetId": "asset:producer:slaughterhouse-t1",
@@ -4899,7 +5447,8 @@
 				"producer",
 				"food",
 				"meat",
-				"leather"
+				"leather",
+				"era:III"
 			],
 			"tier": 1
 		},
@@ -4944,7 +5493,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"beer"
+				"beer",
+				"era:III"
 			],
 			"tier": 1
 		},
@@ -4967,7 +5517,7 @@
 		"producer:townhall-t2": {
 			"assetId": "asset:producer:townhall-t2",
 			"code": "townhall-t2",
-			"description": "Food-chain civic hub that issues farming, food, brewing, and wine blueprints.",
+			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall II",
 			"producerId": "producer:townhall-t2",
@@ -4975,14 +5525,15 @@
 			"tags": [
 				"producer",
 				"townhall",
-				"civic"
+				"civic",
+				"era:II"
 			],
 			"tier": 2
 		},
 		"producer:townhall-t3": {
 			"assetId": "asset:producer:townhall-t3",
 			"code": "townhall-t3",
-			"description": "Industrial civic hub that issues mining, smelting, cleanup, and deposit survey plans.",
+			"description": "Food processing and early industry civic hub that issues milling, baking, tavern, education, and mining plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall III",
 			"producerId": "producer:townhall-t3",
@@ -4990,7 +5541,8 @@
 			"tags": [
 				"producer",
 				"townhall",
-				"civic"
+				"civic",
+				"era:III"
 			],
 			"tier": 3
 		},
@@ -5024,6 +5576,22 @@
 				"knowledge"
 			],
 			"tier": 4
+		},
+		"producer:vegetable-garden-t1": {
+			"assetId": "asset:producer:vegetable-garden-t1",
+			"code": "vegetable-garden-t1",
+			"description": "Consumes water to produce vegetables.",
+			"maxStackSize": 1,
+			"name": "Vegetable Garden I",
+			"producerId": "producer:vegetable-garden-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"food",
+				"vegetable",
+				"era:II"
+			],
+			"tier": 1
 		},
 		"producer:water-power-plant": {
 			"assetId": "asset:producer:water-power-plant",
@@ -5069,7 +5637,8 @@
 				"producer",
 				"food",
 				"grain",
-				"flour"
+				"flour",
+				"era:III"
 			],
 			"tier": 1
 		},
@@ -5084,7 +5653,8 @@
 			"tags": [
 				"producer",
 				"food",
-				"wine"
+				"wine",
+				"era:III"
 			],
 			"tier": 1
 		}
@@ -5185,6 +5755,16 @@
 			"output": [
 				{
 					"itemId": "item:hops",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:cattle-farm-t1:milk": {
+			"name": "Cattle farm milk",
+			"output": [
+				{
+					"itemId": "item:milk",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -5293,6 +5873,16 @@
 					"itemId": "item:treasure-chest",
 					"quantity": 1,
 					"type": "chance"
+				}
+			]
+		},
+		"loot:chicken-coop-t1:egg": {
+			"name": "Chicken coop eggs",
+			"output": [
+				{
+					"itemId": "item:egg",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -5470,6 +6060,16 @@
 				}
 			]
 		},
+		"loot:sheep-pasture-t1:wool": {
+			"name": "Sheep pasture wool",
+			"output": [
+				{
+					"itemId": "item:wool",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:slaughterhouse-t1:sausage-leather": {
 			"name": "Slaughterhouse sausage and leather",
 			"output": [
@@ -5605,21 +6205,31 @@
 				}
 			]
 		},
-		"loot:townhall-t2:blueprint-bakery-t1": {
-			"name": "Blueprint: Bakery I output",
+		"loot:townhall-t2:blueprint-cattle-farm-t1": {
+			"name": "Blueprint: Cattle Farm I output",
 			"output": [
 				{
-					"itemId": "item:blueprint-bakery-t1",
+					"itemId": "item:blueprint-cattle-farm-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:townhall-t2:blueprint-brewery-t1": {
-			"name": "Blueprint: Brewery I output",
+		"loot:townhall-t2:blueprint-chicken-coop-t1": {
+			"name": "Blueprint: Chicken Coop I output",
 			"output": [
 				{
-					"itemId": "item:blueprint-brewery-t1",
+					"itemId": "item:blueprint-chicken-coop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-farm-t1": {
+			"name": "Blueprint: Farm I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-farm-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -5635,31 +6245,11 @@
 				}
 			]
 		},
-		"loot:townhall-t2:blueprint-school": {
-			"name": "Blueprint: School output",
+		"loot:townhall-t2:blueprint-sheep-pasture-t1": {
+			"name": "Blueprint: Sheep Pasture I output",
 			"output": [
 				{
-					"itemId": "item:blueprint-school",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-slaughterhouse-t1": {
-			"name": "Blueprint: Slaughterhouse I output",
-			"output": [
-				{
-					"itemId": "item:blueprint-slaughterhouse-t1",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-tavern-t1": {
-			"name": "Blueprint: Tavern I output",
-			"output": [
-				{
-					"itemId": "item:blueprint-tavern-t1",
+					"itemId": "item:blueprint-sheep-pasture-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -5675,41 +6265,31 @@
 				}
 			]
 		},
-		"loot:townhall-t2:blueprint-windmill-t1": {
-			"name": "Blueprint: Windmill I output",
+		"loot:townhall-t2:blueprint-vegetable-garden-t1": {
+			"name": "Blueprint: Vegetable Garden I output",
 			"output": [
 				{
-					"itemId": "item:blueprint-windmill-t1",
+					"itemId": "item:blueprint-vegetable-garden-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:townhall-t2:blueprint-winery-t1": {
-			"name": "Blueprint: Winery I output",
+		"loot:townhall-t2:food-supply": {
+			"name": "Food Supply output",
 			"output": [
 				{
-					"itemId": "item:blueprint-winery-t1",
+					"itemId": "item:food-supply",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:townhall-t2:hop-field": {
-			"name": "Survey: Hop Field output",
+		"loot:townhall-t2:wheat-field": {
+			"name": "Survey: Wheat Field output",
 			"output": [
 				{
-					"itemId": "item:hop-field",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t2:vineyard": {
-			"name": "Survey: Vineyard output",
-			"output": [
-				{
-					"itemId": "item:vineyard",
+					"itemId": "item:wheat-field",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -5720,6 +6300,26 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-academy",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-bakery-t1": {
+			"name": "Blueprint: Bakery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-brewery-t1": {
+			"name": "Blueprint: Brewery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-brewery-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -5765,6 +6365,26 @@
 				}
 			]
 		},
+		"loot:townhall-t3:blueprint-school": {
+			"name": "Blueprint: School output",
+			"output": [
+				{
+					"itemId": "item:blueprint-school",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-slaughterhouse-t1": {
+			"name": "Blueprint: Slaughterhouse I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-slaughterhouse-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t3:blueprint-smelter-t1": {
 			"name": "Blueprint: Smelter I output",
 			"output": [
@@ -5775,11 +6395,41 @@
 				}
 			]
 		},
+		"loot:townhall-t3:blueprint-tavern-t1": {
+			"name": "Blueprint: Tavern I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-tavern-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t3:blueprint-townhall-t4": {
 			"name": "Blueprint: Town Hall IV output",
 			"output": [
 				{
 					"itemId": "item:blueprint-townhall-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-windmill-t1": {
+			"name": "Blueprint: Windmill I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-windmill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-winery-t1": {
+			"name": "Blueprint: Winery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-winery-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -5805,11 +6455,31 @@
 				}
 			]
 		},
+		"loot:townhall-t3:hop-field": {
+			"name": "Survey: Hop Field output",
+			"output": [
+				{
+					"itemId": "item:hop-field",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t3:iron-deposit": {
 			"name": "Survey: Iron Deposit output",
 			"output": [
 				{
 					"itemId": "item:iron-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:vineyard": {
+			"name": "Survey: Vineyard output",
+			"output": [
+				{
+					"itemId": "item:vineyard",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -5880,6 +6550,16 @@
 			"output": [
 				{
 					"itemId": "item:master-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:vegetable-garden-t1:vegetables": {
+			"name": "Vegetable garden vegetables",
+			"output": [
+				{
+					"itemId": "item:vegetables",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -5986,6 +6666,22 @@
 			"requirementIds": [
 				"proximity:brewery-t1:hop-field"
 			],
+			"type": "producer"
+		},
+		"producer:cattle-farm-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:cattle-farm-t1:milk"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:chicken-coop-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:chicken-coop-t1:egg"
+			],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:coal-mine-t1": {
@@ -6103,6 +6799,14 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:sheep-pasture-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sheep-pasture-t1:wool"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:slaughterhouse-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -6155,16 +6859,14 @@
 		"producer:townhall-t2": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:townhall-t2:blueprint-school",
-				"product:townhall-t2:blueprint-windmill-t1",
-				"product:townhall-t2:blueprint-bakery-t1",
+				"product:townhall-t2:wheat-field",
+				"product:townhall-t2:blueprint-farm-t1",
 				"product:townhall-t2:blueprint-pig-farm-t1",
-				"product:townhall-t2:blueprint-slaughterhouse-t1",
-				"product:townhall-t2:hop-field",
-				"product:townhall-t2:blueprint-brewery-t1",
-				"product:townhall-t2:blueprint-tavern-t1",
-				"product:townhall-t2:vineyard",
-				"product:townhall-t2:blueprint-winery-t1",
+				"product:townhall-t2:blueprint-cattle-farm-t1",
+				"product:townhall-t2:blueprint-chicken-coop-t1",
+				"product:townhall-t2:blueprint-sheep-pasture-t1",
+				"product:townhall-t2:blueprint-vegetable-garden-t1",
+				"product:townhall-t2:food-supply",
 				"product:townhall-t2:blueprint-townhall-t3"
 			],
 			"requirementIds": [],
@@ -6173,6 +6875,15 @@
 		"producer:townhall-t3": {
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:townhall-t3:blueprint-school",
+				"product:townhall-t3:blueprint-windmill-t1",
+				"product:townhall-t3:blueprint-bakery-t1",
+				"product:townhall-t3:blueprint-slaughterhouse-t1",
+				"product:townhall-t3:hop-field",
+				"product:townhall-t3:blueprint-brewery-t1",
+				"product:townhall-t3:blueprint-tavern-t1",
+				"product:townhall-t3:vineyard",
+				"product:townhall-t3:blueprint-winery-t1",
 				"product:townhall-t3:blueprint-academy",
 				"product:townhall-t3:coal-deposit",
 				"product:townhall-t3:blueprint-coal-mine-t1",
@@ -6204,6 +6915,14 @@
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",
 				"product:university:master-knowledge"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:vegetable-garden-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:vegetable-garden-t1:vegetables"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -6325,6 +7044,42 @@
 			"inputRefId": "input:brewery-t1:water",
 			"name": "Hops",
 			"outputTableId": "loot:brewery-t1:hops",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:cattle-farm-t1:milk": {
+			"durationMs": 5000,
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"inputRefId": "input:cattle-farm-t1:grain-water",
+			"name": "Milk",
+			"outputTableId": "loot:cattle-farm-t1:milk",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:chicken-coop-t1:egg": {
+			"durationMs": 5000,
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"inputRefId": "input:chicken-coop-t1:grain-water",
+			"name": "Egg",
+			"outputTableId": "loot:chicken-coop-t1:egg",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -6480,6 +7235,24 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:sheep-pasture-t1:wool": {
+			"durationMs": 5000,
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"inputRefId": "input:sheep-pasture-t1:grain-water",
+			"name": "Wool",
+			"outputTableId": "loot:sheep-pasture-t1:wool",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:slaughterhouse-t1:sausage-leather": {
 			"durationMs": 8000,
 			"inputRefId": "input:slaughterhouse-t1:piglet",
@@ -6576,19 +7349,27 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t2:blueprint-bakery-t1": {
+		"product:townhall-t2:blueprint-cattle-farm-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-bakery-t1",
-			"name": "Blueprint: Bakery I",
-			"outputTableId": "loot:townhall-t2:blueprint-bakery-t1",
+			"inputRefId": "input:townhall-t2:blueprint-cattle-farm-t1",
+			"name": "Blueprint: Cattle Farm I",
+			"outputTableId": "loot:townhall-t2:blueprint-cattle-farm-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t2:blueprint-brewery-t1": {
+		"product:townhall-t2:blueprint-chicken-coop-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-brewery-t1",
-			"name": "Blueprint: Brewery I",
-			"outputTableId": "loot:townhall-t2:blueprint-brewery-t1",
+			"inputRefId": "input:townhall-t2:blueprint-chicken-coop-t1",
+			"name": "Blueprint: Chicken Coop I",
+			"outputTableId": "loot:townhall-t2:blueprint-chicken-coop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-farm-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-farm-t1",
+			"name": "Blueprint: Farm I",
+			"outputTableId": "loot:townhall-t2:blueprint-farm-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -6600,27 +7381,11 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t2:blueprint-school": {
+		"product:townhall-t2:blueprint-sheep-pasture-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-school",
-			"name": "Blueprint: School",
-			"outputTableId": "loot:townhall-t2:blueprint-school",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t2:blueprint-slaughterhouse-t1": {
-			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-slaughterhouse-t1",
-			"name": "Blueprint: Slaughterhouse I",
-			"outputTableId": "loot:townhall-t2:blueprint-slaughterhouse-t1",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t2:blueprint-tavern-t1": {
-			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-tavern-t1",
-			"name": "Blueprint: Tavern I",
-			"outputTableId": "loot:townhall-t2:blueprint-tavern-t1",
+			"inputRefId": "input:townhall-t2:blueprint-sheep-pasture-t1",
+			"name": "Blueprint: Sheep Pasture I",
+			"outputTableId": "loot:townhall-t2:blueprint-sheep-pasture-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -6632,35 +7397,27 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t2:blueprint-windmill-t1": {
+		"product:townhall-t2:blueprint-vegetable-garden-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-windmill-t1",
-			"name": "Blueprint: Windmill I",
-			"outputTableId": "loot:townhall-t2:blueprint-windmill-t1",
+			"inputRefId": "input:townhall-t2:blueprint-vegetable-garden-t1",
+			"name": "Blueprint: Vegetable Garden I",
+			"outputTableId": "loot:townhall-t2:blueprint-vegetable-garden-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t2:blueprint-winery-t1": {
+		"product:townhall-t2:food-supply": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-winery-t1",
-			"name": "Blueprint: Winery I",
-			"outputTableId": "loot:townhall-t2:blueprint-winery-t1",
+			"inputRefId": "input:townhall-t2:food-supply",
+			"name": "Food Supply",
+			"outputTableId": "loot:townhall-t2:food-supply",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t2:hop-field": {
+		"product:townhall-t2:wheat-field": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:hop-field",
-			"name": "Survey: Hop Field",
-			"outputTableId": "loot:townhall-t2:hop-field",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t2:vineyard": {
-			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:vineyard",
-			"name": "Survey: Vineyard",
-			"outputTableId": "loot:townhall-t2:vineyard",
+			"inputRefId": "input:townhall-t2:wheat-field",
+			"name": "Survey: Wheat Field",
+			"outputTableId": "loot:townhall-t2:wheat-field",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -6669,6 +7426,22 @@
 			"inputRefId": "input:townhall-t3:blueprint-academy",
 			"name": "Blueprint: Academy",
 			"outputTableId": "loot:townhall-t3:blueprint-academy",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-bakery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-bakery-t1",
+			"name": "Blueprint: Bakery I",
+			"outputTableId": "loot:townhall-t3:blueprint-bakery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-brewery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-brewery-t1",
+			"name": "Blueprint: Brewery I",
+			"outputTableId": "loot:townhall-t3:blueprint-brewery-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -6704,6 +7477,22 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t3:blueprint-school": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-school",
+			"name": "Blueprint: School",
+			"outputTableId": "loot:townhall-t3:blueprint-school",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-slaughterhouse-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-slaughterhouse-t1",
+			"name": "Blueprint: Slaughterhouse I",
+			"outputTableId": "loot:townhall-t3:blueprint-slaughterhouse-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t3:blueprint-smelter-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t3:blueprint-smelter-t1",
@@ -6712,11 +7501,35 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t3:blueprint-tavern-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-tavern-t1",
+			"name": "Blueprint: Tavern I",
+			"outputTableId": "loot:townhall-t3:blueprint-tavern-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t3:blueprint-townhall-t4": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t3:blueprint-townhall-t4",
 			"name": "Blueprint: Town Hall IV",
 			"outputTableId": "loot:townhall-t3:blueprint-townhall-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-windmill-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-windmill-t1",
+			"name": "Blueprint: Windmill I",
+			"outputTableId": "loot:townhall-t3:blueprint-windmill-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-winery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-winery-t1",
+			"name": "Blueprint: Winery I",
+			"outputTableId": "loot:townhall-t3:blueprint-winery-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -6736,11 +7549,27 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t3:hop-field": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:hop-field",
+			"name": "Survey: Hop Field",
+			"outputTableId": "loot:townhall-t3:hop-field",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t3:iron-deposit": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t3:iron-deposit",
 			"name": "Survey: Iron Deposit",
 			"outputTableId": "loot:townhall-t3:iron-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:vineyard": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:vineyard",
+			"name": "Survey: Vineyard",
+			"outputTableId": "loot:townhall-t3:vineyard",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -6797,6 +7626,24 @@
 			"inputRefId": "input:university:master-knowledge",
 			"name": "Master Knowledge",
 			"outputTableId": "loot:university:master-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:vegetable-garden-t1:vegetables": {
+			"durationMs": 5000,
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"inputRefId": "input:vegetable-garden-t1:water",
+			"name": "Vegetables",
+			"outputTableId": "loot:vegetable-garden-t1:vegetables",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

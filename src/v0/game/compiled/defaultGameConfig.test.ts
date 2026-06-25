@@ -46,15 +46,13 @@ describe("defaultGameConfig", () => {
 		]);
 
 		expectPassiveOwnedRequirements("craft:townhall-t3", [
-			"producer:windmill-t1",
-			"producer:bakery-t1",
+			"item:wheat-field",
+			"producer:farm-t1",
 			"producer:pig-farm-t1",
-			"producer:slaughterhouse-t1",
-			"item:hop-field",
-			"producer:brewery-t1",
-			"producer:tavern-t1",
-			"item:vineyard",
-			"producer:winery-t1",
+			"producer:cattle-farm-t1",
+			"producer:chicken-coop-t1",
+			"producer:sheep-pasture-t1",
+			"producer:vegetable-garden-t1",
 		]);
 
 		expectPassiveOwnedRequirements("craft:townhall-t4", [

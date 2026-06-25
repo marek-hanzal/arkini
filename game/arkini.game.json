@@ -174,6 +174,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-sand-pit": {
+			"kind": "item",
+			"label": "Sand Pit Blueprint",
+			"overlayAssetId": "asset:producer:sand-pit",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-sawmill-t1": {
 			"kind": "item",
 			"label": "Sawmill I Blueprint",
@@ -318,6 +325,12 @@
 			"label": "Clay",
 			"render": "plain",
 			"resourceId": "item-clay"
+		},
+		"asset:item:clay-deposit": {
+			"kind": "item",
+			"label": "Clay Deposit",
+			"render": "plain",
+			"resourceId": "item-clay-deposit"
 		},
 		"asset:item:coal": {
 			"kind": "item",
@@ -607,6 +620,12 @@
 			"render": "plain",
 			"resourceId": "item-sand"
 		},
+		"asset:item:sand-deposit": {
+			"kind": "item",
+			"label": "Sand Deposit",
+			"render": "plain",
+			"resourceId": "item-sand-deposit"
+		},
 		"asset:item:sapling": {
 			"kind": "item",
 			"label": "Sapling",
@@ -828,6 +847,12 @@
 			"label": "Roof Tile Factory",
 			"render": "plain",
 			"resourceId": "producer-roof-tile-factory"
+		},
+		"asset:producer:sand-pit": {
+			"kind": "item",
+			"label": "Sand Pit",
+			"render": "plain",
+			"resourceId": "producer-sand-pit"
 		},
 		"asset:producer:sawmill-t1": {
 			"kind": "item",
@@ -3388,6 +3413,22 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-sand-pit": {
+			"assetId": "asset:item:blueprint-sand-pit",
+			"code": "blueprint-sand-pit",
+			"description": "Prepared build plan for a Sand Pit. Crafting requirements will be connected later.",
+			"maxStackSize": 10,
+			"name": "Sand Pit Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"sand",
+				"glass"
+			],
+			"tier": 0
+		},
 		"item:blueprint-sawmill-t1": {
 			"assetId": "asset:item:blueprint-sawmill-t1",
 			"code": "blueprint-sawmill-t1",
@@ -3689,6 +3730,21 @@
 				"earth"
 			],
 			"tier": 3
+		},
+		"item:clay-deposit": {
+			"assetId": "asset:item:clay-deposit",
+			"code": "clay-deposit",
+			"description": "Movable clay source used by nearby clay pits.",
+			"maxStackSize": 10,
+			"name": "Clay Deposit",
+			"storage": "both",
+			"tags": [
+				"source",
+				"construction",
+				"clay",
+				"deposit"
+			],
+			"tier": 0
 		},
 		"item:coal": {
 			"assetId": "asset:item:coal",
@@ -4161,6 +4217,21 @@
 			],
 			"tier": 4
 		},
+		"item:sand-deposit": {
+			"assetId": "asset:item:sand-deposit",
+			"code": "sand-deposit",
+			"description": "Movable sand source used by nearby sand pits.",
+			"maxStackSize": 10,
+			"name": "Sand Deposit",
+			"storage": "both",
+			"tags": [
+				"source",
+				"construction",
+				"sand",
+				"glass"
+			],
+			"tier": 0
+		},
 		"item:sapphire": {
 			"assetId": "asset:item:sapphire",
 			"code": "sapphire",
@@ -4615,6 +4686,22 @@
 				"producer",
 				"construction",
 				"roof"
+			],
+			"tier": 4
+		},
+		"producer:sand-pit": {
+			"assetId": "asset:producer:sand-pit",
+			"code": "sand-pit",
+			"description": "Prepared sand extraction building. Production rules will be connected later.",
+			"maxStackSize": 1,
+			"name": "Sand Pit",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"sand",
+				"glass"
 			],
 			"tier": 4
 		},

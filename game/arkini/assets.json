@@ -824,6 +824,94 @@
 			"label": "Master Knowledge",
 			"render": "plain",
 			"resourceId": "item-master-knowledge"
+		},
+		"asset:item:nails": {
+			"kind": "item",
+			"label": "Nails",
+			"render": "plain",
+			"resourceId": "item-nails"
+		},
+		"asset:item:clay": {
+			"kind": "item",
+			"label": "Clay",
+			"render": "plain",
+			"resourceId": "item-clay"
+		},
+		"asset:producer:clay-pit": {
+			"kind": "item",
+			"label": "Clay Pit",
+			"render": "plain",
+			"resourceId": "producer-clay-pit"
+		},
+		"asset:item:blueprint-clay-pit": {
+			"kind": "item",
+			"label": "Clay Pit Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:clay-pit"
+		},
+		"asset:item:bricks": {
+			"kind": "item",
+			"label": "Bricks",
+			"render": "plain",
+			"resourceId": "item-bricks"
+		},
+		"asset:producer:brickyard": {
+			"kind": "item",
+			"label": "Brickyard",
+			"render": "plain",
+			"resourceId": "producer-brickyard"
+		},
+		"asset:item:blueprint-brickyard": {
+			"kind": "item",
+			"label": "Brickyard Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:brickyard"
+		},
+		"asset:item:roof-tiles": {
+			"kind": "item",
+			"label": "Roof Tiles",
+			"render": "plain",
+			"resourceId": "item-roof-tiles"
+		},
+		"asset:producer:roof-tile-factory": {
+			"kind": "item",
+			"label": "Roof Tile Factory",
+			"render": "plain",
+			"resourceId": "producer-roof-tile-factory"
+		},
+		"asset:item:blueprint-roof-tile-factory": {
+			"kind": "item",
+			"label": "Roof Tile Factory Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:roof-tile-factory"
+		},
+		"asset:item:sand": {
+			"kind": "item",
+			"label": "Sand",
+			"render": "plain",
+			"resourceId": "item-sand"
+		},
+		"asset:producer:glassworks": {
+			"kind": "item",
+			"label": "Glassworks",
+			"render": "plain",
+			"resourceId": "producer-glassworks"
+		},
+		"asset:item:blueprint-glassworks": {
+			"kind": "item",
+			"label": "Glassworks Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:glassworks"
+		},
+		"asset:item:glass": {
+			"kind": "item",
+			"label": "Glass",
+			"render": "plain",
+			"resourceId": "item-glass"
 		}
 	}
 }

@@ -1594,6 +1594,211 @@
 				"education",
 				"research"
 			]
+		},
+		"item:nails": {
+			"assetId": "asset:item:nails",
+			"code": "nails",
+			"name": "Nails",
+			"tier": 4,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Forged fasteners prepared for advanced construction chains.",
+			"tags": [
+				"material",
+				"construction",
+				"metal"
+			]
+		},
+		"item:clay": {
+			"assetId": "asset:item:clay",
+			"code": "clay",
+			"name": "Clay",
+			"tier": 3,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Raw clay prepared for brick and ceramic production.",
+			"tags": [
+				"material",
+				"construction",
+				"earth"
+			]
+		},
+		"producer:clay-pit": {
+			"assetId": "asset:producer:clay-pit",
+			"code": "clay-pit",
+			"name": "Clay Pit",
+			"tier": 3,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Prepared clay extraction building. Production rules will be connected later.",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"clay"
+			]
+		},
+		"item:blueprint-clay-pit": {
+			"assetId": "asset:item:blueprint-clay-pit",
+			"code": "blueprint-clay-pit",
+			"name": "Clay Pit Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Prepared build plan for a Clay Pit. Crafting requirements will be connected later.",
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"clay"
+			]
+		},
+		"item:bricks": {
+			"assetId": "asset:item:bricks",
+			"code": "bricks",
+			"name": "Bricks",
+			"tier": 3,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Fired clay building material prepared for sturdier construction.",
+			"tags": [
+				"material",
+				"construction",
+				"clay"
+			]
+		},
+		"producer:brickyard": {
+			"assetId": "asset:producer:brickyard",
+			"code": "brickyard",
+			"name": "Brickyard",
+			"tier": 3,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Prepared kiln workshop for brick production. Production rules will be connected later.",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"clay"
+			]
+		},
+		"item:blueprint-brickyard": {
+			"assetId": "asset:item:blueprint-brickyard",
+			"code": "blueprint-brickyard",
+			"name": "Brickyard Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Prepared build plan for a Brickyard. Crafting requirements will be connected later.",
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"clay"
+			]
+		},
+		"item:roof-tiles": {
+			"assetId": "asset:item:roof-tiles",
+			"code": "roof-tiles",
+			"name": "Roof Tiles",
+			"tier": 4,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Curved fired roof tiles prepared for higher-tier building construction.",
+			"tags": [
+				"material",
+				"construction",
+				"clay",
+				"roof"
+			]
+		},
+		"producer:roof-tile-factory": {
+			"assetId": "asset:producer:roof-tile-factory",
+			"code": "roof-tile-factory",
+			"name": "Roof Tile Factory",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Prepared workshop for roof tile production. Production rules will be connected later.",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"roof"
+			]
+		},
+		"item:blueprint-roof-tile-factory": {
+			"assetId": "asset:item:blueprint-roof-tile-factory",
+			"code": "blueprint-roof-tile-factory",
+			"name": "Roof Tile Factory Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Prepared build plan for a Roof Tile Factory. Crafting requirements will be connected later.",
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"roof"
+			]
+		},
+		"item:sand": {
+			"assetId": "asset:item:sand",
+			"code": "sand",
+			"name": "Sand",
+			"tier": 4,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Fine sand prepared as the base material for glassmaking.",
+			"tags": [
+				"material",
+				"construction",
+				"glass"
+			]
+		},
+		"producer:glassworks": {
+			"assetId": "asset:producer:glassworks",
+			"code": "glassworks",
+			"name": "Glassworks",
+			"tier": 4,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Prepared furnace workshop for glassmaking. Production rules will be connected later.",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"glass"
+			]
+		},
+		"item:blueprint-glassworks": {
+			"assetId": "asset:item:blueprint-glassworks",
+			"code": "blueprint-glassworks",
+			"name": "Glassworks Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Prepared build plan for Glassworks. Crafting requirements will be connected later.",
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"glass"
+			]
+		},
+		"item:glass": {
+			"assetId": "asset:item:glass",
+			"code": "glass",
+			"name": "Glass",
+			"tier": 4,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Finished glass panels prepared for advanced building and luxury chains.",
+			"tags": [
+				"material",
+				"construction",
+				"glass"
+			]
 		}
 	}
 }

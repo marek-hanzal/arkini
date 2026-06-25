@@ -97,6 +97,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-coal-power-plant": {
+			"kind": "item",
+			"label": "Coal Power Plant Blueprint",
+			"overlayAssetId": "asset:producer:coal-power-plant",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-farm-t1": {
 			"kind": "item",
 			"label": "Farm I Blueprint",
@@ -258,6 +265,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-water-power-plant": {
+			"kind": "item",
+			"label": "Water Power Plant Blueprint",
+			"overlayAssetId": "asset:producer:water-power-plant",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-well-t1": {
 			"kind": "item",
 			"label": "Well I Blueprint",
@@ -416,6 +430,12 @@
 			"label": "Emerald",
 			"render": "plain",
 			"resourceId": "item-emerald"
+		},
+		"asset:item:energy": {
+			"kind": "item",
+			"label": "Energy",
+			"render": "plain",
+			"resourceId": "item-energy"
 		},
 		"asset:item:flour": {
 			"kind": "item",
@@ -789,6 +809,12 @@
 			"render": "plain",
 			"resourceId": "producer-coal-mine-t1"
 		},
+		"asset:producer:coal-power-plant": {
+			"kind": "item",
+			"label": "Coal Power Plant",
+			"render": "plain",
+			"resourceId": "producer-coal-power-plant"
+		},
 		"asset:producer:farm-t1": {
 			"kind": "item",
 			"label": "Farm I",
@@ -932,6 +958,12 @@
 			"label": "University",
 			"render": "plain",
 			"resourceId": "producer-university"
+		},
+		"asset:producer:water-power-plant": {
+			"kind": "item",
+			"label": "Water Power Plant",
+			"render": "plain",
+			"resourceId": "producer-water-power-plant"
 		},
 		"asset:producer:well-t1": {
 			"kind": "item",
@@ -3259,6 +3291,22 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-coal-power-plant": {
+			"assetId": "asset:item:blueprint-coal-power-plant",
+			"code": "blueprint-coal-power-plant",
+			"description": "Prepared build plan for a Coal Power Plant. Crafting and production rules will be connected later.",
+			"maxStackSize": 10,
+			"name": "Coal Power Plant Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"power",
+				"energy",
+				"coal"
+			],
+			"tier": 0
+		},
 		"item:blueprint-farm-t1": {
 			"assetId": "asset:item:blueprint-farm-t1",
 			"code": "blueprint-farm-t1",
@@ -3609,6 +3657,22 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-water-power-plant": {
+			"assetId": "asset:item:blueprint-water-power-plant",
+			"code": "blueprint-water-power-plant",
+			"description": "Prepared build plan for a Water Power Plant. Crafting and production rules will be connected later.",
+			"maxStackSize": 10,
+			"name": "Water Power Plant Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"power",
+				"energy",
+				"water"
+			],
+			"tier": 0
+		},
 		"item:blueprint-well-t1": {
 			"assetId": "asset:item:blueprint-well-t1",
 			"code": "blueprint-well-t1",
@@ -3830,6 +3894,20 @@
 				"emerald"
 			],
 			"tier": 1
+		},
+		"item:energy": {
+			"assetId": "asset:item:energy",
+			"code": "energy",
+			"description": "Prepared power resource represented by a simplified lightning bolt icon.",
+			"maxStackSize": 50,
+			"name": "Energy",
+			"storage": "both",
+			"tags": [
+				"resource",
+				"power",
+				"energy"
+			],
+			"tier": 5
 		},
 		"item:flour": {
 			"assetId": "asset:item:flour",
@@ -4549,6 +4627,22 @@
 			],
 			"tier": 1
 		},
+		"producer:coal-power-plant": {
+			"assetId": "asset:producer:coal-power-plant",
+			"code": "coal-power-plant",
+			"description": "Prepared fantasy power building shell that will later convert fuel into Energy.",
+			"maxStackSize": 1,
+			"name": "Coal Power Plant",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"power",
+				"energy",
+				"coal"
+			],
+			"tier": 5
+		},
 		"producer:farm-t1": {
 			"assetId": "asset:producer:farm-t1",
 			"code": "farm-t1",
@@ -4913,6 +5007,22 @@
 				"knowledge"
 			],
 			"tier": 4
+		},
+		"producer:water-power-plant": {
+			"assetId": "asset:producer:water-power-plant",
+			"code": "water-power-plant",
+			"description": "Prepared fantasy power building shell with a prominent water wheel for future Energy production.",
+			"maxStackSize": 1,
+			"name": "Water Power Plant",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"power",
+				"energy",
+				"water"
+			],
+			"tier": 5
 		},
 		"producer:well-t1": {
 			"assetId": "asset:producer:well-t1",

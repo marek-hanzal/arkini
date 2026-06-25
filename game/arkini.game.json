@@ -146,6 +146,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-market-t1": {
+			"kind": "item",
+			"label": "Market I Blueprint",
+			"overlayAssetId": "asset:producer:market-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-pig-farm-t1": {
 			"kind": "item",
 			"label": "Pig Farm I Blueprint",
@@ -823,6 +830,12 @@
 			"label": "Lumberjack I",
 			"render": "plain",
 			"resourceId": "producer-lumberjack-t1"
+		},
+		"asset:producer:market-t1": {
+			"kind": "item",
+			"label": "Market I",
+			"render": "plain",
+			"resourceId": "producer-market-t1"
 		},
 		"asset:producer:pig-farm-t1": {
 			"kind": "item",
@@ -3353,6 +3366,21 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-market-t1": {
+			"assetId": "asset:item:blueprint-market-t1",
+			"code": "blueprint-market-t1",
+			"description": "Prepared build plan for Market I. Crafting and trade rules will be connected later.",
+			"maxStackSize": 10,
+			"name": "Market I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"market",
+				"trade"
+			],
+			"tier": 0
+		},
 		"item:blueprint-pig-farm-t1": {
 			"assetId": "asset:item:blueprint-pig-farm-t1",
 			"code": "blueprint-pig-farm-t1",
@@ -4628,6 +4656,21 @@
 				"wood"
 			],
 			"tier": 1
+		},
+		"producer:market-t1": {
+			"assetId": "asset:producer:market-t1",
+			"code": "market-t1",
+			"description": "Prepared trading building shell for future market gameplay.",
+			"maxStackSize": 1,
+			"name": "Market I",
+			"storage": "both",
+			"tags": [
+				"building",
+				"market",
+				"trade",
+				"producer"
+			],
+			"tier": 4
 		},
 		"producer:pig-farm-t1": {
 			"assetId": "asset:producer:pig-farm-t1",

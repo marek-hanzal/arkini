@@ -1,5 +1,11 @@
 {
 	"assets": {
+		"asset:item:advanced-knowledge": {
+			"kind": "item",
+			"label": "Advanced Knowledge",
+			"render": "plain",
+			"resourceId": "item-advanced-knowledge"
+		},
 		"asset:item:aquamarine": {
 			"kind": "item",
 			"label": "Aquamarine",
@@ -11,6 +17,12 @@
 			"label": "Axe",
 			"render": "plain",
 			"resourceId": "item-axe"
+		},
+		"asset:item:basic-knowledge": {
+			"kind": "item",
+			"label": "Basic Knowledge",
+			"render": "plain",
+			"resourceId": "item-basic-knowledge"
 		},
 		"asset:item:beam": {
 			"kind": "item",
@@ -477,6 +489,12 @@
 			"render": "plain",
 			"resourceId": "item-lumber-camp"
 		},
+		"asset:item:master-knowledge": {
+			"kind": "item",
+			"label": "Master Knowledge",
+			"render": "plain",
+			"resourceId": "item-master-knowledge"
+		},
 		"asset:item:ore": {
 			"kind": "item",
 			"label": "Ore",
@@ -809,6 +827,45 @@
 		}
 	},
 	"craftRecipes": {
+		"craft:academy": {
+			"durationMs": 14000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:school",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:townhall-t3",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:academy"
+		},
 		"craft:bakery-t1": {
 			"durationMs": 8000,
 			"inputs": [
@@ -1146,6 +1203,35 @@
 			"requirements": [],
 			"resultItemId": "producer:sawmill-t1"
 		},
+		"craft:school": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:townhall-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:school"
+		},
 		"craft:slaughterhouse-t1": {
 			"durationMs": 8000,
 			"inputs": [
@@ -1461,6 +1547,45 @@
 			],
 			"resultItemId": "producer:townhall-t4"
 		},
+		"craft:university": {
+			"durationMs": 18000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:academy",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 6
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:townhall-t4",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:university"
+		},
 		"craft:well-t1": {
 			"durationMs": 5000,
 			"inputs": [
@@ -1535,6 +1660,34 @@
 		"title": "Arkini"
 	},
 	"inputs": {
+		"input:academy:advanced-knowledge": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"name": "Academy advanced study materials"
+		},
+		"input:academy:basic-knowledge": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				}
+			],
+			"name": "Academy basic lesson supplies"
+		},
 		"input:bakery-t1:flour-water": {
 			"inputs": [
 				{
@@ -1969,6 +2122,23 @@
 			],
 			"name": "Sawmill log input"
 		},
+		"input:school:basic-knowledge": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "School basic lesson supplies"
+		},
 		"input:slaughterhouse-t1:piglet": {
 			"inputs": [
 				{
@@ -2143,6 +2313,12 @@
 					"consume": true,
 					"itemId": "item:flour",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Bakery I input"
@@ -2159,6 +2335,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2177,9 +2359,32 @@
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Pig Farm I input"
+		},
+		"input:townhall-t2:blueprint-school": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: School input"
 		},
 		"input:townhall-t2:blueprint-slaughterhouse-t1": {
 			"inputs": [
@@ -2187,6 +2392,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:piglet",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2198,6 +2409,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:beer-barrel",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2222,6 +2439,12 @@
 					"consume": true,
 					"itemId": "item:sausage",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Town Hall III input"
@@ -2232,6 +2455,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2250,6 +2479,12 @@
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Winery I input"
@@ -2266,6 +2501,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2284,9 +2525,32 @@
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Survey: Vineyard input"
+		},
+		"input:townhall-t3:blueprint-academy": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 3
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Academy input"
 		},
 		"input:townhall-t3:blueprint-coal-mine-t1": {
 			"inputs": [
@@ -2300,6 +2564,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2318,6 +2588,12 @@
 					"consume": true,
 					"itemId": "item:wine-glass",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Gold Mine I input"
@@ -2335,6 +2611,12 @@
 					"consume": true,
 					"itemId": "item:beer",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Iron Mine I input"
@@ -2345,6 +2627,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:pollution",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2363,6 +2651,12 @@
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Smelter I input"
@@ -2380,6 +2674,12 @@
 					"consume": true,
 					"itemId": "item:gold-ingot",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Town Hall IV input"
@@ -2396,6 +2696,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2414,6 +2720,12 @@
 					"consume": true,
 					"itemId": "item:wine-glass",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Survey: Gold Deposit input"
@@ -2430,6 +2742,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2454,6 +2772,12 @@
 					"consume": true,
 					"itemId": "item:leather",
 					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Blacksmith I input"
@@ -2464,6 +2788,12 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
 					"quantity": 1
 				}
 			],
@@ -2476,9 +2806,89 @@
 					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 8
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Heroes Guild I input"
+		},
+		"input:townhall-t4:blueprint-university": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: University input"
+		},
+		"input:university:advanced-knowledge": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "University advanced seminar materials"
+		},
+		"input:university:basic-knowledge": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				}
+			],
+			"name": "University basic lecture supplies"
+		},
+		"input:university:master-knowledge": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "University master research materials"
 		},
 		"input:windmill-t1:grain": {
 			"inputs": [
@@ -2532,6 +2942,20 @@
 		}
 	},
 	"items": {
+		"item:advanced-knowledge": {
+			"assetId": "asset:item:advanced-knowledge",
+			"code": "advanced-knowledge",
+			"description": "Organized technical knowledge produced by academies and used to unlock industrial plans.",
+			"maxStackSize": 50,
+			"name": "Advanced Knowledge",
+			"storage": "both",
+			"tags": [
+				"knowledge",
+				"education",
+				"research"
+			],
+			"tier": 3
+		},
 		"item:aquamarine": {
 			"assetId": "asset:item:aquamarine",
 			"code": "aquamarine",
@@ -2560,6 +2984,20 @@
 				"hero"
 			],
 			"tier": 1
+		},
+		"item:basic-knowledge": {
+			"assetId": "asset:item:basic-knowledge",
+			"code": "basic-knowledge",
+			"description": "Foundational know-how produced by schools and used to unlock early specialized plans.",
+			"maxStackSize": 50,
+			"name": "Basic Knowledge",
+			"storage": "both",
+			"tags": [
+				"knowledge",
+				"education",
+				"research"
+			],
+			"tier": 2
 		},
 		"item:beer": {
 			"assetId": "asset:item:beer",
@@ -2591,7 +3029,8 @@
 		"item:blueprint-academy": {
 			"assetId": "asset:item:blueprint-academy",
 			"code": "blueprint-academy",
-			"description": "Build plan prepared for a future Academy construction flow.",
+			"craftRecipeId": "craft:academy",
+			"description": "Build plan that upgrades a School into an Academy.",
 			"maxStackSize": 10,
 			"name": "Academy Blueprint",
 			"storage": "both",
@@ -2819,7 +3258,8 @@
 		"item:blueprint-school": {
 			"assetId": "asset:item:blueprint-school",
 			"code": "blueprint-school",
-			"description": "Build plan prepared for a future School construction flow.",
+			"craftRecipeId": "craft:school",
+			"description": "Build plan that can be filled with supplies to construct a School.",
 			"maxStackSize": 10,
 			"name": "School Blueprint",
 			"storage": "both",
@@ -2939,7 +3379,8 @@
 		"item:blueprint-university": {
 			"assetId": "asset:item:blueprint-university",
 			"code": "blueprint-university",
-			"description": "Build plan prepared for a future University construction flow.",
+			"craftRecipeId": "craft:university",
+			"description": "Build plan that upgrades an Academy into a University.",
 			"maxStackSize": 10,
 			"name": "University Blueprint",
 			"storage": "both",
@@ -3405,6 +3846,20 @@
 			],
 			"tier": 0
 		},
+		"item:master-knowledge": {
+			"assetId": "asset:item:master-knowledge",
+			"code": "master-knowledge",
+			"description": "High scholarship produced by universities and prepared for late-game research gates.",
+			"maxStackSize": 50,
+			"name": "Master Knowledge",
+			"storage": "both",
+			"tags": [
+				"knowledge",
+				"education",
+				"research"
+			],
+			"tier": 4
+		},
 		"item:piglet": {
 			"assetId": "asset:item:piglet",
 			"code": "piglet",
@@ -3657,11 +4112,13 @@
 		"producer:academy": {
 			"assetId": "asset:producer:academy",
 			"code": "academy",
-			"description": "Advanced education building prepared for future Advanced Knowledge production.",
+			"description": "Education building that can produce Basic Knowledge cheaply and turn it into Advanced Knowledge.",
 			"maxStackSize": 1,
 			"name": "Academy",
+			"producerId": "producer:academy",
 			"storage": "both",
 			"tags": [
+				"producer",
 				"building",
 				"education",
 				"knowledge"
@@ -3885,11 +4342,13 @@
 		"producer:school": {
 			"assetId": "asset:producer:school",
 			"code": "school",
-			"description": "Basic education building prepared for future Basic Knowledge production.",
+			"description": "Education building that turns civic support into Basic Knowledge.",
 			"maxStackSize": 1,
 			"name": "School",
+			"producerId": "producer:school",
 			"storage": "both",
 			"tags": [
+				"producer",
 				"building",
 				"education",
 				"knowledge"
@@ -4019,11 +4478,13 @@
 		"producer:university": {
 			"assetId": "asset:producer:university",
 			"code": "university",
-			"description": "Master education building prepared for future Master Knowledge production.",
+			"description": "Education building that can produce all knowledge tiers, including Master Knowledge.",
 			"maxStackSize": 1,
 			"name": "University",
+			"producerId": "producer:university",
 			"storage": "both",
 			"tags": [
+				"producer",
 				"building",
 				"education",
 				"knowledge"
@@ -4078,6 +4539,26 @@
 		}
 	},
 	"lootTables": {
+		"loot:academy:advanced-knowledge": {
+			"name": "Academy advanced knowledge output",
+			"output": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:basic-knowledge": {
+			"name": "Academy basic knowledge output",
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:bakery-t1:bread": {
 			"name": "Bakery bread",
 			"output": [
@@ -4428,6 +4909,16 @@
 				}
 			]
 		},
+		"loot:school:basic-knowledge": {
+			"name": "School basic knowledge output",
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:slaughterhouse-t1:sausage-leather": {
 			"name": "Slaughterhouse sausage and leather",
 			"output": [
@@ -4603,6 +5094,16 @@
 				}
 			]
 		},
+		"loot:townhall-t2:blueprint-school": {
+			"name": "Blueprint: School output",
+			"output": [
+				{
+					"itemId": "item:blueprint-school",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t2:blueprint-slaughterhouse-t1": {
 			"name": "Blueprint: Slaughterhouse I output",
 			"output": [
@@ -4668,6 +5169,16 @@
 			"output": [
 				{
 					"itemId": "item:vineyard",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-academy": {
+			"name": "Blueprint: Academy output",
+			"output": [
+				{
+					"itemId": "item:blueprint-academy",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -4793,6 +5304,46 @@
 				}
 			]
 		},
+		"loot:townhall-t4:blueprint-university": {
+			"name": "Blueprint: University output",
+			"output": [
+				{
+					"itemId": "item:blueprint-university",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:advanced-knowledge": {
+			"name": "University advanced knowledge output",
+			"output": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:basic-knowledge": {
+			"name": "University basic knowledge output",
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:master-knowledge": {
+			"name": "University master knowledge output",
+			"output": [
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:well-t1:water": {
 			"name": "Well water",
 			"output": [
@@ -4846,6 +5397,15 @@
 	},
 	"merge": {},
 	"producers": {
+		"producer:academy": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:academy:basic-knowledge",
+				"product:academy:advanced-knowledge"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:bakery-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -4994,6 +5554,14 @@
 			],
 			"type": "producer"
 		},
+		"producer:school": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:school:basic-knowledge"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:slaughterhouse-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -5047,6 +5615,7 @@
 		"producer:townhall-t2": {
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:townhall-t2:blueprint-school",
 				"product:townhall-t2:blueprint-windmill-t1",
 				"product:townhall-t2:blueprint-bakery-t1",
 				"product:townhall-t2:blueprint-pig-farm-t1",
@@ -5064,6 +5633,7 @@
 		"producer:townhall-t3": {
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:townhall-t3:blueprint-academy",
 				"product:townhall-t3:coal-deposit",
 				"product:townhall-t3:blueprint-coal-mine-t1",
 				"product:townhall-t3:iron-deposit",
@@ -5080,9 +5650,20 @@
 		"producer:townhall-t4": {
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:townhall-t4:blueprint-university",
 				"product:townhall-t4:blueprint-goldsmith-t1",
 				"product:townhall-t4:blueprint-blacksmith-t1",
 				"product:townhall-t4:blueprint-heroes-guild-t1"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:university": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:university:basic-knowledge",
+				"product:university:advanced-knowledge",
+				"product:university:master-knowledge"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -5127,6 +5708,22 @@
 		}
 	},
 	"products": {
+		"product:academy:advanced-knowledge": {
+			"durationMs": 20000,
+			"inputRefId": "input:academy:advanced-knowledge",
+			"name": "Advanced Knowledge",
+			"outputTableId": "loot:academy:advanced-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:basic-knowledge": {
+			"durationMs": 8000,
+			"inputRefId": "input:academy:basic-knowledge",
+			"name": "Basic Knowledge",
+			"outputTableId": "loot:academy:basic-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:bakery-t1:bread": {
 			"durationMs": 8000,
 			"inputRefId": "input:bakery-t1:flour-water",
@@ -5335,6 +5932,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:school:basic-knowledge": {
+			"durationMs": 12000,
+			"inputRefId": "input:school:basic-knowledge",
+			"name": "Basic Knowledge",
+			"outputTableId": "loot:school:basic-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:slaughterhouse-t1:sausage-leather": {
 			"durationMs": 8000,
 			"inputRefId": "input:slaughterhouse-t1:piglet",
@@ -5463,6 +6068,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t2:blueprint-school": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-school",
+			"name": "Blueprint: School",
+			"outputTableId": "loot:townhall-t2:blueprint-school",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t2:blueprint-slaughterhouse-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t2:blueprint-slaughterhouse-t1",
@@ -5516,6 +6129,14 @@
 			"inputRefId": "input:townhall-t2:vineyard",
 			"name": "Survey: Vineyard",
 			"outputTableId": "loot:townhall-t2:vineyard",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-academy": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-academy",
+			"name": "Blueprint: Academy",
+			"outputTableId": "loot:townhall-t3:blueprint-academy",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -5612,6 +6233,38 @@
 			"inputRefId": "input:townhall-t4:blueprint-heroes-guild-t1",
 			"name": "Blueprint: Heroes Guild I",
 			"outputTableId": "loot:townhall-t4:blueprint-heroes-guild-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-university": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-university",
+			"name": "Blueprint: University",
+			"outputTableId": "loot:townhall-t4:blueprint-university",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:advanced-knowledge": {
+			"durationMs": 14000,
+			"inputRefId": "input:university:advanced-knowledge",
+			"name": "Advanced Knowledge",
+			"outputTableId": "loot:university:advanced-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:basic-knowledge": {
+			"durationMs": 6000,
+			"inputRefId": "input:university:basic-knowledge",
+			"name": "Basic Knowledge",
+			"outputTableId": "loot:university:basic-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:master-knowledge": {
+			"durationMs": 32000,
+			"inputRefId": "input:university:master-knowledge",
+			"name": "Master Knowledge",
+			"outputTableId": "loot:university:master-knowledge",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

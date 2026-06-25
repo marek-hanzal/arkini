@@ -712,6 +712,113 @@
 				}
 			],
 			"durationMs": 16000
+		},
+		"craft:school": {
+			"resultItemId": "producer:school",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:townhall-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 10000
+		},
+		"craft:academy": {
+			"resultItemId": "producer:academy",
+			"inputs": [
+				{
+					"itemId": "producer:school",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:beer",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:townhall-t3",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 14000
+		},
+		"craft:university": {
+			"resultItemId": "producer:university",
+			"inputs": [
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 6,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:townhall-t4",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 18000
 		}
 	}
 }

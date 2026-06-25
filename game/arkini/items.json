@@ -1464,12 +1464,14 @@
 			"tier": 2,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Basic education building prepared for future Basic Knowledge production.",
+			"description": "Education building that turns civic support into Basic Knowledge.",
 			"tags": [
+				"producer",
 				"building",
 				"education",
 				"knowledge"
-			]
+			],
+			"producerId": "producer:school"
 		},
 		"producer:academy": {
 			"assetId": "asset:producer:academy",
@@ -1478,12 +1480,14 @@
 			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Advanced education building prepared for future Advanced Knowledge production.",
+			"description": "Education building that can produce Basic Knowledge cheaply and turn it into Advanced Knowledge.",
 			"tags": [
+				"producer",
 				"building",
 				"education",
 				"knowledge"
-			]
+			],
+			"producerId": "producer:academy"
 		},
 		"producer:university": {
 			"assetId": "asset:producer:university",
@@ -1492,12 +1496,14 @@
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Master education building prepared for future Master Knowledge production.",
+			"description": "Education building that can produce all knowledge tiers, including Master Knowledge.",
 			"tags": [
+				"producer",
 				"building",
 				"education",
 				"knowledge"
-			]
+			],
+			"producerId": "producer:university"
 		},
 		"item:blueprint-school": {
 			"assetId": "asset:item:blueprint-school",
@@ -1506,13 +1512,14 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Build plan prepared for a future School construction flow.",
+			"description": "Build plan that can be filled with supplies to construct a School.",
 			"tags": [
 				"blueprint",
 				"building",
 				"education",
 				"knowledge"
-			]
+			],
+			"craftRecipeId": "craft:school"
 		},
 		"item:blueprint-academy": {
 			"assetId": "asset:item:blueprint-academy",
@@ -1521,13 +1528,14 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Build plan prepared for a future Academy construction flow.",
+			"description": "Build plan that upgrades a School into an Academy.",
 			"tags": [
 				"blueprint",
 				"building",
 				"education",
 				"knowledge"
-			]
+			],
+			"craftRecipeId": "craft:academy"
 		},
 		"item:blueprint-university": {
 			"assetId": "asset:item:blueprint-university",
@@ -1536,12 +1544,55 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Build plan prepared for a future University construction flow.",
+			"description": "Build plan that upgrades an Academy into a University.",
 			"tags": [
 				"blueprint",
 				"building",
 				"education",
 				"knowledge"
+			],
+			"craftRecipeId": "craft:university"
+		},
+		"item:basic-knowledge": {
+			"assetId": "asset:item:basic-knowledge",
+			"code": "basic-knowledge",
+			"name": "Basic Knowledge",
+			"tier": 2,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Foundational know-how produced by schools and used to unlock early specialized plans.",
+			"tags": [
+				"knowledge",
+				"education",
+				"research"
+			]
+		},
+		"item:advanced-knowledge": {
+			"assetId": "asset:item:advanced-knowledge",
+			"code": "advanced-knowledge",
+			"name": "Advanced Knowledge",
+			"tier": 3,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Organized technical knowledge produced by academies and used to unlock industrial plans.",
+			"tags": [
+				"knowledge",
+				"education",
+				"research"
+			]
+		},
+		"item:master-knowledge": {
+			"assetId": "asset:item:master-knowledge",
+			"code": "master-knowledge",
+			"name": "Master Knowledge",
+			"tier": 4,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "High scholarship produced by universities and prepared for late-game research gates.",
+			"tags": [
+				"knowledge",
+				"education",
+				"research"
 			]
 		}
 	}

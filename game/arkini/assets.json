@@ -806,6 +806,24 @@
 			"overlayAssetId": "asset:producer:university",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
+		},
+		"asset:item:basic-knowledge": {
+			"kind": "item",
+			"label": "Basic Knowledge",
+			"render": "plain",
+			"resourceId": "item-basic-knowledge"
+		},
+		"asset:item:advanced-knowledge": {
+			"kind": "item",
+			"label": "Advanced Knowledge",
+			"render": "plain",
+			"resourceId": "item-advanced-knowledge"
+		},
+		"asset:item:master-knowledge": {
+			"kind": "item",
+			"label": "Master Knowledge",
+			"render": "plain",
+			"resourceId": "item-master-knowledge"
 		}
 	}
 }

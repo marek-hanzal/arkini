@@ -870,6 +870,117 @@
 			"inputRefId": "input:townhall-t4:blueprint-tailor-workshop-t1",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t4:blueprint-tailor-workshop-t1"
+		},
+		"product:charcoal-burner-t1:charcoal": {
+			"name": "Charcoal",
+			"durationMs": 6500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:charcoal-burner-t1:charcoal",
+			"requirementIds": [],
+			"outputTableId": "loot:charcoal-burner-t1:charcoal"
+		},
+		"product:clay-pit:clay": {
+			"name": "Clay",
+			"durationMs": 6500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:clay-pit:clay",
+			"requirementIds": [],
+			"outputTableId": "loot:clay-pit:clay"
+		},
+		"product:sand-pit:sand": {
+			"name": "Sand",
+			"durationMs": 6500,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:sand-pit:sand"
+		},
+		"product:brickyard:bricks": {
+			"name": "Bricks",
+			"durationMs": 8500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:brickyard:bricks",
+			"requirementIds": [],
+			"outputTableId": "loot:brickyard:bricks"
+		},
+		"product:glassworks:glass": {
+			"name": "Glass",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:glassworks:glass",
+			"requirementIds": [],
+			"outputTableId": "loot:glassworks:glass"
+		},
+		"product:roof-tile-factory:roof-tiles": {
+			"name": "Roof Tiles",
+			"durationMs": 8500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:roof-tile-factory:roof-tiles",
+			"requirementIds": [],
+			"outputTableId": "loot:roof-tile-factory:roof-tiles"
+		},
+		"product:construction-yard-t1:construction-bundle": {
+			"name": "Construction Bundle",
+			"durationMs": 12000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:construction-yard-t1:construction-bundle",
+			"requirementIds": [],
+			"outputTableId": "loot:construction-yard-t1:construction-bundle"
+		},
+		"product:townhall-t4:blueprint-charcoal-burner-t1": {
+			"name": "Blueprint: Charcoal Burner I",
+			"durationMs": 2500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-charcoal-burner-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-charcoal-burner-t1"
+		},
+		"product:townhall-t4:blueprint-clay-pit": {
+			"name": "Blueprint: Clay Pit",
+			"durationMs": 2500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-clay-pit",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-clay-pit"
+		},
+		"product:townhall-t4:blueprint-sand-pit": {
+			"name": "Blueprint: Sand Pit",
+			"durationMs": 2500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-sand-pit",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-sand-pit"
+		},
+		"product:townhall-t4:blueprint-brickyard": {
+			"name": "Blueprint: Brickyard",
+			"durationMs": 2500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-brickyard",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-brickyard"
+		},
+		"product:townhall-t4:blueprint-glassworks": {
+			"name": "Blueprint: Glassworks",
+			"durationMs": 2500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-glassworks",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-glassworks"
+		},
+		"product:townhall-t4:blueprint-roof-tile-factory": {
+			"name": "Blueprint: Roof Tile Factory",
+			"durationMs": 2500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-roof-tile-factory",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-roof-tile-factory"
+		},
+		"product:townhall-t4:blueprint-construction-yard-t1": {
+			"name": "Blueprint: Construction Yard I",
+			"durationMs": 2500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t4:blueprint-construction-yard-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t4:blueprint-construction-yard-t1"
 		}
 	}
 }

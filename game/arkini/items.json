@@ -159,13 +159,16 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Prepared build plan for a Brickyard. Crafting requirements will be connected later.",
+			"description": "Build plan that can be filled with resources to construct a Brickyard.",
 			"tags": [
 				"blueprint",
 				"building",
 				"construction",
-				"clay"
-			]
+				"clay",
+				"craft-target",
+				"era:VI"
+			],
+			"craftRecipeId": "craft:brickyard"
 		},
 		"item:blueprint-clay-pit": {
 			"assetId": "asset:item:blueprint-clay-pit",
@@ -174,13 +177,16 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Prepared build plan for a Clay Pit. Crafting requirements will be connected later.",
+			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
 			"tags": [
 				"blueprint",
 				"building",
 				"construction",
-				"clay"
-			]
+				"clay",
+				"craft-target",
+				"era:VI"
+			],
+			"craftRecipeId": "craft:clay-pit"
 		},
 		"item:blueprint-coal-mine-t1": {
 			"assetId": "asset:item:blueprint-coal-mine-t1",
@@ -236,13 +242,16 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Prepared build plan for Glassworks. Crafting requirements will be connected later.",
+			"description": "Build plan that can be filled with resources to construct Glassworks.",
 			"tags": [
 				"blueprint",
 				"building",
 				"construction",
-				"glass"
-			]
+				"glass",
+				"craft-target",
+				"era:VI"
+			],
+			"craftRecipeId": "craft:glassworks"
 		},
 		"item:blueprint-gold-mine-t1": {
 			"assetId": "asset:item:blueprint-gold-mine-t1",
@@ -396,13 +405,16 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Prepared build plan for a Roof Tile Factory. Crafting requirements will be connected later.",
+			"description": "Build plan that can be filled with resources to construct a Roof Tile Factory.",
 			"tags": [
 				"blueprint",
 				"building",
 				"construction",
-				"roof"
-			]
+				"roof",
+				"craft-target",
+				"era:VI"
+			],
+			"craftRecipeId": "craft:roof-tile-factory"
 		},
 		"item:blueprint-sand-pit": {
 			"assetId": "asset:item:blueprint-sand-pit",
@@ -411,14 +423,17 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Prepared build plan for a Sand Pit. Crafting requirements will be connected later.",
+			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
 			"tags": [
 				"blueprint",
 				"building",
 				"construction",
 				"sand",
-				"glass"
-			]
+				"glass",
+				"craft-target",
+				"era:VI"
+			],
+			"craftRecipeId": "craft:sand-pit"
 		},
 		"item:blueprint-sawmill-t1": {
 			"assetId": "asset:item:blueprint-sawmill-t1",
@@ -670,7 +685,8 @@
 			"tags": [
 				"material",
 				"construction",
-				"clay"
+				"clay",
+				"era:VI"
 			]
 		},
 		"item:chest-t1": {
@@ -748,7 +764,8 @@
 			"tags": [
 				"material",
 				"construction",
-				"earth"
+				"earth",
+				"era:VI"
 			]
 		},
 		"item:clay-deposit": {
@@ -763,7 +780,8 @@
 				"source",
 				"construction",
 				"clay",
-				"deposit"
+				"deposit",
+				"era:VI"
 			]
 		},
 		"item:coal": {
@@ -866,7 +884,8 @@
 			"tags": [
 				"material",
 				"construction",
-				"glass"
+				"glass",
+				"era:VI"
 			]
 		},
 		"item:gold-deposit": {
@@ -1233,7 +1252,8 @@
 				"material",
 				"construction",
 				"clay",
-				"roof"
+				"roof",
+				"era:VI"
 			]
 		},
 		"item:ruby": {
@@ -1261,7 +1281,8 @@
 			"tags": [
 				"material",
 				"construction",
-				"glass"
+				"glass",
+				"era:VI"
 			]
 		},
 		"item:sand-deposit": {
@@ -1276,7 +1297,8 @@
 				"source",
 				"construction",
 				"sand",
-				"glass"
+				"glass",
+				"era:VI"
 			]
 		},
 		"item:sapphire": {
@@ -1541,13 +1563,15 @@
 			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Prepared kiln workshop for brick production. Production rules will be connected later.",
+			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
-				"clay"
-			]
+				"clay",
+				"era:VI"
+			],
+			"producerId": "producer:brickyard"
 		},
 		"producer:clay-pit": {
 			"assetId": "asset:producer:clay-pit",
@@ -1556,13 +1580,15 @@
 			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Prepared clay extraction building. Production rules will be connected later.",
+			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
-				"clay"
-			]
+				"clay",
+				"era:VI"
+			],
+			"producerId": "producer:clay-pit"
 		},
 		"producer:coal-mine-t1": {
 			"assetId": "asset:producer:coal-mine-t1",
@@ -1619,13 +1645,15 @@
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Prepared furnace workshop for glassmaking. Production rules will be connected later.",
+			"description": "Furnace workshop that turns sand and charcoal into glass.",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
-				"glass"
-			]
+				"glass",
+				"era:VI"
+			],
+			"producerId": "producer:glassworks"
 		},
 		"producer:gold-mine-t1": {
 			"assetId": "asset:producer:gold-mine-t1",
@@ -1778,13 +1806,15 @@
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Prepared workshop for roof tile production. Production rules will be connected later.",
+			"description": "Workshop that fires clay into sturdy roof tiles.",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
-				"roof"
-			]
+				"roof",
+				"era:VI"
+			],
+			"producerId": "producer:roof-tile-factory"
 		},
 		"producer:sand-pit": {
 			"assetId": "asset:producer:sand-pit",
@@ -1793,14 +1823,16 @@
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Prepared sand extraction building. Production rules will be connected later.",
+			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
 				"sand",
-				"glass"
-			]
+				"glass",
+				"era:VI"
+			],
+			"producerId": "producer:sand-pit"
 		},
 		"producer:sawmill-t1": {
 			"assetId": "asset:producer:sawmill-t1",
@@ -2723,6 +2755,102 @@
 				"era:V"
 			],
 			"craftRecipeId": "craft:tailor-workshop-t1"
+		},
+		"producer:charcoal-burner-t1": {
+			"assetId": "asset:producer:charcoal-burner-t1",
+			"code": "charcoal-burner-t1",
+			"name": "Charcoal Burner I",
+			"tier": 6,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Pre-industrial fuel workshop that turns logs into charcoal for advanced construction kilns.",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"fuel",
+				"era:VI"
+			],
+			"producerId": "producer:charcoal-burner-t1"
+		},
+		"producer:construction-yard-t1": {
+			"assetId": "asset:producer:construction-yard-t1",
+			"code": "construction-yard-t1",
+			"name": "Construction Yard I",
+			"tier": 6,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"master",
+				"era:VI"
+			],
+			"producerId": "producer:construction-yard-t1"
+		},
+		"item:blueprint-charcoal-burner-t1": {
+			"assetId": "asset:item:blueprint-charcoal-burner-t1",
+			"code": "blueprint-charcoal-burner-t1",
+			"name": "Charcoal Burner I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Charcoal Burner I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:VI"
+			],
+			"craftRecipeId": "craft:charcoal-burner-t1"
+		},
+		"item:blueprint-construction-yard-t1": {
+			"assetId": "asset:item:blueprint-construction-yard-t1",
+			"code": "blueprint-construction-yard-t1",
+			"name": "Construction Yard I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with resources to construct Construction Yard I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:VI"
+			],
+			"craftRecipeId": "craft:construction-yard-t1"
+		},
+		"item:charcoal": {
+			"assetId": "asset:item:charcoal",
+			"code": "charcoal",
+			"name": "Charcoal",
+			"tier": 6,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Controlled pre-industrial fuel made from logs and used by kilns and furnaces before coal mining is unlocked.",
+			"tags": [
+				"material",
+				"fuel",
+				"construction",
+				"era:VI"
+			]
+		},
+		"item:construction-bundle": {
+			"assetId": "asset:item:construction-bundle",
+			"code": "construction-bundle",
+			"name": "Construction Bundle",
+			"tier": 6,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Master package of advanced construction materials used to unlock heavier expansion and industry.",
+			"tags": [
+				"material",
+				"construction",
+				"master",
+				"era:VI"
+			]
 		}
 	}
 }

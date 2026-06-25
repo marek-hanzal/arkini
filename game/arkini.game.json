@@ -90,6 +90,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-charcoal-burner-t1": {
+			"kind": "item",
+			"label": "Charcoal Burner I Blueprint",
+			"overlayAssetId": "asset:producer:charcoal-burner-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-chicken-coop-t1": {
 			"kind": "item",
 			"label": "Chicken Coop I Blueprint",
@@ -122,6 +129,13 @@
 			"kind": "item",
 			"label": "Coal Power Plant Blueprint",
 			"overlayAssetId": "asset:producer:coal-power-plant",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-construction-yard-t1": {
+			"kind": "item",
+			"label": "Construction Yard I Blueprint",
+			"overlayAssetId": "asset:producer:construction-yard-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -421,6 +435,12 @@
 			"render": "plain",
 			"resourceId": "item-bush"
 		},
+		"asset:item:charcoal": {
+			"kind": "item",
+			"label": "Charcoal",
+			"render": "plain",
+			"resourceId": "item-charcoal"
+		},
 		"asset:item:cheese": {
 			"kind": "item",
 			"label": "Cheese",
@@ -516,6 +536,12 @@
 			"label": "Common Clothing",
 			"render": "plain",
 			"resourceId": "item-common-clothing"
+		},
+		"asset:item:construction-bundle": {
+			"kind": "item",
+			"label": "Construction Bundle",
+			"render": "plain",
+			"resourceId": "item-construction-bundle"
 		},
 		"asset:item:crate": {
 			"kind": "item",
@@ -985,6 +1011,12 @@
 			"render": "plain",
 			"resourceId": "producer-cattle-farm-t1"
 		},
+		"asset:producer:charcoal-burner-t1": {
+			"kind": "item",
+			"label": "Charcoal Burner I",
+			"render": "plain",
+			"resourceId": "producer-charcoal-burner-t1"
+		},
 		"asset:producer:chicken-coop-t1": {
 			"kind": "item",
 			"label": "Chicken Coop I",
@@ -1014,6 +1046,12 @@
 			"label": "Coal Power Plant",
 			"render": "plain",
 			"resourceId": "producer-coal-power-plant"
+		},
+		"asset:producer:construction-yard-t1": {
+			"kind": "item",
+			"label": "Construction Yard I",
+			"render": "plain",
+			"resourceId": "producer-construction-yard-t1"
 		},
 		"asset:producer:cookhouse-t1": {
 			"kind": "item",
@@ -1373,6 +1411,45 @@
 			"requirements": [],
 			"resultItemId": "producer:brewery-t1"
 		},
+		"craft:brickyard": {
+			"durationMs": 11000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:clay-pit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:brickyard"
+		},
 		"craft:cattle-farm-t1": {
 			"durationMs": 7000,
 			"inputs": [
@@ -1399,6 +1476,33 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:cattle-farm-t1"
+		},
+		"craft:charcoal-burner-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:charcoal-burner-t1"
 		},
 		"craft:chicken-coop-t1": {
 			"durationMs": 6000,
@@ -1444,6 +1548,35 @@
 			"requirements": [],
 			"resultItemId": "producer:civic-office-t1"
 		},
+		"craft:clay-pit": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:clay-pit"
+		},
 		"craft:coal-mine-t1": {
 			"durationMs": 8000,
 			"inputs": [
@@ -1470,6 +1603,67 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:coal-mine-t1"
+		},
+		"craft:construction-yard-t1": {
+			"durationMs": 14000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:brickyard",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:glassworks",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:roof-tile-factory",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:construction-yard-t1"
 		},
 		"craft:cookhouse-t1": {
 			"durationMs": 8000,
@@ -1575,6 +1769,50 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:farm-t1"
+		},
+		"craft:glassworks": {
+			"durationMs": 12000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:sand-pit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:glassworks"
 		},
 		"craft:gold-mine-t1": {
 			"durationMs": 10000,
@@ -1856,6 +2094,80 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:quarry-t1"
+		},
+		"craft:roof-tile-factory": {
+			"durationMs": 11000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:clay-pit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:brickyard",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:roof-tile-factory"
+		},
+		"craft:sand-pit": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:sand-pit"
 		},
 		"craft:sawmill-t1": {
 			"durationMs": 5000,
@@ -2697,6 +3009,29 @@
 			],
 			"name": "Brewery water to hops input"
 		},
+		"input:brickyard:bricks": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Brick firing inputs"
+		},
 		"input:cattle-farm-t1:grain-water": {
 			"inputs": [
 				{
@@ -2713,6 +3048,17 @@
 				}
 			],
 			"name": "Cattle farm grain and water input"
+		},
+		"input:charcoal-burner-t1:charcoal": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				}
+			],
+			"name": "Charcoal inputs"
 		},
 		"input:chicken-coop-t1:grain-water": {
 			"inputs": [
@@ -2754,6 +3100,17 @@
 			],
 			"name": "Civic Office permit inputs"
 		},
+		"input:clay-pit:clay": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Clay extraction inputs"
+		},
 		"input:coal-mine-t1:bread-water": {
 			"inputs": [
 				{
@@ -2770,6 +3127,47 @@
 				}
 			],
 			"name": "Coal mine bread and water input"
+		},
+		"input:construction-yard-t1:construction-bundle": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Construction bundle inputs"
 		},
 		"input:cookhouse-t1:feast": {
 			"inputs": [
@@ -2850,6 +3248,23 @@
 				}
 			],
 			"name": "Farm water input"
+		},
+		"input:glassworks:glass": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				}
+			],
+			"name": "Glassmaking inputs"
 		},
 		"input:gold-mine-t1:bread-wine": {
 			"inputs": [
@@ -3212,6 +3627,29 @@
 				}
 			],
 			"name": "Purifier bulk pollution input"
+		},
+		"input:roof-tile-factory:roof-tiles": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Roof tile inputs"
 		},
 		"input:sawmill-t1:log": {
 			"inputs": [
@@ -3958,6 +4396,64 @@
 			],
 			"name": "Survey: Vineyard input"
 		},
+		"input:townhall-t4:blueprint-brickyard": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Brickyard input"
+		},
+		"input:townhall-t4:blueprint-charcoal-burner-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Charcoal Burner I input"
+		},
 		"input:townhall-t4:blueprint-civic-office-t1": {
 			"inputs": [
 				{
@@ -3980,6 +4476,70 @@
 				}
 			],
 			"name": "Blueprint: Civic Office I input"
+		},
+		"input:townhall-t4:blueprint-clay-pit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Clay Pit input"
+		},
+		"input:townhall-t4:blueprint-construction-yard-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Construction Yard I input"
 		},
 		"input:townhall-t4:blueprint-dye-workshop-t1": {
 			"inputs": [
@@ -4009,6 +4569,35 @@
 				}
 			],
 			"name": "Blueprint: Dye Workshop I input"
+		},
+		"input:townhall-t4:blueprint-glassworks": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Glassworks input"
 		},
 		"input:townhall-t4:blueprint-market-t2": {
 			"inputs": [
@@ -4055,6 +4644,58 @@
 				}
 			],
 			"name": "Blueprint: Paper Mill I input"
+		},
+		"input:townhall-t4:blueprint-roof-tile-factory": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Roof Tile Factory input"
+		},
+		"input:townhall-t4:blueprint-sand-pit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Sand Pit input"
 		},
 		"input:townhall-t4:blueprint-school": {
 			"inputs": [
@@ -4451,7 +5092,8 @@
 		"item:blueprint-brickyard": {
 			"assetId": "asset:item:blueprint-brickyard",
 			"code": "blueprint-brickyard",
-			"description": "Prepared build plan for a Brickyard. Crafting requirements will be connected later.",
+			"craftRecipeId": "craft:brickyard",
+			"description": "Build plan that can be filled with resources to construct a Brickyard.",
 			"maxStackSize": 10,
 			"name": "Brickyard Blueprint",
 			"storage": "both",
@@ -4459,7 +5101,9 @@
 				"blueprint",
 				"building",
 				"construction",
-				"clay"
+				"clay",
+				"craft-target",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -4476,6 +5120,22 @@
 				"building",
 				"craft-target",
 				"era:II"
+			],
+			"tier": 0
+		},
+		"item:blueprint-charcoal-burner-t1": {
+			"assetId": "asset:item:blueprint-charcoal-burner-t1",
+			"code": "blueprint-charcoal-burner-t1",
+			"craftRecipeId": "craft:charcoal-burner-t1",
+			"description": "Build plan that can be filled with resources to construct Charcoal Burner I.",
+			"maxStackSize": 10,
+			"name": "Charcoal Burner I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -4516,7 +5176,8 @@
 		"item:blueprint-clay-pit": {
 			"assetId": "asset:item:blueprint-clay-pit",
 			"code": "blueprint-clay-pit",
-			"description": "Prepared build plan for a Clay Pit. Crafting requirements will be connected later.",
+			"craftRecipeId": "craft:clay-pit",
+			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
 			"maxStackSize": 10,
 			"name": "Clay Pit Blueprint",
 			"storage": "both",
@@ -4524,7 +5185,9 @@
 				"blueprint",
 				"building",
 				"construction",
-				"clay"
+				"clay",
+				"craft-target",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -4556,6 +5219,22 @@
 				"power",
 				"energy",
 				"coal"
+			],
+			"tier": 0
+		},
+		"item:blueprint-construction-yard-t1": {
+			"assetId": "asset:item:blueprint-construction-yard-t1",
+			"code": "blueprint-construction-yard-t1",
+			"craftRecipeId": "craft:construction-yard-t1",
+			"description": "Build plan that can be filled with resources to construct Construction Yard I.",
+			"maxStackSize": 10,
+			"name": "Construction Yard I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -4628,7 +5307,8 @@
 		"item:blueprint-glassworks": {
 			"assetId": "asset:item:blueprint-glassworks",
 			"code": "blueprint-glassworks",
-			"description": "Prepared build plan for Glassworks. Crafting requirements will be connected later.",
+			"craftRecipeId": "craft:glassworks",
+			"description": "Build plan that can be filled with resources to construct Glassworks.",
 			"maxStackSize": 10,
 			"name": "Glassworks Blueprint",
 			"storage": "both",
@@ -4636,7 +5316,9 @@
 				"blueprint",
 				"building",
 				"construction",
-				"glass"
+				"glass",
+				"craft-target",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -4824,7 +5506,8 @@
 		"item:blueprint-roof-tile-factory": {
 			"assetId": "asset:item:blueprint-roof-tile-factory",
 			"code": "blueprint-roof-tile-factory",
-			"description": "Prepared build plan for a Roof Tile Factory. Crafting requirements will be connected later.",
+			"craftRecipeId": "craft:roof-tile-factory",
+			"description": "Build plan that can be filled with resources to construct a Roof Tile Factory.",
 			"maxStackSize": 10,
 			"name": "Roof Tile Factory Blueprint",
 			"storage": "both",
@@ -4832,14 +5515,17 @@
 				"blueprint",
 				"building",
 				"construction",
-				"roof"
+				"roof",
+				"craft-target",
+				"era:VI"
 			],
 			"tier": 0
 		},
 		"item:blueprint-sand-pit": {
 			"assetId": "asset:item:blueprint-sand-pit",
 			"code": "blueprint-sand-pit",
-			"description": "Prepared build plan for a Sand Pit. Crafting requirements will be connected later.",
+			"craftRecipeId": "craft:sand-pit",
+			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
 			"maxStackSize": 10,
 			"name": "Sand Pit Blueprint",
 			"storage": "both",
@@ -4848,7 +5534,9 @@
 				"building",
 				"construction",
 				"sand",
-				"glass"
+				"glass",
+				"craft-target",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -5205,7 +5893,8 @@
 			"tags": [
 				"material",
 				"construction",
-				"clay"
+				"clay",
+				"era:VI"
 			],
 			"tier": 3
 		},
@@ -5224,6 +5913,21 @@
 				"era:IV"
 			],
 			"tier": 4
+		},
+		"item:charcoal": {
+			"assetId": "asset:item:charcoal",
+			"code": "charcoal",
+			"description": "Controlled pre-industrial fuel made from logs and used by kilns and furnaces before coal mining is unlocked.",
+			"maxStackSize": 50,
+			"name": "Charcoal",
+			"storage": "both",
+			"tags": [
+				"material",
+				"fuel",
+				"construction",
+				"era:VI"
+			],
+			"tier": 6
 		},
 		"item:cheese": {
 			"assetId": "asset:item:cheese",
@@ -5314,7 +6018,8 @@
 			"tags": [
 				"material",
 				"construction",
-				"earth"
+				"earth",
+				"era:VI"
 			],
 			"tier": 3
 		},
@@ -5329,7 +6034,8 @@
 				"source",
 				"construction",
 				"clay",
-				"deposit"
+				"deposit",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -5406,6 +6112,21 @@
 				"era:V"
 			],
 			"tier": 5
+		},
+		"item:construction-bundle": {
+			"assetId": "asset:item:construction-bundle",
+			"code": "construction-bundle",
+			"description": "Master package of advanced construction materials used to unlock heavier expansion and industry.",
+			"maxStackSize": 20,
+			"name": "Construction Bundle",
+			"storage": "both",
+			"tags": [
+				"material",
+				"construction",
+				"master",
+				"era:VI"
+			],
+			"tier": 6
 		},
 		"item:egg": {
 			"assetId": "asset:item:egg",
@@ -5504,7 +6225,8 @@
 			"tags": [
 				"material",
 				"construction",
-				"glass"
+				"glass",
+				"era:VI"
 			],
 			"tier": 4
 		},
@@ -5948,7 +6670,8 @@
 				"material",
 				"construction",
 				"clay",
-				"roof"
+				"roof",
+				"era:VI"
 			],
 			"tier": 4
 		},
@@ -5976,7 +6699,8 @@
 			"tags": [
 				"material",
 				"construction",
-				"glass"
+				"glass",
+				"era:VI"
 			],
 			"tier": 4
 		},
@@ -5991,7 +6715,8 @@
 				"source",
 				"construction",
 				"sand",
-				"glass"
+				"glass",
+				"era:VI"
 			],
 			"tier": 0
 		},
@@ -6281,15 +7006,17 @@
 		"producer:brickyard": {
 			"assetId": "asset:producer:brickyard",
 			"code": "brickyard",
-			"description": "Prepared kiln workshop for brick production. Production rules will be connected later.",
+			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
 			"maxStackSize": 1,
 			"name": "Brickyard",
+			"producerId": "producer:brickyard",
 			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
-				"clay"
+				"clay",
+				"era:VI"
 			],
 			"tier": 3
 		},
@@ -6308,6 +7035,23 @@
 				"era:II"
 			],
 			"tier": 1
+		},
+		"producer:charcoal-burner-t1": {
+			"assetId": "asset:producer:charcoal-burner-t1",
+			"code": "charcoal-burner-t1",
+			"description": "Pre-industrial fuel workshop that turns logs into charcoal for advanced construction kilns.",
+			"maxStackSize": 1,
+			"name": "Charcoal Burner I",
+			"producerId": "producer:charcoal-burner-t1",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"fuel",
+				"era:VI"
+			],
+			"tier": 6
 		},
 		"producer:chicken-coop-t1": {
 			"assetId": "asset:producer:chicken-coop-t1",
@@ -6345,15 +7089,17 @@
 		"producer:clay-pit": {
 			"assetId": "asset:producer:clay-pit",
 			"code": "clay-pit",
-			"description": "Prepared clay extraction building. Production rules will be connected later.",
+			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
 			"maxStackSize": 1,
 			"name": "Clay Pit",
+			"producerId": "producer:clay-pit",
 			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
-				"clay"
+				"clay",
+				"era:VI"
 			],
 			"tier": 3
 		},
@@ -6388,6 +7134,23 @@
 				"coal"
 			],
 			"tier": 5
+		},
+		"producer:construction-yard-t1": {
+			"assetId": "asset:producer:construction-yard-t1",
+			"code": "construction-yard-t1",
+			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
+			"maxStackSize": 1,
+			"name": "Construction Yard I",
+			"producerId": "producer:construction-yard-t1",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"master",
+				"era:VI"
+			],
+			"tier": 6
 		},
 		"producer:cookhouse-t1": {
 			"assetId": "asset:producer:cookhouse-t1",
@@ -6458,15 +7221,17 @@
 		"producer:glassworks": {
 			"assetId": "asset:producer:glassworks",
 			"code": "glassworks",
-			"description": "Prepared furnace workshop for glassmaking. Production rules will be connected later.",
+			"description": "Furnace workshop that turns sand and charcoal into glass.",
 			"maxStackSize": 1,
 			"name": "Glassworks",
+			"producerId": "producer:glassworks",
 			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
-				"glass"
+				"glass",
+				"era:VI"
 			],
 			"tier": 4
 		},
@@ -6651,31 +7416,35 @@
 		"producer:roof-tile-factory": {
 			"assetId": "asset:producer:roof-tile-factory",
 			"code": "roof-tile-factory",
-			"description": "Prepared workshop for roof tile production. Production rules will be connected later.",
+			"description": "Workshop that fires clay into sturdy roof tiles.",
 			"maxStackSize": 1,
 			"name": "Roof Tile Factory",
+			"producerId": "producer:roof-tile-factory",
 			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
-				"roof"
+				"roof",
+				"era:VI"
 			],
 			"tier": 4
 		},
 		"producer:sand-pit": {
 			"assetId": "asset:producer:sand-pit",
 			"code": "sand-pit",
-			"description": "Prepared sand extraction building. Production rules will be connected later.",
+			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
 			"maxStackSize": 1,
 			"name": "Sand Pit",
+			"producerId": "producer:sand-pit",
 			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
 				"sand",
-				"glass"
+				"glass",
+				"era:VI"
 			],
 			"tier": 4
 		},
@@ -7122,12 +7891,32 @@
 				}
 			]
 		},
+		"loot:brickyard:bricks": {
+			"name": "Bricks output",
+			"output": [
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:cattle-farm-t1:milk": {
 			"name": "Cattle farm milk",
 			"output": [
 				{
 					"itemId": "item:milk",
 					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:charcoal-burner-t1:charcoal": {
+			"name": "Charcoal output",
+			"output": [
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
 					"type": "guaranteed"
 				}
 			]
@@ -7258,11 +8047,31 @@
 				}
 			]
 		},
+		"loot:clay-pit:clay": {
+			"name": "Clay output",
+			"output": [
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:coal-mine-t1:coal": {
 			"name": "Coal mine coal carts",
 			"output": [
 				{
 					"itemId": "item:coal",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:construction-yard-t1:construction-bundle": {
+			"name": "Construction Bundle output",
+			"output": [
+				{
+					"itemId": "item:construction-bundle",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -7303,6 +8112,16 @@
 			"output": [
 				{
 					"itemId": "item:grain",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:glassworks:glass": {
+			"name": "Glass output",
+			"output": [
+				{
+					"itemId": "item:glass",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -7548,6 +8367,26 @@
 				{
 					"itemId": "item:stone",
 					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:roof-tile-factory:roof-tiles": {
+			"name": "Roof tiles output",
+			"output": [
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:sand-pit:sand": {
+			"name": "Sand output",
+			"output": [
+				{
+					"itemId": "item:sand",
+					"quantity": 2,
 					"type": "guaranteed"
 				}
 			]
@@ -7977,6 +8816,26 @@
 				}
 			]
 		},
+		"loot:townhall-t4:blueprint-brickyard": {
+			"name": "Town Hall IV Brickyard blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-brickyard",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-charcoal-burner-t1": {
+			"name": "Town Hall IV Charcoal Burner I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-charcoal-burner-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t4:blueprint-civic-office-t1": {
 			"name": "Town Hall IV Civic Office I blueprint output",
 			"output": [
@@ -7987,11 +8846,41 @@
 				}
 			]
 		},
+		"loot:townhall-t4:blueprint-clay-pit": {
+			"name": "Town Hall IV Clay Pit blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-clay-pit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-construction-yard-t1": {
+			"name": "Town Hall IV Construction Yard I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-construction-yard-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t4:blueprint-dye-workshop-t1": {
 			"name": "Town Hall IV Dye Workshop I blueprint output",
 			"output": [
 				{
 					"itemId": "item:blueprint-dye-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-glassworks": {
+			"name": "Town Hall IV Glassworks blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-glassworks",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -8012,6 +8901,26 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-paper-mill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-roof-tile-factory": {
+			"name": "Town Hall IV Roof Tile Factory blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-roof-tile-factory",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-sand-pit": {
+			"name": "Town Hall IV Sand Pit blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-sand-pit",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -8220,10 +9129,28 @@
 			],
 			"type": "producer"
 		},
+		"producer:brickyard": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:brickyard:bricks"
+			],
+			"requirementIds": [
+				"proximity:brickyard:clay-pit"
+			],
+			"type": "producer"
+		},
 		"producer:cattle-farm-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:cattle-farm-t1:milk"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:charcoal-burner-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:charcoal-burner-t1:charcoal"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -8244,6 +9171,16 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:clay-pit": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:clay-pit:clay"
+			],
+			"requirementIds": [
+				"proximity:clay-pit:clay-deposit"
+			],
+			"type": "producer"
+		},
 		"producer:coal-mine-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -8252,6 +9189,14 @@
 			"requirementIds": [
 				"proximity:coal-mine-t1:coal-deposit"
 			],
+			"type": "producer"
+		},
+		"producer:construction-yard-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:construction-yard-t1:construction-bundle"
+			],
+			"requirementIds": [],
 			"type": "producer"
 		},
 		"producer:cookhouse-t1": {
@@ -8285,6 +9230,16 @@
 			],
 			"requirementIds": [
 				"proximity:farm-t1:wheat-field"
+			],
+			"type": "producer"
+		},
+		"producer:glassworks": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:glassworks:glass"
+			],
+			"requirementIds": [
+				"proximity:glassworks:sand-pit"
 			],
 			"type": "producer"
 		},
@@ -8394,6 +9349,26 @@
 			],
 			"requirementIds": [
 				"proximity:quarry-t1:rock"
+			],
+			"type": "producer"
+		},
+		"producer:roof-tile-factory": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:roof-tile-factory:roof-tiles"
+			],
+			"requirementIds": [
+				"proximity:roof-tile-factory:clay-pit"
+			],
+			"type": "producer"
+		},
+		"producer:sand-pit": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sand-pit:sand"
+			],
+			"requirementIds": [
+				"proximity:sand-pit:sand-deposit"
 			],
 			"type": "producer"
 		},
@@ -8544,7 +9519,14 @@
 				"product:townhall-t4:blueprint-tannery-t1",
 				"product:townhall-t4:blueprint-weaver-hut-t1",
 				"product:townhall-t4:blueprint-dye-workshop-t1",
-				"product:townhall-t4:blueprint-tailor-workshop-t1"
+				"product:townhall-t4:blueprint-tailor-workshop-t1",
+				"product:townhall-t4:blueprint-charcoal-burner-t1",
+				"product:townhall-t4:blueprint-clay-pit",
+				"product:townhall-t4:blueprint-sand-pit",
+				"product:townhall-t4:blueprint-brickyard",
+				"product:townhall-t4:blueprint-glassworks",
+				"product:townhall-t4:blueprint-roof-tile-factory",
+				"product:townhall-t4:blueprint-construction-yard-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -8695,6 +9677,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:brickyard:bricks": {
+			"durationMs": 8500,
+			"inputRefId": "input:brickyard:bricks",
+			"name": "Bricks",
+			"outputTableId": "loot:brickyard:bricks",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:cattle-farm-t1:milk": {
 			"durationMs": 5000,
 			"hinderedBy": [
@@ -8710,6 +9700,14 @@
 			"inputRefId": "input:cattle-farm-t1:grain-water",
 			"name": "Milk",
 			"outputTableId": "loot:cattle-farm-t1:milk",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:charcoal-burner-t1:charcoal": {
+			"durationMs": 6500,
+			"inputRefId": "input:charcoal-burner-t1:charcoal",
+			"name": "Charcoal",
+			"outputTableId": "loot:charcoal-burner-t1:charcoal",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -8739,11 +9737,27 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:clay-pit:clay": {
+			"durationMs": 6500,
+			"inputRefId": "input:clay-pit:clay",
+			"name": "Clay",
+			"outputTableId": "loot:clay-pit:clay",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:coal-mine-t1:coal": {
 			"durationMs": 8000,
 			"inputRefId": "input:coal-mine-t1:bread-water",
 			"name": "Coal Cart",
 			"outputTableId": "loot:coal-mine-t1:coal",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:construction-yard-t1:construction-bundle": {
+			"durationMs": 12000,
+			"inputRefId": "input:construction-yard-t1:construction-bundle",
+			"name": "Construction Bundle",
+			"outputTableId": "loot:construction-yard-t1:construction-bundle",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -8786,6 +9800,14 @@
 			"inputRefId": "input:farm-t1:water",
 			"name": "Grain",
 			"outputTableId": "loot:farm-t1:grain",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:glassworks:glass": {
+			"durationMs": 9000,
+			"inputRefId": "input:glassworks:glass",
+			"name": "Glass",
+			"outputTableId": "loot:glassworks:glass",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -8984,6 +10006,21 @@
 			"durationMs": 5000,
 			"name": "Stone",
 			"outputTableId": "loot:quarry-t1:stone",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:roof-tile-factory:roof-tiles": {
+			"durationMs": 8500,
+			"inputRefId": "input:roof-tile-factory:roof-tiles",
+			"name": "Roof Tiles",
+			"outputTableId": "loot:roof-tile-factory:roof-tiles",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:sand-pit:sand": {
+			"durationMs": 6500,
+			"name": "Sand",
+			"outputTableId": "loot:sand-pit:sand",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -9325,6 +10362,22 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t4:blueprint-brickyard": {
+			"durationMs": 2500,
+			"inputRefId": "input:townhall-t4:blueprint-brickyard",
+			"name": "Blueprint: Brickyard",
+			"outputTableId": "loot:townhall-t4:blueprint-brickyard",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-charcoal-burner-t1": {
+			"durationMs": 2500,
+			"inputRefId": "input:townhall-t4:blueprint-charcoal-burner-t1",
+			"name": "Blueprint: Charcoal Burner I",
+			"outputTableId": "loot:townhall-t4:blueprint-charcoal-burner-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t4:blueprint-civic-office-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t4:blueprint-civic-office-t1",
@@ -9333,11 +10386,35 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t4:blueprint-clay-pit": {
+			"durationMs": 2500,
+			"inputRefId": "input:townhall-t4:blueprint-clay-pit",
+			"name": "Blueprint: Clay Pit",
+			"outputTableId": "loot:townhall-t4:blueprint-clay-pit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-construction-yard-t1": {
+			"durationMs": 2500,
+			"inputRefId": "input:townhall-t4:blueprint-construction-yard-t1",
+			"name": "Blueprint: Construction Yard I",
+			"outputTableId": "loot:townhall-t4:blueprint-construction-yard-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t4:blueprint-dye-workshop-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t4:blueprint-dye-workshop-t1",
 			"name": "Blueprint: Dye Workshop I",
 			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-glassworks": {
+			"durationMs": 2500,
+			"inputRefId": "input:townhall-t4:blueprint-glassworks",
+			"name": "Blueprint: Glassworks",
+			"outputTableId": "loot:townhall-t4:blueprint-glassworks",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -9354,6 +10431,22 @@
 			"inputRefId": "input:townhall-t4:blueprint-paper-mill-t1",
 			"name": "Blueprint: Paper Mill I",
 			"outputTableId": "loot:townhall-t4:blueprint-paper-mill-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-roof-tile-factory": {
+			"durationMs": 2500,
+			"inputRefId": "input:townhall-t4:blueprint-roof-tile-factory",
+			"name": "Blueprint: Roof Tile Factory",
+			"outputTableId": "loot:townhall-t4:blueprint-roof-tile-factory",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-sand-pit": {
+			"durationMs": 2500,
+			"inputRefId": "input:townhall-t4:blueprint-sand-pit",
+			"name": "Blueprint: Sand Pit",
+			"outputTableId": "loot:townhall-t4:blueprint-sand-pit",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -9496,6 +10589,22 @@
 			],
 			"type": "proximity"
 		},
+		"proximity:brickyard:clay-pit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"producer:clay-pit"
+			],
+			"type": "proximity"
+		},
+		"proximity:clay-pit:clay-deposit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:clay-deposit"
+			],
+			"type": "proximity"
+		},
 		"proximity:coal-mine-t1:coal-deposit": {
 			"distance": 2,
 			"durationFactor": 1,
@@ -9509,6 +10618,14 @@
 			"durationFactor": 1,
 			"itemIds": [
 				"item:wheat-field"
+			],
+			"type": "proximity"
+		},
+		"proximity:glassworks:sand-pit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"producer:sand-pit"
 			],
 			"type": "proximity"
 		},
@@ -9541,6 +10658,22 @@
 			"durationFactor": 1,
 			"itemIds": [
 				"item:rock"
+			],
+			"type": "proximity"
+		},
+		"proximity:roof-tile-factory:clay-pit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"producer:clay-pit"
+			],
+			"type": "proximity"
+		},
+		"proximity:sand-pit:sand-deposit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:sand-deposit"
 			],
 			"type": "proximity"
 		},

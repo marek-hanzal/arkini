@@ -260,7 +260,14 @@
 				"product:townhall-t4:blueprint-tannery-t1",
 				"product:townhall-t4:blueprint-weaver-hut-t1",
 				"product:townhall-t4:blueprint-dye-workshop-t1",
-				"product:townhall-t4:blueprint-tailor-workshop-t1"
+				"product:townhall-t4:blueprint-tailor-workshop-t1",
+				"product:townhall-t4:blueprint-charcoal-burner-t1",
+				"product:townhall-t4:blueprint-clay-pit",
+				"product:townhall-t4:blueprint-sand-pit",
+				"product:townhall-t4:blueprint-brickyard",
+				"product:townhall-t4:blueprint-glassworks",
+				"product:townhall-t4:blueprint-roof-tile-factory",
+				"product:townhall-t4:blueprint-construction-yard-t1"
 			],
 			"requirementIds": []
 		},
@@ -440,6 +447,72 @@
 			"productIds": [
 				"product:tailor-workshop-t1:common-clothing",
 				"product:tailor-workshop-t1:luxury-clothing"
+			],
+			"requirementIds": []
+		},
+		"producer:charcoal-burner-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:charcoal-burner-t1:charcoal"
+			],
+			"requirementIds": []
+		},
+		"producer:clay-pit": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:clay-pit:clay"
+			],
+			"requirementIds": [
+				"proximity:clay-pit:clay-deposit"
+			]
+		},
+		"producer:sand-pit": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sand-pit:sand"
+			],
+			"requirementIds": [
+				"proximity:sand-pit:sand-deposit"
+			]
+		},
+		"producer:brickyard": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:brickyard:bricks"
+			],
+			"requirementIds": [
+				"proximity:brickyard:clay-pit"
+			]
+		},
+		"producer:glassworks": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:glassworks:glass"
+			],
+			"requirementIds": [
+				"proximity:glassworks:sand-pit"
+			]
+		},
+		"producer:roof-tile-factory": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:roof-tile-factory:roof-tiles"
+			],
+			"requirementIds": [
+				"proximity:roof-tile-factory:clay-pit"
+			]
+		},
+		"producer:construction-yard-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:construction-yard-t1:construction-bundle"
 			],
 			"requirementIds": []
 		}

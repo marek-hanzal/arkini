@@ -1248,6 +1248,44 @@
 			"overlayAssetId": "asset:producer:tailor-workshop-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
+		},
+		"asset:producer:charcoal-burner-t1": {
+			"kind": "item",
+			"label": "Charcoal Burner I",
+			"render": "plain",
+			"resourceId": "producer-charcoal-burner-t1"
+		},
+		"asset:producer:construction-yard-t1": {
+			"kind": "item",
+			"label": "Construction Yard I",
+			"render": "plain",
+			"resourceId": "producer-construction-yard-t1"
+		},
+		"asset:item:charcoal": {
+			"kind": "item",
+			"label": "Charcoal",
+			"render": "plain",
+			"resourceId": "item-charcoal"
+		},
+		"asset:item:construction-bundle": {
+			"kind": "item",
+			"label": "Construction Bundle",
+			"render": "plain",
+			"resourceId": "item-construction-bundle"
+		},
+		"asset:item:blueprint-charcoal-burner-t1": {
+			"kind": "item",
+			"label": "Charcoal Burner I Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:charcoal-burner-t1"
+		},
+		"asset:item:blueprint-construction-yard-t1": {
+			"kind": "item",
+			"label": "Construction Yard I Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:construction-yard-t1"
 		}
 	}
 }

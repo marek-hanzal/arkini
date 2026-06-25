@@ -555,67 +555,90 @@
 					"consume": true
 				},
 				{
+					"itemId": "item:plank",
+					"quantity": 4,
+					"consume": true
+				},
+				{
 					"itemId": "item:stone-block",
 					"quantity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:iron-ingot",
+					"itemId": "item:feast",
 					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:gold-ingot",
-					"quantity": 1,
+					"itemId": "item:coin",
+					"quantity": 2,
 					"consume": true
 				}
 			],
 			"requirements": [
 				{
 					"type": "passive",
-					"itemId": "item:coal-deposit",
+					"itemId": "producer:windmill-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:coal-mine-t1",
+					"itemId": "producer:bakery-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "item:iron-deposit",
+					"itemId": "producer:slaughterhouse-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:iron-mine-t1",
+					"itemId": "producer:dairy-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:smelter-t1",
+					"itemId": "producer:cookhouse-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:purifier-t1",
+					"itemId": "item:hop-field",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "item:gold-deposit",
+					"itemId": "producer:brewery-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				},
 				{
 					"type": "passive",
-					"itemId": "producer:gold-mine-t1",
+					"itemId": "producer:tavern-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "item:vineyard",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:winery-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:market-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				}
@@ -884,6 +907,82 @@
 			],
 			"requirements": [],
 			"durationMs": 6000
+		},
+		"craft:dairy-t1": {
+			"resultItemId": "producer:dairy-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:milk",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 7000
+		},
+		"craft:cookhouse-t1": {
+			"resultItemId": "producer:cookhouse-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:vegetables",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 8000
+		},
+		"craft:market-t1": {
+			"resultItemId": "producer:market-t1",
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [],
+			"durationMs": 9000
 		}
 	}
 }

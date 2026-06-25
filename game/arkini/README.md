@@ -42,24 +42,24 @@ Yes, it is slightly weird. It is also contained, explicit, and better than quiet
 
 ### Townhall blueprint progression
 
-Townhall is the civic blueprint vendor and progression spine. The starting board is intentionally small: it contains Town Hall I, one lumberjack/tree pair, one quarry/rock pair, one well, and one wheat field. The player first learns to run producers, feed Town Hall for a concrete blueprint, place that blueprint on the board, feed its craft inputs, and complete it into a real building. Tiny tutorial loop, fewer spreadsheets wearing clown shoes.
+Townhall is the civic blueprint vendor and progression spine. The starting board is intentionally small: it contains Town Hall I, one lumberjack/tree pair, one quarry/rock pair, and one well. The player first learns to run producers, feed Town Hall for a concrete blueprint, place that blueprint on the board, feed its craft inputs, and complete it into a real building. Tiny tutorial loop, fewer spreadsheets wearing clown shoes.
 
 Blueprints are concrete from the moment they enter gameplay. There is no blank blueprint and no imprint/bind action. A blueprint is a craft target: it accepts its build resources on the board and completes into its configured building. Construction resources such as planks and stone blocks live in the blueprint craft recipe, not in the Town Hall purchase cost.
 
 Townhall tiers are authored as separate producer buildings:
 
 ```txt
-producer:townhall-t1  Starter settlement blueprints
-producer:townhall-t2  Food-chain blueprints
-producer:townhall-t3  Heavy industry and cleanup blueprints
-producer:townhall-t4  Coin-economy specialist blueprints
+producer:townhall-t1  Era I construction foundation blueprints
+producer:townhall-t2  Era II raw food and livestock blueprints
+producer:townhall-t3  Era III food processing and first trade blueprints
+producer:townhall-t4  Later specialist blueprints
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
 
 Higher Town Hall tiers do not re-issue lower-era blueprints. If the player wants duplicate lower-era infrastructure, they should build it before moving to the next era. Missing duplicates should slow later economy, not soft-lock progression.
 
-Townhall products use era-proof inputs, while blueprint craft recipes use construction inputs:
+Townhall products use era-proof inputs, while blueprint craft recipes use construction inputs. Current era spine:
 
 ```txt
 Town Hall I
@@ -68,39 +68,35 @@ Town Hall I
   Stone -> Quarry I Blueprint
   Stone -> Stonemason I Blueprint
   Water -> Well I Blueprint
-  Water -> Farm I Blueprint
-  Grain -> Town Hall II Blueprint
+  Plank + Stone Block + Water -> Town Hall II Blueprint
 
 Town Hall II
-  Grain -> Windmill I Blueprint
-  Flour -> Bakery I Blueprint
+  Grain -> Wheat Field
+  Grain -> Farm I Blueprint
   Grain + Water -> Pig Farm I Blueprint
-  Piglet -> Slaughterhouse I Blueprint
-  Grain + Water -> Brewery I Blueprint
-  Beer Barrel -> Tavern I Blueprint
-  Grain + Water -> Winery I Blueprint
-  Grain + Water -> Hop Field
-  Grain + Water -> Vineyard
-  Bread + Beer + Sausage -> Town Hall III Blueprint
+  Milk + Grain -> Cattle Farm I Blueprint
+  Egg + Grain -> Chicken Coop I Blueprint
+  Wool + Grain -> Sheep Pasture I Blueprint
+  Vegetables + Water -> Vegetable Garden I Blueprint
+  Grain + Piglet + Milk + Egg + Vegetables -> Food Supply
+  Food Supply + Wool + Plank + Stone Block -> Town Hall III Blueprint
 
 Town Hall III
-  Bread + Water -> Coal Deposit
-  Bread + Water -> Coal Mine I Blueprint
-  Sausage + Beer -> Iron Deposit
-  Sausage + Beer -> Iron Mine I Blueprint
-  Coal + Water -> Smelter I Blueprint
-  Pollution -> Purifier I Blueprint
-  Bread + Wine Glass -> Gold Deposit
-  Bread + Wine Glass -> Gold Mine I Blueprint
-  Iron Ingot + Gold Ingot -> Town Hall IV Blueprint
-
-Town Hall IV
-  Gold Ingot -> Goldsmith I Blueprint
-  8 Coin -> Heroes Guild I Blueprint
-
-Goldsmith I
-  Gold Ingot + 3 Coin -> Key III
+  Grain + Plank -> Windmill I Blueprint
+  Flour + Stone Block -> Bakery I Blueprint
+  Piglet + Plank -> Slaughterhouse I Blueprint
+  Milk + Plank -> Dairy I Blueprint
+  Vegetables + Plank + Stone Block -> Cookhouse I Blueprint
+  Grain + Water -> Hop Field
+  Grain + Water + Plank -> Brewery I Blueprint
+  Beer Barrel + Plank -> Tavern I Blueprint
+  Grain + Water -> Vineyard
+  Grain + Water + Plank -> Winery I Blueprint
+  Bread + Sausage + Plank -> Market Blueprint
+  Feast + 2 Coin + Plank + Stone Block -> Town Hall IV Blueprint
 ```
+
+Market is a single trade building line. Future stronger market behavior should upgrade the same Market producer/tier rather than introduce separate Market II / Market III buildings.
 
 ### Implemented first wave
 
@@ -140,46 +136,37 @@ loot:quarry-t1:stone
 loot:stonemason-t1:stone-block
 ```
 
-Food line:
+Food and trade lines:
 
 ```txt
-item:wheat-field
-item:water
-item:grain
-item:flour
-item:bread
-item:piglet
-item:sausage
-item:leather
-producer:well-t1
-producer:farm-t1
-producer:windmill-t1
-producer:bakery-t1
-producer:pig-farm-t1
-producer:slaughterhouse-t1
-proximity:farm-t1:wheat-field
-product:well-t1:water
-product:farm-t1:grain
-product:windmill-t1:flour
-product:bakery-t1:bread
-product:pig-farm-t1:piglet
-product:slaughterhouse-t1:sausage-leather
-input:farm-t1:water
-input:windmill-t1:grain
-input:bakery-t1:flour-water
-input:pig-farm-t1:grain-water
-input:slaughterhouse-t1:piglet
-loot:well-t1:water
-loot:farm-t1:grain
-loot:windmill-t1:flour
-loot:bakery-t1:bread
-loot:pig-farm-t1:piglet
-loot:slaughterhouse-t1:sausage-leather
+Era II raw food
+  Well -> Water
+  Wheat Field + Farm I + Water -> Grain
+  Pig Farm I + Grain + Water -> Piglet
+  Cattle Farm I + Grain + Water -> Milk
+  Chicken Coop I + Grain + Water -> Egg
+  Sheep Pasture I + Grain + Water -> Wool
+  Vegetable Garden I + Water -> Vegetables
+  Town Hall II -> Food Supply
+
+Era III processing
+  Windmill I + Grain -> Flour
+  Bakery I + Flour + Water -> Bread
+  Slaughterhouse I + Piglet -> Sausage + Leather
+  Dairy I + Milk -> Cheese
+  Cookhouse I + Bread + Sausage + Cheese + Vegetables + Egg -> Feast
+  Brewery I + Water near Hop Field -> Hops
+  Brewery I + Hops + Water -> Beer Barrel
+  Tavern I + Beer Barrel -> Beer
+  Winery I + Water near Vineyard -> Grapes
+  Winery I + Grapes + Water -> Wine Barrel
+  Tavern I + Wine Barrel -> Wine Glass
+  Market + processed food/drink -> Coin
 ```
 
 ### Initial balance placeholder
 
-Most first-pass production durations stay at `5000` ms. The new food processors are slightly longer on purpose: windmill flour takes `6000` ms, while bakery bread and slaughterhouse sausage/leather take `8000` ms. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
+Most first-pass production durations stay in the `5000` to `9000` ms range. Windmill flour takes `6000` ms, bakery bread and slaughterhouse sausage/leather take `8000` ms, dairy cheese takes `7000` ms, cookhouse feast takes `9000` ms, and market trades are intentionally short conversions. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
 Farm grain and pig-farm piglet production have product-level pollution hindrances: every nearby `item:pollution` within proximity `2` stacks a slowdown on those product lines. Brewery has a producer-level pollution hindrance with proximity `2`, and winery has a producer-level pollution hindrance with proximity `3`, so every production line on those buildings reacts to nearby pollution. Tiny ecological disaster, very charming.
 
@@ -200,6 +187,14 @@ Current processor input buffers use capacity `4`:
 - `input:winery-t1:water`
 - `input:winery-t1:grapes-water`
 - `input:winery-t1:wine-glass-to-barrel`
+- `input:dairy-t1:milk`
+- `input:cookhouse-t1:feast`
+- `input:market-t1:coin-from-bread`
+- `input:market-t1:coin-from-sausage`
+- `input:market-t1:coin-from-cheese`
+- `input:market-t1:coin-from-beer`
+- `input:market-t1:coin-from-wine-glass`
+- `input:market-t1:coin-from-feast`
 
 ### Asset alignment and current art gaps
 
@@ -246,6 +241,21 @@ The first food production line is wired into gameplay and uses these prepared as
 - `asset:item:leather` -> `game/arkini/assets/item-leather.png`
 - `asset:producer:well-t1` -> `game/arkini/assets/producer-well-t1.png`
 - `asset:item:water` -> `game/arkini/assets/item-water.png`
+- `asset:item:milk` -> `game/arkini/assets/item-milk.png`
+- `asset:item:egg` -> `game/arkini/assets/item-egg.png`
+- `asset:item:wool` -> `game/arkini/assets/item-wool.png`
+- `asset:item:vegetables` -> `game/arkini/assets/item-vegetables.png`
+- `asset:item:food-supply` -> `game/arkini/assets/item-food-supply.png`
+- `asset:producer:cattle-farm-t1` -> `game/arkini/assets/producer-cattle-farm-t1.png`
+- `asset:producer:chicken-coop-t1` -> `game/arkini/assets/producer-chicken-coop-t1.png`
+- `asset:producer:sheep-pasture-t1` -> `game/arkini/assets/producer-sheep-pasture-t1.png`
+- `asset:producer:vegetable-garden-t1` -> `game/arkini/assets/producer-vegetable-garden-t1.png`
+- `asset:item:cheese` -> `game/arkini/assets/item-cheese.png`
+- `asset:item:feast` -> `game/arkini/assets/item-feast.png`
+- `asset:producer:dairy-t1` -> `game/arkini/assets/producer-dairy-t1.png`
+- `asset:producer:cookhouse-t1` -> `game/arkini/assets/producer-cookhouse-t1.png`
+- `asset:producer:market-t1` -> `game/arkini/assets/producer-market-t1.png`
+- `asset:item:coin` -> `game/arkini/assets/item-coin.png`
 
 ### Brewing and wine asset IDs
 

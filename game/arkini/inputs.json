@@ -409,115 +409,6 @@
 				}
 			]
 		},
-		"input:townhall-t3:blueprint-coal-mine-t1": {
-			"name": "Blueprint: Coal Mine I input",
-			"inputs": [
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t3:blueprint-iron-mine-t1": {
-			"name": "Blueprint: Iron Mine I input",
-			"inputs": [
-				{
-					"itemId": "item:sausage",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:beer",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t3:blueprint-smelter-t1": {
-			"name": "Blueprint: Smelter I input",
-			"inputs": [
-				{
-					"itemId": "item:coal",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t3:blueprint-purifier-t1": {
-			"name": "Blueprint: Purifier I input",
-			"inputs": [
-				{
-					"itemId": "item:pollution",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t3:blueprint-gold-mine-t1": {
-			"name": "Blueprint: Gold Mine I input",
-			"inputs": [
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:wine-glass",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:townhall-t4:blueprint-goldsmith-t1": {
 			"name": "Blueprint: Goldsmith I input",
 			"inputs": [
@@ -591,89 +482,26 @@
 			"name": "Blueprint: Town Hall IV input",
 			"inputs": [
 				{
-					"itemId": "item:iron-ingot",
+					"itemId": "item:feast",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:gold-ingot",
-					"quantity": 1,
-					"capacity": 4,
+					"itemId": "item:coin",
+					"quantity": 2,
+					"capacity": 8,
 					"consume": true
 				},
 				{
-					"itemId": "item:advanced-knowledge",
+					"itemId": "item:plank",
 					"quantity": 2,
 					"capacity": 4,
 					"consume": true
-				}
-			]
-		},
-		"input:townhall-t3:coal-deposit": {
-			"name": "Survey: Coal Deposit input",
-			"inputs": [
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
 				},
 				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t3:iron-deposit": {
-			"name": "Survey: Iron Deposit input",
-			"inputs": [
-				{
-					"itemId": "item:sausage",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:beer",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t3:gold-deposit": {
-			"name": "Survey: Gold Deposit input",
-			"inputs": [
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:wine-glass",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
+					"itemId": "item:stone-block",
+					"quantity": 2,
 					"capacity": 4,
 					"consume": true
 				}
@@ -1058,23 +886,6 @@
 				}
 			]
 		},
-		"input:townhall-t3:blueprint-academy": {
-			"name": "Blueprint: Academy input",
-			"inputs": [
-				{
-					"itemId": "item:basic-knowledge",
-					"quantity": 3,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:beer",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:townhall-t4:blueprint-university": {
 			"name": "Blueprint: University input",
 			"inputs": [
@@ -1154,23 +965,6 @@
 			"inputs": [
 				{
 					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:townhall-t3:blueprint-school": {
-			"name": "Blueprint: School input",
-			"inputs": [
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:plank",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
@@ -1462,6 +1256,181 @@
 				},
 				{
 					"itemId": "item:vegetables",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:dairy-t1:milk": {
+			"name": "Dairy milk input",
+			"inputs": [
+				{
+					"itemId": "item:milk",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:cookhouse-t1:feast": {
+			"name": "Cookhouse feast input",
+			"inputs": [
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:cheese",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:vegetables",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:egg",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t1:coin-from-bread": {
+			"name": "Market bread trade input",
+			"inputs": [
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t1:coin-from-sausage": {
+			"name": "Market sausage trade input",
+			"inputs": [
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t1:coin-from-cheese": {
+			"name": "Market cheese trade input",
+			"inputs": [
+				{
+					"itemId": "item:cheese",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t1:coin-from-beer": {
+			"name": "Market beer trade input",
+			"inputs": [
+				{
+					"itemId": "item:beer",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t1:coin-from-wine-glass": {
+			"name": "Market wine glass trade input",
+			"inputs": [
+				{
+					"itemId": "item:wine-glass",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:market-t1:coin-from-feast": {
+			"name": "Market feast trade input",
+			"inputs": [
+				{
+					"itemId": "item:feast",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-dairy-t1": {
+			"name": "Blueprint: Dairy I input",
+			"inputs": [
+				{
+					"itemId": "item:milk",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-cookhouse-t1": {
+			"name": "Blueprint: Cookhouse I input",
+			"inputs": [
+				{
+					"itemId": "item:vegetables",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:townhall-t3:blueprint-market-t1": {
+			"name": "Blueprint: Market input",
+			"inputs": [
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:plank",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true

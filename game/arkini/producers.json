@@ -233,24 +233,17 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:townhall-t3:blueprint-school",
 				"product:townhall-t3:blueprint-windmill-t1",
 				"product:townhall-t3:blueprint-bakery-t1",
 				"product:townhall-t3:blueprint-slaughterhouse-t1",
+				"product:townhall-t3:blueprint-dairy-t1",
+				"product:townhall-t3:blueprint-cookhouse-t1",
 				"product:townhall-t3:hop-field",
 				"product:townhall-t3:blueprint-brewery-t1",
 				"product:townhall-t3:blueprint-tavern-t1",
 				"product:townhall-t3:vineyard",
 				"product:townhall-t3:blueprint-winery-t1",
-				"product:townhall-t3:blueprint-academy",
-				"product:townhall-t3:coal-deposit",
-				"product:townhall-t3:blueprint-coal-mine-t1",
-				"product:townhall-t3:iron-deposit",
-				"product:townhall-t3:blueprint-iron-mine-t1",
-				"product:townhall-t3:blueprint-smelter-t1",
-				"product:townhall-t3:blueprint-purifier-t1",
-				"product:townhall-t3:gold-deposit",
-				"product:townhall-t3:blueprint-gold-mine-t1",
+				"product:townhall-t3:blueprint-market-t1",
 				"product:townhall-t3:blueprint-townhall-t4"
 			],
 			"requirementIds": []
@@ -344,6 +337,35 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:vegetable-garden-t1:vegetables"
+			],
+			"requirementIds": []
+		},
+		"producer:dairy-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:dairy-t1:cheese"
+			],
+			"requirementIds": []
+		},
+		"producer:cookhouse-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:cookhouse-t1:feast"
+			],
+			"requirementIds": []
+		},
+		"producer:market-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:market-t1:coin-from-bread",
+				"product:market-t1:coin-from-sausage",
+				"product:market-t1:coin-from-cheese",
+				"product:market-t1:coin-from-beer",
+				"product:market-t1:coin-from-wine-glass",
+				"product:market-t1:coin-from-feast"
 			],
 			"requirementIds": []
 		}

@@ -56,14 +56,17 @@ describe("defaultGameConfig", () => {
 		]);
 
 		expectPassiveOwnedRequirements("craft:townhall-t4", [
-			"item:coal-deposit",
-			"producer:coal-mine-t1",
-			"item:iron-deposit",
-			"producer:iron-mine-t1",
-			"producer:smelter-t1",
-			"producer:purifier-t1",
-			"item:gold-deposit",
-			"producer:gold-mine-t1",
+			"producer:windmill-t1",
+			"producer:bakery-t1",
+			"producer:slaughterhouse-t1",
+			"producer:dairy-t1",
+			"producer:cookhouse-t1",
+			"item:hop-field",
+			"producer:brewery-t1",
+			"producer:tavern-t1",
+			"item:vineyard",
+			"producer:winery-t1",
+			"producer:market-t1",
 		]);
 	});
 });

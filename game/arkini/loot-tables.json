@@ -315,56 +315,6 @@
 				}
 			]
 		},
-		"loot:townhall-t3:blueprint-coal-mine-t1": {
-			"name": "Blueprint: Coal Mine I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-coal-mine-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-iron-mine-t1": {
-			"name": "Blueprint: Iron Mine I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-iron-mine-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-smelter-t1": {
-			"name": "Blueprint: Smelter I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-smelter-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-purifier-t1": {
-			"name": "Blueprint: Purifier I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-purifier-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-gold-mine-t1": {
-			"name": "Blueprint: Gold Mine I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-gold-mine-t1",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:townhall-t4:blueprint-goldsmith-t1": {
 			"name": "Blueprint: Goldsmith I output",
 			"output": [
@@ -401,36 +351,6 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-townhall-t4",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:coal-deposit": {
-			"name": "Survey: Coal Deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coal-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:iron-deposit": {
-			"name": "Survey: Iron Deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:iron-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:gold-deposit": {
-			"name": "Survey: Gold Deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:gold-deposit",
 					"quantity": 1
 				}
 			]
@@ -735,32 +655,12 @@
 				}
 			]
 		},
-		"loot:townhall-t3:blueprint-academy": {
-			"name": "Blueprint: Academy output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-academy",
-					"quantity": 1
-				}
-			]
-		},
 		"loot:townhall-t4:blueprint-university": {
 			"name": "Blueprint: University output",
 			"output": [
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-university",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-school": {
-			"name": "Blueprint: School output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-school",
 					"quantity": 1
 				}
 			]
@@ -951,6 +851,116 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:vegetables",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:dairy-t1:cheese": {
+			"name": "Dairy cheese",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:cheese",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:cookhouse-t1:feast": {
+			"name": "Cookhouse feast",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:feast",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t1:coin-from-bread": {
+			"name": "Market coins from bread",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t1:coin-from-sausage": {
+			"name": "Market coins from sausage",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t1:coin-from-cheese": {
+			"name": "Market coins from cheese",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t1:coin-from-beer": {
+			"name": "Market coins from beer",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t1:coin-from-wine-glass": {
+			"name": "Market coins from wine glass",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:market-t1:coin-from-feast": {
+			"name": "Market coins from feast",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-dairy-t1": {
+			"name": "Blueprint: Dairy I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-dairy-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-cookhouse-t1": {
+			"name": "Blueprint: Cookhouse I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-cookhouse-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-market-t1": {
+			"name": "Blueprint: Market output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-market-t1",
 					"quantity": 1
 				}
 			]

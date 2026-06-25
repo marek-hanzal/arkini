@@ -155,7 +155,7 @@
 		},
 		"asset:item:blueprint-market-t1": {
 			"kind": "item",
-			"label": "Market I Blueprint",
+			"label": "Market Blueprint",
 			"render": "blueprint",
 			"resourceId": "item-blueprint",
 			"overlayAssetId": "asset:producer:market-t1"
@@ -859,7 +859,7 @@
 		},
 		"asset:producer:market-t1": {
 			"kind": "item",
-			"label": "Market I",
+			"label": "Market",
 			"render": "plain",
 			"resourceId": "producer-market-t1"
 		},
@@ -1064,6 +1064,44 @@
 			"label": "Food Supply",
 			"render": "plain",
 			"resourceId": "item-food-supply"
+		},
+		"asset:producer:dairy-t1": {
+			"kind": "item",
+			"label": "Dairy I",
+			"render": "plain",
+			"resourceId": "producer-dairy-t1"
+		},
+		"asset:producer:cookhouse-t1": {
+			"kind": "item",
+			"label": "Cookhouse I",
+			"render": "plain",
+			"resourceId": "producer-cookhouse-t1"
+		},
+		"asset:item:cheese": {
+			"kind": "item",
+			"label": "Cheese",
+			"render": "plain",
+			"resourceId": "item-cheese"
+		},
+		"asset:item:feast": {
+			"kind": "item",
+			"label": "Feast",
+			"render": "plain",
+			"resourceId": "item-feast"
+		},
+		"asset:item:blueprint-dairy-t1": {
+			"kind": "item",
+			"label": "Dairy I Blueprint",
+			"overlayAssetId": "asset:producer:dairy-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-cookhouse-t1": {
+			"kind": "item",
+			"label": "Cookhouse I Blueprint",
+			"overlayAssetId": "asset:producer:cookhouse-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
 		}
 	}
 }

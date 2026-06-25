@@ -263,22 +263,6 @@
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t1:blueprint-well-t1"
 		},
-		"product:townhall-t2:blueprint-windmill-t1": {
-			"name": "Blueprint: Windmill I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-windmill-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-windmill-t1"
-		},
-		"product:townhall-t2:blueprint-bakery-t1": {
-			"name": "Blueprint: Bakery I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-bakery-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-bakery-t1"
-		},
 		"product:townhall-t2:blueprint-pig-farm-t1": {
 			"name": "Blueprint: Pig Farm I",
 			"durationMs": 2000,
@@ -286,38 +270,6 @@
 			"inputRefId": "input:townhall-t2:blueprint-pig-farm-t1",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t2:blueprint-pig-farm-t1"
-		},
-		"product:townhall-t2:blueprint-slaughterhouse-t1": {
-			"name": "Blueprint: Slaughterhouse I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-slaughterhouse-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-slaughterhouse-t1"
-		},
-		"product:townhall-t2:blueprint-brewery-t1": {
-			"name": "Blueprint: Brewery I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-brewery-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-brewery-t1"
-		},
-		"product:townhall-t2:blueprint-tavern-t1": {
-			"name": "Blueprint: Tavern I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-tavern-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-tavern-t1"
-		},
-		"product:townhall-t2:blueprint-winery-t1": {
-			"name": "Blueprint: Winery I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-winery-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-winery-t1"
 		},
 		"product:townhall-t3:blueprint-coal-mine-t1": {
 			"name": "Blueprint: Coal Mine I",
@@ -390,22 +342,6 @@
 			"inputRefId": "input:townhall-t3:blueprint-townhall-t4",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t3:blueprint-townhall-t4"
-		},
-		"product:townhall-t2:hop-field": {
-			"name": "Survey: Hop Field",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:hop-field",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:hop-field"
-		},
-		"product:townhall-t2:vineyard": {
-			"name": "Survey: Vineyard",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:vineyard",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:vineyard"
 		},
 		"product:townhall-t3:coal-deposit": {
 			"name": "Survey: Coal Deposit",
@@ -567,14 +503,6 @@
 			"requirementIds": [],
 			"outputTableId": "loot:university:master-knowledge"
 		},
-		"product:townhall-t2:blueprint-school": {
-			"name": "Blueprint: School",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-school",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-school"
-		},
 		"product:townhall-t3:blueprint-academy": {
 			"name": "Blueprint: Academy",
 			"durationMs": 2000,
@@ -590,6 +518,206 @@
 			"inputRefId": "input:townhall-t4:blueprint-university",
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t4:blueprint-university"
+		},
+		"product:townhall-t3:blueprint-school": {
+			"name": "Blueprint: School",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:blueprint-school",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-school"
+		},
+		"product:townhall-t3:blueprint-windmill-t1": {
+			"name": "Blueprint: Windmill I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:blueprint-windmill-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-windmill-t1"
+		},
+		"product:townhall-t3:blueprint-bakery-t1": {
+			"name": "Blueprint: Bakery I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:blueprint-bakery-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-bakery-t1"
+		},
+		"product:townhall-t3:blueprint-slaughterhouse-t1": {
+			"name": "Blueprint: Slaughterhouse I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:blueprint-slaughterhouse-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-slaughterhouse-t1"
+		},
+		"product:townhall-t3:hop-field": {
+			"name": "Survey: Hop Field",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:hop-field",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:hop-field"
+		},
+		"product:townhall-t3:blueprint-brewery-t1": {
+			"name": "Blueprint: Brewery I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:blueprint-brewery-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-brewery-t1"
+		},
+		"product:townhall-t3:blueprint-tavern-t1": {
+			"name": "Blueprint: Tavern I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:blueprint-tavern-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-tavern-t1"
+		},
+		"product:townhall-t3:vineyard": {
+			"name": "Survey: Vineyard",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:vineyard",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:vineyard"
+		},
+		"product:townhall-t3:blueprint-winery-t1": {
+			"name": "Blueprint: Winery I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t3:blueprint-winery-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t3:blueprint-winery-t1"
+		},
+		"product:townhall-t2:wheat-field": {
+			"name": "Survey: Wheat Field",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t2:wheat-field",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t2:wheat-field"
+		},
+		"product:townhall-t2:blueprint-farm-t1": {
+			"name": "Blueprint: Farm I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t2:blueprint-farm-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t2:blueprint-farm-t1"
+		},
+		"product:townhall-t2:blueprint-cattle-farm-t1": {
+			"name": "Blueprint: Cattle Farm I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t2:blueprint-cattle-farm-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t2:blueprint-cattle-farm-t1"
+		},
+		"product:townhall-t2:blueprint-chicken-coop-t1": {
+			"name": "Blueprint: Chicken Coop I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t2:blueprint-chicken-coop-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t2:blueprint-chicken-coop-t1"
+		},
+		"product:townhall-t2:blueprint-sheep-pasture-t1": {
+			"name": "Blueprint: Sheep Pasture I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t2:blueprint-sheep-pasture-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t2:blueprint-sheep-pasture-t1"
+		},
+		"product:townhall-t2:blueprint-vegetable-garden-t1": {
+			"name": "Blueprint: Vegetable Garden I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t2:blueprint-vegetable-garden-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t2:blueprint-vegetable-garden-t1"
+		},
+		"product:townhall-t2:food-supply": {
+			"name": "Food Supply",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:townhall-t2:food-supply",
+			"requirementIds": [],
+			"outputTableId": "loot:townhall-t2:food-supply"
+		},
+		"product:cattle-farm-t1:milk": {
+			"name": "Milk",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:cattle-farm-t1:grain-water",
+			"requirementIds": [],
+			"outputTableId": "loot:cattle-farm-t1:milk",
+			"hinderedBy": [
+				{
+					"type": "proximity",
+					"itemIds": [
+						"item:pollution"
+					],
+					"distance": 2,
+					"durationFactor": 0.5
+				}
+			]
+		},
+		"product:chicken-coop-t1:egg": {
+			"name": "Egg",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:chicken-coop-t1:grain-water",
+			"requirementIds": [],
+			"outputTableId": "loot:chicken-coop-t1:egg",
+			"hinderedBy": [
+				{
+					"type": "proximity",
+					"itemIds": [
+						"item:pollution"
+					],
+					"distance": 2,
+					"durationFactor": 0.5
+				}
+			]
+		},
+		"product:sheep-pasture-t1:wool": {
+			"name": "Wool",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:sheep-pasture-t1:grain-water",
+			"requirementIds": [],
+			"outputTableId": "loot:sheep-pasture-t1:wool",
+			"hinderedBy": [
+				{
+					"type": "proximity",
+					"itemIds": [
+						"item:pollution"
+					],
+					"distance": 2,
+					"durationFactor": 0.5
+				}
+			]
+		},
+		"product:vegetable-garden-t1:vegetables": {
+			"name": "Vegetables",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:vegetable-garden-t1:water",
+			"requirementIds": [],
+			"outputTableId": "loot:vegetable-garden-t1:vegetables",
+			"hinderedBy": [
+				{
+					"type": "proximity",
+					"itemIds": [
+						"item:pollution"
+					],
+					"distance": 2,
+					"durationFactor": 0.5
+				}
+			]
 		}
 	}
 }

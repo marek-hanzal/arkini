@@ -982,6 +982,88 @@
 			"label": "Winery I",
 			"render": "plain",
 			"resourceId": "producer-winery-t1"
+		},
+		"asset:producer:cattle-farm-t1": {
+			"kind": "item",
+			"label": "Cattle Farm I",
+			"render": "plain",
+			"resourceId": "producer-cattle-farm-t1"
+		},
+		"asset:item:blueprint-cattle-farm-t1": {
+			"kind": "item",
+			"label": "Cattle Farm I Blueprint",
+			"overlayAssetId": "asset:producer:cattle-farm-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:milk": {
+			"kind": "item",
+			"label": "Milk",
+			"render": "plain",
+			"resourceId": "item-milk"
+		},
+		"asset:producer:chicken-coop-t1": {
+			"kind": "item",
+			"label": "Chicken Coop I",
+			"render": "plain",
+			"resourceId": "producer-chicken-coop-t1"
+		},
+		"asset:item:blueprint-chicken-coop-t1": {
+			"kind": "item",
+			"label": "Chicken Coop I Blueprint",
+			"overlayAssetId": "asset:producer:chicken-coop-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:egg": {
+			"kind": "item",
+			"label": "Egg",
+			"render": "plain",
+			"resourceId": "item-egg"
+		},
+		"asset:producer:sheep-pasture-t1": {
+			"kind": "item",
+			"label": "Sheep Pasture I",
+			"render": "plain",
+			"resourceId": "producer-sheep-pasture-t1"
+		},
+		"asset:item:blueprint-sheep-pasture-t1": {
+			"kind": "item",
+			"label": "Sheep Pasture I Blueprint",
+			"overlayAssetId": "asset:producer:sheep-pasture-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:wool": {
+			"kind": "item",
+			"label": "Wool",
+			"render": "plain",
+			"resourceId": "item-wool"
+		},
+		"asset:producer:vegetable-garden-t1": {
+			"kind": "item",
+			"label": "Vegetable Garden I",
+			"render": "plain",
+			"resourceId": "producer-vegetable-garden-t1"
+		},
+		"asset:item:blueprint-vegetable-garden-t1": {
+			"kind": "item",
+			"label": "Vegetable Garden I Blueprint",
+			"overlayAssetId": "asset:producer:vegetable-garden-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:vegetables": {
+			"kind": "item",
+			"label": "Vegetables",
+			"render": "plain",
+			"resourceId": "item-vegetables"
+		},
+		"asset:item:food-supply": {
+			"kind": "item",
+			"label": "Food Supply",
+			"render": "plain",
+			"resourceId": "item-food-supply"
 		}
 	}
 }

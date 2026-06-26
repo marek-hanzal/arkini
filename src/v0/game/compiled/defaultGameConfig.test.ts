@@ -47,10 +47,12 @@ describe("defaultGameConfig", () => {
 			"product:townhall-t4:blueprint-weaver-hut-t1",
 			"product:townhall-t4:blueprint-dye-workshop-t1",
 			"product:townhall-t4:blueprint-tailor-workshop-t1",
+			"product:townhall-t4:blueprint-house-t3",
 		]);
 
 		expect(defaultGameConfig.producers["producer:civic-office-t1"].productIds).toEqual([
 			"product:civic-office-t1:building-permit",
+			"product:civic-office-t1:building-permit-morale-t2",
 			"product:civic-office-t1:blueprint-academy",
 			"product:civic-office-t1:guild-charter",
 		]);
@@ -98,6 +100,7 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.producers["producer:tailor-workshop-t1"].productIds).toEqual([
 			"product:tailor-workshop-t1:common-clothing",
 			"product:tailor-workshop-t1:luxury-clothing",
+			"product:tailor-workshop-t1:luxury-clothing-morale-t3",
 		]);
 	});
 
@@ -146,6 +149,7 @@ describe("defaultGameConfig", () => {
 
 		expect(defaultGameConfig.producers["producer:construction-yard-t1"].productIds).toEqual([
 			"product:construction-yard-t1:construction-bundle",
+			"product:construction-yard-t1:construction-bundle-morale-t3",
 		]);
 
 		expect(defaultGameConfig.producers["producer:academy"].productIds).toContain(
@@ -218,6 +222,7 @@ describe("defaultGameConfig", () => {
 
 		expect(defaultGameConfig.producers["producer:civic-office-t1"].productIds).toEqual([
 			"product:civic-office-t1:building-permit",
+			"product:civic-office-t1:building-permit-morale-t2",
 			"product:civic-office-t1:blueprint-academy",
 			"product:civic-office-t1:guild-charter",
 		]);
@@ -260,6 +265,7 @@ describe("defaultGameConfig", () => {
 			"product:heroes-guild-t1:chest-t3",
 			"product:heroes-guild-t1:chest-t4",
 			"product:heroes-guild-t1:treasure-chest",
+			"product:heroes-guild-t1:treasure-chest-morale-t4",
 		]);
 
 		expect(defaultGameConfig.products["product:blacksmith-t1:nails"].requirementIds).toEqual([
@@ -309,6 +315,7 @@ describe("defaultGameConfig", () => {
 		);
 		expect(defaultGameConfig.producers["producer:glazier-workshop-t1"].productIds).toEqual([
 			"product:glazier-workshop-t1:stained-glass",
+			"product:glazier-workshop-t1:stained-glass-morale-t4",
 		]);
 		expect(defaultGameConfig.producers["producer:glazier-workshop-t1"].requirementIds).toEqual([
 			"proximity:glazier-workshop-t1:glassworks",
@@ -374,6 +381,7 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.producers["producer:stonemason-t2"].productIds).toEqual([
 			"product:stonemason-t2:stone-block",
 			"product:stonemason-t2:marble-block",
+			"product:stonemason-t2:marble-block-morale-t4",
 		]);
 		expect(defaultGameConfig.producers["producer:stonemason-t2"].requirementIds).toEqual([
 			"proximity:stonemason-t2:quarry-t2",
@@ -480,6 +488,86 @@ describe("defaultGameConfig", () => {
 			"producer:stonemason-t2",
 			"producer:glazier-workshop-t1",
 			"producer:heroes-guild-t1",
+		]);
+	});
+
+	it("wires housing morale as a side economy and optional production boost", () => {
+		expect(defaultGameConfig.assets["asset:producer:house-t1"].resourceId).toBe(
+			"producer-house-t1",
+		);
+		expect(defaultGameConfig.assets["asset:item:morale-t4"].resourceId).toBe("item-morale-t4");
+
+		expect(defaultGameConfig.producers["producer:townhall-t2"].productIds).toContain(
+			"product:townhall-t2:blueprint-house-t1",
+		);
+		expect(defaultGameConfig.producers["producer:townhall-t3"].productIds).toContain(
+			"product:townhall-t3:blueprint-house-t2",
+		);
+		expect(defaultGameConfig.producers["producer:townhall-t4"].productIds).toContain(
+			"product:townhall-t4:blueprint-house-t3",
+		);
+		expect(defaultGameConfig.producers["producer:university"].productIds).toContain(
+			"product:university:blueprint-house-t4",
+		);
+
+		expect(defaultGameConfig.producers["producer:house-t1"].productIds).toEqual([
+			"product:house-t1:morale-t1",
+		]);
+		expect(defaultGameConfig.lootTables["loot:house-t4:morale-t4"].output).toEqual([
+			{
+				itemId: "item:morale-t4",
+				quantity: 1,
+				type: "guaranteed",
+			},
+			{
+				itemId: "item:morale-t3",
+				quantity: 1,
+				type: "guaranteed",
+			},
+			{
+				itemId: "item:morale-t2",
+				quantity: 1,
+				type: "guaranteed",
+			},
+			{
+				itemId: "item:morale-t1",
+				quantity: 1,
+				type: "guaranteed",
+			},
+		]);
+
+		expect(defaultGameConfig.craftRecipes["craft:townhall-t3"].inputs).toContainEqual({
+			consume: true,
+			itemId: "item:morale-t1",
+			quantity: 1,
+		});
+		expect(defaultGameConfig.craftRecipes["craft:townhall-t4"].inputs).toContainEqual({
+			consume: true,
+			itemId: "item:morale-t2",
+			quantity: 1,
+		});
+		expect(defaultGameConfig.craftRecipes["craft:house-of-engineers"].inputs).toContainEqual({
+			consume: true,
+			itemId: "item:morale-t4",
+			quantity: 1,
+		});
+
+		expect(defaultGameConfig.producers["producer:farm-t1"].productIds).toEqual([
+			"product:farm-t1:grain",
+			"product:farm-t1:grain-morale-t1",
+		]);
+		expect(defaultGameConfig.inputs["input:farm-t1:grain-morale-t1"].inputs).toContainEqual({
+			capacity: 4,
+			consume: true,
+			itemId: "item:morale-t1",
+			quantity: 1,
+		});
+		expect(defaultGameConfig.lootTables["loot:farm-t1:grain-morale-t1"].output).toEqual([
+			{
+				itemId: "item:grain",
+				quantity: 2,
+				type: "guaranteed",
+			},
 		]);
 	});
 

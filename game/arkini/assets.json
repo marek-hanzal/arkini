@@ -223,6 +223,34 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-house-t1": {
+			"kind": "item",
+			"label": "House 1 Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:house-t1"
+		},
+		"asset:item:blueprint-house-t2": {
+			"kind": "item",
+			"label": "House 2 Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:house-t2"
+		},
+		"asset:item:blueprint-house-t3": {
+			"kind": "item",
+			"label": "House 3 Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:house-t3"
+		},
+		"asset:item:blueprint-house-t4": {
+			"kind": "item",
+			"label": "House 4 Blueprint",
+			"render": "blueprint",
+			"resourceId": "item-blueprint",
+			"overlayAssetId": "asset:producer:house-t4"
+		},
 		"asset:item:blueprint-iron-mine-t1": {
 			"kind": "item",
 			"label": "Iron Mine I Blueprint",
@@ -845,6 +873,30 @@
 			"render": "plain",
 			"resourceId": "item-milk"
 		},
+		"asset:item:morale-t1": {
+			"kind": "item",
+			"label": "Morale 1",
+			"render": "plain",
+			"resourceId": "item-morale-t1"
+		},
+		"asset:item:morale-t2": {
+			"kind": "item",
+			"label": "Morale 2",
+			"render": "plain",
+			"resourceId": "item-morale-t2"
+		},
+		"asset:item:morale-t3": {
+			"kind": "item",
+			"label": "Morale 3",
+			"render": "plain",
+			"resourceId": "item-morale-t3"
+		},
+		"asset:item:morale-t4": {
+			"kind": "item",
+			"label": "Morale 4",
+			"render": "plain",
+			"resourceId": "item-morale-t4"
+		},
 		"asset:item:nails": {
 			"kind": "item",
 			"label": "Nails",
@@ -1216,6 +1268,30 @@
 			"label": "House of Engineers",
 			"render": "plain",
 			"resourceId": "producer-house-of-engineers"
+		},
+		"asset:producer:house-t1": {
+			"kind": "item",
+			"label": "House 1",
+			"render": "plain",
+			"resourceId": "producer-house-t1"
+		},
+		"asset:producer:house-t2": {
+			"kind": "item",
+			"label": "House 2",
+			"render": "plain",
+			"resourceId": "producer-house-t2"
+		},
+		"asset:producer:house-t3": {
+			"kind": "item",
+			"label": "House 3",
+			"render": "plain",
+			"resourceId": "producer-house-t3"
+		},
+		"asset:producer:house-t4": {
+			"kind": "item",
+			"label": "House 4",
+			"render": "plain",
+			"resourceId": "producer-house-t4"
 		},
 		"asset:producer:iron-mine-t1": {
 			"kind": "item",

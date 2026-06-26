@@ -32,6 +32,11 @@
 					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t2",
+					"quantity": 1
 				}
 			],
 			"requirements": [
@@ -298,6 +303,16 @@
 					"consume": true,
 					"itemId": "item:coin-stack",
 					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
 				}
 			],
 			"requirements": [
@@ -575,6 +590,11 @@
 				{
 					"consume": true,
 					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3",
 					"quantity": 1
 				}
 			],
@@ -1043,6 +1063,16 @@
 					"consume": true,
 					"itemId": "item:coin-stack",
 					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
 				}
 			],
 			"requirements": [
@@ -1072,6 +1102,221 @@
 				}
 			],
 			"resultItemId": "producer:house-of-engineers"
+		},
+		"craft:house-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:blueprint-house-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:well-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:house-t1"
+		},
+		"craft:house-t2": {
+			"durationMs": 14000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:house-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:blueprint-house-t2",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t1",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:bakery-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:market-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:house-t2"
+		},
+		"craft:house-t3": {
+			"durationMs": 18000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:house-t2",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:blueprint-house-t3",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t2",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:civic-office-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:tailor-workshop-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:house-t3"
+		},
+		"craft:house-t4": {
+			"durationMs": 24000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:house-t3",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:blueprint-house-t4",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:stonemason-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:glazier-workshop-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:house-t4"
 		},
 		"craft:iron-mine-t1": {
 			"durationMs": 12000,
@@ -1182,6 +1427,16 @@
 					"consume": true,
 					"itemId": "item:coin-stack",
 					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
 				}
 			],
 			"requirements": [
@@ -1997,6 +2252,11 @@
 					"consume": true,
 					"itemId": "item:wool",
 					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t1",
+					"quantity": 1
 				}
 			],
 			"requirements": [
@@ -2072,6 +2332,16 @@
 					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t2",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t1",
+					"quantity": 1
 				}
 			],
 			"requirements": [
@@ -2186,6 +2456,16 @@
 					"consume": true,
 					"itemId": "item:coin-stack",
 					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t2",
+					"quantity": 1
 				}
 			],
 			"requirements": [

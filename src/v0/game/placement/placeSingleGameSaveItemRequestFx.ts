@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanceIdFx";
-import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
+import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
+import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
@@ -98,6 +99,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			location: "inventory",
 		});
 
+		let boardBlockedByEffect = false;
 		while (canPlaceOnBoard && remainingQuantity > 0) {
 			if (
 				readBoardItemMaxCountCapacity({
@@ -110,24 +112,27 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 				break;
 			}
 
-			const emptyCell = yield* findFirstEmptyBoardCellFx({
+			const emptyCells = yield* planEmptyBoardCellsFx({
 				config,
 				save,
 				seedCell,
 			});
-
-			if (!emptyCell) {
+			if (emptyCells.length === 0) {
 				boardRanOutOfSpace = true;
 				break;
 			}
 
-			yield* checkPlacementEffectBlocksFx({
+			const [emptyCell] = yield* planItemBoardPlacementCellsFx({
 				config,
 				itemId: item.itemId,
 				nowMs,
 				save,
-				targetCell: emptyCell,
+				seedCell,
 			});
+			if (!emptyCell) {
+				boardBlockedByEffect = true;
+				break;
+			}
 
 			const itemInstanceId = yield* createGameItemInstanceIdFx();
 			save.board.items[itemInstanceId] = {
@@ -171,13 +176,17 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		const reason =
 			canPlaceOnBoard &&
 			(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-			boardHitMaxCount
-				? "board:max-count"
+			boardBlockedByEffect
+				? "effect:block-create"
 				: canPlaceOnBoard &&
 						(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-						boardRanOutOfSpace
-					? "board:full"
-					: "inventory:full";
+						boardHitMaxCount
+					? "board:max-count"
+					: canPlaceOnBoard &&
+							(!canPlaceInInventory || boardPlacedQuantity === 0) &&
+							boardRanOutOfSpace
+						? "board:full"
+						: "inventory:full";
 
 		return yield* Effect.fail(
 			GameEngineError.placementFailed(reason, "Placement target is full."),

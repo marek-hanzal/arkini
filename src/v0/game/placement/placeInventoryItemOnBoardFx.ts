@@ -3,7 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { checkInventoryItemPlaceReadinessFx } from "~/v0/game/placement/checkInventoryItemPlaceReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanceIdFx";
-import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
+import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
@@ -79,20 +79,26 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 		}
 
 		nextSave.inventory.slots[action.slotIndex] = null;
-		const targetCell =
+		const [nearestAllowedCell] =
 			placementMode === "exact"
-				? {
-						x: action.x,
-						y: action.y,
-					}
-				: yield* findFirstEmptyBoardCellFx({
+				? []
+				: yield* planItemBoardPlacementCellsFx({
 						config,
+						itemId,
+						nowMs,
 						save: nextSave,
 						seedCell: {
 							x: action.x,
 							y: action.y,
 						},
 					});
+		const targetCell =
+			placementMode === "exact"
+				? {
+						x: action.x,
+						y: action.y,
+					}
+				: (nearestAllowedCell ?? null);
 
 		if (!targetCell) {
 			return yield* Effect.fail(

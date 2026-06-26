@@ -972,6 +972,21 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [effectId, effect] of Object.entries(value.effects)) {
+		if (
+			effect.scope === "local" &&
+			(effect.sourceScope === "inventory" || effect.sourceScope === "both")
+		) {
+			addIssue(
+				ctx,
+				[
+					"effects",
+					effectId,
+					"sourceScope",
+				],
+				`Local effect "${effectId}" must use board source scope because inventory sources have no board cell.`,
+			);
+		}
+
 		for (const [operationIndex, operation] of effect.operations.entries()) {
 			const targetPath: GameConfigIssuePath = [
 				"effects",

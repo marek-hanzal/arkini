@@ -673,7 +673,7 @@ Product lines can start as `visibility: "hidden"` and be revealed by runtime eff
 
 Runtime effects are product-line mutators and item-creation rules. They do not patch or rewrite `GameConfig`; instead, a concrete product line asks the runtime which effects apply and receives an effective view. Effect sources have identity and board position, so local effects use Chebyshev distance just like proximity requirements, while global effects apply regardless of distance.
 
-Passive effects come from items via `passiveEffectIds`. Each effect definition decides where its source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Local effects still need a board position, so inventory-sourced effects are primarily for global hard rules such as path locks. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
+Passive effects come from items via `passiveEffectIds`. Each effect definition decides where its source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Local effects must be board-sourced because distance needs a board cell; config validation rejects local effects that claim inventory/both source scope. Inventory-sourced effects are for global hard rules such as path locks. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
 
 Effects currently operate on product-line visibility, start blocking, duration, loot plan evaluation, and item creation blocking. They can reveal or hide lines, block starts, add or multiply duration, append or replace loot tables, add chance item drops, adjust the chance that base loot is rolled, and block creation of matching items. They intentionally do not mutate config, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
 
@@ -852,7 +852,7 @@ Default stash output placement is `board_then_inventory`, using the same determi
 
 Stash output is all-or-nothing for the whole open action. Activation must not consume inputs, advance charges, deplete contents, or mutate state unless the complete generated output can be placed across board and inventory.
 
-Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately. Spawn job sequence metadata is the backend source for visual spawn order, so UI does not need to invent a parallel spawn schedule just to animate items like a tiny circus.
+Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately. Spawn job sequence metadata is the backend source for visual spawn order, so UI does not need to invent a parallel spawn schedule just to animate items like a tiny circus. Spawn jobs with unresolved dependencies are not considered wakeable until their dependencies resolve, even if their own due time is already in the past; dependency cycles are invalid save data.
 
 ## 12. Loot tables
 
@@ -1079,7 +1079,7 @@ Until a concrete animation spec exists, implementation should choose minimal loc
 
 ### 16.4 Current merge/feed animation rules
 
-Same-item board merge, mixed consumption, producer drops, stash dumps, and inventory placement all use the same visual rule: the final board/inventory item actor is the real actor. There is no separate duplicate overlay representation for the same item. Cells/slots provide geometry and feedback; items live in stable item layers and animate transform/priority there.
+Same-item board merge, mixed consumption, producer drops, stash dumps, debug spawn, and inventory placement all use the same visual rule: the final board/inventory item actor is the real actor. There is no separate duplicate overlay representation for the same item. Cells/slots provide geometry and feedback; items live in stable item layers and animate transform/priority there. Board placement helpers skip locally effect-blocked cells and continue to the first allowed cell, so local hard rules constrain placement areas without making the whole board unusable.
 
 Newly committed actors may be staged from a source rectangle through `useVisualItemMotions`. During that transient phase they can render above their source with raised priority, then settle back to normal priority when Motion completes. Drag/drop keeps the active source hidden until the durable command and query invalidation settle, preventing the source actor from reappearing on its old slot and then animating a second time.
 

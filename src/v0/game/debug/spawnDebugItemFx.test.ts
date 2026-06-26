@@ -47,6 +47,72 @@ describe("spawnDebugItemFx", () => {
 		]);
 	});
 
+	it("places debug board items into the first effect-allowed cell", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-near-producer": {
+					name: "Block near producer",
+					operations: [
+						{
+							kind: "item.blockCreate",
+							target: {
+								itemIds: [
+									"item:twig",
+								],
+							},
+						},
+					],
+					radius: 1,
+					scope: "local",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 3,
+				},
+				title: "Test",
+			},
+			items: {
+				...baseConfig.items,
+				"item:producer": {
+					...baseConfig.items["item:producer"],
+					passiveEffectIds: [
+						"effect:block-near-producer",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				itemId: "item:twig",
+				location: "board",
+				type: "debug.item.spawn",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 2,
+				y: 0,
+			}),
+		).toBeDefined();
+	});
+
 	it("adds a debug item to the real game inventory", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

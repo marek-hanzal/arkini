@@ -380,6 +380,82 @@ describe("placeGameSaveItemsFx", () => {
 		]);
 	});
 
+	it("skips locally blocked board cells instead of failing the whole placement", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-near-producer": {
+					name: "Block near producer",
+					operations: [
+						{
+							kind: "item.blockCreate",
+							target: {
+								itemIds: [
+									"item:plank",
+								],
+							},
+						},
+					],
+					radius: 1,
+					scope: "local",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 3,
+				},
+				title: "Test",
+			},
+			items: {
+				...baseConfig.items,
+				"item:producer": {
+					...baseConfig.items["item:producer"],
+					passiveEffectIds: [
+						"effect:block-near-producer",
+					],
+				},
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					storage: "board",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runPlacement({
+			config,
+			items: [
+				{
+					itemId: "item:plank",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:plank",
+				to: {
+					kind: "board",
+					x: 2,
+					y: 0,
+				},
+				type: "item.created",
+			},
+		]);
+	});
+
 	it("rejects placement when an effect blocks item creation", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig();

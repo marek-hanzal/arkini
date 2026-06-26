@@ -712,4 +712,4 @@ Choose The Path asset IDs:
 
 ### Runtime effect source scope
 
-Passive effects can choose where their source item counts through `sourceScope`: `board`, `inventory`, or `both`. The Choose The Path keystone locks use `both`, so storing the chosen keystone does not accidentally reopen counter-path blueprints. Global effects work from inventory; local effects need a board position to have meaningful distance.
+Passive effects can choose where their source item counts through `sourceScope`: `board`, `inventory`, or `both`. The Choose The Path keystone locks use `both`, so storing the chosen keystone does not accidentally reopen counter-path blueprints. Global effects work from inventory; local effects must be board-sourced because inventory has no board position for distance.

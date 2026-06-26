@@ -626,6 +626,88 @@ describe("createGameEngineVisualPlan", () => {
 		});
 	});
 
+	it("retains a depleted stash tile even when removal is emitted before spawn events", () => {
+		const previousBoard = boardView([
+			{
+				id: "stash",
+				itemId: "item:chest",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "output:1",
+					itemId: "item:twig",
+					state: {},
+					x: 1,
+					y: 0,
+				},
+				{
+					id: "output:2",
+					itemId: "item:stone",
+					state: {},
+					x: 2,
+					y: 0,
+				},
+			]),
+			currentInventory: undefined,
+			events: [
+				{
+					depletedAtMs: 1,
+					stashId: "stash:chest",
+					stashItemInstanceId: "stash",
+					type: "stash.depleted",
+				},
+				{
+					itemId: "item:chest",
+					itemInstanceId: "stash",
+					reason: "stash-depleted",
+					removedAtMs: 1,
+					type: "item.removed",
+				},
+				{
+					itemId: "item:twig",
+					originItemInstanceId: "stash",
+					reason: "stash-output",
+					spawnSequenceIndex: 0,
+					to: {
+						itemInstanceId: "output:1",
+						kind: "board",
+						x: 1,
+						y: 0,
+					},
+					type: "item.created",
+				},
+				{
+					itemId: "item:stone",
+					originItemInstanceId: "stash",
+					reason: "stash-output",
+					spawnSequenceIndex: 1,
+					to: {
+						itemInstanceId: "output:2",
+						kind: "board",
+						x: 2,
+						y: 0,
+					},
+					type: "item.created",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		const lastOutputStartDelayMs = Math.max(
+			...plan.boardEnterRequests.map((request) => request.enter?.delayMs ?? 0),
+		);
+		expect(plan.boardTransientTilePlans[0]?.request.exit).toMatchObject({
+			delayMs: lastOutputStartDelayMs,
+			kind: "merge-out",
+		});
+	});
+
 	it("does not let stash feedback hold a depleted stash tile on board", () => {
 		const previousBoard = boardView([
 			{

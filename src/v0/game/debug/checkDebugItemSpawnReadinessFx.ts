@@ -3,7 +3,9 @@ import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
+import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
+import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -74,20 +76,6 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 		const quantity = action.quantity ?? 1;
 
 		if (action.location === "board") {
-			const boardCells = yield* planEmptyBoardCellsFx({
-				config,
-				save,
-			});
-			for (const targetCell of boardCells.slice(0, quantity)) {
-				yield* checkItemCreateBlockedByEffectsFx({
-					config,
-					itemId: action.itemId,
-					nowMs,
-					save,
-					targetCell,
-				});
-			}
-
 			const boardMaxCountCapacity = readBoardItemMaxCountCapacity({
 				config,
 				itemId: action.itemId,
@@ -102,14 +90,48 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 				);
 			}
 
-			const freeBoardCells =
-				config.game.board.width * config.game.board.height -
-				Object.keys(save.board.items).length;
-			if (freeBoardCells < quantity) {
+			const simulatedSave = yield* cloneGameSaveFx({
+				save,
+			});
+			let blockedByEffect = false;
+			for (let index = 0; index < quantity; index += 1) {
+				const emptyCells = yield* planEmptyBoardCellsFx({
+					config,
+					save: simulatedSave,
+				});
+				if (emptyCells.length === 0) {
+					return yield* Effect.fail(
+						GameEngineError.actionRejected(
+							"board:full",
+							"Board has no space for debug item.",
+						),
+					);
+				}
+
+				const [targetCell] = yield* planItemBoardPlacementCellsFx({
+					config,
+					itemId: action.itemId,
+					nowMs,
+					save: simulatedSave,
+				});
+				if (!targetCell) {
+					blockedByEffect = true;
+					break;
+				}
+
+				simulatedSave.board.items[`debug-readiness:${index}`] = {
+					id: `debug-readiness:${index}`,
+					itemId: action.itemId,
+					x: targetCell.x,
+					y: targetCell.y,
+				};
+			}
+
+			if (blockedByEffect) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
-						"board:full",
-						"Board has no space for debug item.",
+						"effect:block-create",
+						"No board placement target is allowed by active effects.",
 					),
 				);
 			}

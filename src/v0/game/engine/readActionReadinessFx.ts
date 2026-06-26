@@ -89,6 +89,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					checkDebugItemSpawnReadinessFx({
 						action: spawnAction,
 						config,
+						nowMs,
 						save,
 					}),
 				inventoryItemPlace: (placeAction) =>

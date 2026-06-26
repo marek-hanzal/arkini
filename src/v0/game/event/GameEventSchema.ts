@@ -257,6 +257,16 @@ const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
+			type: z.literal("product.failed"),
+			jobId: IdSchema,
+			producerItemInstanceId: IdSchema,
+			productId: IdSchema,
+			reason: GamePlacementFailureReasonSchema,
+			failedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("stash.opened"),
 			stashId: IdSchema,
 			stashItemInstanceId: IdSchema,
@@ -283,11 +293,30 @@ const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
+			type: z.literal("craft.failed"),
+			jobId: IdSchema,
+			recipeId: IdSchema,
+			targetItemInstanceId: IdSchema,
+			reason: GamePlacementFailureReasonSchema,
+			failedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("item.spawn.blocked"),
 			jobId: IdSchema,
 			itemId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
 			blockedAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("item.spawn.failed"),
+			jobId: IdSchema,
+			itemId: IdSchema,
+			reason: GamePlacementFailureReasonSchema,
+			failedAtMs: NonNegativeIntegerSchema,
 		})
 		.strict(),
 	z

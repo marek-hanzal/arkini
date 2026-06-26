@@ -258,4 +258,65 @@ describe("processItemSpawnJobsFx", () => {
 		});
 		expect(nextTick.save.itemSpawnJobs).toEqual({});
 	});
+
+	it("drops item spawn jobs blocked by hard creation effects", () => {
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-twig": {
+					name: "Block twig",
+					operations: [
+						{
+							kind: "item.blockCreate",
+							target: {
+								itemIds: [
+									"item:twig",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:block-twig"] = {
+			activatedAtMs: 0,
+			effectId: "effect:block-twig",
+			expiresAtMs: 10_000,
+			id: "effect-instance:block-twig",
+			sourceItemInstanceId: "item-instance:1",
+		};
+		const itemSpawn = runCreateItemSpawnJobs({
+			dueAtMs: 100,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			save,
+		});
+		const [jobId] = itemSpawn.jobIds;
+
+		const result = runItemSpawn({
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.events).toEqual([
+			{
+				failedAtMs: 100,
+				itemId: "item:twig",
+				reason: "effect:block-create",
+				jobId,
+				type: "item.spawn.failed",
+			},
+		]);
+		expect(result.save.itemSpawnJobs).toEqual({});
+	});
 });

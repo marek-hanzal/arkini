@@ -495,4 +495,34 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.success).toBe(false);
 		expect(result.error?.issues[0]?.message).toContain('Missing item "item:missing"');
 	});
+
+	it("rejects item spawn jobs with missing dependencies", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.itemSpawnJobs["item-spawn-job:dependent"] = {
+			afterJobIds: [
+				"item-spawn-job:missing",
+			],
+			dueAtMs: 100,
+			id: "item-spawn-job:dependent",
+			itemId: "item:twig",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain(
+			"must reference an existing item spawn job",
+		);
+	});
 });

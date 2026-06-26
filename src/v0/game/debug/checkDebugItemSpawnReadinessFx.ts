@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -10,6 +11,7 @@ export namespace checkDebugItemSpawnReadinessFx {
 	export interface Props {
 		action: GameActionDebugItemSpawn;
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 	}
 }
@@ -45,7 +47,7 @@ const hasInventoryCapacity = ({
 };
 
 export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnReadinessFx")(
-	function* ({ action, config, save }: checkDebugItemSpawnReadinessFx.Props) {
+	function* ({ action, config, nowMs, save }: checkDebugItemSpawnReadinessFx.Props) {
 		const item = config.items[action.itemId];
 		if (!item) {
 			return yield* Effect.fail(
@@ -67,6 +69,13 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 				),
 			);
 		}
+
+		yield* checkItemCreateBlockedByEffectsFx({
+			config,
+			itemId: action.itemId,
+			nowMs,
+			save,
+		});
 
 		const quantity = action.quantity ?? 1;
 

@@ -1,7 +1,7 @@
 {
 	"producers": {
 		"producer:academy": {
-			"maxQueueSize": 1,
+			"maxQueueSize": 2,
 			"productIds": [
 				"product:academy:basic-knowledge",
 				"product:academy:advanced-knowledge",
@@ -567,7 +567,7 @@
 			"type": "producer"
 		},
 		"producer:university": {
-			"maxQueueSize": 1,
+			"maxQueueSize": 2,
 			"productIds": [
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",

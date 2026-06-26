@@ -21,4 +21,10 @@ export const removeBoardItemRuntimeState = ({
 	for (const [jobId, job] of Object.entries(save.craftJobs)) {
 		if (job.targetItemInstanceId === itemInstanceId) delete save.craftJobs[jobId];
 	}
+
+	for (const [effectInstanceId, activeEffect] of Object.entries(save.activeEffects)) {
+		if (activeEffect.sourceItemInstanceId === itemInstanceId) {
+			delete save.activeEffects[effectInstanceId];
+		}
+	}
 };

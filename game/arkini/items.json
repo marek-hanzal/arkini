@@ -315,22 +315,6 @@
 			],
 			"tier": 0
 		},
-		"item:blueprint-coal-power-plant": {
-			"assetId": "asset:item:blueprint-coal-power-plant",
-			"code": "blueprint-coal-power-plant",
-			"description": "Prepared build plan for a Coal Power Plant. Crafting and production rules will be connected later.",
-			"maxStackSize": 10,
-			"name": "Coal Power Plant Blueprint",
-			"storage": "both",
-			"tags": [
-				"blueprint",
-				"building",
-				"power",
-				"energy",
-				"coal"
-			],
-			"tier": 0
-		},
 		"item:blueprint-construction-yard-t1": {
 			"assetId": "asset:item:blueprint-construction-yard-t1",
 			"code": "blueprint-construction-yard-t1",
@@ -1101,22 +1085,6 @@
 			],
 			"tier": 0
 		},
-		"item:blueprint-water-power-plant": {
-			"assetId": "asset:item:blueprint-water-power-plant",
-			"code": "blueprint-water-power-plant",
-			"description": "Prepared build plan for a Water Power Plant. Crafting and production rules will be connected later.",
-			"maxStackSize": 10,
-			"name": "Water Power Plant Blueprint",
-			"storage": "both",
-			"tags": [
-				"blueprint",
-				"building",
-				"power",
-				"energy",
-				"water"
-			],
-			"tier": 0
-		},
 		"item:blueprint-weaver-hut-t1": {
 			"assetId": "asset:item:blueprint-weaver-hut-t1",
 			"code": "blueprint-weaver-hut-t1",
@@ -1495,20 +1463,6 @@
 				"era:IX"
 			],
 			"tier": 1
-		},
-		"item:energy": {
-			"assetId": "asset:item:energy",
-			"code": "energy",
-			"description": "Prepared power resource represented by a simplified lightning bolt icon.",
-			"maxStackSize": 50,
-			"name": "Energy",
-			"storage": "both",
-			"tags": [
-				"resource",
-				"power",
-				"energy"
-			],
-			"tier": 5
 		},
 		"item:feast": {
 			"assetId": "asset:item:feast",
@@ -2697,22 +2651,6 @@
 			],
 			"tier": 7
 		},
-		"producer:coal-power-plant": {
-			"assetId": "asset:producer:coal-power-plant",
-			"code": "coal-power-plant",
-			"description": "Prepared fantasy power building shell that will later convert fuel into Energy.",
-			"maxStackSize": 1,
-			"name": "Coal Power Plant",
-			"storage": "both",
-			"tags": [
-				"building",
-				"producer",
-				"power",
-				"energy",
-				"coal"
-			],
-			"tier": 5
-		},
 		"producer:construction-yard-t1": {
 			"assetId": "asset:producer:construction-yard-t1",
 			"code": "construction-yard-t1",
@@ -3497,22 +3435,6 @@
 				"era:II"
 			],
 			"tier": 1
-		},
-		"producer:water-power-plant": {
-			"assetId": "asset:producer:water-power-plant",
-			"code": "water-power-plant",
-			"description": "Prepared fantasy power building shell with a prominent water wheel for future Energy production.",
-			"maxStackSize": 1,
-			"name": "Water Power Plant",
-			"storage": "both",
-			"tags": [
-				"building",
-				"producer",
-				"power",
-				"energy",
-				"water"
-			],
-			"tier": 5
 		},
 		"producer:weaver-hut-t1": {
 			"assetId": "asset:producer:weaver-hut-t1",

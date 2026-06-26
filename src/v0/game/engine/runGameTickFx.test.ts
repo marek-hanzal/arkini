@@ -651,6 +651,65 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
+	it("fails craft completion when the result is blocked by a hard creation effect", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: true,
+		});
+		config.effects["effect:block-plank"] = {
+			name: "Block plank",
+			operations: [
+				{
+					kind: "item.blockCreate",
+					target: {
+						itemIds: [
+							"item:plank",
+						],
+					},
+				},
+			],
+			scope: "global",
+		};
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:block-plank"] = {
+			activatedAtMs: 0,
+			effectId: "effect:block-plank",
+			expiresAtMs: 10_000,
+			id: "effect-instance:block-plank",
+			sourceItemInstanceId: "item-instance:1",
+		};
+		save.craftJobs["job:craft"] = {
+			completesAtMs: 1000,
+			id: "job:craft",
+			recipeId: "craft:plank",
+			targetItemInstanceId: "item-instance:1",
+			startedAtMs: 0,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.craftJobs).toEqual({});
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:craft-table",
+		});
+		expect(result.events).toEqual([
+			{
+				failedAtMs: 1000,
+				jobId: "job:craft",
+				reason: "effect:block-create",
+				recipeId: "craft:plank",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.failed",
+			},
+		]);
+	});
+
 	it("completes delayed sink products without output", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -683,5 +742,152 @@ describe("runGameTickFx", () => {
 				type: "product.completed",
 			},
 		]);
+	});
+
+	it("voids product output blocked by a hard creation effect instead of retrying forever", () => {
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-twig": {
+					name: "Block twig",
+					operations: [
+						{
+							kind: "item.blockCreate",
+							target: {
+								itemIds: [
+									"item:twig",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:block-twig"] = {
+			activatedAtMs: 0,
+			effectId: "effect:block-twig",
+			expiresAtMs: 10_000,
+			id: "effect-instance:block-twig",
+			sourceItemInstanceId: "item-instance:1",
+		};
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.save.board.items).toEqual({
+			"item-instance:1": expect.objectContaining({
+				itemId: "item:producer",
+			}),
+		});
+		expect(result.save.inventory.slots).toEqual([
+			null,
+			null,
+		]);
+		expect(result.events).toEqual([
+			{
+				completedAtMs: 1000,
+				jobId: "job:1",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "product.completed",
+			},
+			{
+				failedAtMs: 1000,
+				jobId: "job:1",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				reason: "effect:block-create",
+				type: "product.failed",
+			},
+		]);
+	});
+
+	it("keeps producer queue FIFO when the first delivery is blocked", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			...baseConfig,
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+			producers: {
+				...baseConfig.producers,
+				"producer:test": {
+					...baseConfig.producers["producer:test"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.producerJobs["job:1"] = {
+			completesAtMs: 1000,
+			id: "job:1",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 0,
+		};
+		save.producerJobs["job:2"] = {
+			completesAtMs: 2000,
+			id: "job:2",
+			outputTableId: "loot:test",
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 1000,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 2000,
+			save,
+		});
+
+		expect(result.events).toEqual([
+			{
+				blockedAtMs: 2000,
+				jobId: "job:1",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				reason: "board:full",
+				type: "product.blocked",
+			},
+		]);
+		expect(result.nextWakeAtMs).toBe(3000);
+		expect(result.save.producerJobs).toHaveProperty("job:1");
+		expect(result.save.producerJobs).toHaveProperty("job:2");
+		expect(result.save.producerJobs["job:2"]?.delivery).toBeUndefined();
 	});
 });

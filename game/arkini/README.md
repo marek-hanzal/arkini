@@ -692,7 +692,7 @@ producer:cathedral blocks House of Engineers/Mage Lodge blueprint products and c
 producer:mage-lodge blocks House of Engineers/Cathedral blueprint products and creation of House of Engineers/Cathedral blueprints/buildings
 ```
 
-The branches are intentionally only keystone buildings for now. Follow-up eras should give them passive path effects that reveal branch-tagged product lines:
+The branches are intentionally only keystone buildings for now. Unconnected Energy/Power Plant placeholder content is not present in live config; add it back only when Engineers actually use it. Follow-up eras should give branches passive path effects that reveal branch-tagged product lines:
 
 ```txt
 Engineers -> machines, energy, power upgrades, Pollution pressure

@@ -114,6 +114,42 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.error?.issues[0]?.message).toContain("Duplicate board cell");
 	});
 
+	it("rejects overlapping producer queue jobs for the same producer", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.producerJobs["job:first"] = {
+			...createProducerJob("job:first"),
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		invalidSave.producerJobs["job:overlap"] = {
+			...createProducerJob("job:overlap"),
+			readyAtMs: 1500,
+			startAtMs: 500,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("starts before previous job");
+	});
+
 	it("rejects producer line default products that do not belong to the producer", () => {
 		const config = createEngineTestConfig();
 		const save = createInitialSave({

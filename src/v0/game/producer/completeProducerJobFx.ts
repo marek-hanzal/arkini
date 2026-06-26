@@ -115,6 +115,8 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 	});
 
 	if (
+		liveJob.delivery === undefined &&
+		liveJob.outputItems === undefined &&
 		effectiveProductLine.lootPlan.baseOutput.length === 0 &&
 		effectiveProductLine.lootPlan.appendOutputs.length === 0 &&
 		effectiveProductLine.lootPlan.chanceItems.length === 0
@@ -139,6 +141,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 	const deliveryItems =
 		liveJob.delivery?.items ??
+		liveJob.outputItems ??
 		(yield* rollEffectiveLootPlanItemsFx({
 			config,
 			lootPlan: effectiveProductLine.lootPlan,

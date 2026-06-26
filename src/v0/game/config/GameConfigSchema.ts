@@ -495,6 +495,7 @@ const LootTableDefinitionSchema = z
  * Producer product line.
  *
  * Missing `outputTableId` means a valid delayed sink/destructor product.
+ * Optional `showIf` hides the line until any listed marker item exists in runtime state.
  */
 const ProductDefinitionSchema = z
 	.object({
@@ -505,6 +506,7 @@ const ProductDefinitionSchema = z
 		requirementIds: z.array(IdSchema),
 		hinderedBy: GameHindrancesSchema.optional(),
 		outputTableId: IdSchema.optional(),
+		showIf: z.array(IdSchema).optional(),
 	})
 	.strict();
 
@@ -1021,6 +1023,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`Missing loot table "${product.outputTableId}".`,
 			);
 		}
+
+		validateItemIds(
+			ctx,
+			[
+				"products",
+				productId,
+				"showIf",
+			],
+			product.showIf ?? [],
+			hasItem,
+		);
 	}
 
 	validateProductLineOwnership(ctx, value);
@@ -1397,6 +1410,28 @@ const validateRequirementIds = (
 					index,
 				],
 				`Missing requirement "${requirementId}".`,
+			);
+		}
+	}
+};
+
+const validateItemIds = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	itemIds: readonly string[],
+	hasItem: (itemId: string) => boolean,
+) => {
+	validateUniqueStringList(ctx, path, itemIds, (value) => `Duplicate item "${value}".`);
+
+	for (const [index, itemId] of itemIds.entries()) {
+		if (!hasItem(itemId)) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+				],
+				`Missing item "${itemId}".`,
 			);
 		}
 	}

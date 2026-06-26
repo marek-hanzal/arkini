@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import { readProducerProductIdsByPriority } from "~/v0/game/producer/readProducerProductIdsByPriority";
+import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -52,12 +53,17 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 			);
 		}
 
+		const visibleProductIds = readVisibleProducerProductIds({
+			config,
+			productIds: producerDefinition.productIds,
+			save,
+		});
 		const productIds = action.productId
 			? [
 					action.productId,
 				]
 			: readProducerProductIdsByPriority({
-					productIds: producerDefinition.productIds,
+					productIds: visibleProductIds,
 					producerItemInstanceId: action.producerItemInstanceId,
 					save,
 				});
@@ -68,6 +74,14 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 					GameEngineError.actionRejected(
 						"invalid_actor",
 						`Product "${productId}" does not belong to producer "${producerId}".`,
+					),
+				);
+			}
+			if (!visibleProductIds.includes(productId)) {
+				return yield* Effect.fail(
+					GameEngineError.actionRejected(
+						"invalid_actor",
+						`Product "${productId}" is hidden for the current game state.`,
 					),
 				);
 			}

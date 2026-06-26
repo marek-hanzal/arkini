@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
+import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductLineSetDefault } from "~/v0/game/action/GameActionProducerProductLineSetDefault";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -26,6 +27,19 @@ export const checkProducerProductLineSetDefaultReadinessFx = Effect.fn(
 			GameEngineError.actionRejected(
 				"invalid_actor",
 				`Product "${action.productId}" does not belong to producer "${producerDefinition.type}" on item "${producerItem.itemId}".`,
+			),
+		);
+	}
+	const visibleProductIds = readVisibleProducerProductIds({
+		config,
+		productIds: producerDefinition.productIds,
+		save,
+	});
+	if (!visibleProductIds.includes(action.productId)) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"invalid_actor",
+				`Product "${action.productId}" is hidden for the current game state.`,
 			),
 		);
 	}

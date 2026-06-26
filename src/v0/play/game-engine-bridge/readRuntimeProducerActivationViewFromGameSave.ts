@@ -9,6 +9,7 @@ import { readRuntimeActivationHindranceViewsFromGameSave } from "~/v0/play/game-
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
+import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
@@ -60,13 +61,18 @@ const readRuntimeProductLineViewsFromGameSave = ({
 		(job) => job.producerItemInstanceId === targetItemInstanceId,
 	).length;
 	const queueFull = producerQueuedJobs >= maxQueueSize;
-	const selectedDefaultProductId = readProducerDefaultProductId({
+	const visibleProductIds = readVisibleProducerProductIds({
+		config,
 		productIds,
+		save,
+	});
+	const selectedDefaultProductId = readProducerDefaultProductId({
+		productIds: visibleProductIds,
 		producerItemInstanceId: targetItemInstanceId,
 		save,
 	});
 
-	return productIds.flatMap((productId) => {
+	return visibleProductIds.flatMap((productId) => {
 		const product = config.products[productId];
 		if (!product) return [];
 		const isDefault = productId === selectedDefaultProductId;
@@ -214,8 +220,13 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 	const producer = producerId ? config.producers[producerId] : undefined;
 	if (!producerId || !producer) return undefined;
 
-	const selectedProductId = readProducerDefaultProductId({
+	const visibleProductIds = readVisibleProducerProductIds({
+		config,
 		productIds: producer.productIds,
+		save,
+	});
+	const selectedProductId = readProducerDefaultProductId({
+		productIds: visibleProductIds,
 		producerItemInstanceId: boardItem.id,
 		save,
 	});

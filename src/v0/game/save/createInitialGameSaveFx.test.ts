@@ -37,7 +37,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				description: "Producer",
 				maxStackSize: 1,
 				name: "Producer",
-				producerId: "producer:test",
 				tags: [],
 				tier: 0,
 			},
@@ -54,7 +53,7 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 		merge: {},
 		requirements: {},
 		producers: {
-			"producer:test": {
+			"item:producer": {
 				maxQueueSize: 1,
 				productIds: [
 					"product:test",

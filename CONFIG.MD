@@ -42,20 +42,17 @@ Items define physical tiles/stacks. Important fields:
   "tags": ["building", "wood"],
   "maxStackSize": 1,
   "storage": "both",
-  "producerId": "producer:lumber-camp-1",
-  "stashId": "stash:crate-1",
-  "craftRecipeId": "craft:townhall-2",
   "passiveEffectIds": ["effect:path-engineers-lock"],
   "maxCount": 1,
   "label": "1"
 }
 ```
 
-`storage` is `board`, `inventory`, or `both`; omitted means `both`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`.
+`storage` is `board`, `inventory`, or `both`; omitted means `both`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, and craft capabilities are not referenced from the item; they are keyed by the owning item id in `producers`, `stashes`, and `craftRecipes`.
 
 ## Producers and products
 
-A producer owns ordered product ids. A concrete producer item instance may have queued jobs up to `maxQueueSize`.
+A producer capability is keyed by the owning item id and owns ordered product ids. A concrete producer item instance may have queued jobs up to `maxQueueSize`.
 
 ```json
 {
@@ -147,12 +144,12 @@ When depleted, `onDepleted` may be `remove`, `keep`, or `{ "replaceWithItemId": 
 
 ## Craft recipes
 
-Craft recipes belong to items through `craftRecipeId`. Inputs are stored through the normal DnD interaction model.
+Craft recipes are keyed by the craft target item id, usually a blueprint item. Inputs are stored through the normal DnD interaction model.
 
 ```json
 {
   "craftRecipes": {
-    "craft:townhall-2": {
+    "item:blueprint-townhall-t2": {
       "durationMs": 10000,
       "inputs": [
         { "itemId": "item:plank", "quantity": 4, "consume": true }

@@ -555,9 +555,6 @@ const ItemDefinitionSchema = z
 		label: z.string().optional(),
 		tags: z.array(z.string().min(1)),
 		mergeIds: z.array(IdSchema).optional(),
-		producerId: IdSchema.optional(),
-		stashId: IdSchema.optional(),
-		craftRecipeId: IdSchema.optional(),
 		passiveEffectIds: z.array(IdSchema).optional(),
 		removeBy: z.array(RemoveByDefinitionSchema).optional(),
 	})
@@ -824,42 +821,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			}
 		}
 
-		if (item.producerId && !hasProducer(item.producerId)) {
-			addIssue(
-				ctx,
-				[
-					"items",
-					itemId,
-					"producerId",
-				],
-				`Missing producer "${item.producerId}".`,
-			);
-		}
-
-		if (item.stashId && !hasStash(item.stashId)) {
-			addIssue(
-				ctx,
-				[
-					"items",
-					itemId,
-					"stashId",
-				],
-				`Missing stash "${item.stashId}".`,
-			);
-		}
-
-		if (item.craftRecipeId && !hasCraftRecipe(item.craftRecipeId)) {
-			addIssue(
-				ctx,
-				[
-					"items",
-					itemId,
-					"craftRecipeId",
-				],
-				`Missing craft recipe "${item.craftRecipeId}".`,
-			);
-		}
-
 		for (const [index, effectId] of (item.passiveEffectIds ?? []).entries()) {
 			if (!hasEffect(effectId)) {
 				addIssue(
@@ -994,6 +955,45 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					`Missing item "${operation.itemId}".`,
 				);
 			}
+		}
+	}
+
+	for (const producerId of Object.keys(value.producers)) {
+		if (!hasItem(producerId)) {
+			addIssue(
+				ctx,
+				[
+					"producers",
+					producerId,
+				],
+				`Producer "${producerId}" must be keyed by its item id.`,
+			);
+		}
+	}
+
+	for (const stashId of Object.keys(value.stashes)) {
+		if (!hasItem(stashId)) {
+			addIssue(
+				ctx,
+				[
+					"stashes",
+					stashId,
+				],
+				`Stash "${stashId}" must be keyed by its item id.`,
+			);
+		}
+	}
+
+	for (const craftRecipeId of Object.keys(value.craftRecipes)) {
+		if (!hasItem(craftRecipeId)) {
+			addIssue(
+				ctx,
+				[
+					"craftRecipes",
+					craftRecipeId,
+				],
+				`Craft recipe "${craftRecipeId}" must be keyed by its craft target item id.`,
+			);
 		}
 	}
 

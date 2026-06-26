@@ -28,9 +28,8 @@ export const readCraftBoardItemFx = Effect.fn("readCraftBoardItemFx")(function* 
 		);
 	}
 
-	const targetDefinition = config.items[targetItem.itemId];
-	const targetRecipeId = targetDefinition?.craftRecipeId;
-	if (!targetRecipeId) {
+	const targetRecipeId = targetItem.itemId;
+	if (!config.craftRecipes[targetRecipeId]) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
@@ -59,6 +58,5 @@ export const readCraftBoardItemFx = Effect.fn("readCraftBoardItemFx")(function* 
 		recipe,
 		recipeId: targetRecipeId,
 		targetItem,
-		targetDefinition,
 	};
 });

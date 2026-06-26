@@ -35,7 +35,6 @@ const createConfigValue = () => ({
 			description: "Producer",
 			maxStackSize: 1,
 			name: "Producer",
-			producerId: "producer:test",
 			tags: [],
 			tier: 0,
 		},
@@ -64,7 +63,7 @@ const createConfigValue = () => ({
 	merge: {},
 	requirements: {},
 	producers: {
-		"producer:test": {
+		"item:producer": {
 			maxQueueSize: 1,
 			productIds: [
 				"product:test",
@@ -145,7 +144,7 @@ describe("auditGameConfig", () => {
 				type: "proximity",
 			},
 		};
-		config.producers["producer:test"].requirementIds = [
+		config.producers["item:producer"].requirementIds = [
 			"requirement:near-a",
 		];
 

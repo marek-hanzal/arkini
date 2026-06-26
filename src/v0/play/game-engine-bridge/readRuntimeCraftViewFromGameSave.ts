@@ -21,8 +21,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 	nowMs,
 	save,
 }: readRuntimeCraftViewFromGameSave.Props): CraftProgressView | undefined => {
-	const recipeId = config.items[boardItem.itemId]?.craftRecipeId;
-	if (!recipeId) return undefined;
+	const recipeId = boardItem.itemId;
 	const recipe = config.craftRecipes[recipeId];
 	if (!recipe) return undefined;
 

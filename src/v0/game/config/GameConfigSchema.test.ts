@@ -128,7 +128,6 @@ const createValidConfigValue = () => ({
 			description: "Producer",
 			maxStackSize: 1,
 			name: "Producer",
-			producerId: "producer:test",
 			tags: [],
 			tier: 0,
 		},
@@ -152,12 +151,21 @@ const createValidConfigValue = () => ({
 			tags: [],
 			tier: 1,
 		},
+		"item:craft-target": {
+			assetId: "asset:item",
+			code: "craft-target",
+			description: "Craft target",
+			maxStackSize: 1,
+			name: "Craft Target",
+			tags: [],
+			tier: 0,
+		},
 	},
 	merge: {},
 	requirements: {} as Record<string, TestGameRequirement>,
 	effects: {} as Record<string, unknown>,
 	producers: {
-		"producer:test": {
+		"item:producer": {
 			hinderedBy: [] as TestGameHindrance[],
 			maxQueueSize: 1,
 			productIds: [
@@ -169,7 +177,7 @@ const createValidConfigValue = () => ({
 	},
 	stashes: {},
 	craftRecipes: {
-		"craft:test": {
+		"item:craft-target": {
 			durationMs: 1000,
 			inputs: [
 				{
@@ -331,7 +339,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects duplicate producer product lines", () => {
 		const config = createValidConfigValue();
-		config.producers["producer:test"].productIds.push("product:test");
+		config.producers["item:producer"].productIds.push("product:test");
 
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate product/);
 	});
@@ -382,7 +390,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects duplicate craft inputs", () => {
 		const config = createValidConfigValue();
-		config.craftRecipes["craft:test"].inputs.push({
+		config.craftRecipes["item:craft-target"].inputs.push({
 			consume: true,
 			itemId: "item:twig",
 			quantity: 1,
@@ -451,7 +459,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects hindrances that point at missing items", () => {
 		const config = createValidConfigValue();
-		config.producers["producer:test"].hinderedBy = [
+		config.producers["item:producer"].hinderedBy = [
 			{
 				itemId: "item:ghost",
 				quantity: 1,
@@ -661,7 +669,7 @@ describe("GameConfigSchema", () => {
 
 	it("keeps structural checks for queue size and non-empty inline output", () => {
 		const config = createValidConfigValue();
-		config.producers["producer:test"].maxQueueSize = 0;
+		config.producers["item:producer"].maxQueueSize = 0;
 		config.products["product:test"].output = [];
 
 		expect(() => parseGameConfig(config)).toThrow(/Too small/);

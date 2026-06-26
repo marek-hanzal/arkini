@@ -1,6 +1,6 @@
 {
 	"stashes": {
-		"stash:chest-t1": {
+		"item:chest-t1": {
 			"type": "stash",
 			"placement": "board_then_inventory",
 			"inputs": [
@@ -37,7 +37,7 @@
 				}
 			]
 		},
-		"stash:chest-t2": {
+		"item:chest-t2": {
 			"type": "stash",
 			"placement": "board_then_inventory",
 			"inputs": [
@@ -80,7 +80,7 @@
 				}
 			]
 		},
-		"stash:chest-t3": {
+		"item:chest-t3": {
 			"type": "stash",
 			"placement": "board_then_inventory",
 			"inputs": [
@@ -123,7 +123,7 @@
 				}
 			]
 		},
-		"stash:chest-t4": {
+		"item:chest-t4": {
 			"type": "stash",
 			"placement": "board_then_inventory",
 			"inputs": [

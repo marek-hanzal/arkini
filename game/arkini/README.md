@@ -26,18 +26,11 @@ Everything is movable and storable by default unless a concrete mechanic says ot
 - Source items like `tree` and `rock` are normal movable/storable items, not permanent terrain.
 - Board-only restrictions are reserved for explicit danger/hindrance mechanics, such as future fire, fog, enemies, or other hazards.
 
-### Current compatibility note
+### Capability ownership
 
-The current config schema still stores every placeable board tile in the `items` table. Producer tiles therefore appear in `items.json` with `producer:*` IDs and a matching `producerId` field.
+Every placeable board tile lives in `items.json`. If that tile can produce, store, or craft, the capability definition is keyed by the same item id in `producers.json`, `stashes.json`, or `craft-recipes.json`. Items do not carry `producerId`, `stashId`, or `craftRecipeId`. One owner id is enough; making the config repeat itself was paperwork wearing fake architecture glasses.
 
-This is intentional for this package pass:
-
-- do not create `item:lumberjack-t1` / `item:sawmill-t1` style producer aliases
-- keep the real producer identity as `producer:<name>-t<tier>`
-- treat the `items.json` entry as the current placeable tile shell required by the config contract
-- do not change runtime/schema just to clean this up during gameplay data authoring
-
-Yes, it is slightly weird. It is also contained, explicit, and better than quietly teaching the content layer that every building is secretly a log with ambitions.
+Producer building item ids intentionally use the `producer:<name>-t<tier>` shape because those ids are the stable item/capability identity used by saves, effects, and UI. Do not create alias items like `item:lumberjack-t1` unless the gameplay model truly needs a separate item.
 
 
 ### Townhall blueprint progression

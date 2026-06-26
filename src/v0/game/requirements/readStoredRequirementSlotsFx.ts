@@ -37,16 +37,8 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 
 	const requirements: GameRequirement[] = [];
 
-	if (item.producerId) {
-		const producer = config.producers[item.producerId];
-		if (!producer) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(
-					`Producer item "${targetItem.itemId}" references missing producer "${item.producerId}".`,
-				),
-			);
-		}
-
+	const producer = config.producers[targetItem.itemId];
+	if (producer) {
 		requirements.push(
 			...resolveGameRequirements({
 				config,
@@ -58,7 +50,7 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 			if (!product) {
 				return yield* Effect.fail(
 					GameEngineError.configReferenceMissing(
-						`Producer "${item.producerId}" references missing product "${productId}".`,
+						`Producer "${targetItem.itemId}" references missing product "${productId}".`,
 					),
 				);
 			}
@@ -71,29 +63,13 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 		}
 	}
 
-	if (item.craftRecipeId) {
-		const recipe = config.craftRecipes[item.craftRecipeId];
-		if (!recipe) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(
-					`Craft item "${targetItem.itemId}" references missing recipe "${item.craftRecipeId}".`,
-				),
-			);
-		}
-
+	const recipe = config.craftRecipes[targetItem.itemId];
+	if (recipe) {
 		requirements.push(...recipe.requirements);
 	}
 
-	if (item.stashId) {
-		const stash = config.stashes[item.stashId];
-		if (!stash) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(
-					`Stash item "${targetItem.itemId}" references missing stash "${item.stashId}".`,
-				),
-			);
-		}
-
+	const stash = config.stashes[targetItem.itemId];
+	if (stash) {
 		requirements.push(...stash.requirements);
 	}
 

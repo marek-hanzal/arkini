@@ -589,7 +589,7 @@ describe("runGameTickFx", () => {
 		save.craftJobs["job:craft"] = {
 			readyAtMs: 1000,
 			id: "job:craft",
-			recipeId: "craft:plank",
+			recipeId: "item:craft-table",
 			targetItemInstanceId: "item-instance:1",
 			startAtMs: 0,
 		};
@@ -615,7 +615,7 @@ describe("runGameTickFx", () => {
 		expect(result.events).toMatchObject([
 			{
 				jobId: "job:craft",
-				recipeId: "craft:plank",
+				recipeId: "item:craft-table",
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.completed",
 			},
@@ -661,7 +661,7 @@ describe("runGameTickFx", () => {
 		save.craftJobs["job:craft"] = {
 			readyAtMs: 1000,
 			id: "job:craft",
-			recipeId: "craft:plank",
+			recipeId: "item:craft-table",
 			targetItemInstanceId: "item-instance:1",
 			startAtMs: 0,
 		};
@@ -681,7 +681,7 @@ describe("runGameTickFx", () => {
 				atMs: 1000,
 				jobId: "job:craft",
 				reason: "effect:block-create",
-				recipeId: "craft:plank",
+				recipeId: "item:craft-table",
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.failed",
 			},
@@ -812,8 +812,8 @@ describe("runGameTickFx", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},

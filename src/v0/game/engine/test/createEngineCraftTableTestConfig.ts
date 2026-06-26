@@ -23,7 +23,6 @@ export const createEngineCraftTableTestConfig = ({
 			"item:craft-table": {
 				assetId: "asset:test",
 				code: "craft-table",
-				craftRecipeId: "craft:plank",
 				description: "Craft table",
 				maxStackSize: 1,
 				name: "Craft Table",
@@ -35,8 +34,8 @@ export const createEngineCraftTableTestConfig = ({
 		craftRecipes: noRecipeInputs
 			? {
 					...baseConfig.craftRecipes,
-					"craft:plank": {
-						...baseConfig.craftRecipes["craft:plank"],
+					"item:craft-table": {
+						...baseConfig.craftRecipes["item:craft-table"],
 						inputs: [],
 						requirements: [],
 					},

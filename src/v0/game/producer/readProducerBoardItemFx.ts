@@ -25,8 +25,7 @@ export const readProducerBoardItemFx = Effect.fn("readProducerBoardItemFx")(func
 			),
 		);
 	}
-	const item = config.items[boardItem.itemId];
-	if (!item?.producerId) {
+	if (!config.producers[boardItem.itemId]) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",

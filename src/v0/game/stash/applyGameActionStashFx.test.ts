@@ -267,8 +267,8 @@ describe("applyGameActionFx Stash", () => {
 		const config = createEngineTestConfig({
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					inputs: [
 						{
 							capacity: 2,
@@ -331,8 +331,8 @@ describe("applyGameActionFx Stash", () => {
 		const config = createEngineTestConfig({
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					charges: 2,
 				},
 			},
@@ -465,8 +465,8 @@ describe("applyGameActionFx Stash", () => {
 			},
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					inputs: [],
 				},
 			},
@@ -546,8 +546,8 @@ describe("applyGameActionFx Stash", () => {
 			},
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					charges: 2,
 					inputs: [],
 				},
@@ -617,8 +617,8 @@ describe("applyGameActionFx Stash", () => {
 			},
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					inputs: [],
 				},
 			},
@@ -693,8 +693,8 @@ describe("applyGameActionFx Stash", () => {
 			},
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					onDepleted: {
 						replaceWithItemId: "item:empty-stash",
 					},

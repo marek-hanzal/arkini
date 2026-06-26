@@ -336,38 +336,32 @@ const readStoredRequirementSlots = ({
 
 	const requirements = [];
 
-	if (target.item.producerId) {
-		const producer = config.producers[target.item.producerId];
-		if (producer) {
-			requirements.push(
-				...resolveGameRequirements({
-					config,
-					requirementIds: producer.requirementIds,
-				}),
-			);
-			for (const productId of producer.productIds) {
-				const product = config.products[productId];
-				if (product) {
-					requirements.push(
-						...resolveGameRequirements({
-							config,
-							requirementIds: product.requirementIds,
-						}),
-					);
-				}
+	const producer = config.producers[target.itemId];
+	if (producer) {
+		requirements.push(
+			...resolveGameRequirements({
+				config,
+				requirementIds: producer.requirementIds,
+			}),
+		);
+		for (const productId of producer.productIds) {
+			const product = config.products[productId];
+			if (product) {
+				requirements.push(
+					...resolveGameRequirements({
+						config,
+						requirementIds: product.requirementIds,
+					}),
+				);
 			}
 		}
 	}
 
-	if (target.item.craftRecipeId) {
-		const recipe = config.craftRecipes[target.item.craftRecipeId];
-		if (recipe) requirements.push(...recipe.requirements);
-	}
+	const recipe = config.craftRecipes[target.itemId];
+	if (recipe) requirements.push(...recipe.requirements);
 
-	if (target.item.stashId) {
-		const stash = config.stashes[target.item.stashId];
-		if (stash) requirements.push(...stash.requirements);
-	}
+	const stash = config.stashes[target.itemId];
+	if (stash) requirements.push(...stash.requirements);
 
 	return requirements.filter((requirement) => requirement.type === "stored");
 };
@@ -662,7 +656,7 @@ const validateGameSaveAgainstConfig = (
 			save,
 			itemInstanceId: job.producerItemInstanceId,
 		});
-		const producerId = target?.item.producerId;
+		const producerId = target?.boardItem.itemId;
 		const producer = producerId ? config.producers[producerId] : undefined;
 
 		if (!target) {
@@ -784,8 +778,8 @@ const validateGameSaveAgainstConfig = (
 			save,
 			itemInstanceId: producerItemInstanceId,
 		});
-		const producerId = target?.item.producerId;
-		if (!producerId) continue;
+		const producerId = target?.boardItem.itemId;
+		if (!producerId || !config.producers[producerId]) continue;
 		const maxQueueSize = config.producers[producerId]?.maxQueueSize;
 		if (maxQueueSize !== undefined && jobCount > maxQueueSize) {
 			addSaveIssue(
@@ -804,7 +798,7 @@ const validateGameSaveAgainstConfig = (
 			save,
 			itemInstanceId: producerItemInstanceId,
 		});
-		const producerId = target?.item.producerId;
+		const producerId = target?.itemId;
 		const producer = producerId ? config.producers[producerId] : undefined;
 		if (!target || !producerId || !producer) {
 			addSaveIssue(
@@ -840,7 +834,7 @@ const validateGameSaveAgainstConfig = (
 			save,
 			itemInstanceId: producerItemInstanceId,
 		});
-		const producerId = target?.item.producerId;
+		const producerId = target?.itemId;
 		const producer = producerId ? config.producers[producerId] : undefined;
 		if (!target || !producerId || !producer) {
 			addSaveIssue(
@@ -942,7 +936,7 @@ const validateGameSaveAgainstConfig = (
 			save,
 			itemInstanceId: job.targetItemInstanceId,
 		});
-		if (!target || target.item.craftRecipeId !== job.recipeId) {
+		if (!target || target.boardItem.itemId !== job.recipeId) {
 			addSaveIssue(
 				ctx,
 				[
@@ -976,7 +970,7 @@ const validateGameSaveAgainstConfig = (
 			save,
 			itemInstanceId: targetItemInstanceId,
 		});
-		const recipeId = target?.item.craftRecipeId;
+		const recipeId = target?.itemId;
 		const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
 		if (!target || !recipeId || !recipe) {
 			addSaveIssue(
@@ -1039,7 +1033,7 @@ const validateGameSaveAgainstConfig = (
 			save,
 			itemInstanceId: stashItemInstanceId,
 		});
-		const stashId = target?.item.stashId;
+		const stashId = target?.itemId;
 		const stash = stashId ? config.stashes[stashId] : undefined;
 		if (!target || !stashId || !stash) {
 			addSaveIssue(
@@ -1072,7 +1066,7 @@ const validateGameSaveAgainstConfig = (
 			save,
 			itemInstanceId: stashItemInstanceId,
 		});
-		const stashId = target?.item.stashId;
+		const stashId = target?.itemId;
 		const stash = stashId ? config.stashes[stashId] : undefined;
 		if (!target || !stashId || !stash) {
 			addSaveIssue(

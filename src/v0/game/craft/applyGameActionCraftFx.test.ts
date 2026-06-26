@@ -17,7 +17,7 @@ describe("applyGameActionFx Craft", () => {
 			nowMs: 0,
 		});
 		const action = {
-			recipeId: "craft:plank",
+			recipeId: "item:craft-table",
 			targetItemInstanceId: "item-instance:1",
 			type: "craft.start" as const,
 		};
@@ -99,7 +99,7 @@ describe("applyGameActionFx Craft", () => {
 
 		const started = runAction({
 			action: {
-				recipeId: "craft:plank",
+				recipeId: "item:craft-table",
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.start",
 			},
@@ -113,7 +113,7 @@ describe("applyGameActionFx Craft", () => {
 		expect(started.save.craftInputs).toEqual({});
 		expect(readOnlyRecordValue(started.save.craftJobs)).toMatchObject({
 			readyAtMs: 1150,
-			recipeId: "craft:plank",
+			recipeId: "item:craft-table",
 			targetItemInstanceId: "item-instance:1",
 			startAtMs: 150,
 		});
@@ -135,7 +135,7 @@ describe("applyGameActionFx Craft", () => {
 				nextQuantity: 2,
 				previousQuantity: 1,
 				quantity: 1,
-				recipeId: "craft:plank",
+				recipeId: "item:craft-table",
 				atMs: 150,
 				targetItemInstanceId: "item-instance:1",
 				type: "craft_input.stored",
@@ -144,7 +144,7 @@ describe("applyGameActionFx Craft", () => {
 				atMs: 150,
 				readyAtMs: 1150,
 				jobId: readOnlyRecordValue(started.save.craftJobs).id,
-				recipeId: "craft:plank",
+				recipeId: "item:craft-table",
 				startAtMs: 150,
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.started",
@@ -336,7 +336,7 @@ describe("applyGameActionFx Craft", () => {
 		};
 		const started = runAction({
 			action: {
-				recipeId: "craft:plank",
+				recipeId: "item:craft-table",
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.start",
 			},

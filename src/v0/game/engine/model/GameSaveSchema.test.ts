@@ -21,7 +21,7 @@ const createProducerJob = (id: string) => ({
 const createCraftJob = (id: string, targetItemInstanceId: string) => ({
 	readyAtMs: 1000,
 	id,
-	recipeId: "craft:plank",
+	recipeId: "item:craft-table",
 	startAtMs: 0,
 	targetItemInstanceId,
 });
@@ -396,8 +396,8 @@ describe("GameSaveConfigSchema", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:key-storage",
 					],

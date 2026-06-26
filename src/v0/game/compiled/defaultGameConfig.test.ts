@@ -72,7 +72,7 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.items["item:building-permit"].tags).toContain("master");
 		expect(defaultGameConfig.items["item:building-permit"].tags).toContain("era:IV");
 
-		expect(defaultGameConfig.craftRecipes["craft:market-t2"].inputs).toContainEqual({
+		expect(defaultGameConfig.craftRecipes["item:blueprint-market-t2"].inputs).toContainEqual({
 			consume: true,
 			itemId: "producer:market-t1",
 			quantity: 1,
@@ -144,7 +144,9 @@ describe("defaultGameConfig", () => {
 			"product:prospector-guild-t2:marble-deposit",
 		]);
 
-		expect(defaultGameConfig.craftRecipes["craft:coal-mine-t1"].inputs).not.toContainEqual({
+		expect(
+			defaultGameConfig.craftRecipes["item:blueprint-coal-mine-t1"].inputs,
+		).not.toContainEqual({
 			consume: true,
 			itemId: "item:construction-bundle",
 			quantity: 1,
@@ -383,12 +385,14 @@ describe("defaultGameConfig", () => {
 			"proximity:stonemason-t2:quarry-t2",
 		]);
 
-		expect(defaultGameConfig.craftRecipes["craft:quarry-t2"].inputs).toContainEqual({
+		expect(defaultGameConfig.craftRecipes["item:blueprint-quarry-t2"].inputs).toContainEqual({
 			consume: true,
 			itemId: "producer:quarry-t1",
 			quantity: 1,
 		});
-		expect(defaultGameConfig.craftRecipes["craft:stonemason-t2"].inputs).toContainEqual({
+		expect(
+			defaultGameConfig.craftRecipes["item:blueprint-stonemason-t2"].inputs,
+		).toContainEqual({
 			consume: true,
 			itemId: "producer:stonemason-t1",
 			quantity: 1,
@@ -485,19 +489,19 @@ describe("defaultGameConfig", () => {
 			quantity: 1,
 		});
 
-		expectPassiveOwnedRequirements("craft:house-of-engineers", [
+		expectPassiveOwnedRequirements("item:blueprint-house-of-engineers", [
 			"producer:university",
 			"producer:stonemason-t2",
 			"producer:glazier-workshop-t1",
 			"producer:blacksmith-t1",
 		]);
-		expectPassiveOwnedRequirements("craft:cathedral", [
+		expectPassiveOwnedRequirements("item:blueprint-cathedral", [
 			"producer:university",
 			"producer:stonemason-t2",
 			"producer:glazier-workshop-t1",
 			"producer:civic-office-t1",
 		]);
-		expectPassiveOwnedRequirements("craft:mage-lodge", [
+		expectPassiveOwnedRequirements("item:blueprint-mage-lodge", [
 			"producer:university",
 			"producer:stonemason-t2",
 			"producer:glazier-workshop-t1",
@@ -550,17 +554,19 @@ describe("defaultGameConfig", () => {
 			},
 		]);
 
-		expect(defaultGameConfig.craftRecipes["craft:townhall-t3"].inputs).toContainEqual({
+		expect(defaultGameConfig.craftRecipes["item:blueprint-townhall-t3"].inputs).toContainEqual({
 			consume: true,
 			itemId: "item:morale-t1",
 			quantity: 1,
 		});
-		expect(defaultGameConfig.craftRecipes["craft:townhall-t4"].inputs).toContainEqual({
+		expect(defaultGameConfig.craftRecipes["item:blueprint-townhall-t4"].inputs).toContainEqual({
 			consume: true,
 			itemId: "item:morale-t2",
 			quantity: 1,
 		});
-		expect(defaultGameConfig.craftRecipes["craft:house-of-engineers"].inputs).toContainEqual({
+		expect(
+			defaultGameConfig.craftRecipes["item:blueprint-house-of-engineers"].inputs,
+		).toContainEqual({
 			consume: true,
 			itemId: "item:morale-t4",
 			quantity: 1,
@@ -586,7 +592,7 @@ describe("defaultGameConfig", () => {
 	});
 
 	it("requires complete era ownership before townhall tier progression", () => {
-		expectPassiveOwnedRequirements("craft:townhall-t2", [
+		expectPassiveOwnedRequirements("item:blueprint-townhall-t2", [
 			"producer:lumberjack-t1",
 			"producer:sawmill-t1",
 			"producer:quarry-t1",
@@ -594,7 +600,7 @@ describe("defaultGameConfig", () => {
 			"producer:well-t1",
 		]);
 
-		expectPassiveOwnedRequirements("craft:townhall-t3", [
+		expectPassiveOwnedRequirements("item:blueprint-townhall-t3", [
 			"item:wheat-field",
 			"producer:farm-t1",
 			"producer:pig-farm-t1",
@@ -604,7 +610,7 @@ describe("defaultGameConfig", () => {
 			"producer:vegetable-garden-t1",
 		]);
 
-		expectPassiveOwnedRequirements("craft:townhall-t4", [
+		expectPassiveOwnedRequirements("item:blueprint-townhall-t4", [
 			"producer:windmill-t1",
 			"producer:bakery-t1",
 			"producer:slaughterhouse-t1",

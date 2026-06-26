@@ -103,9 +103,7 @@ const readProducedItemIds = ({
 	boardItem: BoardViewItem;
 	config: GameConfig;
 }): Set<string> => {
-	const item = config.items[boardItem.itemId];
-	const producerId = item?.producerId;
-	const producer = producerId ? config.producers[producerId] : undefined;
+	const producer = config.producers[boardItem.itemId];
 	const itemIds = new Set<string>();
 	if (!producer) return itemIds;
 

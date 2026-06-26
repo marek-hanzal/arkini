@@ -100,14 +100,14 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 			usage.merge.add(mergeId);
 		}
 
-		if (item.producerId) {
-			usage.producers.add(item.producerId);
+		if (config.producers[itemId]) {
+			usage.producers.add(itemId);
 		}
-		if (item.stashId) {
-			usage.stashes.add(item.stashId);
+		if (config.stashes[itemId]) {
+			usage.stashes.add(itemId);
 		}
-		if (item.craftRecipeId) {
-			usage.craftRecipes.add(item.craftRecipeId);
+		if (config.craftRecipes[itemId]) {
+			usage.craftRecipes.add(itemId);
 		}
 
 		for (const removal of item.removeBy ?? []) {
@@ -344,7 +344,7 @@ const readTerminalItemWarnings = (
 	Object.keys(config.items)
 		.filter((itemId) => itemFlow.producedItemIds.has(itemId))
 		.filter((itemId) => !itemFlow.consumedItemIds.has(itemId))
-		.filter((itemId) => !hasConfiguredInteraction(config.items[itemId]))
+		.filter((itemId) => !hasConfiguredInteraction(config, itemId, config.items[itemId]))
 		.map((itemId) => ({
 			code: "terminal-item",
 			id: itemId,
@@ -388,11 +388,15 @@ const compareGameConfigAuditWarnings = (
 	return left.id.localeCompare(right.id);
 };
 
-const hasConfiguredInteraction = (item: GameConfig["items"][string] | undefined) =>
+const hasConfiguredInteraction = (
+	config: GameConfig,
+	itemId: string,
+	item: GameConfig["items"][string] | undefined,
+) =>
 	Boolean(
-		item?.producerId ||
-			item?.stashId ||
-			item?.craftRecipeId ||
+		config.producers[itemId] ||
+			config.stashes[itemId] ||
+			config.craftRecipes[itemId] ||
 			(item?.mergeIds && item.mergeIds.length > 0) ||
 			(item?.removeBy && item.removeBy.length > 0),
 	);

@@ -671,7 +671,7 @@ Because inventory is passive, producer jobs require the producer item to be on t
 
 ### 10.4 Producer product lines
 
-A producer owns ordered product lines through `productIds`. Each product line defines its own duration, optional input reference, requirements, placement, tags, baseline runtime visibility, optional active-effect activation, and optional output table.
+A producer owns ordered product lines through `productIds`. Each product line defines its own duration, inline inputs, requirements, placement, tags, baseline runtime visibility, optional active-effect activation, and inline output. `inputRefId` and `outputTableId` remain only rare shared/legacy escape hatches; normal product data lives on the product itself.
 
 Product lines can start as `visibility: "hidden"` and be revealed by runtime effects. Hidden lines are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. A matching hide effect has higher priority than reveal. A matching block effect leaves the line visible but prevents starting new production. Running jobs are not paused or cancelled by block effects, because the game already has enough ways to generate admin work without inventing time-travel bookkeeping.
 
@@ -703,7 +703,7 @@ If the default line is full, feeding continues to the next matching line.
 
 ### 10.5 Producer loot output and sink products
 
-A product line may reference a named loot table to decide generated outputs.
+A product line normally owns its generated `output` inline. Named loot tables remain for stashes, runtime effect mutations, and deliberately shared output tables.
 
 A loot-producing product may generate:
 
@@ -711,9 +711,9 @@ A loot-producing product may generate:
 - multiple different items
 - multiple copies of the same item
 
-The output count and probability rules must be encoded in named loot table data, not hidden in UI code or inline in random item definitions.
+The output count and probability rules must be encoded in product `output` data or an intentionally shared loot table, not hidden in UI code or random item definitions.
 
-A product line may also omit `outputTableId`. Missing output table means a valid delayed sink/destructor product: the product job consumes its inputs, waits for its duration, completes, and creates no output. This is not a zero-output loot table. It is an explicit no-output product.
+A product line may also omit both `output` and `outputTableId`. Missing output means a valid delayed sink/destructor product: the product job consumes its inputs, waits for its duration, completes, and creates no output. This is not a zero-output loot table. It is an explicit no-output product.
 
 ### 10.6 Producer output placement and blocked delivery
 

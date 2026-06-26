@@ -139,6 +139,38 @@ describe("auditGameConfig", () => {
 		]);
 	});
 
+	it("warns about duplicate central definition shapes", () => {
+		const config: any = createConfigValue();
+		config.requirements = {
+			"requirement:near-a": {
+				distance: 1,
+				itemIds: [
+					"item:fuel",
+				],
+				type: "proximity",
+			},
+			"requirement:near-b": {
+				distance: 1,
+				itemIds: [
+					"item:fuel",
+				],
+				type: "proximity",
+			},
+		};
+		config.producers["producer:test"].requirementIds = [
+			"requirement:near-a",
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).toContainEqual(
+			expect.objectContaining({
+				code: "duplicate-definition-shape",
+				section: "requirements",
+			}),
+		);
+	});
+
 	it("does not warn about produced items used as hindrances", () => {
 		const config = createConfigValue();
 		const warnings = auditGameConfig(
@@ -163,6 +195,38 @@ describe("auditGameConfig", () => {
 		);
 
 		expect(warnings).toEqual([]);
+	});
+
+	it("tracks product-owned inline inputs and outputs", () => {
+		const config: any = createConfigValue();
+		config.inputs = {};
+		config.lootTables = {};
+		config.products["product:test"].inputRefId = undefined;
+		config.products["product:test"].outputTableId = undefined;
+		config.products["product:test"].inputs = [
+			{
+				capacity: 1,
+				consume: true,
+				itemId: "item:fuel",
+				quantity: 1,
+			},
+		];
+		config.products["product:test"].output = [
+			{
+				itemId: "item:pollution",
+				quantity: 1,
+				type: "guaranteed",
+			},
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).toEqual([
+			expect.objectContaining({
+				code: "terminal-item",
+				id: "item:pollution",
+			}),
+		]);
 	});
 
 	it("formats warnings for CLI output", () => {

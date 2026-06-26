@@ -11,6 +11,24 @@ const readItemResourceData = (itemId: string) => {
 	return defaultGameConfig.resources[asset.resourceId]?.data;
 };
 
+const readProductInputs = (productId: string) => {
+	const product = defaultGameConfig.products[productId];
+	if (!product) throw new Error(`Missing product ${productId}`);
+	if (product.inputs) return product.inputs;
+	if (!product.inputRefId) return [];
+
+	return defaultGameConfig.inputs[product.inputRefId]?.inputs ?? [];
+};
+
+const readProductOutput = (productId: string) => {
+	const product = defaultGameConfig.products[productId];
+	if (!product) throw new Error(`Missing product ${productId}`);
+	if (product.output) return product.output;
+	if (!product.outputTableId) return [];
+
+	return defaultGameConfig.lootTables[product.outputTableId]?.output ?? [];
+};
+
 describe("defaultGameConfig", () => {
 	it("uses compiled resource data for default item assets", () => {
 		expect(readItemResourceData("item:tree")).toMatch(/^iVBOR/);
@@ -72,9 +90,7 @@ describe("defaultGameConfig", () => {
 			"product:slaughterhouse-t1:sausage-raw-hide",
 		]);
 
-		expect(
-			defaultGameConfig.lootTables["loot:slaughterhouse-t1:sausage-raw-hide"].output,
-		).toContainEqual({
+		expect(readProductOutput("product:slaughterhouse-t1:sausage-raw-hide")).toContainEqual({
 			itemId: "item:raw-hide",
 			quantity: 1,
 			type: "guaranteed",
@@ -88,9 +104,7 @@ describe("defaultGameConfig", () => {
 			"product:dye-workshop-t1:pigment",
 			"product:dye-workshop-t1:luxury-cloth",
 		]);
-		expect(
-			defaultGameConfig.inputs["input:dye-workshop-t1:luxury-cloth"].inputs,
-		).toContainEqual({
+		expect(readProductInputs("product:dye-workshop-t1:luxury-cloth")).toContainEqual({
 			capacity: 4,
 			consume: true,
 			itemId: "item:pigment",
@@ -178,7 +192,7 @@ describe("defaultGameConfig", () => {
 			"proximity:dirty-processing:purifier",
 		]);
 
-		expect(defaultGameConfig.inputs["input:purifier-t1:pollution"].inputs).toEqual([
+		expect(readProductInputs("product:purifier-t1:pollution")).toEqual([
 			{
 				capacity: 4,
 				consume: true,
@@ -199,14 +213,14 @@ describe("defaultGameConfig", () => {
 			},
 		]);
 
-		expect(defaultGameConfig.lootTables["loot:smelter-t1:iron-ingot"].output).toContainEqual({
+		expect(readProductOutput("product:smelter-t1:iron-ingot")).toContainEqual({
 			chance: 0.75,
 			itemId: "item:pollution",
 			quantity: 1,
 			type: "chance",
 		});
 		expect(
-			defaultGameConfig.lootTables["loot:construction-yard-t1:construction-bundle"].output,
+			readProductOutput("product:construction-yard-t1:construction-bundle"),
 		).toContainEqual({
 			itemId: "item:construction-bundle",
 			quantity: 1,
@@ -278,25 +292,19 @@ describe("defaultGameConfig", () => {
 			"proximity:dirty-processing:purifier",
 		]);
 
-		expect(
-			defaultGameConfig.inputs["input:heroes-guild-t1:treasure-chest"].inputs,
-		).toContainEqual({
+		expect(readProductInputs("product:heroes-guild-t1:treasure-chest")).toContainEqual({
 			capacity: 4,
 			consume: true,
 			itemId: "item:master-knowledge",
 			quantity: 1,
 		});
-		expect(
-			defaultGameConfig.inputs["input:heroes-guild-t1:treasure-chest"].inputs,
-		).toContainEqual({
+		expect(readProductInputs("product:heroes-guild-t1:treasure-chest")).toContainEqual({
 			capacity: 4,
 			consume: true,
 			itemId: "item:aquamarine",
 			quantity: 1,
 		});
-		expect(
-			defaultGameConfig.lootTables["loot:heroes-guild-t1:treasure-chest"].output,
-		).toContainEqual({
+		expect(readProductOutput("product:heroes-guild-t1:treasure-chest")).toContainEqual({
 			itemId: "item:treasure-chest",
 			quantity: 1,
 			type: "guaranteed",
@@ -326,25 +334,19 @@ describe("defaultGameConfig", () => {
 		).toEqual([
 			"proximity:dirty-processing:purifier",
 		]);
-		expect(
-			defaultGameConfig.inputs["input:glazier-workshop-t1:stained-glass"].inputs,
-		).toContainEqual({
+		expect(readProductInputs("product:glazier-workshop-t1:stained-glass")).toContainEqual({
 			capacity: 4,
 			consume: true,
 			itemId: "item:pigment",
 			quantity: 1,
 		});
-		expect(
-			defaultGameConfig.lootTables["loot:glazier-workshop-t1:stained-glass"].output,
-		).toContainEqual({
+		expect(readProductOutput("product:glazier-workshop-t1:stained-glass")).toContainEqual({
 			chance: 0.5,
 			itemId: "item:pollution",
 			quantity: 1,
 			type: "chance",
 		});
-		expect(
-			defaultGameConfig.lootTables["loot:glazier-workshop-t1:stained-glass"].output,
-		).toContainEqual({
+		expect(readProductOutput("product:glazier-workshop-t1:stained-glass")).toContainEqual({
 			itemId: "item:stained-glass",
 			quantity: 1,
 			type: "guaranteed",
@@ -397,15 +399,13 @@ describe("defaultGameConfig", () => {
 			itemId: "producer:stonemason-t1",
 			quantity: 1,
 		});
-		expect(defaultGameConfig.inputs["input:stonemason-t2:marble-block"].inputs).toContainEqual({
+		expect(readProductInputs("product:stonemason-t2:marble-block")).toContainEqual({
 			capacity: 4,
 			consume: true,
 			itemId: "item:marble",
 			quantity: 1,
 		});
-		expect(
-			defaultGameConfig.lootTables["loot:stonemason-t2:marble-block"].output,
-		).toContainEqual({
+		expect(readProductOutput("product:stonemason-t2:marble-block")).toContainEqual({
 			itemId: "item:marble-block",
 			quantity: 1,
 			type: "guaranteed",
@@ -470,25 +470,21 @@ describe("defaultGameConfig", () => {
 			},
 		});
 
-		expect(
-			defaultGameConfig.inputs["input:university:blueprint-house-of-engineers"].inputs,
-		).toContainEqual({
-			capacity: 2,
-			consume: true,
-			itemId: "item:treasure-chest",
-			quantity: 1,
-		});
-		expect(
-			defaultGameConfig.inputs["input:university:blueprint-cathedral"].inputs,
-		).toContainEqual({
+		expect(readProductInputs("product:university:blueprint-house-of-engineers")).toContainEqual(
+			{
+				capacity: 2,
+				consume: true,
+				itemId: "item:treasure-chest",
+				quantity: 1,
+			},
+		);
+		expect(readProductInputs("product:university:blueprint-cathedral")).toContainEqual({
 			capacity: 4,
 			consume: true,
 			itemId: "item:stained-glass",
 			quantity: 2,
 		});
-		expect(
-			defaultGameConfig.inputs["input:university:blueprint-mage-lodge"].inputs,
-		).toContainEqual({
+		expect(readProductInputs("product:university:blueprint-mage-lodge")).toContainEqual({
 			capacity: 4,
 			consume: true,
 			itemId: "item:sapphire",
@@ -537,7 +533,7 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.producers["producer:house-t1"].productIds).toEqual([
 			"product:house-t1:morale-t1",
 		]);
-		expect(defaultGameConfig.lootTables["loot:house-t4:morale-t4"].output).toEqual([
+		expect(readProductOutput("product:house-t4:morale-t4")).toEqual([
 			{
 				itemId: "item:morale-t4",
 				quantity: 1,
@@ -580,13 +576,13 @@ describe("defaultGameConfig", () => {
 			"product:farm-t1:grain",
 			"product:farm-t1:grain-morale-t1",
 		]);
-		expect(defaultGameConfig.inputs["input:farm-t1:grain-morale-t1"].inputs).toContainEqual({
+		expect(readProductInputs("product:farm-t1:grain-morale-t1")).toContainEqual({
 			capacity: 4,
 			consume: true,
 			itemId: "item:morale-t1",
 			quantity: 1,
 		});
-		expect(defaultGameConfig.lootTables["loot:farm-t1:grain-morale-t1"].output).toEqual([
+		expect(readProductOutput("product:farm-t1:grain-morale-t1")).toEqual([
 			{
 				itemId: "item:grain",
 				quantity: 2,

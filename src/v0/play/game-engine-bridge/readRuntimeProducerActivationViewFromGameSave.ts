@@ -2,6 +2,7 @@ import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProductInputs } from "~/v0/game/config/readProductInputs";
+import { readProductOutputItemIds } from "~/v0/game/config/readProductOutputItemIds";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
@@ -219,6 +220,10 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				inputsAvailable,
 				missingRequirementItemIds: missingRequirements as ItemId[],
 				name: product.name,
+				outputItemIds: readProductOutputItemIds({
+					config,
+					productId,
+				}),
 				outputTableId: product.outputTableId,
 				productId,
 				producerQueuedJobs,

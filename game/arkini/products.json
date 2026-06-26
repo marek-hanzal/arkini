@@ -2,252 +2,1230 @@
 	"products": {
 		"product:academy:advanced-knowledge": {
 			"durationMs": 22000,
-			"inputRefId": "input:academy:advanced-knowledge",
 			"name": "Advanced Knowledge",
-			"outputTableId": "loot:academy:advanced-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:basic-knowledge": {
 			"durationMs": 8000,
-			"inputRefId": "input:academy:basic-knowledge",
 			"name": "Basic Knowledge",
-			"outputTableId": "loot:academy:basic-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-armory-t1": {
 			"durationMs": 2500,
-			"inputRefId": "input:academy:blueprint-armory-t1",
 			"name": "Blueprint: Armory I",
-			"outputTableId": "loot:academy:blueprint-armory-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-armory-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-blacksmith-t1": {
 			"durationMs": 2500,
-			"inputRefId": "input:academy:blueprint-blacksmith-t1",
 			"name": "Blueprint: Blacksmith I",
-			"outputTableId": "loot:academy:blueprint-blacksmith-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-blacksmith-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-brickyard": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-brickyard",
 			"name": "Blueprint: Brickyard",
-			"outputTableId": "loot:academy:blueprint-brickyard",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-brickyard",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-charcoal-burner-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-charcoal-burner-t1",
 			"name": "Blueprint: Charcoal Burner I",
-			"outputTableId": "loot:academy:blueprint-charcoal-burner-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-charcoal-burner-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-clay-pit": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-clay-pit",
 			"name": "Blueprint: Clay Pit",
-			"outputTableId": "loot:academy:blueprint-clay-pit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:clay-deposit",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-clay-pit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-coal-mine-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-coal-mine-t1",
 			"name": "Blueprint: Coal Mine I",
-			"outputTableId": "loot:academy:blueprint-coal-mine-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-coal-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-construction-yard-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-construction-yard-t1",
 			"name": "Blueprint: Construction Yard I",
-			"outputTableId": "loot:academy:blueprint-construction-yard-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 5
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-construction-yard-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-glassworks": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-glassworks",
 			"name": "Blueprint: Glassworks",
-			"outputTableId": "loot:academy:blueprint-glassworks",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-glassworks",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-gold-mine-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-gold-mine-t1",
 			"name": "Blueprint: Gold Mine I",
-			"outputTableId": "loot:academy:blueprint-gold-mine-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-gold-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-goldsmith-t1": {
 			"durationMs": 2500,
-			"inputRefId": "input:academy:blueprint-goldsmith-t1",
 			"name": "Blueprint: Goldsmith I",
-			"outputTableId": "loot:academy:blueprint-goldsmith-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-goldsmith-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-iron-mine-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-iron-mine-t1",
 			"name": "Blueprint: Iron Mine I",
-			"outputTableId": "loot:academy:blueprint-iron-mine-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-iron-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-prospector-guild-t2": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-prospector-guild-t2",
 			"name": "Blueprint: Prospector Guild 2",
-			"outputTableId": "loot:academy:blueprint-prospector-guild-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-prospector-guild-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-purifier-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-purifier-t1",
 			"name": "Blueprint: Purifier I",
-			"outputTableId": "loot:academy:blueprint-purifier-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-purifier-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-roof-tile-factory": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-roof-tile-factory",
 			"name": "Blueprint: Roof Tile Factory",
-			"outputTableId": "loot:academy:blueprint-roof-tile-factory",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-roof-tile-factory",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-sand-pit": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-sand-pit",
 			"name": "Blueprint: Sand Pit",
-			"outputTableId": "loot:academy:blueprint-sand-pit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sand-deposit",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-sand-pit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-smelter-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:academy:blueprint-smelter-t1",
 			"name": "Blueprint: Smelter I",
-			"outputTableId": "loot:academy:blueprint-smelter-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ore",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-smelter-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:academy:blueprint-university": {
 			"durationMs": 2500,
-			"inputRefId": "input:academy:blueprint-university",
 			"name": "Blueprint: University",
-			"outputTableId": "loot:academy:blueprint-university",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-university",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:armory-t1:iron-armor": {
 			"durationMs": 36000,
-			"inputRefId": "input:armory-t1:iron-armor",
 			"name": "Iron Armor",
-			"outputTableId": "loot:armory-t1:iron-armor",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:iron-armor",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.45,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:armory-t1:leather-armor": {
 			"durationMs": 22000,
-			"inputRefId": "input:armory-t1:leather-armor",
 			"name": "Leather Armor",
-			"outputTableId": "loot:armory-t1:leather-armor",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:leather-armor",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:bakery-t1:bread": {
 			"durationMs": 8000,
-			"inputRefId": "input:bakery-t1:flour-water",
 			"name": "Bread",
-			"outputTableId": "loot:bakery-t1:bread",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:bakery-t1:bread-morale-t1": {
 			"durationMs": 6000,
-			"inputRefId": "input:bakery-t1:bread-morale-t1",
 			"name": "Bread (Inspired)",
-			"outputTableId": "loot:bakery-t1:bread-morale-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t1",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:bread",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:blacksmith-t1:axe": {
 			"durationMs": 15000,
-			"inputRefId": "input:blacksmith-t1:axe",
 			"name": "Axe",
-			"outputTableId": "loot:blacksmith-t1:axe",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:axe",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:blacksmith-t1:nails": {
 			"durationMs": 10000,
-			"inputRefId": "input:blacksmith-t1:nails",
 			"name": "Nails",
-			"outputTableId": "loot:blacksmith-t1:nails",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:nails",
+					"quantity": 4,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:blacksmith-t1:sword": {
 			"durationMs": 22000,
-			"inputRefId": "input:blacksmith-t1:sword",
 			"name": "Sword",
-			"outputTableId": "loot:blacksmith-t1:sword",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:sword",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.45,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:brewery-t1:beer-barrel": {
 			"durationMs": 5000,
-			"inputRefId": "input:brewery-t1:hops-water",
 			"name": "Beer Barrel",
-			"outputTableId": "loot:brewery-t1:beer-barrel",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:hops",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
 			"durationMs": 5000,
-			"inputRefId": "input:brewery-t1:beer-to-barrel",
 			"name": "Beer Barrel",
-			"outputTableId": "loot:brewery-t1:beer-barrel-from-beer",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:brewery-t1:hops": {
 			"durationMs": 5000,
-			"inputRefId": "input:brewery-t1:water",
 			"name": "Hops",
-			"outputTableId": "loot:brewery-t1:hops",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:hops",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:brickyard:bricks": {
 			"durationMs": 8500,
-			"inputRefId": "input:brickyard:bricks",
 			"name": "Bricks",
-			"outputTableId": "loot:brickyard:bricks",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:cattle-farm-t1:milk": {
@@ -262,20 +1240,64 @@
 					"type": "proximity"
 				}
 			],
-			"inputRefId": "input:cattle-farm-t1:grain-water",
 			"name": "Milk",
-			"outputTableId": "loot:cattle-farm-t1:milk",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:milk",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:charcoal-burner-t1:charcoal": {
 			"durationMs": 6500,
-			"inputRefId": "input:charcoal-burner-t1:charcoal",
 			"name": "Charcoal",
-			"outputTableId": "loot:charcoal-burner-t1:charcoal",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:chicken-coop-t1:egg": {
@@ -290,107 +1312,480 @@
 					"type": "proximity"
 				}
 			],
-			"inputRefId": "input:chicken-coop-t1:grain-water",
 			"name": "Egg",
-			"outputTableId": "loot:chicken-coop-t1:egg",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:egg",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:civic-office-t1:blueprint-academy": {
 			"durationMs": 2500,
-			"inputRefId": "input:civic-office-t1:blueprint-academy",
 			"name": "Blueprint: Academy",
-			"outputTableId": "loot:civic-office-t1:blueprint-academy",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 3
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-academy",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:civic-office-t1:building-permit": {
 			"durationMs": 10000,
-			"inputRefId": "input:civic-office-t1:building-permit",
 			"name": "Building Permit",
-			"outputTableId": "loot:civic-office-t1:building-permit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:civic-office-t1:building-permit-morale-t2": {
 			"durationMs": 8000,
-			"inputRefId": "input:civic-office-t1:building-permit-morale-t2",
 			"name": "Building Permit (Inspired)",
-			"outputTableId": "loot:civic-office-t1:building-permit-morale-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t2",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:civic-office-t1:guild-charter": {
 			"durationMs": 12000,
-			"inputRefId": "input:civic-office-t1:guild-charter",
 			"name": "Guild Charter",
-			"outputTableId": "loot:civic-office-t1:guild-charter",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:clay-pit:clay": {
 			"durationMs": 6500,
-			"inputRefId": "input:clay-pit:clay",
 			"name": "Clay",
-			"outputTableId": "loot:clay-pit:clay",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:coal-mine-t1:coal": {
 			"durationMs": 8000,
-			"inputRefId": "input:coal-mine-t1:bread-water",
 			"name": "Coal Cart",
-			"outputTableId": "loot:coal-mine-t1:coal",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:construction-yard-t1:construction-bundle": {
 			"durationMs": 12000,
-			"inputRefId": "input:construction-yard-t1:construction-bundle",
 			"name": "Construction Bundle",
-			"outputTableId": "loot:construction-yard-t1:construction-bundle",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:construction-yard-t1:construction-bundle-morale-t3": {
 			"durationMs": 9000,
-			"inputRefId": "input:construction-yard-t1:construction-bundle-morale-t3",
 			"name": "Construction Bundle (Inspired)",
-			"outputTableId": "loot:construction-yard-t1:construction-bundle-morale-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:cookhouse-t1:feast": {
 			"durationMs": 9000,
-			"inputRefId": "input:cookhouse-t1:feast",
 			"name": "Feast",
-			"outputTableId": "loot:cookhouse-t1:feast",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:cheese",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:egg",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:feast",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:dairy-t1:cheese": {
 			"durationMs": 7000,
-			"inputRefId": "input:dairy-t1:milk",
 			"name": "Cheese",
-			"outputTableId": "loot:dairy-t1:cheese",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:milk",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:cheese",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:dye-workshop-t1:luxury-cloth": {
 			"durationMs": 9000,
-			"inputRefId": "input:dye-workshop-t1:luxury-cloth",
 			"name": "Luxury Cloth",
-			"outputTableId": "loot:dye-workshop-t1:luxury-cloth",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:luxury-cloth",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:dye-workshop-t1:pigment": {
 			"durationMs": 5000,
-			"inputRefId": "input:dye-workshop-t1:pigment",
 			"name": "Pigment",
-			"outputTableId": "loot:dye-workshop-t1:pigment",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:pigment",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:farm-t1:grain": {
 			"durationMs": 5000,
@@ -404,17 +1799,28 @@
 					"type": "proximity"
 				}
 			],
-			"inputRefId": "input:farm-t1:water",
 			"name": "Grain",
-			"outputTableId": "loot:farm-t1:grain",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:farm-t1:grain-morale-t1": {
 			"durationMs": 3500,
-			"inputRefId": "input:farm-t1:grain-morale-t1",
 			"name": "Grain (Inspired)",
-			"outputTableId": "loot:farm-t1:grain-morale-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"hinderedBy": [
@@ -426,278 +1832,1248 @@
 					],
 					"type": "proximity"
 				}
+			],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t1",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:grain",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
 			]
 		},
 		"product:glassworks:glass": {
 			"durationMs": 9000,
-			"inputRefId": "input:glassworks:glass",
 			"name": "Glass",
-			"outputTableId": "loot:glassworks:glass",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:glass",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.15,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:glazier-workshop-t1:stained-glass": {
 			"durationMs": 14000,
-			"inputRefId": "input:glazier-workshop-t1:stained-glass",
 			"name": "Stained Glass",
-			"outputTableId": "loot:glazier-workshop-t1:stained-glass",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:stained-glass",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.5,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
 			"durationMs": 10500,
-			"inputRefId": "input:glazier-workshop-t1:stained-glass-morale-t4",
 			"name": "Stained Glass (Inspired)",
-			"outputTableId": "loot:glazier-workshop-t1:stained-glass-morale-t4",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:stained-glass",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.5,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:gold-mine-t1:gold-ore": {
 			"durationMs": 9000,
-			"inputRefId": "input:gold-mine-t1:bread-wine",
 			"name": "Gold Ore Cart",
-			"outputTableId": "loot:gold-mine-t1:gold-ore",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:gold-ore",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:goldsmith-t1:coin-stack": {
 			"durationMs": 12000,
-			"inputRefId": "input:goldsmith-t1:coin-stack",
 			"name": "Coin Stack",
-			"outputTableId": "loot:goldsmith-t1:coin-stack",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:goldsmith-t1:key-t1": {
 			"durationMs": 14000,
-			"inputRefId": "input:goldsmith-t1:key-t1",
 			"name": "Key I",
-			"outputTableId": "loot:goldsmith-t1:key-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:key-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:goldsmith-t1:key-t2": {
 			"durationMs": 18000,
-			"inputRefId": "input:goldsmith-t1:key-t2",
 			"name": "Key II",
-			"outputTableId": "loot:goldsmith-t1:key-t2",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t1",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:ruby",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:key-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:goldsmith-t1:key-t3": {
 			"durationMs": 22000,
-			"inputRefId": "input:goldsmith-t1:key-t3",
 			"name": "Key III",
-			"outputTableId": "loot:goldsmith-t1:key-t3",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t2",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:emerald",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:key-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:goldsmith-t1:key-t4": {
 			"durationMs": 26000,
-			"inputRefId": "input:goldsmith-t1:key-t4",
 			"name": "Key IV",
-			"outputTableId": "loot:goldsmith-t1:key-t4",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t3",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sapphire",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:key-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:heroes-guild-t1:chest-t1": {
 			"durationMs": 90000,
-			"inputRefId": "input:heroes-guild-t1:chest-t1",
 			"name": "Chest I Expedition",
-			"outputTableId": "loot:heroes-guild-t1:chest-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:axe",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:chest-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:heroes-guild-t1:chest-t2": {
 			"durationMs": 150000,
-			"inputRefId": "input:heroes-guild-t1:chest-t2",
 			"name": "Chest II Expedition",
-			"outputTableId": "loot:heroes-guild-t1:chest-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:chest-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:heroes-guild-t1:chest-t3": {
 			"durationMs": 240000,
-			"inputRefId": "input:heroes-guild-t1:chest-t3",
 			"name": "Chest III Expedition",
-			"outputTableId": "loot:heroes-guild-t1:chest-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t1",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:chest-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:heroes-guild-t1:chest-t4": {
 			"durationMs": 420000,
-			"inputRefId": "input:heroes-guild-t1:chest-t4",
 			"name": "Chest IV Expedition",
-			"outputTableId": "loot:heroes-guild-t1:chest-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t2",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:chest-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:heroes-guild-t1:treasure-chest": {
 			"durationMs": 600000,
-			"inputRefId": "input:heroes-guild-t1:treasure-chest",
 			"name": "Grand Expedition",
-			"outputTableId": "loot:heroes-guild-t1:treasure-chest",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t4",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:topaz",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:aquamarine",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:treasure-chest",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:heroes-guild-t1:treasure-chest-morale-t4": {
 			"durationMs": 420000,
-			"inputRefId": "input:heroes-guild-t1:treasure-chest-morale-t4",
 			"name": "Grand Expedition (Inspired)",
-			"outputTableId": "loot:heroes-guild-t1:treasure-chest-morale-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t4",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:topaz",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:aquamarine",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:treasure-chest",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:aquamarine",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:topaz",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
 		},
 		"product:house-t1:morale-t1": {
 			"durationMs": 8000,
-			"inputRefId": "input:house-t1:morale-t1",
 			"name": "Morale I",
-			"outputTableId": "loot:house-t1:morale-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:morale-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:house-t2:morale-t2": {
 			"durationMs": 12000,
-			"inputRefId": "input:house-t2:morale-t2",
 			"name": "Morale II",
-			"outputTableId": "loot:house-t2:morale-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:morale-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:house-t3:morale-t3": {
 			"durationMs": 18000,
-			"inputRefId": "input:house-t3:morale-t3",
 			"name": "Morale III",
-			"outputTableId": "loot:house-t3:morale-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:morale-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:house-t4:morale-t4": {
 			"durationMs": 24000,
-			"inputRefId": "input:house-t4:morale-t4",
 			"name": "Morale IV",
-			"outputTableId": "loot:house-t4:morale-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:morale-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:iron-mine-t1:iron-ore": {
 			"durationMs": 8000,
-			"inputRefId": "input:iron-mine-t1:sausage-beer",
 			"name": "Iron Ore Cart",
-			"outputTableId": "loot:iron-mine-t1:iron-ore",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:iron-ore",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:lumberjack-t1:log": {
 			"durationMs": 5000,
 			"name": "Log",
-			"outputTableId": "loot:lumberjack-t1:log",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"output": [
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t1:coin-from-beer": {
 			"durationMs": 4000,
-			"inputRefId": "input:market-t1:coin-from-beer",
 			"name": "Coins from Beer",
-			"outputTableId": "loot:market-t1:coin-from-beer",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t1:coin-from-bread": {
 			"durationMs": 4000,
-			"inputRefId": "input:market-t1:coin-from-bread",
 			"name": "Coins from Bread",
-			"outputTableId": "loot:market-t1:coin-from-bread",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t1:coin-from-cheese": {
 			"durationMs": 4000,
-			"inputRefId": "input:market-t1:coin-from-cheese",
 			"name": "Coins from Cheese",
-			"outputTableId": "loot:market-t1:coin-from-cheese",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:cheese",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t1:coin-from-feast": {
 			"durationMs": 6000,
-			"inputRefId": "input:market-t1:coin-from-feast",
 			"name": "Coins from Feast",
-			"outputTableId": "loot:market-t1:coin-from-feast",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t1:coin-from-sausage": {
 			"durationMs": 4000,
-			"inputRefId": "input:market-t1:coin-from-sausage",
 			"name": "Coins from Sausage",
-			"outputTableId": "loot:market-t1:coin-from-sausage",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t1:coin-from-wine-glass": {
 			"durationMs": 4000,
-			"inputRefId": "input:market-t1:coin-from-wine-glass",
 			"name": "Coins from Wine Glass",
-			"outputTableId": "loot:market-t1:coin-from-wine-glass",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t2:coin-from-common-clothing": {
 			"durationMs": 5000,
-			"inputRefId": "input:market-t2:coin-from-common-clothing",
 			"name": "Coins from Common Clothing",
-			"outputTableId": "loot:market-t2:coin-from-common-clothing",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t2:coin-from-feast": {
 			"durationMs": 5000,
-			"inputRefId": "input:market-t2:coin-from-feast",
 			"name": "Better Coins from Feast",
-			"outputTableId": "loot:market-t2:coin-from-feast",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 5,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t2:coin-from-luxury-clothing": {
 			"durationMs": 5000,
-			"inputRefId": "input:market-t2:coin-from-luxury-clothing",
 			"name": "Coins from Luxury Clothing",
-			"outputTableId": "loot:market-t2:coin-from-luxury-clothing",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 6,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:market-t2:coin-from-paper": {
 			"durationMs": 3500,
-			"inputRefId": "input:market-t2:coin-from-paper",
 			"name": "Coins from Paper",
-			"outputTableId": "loot:market-t2:coin-from-paper",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:paper-mill-t1:paper": {
 			"durationMs": 7000,
-			"inputRefId": "input:paper-mill-t1:paper",
 			"name": "Paper",
-			"outputTableId": "loot:paper-mill-t1:paper",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:pig-farm-t1:piglet": {
 			"durationMs": 5000,
@@ -711,151 +3087,550 @@
 					"type": "proximity"
 				}
 			],
-			"inputRefId": "input:pig-farm-t1:grain-water",
 			"name": "Piglet",
-			"outputTableId": "loot:pig-farm-t1:piglet",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:piglet",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:prospector-guild-t1:clay-deposit": {
 			"durationMs": 9000,
-			"inputRefId": "input:prospector-guild-t1:clay-deposit",
 			"name": "Prospect: Clay Deposit",
-			"outputTableId": "loot:prospector-guild-t1:clay-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:prospector-guild-t1:sand-deposit": {
 			"durationMs": 9000,
-			"inputRefId": "input:prospector-guild-t1:sand-deposit",
 			"name": "Prospect: Sand Deposit",
-			"outputTableId": "loot:prospector-guild-t1:sand-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:prospector-guild-t2:clay-deposit": {
 			"durationMs": 9000,
-			"inputRefId": "input:prospector-guild-t2:clay-deposit",
 			"name": "Prospect: Clay Deposit",
-			"outputTableId": "loot:prospector-guild-t2:clay-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:prospector-guild-t2:coal-deposit": {
 			"durationMs": 10000,
-			"inputRefId": "input:prospector-guild-t2:coal-deposit",
 			"name": "Prospect: Coal Deposit",
-			"outputTableId": "loot:prospector-guild-t2:coal-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coal-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:prospector-guild-t2:gold-deposit": {
 			"durationMs": 12000,
-			"inputRefId": "input:prospector-guild-t2:gold-deposit",
 			"name": "Prospect: Gold Deposit",
-			"outputTableId": "loot:prospector-guild-t2:gold-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:gold-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:prospector-guild-t2:iron-deposit": {
 			"durationMs": 10000,
-			"inputRefId": "input:prospector-guild-t2:iron-deposit",
 			"name": "Prospect: Iron Deposit",
-			"outputTableId": "loot:prospector-guild-t2:iron-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:iron-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:prospector-guild-t2:marble-deposit": {
 			"durationMs": 14000,
-			"inputRefId": "input:prospector-guild-t2:marble-deposit",
 			"name": "Prospect: Marble Deposit",
-			"outputTableId": "loot:prospector-guild-t2:marble-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:marble-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:prospector-guild-t2:sand-deposit": {
 			"durationMs": 9000,
-			"inputRefId": "input:prospector-guild-t2:sand-deposit",
 			"name": "Prospect: Sand Deposit",
-			"outputTableId": "loot:prospector-guild-t2:sand-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:purifier-t1:pollution": {
 			"durationMs": 6000,
-			"inputRefId": "input:purifier-t1:pollution",
 			"name": "Purify Pollution",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pollution",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			]
 		},
 		"product:purifier-t1:pollution-bulk": {
 			"durationMs": 18000,
-			"inputRefId": "input:purifier-t1:pollution-bulk",
 			"name": "Purify Pollution x4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:pollution",
+					"quantity": 4
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 4
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				}
+			]
 		},
 		"product:quarry-t1:stone": {
 			"durationMs": 5000,
 			"name": "Stone",
-			"outputTableId": "loot:quarry-t1:stone",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:quarry-t2:marble": {
 			"durationMs": 12000,
 			"name": "Marble",
-			"outputTableId": "loot:quarry-t2:marble",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"output": [
+				{
+					"itemId": "item:marble",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:quarry-t2:stone": {
 			"durationMs": 4000,
 			"name": "Stone",
-			"outputTableId": "loot:quarry-t2:stone",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:roof-tile-factory:roof-tiles": {
 			"durationMs": 8500,
-			"inputRefId": "input:roof-tile-factory:roof-tiles",
 			"name": "Roof Tiles",
-			"outputTableId": "loot:roof-tile-factory:roof-tiles",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:sand-pit:sand": {
 			"durationMs": 6500,
 			"name": "Sand",
-			"outputTableId": "loot:sand-pit:sand",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"output": [
+				{
+					"itemId": "item:sand",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:sawmill-t1:plank": {
 			"durationMs": 5000,
-			"inputRefId": "input:sawmill-t1:log",
 			"name": "Plank",
-			"outputTableId": "loot:sawmill-t1:plank",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:school:basic-knowledge": {
 			"durationMs": 12000,
-			"inputRefId": "input:school:basic-knowledge",
 			"name": "Basic Knowledge",
-			"outputTableId": "loot:school:basic-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:school:basic-knowledge-morale-t2": {
 			"durationMs": 9000,
-			"inputRefId": "input:school:basic-knowledge-morale-t2",
 			"name": "Basic Knowledge (Inspired)",
-			"outputTableId": "loot:school:basic-knowledge-morale-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t2",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:sheep-pasture-t1:wool": {
 			"durationMs": 5000,
@@ -869,527 +3644,2133 @@
 					"type": "proximity"
 				}
 			],
-			"inputRefId": "input:sheep-pasture-t1:grain-water",
 			"name": "Wool",
-			"outputTableId": "loot:sheep-pasture-t1:wool",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wool",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:slaughterhouse-t1:sausage-raw-hide": {
 			"durationMs": 8000,
-			"inputRefId": "input:slaughterhouse-t1:piglet",
 			"name": "Sausage + Raw Hide",
-			"outputTableId": "loot:slaughterhouse-t1:sausage-raw-hide",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:raw-hide",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:smelter-t1:gold-ingot": {
 			"durationMs": 10000,
-			"inputRefId": "input:smelter-t1:gold-ore-coal-water",
 			"name": "Gold Ingot",
-			"outputTableId": "loot:smelter-t1:gold-ingot",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:gold-ore",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.75,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:smelter-t1:iron-ingot": {
 			"durationMs": 10000,
-			"inputRefId": "input:smelter-t1:iron-ore-coal-water",
 			"name": "Iron Ingot",
-			"outputTableId": "loot:smelter-t1:iron-ingot",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
+			],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ore",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.75,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
 			]
 		},
 		"product:stonemason-t1:stone-block": {
 			"durationMs": 5000,
-			"inputRefId": "input:stonemason-t1:stone",
 			"name": "Stone Block",
-			"outputTableId": "loot:stonemason-t1:stone-block",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:stonemason-t2:marble-block": {
 			"durationMs": 13000,
-			"inputRefId": "input:stonemason-t2:marble-block",
 			"name": "Marble Block",
-			"outputTableId": "loot:stonemason-t2:marble-block",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:marble-block",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:stonemason-t2:marble-block-morale-t4": {
 			"durationMs": 10000,
-			"inputRefId": "input:stonemason-t2:marble-block-morale-t4",
 			"name": "Marble Block (Inspired)",
-			"outputTableId": "loot:stonemason-t2:marble-block-morale-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:marble-block",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:stonemason-t2:stone-block": {
 			"durationMs": 4000,
-			"inputRefId": "input:stonemason-t2:stone-block",
 			"name": "Stone Block",
-			"outputTableId": "loot:stonemason-t2:stone-block",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:tailor-workshop-t1:common-clothing": {
 			"durationMs": 9000,
-			"inputRefId": "input:tailor-workshop-t1:common-clothing",
 			"name": "Common Clothing",
-			"outputTableId": "loot:tailor-workshop-t1:common-clothing",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:tailor-workshop-t1:luxury-clothing": {
 			"durationMs": 12000,
-			"inputRefId": "input:tailor-workshop-t1:luxury-clothing",
 			"name": "Luxury Clothing",
-			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:tailor-workshop-t1:luxury-clothing-morale-t3": {
 			"durationMs": 9000,
-			"inputRefId": "input:tailor-workshop-t1:luxury-clothing-morale-t3",
 			"name": "Luxury Clothing (Inspired)",
-			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing-morale-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:tannery-t1:leather": {
 			"durationMs": 8000,
-			"inputRefId": "input:tannery-t1:leather",
 			"name": "Leather",
-			"outputTableId": "loot:tannery-t1:leather",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:raw-hide",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:tavern-t1:beer": {
 			"durationMs": 5000,
-			"inputRefId": "input:tavern-t1:beer-barrel",
 			"name": "Beer",
-			"outputTableId": "loot:tavern-t1:beer",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:beer",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:tavern-t1:wine-glass": {
 			"durationMs": 5000,
-			"inputRefId": "input:tavern-t1:wine-barrel",
 			"name": "Wine Glass",
-			"outputTableId": "loot:tavern-t1:wine-glass",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-barrel",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wine-glass",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t1:blueprint-lumberjack-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t1:blueprint-lumberjack-t1",
 			"name": "Blueprint: Lumberjack I",
-			"outputTableId": "loot:townhall-t1:blueprint-lumberjack-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-lumberjack-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t1:blueprint-quarry-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t1:blueprint-quarry-t1",
 			"name": "Blueprint: Quarry I",
-			"outputTableId": "loot:townhall-t1:blueprint-quarry-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-quarry-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t1:blueprint-sawmill-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t1:blueprint-sawmill-t1",
 			"name": "Blueprint: Sawmill I",
-			"outputTableId": "loot:townhall-t1:blueprint-sawmill-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-sawmill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t1:blueprint-stonemason-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t1:blueprint-stonemason-t1",
 			"name": "Blueprint: Stonemason I",
-			"outputTableId": "loot:townhall-t1:blueprint-stonemason-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-stonemason-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t1:blueprint-townhall-t2": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t1:blueprint-townhall-t2",
 			"name": "Blueprint: Town Hall II",
-			"outputTableId": "loot:townhall-t1:blueprint-townhall-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t1:blueprint-well-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t1:blueprint-well-t1",
 			"name": "Blueprint: Well I",
-			"outputTableId": "loot:townhall-t1:blueprint-well-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-well-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:blueprint-cattle-farm-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-cattle-farm-t1",
 			"name": "Blueprint: Cattle Farm I",
-			"outputTableId": "loot:townhall-t2:blueprint-cattle-farm-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-cattle-farm-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:blueprint-chicken-coop-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-chicken-coop-t1",
 			"name": "Blueprint: Chicken Coop I",
-			"outputTableId": "loot:townhall-t2:blueprint-chicken-coop-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-chicken-coop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:blueprint-farm-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-farm-t1",
 			"name": "Blueprint: Farm I",
-			"outputTableId": "loot:townhall-t2:blueprint-farm-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-farm-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:blueprint-house-t1": {
 			"durationMs": 3000,
-			"inputRefId": "input:townhall-t2:blueprint-house-t1",
 			"name": "Blueprint: House I",
-			"outputTableId": "loot:townhall-t2:blueprint-house-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:food-supply",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:blueprint-pig-farm-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-pig-farm-t1",
 			"name": "Blueprint: Pig Farm I",
-			"outputTableId": "loot:townhall-t2:blueprint-pig-farm-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-pig-farm-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:blueprint-sheep-pasture-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-sheep-pasture-t1",
 			"name": "Blueprint: Sheep Pasture I",
-			"outputTableId": "loot:townhall-t2:blueprint-sheep-pasture-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-sheep-pasture-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:blueprint-townhall-t3": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-townhall-t3",
 			"name": "Blueprint: Town Hall III",
-			"outputTableId": "loot:townhall-t2:blueprint-townhall-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:food-supply",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:blueprint-vegetable-garden-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:blueprint-vegetable-garden-t1",
 			"name": "Blueprint: Vegetable Garden I",
-			"outputTableId": "loot:townhall-t2:blueprint-vegetable-garden-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-vegetable-garden-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:food-supply": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:food-supply",
 			"name": "Food Supply",
-			"outputTableId": "loot:townhall-t2:food-supply",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:milk",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:egg",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:food-supply",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t2:wheat-field": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t2:wheat-field",
 			"name": "Survey: Wheat Field",
-			"outputTableId": "loot:townhall-t2:wheat-field",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wheat-field",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-bakery-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-bakery-t1",
 			"name": "Blueprint: Bakery I",
-			"outputTableId": "loot:townhall-t3:blueprint-bakery-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-brewery-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-brewery-t1",
 			"name": "Blueprint: Brewery I",
-			"outputTableId": "loot:townhall-t3:blueprint-brewery-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-brewery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-cookhouse-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-cookhouse-t1",
 			"name": "Blueprint: Cookhouse I",
-			"outputTableId": "loot:townhall-t3:blueprint-cookhouse-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-cookhouse-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-dairy-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-dairy-t1",
 			"name": "Blueprint: Dairy I",
-			"outputTableId": "loot:townhall-t3:blueprint-dairy-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:milk",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-dairy-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-house-t2": {
 			"durationMs": 3500,
-			"inputRefId": "input:townhall-t3:blueprint-house-t2",
 			"name": "Blueprint: House II",
-			"outputTableId": "loot:townhall-t3:blueprint-house-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-market-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-market-t1",
 			"name": "Blueprint: Market",
-			"outputTableId": "loot:townhall-t3:blueprint-market-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-market-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-slaughterhouse-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-slaughterhouse-t1",
 			"name": "Blueprint: Slaughterhouse I",
-			"outputTableId": "loot:townhall-t3:blueprint-slaughterhouse-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-slaughterhouse-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-tavern-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-tavern-t1",
 			"name": "Blueprint: Tavern I",
-			"outputTableId": "loot:townhall-t3:blueprint-tavern-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer-barrel",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-tavern-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-townhall-t4": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-townhall-t4",
 			"name": "Blueprint: Town Hall IV",
-			"outputTableId": "loot:townhall-t3:blueprint-townhall-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-windmill-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-windmill-t1",
 			"name": "Blueprint: Windmill I",
-			"outputTableId": "loot:townhall-t3:blueprint-windmill-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-windmill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:blueprint-winery-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:blueprint-winery-t1",
 			"name": "Blueprint: Winery I",
-			"outputTableId": "loot:townhall-t3:blueprint-winery-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-winery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:hop-field": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:hop-field",
 			"name": "Survey: Hop Field",
-			"outputTableId": "loot:townhall-t3:hop-field",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:hop-field",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t3:vineyard": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t3:vineyard",
 			"name": "Survey: Vineyard",
-			"outputTableId": "loot:townhall-t3:vineyard",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:vineyard",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-civic-office-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-civic-office-t1",
 			"name": "Blueprint: Civic Office I",
-			"outputTableId": "loot:townhall-t4:blueprint-civic-office-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-civic-office-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-dye-workshop-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-dye-workshop-t1",
 			"name": "Blueprint: Dye Workshop I",
-			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-dye-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-house-t3": {
 			"durationMs": 4000,
-			"inputRefId": "input:townhall-t4:blueprint-house-t3",
 			"name": "Blueprint: House III",
-			"outputTableId": "loot:townhall-t4:blueprint-house-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-market-t2": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-market-t2",
 			"name": "Blueprint: Market II",
-			"outputTableId": "loot:townhall-t4:blueprint-market-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-market-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-paper-mill-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-paper-mill-t1",
 			"name": "Blueprint: Paper Mill I",
-			"outputTableId": "loot:townhall-t4:blueprint-paper-mill-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-paper-mill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-prospector-guild-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-prospector-guild-t1",
 			"name": "Blueprint: Prospector Guild 1",
-			"outputTableId": "loot:townhall-t4:blueprint-prospector-guild-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-prospector-guild-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-school": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-school",
 			"name": "Blueprint: School",
-			"outputTableId": "loot:townhall-t4:blueprint-school",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-school",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-tailor-workshop-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-tailor-workshop-t1",
 			"name": "Blueprint: Tailor Workshop I",
-			"outputTableId": "loot:townhall-t4:blueprint-tailor-workshop-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-tailor-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-tannery-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-tannery-t1",
 			"name": "Blueprint: Tannery I",
-			"outputTableId": "loot:townhall-t4:blueprint-tannery-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:raw-hide",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-tannery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:townhall-t4:blueprint-weaver-hut-t1": {
 			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-weaver-hut-t1",
 			"name": "Blueprint: Weaver Hut I",
-			"outputTableId": "loot:townhall-t4:blueprint-weaver-hut-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-weaver-hut-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:advanced-knowledge": {
 			"durationMs": 14000,
-			"inputRefId": "input:university:advanced-knowledge",
 			"name": "Advanced Knowledge",
-			"outputTableId": "loot:university:advanced-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:basic-knowledge": {
 			"durationMs": 6000,
-			"inputRefId": "input:university:basic-knowledge",
 			"name": "Basic Knowledge",
-			"outputTableId": "loot:university:basic-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:blueprint-cathedral": {
 			"durationMs": 4000,
-			"inputRefId": "input:university:blueprint-cathedral",
 			"name": "Blueprint: Cathedral",
-			"outputTableId": "loot:university:blueprint-cathedral",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 4
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-cathedral",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:blueprint-glazier-workshop-t1": {
 			"durationMs": 3000,
-			"inputRefId": "input:university:blueprint-glazier-workshop-t1",
 			"name": "Blueprint: Glazier Workshop I",
-			"outputTableId": "loot:university:blueprint-glazier-workshop-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-glazier-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:blueprint-heroes-guild-t1": {
 			"durationMs": 3000,
-			"inputRefId": "input:university:blueprint-heroes-guild-t1",
 			"name": "Blueprint: Heroes Guild I",
-			"outputTableId": "loot:university:blueprint-heroes-guild-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:blueprint-house-of-engineers": {
 			"durationMs": 4000,
-			"inputRefId": "input:university:blueprint-house-of-engineers",
 			"name": "Blueprint: House of Engineers",
-			"outputTableId": "loot:university:blueprint-house-of-engineers",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-house-of-engineers",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:blueprint-house-t4": {
 			"durationMs": 5000,
-			"inputRefId": "input:university:blueprint-house-t4",
 			"name": "Blueprint: House IV",
-			"outputTableId": "loot:university:blueprint-house-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:blueprint-mage-lodge": {
 			"durationMs": 4000,
-			"inputRefId": "input:university:blueprint-mage-lodge",
 			"name": "Blueprint: Mage Lodge",
-			"outputTableId": "loot:university:blueprint-mage-lodge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sapphire",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-mage-lodge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:blueprint-quarry-t2": {
 			"durationMs": 3500,
-			"inputRefId": "input:university:blueprint-quarry-t2",
 			"name": "Blueprint: Quarry 2",
-			"outputTableId": "loot:university:blueprint-quarry-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-quarry-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:blueprint-stonemason-t2": {
 			"durationMs": 3500,
-			"inputRefId": "input:university:blueprint-stonemason-t2",
 			"name": "Blueprint: Stonemason 2",
-			"outputTableId": "loot:university:blueprint-stonemason-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:blueprint-stonemason-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:master-knowledge": {
 			"durationMs": 36000,
-			"inputRefId": "input:university:master-knowledge",
 			"name": "Master Knowledge",
-			"outputTableId": "loot:university:master-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:university:master-knowledge-morale-t4": {
 			"durationMs": 26000,
-			"inputRefId": "input:university:master-knowledge-morale-t4",
 			"name": "Master Knowledge (Inspired)",
-			"outputTableId": "loot:university:master-knowledge-morale-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:vegetable-garden-t1:vegetables": {
 			"durationMs": 5000,
@@ -1403,58 +5784,148 @@
 					"type": "proximity"
 				}
 			],
-			"inputRefId": "input:vegetable-garden-t1:water",
 			"name": "Vegetables",
-			"outputTableId": "loot:vegetable-garden-t1:vegetables",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:vegetables",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:weaver-hut-t1:common-cloth": {
 			"durationMs": 7000,
-			"inputRefId": "input:weaver-hut-t1:common-cloth",
 			"name": "Common Cloth",
-			"outputTableId": "loot:weaver-hut-t1:common-cloth",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:common-cloth",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:well-t1:water": {
 			"durationMs": 5000,
 			"name": "Water",
-			"outputTableId": "loot:well-t1:water",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"output": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:windmill-t1:flour": {
 			"durationMs": 6000,
-			"inputRefId": "input:windmill-t1:grain",
 			"name": "Flour",
-			"outputTableId": "loot:windmill-t1:flour",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:flour",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:winery-t1:grapes": {
 			"durationMs": 5000,
-			"inputRefId": "input:winery-t1:water",
 			"name": "Grapes",
-			"outputTableId": "loot:winery-t1:grapes",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:grapes",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:winery-t1:wine-barrel": {
 			"durationMs": 5000,
-			"inputRefId": "input:winery-t1:grapes-water",
 			"name": "Wine Barrel",
-			"outputTableId": "loot:winery-t1:wine-barrel",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grapes",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wine-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
 			"durationMs": 5000,
-			"inputRefId": "input:winery-t1:wine-glass-to-barrel",
 			"name": "Wine Barrel",
-			"outputTableId": "loot:winery-t1:wine-barrel-from-wine-glasses",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wine-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
 		}
 	}
 }

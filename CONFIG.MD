@@ -260,7 +260,6 @@ Plain item asset:
   "assets": {
     "asset:item:log": {
       "kind": "item",
-      "label": "Log",
       "resourceId": "item-log",
       "render": "plain",
     }
@@ -271,7 +270,7 @@ Plain item asset:
 Fields:
 
 - `kind`: `item` or `ui`.
-- `label`: asset label.
+- `label`: optional asset/debug label. Normal item names live on `items.*.name`; do not duplicate item names here.
 - `resourceId`: resource ID.
 - `overlayAssetId`: optional asset rendered as overlay.
 - `render`: `plain` or `blueprint`.
@@ -283,7 +282,6 @@ Blueprint asset with overlay:
   "assets": {
     "asset:item:blueprint-lumber-camp": {
       "kind": "item",
-      "label": "Lumber Camp Blueprint",
       "resourceId": "item-blueprint",
       "overlayAssetId": "asset:item:lumber-camp",
       "render": "blueprint",
@@ -1111,8 +1109,11 @@ A product line defines production name, tags, duration, placement, inputs, requi
       "name": "Twigs",
       "durationMs": 5000,
       "placement": "board_then_inventory",
+      "inputs": [],
       "requirementIds": [],
-      "outputTableId": "loot:lumber-camp-1"
+      "output": [
+        { "type": "guaranteed", "itemId": "item:twig", "quantity": 2 }
+      ]
     }
   }
 }
@@ -1123,13 +1124,15 @@ Fields:
 - `name`: product line name.
 - `durationMs`: base production duration in ms.
 - `placement`: output placement.
-- `inputRefId`: input bundle.
+- `inputs`: normal product-owned input slots. Use this for product-specific costs.
+- `inputRefId`: rare shared/legacy input bundle reference. Do not create one-off `inputs` records for normal products.
 - `requirementIds`: product-level requirements.
 - `hinderedBy`: optional product-level hindrances. Any active hindrance slows this product line.
 - `tags`: product-line tags used by runtime effects. Missing tags default to `[]`. Use tags such as `path:engineers`, `dirty`, `housing`, `morale`, or any content-specific label the effect system can target.
 - `visibility`: baseline runtime visibility, either `visible` or `hidden`. Missing visibility defaults to `visible`. Hidden product lines can be revealed by runtime effects. Hidden lines are not shown, cannot be set as default, cannot be fed through producer priority routing, and cannot be started.
-- `outputTableId`: optional loot table output. Missing `outputTableId` makes a delayed sink/destructor product unless an effect mutates its loot plan at runtime.
-- `activatesEffectId`: optional active effect produced by this line. Active-effect product lines consume inputs, create a timed active effect tied to the source producer, and occupy the producer queue for `durationMs` while that effect counts down. Active-effect lines must not also define `outputTableId`; their output is runtime influence, not an item pile pretending to be weather.
+- `output`: normal product-owned output entries. Use this for product-specific output.
+- `outputTableId`: rare shared/reusable loot table reference. Stashes and effects still use loot tables; normal product lines should usually own `output` inline.
+- `activatesEffectId`: optional active effect produced by this line. Active-effect product lines consume inputs, create a timed active effect tied to the source producer, and occupy the producer queue for `durationMs` while that effect counts down. Active-effect lines must not also define `output` or `outputTableId`; their output is runtime influence, not an item pile pretending to be weather.
 
 Baseline-hidden product line:
 
@@ -1142,9 +1145,11 @@ Baseline-hidden product line:
       "visibility": "hidden",
       "durationMs": 10000,
       "placement": "board_then_inventory",
-      "inputRefId": "input:university-engineering-theory",
+      "inputs": [],
       "requirementIds": [],
-      "outputTableId": "loot:advanced-theory"
+      "output": [
+        { "type": "guaranteed", "itemId": "item:advanced-theory", "quantity": 1 }
+      ]
     }
   }
 }
@@ -1161,8 +1166,11 @@ No-input product:
       "name": "Twigs",
       "durationMs": 5000,
       "placement": "board_then_inventory",
+      "inputs": [],
       "requirementIds": [],
-      "outputTableId": "loot:lumber-camp-1"
+      "output": [
+        { "type": "guaranteed", "itemId": "item:twig", "quantity": 2 }
+      ]
     }
   }
 }
@@ -1390,7 +1398,7 @@ Hidden and blocked states have priority over their positive counterparts: a matc
 
 ## 14. `lootTables`
 
-Defines output tables for products and stashes.
+Defines reusable output tables for stashes, runtime effects, and rare shared product outputs. Normal product-specific output belongs inline on the product through `output`, because making every product jump through a one-off loot-table ID was bureaucratic cosplay.
 
 ```json
 {
@@ -1535,8 +1543,11 @@ Product reference:
       "name": "Twigs",
       "durationMs": 5000,
       "placement": "board_then_inventory",
+      "inputs": [],
       "requirementIds": [],
-      "outputTableId": "loot:lumber-camp-1"
+      "output": [
+        { "type": "guaranteed", "itemId": "item:twig", "quantity": 2 }
+      ]
     }
   }
 }
@@ -1954,11 +1965,14 @@ producers.*.requirementIds[] -> requirements
 producers.*.hinderedBy[].itemId -> items
 producers.*.hinderedBy[].itemIds[] -> items
 
-products.*.inputRefId -> inputs
+products.*.inputs[].itemId -> items
+products.*.inputRefId -> inputs (shared/legacy only)
 products.*.requirementIds[] -> requirements
 products.*.hinderedBy[].itemId -> items
 products.*.hinderedBy[].itemIds[] -> items
-products.*.outputTableId -> lootTables
+products.*.output[].itemId -> items
+products.*.output[].entries[].itemId -> items
+products.*.outputTableId -> lootTables (shared/legacy only)
 products.*.activatesEffectId -> effects
 
 stashes.*.outputTableId -> lootTables
@@ -2438,8 +2452,11 @@ Use `producers`, `products`, and `lootTables`.
       "name": "Twigs",
       "durationMs": 5000,
       "placement": "board_then_inventory",
+      "inputs": [],
       "requirementIds": [],
-      "outputTableId": "loot:lumber-camp-1"
+      "output": [
+        { "type": "guaranteed", "itemId": "item:twig", "quantity": 2 }
+      ]
     }
   },
   "lootTables": {
@@ -2512,13 +2529,15 @@ Set `maxQueueSize`.
 
 ## A.17 Add product with input
 
-Define `inputs` and reference it from product through `inputRefId`.
+Put product-specific input slots directly on the product through `inputs`. Use top-level `inputs` + `inputRefId` only for deliberately shared/legacy bundles.
 
 ```json
 {
-  "inputs": {
-    "input:kiln-1-clay": {
-      "name": "Kiln I Clay",
+  "products": {
+    "product:kiln-1-brick": {
+      "name": "Brick",
+      "durationMs": 7000,
+      "placement": "board_then_inventory",
       "inputs": [
         {
           "itemId": "item:clay",
@@ -2526,17 +2545,11 @@ Define `inputs` and reference it from product through `inputRefId`.
           "capacity": 4,
           "consume": true
         }
-      ]
-    }
-  },
-  "products": {
-    "product:kiln-1-brick": {
-      "name": "Brick",
-      "durationMs": 7000,
-      "placement": "board_then_inventory",
-      "inputRefId": "input:kiln-1-clay",
+      ],
       "requirementIds": [],
-      "outputTableId": "loot:kiln-1-brick"
+      "output": [
+        { "type": "guaranteed", "itemId": "item:brick", "quantity": 1 }
+      ]
     }
   }
 }
@@ -2544,7 +2557,7 @@ Define `inputs` and reference it from product through `inputRefId`.
 
 ## A.18 Add product with multiple input types
 
-Put multiple slots into one input bundle.
+Put multiple slots into the product-owned `inputs` array.
 
 ```json
 {
@@ -3361,7 +3374,7 @@ Add another product to the same producer.
 
 ## A.53 Add product line with own input and own output
 
-Each product line gets its own `inputRefId` and `outputTableId`.
+Each product line gets its own inline `inputs` and `output` unless the data is deliberately shared.
 
 ```json
 {

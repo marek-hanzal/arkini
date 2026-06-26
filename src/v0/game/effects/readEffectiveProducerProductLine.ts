@@ -109,6 +109,7 @@ export const readEffectiveProducerProductLine = ({
 	let durationAddMs = 0;
 	let durationMultiplier = 1;
 	let baseDropChance = 1;
+	let baseOutput = product.output ?? [];
 	let lootTableIds = product.outputTableId
 		? [
 				product.outputTableId,
@@ -262,6 +263,7 @@ export const readEffectiveProducerProductLine = ({
 		lootPlan: {
 			appendTables,
 			baseDropChance: clampProbability(baseDropChance),
+			baseOutput,
 			chanceItems,
 			lootTableIds,
 		},

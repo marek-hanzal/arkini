@@ -96,14 +96,6 @@
 			"distance": 2,
 			"durationFactor": 1
 		},
-		"proximity:brickyard:clay-pit": {
-			"type": "proximity",
-			"itemIds": [
-				"producer:clay-pit"
-			],
-			"distance": 2,
-			"durationFactor": 1
-		},
 		"proximity:glassworks:sand-pit": {
 			"type": "proximity",
 			"itemIds": [
@@ -116,14 +108,6 @@
 			"type": "proximity",
 			"itemIds": [
 				"producer:glassworks"
-			],
-			"distance": 2,
-			"durationFactor": 1
-		},
-		"proximity:roof-tile-factory:clay-pit": {
-			"type": "proximity",
-			"itemIds": [
-				"producer:clay-pit"
 			],
 			"distance": 2,
 			"durationFactor": 1
@@ -148,6 +132,14 @@
 			"type": "proximity",
 			"itemIds": [
 				"producer:quarry-t2"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		},
+		"proximity:clay-pit:nearby": {
+			"type": "proximity",
+			"itemIds": [
+				"producer:clay-pit"
 			],
 			"distance": 2,
 			"durationFactor": 1

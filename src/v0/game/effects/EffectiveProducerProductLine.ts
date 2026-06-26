@@ -32,6 +32,7 @@ export interface EffectiveProducerProductLine {
 	lootPlan: {
 		appendTables: EffectiveLootTableEntry[];
 		baseDropChance: number;
+		baseOutput: GameConfig["lootTables"][string]["output"];
 		chanceItems: EffectiveChanceItemEntry[];
 		lootTableIds: string[];
 	};

@@ -80,6 +80,20 @@ describe("defaultGameConfig", () => {
 
 		expect(defaultGameConfig.items["item:luxury-clothing"].tags).toContain("master");
 		expect(defaultGameConfig.items["item:luxury-clothing"].tags).toContain("era:V");
+		expect(defaultGameConfig.items["item:pigment"].tags).toContain("era:V");
+
+		expect(defaultGameConfig.producers["producer:dye-workshop-t1"].productIds).toEqual([
+			"product:dye-workshop-t1:pigment",
+			"product:dye-workshop-t1:luxury-cloth",
+		]);
+		expect(
+			defaultGameConfig.inputs["input:dye-workshop-t1:luxury-cloth"].inputs,
+		).toContainEqual({
+			capacity: 4,
+			consume: true,
+			itemId: "item:pigment",
+			quantity: 1,
+		});
 
 		expect(defaultGameConfig.producers["producer:tailor-workshop-t1"].productIds).toEqual([
 			"product:tailor-workshop-t1:common-clothing",
@@ -277,6 +291,53 @@ describe("defaultGameConfig", () => {
 			defaultGameConfig.lootTables["loot:heroes-guild-t1:treasure-chest"].output,
 		).toContainEqual({
 			itemId: "item:treasure-chest",
+			quantity: 1,
+			type: "guaranteed",
+		});
+	});
+
+	it("wires era X prestige glass materials through University and Glazier Workshop", () => {
+		expect(defaultGameConfig.items["item:stained-glass"].tags).toContain("master");
+		expect(defaultGameConfig.items["item:stained-glass"].tags).toContain("era:X");
+		expect(defaultGameConfig.assets["asset:item:guild-charter"].resourceId).toBe(
+			"item-guild-charter",
+		);
+
+		expect(defaultGameConfig.producers["producer:university"].productIds).toContain(
+			"product:university:blueprint-glazier-workshop-t1",
+		);
+		expect(defaultGameConfig.producers["producer:glazier-workshop-t1"].productIds).toEqual([
+			"product:glazier-workshop-t1:stained-glass",
+		]);
+		expect(defaultGameConfig.producers["producer:glazier-workshop-t1"].requirementIds).toEqual([
+			"proximity:glazier-workshop-t1:glassworks",
+		]);
+
+		expect(
+			defaultGameConfig.products["product:glazier-workshop-t1:stained-glass"].requirementIds,
+		).toEqual([
+			"proximity:dirty-processing:purifier",
+		]);
+		expect(
+			defaultGameConfig.inputs["input:glazier-workshop-t1:stained-glass"].inputs,
+		).toContainEqual({
+			capacity: 4,
+			consume: true,
+			itemId: "item:pigment",
+			quantity: 1,
+		});
+		expect(
+			defaultGameConfig.lootTables["loot:glazier-workshop-t1:stained-glass"].output,
+		).toContainEqual({
+			chance: 0.5,
+			itemId: "item:pollution",
+			quantity: 1,
+			type: "chance",
+		});
+		expect(
+			defaultGameConfig.lootTables["loot:glazier-workshop-t1:stained-glass"].output,
+		).toContainEqual({
+			itemId: "item:stained-glass",
 			quantity: 1,
 			type: "guaranteed",
 		});

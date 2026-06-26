@@ -262,6 +262,25 @@
 			],
 			"craftRecipeId": "craft:glassworks"
 		},
+		"item:blueprint-glazier-workshop-t1": {
+			"assetId": "asset:item:blueprint-glazier-workshop-t1",
+			"code": "blueprint-glazier-workshop-t1",
+			"name": "Glazier Workshop I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with prestige materials to construct Glazier Workshop I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"glass",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"craftRecipeId": "craft:glazier-workshop-t1"
+		},
 		"item:blueprint-gold-mine-t1": {
 			"assetId": "asset:item:blueprint-gold-mine-t1",
 			"code": "blueprint-gold-mine-t1",
@@ -915,6 +934,24 @@
 				"industry"
 			]
 		},
+		"item:stained-glass": {
+			"assetId": "asset:item:stained-glass",
+			"code": "stained-glass",
+			"name": "Stained Glass",
+			"tier": 10,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Prestige colored glass panels finished by Glazier Workshops for later high-civic and luxury buildings.",
+			"tags": [
+				"material",
+				"construction",
+				"luxury",
+				"glass",
+				"prestige",
+				"master",
+				"era:X"
+			]
+		},
 		"item:gold-deposit": {
 			"assetId": "asset:item:gold-deposit",
 			"code": "gold-deposit",
@@ -1241,6 +1278,22 @@
 				"food",
 				"pig",
 				"era:II"
+			]
+		},
+		"item:pigment": {
+			"assetId": "asset:item:pigment",
+			"code": "pigment",
+			"name": "Pigment",
+			"tier": 5,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Concentrated natural dye powders produced by Dye Workshops for luxury textiles and stained-glass work.",
+			"tags": [
+				"material",
+				"dye",
+				"pigment",
+				"craft",
+				"era:V"
 			]
 		},
 		"item:plank": {
@@ -1714,6 +1767,25 @@
 				"industry"
 			],
 			"producerId": "producer:glassworks"
+		},
+		"producer:glazier-workshop-t1": {
+			"assetId": "asset:producer:glazier-workshop-t1",
+			"code": "glazier-workshop-t1",
+			"name": "Glazier Workshop I",
+			"tier": 10,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
+			"tags": [
+				"producer",
+				"building",
+				"glass",
+				"luxury",
+				"prestige",
+				"construction",
+				"era:X"
+			],
+			"producerId": "producer:glazier-workshop-t1"
 		},
 		"producer:gold-mine-t1": {
 			"assetId": "asset:producer:gold-mine-t1",

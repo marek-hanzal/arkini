@@ -330,7 +330,8 @@
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",
 				"product:university:master-knowledge",
-				"product:university:blueprint-heroes-guild-t1"
+				"product:university:blueprint-heroes-guild-t1",
+				"product:university:blueprint-glazier-workshop-t1"
 			],
 			"requirementIds": []
 		},
@@ -465,6 +466,7 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:dye-workshop-t1:pigment",
 				"product:dye-workshop-t1:luxury-cloth"
 			],
 			"requirementIds": []
@@ -524,6 +526,16 @@
 			],
 			"requirementIds": [
 				"proximity:glassworks:sand-pit"
+			]
+		},
+		"producer:glazier-workshop-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:glazier-workshop-t1:stained-glass"
+			],
+			"requirementIds": [
+				"proximity:glazier-workshop-t1:glassworks"
 			]
 		},
 		"producer:roof-tile-factory": {

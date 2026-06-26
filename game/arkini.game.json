@@ -181,6 +181,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-glazier-workshop-t1": {
+			"kind": "item",
+			"label": "Glazier Workshop I Blueprint",
+			"overlayAssetId": "asset:producer:glazier-workshop-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-gold-mine-t1": {
 			"kind": "item",
 			"label": "Gold Mine I Blueprint",
@@ -669,7 +676,7 @@
 			"kind": "item",
 			"label": "Guild Charter",
 			"render": "plain",
-			"resourceId": "item-building-permit"
+			"resourceId": "item-guild-charter"
 		},
 		"asset:item:hop-field": {
 			"kind": "item",
@@ -815,6 +822,12 @@
 			"render": "plain",
 			"resourceId": "item-piglet"
 		},
+		"asset:item:pigment": {
+			"kind": "item",
+			"label": "Pigment",
+			"render": "plain",
+			"resourceId": "item-pigment"
+		},
 		"asset:item:plank": {
 			"kind": "item",
 			"label": "Plank",
@@ -898,6 +911,12 @@
 			"label": "Sprout",
 			"render": "plain",
 			"resourceId": "item-sprout"
+		},
+		"asset:item:stained-glass": {
+			"kind": "item",
+			"label": "Stained Glass",
+			"render": "plain",
+			"resourceId": "item-stained-glass"
 		},
 		"asset:item:stone": {
 			"kind": "item",
@@ -1108,6 +1127,12 @@
 			"label": "Glassworks",
 			"render": "plain",
 			"resourceId": "producer-glassworks"
+		},
+		"asset:producer:glazier-workshop-t1": {
+			"kind": "item",
+			"label": "Glazier Workshop I",
+			"render": "plain",
+			"resourceId": "producer-glazier-workshop-t1"
 		},
 		"asset:producer:gold-mine-t1": {
 			"kind": "item",
@@ -2015,6 +2040,73 @@
 				}
 			],
 			"resultItemId": "producer:glassworks"
+		},
+		"craft:glazier-workshop-t1": {
+			"durationMs": 18000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:glassworks",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:dye-workshop-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:purifier-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:glazier-workshop-t1"
 		},
 		"craft:gold-mine-t1": {
 			"durationMs": 13000,
@@ -4371,7 +4463,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:vegetables",
+					"itemId": "item:pigment",
 					"quantity": 1
 				},
 				{
@@ -4382,6 +4474,23 @@
 				}
 			],
 			"name": "Dye Workshop luxury cloth input"
+		},
+		"input:dye-workshop-t1:pigment": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Dye Workshop pigment input"
 		},
 		"input:farm-t1:water": {
 			"inputs": [
@@ -4410,6 +4519,35 @@
 				}
 			],
 			"name": "Glassmaking inputs"
+		},
+		"input:glazier-workshop-t1:stained-glass": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Glazier Workshop stained glass inputs"
 		},
 		"input:gold-mine-t1:bread-wine": {
 			"inputs": [
@@ -6115,6 +6253,41 @@
 			],
 			"name": "University basic lecture supplies"
 		},
+		"input:university:blueprint-glazier-workshop-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Glazier Workshop I input"
+		},
 		"input:university:blueprint-heroes-guild-t1": {
 			"inputs": [
 				{
@@ -6670,6 +6843,25 @@
 				"craft-target",
 				"era:VIII",
 				"industry"
+			],
+			"tier": 0
+		},
+		"item:blueprint-glazier-workshop-t1": {
+			"assetId": "asset:item:blueprint-glazier-workshop-t1",
+			"code": "blueprint-glazier-workshop-t1",
+			"craftRecipeId": "craft:glazier-workshop-t1",
+			"description": "Build plan that can be filled with prestige materials to construct Glazier Workshop I.",
+			"maxStackSize": 10,
+			"name": "Glazier Workshop I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"glass",
+				"luxury",
+				"prestige",
+				"era:X"
 			],
 			"tier": 0
 		},
@@ -8043,6 +8235,22 @@
 			],
 			"tier": 0
 		},
+		"item:pigment": {
+			"assetId": "asset:item:pigment",
+			"code": "pigment",
+			"description": "Concentrated natural dye powders produced by Dye Workshops for luxury textiles and stained-glass work.",
+			"maxStackSize": 50,
+			"name": "Pigment",
+			"storage": "both",
+			"tags": [
+				"material",
+				"dye",
+				"pigment",
+				"craft",
+				"era:V"
+			],
+			"tier": 5
+		},
 		"item:plank": {
 			"assetId": "asset:item:plank",
 			"code": "plank",
@@ -8195,6 +8403,24 @@
 				"era:III"
 			],
 			"tier": 0
+		},
+		"item:stained-glass": {
+			"assetId": "asset:item:stained-glass",
+			"code": "stained-glass",
+			"description": "Prestige colored glass panels finished by Glazier Workshops for later high-civic and luxury buildings.",
+			"maxStackSize": 20,
+			"name": "Stained Glass",
+			"storage": "both",
+			"tags": [
+				"material",
+				"construction",
+				"luxury",
+				"glass",
+				"prestige",
+				"master",
+				"era:X"
+			],
+			"tier": 10
 		},
 		"item:stone": {
 			"assetId": "asset:item:stone",
@@ -8711,6 +8937,25 @@
 				"industry"
 			],
 			"tier": 4
+		},
+		"producer:glazier-workshop-t1": {
+			"assetId": "asset:producer:glazier-workshop-t1",
+			"code": "glazier-workshop-t1",
+			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
+			"maxStackSize": 1,
+			"name": "Glazier Workshop I",
+			"producerId": "producer:glazier-workshop-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"glass",
+				"luxury",
+				"prestige",
+				"construction",
+				"era:X"
+			],
+			"tier": 10
 		},
 		"producer:gold-mine-t1": {
 			"assetId": "asset:producer:gold-mine-t1",
@@ -9899,6 +10144,16 @@
 				}
 			]
 		},
+		"loot:dye-workshop-t1:pigment": {
+			"name": "Pigment output",
+			"output": [
+				{
+					"itemId": "item:pigment",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:farm-t1:grain": {
 			"name": "Farm grain",
 			"output": [
@@ -9925,6 +10180,28 @@
 				},
 				{
 					"chance": 0.15,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:glazier-workshop-t1:stained-glass": {
+			"name": "Stained glass output",
+			"output": [
+				{
+					"itemId": "item:stained-glass",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.5,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -10882,6 +11159,16 @@
 				}
 			]
 		},
+		"loot:university:blueprint-glazier-workshop-t1": {
+			"name": "University Glazier Workshop blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-glazier-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:university:blueprint-heroes-guild-t1": {
 			"name": "University Heroes Guild I blueprint output",
 			"output": [
@@ -11141,6 +11428,7 @@
 		"producer:dye-workshop-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:dye-workshop-t1:pigment",
 				"product:dye-workshop-t1:luxury-cloth"
 			],
 			"requirementIds": [],
@@ -11163,6 +11451,16 @@
 			],
 			"requirementIds": [
 				"proximity:glassworks:sand-pit"
+			],
+			"type": "producer"
+		},
+		"producer:glazier-workshop-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:glazier-workshop-t1:stained-glass"
+			],
+			"requirementIds": [
+				"proximity:glazier-workshop-t1:glassworks"
 			],
 			"type": "producer"
 		},
@@ -11469,7 +11767,8 @@
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",
 				"product:university:master-knowledge",
-				"product:university:blueprint-heroes-guild-t1"
+				"product:university:blueprint-heroes-guild-t1",
+				"product:university:blueprint-glazier-workshop-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -11890,6 +12189,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:dye-workshop-t1:pigment": {
+			"durationMs": 5000,
+			"inputRefId": "input:dye-workshop-t1:pigment",
+			"name": "Pigment",
+			"outputTableId": "loot:dye-workshop-t1:pigment",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:farm-t1:grain": {
 			"durationMs": 5000,
 			"hinderedBy": [
@@ -11913,6 +12220,16 @@
 			"inputRefId": "input:glassworks:glass",
 			"name": "Glass",
 			"outputTableId": "loot:glassworks:glass",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:glazier-workshop-t1:stained-glass": {
+			"durationMs": 14000,
+			"inputRefId": "input:glazier-workshop-t1:stained-glass",
+			"name": "Stained Glass",
+			"outputTableId": "loot:glazier-workshop-t1:stained-glass",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
@@ -12645,6 +12962,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:university:blueprint-glazier-workshop-t1": {
+			"durationMs": 3000,
+			"inputRefId": "input:university:blueprint-glazier-workshop-t1",
+			"name": "Blueprint: Glazier Workshop I",
+			"outputTableId": "loot:university:blueprint-glazier-workshop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:university:blueprint-heroes-guild-t1": {
 			"durationMs": 3000,
 			"inputRefId": "input:university:blueprint-heroes-guild-t1",
@@ -12781,6 +13106,14 @@
 			"durationFactor": 1,
 			"itemIds": [
 				"producer:sand-pit"
+			],
+			"type": "proximity"
+		},
+		"proximity:glazier-workshop-t1:glassworks": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"producer:glassworks"
 			],
 			"type": "proximity"
 		},

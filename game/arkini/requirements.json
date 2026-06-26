@@ -112,6 +112,14 @@
 			"distance": 2,
 			"durationFactor": 1
 		},
+		"proximity:glazier-workshop-t1:glassworks": {
+			"type": "proximity",
+			"itemIds": [
+				"producer:glassworks"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		},
 		"proximity:roof-tile-factory:clay-pit": {
 			"type": "proximity",
 			"itemIds": [

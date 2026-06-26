@@ -10,6 +10,7 @@ import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequi
 export namespace rollProducerJobSnapshotFx {
 	export interface Props {
 		config: GameConfig;
+		ignoredProducerJobIds?: ReadonlySet<string>;
 		producerItemInstanceId: string;
 		productId: string;
 		save: GameSave;
@@ -26,6 +27,7 @@ export namespace rollProducerJobSnapshotFx {
 
 export const rollProducerJobSnapshotFx = Effect.fn("rollProducerJobSnapshotFx")(function* ({
 	config,
+	ignoredProducerJobIds,
 	producerItemInstanceId,
 	productId,
 	save,
@@ -80,6 +82,7 @@ export const rollProducerJobSnapshotFx = Effect.fn("rollProducerJobSnapshotFx")(
 		...(product.hinderedBy ?? []),
 	];
 	const effectiveProductLine = readEffectiveProducerProductLine({
+		ignoredProducerJobIds,
 		baseDurationMs: readProducerProductDurationMs({
 			hindrances,
 			product,

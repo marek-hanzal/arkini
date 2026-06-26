@@ -581,4 +581,319 @@ describe("runtime invariants", () => {
 			startAtMs: 2000,
 		});
 	});
+	it("ignores stale queued active effects while rescheduling producer snapshots", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:self-slow": {
+					name: "Self slow",
+					operations: [
+						{
+							kind: "duration.addMs",
+							target: {
+								productIds: [
+									"product:self-timed",
+								],
+							},
+							valueMs: 1000,
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+					productIds: [
+						"product:test",
+						"product:self-timed",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:self-timed": {
+					activatesEffectId: "effect:self-slow",
+					durationMs: 4000,
+					name: "Self timed",
+					tags: [],
+					visibility: "visible",
+					placement: "board_then_inventory",
+					requirementIds: [],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.producerJobs["job:blocking"] = {
+			id: "job:blocking",
+			outputItems: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		save.producerJobs["job:self-timed"] = {
+			id: "job:self-timed",
+			outputItems: [],
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:self-timed",
+			readyAtMs: 5000,
+			startAtMs: 1000,
+		};
+		save.activeEffects["effect-instance:self-timed"] = {
+			effectId: "effect:self-slow",
+			endAtMs: 5000,
+			id: "effect-instance:self-timed",
+			producerJobId: "job:self-timed",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 1000,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.producerJobs["job:self-timed"]).toMatchObject({
+			outputItems: [],
+			readyAtMs: 6000,
+			startAtMs: 2000,
+		});
+		expect(result.save.activeEffects["effect-instance:self-timed"]).toMatchObject({
+			endAtMs: 6000,
+			producerJobId: "job:self-timed",
+			startAtMs: 2000,
+		});
+	});
+
+	it("allows blocked active-effect producer delivery after the linked effect expires", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:timed": {
+					name: "Timed",
+					operations: [
+						{
+							kind: "duration.addMs",
+							target: {
+								all: true,
+							},
+							valueMs: 0,
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					activatesEffectId: "effect:timed",
+					output: undefined,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.producerJobs["job:timed-blocked"] = {
+			id: "job:timed-blocked",
+			outputItems: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		save.activeEffects["effect-instance:timed-blocked"] = {
+			effectId: "effect:timed",
+			endAtMs: 1000,
+			id: "effect-instance:timed-blocked",
+			producerJobId: "job:timed-blocked",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.producerJobs["job:timed-blocked"]?.delivery).toEqual({
+			lastBlockedAtMs: 1000,
+			nextAttemptAtMs: 2000,
+		});
+		expect(result.save.activeEffects).toEqual({});
+		expect(
+			GameSaveConfigSchema.safeParse({
+				config,
+				save: result.save,
+			}).success,
+		).toBe(true);
+	});
+
+	it("rejects stale queued producer timing behind blocked delivery", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const invalidSave = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		invalidSave.producerJobs["job:blocked"] = {
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 3000,
+			},
+			id: "job:blocked",
+			outputItems: createOutputItems(),
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		invalidSave.producerJobs["job:stale"] = {
+			id: "job:stale",
+			outputItems: createOutputItems(),
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 2000,
+			startAtMs: 1000,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					path: [
+						"save",
+						"producerJobs",
+						"job:stale",
+						"startAtMs",
+					],
+				}),
+			]),
+		);
+	});
+	it("rejects blocked delivery on a non-head producer queue job", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const invalidSave = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		invalidSave.producerJobs["job:first"] = {
+			id: "job:first",
+			outputItems: createOutputItems(),
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		invalidSave.producerJobs["job:blocked-second"] = {
+			delivery: {
+				lastBlockedAtMs: 2000,
+				nextAttemptAtMs: 3000,
+			},
+			id: "job:blocked-second",
+			outputItems: createOutputItems(),
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 2000,
+			startAtMs: 1000,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					path: [
+						"save",
+						"producerJobs",
+						"job:blocked-second",
+						"delivery",
+					],
+				}),
+			]),
+		);
+	});
 });

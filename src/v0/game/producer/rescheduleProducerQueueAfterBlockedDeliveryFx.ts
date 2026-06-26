@@ -46,6 +46,7 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 				job.producerItemInstanceId === producerItemInstanceId && job.id !== blockedJobId,
 		)
 		.sort(compareProducerQueueOrder);
+	const rescheduledProducerJobIds = new Set(queuedJobs.map((job) => job.id));
 
 	for (const job of queuedJobs) {
 		const nextStartAtMs = Math.max(job.startAtMs, cursorAtMs);
@@ -56,6 +57,7 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 
 		const snapshot = yield* rollProducerJobSnapshotFx({
 			config,
+			ignoredProducerJobIds: rescheduledProducerJobIds,
 			producerItemInstanceId: job.producerItemInstanceId,
 			productId: job.productId,
 			save: nextSave,

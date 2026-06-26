@@ -164,7 +164,6 @@ describe("readActionReadinessFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",

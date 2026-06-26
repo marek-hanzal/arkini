@@ -3,13 +3,11 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
 export namespace readRuntimeLootDropViewsFromGameConfig {
 	export interface Props {
-		config: GameConfig;
-		lootTableId: string;
+		output: NonNullable<GameConfig["stashes"][string]["output"]>;
 	}
 }
 
-type LootTable = GameConfig["lootTables"][string];
-type LootOutput = LootTable["output"][number];
+type LootOutput = NonNullable<GameConfig["stashes"][string]["output"]>[number];
 type LootQuantity = NonNullable<
 	Extract<
 		LootOutput,
@@ -50,41 +48,39 @@ const readWeightedChanceLabel = (entry: WeightedLootEntry, totalWeight: number) 
 };
 
 export const readRuntimeLootDropViewsFromGameConfig = ({
-	config,
-	lootTableId,
-}: readRuntimeLootDropViewsFromGameConfig.Props): ActivationDropView[] => {
-	const lootTable = config.lootTables[lootTableId];
-	if (!lootTable) return [];
-
-	return lootTable.output.flatMap((output) => {
-		if (output.type === "guaranteed") {
+	output,
+}: readRuntimeLootDropViewsFromGameConfig.Props): ActivationDropView[] =>
+	output.flatMap((entry) => {
+		if (entry.type === "guaranteed") {
 			return [
 				{
 					chanceLabel: "100%",
-					itemId: output.itemId,
-					quantityLabel: readQuantityLabel(output.quantity),
+					itemId: entry.itemId,
+					quantityLabel: readQuantityLabel(entry.quantity),
 				},
 			];
 		}
 
-		if (output.type === "chance") {
+		if (entry.type === "chance") {
 			return [
 				{
-					chanceLabel: formatPercent(output.chance),
-					itemId: output.itemId,
-					quantityLabel: readQuantityLabel(output.quantity),
+					chanceLabel: formatPercent(entry.chance),
+					itemId: entry.itemId,
+					quantityLabel: readQuantityLabel(entry.quantity),
 				},
 			];
 		}
 
-		const totalWeight = output.entries.reduce((total, entry) => total + entry.weight, 0);
-		const rollLabel = readRollLabel(output.rolls);
+		const totalWeight = entry.entries.reduce(
+			(total, weightedEntry) => total + weightedEntry.weight,
+			0,
+		);
+		const rollLabel = readRollLabel(entry.rolls);
 
-		return output.entries.map((entry) => ({
-			chanceLabel: readWeightedChanceLabel(entry, totalWeight),
-			itemId: entry.itemId,
-			quantityLabel: readQuantityLabel(entry.quantity),
+		return entry.entries.map((weightedEntry) => ({
+			chanceLabel: readWeightedChanceLabel(weightedEntry, totalWeight),
+			itemId: weightedEntry.itemId,
+			quantityLabel: readQuantityLabel(weightedEntry.quantity),
 			rollLabel,
 		}));
 	});
-};

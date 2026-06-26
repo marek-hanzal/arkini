@@ -63,30 +63,16 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				type: "producer",
 			},
 		},
-		inputs: {},
 		products: {
 			"product:test": {
 				durationMs: 1000,
 				name: "Test product",
-				outputTableId: "loot:test",
 				placement: "board_then_inventory",
 				requirementIds: [],
 			},
 		},
 		stashes: {},
 		craftRecipes: {},
-		lootTables: {
-			"loot:test": {
-				name: "Test loot",
-				output: [
-					{
-						itemId: "item:twig",
-						quantity: 1,
-						type: "guaranteed",
-					},
-				],
-			},
-		},
 		startingState: {
 			board: [
 				{

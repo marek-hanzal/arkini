@@ -135,7 +135,6 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	nextSave.producerJobs[jobId] = {
 		readyAtMs,
 		id: jobId,
-		outputTableId: checked.product.outputTableId ?? null,
 		placement: checked.product.placement,
 		producerItemInstanceId: action.producerItemInstanceId,
 		productId: checked.productId,

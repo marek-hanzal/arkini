@@ -13,7 +13,6 @@ const cloneSave = (save: GameSave): GameSave => structuredClone(save);
 const createProducerJob = (id: string) => ({
 	readyAtMs: 1000,
 	id,
-	outputTableId: "loot:test",
 	productId: "product:test",
 	producerItemInstanceId: "item-instance:1",
 	startAtMs: 0,

@@ -30,7 +30,6 @@ export const ProducerProductLineViewSchema = z.object({
 	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	hindrances: z.array(ActivationHindranceViewSchema).optional(),
 	outputItemIds: z.array(IdSchema).optional(),
-	outputTableId: IdSchema.optional(),
 });
 
 type ProducerProductLineViewSchema = typeof ProducerProductLineViewSchema;

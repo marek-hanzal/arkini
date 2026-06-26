@@ -62,19 +62,6 @@ const createConfigValue = () => ({
 		},
 	},
 	merge: {},
-	inputs: {
-		"input:test": {
-			name: "Test input",
-			inputs: [
-				{
-					capacity: 1,
-					consume: true,
-					itemId: "item:fuel",
-					quantity: 1,
-				},
-			],
-		},
-	},
 	requirements: {},
 	producers: {
 		"producer:test": {
@@ -91,16 +78,15 @@ const createConfigValue = () => ({
 	products: {
 		"product:test": {
 			durationMs: 1000,
-			inputRefId: "input:test",
+			inputs: [
+				{
+					capacity: 1,
+					consume: true,
+					itemId: "item:fuel",
+					quantity: 1,
+				},
+			],
 			name: "Test product",
-			outputTableId: "loot:test",
-			placement: "board_then_inventory",
-			requirementIds: [],
-		},
-	},
-	lootTables: {
-		"loot:test": {
-			name: "Test loot",
 			output: [
 				{
 					itemId: "item:pollution",
@@ -108,6 +94,8 @@ const createConfigValue = () => ({
 					type: "guaranteed",
 				},
 			],
+			placement: "board_then_inventory",
+			requirementIds: [],
 		},
 	},
 	startingState: {
@@ -199,10 +187,6 @@ describe("auditGameConfig", () => {
 
 	it("tracks product-owned inline inputs and outputs", () => {
 		const config: any = createConfigValue();
-		config.inputs = {};
-		config.lootTables = {};
-		config.products["product:test"].inputRefId = undefined;
-		config.products["product:test"].outputTableId = undefined;
 		config.products["product:test"].inputs = [
 			{
 				capacity: 1,

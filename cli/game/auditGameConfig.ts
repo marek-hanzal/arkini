@@ -12,14 +12,12 @@ type RecordName =
 	| "assets"
 	| "items"
 	| "merge"
-	| "inputs"
 	| "requirements"
 	| "effects"
 	| "producers"
 	| "stashes"
 	| "craftRecipes"
-	| "products"
-	| "lootTables";
+	| "products";
 
 type UsageIndex = Record<RecordName, Set<string>>;
 
@@ -35,14 +33,12 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	collectAssetUsage(config, usage);
 	collectItemUsage(config, usage, itemFlow);
 	collectMergeUsage(config, usage, itemFlow);
-	collectInputUsage(config, itemFlow);
 	collectRequirementUsage(config, itemFlow);
 	collectEffectUsage(config, usage, itemFlow);
 	collectProducerUsage(config, usage, itemFlow);
 	collectStashUsage(config, usage, itemFlow);
 	collectCraftRecipeUsage(config, itemFlow);
 	collectProductUsage(config, usage, itemFlow);
-	collectLootTableUsage(config, itemFlow);
 	collectStartingStateUsage(config, itemFlow);
 
 	return [
@@ -70,14 +66,12 @@ const createUsageIndex = (): UsageIndex => ({
 	assets: new Set(),
 	items: new Set(),
 	merge: new Set(),
-	inputs: new Set(),
 	requirements: new Set(),
 	effects: new Set(),
 	producers: new Set(),
 	stashes: new Set(),
 	craftRecipes: new Set(),
 	products: new Set(),
-	lootTables: new Set(),
 });
 
 const createItemFlowIndex = (): ItemFlowIndex => ({
@@ -132,14 +126,6 @@ const collectMergeUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Item
 	}
 };
 
-const collectInputUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
-	for (const inputDefinition of Object.values(config.inputs)) {
-		for (const input of inputDefinition.inputs) {
-			itemFlow.consumedItemIds.add(input.itemId);
-		}
-	}
-};
-
 const collectRequirementUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
 	for (const requirement of Object.values(config.requirements)) {
 		if (requirement.type === "proximity") {
@@ -168,8 +154,8 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Ite
 
 	for (const effect of Object.values(config.effects)) {
 		for (const operation of effect.operations) {
-			if (operation.kind === "loot.appendTable" || operation.kind === "loot.replaceTable") {
-				usage.lootTables.add(operation.lootTableId);
+			if (operation.kind === "loot.appendOutput" || operation.kind === "loot.replaceOutput") {
+				collectLootOutputUsage(operation.output, itemFlow);
 			}
 
 			if (operation.kind === "loot.addChanceItem") {
@@ -209,7 +195,7 @@ const collectProducerUsage = (config: GameConfig, usage: UsageIndex, itemFlow: I
 
 const collectStashUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const stash of Object.values(config.stashes)) {
-		usage.lootTables.add(stash.outputTableId);
+		collectLootOutputUsage(stash.output, itemFlow);
 
 		for (const input of stash.inputs) {
 			itemFlow.consumedItemIds.add(input.itemId);
@@ -239,14 +225,8 @@ const collectCraftRecipeUsage = (config: GameConfig, itemFlow: ItemFlowIndex) =>
 
 const collectProductUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const product of Object.values(config.products)) {
-		if (product.inputRefId) {
-			usage.inputs.add(product.inputRefId);
-		}
 		for (const input of product.inputs ?? []) {
 			itemFlow.consumedItemIds.add(input.itemId);
-		}
-		if (product.outputTableId) {
-			usage.lootTables.add(product.outputTableId);
 		}
 		if (product.output) {
 			collectLootOutputUsage(product.output, itemFlow);
@@ -274,14 +254,8 @@ const collectHindranceItemUsage = (
 	}
 };
 
-const collectLootTableUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
-	for (const lootTable of Object.values(config.lootTables)) {
-		collectLootOutputUsage(lootTable.output, itemFlow);
-	}
-};
-
 const collectLootOutputUsage = (
-	output: GameConfig["lootTables"][string]["output"],
+	output: NonNullable<GameConfig["products"][string]["output"]>,
 	itemFlow: ItemFlowIndex,
 ) => {
 	for (const entry of output) {
@@ -306,11 +280,9 @@ const collectStartingStateUsage = (config: GameConfig, itemFlow: ItemFlowIndex) 
 };
 
 const duplicateShapeSections = [
-	"inputs",
 	"requirements",
 	"stashes",
 	"craftRecipes",
-	"lootTables",
 ] as const;
 
 const readDuplicateDefinitionShapeWarnings = (config: GameConfig): GameConfigAuditWarning[] =>
@@ -357,14 +329,12 @@ const readUnusedDefinitionWarnings = (
 	usage: UsageIndex,
 ): GameConfigAuditWarning[] => [
 	...readUnusedRecordWarnings("merge", config.merge, usage.merge),
-	...readUnusedRecordWarnings("inputs", config.inputs, usage.inputs),
 	...readUnusedRecordWarnings("requirements", config.requirements, usage.requirements),
 	...readUnusedRecordWarnings("effects", config.effects, usage.effects),
 	...readUnusedRecordWarnings("producers", config.producers, usage.producers),
 	...readUnusedRecordWarnings("stashes", config.stashes, usage.stashes),
 	...readUnusedRecordWarnings("craftRecipes", config.craftRecipes, usage.craftRecipes),
 	...readUnusedRecordWarnings("products", config.products, usage.products),
-	...readUnusedRecordWarnings("lootTables", config.lootTables, usage.lootTables),
 ];
 
 const readTerminalItemWarnings = (

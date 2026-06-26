@@ -14,19 +14,13 @@ const readItemResourceData = (itemId: string) => {
 const readProductInputs = (productId: string) => {
 	const product = defaultGameConfig.products[productId];
 	if (!product) throw new Error(`Missing product ${productId}`);
-	if (product.inputs) return product.inputs;
-	if (!product.inputRefId) return [];
-
-	return defaultGameConfig.inputs[product.inputRefId]?.inputs ?? [];
+	return product.inputs ?? [];
 };
 
 const readProductOutput = (productId: string) => {
 	const product = defaultGameConfig.products[productId];
 	if (!product) throw new Error(`Missing product ${productId}`);
-	if (product.output) return product.output;
-	if (!product.outputTableId) return [];
-
-	return defaultGameConfig.lootTables[product.outputTableId]?.output ?? [];
+	return product.output ?? [];
 };
 
 describe("defaultGameConfig", () => {

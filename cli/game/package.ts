@@ -13,14 +13,12 @@ const collectionKeys = [
 	"assets",
 	"items",
 	"merge",
-	"inputs",
 	"requirements",
 	"effects",
 	"producers",
 	"stashes",
 	"craftRecipes",
 	"products",
-	"lootTables",
 ] as const;
 
 type CollectionKey = (typeof collectionKeys)[number];
@@ -279,14 +277,12 @@ const createEmptyPackage = (): MergedGameConfig => ({
 	assets: {},
 	items: {},
 	merge: {},
-	inputs: {},
 	requirements: {},
 	producers: {},
 	stashes: {},
 	craftRecipes: {},
 	effects: {},
 	products: {},
-	lootTables: {},
 });
 
 const assignSingleton = <T>(

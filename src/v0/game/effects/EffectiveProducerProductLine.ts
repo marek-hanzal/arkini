@@ -1,7 +1,7 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
-interface EffectiveLootTableEntry {
-	lootTableId: string;
+interface EffectiveOutputAppend {
+	output: NonNullable<GameConfig["products"][string]["output"]>;
 	chance: number;
 }
 
@@ -30,11 +30,10 @@ export interface EffectiveProducerProductLine {
 	blockReasons: AppliedGameEffectOperation[];
 	durationMs: number;
 	lootPlan: {
-		appendTables: EffectiveLootTableEntry[];
+		appendOutputs: EffectiveOutputAppend[];
 		baseDropChance: number;
-		baseOutput: GameConfig["lootTables"][string]["output"];
+		baseOutput: NonNullable<GameConfig["products"][string]["output"]>;
 		chanceItems: EffectiveChanceItemEntry[];
-		lootTableIds: string[];
 	};
 	visible: boolean;
 }

@@ -224,7 +224,6 @@ const readRuntimeProductLineViewsFromGameSave = ({
 					config,
 					productId,
 				}),
-				outputTableId: product.outputTableId,
 				productId,
 				producerQueuedJobs,
 				progress,

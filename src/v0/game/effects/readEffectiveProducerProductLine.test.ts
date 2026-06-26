@@ -54,9 +54,15 @@ const createSaveWithEffectSource = () => {
 						},
 					},
 					{
-						kind: "loot.appendTable",
-						lootTableId: "loot:test",
 						chance: 0.25,
+						kind: "loot.appendOutput",
+						output: [
+							{
+								itemId: "item:twig",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
 						target: {
 							productIds: [
 								"product:shred",
@@ -100,7 +106,6 @@ const createSaveWithEffectSource = () => {
 			...baseConfig.products,
 			"product:shred": {
 				...baseConfig.products["product:shred"],
-				outputTableId: "loot:test",
 				visibility: "hidden",
 			},
 		},
@@ -144,10 +149,16 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(effective.blockReasons).toHaveLength(1);
 		expect(effective.durationMs).toBe(3000);
 		expect(effective.lootPlan).toMatchObject({
-			appendTables: [
+			appendOutputs: [
 				{
 					chance: 0.25,
-					lootTableId: "loot:test",
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
 				},
 			],
 			baseDropChance: 0.6,
@@ -157,9 +168,6 @@ describe("readEffectiveProducerProductLine", () => {
 					itemId: "item:key",
 					quantity: 2,
 				},
-			],
-			lootTableIds: [
-				"loot:test",
 			],
 		});
 		expect(config.products["product:shred"].visibility).toBe("hidden");

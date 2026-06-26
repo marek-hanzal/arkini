@@ -372,7 +372,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				nextAttemptAtMs: 2000,
 			},
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -627,10 +626,10 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 	it("shows stash drop previews with probabilities", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			lootTables: {
-				...baseConfig.lootTables,
-				"loot:test": {
-					name: "Test loot",
+			stashes: {
+				...baseConfig.stashes,
+				"stash:test": {
+					...baseConfig.stashes["stash:test"],
 					output: [
 						{
 							itemId: "item:twig",

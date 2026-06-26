@@ -39,8 +39,7 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 			}),
 		),
 		drops: readRuntimeLootDropViewsFromGameConfig({
-			config,
-			lootTableId: stash.outputTableId,
+			output: stash.output,
 		}),
 		kind: "stash",
 		remainingCharges: save.stashes[boardItem.id]?.remainingCharges ?? stash.charges,

@@ -137,10 +137,8 @@ const readEffectOperationSummary = (
 	if (operation.kind === "duration.multiply") {
 		return `Multiply duration by ${operation.multiplier} for ${target}`;
 	}
-	if (operation.kind === "loot.appendTable")
-		return `Append loot table ${operation.lootTableId} to ${target}`;
-	if (operation.kind === "loot.replaceTable")
-		return `Replace loot table with ${operation.lootTableId} for ${target}`;
+	if (operation.kind === "loot.appendOutput") return `Append output to ${target}`;
+	if (operation.kind === "loot.replaceOutput") return `Replace output for ${target}`;
 	if (operation.kind === "loot.addChanceItem")
 		return `Add chance item ${operation.itemId} to ${target}`;
 	if (operation.kind === "loot.dropChance.add")

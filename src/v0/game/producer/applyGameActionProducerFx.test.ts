@@ -32,7 +32,6 @@ describe("applyGameActionFx Producer", () => {
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
 			readyAtMs: 1500,
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -77,7 +76,7 @@ describe("applyGameActionFx Producer", () => {
 				"product:test": {
 					...baseConfig.products["product:test"],
 					activatesEffectId: "effect:test",
-					outputTableId: undefined,
+					output: undefined,
 				},
 			},
 		});
@@ -102,7 +101,6 @@ describe("applyGameActionFx Producer", () => {
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
 			readyAtMs: 1500,
-			outputTableId: null,
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -814,10 +812,10 @@ describe("applyGameActionFx Producer", () => {
 	it("auto-fills available producer inputs without starting an incomplete product", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			inputs: {
-				...baseConfig.inputs,
-				"input:shred": {
-					name: "Shred input",
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
 					inputs: [
 						{
 							capacity: 2,
@@ -889,10 +887,10 @@ describe("applyGameActionFx Producer", () => {
 	it("auto-fills only missing producer input when the product line is partially filled", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			inputs: {
-				...baseConfig.inputs,
-				"input:shred": {
-					name: "Shred input",
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
 					inputs: [
 						{
 							capacity: 2,
@@ -1092,10 +1090,10 @@ describe("applyGameActionFx Producer", () => {
 	it("withdraws an entire producer product-line input through board then inventory placement", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			inputs: {
-				...baseConfig.inputs,
-				"input:shred": {
-					...baseConfig.inputs["input:shred"],
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
 					inputs: [
 						{
 							capacity: 3,
@@ -1229,20 +1227,6 @@ describe("applyGameActionFx Producer", () => {
 	it("stores duplicate producer input into the saved default line before earlier lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			inputs: {
-				...baseConfig.inputs,
-				"input:alt-shred": {
-					name: "Alt shred input",
-					inputs: [
-						{
-							capacity: 1,
-							consume: true,
-							itemId: "item:twig",
-							quantity: 1,
-						},
-					],
-				},
-			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
@@ -1257,7 +1241,14 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.products,
 				"product:alt-shred": {
 					...baseConfig.products["product:shred"],
-					inputRefId: "input:alt-shred",
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
 					name: "Alt shred",
 				},
 			},
@@ -1301,20 +1292,6 @@ describe("applyGameActionFx Producer", () => {
 	it("stores duplicate producer input into the default line before later matching lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			inputs: {
-				...baseConfig.inputs,
-				"input:alt-shred": {
-					name: "Alt shred input",
-					inputs: [
-						{
-							capacity: 1,
-							consume: true,
-							itemId: "item:twig",
-							quantity: 1,
-						},
-					],
-				},
-			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
@@ -1329,7 +1306,14 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.products,
 				"product:alt-shred": {
 					...baseConfig.products["product:shred"],
-					inputRefId: "input:alt-shred",
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
 					name: "Alt shred",
 				},
 			},
@@ -1370,20 +1354,6 @@ describe("applyGameActionFx Producer", () => {
 	it("stores duplicate producer input into the first product line with remaining capacity", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			inputs: {
-				...baseConfig.inputs,
-				"input:alt-shred": {
-					name: "Alt shred input",
-					inputs: [
-						{
-							capacity: 1,
-							consume: true,
-							itemId: "item:twig",
-							quantity: 1,
-						},
-					],
-				},
-			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
@@ -1398,7 +1368,14 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.products,
 				"product:alt-shred": {
 					...baseConfig.products["product:shred"],
-					inputRefId: "input:alt-shred",
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
 					name: "Alt shred",
 				},
 			},
@@ -1453,20 +1430,6 @@ describe("applyGameActionFx Producer", () => {
 	it("stores duplicate producer input into the next product line after the default line is full", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			inputs: {
-				...baseConfig.inputs,
-				"input:alt-shred": {
-					name: "Alt shred input",
-					inputs: [
-						{
-							capacity: 1,
-							consume: true,
-							itemId: "item:twig",
-							quantity: 1,
-						},
-					],
-				},
-			},
 			producers: {
 				...baseConfig.producers,
 				"producer:test": {
@@ -1481,7 +1444,14 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.products,
 				"product:alt-shred": {
 					...baseConfig.products["product:shred"],
-					inputRefId: "input:alt-shred",
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
 					name: "Alt shred",
 				},
 			},

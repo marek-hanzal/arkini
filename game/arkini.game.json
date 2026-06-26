@@ -90,6 +90,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-cathedral": {
+			"kind": "item",
+			"label": "Cathedral Blueprint",
+			"overlayAssetId": "asset:producer:cathedral",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-cattle-farm-t1": {
 			"kind": "item",
 			"label": "Cattle Farm I Blueprint",
@@ -209,6 +216,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-house-of-engineers": {
+			"kind": "item",
+			"label": "House of Engineers Blueprint",
+			"overlayAssetId": "asset:producer:house-of-engineers",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-iron-mine-t1": {
 			"kind": "item",
 			"label": "Iron Mine I Blueprint",
@@ -220,6 +234,13 @@
 			"kind": "item",
 			"label": "Lumberjack I Blueprint",
 			"overlayAssetId": "asset:producer:lumberjack-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-mage-lodge": {
+			"kind": "item",
+			"label": "Mage Lodge Blueprint",
+			"overlayAssetId": "asset:producer:mage-lodge",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -1082,6 +1103,12 @@
 			"render": "plain",
 			"resourceId": "producer-brickyard"
 		},
+		"asset:producer:cathedral": {
+			"kind": "item",
+			"label": "Cathedral",
+			"render": "plain",
+			"resourceId": "producer-cathedral"
+		},
 		"asset:producer:cattle-farm-t1": {
 			"kind": "item",
 			"label": "Cattle Farm I",
@@ -1184,6 +1211,12 @@
 			"render": "plain",
 			"resourceId": "producer-heroes-guild-t1"
 		},
+		"asset:producer:house-of-engineers": {
+			"kind": "item",
+			"label": "House of Engineers",
+			"render": "plain",
+			"resourceId": "producer-house-of-engineers"
+		},
 		"asset:producer:iron-mine-t1": {
 			"kind": "item",
 			"label": "Iron Mine I",
@@ -1195,6 +1228,12 @@
 			"label": "Lumberjack I",
 			"render": "plain",
 			"resourceId": "producer-lumberjack-t1"
+		},
+		"asset:producer:mage-lodge": {
+			"kind": "item",
+			"label": "Mage Lodge",
+			"render": "plain",
+			"resourceId": "producer-mage-lodge"
 		},
 		"asset:producer:market-t1": {
 			"kind": "item",
@@ -1645,6 +1684,78 @@
 				}
 			],
 			"resultItemId": "producer:brickyard"
+		},
+		"craft:cathedral": {
+			"durationMs": 32000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 6
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 3
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:stonemason-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:glazier-workshop-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:civic-office-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:cathedral"
 		},
 		"craft:cattle-farm-t1": {
 			"durationMs": 7000,
@@ -2314,6 +2425,83 @@
 			],
 			"resultItemId": "producer:heroes-guild-t1"
 		},
+		"craft:house-of-engineers": {
+			"durationMs": 30000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 3
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:stonemason-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:glazier-workshop-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:blacksmith-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:house-of-engineers"
+		},
 		"craft:iron-mine-t1": {
 			"durationMs": 12000,
 			"inputs": [
@@ -2375,6 +2563,83 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:lumberjack-t1"
+		},
+		"craft:mage-lodge": {
+			"durationMs": 32000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:sapphire",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:aquamarine",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 3
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:stonemason-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:glazier-workshop-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:heroes-guild-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:mage-lodge"
 		},
 		"craft:market-t1": {
 			"durationMs": 9000,
@@ -6444,6 +6709,59 @@
 			],
 			"name": "University basic lecture supplies"
 		},
+		"input:university:blueprint-cathedral": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 4
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Cathedral input"
+		},
 		"input:university:blueprint-glazier-workshop-t1": {
 			"inputs": [
 				{
@@ -6519,6 +6837,112 @@
 				}
 			],
 			"name": "Blueprint: Heroes Guild I input"
+		},
+		"input:university:blueprint-house-of-engineers": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: House of Engineers input"
+		},
+		"input:university:blueprint-mage-lodge": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sapphire",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Mage Lodge input"
 		},
 		"input:university:blueprint-quarry-t2": {
 			"inputs": [
@@ -6875,6 +7299,25 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-cathedral": {
+			"assetId": "asset:item:blueprint-cathedral",
+			"code": "blueprint-cathedral",
+			"craftRecipeId": "craft:cathedral",
+			"description": "Build plan for Cathedral, one of the mutually exclusive Choose The Path keystone buildings.",
+			"maxStackSize": 10,
+			"name": "Cathedral Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"path",
+				"keystone",
+				"faith",
+				"cathedral",
+				"era:XI"
+			],
+			"tier": 0
+		},
 		"item:blueprint-cattle-farm-t1": {
 			"assetId": "asset:item:blueprint-cattle-farm-t1",
 			"code": "blueprint-cattle-farm-t1",
@@ -7164,6 +7607,25 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-house-of-engineers": {
+			"assetId": "asset:item:blueprint-house-of-engineers",
+			"code": "blueprint-house-of-engineers",
+			"craftRecipeId": "craft:house-of-engineers",
+			"description": "Build plan for House of Engineers, one of the mutually exclusive Choose The Path keystone buildings.",
+			"maxStackSize": 10,
+			"name": "House of Engineers Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"path",
+				"keystone",
+				"engineers",
+				"engineering",
+				"era:XI"
+			],
+			"tier": 0
+		},
 		"item:blueprint-iron-mine-t1": {
 			"assetId": "asset:item:blueprint-iron-mine-t1",
 			"code": "blueprint-iron-mine-t1",
@@ -7193,6 +7655,26 @@
 				"building",
 				"craft-target",
 				"era:I"
+			],
+			"tier": 0
+		},
+		"item:blueprint-mage-lodge": {
+			"assetId": "asset:item:blueprint-mage-lodge",
+			"code": "blueprint-mage-lodge",
+			"craftRecipeId": "craft:mage-lodge",
+			"description": "Build plan for Mage Lodge, one of the mutually exclusive Choose The Path keystone buildings.",
+			"maxStackSize": 10,
+			"name": "Mage Lodge Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"path",
+				"keystone",
+				"mages",
+				"magic",
+				"arcane",
+				"era:XI"
 			],
 			"tier": 0
 		},
@@ -9065,6 +9547,28 @@
 			],
 			"tier": 3
 		},
+		"producer:cathedral": {
+			"assetId": "asset:producer:cathedral",
+			"code": "cathedral",
+			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
+			"exclusiveToIds": [
+				"producer:house-of-engineers",
+				"producer:mage-lodge"
+			],
+			"maxStackSize": 1,
+			"name": "Cathedral",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"faith",
+				"cathedral",
+				"era:XI"
+			],
+			"tier": 11
+		},
 		"producer:cattle-farm-t1": {
 			"assetId": "asset:producer:cattle-farm-t1",
 			"code": "cattle-farm-t1",
@@ -9358,6 +9862,28 @@
 			],
 			"tier": 9
 		},
+		"producer:house-of-engineers": {
+			"assetId": "asset:producer:house-of-engineers",
+			"code": "house-of-engineers",
+			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
+			"exclusiveToIds": [
+				"producer:cathedral",
+				"producer:mage-lodge"
+			],
+			"maxStackSize": 1,
+			"name": "House of Engineers",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"engineers",
+				"engineering",
+				"era:XI"
+			],
+			"tier": 11
+		},
 		"producer:iron-mine-t1": {
 			"assetId": "asset:producer:iron-mine-t1",
 			"code": "iron-mine-t1",
@@ -9389,6 +9915,29 @@
 				"era:I"
 			],
 			"tier": 1
+		},
+		"producer:mage-lodge": {
+			"assetId": "asset:producer:mage-lodge",
+			"code": "mage-lodge",
+			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
+			"exclusiveToIds": [
+				"producer:house-of-engineers",
+				"producer:cathedral"
+			],
+			"maxStackSize": 1,
+			"name": "Mage Lodge",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"mages",
+				"magic",
+				"arcane",
+				"era:XI"
+			],
+			"tier": 11
 		},
 		"producer:market-t1": {
 			"assetId": "asset:producer:market-t1",
@@ -11598,6 +12147,16 @@
 				}
 			]
 		},
+		"loot:university:blueprint-cathedral": {
+			"name": "University Cathedral blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-cathedral",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:university:blueprint-glazier-workshop-t1": {
 			"name": "University Glazier Workshop blueprint output",
 			"output": [
@@ -11613,6 +12172,26 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-house-of-engineers": {
+			"name": "University House of Engineers blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-of-engineers",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-mage-lodge": {
+			"name": "University Mage Lodge blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-mage-lodge",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -12252,7 +12831,10 @@
 				"product:university:blueprint-heroes-guild-t1",
 				"product:university:blueprint-glazier-workshop-t1",
 				"product:university:blueprint-quarry-t2",
-				"product:university:blueprint-stonemason-t2"
+				"product:university:blueprint-stonemason-t2",
+				"product:university:blueprint-house-of-engineers",
+				"product:university:blueprint-cathedral",
+				"product:university:blueprint-mage-lodge"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -13484,6 +14066,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:university:blueprint-cathedral": {
+			"durationMs": 4000,
+			"inputRefId": "input:university:blueprint-cathedral",
+			"name": "Blueprint: Cathedral",
+			"outputTableId": "loot:university:blueprint-cathedral",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:university:blueprint-glazier-workshop-t1": {
 			"durationMs": 3000,
 			"inputRefId": "input:university:blueprint-glazier-workshop-t1",
@@ -13497,6 +14087,22 @@
 			"inputRefId": "input:university:blueprint-heroes-guild-t1",
 			"name": "Blueprint: Heroes Guild I",
 			"outputTableId": "loot:university:blueprint-heroes-guild-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-house-of-engineers": {
+			"durationMs": 4000,
+			"inputRefId": "input:university:blueprint-house-of-engineers",
+			"name": "Blueprint: House of Engineers",
+			"outputTableId": "loot:university:blueprint-house-of-engineers",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-mage-lodge": {
+			"durationMs": 4000,
+			"inputRefId": "input:university:blueprint-mage-lodge",
+			"name": "Blueprint: Mage Lodge",
+			"outputTableId": "loot:university:blueprint-mage-lodge",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

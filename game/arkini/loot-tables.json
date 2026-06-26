@@ -1,570 +1,12 @@
 {
 	"lootTables": {
-		"loot:lumberjack-t1:log": {
-			"name": "Lumberjack logs",
+		"loot:academy:advanced-knowledge": {
+			"name": "Academy advanced knowledge output",
 			"output": [
 				{
-					"type": "guaranteed",
-					"itemId": "item:log",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:sawmill-t1:plank": {
-			"name": "Sawmill planks",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:quarry-t1:stone": {
-			"name": "Quarry stone",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:stone",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:stonemason-t1:stone-block": {
-			"name": "Stonemason stone blocks",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:stone-block",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:well-t1:water": {
-			"name": "Well water",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:water",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:farm-t1:grain": {
-			"name": "Farm grain",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:grain",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:windmill-t1:flour": {
-			"name": "Windmill flour",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:flour",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:bakery-t1:bread": {
-			"name": "Bakery bread",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:bread",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:pig-farm-t1:piglet": {
-			"name": "Pig farm piglets",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:piglet",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:brewery-t1:beer-barrel": {
-			"name": "Brewery beer barrels from hops and water",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:beer-barrel",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:tavern-t1:beer": {
-			"name": "Tavern beers",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:beer",
-					"quantity": 4
-				}
-			]
-		},
-		"loot:brewery-t1:beer-barrel-from-beer": {
-			"name": "Brewery beer barrels from beers",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:beer-barrel",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:brewery-t1:hops": {
-			"name": "Brewery hops",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:hops",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:winery-t1:grapes": {
-			"name": "Winery grapes",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:grapes",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:winery-t1:wine-barrel": {
-			"name": "Winery wine barrels",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:wine-barrel",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:tavern-t1:wine-glass": {
-			"name": "Tavern wine glasses",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:wine-glass",
-					"quantity": 4
-				}
-			]
-		},
-		"loot:winery-t1:wine-barrel-from-wine-glasses": {
-			"name": "Winery wine barrels from glasses",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:wine-barrel",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:coal-mine-t1:coal": {
-			"name": "Coal mine coal carts",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coal",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:iron-mine-t1:iron-ore": {
-			"name": "Iron mine iron ore carts",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:iron-ore",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:gold-mine-t1:gold-ore": {
-			"name": "Gold mine gold ore carts",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:gold-ore",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:smelter-t1:iron-ingot": {
-			"name": "Smelter iron ingots",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:iron-ingot",
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.75,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.3,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:smelter-t1:gold-ingot": {
-			"name": "Smelter gold ingots",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:gold-ingot",
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.75,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.3,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t1:blueprint-lumberjack-t1": {
-			"name": "Blueprint: Lumberjack I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-lumberjack-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t1:blueprint-sawmill-t1": {
-			"name": "Blueprint: Sawmill I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-sawmill-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t1:blueprint-quarry-t1": {
-			"name": "Blueprint: Quarry I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-quarry-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t1:blueprint-stonemason-t1": {
-			"name": "Blueprint: Stonemason I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-stonemason-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t1:blueprint-well-t1": {
-			"name": "Blueprint: Well I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-well-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-pig-farm-t1": {
-			"name": "Blueprint: Pig Farm I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-pig-farm-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t1:blueprint-townhall-t2": {
-			"name": "Blueprint: Town Hall II output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-townhall-t2",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-townhall-t3": {
-			"name": "Blueprint: Town Hall III output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-townhall-t3",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-townhall-t4": {
-			"name": "Blueprint: Town Hall IV output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-townhall-t4",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:heroes-guild-t1:chest-t1": {
-			"name": "Heroes Guild Chest I expedition",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:chest-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:heroes-guild-t1:chest-t2": {
-			"name": "Heroes Guild Chest II expedition",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:chest-t2",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:heroes-guild-t1:chest-t3": {
-			"name": "Heroes Guild Chest III expedition",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:chest-t3",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:heroes-guild-t1:chest-t4": {
-			"name": "Heroes Guild Chest IV expedition",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:chest-t4",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:chest-t1:open": {
-			"name": "Chest I contents",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": {
-						"min": 2,
-						"max": 4
-					}
-				},
-				{
-					"type": "chance",
-					"itemId": "item:ruby",
-					"chance": 0.65,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:emerald",
-					"chance": 0.12,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:chest-t2:open": {
-			"name": "Chest II contents",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": {
-						"min": 4,
-						"max": 7
-					}
-				},
-				{
-					"type": "chance",
-					"itemId": "item:ruby",
-					"chance": 0.35,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:emerald",
-					"chance": 0.65,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:sapphire",
-					"chance": 0.18,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:chest-t3:open": {
-			"name": "Chest III contents",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": {
-						"min": 7,
-						"max": 10
-					}
-				},
-				{
-					"type": "chance",
-					"itemId": "item:emerald",
-					"chance": 0.35,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:sapphire",
-					"chance": 0.65,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:topaz",
-					"chance": 0.25,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:chest-t4:open": {
-			"name": "Chest IV contents",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": {
-						"min": 10,
-						"max": 15
-					}
-				},
-				{
-					"type": "chance",
-					"itemId": "item:sapphire",
-					"chance": 0.35,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:topaz",
-					"chance": 0.55,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:aquamarine",
-					"chance": 0.35,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:goldsmith-t1:key-t3": {
-			"name": "Goldsmith Key III output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:key-t3",
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.35,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.06,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:blacksmith-t1:axe": {
-			"name": "Blacksmith axe output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:axe",
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.4,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.08,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:blacksmith-t1:sword": {
-			"name": "Blacksmith sword output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:sword",
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.45,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.1,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:school:basic-knowledge": {
-			"name": "School basic knowledge output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -572,944 +14,9 @@
 			"name": "Academy basic knowledge output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:basic-knowledge",
-					"quantity": 2
-				}
-			]
-		},
-		"loot:academy:advanced-knowledge": {
-			"name": "Academy advanced knowledge output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-prospector-guild-t2": {
-			"name": "Academy Prospector Guild 2 blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-prospector-guild-t2",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:university:basic-knowledge": {
-			"name": "University basic knowledge output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:basic-knowledge",
-					"quantity": 3
-				}
-			]
-		},
-		"loot:university:advanced-knowledge": {
-			"name": "University advanced knowledge output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:advanced-knowledge",
-					"quantity": 2
-				}
-			]
-		},
-		"loot:university:master-knowledge": {
-			"name": "University master knowledge output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:master-knowledge",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-windmill-t1": {
-			"name": "Blueprint: Windmill I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-windmill-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-bakery-t1": {
-			"name": "Blueprint: Bakery I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-bakery-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-slaughterhouse-t1": {
-			"name": "Blueprint: Slaughterhouse I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-slaughterhouse-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:hop-field": {
-			"name": "Survey: Hop Field output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:hop-field",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-brewery-t1": {
-			"name": "Blueprint: Brewery I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-brewery-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-tavern-t1": {
-			"name": "Blueprint: Tavern I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-tavern-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:vineyard": {
-			"name": "Survey: Vineyard output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:vineyard",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-winery-t1": {
-			"name": "Blueprint: Winery I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-winery-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:wheat-field": {
-			"name": "Survey: Wheat Field output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:wheat-field",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-farm-t1": {
-			"name": "Blueprint: Farm I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-farm-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-cattle-farm-t1": {
-			"name": "Blueprint: Cattle Farm I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-cattle-farm-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-chicken-coop-t1": {
-			"name": "Blueprint: Chicken Coop I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-chicken-coop-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-sheep-pasture-t1": {
-			"name": "Blueprint: Sheep Pasture I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-sheep-pasture-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:blueprint-vegetable-garden-t1": {
-			"name": "Blueprint: Vegetable Garden I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-vegetable-garden-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t2:food-supply": {
-			"name": "Food Supply output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:food-supply",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:cattle-farm-t1:milk": {
-			"name": "Cattle farm milk",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:milk",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:chicken-coop-t1:egg": {
-			"name": "Chicken coop eggs",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:egg",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:sheep-pasture-t1:wool": {
-			"name": "Sheep pasture wool",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:wool",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:vegetable-garden-t1:vegetables": {
-			"name": "Vegetable garden vegetables",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:vegetables",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:dairy-t1:cheese": {
-			"name": "Dairy cheese",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:cheese",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:cookhouse-t1:feast": {
-			"name": "Cookhouse feast",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:feast",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t1:coin-from-bread": {
-			"name": "Market coins from bread",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t1:coin-from-sausage": {
-			"name": "Market coins from sausage",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t1:coin-from-cheese": {
-			"name": "Market coins from cheese",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t1:coin-from-beer": {
-			"name": "Market coins from beer",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t1:coin-from-wine-glass": {
-			"name": "Market coins from wine glass",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t1:coin-from-feast": {
-			"name": "Market coins from feast",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 3
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-dairy-t1": {
-			"name": "Blueprint: Dairy I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-dairy-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-cookhouse-t1": {
-			"name": "Blueprint: Cookhouse I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-cookhouse-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t3:blueprint-market-t1": {
-			"name": "Blueprint: Market output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-market-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:paper-mill-t1:paper": {
-			"name": "Paper Mill paper output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:civic-office-t1:building-permit": {
-			"name": "Civic Office building permit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:building-permit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:prospector-guild-t1:clay-deposit": {
-			"name": "Prospector Guild 1 clay deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:clay-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:prospector-guild-t1:sand-deposit": {
-			"name": "Prospector Guild 1 sand deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:sand-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t2:coin-from-paper": {
-			"name": "Market II coins from paper",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t2:coin-from-feast": {
-			"name": "Market II coins from feast",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 5
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-paper-mill-t1": {
-			"name": "Town Hall IV Paper Mill I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-paper-mill-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-school": {
-			"name": "Town Hall IV School blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-school",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-civic-office-t1": {
-			"name": "Town Hall IV Civic Office I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-civic-office-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-market-t2": {
-			"name": "Town Hall IV Market II blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-market-t2",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-prospector-guild-t1": {
-			"name": "Town Hall IV Prospector Guild 1 blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-prospector-guild-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:slaughterhouse-t1:sausage-raw-hide": {
-			"name": "Slaughterhouse sausage and raw hide",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:sausage",
-					"quantity": 1
-				},
-				{
-					"type": "guaranteed",
-					"itemId": "item:raw-hide",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:tannery-t1:leather": {
-			"name": "Tannery leather",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:leather",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:weaver-hut-t1:common-cloth": {
-			"name": "Weaver Hut common cloth",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:common-cloth",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:dye-workshop-t1:luxury-cloth": {
-			"name": "Dye Workshop luxury cloth",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:luxury-cloth",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:dye-workshop-t1:pigment": {
-			"name": "Pigment output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:pigment",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:tailor-workshop-t1:common-clothing": {
-			"name": "Tailor Workshop common clothing",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:common-clothing",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:tailor-workshop-t1:luxury-clothing": {
-			"name": "Tailor Workshop luxury clothing",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:market-t2:coin-from-common-clothing": {
-			"name": "Market II coins from common clothing",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 3
-				}
-			]
-		},
-		"loot:market-t2:coin-from-luxury-clothing": {
-			"name": "Market II coins from luxury clothing",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 6
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-tannery-t1": {
-			"name": "Town Hall IV Tannery I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-tannery-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-weaver-hut-t1": {
-			"name": "Town Hall IV Weaver Hut I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-weaver-hut-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-dye-workshop-t1": {
-			"name": "Town Hall IV Dye Workshop I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-dye-workshop-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-tailor-workshop-t1": {
-			"name": "Town Hall IV Tailor Workshop I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-tailor-workshop-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:charcoal-burner-t1:charcoal": {
-			"name": "Charcoal output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:charcoal",
-					"quantity": 2
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.4,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.08,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:clay-pit:clay": {
-			"name": "Clay output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:clay",
-					"quantity": 2
-				}
-			]
-		},
-		"loot:sand-pit:sand": {
-			"name": "Sand output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:sand",
-					"quantity": 2
-				}
-			]
-		},
-		"loot:brickyard:bricks": {
-			"name": "Bricks output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:bricks",
-					"quantity": 2
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.55,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.12,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:glassworks:glass": {
-			"name": "Glass output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:glass",
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.65,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.15,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:glazier-workshop-t1:stained-glass": {
-			"name": "Stained glass output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:stained-glass",
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.5,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.1,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:roof-tile-factory:roof-tiles": {
-			"name": "Roof tiles output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:roof-tiles",
-					"quantity": 2
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.55,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.12,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:construction-yard-t1:construction-bundle": {
-			"name": "Construction Bundle output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-coal-mine-t1": {
-			"name": "Blueprint: Coal Mine I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-coal-mine-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-iron-mine-t1": {
-			"name": "Blueprint: Iron Mine I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-iron-mine-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-gold-mine-t1": {
-			"name": "Blueprint: Gold Mine I output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-gold-mine-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-smelter-t1": {
-			"name": "Academy Smelter I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-smelter-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-purifier-t1": {
-			"name": "Academy Purifier I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-purifier-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:prospector-guild-t2:coal-deposit": {
-			"name": "Prospector Guild 2 coal deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coal-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:prospector-guild-t2:iron-deposit": {
-			"name": "Prospector Guild 2 iron deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:iron-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:prospector-guild-t2:gold-deposit": {
-			"name": "Prospector Guild 2 gold deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:gold-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:prospector-guild-t2:sand-deposit": {
-			"name": "Prospector Guild 2 sand deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:sand-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:prospector-guild-t2:clay-deposit": {
-			"name": "Prospector Guild 2 clay deposit output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:clay-deposit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:civic-office-t1:blueprint-academy": {
-			"name": "Civic Office Academy blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-academy",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-charcoal-burner-t1": {
-			"name": "Academy Charcoal Burner I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-charcoal-burner-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-clay-pit": {
-			"name": "Academy Clay Pit blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-clay-pit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-sand-pit": {
-			"name": "Academy Sand Pit blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-sand-pit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-brickyard": {
-			"name": "Academy Brickyard blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-brickyard",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-glassworks": {
-			"name": "Academy Glassworks blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-glassworks",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-roof-tile-factory": {
-			"name": "Academy Roof Tile Factory blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-roof-tile-factory",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-construction-yard-t1": {
-			"name": "Academy Construction Yard I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-construction-yard-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:civic-office-t1:guild-charter": {
-			"name": "Civic Office guild charter output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:academy:blueprint-blacksmith-t1": {
-			"name": "Academy Blacksmith I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-blacksmith-t1",
-					"quantity": 1
+					"quantity": 2,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1517,9 +24,89 @@
 			"name": "Academy Armory I blueprint output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:blueprint-armory-t1",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-blacksmith-t1": {
+			"name": "Academy Blacksmith I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-blacksmith-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-brickyard": {
+			"name": "Academy Brickyard blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-brickyard",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-charcoal-burner-t1": {
+			"name": "Academy Charcoal Burner I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-charcoal-burner-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-clay-pit": {
+			"name": "Academy Clay Pit blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-clay-pit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-coal-mine-t1": {
+			"name": "Blueprint: Coal Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-coal-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-construction-yard-t1": {
+			"name": "Academy Construction Yard I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-construction-yard-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-glassworks": {
+			"name": "Academy Glassworks blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-glassworks",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-gold-mine-t1": {
+			"name": "Blueprint: Gold Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-gold-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1527,9 +114,69 @@
 			"name": "Academy Goldsmith I blueprint output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:blueprint-goldsmith-t1",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-iron-mine-t1": {
+			"name": "Blueprint: Iron Mine I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-iron-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-prospector-guild-t2": {
+			"name": "Academy Prospector Guild 2 blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-prospector-guild-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-purifier-t1": {
+			"name": "Academy Purifier I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-purifier-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-roof-tile-factory": {
+			"name": "Academy Roof Tile Factory blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-roof-tile-factory",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-sand-pit": {
+			"name": "Academy Sand Pit blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-sand-pit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-smelter-t1": {
+			"name": "Academy Smelter I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-smelter-t1",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1537,41 +184,9 @@
 			"name": "Academy University blueprint output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:blueprint-university",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:blacksmith-t1:nails": {
-			"name": "Blacksmith nails output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:nails",
-					"quantity": 4
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.35,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:pollution",
-					"chance": 0.06,
-					"quantity": 1
-				}
-			]
-		},
-		"loot:armory-t1:leather-armor": {
-			"name": "Armory leather armor output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:leather-armor",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1579,21 +194,483 @@
 			"name": "Armory iron armor output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:iron-armor",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.45,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.1,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:armory-t1:leather-armor": {
+			"name": "Armory leather armor output",
+			"output": [
+				{
+					"itemId": "item:leather-armor",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:bakery-t1:bread": {
+			"name": "Bakery bread",
+			"output": [
+				{
+					"itemId": "item:bread",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:blacksmith-t1:axe": {
+			"name": "Blacksmith axe output",
+			"output": [
+				{
+					"itemId": "item:axe",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:blacksmith-t1:nails": {
+			"name": "Blacksmith nails output",
+			"output": [
+				{
+					"itemId": "item:nails",
+					"quantity": 4,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:blacksmith-t1:sword": {
+			"name": "Blacksmith sword output",
+			"output": [
+				{
+					"itemId": "item:sword",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.45,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:brewery-t1:beer-barrel": {
+			"name": "Brewery beer barrels from hops and water",
+			"output": [
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:brewery-t1:beer-barrel-from-beer": {
+			"name": "Brewery beer barrels from beers",
+			"output": [
+				{
+					"itemId": "item:beer-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:brewery-t1:hops": {
+			"name": "Brewery hops",
+			"output": [
+				{
+					"itemId": "item:hops",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:brickyard:bricks": {
+			"name": "Bricks output",
+			"output": [
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:cattle-farm-t1:milk": {
+			"name": "Cattle farm milk",
+			"output": [
+				{
+					"itemId": "item:milk",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:charcoal-burner-t1:charcoal": {
+			"name": "Charcoal output",
+			"output": [
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:chest-t1:open": {
+			"name": "Chest I contents",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 4,
+						"min": 2
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:ruby",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:chest-t2:open": {
+			"name": "Chest II contents",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 7,
+						"min": 4
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:ruby",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.18,
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:chest-t3:open": {
+			"name": "Chest III contents",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 10,
+						"min": 7
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.25,
+					"itemId": "item:topaz",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:chest-t4:open": {
+			"name": "Chest IV contents",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 15,
+						"min": 10
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:topaz",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:aquamarine",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:chicken-coop-t1:egg": {
+			"name": "Chicken coop eggs",
+			"output": [
+				{
+					"itemId": "item:egg",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:civic-office-t1:blueprint-academy": {
+			"name": "Civic Office Academy blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-academy",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:civic-office-t1:building-permit": {
+			"name": "Civic Office building permit output",
+			"output": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:civic-office-t1:guild-charter": {
+			"name": "Civic Office guild charter output",
+			"output": [
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:clay-pit:clay": {
+			"name": "Clay output",
+			"output": [
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:coal-mine-t1:coal": {
+			"name": "Coal mine coal carts",
+			"output": [
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:construction-yard-t1:construction-bundle": {
+			"name": "Construction Bundle output",
+			"output": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:cookhouse-t1:feast": {
+			"name": "Cookhouse feast",
+			"output": [
+				{
+					"itemId": "item:feast",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:dairy-t1:cheese": {
+			"name": "Dairy cheese",
+			"output": [
+				{
+					"itemId": "item:cheese",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:dye-workshop-t1:luxury-cloth": {
+			"name": "Dye Workshop luxury cloth",
+			"output": [
+				{
+					"itemId": "item:luxury-cloth",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:dye-workshop-t1:pigment": {
+			"name": "Pigment output",
+			"output": [
+				{
+					"itemId": "item:pigment",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:farm-t1:grain": {
+			"name": "Farm grain",
+			"output": [
+				{
+					"itemId": "item:grain",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:glassworks:glass": {
+			"name": "Glass output",
+			"output": [
+				{
+					"itemId": "item:glass",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.15,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:glazier-workshop-t1:stained-glass": {
+			"name": "Stained glass output",
+			"output": [
+				{
+					"itemId": "item:stained-glass",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.5,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:gold-mine-t1:gold-ore": {
+			"name": "Gold mine gold ore carts",
+			"output": [
+				{
+					"itemId": "item:gold-ore",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1601,21 +678,21 @@
 			"name": "Goldsmith coin stack output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:coin-stack",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.35,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.06,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -1623,21 +700,21 @@
 			"name": "Goldsmith Key I output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:key-t1",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.35,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.06,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -1645,21 +722,43 @@
 			"name": "Goldsmith Key II output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:key-t2",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.35,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.06,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:goldsmith-t1:key-t3": {
+			"name": "Goldsmith Key III output",
+			"output": [
+				{
+					"itemId": "item:key-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -1667,21 +766,61 @@
 			"name": "Goldsmith Key IV output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:key-t4",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.35,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				},
 				{
-					"type": "chance",
-					"itemId": "item:pollution",
 					"chance": 0.06,
-					"quantity": 1
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:chest-t1": {
+			"name": "Heroes Guild Chest I expedition",
+			"output": [
+				{
+					"itemId": "item:chest-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:chest-t2": {
+			"name": "Heroes Guild Chest II expedition",
+			"output": [
+				{
+					"itemId": "item:chest-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:chest-t3": {
+			"name": "Heroes Guild Chest III expedition",
+			"output": [
+				{
+					"itemId": "item:chest-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:chest-t4": {
+			"name": "Heroes Guild Chest IV expedition",
+			"output": [
+				{
+					"itemId": "item:chest-t4",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1689,29 +828,209 @@
 			"name": "Heroes Guild grand expedition treasure",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:treasure-chest",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:university:blueprint-heroes-guild-t1": {
-			"name": "University Heroes Guild I blueprint output",
+		"loot:iron-mine-t1:iron-ore": {
+			"name": "Iron mine iron ore carts",
 			"output": [
 				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-heroes-guild-t1",
-					"quantity": 1
+					"itemId": "item:iron-ore",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:university:blueprint-glazier-workshop-t1": {
-			"name": "University Glazier Workshop blueprint output",
+		"loot:lumberjack-t1:log": {
+			"name": "Lumberjack logs",
 			"output": [
 				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-glazier-workshop-t1",
-					"quantity": 1
+					"itemId": "item:log",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t1:coin-from-beer": {
+			"name": "Market coins from beer",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t1:coin-from-bread": {
+			"name": "Market coins from bread",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t1:coin-from-cheese": {
+			"name": "Market coins from cheese",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t1:coin-from-feast": {
+			"name": "Market coins from feast",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t1:coin-from-sausage": {
+			"name": "Market coins from sausage",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t1:coin-from-wine-glass": {
+			"name": "Market coins from wine glass",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t2:coin-from-common-clothing": {
+			"name": "Market II coins from common clothing",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t2:coin-from-feast": {
+			"name": "Market II coins from feast",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 5,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t2:coin-from-luxury-clothing": {
+			"name": "Market II coins from luxury clothing",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 6,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:market-t2:coin-from-paper": {
+			"name": "Market II coins from paper",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:paper-mill-t1:paper": {
+			"name": "Paper Mill paper output",
+			"output": [
+				{
+					"itemId": "item:paper",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:pig-farm-t1:piglet": {
+			"name": "Pig farm piglets",
+			"output": [
+				{
+					"itemId": "item:piglet",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t1:clay-deposit": {
+			"name": "Prospector Guild 1 clay deposit output",
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t1:sand-deposit": {
+			"name": "Prospector Guild 1 sand deposit output",
+			"output": [
+				{
+					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:clay-deposit": {
+			"name": "Prospector Guild 2 clay deposit output",
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:coal-deposit": {
+			"name": "Prospector Guild 2 coal deposit output",
+			"output": [
+				{
+					"itemId": "item:coal-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:gold-deposit": {
+			"name": "Prospector Guild 2 gold deposit output",
+			"output": [
+				{
+					"itemId": "item:gold-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:iron-deposit": {
+			"name": "Prospector Guild 2 iron deposit output",
+			"output": [
+				{
+					"itemId": "item:iron-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1719,39 +1038,29 @@
 			"name": "Prospector Guild 2 marble deposit output",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:marble-deposit",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:university:blueprint-quarry-t2": {
-			"name": "University Quarry 2 blueprint output",
+		"loot:prospector-guild-t2:sand-deposit": {
+			"name": "Prospector Guild 2 sand deposit output",
 			"output": [
 				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-quarry-t2",
-					"quantity": 1
+					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:university:blueprint-stonemason-t2": {
-			"name": "University Stonemason 2 blueprint output",
+		"loot:quarry-t1:stone": {
+			"name": "Quarry stone",
 			"output": [
 				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-stonemason-t2",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:quarry-t2:stone": {
-			"name": "Quarry 2 stone",
-			"output": [
-				{
-					"type": "guaranteed",
 					"itemId": "item:stone",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1759,19 +1068,150 @@
 			"name": "Quarry 2 marble",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:marble",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
-		"loot:stonemason-t2:stone-block": {
-			"name": "Stonemason 2 stone blocks",
+		"loot:quarry-t2:stone": {
+			"name": "Quarry 2 stone",
 			"output": [
 				{
-					"type": "guaranteed",
+					"itemId": "item:stone",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:roof-tile-factory:roof-tiles": {
+			"name": "Roof tiles output",
+			"output": [
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:sand-pit:sand": {
+			"name": "Sand output",
+			"output": [
+				{
+					"itemId": "item:sand",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:sawmill-t1:plank": {
+			"name": "Sawmill planks",
+			"output": [
+				{
+					"itemId": "item:plank",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:school:basic-knowledge": {
+			"name": "School basic knowledge output",
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:sheep-pasture-t1:wool": {
+			"name": "Sheep pasture wool",
+			"output": [
+				{
+					"itemId": "item:wool",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:slaughterhouse-t1:sausage-raw-hide": {
+			"name": "Slaughterhouse sausage and raw hide",
+			"output": [
+				{
+					"itemId": "item:sausage",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:raw-hide",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:smelter-t1:gold-ingot": {
+			"name": "Smelter gold ingots",
+			"output": [
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.75,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:smelter-t1:iron-ingot": {
+			"name": "Smelter iron ingots",
+			"output": [
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.75,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:stonemason-t1:stone-block": {
+			"name": "Stonemason stone blocks",
+			"output": [
+				{
 					"itemId": "item:stone-block",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -1779,9 +1219,599 @@
 			"name": "Stonemason 2 marble blocks",
 			"output": [
 				{
-					"type": "guaranteed",
 					"itemId": "item:marble-block",
-					"quantity": 1
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:stonemason-t2:stone-block": {
+			"name": "Stonemason 2 stone blocks",
+			"output": [
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tailor-workshop-t1:common-clothing": {
+			"name": "Tailor Workshop common clothing",
+			"output": [
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tailor-workshop-t1:luxury-clothing": {
+			"name": "Tailor Workshop luxury clothing",
+			"output": [
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tannery-t1:leather": {
+			"name": "Tannery leather",
+			"output": [
+				{
+					"itemId": "item:leather",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tavern-t1:beer": {
+			"name": "Tavern beers",
+			"output": [
+				{
+					"itemId": "item:beer",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tavern-t1:wine-glass": {
+			"name": "Tavern wine glasses",
+			"output": [
+				{
+					"itemId": "item:wine-glass",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-lumberjack-t1": {
+			"name": "Blueprint: Lumberjack I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-lumberjack-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-quarry-t1": {
+			"name": "Blueprint: Quarry I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-quarry-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-sawmill-t1": {
+			"name": "Blueprint: Sawmill I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-sawmill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-stonemason-t1": {
+			"name": "Blueprint: Stonemason I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-stonemason-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-townhall-t2": {
+			"name": "Blueprint: Town Hall II output",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t1:blueprint-well-t1": {
+			"name": "Blueprint: Well I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-well-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-cattle-farm-t1": {
+			"name": "Blueprint: Cattle Farm I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-cattle-farm-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-chicken-coop-t1": {
+			"name": "Blueprint: Chicken Coop I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-chicken-coop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-farm-t1": {
+			"name": "Blueprint: Farm I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-farm-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-pig-farm-t1": {
+			"name": "Blueprint: Pig Farm I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-pig-farm-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-sheep-pasture-t1": {
+			"name": "Blueprint: Sheep Pasture I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-sheep-pasture-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-townhall-t3": {
+			"name": "Blueprint: Town Hall III output",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:blueprint-vegetable-garden-t1": {
+			"name": "Blueprint: Vegetable Garden I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-vegetable-garden-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:food-supply": {
+			"name": "Food Supply output",
+			"output": [
+				{
+					"itemId": "item:food-supply",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t2:wheat-field": {
+			"name": "Survey: Wheat Field output",
+			"output": [
+				{
+					"itemId": "item:wheat-field",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-bakery-t1": {
+			"name": "Blueprint: Bakery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-brewery-t1": {
+			"name": "Blueprint: Brewery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-brewery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-cookhouse-t1": {
+			"name": "Blueprint: Cookhouse I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-cookhouse-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-dairy-t1": {
+			"name": "Blueprint: Dairy I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-dairy-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-market-t1": {
+			"name": "Blueprint: Market output",
+			"output": [
+				{
+					"itemId": "item:blueprint-market-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-slaughterhouse-t1": {
+			"name": "Blueprint: Slaughterhouse I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-slaughterhouse-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-tavern-t1": {
+			"name": "Blueprint: Tavern I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-tavern-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-townhall-t4": {
+			"name": "Blueprint: Town Hall IV output",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-windmill-t1": {
+			"name": "Blueprint: Windmill I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-windmill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:blueprint-winery-t1": {
+			"name": "Blueprint: Winery I output",
+			"output": [
+				{
+					"itemId": "item:blueprint-winery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:hop-field": {
+			"name": "Survey: Hop Field output",
+			"output": [
+				{
+					"itemId": "item:hop-field",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t3:vineyard": {
+			"name": "Survey: Vineyard output",
+			"output": [
+				{
+					"itemId": "item:vineyard",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-civic-office-t1": {
+			"name": "Town Hall IV Civic Office I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-civic-office-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-dye-workshop-t1": {
+			"name": "Town Hall IV Dye Workshop I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-dye-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-market-t2": {
+			"name": "Town Hall IV Market II blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-market-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-paper-mill-t1": {
+			"name": "Town Hall IV Paper Mill I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-paper-mill-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-prospector-guild-t1": {
+			"name": "Town Hall IV Prospector Guild 1 blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-prospector-guild-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-school": {
+			"name": "Town Hall IV School blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-school",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-tailor-workshop-t1": {
+			"name": "Town Hall IV Tailor Workshop I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-tailor-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-tannery-t1": {
+			"name": "Town Hall IV Tannery I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-tannery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-weaver-hut-t1": {
+			"name": "Town Hall IV Weaver Hut I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-weaver-hut-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:advanced-knowledge": {
+			"name": "University advanced knowledge output",
+			"output": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:basic-knowledge": {
+			"name": "University basic knowledge output",
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-cathedral": {
+			"name": "University Cathedral blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-cathedral",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-glazier-workshop-t1": {
+			"name": "University Glazier Workshop blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-glazier-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-heroes-guild-t1": {
+			"name": "University Heroes Guild I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-house-of-engineers": {
+			"name": "University House of Engineers blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-of-engineers",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-mage-lodge": {
+			"name": "University Mage Lodge blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-mage-lodge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-quarry-t2": {
+			"name": "University Quarry 2 blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-quarry-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-stonemason-t2": {
+			"name": "University Stonemason 2 blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-stonemason-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:master-knowledge": {
+			"name": "University master knowledge output",
+			"output": [
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:vegetable-garden-t1:vegetables": {
+			"name": "Vegetable garden vegetables",
+			"output": [
+				{
+					"itemId": "item:vegetables",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:weaver-hut-t1:common-cloth": {
+			"name": "Weaver Hut common cloth",
+			"output": [
+				{
+					"itemId": "item:common-cloth",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:well-t1:water": {
+			"name": "Well water",
+			"output": [
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:windmill-t1:flour": {
+			"name": "Windmill flour",
+			"output": [
+				{
+					"itemId": "item:flour",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:winery-t1:grapes": {
+			"name": "Winery grapes",
+			"output": [
+				{
+					"itemId": "item:grapes",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:winery-t1:wine-barrel": {
+			"name": "Winery wine barrels",
+			"output": [
+				{
+					"itemId": "item:wine-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:winery-t1:wine-barrel-from-wine-glasses": {
+			"name": "Winery wine barrels from glasses",
+			"output": [
+				{
+					"itemId": "item:wine-barrel",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		}

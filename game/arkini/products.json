@@ -1,1280 +1,1304 @@
 {
 	"products": {
-		"product:lumberjack-t1:log": {
-			"name": "Log",
-			"durationMs": 5000,
+		"product:academy:advanced-knowledge": {
+			"durationMs": 22000,
+			"inputRefId": "input:academy:advanced-knowledge",
+			"name": "Advanced Knowledge",
+			"outputTableId": "loot:academy:advanced-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:lumberjack-t1:log"
+			"requirementIds": []
 		},
-		"product:sawmill-t1:plank": {
-			"name": "Plank",
-			"durationMs": 5000,
+		"product:academy:basic-knowledge": {
+			"durationMs": 8000,
+			"inputRefId": "input:academy:basic-knowledge",
+			"name": "Basic Knowledge",
+			"outputTableId": "loot:academy:basic-knowledge",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:sawmill-t1:log",
-			"requirementIds": [],
-			"outputTableId": "loot:sawmill-t1:plank"
+			"requirementIds": []
 		},
-		"product:quarry-t1:stone": {
-			"name": "Stone",
-			"durationMs": 5000,
+		"product:academy:blueprint-armory-t1": {
+			"durationMs": 2500,
+			"inputRefId": "input:academy:blueprint-armory-t1",
+			"name": "Blueprint: Armory I",
+			"outputTableId": "loot:academy:blueprint-armory-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:quarry-t1:stone"
+			"requirementIds": []
 		},
-		"product:stonemason-t1:stone-block": {
-			"name": "Stone Block",
-			"durationMs": 5000,
+		"product:academy:blueprint-blacksmith-t1": {
+			"durationMs": 2500,
+			"inputRefId": "input:academy:blueprint-blacksmith-t1",
+			"name": "Blueprint: Blacksmith I",
+			"outputTableId": "loot:academy:blueprint-blacksmith-t1",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:stonemason-t1:stone",
-			"requirementIds": [],
-			"outputTableId": "loot:stonemason-t1:stone-block"
+			"requirementIds": []
 		},
-		"product:well-t1:water": {
-			"name": "Water",
-			"durationMs": 5000,
+		"product:academy:blueprint-brickyard": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-brickyard",
+			"name": "Blueprint: Brickyard",
+			"outputTableId": "loot:academy:blueprint-brickyard",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:well-t1:water"
+			"requirementIds": []
 		},
-		"product:farm-t1:grain": {
-			"name": "Grain",
-			"durationMs": 5000,
+		"product:academy:blueprint-charcoal-burner-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-charcoal-burner-t1",
+			"name": "Blueprint: Charcoal Burner I",
+			"outputTableId": "loot:academy:blueprint-charcoal-burner-t1",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:farm-t1:water",
-			"requirementIds": [],
-			"outputTableId": "loot:farm-t1:grain",
-			"hinderedBy": [
-				{
-					"type": "proximity",
-					"itemIds": [
-						"item:pollution"
-					],
-					"distance": 2,
-					"durationFactor": 0.5
-				}
+			"requirementIds": []
+		},
+		"product:academy:blueprint-clay-pit": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-clay-pit",
+			"name": "Blueprint: Clay Pit",
+			"outputTableId": "loot:academy:blueprint-clay-pit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-coal-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-coal-mine-t1",
+			"name": "Blueprint: Coal Mine I",
+			"outputTableId": "loot:academy:blueprint-coal-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-construction-yard-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-construction-yard-t1",
+			"name": "Blueprint: Construction Yard I",
+			"outputTableId": "loot:academy:blueprint-construction-yard-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-glassworks": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-glassworks",
+			"name": "Blueprint: Glassworks",
+			"outputTableId": "loot:academy:blueprint-glassworks",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-gold-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-gold-mine-t1",
+			"name": "Blueprint: Gold Mine I",
+			"outputTableId": "loot:academy:blueprint-gold-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-goldsmith-t1": {
+			"durationMs": 2500,
+			"inputRefId": "input:academy:blueprint-goldsmith-t1",
+			"name": "Blueprint: Goldsmith I",
+			"outputTableId": "loot:academy:blueprint-goldsmith-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-iron-mine-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-iron-mine-t1",
+			"name": "Blueprint: Iron Mine I",
+			"outputTableId": "loot:academy:blueprint-iron-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-prospector-guild-t2": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-prospector-guild-t2",
+			"name": "Blueprint: Prospector Guild 2",
+			"outputTableId": "loot:academy:blueprint-prospector-guild-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-purifier-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-purifier-t1",
+			"name": "Blueprint: Purifier I",
+			"outputTableId": "loot:academy:blueprint-purifier-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-roof-tile-factory": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-roof-tile-factory",
+			"name": "Blueprint: Roof Tile Factory",
+			"outputTableId": "loot:academy:blueprint-roof-tile-factory",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-sand-pit": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-sand-pit",
+			"name": "Blueprint: Sand Pit",
+			"outputTableId": "loot:academy:blueprint-sand-pit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-smelter-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-smelter-t1",
+			"name": "Blueprint: Smelter I",
+			"outputTableId": "loot:academy:blueprint-smelter-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-university": {
+			"durationMs": 2500,
+			"inputRefId": "input:academy:blueprint-university",
+			"name": "Blueprint: University",
+			"outputTableId": "loot:academy:blueprint-university",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:armory-t1:iron-armor": {
+			"durationMs": 36000,
+			"inputRefId": "input:armory-t1:iron-armor",
+			"name": "Iron Armor",
+			"outputTableId": "loot:armory-t1:iron-armor",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
 			]
 		},
-		"product:windmill-t1:flour": {
-			"name": "Flour",
-			"durationMs": 6000,
+		"product:armory-t1:leather-armor": {
+			"durationMs": 22000,
+			"inputRefId": "input:armory-t1:leather-armor",
+			"name": "Leather Armor",
+			"outputTableId": "loot:armory-t1:leather-armor",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:windmill-t1:grain",
-			"requirementIds": [],
-			"outputTableId": "loot:windmill-t1:flour"
+			"requirementIds": []
 		},
 		"product:bakery-t1:bread": {
-			"name": "Bread",
 			"durationMs": 8000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:bakery-t1:flour-water",
-			"requirementIds": [],
-			"outputTableId": "loot:bakery-t1:bread"
-		},
-		"product:pig-farm-t1:piglet": {
-			"name": "Piglet",
-			"durationMs": 5000,
+			"name": "Bread",
+			"outputTableId": "loot:bakery-t1:bread",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:pig-farm-t1:grain-water",
-			"requirementIds": [],
-			"outputTableId": "loot:pig-farm-t1:piglet",
-			"hinderedBy": [
-				{
-					"type": "proximity",
-					"itemIds": [
-						"item:pollution"
-					],
-					"distance": 2,
-					"durationFactor": 0.5
-				}
+			"requirementIds": []
+		},
+		"product:blacksmith-t1:axe": {
+			"durationMs": 15000,
+			"inputRefId": "input:blacksmith-t1:axe",
+			"name": "Axe",
+			"outputTableId": "loot:blacksmith-t1:axe",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:blacksmith-t1:nails": {
+			"durationMs": 10000,
+			"inputRefId": "input:blacksmith-t1:nails",
+			"name": "Nails",
+			"outputTableId": "loot:blacksmith-t1:nails",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:blacksmith-t1:sword": {
+			"durationMs": 22000,
+			"inputRefId": "input:blacksmith-t1:sword",
+			"name": "Sword",
+			"outputTableId": "loot:blacksmith-t1:sword",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
 			]
 		},
 		"product:brewery-t1:beer-barrel": {
-			"name": "Beer Barrel",
 			"durationMs": 5000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:brewery-t1:hops-water",
-			"requirementIds": [],
-			"outputTableId": "loot:brewery-t1:beer-barrel"
-		},
-		"product:tavern-t1:beer": {
-			"name": "Beer",
-			"durationMs": 5000,
+			"name": "Beer Barrel",
+			"outputTableId": "loot:brewery-t1:beer-barrel",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:tavern-t1:beer-barrel",
-			"requirementIds": [],
-			"outputTableId": "loot:tavern-t1:beer"
+			"requirementIds": []
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
-			"name": "Beer Barrel",
 			"durationMs": 5000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:brewery-t1:beer-to-barrel",
-			"requirementIds": [],
-			"outputTableId": "loot:brewery-t1:beer-barrel-from-beer"
+			"name": "Beer Barrel",
+			"outputTableId": "loot:brewery-t1:beer-barrel-from-beer",
+			"placement": "board_then_inventory",
+			"requirementIds": []
 		},
 		"product:brewery-t1:hops": {
-			"name": "Hops",
 			"durationMs": 5000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:brewery-t1:water",
-			"requirementIds": [],
-			"outputTableId": "loot:brewery-t1:hops"
-		},
-		"product:winery-t1:grapes": {
-			"name": "Grapes",
-			"durationMs": 5000,
+			"name": "Hops",
+			"outputTableId": "loot:brewery-t1:hops",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:winery-t1:water",
-			"requirementIds": [],
-			"outputTableId": "loot:winery-t1:grapes"
-		},
-		"product:winery-t1:wine-barrel": {
-			"name": "Wine Barrel",
-			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:winery-t1:grapes-water",
-			"requirementIds": [],
-			"outputTableId": "loot:winery-t1:wine-barrel"
-		},
-		"product:tavern-t1:wine-glass": {
-			"name": "Wine Glass",
-			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:tavern-t1:wine-barrel",
-			"requirementIds": [],
-			"outputTableId": "loot:tavern-t1:wine-glass"
-		},
-		"product:winery-t1:wine-barrel-from-wine-glasses": {
-			"name": "Wine Barrel",
-			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:winery-t1:wine-glass-to-barrel",
-			"requirementIds": [],
-			"outputTableId": "loot:winery-t1:wine-barrel-from-wine-glasses"
-		},
-		"product:coal-mine-t1:coal": {
-			"name": "Coal Cart",
-			"durationMs": 8000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:coal-mine-t1:bread-water",
-			"requirementIds": [],
-			"outputTableId": "loot:coal-mine-t1:coal"
-		},
-		"product:iron-mine-t1:iron-ore": {
-			"name": "Iron Ore Cart",
-			"durationMs": 8000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:iron-mine-t1:sausage-beer",
-			"requirementIds": [],
-			"outputTableId": "loot:iron-mine-t1:iron-ore"
-		},
-		"product:gold-mine-t1:gold-ore": {
-			"name": "Gold Ore Cart",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:gold-mine-t1:bread-wine",
-			"requirementIds": [],
-			"outputTableId": "loot:gold-mine-t1:gold-ore"
-		},
-		"product:smelter-t1:iron-ingot": {
-			"name": "Iron Ingot",
-			"durationMs": 10000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:smelter-t1:iron-ore-coal-water",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:smelter-t1:iron-ingot"
-		},
-		"product:smelter-t1:gold-ingot": {
-			"name": "Gold Ingot",
-			"durationMs": 10000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:smelter-t1:gold-ore-coal-water",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:smelter-t1:gold-ingot"
-		},
-		"product:purifier-t1:pollution": {
-			"name": "Purify Pollution",
-			"durationMs": 6000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:purifier-t1:pollution",
 			"requirementIds": []
 		},
-		"product:purifier-t1:pollution-bulk": {
-			"name": "Purify Pollution x4",
-			"durationMs": 18000,
+		"product:brickyard:bricks": {
+			"durationMs": 8500,
+			"inputRefId": "input:brickyard:bricks",
+			"name": "Bricks",
+			"outputTableId": "loot:brickyard:bricks",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:purifier-t1:pollution-bulk",
-			"requirementIds": []
-		},
-		"product:townhall-t1:blueprint-lumberjack-t1": {
-			"name": "Blueprint: Lumberjack I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t1:blueprint-lumberjack-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t1:blueprint-lumberjack-t1"
-		},
-		"product:townhall-t1:blueprint-sawmill-t1": {
-			"name": "Blueprint: Sawmill I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t1:blueprint-sawmill-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t1:blueprint-sawmill-t1"
-		},
-		"product:townhall-t1:blueprint-quarry-t1": {
-			"name": "Blueprint: Quarry I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t1:blueprint-quarry-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t1:blueprint-quarry-t1"
-		},
-		"product:townhall-t1:blueprint-stonemason-t1": {
-			"name": "Blueprint: Stonemason I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t1:blueprint-stonemason-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t1:blueprint-stonemason-t1"
-		},
-		"product:townhall-t1:blueprint-well-t1": {
-			"name": "Blueprint: Well I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t1:blueprint-well-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t1:blueprint-well-t1"
-		},
-		"product:townhall-t2:blueprint-pig-farm-t1": {
-			"name": "Blueprint: Pig Farm I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-pig-farm-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-pig-farm-t1"
-		},
-		"product:townhall-t1:blueprint-townhall-t2": {
-			"name": "Blueprint: Town Hall II",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t1:blueprint-townhall-t2",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t1:blueprint-townhall-t2"
-		},
-		"product:townhall-t2:blueprint-townhall-t3": {
-			"name": "Blueprint: Town Hall III",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-townhall-t3",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-townhall-t3"
-		},
-		"product:townhall-t3:blueprint-townhall-t4": {
-			"name": "Blueprint: Town Hall IV",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-townhall-t4",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-townhall-t4"
-		},
-		"product:heroes-guild-t1:chest-t1": {
-			"name": "Chest I Expedition",
-			"durationMs": 90000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:heroes-guild-t1:chest-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:chest-t1"
-		},
-		"product:heroes-guild-t1:chest-t2": {
-			"name": "Chest II Expedition",
-			"durationMs": 150000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:heroes-guild-t1:chest-t2",
-			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:chest-t2"
-		},
-		"product:heroes-guild-t1:chest-t3": {
-			"name": "Chest III Expedition",
-			"durationMs": 240000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:heroes-guild-t1:chest-t3",
-			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:chest-t3"
-		},
-		"product:heroes-guild-t1:chest-t4": {
-			"name": "Chest IV Expedition",
-			"durationMs": 420000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:heroes-guild-t1:chest-t4",
-			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:chest-t4"
-		},
-		"product:goldsmith-t1:key-t3": {
-			"name": "Key III",
-			"durationMs": 22000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:goldsmith-t1:key-t3",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:goldsmith-t1:key-t3"
-		},
-		"product:blacksmith-t1:axe": {
-			"name": "Axe",
-			"durationMs": 15000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:blacksmith-t1:axe",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:blacksmith-t1:axe"
-		},
-		"product:blacksmith-t1:sword": {
-			"name": "Sword",
-			"durationMs": 22000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:blacksmith-t1:sword",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:blacksmith-t1:sword"
-		},
-		"product:school:basic-knowledge": {
-			"name": "Basic Knowledge",
-			"durationMs": 12000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:school:basic-knowledge",
-			"requirementIds": [],
-			"outputTableId": "loot:school:basic-knowledge"
-		},
-		"product:academy:basic-knowledge": {
-			"name": "Basic Knowledge",
-			"durationMs": 8000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:basic-knowledge",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:basic-knowledge"
-		},
-		"product:academy:advanced-knowledge": {
-			"name": "Advanced Knowledge",
-			"durationMs": 22000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:advanced-knowledge",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:advanced-knowledge"
-		},
-		"product:academy:blueprint-prospector-guild-t2": {
-			"name": "Blueprint: Prospector Guild 2",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-prospector-guild-t2",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-prospector-guild-t2"
-		},
-		"product:university:basic-knowledge": {
-			"name": "Basic Knowledge",
-			"durationMs": 6000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:university:basic-knowledge",
-			"requirementIds": [],
-			"outputTableId": "loot:university:basic-knowledge"
-		},
-		"product:university:advanced-knowledge": {
-			"name": "Advanced Knowledge",
-			"durationMs": 14000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:university:advanced-knowledge",
-			"requirementIds": [],
-			"outputTableId": "loot:university:advanced-knowledge"
-		},
-		"product:university:master-knowledge": {
-			"name": "Master Knowledge",
-			"durationMs": 36000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:university:master-knowledge",
-			"requirementIds": [],
-			"outputTableId": "loot:university:master-knowledge"
-		},
-		"product:townhall-t3:blueprint-windmill-t1": {
-			"name": "Blueprint: Windmill I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-windmill-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-windmill-t1"
-		},
-		"product:townhall-t3:blueprint-bakery-t1": {
-			"name": "Blueprint: Bakery I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-bakery-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-bakery-t1"
-		},
-		"product:townhall-t3:blueprint-slaughterhouse-t1": {
-			"name": "Blueprint: Slaughterhouse I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-slaughterhouse-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-slaughterhouse-t1"
-		},
-		"product:townhall-t3:hop-field": {
-			"name": "Survey: Hop Field",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:hop-field",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:hop-field"
-		},
-		"product:townhall-t3:blueprint-brewery-t1": {
-			"name": "Blueprint: Brewery I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-brewery-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-brewery-t1"
-		},
-		"product:townhall-t3:blueprint-tavern-t1": {
-			"name": "Blueprint: Tavern I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-tavern-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-tavern-t1"
-		},
-		"product:townhall-t3:vineyard": {
-			"name": "Survey: Vineyard",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:vineyard",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:vineyard"
-		},
-		"product:townhall-t3:blueprint-winery-t1": {
-			"name": "Blueprint: Winery I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t3:blueprint-winery-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-winery-t1"
-		},
-		"product:townhall-t2:wheat-field": {
-			"name": "Survey: Wheat Field",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:wheat-field",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:wheat-field"
-		},
-		"product:townhall-t2:blueprint-farm-t1": {
-			"name": "Blueprint: Farm I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-farm-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-farm-t1"
-		},
-		"product:townhall-t2:blueprint-cattle-farm-t1": {
-			"name": "Blueprint: Cattle Farm I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-cattle-farm-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-cattle-farm-t1"
-		},
-		"product:townhall-t2:blueprint-chicken-coop-t1": {
-			"name": "Blueprint: Chicken Coop I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-chicken-coop-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-chicken-coop-t1"
-		},
-		"product:townhall-t2:blueprint-sheep-pasture-t1": {
-			"name": "Blueprint: Sheep Pasture I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-sheep-pasture-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-sheep-pasture-t1"
-		},
-		"product:townhall-t2:blueprint-vegetable-garden-t1": {
-			"name": "Blueprint: Vegetable Garden I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:blueprint-vegetable-garden-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:blueprint-vegetable-garden-t1"
-		},
-		"product:townhall-t2:food-supply": {
-			"name": "Food Supply",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t2:food-supply",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t2:food-supply"
+			]
 		},
 		"product:cattle-farm-t1:milk": {
-			"name": "Milk",
 			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:cattle-farm-t1:grain-water",
-			"requirementIds": [],
-			"outputTableId": "loot:cattle-farm-t1:milk",
 			"hinderedBy": [
 				{
-					"type": "proximity",
+					"distance": 2,
+					"durationFactor": 0.5,
 					"itemIds": [
 						"item:pollution"
 					],
-					"distance": 2,
-					"durationFactor": 0.5
+					"type": "proximity"
 				}
+			],
+			"inputRefId": "input:cattle-farm-t1:grain-water",
+			"name": "Milk",
+			"outputTableId": "loot:cattle-farm-t1:milk",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:charcoal-burner-t1:charcoal": {
+			"durationMs": 6500,
+			"inputRefId": "input:charcoal-burner-t1:charcoal",
+			"name": "Charcoal",
+			"outputTableId": "loot:charcoal-burner-t1:charcoal",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
 			]
 		},
 		"product:chicken-coop-t1:egg": {
-			"name": "Egg",
 			"durationMs": 5000,
-			"placement": "board_then_inventory",
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
 			"inputRefId": "input:chicken-coop-t1:grain-water",
-			"requirementIds": [],
+			"name": "Egg",
 			"outputTableId": "loot:chicken-coop-t1:egg",
-			"hinderedBy": [
-				{
-					"type": "proximity",
-					"itemIds": [
-						"item:pollution"
-					],
-					"distance": 2,
-					"durationFactor": 0.5
-				}
-			]
-		},
-		"product:sheep-pasture-t1:wool": {
-			"name": "Wool",
-			"durationMs": 5000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:sheep-pasture-t1:grain-water",
-			"requirementIds": [],
-			"outputTableId": "loot:sheep-pasture-t1:wool",
-			"hinderedBy": [
-				{
-					"type": "proximity",
-					"itemIds": [
-						"item:pollution"
-					],
-					"distance": 2,
-					"durationFactor": 0.5
-				}
-			]
-		},
-		"product:vegetable-garden-t1:vegetables": {
-			"name": "Vegetables",
-			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:vegetable-garden-t1:water",
-			"requirementIds": [],
-			"outputTableId": "loot:vegetable-garden-t1:vegetables",
-			"hinderedBy": [
-				{
-					"type": "proximity",
-					"itemIds": [
-						"item:pollution"
-					],
-					"distance": 2,
-					"durationFactor": 0.5
-				}
-			]
-		},
-		"product:dairy-t1:cheese": {
-			"name": "Cheese",
-			"durationMs": 7000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:dairy-t1:cheese",
-			"inputRefId": "input:dairy-t1:milk"
-		},
-		"product:cookhouse-t1:feast": {
-			"name": "Feast",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:cookhouse-t1:feast",
-			"inputRefId": "input:cookhouse-t1:feast"
-		},
-		"product:market-t1:coin-from-bread": {
-			"name": "Coins from Bread",
-			"durationMs": 4000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t1:coin-from-bread",
-			"inputRefId": "input:market-t1:coin-from-bread"
-		},
-		"product:market-t1:coin-from-sausage": {
-			"name": "Coins from Sausage",
-			"durationMs": 4000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t1:coin-from-sausage",
-			"inputRefId": "input:market-t1:coin-from-sausage"
-		},
-		"product:market-t1:coin-from-cheese": {
-			"name": "Coins from Cheese",
-			"durationMs": 4000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t1:coin-from-cheese",
-			"inputRefId": "input:market-t1:coin-from-cheese"
-		},
-		"product:market-t1:coin-from-beer": {
-			"name": "Coins from Beer",
-			"durationMs": 4000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t1:coin-from-beer",
-			"inputRefId": "input:market-t1:coin-from-beer"
-		},
-		"product:market-t1:coin-from-wine-glass": {
-			"name": "Coins from Wine Glass",
-			"durationMs": 4000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t1:coin-from-wine-glass",
-			"inputRefId": "input:market-t1:coin-from-wine-glass"
-		},
-		"product:market-t1:coin-from-feast": {
-			"name": "Coins from Feast",
-			"durationMs": 6000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t1:coin-from-feast",
-			"inputRefId": "input:market-t1:coin-from-feast"
-		},
-		"product:townhall-t3:blueprint-dairy-t1": {
-			"name": "Blueprint: Dairy I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-dairy-t1",
-			"inputRefId": "input:townhall-t3:blueprint-dairy-t1"
-		},
-		"product:townhall-t3:blueprint-cookhouse-t1": {
-			"name": "Blueprint: Cookhouse I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-cookhouse-t1",
-			"inputRefId": "input:townhall-t3:blueprint-cookhouse-t1"
-		},
-		"product:townhall-t3:blueprint-market-t1": {
-			"name": "Blueprint: Market",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t3:blueprint-market-t1",
-			"inputRefId": "input:townhall-t3:blueprint-market-t1"
-		},
-		"product:paper-mill-t1:paper": {
-			"name": "Paper",
-			"durationMs": 7000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:paper-mill-t1:paper",
-			"requirementIds": [],
-			"outputTableId": "loot:paper-mill-t1:paper"
-		},
-		"product:civic-office-t1:building-permit": {
-			"name": "Building Permit",
-			"durationMs": 10000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:civic-office-t1:building-permit",
-			"requirementIds": [],
-			"outputTableId": "loot:civic-office-t1:building-permit"
-		},
-		"product:prospector-guild-t1:clay-deposit": {
-			"name": "Prospect: Clay Deposit",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:prospector-guild-t1:clay-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:prospector-guild-t1:clay-deposit"
-		},
-		"product:prospector-guild-t1:sand-deposit": {
-			"name": "Prospect: Sand Deposit",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:prospector-guild-t1:sand-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:prospector-guild-t1:sand-deposit"
-		},
-		"product:market-t2:coin-from-paper": {
-			"name": "Coins from Paper",
-			"durationMs": 3500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:market-t2:coin-from-paper",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t2:coin-from-paper"
-		},
-		"product:market-t2:coin-from-feast": {
-			"name": "Better Coins from Feast",
-			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:market-t2:coin-from-feast",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t2:coin-from-feast"
-		},
-		"product:townhall-t4:blueprint-paper-mill-t1": {
-			"name": "Blueprint: Paper Mill I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-paper-mill-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-paper-mill-t1"
-		},
-		"product:townhall-t4:blueprint-school": {
-			"name": "Blueprint: School",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-school",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-school"
-		},
-		"product:townhall-t4:blueprint-civic-office-t1": {
-			"name": "Blueprint: Civic Office I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-civic-office-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-civic-office-t1"
-		},
-		"product:townhall-t4:blueprint-market-t2": {
-			"name": "Blueprint: Market II",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-market-t2",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-market-t2"
-		},
-		"product:townhall-t4:blueprint-prospector-guild-t1": {
-			"name": "Blueprint: Prospector Guild 1",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-prospector-guild-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-prospector-guild-t1"
-		},
-		"product:slaughterhouse-t1:sausage-raw-hide": {
-			"name": "Sausage + Raw Hide",
-			"durationMs": 8000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:slaughterhouse-t1:piglet",
-			"requirementIds": [],
-			"outputTableId": "loot:slaughterhouse-t1:sausage-raw-hide"
-		},
-		"product:tannery-t1:leather": {
-			"name": "Leather",
-			"durationMs": 8000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:tannery-t1:leather",
-			"requirementIds": [],
-			"outputTableId": "loot:tannery-t1:leather"
-		},
-		"product:weaver-hut-t1:common-cloth": {
-			"name": "Common Cloth",
-			"durationMs": 7000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:weaver-hut-t1:common-cloth",
-			"requirementIds": [],
-			"outputTableId": "loot:weaver-hut-t1:common-cloth"
-		},
-		"product:dye-workshop-t1:luxury-cloth": {
-			"name": "Luxury Cloth",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:dye-workshop-t1:luxury-cloth",
-			"requirementIds": [],
-			"outputTableId": "loot:dye-workshop-t1:luxury-cloth"
-		},
-		"product:dye-workshop-t1:pigment": {
-			"name": "Pigment",
-			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:dye-workshop-t1:pigment",
-			"requirementIds": [],
-			"outputTableId": "loot:dye-workshop-t1:pigment"
-		},
-		"product:tailor-workshop-t1:common-clothing": {
-			"name": "Common Clothing",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:tailor-workshop-t1:common-clothing",
-			"requirementIds": [],
-			"outputTableId": "loot:tailor-workshop-t1:common-clothing"
-		},
-		"product:tailor-workshop-t1:luxury-clothing": {
-			"name": "Luxury Clothing",
-			"durationMs": 12000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:tailor-workshop-t1:luxury-clothing",
-			"requirementIds": [],
-			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing"
-		},
-		"product:market-t2:coin-from-common-clothing": {
-			"name": "Coins from Common Clothing",
-			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:market-t2:coin-from-common-clothing",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t2:coin-from-common-clothing"
-		},
-		"product:market-t2:coin-from-luxury-clothing": {
-			"name": "Coins from Luxury Clothing",
-			"durationMs": 5000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:market-t2:coin-from-luxury-clothing",
-			"requirementIds": [],
-			"outputTableId": "loot:market-t2:coin-from-luxury-clothing"
-		},
-		"product:townhall-t4:blueprint-tannery-t1": {
-			"name": "Blueprint: Tannery I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-tannery-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-tannery-t1"
-		},
-		"product:townhall-t4:blueprint-weaver-hut-t1": {
-			"name": "Blueprint: Weaver Hut I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-weaver-hut-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-weaver-hut-t1"
-		},
-		"product:townhall-t4:blueprint-dye-workshop-t1": {
-			"name": "Blueprint: Dye Workshop I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-dye-workshop-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1"
-		},
-		"product:townhall-t4:blueprint-tailor-workshop-t1": {
-			"name": "Blueprint: Tailor Workshop I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-tailor-workshop-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-tailor-workshop-t1"
-		},
-		"product:charcoal-burner-t1:charcoal": {
-			"name": "Charcoal",
-			"durationMs": 6500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:charcoal-burner-t1:charcoal",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:charcoal-burner-t1:charcoal"
-		},
-		"product:clay-pit:clay": {
-			"name": "Clay",
-			"durationMs": 6500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:clay-pit:clay",
-			"requirementIds": [],
-			"outputTableId": "loot:clay-pit:clay"
-		},
-		"product:sand-pit:sand": {
-			"name": "Sand",
-			"durationMs": 6500,
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:sand-pit:sand"
-		},
-		"product:brickyard:bricks": {
-			"name": "Bricks",
-			"durationMs": 8500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:brickyard:bricks",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:brickyard:bricks"
-		},
-		"product:glassworks:glass": {
-			"name": "Glass",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:glassworks:glass",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:glassworks:glass"
-		},
-		"product:glazier-workshop-t1:stained-glass": {
-			"name": "Stained Glass",
-			"durationMs": 14000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:glazier-workshop-t1:stained-glass",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:glazier-workshop-t1:stained-glass"
-		},
-		"product:roof-tile-factory:roof-tiles": {
-			"name": "Roof Tiles",
-			"durationMs": 8500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:roof-tile-factory:roof-tiles",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:roof-tile-factory:roof-tiles"
-		},
-		"product:construction-yard-t1:construction-bundle": {
-			"name": "Construction Bundle",
-			"durationMs": 12000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:construction-yard-t1:construction-bundle",
-			"requirementIds": [],
-			"outputTableId": "loot:construction-yard-t1:construction-bundle"
-		},
-		"product:academy:blueprint-coal-mine-t1": {
-			"name": "Blueprint: Coal Mine I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-coal-mine-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-coal-mine-t1"
-		},
-		"product:academy:blueprint-iron-mine-t1": {
-			"name": "Blueprint: Iron Mine I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-iron-mine-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-iron-mine-t1"
-		},
-		"product:academy:blueprint-gold-mine-t1": {
-			"name": "Blueprint: Gold Mine I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-gold-mine-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-gold-mine-t1"
-		},
-		"product:academy:blueprint-smelter-t1": {
-			"name": "Blueprint: Smelter I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-smelter-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-smelter-t1"
-		},
-		"product:academy:blueprint-purifier-t1": {
-			"name": "Blueprint: Purifier I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-purifier-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-purifier-t1"
-		},
-		"product:prospector-guild-t2:coal-deposit": {
-			"name": "Prospect: Coal Deposit",
-			"durationMs": 10000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:prospector-guild-t2:coal-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:prospector-guild-t2:coal-deposit"
-		},
-		"product:prospector-guild-t2:iron-deposit": {
-			"name": "Prospect: Iron Deposit",
-			"durationMs": 10000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:prospector-guild-t2:iron-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:prospector-guild-t2:iron-deposit"
-		},
-		"product:prospector-guild-t2:gold-deposit": {
-			"name": "Prospect: Gold Deposit",
-			"durationMs": 12000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:prospector-guild-t2:gold-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:prospector-guild-t2:gold-deposit"
-		},
-		"product:prospector-guild-t2:sand-deposit": {
-			"name": "Prospect: Sand Deposit",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:prospector-guild-t2:sand-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:prospector-guild-t2:sand-deposit"
-		},
-		"product:prospector-guild-t2:clay-deposit": {
-			"name": "Prospect: Clay Deposit",
-			"durationMs": 9000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:prospector-guild-t2:clay-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:prospector-guild-t2:clay-deposit"
+			"requirementIds": []
 		},
 		"product:civic-office-t1:blueprint-academy": {
-			"name": "Blueprint: Academy",
 			"durationMs": 2500,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:civic-office-t1:blueprint-academy",
-			"requirementIds": [],
-			"outputTableId": "loot:civic-office-t1:blueprint-academy"
-		},
-		"product:academy:blueprint-charcoal-burner-t1": {
-			"name": "Blueprint: Charcoal Burner I",
-			"durationMs": 2000,
+			"name": "Blueprint: Academy",
+			"outputTableId": "loot:civic-office-t1:blueprint-academy",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-charcoal-burner-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-charcoal-burner-t1"
+			"requirementIds": []
 		},
-		"product:academy:blueprint-clay-pit": {
-			"name": "Blueprint: Clay Pit",
-			"durationMs": 2000,
+		"product:civic-office-t1:building-permit": {
+			"durationMs": 10000,
+			"inputRefId": "input:civic-office-t1:building-permit",
+			"name": "Building Permit",
+			"outputTableId": "loot:civic-office-t1:building-permit",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-clay-pit",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-clay-pit"
-		},
-		"product:academy:blueprint-sand-pit": {
-			"name": "Blueprint: Sand Pit",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-sand-pit",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-sand-pit"
-		},
-		"product:academy:blueprint-brickyard": {
-			"name": "Blueprint: Brickyard",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-brickyard",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-brickyard"
-		},
-		"product:academy:blueprint-glassworks": {
-			"name": "Blueprint: Glassworks",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-glassworks",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-glassworks"
-		},
-		"product:academy:blueprint-roof-tile-factory": {
-			"name": "Blueprint: Roof Tile Factory",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-roof-tile-factory",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-roof-tile-factory"
-		},
-		"product:academy:blueprint-construction-yard-t1": {
-			"name": "Blueprint: Construction Yard I",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-construction-yard-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-construction-yard-t1"
+			"requirementIds": []
 		},
 		"product:civic-office-t1:guild-charter": {
-			"name": "Guild Charter",
 			"durationMs": 12000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:civic-office-t1:guild-charter",
-			"requirementIds": [],
-			"outputTableId": "loot:civic-office-t1:guild-charter"
-		},
-		"product:academy:blueprint-blacksmith-t1": {
-			"name": "Blueprint: Blacksmith I",
-			"durationMs": 2500,
+			"name": "Guild Charter",
+			"outputTableId": "loot:civic-office-t1:guild-charter",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-blacksmith-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-blacksmith-t1"
+			"requirementIds": []
 		},
-		"product:academy:blueprint-armory-t1": {
-			"name": "Blueprint: Armory I",
-			"durationMs": 2500,
+		"product:clay-pit:clay": {
+			"durationMs": 6500,
+			"inputRefId": "input:clay-pit:clay",
+			"name": "Clay",
+			"outputTableId": "loot:clay-pit:clay",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-armory-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-armory-t1"
+			"requirementIds": []
 		},
-		"product:academy:blueprint-goldsmith-t1": {
-			"name": "Blueprint: Goldsmith I",
-			"durationMs": 2500,
+		"product:coal-mine-t1:coal": {
+			"durationMs": 8000,
+			"inputRefId": "input:coal-mine-t1:bread-water",
+			"name": "Coal Cart",
+			"outputTableId": "loot:coal-mine-t1:coal",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-goldsmith-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-goldsmith-t1"
+			"requirementIds": []
 		},
-		"product:academy:blueprint-university": {
-			"name": "Blueprint: University",
-			"durationMs": 2500,
+		"product:construction-yard-t1:construction-bundle": {
+			"durationMs": 12000,
+			"inputRefId": "input:construction-yard-t1:construction-bundle",
+			"name": "Construction Bundle",
+			"outputTableId": "loot:construction-yard-t1:construction-bundle",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:academy:blueprint-university",
-			"requirementIds": [],
-			"outputTableId": "loot:academy:blueprint-university"
+			"requirementIds": []
 		},
-		"product:blacksmith-t1:nails": {
-			"name": "Nails",
-			"durationMs": 10000,
+		"product:cookhouse-t1:feast": {
+			"durationMs": 9000,
+			"inputRefId": "input:cookhouse-t1:feast",
+			"name": "Feast",
+			"outputTableId": "loot:cookhouse-t1:feast",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:blacksmith-t1:nails",
+			"requirementIds": []
+		},
+		"product:dairy-t1:cheese": {
+			"durationMs": 7000,
+			"inputRefId": "input:dairy-t1:milk",
+			"name": "Cheese",
+			"outputTableId": "loot:dairy-t1:cheese",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:dye-workshop-t1:luxury-cloth": {
+			"durationMs": 9000,
+			"inputRefId": "input:dye-workshop-t1:luxury-cloth",
+			"name": "Luxury Cloth",
+			"outputTableId": "loot:dye-workshop-t1:luxury-cloth",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:dye-workshop-t1:pigment": {
+			"durationMs": 5000,
+			"inputRefId": "input:dye-workshop-t1:pigment",
+			"name": "Pigment",
+			"outputTableId": "loot:dye-workshop-t1:pigment",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:farm-t1:grain": {
+			"durationMs": 5000,
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"inputRefId": "input:farm-t1:water",
+			"name": "Grain",
+			"outputTableId": "loot:farm-t1:grain",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:glassworks:glass": {
+			"durationMs": 9000,
+			"inputRefId": "input:glassworks:glass",
+			"name": "Glass",
+			"outputTableId": "loot:glassworks:glass",
+			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:blacksmith-t1:nails"
+			]
 		},
-		"product:armory-t1:leather-armor": {
-			"name": "Leather Armor",
-			"durationMs": 22000,
+		"product:glazier-workshop-t1:stained-glass": {
+			"durationMs": 14000,
+			"inputRefId": "input:glazier-workshop-t1:stained-glass",
+			"name": "Stained Glass",
+			"outputTableId": "loot:glazier-workshop-t1:stained-glass",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:armory-t1:leather-armor",
-			"requirementIds": [],
-			"outputTableId": "loot:armory-t1:leather-armor"
-		},
-		"product:armory-t1:iron-armor": {
-			"name": "Iron Armor",
-			"durationMs": 36000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:armory-t1:iron-armor",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:armory-t1:iron-armor"
+			]
+		},
+		"product:gold-mine-t1:gold-ore": {
+			"durationMs": 9000,
+			"inputRefId": "input:gold-mine-t1:bread-wine",
+			"name": "Gold Ore Cart",
+			"outputTableId": "loot:gold-mine-t1:gold-ore",
+			"placement": "board_then_inventory",
+			"requirementIds": []
 		},
 		"product:goldsmith-t1:coin-stack": {
-			"name": "Coin Stack",
 			"durationMs": 12000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:goldsmith-t1:coin-stack",
+			"name": "Coin Stack",
+			"outputTableId": "loot:goldsmith-t1:coin-stack",
+			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:goldsmith-t1:coin-stack"
+			]
 		},
 		"product:goldsmith-t1:key-t1": {
-			"name": "Key I",
 			"durationMs": 14000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:goldsmith-t1:key-t1",
+			"name": "Key I",
+			"outputTableId": "loot:goldsmith-t1:key-t1",
+			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:goldsmith-t1:key-t1"
+			]
 		},
 		"product:goldsmith-t1:key-t2": {
-			"name": "Key II",
 			"durationMs": 18000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:goldsmith-t1:key-t2",
+			"name": "Key II",
+			"outputTableId": "loot:goldsmith-t1:key-t2",
+			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:goldsmith-t1:key-t2"
+			]
+		},
+		"product:goldsmith-t1:key-t3": {
+			"durationMs": 22000,
+			"inputRefId": "input:goldsmith-t1:key-t3",
+			"name": "Key III",
+			"outputTableId": "loot:goldsmith-t1:key-t3",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:goldsmith-t1:key-t4": {
-			"name": "Key IV",
 			"durationMs": 26000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:goldsmith-t1:key-t4",
+			"name": "Key IV",
+			"outputTableId": "loot:goldsmith-t1:key-t4",
+			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			],
-			"outputTableId": "loot:goldsmith-t1:key-t4"
+			]
+		},
+		"product:heroes-guild-t1:chest-t1": {
+			"durationMs": 90000,
+			"inputRefId": "input:heroes-guild-t1:chest-t1",
+			"name": "Chest I Expedition",
+			"outputTableId": "loot:heroes-guild-t1:chest-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:chest-t2": {
+			"durationMs": 150000,
+			"inputRefId": "input:heroes-guild-t1:chest-t2",
+			"name": "Chest II Expedition",
+			"outputTableId": "loot:heroes-guild-t1:chest-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:chest-t3": {
+			"durationMs": 240000,
+			"inputRefId": "input:heroes-guild-t1:chest-t3",
+			"name": "Chest III Expedition",
+			"outputTableId": "loot:heroes-guild-t1:chest-t3",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:chest-t4": {
+			"durationMs": 420000,
+			"inputRefId": "input:heroes-guild-t1:chest-t4",
+			"name": "Chest IV Expedition",
+			"outputTableId": "loot:heroes-guild-t1:chest-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
 		},
 		"product:heroes-guild-t1:treasure-chest": {
-			"name": "Grand Expedition",
 			"durationMs": 600000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:heroes-guild-t1:treasure-chest",
-			"requirementIds": [],
-			"outputTableId": "loot:heroes-guild-t1:treasure-chest"
-		},
-		"product:university:blueprint-heroes-guild-t1": {
-			"name": "Blueprint: Heroes Guild I",
-			"durationMs": 3000,
+			"name": "Grand Expedition",
+			"outputTableId": "loot:heroes-guild-t1:treasure-chest",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:university:blueprint-heroes-guild-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:university:blueprint-heroes-guild-t1"
+			"requirementIds": []
 		},
-		"product:university:blueprint-glazier-workshop-t1": {
-			"name": "Blueprint: Glazier Workshop I",
-			"durationMs": 3000,
+		"product:iron-mine-t1:iron-ore": {
+			"durationMs": 8000,
+			"inputRefId": "input:iron-mine-t1:sausage-beer",
+			"name": "Iron Ore Cart",
+			"outputTableId": "loot:iron-mine-t1:iron-ore",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:university:blueprint-glazier-workshop-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:university:blueprint-glazier-workshop-t1"
+			"requirementIds": []
+		},
+		"product:lumberjack-t1:log": {
+			"durationMs": 5000,
+			"name": "Log",
+			"outputTableId": "loot:lumberjack-t1:log",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t1:coin-from-beer": {
+			"durationMs": 4000,
+			"inputRefId": "input:market-t1:coin-from-beer",
+			"name": "Coins from Beer",
+			"outputTableId": "loot:market-t1:coin-from-beer",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t1:coin-from-bread": {
+			"durationMs": 4000,
+			"inputRefId": "input:market-t1:coin-from-bread",
+			"name": "Coins from Bread",
+			"outputTableId": "loot:market-t1:coin-from-bread",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t1:coin-from-cheese": {
+			"durationMs": 4000,
+			"inputRefId": "input:market-t1:coin-from-cheese",
+			"name": "Coins from Cheese",
+			"outputTableId": "loot:market-t1:coin-from-cheese",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t1:coin-from-feast": {
+			"durationMs": 6000,
+			"inputRefId": "input:market-t1:coin-from-feast",
+			"name": "Coins from Feast",
+			"outputTableId": "loot:market-t1:coin-from-feast",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t1:coin-from-sausage": {
+			"durationMs": 4000,
+			"inputRefId": "input:market-t1:coin-from-sausage",
+			"name": "Coins from Sausage",
+			"outputTableId": "loot:market-t1:coin-from-sausage",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t1:coin-from-wine-glass": {
+			"durationMs": 4000,
+			"inputRefId": "input:market-t1:coin-from-wine-glass",
+			"name": "Coins from Wine Glass",
+			"outputTableId": "loot:market-t1:coin-from-wine-glass",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t2:coin-from-common-clothing": {
+			"durationMs": 5000,
+			"inputRefId": "input:market-t2:coin-from-common-clothing",
+			"name": "Coins from Common Clothing",
+			"outputTableId": "loot:market-t2:coin-from-common-clothing",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t2:coin-from-feast": {
+			"durationMs": 5000,
+			"inputRefId": "input:market-t2:coin-from-feast",
+			"name": "Better Coins from Feast",
+			"outputTableId": "loot:market-t2:coin-from-feast",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t2:coin-from-luxury-clothing": {
+			"durationMs": 5000,
+			"inputRefId": "input:market-t2:coin-from-luxury-clothing",
+			"name": "Coins from Luxury Clothing",
+			"outputTableId": "loot:market-t2:coin-from-luxury-clothing",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:market-t2:coin-from-paper": {
+			"durationMs": 3500,
+			"inputRefId": "input:market-t2:coin-from-paper",
+			"name": "Coins from Paper",
+			"outputTableId": "loot:market-t2:coin-from-paper",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:paper-mill-t1:paper": {
+			"durationMs": 7000,
+			"inputRefId": "input:paper-mill-t1:paper",
+			"name": "Paper",
+			"outputTableId": "loot:paper-mill-t1:paper",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:pig-farm-t1:piglet": {
+			"durationMs": 5000,
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"inputRefId": "input:pig-farm-t1:grain-water",
+			"name": "Piglet",
+			"outputTableId": "loot:pig-farm-t1:piglet",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t1:clay-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:prospector-guild-t1:clay-deposit",
+			"name": "Prospect: Clay Deposit",
+			"outputTableId": "loot:prospector-guild-t1:clay-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t1:sand-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:prospector-guild-t1:sand-deposit",
+			"name": "Prospect: Sand Deposit",
+			"outputTableId": "loot:prospector-guild-t1:sand-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:clay-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:prospector-guild-t2:clay-deposit",
+			"name": "Prospect: Clay Deposit",
+			"outputTableId": "loot:prospector-guild-t2:clay-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:coal-deposit": {
+			"durationMs": 10000,
+			"inputRefId": "input:prospector-guild-t2:coal-deposit",
+			"name": "Prospect: Coal Deposit",
+			"outputTableId": "loot:prospector-guild-t2:coal-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:gold-deposit": {
+			"durationMs": 12000,
+			"inputRefId": "input:prospector-guild-t2:gold-deposit",
+			"name": "Prospect: Gold Deposit",
+			"outputTableId": "loot:prospector-guild-t2:gold-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:iron-deposit": {
+			"durationMs": 10000,
+			"inputRefId": "input:prospector-guild-t2:iron-deposit",
+			"name": "Prospect: Iron Deposit",
+			"outputTableId": "loot:prospector-guild-t2:iron-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
 		},
 		"product:prospector-guild-t2:marble-deposit": {
-			"name": "Prospect: Marble Deposit",
 			"durationMs": 14000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:prospector-guild-t2:marble-deposit",
-			"requirementIds": [],
-			"outputTableId": "loot:prospector-guild-t2:marble-deposit"
-		},
-		"product:university:blueprint-quarry-t2": {
-			"name": "Blueprint: Quarry 2",
-			"durationMs": 3500,
+			"name": "Prospect: Marble Deposit",
+			"outputTableId": "loot:prospector-guild-t2:marble-deposit",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:university:blueprint-quarry-t2",
-			"requirementIds": [],
-			"outputTableId": "loot:university:blueprint-quarry-t2"
+			"requirementIds": []
 		},
-		"product:university:blueprint-stonemason-t2": {
-			"name": "Blueprint: Stonemason 2",
-			"durationMs": 3500,
+		"product:prospector-guild-t2:sand-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:prospector-guild-t2:sand-deposit",
+			"name": "Prospect: Sand Deposit",
+			"outputTableId": "loot:prospector-guild-t2:sand-deposit",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:university:blueprint-stonemason-t2",
-			"requirementIds": [],
-			"outputTableId": "loot:university:blueprint-stonemason-t2"
+			"requirementIds": []
 		},
-		"product:quarry-t2:stone": {
+		"product:purifier-t1:pollution": {
+			"durationMs": 6000,
+			"inputRefId": "input:purifier-t1:pollution",
+			"name": "Purify Pollution",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:purifier-t1:pollution-bulk": {
+			"durationMs": 18000,
+			"inputRefId": "input:purifier-t1:pollution-bulk",
+			"name": "Purify Pollution x4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:quarry-t1:stone": {
+			"durationMs": 5000,
 			"name": "Stone",
-			"durationMs": 4000,
+			"outputTableId": "loot:quarry-t1:stone",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:quarry-t2:stone"
+			"requirementIds": []
 		},
 		"product:quarry-t2:marble": {
-			"name": "Marble",
 			"durationMs": 12000,
+			"name": "Marble",
+			"outputTableId": "loot:quarry-t2:marble",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"outputTableId": "loot:quarry-t2:marble"
+			"requirementIds": []
 		},
-		"product:stonemason-t2:stone-block": {
-			"name": "Stone Block",
+		"product:quarry-t2:stone": {
 			"durationMs": 4000,
+			"name": "Stone",
+			"outputTableId": "loot:quarry-t2:stone",
 			"placement": "board_then_inventory",
-			"inputRefId": "input:stonemason-t2:stone-block",
-			"requirementIds": [],
-			"outputTableId": "loot:stonemason-t2:stone-block"
+			"requirementIds": []
+		},
+		"product:roof-tile-factory:roof-tiles": {
+			"durationMs": 8500,
+			"inputRefId": "input:roof-tile-factory:roof-tiles",
+			"name": "Roof Tiles",
+			"outputTableId": "loot:roof-tile-factory:roof-tiles",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:sand-pit:sand": {
+			"durationMs": 6500,
+			"name": "Sand",
+			"outputTableId": "loot:sand-pit:sand",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:sawmill-t1:plank": {
+			"durationMs": 5000,
+			"inputRefId": "input:sawmill-t1:log",
+			"name": "Plank",
+			"outputTableId": "loot:sawmill-t1:plank",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:school:basic-knowledge": {
+			"durationMs": 12000,
+			"inputRefId": "input:school:basic-knowledge",
+			"name": "Basic Knowledge",
+			"outputTableId": "loot:school:basic-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:sheep-pasture-t1:wool": {
+			"durationMs": 5000,
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"inputRefId": "input:sheep-pasture-t1:grain-water",
+			"name": "Wool",
+			"outputTableId": "loot:sheep-pasture-t1:wool",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:slaughterhouse-t1:sausage-raw-hide": {
+			"durationMs": 8000,
+			"inputRefId": "input:slaughterhouse-t1:piglet",
+			"name": "Sausage + Raw Hide",
+			"outputTableId": "loot:slaughterhouse-t1:sausage-raw-hide",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:smelter-t1:gold-ingot": {
+			"durationMs": 10000,
+			"inputRefId": "input:smelter-t1:gold-ore-coal-water",
+			"name": "Gold Ingot",
+			"outputTableId": "loot:smelter-t1:gold-ingot",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:smelter-t1:iron-ingot": {
+			"durationMs": 10000,
+			"inputRefId": "input:smelter-t1:iron-ore-coal-water",
+			"name": "Iron Ingot",
+			"outputTableId": "loot:smelter-t1:iron-ingot",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:stonemason-t1:stone-block": {
+			"durationMs": 5000,
+			"inputRefId": "input:stonemason-t1:stone",
+			"name": "Stone Block",
+			"outputTableId": "loot:stonemason-t1:stone-block",
+			"placement": "board_then_inventory",
+			"requirementIds": []
 		},
 		"product:stonemason-t2:marble-block": {
-			"name": "Marble Block",
 			"durationMs": 13000,
-			"placement": "board_then_inventory",
 			"inputRefId": "input:stonemason-t2:marble-block",
-			"requirementIds": [],
-			"outputTableId": "loot:stonemason-t2:marble-block"
+			"name": "Marble Block",
+			"outputTableId": "loot:stonemason-t2:marble-block",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:stonemason-t2:stone-block": {
+			"durationMs": 4000,
+			"inputRefId": "input:stonemason-t2:stone-block",
+			"name": "Stone Block",
+			"outputTableId": "loot:stonemason-t2:stone-block",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tailor-workshop-t1:common-clothing": {
+			"durationMs": 9000,
+			"inputRefId": "input:tailor-workshop-t1:common-clothing",
+			"name": "Common Clothing",
+			"outputTableId": "loot:tailor-workshop-t1:common-clothing",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tailor-workshop-t1:luxury-clothing": {
+			"durationMs": 12000,
+			"inputRefId": "input:tailor-workshop-t1:luxury-clothing",
+			"name": "Luxury Clothing",
+			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tannery-t1:leather": {
+			"durationMs": 8000,
+			"inputRefId": "input:tannery-t1:leather",
+			"name": "Leather",
+			"outputTableId": "loot:tannery-t1:leather",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tavern-t1:beer": {
+			"durationMs": 5000,
+			"inputRefId": "input:tavern-t1:beer-barrel",
+			"name": "Beer",
+			"outputTableId": "loot:tavern-t1:beer",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tavern-t1:wine-glass": {
+			"durationMs": 5000,
+			"inputRefId": "input:tavern-t1:wine-barrel",
+			"name": "Wine Glass",
+			"outputTableId": "loot:tavern-t1:wine-glass",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-lumberjack-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-lumberjack-t1",
+			"name": "Blueprint: Lumberjack I",
+			"outputTableId": "loot:townhall-t1:blueprint-lumberjack-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-quarry-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-quarry-t1",
+			"name": "Blueprint: Quarry I",
+			"outputTableId": "loot:townhall-t1:blueprint-quarry-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-sawmill-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-sawmill-t1",
+			"name": "Blueprint: Sawmill I",
+			"outputTableId": "loot:townhall-t1:blueprint-sawmill-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-stonemason-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-stonemason-t1",
+			"name": "Blueprint: Stonemason I",
+			"outputTableId": "loot:townhall-t1:blueprint-stonemason-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-townhall-t2": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-townhall-t2",
+			"name": "Blueprint: Town Hall II",
+			"outputTableId": "loot:townhall-t1:blueprint-townhall-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t1:blueprint-well-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t1:blueprint-well-t1",
+			"name": "Blueprint: Well I",
+			"outputTableId": "loot:townhall-t1:blueprint-well-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-cattle-farm-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-cattle-farm-t1",
+			"name": "Blueprint: Cattle Farm I",
+			"outputTableId": "loot:townhall-t2:blueprint-cattle-farm-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-chicken-coop-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-chicken-coop-t1",
+			"name": "Blueprint: Chicken Coop I",
+			"outputTableId": "loot:townhall-t2:blueprint-chicken-coop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-farm-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-farm-t1",
+			"name": "Blueprint: Farm I",
+			"outputTableId": "loot:townhall-t2:blueprint-farm-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-pig-farm-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-pig-farm-t1",
+			"name": "Blueprint: Pig Farm I",
+			"outputTableId": "loot:townhall-t2:blueprint-pig-farm-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-sheep-pasture-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-sheep-pasture-t1",
+			"name": "Blueprint: Sheep Pasture I",
+			"outputTableId": "loot:townhall-t2:blueprint-sheep-pasture-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-townhall-t3": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-townhall-t3",
+			"name": "Blueprint: Town Hall III",
+			"outputTableId": "loot:townhall-t2:blueprint-townhall-t3",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:blueprint-vegetable-garden-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:blueprint-vegetable-garden-t1",
+			"name": "Blueprint: Vegetable Garden I",
+			"outputTableId": "loot:townhall-t2:blueprint-vegetable-garden-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:food-supply": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:food-supply",
+			"name": "Food Supply",
+			"outputTableId": "loot:townhall-t2:food-supply",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t2:wheat-field": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t2:wheat-field",
+			"name": "Survey: Wheat Field",
+			"outputTableId": "loot:townhall-t2:wheat-field",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-bakery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-bakery-t1",
+			"name": "Blueprint: Bakery I",
+			"outputTableId": "loot:townhall-t3:blueprint-bakery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-brewery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-brewery-t1",
+			"name": "Blueprint: Brewery I",
+			"outputTableId": "loot:townhall-t3:blueprint-brewery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-cookhouse-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-cookhouse-t1",
+			"name": "Blueprint: Cookhouse I",
+			"outputTableId": "loot:townhall-t3:blueprint-cookhouse-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-dairy-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-dairy-t1",
+			"name": "Blueprint: Dairy I",
+			"outputTableId": "loot:townhall-t3:blueprint-dairy-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-market-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-market-t1",
+			"name": "Blueprint: Market",
+			"outputTableId": "loot:townhall-t3:blueprint-market-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-slaughterhouse-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-slaughterhouse-t1",
+			"name": "Blueprint: Slaughterhouse I",
+			"outputTableId": "loot:townhall-t3:blueprint-slaughterhouse-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-tavern-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-tavern-t1",
+			"name": "Blueprint: Tavern I",
+			"outputTableId": "loot:townhall-t3:blueprint-tavern-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-townhall-t4": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-townhall-t4",
+			"name": "Blueprint: Town Hall IV",
+			"outputTableId": "loot:townhall-t3:blueprint-townhall-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-windmill-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-windmill-t1",
+			"name": "Blueprint: Windmill I",
+			"outputTableId": "loot:townhall-t3:blueprint-windmill-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:blueprint-winery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:blueprint-winery-t1",
+			"name": "Blueprint: Winery I",
+			"outputTableId": "loot:townhall-t3:blueprint-winery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:hop-field": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:hop-field",
+			"name": "Survey: Hop Field",
+			"outputTableId": "loot:townhall-t3:hop-field",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t3:vineyard": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t3:vineyard",
+			"name": "Survey: Vineyard",
+			"outputTableId": "loot:townhall-t3:vineyard",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-civic-office-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-civic-office-t1",
+			"name": "Blueprint: Civic Office I",
+			"outputTableId": "loot:townhall-t4:blueprint-civic-office-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-dye-workshop-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-dye-workshop-t1",
+			"name": "Blueprint: Dye Workshop I",
+			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-market-t2": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-market-t2",
+			"name": "Blueprint: Market II",
+			"outputTableId": "loot:townhall-t4:blueprint-market-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-paper-mill-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-paper-mill-t1",
+			"name": "Blueprint: Paper Mill I",
+			"outputTableId": "loot:townhall-t4:blueprint-paper-mill-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-prospector-guild-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-prospector-guild-t1",
+			"name": "Blueprint: Prospector Guild 1",
+			"outputTableId": "loot:townhall-t4:blueprint-prospector-guild-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-school": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-school",
+			"name": "Blueprint: School",
+			"outputTableId": "loot:townhall-t4:blueprint-school",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-tailor-workshop-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-tailor-workshop-t1",
+			"name": "Blueprint: Tailor Workshop I",
+			"outputTableId": "loot:townhall-t4:blueprint-tailor-workshop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-tannery-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-tannery-t1",
+			"name": "Blueprint: Tannery I",
+			"outputTableId": "loot:townhall-t4:blueprint-tannery-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-weaver-hut-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-weaver-hut-t1",
+			"name": "Blueprint: Weaver Hut I",
+			"outputTableId": "loot:townhall-t4:blueprint-weaver-hut-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:advanced-knowledge": {
+			"durationMs": 14000,
+			"inputRefId": "input:university:advanced-knowledge",
+			"name": "Advanced Knowledge",
+			"outputTableId": "loot:university:advanced-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:basic-knowledge": {
+			"durationMs": 6000,
+			"inputRefId": "input:university:basic-knowledge",
+			"name": "Basic Knowledge",
+			"outputTableId": "loot:university:basic-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-cathedral": {
+			"durationMs": 4000,
+			"inputRefId": "input:university:blueprint-cathedral",
+			"name": "Blueprint: Cathedral",
+			"outputTableId": "loot:university:blueprint-cathedral",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-glazier-workshop-t1": {
+			"durationMs": 3000,
+			"inputRefId": "input:university:blueprint-glazier-workshop-t1",
+			"name": "Blueprint: Glazier Workshop I",
+			"outputTableId": "loot:university:blueprint-glazier-workshop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-heroes-guild-t1": {
+			"durationMs": 3000,
+			"inputRefId": "input:university:blueprint-heroes-guild-t1",
+			"name": "Blueprint: Heroes Guild I",
+			"outputTableId": "loot:university:blueprint-heroes-guild-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-house-of-engineers": {
+			"durationMs": 4000,
+			"inputRefId": "input:university:blueprint-house-of-engineers",
+			"name": "Blueprint: House of Engineers",
+			"outputTableId": "loot:university:blueprint-house-of-engineers",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-mage-lodge": {
+			"durationMs": 4000,
+			"inputRefId": "input:university:blueprint-mage-lodge",
+			"name": "Blueprint: Mage Lodge",
+			"outputTableId": "loot:university:blueprint-mage-lodge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-quarry-t2": {
+			"durationMs": 3500,
+			"inputRefId": "input:university:blueprint-quarry-t2",
+			"name": "Blueprint: Quarry 2",
+			"outputTableId": "loot:university:blueprint-quarry-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-stonemason-t2": {
+			"durationMs": 3500,
+			"inputRefId": "input:university:blueprint-stonemason-t2",
+			"name": "Blueprint: Stonemason 2",
+			"outputTableId": "loot:university:blueprint-stonemason-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:master-knowledge": {
+			"durationMs": 36000,
+			"inputRefId": "input:university:master-knowledge",
+			"name": "Master Knowledge",
+			"outputTableId": "loot:university:master-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:vegetable-garden-t1:vegetables": {
+			"durationMs": 5000,
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"inputRefId": "input:vegetable-garden-t1:water",
+			"name": "Vegetables",
+			"outputTableId": "loot:vegetable-garden-t1:vegetables",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:weaver-hut-t1:common-cloth": {
+			"durationMs": 7000,
+			"inputRefId": "input:weaver-hut-t1:common-cloth",
+			"name": "Common Cloth",
+			"outputTableId": "loot:weaver-hut-t1:common-cloth",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:well-t1:water": {
+			"durationMs": 5000,
+			"name": "Water",
+			"outputTableId": "loot:well-t1:water",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:windmill-t1:flour": {
+			"durationMs": 6000,
+			"inputRefId": "input:windmill-t1:grain",
+			"name": "Flour",
+			"outputTableId": "loot:windmill-t1:flour",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:winery-t1:grapes": {
+			"durationMs": 5000,
+			"inputRefId": "input:winery-t1:water",
+			"name": "Grapes",
+			"outputTableId": "loot:winery-t1:grapes",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:winery-t1:wine-barrel": {
+			"durationMs": 5000,
+			"inputRefId": "input:winery-t1:grapes-water",
+			"name": "Wine Barrel",
+			"outputTableId": "loot:winery-t1:wine-barrel",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:winery-t1:wine-barrel-from-wine-glasses": {
+			"durationMs": 5000,
+			"inputRefId": "input:winery-t1:wine-glass-to-barrel",
+			"name": "Wine Barrel",
+			"outputTableId": "loot:winery-t1:wine-barrel-from-wine-glasses",
+			"placement": "board_then_inventory",
+			"requirementIds": []
 		}
 	}
 }

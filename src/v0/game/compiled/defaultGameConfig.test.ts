@@ -404,6 +404,85 @@ describe("defaultGameConfig", () => {
 		});
 	});
 
+	it("wires Choose The Path keystone buildings through University blueprints", () => {
+		expect(defaultGameConfig.assets["asset:producer:house-of-engineers"].resourceId).toBe(
+			"producer-house-of-engineers",
+		);
+		expect(defaultGameConfig.assets["asset:producer:cathedral"].resourceId).toBe(
+			"producer-cathedral",
+		);
+		expect(defaultGameConfig.assets["asset:producer:mage-lodge"].resourceId).toBe(
+			"producer-mage-lodge",
+		);
+
+		expect(defaultGameConfig.producers["producer:university"].productIds).toContain(
+			"product:university:blueprint-house-of-engineers",
+		);
+		expect(defaultGameConfig.producers["producer:university"].productIds).toContain(
+			"product:university:blueprint-cathedral",
+		);
+		expect(defaultGameConfig.producers["producer:university"].productIds).toContain(
+			"product:university:blueprint-mage-lodge",
+		);
+
+		expect(defaultGameConfig.items["producer:house-of-engineers"].exclusiveToIds).toEqual([
+			"producer:cathedral",
+			"producer:mage-lodge",
+		]);
+		expect(defaultGameConfig.items["producer:cathedral"].exclusiveToIds).toEqual([
+			"producer:house-of-engineers",
+			"producer:mage-lodge",
+		]);
+		expect(defaultGameConfig.items["producer:mage-lodge"].exclusiveToIds).toEqual([
+			"producer:house-of-engineers",
+			"producer:cathedral",
+		]);
+
+		expect(
+			defaultGameConfig.inputs["input:university:blueprint-house-of-engineers"].inputs,
+		).toContainEqual({
+			capacity: 2,
+			consume: true,
+			itemId: "item:treasure-chest",
+			quantity: 1,
+		});
+		expect(
+			defaultGameConfig.inputs["input:university:blueprint-cathedral"].inputs,
+		).toContainEqual({
+			capacity: 4,
+			consume: true,
+			itemId: "item:stained-glass",
+			quantity: 2,
+		});
+		expect(
+			defaultGameConfig.inputs["input:university:blueprint-mage-lodge"].inputs,
+		).toContainEqual({
+			capacity: 4,
+			consume: true,
+			itemId: "item:sapphire",
+			quantity: 1,
+		});
+
+		expectPassiveOwnedRequirements("craft:house-of-engineers", [
+			"producer:university",
+			"producer:stonemason-t2",
+			"producer:glazier-workshop-t1",
+			"producer:blacksmith-t1",
+		]);
+		expectPassiveOwnedRequirements("craft:cathedral", [
+			"producer:university",
+			"producer:stonemason-t2",
+			"producer:glazier-workshop-t1",
+			"producer:civic-office-t1",
+		]);
+		expectPassiveOwnedRequirements("craft:mage-lodge", [
+			"producer:university",
+			"producer:stonemason-t2",
+			"producer:glazier-workshop-t1",
+			"producer:heroes-guild-t1",
+		]);
+	});
+
 	it("requires complete era ownership before townhall tier progression", () => {
 		expectPassiveOwnedRequirements("craft:townhall-t2", [
 			"producer:lumberjack-t1",

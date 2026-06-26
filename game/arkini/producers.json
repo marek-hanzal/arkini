@@ -1,304 +1,6 @@
 {
 	"producers": {
-		"producer:lumberjack-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:lumberjack-t1:log"
-			],
-			"requirementIds": [
-				"proximity:lumberjack-t1:tree"
-			]
-		},
-		"producer:sawmill-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:sawmill-t1:plank"
-			],
-			"requirementIds": [
-				"proximity:sawmill-t1:lumberjack-t1"
-			]
-		},
-		"producer:quarry-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:quarry-t1:stone"
-			],
-			"requirementIds": [
-				"proximity:quarry-t1:rock"
-			]
-		},
-		"producer:stonemason-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:stonemason-t1:stone-block"
-			],
-			"requirementIds": [
-				"proximity:stonemason-t1:quarry-t1"
-			]
-		},
-		"producer:well-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:well-t1:water"
-			],
-			"requirementIds": []
-		},
-		"producer:farm-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:farm-t1:grain"
-			],
-			"requirementIds": [
-				"proximity:farm-t1:wheat-field"
-			]
-		},
-		"producer:windmill-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:windmill-t1:flour"
-			],
-			"requirementIds": []
-		},
-		"producer:bakery-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:bakery-t1:bread"
-			],
-			"requirementIds": []
-		},
-		"producer:pig-farm-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:pig-farm-t1:piglet"
-			],
-			"requirementIds": []
-		},
-		"producer:slaughterhouse-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:slaughterhouse-t1:sausage-raw-hide"
-			],
-			"requirementIds": []
-		},
-		"producer:brewery-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:brewery-t1:hops",
-				"product:brewery-t1:beer-barrel",
-				"product:brewery-t1:beer-barrel-from-beer"
-			],
-			"requirementIds": [
-				"proximity:brewery-t1:hop-field"
-			],
-			"hinderedBy": [
-				{
-					"type": "proximity",
-					"itemIds": [
-						"item:pollution"
-					],
-					"distance": 2,
-					"durationFactor": 0.5
-				}
-			]
-		},
-		"producer:tavern-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:tavern-t1:beer",
-				"product:tavern-t1:wine-glass"
-			],
-			"requirementIds": []
-		},
-		"producer:winery-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:winery-t1:grapes",
-				"product:winery-t1:wine-barrel",
-				"product:winery-t1:wine-barrel-from-wine-glasses"
-			],
-			"requirementIds": [
-				"proximity:winery-t1:vineyard"
-			],
-			"hinderedBy": [
-				{
-					"type": "proximity",
-					"itemIds": [
-						"item:pollution"
-					],
-					"distance": 3,
-					"durationFactor": 0.5
-				}
-			]
-		},
-		"producer:coal-mine-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:coal-mine-t1:coal"
-			],
-			"requirementIds": [
-				"proximity:coal-mine-t1:coal-deposit"
-			]
-		},
-		"producer:iron-mine-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:iron-mine-t1:iron-ore"
-			],
-			"requirementIds": [
-				"proximity:iron-mine-t1:iron-deposit"
-			]
-		},
-		"producer:gold-mine-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:gold-mine-t1:gold-ore"
-			],
-			"requirementIds": [
-				"proximity:gold-mine-t1:gold-deposit"
-			]
-		},
-		"producer:smelter-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:smelter-t1:iron-ingot",
-				"product:smelter-t1:gold-ingot"
-			],
-			"requirementIds": []
-		},
-		"producer:purifier-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:purifier-t1:pollution",
-				"product:purifier-t1:pollution-bulk"
-			],
-			"requirementIds": []
-		},
-		"producer:goldsmith-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:goldsmith-t1:coin-stack",
-				"product:goldsmith-t1:key-t1",
-				"product:goldsmith-t1:key-t2",
-				"product:goldsmith-t1:key-t3",
-				"product:goldsmith-t1:key-t4"
-			],
-			"requirementIds": []
-		},
-		"producer:townhall-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:townhall-t1:blueprint-lumberjack-t1",
-				"product:townhall-t1:blueprint-sawmill-t1",
-				"product:townhall-t1:blueprint-quarry-t1",
-				"product:townhall-t1:blueprint-stonemason-t1",
-				"product:townhall-t1:blueprint-well-t1",
-				"product:townhall-t1:blueprint-townhall-t2"
-			],
-			"requirementIds": []
-		},
-		"producer:townhall-t2": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:townhall-t2:wheat-field",
-				"product:townhall-t2:blueprint-farm-t1",
-				"product:townhall-t2:blueprint-pig-farm-t1",
-				"product:townhall-t2:blueprint-cattle-farm-t1",
-				"product:townhall-t2:blueprint-chicken-coop-t1",
-				"product:townhall-t2:blueprint-sheep-pasture-t1",
-				"product:townhall-t2:blueprint-vegetable-garden-t1",
-				"product:townhall-t2:food-supply",
-				"product:townhall-t2:blueprint-townhall-t3"
-			],
-			"requirementIds": []
-		},
-		"producer:townhall-t3": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:townhall-t3:blueprint-windmill-t1",
-				"product:townhall-t3:blueprint-bakery-t1",
-				"product:townhall-t3:blueprint-slaughterhouse-t1",
-				"product:townhall-t3:blueprint-dairy-t1",
-				"product:townhall-t3:blueprint-cookhouse-t1",
-				"product:townhall-t3:hop-field",
-				"product:townhall-t3:blueprint-brewery-t1",
-				"product:townhall-t3:blueprint-tavern-t1",
-				"product:townhall-t3:vineyard",
-				"product:townhall-t3:blueprint-winery-t1",
-				"product:townhall-t3:blueprint-market-t1",
-				"product:townhall-t3:blueprint-townhall-t4"
-			],
-			"requirementIds": []
-		},
-		"producer:townhall-t4": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:townhall-t4:blueprint-paper-mill-t1",
-				"product:townhall-t4:blueprint-school",
-				"product:townhall-t4:blueprint-civic-office-t1",
-				"product:townhall-t4:blueprint-market-t2",
-				"product:townhall-t4:blueprint-prospector-guild-t1",
-				"product:townhall-t4:blueprint-tannery-t1",
-				"product:townhall-t4:blueprint-weaver-hut-t1",
-				"product:townhall-t4:blueprint-dye-workshop-t1",
-				"product:townhall-t4:blueprint-tailor-workshop-t1"
-			],
-			"requirementIds": []
-		},
-		"producer:heroes-guild-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:heroes-guild-t1:chest-t1",
-				"product:heroes-guild-t1:chest-t2",
-				"product:heroes-guild-t1:chest-t3",
-				"product:heroes-guild-t1:chest-t4",
-				"product:heroes-guild-t1:treasure-chest"
-			],
-			"requirementIds": []
-		},
-		"producer:blacksmith-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:blacksmith-t1:nails",
-				"product:blacksmith-t1:axe",
-				"product:blacksmith-t1:sword"
-			],
-			"requirementIds": []
-		},
-		"producer:school": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:school:basic-knowledge"
-			],
-			"requirementIds": []
-		},
 		"producer:academy": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:academy:basic-knowledge",
@@ -321,72 +23,240 @@
 				"product:academy:blueprint-goldsmith-t1",
 				"product:academy:blueprint-university"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
 		},
-		"producer:university": {
-			"type": "producer",
+		"producer:armory-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:university:basic-knowledge",
-				"product:university:advanced-knowledge",
-				"product:university:master-knowledge",
-				"product:university:blueprint-heroes-guild-t1",
-				"product:university:blueprint-glazier-workshop-t1",
-				"product:university:blueprint-quarry-t2",
-				"product:university:blueprint-stonemason-t2"
+				"product:armory-t1:leather-armor",
+				"product:armory-t1:iron-armor"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:bakery-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:bakery-t1:bread"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:blacksmith-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:blacksmith-t1:nails",
+				"product:blacksmith-t1:axe",
+				"product:blacksmith-t1:sword"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:brewery-t1": {
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:brewery-t1:hops",
+				"product:brewery-t1:beer-barrel",
+				"product:brewery-t1:beer-barrel-from-beer"
+			],
+			"requirementIds": [
+				"proximity:brewery-t1:hop-field"
+			],
+			"type": "producer"
+		},
+		"producer:brickyard": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:brickyard:bricks"
+			],
+			"requirementIds": [
+				"proximity:brickyard:clay-pit"
+			],
+			"type": "producer"
 		},
 		"producer:cattle-farm-t1": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:cattle-farm-t1:milk"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:charcoal-burner-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:charcoal-burner-t1:charcoal"
+			],
+			"requirementIds": [],
+			"type": "producer"
 		},
 		"producer:chicken-coop-t1": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:chicken-coop-t1:egg"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
 		},
-		"producer:sheep-pasture-t1": {
-			"type": "producer",
+		"producer:civic-office-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:sheep-pasture-t1:wool"
+				"product:civic-office-t1:building-permit",
+				"product:civic-office-t1:blueprint-academy",
+				"product:civic-office-t1:guild-charter"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
 		},
-		"producer:vegetable-garden-t1": {
-			"type": "producer",
+		"producer:clay-pit": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:vegetable-garden-t1:vegetables"
+				"product:clay-pit:clay"
 			],
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:clay-pit:clay-deposit"
+			],
+			"type": "producer"
 		},
-		"producer:dairy-t1": {
-			"type": "producer",
+		"producer:coal-mine-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:dairy-t1:cheese"
+				"product:coal-mine-t1:coal"
 			],
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:coal-mine-t1:coal-deposit"
+			],
+			"type": "producer"
+		},
+		"producer:construction-yard-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:construction-yard-t1:construction-bundle"
+			],
+			"requirementIds": [],
+			"type": "producer"
 		},
 		"producer:cookhouse-t1": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:cookhouse-t1:feast"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:dairy-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:dairy-t1:cheese"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:dye-workshop-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:dye-workshop-t1:pigment",
+				"product:dye-workshop-t1:luxury-cloth"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:farm-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:farm-t1:grain"
+			],
+			"requirementIds": [
+				"proximity:farm-t1:wheat-field"
+			],
+			"type": "producer"
+		},
+		"producer:glassworks": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:glassworks:glass"
+			],
+			"requirementIds": [
+				"proximity:glassworks:sand-pit"
+			],
+			"type": "producer"
+		},
+		"producer:glazier-workshop-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:glazier-workshop-t1:stained-glass"
+			],
+			"requirementIds": [
+				"proximity:glazier-workshop-t1:glassworks"
+			],
+			"type": "producer"
+		},
+		"producer:gold-mine-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:gold-mine-t1:gold-ore"
+			],
+			"requirementIds": [
+				"proximity:gold-mine-t1:gold-deposit"
+			],
+			"type": "producer"
+		},
+		"producer:goldsmith-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:goldsmith-t1:coin-stack",
+				"product:goldsmith-t1:key-t1",
+				"product:goldsmith-t1:key-t2",
+				"product:goldsmith-t1:key-t3",
+				"product:goldsmith-t1:key-t4"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:heroes-guild-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:heroes-guild-t1:chest-t1",
+				"product:heroes-guild-t1:chest-t2",
+				"product:heroes-guild-t1:chest-t3",
+				"product:heroes-guild-t1:chest-t4",
+				"product:heroes-guild-t1:treasure-chest"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:iron-mine-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:iron-mine-t1:iron-ore"
+			],
+			"requirementIds": [
+				"proximity:iron-mine-t1:iron-deposit"
+			],
+			"type": "producer"
+		},
+		"producer:lumberjack-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:lumberjack-t1:log"
+			],
+			"requirementIds": [
+				"proximity:lumberjack-t1:tree"
+			],
+			"type": "producer"
 		},
 		"producer:market-t1": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:market-t1:coin-from-bread",
@@ -396,37 +266,46 @@
 				"product:market-t1:coin-from-wine-glass",
 				"product:market-t1:coin-from-feast"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:market-t2": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:market-t2:coin-from-paper",
+				"product:market-t2:coin-from-feast",
+				"product:market-t2:coin-from-common-clothing",
+				"product:market-t2:coin-from-luxury-clothing"
+			],
+			"requirementIds": [],
+			"type": "producer"
 		},
 		"producer:paper-mill-t1": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:paper-mill-t1:paper"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
 		},
-		"producer:civic-office-t1": {
-			"type": "producer",
+		"producer:pig-farm-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:civic-office-t1:building-permit",
-				"product:civic-office-t1:blueprint-academy",
-				"product:civic-office-t1:guild-charter"
+				"product:pig-farm-t1:piglet"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
 		},
 		"producer:prospector-guild-t1": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:prospector-guild-t1:clay-deposit",
 				"product:prospector-guild-t1:sand-deposit"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
 		},
 		"producer:prospector-guild-t2": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:prospector-guild-t2:clay-deposit",
@@ -436,140 +315,29 @@
 				"product:prospector-guild-t2:gold-deposit",
 				"product:prospector-guild-t2:marble-deposit"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
 		},
-		"producer:market-t2": {
-			"type": "producer",
+		"producer:purifier-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:market-t2:coin-from-paper",
-				"product:market-t2:coin-from-feast",
-				"product:market-t2:coin-from-common-clothing",
-				"product:market-t2:coin-from-luxury-clothing"
+				"product:purifier-t1:pollution",
+				"product:purifier-t1:pollution-bulk"
 			],
-			"requirementIds": []
+			"requirementIds": [],
+			"type": "producer"
 		},
-		"producer:tannery-t1": {
-			"type": "producer",
+		"producer:quarry-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:tannery-t1:leather"
-			],
-			"requirementIds": []
-		},
-		"producer:weaver-hut-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:weaver-hut-t1:common-cloth"
-			],
-			"requirementIds": []
-		},
-		"producer:dye-workshop-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:dye-workshop-t1:pigment",
-				"product:dye-workshop-t1:luxury-cloth"
-			],
-			"requirementIds": []
-		},
-		"producer:tailor-workshop-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:tailor-workshop-t1:common-clothing",
-				"product:tailor-workshop-t1:luxury-clothing"
-			],
-			"requirementIds": []
-		},
-		"producer:charcoal-burner-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:charcoal-burner-t1:charcoal"
-			],
-			"requirementIds": []
-		},
-		"producer:clay-pit": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:clay-pit:clay"
+				"product:quarry-t1:stone"
 			],
 			"requirementIds": [
-				"proximity:clay-pit:clay-deposit"
-			]
-		},
-		"producer:sand-pit": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:sand-pit:sand"
+				"proximity:quarry-t1:rock"
 			],
-			"requirementIds": [
-				"proximity:sand-pit:sand-deposit"
-			]
-		},
-		"producer:brickyard": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:brickyard:bricks"
-			],
-			"requirementIds": [
-				"proximity:brickyard:clay-pit"
-			]
-		},
-		"producer:glassworks": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:glassworks:glass"
-			],
-			"requirementIds": [
-				"proximity:glassworks:sand-pit"
-			]
-		},
-		"producer:glazier-workshop-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:glazier-workshop-t1:stained-glass"
-			],
-			"requirementIds": [
-				"proximity:glazier-workshop-t1:glassworks"
-			]
-		},
-		"producer:roof-tile-factory": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:roof-tile-factory:roof-tiles"
-			],
-			"requirementIds": [
-				"proximity:roof-tile-factory:clay-pit"
-			]
-		},
-		"producer:construction-yard-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:construction-yard-t1:construction-bundle"
-			],
-			"requirementIds": []
-		},
-		"producer:armory-t1": {
-			"type": "producer",
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:armory-t1:leather-armor",
-				"product:armory-t1:iron-armor"
-			],
-			"requirementIds": []
+			"type": "producer"
 		},
 		"producer:quarry-t2": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:quarry-t2:stone",
@@ -577,10 +345,83 @@
 			],
 			"requirementIds": [
 				"proximity:quarry-t2:marble-deposit"
-			]
+			],
+			"type": "producer"
+		},
+		"producer:roof-tile-factory": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:roof-tile-factory:roof-tiles"
+			],
+			"requirementIds": [
+				"proximity:roof-tile-factory:clay-pit"
+			],
+			"type": "producer"
+		},
+		"producer:sand-pit": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sand-pit:sand"
+			],
+			"requirementIds": [
+				"proximity:sand-pit:sand-deposit"
+			],
+			"type": "producer"
+		},
+		"producer:sawmill-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sawmill-t1:plank"
+			],
+			"requirementIds": [
+				"proximity:sawmill-t1:lumberjack-t1"
+			],
+			"type": "producer"
+		},
+		"producer:school": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:school:basic-knowledge"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:sheep-pasture-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:sheep-pasture-t1:wool"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:slaughterhouse-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:slaughterhouse-t1:sausage-raw-hide"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:smelter-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:smelter-t1:iron-ingot",
+				"product:smelter-t1:gold-ingot"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:stonemason-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:stonemason-t1:stone-block"
+			],
+			"requirementIds": [
+				"proximity:stonemason-t1:quarry-t1"
+			],
+			"type": "producer"
 		},
 		"producer:stonemason-t2": {
-			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:stonemason-t2:stone-block",
@@ -588,7 +429,169 @@
 			],
 			"requirementIds": [
 				"proximity:stonemason-t2:quarry-t2"
-			]
+			],
+			"type": "producer"
+		},
+		"producer:tailor-workshop-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:tailor-workshop-t1:common-clothing",
+				"product:tailor-workshop-t1:luxury-clothing"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:tannery-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:tannery-t1:leather"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:tavern-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:tavern-t1:beer",
+				"product:tavern-t1:wine-glass"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:townhall-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:townhall-t1:blueprint-lumberjack-t1",
+				"product:townhall-t1:blueprint-sawmill-t1",
+				"product:townhall-t1:blueprint-quarry-t1",
+				"product:townhall-t1:blueprint-stonemason-t1",
+				"product:townhall-t1:blueprint-well-t1",
+				"product:townhall-t1:blueprint-townhall-t2"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:townhall-t2": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:townhall-t2:wheat-field",
+				"product:townhall-t2:blueprint-farm-t1",
+				"product:townhall-t2:blueprint-pig-farm-t1",
+				"product:townhall-t2:blueprint-cattle-farm-t1",
+				"product:townhall-t2:blueprint-chicken-coop-t1",
+				"product:townhall-t2:blueprint-sheep-pasture-t1",
+				"product:townhall-t2:blueprint-vegetable-garden-t1",
+				"product:townhall-t2:food-supply",
+				"product:townhall-t2:blueprint-townhall-t3"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:townhall-t3": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:townhall-t3:blueprint-windmill-t1",
+				"product:townhall-t3:blueprint-bakery-t1",
+				"product:townhall-t3:blueprint-slaughterhouse-t1",
+				"product:townhall-t3:blueprint-dairy-t1",
+				"product:townhall-t3:blueprint-cookhouse-t1",
+				"product:townhall-t3:hop-field",
+				"product:townhall-t3:blueprint-brewery-t1",
+				"product:townhall-t3:blueprint-tavern-t1",
+				"product:townhall-t3:vineyard",
+				"product:townhall-t3:blueprint-winery-t1",
+				"product:townhall-t3:blueprint-market-t1",
+				"product:townhall-t3:blueprint-townhall-t4"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:townhall-t4": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:townhall-t4:blueprint-paper-mill-t1",
+				"product:townhall-t4:blueprint-school",
+				"product:townhall-t4:blueprint-civic-office-t1",
+				"product:townhall-t4:blueprint-market-t2",
+				"product:townhall-t4:blueprint-prospector-guild-t1",
+				"product:townhall-t4:blueprint-tannery-t1",
+				"product:townhall-t4:blueprint-weaver-hut-t1",
+				"product:townhall-t4:blueprint-dye-workshop-t1",
+				"product:townhall-t4:blueprint-tailor-workshop-t1"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:university": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:university:basic-knowledge",
+				"product:university:advanced-knowledge",
+				"product:university:master-knowledge",
+				"product:university:blueprint-heroes-guild-t1",
+				"product:university:blueprint-glazier-workshop-t1",
+				"product:university:blueprint-quarry-t2",
+				"product:university:blueprint-stonemason-t2",
+				"product:university:blueprint-house-of-engineers",
+				"product:university:blueprint-cathedral",
+				"product:university:blueprint-mage-lodge"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:vegetable-garden-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:vegetable-garden-t1:vegetables"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:weaver-hut-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:weaver-hut-t1:common-cloth"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:well-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:well-t1:water"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:windmill-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:windmill-t1:flour"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:winery-t1": {
+			"hinderedBy": [
+				{
+					"distance": 3,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			],
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:winery-t1:grapes",
+				"product:winery-t1:wine-barrel",
+				"product:winery-t1:wine-barrel-from-wine-glasses"
+			],
+			"requirementIds": [
+				"proximity:winery-t1:vineyard"
+			],
+			"type": "producer"
 		}
 	}
 }

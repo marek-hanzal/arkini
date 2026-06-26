@@ -1189,8 +1189,8 @@
 			],
 			"durationMs": 12000
 		},
-		"craft:surveyor-camp-t1": {
-			"resultItemId": "producer:surveyor-camp-t1",
+		"craft:prospector-guild-t1": {
+			"resultItemId": "producer:prospector-guild-t1",
 			"inputs": [
 				{
 					"itemId": "item:plank",
@@ -1220,6 +1220,50 @@
 			],
 			"requirements": [],
 			"durationMs": 10000
+		},
+		"craft:prospector-guild-t2": {
+			"resultItemId": "producer:prospector-guild-t2",
+			"inputs": [
+				{
+					"itemId": "producer:prospector-guild-t1",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:paper",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 4,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 14000
 		},
 		"craft:tannery-t1": {
 			"resultItemId": "producer:tannery-t1",

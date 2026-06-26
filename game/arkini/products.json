@@ -383,6 +383,14 @@
 			"requirementIds": [],
 			"outputTableId": "loot:academy:advanced-knowledge"
 		},
+		"product:academy:blueprint-prospector-guild-t2": {
+			"name": "Blueprint: Prospector Guild 2",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-prospector-guild-t2",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-prospector-guild-t2"
+		},
 		"product:university:basic-knowledge": {
 			"name": "Basic Knowledge",
 			"durationMs": 6000,
@@ -703,21 +711,21 @@
 			"requirementIds": [],
 			"outputTableId": "loot:civic-office-t1:building-permit"
 		},
-		"product:surveyor-camp-t1:clay-deposit": {
-			"name": "Survey: Clay Deposit",
+		"product:prospector-guild-t1:clay-deposit": {
+			"name": "Prospect: Clay Deposit",
 			"durationMs": 9000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:surveyor-camp-t1:clay-deposit",
+			"inputRefId": "input:prospector-guild-t1:clay-deposit",
 			"requirementIds": [],
-			"outputTableId": "loot:surveyor-camp-t1:clay-deposit"
+			"outputTableId": "loot:prospector-guild-t1:clay-deposit"
 		},
-		"product:surveyor-camp-t1:sand-deposit": {
-			"name": "Survey: Sand Deposit",
+		"product:prospector-guild-t1:sand-deposit": {
+			"name": "Prospect: Sand Deposit",
 			"durationMs": 9000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:surveyor-camp-t1:sand-deposit",
+			"inputRefId": "input:prospector-guild-t1:sand-deposit",
 			"requirementIds": [],
-			"outputTableId": "loot:surveyor-camp-t1:sand-deposit"
+			"outputTableId": "loot:prospector-guild-t1:sand-deposit"
 		},
 		"product:market-t2:coin-from-paper": {
 			"name": "Coins from Paper",
@@ -767,13 +775,13 @@
 			"requirementIds": [],
 			"outputTableId": "loot:townhall-t4:blueprint-market-t2"
 		},
-		"product:townhall-t4:blueprint-surveyor-camp-t1": {
-			"name": "Blueprint: Surveyor Camp I",
+		"product:townhall-t4:blueprint-prospector-guild-t1": {
+			"name": "Blueprint: Prospector Guild 1",
 			"durationMs": 2000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-surveyor-camp-t1",
+			"inputRefId": "input:townhall-t4:blueprint-prospector-guild-t1",
 			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-surveyor-camp-t1"
+			"outputTableId": "loot:townhall-t4:blueprint-prospector-guild-t1"
 		},
 		"product:slaughterhouse-t1:sausage-raw-hide": {
 			"name": "Sausage + Raw Hide",
@@ -1030,29 +1038,45 @@
 			"requirementIds": [],
 			"outputTableId": "loot:academy:blueprint-purifier-t1"
 		},
-		"product:surveyor-camp-t1:coal-deposit": {
-			"name": "Survey: Coal Deposit",
+		"product:prospector-guild-t2:coal-deposit": {
+			"name": "Prospect: Coal Deposit",
 			"durationMs": 10000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:surveyor-camp-t1:coal-deposit",
+			"inputRefId": "input:prospector-guild-t2:coal-deposit",
 			"requirementIds": [],
-			"outputTableId": "loot:surveyor-camp-t1:coal-deposit"
+			"outputTableId": "loot:prospector-guild-t2:coal-deposit"
 		},
-		"product:surveyor-camp-t1:iron-deposit": {
-			"name": "Survey: Iron Deposit",
+		"product:prospector-guild-t2:iron-deposit": {
+			"name": "Prospect: Iron Deposit",
 			"durationMs": 10000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:surveyor-camp-t1:iron-deposit",
+			"inputRefId": "input:prospector-guild-t2:iron-deposit",
 			"requirementIds": [],
-			"outputTableId": "loot:surveyor-camp-t1:iron-deposit"
+			"outputTableId": "loot:prospector-guild-t2:iron-deposit"
 		},
-		"product:surveyor-camp-t1:gold-deposit": {
-			"name": "Survey: Gold Deposit",
+		"product:prospector-guild-t2:gold-deposit": {
+			"name": "Prospect: Gold Deposit",
 			"durationMs": 12000,
 			"placement": "board_then_inventory",
-			"inputRefId": "input:surveyor-camp-t1:gold-deposit",
+			"inputRefId": "input:prospector-guild-t2:gold-deposit",
 			"requirementIds": [],
-			"outputTableId": "loot:surveyor-camp-t1:gold-deposit"
+			"outputTableId": "loot:prospector-guild-t2:gold-deposit"
+		},
+		"product:prospector-guild-t2:sand-deposit": {
+			"name": "Prospect: Sand Deposit",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:prospector-guild-t2:sand-deposit",
+			"requirementIds": [],
+			"outputTableId": "loot:prospector-guild-t2:sand-deposit"
+		},
+		"product:prospector-guild-t2:clay-deposit": {
+			"name": "Prospect: Clay Deposit",
+			"durationMs": 9000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:prospector-guild-t2:clay-deposit",
+			"requirementIds": [],
+			"outputTableId": "loot:prospector-guild-t2:clay-deposit"
 		}
 	}
 }

@@ -237,6 +237,20 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-prospector-guild-t1": {
+			"kind": "item",
+			"label": "Prospector Guild 1 Blueprint",
+			"overlayAssetId": "asset:producer:prospector-guild-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-prospector-guild-t2": {
+			"kind": "item",
+			"label": "Prospector Guild 2 Blueprint",
+			"overlayAssetId": "asset:producer:prospector-guild-t2",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-purifier-t1": {
 			"kind": "item",
 			"label": "Purifier I Blueprint",
@@ -304,13 +318,6 @@
 			"kind": "item",
 			"label": "Stonemason I Blueprint",
 			"overlayAssetId": "asset:producer:stonemason-t1",
-			"render": "blueprint",
-			"resourceId": "item-blueprint"
-		},
-		"asset:item:blueprint-surveyor-camp-t1": {
-			"kind": "item",
-			"label": "Surveyor Camp I Blueprint",
-			"overlayAssetId": "asset:producer:surveyor-camp-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -1137,6 +1144,18 @@
 			"render": "plain",
 			"resourceId": "producer-pig-farm-t1"
 		},
+		"asset:producer:prospector-guild-t1": {
+			"kind": "item",
+			"label": "Prospector Guild 1",
+			"render": "plain",
+			"resourceId": "producer-prospector-guild-t1"
+		},
+		"asset:producer:prospector-guild-t2": {
+			"kind": "item",
+			"label": "Prospector Guild 2",
+			"render": "plain",
+			"resourceId": "producer-prospector-guild-t1"
+		},
 		"asset:producer:purifier-t1": {
 			"kind": "item",
 			"label": "Purifier I",
@@ -1196,12 +1215,6 @@
 			"label": "Stonemason I",
 			"render": "plain",
 			"resourceId": "producer-stonemason-t1"
-		},
-		"asset:producer:surveyor-camp-t1": {
-			"kind": "item",
-			"label": "Surveyor Camp I",
-			"render": "plain",
-			"resourceId": "producer-surveyor-camp-t1"
 		},
 		"asset:producer:tailor-workshop-t1": {
 			"kind": "item",
@@ -2120,6 +2133,82 @@
 			"requirements": [],
 			"resultItemId": "producer:pig-farm-t1"
 		},
+		"craft:prospector-guild-t1": {
+			"durationMs": 10000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:prospector-guild-t1"
+		},
+		"craft:prospector-guild-t2": {
+			"durationMs": 14000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:prospector-guild-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:prospector-guild-t2"
+		},
 		"craft:purifier-t1": {
 			"durationMs": 12000,
 			"inputs": [
@@ -2419,38 +2508,6 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:stonemason-t1"
-		},
-		"craft:surveyor-camp-t1": {
-			"durationMs": 10000,
-			"inputs": [
-				{
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 3
-				},
-				{
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
-				}
-			],
-			"requirements": [],
-			"resultItemId": "producer:surveyor-camp-t1"
 		},
 		"craft:tailor-workshop-t1": {
 			"durationMs": 11000,
@@ -3072,6 +3129,35 @@
 				}
 			],
 			"name": "Blueprint: Iron Mine I input"
+		},
+		"input:academy:blueprint-prospector-guild-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Prospector Guild 2 input"
 		},
 		"input:academy:blueprint-purifier-t1": {
 			"inputs": [
@@ -3965,6 +4051,185 @@
 			],
 			"name": "Pig farm grain and water input"
 		},
+		"input:prospector-guild-t1:clay-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Prospector Guild 1 clay deposit inputs"
+		},
+		"input:prospector-guild-t1:sand-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Prospector Guild 1 sand deposit inputs"
+		},
+		"input:prospector-guild-t2:clay-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Prospector Guild 2 clay deposit inputs"
+		},
+		"input:prospector-guild-t2:coal-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Prospector Guild 2 coal deposit inputs"
+		},
+		"input:prospector-guild-t2:gold-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Prospector Guild 2 gold deposit inputs"
+		},
+		"input:prospector-guild-t2:iron-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Prospector Guild 2 iron deposit inputs"
+		},
+		"input:prospector-guild-t2:sand-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Prospector Guild 2 sand deposit inputs"
+		},
 		"input:purifier-t1:pollution": {
 			"inputs": [
 				{
@@ -4146,139 +4411,6 @@
 				}
 			],
 			"name": "Stonemason stone input"
-		},
-		"input:surveyor-camp-t1:clay-deposit": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			],
-			"name": "Surveyor Camp clay survey inputs"
-		},
-		"input:surveyor-camp-t1:coal-deposit": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
-				}
-			],
-			"name": "Surveyor Camp coal deposit inputs"
-		},
-		"input:surveyor-camp-t1:gold-deposit": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 4
-				}
-			],
-			"name": "Surveyor Camp gold deposit inputs"
-		},
-		"input:surveyor-camp-t1:iron-deposit": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
-				}
-			],
-			"name": "Surveyor Camp iron deposit inputs"
-		},
-		"input:surveyor-camp-t1:sand-deposit": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			],
-			"name": "Surveyor Camp sand survey inputs"
 		},
 		"input:tailor-workshop-t1:common-clothing": {
 			"inputs": [
@@ -5115,6 +5247,29 @@
 			],
 			"name": "Blueprint: Paper Mill I input"
 		},
+		"input:townhall-t4:blueprint-prospector-guild-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Prospector Guild 1 input"
+		},
 		"input:townhall-t4:blueprint-roof-tile-factory": {
 			"inputs": [
 				{
@@ -5183,29 +5338,6 @@
 				}
 			],
 			"name": "Blueprint: School input"
-		},
-		"input:townhall-t4:blueprint-surveyor-camp-t1": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
-				}
-			],
-			"name": "Blueprint: Surveyor Camp I input"
 		},
 		"input:townhall-t4:blueprint-tailor-workshop-t1": {
 			"inputs": [
@@ -5948,6 +6080,46 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-prospector-guild-t1": {
+			"assetId": "asset:item:blueprint-prospector-guild-t1",
+			"code": "blueprint-prospector-guild-t1",
+			"craftRecipeId": "craft:prospector-guild-t1",
+			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
+			"label": "1",
+			"maxStackSize": 10,
+			"name": "Prospector Guild Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"prospecting",
+				"guild",
+				"civic",
+				"era:IV"
+			],
+			"tier": 0
+		},
+		"item:blueprint-prospector-guild-t2": {
+			"assetId": "asset:item:blueprint-prospector-guild-t2",
+			"code": "blueprint-prospector-guild-t2",
+			"craftRecipeId": "craft:prospector-guild-t2",
+			"description": "Build plan that upgrades Prospector Guild 1 into Prospector Guild 2.",
+			"label": "2",
+			"maxStackSize": 10,
+			"name": "Prospector Guild Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"prospecting",
+				"guild",
+				"industry",
+				"era:VII"
+			],
+			"tier": 0
+		},
 		"item:blueprint-purifier-t1": {
 			"assetId": "asset:item:blueprint-purifier-t1",
 			"code": "blueprint-purifier-t1",
@@ -6111,24 +6283,6 @@
 				"building",
 				"craft-target",
 				"era:I"
-			],
-			"tier": 0
-		},
-		"item:blueprint-surveyor-camp-t1": {
-			"assetId": "asset:item:blueprint-surveyor-camp-t1",
-			"code": "blueprint-surveyor-camp-t1",
-			"craftRecipeId": "craft:surveyor-camp-t1",
-			"description": "Build plan that can be filled with resources to construct Surveyor Camp I.",
-			"maxStackSize": 10,
-			"name": "Surveyor Camp I Blueprint",
-			"storage": "both",
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"survey",
-				"civic",
-				"era:IV"
 			],
 			"tier": 0
 		},
@@ -7060,7 +7214,7 @@
 		"item:paper": {
 			"assetId": "asset:item:paper",
 			"code": "paper",
-			"description": "Processed writing material used by schools, civic offices, surveyors, and improved trade.",
+			"description": "Processed writing material used by schools, civic offices, prospectors, and improved trade.",
 			"maxStackSize": 50,
 			"name": "Paper",
 			"storage": "both",
@@ -7873,6 +8027,44 @@
 			],
 			"tier": 1
 		},
+		"producer:prospector-guild-t1": {
+			"assetId": "asset:producer:prospector-guild-t1",
+			"code": "prospector-guild-t1",
+			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
+			"label": "1",
+			"maxStackSize": 1,
+			"name": "Prospector Guild",
+			"producerId": "producer:prospector-guild-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"prospecting",
+				"guild",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"producer:prospector-guild-t2": {
+			"assetId": "asset:producer:prospector-guild-t2",
+			"code": "prospector-guild-t2",
+			"description": "Upgraded prospecting guild that keeps surface surveys and adds coal, iron, and gold deposit prospecting for industry.",
+			"label": "2",
+			"maxStackSize": 1,
+			"name": "Prospector Guild",
+			"producerId": "producer:prospector-guild-t2",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"prospecting",
+				"guild",
+				"industry",
+				"era:VII"
+			],
+			"tier": 7
+		},
 		"producer:purifier-t1": {
 			"assetId": "asset:producer:purifier-t1",
 			"code": "purifier-t1",
@@ -8035,23 +8227,6 @@
 				"era:I"
 			],
 			"tier": 1
-		},
-		"producer:surveyor-camp-t1": {
-			"assetId": "asset:producer:surveyor-camp-t1",
-			"code": "surveyor-camp-t1",
-			"description": "Survey producer that uses permits and knowledge to discover clay and sand deposits for advanced construction.",
-			"maxStackSize": 1,
-			"name": "Surveyor Camp I",
-			"producerId": "producer:surveyor-camp-t1",
-			"storage": "both",
-			"tags": [
-				"producer",
-				"building",
-				"survey",
-				"civic",
-				"era:IV"
-			],
-			"tier": 4
 		},
 		"producer:tailor-workshop-t1": {
 			"assetId": "asset:producer:tailor-workshop-t1",
@@ -8329,6 +8504,16 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-iron-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-prospector-guild-t2": {
+			"name": "Academy Prospector Guild 2 blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-prospector-guild-t2",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -8914,6 +9099,76 @@
 				}
 			]
 		},
+		"loot:prospector-guild-t1:clay-deposit": {
+			"name": "Prospector Guild 1 clay deposit output",
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t1:sand-deposit": {
+			"name": "Prospector Guild 1 sand deposit output",
+			"output": [
+				{
+					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:clay-deposit": {
+			"name": "Prospector Guild 2 clay deposit output",
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:coal-deposit": {
+			"name": "Prospector Guild 2 coal deposit output",
+			"output": [
+				{
+					"itemId": "item:coal-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:gold-deposit": {
+			"name": "Prospector Guild 2 gold deposit output",
+			"output": [
+				{
+					"itemId": "item:gold-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:iron-deposit": {
+			"name": "Prospector Guild 2 iron deposit output",
+			"output": [
+				{
+					"itemId": "item:iron-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:prospector-guild-t2:sand-deposit": {
+			"name": "Prospector Guild 2 sand deposit output",
+			"output": [
+				{
+					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:quarry-t1:stone": {
 			"name": "Quarry stone",
 			"output": [
@@ -9024,56 +9279,6 @@
 			"output": [
 				{
 					"itemId": "item:stone-block",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:surveyor-camp-t1:clay-deposit": {
-			"name": "Surveyor Camp clay deposit output",
-			"output": [
-				{
-					"itemId": "item:clay-deposit",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:surveyor-camp-t1:coal-deposit": {
-			"name": "Surveyor Camp coal deposit output",
-			"output": [
-				{
-					"itemId": "item:coal-deposit",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:surveyor-camp-t1:gold-deposit": {
-			"name": "Surveyor Camp gold deposit output",
-			"output": [
-				{
-					"itemId": "item:gold-deposit",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:surveyor-camp-t1:iron-deposit": {
-			"name": "Surveyor Camp iron deposit output",
-			"output": [
-				{
-					"itemId": "item:iron-deposit",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:surveyor-camp-t1:sand-deposit": {
-			"name": "Surveyor Camp sand deposit output",
-			"output": [
-				{
-					"itemId": "item:sand-deposit",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -9489,6 +9694,16 @@
 				}
 			]
 		},
+		"loot:townhall-t4:blueprint-prospector-guild-t1": {
+			"name": "Town Hall IV Prospector Guild 1 blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-prospector-guild-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t4:blueprint-roof-tile-factory": {
 			"name": "Town Hall IV Roof Tile Factory blueprint output",
 			"output": [
@@ -9514,16 +9729,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-school",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-surveyor-camp-t1": {
-			"name": "Town Hall IV Surveyor Camp I blueprint output",
-			"output": [
-				{
-					"itemId": "item:blueprint-surveyor-camp-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -9667,6 +9872,7 @@
 			"productIds": [
 				"product:academy:basic-knowledge",
 				"product:academy:advanced-knowledge",
+				"product:academy:blueprint-prospector-guild-t2",
 				"product:academy:blueprint-coal-mine-t1",
 				"product:academy:blueprint-iron-mine-t1",
 				"product:academy:blueprint-gold-mine-t1",
@@ -9922,6 +10128,27 @@
 			"requirementIds": [],
 			"type": "producer"
 		},
+		"producer:prospector-guild-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:prospector-guild-t1:clay-deposit",
+				"product:prospector-guild-t1:sand-deposit"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:prospector-guild-t2": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:prospector-guild-t2:clay-deposit",
+				"product:prospector-guild-t2:sand-deposit",
+				"product:prospector-guild-t2:coal-deposit",
+				"product:prospector-guild-t2:iron-deposit",
+				"product:prospector-guild-t2:gold-deposit"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
 		"producer:purifier-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -10014,18 +10241,6 @@
 			],
 			"type": "producer"
 		},
-		"producer:surveyor-camp-t1": {
-			"maxQueueSize": 1,
-			"productIds": [
-				"product:surveyor-camp-t1:clay-deposit",
-				"product:surveyor-camp-t1:sand-deposit",
-				"product:surveyor-camp-t1:coal-deposit",
-				"product:surveyor-camp-t1:iron-deposit",
-				"product:surveyor-camp-t1:gold-deposit"
-			],
-			"requirementIds": [],
-			"type": "producer"
-		},
 		"producer:tailor-workshop-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
@@ -10107,7 +10322,7 @@
 				"product:townhall-t4:blueprint-school",
 				"product:townhall-t4:blueprint-civic-office-t1",
 				"product:townhall-t4:blueprint-market-t2",
-				"product:townhall-t4:blueprint-surveyor-camp-t1",
+				"product:townhall-t4:blueprint-prospector-guild-t1",
 				"product:townhall-t4:blueprint-tannery-t1",
 				"product:townhall-t4:blueprint-weaver-hut-t1",
 				"product:townhall-t4:blueprint-dye-workshop-t1",
@@ -10226,6 +10441,14 @@
 			"inputRefId": "input:academy:blueprint-iron-mine-t1",
 			"name": "Blueprint: Iron Mine I",
 			"outputTableId": "loot:academy:blueprint-iron-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-prospector-guild-t2": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-prospector-guild-t2",
+			"name": "Blueprint: Prospector Guild 2",
+			"outputTableId": "loot:academy:blueprint-prospector-guild-t2",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -10628,6 +10851,62 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:prospector-guild-t1:clay-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:prospector-guild-t1:clay-deposit",
+			"name": "Prospect: Clay Deposit",
+			"outputTableId": "loot:prospector-guild-t1:clay-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t1:sand-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:prospector-guild-t1:sand-deposit",
+			"name": "Prospect: Sand Deposit",
+			"outputTableId": "loot:prospector-guild-t1:sand-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:clay-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:prospector-guild-t2:clay-deposit",
+			"name": "Prospect: Clay Deposit",
+			"outputTableId": "loot:prospector-guild-t2:clay-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:coal-deposit": {
+			"durationMs": 10000,
+			"inputRefId": "input:prospector-guild-t2:coal-deposit",
+			"name": "Prospect: Coal Deposit",
+			"outputTableId": "loot:prospector-guild-t2:coal-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:gold-deposit": {
+			"durationMs": 12000,
+			"inputRefId": "input:prospector-guild-t2:gold-deposit",
+			"name": "Prospect: Gold Deposit",
+			"outputTableId": "loot:prospector-guild-t2:gold-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:iron-deposit": {
+			"durationMs": 10000,
+			"inputRefId": "input:prospector-guild-t2:iron-deposit",
+			"name": "Prospect: Iron Deposit",
+			"outputTableId": "loot:prospector-guild-t2:iron-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:prospector-guild-t2:sand-deposit": {
+			"durationMs": 9000,
+			"inputRefId": "input:prospector-guild-t2:sand-deposit",
+			"name": "Prospect: Sand Deposit",
+			"outputTableId": "loot:prospector-guild-t2:sand-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:purifier-t1:pollution": {
 			"durationMs": 6000,
 			"inputRefId": "input:purifier-t1:pollution",
@@ -10727,46 +11006,6 @@
 			"inputRefId": "input:stonemason-t1:stone",
 			"name": "Stone Block",
 			"outputTableId": "loot:stonemason-t1:stone-block",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:surveyor-camp-t1:clay-deposit": {
-			"durationMs": 9000,
-			"inputRefId": "input:surveyor-camp-t1:clay-deposit",
-			"name": "Survey: Clay Deposit",
-			"outputTableId": "loot:surveyor-camp-t1:clay-deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:surveyor-camp-t1:coal-deposit": {
-			"durationMs": 10000,
-			"inputRefId": "input:surveyor-camp-t1:coal-deposit",
-			"name": "Survey: Coal Deposit",
-			"outputTableId": "loot:surveyor-camp-t1:coal-deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:surveyor-camp-t1:gold-deposit": {
-			"durationMs": 12000,
-			"inputRefId": "input:surveyor-camp-t1:gold-deposit",
-			"name": "Survey: Gold Deposit",
-			"outputTableId": "loot:surveyor-camp-t1:gold-deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:surveyor-camp-t1:iron-deposit": {
-			"durationMs": 10000,
-			"inputRefId": "input:surveyor-camp-t1:iron-deposit",
-			"name": "Survey: Iron Deposit",
-			"outputTableId": "loot:surveyor-camp-t1:iron-deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:surveyor-camp-t1:sand-deposit": {
-			"durationMs": 9000,
-			"inputRefId": "input:surveyor-camp-t1:sand-deposit",
-			"name": "Survey: Sand Deposit",
-			"outputTableId": "loot:surveyor-camp-t1:sand-deposit",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -11098,6 +11337,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t4:blueprint-prospector-guild-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:townhall-t4:blueprint-prospector-guild-t1",
+			"name": "Blueprint: Prospector Guild 1",
+			"outputTableId": "loot:townhall-t4:blueprint-prospector-guild-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t4:blueprint-roof-tile-factory": {
 			"durationMs": 2500,
 			"inputRefId": "input:townhall-t4:blueprint-roof-tile-factory",
@@ -11119,14 +11366,6 @@
 			"inputRefId": "input:townhall-t4:blueprint-school",
 			"name": "Blueprint: School",
 			"outputTableId": "loot:townhall-t4:blueprint-school",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t4:blueprint-surveyor-camp-t1": {
-			"durationMs": 2000,
-			"inputRefId": "input:townhall-t4:blueprint-surveyor-camp-t1",
-			"name": "Blueprint: Surveyor Camp I",
-			"outputTableId": "loot:townhall-t4:blueprint-surveyor-camp-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

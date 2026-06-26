@@ -279,6 +279,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-quarry-t2": {
+			"kind": "item",
+			"label": "Quarry II Blueprint",
+			"overlayAssetId": "asset:producer:quarry-t2",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-roof-tile-factory": {
 			"kind": "item",
 			"label": "Roof Tile Factory Blueprint",
@@ -332,6 +339,13 @@
 			"kind": "item",
 			"label": "Stonemason I Blueprint",
 			"overlayAssetId": "asset:producer:stonemason-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-stonemason-t2": {
+			"kind": "item",
+			"label": "Stonemason II Blueprint",
+			"overlayAssetId": "asset:producer:stonemason-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -780,6 +794,24 @@
 			"render": "plain",
 			"resourceId": "item-luxury-clothing"
 		},
+		"asset:item:marble": {
+			"kind": "item",
+			"label": "Marble",
+			"render": "plain",
+			"resourceId": "item-marble"
+		},
+		"asset:item:marble-block": {
+			"kind": "item",
+			"label": "Marble Block",
+			"render": "plain",
+			"resourceId": "item-marble-block"
+		},
+		"asset:item:marble-deposit": {
+			"kind": "item",
+			"label": "Marble Deposit",
+			"render": "plain",
+			"resourceId": "item-marble-deposit"
+		},
 		"asset:item:master-knowledge": {
 			"kind": "item",
 			"label": "Master Knowledge",
@@ -1212,6 +1244,12 @@
 			"render": "plain",
 			"resourceId": "producer-quarry-t1"
 		},
+		"asset:producer:quarry-t2": {
+			"kind": "item",
+			"label": "Quarry II",
+			"render": "plain",
+			"resourceId": "producer-quarry-t2"
+		},
 		"asset:producer:roof-tile-factory": {
 			"kind": "item",
 			"label": "Roof Tile Factory",
@@ -1259,6 +1297,12 @@
 			"label": "Stonemason I",
 			"render": "plain",
 			"resourceId": "producer-stonemason-t1"
+		},
+		"asset:producer:stonemason-t2": {
+			"kind": "item",
+			"label": "Stonemason II",
+			"render": "plain",
+			"resourceId": "producer-stonemason-t2"
 		},
 		"asset:producer:tailor-workshop-t1": {
 			"kind": "item",
@@ -2585,6 +2629,51 @@
 			"requirements": [],
 			"resultItemId": "producer:quarry-t1"
 		},
+		"craft:quarry-t2": {
+			"durationMs": 16000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:quarry-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "item:marble-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:quarry-t2"
+		},
 		"craft:roof-tile-factory": {
 			"durationMs": 11000,
 			"inputs": [
@@ -2842,6 +2931,51 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:stonemason-t1"
+		},
+		"craft:stonemason-t2": {
+			"durationMs": 16000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:stonemason-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:quarry-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:stonemason-t2"
 		},
 		"craft:tailor-workshop-t1": {
 			"durationMs": 11000,
@@ -5221,6 +5355,35 @@
 			],
 			"name": "Prospector Guild 2 iron deposit inputs"
 		},
+		"input:prospector-guild-t2:marble-deposit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"name": "Prospector Guild 2 marble deposit inputs"
+		},
 		"input:prospector-guild-t2:sand-deposit": {
 			"inputs": [
 				{
@@ -5425,6 +5588,34 @@
 				}
 			],
 			"name": "Stonemason stone input"
+		},
+		"input:stonemason-t2:marble-block": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Stonemason 2 marble input"
+		},
+		"input:stonemason-t2:stone-block": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Stonemason 2 stone input"
 		},
 		"input:tailor-workshop-t1:common-clothing": {
 			"inputs": [
@@ -6329,6 +6520,64 @@
 			],
 			"name": "Blueprint: Heroes Guild I input"
 		},
+		"input:university:blueprint-quarry-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Quarry 2 input"
+		},
+		"input:university:blueprint-stonemason-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Stonemason 2 input"
+		},
 		"input:university:master-knowledge": {
 			"inputs": [
 				{
@@ -7090,6 +7339,27 @@
 			],
 			"tier": 0
 		},
+		"item:blueprint-quarry-t2": {
+			"assetId": "asset:item:blueprint-quarry-t2",
+			"code": "blueprint-quarry-t2",
+			"craftRecipeId": "craft:quarry-t2",
+			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
+			"label": "2",
+			"maxStackSize": 10,
+			"name": "Quarry Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 0
+		},
 		"item:blueprint-roof-tile-factory": {
 			"assetId": "asset:item:blueprint-roof-tile-factory",
 			"code": "blueprint-roof-tile-factory",
@@ -7224,6 +7494,28 @@
 				"building",
 				"craft-target",
 				"era:I"
+			],
+			"tier": 0
+		},
+		"item:blueprint-stonemason-t2": {
+			"assetId": "asset:item:blueprint-stonemason-t2",
+			"code": "blueprint-stonemason-t2",
+			"craftRecipeId": "craft:stonemason-t2",
+			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
+			"label": "2",
+			"maxStackSize": 10,
+			"name": "Stonemason Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X"
 			],
 			"tier": 0
 		},
@@ -8158,6 +8450,61 @@
 				"era:V"
 			],
 			"tier": 5
+		},
+		"item:marble": {
+			"assetId": "asset:item:marble",
+			"code": "marble",
+			"description": "Raw white marble extracted by Quarry II before being finished by Stonemason II.",
+			"maxStackSize": 40,
+			"name": "Marble",
+			"storage": "both",
+			"tags": [
+				"material",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 10
+		},
+		"item:marble-block": {
+			"assetId": "asset:item:marble-block",
+			"code": "marble-block",
+			"description": "Polished marble construction block for future prestige buildings that should not be made from yet another heroic pile of planks.",
+			"maxStackSize": 30,
+			"name": "Marble Block",
+			"storage": "both",
+			"tags": [
+				"material",
+				"construction",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"master",
+				"era:X"
+			],
+			"tier": 10
+		},
+		"item:marble-deposit": {
+			"assetId": "asset:item:marble-deposit",
+			"code": "marble-deposit",
+			"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
+			"maxStackSize": 10,
+			"name": "Marble Deposit",
+			"storage": "both",
+			"tags": [
+				"source",
+				"construction",
+				"stone",
+				"marble",
+				"deposit",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 10
 		},
 		"item:master-knowledge": {
 			"assetId": "asset:item:master-knowledge",
@@ -9179,6 +9526,27 @@
 			],
 			"tier": 1
 		},
+		"producer:quarry-t2": {
+			"assetId": "asset:producer:quarry-t2",
+			"code": "quarry-t2",
+			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
+			"label": "2",
+			"maxStackSize": 1,
+			"name": "Quarry",
+			"producerId": "producer:quarry-t2",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"quarry",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 10
+		},
 		"producer:roof-tile-factory": {
 			"assetId": "asset:producer:roof-tile-factory",
 			"code": "roof-tile-factory",
@@ -9311,6 +9679,27 @@
 				"era:I"
 			],
 			"tier": 1
+		},
+		"producer:stonemason-t2": {
+			"assetId": "asset:producer:stonemason-t2",
+			"code": "stonemason-t2",
+			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
+			"label": "2",
+			"maxStackSize": 1,
+			"name": "Stonemason",
+			"producerId": "producer:stonemason-t2",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 10
 		},
 		"producer:tailor-workshop-t1": {
 			"assetId": "asset:producer:tailor-workshop-t1",
@@ -10578,6 +10967,16 @@
 				}
 			]
 		},
+		"loot:prospector-guild-t2:marble-deposit": {
+			"name": "Prospector Guild 2 marble deposit output",
+			"output": [
+				{
+					"itemId": "item:marble-deposit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:prospector-guild-t2:sand-deposit": {
 			"name": "Prospector Guild 2 sand deposit output",
 			"output": [
@@ -10590,6 +10989,26 @@
 		},
 		"loot:quarry-t1:stone": {
 			"name": "Quarry stone",
+			"output": [
+				{
+					"itemId": "item:stone",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:quarry-t2:marble": {
+			"name": "Quarry 2 marble",
+			"output": [
+				{
+					"itemId": "item:marble",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:quarry-t2:stone": {
+			"name": "Quarry 2 stone",
 			"output": [
 				{
 					"itemId": "item:stone",
@@ -10721,6 +11140,26 @@
 		},
 		"loot:stonemason-t1:stone-block": {
 			"name": "Stonemason stone blocks",
+			"output": [
+				{
+					"itemId": "item:stone-block",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:stonemason-t2:marble-block": {
+			"name": "Stonemason 2 marble blocks",
+			"output": [
+				{
+					"itemId": "item:marble-block",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:stonemason-t2:stone-block": {
+			"name": "Stonemason 2 stone blocks",
 			"output": [
 				{
 					"itemId": "item:stone-block",
@@ -11179,6 +11618,26 @@
 				}
 			]
 		},
+		"loot:university:blueprint-quarry-t2": {
+			"name": "University Quarry 2 blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-quarry-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:blueprint-stonemason-t2": {
+			"name": "University Stonemason 2 blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-stonemason-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:university:master-knowledge": {
 			"name": "University master knowledge output",
 			"output": [
@@ -11574,7 +12033,8 @@
 				"product:prospector-guild-t2:sand-deposit",
 				"product:prospector-guild-t2:coal-deposit",
 				"product:prospector-guild-t2:iron-deposit",
-				"product:prospector-guild-t2:gold-deposit"
+				"product:prospector-guild-t2:gold-deposit",
+				"product:prospector-guild-t2:marble-deposit"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -11595,6 +12055,17 @@
 			],
 			"requirementIds": [
 				"proximity:quarry-t1:rock"
+			],
+			"type": "producer"
+		},
+		"producer:quarry-t2": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:quarry-t2:stone",
+				"product:quarry-t2:marble"
+			],
+			"requirementIds": [
+				"proximity:quarry-t2:marble-deposit"
 			],
 			"type": "producer"
 		},
@@ -11668,6 +12139,17 @@
 			],
 			"requirementIds": [
 				"proximity:stonemason-t1:quarry-t1"
+			],
+			"type": "producer"
+		},
+		"producer:stonemason-t2": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:stonemason-t2:stone-block",
+				"product:stonemason-t2:marble-block"
+			],
+			"requirementIds": [
+				"proximity:stonemason-t2:quarry-t2"
 			],
 			"type": "producer"
 		},
@@ -11768,7 +12250,9 @@
 				"product:university:advanced-knowledge",
 				"product:university:master-knowledge",
 				"product:university:blueprint-heroes-guild-t1",
-				"product:university:blueprint-glazier-workshop-t1"
+				"product:university:blueprint-glazier-workshop-t1",
+				"product:university:blueprint-quarry-t2",
+				"product:university:blueprint-stonemason-t2"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -12502,6 +12986,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:prospector-guild-t2:marble-deposit": {
+			"durationMs": 14000,
+			"inputRefId": "input:prospector-guild-t2:marble-deposit",
+			"name": "Prospect: Marble Deposit",
+			"outputTableId": "loot:prospector-guild-t2:marble-deposit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:prospector-guild-t2:sand-deposit": {
 			"durationMs": 9000,
 			"inputRefId": "input:prospector-guild-t2:sand-deposit",
@@ -12528,6 +13020,20 @@
 			"durationMs": 5000,
 			"name": "Stone",
 			"outputTableId": "loot:quarry-t1:stone",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:quarry-t2:marble": {
+			"durationMs": 12000,
+			"name": "Marble",
+			"outputTableId": "loot:quarry-t2:marble",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:quarry-t2:stone": {
+			"durationMs": 4000,
+			"name": "Stone",
+			"outputTableId": "loot:quarry-t2:stone",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -12615,6 +13121,22 @@
 			"inputRefId": "input:stonemason-t1:stone",
 			"name": "Stone Block",
 			"outputTableId": "loot:stonemason-t1:stone-block",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:stonemason-t2:marble-block": {
+			"durationMs": 13000,
+			"inputRefId": "input:stonemason-t2:marble-block",
+			"name": "Marble Block",
+			"outputTableId": "loot:stonemason-t2:marble-block",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:stonemason-t2:stone-block": {
+			"durationMs": 4000,
+			"inputRefId": "input:stonemason-t2:stone-block",
+			"name": "Stone Block",
+			"outputTableId": "loot:stonemason-t2:stone-block",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -12978,6 +13500,22 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:university:blueprint-quarry-t2": {
+			"durationMs": 3500,
+			"inputRefId": "input:university:blueprint-quarry-t2",
+			"name": "Blueprint: Quarry 2",
+			"outputTableId": "loot:university:blueprint-quarry-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:blueprint-stonemason-t2": {
+			"durationMs": 3500,
+			"inputRefId": "input:university:blueprint-stonemason-t2",
+			"name": "Blueprint: Stonemason 2",
+			"outputTableId": "loot:university:blueprint-stonemason-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:university:master-knowledge": {
 			"durationMs": 36000,
 			"inputRefId": "input:university:master-knowledge",
@@ -13149,6 +13687,14 @@
 			],
 			"type": "proximity"
 		},
+		"proximity:quarry-t2:marble-deposit": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"item:marble-deposit"
+			],
+			"type": "proximity"
+		},
 		"proximity:roof-tile-factory:clay-pit": {
 			"distance": 2,
 			"durationFactor": 1,
@@ -13178,6 +13724,14 @@
 			"durationFactor": 1,
 			"itemIds": [
 				"producer:quarry-t1"
+			],
+			"type": "proximity"
+		},
+		"proximity:stonemason-t2:quarry-t2": {
+			"distance": 2,
+			"durationFactor": 1,
+			"itemIds": [
+				"producer:quarry-t2"
 			],
 			"type": "proximity"
 		},

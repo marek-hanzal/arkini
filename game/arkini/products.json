@@ -1221,6 +1221,60 @@
 			"inputRefId": "input:university:blueprint-glazier-workshop-t1",
 			"requirementIds": [],
 			"outputTableId": "loot:university:blueprint-glazier-workshop-t1"
+		},
+		"product:prospector-guild-t2:marble-deposit": {
+			"name": "Prospect: Marble Deposit",
+			"durationMs": 14000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:prospector-guild-t2:marble-deposit",
+			"requirementIds": [],
+			"outputTableId": "loot:prospector-guild-t2:marble-deposit"
+		},
+		"product:university:blueprint-quarry-t2": {
+			"name": "Blueprint: Quarry 2",
+			"durationMs": 3500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:university:blueprint-quarry-t2",
+			"requirementIds": [],
+			"outputTableId": "loot:university:blueprint-quarry-t2"
+		},
+		"product:university:blueprint-stonemason-t2": {
+			"name": "Blueprint: Stonemason 2",
+			"durationMs": 3500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:university:blueprint-stonemason-t2",
+			"requirementIds": [],
+			"outputTableId": "loot:university:blueprint-stonemason-t2"
+		},
+		"product:quarry-t2:stone": {
+			"name": "Stone",
+			"durationMs": 4000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:quarry-t2:stone"
+		},
+		"product:quarry-t2:marble": {
+			"name": "Marble",
+			"durationMs": 12000,
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"outputTableId": "loot:quarry-t2:marble"
+		},
+		"product:stonemason-t2:stone-block": {
+			"name": "Stone Block",
+			"durationMs": 4000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:stonemason-t2:stone-block",
+			"requirementIds": [],
+			"outputTableId": "loot:stonemason-t2:stone-block"
+		},
+		"product:stonemason-t2:marble-block": {
+			"name": "Marble Block",
+			"durationMs": 13000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:stonemason-t2:marble-block",
+			"requirementIds": [],
+			"outputTableId": "loot:stonemason-t2:marble-block"
 		}
 	}
 }

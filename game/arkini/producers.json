@@ -331,7 +331,9 @@
 				"product:university:advanced-knowledge",
 				"product:university:master-knowledge",
 				"product:university:blueprint-heroes-guild-t1",
-				"product:university:blueprint-glazier-workshop-t1"
+				"product:university:blueprint-glazier-workshop-t1",
+				"product:university:blueprint-quarry-t2",
+				"product:university:blueprint-stonemason-t2"
 			],
 			"requirementIds": []
 		},
@@ -431,7 +433,8 @@
 				"product:prospector-guild-t2:sand-deposit",
 				"product:prospector-guild-t2:coal-deposit",
 				"product:prospector-guild-t2:iron-deposit",
-				"product:prospector-guild-t2:gold-deposit"
+				"product:prospector-guild-t2:gold-deposit",
+				"product:prospector-guild-t2:marble-deposit"
 			],
 			"requirementIds": []
 		},
@@ -564,6 +567,28 @@
 				"product:armory-t1:iron-armor"
 			],
 			"requirementIds": []
+		},
+		"producer:quarry-t2": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:quarry-t2:stone",
+				"product:quarry-t2:marble"
+			],
+			"requirementIds": [
+				"proximity:quarry-t2:marble-deposit"
+			]
+		},
+		"producer:stonemason-t2": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:stonemason-t2:stone-block",
+				"product:stonemason-t2:marble-block"
+			],
+			"requirementIds": [
+				"proximity:stonemason-t2:quarry-t2"
+			]
 		}
 	}
 }

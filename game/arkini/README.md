@@ -258,13 +258,17 @@ Era IX guild institutions, equipment, keys, and expeditions
   Heroes Guild I + gear + food + luxury + keys + knowledge -> Chests and Treasure Chest
   Treasure Chest is the current Era IX master output.
 
-Era X prestige glass materials
+Era X prestige construction materials
   Dye Workshop I + Vegetables + Water -> Pigment
   Dye Workshop I + Common Cloth + Pigment + Water -> Luxury Cloth
   University + Master Knowledge + Guild Charter + Glass + Pigment + Coin Stack -> Glazier Workshop I Blueprint
   Glazier Workshop I + Construction Bundle + Guild Charter + Glass + Bricks + Roof Tiles + Master Knowledge + Coin Stack -> Glazier Workshop I
   Glazier Workshop I + Glass + Pigment + Charcoal + Water + nearby Glassworks + nearby Purifier -> Stained Glass + random Pollution
-  Stained Glass is the current Era X master/prestige construction output.
+  Prospector Guild 2 + Master Knowledge + Guild Charter + Building Permit + Coin Stack -> Marble Deposit
+  University + Master Knowledge + Guild Charter + advanced materials -> Quarry 2 / Stonemason 2 blueprints
+  Quarry 2 near Marble Deposit -> Stone / Marble
+  Stonemason 2 near Quarry 2 -> Stone Block / Marble Block
+  Stained Glass and Marble Block are the current Era X prestige construction outputs.
 ```
 
 ### Initial balance placeholder
@@ -317,12 +321,15 @@ Current processor input buffers use capacity `4`:
 - `input:prospector-guild-t2:coal-deposit`
 - `input:prospector-guild-t2:iron-deposit`
 - `input:prospector-guild-t2:gold-deposit`
+- `input:prospector-guild-t2:marble-deposit`
 - `input:charcoal-burner-t1:charcoal`
 - `input:clay-pit:clay`
 - `input:brickyard:bricks`
 - `input:glassworks:glass`
 - `input:roof-tile-factory:roof-tiles`
 - `input:construction-yard-t1:construction-bundle`
+- `input:stonemason-t2:stone-block`
+- `input:stonemason-t2:marble-block`
 
 ### Era V textile asset IDs
 
@@ -353,16 +360,21 @@ Existing prepared construction assets are now connected into Era VIII: Clay Pit,
 
 `Construction Bundle` is the Era VIII master item and becomes the material base for later advanced civic/guild buildings.
 
-### Era X prestige glass material asset IDs
+### Era X prestige construction material asset IDs
 
-The prestige glass pass adds dedicated 128x128 transparent PNGs for guild paperwork, pigment, stained glass, and the glazier producer:
+The prestige construction pass adds dedicated 128x128 transparent PNGs for guild paperwork, pigment, stained glass, marble, and the prestige producers:
 
 - `asset:item:guild-charter` -> `game/arkini/assets/item-guild-charter.png`
 - `asset:item:pigment` -> `game/arkini/assets/item-pigment.png`
 - `asset:item:stained-glass` -> `game/arkini/assets/item-stained-glass.png`
 - `asset:producer:glazier-workshop-t1` -> `game/arkini/assets/producer-glazier-workshop-t1.png`
+- `asset:item:marble-deposit` -> `game/arkini/assets/item-marble-deposit.png`
+- `asset:item:marble` -> `game/arkini/assets/item-marble.png`
+- `asset:item:marble-block` -> `game/arkini/assets/item-marble-block.png`
+- `asset:producer:quarry-t2` -> `game/arkini/assets/producer-quarry-t2.png`
+- `asset:producer:stonemason-t2` -> `game/arkini/assets/producer-stonemason-t2.png`
 
-`Stained Glass` is currently a terminal Era X prestige construction output. Future high-civic buildings should consume it instead of pretending a university, observatory, or guild palace is just a heroic pile of planks with branding.
+`Stained Glass` and `Marble Block` are currently terminal Era X prestige construction outputs. Future high-civic buildings should consume them instead of pretending a university, observatory, or guild palace is just a heroic pile of planks with branding.
 
 ### Asset alignment and current art gaps
 

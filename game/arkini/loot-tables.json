@@ -1714,6 +1714,76 @@
 					"quantity": 1
 				}
 			]
+		},
+		"loot:prospector-guild-t2:marble-deposit": {
+			"name": "Prospector Guild 2 marble deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:marble-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:university:blueprint-quarry-t2": {
+			"name": "University Quarry 2 blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-quarry-t2",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:university:blueprint-stonemason-t2": {
+			"name": "University Stonemason 2 blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-stonemason-t2",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:quarry-t2:stone": {
+			"name": "Quarry 2 stone",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:quarry-t2:marble": {
+			"name": "Quarry 2 marble",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:marble",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:stonemason-t2:stone-block": {
+			"name": "Stonemason 2 stone blocks",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:stone-block",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:stonemason-t2:marble-block": {
+			"name": "Stonemason 2 marble blocks",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:marble-block",
+					"quantity": 1
+				}
+			]
 		}
 	}
 }

@@ -506,28 +506,57 @@
 			"resultItemId": "producer:goldsmith-t1",
 			"inputs": [
 				{
-					"itemId": "item:plank",
-					"quantity": 2,
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:stone-block",
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
 					"quantity": 2,
 					"consume": true
 				},
 				{
 					"itemId": "item:gold-ingot",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
 					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:coal",
-					"quantity": 1,
+					"itemId": "item:coin",
+					"quantity": 8,
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"durationMs": 10000
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:smelter-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:purifier-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 16000
 		},
 		"craft:townhall-t2": {
 			"resultItemId": "producer:townhall-t2",
@@ -765,17 +794,88 @@
 			"resultItemId": "producer:heroes-guild-t1",
 			"inputs": [
 				{
-					"itemId": "item:plank",
-					"quantity": 4,
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:stone-block",
-					"quantity": 4,
+					"itemId": "item:guild-charter",
+					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:gold-ingot",
+					"itemId": "item:bricks",
+					"quantity": 3,
+					"consume": true
+				},
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 2,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:goldsmith-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:armory-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 24000
+		},
+		"craft:blacksmith-t1": {
+			"resultItemId": "producer:blacksmith-t1",
+			"inputs": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
 					"quantity": 2,
 					"consume": true
 				},
@@ -788,41 +888,19 @@
 			"requirements": [
 				{
 					"type": "passive",
-					"itemId": "producer:goldsmith-t1",
+					"itemId": "producer:academy",
 					"quantity": 1,
 					"scope": "board_or_inventory"
-				}
-			],
-			"durationMs": 20000
-		},
-		"craft:blacksmith-t1": {
-			"resultItemId": "producer:blacksmith-t1",
-			"inputs": [
-				{
-					"itemId": "item:plank",
-					"quantity": 4,
-					"consume": true
 				},
-				{
-					"itemId": "item:stone-block",
-					"quantity": 2,
-					"consume": true
-				},
-				{
-					"itemId": "item:iron-ingot",
-					"quantity": 2,
-					"consume": true
-				},
-				{
-					"itemId": "item:coal",
-					"quantity": 2,
-					"consume": true
-				}
-			],
-			"requirements": [
 				{
 					"type": "passive",
 					"itemId": "producer:smelter-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:purifier-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				}
@@ -909,12 +987,27 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:stone-block",
-					"quantity": 4,
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
 					"consume": true
 				},
 				{
-					"itemId": "item:iron-ingot",
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:roof-tiles",
 					"quantity": 2,
 					"consume": true
 				},
@@ -924,20 +1017,32 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:coin",
-					"quantity": 6,
+					"itemId": "item:coin-stack",
+					"quantity": 2,
 					"consume": true
 				}
 			],
 			"requirements": [
 				{
 					"type": "passive",
-					"itemId": "producer:townhall-t4",
+					"itemId": "producer:construction-yard-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:glassworks",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:roof-tile-factory",
 					"quantity": 1,
 					"scope": "board_or_inventory"
 				}
 			],
-			"durationMs": 18000
+			"durationMs": 22000
 		},
 		"craft:cattle-farm-t1": {
 			"resultItemId": "producer:cattle-farm-t1",
@@ -1770,6 +1875,62 @@
 				}
 			],
 			"durationMs": 14000
+		},
+		"craft:armory-t1": {
+			"resultItemId": "producer:armory-t1",
+			"inputs": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:nails",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 2,
+					"consume": true
+				},
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:blacksmith-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:tannery-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:tailor-workshop-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 16000
 		}
 	}
 }

@@ -55,6 +55,13 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
+		"asset:item:blueprint-armory-t1": {
+			"kind": "item",
+			"label": "Armory I Blueprint",
+			"overlayAssetId": "asset:producer:armory-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
 		"asset:item:blueprint-bakery-t1": {
 			"kind": "item",
 			"label": "Bakery I Blueprint",
@@ -657,6 +664,12 @@
 			"label": "Grapes",
 			"render": "plain",
 			"resourceId": "item-grapes"
+		},
+		"asset:item:guild-charter": {
+			"kind": "item",
+			"label": "Guild Charter",
+			"render": "plain",
+			"resourceId": "item-building-permit"
 		},
 		"asset:item:hop-field": {
 			"kind": "item",
@@ -1352,6 +1365,62 @@
 			],
 			"resultItemId": "producer:academy"
 		},
+		"craft:armory-t1": {
+			"durationMs": 16000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:blacksmith-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:tannery-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:tailor-workshop-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:armory-t1"
+		},
 		"craft:bakery-t1": {
 			"durationMs": 8000,
 			"inputs": [
@@ -1384,12 +1453,17 @@
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 4
+					"itemId": "item:construction-bundle",
+					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
 					"quantity": 2
 				},
 				{
@@ -1399,13 +1473,30 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:coal",
+					"itemId": "item:charcoal",
 					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
 				}
 			],
 			"requirements": [
 				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
 					"itemId": "producer:smelter-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:purifier-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -1971,49 +2062,32 @@
 			"resultItemId": "producer:gold-mine-t1"
 		},
 		"craft:goldsmith-t1": {
-			"durationMs": 10000,
+			"durationMs": 16000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 2
+					"itemId": "item:construction-bundle",
+					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass",
 					"quantity": 2
 				},
 				{
 					"consume": true,
 					"itemId": "item:gold-ingot",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
-				}
-			],
-			"requirements": [],
-			"resultItemId": "producer:goldsmith-t1"
-		},
-		"craft:heroes-guild-t1": {
-			"durationMs": 20000,
-			"inputs": [
-				{
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 4
-				},
-				{
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 4
-				},
-				{
-					"consume": true,
-					"itemId": "item:gold-ingot",
 					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
 				},
 				{
 					"consume": true,
@@ -2023,7 +2097,80 @@
 			],
 			"requirements": [
 				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:smelter-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:purifier-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:goldsmith-t1"
+		},
+		"craft:heroes-guild-t1": {
+			"durationMs": 24000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
 					"itemId": "producer:goldsmith-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:armory-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -2936,7 +3083,7 @@
 			"resultItemId": "producer:townhall-t4"
 		},
 		"craft:university": {
-			"durationMs": 18000,
+			"durationMs": 22000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2945,12 +3092,27 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 4
+					"itemId": "item:construction-bundle",
+					"quantity": 1
 				},
 				{
 					"consume": true,
-					"itemId": "item:iron-ingot",
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:roof-tiles",
 					"quantity": 2
 				},
 				{
@@ -2960,13 +3122,25 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 6
+					"itemId": "item:coin-stack",
+					"quantity": 2
 				}
 			],
 			"requirements": [
 				{
-					"itemId": "producer:townhall-t4",
+					"itemId": "producer:construction-yard-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:glassworks",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:roof-tile-factory",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -3131,6 +3305,88 @@
 				}
 			],
 			"name": "Academy basic lesson supplies"
+		},
+		"input:academy:blueprint-armory-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Armory I input"
+		},
+		"input:academy:blueprint-blacksmith-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Blacksmith I input"
 		},
 		"input:academy:blueprint-brickyard": {
 			"inputs": [
@@ -3371,6 +3627,47 @@
 			],
 			"name": "Blueprint: Gold Mine I input"
 		},
+		"input:academy:blueprint-goldsmith-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Goldsmith I input"
+		},
 		"input:academy:blueprint-iron-mine-t1": {
 			"inputs": [
 				{
@@ -3563,6 +3860,105 @@
 			],
 			"name": "Blueprint: Smelter I input"
 		},
+		"input:academy:blueprint-university": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: University input"
+		},
+		"input:armory-t1:iron-armor": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Armory iron armor materials"
+		},
+		"input:armory-t1:leather-armor": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 1
+				}
+			],
+			"name": "Armory leather armor materials"
+		},
 		"input:bakery-t1:flour-water": {
 			"inputs": [
 				{
@@ -3583,106 +3979,65 @@
 		"input:blacksmith-t1:axe": {
 			"inputs": [
 				{
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true,
 					"itemId": "item:iron-ingot",
 					"quantity": 1
 				},
 				{
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 1
 				},
 				{
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true,
-					"itemId": "item:leather",
+					"itemId": "item:charcoal",
 					"quantity": 1
 				}
 			],
 			"name": "Blacksmith axe materials"
 		},
-		"input:blacksmith-t1:iron-armor": {
+		"input:blacksmith-t1:nails": {
 			"inputs": [
 				{
-					"capacity": 8,
+					"capacity": 6,
 					"consume": true,
 					"itemId": "item:iron-ingot",
-					"quantity": 4
+					"quantity": 1
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
+					"itemId": "item:charcoal",
 					"quantity": 1
 				}
 			],
-			"name": "Blacksmith iron armor materials"
-		},
-		"input:blacksmith-t1:leather-armor": {
-			"inputs": [
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 3
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			],
-			"name": "Blacksmith leather armor materials"
+			"name": "Blacksmith nails materials"
 		},
 		"input:blacksmith-t1:sword": {
 			"inputs": [
 				{
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true,
 					"itemId": "item:iron-ingot",
 					"quantity": 2
 				},
 				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true,
 					"itemId": "item:leather",
 					"quantity": 1
 				},
 				{
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true,
-					"itemId": "item:water",
+					"itemId": "item:charcoal",
 					"quantity": 1
 				}
 			],
-			"name": "Blacksmith precision sword materials"
+			"name": "Blacksmith sword materials"
 		},
 		"input:brewery-t1:beer-to-barrel": {
 			"inputs": [
@@ -3848,6 +4203,41 @@
 				}
 			],
 			"name": "Civic Office permit inputs"
+		},
+		"input:civic-office-t1:guild-charter": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Civic Office guild charter input"
 		},
 		"input:clay-pit:clay": {
 			"inputs": [
@@ -4044,10 +4434,62 @@
 			],
 			"name": "Gold mine crew supplies"
 		},
-		"input:goldsmith-t1:gold-wine-bread-coal": {
+		"input:goldsmith-t1:coin-stack": {
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Goldsmith coin stack materials"
+		},
+		"input:goldsmith-t1:key-t1": {
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Goldsmith Key I materials"
+		},
+		"input:goldsmith-t1:key-t2": {
 			"inputs": [
 				{
 					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t1",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
 					"consume": true,
 					"itemId": "item:gold-ingot",
 					"quantity": 1
@@ -4055,65 +4497,77 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-glass",
+					"itemId": "item:ruby",
 					"quantity": 1
 				},
 				{
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coal",
+					"itemId": "item:charcoal",
 					"quantity": 1
 				}
 			],
-			"name": "Goldsmith gold, wine, bread, and coal input"
+			"name": "Goldsmith Key II materials"
 		},
 		"input:goldsmith-t1:key-t3": {
 			"inputs": [
 				{
 					"capacity": 4,
 					"consume": true,
+					"itemId": "item:key-t2",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
 					"itemId": "item:gold-ingot",
 					"quantity": 1
 				},
 				{
-					"capacity": 8,
+					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
+					"itemId": "item:emerald",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
 				}
 			],
-			"name": "Goldsmith Key III input"
+			"name": "Goldsmith Key III materials"
 		},
-		"input:heroes-guild-t1:chest-t1": {
+		"input:goldsmith-t1:key-t4": {
 			"inputs": [
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:axe",
+					"itemId": "item:key-t3",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
 					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
+					"itemId": "item:sapphire",
 					"quantity": 1
 				},
 				{
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true,
-					"itemId": "item:beer",
+					"itemId": "item:charcoal",
 					"quantity": 1
 				}
 			],
-			"name": "Heroes Guild level I expedition gear"
+			"name": "Goldsmith Key IV materials"
 		},
-		"input:heroes-guild-t1:chest-t2": {
+		"input:heroes-guild-t1:chest-t1": {
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4130,17 +4584,46 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sausage",
+					"itemId": "item:feast",
 					"quantity": 1
 				},
 				{
-					"capacity": 8,
+					"capacity": 12,
 					"consume": true,
 					"itemId": "item:coin",
-					"quantity": 2
+					"quantity": 4
 				}
 			],
-			"name": "Heroes Guild level II expedition gear"
+			"name": "Heroes Guild short expedition supplies"
+		},
+		"input:heroes-guild-t1:chest-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"name": "Heroes Guild armed expedition supplies"
 		},
 		"input:heroes-guild-t1:chest-t3": {
 			"inputs": [
@@ -4159,17 +4642,23 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-glass",
-					"quantity": 2
+					"itemId": "item:key-t1",
+					"quantity": 1
 				},
 				{
-					"capacity": 12,
+					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 4
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
 				}
 			],
-			"name": "Heroes Guild level III expedition gear"
+			"name": "Heroes Guild locked expedition supplies"
 		},
 		"input:heroes-guild-t1:chest-t4": {
 			"inputs": [
@@ -4177,7 +4666,7 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:sword",
-					"quantity": 2
+					"quantity": 1
 				},
 				{
 					"capacity": 4,
@@ -4188,23 +4677,88 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-barrel",
+					"itemId": "item:key-t2",
 					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer-barrel",
+					"itemId": "item:feast",
 					"quantity": 1
 				},
 				{
-					"capacity": 20,
+					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 8
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
 				}
 			],
-			"name": "Heroes Guild level IV expedition gear"
+			"name": "Heroes Guild elite expedition supplies"
+		},
+		"input:heroes-guild-t1:treasure-chest": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t4",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:topaz",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:aquamarine",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Heroes Guild grand expedition supplies"
 		},
 		"input:iron-mine-t1:sausage-beer": {
 			"inputs": [
@@ -5561,25 +6115,72 @@
 			],
 			"name": "University basic lecture supplies"
 		},
-		"input:university:master-knowledge": {
+		"input:university:blueprint-heroes-guild-t1": {
 			"inputs": [
 				{
 					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Heroes Guild I input"
+		},
+		"input:university:master-knowledge": {
+			"inputs": [
+				{
+					"capacity": 6,
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 2
 				},
 				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-glass",
+					"itemId": "item:glass",
 					"quantity": 1
 				},
 				{
-					"capacity": 8,
+					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
+					"itemId": "item:coin-stack",
+					"quantity": 1
 				}
 			],
 			"name": "University master research materials"
@@ -5683,20 +6284,22 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"aquamarine"
+				"aquamarine",
+				"era:IX"
 			],
 			"tier": 4
 		},
 		"item:axe": {
 			"assetId": "asset:item:axe",
 			"code": "axe",
-			"description": "Reliable expedition weapon forged from iron with a sturdy wooden haft.",
+			"description": "Reliable utility weapon forged from iron with a sturdy wooden haft.",
 			"maxStackSize": 20,
 			"name": "Axe",
 			"storage": "both",
 			"tags": [
 				"equipment",
 				"weapon",
+				"tool",
 				"blacksmith",
 				"hero",
 				"era:IX"
@@ -5761,6 +6364,24 @@
 				"education",
 				"knowledge",
 				"era:VII"
+			],
+			"tier": 0
+		},
+		"item:blueprint-armory-t1": {
+			"assetId": "asset:item:blueprint-armory-t1",
+			"code": "blueprint-armory-t1",
+			"craftRecipeId": "craft:armory-t1",
+			"description": "Build plan that can be filled with guild resources to construct Armory I.",
+			"maxStackSize": 10,
+			"name": "Armory I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"armory",
+				"equipment",
+				"era:IX"
 			],
 			"tier": 0
 		},
@@ -6518,7 +7139,7 @@
 			"assetId": "asset:item:blueprint-university",
 			"code": "blueprint-university",
 			"craftRecipeId": "craft:university",
-			"description": "Build plan that upgrades an Academy into a University.",
+			"description": "Build plan that upgrades an Academy into a University as part of the guild and institution era.",
 			"maxStackSize": 10,
 			"name": "University Blueprint",
 			"storage": "both",
@@ -6527,7 +7148,7 @@
 				"building",
 				"education",
 				"knowledge",
-				"era:VI"
+				"era:IX"
 			],
 			"tier": 0
 		},
@@ -6709,7 +7330,7 @@
 		"item:chest-t1": {
 			"assetId": "asset:item:chest-t1",
 			"code": "chest-t1",
-			"description": "Locked chest returned from a short heroes guild expedition. Open it with a Key I.",
+			"description": "Locked chest returned from a short Heroes Guild expedition. Open it with a Key I.",
 			"maxStackSize": 1,
 			"name": "Chest I",
 			"stashId": "stash:chest-t1",
@@ -6718,14 +7339,15 @@
 				"chest",
 				"locked",
 				"stash",
-				"guild"
+				"guild",
+				"era:IX"
 			],
 			"tier": 1
 		},
 		"item:chest-t2": {
 			"assetId": "asset:item:chest-t2",
 			"code": "chest-t2",
-			"description": "Locked chest returned from a tougher heroes guild expedition. Open it with a Key II.",
+			"description": "Locked chest returned from a tougher Heroes Guild expedition. Open it with a Key II.",
 			"maxStackSize": 1,
 			"name": "Chest II",
 			"stashId": "stash:chest-t2",
@@ -6734,14 +7356,15 @@
 				"chest",
 				"locked",
 				"stash",
-				"guild"
+				"guild",
+				"era:IX"
 			],
 			"tier": 2
 		},
 		"item:chest-t3": {
 			"assetId": "asset:item:chest-t3",
 			"code": "chest-t3",
-			"description": "Locked chest returned from a dangerous heroes guild expedition. Open it with a Key III.",
+			"description": "Locked chest returned from a dangerous Heroes Guild expedition. Open it with a Key III.",
 			"maxStackSize": 1,
 			"name": "Chest III",
 			"stashId": "stash:chest-t3",
@@ -6750,14 +7373,15 @@
 				"chest",
 				"locked",
 				"stash",
-				"guild"
+				"guild",
+				"era:IX"
 			],
 			"tier": 3
 		},
 		"item:chest-t4": {
 			"assetId": "asset:item:chest-t4",
 			"code": "chest-t4",
-			"description": "Locked chest returned from the longest heroes guild expedition. Open it with a Key IV.",
+			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
 			"maxStackSize": 1,
 			"name": "Chest IV",
 			"stashId": "stash:chest-t4",
@@ -6766,7 +7390,8 @@
 				"chest",
 				"locked",
 				"stash",
-				"guild"
+				"guild",
+				"era:IX"
 			],
 			"tier": 4
 		},
@@ -6849,6 +7474,22 @@
 			],
 			"tier": 0
 		},
+		"item:coin-stack": {
+			"assetId": "asset:item:coin-stack",
+			"code": "coin-stack",
+			"description": "Minted high-value currency stack produced by the Goldsmith and used to fund advanced guilds, university work, and long expeditions.",
+			"maxStackSize": 50,
+			"name": "Coin Stack",
+			"storage": "both",
+			"tags": [
+				"currency",
+				"coin",
+				"trade",
+				"goldsmith",
+				"era:IX"
+			],
+			"tier": 9
+		},
 		"item:common-cloth": {
 			"assetId": "asset:item:common-cloth",
 			"code": "common-cloth",
@@ -6917,7 +7558,8 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"emerald"
+				"emerald",
+				"era:IX"
 			],
 			"tier": 1
 		},
@@ -7076,6 +7718,22 @@
 			],
 			"tier": 0
 		},
+		"item:guild-charter": {
+			"assetId": "asset:item:guild-charter",
+			"code": "guild-charter",
+			"description": "Formal civic charter that authorizes advanced guild, university, and expedition buildings after the city has advanced construction capacity.",
+			"maxStackSize": 20,
+			"name": "Guild Charter",
+			"storage": "both",
+			"tags": [
+				"civic",
+				"charter",
+				"guild",
+				"permit",
+				"era:IX"
+			],
+			"tier": 9
+		},
 		"item:hop-field": {
 			"assetId": "asset:item:hop-field",
 			"code": "hop-field",
@@ -7111,16 +7769,15 @@
 		"item:iron-armor": {
 			"assetId": "asset:item:iron-armor",
 			"code": "iron-armor",
-			"description": "Heavy iron armor issued to heroes before dangerous late expeditions.",
+			"description": "Heavy iron armor upgraded by the Armory from leather armor, iron ingots, nails, and charcoal-fired fittings.",
 			"maxStackSize": 10,
 			"name": "Iron Armor",
 			"storage": "both",
 			"tags": [
 				"equipment",
 				"armor",
-				"blacksmith",
+				"armory",
 				"hero",
-				"iron",
 				"era:IX"
 			],
 			"tier": 3
@@ -7176,52 +7833,59 @@
 		"item:key-t1": {
 			"assetId": "asset:item:key-t1",
 			"code": "key-t1",
-			"description": "Temporary cheat-only key used to open Chest I.",
+			"description": "Basic goldsmith key used to open Chest I and bootstrap the gem/key expedition loop.",
 			"maxStackSize": 20,
 			"name": "Key I",
 			"storage": "both",
 			"tags": [
 				"key",
-				"cheat-source"
+				"goldsmith",
+				"era:IX"
 			],
 			"tier": 1
 		},
 		"item:key-t2": {
 			"assetId": "asset:item:key-t2",
 			"code": "key-t2",
-			"description": "Temporary cheat-only key used to open Chest II.",
+			"description": "Gem-set goldsmith key used to open Chest II and fund tougher expeditions.",
 			"maxStackSize": 20,
 			"name": "Key II",
 			"storage": "both",
 			"tags": [
 				"key",
-				"cheat-source"
+				"goldsmith",
+				"gem",
+				"era:IX"
 			],
 			"tier": 2
 		},
 		"item:key-t3": {
 			"assetId": "asset:item:key-t3",
 			"code": "key-t3",
-			"description": "Crafted key used to open Chest III.",
+			"description": "Advanced gem-set goldsmith key used to open Chest III and authorize grand expeditions.",
 			"maxStackSize": 20,
 			"name": "Key III",
 			"storage": "both",
 			"tags": [
 				"key",
-				"goldsmith"
+				"goldsmith",
+				"gem",
+				"era:IX"
 			],
 			"tier": 3
 		},
 		"item:key-t4": {
 			"assetId": "asset:item:key-t4",
 			"code": "key-t4",
-			"description": "Temporary cheat-only key used to open Chest IV.",
+			"description": "Masterwork gem-set goldsmith key used to open Chest IV.",
 			"maxStackSize": 20,
 			"name": "Key IV",
 			"storage": "both",
 			"tags": [
 				"key",
-				"cheat-source"
+				"goldsmith",
+				"gem",
+				"era:IX"
 			],
 			"tier": 4
 		},
@@ -7244,16 +7908,15 @@
 		"item:leather-armor": {
 			"assetId": "asset:item:leather-armor",
 			"code": "leather-armor",
-			"description": "Flexible leather armor prepared on a training dummy for early expeditions.",
+			"description": "Layered leather armor assembled by the Armory from leather, clothing, and forged nails.",
 			"maxStackSize": 10,
 			"name": "Leather Armor",
 			"storage": "both",
 			"tags": [
 				"equipment",
 				"armor",
-				"blacksmith",
+				"armory",
 				"hero",
-				"leather",
 				"era:IX"
 			],
 			"tier": 2
@@ -7307,14 +7970,16 @@
 		"item:master-knowledge": {
 			"assetId": "asset:item:master-knowledge",
 			"code": "master-knowledge",
-			"description": "High scholarship produced by universities and prepared for late-game research gates.",
+			"description": "University-level scholarship used to authorize the most ambitious expeditions and future high-civic progression.",
 			"maxStackSize": 50,
 			"name": "Master Knowledge",
 			"storage": "both",
 			"tags": [
 				"knowledge",
 				"education",
-				"research"
+				"research",
+				"university",
+				"era:IX"
 			],
 			"tier": 4
 		},
@@ -7335,14 +8000,16 @@
 		"item:nails": {
 			"assetId": "asset:item:nails",
 			"code": "nails",
-			"description": "Forged fasteners prepared for advanced construction chains.",
+			"description": "Forged fasteners produced by the Blacksmith and consumed by armories and later advanced construction.",
 			"maxStackSize": 50,
 			"name": "Nails",
 			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
-				"metal"
+				"metal",
+				"blacksmith",
+				"era:IX"
 			],
 			"tier": 4
 		},
@@ -7462,7 +8129,8 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"ruby"
+				"ruby",
+				"era:IX"
 			],
 			"tier": 1
 		},
@@ -7508,7 +8176,8 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"sapphire"
+				"sapphire",
+				"era:IX"
 			],
 			"tier": 2
 		},
@@ -7558,7 +8227,7 @@
 		"item:sword": {
 			"assetId": "asset:item:sword",
 			"code": "sword",
-			"description": "Precise expedition weapon that needs extra iron, finishing coal, and a leather grip.",
+			"description": "Expedition weapon forged from iron ingots, leather grip work, and charcoal heat.",
 			"maxStackSize": 20,
 			"name": "Sword",
 			"storage": "both",
@@ -7581,14 +8250,15 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"topaz"
+				"topaz",
+				"era:IX"
 			],
 			"tier": 3
 		},
 		"item:treasure-chest": {
 			"assetId": "asset:item:treasure-chest",
 			"code": "treasure-chest",
-			"description": "An open chest packed with gold and gems. For now, it is a rare trophy reward.",
+			"description": "Master reward from a grand Heroes Guild expedition, packed with gold and gems and ready to gate the next civic tier.",
 			"maxStackSize": 5,
 			"name": "Treasure Chest",
 			"storage": "both",
@@ -7596,7 +8266,9 @@
 				"treasure",
 				"chest",
 				"gem",
-				"gold"
+				"gold",
+				"master",
+				"era:IX"
 			],
 			"tier": 4
 		},
@@ -7734,6 +8406,24 @@
 			],
 			"tier": 7
 		},
+		"producer:armory-t1": {
+			"assetId": "asset:producer:armory-t1",
+			"code": "armory-t1",
+			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
+			"maxStackSize": 1,
+			"name": "Armory I",
+			"producerId": "producer:armory-t1",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"armory",
+				"equipment",
+				"armor",
+				"guild",
+				"era:IX"
+			],
+			"tier": 9
+		},
 		"producer:bakery-t1": {
 			"assetId": "asset:producer:bakery-t1",
 			"code": "bakery-t1",
@@ -7753,7 +8443,7 @@
 		"producer:blacksmith-t1": {
 			"assetId": "asset:producer:blacksmith-t1",
 			"code": "blacksmith-t1",
-			"description": "Forges expedition weapons and armor from iron, leather, coal, and wood.",
+			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
 			"maxStackSize": 1,
 			"name": "Blacksmith I",
 			"producerId": "producer:blacksmith-t1",
@@ -7762,10 +8452,11 @@
 				"producer",
 				"blacksmith",
 				"equipment",
-				"hero",
+				"weapon",
+				"guild",
 				"era:IX"
 			],
-			"tier": 4
+			"tier": 9
 		},
 		"producer:brewery-t1": {
 			"assetId": "asset:producer:brewery-t1",
@@ -8041,7 +8732,7 @@
 		"producer:goldsmith-t1": {
 			"assetId": "asset:producer:goldsmith-t1",
 			"code": "goldsmith-t1",
-			"description": "Consumes gold ingots, wine, bread, and coal to mint coins.",
+			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
 			"producerId": "producer:goldsmith-t1",
@@ -8051,14 +8742,16 @@
 				"economy",
 				"goldsmith",
 				"coin",
+				"key",
+				"guild",
 				"era:IX"
 			],
-			"tier": 1
+			"tier": 9
 		},
 		"producer:heroes-guild-t1": {
 			"assetId": "asset:producer:heroes-guild-t1",
 			"code": "heroes-guild-t1",
-			"description": "Late-era guild that sends paid heroes on long expeditions and returns locked chests.",
+			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
 			"maxStackSize": 1,
 			"name": "Heroes Guild I",
 			"producerId": "producer:heroes-guild-t1",
@@ -8068,9 +8761,10 @@
 				"hero",
 				"guild",
 				"expedition",
+				"master",
 				"era:IX"
 			],
-			"tier": 4
+			"tier": 9
 		},
 		"producer:iron-mine-t1": {
 			"assetId": "asset:producer:iron-mine-t1",
@@ -8490,7 +9184,7 @@
 		"producer:university": {
 			"assetId": "asset:producer:university",
 			"code": "university",
-			"description": "Education building that can produce all knowledge tiers, including Master Knowledge.",
+			"description": "Advanced institution that converts paper, glass, coin stacks, and advanced knowledge into Master Knowledge.",
 			"maxStackSize": 1,
 			"name": "University",
 			"producerId": "producer:university",
@@ -8500,9 +9194,10 @@
 				"building",
 				"education",
 				"knowledge",
-				"era:VI"
+				"university",
+				"era:IX"
 			],
-			"tier": 4
+			"tier": 9
 		},
 		"producer:vegetable-garden-t1": {
 			"assetId": "asset:producer:vegetable-garden-t1",
@@ -8624,6 +9319,26 @@
 				}
 			]
 		},
+		"loot:academy:blueprint-armory-t1": {
+			"name": "Academy Armory I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-armory-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-blacksmith-t1": {
+			"name": "Academy Blacksmith I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-blacksmith-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:academy:blueprint-brickyard": {
 			"name": "Academy Brickyard blueprint output",
 			"output": [
@@ -8694,6 +9409,16 @@
 				}
 			]
 		},
+		"loot:academy:blueprint-goldsmith-t1": {
+			"name": "Academy Goldsmith I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-goldsmith-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:academy:blueprint-iron-mine-t1": {
 			"name": "Blueprint: Iron Mine I output",
 			"output": [
@@ -8754,6 +9479,48 @@
 				}
 			]
 		},
+		"loot:academy:blueprint-university": {
+			"name": "Academy University blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-university",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:armory-t1:iron-armor": {
+			"name": "Armory iron armor output",
+			"output": [
+				{
+					"itemId": "item:iron-armor",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.45,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:armory-t1:leather-armor": {
+			"name": "Armory leather armor output",
+			"output": [
+				{
+					"itemId": "item:leather-armor",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:bakery-t1:bread": {
 			"name": "Bakery bread",
 			"output": [
@@ -8771,26 +9538,40 @@
 					"itemId": "item:axe",
 					"quantity": 1,
 					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
-		"loot:blacksmith-t1:iron-armor": {
-			"name": "Blacksmith iron armor output",
+		"loot:blacksmith-t1:nails": {
+			"name": "Blacksmith nails output",
 			"output": [
 				{
-					"itemId": "item:iron-armor",
-					"quantity": 1,
+					"itemId": "item:nails",
+					"quantity": 4,
 					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:blacksmith-t1:leather-armor": {
-			"name": "Blacksmith leather armor output",
-			"output": [
+				},
 				{
-					"itemId": "item:leather-armor",
+					"chance": 0.35,
+					"itemId": "item:pollution",
 					"quantity": 1,
-					"type": "guaranteed"
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -8801,6 +9582,18 @@
 					"itemId": "item:sword",
 					"quantity": 1,
 					"type": "guaranteed"
+				},
+				{
+					"chance": 0.45,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -8894,19 +9687,19 @@
 				{
 					"itemId": "item:coin",
 					"quantity": {
-						"max": 3,
+						"max": 4,
 						"min": 2
 					},
 					"type": "guaranteed"
 				},
 				{
-					"chance": 0.35,
+					"chance": 0.65,
 					"itemId": "item:ruby",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
-					"chance": 0.2,
+					"chance": 0.12,
 					"itemId": "item:emerald",
 					"quantity": 1,
 					"type": "chance"
@@ -8919,19 +9712,25 @@
 				{
 					"itemId": "item:coin",
 					"quantity": {
-						"max": 5,
-						"min": 3
+						"max": 7,
+						"min": 4
 					},
 					"type": "guaranteed"
 				},
 				{
-					"chance": 0.3,
+					"chance": 0.35,
+					"itemId": "item:ruby",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.65,
 					"itemId": "item:emerald",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
-					"chance": 0.25,
+					"chance": 0.18,
 					"itemId": "item:sapphire",
 					"quantity": 1,
 					"type": "chance"
@@ -8944,13 +9743,19 @@
 				{
 					"itemId": "item:coin",
 					"quantity": {
-						"max": 8,
-						"min": 5
+						"max": 10,
+						"min": 7
 					},
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.65,
 					"itemId": "item:sapphire",
 					"quantity": 1,
 					"type": "chance"
@@ -8969,26 +9774,26 @@
 				{
 					"itemId": "item:coin",
 					"quantity": {
-						"max": 12,
-						"min": 8
+						"max": 15,
+						"min": 10
 					},
 					"type": "guaranteed"
 				},
 				{
-					"chance": 0.4,
+					"chance": 0.35,
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.55,
 					"itemId": "item:topaz",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
-					"chance": 0.3,
+					"chance": 0.35,
 					"itemId": "item:aquamarine",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.08,
-					"itemId": "item:treasure-chest",
 					"quantity": 1,
 					"type": "chance"
 				}
@@ -9019,6 +9824,16 @@
 			"output": [
 				{
 					"itemId": "item:building-permit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:civic-office-t1:guild-charter": {
+			"name": "Civic Office guild charter output",
+			"output": [
+				{
+					"itemId": "item:guild-charter",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -9126,13 +9941,69 @@
 				}
 			]
 		},
-		"loot:goldsmith-t1:coins": {
-			"name": "Goldsmith coins",
+		"loot:goldsmith-t1:coin-stack": {
+			"name": "Goldsmith coin stack output",
 			"output": [
 				{
-					"itemId": "item:coin",
-					"quantity": 4,
+					"itemId": "item:coin-stack",
+					"quantity": 1,
 					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:goldsmith-t1:key-t1": {
+			"name": "Goldsmith Key I output",
+			"output": [
+				{
+					"itemId": "item:key-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:goldsmith-t1:key-t2": {
+			"name": "Goldsmith Key II output",
+			"output": [
+				{
+					"itemId": "item:key-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -9143,6 +10014,40 @@
 					"itemId": "item:key-t3",
 					"quantity": 1,
 					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:goldsmith-t1:key-t4": {
+			"name": "Goldsmith Key IV output",
+			"output": [
+				{
+					"itemId": "item:key-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -9150,17 +10055,9 @@
 			"name": "Heroes Guild Chest I expedition",
 			"output": [
 				{
-					"entries": [
-						{
-							"itemId": "item:chest-t1",
-							"weight": 90
-						},
-						{
-							"itemId": "item:chest-t2",
-							"weight": 10
-						}
-					],
-					"type": "weighted"
+					"itemId": "item:chest-t1",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -9168,17 +10065,9 @@
 			"name": "Heroes Guild Chest II expedition",
 			"output": [
 				{
-					"entries": [
-						{
-							"itemId": "item:chest-t2",
-							"weight": 90
-						},
-						{
-							"itemId": "item:chest-t3",
-							"weight": 10
-						}
-					],
-					"type": "weighted"
+					"itemId": "item:chest-t2",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -9186,17 +10075,9 @@
 			"name": "Heroes Guild Chest III expedition",
 			"output": [
 				{
-					"entries": [
-						{
-							"itemId": "item:chest-t3",
-							"weight": 90
-						},
-						{
-							"itemId": "item:chest-t4",
-							"weight": 10
-						}
-					],
-					"type": "weighted"
+					"itemId": "item:chest-t3",
+					"quantity": 1,
+					"type": "guaranteed"
 				}
 			]
 		},
@@ -9205,6 +10086,16 @@
 			"output": [
 				{
 					"itemId": "item:chest-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:treasure-chest": {
+			"name": "Heroes Guild grand expedition treasure",
+			"output": [
+				{
+					"itemId": "item:treasure-chest",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -9991,6 +10882,16 @@
 				}
 			]
 		},
+		"loot:university:blueprint-heroes-guild-t1": {
+			"name": "University Heroes Guild I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:university:master-knowledge": {
 			"name": "University master knowledge output",
 			"output": [
@@ -10091,7 +10992,20 @@
 				"product:academy:blueprint-glassworks",
 				"product:academy:blueprint-roof-tile-factory",
 				"product:academy:blueprint-smelter-t1",
-				"product:academy:blueprint-construction-yard-t1"
+				"product:academy:blueprint-construction-yard-t1",
+				"product:academy:blueprint-blacksmith-t1",
+				"product:academy:blueprint-armory-t1",
+				"product:academy:blueprint-goldsmith-t1",
+				"product:academy:blueprint-university"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:armory-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:armory-t1:leather-armor",
+				"product:armory-t1:iron-armor"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -10107,10 +11021,9 @@
 		"producer:blacksmith-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:blacksmith-t1:nails",
 				"product:blacksmith-t1:axe",
-				"product:blacksmith-t1:sword",
-				"product:blacksmith-t1:leather-armor",
-				"product:blacksmith-t1:iron-armor"
+				"product:blacksmith-t1:sword"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -10175,7 +11088,8 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:civic-office-t1:building-permit",
-				"product:civic-office-t1:blueprint-academy"
+				"product:civic-office-t1:blueprint-academy",
+				"product:civic-office-t1:guild-charter"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -10265,8 +11179,11 @@
 		"producer:goldsmith-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:goldsmith-t1:coins",
-				"product:goldsmith-t1:key-t3"
+				"product:goldsmith-t1:coin-stack",
+				"product:goldsmith-t1:key-t1",
+				"product:goldsmith-t1:key-t2",
+				"product:goldsmith-t1:key-t3",
+				"product:goldsmith-t1:key-t4"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -10277,7 +11194,8 @@
 				"product:heroes-guild-t1:chest-t1",
 				"product:heroes-guild-t1:chest-t2",
 				"product:heroes-guild-t1:chest-t3",
-				"product:heroes-guild-t1:chest-t4"
+				"product:heroes-guild-t1:chest-t4",
+				"product:heroes-guild-t1:treasure-chest"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -10550,7 +11468,8 @@
 			"productIds": [
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",
-				"product:university:master-knowledge"
+				"product:university:master-knowledge",
+				"product:university:blueprint-heroes-guild-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -10627,6 +11546,22 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:academy:blueprint-armory-t1": {
+			"durationMs": 2500,
+			"inputRefId": "input:academy:blueprint-armory-t1",
+			"name": "Blueprint: Armory I",
+			"outputTableId": "loot:academy:blueprint-armory-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-blacksmith-t1": {
+			"durationMs": 2500,
+			"inputRefId": "input:academy:blueprint-blacksmith-t1",
+			"name": "Blueprint: Blacksmith I",
+			"outputTableId": "loot:academy:blueprint-blacksmith-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:academy:blueprint-brickyard": {
 			"durationMs": 2000,
 			"inputRefId": "input:academy:blueprint-brickyard",
@@ -10683,6 +11618,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:academy:blueprint-goldsmith-t1": {
+			"durationMs": 2500,
+			"inputRefId": "input:academy:blueprint-goldsmith-t1",
+			"name": "Blueprint: Goldsmith I",
+			"outputTableId": "loot:academy:blueprint-goldsmith-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:academy:blueprint-iron-mine-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:academy:blueprint-iron-mine-t1",
@@ -10731,6 +11674,32 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:academy:blueprint-university": {
+			"durationMs": 2500,
+			"inputRefId": "input:academy:blueprint-university",
+			"name": "Blueprint: University",
+			"outputTableId": "loot:academy:blueprint-university",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:armory-t1:iron-armor": {
+			"durationMs": 36000,
+			"inputRefId": "input:armory-t1:iron-armor",
+			"name": "Iron Armor",
+			"outputTableId": "loot:armory-t1:iron-armor",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:armory-t1:leather-armor": {
+			"durationMs": 22000,
+			"inputRefId": "input:armory-t1:leather-armor",
+			"name": "Leather Armor",
+			"outputTableId": "loot:armory-t1:leather-armor",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:bakery-t1:bread": {
 			"durationMs": 8000,
 			"inputRefId": "input:bakery-t1:flour-water",
@@ -10745,31 +11714,29 @@
 			"name": "Axe",
 			"outputTableId": "loot:blacksmith-t1:axe",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
-		"product:blacksmith-t1:iron-armor": {
-			"durationMs": 45000,
-			"inputRefId": "input:blacksmith-t1:iron-armor",
-			"name": "Iron Armor",
-			"outputTableId": "loot:blacksmith-t1:iron-armor",
+		"product:blacksmith-t1:nails": {
+			"durationMs": 10000,
+			"inputRefId": "input:blacksmith-t1:nails",
+			"name": "Nails",
+			"outputTableId": "loot:blacksmith-t1:nails",
 			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:blacksmith-t1:leather-armor": {
-			"durationMs": 30000,
-			"inputRefId": "input:blacksmith-t1:leather-armor",
-			"name": "Leather Armor",
-			"outputTableId": "loot:blacksmith-t1:leather-armor",
-			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:blacksmith-t1:sword": {
-			"durationMs": 25000,
+			"durationMs": 22000,
 			"inputRefId": "input:blacksmith-t1:sword",
 			"name": "Sword",
 			"outputTableId": "loot:blacksmith-t1:sword",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:brewery-t1:beer-barrel": {
 			"durationMs": 5000,
@@ -10867,6 +11834,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:civic-office-t1:guild-charter": {
+			"durationMs": 12000,
+			"inputRefId": "input:civic-office-t1:guild-charter",
+			"name": "Guild Charter",
+			"outputTableId": "loot:civic-office-t1:guild-charter",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:clay-pit:clay": {
 			"durationMs": 6500,
 			"inputRefId": "input:clay-pit:clay",
@@ -10951,51 +11926,93 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:goldsmith-t1:coins": {
+		"product:goldsmith-t1:coin-stack": {
 			"durationMs": 12000,
-			"inputRefId": "input:goldsmith-t1:gold-wine-bread-coal",
-			"name": "Coins",
-			"outputTableId": "loot:goldsmith-t1:coins",
+			"inputRefId": "input:goldsmith-t1:coin-stack",
+			"name": "Coin Stack",
+			"outputTableId": "loot:goldsmith-t1:coin-stack",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:goldsmith-t1:key-t1": {
+			"durationMs": 14000,
+			"inputRefId": "input:goldsmith-t1:key-t1",
+			"name": "Key I",
+			"outputTableId": "loot:goldsmith-t1:key-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:goldsmith-t1:key-t2": {
+			"durationMs": 18000,
+			"inputRefId": "input:goldsmith-t1:key-t2",
+			"name": "Key II",
+			"outputTableId": "loot:goldsmith-t1:key-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:goldsmith-t1:key-t3": {
-			"durationMs": 20000,
+			"durationMs": 22000,
 			"inputRefId": "input:goldsmith-t1:key-t3",
 			"name": "Key III",
 			"outputTableId": "loot:goldsmith-t1:key-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:goldsmith-t1:key-t4": {
+			"durationMs": 26000,
+			"inputRefId": "input:goldsmith-t1:key-t4",
+			"name": "Key IV",
+			"outputTableId": "loot:goldsmith-t1:key-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:heroes-guild-t1:chest-t1": {
-			"durationMs": 120000,
+			"durationMs": 90000,
 			"inputRefId": "input:heroes-guild-t1:chest-t1",
-			"name": "Chest I",
+			"name": "Chest I Expedition",
 			"outputTableId": "loot:heroes-guild-t1:chest-t1",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
 		"product:heroes-guild-t1:chest-t2": {
-			"durationMs": 180000,
+			"durationMs": 150000,
 			"inputRefId": "input:heroes-guild-t1:chest-t2",
-			"name": "Chest II",
+			"name": "Chest II Expedition",
 			"outputTableId": "loot:heroes-guild-t1:chest-t2",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
 		"product:heroes-guild-t1:chest-t3": {
-			"durationMs": 300000,
+			"durationMs": 240000,
 			"inputRefId": "input:heroes-guild-t1:chest-t3",
-			"name": "Chest III",
+			"name": "Chest III Expedition",
 			"outputTableId": "loot:heroes-guild-t1:chest-t3",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
 		"product:heroes-guild-t1:chest-t4": {
-			"durationMs": 600000,
+			"durationMs": 420000,
 			"inputRefId": "input:heroes-guild-t1:chest-t4",
-			"name": "Chest IV",
+			"name": "Chest IV Expedition",
 			"outputTableId": "loot:heroes-guild-t1:chest-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:treasure-chest": {
+			"durationMs": 600000,
+			"inputRefId": "input:heroes-guild-t1:treasure-chest",
+			"name": "Grand Expedition",
+			"outputTableId": "loot:heroes-guild-t1:treasure-chest",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -11628,8 +12645,16 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:university:blueprint-heroes-guild-t1": {
+			"durationMs": 3000,
+			"inputRefId": "input:university:blueprint-heroes-guild-t1",
+			"name": "Blueprint: Heroes Guild I",
+			"outputTableId": "loot:university:blueprint-heroes-guild-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:university:master-knowledge": {
-			"durationMs": 32000,
+			"durationMs": 36000,
 			"inputRefId": "input:university:master-knowledge",
 			"name": "Master Knowledge",
 			"outputTableId": "loot:university:master-knowledge",

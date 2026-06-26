@@ -195,8 +195,11 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:goldsmith-t1:coins",
-				"product:goldsmith-t1:key-t3"
+				"product:goldsmith-t1:coin-stack",
+				"product:goldsmith-t1:key-t1",
+				"product:goldsmith-t1:key-t2",
+				"product:goldsmith-t1:key-t3",
+				"product:goldsmith-t1:key-t4"
 			],
 			"requirementIds": []
 		},
@@ -271,7 +274,8 @@
 				"product:heroes-guild-t1:chest-t1",
 				"product:heroes-guild-t1:chest-t2",
 				"product:heroes-guild-t1:chest-t3",
-				"product:heroes-guild-t1:chest-t4"
+				"product:heroes-guild-t1:chest-t4",
+				"product:heroes-guild-t1:treasure-chest"
 			],
 			"requirementIds": []
 		},
@@ -279,10 +283,9 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
+				"product:blacksmith-t1:nails",
 				"product:blacksmith-t1:axe",
-				"product:blacksmith-t1:sword",
-				"product:blacksmith-t1:leather-armor",
-				"product:blacksmith-t1:iron-armor"
+				"product:blacksmith-t1:sword"
 			],
 			"requirementIds": []
 		},
@@ -312,7 +315,11 @@
 				"product:academy:blueprint-glassworks",
 				"product:academy:blueprint-roof-tile-factory",
 				"product:academy:blueprint-smelter-t1",
-				"product:academy:blueprint-construction-yard-t1"
+				"product:academy:blueprint-construction-yard-t1",
+				"product:academy:blueprint-blacksmith-t1",
+				"product:academy:blueprint-armory-t1",
+				"product:academy:blueprint-goldsmith-t1",
+				"product:academy:blueprint-university"
 			],
 			"requirementIds": []
 		},
@@ -322,7 +329,8 @@
 			"productIds": [
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",
-				"product:university:master-knowledge"
+				"product:university:master-knowledge",
+				"product:university:blueprint-heroes-guild-t1"
 			],
 			"requirementIds": []
 		},
@@ -400,7 +408,8 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:civic-office-t1:building-permit",
-				"product:civic-office-t1:blueprint-academy"
+				"product:civic-office-t1:blueprint-academy",
+				"product:civic-office-t1:guild-charter"
 			],
 			"requirementIds": []
 		},
@@ -532,6 +541,15 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:construction-yard-t1:construction-bundle"
+			],
+			"requirementIds": []
+		},
+		"producer:armory-t1": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:armory-t1:leather-armor",
+				"product:armory-t1:iron-armor"
 			],
 			"requirementIds": []
 		}

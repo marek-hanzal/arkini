@@ -350,35 +350,6 @@
 				}
 			]
 		},
-		"input:goldsmith-t1:gold-wine-bread-coal": {
-			"name": "Goldsmith gold, wine, bread, and coal input",
-			"inputs": [
-				{
-					"itemId": "item:gold-ingot",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:wine-glass",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:coal",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
 		"input:townhall-t1:blueprint-lumberjack-t1": {
 			"name": "Blueprint: Lumberjack I input",
 			"inputs": [
@@ -533,30 +504,7 @@
 			]
 		},
 		"input:heroes-guild-t1:chest-t1": {
-			"name": "Heroes Guild level I expedition gear",
-			"inputs": [
-				{
-					"itemId": "item:axe",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:bread",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:beer",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:heroes-guild-t1:chest-t2": {
-			"name": "Heroes Guild level II expedition gear",
+			"name": "Heroes Guild short expedition supplies",
 			"inputs": [
 				{
 					"itemId": "item:axe",
@@ -571,37 +519,8 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:sausage",
+					"itemId": "item:feast",
 					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:coin",
-					"quantity": 2,
-					"capacity": 8,
-					"consume": true
-				}
-			]
-		},
-		"input:heroes-guild-t1:chest-t3": {
-			"name": "Heroes Guild level III expedition gear",
-			"inputs": [
-				{
-					"itemId": "item:sword",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:iron-armor",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:wine-glass",
-					"quantity": 2,
 					"capacity": 4,
 					"consume": true
 				},
@@ -613,12 +532,12 @@
 				}
 			]
 		},
-		"input:heroes-guild-t1:chest-t4": {
-			"name": "Heroes Guild level IV expedition gear",
+		"input:heroes-guild-t1:chest-t2": {
+			"name": "Heroes Guild armed expedition supplies",
 			"inputs": [
 				{
 					"itemId": "item:sword",
-					"quantity": 2,
+					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
@@ -629,38 +548,120 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:wine-barrel",
+					"itemId": "item:feast",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:beer-barrel",
+					"itemId": "item:coin-stack",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:heroes-guild-t1:chest-t3": {
+			"name": "Heroes Guild locked expedition supplies",
+			"inputs": [
+				{
+					"itemId": "item:sword",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:coin",
-					"quantity": 8,
-					"capacity": 20,
+					"itemId": "item:iron-armor",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:key-t1",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:heroes-guild-t1:chest-t4": {
+			"name": "Heroes Guild elite expedition supplies",
+			"inputs": [
+				{
+					"itemId": "item:sword",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-armor",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:key-t2",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:feast",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 1,
+					"capacity": 4,
 					"consume": true
 				}
 			]
 		},
 		"input:goldsmith-t1:key-t3": {
-			"name": "Goldsmith Key III input",
+			"name": "Goldsmith Key III materials",
 			"inputs": [
 				{
-					"itemId": "item:gold-ingot",
+					"itemId": "item:key-t2",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:coin",
-					"quantity": 3,
-					"capacity": 8,
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
 					"consume": true
 				}
 			]
@@ -671,100 +672,42 @@
 				{
 					"itemId": "item:iron-ingot",
 					"quantity": 1,
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true
 				},
 				{
 					"itemId": "item:plank",
 					"quantity": 1,
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true
 				},
 				{
-					"itemId": "item:leather",
+					"itemId": "item:charcoal",
 					"quantity": 1,
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true
 				}
 			]
 		},
 		"input:blacksmith-t1:sword": {
-			"name": "Blacksmith precision sword materials",
+			"name": "Blacksmith sword materials",
 			"inputs": [
 				{
 					"itemId": "item:iron-ingot",
-					"quantity": 2,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:coal",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:leather",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:water",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:blacksmith-t1:leather-armor": {
-			"name": "Blacksmith leather armor materials",
-			"inputs": [
-				{
-					"itemId": "item:leather",
-					"quantity": 3,
-					"capacity": 6,
-					"consume": true
-				},
-				{
-					"itemId": "item:plank",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				},
-				{
-					"itemId": "item:coin",
-					"quantity": 1,
-					"capacity": 4,
-					"consume": true
-				}
-			]
-		},
-		"input:blacksmith-t1:iron-armor": {
-			"name": "Blacksmith iron armor materials",
-			"inputs": [
-				{
-					"itemId": "item:iron-ingot",
-					"quantity": 4,
-					"capacity": 8,
-					"consume": true
-				},
-				{
-					"itemId": "item:leather",
 					"quantity": 2,
 					"capacity": 6,
 					"consume": true
 				},
 				{
-					"itemId": "item:coal",
-					"quantity": 2,
-					"capacity": 4,
+					"itemId": "item:leather",
+					"quantity": 1,
+					"capacity": 6,
 					"consume": true
 				},
 				{
-					"itemId": "item:water",
+					"itemId": "item:charcoal",
 					"quantity": 1,
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true
 				}
 			]
@@ -889,19 +832,25 @@
 				{
 					"itemId": "item:advanced-knowledge",
 					"quantity": 2,
-					"capacity": 4,
+					"capacity": 6,
 					"consume": true
 				},
 				{
-					"itemId": "item:wine-glass",
+					"itemId": "item:paper",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
 					"quantity": 1,
 					"capacity": 4,
 					"consume": true
 				},
 				{
-					"itemId": "item:coin",
-					"quantity": 2,
-					"capacity": 8,
+					"itemId": "item:coin-stack",
+					"quantity": 1,
+					"capacity": 4,
 					"consume": true
 				}
 			]
@@ -2560,6 +2509,484 @@
 					"itemId": "item:coin",
 					"quantity": 5,
 					"capacity": 12,
+					"consume": true
+				}
+			]
+		},
+		"input:civic-office-t1:guild-charter": {
+			"name": "Civic Office guild charter input",
+			"inputs": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 8,
+					"capacity": 20,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-blacksmith-t1": {
+			"name": "Blueprint: Blacksmith I input",
+			"inputs": [
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 8,
+					"capacity": 20,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-armory-t1": {
+			"name": "Blueprint: Armory I input",
+			"inputs": [
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:nails",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:leather",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 8,
+					"capacity": 20,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-goldsmith-t1": {
+			"name": "Blueprint: Goldsmith I input",
+			"inputs": [
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"quantity": 8,
+					"capacity": 20,
+					"consume": true
+				}
+			]
+		},
+		"input:academy:blueprint-university": {
+			"name": "Blueprint: University input",
+			"inputs": [
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:blacksmith-t1:nails": {
+			"name": "Blacksmith nails materials",
+			"inputs": [
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:armory-t1:leather-armor": {
+			"name": "Armory leather armor materials",
+			"inputs": [
+				{
+					"itemId": "item:leather",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:common-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:nails",
+					"quantity": 1,
+					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:armory-t1:iron-armor": {
+			"name": "Armory iron armor materials",
+			"inputs": [
+				{
+					"itemId": "item:leather-armor",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:nails",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:goldsmith-t1:coin-stack": {
+			"name": "Goldsmith coin stack materials",
+			"inputs": [
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:goldsmith-t1:key-t1": {
+			"name": "Goldsmith Key I materials",
+			"inputs": [
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:goldsmith-t1:key-t2": {
+			"name": "Goldsmith Key II materials",
+			"inputs": [
+				{
+					"itemId": "item:key-t1",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:ruby",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:goldsmith-t1:key-t4": {
+			"name": "Goldsmith Key IV materials",
+			"inputs": [
+				{
+					"itemId": "item:key-t3",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:gold-ingot",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:heroes-guild-t1:treasure-chest": {
+			"name": "Heroes Guild grand expedition supplies",
+			"inputs": [
+				{
+					"itemId": "item:sword",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-armor",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:key-t4",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:topaz",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:aquamarine",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:feast",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:university:blueprint-heroes-guild-t1": {
+			"name": "Blueprint: Heroes Guild I input",
+			"inputs": [
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:feast",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 2,
+					"capacity": 6,
 					"consume": true
 				}
 			]

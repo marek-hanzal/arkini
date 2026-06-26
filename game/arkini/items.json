@@ -26,7 +26,8 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"aquamarine"
+				"aquamarine",
+				"era:IX"
 			]
 		},
 		"item:axe": {
@@ -36,10 +37,11 @@
 			"tier": 1,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Reliable expedition weapon forged from iron with a sturdy wooden haft.",
+			"description": "Reliable utility weapon forged from iron with a sturdy wooden haft.",
 			"tags": [
 				"equipment",
 				"weapon",
+				"tool",
 				"blacksmith",
 				"hero",
 				"era:IX"
@@ -601,13 +603,13 @@
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Build plan that upgrades an Academy into a University.",
+			"description": "Build plan that upgrades an Academy into a University as part of the guild and institution era.",
 			"tags": [
 				"blueprint",
 				"building",
 				"education",
 				"knowledge",
-				"era:VI"
+				"era:IX"
 			],
 			"craftRecipeId": "craft:university"
 		},
@@ -712,12 +714,13 @@
 			"tier": 1,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Locked chest returned from a short heroes guild expedition. Open it with a Key I.",
+			"description": "Locked chest returned from a short Heroes Guild expedition. Open it with a Key I.",
 			"tags": [
 				"chest",
 				"locked",
 				"stash",
-				"guild"
+				"guild",
+				"era:IX"
 			],
 			"stashId": "stash:chest-t1"
 		},
@@ -728,12 +731,13 @@
 			"tier": 2,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Locked chest returned from a tougher heroes guild expedition. Open it with a Key II.",
+			"description": "Locked chest returned from a tougher Heroes Guild expedition. Open it with a Key II.",
 			"tags": [
 				"chest",
 				"locked",
 				"stash",
-				"guild"
+				"guild",
+				"era:IX"
 			],
 			"stashId": "stash:chest-t2"
 		},
@@ -744,12 +748,13 @@
 			"tier": 3,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Locked chest returned from a dangerous heroes guild expedition. Open it with a Key III.",
+			"description": "Locked chest returned from a dangerous Heroes Guild expedition. Open it with a Key III.",
 			"tags": [
 				"chest",
 				"locked",
 				"stash",
-				"guild"
+				"guild",
+				"era:IX"
 			],
 			"stashId": "stash:chest-t3"
 		},
@@ -760,12 +765,13 @@
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Locked chest returned from the longest heroes guild expedition. Open it with a Key IV.",
+			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
 			"tags": [
 				"chest",
 				"locked",
 				"stash",
-				"guild"
+				"guild",
+				"era:IX"
 			],
 			"stashId": "stash:chest-t4"
 		},
@@ -859,7 +865,8 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"emerald"
+				"emerald",
+				"era:IX"
 			]
 		},
 		"item:energy": {
@@ -1027,13 +1034,12 @@
 			"tier": 3,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Heavy iron armor issued to heroes before dangerous late expeditions.",
+			"description": "Heavy iron armor upgraded by the Armory from leather armor, iron ingots, nails, and charcoal-fired fittings.",
 			"tags": [
 				"equipment",
 				"armor",
-				"blacksmith",
+				"armory",
 				"hero",
-				"iron",
 				"era:IX"
 			]
 		},
@@ -1092,10 +1098,11 @@
 			"tier": 1,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Temporary cheat-only key used to open Chest I.",
+			"description": "Basic goldsmith key used to open Chest I and bootstrap the gem/key expedition loop.",
 			"tags": [
 				"key",
-				"cheat-source"
+				"goldsmith",
+				"era:IX"
 			]
 		},
 		"item:key-t2": {
@@ -1105,10 +1112,12 @@
 			"tier": 2,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Temporary cheat-only key used to open Chest II.",
+			"description": "Gem-set goldsmith key used to open Chest II and fund tougher expeditions.",
 			"tags": [
 				"key",
-				"cheat-source"
+				"goldsmith",
+				"gem",
+				"era:IX"
 			]
 		},
 		"item:key-t3": {
@@ -1118,10 +1127,12 @@
 			"tier": 3,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Crafted key used to open Chest III.",
+			"description": "Advanced gem-set goldsmith key used to open Chest III and authorize grand expeditions.",
 			"tags": [
 				"key",
-				"goldsmith"
+				"goldsmith",
+				"gem",
+				"era:IX"
 			]
 		},
 		"item:key-t4": {
@@ -1131,10 +1142,12 @@
 			"tier": 4,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Temporary cheat-only key used to open Chest IV.",
+			"description": "Masterwork gem-set goldsmith key used to open Chest IV.",
 			"tags": [
 				"key",
-				"cheat-source"
+				"goldsmith",
+				"gem",
+				"era:IX"
 			]
 		},
 		"item:leather": {
@@ -1160,13 +1173,12 @@
 			"tier": 2,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Flexible leather armor prepared on a training dummy for early expeditions.",
+			"description": "Layered leather armor assembled by the Armory from leather, clothing, and forged nails.",
 			"tags": [
 				"equipment",
 				"armor",
-				"blacksmith",
+				"armory",
 				"hero",
-				"leather",
 				"era:IX"
 			]
 		},
@@ -1191,11 +1203,13 @@
 			"tier": 4,
 			"maxStackSize": 50,
 			"storage": "both",
-			"description": "High scholarship produced by universities and prepared for late-game research gates.",
+			"description": "University-level scholarship used to authorize the most ambitious expeditions and future high-civic progression.",
 			"tags": [
 				"knowledge",
 				"education",
-				"research"
+				"research",
+				"university",
+				"era:IX"
 			]
 		},
 		"item:nails": {
@@ -1205,11 +1219,13 @@
 			"tier": 4,
 			"maxStackSize": 50,
 			"storage": "both",
-			"description": "Forged fasteners prepared for advanced construction chains.",
+			"description": "Forged fasteners produced by the Blacksmith and consumed by armories and later advanced construction.",
 			"tags": [
 				"material",
 				"construction",
-				"metal"
+				"metal",
+				"blacksmith",
+				"era:IX"
 			]
 		},
 		"item:piglet": {
@@ -1298,7 +1314,8 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"ruby"
+				"ruby",
+				"era:IX"
 			]
 		},
 		"item:sand": {
@@ -1344,7 +1361,8 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"sapphire"
+				"sapphire",
+				"era:IX"
 			]
 		},
 		"item:sausage": {
@@ -1397,7 +1415,7 @@
 			"tier": 2,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Precise expedition weapon that needs extra iron, finishing coal, and a leather grip.",
+			"description": "Expedition weapon forged from iron ingots, leather grip work, and charcoal heat.",
 			"tags": [
 				"equipment",
 				"weapon",
@@ -1417,7 +1435,8 @@
 			"tags": [
 				"treasure",
 				"gem",
-				"topaz"
+				"topaz",
+				"era:IX"
 			]
 		},
 		"item:treasure-chest": {
@@ -1427,12 +1446,14 @@
 			"tier": 4,
 			"maxStackSize": 5,
 			"storage": "both",
-			"description": "An open chest packed with gold and gems. For now, it is a rare trophy reward.",
+			"description": "Master reward from a grand Heroes Guild expedition, packed with gold and gems and ready to gate the next civic tier.",
 			"tags": [
 				"treasure",
 				"chest",
 				"gem",
-				"gold"
+				"gold",
+				"master",
+				"era:IX"
 			]
 		},
 		"item:tree": {
@@ -1561,15 +1582,16 @@
 			"assetId": "asset:producer:blacksmith-t1",
 			"code": "blacksmith-t1",
 			"name": "Blacksmith I",
-			"tier": 4,
+			"tier": 9,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Forges expedition weapons and armor from iron, leather, coal, and wood.",
+			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
 			"tags": [
 				"producer",
 				"blacksmith",
 				"equipment",
-				"hero",
+				"weapon",
+				"guild",
 				"era:IX"
 			],
 			"producerId": "producer:blacksmith-t1"
@@ -1714,15 +1736,17 @@
 			"assetId": "asset:producer:goldsmith-t1",
 			"code": "goldsmith-t1",
 			"name": "Goldsmith I",
-			"tier": 1,
+			"tier": 9,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Consumes gold ingots, wine, bread, and coal to mint coins.",
+			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
 			"tags": [
 				"producer",
 				"economy",
 				"goldsmith",
 				"coin",
+				"key",
+				"guild",
 				"era:IX"
 			],
 			"producerId": "producer:goldsmith-t1"
@@ -1731,15 +1755,16 @@
 			"assetId": "asset:producer:heroes-guild-t1",
 			"code": "heroes-guild-t1",
 			"name": "Heroes Guild I",
-			"tier": 4,
+			"tier": 9,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Late-era guild that sends paid heroes on long expeditions and returns locked chests.",
+			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
 			"tags": [
 				"producer",
 				"hero",
 				"guild",
 				"expedition",
+				"master",
 				"era:IX"
 			],
 			"producerId": "producer:heroes-guild-t1"
@@ -2041,16 +2066,17 @@
 			"assetId": "asset:producer:university",
 			"code": "university",
 			"name": "University",
-			"tier": 4,
+			"tier": 9,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Education building that can produce all knowledge tiers, including Master Knowledge.",
+			"description": "Advanced institution that converts paper, glass, coin stacks, and advanced knowledge into Master Knowledge.",
 			"tags": [
 				"producer",
 				"building",
 				"education",
 				"knowledge",
-				"era:VI"
+				"university",
+				"era:IX"
 			],
 			"producerId": "producer:university"
 		},
@@ -2943,6 +2969,74 @@
 				"master",
 				"era:VIII"
 			]
+		},
+		"item:guild-charter": {
+			"assetId": "asset:item:guild-charter",
+			"code": "guild-charter",
+			"name": "Guild Charter",
+			"tier": 9,
+			"maxStackSize": 20,
+			"storage": "both",
+			"description": "Formal civic charter that authorizes advanced guild, university, and expedition buildings after the city has advanced construction capacity.",
+			"tags": [
+				"civic",
+				"charter",
+				"guild",
+				"permit",
+				"era:IX"
+			]
+		},
+		"item:coin-stack": {
+			"assetId": "asset:item:coin-stack",
+			"code": "coin-stack",
+			"name": "Coin Stack",
+			"tier": 9,
+			"maxStackSize": 50,
+			"storage": "both",
+			"description": "Minted high-value currency stack produced by the Goldsmith and used to fund advanced guilds, university work, and long expeditions.",
+			"tags": [
+				"currency",
+				"coin",
+				"trade",
+				"goldsmith",
+				"era:IX"
+			]
+		},
+		"item:blueprint-armory-t1": {
+			"assetId": "asset:item:blueprint-armory-t1",
+			"code": "blueprint-armory-t1",
+			"name": "Armory I Blueprint",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that can be filled with guild resources to construct Armory I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"armory",
+				"equipment",
+				"era:IX"
+			],
+			"craftRecipeId": "craft:armory-t1"
+		},
+		"producer:armory-t1": {
+			"assetId": "asset:producer:armory-t1",
+			"code": "armory-t1",
+			"name": "Armory I",
+			"tier": 9,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
+			"tags": [
+				"producer",
+				"armory",
+				"equipment",
+				"armor",
+				"guild",
+				"era:IX"
+			],
+			"producerId": "producer:armory-t1"
 		}
 	}
 }

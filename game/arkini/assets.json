@@ -1305,6 +1305,19 @@
 			"render": "blueprint",
 			"resourceId": "item-blueprint",
 			"overlayAssetId": "asset:producer:construction-yard-t1"
+		},
+		"asset:item:guild-charter": {
+			"kind": "item",
+			"label": "Guild Charter",
+			"render": "plain",
+			"resourceId": "item-building-permit"
+		},
+		"asset:item:blueprint-armory-t1": {
+			"kind": "item",
+			"label": "Armory I Blueprint",
+			"overlayAssetId": "asset:producer:armory-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
 		}
 	}
 }

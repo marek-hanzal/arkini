@@ -4,6 +4,7 @@ import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkPr
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProducerStoredInputsFx";
+import { createGameActiveEffectIdFx } from "~/v0/game/effects/createGameActiveEffectIdFx";
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
@@ -123,7 +124,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 				startAtMs: queuedStartAtMs,
 				effectId: checked.product.activatesEffectId,
 				endAtMs: readyAtMs,
-				id: yield* createGameJobIdFx(),
+				id: yield* createGameActiveEffectIdFx(),
 				sourceItemInstanceId: action.producerItemInstanceId,
 			}
 		: undefined;

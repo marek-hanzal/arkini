@@ -112,6 +112,7 @@ describe("applyGameActionFx Producer", () => {
 			endAtMs: 1500,
 			sourceItemInstanceId: "item-instance:1",
 		});
+		expect(activeEffect.id).toMatch(/^effect-instance:/);
 		expect(result.events).toEqual([
 			{
 				atMs: 500,

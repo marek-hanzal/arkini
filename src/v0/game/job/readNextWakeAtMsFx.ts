@@ -3,6 +3,8 @@ import type { GameSave, GameSaveItemSpawnJob } from "~/v0/game/engine/model/Game
 import { readProducerQueueWakeAtMsValues } from "~/v0/game/producer/readProducerQueueWakeAtMsValues";
 import { readMinGameWakeAtMs } from "~/v0/game/time/GameTime";
 
+export const pastDueItemSpawnJobWakeDelayMs = 1;
+
 export namespace readNextWakeAtMsFx {
 	export interface Props {
 		nowMs?: number;
@@ -18,7 +20,12 @@ const isWaitingForItemSpawnDependencies = ({
 	save: GameSave;
 }) => Boolean(job.afterJobIds?.some((jobId) => save.itemSpawnJobs[jobId]));
 
-const readItemSpawnWakeTimes = (save: GameSave) =>
+const readItemSpawnWakeAtMs = ({ job, nowMs }: { job: GameSaveItemSpawnJob; nowMs?: number }) =>
+	nowMs !== undefined && job.readyAtMs <= nowMs
+		? nowMs + pastDueItemSpawnJobWakeDelayMs
+		: job.readyAtMs;
+
+const readItemSpawnWakeTimes = ({ nowMs, save }: { nowMs?: number; save: GameSave }) =>
 	Object.values(save.itemSpawnJobs).flatMap((job) => {
 		if (
 			isWaitingForItemSpawnDependencies({
@@ -30,7 +37,10 @@ const readItemSpawnWakeTimes = (save: GameSave) =>
 		}
 
 		return [
-			job.readyAtMs,
+			readItemSpawnWakeAtMs({
+				job,
+				nowMs,
+			}),
 		];
 	});
 
@@ -41,7 +51,10 @@ export const readNextWakeAtMsFx = Effect.fn("readNextWakeAtMsFx")(function* ({
 	return readMinGameWakeAtMs({
 		nowMs,
 		values: [
-			...readItemSpawnWakeTimes(save),
+			...readItemSpawnWakeTimes({
+				nowMs,
+				save,
+			}),
 			...readProducerQueueWakeAtMsValues(save),
 			...Object.values(save.activeEffects ?? {}).flatMap((effect) => [
 				effect.startAtMs,

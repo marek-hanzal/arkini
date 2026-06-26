@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerInputWithdraw } from "~/v0/game/action/GameActionProducerInputWithdraw";
@@ -31,10 +30,9 @@ export const checkProducerInputWithdrawReadinessFx = Effect.fn(
 		);
 	}
 
-	const inputSlot = readProductInputs({
-		config,
-		productId: action.productId,
-	}).find((input) => input.itemId === action.itemId);
+	const inputSlot = config.products[action.productId]?.inputs?.find(
+		(input) => input.itemId === action.itemId,
+	);
 	if (!inputSlot) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

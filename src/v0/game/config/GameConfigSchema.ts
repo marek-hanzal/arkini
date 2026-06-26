@@ -212,16 +212,18 @@ const StoredItemRequirementSchema = z
  * Passive requirement gates by ownership/presence in an explicit scope. This deliberately
  * avoids spatial rules such as adjacency; those are not part of the current engine DSL.
  */
+const PassiveItemScopeSchema = z.enum([
+	"board",
+	"inventory",
+	"board_or_inventory",
+]);
+
 const PassiveItemRequirementSchema = z
 	.object({
 		type: z.literal("passive"),
 		itemId: IdSchema,
 		quantity: PositiveIntegerSchema,
-		scope: z.enum([
-			"board",
-			"inventory",
-			"board_or_inventory",
-		]),
+		scope: PassiveItemScopeSchema,
 	})
 	.strict();
 
@@ -620,7 +622,6 @@ const CraftRecipeFragmentSchema = CraftRecipeSchema.extend({
 	resultItemId: IdSchema.optional(),
 });
 
-/** Reusable output table referenced by stashes/effects and rare shared product outputs. */
 /**
  * Producer product line.
  *
@@ -646,6 +647,10 @@ const ProductDefinitionSchema = z
 		activatesEffectId: IdSchema.optional(),
 	})
 	.strict();
+
+const ProductDefinitionFragmentSchema = ProductDefinitionSchema.extend({
+	name: z.string().min(1).optional(),
+});
 
 /** New-game seed. Board entries are individual tiles; inventory entries may stack. */
 const StartingStateDefinitionSchema = z
@@ -687,7 +692,7 @@ const GameConfigFragmentSchema = z
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
 		craftRecipes: z.record(IdSchema, CraftRecipeFragmentSchema).optional(),
-		products: z.record(IdSchema, ProductDefinitionSchema).optional(),
+		products: z.record(IdSchema, ProductDefinitionFragmentSchema).optional(),
 		startingState: StartingStateDefinitionSchema.optional(),
 	})
 	.strict();
@@ -1401,42 +1406,6 @@ const validateUniqueStringList = (
 		}
 
 		firstIndexByValue.set(value, index);
-	}
-};
-
-const validateUniqueRecordField = <
-	RecordValue extends Readonly<Record<string, unknown>>,
-	Field extends keyof RecordValue,
->(
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	record: Readonly<Record<string, RecordValue>>,
-	field: Field,
-	createMessage: (value: string) => string,
-) => {
-	const ownerIdByValue = new Map<string, string>();
-
-	for (const [entryId, entry] of Object.entries(record)) {
-		const value = entry[field];
-		if (typeof value !== "string") {
-			continue;
-		}
-
-		const previousOwnerId = ownerIdByValue.get(value);
-		if (previousOwnerId) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					entryId,
-					field as string,
-				],
-				`${createMessage(value)} First used by "${previousOwnerId}".`,
-			);
-			continue;
-		}
-
-		ownerIdByValue.set(value, entryId);
 	}
 };
 

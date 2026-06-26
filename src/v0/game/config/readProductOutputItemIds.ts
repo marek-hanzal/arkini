@@ -1,4 +1,3 @@
-import { readProductOutput } from "~/v0/game/config/readProductOutput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
 export const readProductOutputItemIds = ({
@@ -10,10 +9,7 @@ export const readProductOutputItemIds = ({
 }): string[] => {
 	const itemIds: string[] = [];
 
-	for (const output of readProductOutput({
-		config,
-		productId,
-	})) {
+	for (const output of config.products[productId]?.output ?? []) {
 		if (output.type === "weighted") {
 			for (const entry of output.entries) itemIds.push(entry.itemId);
 			continue;

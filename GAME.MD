@@ -18,7 +18,7 @@ These rules define how the game should be interpreted when implementation detail
 
 1. `GAME.MD` is the source of truth for gameplay semantics.
 2. All gameplay entities should be data-driven from a central game configuration.
-3. Game definitions must describe items, merge chains, producers, stashes, loot tables, blueprints, craft/construction requirements, building tiers, grid sizes, inventory sizes, starting state, and other game rules.
+3. Game definitions must describe items, merge chains, producers, stashes, inline outputs, blueprints, craft/construction requirements, building tiers, grid sizes, inventory sizes, starting state, and other game rules.
 4. The game is client-only and must be able to run offline in the browser.
 5. Saved state is not considered backwards-compatible unless a migration explicitly supports it.
 6. If the game crashes during startup or runtime because local storage is corrupt or incompatible, the first recovery action is a full browser-storage hard reset followed by reload. Do not build soft recovery mazes for prototype saves.
@@ -47,7 +47,7 @@ These rules define how the game should be interpreted when implementation detail
 | Blueprint acquisition | specific blueprint is acquired directly through gameplay |
 | Craft/construction location | board or inventory, with active progress only on board |
 | Building tier progression | physical item/producer tiers, not global config patches |
-| Loot table model | named loot table entities referenced by products and stashes |
+| Output model | inline output on products, stashes, and effect loot operations |
 | Time model | real-world wall-clock time for active board/global timers |
 
 ## 4. Vocabulary
@@ -208,7 +208,7 @@ Examples:
 
 A stash is a finite producer-like entity.
 
-A stash can output concrete contents or roll from a loot table, but unlike a normal producer it has finite charges, finite stored contents, or another explicit depletion rule.
+A stash owns inline output rules, but unlike a normal producer it has finite charges, finite stored contents, or another explicit depletion rule.
 
 A stash may require input items before it can be opened or collected.
 
@@ -242,17 +242,11 @@ A coal mine may require `1 sausage` and `1 beer` per production cycle and may st
 
 Stash consumable inputs are currently open-time inputs, not persistent stash input storage. A locked chest can consume a key when opened. Persistent stash gates should use stored requirements instead.
 
-### 4.13 Loot table
+### 4.13 Inline output model
 
-A loot table is a standalone data entity defining possible outputs and probabilities for a producer, stash, or other generation mechanic.
+Product lines, stashes, and effect loot operations own their output inline. There is no top-level loot-table indirection in the current config model. Reintroduce shared output IDs only if the same output table is intentionally reused enough to beat the extra reference hop, not because humans miss paperwork for some reason.
 
-Loot tables should have stable IDs, for example:
-
-- `loot:lumber-camp-1`
-- `loot:lumber-camp-1:better-1`
-- `loot:quarry-1`
-
-Producer product lines and stashes reference loot tables by ID. Better output should be modeled as another product/building tier with its own named loot table instead of mutating probability numbers inside scattered item definitions.
+Better output should usually be modeled as another product/building tier with its own inline output. Runtime effects may append or replace output when the change is a concrete gameplay rule.
 
 ### 4.14 Blueprint
 
@@ -511,8 +505,7 @@ The item detail must show every gameplay-relevant piece of information available
 - producer input storage
 - stash requirements, inputs, charges, and depletion state
 - stash remaining charges or depletion state
-- active loot table ID
-- possible loot drops and their rules/probabilities, when known to the player
+- possible output drops and their rules/probabilities, when known to the player
 - explicit actions available from the detail
 
 Item detail is gameplay UI. If a mechanic exists and the player can reasonably inspect it, the detail is the canonical place to expose it.
@@ -737,7 +730,7 @@ Board placement uses deterministic nearest-free-cell policy based on the produce
 
 A producer may define consumable product-line inputs and reusable requirement gates.
 
-Consumable inputs are items consumed per successful product start. They belong to product lines through named input references.
+Consumable inputs are items consumed per successful product start. They belong inline to the concrete product line.
 
 Producer and product requirements are referenced by `requirementIds`, not embedded inline. The IDs point into the central top-level `requirements` table. Producer-level `requirementIds` gate every product line on that producer. Product-level `requirementIds` gate only that concrete product line. When both exist, all producer and product requirements must pass.
 
@@ -834,7 +827,7 @@ Possible depletion models:
 
 - fixed number of charges
 - fixed stored contents
-- fixed number of loot table rolls
+- fixed number of inline weighted-output rolls
 - removal on depletion
 - transformation into an empty item on depletion
 
@@ -860,44 +853,32 @@ Stash output is all-or-nothing for the whole open action. Activation must not co
 
 Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately. Spawn job sequence metadata is the backend source for visual spawn order, so UI does not need to invent a parallel spawn schedule just to animate items like a tiny circus. Spawn jobs with unresolved dependencies are not considered wakeable until their dependencies resolve, even if their own ready time is already in the past; dependency cycles are invalid save data.
 
-## 12. Loot tables
+## 12. Output rules
 
-### 12.1 Loot table as standalone entity
+### 12.1 Inline output ownership
 
-Loot tables are standalone data entities.
-
-A producer or stash references its active loot table by ID.
-
-Preferred ID pattern:
-
-- `loot:<entity-id>` for base table
-- `loot:<entity-id>:better-1` for a higher-tier table
-- `loot:<entity-id>:better-2` for a later higher-tier table
+Outputs live inline on the thing that emits them: product lines, stashes, and effect loot operations. There are no standalone loot-table IDs in the current config.
 
 Example:
 
-- `item:lumber-camp-1` references `loot:lumber-camp-1`
-- a higher-tier product references `loot:lumber-camp-1:better-1`
+- `product:lumber-camp-1:log` owns the output that emits `item:log`
+- a higher-tier product owns a different inline output definition
 
-### 12.2 Loot table definition
+### 12.2 Output definition
 
-A loot table must never produce zero output on a successful activation. A zero-output loot table is invalid game data.
+A normal successful product or stash activation should produce at least one output item unless it is explicitly authored as a delayed sink/destructor by omitting `output`. Inline output entries support guaranteed, chance, and weighted entries with optional quantities.
 
-A loot table must define:
+Output entries define:
 
-- stable ID
-- roll model
-- possible item outputs
-- probability or weight per output
-- min/max quantity per output
-- duplicate behavior
-- validation that every successful roll produces at least one output item
+- `type`: `guaranteed`, `chance`, or `weighted`
+- `itemId`, except weighted entries where item IDs live inside `entries`
+- `quantity`, omitted when it is `1`
+- `chance`, for chance entries
+- `entries` and optional `rolls`, for weighted entries; `rolls` is omitted when it is `1`
 
-### 12.3 Higher-tier loot tables
+### 12.3 Higher-tier output
 
-Higher-tier producers/products may reference different named loot tables.
-
-Do not patch drop rates directly inside runtime logic. Probability changes belong in named loot tables attached to concrete product tiers.
+Higher-tier producers/products should own their concrete output inline. Do not patch drop rates directly inside runtime logic. Probability changes belong either in the product's inline output or in explicit runtime effects.
 
 ## 13. Blueprint mechanics
 
@@ -1025,7 +1006,7 @@ Progression to a better building is modeled as a concrete physical tier:
 1. The player acquires a target-specific blueprint or craft target.
 2. The craft recipe consumes required materials and usually the previous building tier.
 3. Completion replaces the old tier with the new concrete item/producer tier.
-4. The new tier carries its own config: product lines, requirements, hindrances, durations, queue size, loot tables, art, and labels.
+4. The new tier carries its own config: product lines, requirements, hindrances, durations, queue size, inline outputs, art, and labels.
 
 This keeps gameplay readable. The player owns `farm-t2`, not an invisible save overlay that secretly mutates `farm-t1`. Capacity or world-scale mechanics may be introduced later as explicit systems, but not through a generic global upgrade patch layer.
 
@@ -1099,14 +1080,14 @@ The economy should be validated using these rules:
 3. Merge chains must not create unrelated materials without an explicit transformation system.
 4. Producer product-line inputs, stash open-time inputs, and stored requirements must be satisfiable from existing sources.
 5. Producer product-line input capacity must be high enough to support intended cycles.
-6. Loot table changes must be traceable through named product/building tiers.
+6. Output changes must be traceable through product/building tiers or explicit runtime effects.
 7. Currency item sources and sinks must be balanced intentionally.
 8. Inventory capacity must be considered when adding new chains or producers.
 9. Stateful items must preserve state through all allowed movement.
 10. No important economy behavior should live only in UI interaction code.
 11. Exclusive branch constraints must be authored through effects and enforced by runtime creation/start guards, not only by detail-sheet warnings.
 11. Existing `GameConfig` economy data is inspiration until a dedicated economy pass rewrites it to match this document.
-12. No successful loot table activation may produce zero output.
+12. No successful output activation may silently produce zero items unless the product is intentionally authored as a sink/destructor.
 14. No source-target item pair may match multiple interaction behaviors unless explicitly documented.
 
 ## 18. Data model expectations
@@ -1180,9 +1161,8 @@ Expected fields or equivalent rule definitions:
 
 Expected fields:
 
-- `id`
 - `withItemId`
-- `resultItemId`, only when it cannot be derived from a blueprint craft id
+- `resultItemId`
 - `secret`, if needed
 
 Merge is always a two-item interaction. Anything more complex belongs to producers, stashes, craft recipes or another explicit mechanic, not a fake variable-input merge rule.
@@ -1197,7 +1177,7 @@ Expected fields:
 - producer-level requirements
 - maximum queue size
 - product-level duration/input/output rules
-- optional sink product behavior when no output table is defined
+- optional sink product behavior when no output is defined
 - product-level requirements
 - product-line enable/default runtime state
 - input requirements
@@ -1214,7 +1194,7 @@ Expected fields:
 - `name`
 - trigger: `click`
 - finite behavior model
-- charges/contents/roll count
+- charges and inline output
 - current whole-stash open behavior
 - open-time consumable inputs, if any
 - persistent stored requirements, if any
@@ -1231,9 +1211,7 @@ Expected fields or defaults:
 - `quantity`, omitted when it is `1`
 - `chance`, for chance entries
 - `entries` and `rolls`, for weighted entries; `rolls` is omitted when it is `1`
-- `maxCount`
-- `allowDuplicateResults`
-- non-empty output validation
+- non-empty output validation unless the owning product intentionally omits output as a sink
 
 ### 18.9 Blueprint definition
 
@@ -1314,7 +1292,7 @@ These are intentionally not finalized yet.
 1. What are the final concrete economy merge chains?
 2. Which exact producers exist in the first balanced economy pass?
 3. Which exact stashes exist in the first balanced economy pass?
-4. What are the exact named loot tables and their probabilities?
+4. What are the exact inline outputs and their probabilities?
 5. What are the exact blueprint recipes for each building/tier?
 6. Which craft/construction/growth items use timers, and what are their durations?
 9. Can merge chains require more than two input items?
@@ -1334,7 +1312,7 @@ These notes track where the current implementation already matches this document
 3. Board -> inventory storage preserves runtime state through the explicit item-detail store action.
 4. Inventory -> board placement restores runtime state and supports empty-cell long-press placement targets.
 5. Producers and stashes are separate entity types.
-6. Producer and stash outputs use named loot tables when they generate items.
+6. Producer and stash outputs are authored inline when they generate items.
 7. Producer output capacity is handled at completion time with blocked delivery retry and preserved rolled delivery.
 8. Stash activation is all-or-nothing for the whole open action.
 9. Producer and craft input withdrawal is exposed through item detail and must not silently destroy nested items.
@@ -1361,7 +1339,7 @@ These concepts are not part of canonical gameplay and should be removed during c
 12. Inventory capacity changes as current gameplay. Inventory size is fixed at `7 x 5`.
 13. Any global upgrade UI, schema, or copy that implies save-driven config patching.
 14. Resource/currency storage outside item inventory unless a future mechanic explicitly reintroduces it here.
-15. Inline base producer output definitions once named loot tables are introduced for all loot-producing producer/stash outputs.
+15. Standalone loot-table IDs for one-off producer/stash outputs.
 
 Obsolete means delete or migrate unless this document explicitly reintroduces the concept later.
 
@@ -1404,7 +1382,7 @@ A gameplay implementation should provide tests or validation for:
 33. producer default product-line selection
 34. producer proximity requirements affect duration through `durationFactor`
 35. producer proximity effects average across producer-level and product-level proximity requirements
-36. producer loot table rolls from named table ID
+36. producer inline output rolls
 37. producer generating multiple items
 38. producer generating duplicate item outputs when allowed
 39. producer input deposit
@@ -1416,7 +1394,7 @@ A gameplay implementation should provide tests or validation for:
 45. producer production consumes required inputs only for production that actually starts
 46. producer blocked delivery preserves rolled output and retries without rerolling
 47. producer output uses deterministic nearest-free-cell placement from producer origin
-48. sink product lines with no output table complete without spawning output
+48. sink product lines with no output complete without spawning output
 49. stash finite depletion
 50. stash single open releases all remaining charges
 51. stash open-time input requirement, for keyed/locked stashes
@@ -1438,7 +1416,7 @@ A gameplay implementation should provide tests or validation for:
 67. save compatibility behavior when game definition version changes
 68. board timers advance while the app is closed
 69. inventory timers do not advance while the app is closed
-70. zero-output loot tables are rejected as invalid data
+70. zero-output activations are rejected unless explicitly authored as sink/destructor products
 71. ambiguous source-target interaction definitions are rejected as invalid data
 72. blueprint imprinting/binding behavior is absent from board drag/drop
 73. craft completion replaces the progress item in the same board cell

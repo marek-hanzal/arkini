@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
 import { planProducerProductAutoFillInputRefsFx } from "~/v0/game/producer/planProducerProductAutoFillInputRefsFx";
-import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
@@ -155,10 +154,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	yield* match(product.placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
-	const productInputs = readProductInputs({
-		config,
-		productId,
-	});
+	const productInputs = product.inputs ?? [];
 	if (action.inputRefs.length > 0) {
 		yield* checkActivationInputsFx({
 			inputRefs: action.inputRefs,

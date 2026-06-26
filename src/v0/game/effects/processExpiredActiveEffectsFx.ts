@@ -16,12 +16,19 @@ export const processExpiredActiveEffectsFx = Effect.fn("processExpiredActiveEffe
 	nowMs,
 	save,
 }: processExpiredActiveEffectsFx.Props) {
-	const expiredEffects = Object.values(save.activeEffects ?? {}).filter((effect) =>
-		isGameTimeDue({
-			nowMs,
-			readyAtMs: effect.endAtMs,
-		}),
-	);
+	const expiredEffects = Object.values(save.activeEffects ?? {})
+		.filter((effect) =>
+			isGameTimeDue({
+				nowMs,
+				readyAtMs: effect.endAtMs,
+			}),
+		)
+		.sort(
+			(left, right) =>
+				left.endAtMs - right.endAtMs ||
+				left.startAtMs - right.startAtMs ||
+				left.id.localeCompare(right.id),
+		);
 
 	if (expiredEffects.length === 0) {
 		return {

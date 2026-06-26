@@ -2,6 +2,7 @@ import type { BoardCell } from "~/v0/game/board/BoardCell";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { BlockedGameEffectOperation } from "~/v0/game/effects/BlockedGameEffectOperation";
+import { compareGameEffectSourceInstances } from "~/v0/game/effects/compareGameEffectSourceInstances";
 import { doesGameEffectTargetItem } from "~/v0/game/effects/doesGameEffectTargetItem";
 import { doesGameEffectSourceApplyToBoardCell } from "~/v0/game/effects/doesGameEffectSourceApplyToBoardCell";
 import { readGameEffectSourceInstances } from "~/v0/game/effects/readGameEffectSourceInstances";
@@ -25,11 +26,19 @@ export const readGameEffectItemCreateBlockReasons = ({
 }: readGameEffectItemCreateBlockReasons.Props): BlockedGameEffectOperation[] => {
 	const reasons: BlockedGameEffectOperation[] = [];
 
-	for (const source of readGameEffectSourceInstances({
+	const sources = readGameEffectSourceInstances({
 		config,
 		nowMs,
 		save,
-	})) {
+	}).sort((left, right) =>
+		compareGameEffectSourceInstances({
+			config,
+			left,
+			right,
+		}),
+	);
+
+	for (const source of sources) {
 		const effect = config.effects[source.effectId];
 		if (!effect) continue;
 		if (

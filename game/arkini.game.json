@@ -4101,7 +4101,56 @@
 			"resultItemId": "producer:winery-t1"
 		}
 	},
-	"effects": {},
+	"effects": {
+		"effect:path-engineers-locks-counter-keystones": {
+			"name": "Engineers path locks Faith and Mages keystone plans",
+			"operations": [
+				{
+					"kind": "line.blockStart",
+					"reason": "Engineers path is already chosen.",
+					"target": {
+						"productIds": [
+							"product:university:blueprint-cathedral",
+							"product:university:blueprint-mage-lodge"
+						]
+					}
+				}
+			],
+			"scope": "global"
+		},
+		"effect:path-faith-locks-counter-keystones": {
+			"name": "Faith path locks Engineers and Mages keystone plans",
+			"operations": [
+				{
+					"kind": "line.blockStart",
+					"reason": "Faith path is already chosen.",
+					"target": {
+						"productIds": [
+							"product:university:blueprint-house-of-engineers",
+							"product:university:blueprint-mage-lodge"
+						]
+					}
+				}
+			],
+			"scope": "global"
+		},
+		"effect:path-mages-locks-counter-keystones": {
+			"name": "Mages path locks Engineers and Faith keystone plans",
+			"operations": [
+				{
+					"kind": "line.blockStart",
+					"reason": "Mages path is already chosen.",
+					"target": {
+						"productIds": [
+							"product:university:blueprint-house-of-engineers",
+							"product:university:blueprint-cathedral"
+						]
+					}
+				}
+			],
+			"scope": "global"
+		}
+	},
 	"game": {
 		"board": {
 			"height": 11,
@@ -10568,6 +10617,9 @@
 			],
 			"maxStackSize": 1,
 			"name": "Cathedral",
+			"passiveEffectIds": [
+				"effect:path-faith-locks-counter-keystones"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -10883,6 +10935,9 @@
 			],
 			"maxStackSize": 1,
 			"name": "House of Engineers",
+			"passiveEffectIds": [
+				"effect:path-engineers-locks-counter-keystones"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -11013,6 +11068,9 @@
 			],
 			"maxStackSize": 1,
 			"name": "Mage Lodge",
+			"passiveEffectIds": [
+				"effect:path-mages-locks-counter-keystones"
+			],
 			"storage": "both",
 			"tags": [
 				"building",

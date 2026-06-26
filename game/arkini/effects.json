@@ -1,0 +1,52 @@
+{
+	"effects": {
+		"effect:path-engineers-locks-counter-keystones": {
+			"name": "Engineers path locks Faith and Mages keystone plans",
+			"scope": "global",
+			"operations": [
+				{
+					"kind": "line.blockStart",
+					"reason": "Engineers path is already chosen.",
+					"target": {
+						"productIds": [
+							"product:university:blueprint-cathedral",
+							"product:university:blueprint-mage-lodge"
+						]
+					}
+				}
+			]
+		},
+		"effect:path-faith-locks-counter-keystones": {
+			"name": "Faith path locks Engineers and Mages keystone plans",
+			"scope": "global",
+			"operations": [
+				{
+					"kind": "line.blockStart",
+					"reason": "Faith path is already chosen.",
+					"target": {
+						"productIds": [
+							"product:university:blueprint-house-of-engineers",
+							"product:university:blueprint-mage-lodge"
+						]
+					}
+				}
+			]
+		},
+		"effect:path-mages-locks-counter-keystones": {
+			"name": "Mages path locks Engineers and Faith keystone plans",
+			"scope": "global",
+			"operations": [
+				{
+					"kind": "line.blockStart",
+					"reason": "Mages path is already chosen.",
+					"target": {
+						"productIds": [
+							"product:university:blueprint-house-of-engineers",
+							"product:university:blueprint-cathedral"
+						]
+					}
+				}
+			]
+		}
+	}
+}

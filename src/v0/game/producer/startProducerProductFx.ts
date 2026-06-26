@@ -57,6 +57,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	const checked = yield* checkProducerProductStartReadinessFx({
 		action,
 		config,
+		nowMs,
 		save,
 	});
 	const consumed = action.inputRefs.length
@@ -115,34 +116,17 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	const durationMs = checked.effectiveProductLine.durationMs;
 	const completesAtMs = queuedStartAtMs + durationMs;
 
-	if (checked.product.activatesEffectId) {
-		const activeEffectId = yield* createGameJobIdFx();
-		nextSave.activeEffects[activeEffectId] = {
-			activatedAtMs: queuedStartAtMs,
-			effectId: checked.product.activatesEffectId,
-			expiresAtMs: completesAtMs,
-			id: activeEffectId,
-			sourceItemInstanceId: action.producerItemInstanceId,
-		};
-		nextSave.updatedAtMs = nowMs;
-
-		return {
-			events: [
-				...consumed.events,
-				{
-					activatedAtMs: queuedStartAtMs,
-					effectId: checked.product.activatesEffectId,
-					expiresAtMs: completesAtMs,
-					id: activeEffectId,
-					sourceItemInstanceId: action.producerItemInstanceId,
-					type: "effect.activated" as const,
-				},
-			],
-			nextWakeAtMs: yield* readNextWakeAtMsFx({
-				save: nextSave,
-			}),
-			save: nextSave,
-		} satisfies GameEngineResult;
+	const activatedEffect = checked.product.activatesEffectId
+		? {
+				activatedAtMs: queuedStartAtMs,
+				effectId: checked.product.activatesEffectId,
+				expiresAtMs: completesAtMs,
+				id: yield* createGameJobIdFx(),
+				sourceItemInstanceId: action.producerItemInstanceId,
+			}
+		: undefined;
+	if (activatedEffect) {
+		nextSave.activeEffects[activatedEffect.id] = activatedEffect;
 	}
 
 	const jobId = yield* createGameJobIdFx();
@@ -168,6 +152,18 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 				startedAtMs: queuedStartAtMs,
 				type: "product.started" as const,
 			},
+			...(activatedEffect
+				? [
+						{
+							activatedAtMs: activatedEffect.activatedAtMs,
+							effectId: activatedEffect.effectId,
+							expiresAtMs: activatedEffect.expiresAtMs,
+							id: activatedEffect.id,
+							sourceItemInstanceId: activatedEffect.sourceItemInstanceId,
+							type: "effect.activated" as const,
+						},
+					]
+				: []),
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
 			save: nextSave,

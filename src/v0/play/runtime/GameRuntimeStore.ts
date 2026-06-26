@@ -117,9 +117,10 @@ export class GameRuntimeStore {
 		});
 	}
 
-	async readiness({ action }: RuntimeGameEngineAdapter.ReadinessProps) {
+	async readiness({ action, nowMs = Date.now() }: RuntimeGameEngineAdapter.ReadinessProps) {
 		return this.adapter.readiness({
 			action,
+			nowMs,
 		});
 	}
 

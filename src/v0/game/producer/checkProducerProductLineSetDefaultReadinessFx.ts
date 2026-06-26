@@ -9,6 +9,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 export namespace checkProducerProductLineSetDefaultReadinessFx {
 	export interface Props {
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 		action: GameActionProducerProductLineSetDefault;
 	}
@@ -16,7 +17,7 @@ export namespace checkProducerProductLineSetDefaultReadinessFx {
 
 export const checkProducerProductLineSetDefaultReadinessFx = Effect.fn(
 	"checkProducerProductLineSetDefaultReadinessFx",
-)(function* ({ config, save, action }: checkProducerProductLineSetDefaultReadinessFx.Props) {
+)(function* ({ config, nowMs, save, action }: checkProducerProductLineSetDefaultReadinessFx.Props) {
 	const { producerDefinition, producerId, producerItem } = yield* readProducerRuntimeTargetFx({
 		config,
 		producerItemInstanceId: action.producerItemInstanceId,
@@ -35,6 +36,7 @@ export const checkProducerProductLineSetDefaultReadinessFx = Effect.fn(
 		producerId,
 		producerItemId: producerItem.itemId,
 		producerItemInstanceId: action.producerItemInstanceId,
+		nowMs,
 		productIds: producerDefinition.productIds,
 		save,
 	});

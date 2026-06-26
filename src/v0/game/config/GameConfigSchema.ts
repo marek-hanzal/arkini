@@ -303,12 +303,13 @@ const GameHindrancesSchema = z.array(GameHindranceDefinitionSchema);
 /** Selects which producer product lines an effect operation may touch. */
 const GameEffectTargetSchema = z
 	.object({
-		producerIds: z.array(IdSchema).optional(),
-		productIds: z.array(IdSchema).optional(),
-		producerTagsAny: z.array(z.string().min(1)).optional(),
-		producerTagsAll: z.array(z.string().min(1)).optional(),
-		productTagsAny: z.array(z.string().min(1)).optional(),
-		productTagsAll: z.array(z.string().min(1)).optional(),
+		all: z.literal(true).optional(),
+		producerIds: z.array(IdSchema).min(1).optional(),
+		productIds: z.array(IdSchema).min(1).optional(),
+		producerTagsAny: z.array(z.string().min(1)).min(1).optional(),
+		producerTagsAll: z.array(z.string().min(1)).min(1).optional(),
+		productTagsAny: z.array(z.string().min(1)).min(1).optional(),
+		productTagsAll: z.array(z.string().min(1)).min(1).optional(),
 	})
 	.strict();
 
@@ -1660,6 +1661,26 @@ const validateGameEffectTarget = (
 	hasProducer: (producerId: string) => boolean,
 	hasProduct: (productId: string) => boolean,
 ) => {
+	const selectorFieldNames = [
+		"producerIds",
+		"productIds",
+		"producerTagsAny",
+		"producerTagsAll",
+		"productTagsAny",
+		"productTagsAll",
+	] as const;
+	const selectorCount = selectorFieldNames.filter((fieldName) => target[fieldName]).length;
+	if (!target.all && selectorCount === 0) {
+		addIssue(
+			ctx,
+			path,
+			`Effect target must define at least one selector or explicit all: true.`,
+		);
+	}
+	if (target.all && selectorCount > 0) {
+		addIssue(ctx, path, `Effect target all: true must not be combined with selectors.`);
+	}
+
 	const targetLists = [
 		[
 			"producerIds",

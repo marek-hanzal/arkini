@@ -1101,7 +1101,7 @@ Fields:
 - `tags`: product-line tags used by runtime effects. Missing tags default to `[]`. Use tags such as `path:engineers`, `dirty`, `housing`, `morale`, or any content-specific label the effect system can target.
 - `visibility`: baseline runtime visibility, either `visible` or `hidden`. Missing visibility defaults to `visible`. Hidden product lines can be revealed by runtime effects. Hidden lines are not shown, cannot be set as default, cannot be fed through producer priority routing, and cannot be started.
 - `outputTableId`: optional loot table output. Missing `outputTableId` makes a delayed sink/destructor product unless an effect mutates its loot plan at runtime.
-- `activatesEffectId`: optional active effect produced by this line. Active-effect product lines consume inputs and run for `durationMs`, then keep the effect active until the duration expires. Active-effect lines must not also define `outputTableId`; their output is runtime influence, not an item pile pretending to be weather.
+- `activatesEffectId`: optional active effect produced by this line. Active-effect product lines consume inputs, create a timed active effect tied to the source producer, and occupy the producer queue for `durationMs` while that effect counts down. Active-effect lines must not also define `outputTableId`; their output is runtime influence, not an item pile pretending to be weather.
 
 Baseline-hidden product line:
 
@@ -1211,7 +1211,7 @@ Defines runtime mutators that change how product lines are interpreted. Effects 
 Effects can come from two places:
 
 - item `passiveEffectIds`: the effect is active while that item exists on the board
-- product `activatesEffectId`: the product consumes inputs, runs for its duration, then creates a timed active effect instance tied to the source item
+- product `activatesEffectId`: the product consumes inputs, creates a timed active effect instance tied to the source item, and uses its producer job duration as the effect countdown/queue occupancy
 
 Global passive reveal effect example:
 
@@ -1309,6 +1309,8 @@ Operation semantics:
 - `loot.addChanceItem`: adds a direct chance item drop, default quantity `1`.
 - `loot.dropChance.add`: changes the chance that base loot is evaluated. The final chance is clamped to `0..1`.
 
+Every operation must declare a target. Use `"all": true` for an explicit match-everything operation. Selector-less `{}` is invalid, because silent global mutation is how balance goes off to live in a sewer. `all: true` cannot be combined with other selectors.
+
 Target selectors are ANDed together when multiple fields are present:
 
 ```json
@@ -1321,6 +1323,7 @@ Target selectors are ANDed together when multiple fields are present:
 
 Supported target fields:
 
+- `all`: explicit match every product line
 - `producerIds`
 - `productIds`
 - `producerTagsAny`

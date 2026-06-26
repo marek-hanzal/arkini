@@ -27,6 +27,7 @@ export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* 
 	const checked = yield* checkProducerInputStoreReadinessFx({
 		action,
 		config,
+		nowMs,
 		save,
 	});
 	const nextSave = yield* cloneGameSaveFx({

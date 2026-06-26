@@ -22,6 +22,7 @@ import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 export namespace checkProducerProductStartReadinessFx {
 	export interface Props {
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 		action: GameActionProducerProductStart;
 	}
@@ -29,7 +30,7 @@ export namespace checkProducerProductStartReadinessFx {
 
 export const checkProducerProductStartReadinessFx = Effect.fn(
 	"checkProducerProductStartReadinessFx",
-)(function* ({ config, save, action }: checkProducerProductStartReadinessFx.Props) {
+)(function* ({ config, nowMs, save, action }: checkProducerProductStartReadinessFx.Props) {
 	const { producerDefinition, producerId, producerItem } = yield* readProducerRuntimeTargetFx({
 		config,
 		producerItemInstanceId: action.producerItemInstanceId,
@@ -40,6 +41,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		producerId,
 		producerItemId: producerItem.itemId,
 		producerItemInstanceId: action.producerItemInstanceId,
+		nowMs,
 		productIds: producerDefinition.productIds,
 		save,
 	});
@@ -127,6 +129,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		producerId,
 		producerItemId: producerItem.itemId,
 		producerItemInstanceId: action.producerItemInstanceId,
+		nowMs,
 		product,
 		productId,
 		save,

@@ -28,6 +28,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 export namespace readActionReadinessFx {
 	export interface Props {
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 		action: unknown;
 	}
@@ -35,6 +36,7 @@ export namespace readActionReadinessFx {
 
 export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function* ({
 	config,
+	nowMs,
 	save,
 	action,
 }: readActionReadinessFx.Props) {
@@ -108,6 +110,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					checkProducerInputStoreReadinessFx({
 						action: storeInputAction,
 						config,
+						nowMs,
 						save,
 					}),
 				producerInputWithdraw: (withdrawInputAction) =>
@@ -120,12 +123,14 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					checkProducerProductLineSetDefaultReadinessFx({
 						action: setDefaultAction,
 						config,
+						nowMs,
 						save,
 					}),
 				producerProductStart: (startAction) =>
 					checkProducerProductStartReadinessFx({
 						action: startAction,
 						config,
+						nowMs,
 						save,
 					}),
 				stashOpen: (openAction) =>

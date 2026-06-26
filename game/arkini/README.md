@@ -684,12 +684,12 @@ University
   -> House of Engineers Blueprint / Cathedral Blueprint / Mage Lodge Blueprint
 ```
 
-The actual keystone buildings are authored as exclusive building items. Owning any one of them blocks crafting the other two through item-level `exclusiveToIds`. Later branch-specific product lines should be baseline-hidden and revealed by path effects emitted from the chosen keystone building.
+The actual keystone buildings are authored as exclusive building items. Owning any one of them blocks crafting the other two through item-level `exclusiveToIds`, and each keystone also emits a passive global effect that blocks University from producing the two counter-path blueprints. Later branch-specific product lines should be baseline-hidden and revealed by path effects emitted from the chosen keystone building.
 
 ```txt
-producer:house-of-engineers exclusive with producer:cathedral, producer:mage-lodge
-producer:cathedral exclusive with producer:house-of-engineers, producer:mage-lodge
-producer:mage-lodge exclusive with producer:house-of-engineers, producer:cathedral
+producer:house-of-engineers exclusive with producer:cathedral, producer:mage-lodge; blocks Cathedral and Mage Lodge blueprint production
+producer:cathedral exclusive with producer:house-of-engineers, producer:mage-lodge; blocks House of Engineers and Mage Lodge blueprint production
+producer:mage-lodge exclusive with producer:house-of-engineers, producer:cathedral; blocks House of Engineers and Cathedral blueprint production
 ```
 
 The branches are intentionally only keystone buildings for now. Follow-up eras should give them passive path effects that reveal branch-tagged product lines:

@@ -22,6 +22,7 @@ export const setProducerProductLineDefaultFx = Effect.fn("setProducerProductLine
 		const checked = yield* checkProducerProductLineSetDefaultReadinessFx({
 			action,
 			config,
+			nowMs,
 			save,
 		});
 		const previousProductId = readProducerDefaultProductId({

@@ -1,21 +1,19 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
-export type EffectiveLootQuantity =
-	| number
-	| {
-			max: number;
-			min: number;
-	  };
-
-export interface EffectiveLootTableEntry {
+interface EffectiveLootTableEntry {
 	lootTableId: string;
 	chance: number;
 }
 
-export interface EffectiveChanceItemEntry {
+interface EffectiveChanceItemEntry {
 	itemId: string;
 	chance: number;
-	quantity?: EffectiveLootQuantity;
+	quantity?:
+		| number
+		| {
+				max: number;
+				min: number;
+		  };
 }
 
 export interface AppliedGameEffectOperation {

@@ -1311,7 +1311,6 @@ export type GameSaveInventoryInstance = z.infer<typeof GameSaveInventoryInstance
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveProducerDeliveryItem = z.infer<typeof GameSaveProducerDeliveryItemSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
-export type GameSaveActiveEffect = z.infer<typeof GameSaveActiveEffectSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;
 export type GameSave = z.infer<typeof GameSaveSchema>;

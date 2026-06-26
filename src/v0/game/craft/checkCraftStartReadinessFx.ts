@@ -3,8 +3,10 @@ import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequire
 import { checkCraftTargetIdleFx } from "~/v0/game/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
+import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
+import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -51,6 +53,23 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		itemId: target.recipe.resultItemId,
 		save,
 	});
+	if (
+		readBoardItemMaxCountCapacity({
+			config,
+			ignoredBoardItemInstanceIds: new Set([
+				action.targetItemInstanceId,
+			]),
+			itemId: target.recipe.resultItemId,
+			save,
+		}) <= 0
+	) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"board:max-count",
+				`Board already has the maximum allowed count for "${target.recipe.resultItemId}".`,
+			),
+		);
+	}
 
 	return {
 		recipe: target.recipe,

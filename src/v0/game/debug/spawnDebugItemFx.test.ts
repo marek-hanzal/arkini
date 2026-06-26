@@ -124,6 +124,48 @@ describe("spawnDebugItemFx", () => {
 		]);
 	});
 
+	it("rejects board debug spawn above item maxCount", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					maxCount: 1,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+
+		const result = runActionEither({
+			action: {
+				itemId: "item:twig",
+				location: "board",
+				type: "debug.item.spawn",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "board:max-count",
+			},
+		});
+	});
+
 	it("rejects board-only overflow instead of silently falling back to inventory", () => {
 		const config = createEngineTestConfig({
 			startingState: {

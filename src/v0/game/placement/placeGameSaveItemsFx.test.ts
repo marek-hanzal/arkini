@@ -199,6 +199,89 @@ describe("placeGameSaveItemsFx", () => {
 		]);
 	});
 
+	it("spills output to inventory after item board maxCount is reached", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					maxCount: 1,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runPlacement({
+			config,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 2,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(
+			Object.values(result.save.board.items).filter((item) => item.itemId === "item:twig"),
+		).toHaveLength(1);
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+	});
+
+	it("rejects board-only output after item board maxCount is reached", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					maxCount: 1,
+					storage: "board",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+
+		const result = runPlacementEither({
+			config,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GamePlacementFailed",
+				reason: "board:max-count",
+			},
+		});
+	});
+
 	it("places inventory-only output directly into inventory", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

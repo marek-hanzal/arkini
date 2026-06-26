@@ -667,6 +667,10 @@ A producer owns ordered product lines through `productIds`. Each product line de
 
 Product lines may define `showIf`, an OR list of marker item IDs. A hidden line is not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. `showIf` only checks whether any marker item exists anywhere in the current save; it does not consume that marker and is not a replacement for inputs or requirements. This is meant for late-game path-specific variants where one building can offer different recipes depending on whether the player chose Engineers, Faith, or Mages, because apparently civilization must eventually pick a flavor of nonsense.
 
+### Board max count
+
+Items may define `maxCount` to cap how many copies of that item can exist on the board at once. Missing `maxCount` means unlimited. The cap is board-only: inventory stacks and stored inputs are not counted. Runtime placement, debug spawn, merge results, craft completion, and save/config validation all honor the limit. Board-and-inventory outputs may spill remainder into inventory; board-only outputs fail with `board:max-count`. This is mainly for buildings like wells, path keystones, or other content that should not be spammed across the board like a zoning disaster with icons.
+
 Runtime save state may store a default product line per concrete producer item instance. The default affects:
 
 - board single-click activation

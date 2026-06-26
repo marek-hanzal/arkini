@@ -3,6 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanceIdFx";
 import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
+import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { readGameSaveExclusiveConflicts } from "~/v0/game/exclusivity/readGameSaveExclusiveConflicts";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -51,6 +52,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 
 		let remainingQuantity = item.quantity;
 		let boardPlacedQuantity = 0;
+		let boardHitMaxCount = false;
 		let boardRanOutOfSpace = false;
 		const canPlaceOnBoard = isItemStorageAllowed({
 			config,
@@ -64,6 +66,17 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		});
 
 		while (canPlaceOnBoard && remainingQuantity > 0) {
+			if (
+				readBoardItemMaxCountCapacity({
+					config,
+					itemId: item.itemId,
+					save,
+				}) <= 0
+			) {
+				boardHitMaxCount = true;
+				break;
+			}
+
 			const emptyCell = yield* findFirstEmptyBoardCellFx({
 				config,
 				save,
@@ -117,9 +130,13 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		const reason =
 			canPlaceOnBoard &&
 			(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-			boardRanOutOfSpace
-				? "board:full"
-				: "inventory:full";
+			boardHitMaxCount
+				? "board:max-count"
+				: canPlaceOnBoard &&
+						(!canPlaceInInventory || boardPlacedQuantity === 0) &&
+						boardRanOutOfSpace
+					? "board:full"
+					: "inventory:full";
 
 		return yield* Effect.fail(
 			GameEngineError.placementFailed(reason, "Placement target is full."),

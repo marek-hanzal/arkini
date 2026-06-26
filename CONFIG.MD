@@ -333,6 +333,7 @@ Item shape:
       "name": "Twig",
       "tier": 1,
       "maxStackSize": 50,
+      "maxCount": 3,
       "storage": "both",
       "description": "Small wood resource.",
       "label": "I",
@@ -360,6 +361,7 @@ Fields:
 - `name`: item display name.
 - `tier`: item level.
 - `maxStackSize`: max stack size in inventory.
+- `maxCount`: optional maximum number of this item that may exist on the board at once. Omit it for unlimited board count. It does not limit inventory stacks or stored inputs.
 - `storage`: `board`, `inventory`, or `both`. Defaults to `both`.
 - `description`: item text.
 - `label`: short label.
@@ -1807,6 +1809,7 @@ Config validation also checks common data mistakes:
 - exclusive item conflicts in saves, where an owned item coexists with an item listed in its `exclusiveToIds`
 - starting inventory quantity above item `maxStackSize`
 - starting state violating item `storage`
+- starting board containing more copies of an item than its optional `maxCount`
 
 ## 20. Supported values
 

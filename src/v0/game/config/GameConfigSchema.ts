@@ -30,6 +30,8 @@ import { z } from "zod";
  * - Item `storage` declares where the item may persist: `board`, `inventory`, or
  *   `both`. Missing storage defaults to `both`. Board-only danger tiles can therefore
  *   spawn on the board without letting the player launder the problem through inventory.
+ * - Item `maxCount` optionally caps how many copies may exist on the board. Missing
+ *   `maxCount` means unlimited, because sometimes restraint should be explicit.
  * - Merge definitions are explicit source-owned rules. If both drag directions should
  *   work, both source items must reference their own rule. The engine must not invent
  *   reverse merges from target-owned rules.
@@ -424,6 +426,7 @@ const ItemDefinitionSchema = z
 		name: z.string().min(1),
 		tier: NonNegativeIntegerSchema,
 		maxStackSize: PositiveIntegerSchema,
+		maxCount: PositiveIntegerSchema.optional(),
 		storage: ItemStoragePolicySchema,
 		description: z.string(),
 		label: z.string().optional(),
@@ -1092,6 +1095,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	const usedStartingBoardCells = new Set<string>();
+	const startingBoardItemCountByItemId = new Map<string, number>();
 	for (const [index, entry] of value.startingState.board.entries()) {
 		if (!hasItem(entry.itemId)) {
 			addIssue(
@@ -1143,6 +1147,11 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 
+		startingBoardItemCountByItemId.set(
+			entry.itemId,
+			(startingBoardItemCountByItemId.get(entry.itemId) ?? 0) + 1,
+		);
+
 		const cellKey = `${entry.x}:${entry.y}`;
 		if (usedStartingBoardCells.has(cellKey)) {
 			addIssue(
@@ -1156,6 +1165,20 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 		usedStartingBoardCells.add(cellKey);
+	}
+
+	for (const [itemId, quantity] of startingBoardItemCountByItemId) {
+		const maxCount = value.items[itemId]?.maxCount;
+		if (maxCount === undefined || quantity <= maxCount) continue;
+
+		addIssue(
+			ctx,
+			[
+				"startingState",
+				"board",
+			],
+			`Starting board has ${quantity} item(s) of "${itemId}" but maxCount is ${maxCount}.`,
+		);
 	}
 });
 

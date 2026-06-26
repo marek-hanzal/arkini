@@ -59,6 +59,10 @@ type TestProduct = {
 
 type TestItemStorage = "board" | "inventory" | "both";
 
+type TestItemWithMaxCount = {
+	maxCount?: number;
+};
+
 type TestCraftRecipe = {
 	durationMs: number;
 	inputs: {
@@ -252,6 +256,32 @@ describe("GameConfigSchema", () => {
 
 	it("defaults item storage to both", () => {
 		expect(parseGameConfig(createValidConfigValue()).items["item:twig"].storage).toBe("both");
+	});
+
+	it("accepts optional item maxCount", () => {
+		const config = createValidConfigValue();
+		(config.items["item:twig"] as TestItemWithMaxCount).maxCount = 2;
+
+		expect(parseGameConfig(config).items["item:twig"].maxCount).toBe(2);
+	});
+
+	it("rejects starting board item counts above item maxCount", () => {
+		const config = createValidConfigValue();
+		(config.items["item:twig"] as TestItemWithMaxCount).maxCount = 1;
+		config.startingState.board.push(
+			{
+				itemId: "item:twig",
+				x: 0,
+				y: 1,
+			},
+			{
+				itemId: "item:twig",
+				x: 1,
+				y: 1,
+			},
+		);
+
+		expect(() => parseGameConfig(config)).toThrow(/maxCount is 1/);
 	});
 
 	it("rejects board-only items in starting inventory", () => {

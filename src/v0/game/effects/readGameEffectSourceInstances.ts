@@ -6,6 +6,7 @@ import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourc
 export namespace readGameEffectSourceInstances {
 	export interface Props {
 		config: GameConfig;
+		ignoredProducerJobIds?: ReadonlySet<string>;
 		nowMs?: number;
 		save: GameSave;
 	}
@@ -120,10 +121,14 @@ const readPassiveInventorySources = ({
 
 export const readGameEffectSourceInstances = ({
 	config,
+	ignoredProducerJobIds,
 	nowMs,
 	save,
 }: readGameEffectSourceInstances.Props): GameEffectSourceInstance[] => {
 	const activeSources = Object.values(save.activeEffects ?? {})
+		.filter(
+			(effect) => !effect.producerJobId || !ignoredProducerJobIds?.has(effect.producerJobId),
+		)
 		.filter(
 			(effect) =>
 				nowMs === undefined ||

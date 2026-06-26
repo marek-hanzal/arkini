@@ -14,6 +14,7 @@ export namespace readEffectiveProducerProductLine {
 	export interface Props {
 		baseDurationMs: number;
 		config: GameConfig;
+		ignoredProducerJobIds?: ReadonlySet<string>;
 		nowMs?: number;
 		producerId: string;
 		producerItemId: string;
@@ -68,6 +69,7 @@ const createAppliedOperation = ({
 export const readEffectiveProducerProductLine = ({
 	baseDurationMs,
 	config,
+	ignoredProducerJobIds,
 	nowMs,
 	producerId,
 	producerItemId,
@@ -91,6 +93,7 @@ export const readEffectiveProducerProductLine = ({
 
 	const sources = readGameEffectSourceInstances({
 		config,
+		ignoredProducerJobIds,
 		nowMs,
 		save,
 	})

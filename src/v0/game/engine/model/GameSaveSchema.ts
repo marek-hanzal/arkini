@@ -402,6 +402,9 @@ const readEffectiveProductInputSlots = ({
 	productId: string;
 }) => config.products[productId]?.inputs ?? [];
 
+const readProducerQueueBarrierAtMs = (job: GameSaveProducerJob) =>
+	job.delivery?.nextAttemptAtMs ?? job.readyAtMs;
+
 const readItemSpawnDependencyCycleJobIds = (save: GameSave) => {
 	const visiting = new Set<string>();
 	const visited = new Set<string>();
@@ -863,14 +866,17 @@ const validateGameSaveAgainstConfig = (
 		if (!product?.activatesEffectId) continue;
 
 		const activeEffectIds = activeEffectIdsByProducerJobId.get(jobId) ?? [];
-		if (activeEffectIds.length !== 1) {
+		const expectedActiveEffectCount = job.delivery ? 0 : 1;
+		if (activeEffectIds.length !== expectedActiveEffectCount) {
 			addSaveIssue(
 				ctx,
 				[
 					"producerJobs",
 					jobId,
 				],
-				`Producer job "${jobId}" activates effect "${product.activatesEffectId}" and must have exactly one linked active effect.`,
+				job.delivery
+					? `Blocked producer job "${jobId}" has completed activated effect "${product.activatesEffectId}" and must not keep a linked active effect.`
+					: `Producer job "${jobId}" activates effect "${product.activatesEffectId}" and must have exactly one linked active effect.`,
 			);
 		}
 	}
@@ -908,7 +914,21 @@ const validateGameSaveAgainstConfig = (
 			const previous = sortedProducerJobs[index - 1];
 			const current = sortedProducerJobs[index];
 			if (!previous || !current) continue;
-			if (current.job.startAtMs < previous.job.readyAtMs) {
+
+			if (current.job.delivery) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerJobs",
+						current.jobId,
+						"delivery",
+					],
+					`Producer job "${current.jobId}" for "${producerItemInstanceId}" has blocked delivery but is not first in the producer queue.`,
+				);
+			}
+
+			const previousQueueBarrierAtMs = readProducerQueueBarrierAtMs(previous.job);
+			if (current.job.startAtMs < previousQueueBarrierAtMs) {
 				addSaveIssue(
 					ctx,
 					[
@@ -916,7 +936,7 @@ const validateGameSaveAgainstConfig = (
 						current.jobId,
 						"startAtMs",
 					],
-					`Producer job "${current.jobId}" for "${producerItemInstanceId}" starts before previous job "${previous.jobId}" is ready.`,
+					`Producer job "${current.jobId}" for "${producerItemInstanceId}" starts before previous job "${previous.jobId}" releases the queue.`,
 				);
 			}
 		}

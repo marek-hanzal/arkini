@@ -1,11 +1,13 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
+import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
-import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
+import type { GamePlacementFailureReason } from "~/v0/game/placement/GamePlacementFailureReasonSchema";
 import type { GameSave, GameSaveCraftJob } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace completeCraftJobFx {
@@ -16,6 +18,39 @@ export namespace completeCraftJobFx {
 		nowMs: number;
 	}
 }
+
+const failCraftJobFx = Effect.fn("completeCraftJobFx.failCraftJobFx")(function* ({
+	reason,
+	save,
+	job,
+	nowMs,
+}: {
+	reason: GamePlacementFailureReason;
+	save: GameSave;
+	job: GameSaveCraftJob;
+	nowMs: number;
+}) {
+	const nextSave = yield* cloneGameSaveFx({
+		save,
+	});
+	delete nextSave.craftJobs[job.id];
+	nextSave.updatedAtMs = nowMs;
+
+	return {
+		events: [
+			{
+				failedAtMs: nowMs,
+				jobId: job.id,
+				reason,
+				recipeId: job.recipeId,
+				targetItemInstanceId: job.targetItemInstanceId,
+				type: "craft.failed" as const,
+			},
+		],
+		save: nextSave,
+		type: "completed" as const,
+	} satisfies GameEngineCompletionResult;
+});
 
 export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 	config,
@@ -67,12 +102,40 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		);
 	}
 
-	yield* checkItemCreateBlockedByEffectsFx({
+	if (
+		!isItemStorageAllowed({
+			config,
+			itemId: recipe.resultItemId,
+			location: "board",
+		})
+	) {
+		return yield* failCraftJobFx({
+			job: liveJob,
+			nowMs,
+			reason: "storage:inventory-forbidden",
+			save,
+		});
+	}
+
+	const effectBlocks = readGameEffectItemCreateBlockReasons({
 		config,
 		itemId: recipe.resultItemId,
 		nowMs,
 		save,
+		targetCell: {
+			x: liveTarget.x,
+			y: liveTarget.y,
+		},
 	});
+	if (effectBlocks.length > 0) {
+		return yield* failCraftJobFx({
+			job: liveJob,
+			nowMs,
+			reason: "effect:block-create",
+			save,
+		});
+	}
+
 	if (
 		readBoardItemMaxCountCapacity({
 			config,
@@ -83,12 +146,12 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 			save,
 		}) <= 0
 	) {
-		return yield* Effect.fail(
-			GameEngineError.placementFailed(
-				"board:max-count",
-				`Board already has the maximum allowed count for "${recipe.resultItemId}".`,
-			),
-		);
+		return yield* failCraftJobFx({
+			job: liveJob,
+			nowMs,
+			reason: "board:max-count",
+			save,
+		});
 	}
 
 	const nextSave = yield* cloneGameSaveFx({

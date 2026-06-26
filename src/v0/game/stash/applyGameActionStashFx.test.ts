@@ -93,7 +93,16 @@ describe("applyGameActionFx Stash", () => {
 				reason: "stash-output",
 				to: {
 					kind: "inventory",
-					quantity: 2,
+					quantity: 1,
+				},
+				type: "item.created",
+			},
+			{
+				itemId: "item:twig",
+				reason: "stash-output",
+				to: {
+					kind: "inventory",
+					quantity: 1,
 				},
 				type: "item.created",
 			},
@@ -369,6 +378,7 @@ describe("applyGameActionFx Stash", () => {
 			"item.created",
 			"item.created",
 			"item.created",
+			"item.created",
 			"stash.depleted",
 			"item.removed",
 		]);
@@ -390,7 +400,14 @@ describe("applyGameActionFx Stash", () => {
 			{
 				to: {
 					kind: "inventory",
-					quantity: 2,
+					quantity: 1,
+					slotIndex: 0,
+				},
+			},
+			{
+				to: {
+					kind: "inventory",
+					quantity: 1,
 					slotIndex: 0,
 				},
 			},

@@ -1026,7 +1026,7 @@ A producer defines product lines, queue size, and producer-level requirements.
 Fields:
 
 - `type`: `producer`.
-- `maxQueueSize`: queue size.
+- `maxQueueSize`: per-producer-instance queue size. Jobs are queued and completed FIFO; a later queued job cannot complete ahead of an earlier unresolved blocked delivery.
 - `productIds`: product lines owned by this producer.
 - `requirementIds`: producer-level requirements.
 - `hinderedBy`: optional producer-level hindrances. Any active hindrance slows every product line on this producer.
@@ -1337,7 +1337,7 @@ Operation semantics:
 - `loot.replaceTable`: replaces the base loot table list. Later replacements win by deterministic effect order.
 - `loot.addChanceItem`: adds a direct chance item drop, default quantity `1`.
 - `loot.dropChance.add`: changes the chance that base loot is evaluated. The final chance is clamped to `0..1`.
-- `item.blockCreate`: hard-blocks creation/replacement/placement outputs for matching items while the effect applies. Use it for path/faction locks and other rules where the item must not enter gameplay through normal actions.
+- `item.blockCreate`: hard-blocks creation/replacement/placement outputs for matching items while the effect applies. Use it for path/faction locks and other rules where the item must not enter gameplay through normal actions. Immediate actions fail. Delayed product/spawn outputs fail or discard instead of retrying forever, because hard rules are not capacity problems wearing a fake moustache.
 
 Every operation must declare a target. Use `"all": true` for an explicit match-everything operation. Selector-less `{}` is invalid, because silent global mutation is how balance goes off to live in a sewer. `all: true` cannot be combined with other selectors.
 
@@ -2938,7 +2938,7 @@ Use `onDepleted: "remove"`.
 
 ## A.32 Replace stash when depleted
 
-Use `replaceWithItemId`.
+Use `replaceWithItemId`. Replacement is still a normal board creation rule: the replacement item must be board-storable, pass `maxCount`, and not be blocked by active `item.blockCreate` effects.
 
 ```json
 {

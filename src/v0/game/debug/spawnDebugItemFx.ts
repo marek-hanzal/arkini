@@ -6,6 +6,7 @@ import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoa
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -30,6 +31,7 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 	yield* checkDebugItemSpawnReadinessFx({
 		action,
 		config,
+		nowMs,
 		save,
 	});
 
@@ -61,6 +63,14 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 					),
 				);
 			}
+
+			yield* checkItemCreateBlockedByEffectsFx({
+				config,
+				itemId: action.itemId,
+				nowMs,
+				save: nextSave,
+				targetCell: emptyCell,
+			});
 
 			const itemInstanceId = yield* createGameItemInstanceIdFx();
 			nextSave.board.items[itemInstanceId] = {

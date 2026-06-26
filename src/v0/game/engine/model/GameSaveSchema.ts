@@ -1188,6 +1188,21 @@ const validateGameSaveAgainstConfig = (
 				`Missing item "${job.itemId}".`,
 			);
 		}
+
+		for (const [dependencyIndex, afterJobId] of (job.afterJobIds ?? []).entries()) {
+			if (!save.itemSpawnJobs[afterJobId]) {
+				addSaveIssue(
+					ctx,
+					[
+						"itemSpawnJobs",
+						jobId,
+						"afterJobIds",
+						dependencyIndex,
+					],
+					`Item spawn job dependency "${afterJobId}" must reference an existing item spawn job.`,
+				);
+			}
+		}
 	}
 };
 

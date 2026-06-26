@@ -17,27 +17,26 @@ export const processCompletedProducerJobsFx = Effect.fn("processCompletedProduce
 	function* ({ config, save, nowMs }: processCompletedProducerJobsFx.Props) {
 		let nextSave = save;
 		const events: GameEvent[] = [];
-		const producerJobs = yield* readCompletedProducerJobsFx({
-			nowMs,
-			save: nextSave,
-		});
 
-		for (const job of producerJobs) {
-			const result = yield* completeProducerJobFx({
-				config,
-				job,
+		while (true) {
+			const producerJobs = yield* readCompletedProducerJobsFx({
 				nowMs,
 				save: nextSave,
 			});
 
-			if (result.type === "blocked") {
+			if (producerJobs.length === 0) break;
+
+			for (const job of producerJobs) {
+				const result = yield* completeProducerJobFx({
+					config,
+					job,
+					nowMs,
+					save: nextSave,
+				});
+
 				nextSave = result.save;
 				events.push(...result.events);
-				continue;
 			}
-
-			nextSave = result.save;
-			events.push(...result.events);
 		}
 
 		return {

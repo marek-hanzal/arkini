@@ -5,6 +5,7 @@ import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/producer/producerDeliveryTiming";
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
+import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
@@ -190,6 +191,31 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		const nextSave = yield* cloneGameSaveFx({
 			save,
 		});
+
+		if (!isGamePlacementFailureRetryable(error.reason)) {
+			delete nextSave.producerJobs[liveJob.id];
+			nextSave.updatedAtMs = nowMs;
+
+			return {
+				events: [
+					createProductCompletedEvent({
+						job: liveJob,
+						nowMs,
+					}),
+					{
+						failedAtMs: nowMs,
+						jobId: liveJob.id,
+						producerItemInstanceId: liveJob.producerItemInstanceId,
+						productId: liveJob.productId,
+						reason: error.reason,
+						type: "product.failed" as const,
+					},
+				],
+				save: nextSave,
+				type: "completed" as const,
+			} satisfies GameEngineCompletionResult;
+		}
+
 		nextSave.producerJobs[liveJob.id] = {
 			...liveJob,
 			delivery: {

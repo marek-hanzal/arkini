@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
+import { createItemSpawnJobsFx } from "~/v0/game/job/createItemSpawnJobsFx";
+import { processItemSpawnJobsFx } from "~/v0/game/job/processItemSpawnJobsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
@@ -106,7 +108,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		itemInstanceId: action.stashItemInstanceId,
 		save: nextSave,
 	});
-	const placement = yield* placeGameSaveItemsFx({
+	yield* placeGameSaveItemsFx({
 		config,
 		items: placementRequests,
 		nowMs,
@@ -123,15 +125,27 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		),
 	);
 
+	yield* createItemSpawnJobsFx({
+		dueAtMs: nowMs,
+		items: placementRequests,
+		save: nextSave,
+	});
+	const spawned = yield* processItemSpawnJobsFx({
+		config,
+		nowMs,
+		save: nextSave,
+	});
+
 	const nextRemainingCharges = 0;
 	const depletionEvents = yield* applyStashDepletionFx({
+		config,
 		nowMs,
 		onDepleted: stash.onDepleted,
-		save: placement.save,
+		save: spawned.save,
 		stashItemId: stashItem.itemId,
 		stashItemInstanceId: action.stashItemInstanceId,
 	});
-	placement.save.updatedAtMs = nowMs;
+	spawned.save.updatedAtMs = nowMs;
 
 	return {
 		events: [
@@ -143,7 +157,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 				stashItemInstanceId: action.stashItemInstanceId,
 				type: "stash.opened" as const,
 			},
-			...placement.events,
+			...spawned.events,
 			{
 				depletedAtMs: nowMs,
 				stashId,
@@ -153,8 +167,8 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 			...depletionEvents,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			save: placement.save,
+			save: spawned.save,
 		}),
-		save: placement.save,
+		save: spawned.save,
 	} satisfies GameEngineResult;
 });

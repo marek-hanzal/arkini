@@ -655,7 +655,7 @@ Current producers do not use a separate refresh/cooldown clock. A successful act
 
 Each producer definition has `maxQueueSize`. This is a per-producer-instance limit over running plus queued jobs. If a producer already has `maxQueueSize` jobs, starting another product is rejected with a queue-full failure.
 
-Jobs for one producer instance run sequentially. Starting a second job while the first is running queues it after the previous job's completion time instead of running it in parallel.
+Jobs for one producer instance run sequentially. Starting a second job while the first is running queues it after the previous job's completion time instead of running it in parallel. Completion is FIFO, including blocked delivery: a later queued job cannot complete ahead of an earlier unresolved delivery just because its timestamp is due. Queues are not tiny wormholes for skipping failed logistics.
 
 Product duration may be changed by concrete product tier data, requirements, hindrances, and proximity duration multipliers. The computed duration is captured when the job starts. Moving a resource after job start does not retroactively change that running job.
 
@@ -717,9 +717,11 @@ When a producer job completes, output placement tries to:
 2. place any remaining produced items into normal inventory using inventory normalization
 3. block delivery if the complete output cannot fit across board and inventory
 
-Producer output placement is atomic per completion attempt. A completion attempt either places the complete generated output and removes the job, or places nothing and keeps the job blocked with its already-rolled delivery saved on the job.
+Producer output placement is atomic per completion attempt. Retryable placement failures either place the complete generated output and remove the job, or place nothing and keep the job blocked with its already-rolled delivery saved on the job.
 
-A blocked producer delivery retries later. The output is not rerolled while blocked. The saved delivery must eventually be placed as rolled, or remain blocked until the board/inventory state changes.
+A blocked producer delivery retries later when the failure is logistical, such as full board/inventory capacity or a board max-count cap that can become valid after removal. The output is not rerolled while blocked. The saved delivery must eventually be placed as rolled, or remain blocked until the board/inventory state changes.
+
+Hard gameplay-rule failures are not retryable delivery. If completion output is blocked by a rule such as `item.blockCreate`, the product job completes and its output is discarded with a failure event. Craft completion follows the same rule: a blocked result fails the craft job instead of crashing the tick or retrying forever. The player changed the world before the job finished, so the result is allowed to go bad; the producer must not be jammed forever by a rule that is not going to become magically less true.
 
 Board placement uses deterministic nearest-free-cell policy based on the producer origin: Manhattan distance from the seed cell, then scan order by `y`, then `x`. Without a seed cell, placement uses scan order by `y`, then `x`. Yes, the little grid goblin has rules.
 
@@ -788,7 +790,7 @@ A product line can start when:
 
 Starting production consumes configured input quantities immediately. Persistent/stored requirements are never consumed by production. If validation fails, activation is rejected without consuming inputs or changing job state.
 
-Output capacity is checked at completion time, not start time. If completion output cannot fit, the job becomes blocked and preserves its rolled delivery for retry.
+Output capacity is checked at completion time, not start time. If completion output cannot fit for a retryable logistical reason, the job becomes blocked and preserves its rolled delivery for retry. If completion violates a hard creation rule such as `item.blockCreate`, the job is resolved as failed/discarded instead of retrying forever.
 
 ### 10.10 Effect-authored path choices
 
@@ -796,7 +798,7 @@ Path/faction exclusivity is not a separate item-level mechanic. It is authored t
 
 A keystone building can emit passive global effects while it exists on the board. Those effects may use `line.blockStart` to prevent counter-path production lines from starting and `item.blockCreate` to prevent counter-path blueprints/buildings from entering gameplay through placement, merge/craft replacement, producer delivery, or spawn jobs.
 
-Effects are not soft UI gates. If an effect blocks creation, the action must fail or the delivery job must become blocked until the rule no longer applies. The UI must always list generated effects on buildings/items so the player can understand exactly what commitment a keystone emits. Hidden rule magic is how tiny civilizations die screaming, now with worse UX.
+Effects are not soft UI gates. If an effect blocks creation, immediate actions must fail and delayed producer, craft, or spawn outputs must resolve as failed/discarded instead of retrying forever. The UI must always list generated effects on buildings/items so the player can understand exactly what commitment a keystone emits. Hidden rule magic is how tiny civilizations die screaming, now with worse UX.
 
 ## 11. Stashes
 
@@ -848,7 +850,7 @@ Default stash output placement is `board_then_inventory`, using the same determi
 
 Stash output is all-or-nothing for the whole open action. Activation must not consume inputs, advance charges, deplete contents, or mutate state unless the complete generated output can be placed across board and inventory.
 
-Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll.
+Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately, so stash dumps reuse the same spawn-job pipe as scheduled outputs instead of maintaining a cute little parallel universe.
 
 ## 12. Loot tables
 
@@ -1094,7 +1096,7 @@ The economy should be validated using these rules:
 8. Inventory capacity must be considered when adding new chains or producers.
 9. Stateful items must preserve state through all allowed movement.
 10. No important economy behavior should live only in UI interaction code.
-11. Exclusive branch constraints must be enforced by config/save validation and runtime creation guards, not only by detail-sheet warnings.
+11. Exclusive branch constraints must be authored through effects and enforced by runtime creation/start guards, not only by detail-sheet warnings.
 11. Existing `GameConfig` economy data is inspiration until a dedicated economy pass rewrites it to match this document.
 12. No successful loot table activation may produce zero output.
 14. No source-target item pair may match multiple interaction behaviors unless explicitly documented.

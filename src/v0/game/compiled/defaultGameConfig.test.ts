@@ -42,7 +42,7 @@ describe("defaultGameConfig", () => {
 			"product:townhall-t4:blueprint-school",
 			"product:townhall-t4:blueprint-civic-office-t1",
 			"product:townhall-t4:blueprint-market-t2",
-			"product:townhall-t4:blueprint-surveyor-camp-t1",
+			"product:townhall-t4:blueprint-prospector-guild-t1",
 			"product:townhall-t4:blueprint-tannery-t1",
 			"product:townhall-t4:blueprint-weaver-hut-t1",
 			"product:townhall-t4:blueprint-dye-workshop-t1",
@@ -123,6 +123,7 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.producers["producer:academy"].productIds).toEqual([
 			"product:academy:basic-knowledge",
 			"product:academy:advanced-knowledge",
+			"product:academy:blueprint-prospector-guild-t2",
 			"product:academy:blueprint-coal-mine-t1",
 			"product:academy:blueprint-iron-mine-t1",
 			"product:academy:blueprint-gold-mine-t1",
@@ -130,12 +131,20 @@ describe("defaultGameConfig", () => {
 			"product:academy:blueprint-purifier-t1",
 		]);
 
-		expect(defaultGameConfig.producers["producer:surveyor-camp-t1"].productIds).toEqual([
-			"product:surveyor-camp-t1:clay-deposit",
-			"product:surveyor-camp-t1:sand-deposit",
-			"product:surveyor-camp-t1:coal-deposit",
-			"product:surveyor-camp-t1:iron-deposit",
-			"product:surveyor-camp-t1:gold-deposit",
+		expect(defaultGameConfig.items["producer:prospector-guild-t1"].label).toBe("1");
+		expect(defaultGameConfig.items["producer:prospector-guild-t2"].label).toBe("2");
+
+		expect(defaultGameConfig.producers["producer:prospector-guild-t1"].productIds).toEqual([
+			"product:prospector-guild-t1:clay-deposit",
+			"product:prospector-guild-t1:sand-deposit",
+		]);
+
+		expect(defaultGameConfig.producers["producer:prospector-guild-t2"].productIds).toEqual([
+			"product:prospector-guild-t2:clay-deposit",
+			"product:prospector-guild-t2:sand-deposit",
+			"product:prospector-guild-t2:coal-deposit",
+			"product:prospector-guild-t2:iron-deposit",
+			"product:prospector-guild-t2:gold-deposit",
 		]);
 
 		expect(defaultGameConfig.inputs["input:purifier-t1:pollution"].inputs).toEqual([

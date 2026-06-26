@@ -256,7 +256,7 @@
 				"product:townhall-t4:blueprint-school",
 				"product:townhall-t4:blueprint-civic-office-t1",
 				"product:townhall-t4:blueprint-market-t2",
-				"product:townhall-t4:blueprint-surveyor-camp-t1",
+				"product:townhall-t4:blueprint-prospector-guild-t1",
 				"product:townhall-t4:blueprint-tannery-t1",
 				"product:townhall-t4:blueprint-weaver-hut-t1",
 				"product:townhall-t4:blueprint-dye-workshop-t1",
@@ -307,6 +307,7 @@
 			"productIds": [
 				"product:academy:basic-knowledge",
 				"product:academy:advanced-knowledge",
+				"product:academy:blueprint-prospector-guild-t2",
 				"product:academy:blueprint-coal-mine-t1",
 				"product:academy:blueprint-iron-mine-t1",
 				"product:academy:blueprint-gold-mine-t1",
@@ -402,15 +403,24 @@
 			],
 			"requirementIds": []
 		},
-		"producer:surveyor-camp-t1": {
+		"producer:prospector-guild-t1": {
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:surveyor-camp-t1:clay-deposit",
-				"product:surveyor-camp-t1:sand-deposit",
-				"product:surveyor-camp-t1:coal-deposit",
-				"product:surveyor-camp-t1:iron-deposit",
-				"product:surveyor-camp-t1:gold-deposit"
+				"product:prospector-guild-t1:clay-deposit",
+				"product:prospector-guild-t1:sand-deposit"
+			],
+			"requirementIds": []
+		},
+		"producer:prospector-guild-t2": {
+			"type": "producer",
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:prospector-guild-t2:clay-deposit",
+				"product:prospector-guild-t2:sand-deposit",
+				"product:prospector-guild-t2:coal-deposit",
+				"product:prospector-guild-t2:iron-deposit",
+				"product:prospector-guild-t2:gold-deposit"
 			],
 			"requirementIds": []
 		},

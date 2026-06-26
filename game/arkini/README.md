@@ -101,7 +101,7 @@ Town Hall IV
   Paper + Coin -> School Blueprint
   Basic Knowledge + Paper + Coin -> Civic Office I Blueprint
   Building Permit + Feast + 2 Coin -> Market II Blueprint
-  Building Permit + Basic Knowledge + 2 Coin -> Surveyor Camp I Blueprint
+  Building Permit + Basic Knowledge + 2 Coin -> Prospector Guild 1 Blueprint
   Building Permit + Raw Hide + Paper -> Tannery I Blueprint
   Building Permit + Wool + Paper -> Weaver Hut I Blueprint
   Building Permit + Common Cloth + Vegetables + Paper -> Dye Workshop I Blueprint
@@ -120,23 +120,30 @@ Construction Yard I
 Academy
   Paper + Coin -> Basic Knowledge
   Basic Knowledge + Paper + Coin + Construction Bundle -> Advanced Knowledge
+  Advanced Knowledge + Construction Bundle + Building Permit + 2 Coin -> Prospector Guild 2 Blueprint
   Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Coal Mine I Blueprint
   Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Iron Mine I Blueprint
   Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Gold Mine I Blueprint
   Advanced Knowledge + Construction Bundle + Building Permit + Bricks + Charcoal + Coin -> Smelter I Blueprint
   Advanced Knowledge + Construction Bundle + Building Permit + Glass + Charcoal + Coin -> Purifier I Blueprint
 
-Surveyor Camp I
-  Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Coal Deposit
-  Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Iron Deposit
-  Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Gold Deposit
+Prospector Guild 1
+  Building Permit + Basic Knowledge + Coin -> Clay Deposit
+  Building Permit + Basic Knowledge + Coin -> Sand Deposit
+
+Prospector Guild 2
+  Building Permit + Basic Knowledge + Coin -> Clay Deposit
+  Building Permit + Basic Knowledge + Coin -> Sand Deposit
+  Advanced Knowledge + Building Permit + Construction Bundle + 2 Coin -> Coal Deposit
+  Advanced Knowledge + Building Permit + Construction Bundle + 2 Coin -> Iron Deposit
+  Advanced Knowledge + Building Permit + Construction Bundle + 4 Coin -> Gold Deposit
 ```
 
 Market is a tiered trade building line. Market I starts first trade in Era III; Market II is a new Era IV building upgrade with stronger trade options, civic-era possibilities, and later luxury/textile trades.
 
 ### Implemented first wave
 
-The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, surveys, an improved Market II trade step, Era V textile/clothing production, Era VI advanced construction materials, and Era VII mining/metallurgy through Academy-driven industrial plans.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, prospecting, an improved Market II trade step, Era V textile/clothing production, Era VI advanced construction materials, and Era VII mining/metallurgy through Academy-driven industrial plans.
 
 Wood pair:
 
@@ -205,8 +212,8 @@ Era IV civic administration
   Civic Office I + Paper + Basic Knowledge + Coin -> Building Permit
   Market II + Paper -> Coin
   Market II + Feast -> more Coin
-  Surveyor Camp I + Building Permit + Basic Knowledge + Coin -> Clay Deposit
-  Surveyor Camp I + Building Permit + Basic Knowledge + Coin -> Sand Deposit
+  Prospector Guild 1 + Building Permit + Basic Knowledge + Coin -> Clay Deposit
+  Prospector Guild 1 + Building Permit + Basic Knowledge + Coin -> Sand Deposit
 
 Era V textile and clothing
   Slaughterhouse I + Piglet -> Sausage + Raw Hide
@@ -229,9 +236,10 @@ Era VI advanced construction materials
 Era VII mining and metallurgy
   Construction Yard I + Construction Bundle + Building Permit + Basic Knowledge + Paper + Coin -> Academy Blueprint
   Academy + Basic Knowledge + Paper + Coin + Construction Bundle -> Advanced Knowledge
-  Surveyor Camp I + Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Coal Deposit
-  Surveyor Camp I + Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Iron Deposit
-  Surveyor Camp I + Advanced Knowledge + Building Permit + Construction Bundle + Coin -> Gold Deposit
+  Academy + Advanced Knowledge + Construction Bundle + Building Permit + 2 Coin -> Prospector Guild 2 Blueprint
+  Prospector Guild 2 + Advanced Knowledge + Building Permit + Construction Bundle + 2 Coin -> Coal Deposit
+  Prospector Guild 2 + Advanced Knowledge + Building Permit + Construction Bundle + 2 Coin -> Iron Deposit
+  Prospector Guild 2 + Advanced Knowledge + Building Permit + Construction Bundle + 4 Coin -> Gold Deposit
   Academy + Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Mine Blueprints
   Academy + Advanced Knowledge + Construction Bundle + Building Permit + Bricks/Glass + Charcoal + Coin -> Smelter/Purifier Blueprints
   Mines + crew supplies + nearby deposit -> Coal / Iron Ore / Gold Ore
@@ -282,8 +290,13 @@ Current processor input buffers use capacity `4`:
 - `input:market-t2:coin-from-feast`
 - `input:market-t2:coin-from-common-clothing`
 - `input:market-t2:coin-from-luxury-clothing`
-- `input:surveyor-camp-t1:clay-deposit`
-- `input:surveyor-camp-t1:sand-deposit`
+- `input:prospector-guild-t1:clay-deposit`
+- `input:prospector-guild-t1:sand-deposit`
+- `input:prospector-guild-t2:clay-deposit`
+- `input:prospector-guild-t2:sand-deposit`
+- `input:prospector-guild-t2:coal-deposit`
+- `input:prospector-guild-t2:iron-deposit`
+- `input:prospector-guild-t2:gold-deposit`
 - `input:charcoal-burner-t1:charcoal`
 - `input:clay-pit:clay`
 - `input:brickyard:bricks`
@@ -384,7 +397,8 @@ The first food production line is wired into gameplay and uses these prepared as
 - `asset:item:building-permit` -> `game/arkini/assets/item-building-permit.png`
 - `asset:producer:paper-mill-t1` -> `game/arkini/assets/producer-paper-mill-t1.png`
 - `asset:producer:civic-office-t1` -> `game/arkini/assets/producer-civic-office-t1.png`
-- `asset:producer:surveyor-camp-t1` -> `game/arkini/assets/producer-surveyor-camp-t1.png`
+- `asset:producer:prospector-guild-t1` -> `game/arkini/assets/producer-prospector-guild-t1.png`
+- `asset:producer:prospector-guild-t2` -> `game/arkini/assets/producer-prospector-guild-t1.png`
 - `asset:producer:market-t2` -> `game/arkini/assets/producer-market-t2.png`
 
 ### Brewing and wine asset IDs
@@ -470,7 +484,7 @@ Prepared item asset IDs:
 
 ### Heavy industry gameplay
 
-Heavy industry is connected as Era VII progression through Construction Yard, Academy, and Surveyor Camp. Use cheat inventory to stress-test it without replaying half of civilization every time, because we are not monsters on purpose.
+Heavy industry is connected as Era VII progression through Construction Yard, Academy, and Prospector Guild 2. Use cheat inventory to stress-test it without replaying half of civilization every time, because we are not monsters on purpose.
 
 `item:sausage` is now produced by the slaughterhouse branch of the food chain instead of being a placeholder. Good, the economy no longer pretends sausages grow in config comments.
 
@@ -528,7 +542,8 @@ Heavy industry asset IDs:
 - `asset:item:building-permit` -> `game/arkini/assets/item-building-permit.png`
 - `asset:producer:paper-mill-t1` -> `game/arkini/assets/producer-paper-mill-t1.png`
 - `asset:producer:civic-office-t1` -> `game/arkini/assets/producer-civic-office-t1.png`
-- `asset:producer:surveyor-camp-t1` -> `game/arkini/assets/producer-surveyor-camp-t1.png`
+- `asset:producer:prospector-guild-t1` -> `game/arkini/assets/producer-prospector-guild-t1.png`
+- `asset:producer:prospector-guild-t2` -> `game/arkini/assets/producer-prospector-guild-t1.png`
 - `asset:producer:market-t2` -> `game/arkini/assets/producer-market-t2.png`
 
 ### Coin economy gameplay

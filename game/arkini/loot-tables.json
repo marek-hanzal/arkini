@@ -580,6 +580,16 @@
 				}
 			]
 		},
+		"loot:academy:blueprint-prospector-guild-t2": {
+			"name": "Academy Prospector Guild 2 blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-prospector-guild-t2",
+					"quantity": 1
+				}
+			]
+		},
 		"loot:university:basic-knowledge": {
 			"name": "University basic knowledge output",
 			"output": [
@@ -930,8 +940,8 @@
 				}
 			]
 		},
-		"loot:surveyor-camp-t1:clay-deposit": {
-			"name": "Surveyor Camp clay deposit output",
+		"loot:prospector-guild-t1:clay-deposit": {
+			"name": "Prospector Guild 1 clay deposit output",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -940,8 +950,8 @@
 				}
 			]
 		},
-		"loot:surveyor-camp-t1:sand-deposit": {
-			"name": "Surveyor Camp sand deposit output",
+		"loot:prospector-guild-t1:sand-deposit": {
+			"name": "Prospector Guild 1 sand deposit output",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -1010,12 +1020,12 @@
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-surveyor-camp-t1": {
-			"name": "Town Hall IV Surveyor Camp I blueprint output",
+		"loot:townhall-t4:blueprint-prospector-guild-t1": {
+			"name": "Town Hall IV Prospector Guild 1 blueprint output",
 			"output": [
 				{
 					"type": "guaranteed",
-					"itemId": "item:blueprint-surveyor-camp-t1",
+					"itemId": "item:blueprint-prospector-guild-t1",
 					"quantity": 1
 				}
 			]
@@ -1345,8 +1355,8 @@
 				}
 			]
 		},
-		"loot:surveyor-camp-t1:coal-deposit": {
-			"name": "Surveyor Camp coal deposit output",
+		"loot:prospector-guild-t2:coal-deposit": {
+			"name": "Prospector Guild 2 coal deposit output",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -1355,8 +1365,8 @@
 				}
 			]
 		},
-		"loot:surveyor-camp-t1:iron-deposit": {
-			"name": "Surveyor Camp iron deposit output",
+		"loot:prospector-guild-t2:iron-deposit": {
+			"name": "Prospector Guild 2 iron deposit output",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -1365,12 +1375,32 @@
 				}
 			]
 		},
-		"loot:surveyor-camp-t1:gold-deposit": {
-			"name": "Surveyor Camp gold deposit output",
+		"loot:prospector-guild-t2:gold-deposit": {
+			"name": "Prospector Guild 2 gold deposit output",
 			"output": [
 				{
 					"type": "guaranteed",
 					"itemId": "item:gold-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:prospector-guild-t2:sand-deposit": {
+			"name": "Prospector Guild 2 sand deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:sand-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:prospector-guild-t2:clay-deposit": {
+			"name": "Prospector Guild 2 clay deposit output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:clay-deposit",
 					"quantity": 1
 				}
 			]

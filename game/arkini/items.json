@@ -2397,7 +2397,7 @@
 			"tier": 4,
 			"maxStackSize": 50,
 			"storage": "both",
-			"description": "Processed writing material used by schools, civic offices, surveyors, and improved trade.",
+			"description": "Processed writing material used by schools, civic offices, prospectors, and improved trade.",
 			"tags": [
 				"resource",
 				"paper",
@@ -2455,22 +2455,43 @@
 			],
 			"producerId": "producer:civic-office-t1"
 		},
-		"producer:surveyor-camp-t1": {
-			"assetId": "asset:producer:surveyor-camp-t1",
-			"code": "surveyor-camp-t1",
-			"name": "Surveyor Camp I",
+		"producer:prospector-guild-t1": {
+			"assetId": "asset:producer:prospector-guild-t1",
+			"code": "prospector-guild-t1",
+			"name": "Prospector Guild",
+			"label": "1",
 			"tier": 4,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Survey producer that uses permits and knowledge to discover clay and sand deposits for advanced construction.",
+			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
 			"tags": [
 				"producer",
 				"building",
-				"survey",
+				"prospecting",
+				"guild",
 				"civic",
 				"era:IV"
 			],
-			"producerId": "producer:surveyor-camp-t1"
+			"producerId": "producer:prospector-guild-t1"
+		},
+		"producer:prospector-guild-t2": {
+			"assetId": "asset:producer:prospector-guild-t2",
+			"code": "prospector-guild-t2",
+			"name": "Prospector Guild",
+			"label": "2",
+			"tier": 7,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Upgraded prospecting guild that keeps surface surveys and adds coal, iron, and gold deposit prospecting for industry.",
+			"tags": [
+				"producer",
+				"building",
+				"prospecting",
+				"guild",
+				"industry",
+				"era:VII"
+			],
+			"producerId": "producer:prospector-guild-t2"
 		},
 		"producer:market-t2": {
 			"assetId": "asset:producer:market-t2",
@@ -2525,23 +2546,45 @@
 			],
 			"craftRecipeId": "craft:civic-office-t1"
 		},
-		"item:blueprint-surveyor-camp-t1": {
-			"assetId": "asset:item:blueprint-surveyor-camp-t1",
-			"code": "blueprint-surveyor-camp-t1",
-			"name": "Surveyor Camp I Blueprint",
+		"item:blueprint-prospector-guild-t1": {
+			"assetId": "asset:item:blueprint-prospector-guild-t1",
+			"code": "blueprint-prospector-guild-t1",
+			"name": "Prospector Guild Blueprint",
+			"label": "1",
 			"tier": 0,
 			"maxStackSize": 10,
 			"storage": "both",
-			"description": "Build plan that can be filled with resources to construct Surveyor Camp I.",
+			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
-				"survey",
+				"prospecting",
+				"guild",
 				"civic",
 				"era:IV"
 			],
-			"craftRecipeId": "craft:surveyor-camp-t1"
+			"craftRecipeId": "craft:prospector-guild-t1"
+		},
+		"item:blueprint-prospector-guild-t2": {
+			"assetId": "asset:item:blueprint-prospector-guild-t2",
+			"code": "blueprint-prospector-guild-t2",
+			"name": "Prospector Guild Blueprint",
+			"label": "2",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that upgrades Prospector Guild 1 into Prospector Guild 2.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"prospecting",
+				"guild",
+				"industry",
+				"era:VII"
+			],
+			"craftRecipeId": "craft:prospector-guild-t2"
 		},
 		"item:blueprint-market-t2": {
 			"assetId": "asset:item:blueprint-market-t2",

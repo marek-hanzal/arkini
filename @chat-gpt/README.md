@@ -27,7 +27,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Market progression is tiered by real building upgrades, starting with Market I in Era III and Market II in Era IV; use new market tiers for new capabilities instead of treating Market as a single eternal building.
 - Era V is textile/clothing production: Raw Hide -> Leather, Wool -> Common Cloth -> Luxury Cloth, then Common Clothing and Luxury Clothing. Do not use Work Clothes as a specific item.
 - Era VI is advanced construction materials: Charcoal Burner, Clay Pit, Sand Pit, Brickyard, Glassworks, Roof Tile Factory, Construction Yard, and Construction Bundle as its master item.
-- Era VII is industrial knowledge/mining/metallurgy: Construction Yard issues Academy, Academy issues Advanced Knowledge and industrial blueprints, Surveyor Camp surveys Coal/Iron/Gold deposits, mines feed Smelter, and Purifier consumes Pollution plus Water/Charcoal rather than cleaning for free.
+- Era VII is industrial knowledge/mining/metallurgy: Construction Yard issues Academy, Academy issues Advanced Knowledge and the Prospector Guild 2 blueprint, Prospector Guild 1 surveys Clay/Sand deposits, Prospector Guild 2 upgrades it for Coal/Iron/Gold deposits, mines feed Smelter, and Purifier consumes Pollution plus Water/Charcoal rather than cleaning for free.
 - Loaded JSON `GameConfig` is the canonical immutable source of truth. There is no save-driven config overlay/layer and no global upgrade patch system.
 - Item-level `exclusiveToIds` is directional and explicit, never auto-symmetric. It is a hard ownership/creation constraint for path choices. UI must warn early on blueprints/craft targets before resource investment.
 - Heroes Guild / Goldsmith / Blacksmith / University definitions are currently prepared late-era content, not connected to the current townhall progression. Town Hall IV is now civic administration, paper, permits, surveys, and Market II.
@@ -40,3 +40,4 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Before non-trivial work, inspect current source and existing library capabilities.
 - Keep active notes short. Archive completed task notes immediately.
 - Do not reintroduce pending/scheduled event queues; future delayed gameplay belongs in explicit job maps/families.
+- Prospector Guild is the long-term tiered source-discovery hub. Use numeric tile labels via item `label` (`1`, `2`, …): T1 finds Clay/Sand deposits, T2 keeps Clay/Sand and adds Coal/Iron/Gold. Do not reintroduce Surveyor Camp as a separate concept.

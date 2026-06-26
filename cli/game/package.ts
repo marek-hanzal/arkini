@@ -15,6 +15,7 @@ const collectionKeys = [
 	"merge",
 	"inputs",
 	"requirements",
+	"effects",
 	"producers",
 	"stashes",
 	"craftRecipes",
@@ -283,6 +284,7 @@ const createEmptyPackage = (): MergedGameConfig => ({
 	producers: {},
 	stashes: {},
 	craftRecipes: {},
+	effects: {},
 	products: {},
 	lootTables: {},
 });

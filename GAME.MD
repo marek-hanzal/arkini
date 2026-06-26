@@ -663,9 +663,19 @@ Because inventory is passive, producer jobs require the producer item to be on t
 
 ### 10.4 Producer product lines
 
-A producer owns ordered product lines through `productIds`. Each product line defines its own duration, optional input reference, requirements, placement, optional visibility markers, and optional output table.
+A producer owns ordered product lines through `productIds`. Each product line defines its own duration, optional input reference, requirements, placement, tags, baseline runtime visibility, optional active-effect activation, and optional output table.
 
-Product lines may define `showIf`, an OR list of marker item IDs. A hidden line is not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. `showIf` only checks whether any marker item exists anywhere in the current save; it does not consume that marker and is not a replacement for inputs or requirements. This is meant for late-game path-specific variants where one building can offer different recipes depending on whether the player chose Engineers, Faith, or Mages, because apparently civilization must eventually pick a flavor of nonsense.
+Product lines can start as `visibility: "hidden"` and be revealed by runtime effects. Hidden lines are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. A matching hide effect has higher priority than reveal. A matching block effect leaves the line visible but prevents starting new production. Running jobs are not paused or cancelled by block effects, because the game already has enough ways to generate admin work without inventing time-travel bookkeeping.
+
+### 10.6 Runtime effects
+
+Runtime effects are product-line mutators. They do not patch or rewrite `GameConfig`; instead, a concrete product line asks the runtime which effects apply and receives an effective view. Effect sources have identity and board position, so local effects use Chebyshev distance just like proximity requirements, while global effects apply regardless of distance.
+
+Passive effects come from board items via `passiveEffectIds`. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, runs for its duration, activates a timed effect instance, and expires later through the tick engine.
+
+Effects currently operate on product-line visibility, start blocking, duration, and loot plan evaluation. They can reveal or hide lines, block starts, add or multiply duration, append or replace loot tables, add chance item drops, and adjust the chance that base loot is rolled. They intentionally do not mutate storage/placement, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
+
+Effect conflict rules are simple: hide beats reveal, and any block blocks start. Numeric duration and loot chance operations are aggregated deterministically after effects are sorted by scope and activation/source order.
 
 ### Board max count
 

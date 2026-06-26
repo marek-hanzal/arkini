@@ -209,6 +209,25 @@ const GameEventSchema = z.discriminatedUnion("type", [
 
 	z
 		.object({
+			type: z.literal("effect.activated"),
+			id: IdSchema,
+			effectId: IdSchema,
+			sourceItemInstanceId: IdSchema,
+			activatedAtMs: NonNegativeIntegerSchema,
+			expiresAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("effect.expired"),
+			id: IdSchema,
+			effectId: IdSchema,
+			sourceItemInstanceId: IdSchema,
+			expiredAtMs: NonNegativeIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("craft.started"),
 			jobId: IdSchema,
 			recipeId: IdSchema,

@@ -39,6 +39,55 @@ describe("runGameTickFx", () => {
 		expect(result.save.producerJobs).toHaveProperty("job:1");
 	});
 
+	it("expires active effects on tick", () => {
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test": {
+					name: "Test effect",
+					operations: [
+						{
+							kind: "line.blockStart",
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:1"] = {
+			activatedAtMs: 0,
+			effectId: "effect:test",
+			expiresAtMs: 1000,
+			id: "effect-instance:1",
+			sourceItemInstanceId: "item-instance:1",
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.activeEffects).toEqual({});
+		expect(result.events).toEqual([
+			{
+				effectId: "effect:test",
+				expiredAtMs: 1000,
+				id: "effect-instance:1",
+				sourceItemInstanceId: "item-instance:1",
+				type: "effect.expired",
+			},
+		]);
+	});
+
 	it("completes product jobs and places output board first, then inventory", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

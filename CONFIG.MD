@@ -42,6 +42,7 @@ A compiled `GameConfig` contains these sections:
   "merge": {},
   "inputs": {},
   "requirements": {},
+  "effects": {},
   "producers": {},
   "stashes": {},
   "craftRecipes": {},
@@ -1073,7 +1074,7 @@ Item reference:
 
 Defines producer product lines.
 
-A product line defines production name, duration, placement, inputs, requirements, optional visibility markers, optional hindrances, and output.
+A product line defines production name, tags, duration, placement, inputs, requirements, runtime visibility baseline, optional hindrances, optional active effect activation, and optional output.
 
 ```json
 {
@@ -1097,39 +1098,31 @@ Fields:
 - `inputRefId`: input bundle.
 - `requirementIds`: product-level requirements.
 - `hinderedBy`: optional product-level hindrances. Any active hindrance slows this product line.
-- `showIf`: optional item ID list. If omitted, the line is always visible. If present, the runtime shows the line only while at least one listed item exists anywhere in the current save. This is an OR visibility gate, not an input and not consumed.
-- `outputTableId`: loot table output.
+- `tags`: product-line tags used by runtime effects. Missing tags default to `[]`. Use tags such as `path:engineers`, `dirty`, `housing`, `morale`, or any content-specific label the effect system can target.
+- `visibility`: baseline runtime visibility, either `visible` or `hidden`. Missing visibility defaults to `visible`. Hidden product lines can be revealed by runtime effects. Hidden lines are not shown, cannot be set as default, cannot be fed through producer priority routing, and cannot be started.
+- `outputTableId`: optional loot table output. Missing `outputTableId` makes a delayed sink/destructor product unless an effect mutates its loot plan at runtime.
+- `activatesEffectId`: optional active effect produced by this line. Active-effect product lines consume inputs and run for `durationMs`, then keep the effect active until the duration expires. Active-effect lines must not also define `outputTableId`; their output is runtime influence, not an item pile pretending to be weather.
 
-
-
-Conditional product-line visibility:
+Baseline-hidden product line:
 
 ```json
 {
   "products": {
     "product:university-engineering-theory": {
       "name": "Advanced Theory",
+      "tags": ["path:engineers"],
+      "visibility": "hidden",
       "durationMs": 10000,
       "placement": "board_then_inventory",
       "inputRefId": "input:university-engineering-theory",
       "requirementIds": [],
-      "showIf": ["item:house-of-engineers"],
-      "outputTableId": "loot:advanced-theory"
-    },
-    "product:university-mage-theory": {
-      "name": "Advanced Theory",
-      "durationMs": 10000,
-      "placement": "board_then_inventory",
-      "inputRefId": "input:university-mage-theory",
-      "requirementIds": [],
-      "showIf": ["item:mage-lodge"],
       "outputTableId": "loot:advanced-theory"
     }
   }
 }
 ```
 
-Use `showIf` when several product lines intentionally produce the same result but should be selected by world state, such as exclusive late-game paths. It is only a display/interaction gate. Put consumed materials in `inputs`, and reusable gating rules in `requirementIds`, because naturally one field cannot be allowed to cosplay as three systems without starting a tiny government agency.
+Use `visibility: "hidden"` for product lines that should exist in config but appear only when an effect reveals them. This replaces the old marker-property style: visibility is now part of the unified effect runtime, because duplicating one gating idea in six properties is how codebases get mold.
 
 No-input product:
 
@@ -1210,6 +1203,132 @@ Producer reference:
   }
 }
 ```
+
+## 13.1 `effects`
+
+Defines runtime mutators that change how product lines are interpreted. Effects never mutate `GameConfig`; they build an effective runtime view for a concrete producer/product line. An effect source still has a board position, so local effects can use the same Chebyshev distance model as proximity requirements.
+
+Effects can come from two places:
+
+- item `passiveEffectIds`: the effect is active while that item exists on the board
+- product `activatesEffectId`: the product consumes inputs, runs for its duration, then creates a timed active effect instance tied to the source item
+
+Global passive reveal effect example:
+
+```json
+{
+  "items": {
+    "producer:house-of-engineers": {
+      "assetId": "asset:producer:house-of-engineers",
+      "code": "house-of-engineers",
+      "name": "House of Engineers",
+      "tier": 11,
+      "maxStackSize": 1,
+      "description": "Locks the settlement into the engineering path.",
+      "tags": ["producer", "building", "path", "path:engineers"],
+      "passiveEffectIds": ["effect:path.engineers.reveal"]
+    }
+  },
+  "effects": {
+    "effect:path.engineers.reveal": {
+      "name": "Engineering Path",
+      "scope": "global",
+      "operations": [
+        {
+          "kind": "line.reveal",
+          "target": { "productTagsAny": ["path:engineers"] }
+        }
+      ]
+    }
+  }
+}
+```
+
+Local penalty/loot mutation example:
+
+```json
+{
+  "effects": {
+    "effect:chaos": {
+      "name": "Chaos",
+      "scope": "local",
+      "radius": 2,
+      "operations": [
+        {
+          "kind": "duration.multiply",
+          "target": { "productTagsAny": ["precise"] },
+          "multiplier": 1.25
+        },
+        {
+          "kind": "loot.appendTable",
+          "target": { "productTagsAny": ["arcane"] },
+          "lootTableId": "loot:void-splinter",
+          "chance": 0.2
+        },
+        {
+          "kind": "loot.dropChance.add",
+          "target": { "productTagsAny": ["stable"] },
+          "delta": -0.15
+        }
+      ]
+    }
+  }
+}
+```
+
+Effect fields:
+
+- `name`: player/debug label.
+- `scope`: `global` or `local`.
+- `radius`: required for local effects. Radius uses Chebyshev distance, so diagonals count.
+- `operations`: one or more typed operations.
+
+Effect operation kinds:
+
+```txt
+line.reveal
+line.hide
+line.blockStart
+duration.addMs
+duration.multiply
+loot.appendTable
+loot.replaceTable
+loot.addChanceItem
+loot.dropChance.add
+```
+
+Operation semantics:
+
+- `line.reveal`: reveals a baseline-hidden line when the target selector matches.
+- `line.hide`: hides a line. Hide has higher priority than reveal.
+- `line.blockStart`: leaves the line visible but prevents starting new production. Running jobs are not paused or cancelled.
+- `duration.addMs`: adds a signed fixed time delta.
+- `duration.multiply`: multiplies the effective duration after fixed duration deltas.
+- `loot.appendTable`: evaluates an additional loot table beside the normal loot, optionally behind `chance`.
+- `loot.replaceTable`: replaces the base loot table list. Later replacements win by deterministic effect order.
+- `loot.addChanceItem`: adds a direct chance item drop, default quantity `1`.
+- `loot.dropChance.add`: changes the chance that base loot is evaluated. The final chance is clamped to `0..1`.
+
+Target selectors are ANDed together when multiple fields are present:
+
+```json
+{
+  "producerIds": ["producer:university"],
+  "productTagsAny": ["path:mages"],
+  "productTagsAll": ["arcane"]
+}
+```
+
+Supported target fields:
+
+- `producerIds`
+- `productIds`
+- `producerTagsAny`
+- `producerTagsAll`
+- `productTagsAny`
+- `productTagsAll`
+
+Hidden and blocked states have priority over their positive counterparts: a matching hide means the line is not visible, and any matching block means the line cannot start. There is no explicit suppression or propagation subsystem. If content wants cleanup, remove the source item or create another effect whose numeric mutations cancel out. If content wants spread, add side loot that drops another source item. Horrifyingly simple, which is usually the part that survives production.
 
 ## 14. `lootTables`
 
@@ -1756,6 +1875,7 @@ items.*.producerId -> producers
 items.*.stashId -> stashes
 items.*.craftRecipeId -> craftRecipes
 items.*.exclusiveToIds[] -> items
+items.*.passiveEffectIds[] -> effects
 items.*.removeBy[].itemId -> items
 
 merge.*.withItemId -> items
@@ -1766,6 +1886,11 @@ inputs.*.inputs[].itemId -> items
 requirements.*.itemId -> items
 requirements.*.itemIds[] -> items
 
+effects.*.operations[].producerIds[] -> producers
+effects.*.operations[].productIds[] -> products
+effects.*.operations[].lootTableId -> lootTables
+effects.*.operations[].itemId -> items
+
 producers.*.productIds[] -> products
 producers.*.requirementIds[] -> requirements
 producers.*.hinderedBy[].itemId -> items
@@ -1775,8 +1900,8 @@ products.*.inputRefId -> inputs
 products.*.requirementIds[] -> requirements
 products.*.hinderedBy[].itemId -> items
 products.*.hinderedBy[].itemIds[] -> items
-products.*.showIf[] -> items
 products.*.outputTableId -> lootTables
+products.*.activatesEffectId -> effects
 
 stashes.*.outputTableId -> lootTables
 stashes.*.inputs[].itemId -> items

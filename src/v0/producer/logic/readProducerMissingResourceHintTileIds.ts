@@ -161,7 +161,7 @@ export const readProducerMissingResourceHintTileIds = ({
 		producerItem,
 		productId,
 	});
-	if (!line || line.queueFull) return [];
+	if (!line || line.queueFull || line.blocked) return [];
 
 	const requirementItemIds = new Set<string>();
 	addUnsatisfiedRequirementItemIds({

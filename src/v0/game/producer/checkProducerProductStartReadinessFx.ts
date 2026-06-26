@@ -9,6 +9,8 @@ import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRunt
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
+import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -28,13 +30,16 @@ export namespace checkProducerProductStartReadinessFx {
 export const checkProducerProductStartReadinessFx = Effect.fn(
 	"checkProducerProductStartReadinessFx",
 )(function* ({ config, save, action }: checkProducerProductStartReadinessFx.Props) {
-	const { producerDefinition, producerItem } = yield* readProducerRuntimeTargetFx({
+	const { producerDefinition, producerId, producerItem } = yield* readProducerRuntimeTargetFx({
 		config,
 		producerItemInstanceId: action.producerItemInstanceId,
 		save,
 	});
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
+		producerId,
+		producerItemId: producerItem.itemId,
+		producerItemInstanceId: action.producerItemInstanceId,
 		productIds: producerDefinition.productIds,
 		save,
 	});
@@ -102,6 +107,38 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		storedItems,
 		targetItemInstanceId: action.producerItemInstanceId,
 	});
+	const hindrances = [
+		...(producerDefinition.hinderedBy ?? []),
+		...(product.hinderedBy ?? []),
+	];
+	const requirements = [
+		...producerRequirements,
+		...productRequirements,
+	];
+	const effectiveProductLine = readEffectiveProducerProductLine({
+		baseDurationMs: readProducerProductDurationMs({
+			hindrances,
+			product,
+			producerItemInstanceId: action.producerItemInstanceId,
+			requirements,
+			save,
+		}),
+		config,
+		producerId,
+		producerItemId: producerItem.itemId,
+		producerItemInstanceId: action.producerItemInstanceId,
+		product,
+		productId,
+		save,
+	});
+	if (effectiveProductLine.blocked) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"blocked",
+				`Product "${productId}" is blocked by an active effect.`,
+			),
+		);
+	}
 	yield* match(product.placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
@@ -139,18 +176,13 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	}
 
 	return {
-		hindrances: [
-			...(producerDefinition.hinderedBy ?? []),
-			...(product.hinderedBy ?? []),
-		],
+		effectiveProductLine,
+		hindrances,
 		producerDefinition,
 		producerItem,
 		product,
 		productId,
 		productInputs,
-		requirements: [
-			...producerRequirements,
-			...productRequirements,
-		],
+		requirements,
 	};
 });

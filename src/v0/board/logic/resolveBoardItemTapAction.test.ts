@@ -60,6 +60,8 @@ const productLine = (isDefault: boolean, overrides = {}) => ({
 	productId: "product:test",
 	progress: undefined,
 	queueFull: false,
+	blocked: false,
+	blockReasonEffectIds: [],
 	queueSize: 1,
 	queuedJobs: 0,
 	requirementItemIds: [],

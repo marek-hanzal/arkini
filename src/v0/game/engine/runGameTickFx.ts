@@ -3,6 +3,7 @@ import { GameConfigFx } from "~/v0/game/config/GameConfigFx";
 import { processCompletedCraftJobsFx } from "~/v0/game/craft/processCompletedCraftJobsFx";
 import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
 import { processItemSpawnJobsFx } from "~/v0/game/job/processItemSpawnJobsFx";
+import { processExpiredActiveEffectsFx } from "~/v0/game/effects/processExpiredActiveEffectsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -49,6 +50,13 @@ export const runGameTickFx = Effect.fn("runGameTickFx")(function* ({
 		});
 		nextSave = craftJobs.save;
 		events.push(...craftJobs.events);
+
+		const activeEffects = yield* processExpiredActiveEffectsFx({
+			nowMs,
+			save: nextSave,
+		});
+		nextSave = activeEffects.save;
+		events.push(...activeEffects.events);
 
 		return {
 			events,

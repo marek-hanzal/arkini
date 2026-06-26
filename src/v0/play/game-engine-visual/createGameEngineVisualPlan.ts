@@ -148,6 +148,8 @@ export const createGameEngineVisualPlan = ({
 				plan.ignoredEventTypes.push(event.type);
 				break;
 			case "craft.completed":
+			case "effect.activated":
+			case "effect.expired":
 			case "craft.started":
 			case "craft_input.withdrawn":
 			case "item.spawn.blocked":

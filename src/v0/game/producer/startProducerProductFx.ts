@@ -6,7 +6,6 @@ import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivat
 import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProducerStoredInputsFx";
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
-import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -107,21 +106,46 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			productId: checked.productId,
 		});
 	}
-	const jobId = yield* createGameJobIdFx();
 	const queuedStartAtMs = Math.max(
 		nowMs,
 		...Object.values(nextSave.producerJobs)
 			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
 			.map((job) => job.completesAtMs),
 	);
-	const durationMs = readProducerProductDurationMs({
-		hindrances: checked.hindrances,
-		product: checked.product,
-		producerItemInstanceId: action.producerItemInstanceId,
-		requirements: checked.requirements,
-		save,
-	});
+	const durationMs = checked.effectiveProductLine.durationMs;
 	const completesAtMs = queuedStartAtMs + durationMs;
+
+	if (checked.product.activatesEffectId) {
+		const activeEffectId = yield* createGameJobIdFx();
+		nextSave.activeEffects[activeEffectId] = {
+			activatedAtMs: queuedStartAtMs,
+			effectId: checked.product.activatesEffectId,
+			expiresAtMs: completesAtMs,
+			id: activeEffectId,
+			sourceItemInstanceId: action.producerItemInstanceId,
+		};
+		nextSave.updatedAtMs = nowMs;
+
+		return {
+			events: [
+				...consumed.events,
+				{
+					activatedAtMs: queuedStartAtMs,
+					effectId: checked.product.activatesEffectId,
+					expiresAtMs: completesAtMs,
+					id: activeEffectId,
+					sourceItemInstanceId: action.producerItemInstanceId,
+					type: "effect.activated" as const,
+				},
+			],
+			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				save: nextSave,
+			}),
+			save: nextSave,
+		} satisfies GameEngineResult;
+	}
+
+	const jobId = yield* createGameJobIdFx();
 	nextSave.producerJobs[jobId] = {
 		completesAtMs,
 		id: jobId,

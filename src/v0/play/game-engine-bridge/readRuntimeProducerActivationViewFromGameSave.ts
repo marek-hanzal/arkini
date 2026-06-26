@@ -11,6 +11,7 @@ import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDef
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
 	readRuntimeMissingRequirementItemIdsFromGameSave,
@@ -43,6 +44,8 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	maxQueueSize,
 	nowMs,
 	producerHinderedBy,
+	producerId,
+	producerItemId,
 	producerRequirementIds,
 	productIds,
 	save,
@@ -52,6 +55,8 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	maxQueueSize: number;
 	nowMs: number;
 	producerHinderedBy: NonNullable<GameConfig["producers"][string]["hinderedBy"]>;
+	producerId: string;
+	producerItemId: string;
 	producerRequirementIds: GameConfig["producers"][string]["requirementIds"];
 	productIds: readonly string[];
 	save: GameSave;
@@ -63,6 +68,10 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	const queueFull = producerQueuedJobs >= maxQueueSize;
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
+		nowMs,
+		producerId,
+		producerItemId,
+		producerItemInstanceId: targetItemInstanceId,
 		productIds,
 		save,
 	});
@@ -125,15 +134,27 @@ const readRuntimeProductLineViewsFromGameSave = ({
 					left.startedAtMs - right.startedAtMs || left.id.localeCompare(right.id),
 			);
 		const activeJob = jobs.find((job) => job.completesAtMs > nowMs) ?? jobs[0];
+		const baseDurationMs = readProducerProductDurationMs({
+			hindrances,
+			product,
+			producerItemInstanceId: targetItemInstanceId,
+			requirements,
+			save,
+		});
+		const effectiveProductLine = readEffectiveProducerProductLine({
+			baseDurationMs,
+			config,
+			nowMs,
+			producerId,
+			producerItemId,
+			producerItemInstanceId: targetItemInstanceId,
+			product,
+			productId,
+			save,
+		});
 		const durationMs = activeJob
 			? activeJob.completesAtMs - activeJob.startedAtMs
-			: readProducerProductDurationMs({
-					hindrances,
-					product,
-					producerItemInstanceId: targetItemInstanceId,
-					requirements,
-					save,
-				});
+			: effectiveProductLine.durationMs;
 		const progress = activeJob
 			? Math.max(
 					0,
@@ -178,6 +199,10 @@ const readRuntimeProductLineViewsFromGameSave = ({
 
 		return [
 			{
+				blocked: effectiveProductLine.blocked,
+				blockReasonEffectIds: effectiveProductLine.blockReasons.map(
+					(effect) => effect.effectId,
+				),
 				durationMs,
 				inProgress: jobs.length > 0,
 				hindrances: readRuntimeActivationHindranceViewsFromGameSave({
@@ -222,6 +247,10 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
+		nowMs,
+		producerId,
+		producerItemId: boardItem.itemId,
+		producerItemInstanceId: boardItem.id,
 		productIds: producer.productIds,
 		save,
 	});
@@ -247,6 +276,8 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 			maxQueueSize: producer.maxQueueSize,
 			nowMs,
 			producerHinderedBy: producer.hinderedBy ?? [],
+			producerId,
+			producerItemId: boardItem.itemId,
 			producerRequirementIds: producer.requirementIds,
 			productIds: producer.productIds,
 			save,

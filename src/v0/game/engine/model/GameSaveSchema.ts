@@ -75,6 +75,22 @@ const GameSaveProducerJobSchema = z
 		],
 	});
 
+const GameSaveActiveEffectSchema = z
+	.object({
+		id: IdSchema,
+		effectId: IdSchema,
+		sourceItemInstanceId: IdSchema,
+		activatedAtMs: NonNegativeIntegerSchema,
+		expiresAtMs: NonNegativeIntegerSchema,
+	})
+	.strict()
+	.refine((value) => value.expiresAtMs >= value.activatedAtMs, {
+		message: "expiresAtMs must be >= activatedAtMs",
+		path: [
+			"expiresAtMs",
+		],
+	});
+
 const GameSaveCraftJobSchema = z
 	.object({
 		id: IdSchema,
@@ -191,6 +207,7 @@ const GameSaveSchema = z
 			})
 			.strict(),
 		producerJobs: z.record(IdSchema, GameSaveProducerJobSchema),
+		activeEffects: z.record(IdSchema, GameSaveActiveEffectSchema).default({}),
 		producerLines: z.record(IdSchema, GameSaveProducerLineStateSchema),
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
@@ -784,18 +801,6 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if (job.delivery && job.outputTableId === null) {
-			addSaveIssue(
-				ctx,
-				[
-					"producerJobs",
-					jobId,
-					"delivery",
-				],
-				"Producer delivery requires an output table.",
-			);
-		}
-
 		if (job.delivery) {
 			for (const [index, deliveryItem] of job.delivery.items.entries()) {
 				if (!config.items[deliveryItem.itemId]) {
@@ -819,6 +824,50 @@ const validateGameSaveAgainstConfig = (
 			job.producerItemInstanceId,
 			(producerJobCountByProducerItemInstanceId.get(job.producerItemInstanceId) ?? 0) + 1,
 		);
+	}
+
+	for (const [activeEffectId, activeEffect] of Object.entries(save.activeEffects ?? {})) {
+		if (activeEffect.id !== activeEffectId) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"id",
+				],
+				`Active effect id must match record key "${activeEffectId}".`,
+			);
+		}
+
+		if (!config.effects[activeEffect.effectId]) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"effectId",
+				],
+				`Missing effect "${activeEffect.effectId}".`,
+			);
+		}
+
+		if (
+			!readItemInstanceDefinition({
+				config,
+				itemInstanceId: activeEffect.sourceItemInstanceId,
+				save,
+			})
+		) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"sourceItemInstanceId",
+				],
+				`Active effect source "${activeEffect.sourceItemInstanceId}" must reference a save item instance.`,
+			);
+		}
 	}
 
 	for (const [producerItemInstanceId, jobCount] of producerJobCountByProducerItemInstanceId) {
@@ -1262,6 +1311,7 @@ export type GameSaveInventoryInstance = z.infer<typeof GameSaveInventoryInstance
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveProducerDeliveryItem = z.infer<typeof GameSaveProducerDeliveryItemSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
+export type GameSaveActiveEffect = z.infer<typeof GameSaveActiveEffectSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;
 export type GameSave = z.infer<typeof GameSaveSchema>;

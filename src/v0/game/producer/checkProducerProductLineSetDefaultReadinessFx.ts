@@ -17,7 +17,7 @@ export namespace checkProducerProductLineSetDefaultReadinessFx {
 export const checkProducerProductLineSetDefaultReadinessFx = Effect.fn(
 	"checkProducerProductLineSetDefaultReadinessFx",
 )(function* ({ config, save, action }: checkProducerProductLineSetDefaultReadinessFx.Props) {
-	const { producerDefinition, producerItem } = yield* readProducerRuntimeTargetFx({
+	const { producerDefinition, producerId, producerItem } = yield* readProducerRuntimeTargetFx({
 		config,
 		producerItemInstanceId: action.producerItemInstanceId,
 		save,
@@ -32,6 +32,9 @@ export const checkProducerProductLineSetDefaultReadinessFx = Effect.fn(
 	}
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
+		producerId,
+		producerItemId: producerItem.itemId,
+		producerItemInstanceId: action.producerItemInstanceId,
 		productIds: producerDefinition.productIds,
 		save,
 	});

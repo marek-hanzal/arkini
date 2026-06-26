@@ -74,6 +74,7 @@ export const createGameSaveFromDevScenario = ({
 		createdAtMs: nowMs,
 		craftInputs: {},
 		craftJobs: {},
+		activeEffects: {},
 		gameId: config.game.id,
 		inventory: {
 			slots: inventorySlots,

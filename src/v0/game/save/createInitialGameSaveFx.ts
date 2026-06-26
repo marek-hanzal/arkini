@@ -81,6 +81,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 	}
 
 	const save: GameSave = {
+		activeEffects: {},
 		board: {
 			items: boardItems,
 		},

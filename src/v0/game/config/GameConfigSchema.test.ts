@@ -48,6 +48,7 @@ type TestProductInput = {
 
 type TestProduct = {
 	hinderedBy?: TestGameHindrance[];
+	showIf?: string[];
 	durationMs: number;
 	inputRefId?: string;
 	name: string;
@@ -481,6 +482,26 @@ describe("GameConfigSchema", () => {
 				scope: "board_or_inventory",
 				type: "passive",
 			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
+	});
+
+	it("accepts product line showIf marker item ids", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].showIf = [
+			"item:plank",
+		];
+
+		expect(parseGameConfig(config).products["product:test"].showIf).toEqual([
+			"item:plank",
+		]);
+	});
+
+	it("rejects product line showIf marker item ids that point at missing items", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].showIf = [
+			"item:ghost",
 		];
 
 		expect(() => parseGameConfig(config)).toThrow(/Missing item/);

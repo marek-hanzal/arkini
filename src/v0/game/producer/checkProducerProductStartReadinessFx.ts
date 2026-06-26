@@ -8,6 +8,7 @@ import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequi
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
+import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -32,10 +33,15 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		producerItemInstanceId: action.producerItemInstanceId,
 		save,
 	});
+	const visibleProductIds = readVisibleProducerProductIds({
+		config,
+		productIds: producerDefinition.productIds,
+		save,
+	});
 	const productId =
 		action.productId ??
 		readProducerDefaultProductId({
-			productIds: producerDefinition.productIds,
+			productIds: visibleProductIds,
 			producerItemInstanceId: action.producerItemInstanceId,
 			save,
 		});
@@ -44,6 +50,14 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			GameEngineError.actionRejected(
 				"invalid_actor",
 				`Product "${action.productId ?? "<default>"}" does not belong to producer "${producerDefinition.type}" on item "${producerItem.itemId}".`,
+			),
+		);
+	}
+	if (!visibleProductIds.includes(productId)) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"invalid_actor",
+				`Product "${productId}" is hidden for the current game state.`,
 			),
 		);
 	}

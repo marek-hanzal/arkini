@@ -78,6 +78,45 @@ describe("applyGameActionFx Producer", () => {
 		}
 	});
 
+	it("rejects hidden producer product lines", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					showIf: [
+						"item:axe",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "invalid_actor",
+			});
+		}
+	});
+
 	it("starts the saved default producer product line when productId is omitted", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

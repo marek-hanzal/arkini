@@ -1071,7 +1071,7 @@ Item reference:
 
 Defines producer product lines.
 
-A product line defines production name, duration, placement, inputs, requirements, optional hindrances, and output.
+A product line defines production name, duration, placement, inputs, requirements, optional visibility markers, optional hindrances, and output.
 
 ```json
 {
@@ -1095,7 +1095,39 @@ Fields:
 - `inputRefId`: input bundle.
 - `requirementIds`: product-level requirements.
 - `hinderedBy`: optional product-level hindrances. Any active hindrance slows this product line.
+- `showIf`: optional item ID list. If omitted, the line is always visible. If present, the runtime shows the line only while at least one listed item exists anywhere in the current save. This is an OR visibility gate, not an input and not consumed.
 - `outputTableId`: loot table output.
+
+
+
+Conditional product-line visibility:
+
+```json
+{
+  "products": {
+    "product:university-engineering-theory": {
+      "name": "Advanced Theory",
+      "durationMs": 10000,
+      "placement": "board_then_inventory",
+      "inputRefId": "input:university-engineering-theory",
+      "requirementIds": [],
+      "showIf": ["item:house-of-engineers"],
+      "outputTableId": "loot:advanced-theory"
+    },
+    "product:university-mage-theory": {
+      "name": "Advanced Theory",
+      "durationMs": 10000,
+      "placement": "board_then_inventory",
+      "inputRefId": "input:university-mage-theory",
+      "requirementIds": [],
+      "showIf": ["item:mage-lodge"],
+      "outputTableId": "loot:advanced-theory"
+    }
+  }
+}
+```
+
+Use `showIf` when several product lines intentionally produce the same result but should be selected by world state, such as exclusive late-game paths. It is only a display/interaction gate. Put consumed materials in `inputs`, and reusable gating rules in `requirementIds`, because naturally one field cannot be allowed to cosplay as three systems without starting a tiny government agency.
 
 No-input product:
 
@@ -1741,6 +1773,7 @@ products.*.inputRefId -> inputs
 products.*.requirementIds[] -> requirements
 products.*.hinderedBy[].itemId -> items
 products.*.hinderedBy[].itemIds[] -> items
+products.*.showIf[] -> items
 products.*.outputTableId -> lootTables
 
 stashes.*.outputTableId -> lootTables

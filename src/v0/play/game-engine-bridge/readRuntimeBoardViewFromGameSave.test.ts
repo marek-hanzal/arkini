@@ -277,6 +277,56 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		]);
 	});
 
+	it("hides producer product lines until a showIf marker item is owned", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					showIf: [
+						"item:axe",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const hiddenBoard = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(hiddenBoard.byId["item-instance:1"]?.activation?.productLines).toMatchObject([
+			{
+				productId: "product:test",
+			},
+		]);
+
+		save.inventory.slots[0] = {
+			itemId: "item:axe",
+			quantity: 1,
+		};
+		const visibleBoard = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(visibleBoard.byId["item-instance:1"]?.activation?.productLines).toMatchObject([
+			{
+				productId: "product:test",
+			},
+			{
+				productId: "product:shred",
+			},
+		]);
+	});
+
 	it("marks producer activation danger when delivery is blocked", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

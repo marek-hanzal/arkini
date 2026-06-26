@@ -663,7 +663,9 @@ Because inventory is passive, producer jobs require the producer item to be on t
 
 ### 10.4 Producer product lines
 
-A producer owns ordered product lines through `productIds`. Each product line defines its own duration, optional input reference, requirements, placement, and optional output table.
+A producer owns ordered product lines through `productIds`. Each product line defines its own duration, optional input reference, requirements, placement, optional visibility markers, and optional output table.
+
+Product lines may define `showIf`, an OR list of marker item IDs. A hidden line is not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. `showIf` only checks whether any marker item exists anywhere in the current save; it does not consume that marker and is not a replacement for inputs or requirements. This is meant for late-game path-specific variants where one building can offer different recipes depending on whether the player chose Engineers, Faith, or Mages, because apparently civilization must eventually pick a flavor of nonsense.
 
 Runtime save state may store a default product line per concrete producer item instance. The default affects:
 

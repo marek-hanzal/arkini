@@ -35,6 +35,10 @@ export const readGameSaveOwnedItemQuantity = ({
 		quantity += craftState.items[itemId] ?? 0;
 	}
 
+	for (const stashInputState of Object.values(save.stashInputs)) {
+		quantity += stashInputState.items[itemId] ?? 0;
+	}
+
 	for (const storedRequirementState of Object.values(save.storedRequirements)) {
 		quantity += storedRequirementState.items[itemId] ?? 0;
 	}

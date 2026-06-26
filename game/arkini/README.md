@@ -636,3 +636,38 @@ Guild branch asset IDs:
 - `asset:item:key-t3` -> `game/arkini/assets/item-key-t3.png`
 - `asset:item:key-t4` -> `game/arkini/assets/item-key-t4.png`
 
+
+### Era XI Choose The Path keystones
+
+Era XI starts as a commitment gate, not a full branch yet. University can now issue one of three mutually exclusive path blueprints after the player has reached guild, treasure, and prestige-construction infrastructure.
+
+```txt
+University
+  Master Knowledge + Guild Charter + Treasure Chest + prestige materials + branch-flavored inputs
+  -> House of Engineers Blueprint / Cathedral Blueprint / Mage Lodge Blueprint
+```
+
+The actual keystone buildings are authored as exclusive building items. Owning any one of them blocks crafting the other two through item-level `exclusiveToIds`, which gives the later branch-specific product lines a clean `showIf` marker.
+
+```txt
+producer:house-of-engineers exclusive with producer:cathedral, producer:mage-lodge
+producer:cathedral exclusive with producer:house-of-engineers, producer:mage-lodge
+producer:mage-lodge exclusive with producer:house-of-engineers, producer:cathedral
+```
+
+The branches are intentionally only marker buildings for now. Follow-up eras should use them as `showIf` markers:
+
+```txt
+Engineers -> machines, energy, power upgrades, Pollution pressure
+Faith -> order, cleansing, protection, Corruption pressure
+Mages -> rune/mana/arcane science, Void pressure
+```
+
+Choose The Path asset IDs:
+
+- `asset:producer:house-of-engineers` -> `game/arkini/assets/producer-house-of-engineers.png`
+- `asset:producer:cathedral` -> `game/arkini/assets/producer-cathedral.png`
+- `asset:producer:mage-lodge` -> `game/arkini/assets/producer-mage-lodge.png`
+- `asset:item:blueprint-house-of-engineers` -> blueprint render over House of Engineers
+- `asset:item:blueprint-cathedral` -> blueprint render over Cathedral
+- `asset:item:blueprint-mage-lodge` -> blueprint render over Mage Lodge

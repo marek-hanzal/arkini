@@ -37,16 +37,18 @@ export const createGameEngineVisualPlan = ({
 		if (skipped.has(index)) continue;
 
 		switch (event.type) {
-			case "item.created":
+			case "item.created": {
+				const sequenceIndex = event.spawnSequenceIndex ?? createdSequenceIndex;
 				appendItemCreatedVisuals({
 					currentBoard,
 					currentInventory,
 					event,
 					plan,
-					sequenceIndex: createdSequenceIndex,
+					sequenceIndex,
 				});
-				createdSequenceIndex += 1;
+				createdSequenceIndex = Math.max(createdSequenceIndex + 1, sequenceIndex + 1);
 				break;
+			}
 
 			case "item.consumed": {
 				if (event.reason === "merge-source") {

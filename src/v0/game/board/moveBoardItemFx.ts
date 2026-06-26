@@ -46,6 +46,7 @@ export const moveBoardItemFx = Effect.fn("moveBoardItemFx")(function* ({
 	return {
 		events: [],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: nextSave,
 		}),
 		save: nextSave,

@@ -61,6 +61,7 @@ export const storeStoredRequirementFx = Effect.fn("storeStoredRequirementFx")(fu
 	return {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: nextSave,
 		}),
 		save: nextSave,

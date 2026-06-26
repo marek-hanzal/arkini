@@ -61,6 +61,7 @@ export const runGameTickFx = Effect.fn("runGameTickFx")(function* ({
 		return {
 			events,
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				nowMs,
 				save: nextSave,
 			}),
 			save: nextSave,

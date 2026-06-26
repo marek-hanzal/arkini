@@ -24,6 +24,7 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 		return {
 			events: [],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				nowMs,
 				save,
 			}),
 			save,
@@ -38,6 +39,7 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 		return {
 			events: [],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				nowMs,
 				save,
 			}),
 			save,
@@ -68,6 +70,7 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 	return {
 		events: [],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: nextSave,
 		}),
 		save: nextSave,

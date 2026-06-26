@@ -52,6 +52,7 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		itemId: target.recipe.resultItemId,
 		nowMs,
 		save,
+		targetCell: target.targetItem,
 	});
 	if (
 		readBoardItemMaxCountCapacity({

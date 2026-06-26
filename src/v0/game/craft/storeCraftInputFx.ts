@@ -62,6 +62,7 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 	return {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: nextSave,
 		}),
 		save: nextSave,

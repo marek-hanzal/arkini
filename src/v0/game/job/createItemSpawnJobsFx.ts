@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { BoardCell } from "~/v0/game/board/BoardCell";
 import { createGameItemSpawnJobIdFx } from "~/v0/game/job/createGameItemSpawnJobIdFx";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -10,6 +11,7 @@ export namespace createItemSpawnJobsFx {
 		dueAtMs: number;
 		exclusiveGroupKey?: string;
 		intervalMs?: number;
+		seedCell?: BoardCell;
 	}
 }
 
@@ -19,6 +21,7 @@ export const createItemSpawnJobsFx = Effect.fn("createItemSpawnJobsFx")(function
 	dueAtMs,
 	exclusiveGroupKey,
 	intervalMs = 0,
+	seedCell,
 }: createItemSpawnJobsFx.Props) {
 	let itemSpawnIndex = 0;
 	let lastDueAtMs = dueAtMs;
@@ -37,6 +40,8 @@ export const createItemSpawnJobsFx = Effect.fn("createItemSpawnJobsFx")(function
 				originItemInstanceId: item.originItemInstanceId,
 				quantity: 1,
 				reason: item.reason,
+				seedCell,
+				sequenceIndex: itemSpawnIndex,
 				type: "item.spawn",
 			};
 			jobIds.push(id);

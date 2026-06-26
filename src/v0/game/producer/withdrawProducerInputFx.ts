@@ -86,6 +86,7 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 	return {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: placement.save,
 		}),
 		save: placement.save,

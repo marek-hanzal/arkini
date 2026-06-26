@@ -26,7 +26,8 @@
 						]
 					}
 				}
-			]
+			],
+			"sourceScope": "both"
 		},
 		"effect:path-faith-locks-counter-keystones": {
 			"name": "Faith path locks Engineers and Mages keystone plans",
@@ -54,7 +55,8 @@
 						]
 					}
 				}
-			]
+			],
+			"sourceScope": "both"
 		},
 		"effect:path-mages-locks-counter-keystones": {
 			"name": "Mages path locks Engineers and Faith keystone plans",
@@ -82,7 +84,8 @@
 						]
 					}
 				}
-			]
+			],
+			"sourceScope": "both"
 		}
 	}
 }

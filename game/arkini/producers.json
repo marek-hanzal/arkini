@@ -38,7 +38,8 @@
 		"producer:bakery-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:bakery-t1:bread"
+				"product:bakery-t1:bread",
+				"product:bakery-t1:bread-morale-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -113,6 +114,7 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:civic-office-t1:building-permit",
+				"product:civic-office-t1:building-permit-morale-t2",
 				"product:civic-office-t1:blueprint-academy",
 				"product:civic-office-t1:guild-charter"
 			],
@@ -142,7 +144,8 @@
 		"producer:construction-yard-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:construction-yard-t1:construction-bundle"
+				"product:construction-yard-t1:construction-bundle",
+				"product:construction-yard-t1:construction-bundle-morale-t3"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -175,7 +178,8 @@
 		"producer:farm-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:farm-t1:grain"
+				"product:farm-t1:grain",
+				"product:farm-t1:grain-morale-t1"
 			],
 			"requirementIds": [
 				"proximity:farm-t1:wheat-field"
@@ -195,7 +199,8 @@
 		"producer:glazier-workshop-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:glazier-workshop-t1:stained-glass"
+				"product:glazier-workshop-t1:stained-glass",
+				"product:glazier-workshop-t1:stained-glass-morale-t4"
 			],
 			"requirementIds": [
 				"proximity:glazier-workshop-t1:glassworks"
@@ -231,7 +236,40 @@
 				"product:heroes-guild-t1:chest-t2",
 				"product:heroes-guild-t1:chest-t3",
 				"product:heroes-guild-t1:chest-t4",
-				"product:heroes-guild-t1:treasure-chest"
+				"product:heroes-guild-t1:treasure-chest",
+				"product:heroes-guild-t1:treasure-chest-morale-t4"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:house-t1": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:house-t1:morale-t1"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:house-t2": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:house-t2:morale-t2"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:house-t3": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:house-t3:morale-t3"
+			],
+			"requirementIds": [],
+			"type": "producer"
+		},
+		"producer:house-t4": {
+			"maxQueueSize": 1,
+			"productIds": [
+				"product:house-t4:morale-t4"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -381,7 +419,8 @@
 		"producer:school": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:school:basic-knowledge"
+				"product:school:basic-knowledge",
+				"product:school:basic-knowledge-morale-t2"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -425,7 +464,8 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:stonemason-t2:stone-block",
-				"product:stonemason-t2:marble-block"
+				"product:stonemason-t2:marble-block",
+				"product:stonemason-t2:marble-block-morale-t4"
 			],
 			"requirementIds": [
 				"proximity:stonemason-t2:quarry-t2"
@@ -436,7 +476,8 @@
 			"maxQueueSize": 1,
 			"productIds": [
 				"product:tailor-workshop-t1:common-clothing",
-				"product:tailor-workshop-t1:luxury-clothing"
+				"product:tailor-workshop-t1:luxury-clothing",
+				"product:tailor-workshop-t1:luxury-clothing-morale-t3"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -482,6 +523,7 @@
 				"product:townhall-t2:blueprint-sheep-pasture-t1",
 				"product:townhall-t2:blueprint-vegetable-garden-t1",
 				"product:townhall-t2:food-supply",
+				"product:townhall-t2:blueprint-house-t1",
 				"product:townhall-t2:blueprint-townhall-t3"
 			],
 			"requirementIds": [],
@@ -501,6 +543,7 @@
 				"product:townhall-t3:vineyard",
 				"product:townhall-t3:blueprint-winery-t1",
 				"product:townhall-t3:blueprint-market-t1",
+				"product:townhall-t3:blueprint-house-t2",
 				"product:townhall-t3:blueprint-townhall-t4"
 			],
 			"requirementIds": [],
@@ -517,7 +560,8 @@
 				"product:townhall-t4:blueprint-tannery-t1",
 				"product:townhall-t4:blueprint-weaver-hut-t1",
 				"product:townhall-t4:blueprint-dye-workshop-t1",
-				"product:townhall-t4:blueprint-tailor-workshop-t1"
+				"product:townhall-t4:blueprint-tailor-workshop-t1",
+				"product:townhall-t4:blueprint-house-t3"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -528,10 +572,12 @@
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",
 				"product:university:master-knowledge",
+				"product:university:master-knowledge-morale-t4",
 				"product:university:blueprint-heroes-guild-t1",
 				"product:university:blueprint-glazier-workshop-t1",
 				"product:university:blueprint-quarry-t2",
 				"product:university:blueprint-stonemason-t2",
+				"product:university:blueprint-house-t4",
 				"product:university:blueprint-house-of-engineers",
 				"product:university:blueprint-cathedral",
 				"product:university:blueprint-mage-lodge"

@@ -232,6 +232,16 @@
 				}
 			]
 		},
+		"loot:bakery-t1:bread-morale-t1": {
+			"name": "Bread morale output",
+			"output": [
+				{
+					"itemId": "item:bread",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:blacksmith-t1:axe": {
 			"name": "Blacksmith axe output",
 			"output": [
@@ -530,6 +540,16 @@
 				}
 			]
 		},
+		"loot:civic-office-t1:building-permit-morale-t2": {
+			"name": "Building Permit morale output",
+			"output": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:civic-office-t1:guild-charter": {
 			"name": "Civic Office guild charter output",
 			"output": [
@@ -566,6 +586,16 @@
 				{
 					"itemId": "item:construction-bundle",
 					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:construction-yard-t1:construction-bundle-morale-t3": {
+			"name": "Construction Bundle morale output",
+			"output": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 2,
 					"type": "guaranteed"
 				}
 			]
@@ -620,6 +650,16 @@
 				}
 			]
 		},
+		"loot:farm-t1:grain-morale-t1": {
+			"name": "Grain morale output",
+			"output": [
+				{
+					"itemId": "item:grain",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:glassworks:glass": {
 			"name": "Glass output",
 			"output": [
@@ -648,6 +688,28 @@
 				{
 					"itemId": "item:stained-glass",
 					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.5,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:glazier-workshop-t1:stained-glass-morale-t4": {
+			"name": "Stained Glass morale output",
+			"output": [
+				{
+					"itemId": "item:stained-glass",
+					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
@@ -829,6 +891,98 @@
 			"output": [
 				{
 					"itemId": "item:treasure-chest",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:heroes-guild-t1:treasure-chest-morale-t4": {
+			"name": "Grand Expedition morale output",
+			"output": [
+				{
+					"itemId": "item:treasure-chest",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:aquamarine",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:topaz",
+					"quantity": 1,
+					"type": "chance"
+				}
+			]
+		},
+		"loot:house-t1:morale-t1": {
+			"name": "House 1 morale output",
+			"output": [
+				{
+					"itemId": "item:morale-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:house-t2:morale-t2": {
+			"name": "House 2 morale output",
+			"output": [
+				{
+					"itemId": "item:morale-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:house-t3:morale-t3": {
+			"name": "House 3 morale output",
+			"output": [
+				{
+					"itemId": "item:morale-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:house-t4:morale-t4": {
+			"name": "House 4 morale output",
+			"output": [
+				{
+					"itemId": "item:morale-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t3",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -1136,6 +1290,16 @@
 				}
 			]
 		},
+		"loot:school:basic-knowledge-morale-t2": {
+			"name": "Basic Knowledge morale output",
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:sheep-pasture-t1:wool": {
 			"name": "Sheep pasture wool",
 			"output": [
@@ -1225,6 +1389,16 @@
 				}
 			]
 		},
+		"loot:stonemason-t2:marble-block-morale-t4": {
+			"name": "Marble Block morale output",
+			"output": [
+				{
+					"itemId": "item:marble-block",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:stonemason-t2:stone-block": {
 			"name": "Stonemason 2 stone blocks",
 			"output": [
@@ -1251,6 +1425,16 @@
 				{
 					"itemId": "item:luxury-clothing",
 					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:tailor-workshop-t1:luxury-clothing-morale-t3": {
+			"name": "Luxury Clothing morale output",
+			"output": [
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 2,
 					"type": "guaranteed"
 				}
 			]
@@ -1375,6 +1559,16 @@
 				}
 			]
 		},
+		"loot:townhall-t2:blueprint-house-t1": {
+			"name": "Town Hall II House I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t2:blueprint-pig-farm-t1": {
 			"name": "Blueprint: Pig Farm I output",
 			"output": [
@@ -1475,6 +1669,16 @@
 				}
 			]
 		},
+		"loot:townhall-t3:blueprint-house-t2": {
+			"name": "Town Hall III House II blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:townhall-t3:blueprint-market-t1": {
 			"name": "Blueprint: Market output",
 			"output": [
@@ -1570,6 +1774,16 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-dye-workshop-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:townhall-t4:blueprint-house-t3": {
+			"name": "Town Hall IV House III blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t3",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -1705,6 +1919,16 @@
 				}
 			]
 		},
+		"loot:university:blueprint-house-t4": {
+			"name": "University House IV blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t4",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:university:blueprint-mage-lodge": {
 			"name": "University Mage Lodge blueprint output",
 			"output": [
@@ -1741,6 +1965,16 @@
 				{
 					"itemId": "item:master-knowledge",
 					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:university:master-knowledge-morale-t4": {
+			"name": "Master Knowledge morale output",
+			"output": [
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 2,
 					"type": "guaranteed"
 				}
 			]

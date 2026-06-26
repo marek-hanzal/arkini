@@ -55,7 +55,7 @@ producer:townhall-t3  Era III food processing and first trade blueprints
 producer:townhall-t4  Era IV civic administration, Market II, Era V textile/clothing, and Prospector Guild 1
 producer:civic-office  Era IV permits, Academy blueprint bridge, and Era IX Guild Charter
 producer:academy      Era VII mining expansion, Era VIII dirty-processing/material plans, and Era IX smith/armory/goldsmith/university blueprints
-producer:university   Era IX Master Knowledge / Heroes Guild blueprint and Era X Glazier Workshop blueprint
+producer:university   Era IX Master Knowledge / Heroes Guild blueprint, Era X prestige plans, House IV, and Choose The Path blueprints
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
@@ -82,7 +82,8 @@ Town Hall II
   Wool + Grain -> Sheep Pasture I Blueprint
   Vegetables + Water -> Vegetable Garden I Blueprint
   Grain + Piglet + Milk + Egg + Vegetables -> Food Supply
-  Food Supply + Wool + Plank + Stone Block -> Town Hall III Blueprint
+  Food Supply + Water -> House I Blueprint
+  Food Supply + Wool + Plank + Stone Block + Morale I -> Town Hall III Blueprint
 
 Town Hall III
   Grain + Plank -> Windmill I Blueprint
@@ -96,7 +97,8 @@ Town Hall III
   Grain + Water -> Vineyard
   Grain + Water + Plank -> Winery I Blueprint
   Bread + Sausage + Plank -> Market Blueprint
-  Feast + 2 Coin + Plank + Stone Block -> Town Hall IV Blueprint
+  Bread + Beer + Coin -> House II Blueprint
+  Feast + 2 Coin + Plank + Stone Block + Morale II + Morale I -> Town Hall IV Blueprint
 
 Town Hall IV
   Coin + Water + Plank -> Paper Mill I Blueprint
@@ -108,6 +110,7 @@ Town Hall IV
   Building Permit + Wool + Paper -> Weaver Hut I Blueprint
   Building Permit + Common Cloth + Vegetables + Paper -> Dye Workshop I Blueprint
   Building Permit + Common Cloth + Leather + Paper -> Tailor Workshop I Blueprint
+  Building Permit + Common Clothing + Feast + Coin -> House III Blueprint
 
 Civic Office I
   Paper + Basic Knowledge + Coin -> Building Permit
@@ -122,6 +125,7 @@ Academy
   Advanced Knowledge + Coal/Clay/Sand/Charcoal + Building Permit + Coin -> dirty processing blueprints
   Guild Charter + Construction Bundle + ingots/materials -> smith, armory, goldsmith, and university blueprints
   Master Knowledge + Guild Charter + Construction Bundle -> Heroes Guild Blueprint
+  Master Knowledge + Marble Block + Stained Glass + Coin Stack -> House IV Blueprint
 
 Prospector Guild 1
   Building Permit + Basic Knowledge + Coin -> Clay Deposit
@@ -139,7 +143,7 @@ Market is a tiered trade building line. Market I starts first trade in Era III; 
 
 ### Implemented first wave
 
-The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, prospecting, an improved Market II trade step, Era V textile/clothing production with Pigment, Era VII mining through Academy-driven Prospector Guild 2 plans, Era VIII dirty processing / advanced construction materials, Era IX guild institutions / equipment / expeditions, and Era X prestige glass materials through Glazier Workshop. The old “all heavy industry at once” blob has been split because apparently pacing is healthier than throwing every furnace at the player like a drunk civil engineer.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, housing morale, prospecting, an improved Market II trade step, Era V textile/clothing production with Pigment, Era VII mining through Academy-driven Prospector Guild 2 plans, Era VIII dirty processing / advanced construction materials, Era IX guild institutions / equipment / expeditions, and Era X prestige glass/marble materials. The old “all heavy industry at once” blob has been split because apparently pacing is healthier than throwing every furnace at the player like a drunk civil engineer.
 
 Wood pair:
 
@@ -187,6 +191,7 @@ Era II raw food
   Sheep Pasture I + Grain + Water -> Wool
   Vegetable Garden I + Water -> Vegetables
   Town Hall II -> Food Supply
+  House I + Water + Log -> Morale I
 
 Era III processing
   Windmill I + Grain -> Flour
@@ -201,6 +206,7 @@ Era III processing
   Winery I + Grapes + Water -> Wine Barrel
   Tavern I + Wine Barrel -> Wine Glass
   Market I + processed food/drink -> Coin
+  House II + Bread + Water + Coin -> Morale II + Morale I
 
 Era IV civic administration
   Paper Mill I + Plank + Water -> Paper
@@ -220,6 +226,7 @@ Era V textile and clothing
   Tailor Workshop I + Luxury Cloth + Leather + Coin -> Luxury Clothing
   Market II + Common Clothing -> Coin
   Market II + Luxury Clothing -> more Coin
+  House III + Common Clothing + Feast + Beer + Coin -> Morale III + Morale II + Morale I
 Era VII mining expansion
   Civic Office I + Building Permit + Basic Knowledge + Paper + Luxury Clothing + Coin -> Academy Blueprint
   Academy + Basic Knowledge + Paper + Coin -> Advanced Knowledge
@@ -268,6 +275,7 @@ Era X prestige construction materials
   University + Master Knowledge + Guild Charter + advanced materials -> Quarry 2 / Stonemason 2 blueprints
   Quarry 2 near Marble Deposit -> Stone / Marble
   Stonemason 2 near Quarry 2 -> Stone Block / Marble Block
+  House IV + Luxury Clothing + Feast + Wine Glass + Coin Stack -> Morale IV + Morale III + Morale II + Morale I
   Stained Glass and Marble Block are the current Era X prestige construction outputs.
 ```
 
@@ -636,6 +644,35 @@ Guild branch asset IDs:
 - `asset:item:key-t3` -> `game/arkini/assets/item-key-t3.png`
 - `asset:item:key-t4` -> `game/arkini/assets/item-key-t4.png`
 
+
+### Housing morale side economy
+
+Housing is a parallel morale subsystem layered on top of the core producer economy. Houses consume comfort goods from the era where they appear and produce morale tokens. Morale is intentionally not required for ordinary production lines; base lines stay available. Where morale appears in producer products, it is authored as a duplicate boosted line with better output/speed. Where morale appears in crafts, it is reserved for bigger civic upgrades and prestige buildings, because even a tiny city should occasionally ask whether its people are miserable before building another giant marble ego box.
+
+```txt
+House I  + Water + Log -> Morale I
+House II + Bread + Water + Coin -> Morale II + Morale I
+House III + Common Clothing + Feast + Beer + Coin -> Morale III + Morale II + Morale I
+House IV + Luxury Clothing + Feast + Wine Glass + Coin Stack -> Morale IV + Morale III + Morale II + Morale I
+
+Morale boosted examples:
+  Farm I + Water + Morale I -> 2 Grain
+  Bakery I + Flour + Water + Morale I -> 2 Bread
+  School + Paper + Coin + Morale II -> 2 Basic Knowledge
+  Construction Yard I + materials + Morale III -> 2 Construction Bundle
+  Glazier Workshop I + materials + Morale IV -> 2 Stained Glass + random Pollution
+```
+
+Housing asset IDs:
+
+- `asset:producer:house-t1` -> `game/arkini/assets/producer-house-t1.png`
+- `asset:producer:house-t2` -> `game/arkini/assets/producer-house-t2.png`
+- `asset:producer:house-t3` -> `game/arkini/assets/producer-house-t3.png`
+- `asset:producer:house-t4` -> `game/arkini/assets/producer-house-t4.png`
+- `asset:item:morale-t1` -> `game/arkini/assets/item-morale-t1.png`
+- `asset:item:morale-t2` -> `game/arkini/assets/item-morale-t2.png`
+- `asset:item:morale-t3` -> `game/arkini/assets/item-morale-t3.png`
+- `asset:item:morale-t4` -> `game/arkini/assets/item-morale-t4.png`
 
 ### Era XI Choose The Path keystones
 

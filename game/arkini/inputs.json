@@ -693,6 +693,29 @@
 			],
 			"name": "Armory leather armor materials"
 		},
+		"input:bakery-t1:bread-morale-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t1",
+					"quantity": 1
+				}
+			],
+			"name": "Bakery flour and water input with morale"
+		},
 		"input:bakery-t1:flour-water": {
 			"inputs": [
 				{
@@ -938,6 +961,35 @@
 			],
 			"name": "Civic Office permit inputs"
 		},
+		"input:civic-office-t1:building-permit-morale-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t2",
+					"quantity": 1
+				}
+			],
+			"name": "Civic Office permit inputs with morale"
+		},
 		"input:civic-office-t1:guild-charter": {
 			"inputs": [
 				{
@@ -1048,6 +1100,53 @@
 			],
 			"name": "Construction bundle inputs"
 		},
+		"input:construction-yard-t1:construction-bundle-morale-t3": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
+				}
+			],
+			"name": "Construction bundle inputs with morale"
+		},
 		"input:cookhouse-t1:feast": {
 			"inputs": [
 				{
@@ -1134,6 +1233,23 @@
 			],
 			"name": "Dye Workshop pigment input"
 		},
+		"input:farm-t1:grain-morale-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t1",
+					"quantity": 1
+				}
+			],
+			"name": "Farm water input with morale"
+		},
 		"input:farm-t1:water": {
 			"inputs": [
 				{
@@ -1190,6 +1306,41 @@
 				}
 			],
 			"name": "Glazier Workshop stained glass inputs"
+		},
+		"input:glazier-workshop-t1:stained-glass-morale-t4": {
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				}
+			],
+			"name": "Glazier Workshop stained glass inputs with morale"
 		},
 		"input:gold-mine-t1:bread-wine": {
 			"inputs": [
@@ -1539,6 +1690,169 @@
 				}
 			],
 			"name": "Heroes Guild grand expedition supplies"
+		},
+		"input:heroes-guild-t1:treasure-chest-morale-t4": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t4",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:topaz",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:aquamarine",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				}
+			],
+			"name": "Heroes Guild grand expedition supplies with morale"
+		},
+		"input:house-t1:morale-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"name": "House 1 basic comfort supplies"
+		},
+		"input:house-t2:morale-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "House 2 comfort supplies"
+		},
+		"input:house-t3:morale-t3": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "House 3 comfort supplies"
+		},
+		"input:house-t4:morale-t4": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				}
+			],
+			"name": "House 4 luxury comfort supplies"
 		},
 		"input:iron-mine-t1:sausage-beer": {
 			"inputs": [
@@ -2012,6 +2326,29 @@
 			],
 			"name": "School paper lesson inputs"
 		},
+		"input:school:basic-knowledge-morale-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t2",
+					"quantity": 1
+				}
+			],
+			"name": "School paper lesson inputs with morale"
+		},
 		"input:sheep-pasture-t1:grain-water": {
 			"inputs": [
 				{
@@ -2114,6 +2451,29 @@
 			],
 			"name": "Stonemason 2 marble input"
 		},
+		"input:stonemason-t2:marble-block-morale-t4": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				}
+			],
+			"name": "Stonemason 2 marble input with morale"
+		},
 		"input:stonemason-t2:stone-block": {
 			"inputs": [
 				{
@@ -2164,6 +2524,35 @@
 				}
 			],
 			"name": "Tailor Workshop luxury clothing input"
+		},
+		"input:tailor-workshop-t1:luxury-clothing-morale-t3": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-cloth",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t3",
+					"quantity": 1
+				}
+			],
+			"name": "Tailor Workshop luxury clothing input with morale"
 		},
 		"input:tannery-t1:leather": {
 			"inputs": [
@@ -2338,6 +2727,23 @@
 				}
 			],
 			"name": "Blueprint: Farm I input"
+		},
+		"input:townhall-t2:blueprint-house-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:food-supply",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: House I input"
 		},
 		"input:townhall-t2:blueprint-pig-farm-t1": {
 			"inputs": [
@@ -2551,6 +2957,29 @@
 			],
 			"name": "Blueprint: Dairy I input"
 		},
+		"input:townhall-t3:blueprint-house-t2": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: House II input"
+		},
 		"input:townhall-t3:blueprint-market-t1": {
 			"inputs": [
 				{
@@ -2762,6 +3191,35 @@
 				}
 			],
 			"name": "Blueprint: Dye Workshop I input"
+		},
+		"input:townhall-t4:blueprint-house-t3": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: House III input"
 		},
 		"input:townhall-t4:blueprint-market-t2": {
 			"inputs": [
@@ -3134,6 +3592,35 @@
 			],
 			"name": "Blueprint: House of Engineers input"
 		},
+		"input:university:blueprint-house-t4": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: House IV input"
+		},
 		"input:university:blueprint-mage-lodge": {
 			"inputs": [
 				{
@@ -3273,6 +3760,41 @@
 				}
 			],
 			"name": "University master research materials"
+		},
+		"input:university:master-knowledge-morale-t4": {
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4",
+					"quantity": 1
+				}
+			],
+			"name": "University master research materials with morale"
 		},
 		"input:vegetable-garden-t1:water": {
 			"inputs": [

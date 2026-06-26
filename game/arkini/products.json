@@ -178,6 +178,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:bakery-t1:bread-morale-t1": {
+			"durationMs": 6000,
+			"inputRefId": "input:bakery-t1:bread-morale-t1",
+			"name": "Bread (Inspired)",
+			"outputTableId": "loot:bakery-t1:bread-morale-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:blacksmith-t1:axe": {
 			"durationMs": 15000,
 			"inputRefId": "input:blacksmith-t1:axe",
@@ -304,6 +312,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:civic-office-t1:building-permit-morale-t2": {
+			"durationMs": 8000,
+			"inputRefId": "input:civic-office-t1:building-permit-morale-t2",
+			"name": "Building Permit (Inspired)",
+			"outputTableId": "loot:civic-office-t1:building-permit-morale-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:civic-office-t1:guild-charter": {
 			"durationMs": 12000,
 			"inputRefId": "input:civic-office-t1:guild-charter",
@@ -333,6 +349,14 @@
 			"inputRefId": "input:construction-yard-t1:construction-bundle",
 			"name": "Construction Bundle",
 			"outputTableId": "loot:construction-yard-t1:construction-bundle",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:construction-yard-t1:construction-bundle-morale-t3": {
+			"durationMs": 9000,
+			"inputRefId": "input:construction-yard-t1:construction-bundle-morale-t3",
+			"name": "Construction Bundle (Inspired)",
+			"outputTableId": "loot:construction-yard-t1:construction-bundle-morale-t3",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -386,6 +410,24 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:farm-t1:grain-morale-t1": {
+			"durationMs": 3500,
+			"inputRefId": "input:farm-t1:grain-morale-t1",
+			"name": "Grain (Inspired)",
+			"outputTableId": "loot:farm-t1:grain-morale-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"hinderedBy": [
+				{
+					"distance": 2,
+					"durationFactor": 0.5,
+					"itemIds": [
+						"item:pollution"
+					],
+					"type": "proximity"
+				}
+			]
+		},
 		"product:glassworks:glass": {
 			"durationMs": 9000,
 			"inputRefId": "input:glassworks:glass",
@@ -401,6 +443,16 @@
 			"inputRefId": "input:glazier-workshop-t1:stained-glass",
 			"name": "Stained Glass",
 			"outputTableId": "loot:glazier-workshop-t1:stained-glass",
+			"placement": "board_then_inventory",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
+		},
+		"product:glazier-workshop-t1:stained-glass-morale-t4": {
+			"durationMs": 10500,
+			"inputRefId": "input:glazier-workshop-t1:stained-glass-morale-t4",
+			"name": "Stained Glass (Inspired)",
+			"outputTableId": "loot:glazier-workshop-t1:stained-glass-morale-t4",
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
@@ -501,6 +553,46 @@
 			"inputRefId": "input:heroes-guild-t1:treasure-chest",
 			"name": "Grand Expedition",
 			"outputTableId": "loot:heroes-guild-t1:treasure-chest",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:heroes-guild-t1:treasure-chest-morale-t4": {
+			"durationMs": 420000,
+			"inputRefId": "input:heroes-guild-t1:treasure-chest-morale-t4",
+			"name": "Grand Expedition (Inspired)",
+			"outputTableId": "loot:heroes-guild-t1:treasure-chest-morale-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:house-t1:morale-t1": {
+			"durationMs": 8000,
+			"inputRefId": "input:house-t1:morale-t1",
+			"name": "Morale I",
+			"outputTableId": "loot:house-t1:morale-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:house-t2:morale-t2": {
+			"durationMs": 12000,
+			"inputRefId": "input:house-t2:morale-t2",
+			"name": "Morale II",
+			"outputTableId": "loot:house-t2:morale-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:house-t3:morale-t3": {
+			"durationMs": 18000,
+			"inputRefId": "input:house-t3:morale-t3",
+			"name": "Morale III",
+			"outputTableId": "loot:house-t3:morale-t3",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:house-t4:morale-t4": {
+			"durationMs": 24000,
+			"inputRefId": "input:house-t4:morale-t4",
+			"name": "Morale IV",
+			"outputTableId": "loot:house-t4:morale-t4",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -757,6 +849,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:school:basic-knowledge-morale-t2": {
+			"durationMs": 9000,
+			"inputRefId": "input:school:basic-knowledge-morale-t2",
+			"name": "Basic Knowledge (Inspired)",
+			"outputTableId": "loot:school:basic-knowledge-morale-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:sheep-pasture-t1:wool": {
 			"durationMs": 5000,
 			"hinderedBy": [
@@ -819,6 +919,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:stonemason-t2:marble-block-morale-t4": {
+			"durationMs": 10000,
+			"inputRefId": "input:stonemason-t2:marble-block-morale-t4",
+			"name": "Marble Block (Inspired)",
+			"outputTableId": "loot:stonemason-t2:marble-block-morale-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:stonemason-t2:stone-block": {
 			"durationMs": 4000,
 			"inputRefId": "input:stonemason-t2:stone-block",
@@ -840,6 +948,14 @@
 			"inputRefId": "input:tailor-workshop-t1:luxury-clothing",
 			"name": "Luxury Clothing",
 			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:tailor-workshop-t1:luxury-clothing-morale-t3": {
+			"durationMs": 9000,
+			"inputRefId": "input:tailor-workshop-t1:luxury-clothing-morale-t3",
+			"name": "Luxury Clothing (Inspired)",
+			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing-morale-t3",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -939,6 +1055,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t2:blueprint-house-t1": {
+			"durationMs": 3000,
+			"inputRefId": "input:townhall-t2:blueprint-house-t1",
+			"name": "Blueprint: House I",
+			"outputTableId": "loot:townhall-t2:blueprint-house-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t2:blueprint-pig-farm-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t2:blueprint-pig-farm-t1",
@@ -1019,6 +1143,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:townhall-t3:blueprint-house-t2": {
+			"durationMs": 3500,
+			"inputRefId": "input:townhall-t3:blueprint-house-t2",
+			"name": "Blueprint: House II",
+			"outputTableId": "loot:townhall-t3:blueprint-house-t2",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:townhall-t3:blueprint-market-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t3:blueprint-market-t1",
@@ -1096,6 +1228,14 @@
 			"inputRefId": "input:townhall-t4:blueprint-dye-workshop-t1",
 			"name": "Blueprint: Dye Workshop I",
 			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:townhall-t4:blueprint-house-t3": {
+			"durationMs": 4000,
+			"inputRefId": "input:townhall-t4:blueprint-house-t3",
+			"name": "Blueprint: House III",
+			"outputTableId": "loot:townhall-t4:blueprint-house-t3",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -1203,6 +1343,14 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:university:blueprint-house-t4": {
+			"durationMs": 5000,
+			"inputRefId": "input:university:blueprint-house-t4",
+			"name": "Blueprint: House IV",
+			"outputTableId": "loot:university:blueprint-house-t4",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:university:blueprint-mage-lodge": {
 			"durationMs": 4000,
 			"inputRefId": "input:university:blueprint-mage-lodge",
@@ -1232,6 +1380,14 @@
 			"inputRefId": "input:university:master-knowledge",
 			"name": "Master Knowledge",
 			"outputTableId": "loot:university:master-knowledge",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:university:master-knowledge-morale-t4": {
+			"durationMs": 26000,
+			"inputRefId": "input:university:master-knowledge-morale-t4",
+			"name": "Master Knowledge (Inspired)",
+			"outputTableId": "loot:university:master-knowledge-morale-t4",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},

@@ -213,7 +213,7 @@ describe("applyGameActionFx Craft", () => {
 			_tag: "Left",
 			left: {
 				_tag: "GameActionRejected",
-				reason: "blocked",
+				reason: "effect:block-create",
 			},
 		});
 		expect(save.inventory.slots[0]).toEqual({

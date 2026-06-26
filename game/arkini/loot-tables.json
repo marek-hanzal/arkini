@@ -244,16 +244,6 @@
 				}
 			]
 		},
-		"loot:goldsmith-t1:coins": {
-			"name": "Goldsmith coins",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:coin",
-					"quantity": 4
-				}
-			]
-		},
 		"loot:townhall-t1:blueprint-lumberjack-t1": {
 			"name": "Blueprint: Lumberjack I output",
 			"output": [
@@ -348,17 +338,9 @@
 			"name": "Heroes Guild Chest I expedition",
 			"output": [
 				{
-					"type": "weighted",
-					"entries": [
-						{
-							"itemId": "item:chest-t1",
-							"weight": 90
-						},
-						{
-							"itemId": "item:chest-t2",
-							"weight": 10
-						}
-					]
+					"type": "guaranteed",
+					"itemId": "item:chest-t1",
+					"quantity": 1
 				}
 			]
 		},
@@ -366,17 +348,9 @@
 			"name": "Heroes Guild Chest II expedition",
 			"output": [
 				{
-					"type": "weighted",
-					"entries": [
-						{
-							"itemId": "item:chest-t2",
-							"weight": 90
-						},
-						{
-							"itemId": "item:chest-t3",
-							"weight": 10
-						}
-					]
+					"type": "guaranteed",
+					"itemId": "item:chest-t2",
+					"quantity": 1
 				}
 			]
 		},
@@ -384,17 +358,9 @@
 			"name": "Heroes Guild Chest III expedition",
 			"output": [
 				{
-					"type": "weighted",
-					"entries": [
-						{
-							"itemId": "item:chest-t3",
-							"weight": 90
-						},
-						{
-							"itemId": "item:chest-t4",
-							"weight": 10
-						}
-					]
+					"type": "guaranteed",
+					"itemId": "item:chest-t3",
+					"quantity": 1
 				}
 			]
 		},
@@ -416,19 +382,19 @@
 					"itemId": "item:coin",
 					"quantity": {
 						"min": 2,
-						"max": 3
+						"max": 4
 					}
 				},
 				{
 					"type": "chance",
 					"itemId": "item:ruby",
-					"chance": 0.35,
+					"chance": 0.65,
 					"quantity": 1
 				},
 				{
 					"type": "chance",
 					"itemId": "item:emerald",
-					"chance": 0.2,
+					"chance": 0.12,
 					"quantity": 1
 				}
 			]
@@ -440,20 +406,26 @@
 					"type": "guaranteed",
 					"itemId": "item:coin",
 					"quantity": {
-						"min": 3,
-						"max": 5
+						"min": 4,
+						"max": 7
 					}
 				},
 				{
 					"type": "chance",
+					"itemId": "item:ruby",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
 					"itemId": "item:emerald",
-					"chance": 0.3,
+					"chance": 0.65,
 					"quantity": 1
 				},
 				{
 					"type": "chance",
 					"itemId": "item:sapphire",
-					"chance": 0.25,
+					"chance": 0.18,
 					"quantity": 1
 				}
 			]
@@ -465,14 +437,20 @@
 					"type": "guaranteed",
 					"itemId": "item:coin",
 					"quantity": {
-						"min": 5,
-						"max": 8
+						"min": 7,
+						"max": 10
 					}
 				},
 				{
 					"type": "chance",
-					"itemId": "item:sapphire",
+					"itemId": "item:emerald",
 					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:sapphire",
+					"chance": 0.65,
 					"quantity": 1
 				},
 				{
@@ -490,26 +468,26 @@
 					"type": "guaranteed",
 					"itemId": "item:coin",
 					"quantity": {
-						"min": 8,
-						"max": 12
+						"min": 10,
+						"max": 15
 					}
 				},
 				{
 					"type": "chance",
+					"itemId": "item:sapphire",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
 					"itemId": "item:topaz",
-					"chance": 0.4,
+					"chance": 0.55,
 					"quantity": 1
 				},
 				{
 					"type": "chance",
 					"itemId": "item:aquamarine",
-					"chance": 0.3,
-					"quantity": 1
-				},
-				{
-					"type": "chance",
-					"itemId": "item:treasure-chest",
-					"chance": 0.08,
+					"chance": 0.35,
 					"quantity": 1
 				}
 			]
@@ -521,6 +499,18 @@
 					"type": "guaranteed",
 					"itemId": "item:key-t3",
 					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.06,
+					"quantity": 1
 				}
 			]
 		},
@@ -530,6 +520,18 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:axe",
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.4,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.08,
 					"quantity": 1
 				}
 			]
@@ -541,25 +543,17 @@
 					"type": "guaranteed",
 					"itemId": "item:sword",
 					"quantity": 1
-				}
-			]
-		},
-		"loot:blacksmith-t1:leather-armor": {
-			"name": "Blacksmith leather armor output",
-			"output": [
+				},
 				{
-					"type": "guaranteed",
-					"itemId": "item:leather-armor",
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.45,
 					"quantity": 1
-				}
-			]
-		},
-		"loot:blacksmith-t1:iron-armor": {
-			"name": "Blacksmith iron armor output",
-			"output": [
+				},
 				{
-					"type": "guaranteed",
-					"itemId": "item:iron-armor",
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.1,
 					"quantity": 1
 				}
 			]
@@ -1463,6 +1457,218 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-construction-yard-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:civic-office-t1:guild-charter": {
+			"name": "Civic Office guild charter output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:guild-charter",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-blacksmith-t1": {
+			"name": "Academy Blacksmith I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-blacksmith-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-armory-t1": {
+			"name": "Academy Armory I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-armory-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-goldsmith-t1": {
+			"name": "Academy Goldsmith I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-goldsmith-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-university": {
+			"name": "Academy University blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-university",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:blacksmith-t1:nails": {
+			"name": "Blacksmith nails output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:nails",
+					"quantity": 4
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.06,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:armory-t1:leather-armor": {
+			"name": "Armory leather armor output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:leather-armor",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:armory-t1:iron-armor": {
+			"name": "Armory iron armor output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:iron-armor",
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.45,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.1,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:goldsmith-t1:coin-stack": {
+			"name": "Goldsmith coin stack output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:coin-stack",
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.06,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:goldsmith-t1:key-t1": {
+			"name": "Goldsmith Key I output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:key-t1",
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.06,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:goldsmith-t1:key-t2": {
+			"name": "Goldsmith Key II output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:key-t2",
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.06,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:goldsmith-t1:key-t4": {
+			"name": "Goldsmith Key IV output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:key-t4",
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.35,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.06,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:heroes-guild-t1:treasure-chest": {
+			"name": "Heroes Guild grand expedition treasure",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:university:blueprint-heroes-guild-t1": {
+			"name": "University Heroes Guild I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-heroes-guild-t1",
 					"quantity": 1
 				}
 			]

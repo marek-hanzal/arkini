@@ -52,6 +52,7 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.producers["producer:civic-office-t1"].productIds).toEqual([
 			"product:civic-office-t1:building-permit",
 			"product:civic-office-t1:blueprint-academy",
+			"product:civic-office-t1:guild-charter",
 		]);
 
 		expect(defaultGameConfig.items["item:building-permit"].tags).toContain("master");
@@ -189,6 +190,93 @@ describe("defaultGameConfig", () => {
 			defaultGameConfig.lootTables["loot:construction-yard-t1:construction-bundle"].output,
 		).toContainEqual({
 			itemId: "item:construction-bundle",
+			quantity: 1,
+			type: "guaranteed",
+		});
+	});
+
+	it("wires era IX guild institutions, equipment, keys, and expeditions", () => {
+		expect(defaultGameConfig.items["item:guild-charter"].tags).toContain("era:IX");
+		expect(defaultGameConfig.items["item:coin-stack"].tags).toContain("era:IX");
+		expect(defaultGameConfig.items["item:treasure-chest"].tags).toContain("master");
+		expect(defaultGameConfig.items["item:treasure-chest"].tags).toContain("era:IX");
+
+		expect(defaultGameConfig.producers["producer:civic-office-t1"].productIds).toEqual([
+			"product:civic-office-t1:building-permit",
+			"product:civic-office-t1:blueprint-academy",
+			"product:civic-office-t1:guild-charter",
+		]);
+
+		expect(defaultGameConfig.producers["producer:academy"].productIds).toContain(
+			"product:academy:blueprint-blacksmith-t1",
+		);
+		expect(defaultGameConfig.producers["producer:academy"].productIds).toContain(
+			"product:academy:blueprint-armory-t1",
+		);
+		expect(defaultGameConfig.producers["producer:academy"].productIds).toContain(
+			"product:academy:blueprint-goldsmith-t1",
+		);
+		expect(defaultGameConfig.producers["producer:academy"].productIds).toContain(
+			"product:academy:blueprint-university",
+		);
+		expect(defaultGameConfig.producers["producer:university"].productIds).toContain(
+			"product:university:blueprint-heroes-guild-t1",
+		);
+
+		expect(defaultGameConfig.producers["producer:blacksmith-t1"].productIds).toEqual([
+			"product:blacksmith-t1:nails",
+			"product:blacksmith-t1:axe",
+			"product:blacksmith-t1:sword",
+		]);
+		expect(defaultGameConfig.producers["producer:armory-t1"].productIds).toEqual([
+			"product:armory-t1:leather-armor",
+			"product:armory-t1:iron-armor",
+		]);
+		expect(defaultGameConfig.producers["producer:goldsmith-t1"].productIds).toEqual([
+			"product:goldsmith-t1:coin-stack",
+			"product:goldsmith-t1:key-t1",
+			"product:goldsmith-t1:key-t2",
+			"product:goldsmith-t1:key-t3",
+			"product:goldsmith-t1:key-t4",
+		]);
+		expect(defaultGameConfig.producers["producer:heroes-guild-t1"].productIds).toEqual([
+			"product:heroes-guild-t1:chest-t1",
+			"product:heroes-guild-t1:chest-t2",
+			"product:heroes-guild-t1:chest-t3",
+			"product:heroes-guild-t1:chest-t4",
+			"product:heroes-guild-t1:treasure-chest",
+		]);
+
+		expect(defaultGameConfig.products["product:blacksmith-t1:nails"].requirementIds).toEqual([
+			"proximity:dirty-processing:purifier",
+		]);
+		expect(defaultGameConfig.products["product:armory-t1:iron-armor"].requirementIds).toEqual([
+			"proximity:dirty-processing:purifier",
+		]);
+		expect(defaultGameConfig.products["product:goldsmith-t1:key-t4"].requirementIds).toEqual([
+			"proximity:dirty-processing:purifier",
+		]);
+
+		expect(
+			defaultGameConfig.inputs["input:heroes-guild-t1:treasure-chest"].inputs,
+		).toContainEqual({
+			capacity: 4,
+			consume: true,
+			itemId: "item:master-knowledge",
+			quantity: 1,
+		});
+		expect(
+			defaultGameConfig.inputs["input:heroes-guild-t1:treasure-chest"].inputs,
+		).toContainEqual({
+			capacity: 4,
+			consume: true,
+			itemId: "item:aquamarine",
+			quantity: 1,
+		});
+		expect(
+			defaultGameConfig.lootTables["loot:heroes-guild-t1:treasure-chest"].output,
+		).toContainEqual({
+			itemId: "item:treasure-chest",
 			quantity: 1,
 			type: "guaranteed",
 		});

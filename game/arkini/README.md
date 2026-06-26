@@ -53,8 +53,9 @@ producer:townhall-t1  Era I construction foundation blueprints
 producer:townhall-t2  Era II raw food and livestock blueprints
 producer:townhall-t3  Era III food processing and first trade blueprints
 producer:townhall-t4  Era IV civic administration, Market II, Era V textile/clothing, and Prospector Guild 1
-producer:civic-office  Era IV permits plus the Academy blueprint bridge into mining
-producer:academy      Era VII mining expansion and Era VIII dirty-processing/material plans
+producer:civic-office  Era IV permits, Academy blueprint bridge, and Era IX Guild Charter
+producer:academy      Era VII mining expansion, Era VIII dirty-processing/material plans, and Era IX smith/armory/goldsmith/university blueprints
+producer:university   Era IX Master Knowledge and Heroes Guild blueprint
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
@@ -119,6 +120,8 @@ Academy
   Advanced Knowledge + Building Permit + Paper + Coin -> Mine Blueprints
   Advanced Knowledge + Coal + Water + Coin -> Purifier I Blueprint
   Advanced Knowledge + Coal/Clay/Sand/Charcoal + Building Permit + Coin -> dirty processing blueprints
+  Guild Charter + Construction Bundle + ingots/materials -> smith, armory, goldsmith, and university blueprints
+  Master Knowledge + Guild Charter + Construction Bundle -> Heroes Guild Blueprint
 
 Prospector Guild 1
   Building Permit + Basic Knowledge + Coin -> Clay Deposit
@@ -136,7 +139,7 @@ Market is a tiered trade building line. Market I starts first trade in Era III; 
 
 ### Implemented first wave
 
-The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, prospecting, an improved Market II trade step, Era V textile/clothing production, Era VII mining through Academy-driven Prospector Guild 2 plans, and Era VIII dirty processing / advanced construction materials. The old “all heavy industry at once” blob has been split because apparently pacing is healthier than throwing every furnace at the player like a drunk civil engineer.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, prospecting, an improved Market II trade step, Era V textile/clothing production, Era VII mining through Academy-driven Prospector Guild 2 plans, Era VIII dirty processing / advanced construction materials, and Era IX guild institutions / equipment / expeditions. The old “all heavy industry at once” blob has been split because apparently pacing is healthier than throwing every furnace at the player like a drunk civil engineer.
 
 Wood pair:
 
@@ -240,7 +243,20 @@ Era VIII dirty processing and advanced construction materials
   Smelter + Ore + Coal + Water + nearby Purifier -> Ingot + random Pollution
   Purifier + Pollution + Water + Charcoal -> nothing
   Construction Yard I + Bricks + Glass + Roof Tiles + Gold Ingot + Building Permit + Luxury Clothing -> Construction Bundle
-  Construction Bundle is the current Era VIII master output.
+  Construction Bundle is the Era VIII master output.
+
+Era IX guild institutions, equipment, keys, and expeditions
+  Civic Office I + Construction Bundle + Advanced Knowledge + Building Permit + Luxury Clothing + Coin -> Guild Charter
+  Academy + Guild Charter + Construction Bundle + ingots/materials -> Blacksmith / Armory / Goldsmith / University blueprints
+  University + Master Knowledge + Guild Charter + Construction Bundle -> Heroes Guild Blueprint
+  Blacksmith I + Iron Ingot + Charcoal + nearby Purifier -> Nails / Axe / Sword + random Pollution
+  Armory I + Leather + Common Clothing + Nails -> Leather Armor
+  Armory I + Leather Armor + Iron Ingot + Nails + Charcoal + nearby Purifier -> Iron Armor + random Pollution
+  Goldsmith I + Gold Ingot + Charcoal + nearby Purifier -> Coin Stack + random Pollution
+  Goldsmith I + Gold Ingot + Iron/Gems + Charcoal + nearby Purifier -> Key I-IV + random Pollution
+  University + Advanced Knowledge + Paper + Glass + Coin Stack -> Master Knowledge
+  Heroes Guild I + gear + food + luxury + keys + knowledge -> Chests and Treasure Chest
+  Treasure Chest is the current Era IX master output.
 ```
 
 ### Initial balance placeholder

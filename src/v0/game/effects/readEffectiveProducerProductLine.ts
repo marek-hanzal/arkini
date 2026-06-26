@@ -4,7 +4,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { AppliedGameEffectOperation } from "~/v0/game/effects/EffectiveProducerProductLine";
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 import { doesGameEffectTargetProductLine } from "~/v0/game/effects/doesGameEffectTargetProductLine";
-import { readChebyshevDistance } from "~/v0/game/effects/readChebyshevDistance";
+import { doesGameEffectSourceApplyToBoardCell } from "~/v0/game/effects/doesGameEffectSourceApplyToBoardCell";
 import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSourceCell";
 import { readGameEffectSourceInstances } from "~/v0/game/effects/readGameEffectSourceInstances";
 import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourceInstance";
@@ -55,23 +55,16 @@ const readEffectSourceAppliesToTarget = ({
 	save: GameSave;
 	source: GameEffectSourceInstance;
 	targetItemInstanceId: string;
-}) => {
-	const effect = config.effects[source.effectId];
-	if (!effect) return false;
-	if (effect.scope === "global") return true;
-
-	const sourceCell = readGameEffectSourceCell({
+}) =>
+	doesGameEffectSourceApplyToBoardCell({
+		config,
 		save,
-		sourceItemInstanceId: source.sourceItemInstanceId,
+		source,
+		targetCell: readGameEffectSourceCell({
+			save,
+			sourceItemInstanceId: targetItemInstanceId,
+		}),
 	});
-	const targetCell = readGameEffectSourceCell({
-		save,
-		sourceItemInstanceId: targetItemInstanceId,
-	});
-	if (!sourceCell || !targetCell) return false;
-
-	return readChebyshevDistance(sourceCell, targetCell) <= effect.radius;
-};
 
 const createAppliedOperation = ({
 	effectId,

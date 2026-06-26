@@ -3,10 +3,8 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { BlockedGameEffectOperation } from "~/v0/game/effects/BlockedGameEffectOperation";
 import { doesGameEffectTargetItem } from "~/v0/game/effects/doesGameEffectTargetItem";
-import { readChebyshevDistance } from "~/v0/game/effects/readChebyshevDistance";
-import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSourceCell";
+import { doesGameEffectSourceApplyToBoardCell } from "~/v0/game/effects/doesGameEffectSourceApplyToBoardCell";
 import { readGameEffectSourceInstances } from "~/v0/game/effects/readGameEffectSourceInstances";
-import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourceInstance";
 
 export namespace readGameEffectItemCreateBlockReasons {
 	export interface Props {
@@ -17,31 +15,6 @@ export namespace readGameEffectItemCreateBlockReasons {
 		targetCell?: BoardCell;
 	}
 }
-
-const readSourceAppliesToTargetCell = ({
-	config,
-	save,
-	source,
-	targetCell,
-}: {
-	config: GameConfig;
-	save: GameSave;
-	source: GameEffectSourceInstance;
-	targetCell?: BoardCell;
-}) => {
-	const effect = config.effects[source.effectId];
-	if (!effect) return false;
-	if (effect.scope === "global") return true;
-	if (!targetCell) return false;
-
-	const sourceCell = readGameEffectSourceCell({
-		save,
-		sourceItemInstanceId: source.sourceItemInstanceId,
-	});
-	if (!sourceCell) return false;
-
-	return readChebyshevDistance(sourceCell, targetCell) <= effect.radius;
-};
 
 export const readGameEffectItemCreateBlockReasons = ({
 	config,
@@ -60,7 +33,7 @@ export const readGameEffectItemCreateBlockReasons = ({
 		const effect = config.effects[source.effectId];
 		if (!effect) continue;
 		if (
-			!readSourceAppliesToTargetCell({
+			!doesGameEffectSourceApplyToBoardCell({
 				config,
 				save,
 				source,

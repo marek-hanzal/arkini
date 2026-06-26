@@ -6,7 +6,10 @@ import {
 	processItemSpawnJobsFx,
 } from "~/v0/game/job/processItemSpawnJobsFx";
 import { createItemSpawnJobsFx } from "~/v0/game/job/createItemSpawnJobsFx";
-import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
+import {
+	pastDueItemSpawnJobWakeDelayMs,
+	readNextWakeAtMsFx,
+} from "~/v0/game/job/readNextWakeAtMsFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
@@ -83,6 +86,12 @@ describe("processItemSpawnJobsFx", () => {
 			type: "item.created",
 		});
 		expect(Object.values(lateTick.save.itemSpawnJobs)).toHaveLength(2);
+		expect(
+			runNextWakeAtMs({
+				nowMs: 1000,
+				save: lateTick.save,
+			}),
+		).toBe(1000 + pastDueItemSpawnJobWakeDelayMs);
 
 		const nextTick = runItemSpawn({
 			config,
@@ -203,6 +212,29 @@ describe("processItemSpawnJobsFx", () => {
 		});
 	});
 
+	it("wakes again for runnable past-due spawn jobs", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.itemSpawnJobs["item-spawn-job:overdue"] = {
+			readyAtMs: 100,
+			id: "item-spawn-job:overdue",
+			itemId: "item:twig",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+
+		expect(
+			runNextWakeAtMs({
+				nowMs: 500,
+				save,
+			}),
+		).toBe(500 + pastDueItemSpawnJobWakeDelayMs);
+	});
+
 	it("does not wake on a past-due dependent spawn job before its dependency can run", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -282,6 +314,12 @@ describe("processItemSpawnJobsFx", () => {
 			"item.created",
 		]);
 		expect(Object.values(lateTick.save.itemSpawnJobs)).toHaveLength(1);
+		expect(
+			runNextWakeAtMs({
+				nowMs: 1000,
+				save: lateTick.save,
+			}),
+		).toBe(1000 + pastDueItemSpawnJobWakeDelayMs);
 
 		const nextTick = runItemSpawn({
 			config,

@@ -2,7 +2,6 @@ import { z } from "zod";
 import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 import { CraftProgressPhaseSchema } from "./CraftProgressPhaseSchema";
 import { ActivationRequirementViewSchema } from "./ActivationRequirementViewSchema";
-import { ExclusiveItemRuleViewSchema } from "./ExclusiveItemRuleViewSchema";
 
 export const CraftProgressViewSchema = z.object({
 	id: z.string().min(1),
@@ -16,7 +15,6 @@ export const CraftProgressViewSchema = z.object({
 		}),
 	),
 	delivered: z.record(z.string(), z.number().int().nonnegative()),
-	exclusiveTo: z.array(ExclusiveItemRuleViewSchema),
 	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	inputProgress: z.number(),
 	timeProgress: z.number(),

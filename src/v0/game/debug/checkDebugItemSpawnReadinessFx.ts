@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
-import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -53,12 +52,6 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 				GameEngineError.configReferenceMissing(`Missing item "${action.itemId}".`),
 			);
 		}
-
-		yield* checkItemExclusiveOwnershipFx({
-			config,
-			itemId: action.itemId,
-			save,
-		});
 
 		if (
 			!isItemStorageAllowed({

@@ -1,7 +1,6 @@
 import type { FC, ReactNode } from "react";
 import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
-import type { ExclusiveItemRuleView } from "~/v0/board/view/ExclusiveItemRuleViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import { ItemInlineAssetGroup } from "~/v0/item/ui/ItemInlineAssetGroup";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
@@ -11,7 +10,6 @@ export namespace ItemRequirementRulesCard {
 	export interface Props {
 		title: string;
 		requirements?: readonly ActivationRequirementView[];
-		exclusiveTo?: readonly ExclusiveItemRuleView[];
 		inputs?: readonly ActivationInputView[];
 		items: ItemCatalogView;
 	}
@@ -108,23 +106,6 @@ const readRequirementRow = (
 	};
 };
 
-const readExclusiveChoiceRow = (
-	rule: ExclusiveItemRuleView,
-	items: ItemCatalogView,
-): DetailRow => ({
-	key: `exclusive:${rule.itemId}`,
-	label: items[rule.itemId]?.name ?? rule.itemId,
-	meta: rule.blocked ? "Blocked: cannot coexist" : "Choice: will block when placed",
-	satisfied: !rule.blocked,
-	tone: rule.blocked ? "danger" : "warning",
-	asset: (
-		<ItemInlineAsset
-			item={items[rule.itemId]}
-			className="h-9 w-9"
-		/>
-	),
-});
-
 const readInputRow = (input: ActivationInputView, items: ItemCatalogView): DetailRow => {
 	const capacityLabel = input.capacity > input.quantity ? `cap ${input.capacity}` : undefined;
 	const availableLabel =
@@ -157,14 +138,12 @@ const readInputRow = (input: ActivationInputView, items: ItemCatalogView): Detai
 };
 
 export const ItemRequirementRulesCard: FC<ItemRequirementRulesCard.Props> = ({
-	exclusiveTo = [],
 	items,
 	inputs = [],
 	requirements = [],
 	title,
 }) => {
 	const rows: readonly DetailRow[] = [
-		...exclusiveTo.map((rule) => readExclusiveChoiceRow(rule, items)),
 		...requirements.map((requirement, index) => readRequirementRow(requirement, items, index)),
 		...inputs.map((input) => readInputRow(input, items)),
 	];

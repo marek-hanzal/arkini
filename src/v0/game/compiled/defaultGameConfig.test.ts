@@ -433,19 +433,6 @@ describe("defaultGameConfig", () => {
 			"product:university:blueprint-mage-lodge",
 		);
 
-		expect(defaultGameConfig.items["producer:house-of-engineers"].exclusiveToIds).toEqual([
-			"producer:cathedral",
-			"producer:mage-lodge",
-		]);
-		expect(defaultGameConfig.items["producer:cathedral"].exclusiveToIds).toEqual([
-			"producer:house-of-engineers",
-			"producer:mage-lodge",
-		]);
-		expect(defaultGameConfig.items["producer:mage-lodge"].exclusiveToIds).toEqual([
-			"producer:house-of-engineers",
-			"producer:cathedral",
-		]);
-
 		expect(defaultGameConfig.items["producer:house-of-engineers"].passiveEffectIds).toEqual([
 			"effect:path-engineers-locks-counter-keystones",
 		]);
@@ -465,6 +452,20 @@ describe("defaultGameConfig", () => {
 				productIds: [
 					"product:university:blueprint-cathedral",
 					"product:university:blueprint-mage-lodge",
+				],
+			},
+		});
+		expect(
+			defaultGameConfig.effects["effect:path-engineers-locks-counter-keystones"].operations,
+		).toContainEqual({
+			kind: "item.blockCreate",
+			reason: "Engineers path is already chosen.",
+			target: {
+				itemIds: [
+					"item:blueprint-cathedral",
+					"item:blueprint-mage-lodge",
+					"producer:cathedral",
+					"producer:mage-lodge",
 				],
 			},
 		});

@@ -4114,6 +4114,18 @@
 							"product:university:blueprint-mage-lodge"
 						]
 					}
+				},
+				{
+					"kind": "item.blockCreate",
+					"reason": "Engineers path is already chosen.",
+					"target": {
+						"itemIds": [
+							"item:blueprint-cathedral",
+							"item:blueprint-mage-lodge",
+							"producer:cathedral",
+							"producer:mage-lodge"
+						]
+					}
 				}
 			],
 			"scope": "global"
@@ -4130,6 +4142,18 @@
 							"product:university:blueprint-mage-lodge"
 						]
 					}
+				},
+				{
+					"kind": "item.blockCreate",
+					"reason": "Faith path is already chosen.",
+					"target": {
+						"itemIds": [
+							"item:blueprint-house-of-engineers",
+							"item:blueprint-mage-lodge",
+							"producer:house-of-engineers",
+							"producer:mage-lodge"
+						]
+					}
 				}
 			],
 			"scope": "global"
@@ -4144,6 +4168,18 @@
 						"productIds": [
 							"product:university:blueprint-house-of-engineers",
 							"product:university:blueprint-cathedral"
+						]
+					}
+				},
+				{
+					"kind": "item.blockCreate",
+					"reason": "Mages path is already chosen.",
+					"target": {
+						"itemIds": [
+							"item:blueprint-house-of-engineers",
+							"item:blueprint-cathedral",
+							"producer:house-of-engineers",
+							"producer:cathedral"
 						]
 					}
 				}
@@ -10611,10 +10647,6 @@
 			"assetId": "asset:producer:cathedral",
 			"code": "cathedral",
 			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
-			"exclusiveToIds": [
-				"producer:house-of-engineers",
-				"producer:mage-lodge"
-			],
 			"maxStackSize": 1,
 			"name": "Cathedral",
 			"passiveEffectIds": [
@@ -10929,10 +10961,6 @@
 			"assetId": "asset:producer:house-of-engineers",
 			"code": "house-of-engineers",
 			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
-			"exclusiveToIds": [
-				"producer:cathedral",
-				"producer:mage-lodge"
-			],
 			"maxStackSize": 1,
 			"name": "House of Engineers",
 			"passiveEffectIds": [
@@ -11062,10 +11090,6 @@
 			"assetId": "asset:producer:mage-lodge",
 			"code": "mage-lodge",
 			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
-			"exclusiveToIds": [
-				"producer:house-of-engineers",
-				"producer:cathedral"
-			],
 			"maxStackSize": 1,
 			"name": "Mage Lodge",
 			"passiveEffectIds": [

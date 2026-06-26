@@ -14,7 +14,6 @@ export const GameActionRejectedReadinessSchema = z
 		reason: z
 			.union([
 				z.enum([
-					"exclusive_conflict",
 					"input_mismatch",
 					"input_unavailable",
 					"invalid_actor",

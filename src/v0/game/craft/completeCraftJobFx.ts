@@ -4,7 +4,7 @@ import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameSave, GameSaveCraftJob } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -67,12 +67,10 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		);
 	}
 
-	yield* checkItemExclusiveOwnershipFx({
+	yield* checkItemCreateBlockedByEffectsFx({
 		config,
-		ignoredBoardItemInstanceIds: new Set([
-			liveJob.targetItemInstanceId,
-		]),
 		itemId: recipe.resultItemId,
+		nowMs,
 		save,
 	});
 	if (

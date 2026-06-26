@@ -13,6 +13,18 @@
 							"product:university:blueprint-mage-lodge"
 						]
 					}
+				},
+				{
+					"kind": "item.blockCreate",
+					"reason": "Engineers path is already chosen.",
+					"target": {
+						"itemIds": [
+							"item:blueprint-cathedral",
+							"item:blueprint-mage-lodge",
+							"producer:cathedral",
+							"producer:mage-lodge"
+						]
+					}
 				}
 			]
 		},
@@ -29,6 +41,18 @@
 							"product:university:blueprint-mage-lodge"
 						]
 					}
+				},
+				{
+					"kind": "item.blockCreate",
+					"reason": "Faith path is already chosen.",
+					"target": {
+						"itemIds": [
+							"item:blueprint-house-of-engineers",
+							"item:blueprint-mage-lodge",
+							"producer:house-of-engineers",
+							"producer:mage-lodge"
+						]
+					}
 				}
 			]
 		},
@@ -43,6 +67,18 @@
 						"productIds": [
 							"product:university:blueprint-house-of-engineers",
 							"product:university:blueprint-cathedral"
+						]
+					}
+				},
+				{
+					"kind": "item.blockCreate",
+					"reason": "Mages path is already chosen.",
+					"target": {
+						"itemIds": [
+							"item:blueprint-house-of-engineers",
+							"item:blueprint-cathedral",
+							"producer:house-of-engineers",
+							"producer:cathedral"
 						]
 					}
 				}

@@ -87,6 +87,86 @@ const isMergeableItem = ({ config, itemId }: { config: GameConfig; itemId: strin
 		(rule) => rule.resultItemId === itemId || rule.withItemId === itemId,
 	) || Boolean(config.items[itemId]?.mergeIds?.length);
 
+const readEffectTargetSummary = (
+	target: GameConfig["effects"][string]["operations"][number]["target"],
+) => {
+	if ("all" in target && target.all) return "all targets";
+	const parts = [];
+	if ("producerIds" in target && target.producerIds?.length) {
+		parts.push(`producers ${target.producerIds.join(", ")}`);
+	}
+	if ("productIds" in target && target.productIds?.length) {
+		parts.push(`products ${target.productIds.join(", ")}`);
+	}
+	if ("producerTagsAny" in target && target.producerTagsAny?.length) {
+		parts.push(`producer tag any ${target.producerTagsAny.join(", ")}`);
+	}
+	if ("producerTagsAll" in target && target.producerTagsAll?.length) {
+		parts.push(`producer tags ${target.producerTagsAll.join(", ")}`);
+	}
+	if ("productTagsAny" in target && target.productTagsAny?.length) {
+		parts.push(`product tag any ${target.productTagsAny.join(", ")}`);
+	}
+	if ("productTagsAll" in target && target.productTagsAll?.length) {
+		parts.push(`product tags ${target.productTagsAll.join(", ")}`);
+	}
+	if ("itemIds" in target && target.itemIds?.length) {
+		parts.push(`items ${target.itemIds.map((id) => configItemNameFallback(id)).join(", ")}`);
+	}
+	if ("itemTagsAny" in target && target.itemTagsAny?.length) {
+		parts.push(`item tag any ${target.itemTagsAny.join(", ")}`);
+	}
+	if ("itemTagsAll" in target && target.itemTagsAll?.length) {
+		parts.push(`item tags ${target.itemTagsAll.join(", ")}`);
+	}
+	return parts.join(" · ") || "targeted";
+};
+
+const configItemNameFallback = (itemId: string) =>
+	itemId.replace(/^item:/, "").replace(/^producer:/, "");
+
+const readEffectOperationSummary = (
+	operation: GameConfig["effects"][string]["operations"][number],
+) => {
+	const target = readEffectTargetSummary(operation.target);
+	if (operation.kind === "line.reveal") return `Reveal product lines for ${target}`;
+	if (operation.kind === "line.hide") return `Hide product lines for ${target}`;
+	if (operation.kind === "line.blockStart") return `Block product start for ${target}`;
+	if (operation.kind === "duration.addMs")
+		return `Add ${operation.valueMs} ms duration to ${target}`;
+	if (operation.kind === "duration.multiply") {
+		return `Multiply duration by ${operation.multiplier} for ${target}`;
+	}
+	if (operation.kind === "loot.appendTable")
+		return `Append loot table ${operation.lootTableId} to ${target}`;
+	if (operation.kind === "loot.replaceTable")
+		return `Replace loot table with ${operation.lootTableId} for ${target}`;
+	if (operation.kind === "loot.addChanceItem")
+		return `Add chance item ${operation.itemId} to ${target}`;
+	if (operation.kind === "loot.dropChance.add")
+		return `Adjust drop chance by ${operation.delta} for ${target}`;
+	return `Block item creation for ${target}`;
+};
+
+const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
+	(config.items[itemId]?.passiveEffectIds ?? []).flatMap((effectId) => {
+		const effect = config.effects[effectId];
+		if (!effect) return [];
+
+		return [
+			{
+				id: effectId,
+				name: effect.name,
+				operations: effect.operations.map((operation) => ({
+					kind: operation.kind,
+					summary: readEffectOperationSummary(operation),
+				})),
+				radius: effect.scope === "local" ? effect.radius : undefined,
+				scope: effect.scope,
+			},
+		];
+	});
+
 const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: string }): ViewItem => {
 	const item = config.items[itemId];
 	const asset = config.assets[item.assetId];
@@ -119,7 +199,10 @@ const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: strin
 			config,
 			itemId,
 		}),
-		exclusiveToIds: (item.exclusiveToIds ?? []) as ItemId[],
+		generatedEffects: readGeneratedEffects({
+			config,
+			itemId,
+		}),
 		mergeResults: readMergeResults({
 			config,
 			itemId,

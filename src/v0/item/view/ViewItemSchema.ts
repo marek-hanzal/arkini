@@ -1,6 +1,22 @@
 import { z } from "zod";
 import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 
+const ViewItemGeneratedEffectOperationSchema = z.object({
+	kind: z.string(),
+	summary: z.string(),
+});
+
+const ViewItemGeneratedEffectSchema = z.object({
+	id: z.string().min(1),
+	name: z.string(),
+	operations: z.array(ViewItemGeneratedEffectOperationSchema),
+	radius: z.number().int().positive().optional(),
+	scope: z.enum([
+		"global",
+		"local",
+	]),
+});
+
 export const ViewItemSchema = z.object({
 	id: GameItemIdSchema,
 	name: z.string(),
@@ -24,7 +40,7 @@ export const ViewItemSchema = z.object({
 	canProduce: z.boolean(),
 	producerTrigger: z.literal("click").optional(),
 	canMerge: z.boolean(),
-	exclusiveToIds: z.array(GameItemIdSchema),
+	generatedEffects: z.array(ViewItemGeneratedEffectSchema),
 	mergeResults: z
 		.array(
 			z.object({
@@ -58,4 +74,5 @@ export namespace ViewItemSchema {
 	export type Type = z.infer<ViewItemSchema>;
 }
 
+export type ViewItemGeneratedEffect = z.infer<typeof ViewItemGeneratedEffectSchema>;
 export type ViewItem = ViewItemSchema.Type;

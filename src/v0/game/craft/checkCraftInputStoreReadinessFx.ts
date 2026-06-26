@@ -6,20 +6,21 @@ import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftInputStore } from "~/v0/game/action/GameActionCraftInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace checkCraftInputStoreReadinessFx {
 	export interface Props {
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 		action: GameActionCraftInputStore;
 	}
 }
 
 export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreReadinessFx")(
-	function* ({ config, save, action }: checkCraftInputStoreReadinessFx.Props) {
+	function* ({ config, nowMs, save, action }: checkCraftInputStoreReadinessFx.Props) {
 		const target = yield* readCraftBoardItemFx({
 			config,
 			save,
@@ -56,12 +57,10 @@ export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreRe
 			);
 		}
 
-		yield* checkItemExclusiveOwnershipFx({
+		yield* checkItemCreateBlockedByEffectsFx({
 			config,
-			ignoredBoardItemInstanceIds: new Set([
-				action.targetItemInstanceId,
-			]),
 			itemId: target.recipe.resultItemId,
+			nowMs,
 			save,
 		});
 

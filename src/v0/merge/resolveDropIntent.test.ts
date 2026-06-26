@@ -272,7 +272,6 @@ describe("resolveDropIntent", () => {
 						complete: false,
 						delivered: {},
 						durationMs: 1000,
-						exclusiveTo: [],
 						id: "craft:test",
 						inputProgress: 0,
 						inputs: [

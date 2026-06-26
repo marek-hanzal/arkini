@@ -4,7 +4,7 @@ import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanc
 import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
-import { readGameSaveExclusiveConflicts } from "~/v0/game/exclusivity/readGameSaveExclusiveConflicts";
+import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { BoardCell } from "~/v0/game/board/BoardCell";
@@ -16,18 +16,58 @@ type GameSaveSingleItemPlacementResult = {
 	type: "placed";
 };
 
+const checkPlacementEffectBlocksFx = Effect.fn("checkPlacementEffectBlocksFx")(function* ({
+	config,
+	itemId,
+	nowMs,
+	save,
+	targetCell,
+}: {
+	config: GameConfig;
+	itemId: string;
+	nowMs: number;
+	save: GameSave;
+	targetCell?: BoardCell;
+}) {
+	const blockReasons = readGameEffectItemCreateBlockReasons({
+		config,
+		itemId,
+		nowMs,
+		save,
+		targetCell,
+	});
+	if (blockReasons.length === 0) return;
+
+	const [firstReason] = blockReasons;
+	return yield* Effect.fail(
+		GameEngineError.placementFailed(
+			"effect:block-create",
+			firstReason?.reason ??
+				`Item "${itemId}" cannot be created while effect "${firstReason?.effectName ?? "unknown"}" is active.`,
+		),
+	);
+});
+
 export namespace placeSingleGameSaveItemRequestFx {
 	export interface Props {
 		config: GameConfig;
 		events: GameEvent[];
 		item: GameSaveItemPlacementRequest;
+		nowMs: number;
 		save: GameSave;
 		seedCell?: BoardCell;
 	}
 }
 
 export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveItemRequestFx")(
-	function* ({ config, events, item, save, seedCell }: placeSingleGameSaveItemRequestFx.Props) {
+	function* ({
+		config,
+		events,
+		item,
+		nowMs,
+		save,
+		seedCell,
+	}: placeSingleGameSaveItemRequestFx.Props) {
 		const itemDefinition = config.items[item.itemId];
 
 		if (!itemDefinition) {
@@ -36,19 +76,12 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			);
 		}
 
-		const exclusiveConflicts = readGameSaveExclusiveConflicts({
+		yield* checkPlacementEffectBlocksFx({
 			config,
 			itemId: item.itemId,
+			nowMs,
 			save,
 		});
-		if (exclusiveConflicts.length > 0) {
-			return yield* Effect.fail(
-				GameEngineError.placementFailed(
-					"exclusive:conflict",
-					`Item "${item.itemId}" cannot coexist with "${exclusiveConflicts.join('", "')}".`,
-				),
-			);
-		}
 
 		let remainingQuantity = item.quantity;
 		let boardPlacedQuantity = 0;
@@ -87,6 +120,14 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 				boardRanOutOfSpace = true;
 				break;
 			}
+
+			yield* checkPlacementEffectBlocksFx({
+				config,
+				itemId: item.itemId,
+				nowMs,
+				save,
+				targetCell: emptyCell,
+			});
 
 			const itemInstanceId = yield* createGameItemInstanceIdFx();
 			save.board.items[itemInstanceId] = {

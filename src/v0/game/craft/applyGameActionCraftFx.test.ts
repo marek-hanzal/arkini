@@ -151,29 +151,46 @@ describe("applyGameActionFx Craft", () => {
 		]);
 	});
 
-	it("rejects craft input investment when the result is exclusive to owned items", () => {
+	it("rejects craft input investment when an effect blocks the result item", () => {
 		const baseConfig = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,
 		});
 		const config = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,
 		});
-		config.items["item:plank"] = {
-			...baseConfig.items["item:plank"],
-			exclusiveToIds: [
-				"item:key",
+		config.effects["effect:block-plank"] = {
+			name: "Block plank",
+			operations: [
+				{
+					kind: "item.blockCreate",
+					reason: "Plank creation is blocked.",
+					target: {
+						itemIds: [
+							"item:plank",
+						],
+					},
+				},
+			],
+			scope: "global",
+		};
+		config.items["item:key"] = {
+			...baseConfig.items["item:key"],
+			passiveEffectIds: [
+				"effect:block-plank",
 			],
 		};
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:key",
+			x: 1,
+			y: 0,
+		};
 		save.inventory.slots[0] = {
 			itemId: "item:twig",
-			quantity: 1,
-		};
-		save.inventory.slots[1] = {
-			itemId: "item:key",
 			quantity: 1,
 		};
 
@@ -196,7 +213,7 @@ describe("applyGameActionFx Craft", () => {
 			_tag: "Left",
 			left: {
 				_tag: "GameActionRejected",
-				reason: "exclusive_conflict",
+				reason: "blocked",
 			},
 		});
 		expect(save.inventory.slots[0]).toEqual({

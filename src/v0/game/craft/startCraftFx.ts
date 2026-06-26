@@ -52,6 +52,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 	const checked = yield* checkCraftStartReadinessFx({
 		action,
 		config,
+		nowMs,
 		save,
 	});
 

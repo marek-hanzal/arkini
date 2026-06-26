@@ -5,11 +5,13 @@ import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxC
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/action/GameActionItemMerge";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace checkItemMergeReadinessFx {
 	export interface Props {
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 		action: GameActionItemMerge;
 	}
@@ -17,6 +19,7 @@ export namespace checkItemMergeReadinessFx {
 
 export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(function* ({
 	config,
+	nowMs,
 	save,
 	action,
 }: checkItemMergeReadinessFx.Props) {
@@ -71,6 +74,13 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 			GameEngineError.configReferenceMissing(`Missing merge result "${merge.resultItemId}".`),
 		);
 	}
+	yield* checkItemCreateBlockedByEffectsFx({
+		config,
+		itemId: merge.resultItemId,
+		nowMs,
+		save,
+		targetCell: target,
+	});
 	if (
 		readBoardItemMaxCountCapacity({
 			config,

@@ -17,7 +17,6 @@ const craft = (overrides: Partial<NonNullable<BoardViewItem["craft"]>> = {}) => 
 	complete: false,
 	delivered: {},
 	durationMs: 1000,
-	exclusiveTo: [],
 	id: "craft:twig",
 	inputProgress: 1,
 	inputs: [],

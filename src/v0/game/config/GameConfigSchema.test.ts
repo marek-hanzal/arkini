@@ -552,6 +552,63 @@ describe("GameConfigSchema", () => {
 		});
 	});
 
+	it("accepts explicit all-target effects", () => {
+		const config = createValidConfigValue();
+		config.effects["effect:test"] = {
+			name: "Test effect",
+			operations: [
+				{
+					kind: "line.blockStart",
+					target: {
+						all: true,
+					},
+				},
+			],
+			scope: "global",
+		};
+
+		expect(parseGameConfig(config).effects["effect:test"]?.operations[0]?.target).toEqual({
+			all: true,
+		});
+	});
+
+	it("rejects selector-less effects without explicit all target", () => {
+		const config = createValidConfigValue();
+		config.effects["effect:test"] = {
+			name: "Test effect",
+			operations: [
+				{
+					kind: "line.blockStart",
+					target: {},
+				},
+			],
+			scope: "global",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/explicit all: true/);
+	});
+
+	it("rejects all-target effects combined with selectors", () => {
+		const config = createValidConfigValue();
+		config.effects["effect:test"] = {
+			name: "Test effect",
+			operations: [
+				{
+					kind: "line.blockStart",
+					target: {
+						all: true,
+						productIds: [
+							"product:test",
+						],
+					},
+				},
+			],
+			scope: "global",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/must not be combined/);
+	});
+
 	it("rejects active effect product lines that also define output loot", () => {
 		const config = createValidConfigValue();
 		config.effects["effect:test"] = {

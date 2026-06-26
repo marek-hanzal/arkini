@@ -2584,6 +2584,9 @@
 			],
 			"maxStackSize": 1,
 			"name": "Cathedral",
+			"passiveEffectIds": [
+				"effect:path-faith-locks-counter-keystones"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -2899,6 +2902,9 @@
 			],
 			"maxStackSize": 1,
 			"name": "House of Engineers",
+			"passiveEffectIds": [
+				"effect:path-engineers-locks-counter-keystones"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -3029,6 +3035,9 @@
 			],
 			"maxStackSize": 1,
 			"name": "Mage Lodge",
+			"passiveEffectIds": [
+				"effect:path-mages-locks-counter-keystones"
+			],
 			"storage": "both",
 			"tags": [
 				"building",

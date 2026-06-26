@@ -27,7 +27,11 @@ export const readGameEffectSourceInstances = ({
 	});
 
 	const activeSources = Object.values(save.activeEffects ?? {})
-		.filter((effect) => nowMs === undefined || effect.expiresAtMs > nowMs)
+		.filter(
+			(effect) =>
+				nowMs === undefined ||
+				(effect.activatedAtMs <= nowMs && effect.expiresAtMs > nowMs),
+		)
 		.map((effect) => ({
 			activatedAtMs: effect.activatedAtMs,
 			effectId: effect.effectId,

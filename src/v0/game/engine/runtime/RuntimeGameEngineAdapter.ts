@@ -38,6 +38,7 @@ export namespace RuntimeGameEngineAdapter {
 
 	export interface ReadinessProps {
 		action: GameAction | unknown;
+		nowMs?: number;
 	}
 
 	export interface ReplaceSaveProps {
@@ -133,6 +134,7 @@ export class RuntimeGameEngineAdapter {
 
 	async readiness({
 		action,
+		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
 		await this.mutationQueue;
 
@@ -140,6 +142,7 @@ export class RuntimeGameEngineAdapter {
 			readActionReadinessFx({
 				action,
 				config: this.config,
+				nowMs,
 				save: this.save,
 			}),
 			{

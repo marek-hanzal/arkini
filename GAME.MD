@@ -671,7 +671,7 @@ Product lines can start as `visibility: "hidden"` and be revealed by runtime eff
 
 Runtime effects are product-line mutators. They do not patch or rewrite `GameConfig`; instead, a concrete product line asks the runtime which effects apply and receives an effective view. Effect sources have identity and board position, so local effects use Chebyshev distance just like proximity requirements, while global effects apply regardless of distance.
 
-Passive effects come from board items via `passiveEffectIds`. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, runs for its duration, activates a timed effect instance, and expires later through the tick engine.
+Passive effects come from board items via `passiveEffectIds`. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
 
 Effects currently operate on product-line visibility, start blocking, duration, and loot plan evaluation. They can reveal or hide lines, block starts, add or multiply duration, append or replace loot tables, add chance item drops, and adjust the chance that base loot is rolled. They intentionally do not mutate storage/placement, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
 

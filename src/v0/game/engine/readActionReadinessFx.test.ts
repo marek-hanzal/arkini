@@ -107,6 +107,54 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
+	it("ignores expired active effects while reading producer start readiness", () => {
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-product": {
+					name: "Block product",
+					operations: [
+						{
+							kind: "line.blockStart",
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:1"] = {
+			activatedAtMs: 0,
+			effectId: "effect:block-product",
+			expiresAtMs: 1000,
+			id: "effect-instance:1",
+			sourceItemInstanceId: "item-instance:1",
+		};
+
+		const readiness = runReadiness({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 1001,
+			save,
+		});
+
+		expect(readiness).toEqual({
+			type: "ready",
+		});
+	});
+
 	it("returns rejected readiness when the producer queue is full", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

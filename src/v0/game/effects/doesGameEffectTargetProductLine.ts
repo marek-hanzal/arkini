@@ -26,6 +26,8 @@ export const doesGameEffectTargetProductLine = ({
 	productId,
 	target,
 }: doesGameEffectTargetProductLine.Props) => {
+	if (target.all) return true;
+
 	const producerTagSet = new Set(producerTags);
 	const productTagSet = new Set(product.tags);
 

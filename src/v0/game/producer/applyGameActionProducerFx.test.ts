@@ -51,7 +51,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
-	it("starts active effect product lines without creating product jobs", () => {
+	it("starts active effect product lines as timed producer jobs", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -98,7 +98,15 @@ describe("applyGameActionFx Producer", () => {
 		});
 
 		const activeEffect = readOnlyRecordValue(result.save.activeEffects);
-		expect(result.save.producerJobs).toEqual({});
+		const job = readOnlyRecordValue(result.save.producerJobs);
+		expect(job).toMatchObject({
+			completesAtMs: 1500,
+			outputTableId: null,
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startedAtMs: 500,
+		});
 		expect(activeEffect).toMatchObject({
 			activatedAtMs: 500,
 			effectId: "effect:test",
@@ -106,6 +114,14 @@ describe("applyGameActionFx Producer", () => {
 			sourceItemInstanceId: "item-instance:1",
 		});
 		expect(result.events).toEqual([
+			{
+				completesAtMs: 1500,
+				jobId: job.id,
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				startedAtMs: 500,
+				type: "product.started",
+			},
 			{
 				activatedAtMs: 500,
 				effectId: "effect:test",

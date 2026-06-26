@@ -165,6 +165,62 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(config.products["product:shred"].visibility).toBe("hidden");
 	});
 
+	it("applies active effects only between activation and expiration", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:reveal": {
+					name: "Reveal while active",
+					operations: [
+						{
+							kind: "line.reveal",
+							target: {
+								all: true,
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					visibility: "hidden",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["active:reveal"] = {
+			activatedAtMs: 1000,
+			effectId: "effect:reveal",
+			expiresAtMs: 2000,
+			id: "active:reveal",
+			sourceItemInstanceId: "item-instance:1",
+		};
+		const product = config.products["product:shred"];
+		const readVisibleAt = (nowMs: number) =>
+			readEffectiveProducerProductLine({
+				baseDurationMs: product.durationMs,
+				config,
+				nowMs,
+				producerId: "producer:test",
+				producerItemId: "item:producer",
+				producerItemInstanceId: "item-instance:1",
+				product,
+				productId: "product:shred",
+				save,
+			}).visible;
+
+		expect(readVisibleAt(999)).toBe(false);
+		expect(readVisibleAt(1000)).toBe(true);
+		expect(readVisibleAt(1999)).toBe(true);
+		expect(readVisibleAt(2000)).toBe(false);
+	});
+
 	it("keeps local effects outside radius from touching the target", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

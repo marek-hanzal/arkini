@@ -14,13 +14,14 @@ import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 export namespace checkProducerInputStoreReadinessFx {
 	export interface Props {
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 		action: GameActionProducerInputStore;
 	}
 }
 
 export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputStoreReadinessFx")(
-	function* ({ config, save, action }: checkProducerInputStoreReadinessFx.Props) {
+	function* ({ config, nowMs, save, action }: checkProducerInputStoreReadinessFx.Props) {
 		const { producerDefinition, producerId, producerItem } = yield* readProducerRuntimeTargetFx(
 			{
 				config,
@@ -58,6 +59,7 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 			producerId,
 			producerItemId: producerItem.itemId,
 			producerItemInstanceId: action.producerItemInstanceId,
+			nowMs,
 			productIds: producerDefinition.productIds,
 			save,
 		});

@@ -196,6 +196,8 @@ const normalizePackage = (value: unknown): unknown => {
 		...sourceAssets,
 	};
 	const normalizedItems: Record<string, unknown> = {};
+	const craftRecipes = asRecord(packageValue.craftRecipes);
+	const normalizedCraftRecipes: Record<string, unknown> = {};
 
 	for (const [itemId, itemEntry] of Object.entries(items)) {
 		if (!itemEntry || typeof itemEntry !== "object" || Array.isArray(itemEntry)) {
@@ -206,19 +208,36 @@ const normalizePackage = (value: unknown): unknown => {
 		const item = {
 			...(itemEntry as Record<string, unknown>),
 		};
-		const code = typeof item.code === "string" ? item.code : readItemCodeFromId(itemId);
 		const assetId = typeof item.assetId === "string" ? item.assetId : `asset:${itemId}`;
 
-		item.code = code;
 		item.assetId = assetId;
 		normalizedItems[itemId] = item;
 
 		assets[assetId] = normalizeAssetDefinition(assetId, assets[assetId]);
 	}
 
+	for (const [craftRecipeId, craftRecipeEntry] of Object.entries(craftRecipes)) {
+		if (
+			!craftRecipeEntry ||
+			typeof craftRecipeEntry !== "object" ||
+			Array.isArray(craftRecipeEntry)
+		) {
+			normalizedCraftRecipes[craftRecipeId] = craftRecipeEntry;
+			continue;
+		}
+
+		const craftRecipe = {
+			...(craftRecipeEntry as Record<string, unknown>),
+		};
+
+		craftRecipe.resultItemId ??= readCraftResultItemIdFromCraftTargetId(craftRecipeId);
+		normalizedCraftRecipes[craftRecipeId] = craftRecipe;
+	}
+
 	return {
 		...packageValue,
 		assets,
+		craftRecipes: normalizedCraftRecipes,
 		items: normalizedItems,
 	};
 };
@@ -248,7 +267,13 @@ const asRecord = (value: unknown): Record<string, unknown> =>
 		? (value as Record<string, unknown>)
 		: {};
 
-const readItemCodeFromId = (itemId: string) => itemId.split(":").slice(1).join(":") || itemId;
+const readCraftResultItemIdFromCraftTargetId = (craftTargetItemId: string) => {
+	const prefix = "item:blueprint-";
+
+	return craftTargetItemId.startsWith(prefix)
+		? `producer:${craftTargetItemId.slice(prefix.length)}`
+		: undefined;
+};
 
 const readBlueprintAssetSuffix = (assetId: string) => {
 	const prefix = "asset:item:blueprint-";
@@ -258,9 +283,9 @@ const readBlueprintAssetSuffix = (assetId: string) => {
 
 const readResourceIdFromAssetId = (assetId: string) => {
 	const [namespace, kind, ...rest] = assetId.split(":");
-	const code = rest.join(":");
+	const assetCode = rest.join(":");
 
-	return namespace === "asset" && kind && code ? `${kind}-${code}` : assetId;
+	return namespace === "asset" && kind && assetCode ? `${kind}-${assetCode}` : assetId;
 };
 
 const readJsonSources = async (paths: readonly string[]) => {

@@ -31,7 +31,6 @@ const createConfigValue = () => ({
 	items: {
 		"item:producer": {
 			assetId: "asset:item",
-			code: "producer",
 			description: "Producer",
 			maxStackSize: 1,
 			name: "Producer",
@@ -40,7 +39,6 @@ const createConfigValue = () => ({
 		},
 		"item:fuel": {
 			assetId: "asset:item",
-			code: "fuel",
 			description: "Fuel",
 			maxStackSize: 10,
 			name: "Fuel",
@@ -49,7 +47,6 @@ const createConfigValue = () => ({
 		},
 		"item:pollution": {
 			assetId: "asset:item",
-			code: "pollution",
 			description: "Pollution",
 			maxStackSize: 1,
 			name: "Pollution",

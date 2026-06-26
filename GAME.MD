@@ -1182,7 +1182,7 @@ Expected fields:
 
 - `id`
 - `withItemId`
-- `resultItemId`
+- `resultItemId`, only when it cannot be derived from a blueprint craft id
 - `secret`, if needed
 
 Merge is always a two-item interaction. Anything more complex belongs to producers, stashes, craft recipes or another explicit mechanic, not a fake variable-input merge rule.
@@ -1196,7 +1196,7 @@ Expected fields:
 - ordered product line IDs
 - producer-level requirements
 - maximum queue size
-- product-level duration/input/output-table rules
+- product-level duration/input/output rules
 - optional sink product behavior when no output table is defined
 - product-level requirements
 - product-line enable/default runtime state
@@ -1216,23 +1216,21 @@ Expected fields:
 - finite behavior model
 - charges/contents/roll count
 - current whole-stash open behavior
-- active loot table ID, if table-driven
 - open-time consumable inputs, if any
 - persistent stored requirements, if any
 - depletion behavior
 - output placement rules
 - all-or-nothing output validation
 
-### 18.8 Loot table definition
+### 18.8 Output definition
 
-Expected fields:
+Expected fields or defaults:
 
-- `id`
-- `rolls`
-- `entries`
+- `type`: `guaranteed`, `chance`, or `weighted`
 - `itemId`
-- `weight` or `probability`
-- `minCount`
+- `quantity`, omitted when it is `1`
+- `chance`, for chance entries
+- `entries` and `rolls`, for weighted entries; `rolls` is omitted when it is `1`
 - `maxCount`
 - `allowDuplicateResults`
 - non-empty output validation

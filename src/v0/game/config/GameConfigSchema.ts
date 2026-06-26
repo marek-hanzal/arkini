@@ -36,7 +36,7 @@ import { z } from "zod";
  *   work, both source items must reference their own rule. The engine must not invent
  *   reverse merges from target-owned rules.
  * - Activation inputs always say whether they are consumed. Product-line/stash/craft
- *   code must not guess this from context, because guessing is just a bug wearing a hat.
+ *   code must not guess consumption from context, because guessing is just a bug wearing a hat. Input quantity defaults to 1.
  * - Passive requirements always declare their search scope (`board`, `inventory`, or
  *   `board_or_inventory`). They model global knowledge/permission/ownership gates.
  * - Producer/product requirements are referenced through central `requirements` entries by
@@ -64,8 +64,6 @@ import { z } from "zod";
  * {
  *   "items": {
  *     "item:twig": {
- *       "assetId": "asset:twig",
- *       "code": "twig",
  *       "name": "Twig",
  *       "tier": 0,
  *       "maxStackSize": 32,
@@ -177,12 +175,12 @@ const QuantitySchema = z.union([
 
 /**
  * Input slot for activations that can be gradually filled, currently products/stashes.
- * `consume` is required because config authors must see whether a fed item disappears.
+ * `consume` is required because config authors must see whether a fed item disappears. Missing quantity defaults to 1 because needing one item is the boring common case, not a revelation.
  */
 const ItemStackInputSchema = z
 	.object({
 		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
+		quantity: PositiveIntegerSchema.default(1),
 		capacity: PositiveIntegerSchema,
 		consume: z.boolean(),
 	})
@@ -192,7 +190,7 @@ const ItemStackInputSchema = z
 const CraftRecipeInputSchema = z
 	.object({
 		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
+		quantity: PositiveIntegerSchema.default(1),
 		consume: z.boolean(),
 	})
 	.strict();
@@ -330,7 +328,7 @@ const ActivationOutputSchema = z.array(
 			.object({
 				type: z.literal("guaranteed"),
 				itemId: IdSchema,
-				quantity: QuantitySchema.optional(),
+				quantity: QuantitySchema.default(1),
 			})
 			.strict(),
 		z
@@ -338,20 +336,20 @@ const ActivationOutputSchema = z.array(
 				type: z.literal("chance"),
 				itemId: IdSchema,
 				chance: z.number().min(0).max(1),
-				quantity: QuantitySchema.optional(),
+				quantity: QuantitySchema.default(1),
 			})
 			.strict(),
 		z
 			.object({
 				type: z.literal("weighted"),
-				rolls: QuantitySchema.optional(),
+				rolls: QuantitySchema.default(1),
 				entries: z
 					.array(
 						z
 							.object({
 								itemId: IdSchema,
 								weight: PositiveIntegerSchema,
-								quantity: QuantitySchema.optional(),
+								quantity: QuantitySchema.default(1),
 							})
 							.strict(),
 					)
@@ -417,7 +415,7 @@ const GameEffectOperationSchema = z.discriminatedUnion("kind", [
 			kind: z.literal("loot.addChanceItem"),
 			itemId: IdSchema,
 			chance: ProbabilitySchema,
-			quantity: QuantitySchema.optional(),
+			quantity: QuantitySchema.default(1),
 		})
 		.strict(),
 	z
@@ -553,7 +551,6 @@ const RemoveByDefinitionSchema = z
 const ItemDefinitionSchema = z
 	.object({
 		assetId: IdSchema,
-		code: z.string().min(1),
 		name: z.string().min(1),
 		tier: NonNegativeIntegerSchema.default(0),
 		maxStackSize: PositiveIntegerSchema.default(10),
@@ -570,7 +567,6 @@ const ItemDefinitionSchema = z
 
 const ItemDefinitionFragmentSchema = ItemDefinitionSchema.extend({
 	assetId: IdSchema.optional(),
-	code: z.string().min(1).optional(),
 });
 
 /** Producer shell with ordered product lines and producer-level requirements. Inputs live on product lines. */
@@ -608,7 +604,8 @@ const StashDefinitionSchema = z
  * Delayed recipe outside two-item merge.
  *
  * Inputs are gradually stored on the concrete target before explicit start. Completion
- * replaces the target item in-place with exactly one result item.
+ * replaces the target item in-place with exactly one result item. Source blueprint recipes
+ * may omit resultItemId when it is conventionally derived from the craft target id.
  */
 const CraftRecipeSchema = z
 	.object({
@@ -618,6 +615,10 @@ const CraftRecipeSchema = z
 		durationMs: NonNegativeIntegerSchema,
 	})
 	.strict();
+
+const CraftRecipeFragmentSchema = CraftRecipeSchema.extend({
+	resultItemId: IdSchema.optional(),
+});
 
 /** Reusable output table referenced by stashes/effects and rare shared product outputs. */
 /**
@@ -685,7 +686,7 @@ const GameConfigFragmentSchema = z
 		effects: z.record(IdSchema, GameEffectDefinitionSchema).optional(),
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
-		craftRecipes: z.record(IdSchema, CraftRecipeSchema).optional(),
+		craftRecipes: z.record(IdSchema, CraftRecipeFragmentSchema).optional(),
 		products: z.record(IdSchema, ProductDefinitionSchema).optional(),
 		startingState: StartingStateDefinitionSchema.optional(),
 	})
@@ -729,15 +730,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasStash = createRecordGuard(value.stashes);
 	const hasCraftRecipe = createRecordGuard(value.craftRecipes);
 
-	validateUniqueRecordField(
-		ctx,
-		[
-			"items",
-		],
-		value.items,
-		"code",
-		(value) => `Duplicate item code "${value}".`,
-	);
 	for (const [assetId, asset] of Object.entries(value.assets)) {
 		if (!hasResource(asset.resourceId)) {
 			addIssue(

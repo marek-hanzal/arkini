@@ -5,13 +5,11 @@
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:school",
-					"quantity": 1
+					"itemId": "producer:school"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
@@ -25,8 +23,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"consume": true,
@@ -35,8 +32,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t2",
-					"quantity": 1
+					"itemId": "item:morale-t2"
 				}
 			],
 			"requirements": [
@@ -46,21 +42,18 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:academy"
+			]
 		},
 		"item:blueprint-armory-t1": {
 			"durationMs": 16000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
@@ -74,13 +67,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				},
 				{
 					"consume": true,
-					"itemId": "item:iron-ingot",
-					"quantity": 1
+					"itemId": "item:iron-ingot"
 				}
 			],
 			"requirements": [
@@ -102,8 +93,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:armory-t1"
+			]
 		},
 		"item:blueprint-bakery-t1": {
 			"durationMs": 8000,
@@ -120,29 +110,24 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:flour",
-					"quantity": 1
+					"itemId": "item:flour"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:bakery-t1"
+			]
 		},
 		"item:blueprint-blacksmith-t1": {
 			"durationMs": 16000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
@@ -184,8 +169,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:blacksmith-t1"
+			]
 		},
 		"item:blueprint-brewery-t1": {
 			"durationMs": 7000,
@@ -197,16 +181,13 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:brewery-t1"
+			]
 		},
 		"item:blueprint-brickyard": {
 			"durationMs": 11000,
@@ -228,13 +209,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				}
 			],
 			"requirements": [
@@ -256,21 +235,18 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:brickyard"
+			]
 		},
 		"item:blueprint-cathedral": {
 			"durationMs": 32000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
@@ -284,8 +260,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"consume": true,
@@ -304,13 +279,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t4",
-					"quantity": 1
+					"itemId": "item:morale-t4"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t3",
-					"quantity": 1
+					"itemId": "item:morale-t3"
 				}
 			],
 			"requirements": [
@@ -338,8 +311,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:cathedral"
+			]
 		},
 		"item:blueprint-cattle-farm-t1": {
 			"durationMs": 7000,
@@ -351,21 +323,17 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
+					"itemId": "item:stone"
 				},
 				{
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:cattle-farm-t1"
+			]
 		},
 		"item:blueprint-charcoal-burner-t1": {
 			"durationMs": 10000,
@@ -387,18 +355,15 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
+					"itemId": "item:coal"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				}
 			],
 			"requirements": [
@@ -414,8 +379,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:charcoal-burner-t1"
+			]
 		},
 		"item:blueprint-chicken-coop-t1": {
 			"durationMs": 6000,
@@ -427,11 +391,9 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				}
-			],
-			"resultItemId": "producer:chicken-coop-t1"
+			]
 		},
 		"item:blueprint-civic-office-t1": {
 			"durationMs": 10000,
@@ -453,11 +415,9 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				}
-			],
-			"resultItemId": "producer:civic-office-t1"
+			]
 		},
 		"item:blueprint-clay-pit": {
 			"durationMs": 10000,
@@ -474,13 +434,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				}
 			],
 			"requirements": [
@@ -496,8 +454,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:clay-pit"
+			]
 		},
 		"item:blueprint-coal-mine-t1": {
 			"durationMs": 11000,
@@ -514,13 +471,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"consume": true,
@@ -541,8 +496,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:coal-mine-t1"
+			]
 		},
 		"item:blueprint-construction-yard-t1": {
 			"durationMs": 14000,
@@ -564,8 +518,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
+					"itemId": "item:glass"
 				},
 				{
 					"consume": true,
@@ -574,23 +527,19 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 1
+					"itemId": "item:gold-ingot"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t3",
-					"quantity": 1
+					"itemId": "item:morale-t3"
 				}
 			],
 			"requirements": [
@@ -618,8 +567,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:construction-yard-t1"
+			]
 		},
 		"item:blueprint-cookhouse-t1": {
 			"durationMs": 8000,
@@ -636,16 +584,13 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:vegetables",
-					"quantity": 1
+					"itemId": "item:vegetables"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:cookhouse-t1"
+			]
 		},
 		"item:blueprint-dairy-t1": {
 			"durationMs": 7000,
@@ -657,16 +602,13 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				},
 				{
 					"consume": true,
-					"itemId": "item:milk",
-					"quantity": 1
+					"itemId": "item:milk"
 				}
-			],
-			"resultItemId": "producer:dairy-t1"
+			]
 		},
 		"item:blueprint-dye-workshop-t1": {
 			"durationMs": 10000,
@@ -688,13 +630,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				}
 			],
 			"requirements": [
@@ -704,24 +644,20 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:dye-workshop-t1"
+			]
 		},
 		"item:blueprint-farm-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:farm-t1"
+			]
 		},
 		"item:blueprint-glassworks": {
 			"durationMs": 12000,
@@ -753,8 +689,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				}
 			],
 			"requirements": [
@@ -776,21 +711,18 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:glassworks"
+			]
 		},
 		"item:blueprint-glazier-workshop-t1": {
 			"durationMs": 18000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
@@ -799,23 +731,19 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:bricks",
-					"quantity": 1
+					"itemId": "item:bricks"
 				},
 				{
 					"consume": true,
-					"itemId": "item:roof-tiles",
-					"quantity": 1
+					"itemId": "item:roof-tiles"
 				},
 				{
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"requirements": [
@@ -843,8 +771,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:glazier-workshop-t1"
+			]
 		},
 		"item:blueprint-gold-mine-t1": {
 			"durationMs": 13000,
@@ -861,13 +788,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"consume": true,
@@ -888,21 +813,18 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:gold-mine-t1"
+			]
 		},
 		"item:blueprint-goldsmith-t1": {
 			"durationMs": 16000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
@@ -916,8 +838,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"consume": true,
@@ -944,21 +865,18 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:goldsmith-t1"
+			]
 		},
 		"item:blueprint-heroes-guild-t1": {
 			"durationMs": 24000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
@@ -972,13 +890,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"consume": true,
@@ -1005,36 +921,30 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:heroes-guild-t1"
+			]
 		},
 		"item:blueprint-house-of-engineers": {
 			"durationMs": 30000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
+					"itemId": "item:marble-block"
 				},
 				{
 					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
+					"itemId": "item:stained-glass"
 				},
 				{
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"consume": true,
@@ -1043,8 +953,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 1
+					"itemId": "item:gold-ingot"
 				},
 				{
 					"consume": true,
@@ -1058,13 +967,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t4",
-					"quantity": 1
+					"itemId": "item:morale-t4"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t3",
-					"quantity": 1
+					"itemId": "item:morale-t3"
 				}
 			],
 			"requirements": [
@@ -1092,16 +999,14 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:house-of-engineers"
+			]
 		},
 		"item:blueprint-house-t1": {
 			"durationMs": 10000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:blueprint-house-t1",
-					"quantity": 1
+					"itemId": "item:blueprint-house-t1"
 				},
 				{
 					"consume": true,
@@ -1115,13 +1020,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"requirements": [
@@ -1131,21 +1034,18 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:house-t1"
+			]
 		},
 		"item:blueprint-house-t2": {
 			"durationMs": 14000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:house-t1",
-					"quantity": 1
+					"itemId": "producer:house-t1"
 				},
 				{
 					"consume": true,
-					"itemId": "item:blueprint-house-t2",
-					"quantity": 1
+					"itemId": "item:blueprint-house-t2"
 				},
 				{
 					"consume": true,
@@ -1159,8 +1059,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				},
 				{
 					"consume": true,
@@ -1169,8 +1068,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t1",
-					"quantity": 1
+					"itemId": "item:morale-t1"
 				}
 			],
 			"requirements": [
@@ -1186,26 +1084,22 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:house-t2"
+			]
 		},
 		"item:blueprint-house-t3": {
 			"durationMs": 18000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:house-t2",
-					"quantity": 1
+					"itemId": "producer:house-t2"
 				},
 				{
 					"consume": true,
-					"itemId": "item:blueprint-house-t3",
-					"quantity": 1
+					"itemId": "item:blueprint-house-t3"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
@@ -1219,13 +1113,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t2",
-					"quantity": 1
+					"itemId": "item:morale-t2"
 				}
 			],
 			"requirements": [
@@ -1241,51 +1133,42 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:house-t3"
+			]
 		},
 		"item:blueprint-house-t4": {
 			"durationMs": 24000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:house-t3",
-					"quantity": 1
+					"itemId": "producer:house-t3"
 				},
 				{
 					"consume": true,
-					"itemId": "item:blueprint-house-t4",
-					"quantity": 1
+					"itemId": "item:blueprint-house-t4"
 				},
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
+					"itemId": "item:marble-block"
 				},
 				{
 					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
+					"itemId": "item:stained-glass"
 				},
 				{
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t3",
-					"quantity": 1
+					"itemId": "item:morale-t3"
 				}
 			],
 			"requirements": [
@@ -1307,8 +1190,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:house-t4"
+			]
 		},
 		"item:blueprint-iron-mine-t1": {
 			"durationMs": 12000,
@@ -1325,13 +1207,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"consume": true,
@@ -1352,37 +1232,31 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:iron-mine-t1"
+			]
 		},
 		"item:blueprint-lumberjack-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:lumberjack-t1"
+			]
 		},
 		"item:blueprint-mage-lodge": {
 			"durationMs": 32000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
@@ -1396,8 +1270,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"consume": true,
@@ -1406,13 +1279,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:sapphire",
-					"quantity": 1
+					"itemId": "item:sapphire"
 				},
 				{
 					"consume": true,
-					"itemId": "item:aquamarine",
-					"quantity": 1
+					"itemId": "item:aquamarine"
 				},
 				{
 					"consume": true,
@@ -1421,13 +1292,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t4",
-					"quantity": 1
+					"itemId": "item:morale-t4"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t3",
-					"quantity": 1
+					"itemId": "item:morale-t3"
 				}
 			],
 			"requirements": [
@@ -1455,8 +1324,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:mage-lodge"
+			]
 		},
 		"item:blueprint-market-t1": {
 			"durationMs": 9000,
@@ -1473,29 +1341,24 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				},
 				{
 					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
+					"itemId": "item:sausage"
 				}
-			],
-			"resultItemId": "producer:market-t1"
+			]
 		},
 		"item:blueprint-market-t2": {
 			"durationMs": 12000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:market-t1",
-					"quantity": 1
+					"itemId": "producer:market-t1"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
@@ -1515,8 +1378,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:market-t2"
+			]
 		},
 		"item:blueprint-paper-mill-t1": {
 			"durationMs": 8000,
@@ -1528,21 +1390,17 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
-			],
-			"resultItemId": "producer:paper-mill-t1"
+			]
 		},
 		"item:blueprint-pig-farm-t1": {
 			"durationMs": 7000,
@@ -1559,11 +1417,9 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:pig-farm-t1"
+			]
 		},
 		"item:blueprint-prospector-guild-t1": {
 			"durationMs": 10000,
@@ -1585,34 +1441,29 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 2
 				}
-			],
-			"resultItemId": "producer:prospector-guild-t1"
+			]
 		},
 		"item:blueprint-prospector-guild-t2": {
 			"durationMs": 14000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:prospector-guild-t1",
-					"quantity": 1
+					"itemId": "producer:prospector-guild-t1"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
@@ -1632,8 +1483,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:prospector-guild-t2"
+			]
 		},
 		"item:blueprint-purifier-t1": {
 			"durationMs": 12000,
@@ -1660,13 +1510,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"consume": true,
@@ -1687,8 +1535,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:purifier-t1"
+			]
 		},
 		"item:blueprint-quarry-t1": {
 			"durationMs": 5000,
@@ -1700,39 +1547,32 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
+					"itemId": "item:stone"
 				}
-			],
-			"resultItemId": "producer:quarry-t1"
+			]
 		},
 		"item:blueprint-quarry-t2": {
 			"durationMs": 16000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:quarry-t1",
-					"quantity": 1
+					"itemId": "producer:quarry-t1"
 				},
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
-					"itemId": "item:iron-ingot",
-					"quantity": 1
+					"itemId": "item:iron-ingot"
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"requirements": [
@@ -1748,8 +1588,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:quarry-t2"
+			]
 		},
 		"item:blueprint-roof-tile-factory": {
 			"durationMs": 11000,
@@ -1771,13 +1610,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				}
 			],
 			"requirements": [
@@ -1805,8 +1642,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:roof-tile-factory"
+			]
 		},
 		"item:blueprint-sand-pit": {
 			"durationMs": 10000,
@@ -1823,13 +1659,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				}
 			],
 			"requirements": [
@@ -1845,8 +1679,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:sand-pit"
+			]
 		},
 		"item:blueprint-sawmill-t1": {
 			"durationMs": 5000,
@@ -1858,11 +1691,9 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
+					"itemId": "item:stone"
 				}
-			],
-			"resultItemId": "producer:sawmill-t1"
+			]
 		},
 		"item:blueprint-school": {
 			"durationMs": 10000,
@@ -1879,16 +1710,13 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
-			],
-			"resultItemId": "producer:school"
+			]
 		},
 		"item:blueprint-sheep-pasture-t1": {
 			"durationMs": 7000,
@@ -1900,21 +1728,17 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
+					"itemId": "item:stone"
 				},
 				{
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:sheep-pasture-t1"
+			]
 		},
 		"item:blueprint-slaughterhouse-t1": {
 			"durationMs": 8000,
@@ -1931,11 +1755,9 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:piglet",
-					"quantity": 1
+					"itemId": "item:piglet"
 				}
-			],
-			"resultItemId": "producer:slaughterhouse-t1"
+			]
 		},
 		"item:blueprint-smelter-t1": {
 			"durationMs": 13000,
@@ -1957,13 +1779,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				}
 			],
 			"requirements": [
@@ -1985,52 +1805,44 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:smelter-t1"
+			]
 		},
 		"item:blueprint-stonemason-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone",
 					"quantity": 2
 				}
-			],
-			"resultItemId": "producer:stonemason-t1"
+			]
 		},
 		"item:blueprint-stonemason-t2": {
 			"durationMs": 16000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:stonemason-t1",
-					"quantity": 1
+					"itemId": "producer:stonemason-t1"
 				},
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
+					"itemId": "item:stained-glass"
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"requirements": [
@@ -2046,8 +1858,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:stonemason-t2"
+			]
 		},
 		"item:blueprint-tailor-workshop-t1": {
 			"durationMs": 11000,
@@ -2059,18 +1870,15 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:common-cloth",
-					"quantity": 1
+					"itemId": "item:common-cloth"
 				},
 				{
 					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 1
+					"itemId": "item:leather"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
@@ -2091,8 +1899,7 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:tailor-workshop-t1"
+			]
 		},
 		"item:blueprint-tannery-t1": {
 			"durationMs": 10000,
@@ -2109,21 +1916,17 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
-			],
-			"resultItemId": "producer:tannery-t1"
+			]
 		},
 		"item:blueprint-tavern-t1": {
 			"durationMs": 8000,
@@ -2140,19 +1943,16 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:beer-barrel",
-					"quantity": 1
+					"itemId": "item:beer-barrel"
 				}
-			],
-			"resultItemId": "producer:tavern-t1"
+			]
 		},
 		"item:blueprint-townhall-t2": {
 			"durationMs": 10000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:townhall-t1",
-					"quantity": 1
+					"itemId": "producer:townhall-t1"
 				},
 				{
 					"consume": true,
@@ -2166,8 +1966,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"requirements": [
@@ -2201,16 +2000,14 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:townhall-t2"
+			]
 		},
 		"item:blueprint-townhall-t3": {
 			"durationMs": 12000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:townhall-t2",
-					"quantity": 1
+					"itemId": "producer:townhall-t2"
 				},
 				{
 					"consume": true,
@@ -2224,18 +2021,15 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:food-supply",
-					"quantity": 1
+					"itemId": "item:food-supply"
 				},
 				{
 					"consume": true,
-					"itemId": "item:wool",
-					"quantity": 1
+					"itemId": "item:wool"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t1",
-					"quantity": 1
+					"itemId": "item:morale-t1"
 				}
 			],
 			"requirements": [
@@ -2281,16 +2075,14 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:townhall-t3"
+			]
 		},
 		"item:blueprint-townhall-t4": {
 			"durationMs": 14000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:townhall-t3",
-					"quantity": 1
+					"itemId": "producer:townhall-t3"
 				},
 				{
 					"consume": true,
@@ -2304,8 +2096,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"consume": true,
@@ -2314,13 +2105,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t2",
-					"quantity": 1
+					"itemId": "item:morale-t2"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t1",
-					"quantity": 1
+					"itemId": "item:morale-t1"
 				}
 			],
 			"requirements": [
@@ -2390,26 +2179,22 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:townhall-t4"
+			]
 		},
 		"item:blueprint-university": {
 			"durationMs": 22000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "producer:academy",
-					"quantity": 1
+					"itemId": "producer:academy"
 				},
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"consume": true,
@@ -2438,13 +2223,11 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t3",
-					"quantity": 1
+					"itemId": "item:morale-t3"
 				},
 				{
 					"consume": true,
-					"itemId": "item:morale-t2",
-					"quantity": 1
+					"itemId": "item:morale-t2"
 				}
 			],
 			"requirements": [
@@ -2466,24 +2249,21 @@
 					"scope": "board_or_inventory",
 					"type": "passive"
 				}
-			],
-			"resultItemId": "producer:university"
+			]
 		},
 		"item:blueprint-vegetable-garden-t1": {
 			"durationMs": 6000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				},
 				{
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 2
 				}
-			],
-			"resultItemId": "producer:vegetable-garden-t1"
+			]
 		},
 		"item:blueprint-weaver-hut-t1": {
 			"durationMs": 9000,
@@ -2500,32 +2280,27 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
-			],
-			"resultItemId": "producer:weaver-hut-t1"
+			]
 		},
 		"item:blueprint-well-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone",
 					"quantity": 2
 				}
-			],
-			"resultItemId": "producer:well-t1"
+			]
 		},
 		"item:blueprint-windmill-t1": {
 			"durationMs": 6000,
@@ -2537,16 +2312,13 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				},
 				{
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				}
-			],
-			"resultItemId": "producer:windmill-t1"
+			]
 		},
 		"item:blueprint-winery-t1": {
 			"durationMs": 7000,
@@ -2558,16 +2330,13 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				},
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
-			],
-			"resultItemId": "producer:winery-t1"
+			]
 		}
 	}
 }

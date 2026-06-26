@@ -58,6 +58,8 @@ const line = (overrides: Partial<ProducerProductLineView>): ProducerProductLineV
 	producerQueuedJobs: 0,
 	productId: "product:target",
 	queueFull: false,
+	blocked: false,
+	blockReasonEffectIds: [],
 	queuedJobs: 0,
 	queueSize: 1,
 	requirementItemIds: [],

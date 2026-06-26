@@ -51,6 +51,7 @@ const readRunButtonLabel = ({
 	canRunAction: boolean;
 }) => {
 	if (line.queueFull) return "Queue full";
+	if (line.blocked) return "Blocked by effect";
 	if (!line.requirementsReady) return "Requirements missing";
 	if (!canRunAction) return "Feed items by drag";
 	if (line.inputsReady) return "Start";
@@ -193,6 +194,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					const canRunAction =
 						(line.inputsReady || line.inputsAvailable || inputsPartiallyAvailable) &&
 						line.requirementsReady &&
+						!line.blocked &&
 						!line.queueFull;
 					const remainingMs = line.readyAtMs
 						? Math.max(0, line.readyAtMs - nowMs)
@@ -220,6 +222,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											{hindranceMultiplier > 1
 												? ` · hindered ${formatMultiplier(hindranceMultiplier)}×`
 												: ""}
+											{line.blocked ? " · blocked by effect" : ""}
 											{line.inputItemIds.length
 												? ` · ${
 														line.inputsReady

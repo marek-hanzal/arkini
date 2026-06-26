@@ -13,6 +13,8 @@ export const ProducerProductLineViewSchema = z.object({
 	inProgress: z.boolean(),
 	producerQueuedJobs: z.number().int().nonnegative(),
 	queueFull: z.boolean(),
+	blocked: z.boolean(),
+	blockReasonEffectIds: z.array(IdSchema),
 	queueSize: z.number().int().positive(),
 	queuedJobs: z.number().int().nonnegative(),
 	inputs: z.array(ActivationInputViewSchema),

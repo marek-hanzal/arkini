@@ -229,6 +229,8 @@ describe("resolveBoardDropFeedback", () => {
 						producerQueuedJobs: 0,
 						productId: "product:test",
 						queueFull: false,
+						blocked: false,
+						blockReasonEffectIds: [],
 						queuedJobs: 0,
 						queueSize: 1,
 						requirementItemIds: [],

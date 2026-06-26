@@ -277,16 +277,40 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		]);
 	});
 
-	it("hides producer product lines until a showIf marker item is owned", () => {
+	it("reveals hidden producer product lines through passive effects", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			effects: {
+				...baseConfig.effects,
+				"effect:reveal-shred": {
+					name: "Reveal shred",
+					operations: [
+						{
+							kind: "line.reveal",
+							target: {
+								productIds: [
+									"product:shred",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:reveal-shred",
+					],
+				},
+			},
 			products: {
 				...baseConfig.products,
 				"product:shred": {
 					...baseConfig.products["product:shred"],
-					showIf: [
-						"item:axe",
-					],
+					visibility: "hidden",
 				},
 			},
 		});
@@ -307,9 +331,11 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			},
 		]);
 
-		save.inventory.slots[0] = {
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
 			itemId: "item:axe",
-			quantity: 1,
+			x: 1,
+			y: 0,
 		};
 		const visibleBoard = readRuntimeBoardViewFromGameSave({
 			config,

@@ -144,6 +144,9 @@ import { z } from "zod";
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
+const SignedIntegerSchema = z.number().int();
+const ProbabilitySchema = z.number().min(0).max(1);
+const ProbabilityDeltaSchema = z.number().min(-1).max(1);
 /**
  * Output placement policy.
  *
@@ -297,6 +300,109 @@ const GameHindranceDefinitionSchema = z.discriminatedUnion("type", [
 
 const GameHindrancesSchema = z.array(GameHindranceDefinitionSchema);
 
+/** Selects which producer product lines an effect operation may touch. */
+const GameEffectTargetSchema = z
+	.object({
+		producerIds: z.array(IdSchema).optional(),
+		productIds: z.array(IdSchema).optional(),
+		producerTagsAny: z.array(z.string().min(1)).optional(),
+		producerTagsAll: z.array(z.string().min(1)).optional(),
+		productTagsAny: z.array(z.string().min(1)).optional(),
+		productTagsAll: z.array(z.string().min(1)).optional(),
+	})
+	.strict();
+
+const GameEffectOperationBaseSchema = {
+	target: GameEffectTargetSchema,
+};
+
+/** Runtime-only product-line and loot mutator operation. */
+const GameEffectOperationSchema = z.discriminatedUnion("kind", [
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("line.reveal"),
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("line.hide"),
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("line.blockStart"),
+			reason: z.string().min(1).optional(),
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("duration.addMs"),
+			valueMs: SignedIntegerSchema,
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("duration.multiply"),
+			multiplier: z.number().min(0),
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("loot.appendTable"),
+			lootTableId: IdSchema,
+			chance: ProbabilitySchema.optional(),
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("loot.replaceTable"),
+			lootTableId: IdSchema,
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("loot.addChanceItem"),
+			itemId: IdSchema,
+			chance: ProbabilitySchema,
+			quantity: QuantitySchema.optional(),
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectOperationBaseSchema,
+			kind: z.literal("loot.dropChance.add"),
+			delta: ProbabilityDeltaSchema,
+		})
+		.strict(),
+]);
+
+/** Runtime mutator definition. Effects never mutate GameConfig; they shape runtime views. */
+const GameEffectDefinitionSchema = z.discriminatedUnion("scope", [
+	z
+		.object({
+			name: z.string().min(1),
+			scope: z.literal("global"),
+			operations: z.array(GameEffectOperationSchema).min(1),
+		})
+		.strict(),
+	z
+		.object({
+			name: z.string().min(1),
+			scope: z.literal("local"),
+			radius: PositiveIntegerSchema,
+			operations: z.array(GameEffectOperationSchema).min(1),
+		})
+		.strict(),
+]);
+
 /** Central reusable requirement table entry referenced by producer/product requirementIds. */
 const GameRequirementDefinitionSchema = z.discriminatedUnion("type", [
 	StoredItemRequirementSchema,
@@ -436,6 +542,7 @@ const ItemDefinitionSchema = z
 		stashId: IdSchema.optional(),
 		craftRecipeId: IdSchema.optional(),
 		exclusiveToIds: z.array(IdSchema).optional(),
+		passiveEffectIds: z.array(IdSchema).optional(),
 		removeBy: z.array(RemoveByDefinitionSchema).optional(),
 	})
 	.strict();
@@ -498,18 +605,25 @@ const LootTableDefinitionSchema = z
  * Producer product line.
  *
  * Missing `outputTableId` means a valid delayed sink/destructor product.
- * Optional `showIf` hides the line until any listed marker item exists in runtime state.
+ * `visibility: "hidden"` makes the line hidden until an effect reveals it.
  */
 const ProductDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
+		tags: z.array(z.string().min(1)).default([]),
+		visibility: z
+			.enum([
+				"visible",
+				"hidden",
+			])
+			.default("visible"),
 		durationMs: PositiveIntegerSchema,
 		placement: PlacementSchema,
 		inputRefId: IdSchema.optional(),
 		requirementIds: z.array(IdSchema),
 		hinderedBy: GameHindrancesSchema.optional(),
 		outputTableId: IdSchema.optional(),
-		showIf: z.array(IdSchema).optional(),
+		activatesEffectId: IdSchema.optional(),
 	})
 	.strict();
 
@@ -550,6 +664,7 @@ const GameConfigFragmentSchema = z
 		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
 		inputs: z.record(IdSchema, ProductInputDefinitionSchema).optional(),
 		requirements: z.record(IdSchema, GameRequirementDefinitionSchema).optional(),
+		effects: z.record(IdSchema, GameEffectDefinitionSchema).optional(),
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema).optional(),
@@ -570,6 +685,7 @@ const BaseGameConfigSchema = z
 		merge: z.record(IdSchema, MergeDefinitionSchema),
 		inputs: z.record(IdSchema, ProductInputDefinitionSchema),
 		requirements: z.record(IdSchema, GameRequirementDefinitionSchema),
+		effects: z.record(IdSchema, GameEffectDefinitionSchema).default({}),
 		producers: z.record(IdSchema, ProducerDefinitionSchema),
 		stashes: z.record(IdSchema, StashDefinitionSchema),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema),
@@ -593,6 +709,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasMerge = createRecordGuard(value.merge);
 	const hasInput = createRecordGuard(value.inputs);
 	const hasRequirement = createRecordGuard(value.requirements);
+	const hasEffect = createRecordGuard(value.effects);
 	const hasProducer = createRecordGuard(value.producers);
 	const hasProduct = createRecordGuard(value.products);
 	const hasStash = createRecordGuard(value.stashes);
@@ -688,6 +805,16 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			item.exclusiveToIds ?? [],
 			(value) => `Duplicate exclusive item "${value}".`,
 		);
+		validateUniqueStringList(
+			ctx,
+			[
+				"items",
+				itemId,
+				"passiveEffectIds",
+			],
+			item.passiveEffectIds ?? [],
+			(value) => `Duplicate passive effect "${value}".`,
+		);
 
 		for (const [index, exclusiveItemId] of (item.exclusiveToIds ?? []).entries()) {
 			if (exclusiveItemId === itemId) {
@@ -769,6 +896,21 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 
+		for (const [index, effectId] of (item.passiveEffectIds ?? []).entries()) {
+			if (!hasEffect(effectId)) {
+				addIssue(
+					ctx,
+					[
+						"items",
+						itemId,
+						"passiveEffectIds",
+						index,
+					],
+					`Missing effect "${effectId}".`,
+				);
+			}
+		}
+
 		for (const [index, removal] of (item.removeBy ?? []).entries()) {
 			if (!hasItem(removal.itemId)) {
 				addIssue(
@@ -835,6 +977,55 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			requirement,
 			hasItem,
 		);
+	}
+
+	for (const [effectId, effect] of Object.entries(value.effects)) {
+		for (const [operationIndex, operation] of effect.operations.entries()) {
+			validateGameEffectTarget(
+				ctx,
+				[
+					"effects",
+					effectId,
+					"operations",
+					operationIndex,
+					"target",
+				],
+				operation.target,
+				hasProducer,
+				hasProduct,
+			);
+
+			if (
+				(operation.kind === "loot.appendTable" || operation.kind === "loot.replaceTable") &&
+				!hasLootTable(operation.lootTableId)
+			) {
+				addIssue(
+					ctx,
+					[
+						"effects",
+						effectId,
+						"operations",
+						operationIndex,
+						"lootTableId",
+					],
+					`Missing loot table "${operation.lootTableId}".`,
+				);
+			}
+
+			if (operation.kind === "loot.addChanceItem" && !hasItem(operation.itemId)) {
+				addIssue(
+					ctx,
+					[
+						"effects",
+						effectId,
+						"operations",
+						operationIndex,
+						"itemId",
+					],
+					`Missing item "${operation.itemId}".`,
+				);
+			}
+		}
 	}
 
 	for (const [producerId, producer] of Object.entries(value.producers)) {
@@ -1015,6 +1206,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			hasItem,
 		);
 
+		validateUniqueStringList(
+			ctx,
+			[
+				"products",
+				productId,
+				"tags",
+			],
+			product.tags,
+			(value) => `Duplicate tag "${value}".`,
+		);
+
 		if (product.outputTableId && !hasLootTable(product.outputTableId)) {
 			addIssue(
 				ctx,
@@ -1027,16 +1229,29 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 
-		validateItemIds(
-			ctx,
-			[
-				"products",
-				productId,
-				"showIf",
-			],
-			product.showIf ?? [],
-			hasItem,
-		);
+		if (product.activatesEffectId && !hasEffect(product.activatesEffectId)) {
+			addIssue(
+				ctx,
+				[
+					"products",
+					productId,
+					"activatesEffectId",
+				],
+				`Missing effect "${product.activatesEffectId}".`,
+			);
+		}
+
+		if (product.activatesEffectId && product.outputTableId) {
+			addIssue(
+				ctx,
+				[
+					"products",
+					productId,
+					"activatesEffectId",
+				],
+				"Active effect product lines must not also define outputTableId.",
+			);
+		}
 	}
 
 	validateProductLineOwnership(ctx, value);
@@ -1433,6 +1648,87 @@ const validateRequirementIds = (
 					index,
 				],
 				`Missing requirement "${requirementId}".`,
+			);
+		}
+	}
+};
+
+const validateGameEffectTarget = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	target: z.infer<typeof GameEffectTargetSchema>,
+	hasProducer: (producerId: string) => boolean,
+	hasProduct: (productId: string) => boolean,
+) => {
+	const targetLists = [
+		[
+			"producerIds",
+			target.producerIds ?? [],
+			(value: string) => `Duplicate producer "${value}".`,
+		] as const,
+		[
+			"productIds",
+			target.productIds ?? [],
+			(value: string) => `Duplicate product "${value}".`,
+		] as const,
+		[
+			"producerTagsAny",
+			target.producerTagsAny ?? [],
+			(value: string) => `Duplicate producer tag "${value}".`,
+		] as const,
+		[
+			"producerTagsAll",
+			target.producerTagsAll ?? [],
+			(value: string) => `Duplicate producer tag "${value}".`,
+		] as const,
+		[
+			"productTagsAny",
+			target.productTagsAny ?? [],
+			(value: string) => `Duplicate product tag "${value}".`,
+		] as const,
+		[
+			"productTagsAll",
+			target.productTagsAll ?? [],
+			(value: string) => `Duplicate product tag "${value}".`,
+		] as const,
+	];
+
+	for (const [field, values, createMessage] of targetLists) {
+		validateUniqueStringList(
+			ctx,
+			[
+				...path,
+				field,
+			],
+			values,
+			createMessage,
+		);
+	}
+
+	for (const [index, producerId] of (target.producerIds ?? []).entries()) {
+		if (!hasProducer(producerId)) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"producerIds",
+					index,
+				],
+				`Missing producer "${producerId}".`,
+			);
+		}
+	}
+
+	for (const [index, productId] of (target.productIds ?? []).entries()) {
+		if (!hasProduct(productId)) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"productIds",
+					index,
+				],
+				`Missing product "${productId}".`,
 			);
 		}
 	}

@@ -55,6 +55,9 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 
 		const visibleProductIds = readVisibleProducerProductIds({
 			config,
+			producerId,
+			producerItemId: producerItem.itemId,
+			producerItemInstanceId: action.producerItemInstanceId,
 			productIds: producerDefinition.productIds,
 			save,
 		});

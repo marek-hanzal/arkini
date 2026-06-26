@@ -48,8 +48,10 @@ type TestProductInput = {
 
 type TestProduct = {
 	hinderedBy?: TestGameHindrance[];
-	showIf?: string[];
+	activatesEffectId?: string;
 	durationMs: number;
+	tags?: string[];
+	visibility?: "visible" | "hidden";
 	inputRefId?: string;
 	name: string;
 	outputTableId?: string;
@@ -142,6 +144,7 @@ const createValidConfigValue = () => ({
 	},
 	merge: {},
 	requirements: {} as Record<string, TestGameRequirement>,
+	effects: {} as Record<string, unknown>,
 	producers: {
 		"producer:test": {
 			hinderedBy: [] as TestGameHindrance[],
@@ -517,24 +520,65 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
 	});
 
-	it("accepts product line showIf marker item ids", () => {
+	it("accepts product visibility, tags, and active effect refs", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].showIf = [
-			"item:plank",
+		config.effects["effect:test"] = {
+			name: "Test effect",
+			operations: [
+				{
+					kind: "line.blockStart",
+					target: {
+						productIds: [
+							"product:test",
+						],
+					},
+				},
+			],
+			scope: "global",
+		};
+		config.products["product:test"].activatesEffectId = "effect:test";
+		config.products["product:test"].outputTableId = undefined;
+		config.products["product:test"].tags = [
+			"tag:test",
 		];
+		config.products["product:test"].visibility = "hidden";
 
-		expect(parseGameConfig(config).products["product:test"].showIf).toEqual([
-			"item:plank",
-		]);
+		expect(parseGameConfig(config).products["product:test"]).toMatchObject({
+			activatesEffectId: "effect:test",
+			tags: [
+				"tag:test",
+			],
+			visibility: "hidden",
+		});
 	});
 
-	it("rejects product line showIf marker item ids that point at missing items", () => {
+	it("rejects active effect product lines that also define output loot", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].showIf = [
-			"item:ghost",
-		];
+		config.effects["effect:test"] = {
+			name: "Test effect",
+			operations: [
+				{
+					kind: "line.blockStart",
+					target: {
+						productIds: [
+							"product:test",
+						],
+					},
+				},
+			],
+			scope: "global",
+		};
+		config.products["product:test"].activatesEffectId = "effect:test";
 
-		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
+		expect(() => parseGameConfig(config)).toThrow(/must not also define outputTableId/);
+	});
+
+	it("rejects product active effect refs that point at missing effects", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].activatesEffectId = "effect:ghost";
+		config.products["product:test"].outputTableId = undefined;
+
+		expect(() => parseGameConfig(config)).toThrow(/Missing effect/);
 	});
 
 	it("rejects proximity requirements that point at missing items", () => {

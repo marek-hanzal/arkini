@@ -4101,6 +4101,7 @@
 			"resultItemId": "producer:winery-t1"
 		}
 	},
+	"effects": {},
 	"game": {
 		"board": {
 			"height": 11,
@@ -14267,7 +14268,9 @@
 			"name": "Advanced Knowledge",
 			"outputTableId": "loot:academy:advanced-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:basic-knowledge": {
 			"durationMs": 8000,
@@ -14275,7 +14278,9 @@
 			"name": "Basic Knowledge",
 			"outputTableId": "loot:academy:basic-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-armory-t1": {
 			"durationMs": 2500,
@@ -14283,7 +14288,9 @@
 			"name": "Blueprint: Armory I",
 			"outputTableId": "loot:academy:blueprint-armory-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-blacksmith-t1": {
 			"durationMs": 2500,
@@ -14291,7 +14298,9 @@
 			"name": "Blueprint: Blacksmith I",
 			"outputTableId": "loot:academy:blueprint-blacksmith-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-brickyard": {
 			"durationMs": 2000,
@@ -14299,7 +14308,9 @@
 			"name": "Blueprint: Brickyard",
 			"outputTableId": "loot:academy:blueprint-brickyard",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-charcoal-burner-t1": {
 			"durationMs": 2000,
@@ -14307,7 +14318,9 @@
 			"name": "Blueprint: Charcoal Burner I",
 			"outputTableId": "loot:academy:blueprint-charcoal-burner-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-clay-pit": {
 			"durationMs": 2000,
@@ -14315,7 +14328,9 @@
 			"name": "Blueprint: Clay Pit",
 			"outputTableId": "loot:academy:blueprint-clay-pit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-coal-mine-t1": {
 			"durationMs": 2000,
@@ -14323,7 +14338,9 @@
 			"name": "Blueprint: Coal Mine I",
 			"outputTableId": "loot:academy:blueprint-coal-mine-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-construction-yard-t1": {
 			"durationMs": 2000,
@@ -14331,7 +14348,9 @@
 			"name": "Blueprint: Construction Yard I",
 			"outputTableId": "loot:academy:blueprint-construction-yard-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-glassworks": {
 			"durationMs": 2000,
@@ -14339,7 +14358,9 @@
 			"name": "Blueprint: Glassworks",
 			"outputTableId": "loot:academy:blueprint-glassworks",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-gold-mine-t1": {
 			"durationMs": 2000,
@@ -14347,7 +14368,9 @@
 			"name": "Blueprint: Gold Mine I",
 			"outputTableId": "loot:academy:blueprint-gold-mine-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-goldsmith-t1": {
 			"durationMs": 2500,
@@ -14355,7 +14378,9 @@
 			"name": "Blueprint: Goldsmith I",
 			"outputTableId": "loot:academy:blueprint-goldsmith-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-iron-mine-t1": {
 			"durationMs": 2000,
@@ -14363,7 +14388,9 @@
 			"name": "Blueprint: Iron Mine I",
 			"outputTableId": "loot:academy:blueprint-iron-mine-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-prospector-guild-t2": {
 			"durationMs": 2000,
@@ -14371,7 +14398,9 @@
 			"name": "Blueprint: Prospector Guild 2",
 			"outputTableId": "loot:academy:blueprint-prospector-guild-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-purifier-t1": {
 			"durationMs": 2000,
@@ -14379,7 +14408,9 @@
 			"name": "Blueprint: Purifier I",
 			"outputTableId": "loot:academy:blueprint-purifier-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-roof-tile-factory": {
 			"durationMs": 2000,
@@ -14387,7 +14418,9 @@
 			"name": "Blueprint: Roof Tile Factory",
 			"outputTableId": "loot:academy:blueprint-roof-tile-factory",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-sand-pit": {
 			"durationMs": 2000,
@@ -14395,7 +14428,9 @@
 			"name": "Blueprint: Sand Pit",
 			"outputTableId": "loot:academy:blueprint-sand-pit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-smelter-t1": {
 			"durationMs": 2000,
@@ -14403,7 +14438,9 @@
 			"name": "Blueprint: Smelter I",
 			"outputTableId": "loot:academy:blueprint-smelter-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:academy:blueprint-university": {
 			"durationMs": 2500,
@@ -14411,7 +14448,9 @@
 			"name": "Blueprint: University",
 			"outputTableId": "loot:academy:blueprint-university",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:armory-t1:iron-armor": {
 			"durationMs": 36000,
@@ -14421,7 +14460,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:armory-t1:leather-armor": {
 			"durationMs": 22000,
@@ -14429,7 +14470,9 @@
 			"name": "Leather Armor",
 			"outputTableId": "loot:armory-t1:leather-armor",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:bakery-t1:bread": {
 			"durationMs": 8000,
@@ -14437,7 +14480,9 @@
 			"name": "Bread",
 			"outputTableId": "loot:bakery-t1:bread",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:bakery-t1:bread-morale-t1": {
 			"durationMs": 6000,
@@ -14445,7 +14490,9 @@
 			"name": "Bread (Inspired)",
 			"outputTableId": "loot:bakery-t1:bread-morale-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:blacksmith-t1:axe": {
 			"durationMs": 15000,
@@ -14455,7 +14502,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:blacksmith-t1:nails": {
 			"durationMs": 10000,
@@ -14465,7 +14514,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:blacksmith-t1:sword": {
 			"durationMs": 22000,
@@ -14475,7 +14526,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:brewery-t1:beer-barrel": {
 			"durationMs": 5000,
@@ -14483,7 +14536,9 @@
 			"name": "Beer Barrel",
 			"outputTableId": "loot:brewery-t1:beer-barrel",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
 			"durationMs": 5000,
@@ -14491,7 +14546,9 @@
 			"name": "Beer Barrel",
 			"outputTableId": "loot:brewery-t1:beer-barrel-from-beer",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:brewery-t1:hops": {
 			"durationMs": 5000,
@@ -14499,7 +14556,9 @@
 			"name": "Hops",
 			"outputTableId": "loot:brewery-t1:hops",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:brickyard:bricks": {
 			"durationMs": 8500,
@@ -14509,7 +14568,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:cattle-farm-t1:milk": {
 			"durationMs": 5000,
@@ -14527,7 +14588,9 @@
 			"name": "Milk",
 			"outputTableId": "loot:cattle-farm-t1:milk",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:charcoal-burner-t1:charcoal": {
 			"durationMs": 6500,
@@ -14537,7 +14600,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:chicken-coop-t1:egg": {
 			"durationMs": 5000,
@@ -14555,7 +14620,9 @@
 			"name": "Egg",
 			"outputTableId": "loot:chicken-coop-t1:egg",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:civic-office-t1:blueprint-academy": {
 			"durationMs": 2500,
@@ -14563,7 +14630,9 @@
 			"name": "Blueprint: Academy",
 			"outputTableId": "loot:civic-office-t1:blueprint-academy",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:civic-office-t1:building-permit": {
 			"durationMs": 10000,
@@ -14571,7 +14640,9 @@
 			"name": "Building Permit",
 			"outputTableId": "loot:civic-office-t1:building-permit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:civic-office-t1:building-permit-morale-t2": {
 			"durationMs": 8000,
@@ -14579,7 +14650,9 @@
 			"name": "Building Permit (Inspired)",
 			"outputTableId": "loot:civic-office-t1:building-permit-morale-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:civic-office-t1:guild-charter": {
 			"durationMs": 12000,
@@ -14587,7 +14660,9 @@
 			"name": "Guild Charter",
 			"outputTableId": "loot:civic-office-t1:guild-charter",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:clay-pit:clay": {
 			"durationMs": 6500,
@@ -14595,7 +14670,9 @@
 			"name": "Clay",
 			"outputTableId": "loot:clay-pit:clay",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:coal-mine-t1:coal": {
 			"durationMs": 8000,
@@ -14603,7 +14680,9 @@
 			"name": "Coal Cart",
 			"outputTableId": "loot:coal-mine-t1:coal",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:construction-yard-t1:construction-bundle": {
 			"durationMs": 12000,
@@ -14611,7 +14690,9 @@
 			"name": "Construction Bundle",
 			"outputTableId": "loot:construction-yard-t1:construction-bundle",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:construction-yard-t1:construction-bundle-morale-t3": {
 			"durationMs": 9000,
@@ -14619,7 +14700,9 @@
 			"name": "Construction Bundle (Inspired)",
 			"outputTableId": "loot:construction-yard-t1:construction-bundle-morale-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:cookhouse-t1:feast": {
 			"durationMs": 9000,
@@ -14627,7 +14710,9 @@
 			"name": "Feast",
 			"outputTableId": "loot:cookhouse-t1:feast",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:dairy-t1:cheese": {
 			"durationMs": 7000,
@@ -14635,7 +14720,9 @@
 			"name": "Cheese",
 			"outputTableId": "loot:dairy-t1:cheese",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:dye-workshop-t1:luxury-cloth": {
 			"durationMs": 9000,
@@ -14643,7 +14730,9 @@
 			"name": "Luxury Cloth",
 			"outputTableId": "loot:dye-workshop-t1:luxury-cloth",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:dye-workshop-t1:pigment": {
 			"durationMs": 5000,
@@ -14651,7 +14740,9 @@
 			"name": "Pigment",
 			"outputTableId": "loot:dye-workshop-t1:pigment",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:farm-t1:grain": {
 			"durationMs": 5000,
@@ -14669,7 +14760,9 @@
 			"name": "Grain",
 			"outputTableId": "loot:farm-t1:grain",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:farm-t1:grain-morale-t1": {
 			"durationMs": 3500,
@@ -14687,7 +14780,9 @@
 			"name": "Grain (Inspired)",
 			"outputTableId": "loot:farm-t1:grain-morale-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:glassworks:glass": {
 			"durationMs": 9000,
@@ -14697,7 +14792,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:glazier-workshop-t1:stained-glass": {
 			"durationMs": 14000,
@@ -14707,7 +14804,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
 			"durationMs": 10500,
@@ -14717,7 +14816,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:gold-mine-t1:gold-ore": {
 			"durationMs": 9000,
@@ -14725,7 +14826,9 @@
 			"name": "Gold Ore Cart",
 			"outputTableId": "loot:gold-mine-t1:gold-ore",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:coin-stack": {
 			"durationMs": 12000,
@@ -14735,7 +14838,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t1": {
 			"durationMs": 14000,
@@ -14745,7 +14850,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t2": {
 			"durationMs": 18000,
@@ -14755,7 +14862,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t3": {
 			"durationMs": 22000,
@@ -14765,7 +14874,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t4": {
 			"durationMs": 26000,
@@ -14775,7 +14886,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t1": {
 			"durationMs": 90000,
@@ -14783,7 +14896,9 @@
 			"name": "Chest I Expedition",
 			"outputTableId": "loot:heroes-guild-t1:chest-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t2": {
 			"durationMs": 150000,
@@ -14791,7 +14906,9 @@
 			"name": "Chest II Expedition",
 			"outputTableId": "loot:heroes-guild-t1:chest-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t3": {
 			"durationMs": 240000,
@@ -14799,7 +14916,9 @@
 			"name": "Chest III Expedition",
 			"outputTableId": "loot:heroes-guild-t1:chest-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t4": {
 			"durationMs": 420000,
@@ -14807,7 +14926,9 @@
 			"name": "Chest IV Expedition",
 			"outputTableId": "loot:heroes-guild-t1:chest-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:treasure-chest": {
 			"durationMs": 600000,
@@ -14815,7 +14936,9 @@
 			"name": "Grand Expedition",
 			"outputTableId": "loot:heroes-guild-t1:treasure-chest",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:treasure-chest-morale-t4": {
 			"durationMs": 420000,
@@ -14823,7 +14946,9 @@
 			"name": "Grand Expedition (Inspired)",
 			"outputTableId": "loot:heroes-guild-t1:treasure-chest-morale-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:house-t1:morale-t1": {
 			"durationMs": 8000,
@@ -14831,7 +14956,9 @@
 			"name": "Morale I",
 			"outputTableId": "loot:house-t1:morale-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:house-t2:morale-t2": {
 			"durationMs": 12000,
@@ -14839,7 +14966,9 @@
 			"name": "Morale II",
 			"outputTableId": "loot:house-t2:morale-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:house-t3:morale-t3": {
 			"durationMs": 18000,
@@ -14847,7 +14976,9 @@
 			"name": "Morale III",
 			"outputTableId": "loot:house-t3:morale-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:house-t4:morale-t4": {
 			"durationMs": 24000,
@@ -14855,7 +14986,9 @@
 			"name": "Morale IV",
 			"outputTableId": "loot:house-t4:morale-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:iron-mine-t1:iron-ore": {
 			"durationMs": 8000,
@@ -14863,14 +14996,18 @@
 			"name": "Iron Ore Cart",
 			"outputTableId": "loot:iron-mine-t1:iron-ore",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:lumberjack-t1:log": {
 			"durationMs": 5000,
 			"name": "Log",
 			"outputTableId": "loot:lumberjack-t1:log",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-beer": {
 			"durationMs": 4000,
@@ -14878,7 +15015,9 @@
 			"name": "Coins from Beer",
 			"outputTableId": "loot:market-t1:coin-from-beer",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-bread": {
 			"durationMs": 4000,
@@ -14886,7 +15025,9 @@
 			"name": "Coins from Bread",
 			"outputTableId": "loot:market-t1:coin-from-bread",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-cheese": {
 			"durationMs": 4000,
@@ -14894,7 +15035,9 @@
 			"name": "Coins from Cheese",
 			"outputTableId": "loot:market-t1:coin-from-cheese",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-feast": {
 			"durationMs": 6000,
@@ -14902,7 +15045,9 @@
 			"name": "Coins from Feast",
 			"outputTableId": "loot:market-t1:coin-from-feast",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-sausage": {
 			"durationMs": 4000,
@@ -14910,7 +15055,9 @@
 			"name": "Coins from Sausage",
 			"outputTableId": "loot:market-t1:coin-from-sausage",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-wine-glass": {
 			"durationMs": 4000,
@@ -14918,7 +15065,9 @@
 			"name": "Coins from Wine Glass",
 			"outputTableId": "loot:market-t1:coin-from-wine-glass",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t2:coin-from-common-clothing": {
 			"durationMs": 5000,
@@ -14926,7 +15075,9 @@
 			"name": "Coins from Common Clothing",
 			"outputTableId": "loot:market-t2:coin-from-common-clothing",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t2:coin-from-feast": {
 			"durationMs": 5000,
@@ -14934,7 +15085,9 @@
 			"name": "Better Coins from Feast",
 			"outputTableId": "loot:market-t2:coin-from-feast",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t2:coin-from-luxury-clothing": {
 			"durationMs": 5000,
@@ -14942,7 +15095,9 @@
 			"name": "Coins from Luxury Clothing",
 			"outputTableId": "loot:market-t2:coin-from-luxury-clothing",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:market-t2:coin-from-paper": {
 			"durationMs": 3500,
@@ -14950,7 +15105,9 @@
 			"name": "Coins from Paper",
 			"outputTableId": "loot:market-t2:coin-from-paper",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:paper-mill-t1:paper": {
 			"durationMs": 7000,
@@ -14958,7 +15115,9 @@
 			"name": "Paper",
 			"outputTableId": "loot:paper-mill-t1:paper",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:pig-farm-t1:piglet": {
 			"durationMs": 5000,
@@ -14976,7 +15135,9 @@
 			"name": "Piglet",
 			"outputTableId": "loot:pig-farm-t1:piglet",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:prospector-guild-t1:clay-deposit": {
 			"durationMs": 9000,
@@ -14984,7 +15145,9 @@
 			"name": "Prospect: Clay Deposit",
 			"outputTableId": "loot:prospector-guild-t1:clay-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:prospector-guild-t1:sand-deposit": {
 			"durationMs": 9000,
@@ -14992,7 +15155,9 @@
 			"name": "Prospect: Sand Deposit",
 			"outputTableId": "loot:prospector-guild-t1:sand-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:clay-deposit": {
 			"durationMs": 9000,
@@ -15000,7 +15165,9 @@
 			"name": "Prospect: Clay Deposit",
 			"outputTableId": "loot:prospector-guild-t2:clay-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:coal-deposit": {
 			"durationMs": 10000,
@@ -15008,7 +15175,9 @@
 			"name": "Prospect: Coal Deposit",
 			"outputTableId": "loot:prospector-guild-t2:coal-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:gold-deposit": {
 			"durationMs": 12000,
@@ -15016,7 +15185,9 @@
 			"name": "Prospect: Gold Deposit",
 			"outputTableId": "loot:prospector-guild-t2:gold-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:iron-deposit": {
 			"durationMs": 10000,
@@ -15024,7 +15195,9 @@
 			"name": "Prospect: Iron Deposit",
 			"outputTableId": "loot:prospector-guild-t2:iron-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:marble-deposit": {
 			"durationMs": 14000,
@@ -15032,7 +15205,9 @@
 			"name": "Prospect: Marble Deposit",
 			"outputTableId": "loot:prospector-guild-t2:marble-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:sand-deposit": {
 			"durationMs": 9000,
@@ -15040,42 +15215,54 @@
 			"name": "Prospect: Sand Deposit",
 			"outputTableId": "loot:prospector-guild-t2:sand-deposit",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:purifier-t1:pollution": {
 			"durationMs": 6000,
 			"inputRefId": "input:purifier-t1:pollution",
 			"name": "Purify Pollution",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:purifier-t1:pollution-bulk": {
 			"durationMs": 18000,
 			"inputRefId": "input:purifier-t1:pollution-bulk",
 			"name": "Purify Pollution x4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:quarry-t1:stone": {
 			"durationMs": 5000,
 			"name": "Stone",
 			"outputTableId": "loot:quarry-t1:stone",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:quarry-t2:marble": {
 			"durationMs": 12000,
 			"name": "Marble",
 			"outputTableId": "loot:quarry-t2:marble",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:quarry-t2:stone": {
 			"durationMs": 4000,
 			"name": "Stone",
 			"outputTableId": "loot:quarry-t2:stone",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:roof-tile-factory:roof-tiles": {
 			"durationMs": 8500,
@@ -15085,14 +15272,18 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:sand-pit:sand": {
 			"durationMs": 6500,
 			"name": "Sand",
 			"outputTableId": "loot:sand-pit:sand",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:sawmill-t1:plank": {
 			"durationMs": 5000,
@@ -15100,7 +15291,9 @@
 			"name": "Plank",
 			"outputTableId": "loot:sawmill-t1:plank",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:school:basic-knowledge": {
 			"durationMs": 12000,
@@ -15108,7 +15301,9 @@
 			"name": "Basic Knowledge",
 			"outputTableId": "loot:school:basic-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:school:basic-knowledge-morale-t2": {
 			"durationMs": 9000,
@@ -15116,7 +15311,9 @@
 			"name": "Basic Knowledge (Inspired)",
 			"outputTableId": "loot:school:basic-knowledge-morale-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:sheep-pasture-t1:wool": {
 			"durationMs": 5000,
@@ -15134,7 +15331,9 @@
 			"name": "Wool",
 			"outputTableId": "loot:sheep-pasture-t1:wool",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:slaughterhouse-t1:sausage-raw-hide": {
 			"durationMs": 8000,
@@ -15142,7 +15341,9 @@
 			"name": "Sausage + Raw Hide",
 			"outputTableId": "loot:slaughterhouse-t1:sausage-raw-hide",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:smelter-t1:gold-ingot": {
 			"durationMs": 10000,
@@ -15152,7 +15353,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:smelter-t1:iron-ingot": {
 			"durationMs": 10000,
@@ -15162,7 +15365,9 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
-			]
+			],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:stonemason-t1:stone-block": {
 			"durationMs": 5000,
@@ -15170,7 +15375,9 @@
 			"name": "Stone Block",
 			"outputTableId": "loot:stonemason-t1:stone-block",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:stonemason-t2:marble-block": {
 			"durationMs": 13000,
@@ -15178,7 +15385,9 @@
 			"name": "Marble Block",
 			"outputTableId": "loot:stonemason-t2:marble-block",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:stonemason-t2:marble-block-morale-t4": {
 			"durationMs": 10000,
@@ -15186,7 +15395,9 @@
 			"name": "Marble Block (Inspired)",
 			"outputTableId": "loot:stonemason-t2:marble-block-morale-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:stonemason-t2:stone-block": {
 			"durationMs": 4000,
@@ -15194,7 +15405,9 @@
 			"name": "Stone Block",
 			"outputTableId": "loot:stonemason-t2:stone-block",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:tailor-workshop-t1:common-clothing": {
 			"durationMs": 9000,
@@ -15202,7 +15415,9 @@
 			"name": "Common Clothing",
 			"outputTableId": "loot:tailor-workshop-t1:common-clothing",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:tailor-workshop-t1:luxury-clothing": {
 			"durationMs": 12000,
@@ -15210,7 +15425,9 @@
 			"name": "Luxury Clothing",
 			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:tailor-workshop-t1:luxury-clothing-morale-t3": {
 			"durationMs": 9000,
@@ -15218,7 +15435,9 @@
 			"name": "Luxury Clothing (Inspired)",
 			"outputTableId": "loot:tailor-workshop-t1:luxury-clothing-morale-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:tannery-t1:leather": {
 			"durationMs": 8000,
@@ -15226,7 +15445,9 @@
 			"name": "Leather",
 			"outputTableId": "loot:tannery-t1:leather",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:tavern-t1:beer": {
 			"durationMs": 5000,
@@ -15234,7 +15455,9 @@
 			"name": "Beer",
 			"outputTableId": "loot:tavern-t1:beer",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:tavern-t1:wine-glass": {
 			"durationMs": 5000,
@@ -15242,7 +15465,9 @@
 			"name": "Wine Glass",
 			"outputTableId": "loot:tavern-t1:wine-glass",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-lumberjack-t1": {
 			"durationMs": 2000,
@@ -15250,7 +15475,9 @@
 			"name": "Blueprint: Lumberjack I",
 			"outputTableId": "loot:townhall-t1:blueprint-lumberjack-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-quarry-t1": {
 			"durationMs": 2000,
@@ -15258,7 +15485,9 @@
 			"name": "Blueprint: Quarry I",
 			"outputTableId": "loot:townhall-t1:blueprint-quarry-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-sawmill-t1": {
 			"durationMs": 2000,
@@ -15266,7 +15495,9 @@
 			"name": "Blueprint: Sawmill I",
 			"outputTableId": "loot:townhall-t1:blueprint-sawmill-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-stonemason-t1": {
 			"durationMs": 2000,
@@ -15274,7 +15505,9 @@
 			"name": "Blueprint: Stonemason I",
 			"outputTableId": "loot:townhall-t1:blueprint-stonemason-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-townhall-t2": {
 			"durationMs": 2000,
@@ -15282,7 +15515,9 @@
 			"name": "Blueprint: Town Hall II",
 			"outputTableId": "loot:townhall-t1:blueprint-townhall-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-well-t1": {
 			"durationMs": 2000,
@@ -15290,7 +15525,9 @@
 			"name": "Blueprint: Well I",
 			"outputTableId": "loot:townhall-t1:blueprint-well-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-cattle-farm-t1": {
 			"durationMs": 2000,
@@ -15298,7 +15535,9 @@
 			"name": "Blueprint: Cattle Farm I",
 			"outputTableId": "loot:townhall-t2:blueprint-cattle-farm-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-chicken-coop-t1": {
 			"durationMs": 2000,
@@ -15306,7 +15545,9 @@
 			"name": "Blueprint: Chicken Coop I",
 			"outputTableId": "loot:townhall-t2:blueprint-chicken-coop-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-farm-t1": {
 			"durationMs": 2000,
@@ -15314,7 +15555,9 @@
 			"name": "Blueprint: Farm I",
 			"outputTableId": "loot:townhall-t2:blueprint-farm-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-house-t1": {
 			"durationMs": 3000,
@@ -15322,7 +15565,9 @@
 			"name": "Blueprint: House I",
 			"outputTableId": "loot:townhall-t2:blueprint-house-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-pig-farm-t1": {
 			"durationMs": 2000,
@@ -15330,7 +15575,9 @@
 			"name": "Blueprint: Pig Farm I",
 			"outputTableId": "loot:townhall-t2:blueprint-pig-farm-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-sheep-pasture-t1": {
 			"durationMs": 2000,
@@ -15338,7 +15585,9 @@
 			"name": "Blueprint: Sheep Pasture I",
 			"outputTableId": "loot:townhall-t2:blueprint-sheep-pasture-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-townhall-t3": {
 			"durationMs": 2000,
@@ -15346,7 +15595,9 @@
 			"name": "Blueprint: Town Hall III",
 			"outputTableId": "loot:townhall-t2:blueprint-townhall-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-vegetable-garden-t1": {
 			"durationMs": 2000,
@@ -15354,7 +15605,9 @@
 			"name": "Blueprint: Vegetable Garden I",
 			"outputTableId": "loot:townhall-t2:blueprint-vegetable-garden-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:food-supply": {
 			"durationMs": 2000,
@@ -15362,7 +15615,9 @@
 			"name": "Food Supply",
 			"outputTableId": "loot:townhall-t2:food-supply",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t2:wheat-field": {
 			"durationMs": 2000,
@@ -15370,7 +15625,9 @@
 			"name": "Survey: Wheat Field",
 			"outputTableId": "loot:townhall-t2:wheat-field",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-bakery-t1": {
 			"durationMs": 2000,
@@ -15378,7 +15635,9 @@
 			"name": "Blueprint: Bakery I",
 			"outputTableId": "loot:townhall-t3:blueprint-bakery-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-brewery-t1": {
 			"durationMs": 2000,
@@ -15386,7 +15645,9 @@
 			"name": "Blueprint: Brewery I",
 			"outputTableId": "loot:townhall-t3:blueprint-brewery-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-cookhouse-t1": {
 			"durationMs": 2000,
@@ -15394,7 +15655,9 @@
 			"name": "Blueprint: Cookhouse I",
 			"outputTableId": "loot:townhall-t3:blueprint-cookhouse-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-dairy-t1": {
 			"durationMs": 2000,
@@ -15402,7 +15665,9 @@
 			"name": "Blueprint: Dairy I",
 			"outputTableId": "loot:townhall-t3:blueprint-dairy-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-house-t2": {
 			"durationMs": 3500,
@@ -15410,7 +15675,9 @@
 			"name": "Blueprint: House II",
 			"outputTableId": "loot:townhall-t3:blueprint-house-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-market-t1": {
 			"durationMs": 2000,
@@ -15418,7 +15685,9 @@
 			"name": "Blueprint: Market",
 			"outputTableId": "loot:townhall-t3:blueprint-market-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-slaughterhouse-t1": {
 			"durationMs": 2000,
@@ -15426,7 +15695,9 @@
 			"name": "Blueprint: Slaughterhouse I",
 			"outputTableId": "loot:townhall-t3:blueprint-slaughterhouse-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-tavern-t1": {
 			"durationMs": 2000,
@@ -15434,7 +15705,9 @@
 			"name": "Blueprint: Tavern I",
 			"outputTableId": "loot:townhall-t3:blueprint-tavern-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-townhall-t4": {
 			"durationMs": 2000,
@@ -15442,7 +15715,9 @@
 			"name": "Blueprint: Town Hall IV",
 			"outputTableId": "loot:townhall-t3:blueprint-townhall-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-windmill-t1": {
 			"durationMs": 2000,
@@ -15450,7 +15725,9 @@
 			"name": "Blueprint: Windmill I",
 			"outputTableId": "loot:townhall-t3:blueprint-windmill-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-winery-t1": {
 			"durationMs": 2000,
@@ -15458,7 +15735,9 @@
 			"name": "Blueprint: Winery I",
 			"outputTableId": "loot:townhall-t3:blueprint-winery-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:hop-field": {
 			"durationMs": 2000,
@@ -15466,7 +15745,9 @@
 			"name": "Survey: Hop Field",
 			"outputTableId": "loot:townhall-t3:hop-field",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t3:vineyard": {
 			"durationMs": 2000,
@@ -15474,7 +15755,9 @@
 			"name": "Survey: Vineyard",
 			"outputTableId": "loot:townhall-t3:vineyard",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-civic-office-t1": {
 			"durationMs": 2000,
@@ -15482,7 +15765,9 @@
 			"name": "Blueprint: Civic Office I",
 			"outputTableId": "loot:townhall-t4:blueprint-civic-office-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-dye-workshop-t1": {
 			"durationMs": 2000,
@@ -15490,7 +15775,9 @@
 			"name": "Blueprint: Dye Workshop I",
 			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-house-t3": {
 			"durationMs": 4000,
@@ -15498,7 +15785,9 @@
 			"name": "Blueprint: House III",
 			"outputTableId": "loot:townhall-t4:blueprint-house-t3",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-market-t2": {
 			"durationMs": 2000,
@@ -15506,7 +15795,9 @@
 			"name": "Blueprint: Market II",
 			"outputTableId": "loot:townhall-t4:blueprint-market-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-paper-mill-t1": {
 			"durationMs": 2000,
@@ -15514,7 +15805,9 @@
 			"name": "Blueprint: Paper Mill I",
 			"outputTableId": "loot:townhall-t4:blueprint-paper-mill-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-prospector-guild-t1": {
 			"durationMs": 2000,
@@ -15522,7 +15815,9 @@
 			"name": "Blueprint: Prospector Guild 1",
 			"outputTableId": "loot:townhall-t4:blueprint-prospector-guild-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-school": {
 			"durationMs": 2000,
@@ -15530,7 +15825,9 @@
 			"name": "Blueprint: School",
 			"outputTableId": "loot:townhall-t4:blueprint-school",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-tailor-workshop-t1": {
 			"durationMs": 2000,
@@ -15538,7 +15835,9 @@
 			"name": "Blueprint: Tailor Workshop I",
 			"outputTableId": "loot:townhall-t4:blueprint-tailor-workshop-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-tannery-t1": {
 			"durationMs": 2000,
@@ -15546,7 +15845,9 @@
 			"name": "Blueprint: Tannery I",
 			"outputTableId": "loot:townhall-t4:blueprint-tannery-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-weaver-hut-t1": {
 			"durationMs": 2000,
@@ -15554,7 +15855,9 @@
 			"name": "Blueprint: Weaver Hut I",
 			"outputTableId": "loot:townhall-t4:blueprint-weaver-hut-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:advanced-knowledge": {
 			"durationMs": 14000,
@@ -15562,7 +15865,9 @@
 			"name": "Advanced Knowledge",
 			"outputTableId": "loot:university:advanced-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:basic-knowledge": {
 			"durationMs": 6000,
@@ -15570,7 +15875,9 @@
 			"name": "Basic Knowledge",
 			"outputTableId": "loot:university:basic-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:blueprint-cathedral": {
 			"durationMs": 4000,
@@ -15578,7 +15885,9 @@
 			"name": "Blueprint: Cathedral",
 			"outputTableId": "loot:university:blueprint-cathedral",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:blueprint-glazier-workshop-t1": {
 			"durationMs": 3000,
@@ -15586,7 +15895,9 @@
 			"name": "Blueprint: Glazier Workshop I",
 			"outputTableId": "loot:university:blueprint-glazier-workshop-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:blueprint-heroes-guild-t1": {
 			"durationMs": 3000,
@@ -15594,7 +15905,9 @@
 			"name": "Blueprint: Heroes Guild I",
 			"outputTableId": "loot:university:blueprint-heroes-guild-t1",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:blueprint-house-of-engineers": {
 			"durationMs": 4000,
@@ -15602,7 +15915,9 @@
 			"name": "Blueprint: House of Engineers",
 			"outputTableId": "loot:university:blueprint-house-of-engineers",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:blueprint-house-t4": {
 			"durationMs": 5000,
@@ -15610,7 +15925,9 @@
 			"name": "Blueprint: House IV",
 			"outputTableId": "loot:university:blueprint-house-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:blueprint-mage-lodge": {
 			"durationMs": 4000,
@@ -15618,7 +15935,9 @@
 			"name": "Blueprint: Mage Lodge",
 			"outputTableId": "loot:university:blueprint-mage-lodge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:blueprint-quarry-t2": {
 			"durationMs": 3500,
@@ -15626,7 +15945,9 @@
 			"name": "Blueprint: Quarry 2",
 			"outputTableId": "loot:university:blueprint-quarry-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:blueprint-stonemason-t2": {
 			"durationMs": 3500,
@@ -15634,7 +15955,9 @@
 			"name": "Blueprint: Stonemason 2",
 			"outputTableId": "loot:university:blueprint-stonemason-t2",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:master-knowledge": {
 			"durationMs": 36000,
@@ -15642,7 +15965,9 @@
 			"name": "Master Knowledge",
 			"outputTableId": "loot:university:master-knowledge",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:university:master-knowledge-morale-t4": {
 			"durationMs": 26000,
@@ -15650,7 +15975,9 @@
 			"name": "Master Knowledge (Inspired)",
 			"outputTableId": "loot:university:master-knowledge-morale-t4",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:vegetable-garden-t1:vegetables": {
 			"durationMs": 5000,
@@ -15668,7 +15995,9 @@
 			"name": "Vegetables",
 			"outputTableId": "loot:vegetable-garden-t1:vegetables",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:weaver-hut-t1:common-cloth": {
 			"durationMs": 7000,
@@ -15676,14 +16005,18 @@
 			"name": "Common Cloth",
 			"outputTableId": "loot:weaver-hut-t1:common-cloth",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:well-t1:water": {
 			"durationMs": 5000,
 			"name": "Water",
 			"outputTableId": "loot:well-t1:water",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:windmill-t1:flour": {
 			"durationMs": 6000,
@@ -15691,7 +16024,9 @@
 			"name": "Flour",
 			"outputTableId": "loot:windmill-t1:flour",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:winery-t1:grapes": {
 			"durationMs": 5000,
@@ -15699,7 +16034,9 @@
 			"name": "Grapes",
 			"outputTableId": "loot:winery-t1:grapes",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:winery-t1:wine-barrel": {
 			"durationMs": 5000,
@@ -15707,7 +16044,9 @@
 			"name": "Wine Barrel",
 			"outputTableId": "loot:winery-t1:wine-barrel",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
 			"durationMs": 5000,
@@ -15715,7 +16054,9 @@
 			"name": "Wine Barrel",
 			"outputTableId": "loot:winery-t1:wine-barrel-from-wine-glasses",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
 		}
 	},
 	"requirements": {

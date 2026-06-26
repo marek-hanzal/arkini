@@ -23,6 +23,7 @@ export type GameEngineError =
 				| "missing_requirement"
 				| GamePlacementFailureReason
 				| "producer_queue_full"
+				| "blocked"
 				| "storage_restricted"
 				| "stash_depleted"
 				| "unsupported_target"

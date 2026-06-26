@@ -6,10 +6,12 @@ import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/producer/producerDeliveryTiming";
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
-import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
-import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
+import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
+import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
+import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
 import type {
 	GameSave,
 	GameSaveProducerDeliveryItem,
@@ -74,10 +76,49 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 	const product = yield* readProductFx({
 		productId: liveJob.productId,
 	});
-	const outputTableId = liveJob.outputTableId;
 	const placement = liveJob.placement ?? product.placement;
+	yield* match(placement)
+		.with("board_then_inventory", () => Effect.void)
+		.exhaustive();
 
-	if (!outputTableId) {
+	const producerBoardItem = save.board.items[liveJob.producerItemInstanceId];
+	const producerItem = producerBoardItem ? config.items[producerBoardItem.itemId] : undefined;
+	const producerId = producerItem?.producerId ?? "";
+	const producerDefinition = producerId ? config.producers[producerId] : undefined;
+	const requirements = resolveGameRequirements({
+		config,
+		requirementIds: [
+			...(producerDefinition?.requirementIds ?? []),
+			...product.requirementIds,
+		],
+	});
+	const hindrances = [
+		...(producerDefinition?.hinderedBy ?? []),
+		...(product.hinderedBy ?? []),
+	];
+	const effectiveProductLine = readEffectiveProducerProductLine({
+		baseDurationMs: readProducerProductDurationMs({
+			hindrances,
+			product,
+			producerItemInstanceId: liveJob.producerItemInstanceId,
+			requirements,
+			save,
+		}),
+		config,
+		nowMs,
+		producerId,
+		producerItemId: producerBoardItem?.itemId ?? "",
+		producerItemInstanceId: liveJob.producerItemInstanceId,
+		product,
+		productId: liveJob.productId,
+		save,
+	});
+
+	if (
+		effectiveProductLine.lootPlan.lootTableIds.length === 0 &&
+		effectiveProductLine.lootPlan.appendTables.length === 0 &&
+		effectiveProductLine.lootPlan.chanceItems.length === 0
+	) {
 		const nextSave = yield* cloneGameSaveFx({
 			save,
 		});
@@ -96,22 +137,11 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		} satisfies GameEngineCompletionResult;
 	}
 
-	yield* match(placement)
-		.with("board_then_inventory", () => Effect.void)
-		.exhaustive();
-
-	const lootTable = config.lootTables[outputTableId];
-
-	if (!lootTable) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing loot table "${outputTableId}".`),
-		);
-	}
-
 	const deliveryItems =
 		liveJob.delivery?.items ??
-		(yield* rollLootTableItemsFx({
-			lootTable,
+		(yield* rollEffectiveLootPlanItemsFx({
+			config,
+			lootPlan: effectiveProductLine.lootPlan,
 		})).items;
 
 	if (deliveryItems.length === 0) {

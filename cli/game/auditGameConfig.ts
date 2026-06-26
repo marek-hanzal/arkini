@@ -14,6 +14,7 @@ type RecordName =
 	| "merge"
 	| "inputs"
 	| "requirements"
+	| "effects"
 	| "producers"
 	| "stashes"
 	| "craftRecipes"
@@ -36,6 +37,7 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	collectMergeUsage(config, usage, itemFlow);
 	collectInputUsage(config, itemFlow);
 	collectRequirementUsage(config, itemFlow);
+	collectEffectUsage(config, usage, itemFlow);
 	collectProducerUsage(config, usage, itemFlow);
 	collectStashUsage(config, usage, itemFlow);
 	collectCraftRecipeUsage(config, itemFlow);
@@ -69,6 +71,7 @@ const createUsageIndex = (): UsageIndex => ({
 	merge: new Set(),
 	inputs: new Set(),
 	requirements: new Set(),
+	effects: new Set(),
 	producers: new Set(),
 	stashes: new Set(),
 	craftRecipes: new Set(),
@@ -151,6 +154,40 @@ const collectRequirementUsage = (config: GameConfig, itemFlow: ItemFlowIndex) =>
 		}
 
 		itemFlow.consumedItemIds.add(requirement.itemId);
+	}
+};
+
+const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
+	for (const item of Object.values(config.items)) {
+		for (const effectId of item.passiveEffectIds ?? []) {
+			usage.effects.add(effectId);
+		}
+	}
+
+	for (const product of Object.values(config.products)) {
+		if (product.activatesEffectId) {
+			usage.effects.add(product.activatesEffectId);
+		}
+	}
+
+	for (const effect of Object.values(config.effects)) {
+		for (const operation of effect.operations) {
+			if (operation.kind === "loot.appendTable" || operation.kind === "loot.replaceTable") {
+				usage.lootTables.add(operation.lootTableId);
+			}
+
+			if (operation.kind === "loot.addChanceItem") {
+				usage.items.add(operation.itemId);
+				itemFlow.producedItemIds.add(operation.itemId);
+			}
+
+			for (const producerId of operation.target.producerIds ?? []) {
+				usage.producers.add(producerId);
+			}
+			for (const productId of operation.target.productIds ?? []) {
+				usage.products.add(productId);
+			}
+		}
 	}
 };
 
@@ -258,6 +295,7 @@ const readUnusedDefinitionWarnings = (
 	...readUnusedRecordWarnings("merge", config.merge, usage.merge),
 	...readUnusedRecordWarnings("inputs", config.inputs, usage.inputs),
 	...readUnusedRecordWarnings("requirements", config.requirements, usage.requirements),
+	...readUnusedRecordWarnings("effects", config.effects, usage.effects),
 	...readUnusedRecordWarnings("producers", config.producers, usage.producers),
 	...readUnusedRecordWarnings("stashes", config.stashes, usage.stashes),
 	...readUnusedRecordWarnings("craftRecipes", config.craftRecipes, usage.craftRecipes),

@@ -17,6 +17,8 @@ const productLine = (
 	producerQueuedJobs: 0,
 	productId: "product:test",
 	queueFull: false,
+	blocked: false,
+	blockReasonEffectIds: [],
 	queueSize: 1,
 	queuedJobs: 0,
 	requirementItemIds: [],

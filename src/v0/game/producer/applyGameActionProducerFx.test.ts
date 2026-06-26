@@ -51,6 +51,73 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
+	it("starts active effect product lines without creating product jobs", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test": {
+					name: "Test effect",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0.5,
+							target: {
+								productIds: [
+									"product:shred",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					activatesEffectId: "effect:test",
+					outputTableId: undefined,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		const activeEffect = readOnlyRecordValue(result.save.activeEffects);
+		expect(result.save.producerJobs).toEqual({});
+		expect(activeEffect).toMatchObject({
+			activatedAtMs: 500,
+			effectId: "effect:test",
+			expiresAtMs: 1500,
+			sourceItemInstanceId: "item-instance:1",
+		});
+		expect(result.events).toEqual([
+			{
+				activatedAtMs: 500,
+				effectId: "effect:test",
+				expiresAtMs: 1500,
+				id: activeEffect.id,
+				sourceItemInstanceId: "item-instance:1",
+				type: "effect.activated",
+			},
+		]);
+		expect(result.nextWakeAtMs).toBe(1500);
+	});
+
 	it("rejects default producer product action when no default line is selected", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -85,9 +152,7 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.products,
 				"product:shred": {
 					...baseConfig.products["product:shred"],
-					showIf: [
-						"item:axe",
-					],
+					visibility: "hidden",
 				},
 			},
 		});

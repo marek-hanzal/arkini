@@ -1,10 +1,14 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { isProductLineVisibleForGameSave } from "~/v0/game/producer/isProductLineVisibleForGameSave";
 
 export namespace readVisibleProducerProductIds {
 	export interface Props {
 		config: GameConfig;
+		nowMs?: number;
+		producerId: string;
+		producerItemId: string;
+		producerItemInstanceId: string;
 		productIds: readonly string[];
 		save: GameSave;
 	}
@@ -12,6 +16,10 @@ export namespace readVisibleProducerProductIds {
 
 export const readVisibleProducerProductIds = ({
 	config,
+	nowMs,
+	producerId,
+	producerItemId,
+	producerItemInstanceId,
 	productIds,
 	save,
 }: readVisibleProducerProductIds.Props) =>
@@ -19,9 +27,16 @@ export const readVisibleProducerProductIds = ({
 		const product = config.products[productId];
 		return Boolean(
 			product &&
-				isProductLineVisibleForGameSave({
+				readEffectiveProducerProductLine({
+					baseDurationMs: product.durationMs,
+					config,
+					nowMs,
+					producerId,
+					producerItemId,
+					producerItemInstanceId,
 					product,
+					productId,
 					save,
-				}),
+				}).visible,
 		);
 	});

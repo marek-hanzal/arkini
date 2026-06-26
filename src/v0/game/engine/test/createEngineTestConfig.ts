@@ -113,6 +113,7 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 		},
 		requirements: {},
+		effects: {},
 		merge: {
 			"merge:twig-plank": {
 				resultItemId: "item:plank",

@@ -19,10 +19,8 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 	config,
 	save,
 }: readRuntimeStashActivationViewFromGameSave.Props): ActivationView | undefined => {
-	const item = config.items[boardItem.itemId];
-	const stashId = item?.stashId;
-	const stash = stashId ? config.stashes[stashId] : undefined;
-	if (!stashId || !stash) return undefined;
+	const stash = config.stashes[boardItem.itemId];
+	if (!stash) return undefined;
 
 	const storedInputs = save.stashInputs[boardItem.id]?.items ?? {};
 

@@ -24,8 +24,8 @@ describe("applyGameActionFx StoredRequirement", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:producer-axe",
 					],
@@ -120,8 +120,8 @@ describe("applyGameActionFx StoredRequirement", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:producer-axe",
 					],
@@ -168,8 +168,8 @@ describe("applyGameActionFx StoredRequirement", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:producer-axe",
 					],
@@ -254,8 +254,8 @@ describe("applyGameActionFx StoredRequirement", () => {
 			},
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					requirements: [
 						{
 							capacity: 1,

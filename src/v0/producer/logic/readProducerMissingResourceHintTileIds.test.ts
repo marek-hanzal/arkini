@@ -7,20 +7,16 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
 const config = {
 	items: {
-		"item:source-producer": {
-			producerId: "producer:source",
-		},
-		"item:target-producer": {
-			producerId: "producer:target",
-		},
+		"item:source-producer": {},
+		"item:target-producer": {},
 	},
 	producers: {
-		"producer:source": {
+		"item:source-producer": {
 			productIds: [
 				"product:source-water",
 			],
 		},
-		"producer:target": {
+		"item:target-producer": {
 			productIds: [
 				"product:target",
 			],

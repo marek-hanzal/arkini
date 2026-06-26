@@ -1,6 +1,6 @@
 {
 	"craftRecipes": {
-		"craft:academy": {
+		"item:blueprint-academy": {
 			"durationMs": 18000,
 			"inputs": [
 				{
@@ -49,7 +49,7 @@
 			],
 			"resultItemId": "producer:academy"
 		},
-		"craft:armory-t1": {
+		"item:blueprint-armory-t1": {
 			"durationMs": 16000,
 			"inputs": [
 				{
@@ -105,7 +105,7 @@
 			],
 			"resultItemId": "producer:armory-t1"
 		},
-		"craft:bakery-t1": {
+		"item:blueprint-bakery-t1": {
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -132,7 +132,7 @@
 			"requirements": [],
 			"resultItemId": "producer:bakery-t1"
 		},
-		"craft:blacksmith-t1": {
+		"item:blueprint-blacksmith-t1": {
 			"durationMs": 16000,
 			"inputs": [
 				{
@@ -188,7 +188,7 @@
 			],
 			"resultItemId": "producer:blacksmith-t1"
 		},
-		"craft:brewery-t1": {
+		"item:blueprint-brewery-t1": {
 			"durationMs": 7000,
 			"inputs": [
 				{
@@ -210,7 +210,7 @@
 			"requirements": [],
 			"resultItemId": "producer:brewery-t1"
 		},
-		"craft:brickyard": {
+		"item:blueprint-brickyard": {
 			"durationMs": 11000,
 			"inputs": [
 				{
@@ -261,7 +261,7 @@
 			],
 			"resultItemId": "producer:brickyard"
 		},
-		"craft:cathedral": {
+		"item:blueprint-cathedral": {
 			"durationMs": 32000,
 			"inputs": [
 				{
@@ -343,7 +343,7 @@
 			],
 			"resultItemId": "producer:cathedral"
 		},
-		"craft:cattle-farm-t1": {
+		"item:blueprint-cattle-farm-t1": {
 			"durationMs": 7000,
 			"inputs": [
 				{
@@ -370,7 +370,7 @@
 			"requirements": [],
 			"resultItemId": "producer:cattle-farm-t1"
 		},
-		"craft:charcoal-burner-t1": {
+		"item:blueprint-charcoal-burner-t1": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -420,7 +420,7 @@
 			],
 			"resultItemId": "producer:charcoal-burner-t1"
 		},
-		"craft:chicken-coop-t1": {
+		"item:blueprint-chicken-coop-t1": {
 			"durationMs": 6000,
 			"inputs": [
 				{
@@ -437,7 +437,7 @@
 			"requirements": [],
 			"resultItemId": "producer:chicken-coop-t1"
 		},
-		"craft:civic-office-t1": {
+		"item:blueprint-civic-office-t1": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -464,7 +464,7 @@
 			"requirements": [],
 			"resultItemId": "producer:civic-office-t1"
 		},
-		"craft:clay-pit": {
+		"item:blueprint-clay-pit": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -504,7 +504,7 @@
 			],
 			"resultItemId": "producer:clay-pit"
 		},
-		"craft:coal-mine-t1": {
+		"item:blueprint-coal-mine-t1": {
 			"durationMs": 11000,
 			"inputs": [
 				{
@@ -549,7 +549,7 @@
 			],
 			"resultItemId": "producer:coal-mine-t1"
 		},
-		"craft:construction-yard-t1": {
+		"item:blueprint-construction-yard-t1": {
 			"durationMs": 14000,
 			"inputs": [
 				{
@@ -626,7 +626,7 @@
 			],
 			"resultItemId": "producer:construction-yard-t1"
 		},
-		"craft:cookhouse-t1": {
+		"item:blueprint-cookhouse-t1": {
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -653,7 +653,7 @@
 			"requirements": [],
 			"resultItemId": "producer:cookhouse-t1"
 		},
-		"craft:dairy-t1": {
+		"item:blueprint-dairy-t1": {
 			"durationMs": 7000,
 			"inputs": [
 				{
@@ -675,7 +675,7 @@
 			"requirements": [],
 			"resultItemId": "producer:dairy-t1"
 		},
-		"craft:dye-workshop-t1": {
+		"item:blueprint-dye-workshop-t1": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -714,7 +714,7 @@
 			],
 			"resultItemId": "producer:dye-workshop-t1"
 		},
-		"craft:farm-t1": {
+		"item:blueprint-farm-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -731,7 +731,7 @@
 			"requirements": [],
 			"resultItemId": "producer:farm-t1"
 		},
-		"craft:glassworks": {
+		"item:blueprint-glassworks": {
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -787,7 +787,7 @@
 			],
 			"resultItemId": "producer:glassworks"
 		},
-		"craft:glazier-workshop-t1": {
+		"item:blueprint-glazier-workshop-t1": {
 			"durationMs": 18000,
 			"inputs": [
 				{
@@ -854,7 +854,7 @@
 			],
 			"resultItemId": "producer:glazier-workshop-t1"
 		},
-		"craft:gold-mine-t1": {
+		"item:blueprint-gold-mine-t1": {
 			"durationMs": 13000,
 			"inputs": [
 				{
@@ -899,7 +899,7 @@
 			],
 			"resultItemId": "producer:gold-mine-t1"
 		},
-		"craft:goldsmith-t1": {
+		"item:blueprint-goldsmith-t1": {
 			"durationMs": 16000,
 			"inputs": [
 				{
@@ -955,7 +955,7 @@
 			],
 			"resultItemId": "producer:goldsmith-t1"
 		},
-		"craft:heroes-guild-t1": {
+		"item:blueprint-heroes-guild-t1": {
 			"durationMs": 24000,
 			"inputs": [
 				{
@@ -1016,7 +1016,7 @@
 			],
 			"resultItemId": "producer:heroes-guild-t1"
 		},
-		"craft:house-of-engineers": {
+		"item:blueprint-house-of-engineers": {
 			"durationMs": 30000,
 			"inputs": [
 				{
@@ -1103,7 +1103,7 @@
 			],
 			"resultItemId": "producer:house-of-engineers"
 		},
-		"craft:house-t1": {
+		"item:blueprint-house-t1": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -1142,7 +1142,7 @@
 			],
 			"resultItemId": "producer:house-t1"
 		},
-		"craft:house-t2": {
+		"item:blueprint-house-t2": {
 			"durationMs": 14000,
 			"inputs": [
 				{
@@ -1197,7 +1197,7 @@
 			],
 			"resultItemId": "producer:house-t2"
 		},
-		"craft:house-t3": {
+		"item:blueprint-house-t3": {
 			"durationMs": 18000,
 			"inputs": [
 				{
@@ -1252,7 +1252,7 @@
 			],
 			"resultItemId": "producer:house-t3"
 		},
-		"craft:house-t4": {
+		"item:blueprint-house-t4": {
 			"durationMs": 24000,
 			"inputs": [
 				{
@@ -1318,7 +1318,7 @@
 			],
 			"resultItemId": "producer:house-t4"
 		},
-		"craft:iron-mine-t1": {
+		"item:blueprint-iron-mine-t1": {
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -1363,7 +1363,7 @@
 			],
 			"resultItemId": "producer:iron-mine-t1"
 		},
-		"craft:lumberjack-t1": {
+		"item:blueprint-lumberjack-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -1380,7 +1380,7 @@
 			"requirements": [],
 			"resultItemId": "producer:lumberjack-t1"
 		},
-		"craft:mage-lodge": {
+		"item:blueprint-mage-lodge": {
 			"durationMs": 32000,
 			"inputs": [
 				{
@@ -1467,7 +1467,7 @@
 			],
 			"resultItemId": "producer:mage-lodge"
 		},
-		"craft:market-t1": {
+		"item:blueprint-market-t1": {
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -1494,7 +1494,7 @@
 			"requirements": [],
 			"resultItemId": "producer:market-t1"
 		},
-		"craft:market-t2": {
+		"item:blueprint-market-t2": {
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -1528,7 +1528,7 @@
 			],
 			"resultItemId": "producer:market-t2"
 		},
-		"craft:paper-mill-t1": {
+		"item:blueprint-paper-mill-t1": {
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -1555,7 +1555,7 @@
 			"requirements": [],
 			"resultItemId": "producer:paper-mill-t1"
 		},
-		"craft:pig-farm-t1": {
+		"item:blueprint-pig-farm-t1": {
 			"durationMs": 7000,
 			"inputs": [
 				{
@@ -1577,7 +1577,7 @@
 			"requirements": [],
 			"resultItemId": "producer:pig-farm-t1"
 		},
-		"craft:prospector-guild-t1": {
+		"item:blueprint-prospector-guild-t1": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -1609,7 +1609,7 @@
 			"requirements": [],
 			"resultItemId": "producer:prospector-guild-t1"
 		},
-		"craft:prospector-guild-t2": {
+		"item:blueprint-prospector-guild-t2": {
 			"durationMs": 14000,
 			"inputs": [
 				{
@@ -1648,7 +1648,7 @@
 			],
 			"resultItemId": "producer:prospector-guild-t2"
 		},
-		"craft:purifier-t1": {
+		"item:blueprint-purifier-t1": {
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -1703,7 +1703,7 @@
 			],
 			"resultItemId": "producer:purifier-t1"
 		},
-		"craft:quarry-t1": {
+		"item:blueprint-quarry-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -1720,7 +1720,7 @@
 			"requirements": [],
 			"resultItemId": "producer:quarry-t1"
 		},
-		"craft:quarry-t2": {
+		"item:blueprint-quarry-t2": {
 			"durationMs": 16000,
 			"inputs": [
 				{
@@ -1765,7 +1765,7 @@
 			],
 			"resultItemId": "producer:quarry-t2"
 		},
-		"craft:roof-tile-factory": {
+		"item:blueprint-roof-tile-factory": {
 			"durationMs": 11000,
 			"inputs": [
 				{
@@ -1822,7 +1822,7 @@
 			],
 			"resultItemId": "producer:roof-tile-factory"
 		},
-		"craft:sand-pit": {
+		"item:blueprint-sand-pit": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -1862,7 +1862,7 @@
 			],
 			"resultItemId": "producer:sand-pit"
 		},
-		"craft:sawmill-t1": {
+		"item:blueprint-sawmill-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -1879,7 +1879,7 @@
 			"requirements": [],
 			"resultItemId": "producer:sawmill-t1"
 		},
-		"craft:school": {
+		"item:blueprint-school": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -1906,7 +1906,7 @@
 			"requirements": [],
 			"resultItemId": "producer:school"
 		},
-		"craft:sheep-pasture-t1": {
+		"item:blueprint-sheep-pasture-t1": {
 			"durationMs": 7000,
 			"inputs": [
 				{
@@ -1933,7 +1933,7 @@
 			"requirements": [],
 			"resultItemId": "producer:sheep-pasture-t1"
 		},
-		"craft:slaughterhouse-t1": {
+		"item:blueprint-slaughterhouse-t1": {
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -1955,7 +1955,7 @@
 			"requirements": [],
 			"resultItemId": "producer:slaughterhouse-t1"
 		},
-		"craft:smelter-t1": {
+		"item:blueprint-smelter-t1": {
 			"durationMs": 13000,
 			"inputs": [
 				{
@@ -2006,7 +2006,7 @@
 			],
 			"resultItemId": "producer:smelter-t1"
 		},
-		"craft:stonemason-t1": {
+		"item:blueprint-stonemason-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -2023,7 +2023,7 @@
 			"requirements": [],
 			"resultItemId": "producer:stonemason-t1"
 		},
-		"craft:stonemason-t2": {
+		"item:blueprint-stonemason-t2": {
 			"durationMs": 16000,
 			"inputs": [
 				{
@@ -2068,7 +2068,7 @@
 			],
 			"resultItemId": "producer:stonemason-t2"
 		},
-		"craft:tailor-workshop-t1": {
+		"item:blueprint-tailor-workshop-t1": {
 			"durationMs": 11000,
 			"inputs": [
 				{
@@ -2113,7 +2113,7 @@
 			],
 			"resultItemId": "producer:tailor-workshop-t1"
 		},
-		"craft:tannery-t1": {
+		"item:blueprint-tannery-t1": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -2145,7 +2145,7 @@
 			"requirements": [],
 			"resultItemId": "producer:tannery-t1"
 		},
-		"craft:tavern-t1": {
+		"item:blueprint-tavern-t1": {
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -2167,7 +2167,7 @@
 			"requirements": [],
 			"resultItemId": "producer:tavern-t1"
 		},
-		"craft:townhall-t2": {
+		"item:blueprint-townhall-t2": {
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -2225,7 +2225,7 @@
 			],
 			"resultItemId": "producer:townhall-t2"
 		},
-		"craft:townhall-t3": {
+		"item:blueprint-townhall-t3": {
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -2305,7 +2305,7 @@
 			],
 			"resultItemId": "producer:townhall-t3"
 		},
-		"craft:townhall-t4": {
+		"item:blueprint-townhall-t4": {
 			"durationMs": 14000,
 			"inputs": [
 				{
@@ -2414,7 +2414,7 @@
 			],
 			"resultItemId": "producer:townhall-t4"
 		},
-		"craft:university": {
+		"item:blueprint-university": {
 			"durationMs": 22000,
 			"inputs": [
 				{
@@ -2490,7 +2490,7 @@
 			],
 			"resultItemId": "producer:university"
 		},
-		"craft:vegetable-garden-t1": {
+		"item:blueprint-vegetable-garden-t1": {
 			"durationMs": 6000,
 			"inputs": [
 				{
@@ -2507,7 +2507,7 @@
 			"requirements": [],
 			"resultItemId": "producer:vegetable-garden-t1"
 		},
-		"craft:weaver-hut-t1": {
+		"item:blueprint-weaver-hut-t1": {
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -2534,7 +2534,7 @@
 			"requirements": [],
 			"resultItemId": "producer:weaver-hut-t1"
 		},
-		"craft:well-t1": {
+		"item:blueprint-well-t1": {
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -2551,7 +2551,7 @@
 			"requirements": [],
 			"resultItemId": "producer:well-t1"
 		},
-		"craft:windmill-t1": {
+		"item:blueprint-windmill-t1": {
 			"durationMs": 6000,
 			"inputs": [
 				{
@@ -2573,7 +2573,7 @@
 			"requirements": [],
 			"resultItemId": "producer:windmill-t1"
 		},
-		"craft:winery-t1": {
+		"item:blueprint-winery-t1": {
 			"durationMs": 7000,
 			"inputs": [
 				{

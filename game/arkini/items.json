@@ -94,7 +94,6 @@
 		"item:blueprint-academy": {
 			"assetId": "asset:item:blueprint-academy",
 			"code": "blueprint-academy",
-			"craftRecipeId": "craft:academy",
 			"description": "Build plan that upgrades a School into an Academy.",
 			"maxStackSize": 10,
 			"name": "Academy Blueprint",
@@ -111,7 +110,6 @@
 		"item:blueprint-armory-t1": {
 			"assetId": "asset:item:blueprint-armory-t1",
 			"code": "blueprint-armory-t1",
-			"craftRecipeId": "craft:armory-t1",
 			"description": "Build plan that can be filled with guild resources to construct Armory I.",
 			"maxStackSize": 10,
 			"name": "Armory I Blueprint",
@@ -129,7 +127,6 @@
 		"item:blueprint-bakery-t1": {
 			"assetId": "asset:item:blueprint-bakery-t1",
 			"code": "blueprint-bakery-t1",
-			"craftRecipeId": "craft:bakery-t1",
 			"description": "Build plan that can be filled with resources to construct Bakery I.",
 			"maxStackSize": 10,
 			"name": "Bakery I Blueprint",
@@ -145,7 +142,6 @@
 		"item:blueprint-blacksmith-t1": {
 			"assetId": "asset:item:blueprint-blacksmith-t1",
 			"code": "blueprint-blacksmith-t1",
-			"craftRecipeId": "craft:blacksmith-t1",
 			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
 			"maxStackSize": 10,
 			"name": "Blacksmith I Blueprint",
@@ -162,7 +158,6 @@
 		"item:blueprint-brewery-t1": {
 			"assetId": "asset:item:blueprint-brewery-t1",
 			"code": "blueprint-brewery-t1",
-			"craftRecipeId": "craft:brewery-t1",
 			"description": "Build plan that can be filled with resources to construct Brewery I.",
 			"maxStackSize": 10,
 			"name": "Brewery I Blueprint",
@@ -178,7 +173,6 @@
 		"item:blueprint-brickyard": {
 			"assetId": "asset:item:blueprint-brickyard",
 			"code": "blueprint-brickyard",
-			"craftRecipeId": "craft:brickyard",
 			"description": "Build plan that can be filled with resources to construct a Brickyard.",
 			"maxStackSize": 10,
 			"name": "Brickyard Blueprint",
@@ -197,7 +191,6 @@
 		"item:blueprint-cathedral": {
 			"assetId": "asset:item:blueprint-cathedral",
 			"code": "blueprint-cathedral",
-			"craftRecipeId": "craft:cathedral",
 			"description": "Build plan for Cathedral, one of the mutually exclusive Choose The Path keystone buildings.",
 			"maxStackSize": 10,
 			"name": "Cathedral Blueprint",
@@ -216,7 +209,6 @@
 		"item:blueprint-cattle-farm-t1": {
 			"assetId": "asset:item:blueprint-cattle-farm-t1",
 			"code": "blueprint-cattle-farm-t1",
-			"craftRecipeId": "craft:cattle-farm-t1",
 			"description": "Build plan that can be filled with resources to construct Cattle Farm I.",
 			"maxStackSize": 10,
 			"name": "Cattle Farm I Blueprint",
@@ -232,7 +224,6 @@
 		"item:blueprint-charcoal-burner-t1": {
 			"assetId": "asset:item:blueprint-charcoal-burner-t1",
 			"code": "blueprint-charcoal-burner-t1",
-			"craftRecipeId": "craft:charcoal-burner-t1",
 			"description": "Build plan that can be filled with resources to construct Charcoal Burner I.",
 			"maxStackSize": 10,
 			"name": "Charcoal Burner I Blueprint",
@@ -249,7 +240,6 @@
 		"item:blueprint-chicken-coop-t1": {
 			"assetId": "asset:item:blueprint-chicken-coop-t1",
 			"code": "blueprint-chicken-coop-t1",
-			"craftRecipeId": "craft:chicken-coop-t1",
 			"description": "Build plan that can be filled with resources to construct Chicken Coop I.",
 			"maxStackSize": 10,
 			"name": "Chicken Coop I Blueprint",
@@ -265,7 +255,6 @@
 		"item:blueprint-civic-office-t1": {
 			"assetId": "asset:item:blueprint-civic-office-t1",
 			"code": "blueprint-civic-office-t1",
-			"craftRecipeId": "craft:civic-office-t1",
 			"description": "Build plan that can be filled with resources to construct Civic Office I.",
 			"maxStackSize": 10,
 			"name": "Civic Office I Blueprint",
@@ -283,7 +272,6 @@
 		"item:blueprint-clay-pit": {
 			"assetId": "asset:item:blueprint-clay-pit",
 			"code": "blueprint-clay-pit",
-			"craftRecipeId": "craft:clay-pit",
 			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
 			"maxStackSize": 10,
 			"name": "Clay Pit Blueprint",
@@ -302,7 +290,6 @@
 		"item:blueprint-coal-mine-t1": {
 			"assetId": "asset:item:blueprint-coal-mine-t1",
 			"code": "blueprint-coal-mine-t1",
-			"craftRecipeId": "craft:coal-mine-t1",
 			"description": "Build plan that can be filled with resources to construct Coal Mine I.",
 			"maxStackSize": 10,
 			"name": "Coal Mine I Blueprint",
@@ -318,7 +305,6 @@
 		"item:blueprint-construction-yard-t1": {
 			"assetId": "asset:item:blueprint-construction-yard-t1",
 			"code": "blueprint-construction-yard-t1",
-			"craftRecipeId": "craft:construction-yard-t1",
 			"description": "Build plan that can be filled with resources to construct Construction Yard I.",
 			"maxStackSize": 10,
 			"name": "Construction Yard I Blueprint",
@@ -335,7 +321,6 @@
 		"item:blueprint-cookhouse-t1": {
 			"assetId": "asset:item:blueprint-cookhouse-t1",
 			"code": "blueprint-cookhouse-t1",
-			"craftRecipeId": "craft:cookhouse-t1",
 			"description": "Build plan that can be filled with resources to construct Cookhouse I.",
 			"maxStackSize": 10,
 			"name": "Cookhouse I Blueprint",
@@ -351,7 +336,6 @@
 		"item:blueprint-dairy-t1": {
 			"assetId": "asset:item:blueprint-dairy-t1",
 			"code": "blueprint-dairy-t1",
-			"craftRecipeId": "craft:dairy-t1",
 			"description": "Build plan that can be filled with resources to construct Dairy I.",
 			"maxStackSize": 10,
 			"name": "Dairy I Blueprint",
@@ -367,7 +351,6 @@
 		"item:blueprint-dye-workshop-t1": {
 			"assetId": "asset:item:blueprint-dye-workshop-t1",
 			"code": "blueprint-dye-workshop-t1",
-			"craftRecipeId": "craft:dye-workshop-t1",
 			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
 			"maxStackSize": 10,
 			"name": "Dye Workshop I Blueprint",
@@ -385,7 +368,6 @@
 		"item:blueprint-farm-t1": {
 			"assetId": "asset:item:blueprint-farm-t1",
 			"code": "blueprint-farm-t1",
-			"craftRecipeId": "craft:farm-t1",
 			"description": "Build plan that can be filled with resources to construct Farm I.",
 			"maxStackSize": 10,
 			"name": "Farm I Blueprint",
@@ -401,7 +383,6 @@
 		"item:blueprint-glassworks": {
 			"assetId": "asset:item:blueprint-glassworks",
 			"code": "blueprint-glassworks",
-			"craftRecipeId": "craft:glassworks",
 			"description": "Build plan that can be filled with resources to construct Glassworks.",
 			"maxStackSize": 10,
 			"name": "Glassworks Blueprint",
@@ -420,7 +401,6 @@
 		"item:blueprint-glazier-workshop-t1": {
 			"assetId": "asset:item:blueprint-glazier-workshop-t1",
 			"code": "blueprint-glazier-workshop-t1",
-			"craftRecipeId": "craft:glazier-workshop-t1",
 			"description": "Build plan that can be filled with prestige materials to construct Glazier Workshop I.",
 			"maxStackSize": 10,
 			"name": "Glazier Workshop I Blueprint",
@@ -439,7 +419,6 @@
 		"item:blueprint-gold-mine-t1": {
 			"assetId": "asset:item:blueprint-gold-mine-t1",
 			"code": "blueprint-gold-mine-t1",
-			"craftRecipeId": "craft:gold-mine-t1",
 			"description": "Build plan that can be filled with resources to construct Gold Mine I.",
 			"maxStackSize": 10,
 			"name": "Gold Mine I Blueprint",
@@ -455,7 +434,6 @@
 		"item:blueprint-goldsmith-t1": {
 			"assetId": "asset:item:blueprint-goldsmith-t1",
 			"code": "blueprint-goldsmith-t1",
-			"craftRecipeId": "craft:goldsmith-t1",
 			"description": "Build plan that can be filled with resources to construct Goldsmith I.",
 			"maxStackSize": 10,
 			"name": "Goldsmith I Blueprint",
@@ -471,7 +449,6 @@
 		"item:blueprint-heroes-guild-t1": {
 			"assetId": "asset:item:blueprint-heroes-guild-t1",
 			"code": "blueprint-heroes-guild-t1",
-			"craftRecipeId": "craft:heroes-guild-t1",
 			"description": "Build plan that can be filled with late-era resources to construct Heroes Guild I.",
 			"maxStackSize": 10,
 			"name": "Heroes Guild I Blueprint",
@@ -489,7 +466,6 @@
 		"item:blueprint-house-of-engineers": {
 			"assetId": "asset:item:blueprint-house-of-engineers",
 			"code": "blueprint-house-of-engineers",
-			"craftRecipeId": "craft:house-of-engineers",
 			"description": "Build plan for House of Engineers, one of the mutually exclusive Choose The Path keystone buildings.",
 			"maxStackSize": 10,
 			"name": "House of Engineers Blueprint",
@@ -520,8 +496,7 @@
 				"morale",
 				"era:II"
 			],
-			"tier": 0,
-			"craftRecipeId": "craft:house-t1"
+			"tier": 0
 		},
 		"item:blueprint-house-t2": {
 			"assetId": "asset:item:blueprint-house-t2",
@@ -538,8 +513,7 @@
 				"morale",
 				"era:III"
 			],
-			"tier": 0,
-			"craftRecipeId": "craft:house-t2"
+			"tier": 0
 		},
 		"item:blueprint-house-t3": {
 			"assetId": "asset:item:blueprint-house-t3",
@@ -556,8 +530,7 @@
 				"morale",
 				"era:V"
 			],
-			"tier": 0,
-			"craftRecipeId": "craft:house-t3"
+			"tier": 0
 		},
 		"item:blueprint-house-t4": {
 			"assetId": "asset:item:blueprint-house-t4",
@@ -574,13 +547,11 @@
 				"morale",
 				"era:X"
 			],
-			"tier": 0,
-			"craftRecipeId": "craft:house-t4"
+			"tier": 0
 		},
 		"item:blueprint-iron-mine-t1": {
 			"assetId": "asset:item:blueprint-iron-mine-t1",
 			"code": "blueprint-iron-mine-t1",
-			"craftRecipeId": "craft:iron-mine-t1",
 			"description": "Build plan that can be filled with resources to construct Iron Mine I.",
 			"maxStackSize": 10,
 			"name": "Iron Mine I Blueprint",
@@ -596,7 +567,6 @@
 		"item:blueprint-lumberjack-t1": {
 			"assetId": "asset:item:blueprint-lumberjack-t1",
 			"code": "blueprint-lumberjack-t1",
-			"craftRecipeId": "craft:lumberjack-t1",
 			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
 			"maxStackSize": 10,
 			"name": "Lumberjack I Blueprint",
@@ -612,7 +582,6 @@
 		"item:blueprint-mage-lodge": {
 			"assetId": "asset:item:blueprint-mage-lodge",
 			"code": "blueprint-mage-lodge",
-			"craftRecipeId": "craft:mage-lodge",
 			"description": "Build plan for Mage Lodge, one of the mutually exclusive Choose The Path keystone buildings.",
 			"maxStackSize": 10,
 			"name": "Mage Lodge Blueprint",
@@ -632,7 +601,6 @@
 		"item:blueprint-market-t1": {
 			"assetId": "asset:item:blueprint-market-t1",
 			"code": "blueprint-market-t1",
-			"craftRecipeId": "craft:market-t1",
 			"description": "Build plan that can be filled with resources to construct the Market.",
 			"maxStackSize": 10,
 			"name": "Market Blueprint",
@@ -650,7 +618,6 @@
 		"item:blueprint-market-t2": {
 			"assetId": "asset:item:blueprint-market-t2",
 			"code": "blueprint-market-t2",
-			"craftRecipeId": "craft:market-t2",
 			"description": "Build plan that can upgrade Market into Market II.",
 			"maxStackSize": 10,
 			"name": "Market II Blueprint",
@@ -668,7 +635,6 @@
 		"item:blueprint-paper-mill-t1": {
 			"assetId": "asset:item:blueprint-paper-mill-t1",
 			"code": "blueprint-paper-mill-t1",
-			"craftRecipeId": "craft:paper-mill-t1",
 			"description": "Build plan that can be filled with resources to construct Paper Mill I.",
 			"maxStackSize": 10,
 			"name": "Paper Mill I Blueprint",
@@ -686,7 +652,6 @@
 		"item:blueprint-pig-farm-t1": {
 			"assetId": "asset:item:blueprint-pig-farm-t1",
 			"code": "blueprint-pig-farm-t1",
-			"craftRecipeId": "craft:pig-farm-t1",
 			"description": "Build plan that can be filled with resources to construct Pig Farm I.",
 			"maxStackSize": 10,
 			"name": "Pig Farm I Blueprint",
@@ -702,7 +667,6 @@
 		"item:blueprint-prospector-guild-t1": {
 			"assetId": "asset:item:blueprint-prospector-guild-t1",
 			"code": "blueprint-prospector-guild-t1",
-			"craftRecipeId": "craft:prospector-guild-t1",
 			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
 			"label": "1",
 			"maxStackSize": 10,
@@ -722,7 +686,6 @@
 		"item:blueprint-prospector-guild-t2": {
 			"assetId": "asset:item:blueprint-prospector-guild-t2",
 			"code": "blueprint-prospector-guild-t2",
-			"craftRecipeId": "craft:prospector-guild-t2",
 			"description": "Build plan that upgrades Prospector Guild 1 into Prospector Guild 2.",
 			"label": "2",
 			"maxStackSize": 10,
@@ -742,7 +705,6 @@
 		"item:blueprint-purifier-t1": {
 			"assetId": "asset:item:blueprint-purifier-t1",
 			"code": "blueprint-purifier-t1",
-			"craftRecipeId": "craft:purifier-t1",
 			"description": "Build plan that can be filled with resources to construct Purifier I.",
 			"maxStackSize": 10,
 			"name": "Purifier I Blueprint",
@@ -759,7 +721,6 @@
 		"item:blueprint-quarry-t1": {
 			"assetId": "asset:item:blueprint-quarry-t1",
 			"code": "blueprint-quarry-t1",
-			"craftRecipeId": "craft:quarry-t1",
 			"description": "Build plan that can be filled with resources to construct Quarry I.",
 			"maxStackSize": 10,
 			"name": "Quarry I Blueprint",
@@ -775,7 +736,6 @@
 		"item:blueprint-quarry-t2": {
 			"assetId": "asset:item:blueprint-quarry-t2",
 			"code": "blueprint-quarry-t2",
-			"craftRecipeId": "craft:quarry-t2",
 			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
 			"label": "2",
 			"maxStackSize": 10,
@@ -796,7 +756,6 @@
 		"item:blueprint-roof-tile-factory": {
 			"assetId": "asset:item:blueprint-roof-tile-factory",
 			"code": "blueprint-roof-tile-factory",
-			"craftRecipeId": "craft:roof-tile-factory",
 			"description": "Build plan that can be filled with resources to construct a Roof Tile Factory.",
 			"maxStackSize": 10,
 			"name": "Roof Tile Factory Blueprint",
@@ -815,7 +774,6 @@
 		"item:blueprint-sand-pit": {
 			"assetId": "asset:item:blueprint-sand-pit",
 			"code": "blueprint-sand-pit",
-			"craftRecipeId": "craft:sand-pit",
 			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
 			"maxStackSize": 10,
 			"name": "Sand Pit Blueprint",
@@ -835,7 +793,6 @@
 		"item:blueprint-sawmill-t1": {
 			"assetId": "asset:item:blueprint-sawmill-t1",
 			"code": "blueprint-sawmill-t1",
-			"craftRecipeId": "craft:sawmill-t1",
 			"description": "Build plan that can be filled with resources to construct Sawmill I.",
 			"maxStackSize": 10,
 			"name": "Sawmill I Blueprint",
@@ -851,7 +808,6 @@
 		"item:blueprint-school": {
 			"assetId": "asset:item:blueprint-school",
 			"code": "blueprint-school",
-			"craftRecipeId": "craft:school",
 			"description": "Build plan that can be filled with supplies to construct a School.",
 			"maxStackSize": 10,
 			"name": "School Blueprint",
@@ -868,7 +824,6 @@
 		"item:blueprint-sheep-pasture-t1": {
 			"assetId": "asset:item:blueprint-sheep-pasture-t1",
 			"code": "blueprint-sheep-pasture-t1",
-			"craftRecipeId": "craft:sheep-pasture-t1",
 			"description": "Build plan that can be filled with resources to construct Sheep Pasture I.",
 			"maxStackSize": 10,
 			"name": "Sheep Pasture I Blueprint",
@@ -884,7 +839,6 @@
 		"item:blueprint-slaughterhouse-t1": {
 			"assetId": "asset:item:blueprint-slaughterhouse-t1",
 			"code": "blueprint-slaughterhouse-t1",
-			"craftRecipeId": "craft:slaughterhouse-t1",
 			"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
 			"maxStackSize": 10,
 			"name": "Slaughterhouse I Blueprint",
@@ -900,7 +854,6 @@
 		"item:blueprint-smelter-t1": {
 			"assetId": "asset:item:blueprint-smelter-t1",
 			"code": "blueprint-smelter-t1",
-			"craftRecipeId": "craft:smelter-t1",
 			"description": "Build plan that can be filled with resources to construct Smelter I.",
 			"maxStackSize": 10,
 			"name": "Smelter I Blueprint",
@@ -917,7 +870,6 @@
 		"item:blueprint-stonemason-t1": {
 			"assetId": "asset:item:blueprint-stonemason-t1",
 			"code": "blueprint-stonemason-t1",
-			"craftRecipeId": "craft:stonemason-t1",
 			"description": "Build plan that can be filled with resources to construct Stonemason I.",
 			"maxStackSize": 10,
 			"name": "Stonemason I Blueprint",
@@ -933,7 +885,6 @@
 		"item:blueprint-stonemason-t2": {
 			"assetId": "asset:item:blueprint-stonemason-t2",
 			"code": "blueprint-stonemason-t2",
-			"craftRecipeId": "craft:stonemason-t2",
 			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
 			"label": "2",
 			"maxStackSize": 10,
@@ -955,7 +906,6 @@
 		"item:blueprint-tailor-workshop-t1": {
 			"assetId": "asset:item:blueprint-tailor-workshop-t1",
 			"code": "blueprint-tailor-workshop-t1",
-			"craftRecipeId": "craft:tailor-workshop-t1",
 			"description": "Build plan that can be filled with resources to construct Tailor Workshop I.",
 			"maxStackSize": 10,
 			"name": "Tailor Workshop I Blueprint",
@@ -973,7 +923,6 @@
 		"item:blueprint-tannery-t1": {
 			"assetId": "asset:item:blueprint-tannery-t1",
 			"code": "blueprint-tannery-t1",
-			"craftRecipeId": "craft:tannery-t1",
 			"description": "Build plan that can be filled with resources to construct Tannery I.",
 			"maxStackSize": 10,
 			"name": "Tannery I Blueprint",
@@ -991,7 +940,6 @@
 		"item:blueprint-tavern-t1": {
 			"assetId": "asset:item:blueprint-tavern-t1",
 			"code": "blueprint-tavern-t1",
-			"craftRecipeId": "craft:tavern-t1",
 			"description": "Build plan that can be filled with resources to construct Tavern I.",
 			"maxStackSize": 10,
 			"name": "Tavern I Blueprint",
@@ -1007,7 +955,6 @@
 		"item:blueprint-townhall-t2": {
 			"assetId": "asset:item:blueprint-townhall-t2",
 			"code": "blueprint-townhall-t2",
-			"craftRecipeId": "craft:townhall-t2",
 			"description": "Build plan that can be filled with resources to construct Town Hall II.",
 			"maxStackSize": 10,
 			"name": "Town Hall II Blueprint",
@@ -1023,7 +970,6 @@
 		"item:blueprint-townhall-t3": {
 			"assetId": "asset:item:blueprint-townhall-t3",
 			"code": "blueprint-townhall-t3",
-			"craftRecipeId": "craft:townhall-t3",
 			"description": "Build plan that can be filled with resources to construct Town Hall III.",
 			"maxStackSize": 10,
 			"name": "Town Hall III Blueprint",
@@ -1039,7 +985,6 @@
 		"item:blueprint-townhall-t4": {
 			"assetId": "asset:item:blueprint-townhall-t4",
 			"code": "blueprint-townhall-t4",
-			"craftRecipeId": "craft:townhall-t4",
 			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
 			"maxStackSize": 10,
 			"name": "Town Hall IV Blueprint",
@@ -1055,7 +1000,6 @@
 		"item:blueprint-university": {
 			"assetId": "asset:item:blueprint-university",
 			"code": "blueprint-university",
-			"craftRecipeId": "craft:university",
 			"description": "Build plan that upgrades an Academy into a University as part of the guild and institution era.",
 			"maxStackSize": 10,
 			"name": "University Blueprint",
@@ -1072,7 +1016,6 @@
 		"item:blueprint-vegetable-garden-t1": {
 			"assetId": "asset:item:blueprint-vegetable-garden-t1",
 			"code": "blueprint-vegetable-garden-t1",
-			"craftRecipeId": "craft:vegetable-garden-t1",
 			"description": "Build plan that can be filled with resources to construct Vegetable Garden I.",
 			"maxStackSize": 10,
 			"name": "Vegetable Garden I Blueprint",
@@ -1088,7 +1031,6 @@
 		"item:blueprint-weaver-hut-t1": {
 			"assetId": "asset:item:blueprint-weaver-hut-t1",
 			"code": "blueprint-weaver-hut-t1",
-			"craftRecipeId": "craft:weaver-hut-t1",
 			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
 			"maxStackSize": 10,
 			"name": "Weaver Hut I Blueprint",
@@ -1106,7 +1048,6 @@
 		"item:blueprint-well-t1": {
 			"assetId": "asset:item:blueprint-well-t1",
 			"code": "blueprint-well-t1",
-			"craftRecipeId": "craft:well-t1",
 			"description": "Build plan that can be filled with resources to construct Well I.",
 			"maxStackSize": 10,
 			"name": "Well I Blueprint",
@@ -1122,7 +1063,6 @@
 		"item:blueprint-windmill-t1": {
 			"assetId": "asset:item:blueprint-windmill-t1",
 			"code": "blueprint-windmill-t1",
-			"craftRecipeId": "craft:windmill-t1",
 			"description": "Build plan that can be filled with resources to construct Windmill I.",
 			"maxStackSize": 10,
 			"name": "Windmill I Blueprint",
@@ -1138,7 +1078,6 @@
 		"item:blueprint-winery-t1": {
 			"assetId": "asset:item:blueprint-winery-t1",
 			"code": "blueprint-winery-t1",
-			"craftRecipeId": "craft:winery-t1",
 			"description": "Build plan that can be filled with resources to construct Winery I.",
 			"maxStackSize": 10,
 			"name": "Winery I Blueprint",
@@ -1234,7 +1173,6 @@
 			"description": "Locked chest returned from a short Heroes Guild expedition. Open it with a Key I.",
 			"maxStackSize": 1,
 			"name": "Chest I",
-			"stashId": "stash:chest-t1",
 			"storage": "both",
 			"tags": [
 				"chest",
@@ -1251,7 +1189,6 @@
 			"description": "Locked chest returned from a tougher Heroes Guild expedition. Open it with a Key II.",
 			"maxStackSize": 1,
 			"name": "Chest II",
-			"stashId": "stash:chest-t2",
 			"storage": "both",
 			"tags": [
 				"chest",
@@ -1268,7 +1205,6 @@
 			"description": "Locked chest returned from a dangerous Heroes Guild expedition. Open it with a Key III.",
 			"maxStackSize": 1,
 			"name": "Chest III",
-			"stashId": "stash:chest-t3",
 			"storage": "both",
 			"tags": [
 				"chest",
@@ -1285,7 +1221,6 @@
 			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
 			"maxStackSize": 1,
 			"name": "Chest IV",
-			"stashId": "stash:chest-t4",
 			"storage": "both",
 			"tags": [
 				"chest",
@@ -2431,7 +2366,6 @@
 			"description": "Industrial education hub that converts civic knowledge into advanced knowledge and issues mining and metallurgy plans.",
 			"maxStackSize": 1,
 			"name": "Academy",
-			"producerId": "producer:academy",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2448,7 +2382,6 @@
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
 			"maxStackSize": 1,
 			"name": "Armory I",
-			"producerId": "producer:armory-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2466,7 +2399,6 @@
 			"description": "Consumes flour and water to bake bread.",
 			"maxStackSize": 1,
 			"name": "Bakery I",
-			"producerId": "producer:bakery-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2482,7 +2414,6 @@
 			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
 			"maxStackSize": 1,
 			"name": "Blacksmith I",
-			"producerId": "producer:blacksmith-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2500,7 +2431,6 @@
 			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
 			"maxStackSize": 1,
 			"name": "Brewery I",
-			"producerId": "producer:brewery-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2516,7 +2446,6 @@
 			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
 			"maxStackSize": 1,
 			"name": "Brickyard",
-			"producerId": "producer:brickyard",
 			"storage": "both",
 			"tags": [
 				"building",
@@ -2555,7 +2484,6 @@
 			"description": "Consumes grain and water to produce milk.",
 			"maxStackSize": 1,
 			"name": "Cattle Farm I",
-			"producerId": "producer:cattle-farm-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2571,7 +2499,6 @@
 			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
 			"maxStackSize": 1,
 			"name": "Charcoal Burner I",
-			"producerId": "producer:charcoal-burner-t1",
 			"storage": "both",
 			"tags": [
 				"building",
@@ -2589,7 +2516,6 @@
 			"description": "Consumes grain and water to produce eggs.",
 			"maxStackSize": 1,
 			"name": "Chicken Coop I",
-			"producerId": "producer:chicken-coop-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2605,7 +2531,6 @@
 			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
 			"maxStackSize": 1,
 			"name": "Civic Office I",
-			"producerId": "producer:civic-office-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2622,7 +2547,6 @@
 			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
 			"maxStackSize": 1,
 			"name": "Clay Pit",
-			"producerId": "producer:clay-pit",
 			"storage": "both",
 			"tags": [
 				"building",
@@ -2640,7 +2564,6 @@
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
-			"producerId": "producer:coal-mine-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2657,7 +2580,6 @@
 			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
 			"maxStackSize": 1,
 			"name": "Construction Yard I",
-			"producerId": "producer:construction-yard-t1",
 			"storage": "both",
 			"tags": [
 				"building",
@@ -2675,7 +2597,6 @@
 			"description": "Combines processed food into feasts.",
 			"maxStackSize": 1,
 			"name": "Cookhouse I",
-			"producerId": "producer:cookhouse-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2691,7 +2612,6 @@
 			"description": "Processes milk into cheese.",
 			"maxStackSize": 1,
 			"name": "Dairy I",
-			"producerId": "producer:dairy-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2707,7 +2627,6 @@
 			"description": "Textile producer that dyes common cloth into luxury cloth.",
 			"maxStackSize": 1,
 			"name": "Dye Workshop I",
-			"producerId": "producer:dye-workshop-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2725,7 +2644,6 @@
 			"description": "Consumes water and produces grain when placed near a wheat field.",
 			"maxStackSize": 1,
 			"name": "Farm I",
-			"producerId": "producer:farm-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2741,7 +2659,6 @@
 			"description": "Furnace workshop that turns sand and charcoal into glass.",
 			"maxStackSize": 1,
 			"name": "Glassworks",
-			"producerId": "producer:glassworks",
 			"storage": "both",
 			"tags": [
 				"building",
@@ -2759,7 +2676,6 @@
 			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
 			"maxStackSize": 1,
 			"name": "Glazier Workshop I",
-			"producerId": "producer:glazier-workshop-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2778,7 +2694,6 @@
 			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
 			"maxStackSize": 1,
 			"name": "Gold Mine I",
-			"producerId": "producer:gold-mine-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2795,7 +2710,6 @@
 			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
-			"producerId": "producer:goldsmith-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2814,7 +2728,6 @@
 			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
 			"maxStackSize": 1,
 			"name": "Heroes Guild I",
-			"producerId": "producer:heroes-guild-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2863,7 +2776,6 @@
 				"era:II"
 			],
 			"tier": 1,
-			"producerId": "producer:house-t1",
 			"label": "1"
 		},
 		"producer:house-t2": {
@@ -2882,7 +2794,6 @@
 				"era:III"
 			],
 			"tier": 2,
-			"producerId": "producer:house-t2",
 			"label": "2"
 		},
 		"producer:house-t3": {
@@ -2901,7 +2812,6 @@
 				"era:V"
 			],
 			"tier": 3,
-			"producerId": "producer:house-t3",
 			"label": "3"
 		},
 		"producer:house-t4": {
@@ -2920,7 +2830,6 @@
 				"era:X"
 			],
 			"tier": 4,
-			"producerId": "producer:house-t4",
 			"label": "4"
 		},
 		"producer:iron-mine-t1": {
@@ -2929,7 +2838,6 @@
 			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
 			"maxStackSize": 1,
 			"name": "Iron Mine I",
-			"producerId": "producer:iron-mine-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2946,7 +2854,6 @@
 			"description": "Produces logs when placed near a tree.",
 			"maxStackSize": 1,
 			"name": "Lumberjack I",
-			"producerId": "producer:lumberjack-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2983,7 +2890,6 @@
 			"description": "First trade producer that converts processed food and drink into coins.",
 			"maxStackSize": 1,
 			"name": "Market",
-			"producerId": "producer:market-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -2999,7 +2905,6 @@
 			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
 			"maxStackSize": 1,
 			"name": "Market II",
-			"producerId": "producer:market-t2",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3016,7 +2921,6 @@
 			"description": "Civic workshop that turns planks and water into paper for education and permits.",
 			"maxStackSize": 1,
 			"name": "Paper Mill I",
-			"producerId": "producer:paper-mill-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3033,7 +2937,6 @@
 			"description": "Consumes grain and water to produce piglets.",
 			"maxStackSize": 1,
 			"name": "Pig Farm I",
-			"producerId": "producer:pig-farm-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3050,7 +2953,6 @@
 			"label": "1",
 			"maxStackSize": 1,
 			"name": "Prospector Guild",
-			"producerId": "producer:prospector-guild-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3069,7 +2971,6 @@
 			"label": "2",
 			"maxStackSize": 1,
 			"name": "Prospector Guild",
-			"producerId": "producer:prospector-guild-t2",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3087,7 +2988,6 @@
 			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
 			"maxStackSize": 1,
 			"name": "Purifier I",
-			"producerId": "producer:purifier-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3104,7 +3004,6 @@
 			"description": "Produces stone when placed near a rock.",
 			"maxStackSize": 1,
 			"name": "Quarry I",
-			"producerId": "producer:quarry-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3120,7 +3019,6 @@
 			"label": "2",
 			"maxStackSize": 1,
 			"name": "Quarry",
-			"producerId": "producer:quarry-t2",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3140,7 +3038,6 @@
 			"description": "Workshop that fires clay into sturdy roof tiles.",
 			"maxStackSize": 1,
 			"name": "Roof Tile Factory",
-			"producerId": "producer:roof-tile-factory",
 			"storage": "both",
 			"tags": [
 				"building",
@@ -3158,7 +3055,6 @@
 			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
 			"maxStackSize": 1,
 			"name": "Sand Pit",
-			"producerId": "producer:sand-pit",
 			"storage": "both",
 			"tags": [
 				"building",
@@ -3177,7 +3073,6 @@
 			"description": "Turns logs into planks when placed near a lumberjack.",
 			"maxStackSize": 1,
 			"name": "Sawmill I",
-			"producerId": "producer:sawmill-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3192,7 +3087,6 @@
 			"description": "Education building that turns civic support into Basic Knowledge.",
 			"maxStackSize": 1,
 			"name": "School",
-			"producerId": "producer:school",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3209,7 +3103,6 @@
 			"description": "Consumes grain and water to produce wool.",
 			"maxStackSize": 1,
 			"name": "Sheep Pasture I",
-			"producerId": "producer:sheep-pasture-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3225,7 +3118,6 @@
 			"description": "Processes piglets into sausage and leather.",
 			"maxStackSize": 1,
 			"name": "Slaughterhouse I",
-			"producerId": "producer:slaughterhouse-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3242,7 +3134,6 @@
 			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
 			"maxStackSize": 1,
 			"name": "Smelter I",
-			"producerId": "producer:smelter-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3258,7 +3149,6 @@
 			"description": "Turns stone into stone blocks when placed near a quarry.",
 			"maxStackSize": 1,
 			"name": "Stonemason I",
-			"producerId": "producer:stonemason-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3274,7 +3164,6 @@
 			"label": "2",
 			"maxStackSize": 1,
 			"name": "Stonemason",
-			"producerId": "producer:stonemason-t2",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3294,7 +3183,6 @@
 			"description": "Clothing producer that sews common and luxury clothing.",
 			"maxStackSize": 1,
 			"name": "Tailor Workshop I",
-			"producerId": "producer:tailor-workshop-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3311,7 +3199,6 @@
 			"description": "Leatherworking producer that turns raw hide and water into leather.",
 			"maxStackSize": 1,
 			"name": "Tannery I",
-			"producerId": "producer:tannery-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3328,7 +3215,6 @@
 			"description": "Serves beer barrels as individual beers.",
 			"maxStackSize": 1,
 			"name": "Tavern I",
-			"producerId": "producer:tavern-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3344,7 +3230,6 @@
 			"description": "Starter civic hub that issues basic settlement blueprints.",
 			"maxStackSize": 1,
 			"name": "Town Hall I",
-			"producerId": "producer:townhall-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3360,7 +3245,6 @@
 			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall II",
-			"producerId": "producer:townhall-t2",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3376,7 +3260,6 @@
 			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, cookhouse, brewing, wine, market, and Era IV plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall III",
-			"producerId": "producer:townhall-t3",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3392,7 +3275,6 @@
 			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall IV",
-			"producerId": "producer:townhall-t4",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3408,7 +3290,6 @@
 			"description": "Advanced institution that converts paper, glass, coin stacks, and advanced knowledge into Master Knowledge.",
 			"maxStackSize": 1,
 			"name": "University",
-			"producerId": "producer:university",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3426,7 +3307,6 @@
 			"description": "Consumes water to produce vegetables.",
 			"maxStackSize": 1,
 			"name": "Vegetable Garden I",
-			"producerId": "producer:vegetable-garden-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3442,7 +3322,6 @@
 			"description": "Textile producer that weaves wool into common cloth.",
 			"maxStackSize": 1,
 			"name": "Weaver Hut I",
-			"producerId": "producer:weaver-hut-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3459,7 +3338,6 @@
 			"description": "Produces water.",
 			"maxStackSize": 1,
 			"name": "Well I",
-			"producerId": "producer:well-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3475,7 +3353,6 @@
 			"description": "Mills grain into flour.",
 			"maxStackSize": 1,
 			"name": "Windmill I",
-			"producerId": "producer:windmill-t1",
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -3492,7 +3369,6 @@
 			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
 			"maxStackSize": 1,
 			"name": "Winery I",
-			"producerId": "producer:winery-t1",
 			"storage": "both",
 			"tags": [
 				"producer",

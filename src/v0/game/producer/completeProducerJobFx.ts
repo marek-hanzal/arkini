@@ -83,8 +83,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		.exhaustive();
 
 	const producerBoardItem = save.board.items[liveJob.producerItemInstanceId];
-	const producerItem = producerBoardItem ? config.items[producerBoardItem.itemId] : undefined;
-	const producerId = producerItem?.producerId ?? "";
+	const producerId = producerBoardItem?.itemId ?? "";
 	const producerDefinition = producerId ? config.producers[producerId] : undefined;
 	const requirements = resolveGameRequirements({
 		config,

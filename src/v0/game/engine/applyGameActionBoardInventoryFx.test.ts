@@ -305,7 +305,6 @@ describe("applyGameActionFx BoardInventory", () => {
 				"item:craft-stack": {
 					assetId: "asset:test",
 					code: "craft-stack",
-					craftRecipeId: "craft:plank",
 					description: "Stackable craft target",
 					maxStackSize: 3,
 					name: "Craft Stack",
@@ -403,7 +402,7 @@ describe("applyGameActionFx BoardInventory", () => {
 		save.craftJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			recipeId: "craft:plank",
+			recipeId: "item:craft-table",
 			startAtMs: 0,
 			targetItemInstanceId: "item-instance:1",
 		};

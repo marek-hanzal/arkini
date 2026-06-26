@@ -68,11 +68,8 @@ const readUsedInMerges = ({ config, itemId }: { config: GameConfig; itemId: stri
 	});
 
 const readUsedInCrafts = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	Object.entries(config.items).flatMap(([targetItemId, targetItem]) => {
-		const recipe = targetItem.craftRecipeId
-			? config.craftRecipes[targetItem.craftRecipeId]
-			: undefined;
-		if (!recipe?.inputs.some((input) => input.itemId === itemId)) return [];
+	Object.entries(config.craftRecipes).flatMap(([targetItemId, recipe]) => {
+		if (!recipe.inputs.some((input) => input.itemId === itemId)) return [];
 
 		return [
 			{
@@ -192,8 +189,8 @@ const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: strin
 		tags: [
 			...item.tags,
 		],
-		canProduce: Boolean(item.producerId || item.stashId),
-		producerTrigger: item.producerId || item.stashId ? "click" : undefined,
+		canProduce: Boolean(config.producers[itemId] || config.stashes[itemId]),
+		producerTrigger: config.producers[itemId] || config.stashes[itemId] ? "click" : undefined,
 		canMerge: isMergeableItem({
 			config,
 			itemId,

@@ -34,7 +34,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				description: "Producer",
 				maxStackSize: 1,
 				name: "Producer",
-				producerId: "producer:test",
 				tags: [],
 				tier: 0,
 			},
@@ -59,6 +58,15 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tags: [],
 				tier: 1,
 			},
+			"item:craft-table": {
+				assetId: "asset:test",
+				code: "craft-table",
+				description: "Craft table",
+				maxStackSize: 1,
+				name: "Craft Table",
+				tags: [],
+				tier: 0,
+			},
 			"item:key": {
 				assetId: "asset:test",
 				code: "key",
@@ -74,7 +82,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				description: "Stash",
 				maxStackSize: 1,
 				name: "Stash",
-				stashId: "stash:test",
 				tags: [],
 				tier: 0,
 			},
@@ -121,7 +128,7 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 		},
 		producers: {
-			"producer:test": {
+			"item:producer": {
 				maxQueueSize: 1,
 				productIds: [
 					"product:test",
@@ -161,7 +168,7 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 		},
 		stashes: {
-			"stash:test": {
+			"item:stash": {
 				charges: 1,
 				inputs: [
 					{
@@ -185,7 +192,7 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 		},
 		craftRecipes: {
-			"craft:plank": {
+			"item:craft-table": {
 				durationMs: 1000,
 				inputs: [
 					{

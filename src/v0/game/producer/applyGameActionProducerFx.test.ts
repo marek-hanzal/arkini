@@ -273,8 +273,8 @@ describe("applyGameActionFx Producer", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:near-twig",
 					],
@@ -343,8 +343,8 @@ describe("applyGameActionFx Producer", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:near-twig",
 					],
@@ -422,8 +422,8 @@ describe("applyGameActionFx Producer", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:near-twig",
 					],
@@ -1229,8 +1229,8 @@ describe("applyGameActionFx Producer", () => {
 		const config = createEngineTestConfig({
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					productIds: [
 						"product:shred",
 						"product:alt-shred",
@@ -1294,8 +1294,8 @@ describe("applyGameActionFx Producer", () => {
 		const config = createEngineTestConfig({
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					productIds: [
 						"product:shred",
 						"product:alt-shred",
@@ -1356,8 +1356,8 @@ describe("applyGameActionFx Producer", () => {
 		const config = createEngineTestConfig({
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					productIds: [
 						"product:shred",
 						"product:alt-shred",
@@ -1432,8 +1432,8 @@ describe("applyGameActionFx Producer", () => {
 		const config = createEngineTestConfig({
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					productIds: [
 						"product:shred",
 						"product:alt-shred",
@@ -1606,8 +1606,8 @@ describe("applyGameActionFx Producer", () => {
 		const config = createEngineTestConfig({
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},

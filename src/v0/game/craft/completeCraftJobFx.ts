@@ -85,8 +85,7 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		);
 	}
 
-	const targetDefinition = config.items[liveTarget.itemId];
-	if (targetDefinition?.craftRecipeId !== liveJob.recipeId) {
+	if (liveTarget.itemId !== liveJob.recipeId) {
 		return yield* Effect.fail(
 			GameEngineError.saveInvalid(
 				`Craft job "${liveJob.id}" target "${liveJob.targetItemInstanceId}" no longer matches recipe "${liveJob.recipeId}".`,

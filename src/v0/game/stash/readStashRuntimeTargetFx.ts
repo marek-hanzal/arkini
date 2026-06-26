@@ -22,13 +22,11 @@ export const readStashRuntimeTargetFx = Effect.fn("readStashRuntimeTargetFx")(fu
 		save,
 		stashItemInstanceId,
 	});
-	const stashId = config.items[stashItem.itemId]?.stashId;
-	const stash = stashId ? config.stashes[stashId] : undefined;
-	if (!stashId || !stash) {
+	const stashId = stashItem.itemId;
+	const stash = config.stashes[stashId];
+	if (!stash) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(
-				`Stash item "${stashItem.itemId}" references missing stash.`,
-			),
+			GameEngineError.configReferenceMissing(`Item "${stashItem.itemId}" is not a stash.`),
 		);
 	}
 

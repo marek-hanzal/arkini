@@ -14,6 +14,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 
 - Runtime truth: compiled JSON `GameConfig` + `GameSave` inside `RuntimeGameEngineAdapter` / `GameRuntimeStore`.
 - Product lines own their activation `inputs` and `output` inline. Stashes and effect output mutations also own output inline. There are no top-level product input/loot tables and no legacy product output refs; do not reintroduce one-off indirection pretending to be reuse.
+- Producer, stash, and craft capabilities are keyed by their owning item id. Items do not carry `producerId`, `stashId`, or `craftRecipeId`; one-to-one capability references are fake indirection, not architecture.
 - Action contracts live in `game/action`; output event contracts live in `game/event`; dense save contract stays in `game/engine/model`.
 - React reads runtime through `useGameRuntimeSelector` / focused hooks, not React Query.
 - Gameplay mutations go through typed engine actions, not `useMutation` wrappers.

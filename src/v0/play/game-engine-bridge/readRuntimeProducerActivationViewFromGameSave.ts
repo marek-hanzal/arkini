@@ -246,10 +246,9 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 	nowMs,
 	save,
 }: readRuntimeProducerActivationViewFromGameSave.Props): ActivationView | undefined => {
-	const item = config.items[boardItem.itemId];
-	const producerId = item?.producerId;
-	const producer = producerId ? config.producers[producerId] : undefined;
-	if (!producerId || !producer) return undefined;
+	const producerId = boardItem.itemId;
+	const producer = config.producers[producerId];
+	if (!producer) return undefined;
 
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,

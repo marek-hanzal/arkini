@@ -22,8 +22,8 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:producer-axe",
 					],
@@ -94,8 +94,8 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			},
 			producers: {
 				...baseConfig.producers,
-				"producer:test": {
-					...baseConfig.producers["producer:test"],
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
 					requirementIds: [
 						"requirement:near-twig",
 					],
@@ -397,7 +397,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:craft-table": {
 					assetId: "asset:test",
 					code: "craft-table",
-					craftRecipeId: "craft:plank",
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -469,7 +468,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:craft-table": {
 					assetId: "asset:test",
 					code: "craft-table",
-					craftRecipeId: "craft:plank",
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -578,7 +576,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:craft-table": {
 					assetId: "asset:test",
 					code: "craft-table",
-					craftRecipeId: "craft:plank",
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -628,8 +625,8 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		const config = createEngineTestConfig({
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					output: [
 						{
 							itemId: "item:twig",

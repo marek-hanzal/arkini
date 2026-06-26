@@ -397,17 +397,17 @@ describe("createGameEngineVisualPlan", () => {
 					nextQuantity: 1,
 					previousQuantity: 0,
 					quantity: 1,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					atMs: 1,
 					type: "stash_input.stored",
+					stashId: "item:stash",
 				},
 				{
 					atMs: 1,
 					remainingCharges: 0,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					type: "stash.opened",
+					stashId: "item:stash",
 				},
 			] satisfies GameEvent[],
 			previousBoard,
@@ -479,17 +479,17 @@ describe("createGameEngineVisualPlan", () => {
 					nextQuantity: 1,
 					previousQuantity: 0,
 					quantity: 1,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					atMs: 1,
 					type: "stash_input.stored",
+					stashId: "item:stash",
 				},
 				{
 					atMs: 1,
 					remainingCharges: 0,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					type: "stash.opened",
+					stashId: "item:stash",
 				},
 			] satisfies GameEvent[],
 			previousBoard,
@@ -545,9 +545,9 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					atMs: 1,
 					remainingCharges: 0,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					type: "stash.opened",
+					stashId: "item:stash",
 				},
 				{
 					itemId: "item:twig",
@@ -587,9 +587,9 @@ describe("createGameEngineVisualPlan", () => {
 				},
 				{
 					atMs: 1,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					type: "stash.depleted",
+					stashId: "item:stash",
 				},
 				{
 					itemId: "item:chest",
@@ -659,9 +659,9 @@ describe("createGameEngineVisualPlan", () => {
 			events: [
 				{
 					atMs: 1,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					type: "stash.depleted",
+					stashId: "item:stash",
 				},
 				{
 					itemId: "item:chest",
@@ -737,10 +737,10 @@ describe("createGameEngineVisualPlan", () => {
 					nextQuantity: 1,
 					previousQuantity: 0,
 					quantity: 1,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					atMs: 1,
 					type: "stash_input.stored",
+					stashId: "item:stash",
 				},
 				{
 					itemId: "item:twig",
@@ -756,9 +756,9 @@ describe("createGameEngineVisualPlan", () => {
 				},
 				{
 					atMs: 1,
-					stashId: "stash:chest",
 					stashItemInstanceId: "stash",
 					type: "stash.depleted",
+					stashId: "item:stash",
 				},
 				{
 					itemId: "item:chest",

@@ -22,12 +22,12 @@ export const readProducerRuntimeTargetFx = Effect.fn("readProducerRuntimeTargetF
 		producerItemInstanceId,
 		save,
 	});
-	const producerId = config.items[producerItem.itemId]?.producerId ?? "";
+	const producerId = producerItem.itemId;
 	const producerDefinition = config.producers[producerId];
 	if (!producerDefinition) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(
-				`Producer item "${producerItem.itemId}" references missing producer.`,
+				`Item "${producerItem.itemId}" is not a producer.`,
 			),
 		);
 	}

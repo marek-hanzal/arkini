@@ -197,14 +197,14 @@ describe("readActionReadinessFx", () => {
 		save.craftJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			recipeId: "craft:plank",
+			recipeId: "item:craft-table",
 			startAtMs: 0,
 			targetItemInstanceId: "item-instance:1",
 		};
 
 		const readiness = runReadiness({
 			action: {
-				recipeId: "craft:plank",
+				recipeId: "item:craft-table",
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.start",
 			},
@@ -289,8 +289,8 @@ describe("readActionReadinessFx", () => {
 		const config = createEngineTestConfig({
 			stashes: {
 				...baseConfig.stashes,
-				"stash:test": {
-					...baseConfig.stashes["stash:test"],
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
 					inputs: [
 						{
 							capacity: 2,

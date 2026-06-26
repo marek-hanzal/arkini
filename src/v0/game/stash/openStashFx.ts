@@ -12,6 +12,8 @@ import { storeStashResolvedInput } from "~/v0/game/stash/storeStashResolvedInput
 import { readStashInputsReady } from "~/v0/game/stash/readStashInputsReady";
 import { resolveStashOpenInputRefsFx } from "~/v0/game/stash/resolveStashOpenInputRefsFx";
 import { readStashOpenCoreFx } from "~/v0/game/stash/readStashOpenCoreFx";
+import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
+import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionStashOpen } from "~/v0/game/action/GameActionStashOpen";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -87,6 +89,17 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 			save: nextSave,
 		} satisfies GameEngineResult;
 	}
+
+	const storedRequirementItems = yield* readStoredRequirementQuantitiesFx({
+		save: nextSave,
+		targetItemInstanceId: action.stashItemInstanceId,
+	});
+	yield* checkGameRequirementsFx({
+		requirements: stash.requirements,
+		save: nextSave,
+		storedItems: storedRequirementItems,
+		targetItemInstanceId: action.stashItemInstanceId,
+	});
 
 	delete nextSave.stashInputs[action.stashItemInstanceId];
 	const placementRequests: GameSaveItemPlacementRequest[] = [];

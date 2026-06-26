@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { autoFillCraftInputsFx } from "~/v0/game/craft/autoFillCraftInputsFx";
 import { checkCraftStartReadinessFx } from "~/v0/game/craft/checkCraftStartReadinessFx";
+import { checkCraftStartRuntimeConstraintsFx } from "~/v0/game/craft/checkCraftStartRuntimeConstraintsFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
@@ -87,6 +88,14 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 		} satisfies GameEngineResult;
 	}
 
+	yield* checkCraftStartRuntimeConstraintsFx({
+		config,
+		nowMs,
+		recipe: checked.recipe,
+		save: nextSave,
+		targetItem: checked.targetItem,
+		targetItemInstanceId: action.targetItemInstanceId,
+	});
 	delete nextSave.craftInputs[action.targetItemInstanceId];
 	const jobId = yield* createGameJobIdFx();
 	const readyAtMs = nowMs + checked.recipe.durationMs;

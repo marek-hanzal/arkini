@@ -326,6 +326,74 @@ describe("applyGameActionFx Stash", () => {
 		]);
 	});
 
+	it("rechecks stash requirements after auto-filled inputs are consumed", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			stashes: {
+				...baseConfig.stashes,
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
+					requirements: [
+						{
+							itemId: "item:key",
+							quantity: 1,
+							scope: "board",
+							type: "passive",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:key",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				stashItemInstanceId: "item-instance:1",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "missing_requirement",
+			});
+		}
+		expect(save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:key",
+		});
+	});
+
 	it("opens every remaining stash charge in one atomic sequential-placement batch", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

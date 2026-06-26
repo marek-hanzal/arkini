@@ -233,6 +233,199 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 
+	it("rejects queued producer start when a block effect is active at queued start time", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-test": {
+					name: "Block test",
+					operations: [
+						{
+							kind: "line.blockStart",
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:block-test"] = {
+			endAtMs: 1500,
+			effectId: "effect:block-test",
+			id: "effect-instance:block-test",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 500,
+		};
+
+		const first = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const second = runActionEither({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save: first.save,
+		});
+
+		expect(second._tag).toBe("Left");
+		if (second._tag === "Left") {
+			expect(second.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "blocked",
+			});
+		}
+	});
+
+	it("does not let consumed input effects block their own producer start", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:twig-blocks-shred": {
+					name: "Twig blocks shred",
+					operations: [
+						{
+							kind: "line.blockStart",
+							target: {
+								productIds: [
+									"product:shred",
+								],
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:twig-blocks-shred",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(Object.values(result.save.producerJobs)).toHaveLength(1);
+		expect(result.save.inventory.slots[0]).toBeNull();
+	});
+
+	it("rechecks producer requirements after auto-filled inputs are consumed", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:near-twig": {
+					distance: 1,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					requirementIds: [
+						"requirement:near-twig",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "missing_requirement",
+			});
+		}
+		expect(save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+		});
+	});
+
 	it("evaluates queued producer output against the queued start time", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

@@ -60,6 +60,14 @@ export const checkTileRemoveReadinessFx = Effect.fn("checkTileRemoveReadinessFx"
 			),
 		);
 	}
+	if (Object.values(save.craftJobs).some((job) => job.targetItemInstanceId === target.id)) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"invalid_actor",
+				"Tile has a running craft job and cannot be removed.",
+			),
+		);
+	}
 
 	const targetDefinition = config.items[target.itemId];
 	const removal = targetDefinition?.removeBy?.find((entry) => entry.itemId === tool.itemId);

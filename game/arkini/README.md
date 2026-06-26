@@ -52,8 +52,9 @@ Townhall tiers are authored as separate producer buildings:
 producer:townhall-t1  Era I construction foundation blueprints
 producer:townhall-t2  Era II raw food and livestock blueprints
 producer:townhall-t3  Era III food processing and first trade blueprints
-producer:townhall-t4  Era IV civic administration, Market II, Era V textile/clothing, and Era VI advanced construction plans
-producer:academy      Era VII industrial knowledge, mining, metallurgy, and pollution cleanup plans
+producer:townhall-t4  Era IV civic administration, Market II, Era V textile/clothing, and Prospector Guild 1
+producer:civic-office  Era IV permits plus the Academy blueprint bridge into mining
+producer:academy      Era VII mining expansion and Era VIII dirty-processing/material plans
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
@@ -106,26 +107,18 @@ Town Hall IV
   Building Permit + Wool + Paper -> Weaver Hut I Blueprint
   Building Permit + Common Cloth + Vegetables + Paper -> Dye Workshop I Blueprint
   Building Permit + Common Cloth + Leather + Paper -> Tailor Workshop I Blueprint
-  Building Permit + Luxury Clothing + Log + Paper -> Charcoal Burner I Blueprint
-  Building Permit + Luxury Clothing + Paper -> Clay Pit Blueprint
-  Building Permit + Luxury Clothing + Paper -> Sand Pit Blueprint
-  Building Permit + Luxury Clothing + Clay + Paper -> Brickyard Blueprint
-  Building Permit + Luxury Clothing + Sand + Paper -> Glassworks Blueprint
-  Building Permit + Luxury Clothing + Clay + Paper -> Roof Tile Factory Blueprint
-  Building Permit + Luxury Clothing + Bricks + Glass + Roof Tiles + Coin -> Construction Yard I Blueprint
 
-Construction Yard I
-  Construction Bundle + Building Permit + Basic Knowledge + Paper + Coin -> Academy Blueprint
+Civic Office I
+  Paper + Basic Knowledge + Coin -> Building Permit
+  Building Permit + Basic Knowledge + Paper + Luxury Clothing + Coin -> Academy Blueprint
 
 Academy
   Paper + Coin -> Basic Knowledge
-  Basic Knowledge + Paper + Coin + Construction Bundle -> Advanced Knowledge
-  Advanced Knowledge + Construction Bundle + Building Permit + 2 Coin -> Prospector Guild 2 Blueprint
-  Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Coal Mine I Blueprint
-  Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Iron Mine I Blueprint
-  Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Gold Mine I Blueprint
-  Advanced Knowledge + Construction Bundle + Building Permit + Bricks + Charcoal + Coin -> Smelter I Blueprint
-  Advanced Knowledge + Construction Bundle + Building Permit + Glass + Charcoal + Coin -> Purifier I Blueprint
+  Basic Knowledge + Paper + Coin -> Advanced Knowledge
+  Advanced Knowledge + Building Permit + Paper + Coin -> Prospector Guild 2 Blueprint
+  Advanced Knowledge + Building Permit + Paper + Coin -> Mine Blueprints
+  Advanced Knowledge + Coal + Water + Coin -> Purifier I Blueprint
+  Advanced Knowledge + Coal/Clay/Sand/Charcoal + Building Permit + Coin -> dirty processing blueprints
 
 Prospector Guild 1
   Building Permit + Basic Knowledge + Coin -> Clay Deposit
@@ -134,16 +127,16 @@ Prospector Guild 1
 Prospector Guild 2
   Building Permit + Basic Knowledge + Coin -> Clay Deposit
   Building Permit + Basic Knowledge + Coin -> Sand Deposit
-  Advanced Knowledge + Building Permit + Construction Bundle + 2 Coin -> Coal Deposit
-  Advanced Knowledge + Building Permit + Construction Bundle + 2 Coin -> Iron Deposit
-  Advanced Knowledge + Building Permit + Construction Bundle + 4 Coin -> Gold Deposit
+  Advanced Knowledge + Building Permit + Coin -> Coal Deposit
+  Advanced Knowledge + Building Permit + Coin -> Iron Deposit
+  Advanced Knowledge + Building Permit + Coin -> Gold Deposit
 ```
 
 Market is a tiered trade building line. Market I starts first trade in Era III; Market II is a new Era IV building upgrade with stronger trade options, civic-era possibilities, and later luxury/textile trades.
 
 ### Implemented first wave
 
-The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, prospecting, an improved Market II trade step, Era V textile/clothing production, Era VI advanced construction materials, and Era VII mining/metallurgy through Academy-driven industrial plans.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, prospecting, an improved Market II trade step, Era V textile/clothing production, Era VII mining through Academy-driven Prospector Guild 2 plans, and Era VIII dirty processing / advanced construction materials. The old “all heavy industry at once” blob has been split because apparently pacing is healthier than throwing every furnace at the player like a drunk civil engineer.
 
 Wood pair:
 
@@ -224,27 +217,30 @@ Era V textile and clothing
   Tailor Workshop I + Luxury Cloth + Leather + Coin -> Luxury Clothing
   Market II + Common Clothing -> Coin
   Market II + Luxury Clothing -> more Coin
-Era VI advanced construction materials
-  Charcoal Burner I + Log -> Charcoal
+Era VII mining expansion
+  Civic Office I + Building Permit + Basic Knowledge + Paper + Luxury Clothing + Coin -> Academy Blueprint
+  Academy + Basic Knowledge + Paper + Coin -> Advanced Knowledge
+  Academy + Advanced Knowledge + Building Permit + Paper + Coin -> Prospector Guild 2 Blueprint
+  Prospector Guild 2 + Advanced Knowledge + Building Permit + Coin -> Coal Deposit
+  Prospector Guild 2 + Advanced Knowledge + Building Permit + Coin -> Iron Deposit
+  Prospector Guild 2 + Advanced Knowledge + Building Permit + Coin -> Gold Deposit
+  Academy + Advanced Knowledge + Building Permit + Paper + Coin -> Mine Blueprints
+  Mines + crew supplies + nearby deposit -> Coal / Iron Ore / Gold Ore
+  Gold Ore is the current Era VII master output.
+
+Era VIII dirty processing and advanced construction materials
+  Academy + Coal + Water + Advanced Knowledge -> Purifier I Blueprint
+  Purifier I must be owned and nearby before dirty product lines run.
+  Charcoal Burner I + Log + nearby Purifier -> Charcoal + random Pollution
   Clay Pit + Water + nearby Clay Deposit -> Clay
   Sand Pit + nearby Sand Deposit -> Sand
-  Brickyard + Clay + Charcoal + Water -> Bricks
-  Glassworks + Sand + Charcoal -> Glass
-  Roof Tile Factory + Clay + Charcoal + Water -> Roof Tiles
-  Construction Yard I + Bricks + Glass + Roof Tiles + Building Permit + Luxury Clothing + Coin -> Construction Bundle
-
-Era VII mining and metallurgy
-  Construction Yard I + Construction Bundle + Building Permit + Basic Knowledge + Paper + Coin -> Academy Blueprint
-  Academy + Basic Knowledge + Paper + Coin + Construction Bundle -> Advanced Knowledge
-  Academy + Advanced Knowledge + Construction Bundle + Building Permit + 2 Coin -> Prospector Guild 2 Blueprint
-  Prospector Guild 2 + Advanced Knowledge + Building Permit + Construction Bundle + 2 Coin -> Coal Deposit
-  Prospector Guild 2 + Advanced Knowledge + Building Permit + Construction Bundle + 2 Coin -> Iron Deposit
-  Prospector Guild 2 + Advanced Knowledge + Building Permit + Construction Bundle + 4 Coin -> Gold Deposit
-  Academy + Advanced Knowledge + Construction Bundle + Building Permit + Coin -> Mine Blueprints
-  Academy + Advanced Knowledge + Construction Bundle + Building Permit + Bricks/Glass + Charcoal + Coin -> Smelter/Purifier Blueprints
-  Mines + crew supplies + nearby deposit -> Coal / Iron Ore / Gold Ore
-  Smelter + Ore + Coal + Water -> Ingot + Pollution
+  Brickyard + Clay + Charcoal + Water + nearby Purifier -> Bricks + random Pollution
+  Glassworks + Sand + Charcoal + nearby Purifier -> Glass + random Pollution
+  Roof Tile Factory + Clay + Charcoal + Water + nearby Purifier -> Roof Tiles + random Pollution
+  Smelter + Ore + Coal + Water + nearby Purifier -> Ingot + random Pollution
   Purifier + Pollution + Water + Charcoal -> nothing
+  Construction Yard I + Bricks + Glass + Roof Tiles + Gold Ingot + Building Permit + Luxury Clothing -> Construction Bundle
+  Construction Bundle is the current Era VIII master output.
 ```
 
 ### Initial balance placeholder
@@ -320,18 +316,18 @@ The textile and clothing pass adds dedicated 128x128 transparent PNG coverage fo
 
 `Luxury Clothing` is the current Era V master item. It is also sellable through Market II so the chain stays useful before the next era consumes it.
 
-### Era VI advanced construction asset IDs
+### Era VIII advanced construction / dirty processing asset IDs
 
-The advanced construction pass adds dedicated 128x128 transparent PNG coverage for the new charcoal and construction-yard pieces:
+The dirty processing / advanced construction pass uses the existing dedicated 128x128 transparent PNG coverage for the charcoal and construction-yard pieces:
 
 - `asset:producer:charcoal-burner-t1` -> `game/arkini/assets/producer-charcoal-burner-t1.png`
 - `asset:producer:construction-yard-t1` -> `game/arkini/assets/producer-construction-yard-t1.png`
 - `asset:item:charcoal` -> `game/arkini/assets/item-charcoal.png`
 - `asset:item:construction-bundle` -> `game/arkini/assets/item-construction-bundle.png`
 
-Existing prepared construction assets are now connected into Era VI: Clay Pit, Sand Pit, Brickyard, Glassworks, Roof Tile Factory, Clay, Sand, Bricks, Glass, and Roof Tiles.
+Existing prepared construction assets are now connected into Era VIII: Clay Pit, Sand Pit, Brickyard, Glassworks, Roof Tile Factory, Clay, Sand, Bricks, Glass, and Roof Tiles.
 
-`Construction Bundle` is the Era VI master item and now points into Academy-driven Era VII industry.
+`Construction Bundle` is the Era VIII master item and becomes the material base for later advanced civic/guild buildings.
 
 ### Asset alignment and current art gaps
 
@@ -482,9 +478,9 @@ Prepared item asset IDs:
 - `asset:item:gold-deposit` -> `game/arkini/assets/item-gold-deposit.png`
 - `asset:item:hops` -> `game/arkini/assets/item-hops.png` (refreshed with the improved hop illustration)
 
-### Heavy industry gameplay
+### Mining and dirty industry gameplay
 
-Heavy industry is connected as Era VII progression through Construction Yard, Academy, and Prospector Guild 2. Use cheat inventory to stress-test it without replaying half of civilization every time, because we are not monsters on purpose.
+Mining is now the focused Era VII progression through Academy and Prospector Guild 2. Dirty processing is the following Era VIII layer: Purifier comes first, and any coal/charcoal product line must run near it and may emit board-only pollution. Tiny OSHA, but with worse paperwork.
 
 `item:sausage` is now produced by the slaughterhouse branch of the food chain instead of being a placeholder. Good, the economy no longer pretends sausages grow in config comments.
 
@@ -504,15 +500,15 @@ producer:gold-mine-t1
   Bread + Wine Glass + Luxury Clothing -> Gold Ore Cart
 ```
 
-The smelter consumes ore, coal fuel, and water for every ingot. Worker provisions stay in the mines; the furnace gets actual fuel and cooling because apparently metallurgy is not catering.
+The smelter consumes ore, coal fuel, and water for every ingot. It requires nearby Purifier support and emits pollution through chance side outputs instead of guaranteed soot every single run. Worker provisions stay in the mines; the furnace gets actual fuel and cooling because apparently metallurgy is not catering.
 
 ```txt
 producer:smelter-t1
-  Iron Ore Cart + Coal Cart + Water -> Iron Ingot + Pollution
-  Gold Ore Cart + 2 Coal Cart + Water -> Gold Ingot + Pollution
+  Iron Ore Cart + Coal Cart + Water + nearby Purifier -> Iron Ingot + random Pollution
+  Gold Ore Cart + 2 Coal Cart + Water + nearby Purifier -> Gold Ingot + random Pollution
 ```
 
-The purifier is a delayed sink for board-only pollution. It intentionally has no output table; the product consumes pollution and finishes without spawning anything. It has a single-cleanup line plus a bulk quality-of-life line:
+The purifier is an early required sink for board-only pollution. It intentionally has no output table; the product consumes pollution and finishes without spawning anything. It has a single-cleanup line plus a bulk quality-of-life line:
 
 ```txt
 producer:purifier-t1

@@ -119,6 +119,14 @@
 			],
 			"distance": 2,
 			"durationFactor": 1
+		},
+		"proximity:dirty-processing:purifier": {
+			"type": "proximity",
+			"itemIds": [
+				"producer:purifier-t1"
+			],
+			"distance": 3,
+			"durationFactor": 1
 		}
 	}
 }

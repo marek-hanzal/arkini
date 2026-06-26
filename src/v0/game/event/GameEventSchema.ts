@@ -220,6 +220,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			sourceItemInstanceId: IdSchema,
 			startAtMs: GameInstantMsSchema,
 			endAtMs: GameInstantMsSchema,
+			producerJobId: IdSchema.optional(),
 		})
 		.strict(),
 	z
@@ -228,6 +229,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			id: IdSchema,
 			effectId: IdSchema,
 			sourceItemInstanceId: IdSchema,
+			producerJobId: IdSchema.optional(),
 			atMs: GameInstantMsSchema,
 		})
 		.strict(),

@@ -148,6 +148,13 @@ const GameSaveStoredRequirementStateSchema = z
 	})
 	.strict();
 
+const GameSaveItemSpawnJobSeedCellSchema = z
+	.object({
+		x: NonNegativeIntegerSchema,
+		y: NonNegativeIntegerSchema,
+	})
+	.strict();
+
 const GameSaveItemSpawnJobBaseSchema = z
 	.object({
 		id: IdSchema,
@@ -155,6 +162,8 @@ const GameSaveItemSpawnJobBaseSchema = z
 		exclusiveGroupKey: IdSchema.optional(),
 		afterJobIds: z.array(IdSchema).optional(),
 		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
+		seedCell: GameSaveItemSpawnJobSeedCellSchema.optional(),
+		sequenceIndex: NonNegativeIntegerSchema.optional(),
 	})
 	.strict()
 	.refine(

@@ -96,6 +96,7 @@ export class RuntimeGameEngineAdapter {
 
 		const nextWakeAtMs = await runGameEngineEffect(
 			readNextWakeAtMsFx({
+				nowMs,
 				save,
 			}),
 			{
@@ -136,19 +137,21 @@ export class RuntimeGameEngineAdapter {
 		action,
 		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
-		await this.mutationQueue;
+		return this.enqueueMutation(async () => {
+			await this.catchUpDueTicks(nowMs);
 
-		return runGameEngineEffect(
-			readActionReadinessFx({
-				action,
-				config: this.config,
-				nowMs,
-				save: this.save,
-			}),
-			{
-				random: this.random,
-			},
-		);
+			return runGameEngineEffect(
+				readActionReadinessFx({
+					action,
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			);
+		});
 	}
 
 	async dispatch({
@@ -156,6 +159,8 @@ export class RuntimeGameEngineAdapter {
 		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.DispatchProps): Promise<GameEngineResult> {
 		return this.enqueueMutation(async () => {
+			await this.catchUpDueTicks(nowMs);
+
 			const result = await runGameEngineEffect(
 				applyGameActionFx({
 					action,
@@ -182,6 +187,7 @@ export class RuntimeGameEngineAdapter {
 		return this.enqueueMutation(async () => {
 			const nextWakeAtMs = await runGameEngineEffect(
 				readNextWakeAtMsFx({
+					nowMs,
 					save,
 				}),
 				{
@@ -224,6 +230,29 @@ export class RuntimeGameEngineAdapter {
 
 			return result;
 		});
+	}
+
+	private async catchUpDueTicks(nowMs: number) {
+		let tickCount = 0;
+		while (this.nextWakeAtMs !== null && this.nextWakeAtMs <= nowMs) {
+			tickCount += 1;
+			if (tickCount > 100) {
+				throw new Error("Game runtime catch-up exceeded 100 due ticks.");
+			}
+
+			const result = await runGameEngineEffect(
+				runGameTickFx({
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			);
+
+			this.commit(result);
+		}
 	}
 
 	private enqueueMutation<T>(run: () => Promise<T>): Promise<T> {

@@ -67,6 +67,8 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			itemId: IdSchema,
 			originItemInstanceId: IdSchema.optional(),
 			reason: GameItemCreatedReasonSchema,
+			spawnJobId: IdSchema.optional(),
+			spawnSequenceIndex: NonNegativeIntegerSchema.optional(),
 			to: GameEventPlacementTargetSchema,
 		})
 		.strict(),

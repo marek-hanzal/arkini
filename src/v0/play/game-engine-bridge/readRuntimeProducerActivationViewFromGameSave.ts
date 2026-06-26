@@ -12,6 +12,7 @@ import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerPr
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
+import { readFirstProducerQueueJobs } from "~/v0/game/producer/readFirstProducerQueueJobs";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
 	readRuntimeMissingRequirementItemIdsFromGameSave,
@@ -62,9 +63,13 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	save: GameSave;
 	targetItemInstanceId: string;
 }): ProducerProductLineView[] => {
-	const producerQueuedJobs = Object.values(save.producerJobs).filter(
+	const producerJobs = Object.values(save.producerJobs).filter(
 		(job) => job.producerItemInstanceId === targetItemInstanceId,
-	).length;
+	);
+	const producerQueuedJobs = producerJobs.length;
+	const firstProducerJob = readFirstProducerQueueJobs(save).find(
+		(job) => job.producerItemInstanceId === targetItemInstanceId,
+	);
 	const queueFull = producerQueuedJobs >= maxQueueSize;
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
@@ -123,17 +128,13 @@ const readRuntimeProductLineViewsFromGameSave = ({
 			save,
 			targetItemInstanceId,
 		});
-		const jobs = Object.values(save.producerJobs)
-			.filter(
-				(job) =>
-					job.producerItemInstanceId === targetItemInstanceId &&
-					job.productId === productId,
-			)
+		const jobs = producerJobs
+			.filter((job) => job.productId === productId)
 			.sort(
 				(left, right) =>
 					left.startedAtMs - right.startedAtMs || left.id.localeCompare(right.id),
 			);
-		const activeJob = jobs.find((job) => job.completesAtMs > nowMs) ?? jobs[0];
+		const activeJob = firstProducerJob?.productId === productId ? firstProducerJob : undefined;
 		const baseDurationMs = readProducerProductDurationMs({
 			hindrances,
 			product,

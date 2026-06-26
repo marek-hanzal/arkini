@@ -85,6 +85,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 			},
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: nextSave,
 		}),
 		save: nextSave,

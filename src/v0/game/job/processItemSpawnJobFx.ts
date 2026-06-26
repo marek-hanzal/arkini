@@ -27,10 +27,12 @@ export const processItemSpawnJobFx = Effect.fn("processItemSpawnJobFx")(function
 	itemSpawnJob,
 	nowMs,
 }: processItemSpawnJobFx.Props) {
-	const seedCell = readBoardItemCell({
-		itemInstanceId: itemSpawnJob.originItemInstanceId,
-		save,
-	});
+	const seedCell =
+		itemSpawnJob.seedCell ??
+		readBoardItemCell({
+			itemInstanceId: itemSpawnJob.originItemInstanceId,
+			save,
+		});
 	const placementEither = yield* Effect.either(
 		placeGameSaveItemsFx({
 			config,
@@ -96,7 +98,15 @@ export const processItemSpawnJobFx = Effect.fn("processItemSpawnJobFx")(function
 	placement.save.updatedAtMs = nowMs;
 
 	return {
-		events: placement.events,
+		events: placement.events.map((event) =>
+			event.type === "item.created"
+				? {
+						...event,
+						spawnJobId: itemSpawnJob.id,
+						spawnSequenceIndex: itemSpawnJob.sequenceIndex,
+					}
+				: event,
+		),
 		save: placement.save,
 		type: "completed" as const,
 	} satisfies GameEngineCompletionResult;

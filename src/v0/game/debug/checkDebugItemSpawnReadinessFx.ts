@@ -3,6 +3,7 @@ import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
+import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -70,16 +71,23 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 			);
 		}
 
-		yield* checkItemCreateBlockedByEffectsFx({
-			config,
-			itemId: action.itemId,
-			nowMs,
-			save,
-		});
-
 		const quantity = action.quantity ?? 1;
 
 		if (action.location === "board") {
+			const boardCells = yield* planEmptyBoardCellsFx({
+				config,
+				save,
+			});
+			for (const targetCell of boardCells.slice(0, quantity)) {
+				yield* checkItemCreateBlockedByEffectsFx({
+					config,
+					itemId: action.itemId,
+					nowMs,
+					save,
+					targetCell,
+				});
+			}
+
 			const boardMaxCountCapacity = readBoardItemMaxCountCapacity({
 				config,
 				itemId: action.itemId,
@@ -107,6 +115,13 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 			}
 			return;
 		}
+
+		yield* checkItemCreateBlockedByEffectsFx({
+			config,
+			itemId: action.itemId,
+			nowMs,
+			save,
+		});
 
 		if (
 			!hasInventoryCapacity({

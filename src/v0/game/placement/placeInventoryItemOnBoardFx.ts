@@ -134,6 +134,7 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 				},
 			],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				nowMs,
 				save: nextSave,
 			}),
 			save: nextSave,
@@ -176,6 +177,7 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 				...placed.events,
 			],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				nowMs,
 				save: placed.save,
 			}),
 			save: placed.save,
@@ -217,6 +219,7 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 			},
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: nextSave,
 		}),
 		save: nextSave,

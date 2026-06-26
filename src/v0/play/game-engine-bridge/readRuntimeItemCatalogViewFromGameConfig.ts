@@ -163,6 +163,7 @@ const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: 
 				})),
 				radius: effect.scope === "local" ? effect.radius : undefined,
 				scope: effect.scope,
+				sourceScope: effect.sourceScope ?? "board",
 			},
 		];
 	});

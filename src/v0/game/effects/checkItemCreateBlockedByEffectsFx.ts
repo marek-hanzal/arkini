@@ -35,7 +35,7 @@ export const checkItemCreateBlockedByEffectsFx = Effect.fn("checkItemCreateBlock
 		const [firstReason] = blockReasons;
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
-				"blocked",
+				"effect:block-create",
 				firstReason?.reason ??
 					`Item "${itemId}" cannot be created while effect "${firstReason?.effectName ?? "unknown"}" is active.`,
 			),

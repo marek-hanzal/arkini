@@ -4,4 +4,5 @@ export interface GameEffectSourceInstance {
 	kind: "active" | "passive";
 	sourceId: string;
 	sourceItemInstanceId: string;
+	sourceLocation: "board" | "inventory";
 }

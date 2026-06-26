@@ -7,6 +7,7 @@ import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProduce
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
+import { readProducerJobWakeAtMs } from "~/v0/game/producer/producerDeliveryTiming";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
@@ -95,6 +96,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			return {
 				events: consumed.events,
 				nextWakeAtMs: yield* readNextWakeAtMsFx({
+					nowMs,
 					save: nextSave,
 				}),
 				save: nextSave,
@@ -111,7 +113,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		nowMs,
 		...Object.values(nextSave.producerJobs)
 			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
-			.map((job) => job.completesAtMs),
+			.map(readProducerJobWakeAtMs),
 	);
 	const durationMs = checked.effectiveProductLine.durationMs;
 	const completesAtMs = queuedStartAtMs + durationMs;
@@ -166,6 +168,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 				: []),
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: nextSave,
 		}),
 		save: nextSave,

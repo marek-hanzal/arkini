@@ -81,6 +81,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		return {
 			events,
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				nowMs,
 				save: nextSave,
 			}),
 			save: nextSave,
@@ -108,11 +109,17 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		itemInstanceId: action.stashItemInstanceId,
 		save: nextSave,
 	});
+	const preflightSave = yield* cloneGameSaveFx({
+		save: nextSave,
+	});
+	if (stash.onDepleted === "remove") {
+		delete preflightSave.board.items[action.stashItemInstanceId];
+	}
 	yield* placeGameSaveItemsFx({
 		config,
 		items: placementRequests,
 		nowMs,
-		save: nextSave,
+		save: preflightSave,
 		seedCell,
 	}).pipe(
 		Effect.catchTag("GamePlacementFailed", (error) =>
@@ -125,25 +132,25 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		),
 	);
 
-	yield* createItemSpawnJobsFx({
-		dueAtMs: nowMs,
-		items: placementRequests,
-		save: nextSave,
-	});
-	const spawned = yield* processItemSpawnJobsFx({
-		config,
-		nowMs,
-		save: nextSave,
-	});
-
 	const nextRemainingCharges = 0;
 	const depletionEvents = yield* applyStashDepletionFx({
 		config,
 		nowMs,
 		onDepleted: stash.onDepleted,
-		save: spawned.save,
+		save: nextSave,
 		stashItemId: stashItem.itemId,
 		stashItemInstanceId: action.stashItemInstanceId,
+	});
+	yield* createItemSpawnJobsFx({
+		dueAtMs: nowMs,
+		items: placementRequests,
+		save: nextSave,
+		seedCell,
+	});
+	const spawned = yield* processItemSpawnJobsFx({
+		config,
+		nowMs,
+		save: nextSave,
 	});
 	spawned.save.updatedAtMs = nowMs;
 
@@ -157,7 +164,6 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 				stashItemInstanceId: action.stashItemInstanceId,
 				type: "stash.opened" as const,
 			},
-			...spawned.events,
 			{
 				depletedAtMs: nowMs,
 				stashId,
@@ -165,8 +171,10 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 				type: "stash.depleted" as const,
 			},
 			...depletionEvents,
+			...spawned.events,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			nowMs,
 			save: spawned.save,
 		}),
 		save: spawned.save,

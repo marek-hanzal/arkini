@@ -15,6 +15,11 @@ const ViewItemGeneratedEffectSchema = z.object({
 		"global",
 		"local",
 	]),
+	sourceScope: z.enum([
+		"board",
+		"inventory",
+		"both",
+	]),
 });
 
 export const ViewItemSchema = z.object({

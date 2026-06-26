@@ -406,21 +406,31 @@ const GameEffectOperationSchema = z.discriminatedUnion("kind", [
 		.strict(),
 ]);
 
+const GameEffectSourceScopeSchema = z.enum([
+	"board",
+	"inventory",
+	"both",
+]);
+
+const GameEffectCommonDefinitionFieldsSchema = {
+	name: z.string().min(1),
+	operations: z.array(GameEffectOperationSchema).min(1),
+	sourceScope: GameEffectSourceScopeSchema.optional(),
+};
+
 /** Runtime mutator definition. Effects never mutate GameConfig; they shape runtime views. */
 const GameEffectDefinitionSchema = z.discriminatedUnion("scope", [
 	z
 		.object({
-			name: z.string().min(1),
+			...GameEffectCommonDefinitionFieldsSchema,
 			scope: z.literal("global"),
-			operations: z.array(GameEffectOperationSchema).min(1),
 		})
 		.strict(),
 	z
 		.object({
-			name: z.string().min(1),
+			...GameEffectCommonDefinitionFieldsSchema,
 			scope: z.literal("local"),
 			radius: PositiveIntegerSchema,
-			operations: z.array(GameEffectOperationSchema).min(1),
 		})
 		.strict(),
 ]);

@@ -11,6 +11,12 @@ export namespace ItemGeneratedEffectsCard {
 const readScopeLabel = (effect: ViewItemGeneratedEffect) =>
 	effect.scope === "global" ? "Global" : `Local radius ${effect.radius ?? "?"}`;
 
+const readSourceScopeLabel = (effect: ViewItemGeneratedEffect) => {
+	if (effect.sourceScope === "both") return "Active from board or inventory";
+	if (effect.sourceScope === "inventory") return "Active while stored in inventory";
+	return "Active while placed on board";
+};
+
 export const ItemGeneratedEffectsCard: FC<ItemGeneratedEffectsCard.Props> = ({ effects }) => {
 	if (effects.length === 0) return null;
 
@@ -34,6 +40,9 @@ export const ItemGeneratedEffectsCard: FC<ItemGeneratedEffectsCard.Props> = ({ e
 								{readScopeLabel(effect)}
 							</span>
 						</div>
+						<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
+							{readSourceScopeLabel(effect)}
+						</p>
 						<ul className="mt-2 grid gap-1.5">
 							{effect.operations.map((operation, index) => (
 								<li

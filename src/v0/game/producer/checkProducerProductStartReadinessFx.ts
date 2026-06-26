@@ -69,9 +69,19 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		);
 	}
 
-	const producerJobCount = Object.values(save.producerJobs).filter(
+	const producerJobs = Object.values(save.producerJobs).filter(
 		(job) => job.producerItemInstanceId === action.producerItemInstanceId,
-	).length;
+	);
+	const producerJobCount = producerJobs.length;
+	if (producerJobs.some((job) => job.delivery)) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"producer_queue_full",
+				`Producer item "${action.producerItemInstanceId}" queue is waiting for blocked delivery.`,
+			),
+		);
+	}
+
 	if (producerJobCount >= producerDefinition.maxQueueSize) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

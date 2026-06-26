@@ -6,6 +6,7 @@ import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxC
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
+import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 import {
 	isGameSaveInventoryInstance,
 	isGameSaveInventoryStack,
@@ -104,13 +105,6 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			);
 		}
 
-		yield* checkItemCreateBlockedByEffectsFx({
-			config,
-			itemId: slot.itemId,
-			nowMs,
-			save,
-		});
-
 		const itemDefinition = yield* readGameConfigItemDefinitionFx({
 			config,
 			itemId: slot.itemId,
@@ -177,6 +171,17 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 				);
 			}
 
+			yield* checkItemCreateBlockedByEffectsFx({
+				config,
+				itemId: slot.itemId,
+				nowMs,
+				save,
+				targetCell: {
+					x: action.x,
+					y: action.y,
+				},
+			});
+
 			return {
 				itemDefinition,
 				slot,
@@ -222,6 +227,24 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 				);
 			}
 
+			const [targetCell] = yield* planEmptyBoardCellsFx({
+				config,
+				save,
+				seedCell: {
+					x: action.x,
+					y: action.y,
+				},
+			});
+			if (targetCell) {
+				yield* checkItemCreateBlockedByEffectsFx({
+					config,
+					itemId: liveSlot.itemId,
+					nowMs,
+					save,
+					targetCell,
+				});
+			}
+
 			return {
 				itemDefinition,
 				slot,
@@ -242,6 +265,25 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			itemId: liveSlot.itemId,
 			save,
 		});
+		const boardPlacementCells = boardCapacity > 0
+			? yield* planEmptyBoardCellsFx({
+					config,
+					save,
+					seedCell: {
+						x: action.x,
+						y: action.y,
+					},
+				})
+			: [];
+		for (const targetCell of boardPlacementCells.slice(0, Math.min(quantity, boardCapacity))) {
+			yield* checkItemCreateBlockedByEffectsFx({
+				config,
+				itemId: liveSlot.itemId,
+				nowMs,
+				save,
+				targetCell,
+			});
+		}
 		const inventoryCapacity = readInventoryStackCapacity({
 			itemId: liveSlot.itemId,
 			maxStackSize: itemDefinition.maxStackSize,

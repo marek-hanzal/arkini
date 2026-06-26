@@ -69,7 +69,6 @@ const createConfigValue = () => ({
 				"product:test",
 			],
 			requirementIds: [],
-			type: "producer",
 		},
 	},
 	stashes: {},

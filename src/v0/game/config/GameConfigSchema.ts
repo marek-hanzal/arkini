@@ -146,9 +146,11 @@ const ProbabilityDeltaSchema = z.number().min(-1).max(1);
  * Keep this as an enum even while it has one value so runtime code can use exhaustive
  * matching when future placement modes finally arrive to make our lives worse.
  */
-const PlacementSchema = z.enum([
-	"board_then_inventory",
-]);
+const PlacementSchema = z
+	.enum([
+		"board_then_inventory",
+	])
+	.default("board_then_inventory");
 
 /** Persistent location policy for item definitions. */
 const ItemStoragePolicySchema = z
@@ -499,10 +501,12 @@ const ResourceDefinitionSchema = z
 /** Render-facing asset metadata that maps game definitions to generated resources. */
 const AssetDefinitionSchema = z
 	.object({
-		kind: z.enum([
-			"item",
-			"ui",
-		]),
+		kind: z
+			.enum([
+				"item",
+				"ui",
+			])
+			.default("item"),
 		label: z.string().min(1).optional(),
 		resourceId: IdSchema,
 		overlayAssetId: IdSchema.optional(),
@@ -511,9 +515,13 @@ const AssetDefinitionSchema = z
 				"plain",
 				"blueprint",
 			])
-			.optional(),
+			.default("plain"),
 	})
 	.strict();
+
+const AssetDefinitionFragmentSchema = AssetDefinitionSchema.extend({
+	resourceId: IdSchema.optional(),
+});
 
 /** Explicit source-owned two-item merge option referenced from `items.*.mergeIds`. */
 const MergeDefinitionSchema = z
@@ -547,26 +555,30 @@ const ItemDefinitionSchema = z
 		assetId: IdSchema,
 		code: z.string().min(1),
 		name: z.string().min(1),
-		tier: NonNegativeIntegerSchema,
-		maxStackSize: PositiveIntegerSchema,
+		tier: NonNegativeIntegerSchema.default(0),
+		maxStackSize: PositiveIntegerSchema.default(10),
 		maxCount: PositiveIntegerSchema.optional(),
 		storage: ItemStoragePolicySchema,
 		description: z.string(),
 		label: z.string().optional(),
-		tags: z.array(z.string().min(1)),
+		tags: z.array(z.string().min(1)).default([]),
 		mergeIds: z.array(IdSchema).optional(),
 		passiveEffectIds: z.array(IdSchema).optional(),
 		removeBy: z.array(RemoveByDefinitionSchema).optional(),
 	})
 	.strict();
 
+const ItemDefinitionFragmentSchema = ItemDefinitionSchema.extend({
+	assetId: IdSchema.optional(),
+	code: z.string().min(1).optional(),
+});
+
 /** Producer shell with ordered product lines and producer-level requirements. Inputs live on product lines. */
 const ProducerDefinitionSchema = z
 	.object({
-		type: z.literal("producer"),
-		maxQueueSize: PositiveIntegerSchema,
+		maxQueueSize: PositiveIntegerSchema.default(1),
 		productIds: z.array(IdSchema).min(1),
-		requirementIds: z.array(IdSchema),
+		requirementIds: z.array(IdSchema).default([]),
 		hinderedBy: GameHindrancesSchema.optional(),
 	})
 	.strict();
@@ -574,20 +586,21 @@ const ProducerDefinitionSchema = z
 /** Click/open container that may consume inputs, check requirements and emit loot charges. */
 const StashDefinitionSchema = z
 	.object({
-		type: z.literal("stash"),
 		placement: PlacementSchema,
 		output: ActivationOutputSchema.min(1),
 		inputs: ActivationInputSchema,
-		requirements: ActivationRequirementSchema,
-		charges: PositiveIntegerSchema,
-		onDepleted: z.union([
-			z.literal("remove"),
-			z
-				.object({
-					replaceWithItemId: IdSchema,
-				})
-				.strict(),
-		]),
+		requirements: ActivationRequirementSchema.default([]),
+		charges: PositiveIntegerSchema.default(1),
+		onDepleted: z
+			.union([
+				z.literal("remove"),
+				z
+					.object({
+						replaceWithItemId: IdSchema,
+					})
+					.strict(),
+			])
+			.default("remove"),
 	})
 	.strict();
 
@@ -601,7 +614,7 @@ const CraftRecipeSchema = z
 	.object({
 		resultItemId: IdSchema,
 		inputs: z.array(CraftRecipeInputSchema),
-		requirements: ActivationRequirementSchema,
+		requirements: ActivationRequirementSchema.default([]),
 		durationMs: NonNegativeIntegerSchema,
 	})
 	.strict();
@@ -626,7 +639,7 @@ const ProductDefinitionSchema = z
 		durationMs: PositiveIntegerSchema,
 		placement: PlacementSchema,
 		inputs: ActivationInputSchema.optional(),
-		requirementIds: z.array(IdSchema),
+		requirementIds: z.array(IdSchema).default([]),
 		hinderedBy: GameHindrancesSchema.optional(),
 		output: ActivationOutputSchema.min(1).optional(),
 		activatesEffectId: IdSchema.optional(),
@@ -665,8 +678,8 @@ const GameConfigFragmentSchema = z
 		version: z.literal(1).optional(),
 		game: GameMetaSchema.optional(),
 		resources: z.record(IdSchema, ResourceDefinitionSchema).optional(),
-		assets: z.record(IdSchema, AssetDefinitionSchema).optional(),
-		items: z.record(IdSchema, ItemDefinitionSchema).optional(),
+		assets: z.record(IdSchema, AssetDefinitionFragmentSchema).optional(),
+		items: z.record(IdSchema, ItemDefinitionFragmentSchema).optional(),
 		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
 		requirements: z.record(IdSchema, GameRequirementDefinitionSchema).optional(),
 		effects: z.record(IdSchema, GameEffectDefinitionSchema).optional(),

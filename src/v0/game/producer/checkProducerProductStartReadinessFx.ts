@@ -56,7 +56,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
-				`Product "${action.productId ?? "<default>"}" does not belong to producer "${producerDefinition.type}" on item "${producerItem.itemId}".`,
+				`Product "${action.productId ?? "<default>"}" does not belong to producer "${producerId}" on item "${producerItem.itemId}".`,
 			),
 		);
 	}

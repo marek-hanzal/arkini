@@ -178,10 +178,89 @@ const mergeSources = (sources: readonly FileSource[]): MergedGameConfig => {
 
 const validatePackage = (value: unknown): GameConfig => {
 	try {
-		return parseGameConfig(value);
+		return parseGameConfig(normalizePackage(value));
 	} catch (error) {
 		throw formatZodError(error, "compiled package");
 	}
+};
+
+const normalizePackage = (value: unknown): unknown => {
+	if (!value || typeof value !== "object" || Array.isArray(value)) {
+		return value;
+	}
+
+	const packageValue = value as Record<string, unknown>;
+	const items = asRecord(packageValue.items);
+	const sourceAssets = asRecord(packageValue.assets);
+	const assets: Record<string, unknown> = {
+		...sourceAssets,
+	};
+	const normalizedItems: Record<string, unknown> = {};
+
+	for (const [itemId, itemEntry] of Object.entries(items)) {
+		if (!itemEntry || typeof itemEntry !== "object" || Array.isArray(itemEntry)) {
+			normalizedItems[itemId] = itemEntry;
+			continue;
+		}
+
+		const item = {
+			...(itemEntry as Record<string, unknown>),
+		};
+		const code = typeof item.code === "string" ? item.code : readItemCodeFromId(itemId);
+		const assetId = typeof item.assetId === "string" ? item.assetId : `asset:${itemId}`;
+
+		item.code = code;
+		item.assetId = assetId;
+		normalizedItems[itemId] = item;
+
+		assets[assetId] = normalizeAssetDefinition(assetId, assets[assetId]);
+	}
+
+	return {
+		...packageValue,
+		assets,
+		items: normalizedItems,
+	};
+};
+
+const normalizeAssetDefinition = (assetId: string, sourceAsset: unknown): unknown => {
+	const asset =
+		sourceAsset && typeof sourceAsset === "object" && !Array.isArray(sourceAsset)
+			? {
+					...(sourceAsset as Record<string, unknown>),
+				}
+			: {};
+	const blueprintSuffix = readBlueprintAssetSuffix(assetId);
+
+	asset.kind ??= "item";
+	asset.render ??= blueprintSuffix ? "blueprint" : "plain";
+	asset.resourceId ??= blueprintSuffix ? "item-blueprint" : readResourceIdFromAssetId(assetId);
+
+	if (blueprintSuffix) {
+		asset.overlayAssetId ??= `asset:producer:${blueprintSuffix}`;
+	}
+
+	return asset;
+};
+
+const asRecord = (value: unknown): Record<string, unknown> =>
+	value && typeof value === "object" && !Array.isArray(value)
+		? (value as Record<string, unknown>)
+		: {};
+
+const readItemCodeFromId = (itemId: string) => itemId.split(":").slice(1).join(":") || itemId;
+
+const readBlueprintAssetSuffix = (assetId: string) => {
+	const prefix = "asset:item:blueprint-";
+
+	return assetId.startsWith(prefix) ? assetId.slice(prefix.length) : undefined;
+};
+
+const readResourceIdFromAssetId = (assetId: string) => {
+	const [namespace, kind, ...rest] = assetId.split(":");
+	const code = rest.join(":");
+
+	return namespace === "asset" && kind && code ? `${kind}-${code}` : assetId;
 };
 
 const readJsonSources = async (paths: readonly string[]) => {

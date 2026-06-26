@@ -59,7 +59,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 					"product:test",
 				],
 				requirementIds: [],
-				type: "producer",
 			},
 		},
 		products: {

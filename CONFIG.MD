@@ -26,29 +26,26 @@ Canonical game config keys:
 }
 ```
 
-There are no top-level reusable product input tables and no top-level reusable loot tables. Normal product/stash data lives directly on the thing that uses it. Referencing one-off data through another file was not architecture, it was paperwork with extra steps.
+There are no top-level reusable product input tables and no top-level reusable loot tables. Normal product/stash data lives directly on the thing that uses it. Referencing one-off data through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
 
 ## Items
 
-Items define physical tiles/stacks. Important fields:
+Items define physical tiles/stacks. Source items omit identity fields that can be derived from the item id:
 
 ```json
 {
   "name": "Lumber Camp I",
-  "code": "lumber-camp-1",
   "description": "Produces early wood resources.",
-  "assetId": "asset:lumber-camp-1",
   "tier": 1,
   "tags": ["building", "wood"],
   "maxStackSize": 1,
-  "storage": "both",
   "passiveEffectIds": ["effect:path-engineers-lock"],
   "maxCount": 1,
   "label": "1"
 }
 ```
 
-`storage` is `board`, `inventory`, or `both`; omitted means `both`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, and craft capabilities are not referenced from the item; they are keyed by the owning item id in `producers`, `stashes`, and `craftRecipes`.
+The compiler derives `code` from the item id suffix and `assetId` as `asset:<itemId>`. It also synthesizes conventional item assets; `assets.json` only contains overrides such as intentional resource reuse. `storage` is `board`, `inventory`, or `both`; omitted means `both`. `tier` defaults to `0`, `maxStackSize` defaults to `10`, and `tags` default to `[]`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, and craft capabilities are not referenced from the item; they are keyed by the owning item id in `producers`, `stashes`, and `craftRecipes`.
 
 ## Producers and products
 
@@ -58,15 +55,13 @@ A producer capability is keyed by the owning item id and owns ordered product id
 {
   "producers": {
     "producer:lumber-camp-1": {
-      "type": "producer",
-      "productIds": ["product:lumber-camp-1-twigs"],
-      "requirementIds": [],
-      "hinderedBy": [],
-      "maxQueueSize": 1
+      "productIds": ["product:lumber-camp-1-twigs"]
     }
   }
 }
 ```
+
+`maxQueueSize` defaults to `1`; `requirementIds` defaults to `[]`. There is no `type: "producer"` field because the section already says the thing is a producer. Humans, tragically, can infer this too.
 
 A product line owns its inputs and output inline:
 
@@ -76,8 +71,6 @@ A product line owns its inputs and output inline:
     "product:lumber-camp-1-twigs": {
       "name": "Twigs",
       "durationMs": 3000,
-      "placement": "board_then_inventory",
-      "requirementIds": [],
       "inputs": [
         {
           "itemId": "item:water",
@@ -98,7 +91,7 @@ A product line owns its inputs and output inline:
 }
 ```
 
-`inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence.
+`placement` defaults to `board_then_inventory`; `requirementIds` defaults to `[]`. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence.
 
 Output entries support:
 
@@ -124,21 +117,18 @@ A stash is a charged container/loot source. It owns its inputs and output inline
 ```json
 {
   "stashes": {
-    "stash:crate-1": {
-      "type": "stash",
-      "charges": 1,
-      "placement": "board_then_inventory",
-      "requirements": [],
+    "item:crate-1": {
       "inputs": [],
       "output": [
         { "type": "guaranteed", "itemId": "item:twig", "quantity": { "min": 1, "max": 3 } },
         { "type": "chance", "itemId": "item:plank", "chance": 0.25, "quantity": 1 }
-      ],
-      "onDepleted": "remove"
+      ]
     }
   }
 }
 ```
+
+`placement` defaults to `board_then_inventory`, `requirements` defaults to `[]`, `charges` defaults to `1`, and `onDepleted` defaults to `remove`. There is no `type: "stash"`; again, the section is not trying to trick anyone.
 
 When depleted, `onDepleted` may be `remove`, `keep`, or `{ "replaceWithItemId": "item:empty-stash" }`. Stash release preflights atomically, counts the removing stash cell as output space when relevant, and emits output through item spawn jobs so backend order and visual order share the same source.
 
@@ -154,7 +144,6 @@ Craft recipes are keyed by the craft target item id, usually a blueprint item. I
       "inputs": [
         { "itemId": "item:plank", "quantity": 4, "consume": true }
       ],
-      "requirements": [],
       "resultItemId": "item:townhall-2"
     }
   }
@@ -163,12 +152,12 @@ Craft recipes are keyed by the craft target item id, usually a blueprint item. I
 
 ## Requirements and hindrances
 
-Requirements can be passive, stored, or proximity-based. Product/producers reference reusable requirements through `requirementIds`. Craft/stash requirements are inline.
+Requirements can be passive, stored, or proximity-based. Product/producers reference reusable requirements through `requirementIds`. Craft/stash requirements are inline. Requirement `durationFactor` defaults to `1`; write it only when it actually changes duration.
 
 ```json
 { "type": "passive", "itemId": "item:well", "quantity": 1, "scope": "board_or_inventory" }
 { "type": "stored", "itemId": "item:water", "quantity": 1, "capacity": 2 }
-{ "type": "proximity", "itemIds": ["item:purifier"], "distance": 2, "durationFactor": 1.5 }
+{ "type": "proximity", "itemIds": ["item:purifier"], "distance": 2 }
 ```
 
 Hindrances use the passive/proximity shapes but slow production instead of gating start. Multiple active hindrances stack.

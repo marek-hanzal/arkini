@@ -172,7 +172,6 @@ const createValidConfigValue = () => ({
 				"product:test",
 			],
 			requirementIds: [] as string[],
-			type: "producer",
 		},
 	},
 	stashes: {},
@@ -353,7 +352,6 @@ describe("GameConfigSchema", () => {
 					maxQueueSize: number;
 					productIds: string[];
 					requirementIds: string[];
-					type: string;
 				}
 			>
 		)["producer:second"] = {
@@ -362,7 +360,6 @@ describe("GameConfigSchema", () => {
 				"product:test",
 			],
 			requirementIds: [],
-			type: "producer",
 		};
 
 		expect(() => parseGameConfig(config)).toThrow(/owned by exactly one producer/);

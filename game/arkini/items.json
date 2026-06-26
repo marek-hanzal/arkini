@@ -1,12 +1,9 @@
 {
 	"items": {
 		"item:advanced-knowledge": {
-			"assetId": "asset:item:advanced-knowledge",
-			"code": "advanced-knowledge",
 			"description": "Advanced civic and technical knowledge produced by academies and used to unlock prospecting, mining, and later industrial plans.",
 			"maxStackSize": 50,
 			"name": "Advanced Knowledge",
-			"storage": "both",
 			"tags": [
 				"knowledge",
 				"education",
@@ -16,12 +13,9 @@
 			"tier": 3
 		},
 		"item:aquamarine": {
-			"assetId": "asset:item:aquamarine",
-			"code": "aquamarine",
 			"description": "A polished cyan gemstone reserved for late-game treasure economy.",
 			"maxStackSize": 20,
 			"name": "Aquamarine",
-			"storage": "both",
 			"tags": [
 				"treasure",
 				"gem",
@@ -31,12 +25,9 @@
 			"tier": 4
 		},
 		"item:axe": {
-			"assetId": "asset:item:axe",
-			"code": "axe",
 			"description": "Reliable utility weapon forged from iron with a sturdy wooden haft.",
 			"maxStackSize": 20,
 			"name": "Axe",
-			"storage": "both",
 			"tags": [
 				"equipment",
 				"weapon",
@@ -48,12 +39,9 @@
 			"tier": 1
 		},
 		"item:basic-knowledge": {
-			"assetId": "asset:item:basic-knowledge",
-			"code": "basic-knowledge",
 			"description": "Foundational know-how produced by schools and used to unlock early specialized plans.",
 			"maxStackSize": 50,
 			"name": "Basic Knowledge",
-			"storage": "both",
 			"tags": [
 				"knowledge",
 				"education",
@@ -63,57 +51,40 @@
 			"tier": 2
 		},
 		"item:beer": {
-			"assetId": "asset:item:beer",
-			"code": "beer",
 			"description": "A single mug of beer served by taverns.",
 			"maxStackSize": 50,
 			"name": "Beer",
-			"storage": "both",
 			"tags": [
 				"food",
 				"beer",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:beer-barrel": {
-			"assetId": "asset:item:beer-barrel",
-			"code": "beer-barrel",
 			"description": "A barrel of beer produced by breweries and served by taverns.",
 			"maxStackSize": 20,
 			"name": "Beer Barrel",
-			"storage": "both",
 			"tags": [
 				"material",
 				"food",
 				"beer",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-academy": {
-			"assetId": "asset:item:blueprint-academy",
-			"code": "blueprint-academy",
 			"description": "Build plan that upgrades a School into an Academy.",
-			"maxStackSize": 10,
 			"name": "Academy Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"education",
 				"knowledge",
 				"era:VII"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-armory-t1": {
-			"assetId": "asset:item:blueprint-armory-t1",
-			"code": "blueprint-armory-t1",
 			"description": "Build plan that can be filled with guild resources to construct Armory I.",
-			"maxStackSize": 10,
 			"name": "Armory I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -121,62 +92,42 @@
 				"armory",
 				"equipment",
 				"era:IX"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-bakery-t1": {
-			"assetId": "asset:item:blueprint-bakery-t1",
-			"code": "blueprint-bakery-t1",
 			"description": "Build plan that can be filled with resources to construct Bakery I.",
-			"maxStackSize": 10,
 			"name": "Bakery I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-blacksmith-t1": {
-			"assetId": "asset:item:blueprint-blacksmith-t1",
-			"code": "blueprint-blacksmith-t1",
 			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
-			"maxStackSize": 10,
 			"name": "Blacksmith I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"blacksmith",
 				"era:IX"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-brewery-t1": {
-			"assetId": "asset:item:blueprint-brewery-t1",
-			"code": "blueprint-brewery-t1",
 			"description": "Build plan that can be filled with resources to construct Brewery I.",
-			"maxStackSize": 10,
 			"name": "Brewery I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-brickyard": {
-			"assetId": "asset:item:blueprint-brickyard",
-			"code": "blueprint-brickyard",
 			"description": "Build plan that can be filled with resources to construct a Brickyard.",
-			"maxStackSize": 10,
 			"name": "Brickyard Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -185,16 +136,11 @@
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-cathedral": {
-			"assetId": "asset:item:blueprint-cathedral",
-			"code": "blueprint-cathedral",
 			"description": "Build plan for Cathedral, one of the mutually exclusive Choose The Path keystone buildings.",
-			"maxStackSize": 10,
 			"name": "Cathedral Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -203,62 +149,42 @@
 				"faith",
 				"cathedral",
 				"era:XI"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-cattle-farm-t1": {
-			"assetId": "asset:item:blueprint-cattle-farm-t1",
-			"code": "blueprint-cattle-farm-t1",
 			"description": "Build plan that can be filled with resources to construct Cattle Farm I.",
-			"maxStackSize": 10,
 			"name": "Cattle Farm I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-charcoal-burner-t1": {
-			"assetId": "asset:item:blueprint-charcoal-burner-t1",
-			"code": "blueprint-charcoal-burner-t1",
 			"description": "Build plan that can be filled with resources to construct Charcoal Burner I.",
-			"maxStackSize": 10,
 			"name": "Charcoal Burner I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-chicken-coop-t1": {
-			"assetId": "asset:item:blueprint-chicken-coop-t1",
-			"code": "blueprint-chicken-coop-t1",
 			"description": "Build plan that can be filled with resources to construct Chicken Coop I.",
-			"maxStackSize": 10,
 			"name": "Chicken Coop I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-civic-office-t1": {
-			"assetId": "asset:item:blueprint-civic-office-t1",
-			"code": "blueprint-civic-office-t1",
 			"description": "Build plan that can be filled with resources to construct Civic Office I.",
-			"maxStackSize": 10,
 			"name": "Civic Office I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -266,16 +192,11 @@
 				"civic",
 				"permit",
 				"era:IV"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-clay-pit": {
-			"assetId": "asset:item:blueprint-clay-pit",
-			"code": "blueprint-clay-pit",
 			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
-			"maxStackSize": 10,
 			"name": "Clay Pit Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -284,77 +205,52 @@
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-coal-mine-t1": {
-			"assetId": "asset:item:blueprint-coal-mine-t1",
-			"code": "blueprint-coal-mine-t1",
 			"description": "Build plan that can be filled with resources to construct Coal Mine I.",
-			"maxStackSize": 10,
 			"name": "Coal Mine I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:VII"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-construction-yard-t1": {
-			"assetId": "asset:item:blueprint-construction-yard-t1",
-			"code": "blueprint-construction-yard-t1",
 			"description": "Build plan that can be filled with resources to construct Construction Yard I.",
-			"maxStackSize": 10,
 			"name": "Construction Yard I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-cookhouse-t1": {
-			"assetId": "asset:item:blueprint-cookhouse-t1",
-			"code": "blueprint-cookhouse-t1",
 			"description": "Build plan that can be filled with resources to construct Cookhouse I.",
-			"maxStackSize": 10,
 			"name": "Cookhouse I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-dairy-t1": {
-			"assetId": "asset:item:blueprint-dairy-t1",
-			"code": "blueprint-dairy-t1",
 			"description": "Build plan that can be filled with resources to construct Dairy I.",
-			"maxStackSize": 10,
 			"name": "Dairy I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-dye-workshop-t1": {
-			"assetId": "asset:item:blueprint-dye-workshop-t1",
-			"code": "blueprint-dye-workshop-t1",
 			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
-			"maxStackSize": 10,
 			"name": "Dye Workshop I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -362,31 +258,21 @@
 				"dye",
 				"textile",
 				"era:V"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-farm-t1": {
-			"assetId": "asset:item:blueprint-farm-t1",
-			"code": "blueprint-farm-t1",
 			"description": "Build plan that can be filled with resources to construct Farm I.",
-			"maxStackSize": 10,
 			"name": "Farm I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-glassworks": {
-			"assetId": "asset:item:blueprint-glassworks",
-			"code": "blueprint-glassworks",
 			"description": "Build plan that can be filled with resources to construct Glassworks.",
-			"maxStackSize": 10,
 			"name": "Glassworks Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -395,16 +281,11 @@
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-glazier-workshop-t1": {
-			"assetId": "asset:item:blueprint-glazier-workshop-t1",
-			"code": "blueprint-glazier-workshop-t1",
 			"description": "Build plan that can be filled with prestige materials to construct Glazier Workshop I.",
-			"maxStackSize": 10,
 			"name": "Glazier Workshop I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -413,46 +294,31 @@
 				"luxury",
 				"prestige",
 				"era:X"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-gold-mine-t1": {
-			"assetId": "asset:item:blueprint-gold-mine-t1",
-			"code": "blueprint-gold-mine-t1",
 			"description": "Build plan that can be filled with resources to construct Gold Mine I.",
-			"maxStackSize": 10,
 			"name": "Gold Mine I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:VII"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-goldsmith-t1": {
-			"assetId": "asset:item:blueprint-goldsmith-t1",
-			"code": "blueprint-goldsmith-t1",
 			"description": "Build plan that can be filled with resources to construct Goldsmith I.",
-			"maxStackSize": 10,
 			"name": "Goldsmith I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:IX"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-heroes-guild-t1": {
-			"assetId": "asset:item:blueprint-heroes-guild-t1",
-			"code": "blueprint-heroes-guild-t1",
 			"description": "Build plan that can be filled with late-era resources to construct Heroes Guild I.",
-			"maxStackSize": 10,
 			"name": "Heroes Guild I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -460,16 +326,11 @@
 				"hero",
 				"guild",
 				"era:IX"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-house-of-engineers": {
-			"assetId": "asset:item:blueprint-house-of-engineers",
-			"code": "blueprint-house-of-engineers",
 			"description": "Build plan for House of Engineers, one of the mutually exclusive Choose The Path keystone buildings.",
-			"maxStackSize": 10,
 			"name": "House of Engineers Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -478,16 +339,11 @@
 				"engineers",
 				"engineering",
 				"era:XI"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-house-t1": {
-			"assetId": "asset:item:blueprint-house-t1",
-			"code": "blueprint-house-t1",
 			"description": "Build plan for House I, a housing producer that generates morale.",
-			"maxStackSize": 10,
 			"name": "House I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -495,16 +351,11 @@
 				"housing",
 				"morale",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-house-t2": {
-			"assetId": "asset:item:blueprint-house-t2",
-			"code": "blueprint-house-t2",
 			"description": "Build plan for House II, a housing producer that generates morale.",
-			"maxStackSize": 10,
 			"name": "House II Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -512,16 +363,11 @@
 				"housing",
 				"morale",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-house-t3": {
-			"assetId": "asset:item:blueprint-house-t3",
-			"code": "blueprint-house-t3",
 			"description": "Build plan for House III, a housing producer that generates morale.",
-			"maxStackSize": 10,
 			"name": "House III Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -529,16 +375,11 @@
 				"housing",
 				"morale",
 				"era:V"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-house-t4": {
-			"assetId": "asset:item:blueprint-house-t4",
-			"code": "blueprint-house-t4",
 			"description": "Build plan for House IV, a housing producer that generates morale.",
-			"maxStackSize": 10,
 			"name": "House IV Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -546,46 +387,31 @@
 				"housing",
 				"morale",
 				"era:X"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-iron-mine-t1": {
-			"assetId": "asset:item:blueprint-iron-mine-t1",
-			"code": "blueprint-iron-mine-t1",
 			"description": "Build plan that can be filled with resources to construct Iron Mine I.",
-			"maxStackSize": 10,
 			"name": "Iron Mine I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:VII"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-lumberjack-t1": {
-			"assetId": "asset:item:blueprint-lumberjack-t1",
-			"code": "blueprint-lumberjack-t1",
 			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
-			"maxStackSize": 10,
 			"name": "Lumberjack I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-mage-lodge": {
-			"assetId": "asset:item:blueprint-mage-lodge",
-			"code": "blueprint-mage-lodge",
 			"description": "Build plan for Mage Lodge, one of the mutually exclusive Choose The Path keystone buildings.",
-			"maxStackSize": 10,
 			"name": "Mage Lodge Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -595,16 +421,11 @@
 				"magic",
 				"arcane",
 				"era:XI"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-market-t1": {
-			"assetId": "asset:item:blueprint-market-t1",
-			"code": "blueprint-market-t1",
 			"description": "Build plan that can be filled with resources to construct the Market.",
-			"maxStackSize": 10,
 			"name": "Market Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -612,16 +433,11 @@
 				"market",
 				"trade",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-market-t2": {
-			"assetId": "asset:item:blueprint-market-t2",
-			"code": "blueprint-market-t2",
 			"description": "Build plan that can upgrade Market into Market II.",
-			"maxStackSize": 10,
 			"name": "Market II Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -629,16 +445,11 @@
 				"market",
 				"trade",
 				"era:IV"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-paper-mill-t1": {
-			"assetId": "asset:item:blueprint-paper-mill-t1",
-			"code": "blueprint-paper-mill-t1",
 			"description": "Build plan that can be filled with resources to construct Paper Mill I.",
-			"maxStackSize": 10,
 			"name": "Paper Mill I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -646,32 +457,22 @@
 				"paper",
 				"civic",
 				"era:IV"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-pig-farm-t1": {
-			"assetId": "asset:item:blueprint-pig-farm-t1",
-			"code": "blueprint-pig-farm-t1",
 			"description": "Build plan that can be filled with resources to construct Pig Farm I.",
-			"maxStackSize": 10,
 			"name": "Pig Farm I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-prospector-guild-t1": {
-			"assetId": "asset:item:blueprint-prospector-guild-t1",
-			"code": "blueprint-prospector-guild-t1",
 			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
 			"label": "1",
-			"maxStackSize": 10,
 			"name": "Prospector Guild Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -680,17 +481,12 @@
 				"guild",
 				"civic",
 				"era:IV"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-prospector-guild-t2": {
-			"assetId": "asset:item:blueprint-prospector-guild-t2",
-			"code": "blueprint-prospector-guild-t2",
 			"description": "Build plan that upgrades Prospector Guild 1 into Prospector Guild 2.",
 			"label": "2",
-			"maxStackSize": 10,
 			"name": "Prospector Guild Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -699,48 +495,33 @@
 				"guild",
 				"industry",
 				"era:VII"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-purifier-t1": {
-			"assetId": "asset:item:blueprint-purifier-t1",
-			"code": "blueprint-purifier-t1",
 			"description": "Build plan that can be filled with resources to construct Purifier I.",
-			"maxStackSize": 10,
 			"name": "Purifier I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-quarry-t1": {
-			"assetId": "asset:item:blueprint-quarry-t1",
-			"code": "blueprint-quarry-t1",
 			"description": "Build plan that can be filled with resources to construct Quarry I.",
-			"maxStackSize": 10,
 			"name": "Quarry I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-quarry-t2": {
-			"assetId": "asset:item:blueprint-quarry-t2",
-			"code": "blueprint-quarry-t2",
 			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
 			"label": "2",
-			"maxStackSize": 10,
 			"name": "Quarry Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -750,16 +531,11 @@
 				"luxury",
 				"prestige",
 				"era:X"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-roof-tile-factory": {
-			"assetId": "asset:item:blueprint-roof-tile-factory",
-			"code": "blueprint-roof-tile-factory",
 			"description": "Build plan that can be filled with resources to construct a Roof Tile Factory.",
-			"maxStackSize": 10,
 			"name": "Roof Tile Factory Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -768,16 +544,11 @@
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-sand-pit": {
-			"assetId": "asset:item:blueprint-sand-pit",
-			"code": "blueprint-sand-pit",
 			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
-			"maxStackSize": 10,
 			"name": "Sand Pit Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -787,109 +558,74 @@
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-sawmill-t1": {
-			"assetId": "asset:item:blueprint-sawmill-t1",
-			"code": "blueprint-sawmill-t1",
 			"description": "Build plan that can be filled with resources to construct Sawmill I.",
-			"maxStackSize": 10,
 			"name": "Sawmill I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-school": {
-			"assetId": "asset:item:blueprint-school",
-			"code": "blueprint-school",
 			"description": "Build plan that can be filled with supplies to construct a School.",
-			"maxStackSize": 10,
 			"name": "School Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"education",
 				"knowledge",
 				"era:IV"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-sheep-pasture-t1": {
-			"assetId": "asset:item:blueprint-sheep-pasture-t1",
-			"code": "blueprint-sheep-pasture-t1",
 			"description": "Build plan that can be filled with resources to construct Sheep Pasture I.",
-			"maxStackSize": 10,
 			"name": "Sheep Pasture I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-slaughterhouse-t1": {
-			"assetId": "asset:item:blueprint-slaughterhouse-t1",
-			"code": "blueprint-slaughterhouse-t1",
 			"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
-			"maxStackSize": 10,
 			"name": "Slaughterhouse I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-smelter-t1": {
-			"assetId": "asset:item:blueprint-smelter-t1",
-			"code": "blueprint-smelter-t1",
 			"description": "Build plan that can be filled with resources to construct Smelter I.",
-			"maxStackSize": 10,
 			"name": "Smelter I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:VIII",
 				"industry"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-stonemason-t1": {
-			"assetId": "asset:item:blueprint-stonemason-t1",
-			"code": "blueprint-stonemason-t1",
 			"description": "Build plan that can be filled with resources to construct Stonemason I.",
-			"maxStackSize": 10,
 			"name": "Stonemason I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-stonemason-t2": {
-			"assetId": "asset:item:blueprint-stonemason-t2",
-			"code": "blueprint-stonemason-t2",
 			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
 			"label": "2",
-			"maxStackSize": 10,
 			"name": "Stonemason Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -900,16 +636,11 @@
 				"luxury",
 				"prestige",
 				"era:X"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-tailor-workshop-t1": {
-			"assetId": "asset:item:blueprint-tailor-workshop-t1",
-			"code": "blueprint-tailor-workshop-t1",
 			"description": "Build plan that can be filled with resources to construct Tailor Workshop I.",
-			"maxStackSize": 10,
 			"name": "Tailor Workshop I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -917,16 +648,11 @@
 				"clothing",
 				"textile",
 				"era:V"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-tannery-t1": {
-			"assetId": "asset:item:blueprint-tannery-t1",
-			"code": "blueprint-tannery-t1",
 			"description": "Build plan that can be filled with resources to construct Tannery I.",
-			"maxStackSize": 10,
 			"name": "Tannery I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -934,107 +660,72 @@
 				"leather",
 				"textile",
 				"era:V"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-tavern-t1": {
-			"assetId": "asset:item:blueprint-tavern-t1",
-			"code": "blueprint-tavern-t1",
 			"description": "Build plan that can be filled with resources to construct Tavern I.",
-			"maxStackSize": 10,
 			"name": "Tavern I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-townhall-t2": {
-			"assetId": "asset:item:blueprint-townhall-t2",
-			"code": "blueprint-townhall-t2",
 			"description": "Build plan that can be filled with resources to construct Town Hall II.",
-			"maxStackSize": 10,
 			"name": "Town Hall II Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-townhall-t3": {
-			"assetId": "asset:item:blueprint-townhall-t3",
-			"code": "blueprint-townhall-t3",
 			"description": "Build plan that can be filled with resources to construct Town Hall III.",
-			"maxStackSize": 10,
 			"name": "Town Hall III Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-townhall-t4": {
-			"assetId": "asset:item:blueprint-townhall-t4",
-			"code": "blueprint-townhall-t4",
 			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
-			"maxStackSize": 10,
 			"name": "Town Hall IV Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-university": {
-			"assetId": "asset:item:blueprint-university",
-			"code": "blueprint-university",
 			"description": "Build plan that upgrades an Academy into a University as part of the guild and institution era.",
-			"maxStackSize": 10,
 			"name": "University Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"education",
 				"knowledge",
 				"era:IX"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-vegetable-garden-t1": {
-			"assetId": "asset:item:blueprint-vegetable-garden-t1",
-			"code": "blueprint-vegetable-garden-t1",
 			"description": "Build plan that can be filled with resources to construct Vegetable Garden I.",
-			"maxStackSize": 10,
 			"name": "Vegetable Garden I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-weaver-hut-t1": {
-			"assetId": "asset:item:blueprint-weaver-hut-t1",
-			"code": "blueprint-weaver-hut-t1",
 			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
-			"maxStackSize": 10,
 			"name": "Weaver Hut I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
@@ -1042,75 +733,52 @@
 				"cloth",
 				"textile",
 				"era:V"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-well-t1": {
-			"assetId": "asset:item:blueprint-well-t1",
-			"code": "blueprint-well-t1",
 			"description": "Build plan that can be filled with resources to construct Well I.",
-			"maxStackSize": 10,
 			"name": "Well I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-windmill-t1": {
-			"assetId": "asset:item:blueprint-windmill-t1",
-			"code": "blueprint-windmill-t1",
 			"description": "Build plan that can be filled with resources to construct Windmill I.",
-			"maxStackSize": 10,
 			"name": "Windmill I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:blueprint-winery-t1": {
-			"assetId": "asset:item:blueprint-winery-t1",
-			"code": "blueprint-winery-t1",
 			"description": "Build plan that can be filled with resources to construct Winery I.",
-			"maxStackSize": 10,
 			"name": "Winery I Blueprint",
-			"storage": "both",
 			"tags": [
 				"blueprint",
 				"building",
 				"craft-target",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:bread": {
-			"assetId": "asset:item:bread",
-			"code": "bread",
 			"description": "Baked food produced by bakeries from flour and water.",
 			"maxStackSize": 50,
 			"name": "Bread",
-			"storage": "both",
 			"tags": [
 				"food",
 				"bread",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:bricks": {
-			"assetId": "asset:item:bricks",
-			"code": "bricks",
 			"description": "Fired clay building material prepared for sturdier construction.",
 			"maxStackSize": 50,
 			"name": "Bricks",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -1121,12 +789,9 @@
 			"tier": 3
 		},
 		"item:building-permit": {
-			"assetId": "asset:item:building-permit",
-			"code": "building-permit",
 			"description": "Official construction authorization produced by the Civic Office and used as the Era IV master item.",
 			"maxStackSize": 20,
 			"name": "Building Permit",
-			"storage": "both",
 			"tags": [
 				"resource",
 				"master",
@@ -1137,12 +802,9 @@
 			"tier": 4
 		},
 		"item:charcoal": {
-			"assetId": "asset:item:charcoal",
-			"code": "charcoal",
 			"description": "Controlled pre-industrial fuel made from logs and used by kilns and furnaces before coal mining is unlocked.",
 			"maxStackSize": 50,
 			"name": "Charcoal",
-			"storage": "both",
 			"tags": [
 				"material",
 				"fuel",
@@ -1153,27 +815,20 @@
 			"tier": 6
 		},
 		"item:cheese": {
-			"assetId": "asset:item:cheese",
-			"code": "cheese",
 			"description": "Processed dairy food produced from milk and used by cookhouses and markets.",
 			"maxStackSize": 50,
 			"name": "Cheese",
-			"storage": "both",
 			"tags": [
 				"food",
 				"dairy",
 				"cheese",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:chest-t1": {
-			"assetId": "asset:item:chest-t1",
-			"code": "chest-t1",
 			"description": "Locked chest returned from a short Heroes Guild expedition. Open it with a Key I.",
 			"maxStackSize": 1,
 			"name": "Chest I",
-			"storage": "both",
 			"tags": [
 				"chest",
 				"locked",
@@ -1184,12 +839,9 @@
 			"tier": 1
 		},
 		"item:chest-t2": {
-			"assetId": "asset:item:chest-t2",
-			"code": "chest-t2",
 			"description": "Locked chest returned from a tougher Heroes Guild expedition. Open it with a Key II.",
 			"maxStackSize": 1,
 			"name": "Chest II",
-			"storage": "both",
 			"tags": [
 				"chest",
 				"locked",
@@ -1200,12 +852,9 @@
 			"tier": 2
 		},
 		"item:chest-t3": {
-			"assetId": "asset:item:chest-t3",
-			"code": "chest-t3",
 			"description": "Locked chest returned from a dangerous Heroes Guild expedition. Open it with a Key III.",
 			"maxStackSize": 1,
 			"name": "Chest III",
-			"storage": "both",
 			"tags": [
 				"chest",
 				"locked",
@@ -1216,12 +865,9 @@
 			"tier": 3
 		},
 		"item:chest-t4": {
-			"assetId": "asset:item:chest-t4",
-			"code": "chest-t4",
 			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
 			"maxStackSize": 1,
 			"name": "Chest IV",
-			"storage": "both",
 			"tags": [
 				"chest",
 				"locked",
@@ -1232,12 +878,9 @@
 			"tier": 4
 		},
 		"item:clay": {
-			"assetId": "asset:item:clay",
-			"code": "clay",
 			"description": "Raw clay prepared for brick and ceramic production.",
 			"maxStackSize": 50,
 			"name": "Clay",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -1248,28 +891,20 @@
 			"tier": 3
 		},
 		"item:clay-deposit": {
-			"assetId": "asset:item:clay-deposit",
-			"code": "clay-deposit",
 			"description": "Movable clay source used by nearby clay pits.",
-			"maxStackSize": 10,
 			"name": "Clay Deposit",
-			"storage": "both",
 			"tags": [
 				"source",
 				"construction",
 				"clay",
 				"deposit",
 				"era:VI"
-			],
-			"tier": 0
+			]
 		},
 		"item:coal": {
-			"assetId": "asset:item:coal",
-			"code": "coal",
 			"description": "A mining cart loaded with coal. Used as fuel by smelters.",
 			"maxStackSize": 20,
 			"name": "Coal Cart",
-			"storage": "both",
 			"tags": [
 				"material",
 				"industry",
@@ -1280,12 +915,8 @@
 			"tier": 7
 		},
 		"item:coal-deposit": {
-			"assetId": "asset:item:coal-deposit",
-			"code": "coal-deposit",
 			"description": "Movable coal source used by nearby coal mines.",
-			"maxStackSize": 10,
 			"name": "Coal Deposit",
-			"storage": "both",
 			"tags": [
 				"source",
 				"industry",
@@ -1296,27 +927,20 @@
 			"tier": 7
 		},
 		"item:coin": {
-			"assetId": "asset:item:coin",
-			"code": "coin",
 			"description": "Basic currency produced by markets from processed food and drink, and later by specialist economy buildings.",
 			"maxStackSize": 100,
 			"name": "Coin",
-			"storage": "both",
 			"tags": [
 				"currency",
 				"coin",
 				"trade",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:coin-stack": {
-			"assetId": "asset:item:coin-stack",
-			"code": "coin-stack",
 			"description": "Minted high-value currency stack produced by the Goldsmith and used to fund advanced guilds, university work, and long expeditions.",
 			"maxStackSize": 50,
 			"name": "Coin Stack",
-			"storage": "both",
 			"tags": [
 				"currency",
 				"coin",
@@ -1327,12 +951,9 @@
 			"tier": 9
 		},
 		"item:common-cloth": {
-			"assetId": "asset:item:common-cloth",
-			"code": "common-cloth",
 			"description": "Plain woven cloth produced from wool by weaver huts.",
 			"maxStackSize": 50,
 			"name": "Common Cloth",
-			"storage": "both",
 			"tags": [
 				"material",
 				"cloth",
@@ -1342,12 +963,9 @@
 			"tier": 5
 		},
 		"item:common-clothing": {
-			"assetId": "asset:item:common-clothing",
-			"code": "common-clothing",
 			"description": "Practical clothing sewn from common cloth and leather.",
 			"maxStackSize": 30,
 			"name": "Common Clothing",
-			"storage": "both",
 			"tags": [
 				"clothing",
 				"textile",
@@ -1356,12 +974,9 @@
 			"tier": 5
 		},
 		"item:construction-bundle": {
-			"assetId": "asset:item:construction-bundle",
-			"code": "construction-bundle",
 			"description": "Master package of fired bricks, glass, roof tiles, permits, and prestige materials used to unlock advanced civic and guild buildings.",
 			"maxStackSize": 20,
 			"name": "Construction Bundle",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -1371,26 +986,19 @@
 			"tier": 6
 		},
 		"item:egg": {
-			"assetId": "asset:item:egg",
-			"code": "egg",
 			"description": "Fresh eggs produced by chicken coops for base food supply chains.",
 			"maxStackSize": 50,
 			"name": "Egg",
-			"storage": "both",
 			"tags": [
 				"food",
 				"egg",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:emerald": {
-			"assetId": "asset:item:emerald",
-			"code": "emerald",
 			"description": "A polished green gemstone prepared for later treasure recipes.",
 			"maxStackSize": 20,
 			"name": "Emerald",
-			"storage": "both",
 			"tags": [
 				"treasure",
 				"gem",
@@ -1400,57 +1008,42 @@
 			"tier": 1
 		},
 		"item:feast": {
-			"assetId": "asset:item:feast",
-			"code": "feast",
 			"description": "Hearty processed food platter that proves Era III food production is complete.",
 			"maxStackSize": 20,
 			"name": "Feast",
-			"storage": "both",
 			"tags": [
 				"food",
 				"master",
 				"feast",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:flour": {
-			"assetId": "asset:item:flour",
-			"code": "flour",
 			"description": "Milled grain produced by windmills and baked into bread.",
 			"maxStackSize": 50,
 			"name": "Flour",
-			"storage": "both",
 			"tags": [
 				"material",
 				"food",
 				"grain",
 				"flour",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:food-supply": {
-			"assetId": "asset:item:food-supply",
-			"code": "food-supply",
 			"description": "Packed base food supply prepared from grain, animal produce, and vegetables. Era II master item.",
 			"maxStackSize": 20,
 			"name": "Food Supply",
-			"storage": "both",
 			"tags": [
 				"food",
 				"master",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:glass": {
-			"assetId": "asset:item:glass",
-			"code": "glass",
 			"description": "Finished glass panels prepared for advanced building and luxury chains.",
 			"maxStackSize": 50,
 			"name": "Glass",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -1461,12 +1054,8 @@
 			"tier": 4
 		},
 		"item:gold-deposit": {
-			"assetId": "asset:item:gold-deposit",
-			"code": "gold-deposit",
 			"description": "Movable gold source used by nearby gold mines.",
-			"maxStackSize": 10,
 			"name": "Gold Deposit",
-			"storage": "both",
 			"tags": [
 				"source",
 				"industry",
@@ -1477,12 +1066,9 @@
 			"tier": 7
 		},
 		"item:gold-ingot": {
-			"assetId": "asset:item:gold-ingot",
-			"code": "gold-ingot",
 			"description": "Refined gold produced by smelters from gold ore and coal.",
 			"maxStackSize": 50,
 			"name": "Gold Ingot",
-			"storage": "both",
 			"tags": [
 				"material",
 				"industry",
@@ -1493,12 +1079,9 @@
 			"tier": 7
 		},
 		"item:gold-ore": {
-			"assetId": "asset:item:gold-ore",
-			"code": "gold-ore",
 			"description": "A mining cart loaded with gold ore. This is the high-value mining output that proves the settlement can reach deep mineral resources.",
 			"maxStackSize": 20,
 			"name": "Gold Ore Cart",
-			"storage": "both",
 			"tags": [
 				"material",
 				"industry",
@@ -1510,43 +1093,32 @@
 			"tier": 7
 		},
 		"item:grain": {
-			"assetId": "asset:item:grain",
-			"code": "grain",
 			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
 			"maxStackSize": 50,
 			"name": "Grain",
-			"storage": "both",
 			"tags": [
 				"material",
 				"food",
 				"grain",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:grapes": {
-			"assetId": "asset:item:grapes",
-			"code": "grapes",
 			"description": "Harvested grapes produced by wineries when supplied with water near a vineyard.",
 			"maxStackSize": 50,
 			"name": "Grapes",
-			"storage": "both",
 			"tags": [
 				"material",
 				"food",
 				"wine",
 				"grapes",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:guild-charter": {
-			"assetId": "asset:item:guild-charter",
-			"code": "guild-charter",
 			"description": "Formal civic charter that authorizes advanced guild, university, and expedition buildings after the city has advanced construction capacity.",
 			"maxStackSize": 20,
 			"name": "Guild Charter",
-			"storage": "both",
 			"tags": [
 				"civic",
 				"charter",
@@ -1557,44 +1129,31 @@
 			"tier": 9
 		},
 		"item:hop-field": {
-			"assetId": "asset:item:hop-field",
-			"code": "hop-field",
 			"description": "Movable hop source used by nearby breweries.",
-			"maxStackSize": 10,
 			"name": "Hop Field",
-			"storage": "both",
 			"tags": [
 				"source",
 				"food",
 				"beer",
 				"hops",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:hops": {
-			"assetId": "asset:item:hops",
-			"code": "hops",
 			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
 			"maxStackSize": 50,
 			"name": "Hops",
-			"storage": "both",
 			"tags": [
 				"material",
 				"food",
 				"beer",
 				"hops",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:iron-armor": {
-			"assetId": "asset:item:iron-armor",
-			"code": "iron-armor",
 			"description": "Heavy iron armor upgraded by the Armory from leather armor, iron ingots, nails, and charcoal-fired fittings.",
-			"maxStackSize": 10,
 			"name": "Iron Armor",
-			"storage": "both",
 			"tags": [
 				"equipment",
 				"armor",
@@ -1605,12 +1164,8 @@
 			"tier": 3
 		},
 		"item:iron-deposit": {
-			"assetId": "asset:item:iron-deposit",
-			"code": "iron-deposit",
 			"description": "Movable iron source used by nearby iron mines.",
-			"maxStackSize": 10,
 			"name": "Iron Deposit",
-			"storage": "both",
 			"tags": [
 				"source",
 				"industry",
@@ -1621,12 +1176,9 @@
 			"tier": 7
 		},
 		"item:iron-ingot": {
-			"assetId": "asset:item:iron-ingot",
-			"code": "iron-ingot",
 			"description": "Refined iron produced by smelters from iron ore and coal.",
 			"maxStackSize": 50,
 			"name": "Iron Ingot",
-			"storage": "both",
 			"tags": [
 				"material",
 				"industry",
@@ -1637,12 +1189,9 @@
 			"tier": 7
 		},
 		"item:iron-ore": {
-			"assetId": "asset:item:iron-ore",
-			"code": "iron-ore",
 			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
 			"maxStackSize": 20,
 			"name": "Iron Ore Cart",
-			"storage": "both",
 			"tags": [
 				"material",
 				"industry",
@@ -1653,12 +1202,9 @@
 			"tier": 7
 		},
 		"item:key-t1": {
-			"assetId": "asset:item:key-t1",
-			"code": "key-t1",
 			"description": "Basic goldsmith key used to open Chest I and bootstrap the gem/key expedition loop.",
 			"maxStackSize": 20,
 			"name": "Key I",
-			"storage": "both",
 			"tags": [
 				"key",
 				"goldsmith",
@@ -1667,12 +1213,9 @@
 			"tier": 1
 		},
 		"item:key-t2": {
-			"assetId": "asset:item:key-t2",
-			"code": "key-t2",
 			"description": "Gem-set goldsmith key used to open Chest II and fund tougher expeditions.",
 			"maxStackSize": 20,
 			"name": "Key II",
-			"storage": "both",
 			"tags": [
 				"key",
 				"goldsmith",
@@ -1682,12 +1225,9 @@
 			"tier": 2
 		},
 		"item:key-t3": {
-			"assetId": "asset:item:key-t3",
-			"code": "key-t3",
 			"description": "Advanced gem-set goldsmith key used to open Chest III and authorize grand expeditions.",
 			"maxStackSize": 20,
 			"name": "Key III",
-			"storage": "both",
 			"tags": [
 				"key",
 				"goldsmith",
@@ -1697,12 +1237,9 @@
 			"tier": 3
 		},
 		"item:key-t4": {
-			"assetId": "asset:item:key-t4",
-			"code": "key-t4",
 			"description": "Masterwork gem-set goldsmith key used to open Chest IV.",
 			"maxStackSize": 20,
 			"name": "Key IV",
-			"storage": "both",
 			"tags": [
 				"key",
 				"goldsmith",
@@ -1712,12 +1249,9 @@
 			"tier": 4
 		},
 		"item:leather": {
-			"assetId": "asset:item:leather",
-			"code": "leather",
 			"description": "Processed leather prepared by tanneries from raw hide and used by clothing and equipment chains.",
 			"maxStackSize": 50,
 			"name": "Leather",
-			"storage": "both",
 			"tags": [
 				"material",
 				"leather",
@@ -1728,12 +1262,8 @@
 			"tier": 5
 		},
 		"item:leather-armor": {
-			"assetId": "asset:item:leather-armor",
-			"code": "leather-armor",
 			"description": "Layered leather armor assembled by the Armory from leather, clothing, and forged nails.",
-			"maxStackSize": 10,
 			"name": "Leather Armor",
-			"storage": "both",
 			"tags": [
 				"equipment",
 				"armor",
@@ -1744,26 +1274,19 @@
 			"tier": 2
 		},
 		"item:log": {
-			"assetId": "asset:item:log",
-			"code": "log",
 			"description": "Basic wood material produced by lumberjacks.",
 			"maxStackSize": 50,
 			"name": "Log",
-			"storage": "both",
 			"tags": [
 				"material",
 				"wood",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:luxury-cloth": {
-			"assetId": "asset:item:luxury-cloth",
-			"code": "luxury-cloth",
 			"description": "Refined dyed cloth used for high-status clothing and later civic luxuries.",
 			"maxStackSize": 30,
 			"name": "Luxury Cloth",
-			"storage": "both",
 			"tags": [
 				"material",
 				"cloth",
@@ -1774,12 +1297,9 @@
 			"tier": 5
 		},
 		"item:luxury-clothing": {
-			"assetId": "asset:item:luxury-clothing",
-			"code": "luxury-clothing",
 			"description": "Prestige clothing sewn from luxury cloth, leather, and coins.",
 			"maxStackSize": 20,
 			"name": "Luxury Clothing",
-			"storage": "both",
 			"tags": [
 				"clothing",
 				"luxury",
@@ -1790,12 +1310,9 @@
 			"tier": 5
 		},
 		"item:marble": {
-			"assetId": "asset:item:marble",
-			"code": "marble",
 			"description": "Raw white marble extracted by Quarry II before being finished by Stonemason II.",
 			"maxStackSize": 40,
 			"name": "Marble",
-			"storage": "both",
 			"tags": [
 				"material",
 				"stone",
@@ -1807,12 +1324,9 @@
 			"tier": 10
 		},
 		"item:marble-block": {
-			"assetId": "asset:item:marble-block",
-			"code": "marble-block",
 			"description": "Polished marble construction block for future prestige buildings that should not be made from yet another heroic pile of planks.",
 			"maxStackSize": 30,
 			"name": "Marble Block",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -1826,12 +1340,8 @@
 			"tier": 10
 		},
 		"item:marble-deposit": {
-			"assetId": "asset:item:marble-deposit",
-			"code": "marble-deposit",
 			"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
-			"maxStackSize": 10,
 			"name": "Marble Deposit",
-			"storage": "both",
 			"tags": [
 				"source",
 				"construction",
@@ -1845,12 +1355,9 @@
 			"tier": 10
 		},
 		"item:master-knowledge": {
-			"assetId": "asset:item:master-knowledge",
-			"code": "master-knowledge",
 			"description": "University-level scholarship used to authorize the most ambitious expeditions and future high-civic progression.",
 			"maxStackSize": 50,
 			"name": "Master Knowledge",
-			"storage": "both",
 			"tags": [
 				"knowledge",
 				"education",
@@ -1861,26 +1368,19 @@
 			"tier": 4
 		},
 		"item:milk": {
-			"assetId": "asset:item:milk",
-			"code": "milk",
 			"description": "Fresh milk produced by cattle farms for base food supply chains.",
 			"maxStackSize": 50,
 			"name": "Milk",
-			"storage": "both",
 			"tags": [
 				"food",
 				"dairy",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:morale-t1": {
-			"assetId": "asset:item:morale-t1",
-			"code": "morale-t1",
 			"description": "Tier I social morale generated by housing and spent as an optional boost currency or prestige requirement.",
 			"maxStackSize": 50,
 			"name": "Morale I",
-			"storage": "both",
 			"tags": [
 				"morale",
 				"housing",
@@ -1890,12 +1390,9 @@
 			"tier": 1
 		},
 		"item:morale-t2": {
-			"assetId": "asset:item:morale-t2",
-			"code": "morale-t2",
 			"description": "Tier II social morale generated by housing and spent as an optional boost currency or prestige requirement.",
 			"maxStackSize": 50,
 			"name": "Morale II",
-			"storage": "both",
 			"tags": [
 				"morale",
 				"housing",
@@ -1905,12 +1402,9 @@
 			"tier": 2
 		},
 		"item:morale-t3": {
-			"assetId": "asset:item:morale-t3",
-			"code": "morale-t3",
 			"description": "Tier III social morale generated by housing and spent as an optional boost currency or prestige requirement.",
 			"maxStackSize": 50,
 			"name": "Morale III",
-			"storage": "both",
 			"tags": [
 				"morale",
 				"housing",
@@ -1920,12 +1414,9 @@
 			"tier": 3
 		},
 		"item:morale-t4": {
-			"assetId": "asset:item:morale-t4",
-			"code": "morale-t4",
 			"description": "Tier IV social morale generated by housing and spent as an optional boost currency or prestige requirement.",
 			"maxStackSize": 50,
 			"name": "Morale IV",
-			"storage": "both",
 			"tags": [
 				"morale",
 				"housing",
@@ -1935,12 +1426,9 @@
 			"tier": 4
 		},
 		"item:nails": {
-			"assetId": "asset:item:nails",
-			"code": "nails",
 			"description": "Forged fasteners produced by the Blacksmith and consumed by armories and later advanced construction.",
 			"maxStackSize": 50,
 			"name": "Nails",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -1951,12 +1439,9 @@
 			"tier": 4
 		},
 		"item:paper": {
-			"assetId": "asset:item:paper",
-			"code": "paper",
 			"description": "Processed writing material used by schools, civic offices, prospectors, and improved trade.",
 			"maxStackSize": 50,
 			"name": "Paper",
-			"storage": "both",
 			"tags": [
 				"resource",
 				"paper",
@@ -1966,27 +1451,20 @@
 			"tier": 4
 		},
 		"item:piglet": {
-			"assetId": "asset:item:piglet",
-			"code": "piglet",
 			"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
 			"maxStackSize": 20,
 			"name": "Piglet",
-			"storage": "both",
 			"tags": [
 				"animal",
 				"food",
 				"pig",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:pigment": {
-			"assetId": "asset:item:pigment",
-			"code": "pigment",
 			"description": "Concentrated natural dye powders produced by Dye Workshops for luxury textiles and stained-glass work.",
 			"maxStackSize": 50,
 			"name": "Pigment",
-			"storage": "both",
 			"tags": [
 				"material",
 				"dye",
@@ -1997,22 +1475,16 @@
 			"tier": 5
 		},
 		"item:plank": {
-			"assetId": "asset:item:plank",
-			"code": "plank",
 			"description": "Processed wood material produced by sawmills.",
 			"maxStackSize": 50,
 			"name": "Plank",
-			"storage": "both",
 			"tags": [
 				"material",
 				"wood",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:pollution": {
-			"assetId": "asset:item:pollution",
-			"code": "pollution",
 			"description": "Dirty board-only industrial pollution emitted by coal or charcoal processing. It stays on the board and must be cleaned by Purifier I.",
 			"maxStackSize": 1,
 			"name": "Pollution",
@@ -2026,12 +1498,9 @@
 			"tier": 7
 		},
 		"item:raw-hide": {
-			"assetId": "asset:item:raw-hide",
-			"code": "raw-hide",
 			"description": "Untreated animal hide produced by slaughterhouses and processed by tanneries into leather.",
 			"maxStackSize": 50,
 			"name": "Raw Hide",
-			"storage": "both",
 			"tags": [
 				"material",
 				"animal",
@@ -2042,26 +1511,18 @@
 			"tier": 5
 		},
 		"item:rock": {
-			"assetId": "asset:item:rock",
-			"code": "rock",
 			"description": "Movable stone source used by nearby quarries.",
-			"maxStackSize": 10,
 			"name": "Rock",
-			"storage": "both",
 			"tags": [
 				"source",
 				"stone",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:roof-tiles": {
-			"assetId": "asset:item:roof-tiles",
-			"code": "roof-tiles",
 			"description": "Curved fired roof tiles prepared for higher-tier building construction.",
 			"maxStackSize": 50,
 			"name": "Roof Tiles",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -2073,12 +1534,9 @@
 			"tier": 4
 		},
 		"item:ruby": {
-			"assetId": "asset:item:ruby",
-			"code": "ruby",
 			"description": "A polished red gemstone recovered from low-tier hero loot.",
 			"maxStackSize": 20,
 			"name": "Ruby",
-			"storage": "both",
 			"tags": [
 				"treasure",
 				"gem",
@@ -2088,12 +1546,9 @@
 			"tier": 1
 		},
 		"item:sand": {
-			"assetId": "asset:item:sand",
-			"code": "sand",
 			"description": "Fine sand prepared as the base material for glassmaking.",
 			"maxStackSize": 50,
 			"name": "Sand",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -2104,28 +1559,20 @@
 			"tier": 4
 		},
 		"item:sand-deposit": {
-			"assetId": "asset:item:sand-deposit",
-			"code": "sand-deposit",
 			"description": "Movable sand source used by nearby sand pits.",
-			"maxStackSize": 10,
 			"name": "Sand Deposit",
-			"storage": "both",
 			"tags": [
 				"source",
 				"construction",
 				"sand",
 				"glass",
 				"era:VI"
-			],
-			"tier": 0
+			]
 		},
 		"item:sapphire": {
-			"assetId": "asset:item:sapphire",
-			"code": "sapphire",
 			"description": "A polished blue gemstone from better guild rewards.",
 			"maxStackSize": 20,
 			"name": "Sapphire",
-			"storage": "both",
 			"tags": [
 				"treasure",
 				"gem",
@@ -2135,27 +1582,20 @@
 			"tier": 2
 		},
 		"item:sausage": {
-			"assetId": "asset:item:sausage",
-			"code": "sausage",
 			"description": "Meat food produced by slaughterhouses from piglets and consumed by heavy industry workers.",
 			"maxStackSize": 50,
 			"name": "Sausage",
-			"storage": "both",
 			"tags": [
 				"food",
 				"meat",
 				"sausage",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:stained-glass": {
-			"assetId": "asset:item:stained-glass",
-			"code": "stained-glass",
 			"description": "Prestige colored glass panels finished by Glazier Workshops for later high-civic and luxury buildings.",
 			"maxStackSize": 20,
 			"name": "Stained Glass",
-			"storage": "both",
 			"tags": [
 				"material",
 				"construction",
@@ -2168,40 +1608,29 @@
 			"tier": 10
 		},
 		"item:stone": {
-			"assetId": "asset:item:stone",
-			"code": "stone",
 			"description": "Basic stone material produced by quarries.",
 			"maxStackSize": 50,
 			"name": "Stone",
-			"storage": "both",
 			"tags": [
 				"material",
 				"stone",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:stone-block": {
-			"assetId": "asset:item:stone-block",
-			"code": "stone-block",
 			"description": "Processed stone material produced by stonemasons.",
 			"maxStackSize": 50,
 			"name": "Stone Block",
-			"storage": "both",
 			"tags": [
 				"material",
 				"stone",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:sword": {
-			"assetId": "asset:item:sword",
-			"code": "sword",
 			"description": "Expedition weapon forged from iron ingots, leather grip work, and charcoal heat.",
 			"maxStackSize": 20,
 			"name": "Sword",
-			"storage": "both",
 			"tags": [
 				"equipment",
 				"weapon",
@@ -2212,12 +1641,9 @@
 			"tier": 2
 		},
 		"item:topaz": {
-			"assetId": "asset:item:topaz",
-			"code": "topaz",
 			"description": "A polished amber gemstone from high-tier treasure chests.",
 			"maxStackSize": 20,
 			"name": "Topaz",
-			"storage": "both",
 			"tags": [
 				"treasure",
 				"gem",
@@ -2227,12 +1653,9 @@
 			"tier": 3
 		},
 		"item:treasure-chest": {
-			"assetId": "asset:item:treasure-chest",
-			"code": "treasure-chest",
 			"description": "Master reward from a grand Heroes Guild expedition, packed with gold and gems and ready to gate the next civic tier.",
 			"maxStackSize": 5,
 			"name": "Treasure Chest",
-			"storage": "both",
 			"tags": [
 				"treasure",
 				"chest",
@@ -2244,129 +1667,91 @@
 			"tier": 4
 		},
 		"item:tree": {
-			"assetId": "asset:item:tree",
-			"code": "tree",
 			"description": "Movable wood source used by nearby lumberjacks.",
-			"maxStackSize": 10,
 			"name": "Tree",
-			"storage": "both",
 			"tags": [
 				"source",
 				"wood",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:vegetables": {
-			"assetId": "asset:item:vegetables",
-			"code": "vegetables",
 			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
 			"maxStackSize": 50,
 			"name": "Vegetables",
-			"storage": "both",
 			"tags": [
 				"food",
 				"vegetable",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:vineyard": {
-			"assetId": "asset:item:vineyard",
-			"code": "vineyard",
 			"description": "Movable vineyard source used by nearby wineries.",
-			"maxStackSize": 10,
 			"name": "Vineyard",
-			"storage": "both",
 			"tags": [
 				"source",
 				"food",
 				"wine",
 				"grapes",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:water": {
-			"assetId": "asset:item:water",
-			"code": "water",
 			"description": "Basic water resource produced by wells and consumed by farms.",
 			"maxStackSize": 50,
 			"name": "Water",
-			"storage": "both",
 			"tags": [
 				"material",
 				"food",
 				"water",
 				"era:I"
-			],
-			"tier": 0
+			]
 		},
 		"item:wheat-field": {
-			"assetId": "asset:item:wheat-field",
-			"code": "wheat-field",
 			"description": "Movable grain source used by nearby farms.",
-			"maxStackSize": 10,
 			"name": "Wheat Field",
-			"storage": "both",
 			"tags": [
 				"source",
 				"food",
 				"grain",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"item:wine-barrel": {
-			"assetId": "asset:item:wine-barrel",
-			"code": "wine-barrel",
 			"description": "A barrel of wine produced by wineries and served by taverns.",
 			"maxStackSize": 20,
 			"name": "Wine Barrel",
-			"storage": "both",
 			"tags": [
 				"material",
 				"food",
 				"wine",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:wine-glass": {
-			"assetId": "asset:item:wine-glass",
-			"code": "wine-glass",
 			"description": "A single glass of wine served by taverns.",
 			"maxStackSize": 50,
 			"name": "Wine Glass",
-			"storage": "both",
 			"tags": [
 				"food",
 				"wine",
 				"era:III"
-			],
-			"tier": 0
+			]
 		},
 		"item:wool": {
-			"assetId": "asset:item:wool",
-			"code": "wool",
 			"description": "Raw wool produced by sheep pastures and used as early settlement material.",
 			"maxStackSize": 50,
 			"name": "Wool",
-			"storage": "both",
 			"tags": [
 				"material",
 				"animal",
 				"era:II"
-			],
-			"tier": 0
+			]
 		},
 		"producer:academy": {
-			"assetId": "asset:producer:academy",
-			"code": "academy",
 			"description": "Industrial education hub that converts civic knowledge into advanced knowledge and issues mining and metallurgy plans.",
 			"maxStackSize": 1,
 			"name": "Academy",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2377,12 +1762,9 @@
 			"tier": 7
 		},
 		"producer:armory-t1": {
-			"assetId": "asset:producer:armory-t1",
-			"code": "armory-t1",
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
 			"maxStackSize": 1,
 			"name": "Armory I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"armory",
@@ -2394,12 +1776,9 @@
 			"tier": 9
 		},
 		"producer:bakery-t1": {
-			"assetId": "asset:producer:bakery-t1",
-			"code": "bakery-t1",
 			"description": "Consumes flour and water to bake bread.",
 			"maxStackSize": 1,
 			"name": "Bakery I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -2409,12 +1788,9 @@
 			"tier": 1
 		},
 		"producer:blacksmith-t1": {
-			"assetId": "asset:producer:blacksmith-t1",
-			"code": "blacksmith-t1",
 			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
 			"maxStackSize": 1,
 			"name": "Blacksmith I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"blacksmith",
@@ -2426,12 +1802,9 @@
 			"tier": 9
 		},
 		"producer:brewery-t1": {
-			"assetId": "asset:producer:brewery-t1",
-			"code": "brewery-t1",
 			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
 			"maxStackSize": 1,
 			"name": "Brewery I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -2441,12 +1814,9 @@
 			"tier": 1
 		},
 		"producer:brickyard": {
-			"assetId": "asset:producer:brickyard",
-			"code": "brickyard",
 			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
 			"maxStackSize": 1,
 			"name": "Brickyard",
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -2458,15 +1828,12 @@
 			"tier": 3
 		},
 		"producer:cathedral": {
-			"assetId": "asset:producer:cathedral",
-			"code": "cathedral",
 			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
 			"maxStackSize": 1,
 			"name": "Cathedral",
 			"passiveEffectIds": [
 				"effect:path-faith-locks-counter-keystones"
 			],
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -2479,12 +1846,9 @@
 			"tier": 11
 		},
 		"producer:cattle-farm-t1": {
-			"assetId": "asset:producer:cattle-farm-t1",
-			"code": "cattle-farm-t1",
 			"description": "Consumes grain and water to produce milk.",
 			"maxStackSize": 1,
 			"name": "Cattle Farm I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -2494,12 +1858,9 @@
 			"tier": 1
 		},
 		"producer:charcoal-burner-t1": {
-			"assetId": "asset:producer:charcoal-burner-t1",
-			"code": "charcoal-burner-t1",
 			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
 			"maxStackSize": 1,
 			"name": "Charcoal Burner I",
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -2511,12 +1872,9 @@
 			"tier": 6
 		},
 		"producer:chicken-coop-t1": {
-			"assetId": "asset:producer:chicken-coop-t1",
-			"code": "chicken-coop-t1",
 			"description": "Consumes grain and water to produce eggs.",
 			"maxStackSize": 1,
 			"name": "Chicken Coop I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -2526,12 +1884,9 @@
 			"tier": 1
 		},
 		"producer:civic-office-t1": {
-			"assetId": "asset:producer:civic-office-t1",
-			"code": "civic-office-t1",
 			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
 			"maxStackSize": 1,
 			"name": "Civic Office I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2542,12 +1897,9 @@
 			"tier": 4
 		},
 		"producer:clay-pit": {
-			"assetId": "asset:producer:clay-pit",
-			"code": "clay-pit",
 			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
 			"maxStackSize": 1,
 			"name": "Clay Pit",
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -2559,12 +1911,9 @@
 			"tier": 3
 		},
 		"producer:coal-mine-t1": {
-			"assetId": "asset:producer:coal-mine-t1",
-			"code": "coal-mine-t1",
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"industry",
@@ -2575,12 +1924,9 @@
 			"tier": 7
 		},
 		"producer:construction-yard-t1": {
-			"assetId": "asset:producer:construction-yard-t1",
-			"code": "construction-yard-t1",
 			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
 			"maxStackSize": 1,
 			"name": "Construction Yard I",
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -2592,12 +1938,9 @@
 			"tier": 6
 		},
 		"producer:cookhouse-t1": {
-			"assetId": "asset:producer:cookhouse-t1",
-			"code": "cookhouse-t1",
 			"description": "Combines processed food into feasts.",
 			"maxStackSize": 1,
 			"name": "Cookhouse I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -2607,12 +1950,9 @@
 			"tier": 1
 		},
 		"producer:dairy-t1": {
-			"assetId": "asset:producer:dairy-t1",
-			"code": "dairy-t1",
 			"description": "Processes milk into cheese.",
 			"maxStackSize": 1,
 			"name": "Dairy I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -2622,12 +1962,9 @@
 			"tier": 1
 		},
 		"producer:dye-workshop-t1": {
-			"assetId": "asset:producer:dye-workshop-t1",
-			"code": "dye-workshop-t1",
 			"description": "Textile producer that dyes common cloth into luxury cloth.",
 			"maxStackSize": 1,
 			"name": "Dye Workshop I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2639,12 +1976,9 @@
 			"tier": 5
 		},
 		"producer:farm-t1": {
-			"assetId": "asset:producer:farm-t1",
-			"code": "farm-t1",
 			"description": "Consumes water and produces grain when placed near a wheat field.",
 			"maxStackSize": 1,
 			"name": "Farm I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -2654,12 +1988,9 @@
 			"tier": 1
 		},
 		"producer:glassworks": {
-			"assetId": "asset:producer:glassworks",
-			"code": "glassworks",
 			"description": "Furnace workshop that turns sand and charcoal into glass.",
 			"maxStackSize": 1,
 			"name": "Glassworks",
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -2671,12 +2002,9 @@
 			"tier": 4
 		},
 		"producer:glazier-workshop-t1": {
-			"assetId": "asset:producer:glazier-workshop-t1",
-			"code": "glazier-workshop-t1",
 			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
 			"maxStackSize": 1,
 			"name": "Glazier Workshop I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2689,12 +2017,9 @@
 			"tier": 10
 		},
 		"producer:gold-mine-t1": {
-			"assetId": "asset:producer:gold-mine-t1",
-			"code": "gold-mine-t1",
 			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
 			"maxStackSize": 1,
 			"name": "Gold Mine I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"industry",
@@ -2705,12 +2030,9 @@
 			"tier": 7
 		},
 		"producer:goldsmith-t1": {
-			"assetId": "asset:producer:goldsmith-t1",
-			"code": "goldsmith-t1",
 			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"economy",
@@ -2723,12 +2045,9 @@
 			"tier": 9
 		},
 		"producer:heroes-guild-t1": {
-			"assetId": "asset:producer:heroes-guild-t1",
-			"code": "heroes-guild-t1",
 			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
 			"maxStackSize": 1,
 			"name": "Heroes Guild I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"hero",
@@ -2740,15 +2059,12 @@
 			"tier": 9
 		},
 		"producer:house-of-engineers": {
-			"assetId": "asset:producer:house-of-engineers",
-			"code": "house-of-engineers",
 			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
 			"maxStackSize": 1,
 			"name": "House of Engineers",
 			"passiveEffectIds": [
 				"effect:path-engineers-locks-counter-keystones"
 			],
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -2761,12 +2077,9 @@
 			"tier": 11
 		},
 		"producer:house-t1": {
-			"assetId": "asset:producer:house-t1",
-			"code": "house-t1",
 			"description": "Basic housing that turns warmth and water into early morale.",
 			"maxStackSize": 1,
 			"name": "House",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2779,12 +2092,9 @@
 			"label": "1"
 		},
 		"producer:house-t2": {
-			"assetId": "asset:producer:house-t2",
-			"code": "house-t2",
 			"description": "Improved housing that consumes processed food and coins to produce stronger morale while still creating lower morale.",
 			"maxStackSize": 1,
 			"name": "House",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2797,12 +2107,9 @@
 			"label": "2"
 		},
 		"producer:house-t3": {
-			"assetId": "asset:producer:house-t3",
-			"code": "house-t3",
 			"description": "Prosperous housing that consumes clothing, food, and comfort goods to produce mid-tier morale and lower morale.",
 			"maxStackSize": 1,
 			"name": "House",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2815,12 +2122,9 @@
 			"label": "3"
 		},
 		"producer:house-t4": {
-			"assetId": "asset:producer:house-t4",
-			"code": "house-t4",
 			"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
 			"maxStackSize": 1,
 			"name": "House",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2833,12 +2137,9 @@
 			"label": "4"
 		},
 		"producer:iron-mine-t1": {
-			"assetId": "asset:producer:iron-mine-t1",
-			"code": "iron-mine-t1",
 			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
 			"maxStackSize": 1,
 			"name": "Iron Mine I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"industry",
@@ -2849,12 +2150,9 @@
 			"tier": 7
 		},
 		"producer:lumberjack-t1": {
-			"assetId": "asset:producer:lumberjack-t1",
-			"code": "lumberjack-t1",
 			"description": "Produces logs when placed near a tree.",
 			"maxStackSize": 1,
 			"name": "Lumberjack I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"wood",
@@ -2863,15 +2161,12 @@
 			"tier": 1
 		},
 		"producer:mage-lodge": {
-			"assetId": "asset:producer:mage-lodge",
-			"code": "mage-lodge",
 			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
 			"maxStackSize": 1,
 			"name": "Mage Lodge",
 			"passiveEffectIds": [
 				"effect:path-mages-locks-counter-keystones"
 			],
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -2885,12 +2180,9 @@
 			"tier": 11
 		},
 		"producer:market-t1": {
-			"assetId": "asset:producer:market-t1",
-			"code": "market-t1",
 			"description": "First trade producer that converts processed food and drink into coins.",
 			"maxStackSize": 1,
 			"name": "Market",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"trade",
@@ -2900,12 +2192,9 @@
 			"tier": 3
 		},
 		"producer:market-t2": {
-			"assetId": "asset:producer:market-t2",
-			"code": "market-t2",
 			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
 			"maxStackSize": 1,
 			"name": "Market II",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"trade",
@@ -2916,12 +2205,9 @@
 			"tier": 4
 		},
 		"producer:paper-mill-t1": {
-			"assetId": "asset:producer:paper-mill-t1",
-			"code": "paper-mill-t1",
 			"description": "Civic workshop that turns planks and water into paper for education and permits.",
 			"maxStackSize": 1,
 			"name": "Paper Mill I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2932,12 +2218,9 @@
 			"tier": 4
 		},
 		"producer:pig-farm-t1": {
-			"assetId": "asset:producer:pig-farm-t1",
-			"code": "pig-farm-t1",
 			"description": "Consumes grain and water to produce piglets.",
 			"maxStackSize": 1,
 			"name": "Pig Farm I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -2947,13 +2230,10 @@
 			"tier": 1
 		},
 		"producer:prospector-guild-t1": {
-			"assetId": "asset:producer:prospector-guild-t1",
-			"code": "prospector-guild-t1",
 			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
 			"label": "1",
 			"maxStackSize": 1,
 			"name": "Prospector Guild",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2965,13 +2245,10 @@
 			"tier": 4
 		},
 		"producer:prospector-guild-t2": {
-			"assetId": "asset:producer:prospector-guild-t2",
-			"code": "prospector-guild-t2",
 			"description": "Upgraded prospecting guild that keeps surface surveys and adds coal, iron, and gold deposit prospecting for industry.",
 			"label": "2",
 			"maxStackSize": 1,
 			"name": "Prospector Guild",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -2983,12 +2260,9 @@
 			"tier": 7
 		},
 		"producer:purifier-t1": {
-			"assetId": "asset:producer:purifier-t1",
-			"code": "purifier-t1",
 			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
 			"maxStackSize": 1,
 			"name": "Purifier I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"industry",
@@ -2999,12 +2273,9 @@
 			"tier": 7
 		},
 		"producer:quarry-t1": {
-			"assetId": "asset:producer:quarry-t1",
-			"code": "quarry-t1",
 			"description": "Produces stone when placed near a rock.",
 			"maxStackSize": 1,
 			"name": "Quarry I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"stone",
@@ -3013,13 +2284,10 @@
 			"tier": 1
 		},
 		"producer:quarry-t2": {
-			"assetId": "asset:producer:quarry-t2",
-			"code": "quarry-t2",
 			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
 			"label": "2",
 			"maxStackSize": 1,
 			"name": "Quarry",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -3033,12 +2301,9 @@
 			"tier": 10
 		},
 		"producer:roof-tile-factory": {
-			"assetId": "asset:producer:roof-tile-factory",
-			"code": "roof-tile-factory",
 			"description": "Workshop that fires clay into sturdy roof tiles.",
 			"maxStackSize": 1,
 			"name": "Roof Tile Factory",
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -3050,12 +2315,9 @@
 			"tier": 4
 		},
 		"producer:sand-pit": {
-			"assetId": "asset:producer:sand-pit",
-			"code": "sand-pit",
 			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
 			"maxStackSize": 1,
 			"name": "Sand Pit",
-			"storage": "both",
 			"tags": [
 				"building",
 				"producer",
@@ -3068,12 +2330,9 @@
 			"tier": 4
 		},
 		"producer:sawmill-t1": {
-			"assetId": "asset:producer:sawmill-t1",
-			"code": "sawmill-t1",
 			"description": "Turns logs into planks when placed near a lumberjack.",
 			"maxStackSize": 1,
 			"name": "Sawmill I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"wood",
@@ -3082,12 +2341,9 @@
 			"tier": 1
 		},
 		"producer:school": {
-			"assetId": "asset:producer:school",
-			"code": "school",
 			"description": "Education building that turns civic support into Basic Knowledge.",
 			"maxStackSize": 1,
 			"name": "School",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -3098,12 +2354,9 @@
 			"tier": 2
 		},
 		"producer:sheep-pasture-t1": {
-			"assetId": "asset:producer:sheep-pasture-t1",
-			"code": "sheep-pasture-t1",
 			"description": "Consumes grain and water to produce wool.",
 			"maxStackSize": 1,
 			"name": "Sheep Pasture I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"animal",
@@ -3113,12 +2366,9 @@
 			"tier": 1
 		},
 		"producer:slaughterhouse-t1": {
-			"assetId": "asset:producer:slaughterhouse-t1",
-			"code": "slaughterhouse-t1",
 			"description": "Processes piglets into sausage and leather.",
 			"maxStackSize": 1,
 			"name": "Slaughterhouse I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -3129,12 +2379,9 @@
 			"tier": 1
 		},
 		"producer:smelter-t1": {
-			"assetId": "asset:producer:smelter-t1",
-			"code": "smelter-t1",
 			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
 			"maxStackSize": 1,
 			"name": "Smelter I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"industry",
@@ -3144,12 +2391,9 @@
 			"tier": 7
 		},
 		"producer:stonemason-t1": {
-			"assetId": "asset:producer:stonemason-t1",
-			"code": "stonemason-t1",
 			"description": "Turns stone into stone blocks when placed near a quarry.",
 			"maxStackSize": 1,
 			"name": "Stonemason I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"stone",
@@ -3158,13 +2402,10 @@
 			"tier": 1
 		},
 		"producer:stonemason-t2": {
-			"assetId": "asset:producer:stonemason-t2",
-			"code": "stonemason-t2",
 			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
 			"label": "2",
 			"maxStackSize": 1,
 			"name": "Stonemason",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -3178,12 +2419,9 @@
 			"tier": 10
 		},
 		"producer:tailor-workshop-t1": {
-			"assetId": "asset:producer:tailor-workshop-t1",
-			"code": "tailor-workshop-t1",
 			"description": "Clothing producer that sews common and luxury clothing.",
 			"maxStackSize": 1,
 			"name": "Tailor Workshop I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -3194,12 +2432,9 @@
 			"tier": 5
 		},
 		"producer:tannery-t1": {
-			"assetId": "asset:producer:tannery-t1",
-			"code": "tannery-t1",
 			"description": "Leatherworking producer that turns raw hide and water into leather.",
 			"maxStackSize": 1,
 			"name": "Tannery I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -3210,12 +2445,9 @@
 			"tier": 5
 		},
 		"producer:tavern-t1": {
-			"assetId": "asset:producer:tavern-t1",
-			"code": "tavern-t1",
 			"description": "Serves beer barrels as individual beers.",
 			"maxStackSize": 1,
 			"name": "Tavern I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -3225,12 +2457,9 @@
 			"tier": 1
 		},
 		"producer:townhall-t1": {
-			"assetId": "asset:producer:townhall-t1",
-			"code": "townhall-t1",
 			"description": "Starter civic hub that issues basic settlement blueprints.",
 			"maxStackSize": 1,
 			"name": "Town Hall I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"townhall",
@@ -3240,12 +2469,9 @@
 			"tier": 1
 		},
 		"producer:townhall-t2": {
-			"assetId": "asset:producer:townhall-t2",
-			"code": "townhall-t2",
 			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall II",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"townhall",
@@ -3255,12 +2481,9 @@
 			"tier": 2
 		},
 		"producer:townhall-t3": {
-			"assetId": "asset:producer:townhall-t3",
-			"code": "townhall-t3",
 			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, cookhouse, brewing, wine, market, and Era IV plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall III",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"townhall",
@@ -3270,12 +2493,9 @@
 			"tier": 3
 		},
 		"producer:townhall-t4": {
-			"assetId": "asset:producer:townhall-t4",
-			"code": "townhall-t4",
 			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
 			"maxStackSize": 1,
 			"name": "Town Hall IV",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"townhall",
@@ -3285,12 +2505,9 @@
 			"tier": 4
 		},
 		"producer:university": {
-			"assetId": "asset:producer:university",
-			"code": "university",
 			"description": "Advanced institution that converts paper, glass, coin stacks, and advanced knowledge into Master Knowledge.",
 			"maxStackSize": 1,
 			"name": "University",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -3302,12 +2519,9 @@
 			"tier": 9
 		},
 		"producer:vegetable-garden-t1": {
-			"assetId": "asset:producer:vegetable-garden-t1",
-			"code": "vegetable-garden-t1",
 			"description": "Consumes water to produce vegetables.",
 			"maxStackSize": 1,
 			"name": "Vegetable Garden I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -3317,12 +2531,9 @@
 			"tier": 1
 		},
 		"producer:weaver-hut-t1": {
-			"assetId": "asset:producer:weaver-hut-t1",
-			"code": "weaver-hut-t1",
 			"description": "Textile producer that weaves wool into common cloth.",
 			"maxStackSize": 1,
 			"name": "Weaver Hut I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"building",
@@ -3333,12 +2544,9 @@
 			"tier": 5
 		},
 		"producer:well-t1": {
-			"assetId": "asset:producer:well-t1",
-			"code": "well-t1",
 			"description": "Produces water.",
 			"maxStackSize": 1,
 			"name": "Well I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -3348,12 +2556,9 @@
 			"tier": 1
 		},
 		"producer:windmill-t1": {
-			"assetId": "asset:producer:windmill-t1",
-			"code": "windmill-t1",
 			"description": "Mills grain into flour.",
 			"maxStackSize": 1,
 			"name": "Windmill I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",
@@ -3364,12 +2569,9 @@
 			"tier": 1
 		},
 		"producer:winery-t1": {
-			"assetId": "asset:producer:winery-t1",
-			"code": "winery-t1",
 			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
 			"maxStackSize": 1,
 			"name": "Winery I",
-			"storage": "both",
 			"tags": [
 				"producer",
 				"food",

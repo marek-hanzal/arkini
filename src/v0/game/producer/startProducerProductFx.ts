@@ -9,6 +9,8 @@ import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readProducerJobWakeAtMs } from "~/v0/game/producer/producerDeliveryTiming";
+import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -117,7 +119,24 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
 			.map(readProducerJobWakeAtMs),
 	);
-	const durationMs = checked.effectiveProductLine.durationMs;
+	const jobEffectiveProductLine = readEffectiveProducerProductLine({
+		baseDurationMs: readProducerProductDurationMs({
+			hindrances: checked.hindrances,
+			product: checked.product,
+			producerItemInstanceId: action.producerItemInstanceId,
+			requirements: checked.requirements,
+			save: nextSave,
+		}),
+		config,
+		nowMs: queuedStartAtMs,
+		producerId: checked.producerId,
+		producerItemId: checked.producerItem.itemId,
+		producerItemInstanceId: action.producerItemInstanceId,
+		product: checked.product,
+		productId: checked.productId,
+		save: nextSave,
+	});
+	const durationMs = jobEffectiveProductLine.durationMs;
 	const readyAtMs = queuedStartAtMs + durationMs;
 
 	const activatedEffect = checked.product.activatesEffectId
@@ -135,7 +154,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 
 	const outputItems = (yield* rollEffectiveLootPlanItemsFx({
 		config,
-		lootPlan: checked.effectiveProductLine.lootPlan,
+		lootPlan: jobEffectiveProductLine.lootPlan,
 	})).items;
 
 	const jobId = yield* createGameJobIdFx();

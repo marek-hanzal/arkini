@@ -64,7 +64,7 @@ const GameSaveProducerJobSchema = z
 		delivery: GameSaveProducerDeliverySchema.optional(),
 		outputItems: z.array(GameSaveProducerDeliveryItemSchema),
 		producerItemInstanceId: IdSchema,
-		placement: z.literal("board_then_inventory").optional(),
+		placement: z.literal("board_then_inventory"),
 		productId: IdSchema,
 		startAtMs: GameInstantMsSchema,
 		readyAtMs: GameInstantMsSchema,

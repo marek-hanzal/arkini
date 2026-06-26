@@ -185,9 +185,9 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	}
 
 	return {
-		effectiveProductLine,
 		hindrances,
 		producerDefinition,
+		producerId,
 		producerItem,
 		product,
 		productId,

@@ -79,7 +79,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 				fromItemId: checked.target.itemId,
 				itemInstanceId: checked.target.id,
 				reason: "merge-result" as const,
-				replacedAtMs: nowMs,
+				atMs: nowMs,
 				toItemId: checked.merge.resultItemId,
 				type: "item.replaced" as const,
 			},

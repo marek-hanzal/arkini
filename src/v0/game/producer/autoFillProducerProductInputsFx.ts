@@ -50,7 +50,7 @@ const storeProducerResolvedInput = ({
 		producerItemInstanceId,
 		productId,
 		quantity: ref.quantity,
-		storedAtMs: nowMs,
+		atMs: nowMs,
 		type: "producer_input.stored",
 	});
 };

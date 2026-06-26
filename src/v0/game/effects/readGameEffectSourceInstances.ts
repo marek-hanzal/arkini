@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { isGameTimeWindowActive } from "~/v0/game/time/GameTime";
 import type { GameSave, GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourceInstance";
 
@@ -41,7 +42,7 @@ const readPassiveBoardSources = ({
 
 			return [
 				{
-					activatedAtMs: 0,
+					startAtMs: 0,
 					effectId,
 					kind: "passive" as const,
 					sourceId: item.id,
@@ -105,7 +106,7 @@ const readPassiveInventorySources = ({
 					});
 
 					return {
-						activatedAtMs: 0,
+						startAtMs: 0,
 						effectId,
 						kind: "passive" as const,
 						sourceId: sourceItemInstanceId,
@@ -126,7 +127,11 @@ export const readGameEffectSourceInstances = ({
 		.filter(
 			(effect) =>
 				nowMs === undefined ||
-				(effect.activatedAtMs <= nowMs && effect.expiresAtMs > nowMs),
+				isGameTimeWindowActive({
+					endAtMs: effect.endAtMs,
+					nowMs,
+					startAtMs: effect.startAtMs,
+				}),
 		)
 		.flatMap((effect) => {
 			const boardSource = save.board.items[effect.sourceItemInstanceId];
@@ -154,7 +159,7 @@ export const readGameEffectSourceInstances = ({
 
 			return [
 				{
-					activatedAtMs: effect.activatedAtMs,
+					startAtMs: effect.startAtMs,
 					effectId: effect.effectId,
 					kind: "active" as const,
 					sourceId: effect.id,

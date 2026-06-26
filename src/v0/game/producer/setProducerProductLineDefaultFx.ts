@@ -47,7 +47,7 @@ export const setProducerProductLineDefaultFx = Effect.fn("setProducerProductLine
 		return {
 			events: [
 				{
-					changedAtMs: nowMs,
+					atMs: nowMs,
 					nextProductId,
 					previousProductId,
 					producerItemInstanceId: action.producerItemInstanceId,

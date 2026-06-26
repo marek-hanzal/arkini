@@ -22,7 +22,7 @@ export const ProducerProductLineViewSchema = z.object({
 	inputsAvailable: z.boolean(),
 	requirementsReady: z.boolean(),
 	missingRequirementItemIds: z.array(IdSchema),
-	startedAtMs: z.number().int().nonnegative().optional(),
+	startAtMs: z.number().int().nonnegative().optional(),
 	readyAtMs: z.number().int().nonnegative().optional(),
 	progress: z.number().min(0).max(1).optional(),
 	inputItemIds: z.array(IdSchema),

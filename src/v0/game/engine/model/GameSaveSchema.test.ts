@@ -11,19 +11,19 @@ const createInitialSave = (props: createInitialGameSaveFx.Props) =>
 const cloneSave = (save: GameSave): GameSave => structuredClone(save);
 
 const createProducerJob = (id: string) => ({
-	completesAtMs: 1000,
+	readyAtMs: 1000,
 	id,
 	outputTableId: "loot:test",
 	productId: "product:test",
 	producerItemInstanceId: "item-instance:1",
-	startedAtMs: 0,
+	startAtMs: 0,
 });
 
 const createCraftJob = (id: string, targetItemInstanceId: string) => ({
-	completesAtMs: 1000,
+	readyAtMs: 1000,
 	id,
 	recipeId: "craft:plank",
-	startedAtMs: 0,
+	startAtMs: 0,
 	targetItemInstanceId,
 });
 
@@ -481,7 +481,7 @@ describe("GameSaveConfigSchema", () => {
 		});
 		const invalidSave = cloneSave(save);
 		invalidSave.itemSpawnJobs["item-spawn-job:record"] = {
-			dueAtMs: 100,
+			readyAtMs: 100,
 			id: "item-spawn-job:different",
 			itemId: "item:twig",
 			quantity: 1,
@@ -506,7 +506,7 @@ describe("GameSaveConfigSchema", () => {
 		});
 		const invalidSave = cloneSave(save);
 		invalidSave.itemSpawnJobs["item-spawn-job:missing"] = {
-			dueAtMs: 100,
+			readyAtMs: 100,
 			id: "item-spawn-job:missing",
 			itemId: "item:missing",
 			quantity: 1,
@@ -534,7 +534,7 @@ describe("GameSaveConfigSchema", () => {
 			afterJobIds: [
 				"item-spawn-job:b",
 			],
-			dueAtMs: 100,
+			readyAtMs: 100,
 			id: "item-spawn-job:a",
 			itemId: "item:twig",
 			quantity: 1,
@@ -545,7 +545,7 @@ describe("GameSaveConfigSchema", () => {
 			afterJobIds: [
 				"item-spawn-job:a",
 			],
-			dueAtMs: 100,
+			readyAtMs: 100,
 			id: "item-spawn-job:b",
 			itemId: "item:plank",
 			quantity: 1,
@@ -575,7 +575,7 @@ describe("GameSaveConfigSchema", () => {
 			afterJobIds: [
 				"item-spawn-job:missing",
 			],
-			dueAtMs: 100,
+			readyAtMs: 100,
 			id: "item-spawn-job:dependent",
 			itemId: "item:twig",
 			quantity: 1,

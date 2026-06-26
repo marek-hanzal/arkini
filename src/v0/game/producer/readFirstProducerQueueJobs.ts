@@ -1,8 +1,8 @@
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 
 const compareProducerQueueOrder = (left: GameSaveProducerJob, right: GameSaveProducerJob) =>
-	left.startedAtMs - right.startedAtMs ||
-	left.completesAtMs - right.completesAtMs ||
+	left.startAtMs - right.startAtMs ||
+	left.readyAtMs - right.readyAtMs ||
 	left.id.localeCompare(right.id);
 
 export const readFirstProducerQueueJobs = (save: GameSave) => {

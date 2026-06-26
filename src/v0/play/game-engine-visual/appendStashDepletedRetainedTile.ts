@@ -62,7 +62,7 @@ export const appendStashDepletedRetainedTile = ({
 		stashItemInstanceId: event.itemInstanceId,
 	});
 	const durationMs = stashExitDurationMs;
-	const groupId = `engine:stash-retain:${event.itemInstanceId}:${event.removedAtMs}`;
+	const groupId = `engine:stash-retain:${event.itemInstanceId}:${event.atMs}`;
 	const cleanupDelayMs = delayMs + durationMs + TileEngineTiming.motionCleanupBufferMs;
 	const tile: BoardTransientTile = {
 		groupId,

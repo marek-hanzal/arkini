@@ -53,7 +53,7 @@ export const storeStoredRequirementFx = Effect.fn("storeStoredRequirementFx")(fu
 		nextQuantity: checked.nextQuantity,
 		previousQuantity: checked.previousQuantity,
 		quantity: checked.resolvedRef.quantity,
-		storedAtMs: nowMs,
+		atMs: nowMs,
 		targetItemInstanceId: action.targetItemInstanceId,
 		type: "stored_requirement.stored",
 	});

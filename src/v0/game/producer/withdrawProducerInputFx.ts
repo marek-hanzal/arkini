@@ -78,7 +78,7 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 			productId: action.productId,
 			quantity: checked.previousQuantity,
 			type: "producer_input.withdrawn",
-			withdrawnAtMs: nowMs,
+			atMs: nowMs,
 		},
 		...placement.events,
 	];

@@ -22,7 +22,7 @@ export const CraftProgressViewSchema = z.object({
 	phase: CraftProgressPhaseSchema,
 	complete: z.boolean(),
 	canAcceptInputs: z.boolean(),
-	startedAtMs: z.number().optional(),
+	startAtMs: z.number().optional(),
 	readyAtMs: z.number().optional(),
 	remainingMs: z.number().optional(),
 	acceptedInputItemIds: z.array(GameItemIdSchema),

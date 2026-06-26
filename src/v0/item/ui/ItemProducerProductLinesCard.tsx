@@ -6,6 +6,7 @@ import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import { ItemInlineAssetGroup } from "~/v0/item/ui/ItemInlineAssetGroup";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
+import { readGameTimeRemainingMs } from "~/v0/game/time/GameTime";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiSection } from "~/v0/ui/UiSection";
@@ -197,7 +198,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						!line.blocked &&
 						!line.queueFull;
 					const remainingMs = line.readyAtMs
-						? Math.max(0, line.readyAtMs - nowMs)
+						? readGameTimeRemainingMs({
+								nowMs,
+								readyAtMs: line.readyAtMs,
+							})
 						: undefined;
 					const runButtonLabel = readRunButtonLabel({
 						canRunAction,

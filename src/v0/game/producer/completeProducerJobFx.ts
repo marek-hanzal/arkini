@@ -35,7 +35,7 @@ const createProductCompletedEvent = ({
 	job: GameSaveProducerJob;
 	nowMs: number;
 }) => ({
-	completedAtMs: nowMs,
+	atMs: nowMs,
 	jobId: job.id,
 	producerItemInstanceId: job.producerItemInstanceId,
 	productId: job.productId,
@@ -203,7 +203,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 						nowMs,
 					}),
 					{
-						failedAtMs: nowMs,
+						atMs: nowMs,
 						jobId: liveJob.id,
 						producerItemInstanceId: liveJob.producerItemInstanceId,
 						productId: liveJob.productId,
@@ -221,7 +221,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			delivery: {
 				items: deliveryItems,
 				lastBlockedAtMs: nowMs,
-				retryAtMs: nowMs + blockedProducerDeliveryRetryDelayMs,
+				nextAttemptAtMs: nowMs + blockedProducerDeliveryRetryDelayMs,
 			},
 		};
 		nextSave.updatedAtMs = nowMs;
@@ -231,7 +231,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 				liveJob.delivery?.lastBlockedAtMs === undefined
 					? [
 							{
-								blockedAtMs: nowMs,
+								atMs: nowMs,
 								jobId: liveJob.id,
 								producerItemInstanceId: liveJob.producerItemInstanceId,
 								productId: liveJob.productId,

@@ -76,7 +76,7 @@ export const withdrawStoredRequirementFx = Effect.fn("withdrawStoredRequirementF
 			quantity: action.quantity,
 			targetItemInstanceId: action.targetItemInstanceId,
 			type: "stored_requirement.withdrawn",
-			withdrawnAtMs: nowMs,
+			atMs: nowMs,
 		},
 		...placement.events,
 	];

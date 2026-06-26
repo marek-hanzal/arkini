@@ -35,7 +35,7 @@ export const storeStashResolvedInput = ({
 		quantity: ref.quantity,
 		stashId,
 		stashItemInstanceId,
-		storedAtMs: nowMs,
+		atMs: nowMs,
 		type: "stash_input.stored",
 	});
 };

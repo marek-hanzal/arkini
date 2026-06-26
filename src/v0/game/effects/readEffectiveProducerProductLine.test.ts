@@ -195,9 +195,9 @@ describe("readEffectiveProducerProductLine", () => {
 			nowMs: 0,
 		});
 		save.activeEffects["active:reveal"] = {
-			activatedAtMs: 1000,
+			startAtMs: 1000,
 			effectId: "effect:reveal",
-			expiresAtMs: 2000,
+			endAtMs: 2000,
 			id: "active:reveal",
 			sourceItemInstanceId: "item-instance:1",
 		};

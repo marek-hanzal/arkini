@@ -25,7 +25,7 @@ const craft = (overrides: Partial<NonNullable<BoardViewItem["craft"]>> = {}) => 
 	readyAtMs: 2000,
 	remainingMs: 1000,
 	resultItemId: "item:branch" as const,
-	startedAtMs: 1000,
+	startAtMs: 1000,
 	timeProgress: 0.5,
 	...overrides,
 });

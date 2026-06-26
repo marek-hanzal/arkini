@@ -48,7 +48,7 @@ const storeCraftResolvedInput = ({
 		previousQuantity,
 		quantity: ref.quantity,
 		recipeId,
-		storedAtMs: nowMs,
+		atMs: nowMs,
 		targetItemInstanceId,
 		type: "craft_input.stored",
 	});

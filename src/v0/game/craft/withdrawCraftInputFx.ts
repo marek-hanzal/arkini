@@ -81,7 +81,7 @@ export const withdrawCraftInputFx = Effect.fn("withdrawCraftInputFx")(function* 
 			recipeId: checked.target.recipeId,
 			targetItemInstanceId: action.targetItemInstanceId,
 			type: "craft_input.withdrawn",
-			withdrawnAtMs: nowMs,
+			atMs: nowMs,
 		},
 		...placement.events,
 	];

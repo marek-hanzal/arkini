@@ -31,20 +31,21 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			completesAtMs: 1500,
+			readyAtMs: 1500,
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 500,
+			startAtMs: 500,
 		});
 		expect(result.events).toEqual([
 			{
-				completesAtMs: 1500,
+				atMs: 500,
+				readyAtMs: 1500,
 				jobId: job.id,
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
-				startedAtMs: 500,
+				startAtMs: 500,
 				type: "product.started",
 			},
 		]);
@@ -100,32 +101,34 @@ describe("applyGameActionFx Producer", () => {
 		const activeEffect = readOnlyRecordValue(result.save.activeEffects);
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			completesAtMs: 1500,
+			readyAtMs: 1500,
 			outputTableId: null,
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 500,
+			startAtMs: 500,
 		});
 		expect(activeEffect).toMatchObject({
-			activatedAtMs: 500,
+			startAtMs: 500,
 			effectId: "effect:test",
-			expiresAtMs: 1500,
+			endAtMs: 1500,
 			sourceItemInstanceId: "item-instance:1",
 		});
 		expect(result.events).toEqual([
 			{
-				completesAtMs: 1500,
+				atMs: 500,
+				readyAtMs: 1500,
 				jobId: job.id,
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
-				startedAtMs: 500,
+				startAtMs: 500,
 				type: "product.started",
 			},
 			{
-				activatedAtMs: 500,
+				atMs: 500,
+				startAtMs: 500,
 				effectId: "effect:test",
-				expiresAtMs: 1500,
+				endAtMs: 1500,
 				id: activeEffect.id,
 				sourceItemInstanceId: "item-instance:1",
 				type: "effect.activated",
@@ -384,8 +387,8 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			completesAtMs: 2500,
-			startedAtMs: 500,
+			readyAtMs: 2500,
+			startAtMs: 500,
 		});
 		expect(result.nextWakeAtMs).toBe(2500);
 	});
@@ -477,8 +480,8 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			completesAtMs: 1500,
-			startedAtMs: 0,
+			readyAtMs: 1500,
+			startAtMs: 0,
 		});
 	});
 
@@ -548,8 +551,8 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			completesAtMs: 3000,
-			startedAtMs: 0,
+			readyAtMs: 3000,
+			startAtMs: 0,
 		});
 	});
 
@@ -618,8 +621,8 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			completesAtMs: 3000,
-			startedAtMs: 0,
+			readyAtMs: 3000,
+			startAtMs: 0,
 		});
 	});
 
@@ -1669,8 +1672,8 @@ describe("applyGameActionFx Producer", () => {
 
 		const queuedJobs = Object.values(second.save.producerJobs);
 		expect(queuedJobs).toHaveLength(2);
-		expect(queuedJobs.find((job) => job.startedAtMs === 1500)).toMatchObject({
-			completesAtMs: 2500,
+		expect(queuedJobs.find((job) => job.startAtMs === 1500)).toMatchObject({
+			readyAtMs: 2500,
 		});
 		expect(second.nextWakeAtMs).toBe(1500);
 	});
@@ -1739,7 +1742,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 		expect(defaulted.events).toEqual([
 			{
-				changedAtMs: 100,
+				atMs: 100,
 				nextProductId: "product:shred",
 				previousProductId: undefined,
 				producerItemInstanceId: "item-instance:1",
@@ -1765,7 +1768,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 		expect(reset.events).toEqual([
 			{
-				changedAtMs: 200,
+				atMs: 200,
 				nextProductId: "product:test",
 				previousProductId: "product:shred",
 				producerItemInstanceId: "item-instance:1",
@@ -1804,7 +1807,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(unset.save.producerLines).toEqual({});
 		expect(unset.events).toEqual([
 			{
-				changedAtMs: 200,
+				atMs: 200,
 				nextProductId: undefined,
 				previousProductId: "product:test",
 				producerItemInstanceId: "item-instance:1",

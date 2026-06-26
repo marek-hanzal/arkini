@@ -74,7 +74,7 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 				itemId: checked.target.itemId,
 				itemInstanceId: checked.target.id,
 				reason: "tile-remove" as const,
-				removedAtMs: nowMs,
+				atMs: nowMs,
 				type: "item.removed" as const,
 			},
 		],

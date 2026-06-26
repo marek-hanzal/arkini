@@ -131,9 +131,9 @@ describe("readActionReadinessFx", () => {
 			nowMs: 0,
 		});
 		save.activeEffects["effect-instance:1"] = {
-			activatedAtMs: 0,
+			startAtMs: 0,
 			effectId: "effect:block-product",
-			expiresAtMs: 1000,
+			endAtMs: 1000,
 			id: "effect-instance:1",
 			sourceItemInstanceId: "item-instance:1",
 		};
@@ -162,13 +162,13 @@ describe("readActionReadinessFx", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const readiness = runReadiness({
@@ -196,10 +196,10 @@ describe("readActionReadinessFx", () => {
 			nowMs: 0,
 		});
 		save.craftJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			recipeId: "craft:plank",
-			startedAtMs: 0,
+			startAtMs: 0,
 			targetItemInstanceId: "item-instance:1",
 		};
 

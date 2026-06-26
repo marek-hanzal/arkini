@@ -1,5 +1,5 @@
 export interface GameEffectSourceInstance {
-	activatedAtMs: number;
+	startAtMs: number;
 	effectId: string;
 	kind: "active" | "passive";
 	sourceId: string;

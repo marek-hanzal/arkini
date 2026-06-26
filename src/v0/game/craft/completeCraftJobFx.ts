@@ -39,7 +39,7 @@ const failCraftJobFx = Effect.fn("completeCraftJobFx.failCraftJobFx")(function* 
 	return {
 		events: [
 			{
-				failedAtMs: nowMs,
+				atMs: nowMs,
 				jobId: job.id,
 				reason,
 				recipeId: job.recipeId,
@@ -177,7 +177,7 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 	return {
 		events: [
 			{
-				completedAtMs: nowMs,
+				atMs: nowMs,
 				jobId: liveJob.id,
 				recipeId: liveJob.recipeId,
 				targetItemInstanceId: liveJob.targetItemInstanceId,
@@ -187,7 +187,7 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 				fromItemId: liveTarget.itemId,
 				itemInstanceId: liveJob.targetItemInstanceId,
 				reason: "craft-result" as const,
-				replacedAtMs: nowMs,
+				atMs: nowMs,
 				toItemId: recipe.resultItemId,
 				type: "item.replaced" as const,
 			},

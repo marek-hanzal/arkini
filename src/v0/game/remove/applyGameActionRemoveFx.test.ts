@@ -51,7 +51,7 @@ describe("applyGameActionFx remove", () => {
 				itemId: "item:rock",
 				itemInstanceId: "item-instance:1",
 				reason: "tile-remove",
-				removedAtMs: 100,
+				atMs: 100,
 				type: "item.removed",
 			},
 		]);

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GameInstantMsSchema } from "~/v0/game/time/GameTimeSchema";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
@@ -47,8 +48,8 @@ const GameSaveProducerDeliveryItemSchema = z
 const GameSaveProducerDeliverySchema = z
 	.object({
 		items: z.array(GameSaveProducerDeliveryItemSchema).min(1),
-		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
-		retryAtMs: NonNegativeIntegerSchema.optional(),
+		lastBlockedAtMs: GameInstantMsSchema.optional(),
+		nextAttemptAtMs: GameInstantMsSchema.optional(),
 	})
 	.strict();
 
@@ -63,14 +64,14 @@ const GameSaveProducerJobSchema = z
 		]),
 		placement: z.literal("board_then_inventory").optional(),
 		productId: IdSchema,
-		startedAtMs: NonNegativeIntegerSchema,
-		completesAtMs: NonNegativeIntegerSchema,
+		startAtMs: GameInstantMsSchema,
+		readyAtMs: GameInstantMsSchema,
 	})
 	.strict()
-	.refine((value) => value.completesAtMs >= value.startedAtMs, {
-		message: "completesAtMs must be >= startedAtMs",
+	.refine((value) => value.readyAtMs >= value.startAtMs, {
+		message: "readyAtMs must be >= startAtMs",
 		path: [
-			"completesAtMs",
+			"readyAtMs",
 		],
 	});
 
@@ -79,14 +80,14 @@ const GameSaveActiveEffectSchema = z
 		id: IdSchema,
 		effectId: IdSchema,
 		sourceItemInstanceId: IdSchema,
-		activatedAtMs: NonNegativeIntegerSchema,
-		expiresAtMs: NonNegativeIntegerSchema,
+		startAtMs: GameInstantMsSchema,
+		endAtMs: GameInstantMsSchema,
 	})
 	.strict()
-	.refine((value) => value.expiresAtMs >= value.activatedAtMs, {
-		message: "expiresAtMs must be >= activatedAtMs",
+	.refine((value) => value.endAtMs >= value.startAtMs, {
+		message: "endAtMs must be >= startAtMs",
 		path: [
-			"expiresAtMs",
+			"endAtMs",
 		],
 	});
 
@@ -94,15 +95,15 @@ const GameSaveCraftJobSchema = z
 	.object({
 		id: IdSchema,
 		recipeId: IdSchema,
-		startedAtMs: NonNegativeIntegerSchema,
-		completesAtMs: NonNegativeIntegerSchema,
+		startAtMs: GameInstantMsSchema,
+		readyAtMs: GameInstantMsSchema,
 		targetItemInstanceId: IdSchema,
 	})
 	.strict()
-	.refine((value) => value.completesAtMs >= value.startedAtMs, {
-		message: "completesAtMs must be >= startedAtMs",
+	.refine((value) => value.readyAtMs >= value.startAtMs, {
+		message: "readyAtMs must be >= startAtMs",
 		path: [
-			"completesAtMs",
+			"readyAtMs",
 		],
 	});
 
@@ -158,10 +159,10 @@ const GameSaveItemSpawnJobSeedCellSchema = z
 const GameSaveItemSpawnJobBaseSchema = z
 	.object({
 		id: IdSchema,
-		dueAtMs: NonNegativeIntegerSchema,
+		readyAtMs: GameInstantMsSchema,
 		exclusiveGroupKey: IdSchema.optional(),
 		afterJobIds: z.array(IdSchema).optional(),
-		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
+		lastBlockedAtMs: GameInstantMsSchema.optional(),
 		seedCell: GameSaveItemSpawnJobSeedCellSchema.optional(),
 		sequenceIndex: NonNegativeIntegerSchema.optional(),
 	})
@@ -202,8 +203,8 @@ const GameSaveSchema = z
 	.object({
 		version: z.literal(1),
 		gameId: IdSchema,
-		createdAtMs: NonNegativeIntegerSchema,
-		updatedAtMs: NonNegativeIntegerSchema,
+		createdAtMs: GameInstantMsSchema,
+		updatedAtMs: GameInstantMsSchema,
 		board: z
 			.object({
 				items: z.record(IdSchema, GameSaveBoardItemSchema),

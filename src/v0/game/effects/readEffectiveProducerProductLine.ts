@@ -39,7 +39,7 @@ const compareGameEffectSources = ({
 	const leftScopePriority = leftEffect?.scope === "local" ? 0 : 1;
 	const rightScopePriority = rightEffect?.scope === "local" ? 0 : 1;
 	if (leftScopePriority !== rightScopePriority) return leftScopePriority - rightScopePriority;
-	if (left.activatedAtMs !== right.activatedAtMs) return left.activatedAtMs - right.activatedAtMs;
+	if (left.startAtMs !== right.startAtMs) return left.startAtMs - right.startAtMs;
 	return (
 		left.sourceId.localeCompare(right.sourceId) || left.effectId.localeCompare(right.effectId)
 	);

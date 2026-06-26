@@ -81,7 +81,7 @@ describe("RuntimeGameEngineAdapter", () => {
 			},
 		]);
 		expect(Object.values(adapter.readSnapshot().save.producerJobs)[0]).toMatchObject({
-			completesAtMs: 1200,
+			readyAtMs: 1200,
 			productId: "product:test",
 		});
 		expect(adapter.readSnapshot().nextWakeAtMs).toBe(1200);
@@ -160,7 +160,7 @@ describe("RuntimeGameEngineAdapter", () => {
 		});
 	});
 
-	it("catches up due ticks before reading readiness", async () => {
+	it("catches up ready ticks before reading readiness", async () => {
 		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createEngineTestConfig(),
 			nowMs: 0,

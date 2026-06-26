@@ -66,7 +66,7 @@ export const processItemSpawnJobFx = Effect.fn("processItemSpawnJobFx")(function
 			return {
 				events: [
 					{
-						failedAtMs: nowMs,
+						atMs: nowMs,
 						itemId: itemSpawnJob.itemId,
 						reason: error.reason,
 						jobId: itemSpawnJob.id,
@@ -81,7 +81,7 @@ export const processItemSpawnJobFx = Effect.fn("processItemSpawnJobFx")(function
 		return {
 			events: [
 				{
-					blockedAtMs: nowMs,
+					atMs: nowMs,
 					itemId: itemSpawnJob.itemId,
 					reason: error.reason,
 					jobId: itemSpawnJob.id,

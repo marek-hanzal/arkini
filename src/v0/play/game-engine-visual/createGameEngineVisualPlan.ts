@@ -31,6 +31,12 @@ export const createGameEngineVisualPlan = ({
 }: createGameEngineVisualPlan.Props): GameEngineVisualPlan => {
 	const plan = createGameEngineVisualPlanDraft();
 	const skipped = new Set<number>();
+	const deferredStashDepletionRemovals: Extract<
+		GameEvent,
+		{
+			type: "item.removed";
+		}
+	>[] = [];
 	let createdSequenceIndex = 0;
 
 	for (const [index, event] of events.entries()) {
@@ -141,12 +147,16 @@ export const createGameEngineVisualPlan = ({
 				break;
 
 			case "item.removed":
-				appendStashDepletedRetainedTile({
-					currentBoard,
-					event,
-					plan,
-					previousBoard,
-				});
+				if (event.reason === "stash-depleted") {
+					deferredStashDepletionRemovals.push(event);
+				} else {
+					appendStashDepletedRetainedTile({
+						currentBoard,
+						event,
+						plan,
+						previousBoard,
+					});
+				}
 				plan.ignoredEventTypes.push(event.type);
 				break;
 			case "craft.completed":
@@ -175,5 +185,15 @@ export const createGameEngineVisualPlan = ({
 			}
 		}
 	}
+
+	for (const event of deferredStashDepletionRemovals) {
+		appendStashDepletedRetainedTile({
+			currentBoard,
+			event,
+			plan,
+			previousBoard,
+		});
+	}
+
 	return plan;
 };

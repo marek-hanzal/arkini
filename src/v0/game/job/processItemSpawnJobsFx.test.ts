@@ -6,6 +6,7 @@ import {
 	processItemSpawnJobsFx,
 } from "~/v0/game/job/processItemSpawnJobsFx";
 import { createItemSpawnJobsFx } from "~/v0/game/job/createItemSpawnJobsFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
@@ -14,6 +15,8 @@ const runItemSpawn = (props: processItemSpawnJobsFx.Props) =>
 	Effect.runSync(processItemSpawnJobsFx(props));
 const runCreateItemSpawnJobs = (props: createItemSpawnJobsFx.Props) =>
 	Effect.runSync(createItemSpawnJobsFx(props));
+const runNextWakeAtMs = (props: readNextWakeAtMsFx.Props) =>
+	Effect.runSync(readNextWakeAtMsFx(props));
 
 describe("processItemSpawnJobsFx", () => {
 	it("emits every due non-exclusive item spawn job in one tick", () => {
@@ -198,6 +201,42 @@ describe("processItemSpawnJobsFx", () => {
 			dueAtMs: 100 + blockedItemSpawnJobRetryDelayMs * 2,
 			lastBlockedAtMs: 100 + blockedItemSpawnJobRetryDelayMs,
 		});
+	});
+
+	it("does not wake on a past-due dependent spawn job before its dependency can run", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const sourceJobId = "item-spawn-job:source";
+		const dependentJobId = "item-spawn-job:dependent";
+		save.itemSpawnJobs[sourceJobId] = {
+			dueAtMs: 1000,
+			id: sourceJobId,
+			itemId: "item:twig",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+		save.itemSpawnJobs[dependentJobId] = {
+			afterJobIds: [
+				sourceJobId,
+			],
+			dueAtMs: 100,
+			id: dependentJobId,
+			itemId: "item:plank",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+
+		expect(
+			runNextWakeAtMs({
+				nowMs: 500,
+				save,
+			}),
+		).toBe(1000);
 	});
 
 	it("waits with dependent item spawn jobs until source jobs are processed", () => {

@@ -224,6 +224,79 @@ describe("applyGameActionFx BoardInventory", () => {
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 
+	it("places nearest inventory items into the first effect-allowed board cell", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-near-producer": {
+					name: "Block near producer",
+					operations: [
+						{
+							kind: "item.blockCreate",
+							target: {
+								itemIds: [
+									"item:plank",
+								],
+							},
+						},
+					],
+					radius: 1,
+					scope: "local",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				board: {
+					height: 1,
+					width: 3,
+				},
+				title: "Test",
+			},
+			items: {
+				...baseConfig.items,
+				"item:producer": {
+					...baseConfig.items["item:producer"],
+					passiveEffectIds: [
+						"effect:block-near-producer",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:plank",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				placementMode: "nearest_by_manhattan",
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:plank",
+				x: 2,
+				y: 0,
+			}),
+		).toBeDefined();
+		expect(result.save.inventory.slots[0]).toBeNull();
+	});
+
 	it("stashes a stateful stackable board item as an inventory instance", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

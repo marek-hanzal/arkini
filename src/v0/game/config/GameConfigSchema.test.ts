@@ -595,6 +595,28 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/must not be combined/);
 	});
 
+	it("rejects local effects that claim inventory source scope", () => {
+		const config = createValidConfigValue();
+		config.effects["effect:local-inventory"] = {
+			name: "Local inventory lie",
+			operations: [
+				{
+					kind: "item.blockCreate",
+					target: {
+						itemIds: [
+							"item:plank",
+						],
+					},
+				},
+			],
+			radius: 1,
+			scope: "local",
+			sourceScope: "both",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/inventory sources have no board cell/);
+	});
+
 	it("rejects active effect product lines that also define output loot", () => {
 		const config = createValidConfigValue();
 		config.effects["effect:test"] = {

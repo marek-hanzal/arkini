@@ -135,6 +135,33 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.error?.issues[0]?.message).toContain("Default product");
 	});
 
+	it("reports save validation issues on the exact save path", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 4,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.path).toEqual([
+			"save",
+			"inventory",
+			"slots",
+			0,
+			"quantity",
+		]);
+	});
+
 	it("rejects inventory stacks above the item max stack size", () => {
 		const config = createEngineTestConfig();
 		const save = createInitialSave({
@@ -494,6 +521,47 @@ describe("GameSaveConfigSchema", () => {
 
 		expect(result.success).toBe(false);
 		expect(result.error?.issues[0]?.message).toContain('Missing item "item:missing"');
+	});
+
+	it("rejects item spawn dependency cycles", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.itemSpawnJobs["item-spawn-job:a"] = {
+			afterJobIds: [
+				"item-spawn-job:b",
+			],
+			dueAtMs: 100,
+			id: "item-spawn-job:a",
+			itemId: "item:twig",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+		invalidSave.itemSpawnJobs["item-spawn-job:b"] = {
+			afterJobIds: [
+				"item-spawn-job:a",
+			],
+			dueAtMs: 100,
+			id: "item-spawn-job:b",
+			itemId: "item:plank",
+			quantity: 1,
+			reason: "debug",
+			type: "item.spawn",
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues.map((issue) => issue.message).join("\n")).toContain(
+			"dependency cycle",
+		);
 	});
 
 	it("rejects item spawn jobs with missing dependencies", () => {

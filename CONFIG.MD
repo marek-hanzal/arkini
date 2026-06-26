@@ -1234,7 +1234,7 @@ Producer reference:
 
 ## 13.1 `effects`
 
-Defines runtime mutators that change product-line interpretation and item-creation rules. Effects never mutate `GameConfig`; they build an effective runtime view for concrete gameplay checks. An effect source may count from board, inventory, or both depending on `sourceScope`. Local effects need a board position, so inventory-only sources are useful mainly for global rules.
+Defines runtime mutators that change product-line interpretation and item-creation rules. Effects never mutate `GameConfig`; they build an effective runtime view for concrete gameplay checks. An effect source may count from board, inventory, or both depending on `sourceScope`. Local effects need a board position, so config validation rejects local effects with `sourceScope: "inventory"` or `sourceScope: "both"`; inventory-sourced effects are for global rules.
 
 Effects can come from two places:
 
@@ -1245,7 +1245,7 @@ Effect fields:
 
 - `name`: display name.
 - `scope`: `global` or `local`.
-- `sourceScope`: optional `board`, `inventory`, or `both`; defaults to `board`.
+- `sourceScope`: optional `board`, `inventory`, or `both`; defaults to `board`. Local effects must use board scope because inventory sources have no cell for distance checks.
 - `radius`: required for local effects.
 - `operations`: runtime operations performed by the effect.
 
@@ -2947,7 +2947,7 @@ Use `onDepleted: "remove"`.
 
 ## A.32 Replace stash when depleted
 
-Use `replaceWithItemId`. Replacement is still a normal board creation rule: the replacement item must be board-storable, pass `maxCount`, and not be blocked by active `item.blockCreate` effects.
+Use `replaceWithItemId`. Replacement is still a normal board creation rule: the replacement item must be board-storable, pass `maxCount`, and not be blocked by active `item.blockCreate` effects. Board placement planners skip cells blocked by local `item.blockCreate` effects instead of failing the whole request while another allowed cell exists.
 
 ```json
 {

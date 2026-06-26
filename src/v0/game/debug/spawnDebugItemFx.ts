@@ -2,7 +2,8 @@ import { Effect } from "effect";
 import { checkDebugItemSpawnReadinessFx } from "~/v0/game/debug/checkDebugItemSpawnReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanceIdFx";
-import { findFirstEmptyBoardCellFx } from "~/v0/game/placement/findFirstEmptyBoardCellFx";
+import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
+import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -50,16 +51,30 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 
 	if (action.location === "board") {
 		for (let index = 0; index < quantity; index += 1) {
-			const emptyCell = yield* findFirstEmptyBoardCellFx({
+			const emptyCells = yield* planEmptyBoardCellsFx({
 				config,
 				save: nextSave,
 			});
-
-			if (!emptyCell) {
+			if (emptyCells.length === 0) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
 						"board:full",
 						"Board has no space for debug item.",
+					),
+				);
+			}
+
+			const [emptyCell] = yield* planItemBoardPlacementCellsFx({
+				config,
+				itemId: action.itemId,
+				nowMs,
+				save: nextSave,
+			});
+			if (!emptyCell) {
+				return yield* Effect.fail(
+					GameEngineError.actionRejected(
+						"effect:block-create",
+						"No board placement target is allowed by active effects.",
 					),
 				);
 			}

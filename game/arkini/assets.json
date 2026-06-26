@@ -1343,6 +1343,50 @@
 			"overlayAssetId": "asset:producer:armory-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
+		},
+		"asset:item:marble-deposit": {
+			"kind": "item",
+			"label": "Marble Deposit",
+			"render": "plain",
+			"resourceId": "item-marble-deposit"
+		},
+		"asset:item:marble": {
+			"kind": "item",
+			"label": "Marble",
+			"render": "plain",
+			"resourceId": "item-marble"
+		},
+		"asset:item:marble-block": {
+			"kind": "item",
+			"label": "Marble Block",
+			"render": "plain",
+			"resourceId": "item-marble-block"
+		},
+		"asset:producer:quarry-t2": {
+			"kind": "item",
+			"label": "Quarry II",
+			"render": "plain",
+			"resourceId": "producer-quarry-t2"
+		},
+		"asset:producer:stonemason-t2": {
+			"kind": "item",
+			"label": "Stonemason II",
+			"render": "plain",
+			"resourceId": "producer-stonemason-t2"
+		},
+		"asset:item:blueprint-quarry-t2": {
+			"kind": "item",
+			"label": "Quarry II Blueprint",
+			"overlayAssetId": "asset:producer:quarry-t2",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-stonemason-t2": {
+			"kind": "item",
+			"label": "Stonemason II Blueprint",
+			"overlayAssetId": "asset:producer:stonemason-t2",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
 		}
 	}
 }

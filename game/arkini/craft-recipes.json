@@ -1998,6 +1998,96 @@
 				}
 			],
 			"durationMs": 16000
+		},
+		"craft:quarry-t2": {
+			"resultItemId": "producer:quarry-t2",
+			"inputs": [
+				{
+					"itemId": "producer:quarry-t1",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:iron-ingot",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "item:marble-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 16000
+		},
+		"craft:stonemason-t2": {
+			"resultItemId": "producer:stonemason-t2",
+			"inputs": [
+				{
+					"itemId": "producer:stonemason-t1",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:stained-glass",
+					"quantity": 1,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 1,
+					"consume": true
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:quarry-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:university",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"durationMs": 16000
 		}
 	}
 }

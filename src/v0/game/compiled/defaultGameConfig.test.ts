@@ -130,6 +130,7 @@ describe("defaultGameConfig", () => {
 			"product:prospector-guild-t2:coal-deposit",
 			"product:prospector-guild-t2:iron-deposit",
 			"product:prospector-guild-t2:gold-deposit",
+			"product:prospector-guild-t2:marble-deposit",
 		]);
 
 		expect(defaultGameConfig.craftRecipes["craft:coal-mine-t1"].inputs).not.toContainEqual({
@@ -338,6 +339,66 @@ describe("defaultGameConfig", () => {
 			defaultGameConfig.lootTables["loot:glazier-workshop-t1:stained-glass"].output,
 		).toContainEqual({
 			itemId: "item:stained-glass",
+			quantity: 1,
+			type: "guaranteed",
+		});
+	});
+
+	it("wires era X marble prestige stone through Prospector, Quarry II, and Stonemason II", () => {
+		expect(defaultGameConfig.items["item:marble-block"].tags).toContain("master");
+		expect(defaultGameConfig.items["item:marble-block"].tags).toContain("era:X");
+		expect(defaultGameConfig.assets["asset:item:marble-deposit"].resourceId).toBe(
+			"item-marble-deposit",
+		);
+		expect(defaultGameConfig.assets["asset:producer:quarry-t2"].resourceId).toBe(
+			"producer-quarry-t2",
+		);
+
+		expect(defaultGameConfig.producers["producer:prospector-guild-t2"].productIds).toContain(
+			"product:prospector-guild-t2:marble-deposit",
+		);
+		expect(defaultGameConfig.producers["producer:university"].productIds).toContain(
+			"product:university:blueprint-quarry-t2",
+		);
+		expect(defaultGameConfig.producers["producer:university"].productIds).toContain(
+			"product:university:blueprint-stonemason-t2",
+		);
+
+		expect(defaultGameConfig.producers["producer:quarry-t2"].productIds).toEqual([
+			"product:quarry-t2:stone",
+			"product:quarry-t2:marble",
+		]);
+		expect(defaultGameConfig.producers["producer:quarry-t2"].requirementIds).toEqual([
+			"proximity:quarry-t2:marble-deposit",
+		]);
+		expect(defaultGameConfig.producers["producer:stonemason-t2"].productIds).toEqual([
+			"product:stonemason-t2:stone-block",
+			"product:stonemason-t2:marble-block",
+		]);
+		expect(defaultGameConfig.producers["producer:stonemason-t2"].requirementIds).toEqual([
+			"proximity:stonemason-t2:quarry-t2",
+		]);
+
+		expect(defaultGameConfig.craftRecipes["craft:quarry-t2"].inputs).toContainEqual({
+			consume: true,
+			itemId: "producer:quarry-t1",
+			quantity: 1,
+		});
+		expect(defaultGameConfig.craftRecipes["craft:stonemason-t2"].inputs).toContainEqual({
+			consume: true,
+			itemId: "producer:stonemason-t1",
+			quantity: 1,
+		});
+		expect(defaultGameConfig.inputs["input:stonemason-t2:marble-block"].inputs).toContainEqual({
+			capacity: 4,
+			consume: true,
+			itemId: "item:marble",
+			quantity: 1,
+		});
+		expect(
+			defaultGameConfig.lootTables["loot:stonemason-t2:marble-block"].output,
+		).toContainEqual({
+			itemId: "item:marble-block",
 			quantity: 1,
 			type: "guaranteed",
 		});

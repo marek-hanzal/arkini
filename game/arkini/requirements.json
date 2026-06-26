@@ -135,6 +135,22 @@
 			],
 			"distance": 3,
 			"durationFactor": 1
+		},
+		"proximity:quarry-t2:marble-deposit": {
+			"type": "proximity",
+			"itemIds": [
+				"item:marble-deposit"
+			],
+			"distance": 2,
+			"durationFactor": 1
+		},
+		"proximity:stonemason-t2:quarry-t2": {
+			"type": "proximity",
+			"itemIds": [
+				"producer:quarry-t2"
+			],
+			"distance": 2,
+			"durationFactor": 1
 		}
 	}
 }

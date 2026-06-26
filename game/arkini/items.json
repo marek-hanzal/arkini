@@ -3109,6 +3109,146 @@
 				"era:IX"
 			],
 			"producerId": "producer:armory-t1"
+		},
+		"item:marble-deposit": {
+			"assetId": "asset:item:marble-deposit",
+			"code": "marble-deposit",
+			"name": "Marble Deposit",
+			"tier": 10,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
+			"tags": [
+				"source",
+				"construction",
+				"stone",
+				"marble",
+				"deposit",
+				"luxury",
+				"prestige",
+				"era:X"
+			]
+		},
+		"item:marble": {
+			"assetId": "asset:item:marble",
+			"code": "marble",
+			"name": "Marble",
+			"tier": 10,
+			"maxStackSize": 40,
+			"storage": "both",
+			"description": "Raw white marble extracted by Quarry II before being finished by Stonemason II.",
+			"tags": [
+				"material",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X"
+			]
+		},
+		"item:marble-block": {
+			"assetId": "asset:item:marble-block",
+			"code": "marble-block",
+			"name": "Marble Block",
+			"tier": 10,
+			"maxStackSize": 30,
+			"storage": "both",
+			"description": "Polished marble construction block for future prestige buildings that should not be made from yet another heroic pile of planks.",
+			"tags": [
+				"material",
+				"construction",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"master",
+				"era:X"
+			]
+		},
+		"producer:quarry-t2": {
+			"assetId": "asset:producer:quarry-t2",
+			"code": "quarry-t2",
+			"name": "Quarry",
+			"label": "2",
+			"tier": 10,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"quarry",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"producerId": "producer:quarry-t2"
+		},
+		"producer:stonemason-t2": {
+			"assetId": "asset:producer:stonemason-t2",
+			"code": "stonemason-t2",
+			"name": "Stonemason",
+			"label": "2",
+			"tier": 10,
+			"maxStackSize": 1,
+			"storage": "both",
+			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"producerId": "producer:stonemason-t2"
+		},
+		"item:blueprint-quarry-t2": {
+			"assetId": "asset:item:blueprint-quarry-t2",
+			"code": "blueprint-quarry-t2",
+			"name": "Quarry Blueprint",
+			"label": "2",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"craftRecipeId": "craft:quarry-t2"
+		},
+		"item:blueprint-stonemason-t2": {
+			"assetId": "asset:item:blueprint-stonemason-t2",
+			"code": "blueprint-stonemason-t2",
+			"name": "Stonemason Blueprint",
+			"label": "2",
+			"tier": 0,
+			"maxStackSize": 10,
+			"storage": "both",
+			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"craftRecipeId": "craft:stonemason-t2"
 		}
 	}
 }

@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { autoFillProducerProductInputsFx } from "~/v0/game/producer/autoFillProducerProductInputsFx";
 import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkProducerProductStartReadinessFx";
+import { checkProducerProductStartRuntimeConstraintsFx } from "~/v0/game/producer/checkProducerProductStartRuntimeConstraintsFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
 import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProducerStoredInputsFx";
@@ -117,6 +118,18 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
 			.map(readProducerJobWakeAtMs),
 	);
+	yield* checkProducerProductStartRuntimeConstraintsFx({
+		config,
+		hindrances: checked.hindrances,
+		producerId: checked.producerId,
+		producerItemId: checked.producerItem.itemId,
+		producerItemInstanceId: action.producerItemInstanceId,
+		product: checked.product,
+		productId: checked.productId,
+		requirements: checked.requirements,
+		save: nextSave,
+		startAtMs: queuedStartAtMs,
+	});
 	const jobId = yield* createGameJobIdFx();
 	const jobSnapshot = yield* rollProducerJobSnapshotFx({
 		config,

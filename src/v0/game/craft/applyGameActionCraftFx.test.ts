@@ -223,6 +223,134 @@ describe("applyGameActionFx Craft", () => {
 		});
 	});
 
+	it("does not let consumed input effects block their own craft start", () => {
+		const baseConfig = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		config.effects["effect:twig-blocks-plank"] = {
+			name: "Twig blocks plank",
+			operations: [
+				{
+					kind: "item.blockCreate",
+					reason: "Twig blocks plank creation.",
+					target: {
+						itemIds: [
+							"item:plank",
+						],
+					},
+				},
+			],
+			scope: "global",
+			sourceScope: "inventory",
+		};
+		config.items["item:twig"] = {
+			...baseConfig.items["item:twig"],
+			passiveEffectIds: [
+				"effect:twig-blocks-plank",
+			],
+		};
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 2,
+		};
+
+		const result = runAction({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(Object.values(result.save.craftJobs)).toHaveLength(1);
+		expect(result.save.inventory.slots[0]).toBeNull();
+	});
+
+	it("rechecks craft passive requirements after auto-filled inputs are consumed", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:craft-table": {
+					...baseConfig.craftRecipes["item:craft-table"],
+					inputs: [
+						{
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+					requirements: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							scope: "board",
+							type: "passive",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "missing_requirement",
+			});
+		}
+		expect(save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+		});
+	});
+
 	it("withdraws one stored craft input through producer-style board placement", () => {
 		const config = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,

@@ -182,7 +182,9 @@
 			"durationMs": 10000,
 			"placement": "board_then_inventory",
 			"inputRefId": "input:smelter-t1:iron-ore-coal-water",
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			],
 			"outputTableId": "loot:smelter-t1:iron-ingot"
 		},
 		"product:smelter-t1:gold-ingot": {
@@ -190,7 +192,9 @@
 			"durationMs": 10000,
 			"placement": "board_then_inventory",
 			"inputRefId": "input:smelter-t1:gold-ore-coal-water",
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			],
 			"outputTableId": "loot:smelter-t1:gold-ingot"
 		},
 		"product:purifier-t1:pollution": {
@@ -884,7 +888,9 @@
 			"durationMs": 6500,
 			"placement": "board_then_inventory",
 			"inputRefId": "input:charcoal-burner-t1:charcoal",
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			],
 			"outputTableId": "loot:charcoal-burner-t1:charcoal"
 		},
 		"product:clay-pit:clay": {
@@ -907,7 +913,9 @@
 			"durationMs": 8500,
 			"placement": "board_then_inventory",
 			"inputRefId": "input:brickyard:bricks",
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			],
 			"outputTableId": "loot:brickyard:bricks"
 		},
 		"product:glassworks:glass": {
@@ -915,7 +923,9 @@
 			"durationMs": 9000,
 			"placement": "board_then_inventory",
 			"inputRefId": "input:glassworks:glass",
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			],
 			"outputTableId": "loot:glassworks:glass"
 		},
 		"product:roof-tile-factory:roof-tiles": {
@@ -923,7 +933,9 @@
 			"durationMs": 8500,
 			"placement": "board_then_inventory",
 			"inputRefId": "input:roof-tile-factory:roof-tiles",
-			"requirementIds": [],
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			],
 			"outputTableId": "loot:roof-tile-factory:roof-tiles"
 		},
 		"product:construction-yard-t1:construction-bundle": {
@@ -933,70 +945,6 @@
 			"inputRefId": "input:construction-yard-t1:construction-bundle",
 			"requirementIds": [],
 			"outputTableId": "loot:construction-yard-t1:construction-bundle"
-		},
-		"product:townhall-t4:blueprint-charcoal-burner-t1": {
-			"name": "Blueprint: Charcoal Burner I",
-			"durationMs": 2500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-charcoal-burner-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-charcoal-burner-t1"
-		},
-		"product:townhall-t4:blueprint-clay-pit": {
-			"name": "Blueprint: Clay Pit",
-			"durationMs": 2500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-clay-pit",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-clay-pit"
-		},
-		"product:townhall-t4:blueprint-sand-pit": {
-			"name": "Blueprint: Sand Pit",
-			"durationMs": 2500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-sand-pit",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-sand-pit"
-		},
-		"product:townhall-t4:blueprint-brickyard": {
-			"name": "Blueprint: Brickyard",
-			"durationMs": 2500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-brickyard",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-brickyard"
-		},
-		"product:townhall-t4:blueprint-glassworks": {
-			"name": "Blueprint: Glassworks",
-			"durationMs": 2500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-glassworks",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-glassworks"
-		},
-		"product:townhall-t4:blueprint-roof-tile-factory": {
-			"name": "Blueprint: Roof Tile Factory",
-			"durationMs": 2500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-roof-tile-factory",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-roof-tile-factory"
-		},
-		"product:townhall-t4:blueprint-construction-yard-t1": {
-			"name": "Blueprint: Construction Yard I",
-			"durationMs": 2500,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:townhall-t4:blueprint-construction-yard-t1",
-			"requirementIds": [],
-			"outputTableId": "loot:townhall-t4:blueprint-construction-yard-t1"
-		},
-		"product:construction-yard-t1:blueprint-academy": {
-			"name": "Blueprint: Academy",
-			"durationMs": 2000,
-			"placement": "board_then_inventory",
-			"inputRefId": "input:construction-yard-t1:blueprint-academy",
-			"requirementIds": [],
-			"outputTableId": "loot:construction-yard-t1:blueprint-academy"
 		},
 		"product:academy:blueprint-coal-mine-t1": {
 			"name": "Blueprint: Coal Mine I",
@@ -1077,6 +1025,70 @@
 			"inputRefId": "input:prospector-guild-t2:clay-deposit",
 			"requirementIds": [],
 			"outputTableId": "loot:prospector-guild-t2:clay-deposit"
+		},
+		"product:civic-office-t1:blueprint-academy": {
+			"name": "Blueprint: Academy",
+			"durationMs": 2500,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:civic-office-t1:blueprint-academy",
+			"requirementIds": [],
+			"outputTableId": "loot:civic-office-t1:blueprint-academy"
+		},
+		"product:academy:blueprint-charcoal-burner-t1": {
+			"name": "Blueprint: Charcoal Burner I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-charcoal-burner-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-charcoal-burner-t1"
+		},
+		"product:academy:blueprint-clay-pit": {
+			"name": "Blueprint: Clay Pit",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-clay-pit",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-clay-pit"
+		},
+		"product:academy:blueprint-sand-pit": {
+			"name": "Blueprint: Sand Pit",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-sand-pit",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-sand-pit"
+		},
+		"product:academy:blueprint-brickyard": {
+			"name": "Blueprint: Brickyard",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-brickyard",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-brickyard"
+		},
+		"product:academy:blueprint-glassworks": {
+			"name": "Blueprint: Glassworks",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-glassworks",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-glassworks"
+		},
+		"product:academy:blueprint-roof-tile-factory": {
+			"name": "Blueprint: Roof Tile Factory",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-roof-tile-factory",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-roof-tile-factory"
+		},
+		"product:academy:blueprint-construction-yard-t1": {
+			"name": "Blueprint: Construction Yard I",
+			"durationMs": 2000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:academy:blueprint-construction-yard-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:academy:blueprint-construction-yard-t1"
 		}
 	}
 }

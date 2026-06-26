@@ -260,14 +260,7 @@
 				"product:townhall-t4:blueprint-tannery-t1",
 				"product:townhall-t4:blueprint-weaver-hut-t1",
 				"product:townhall-t4:blueprint-dye-workshop-t1",
-				"product:townhall-t4:blueprint-tailor-workshop-t1",
-				"product:townhall-t4:blueprint-charcoal-burner-t1",
-				"product:townhall-t4:blueprint-clay-pit",
-				"product:townhall-t4:blueprint-sand-pit",
-				"product:townhall-t4:blueprint-brickyard",
-				"product:townhall-t4:blueprint-glassworks",
-				"product:townhall-t4:blueprint-roof-tile-factory",
-				"product:townhall-t4:blueprint-construction-yard-t1"
+				"product:townhall-t4:blueprint-tailor-workshop-t1"
 			],
 			"requirementIds": []
 		},
@@ -311,8 +304,15 @@
 				"product:academy:blueprint-coal-mine-t1",
 				"product:academy:blueprint-iron-mine-t1",
 				"product:academy:blueprint-gold-mine-t1",
+				"product:academy:blueprint-purifier-t1",
+				"product:academy:blueprint-charcoal-burner-t1",
+				"product:academy:blueprint-clay-pit",
+				"product:academy:blueprint-sand-pit",
+				"product:academy:blueprint-brickyard",
+				"product:academy:blueprint-glassworks",
+				"product:academy:blueprint-roof-tile-factory",
 				"product:academy:blueprint-smelter-t1",
-				"product:academy:blueprint-purifier-t1"
+				"product:academy:blueprint-construction-yard-t1"
 			],
 			"requirementIds": []
 		},
@@ -399,7 +399,8 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:civic-office-t1:building-permit"
+				"product:civic-office-t1:building-permit",
+				"product:civic-office-t1:blueprint-academy"
 			],
 			"requirementIds": []
 		},
@@ -530,8 +531,7 @@
 			"type": "producer",
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:construction-yard-t1:construction-bundle",
-				"product:construction-yard-t1:blueprint-academy"
+				"product:construction-yard-t1:construction-bundle"
 			],
 			"requirementIds": []
 		}

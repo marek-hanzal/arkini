@@ -1309,16 +1309,11 @@
 	},
 	"craftRecipes": {
 		"craft:academy": {
-			"durationMs": 16000,
+			"durationMs": 18000,
 			"inputs": [
 				{
 					"consume": true,
 					"itemId": "producer:school",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:construction-bundle",
 					"quantity": 1
 				},
 				{
@@ -1334,17 +1329,22 @@
 				{
 					"consume": true,
 					"itemId": "item:paper",
-					"quantity": 2
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
 				},
 				{
 					"consume": true,
 					"itemId": "item:coin",
-					"quantity": 3
+					"quantity": 4
 				}
 			],
 			"requirements": [
 				{
-					"itemId": "producer:construction-yard-t1",
+					"itemId": "producer:civic-office-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -1470,6 +1470,18 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"itemId": "producer:purifier-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
 				}
 			],
 			"resultItemId": "producer:brickyard"
@@ -1512,7 +1524,7 @@
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 2
+					"quantity": 3
 				},
 				{
 					"consume": true,
@@ -1521,11 +1533,34 @@
 				},
 				{
 					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"consume": true,
 					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
-			"requirements": [],
+			"requirements": [
+				{
+					"itemId": "producer:purifier-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
 			"resultItemId": "producer:charcoal-burner-t1"
 		},
 		"craft:chicken-coop-t1": {
@@ -1589,11 +1624,22 @@
 					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
 				}
 			],
 			"requirements": [
 				{
 					"itemId": "item:clay-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -1607,17 +1653,12 @@
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 3
+					"quantity": 6
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 4
-				},
-				{
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
 				},
 				{
 					"consume": true,
@@ -1628,6 +1669,11 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
 				}
 			],
 			"requirements": [
@@ -1676,6 +1722,11 @@
 				},
 				{
 					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 1
+				},
+				{
+					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
 				},
@@ -1700,6 +1751,12 @@
 				},
 				{
 					"itemId": "producer:roof-tile-factory",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:smelter-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -1852,6 +1909,18 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"itemId": "producer:purifier-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
 				}
 			],
 			"resultItemId": "producer:glassworks"
@@ -1862,17 +1931,12 @@
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 3
+					"quantity": 6
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 5
-				},
-				{
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
 				},
 				{
 					"consume": true,
@@ -1887,7 +1951,7 @@
 				{
 					"consume": true,
 					"itemId": "item:coin",
-					"quantity": 2
+					"quantity": 4
 				}
 			],
 			"requirements": [
@@ -1973,17 +2037,12 @@
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 3
+					"quantity": 6
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 4
-				},
-				{
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
 				},
 				{
 					"consume": true,
@@ -1994,6 +2053,11 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
 				}
 			],
 			"requirements": [
@@ -2186,11 +2250,6 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
 				},
@@ -2220,27 +2279,22 @@
 			"inputs": [
 				{
 					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 4
+					"quantity": 5
 				},
 				{
 					"consume": true,
-					"itemId": "item:bricks",
+					"itemId": "item:coal",
 					"quantity": 2
 				},
 				{
 					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:iron-ingot",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:charcoal",
+					"itemId": "item:water",
 					"quantity": 2
 				},
 				{
@@ -2252,11 +2306,22 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
 				}
 			],
 			"requirements": [
 				{
-					"itemId": "producer:smelter-t1",
+					"itemId": "producer:coal-mine-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -2322,6 +2387,18 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"itemId": "producer:purifier-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
 				}
 			],
 			"resultItemId": "producer:roof-tile-factory"
@@ -2343,11 +2420,22 @@
 					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
 				}
 			],
 			"requirements": [
 				{
 					"itemId": "item:sand-deposit",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -2454,7 +2542,7 @@
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 4
+					"quantity": 5
 				},
 				{
 					"consume": true,
@@ -2463,13 +2551,8 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:coal",
+					"quantity": 3
 				},
 				{
 					"consume": true,
@@ -2491,6 +2574,12 @@
 				},
 				{
 					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:purifier-t1",
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
@@ -3022,12 +3111,6 @@
 					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
 				}
 			],
 			"name": "Academy advanced study materials"
@@ -3049,6 +3132,111 @@
 			],
 			"name": "Academy basic lesson supplies"
 		},
+		"input:academy:blueprint-brickyard": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Brickyard input"
+		},
+		"input:academy:blueprint-charcoal-burner-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Charcoal Burner I input"
+		},
+		"input:academy:blueprint-clay-pit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:clay-deposit",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Clay Pit input"
+		},
 		"input:academy:blueprint-coal-mine-t1": {
 			"inputs": [
 				{
@@ -3060,13 +3248,13 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
+					"itemId": "item:building-permit",
 					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
+					"itemId": "item:paper",
 					"quantity": 1
 				},
 				{
@@ -3077,6 +3265,82 @@
 				}
 			],
 			"name": "Blueprint: Coal Mine I input"
+		},
+		"input:academy:blueprint-construction-yard-t1": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 5
+				}
+			],
+			"name": "Blueprint: Construction Yard I input"
+		},
+		"input:academy:blueprint-glassworks": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Glassworks input"
 		},
 		"input:academy:blueprint-gold-mine-t1": {
 			"inputs": [
@@ -3089,13 +3353,13 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
+					"itemId": "item:building-permit",
 					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
+					"itemId": "item:paper",
 					"quantity": 1
 				},
 				{
@@ -3118,13 +3382,13 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
+					"itemId": "item:building-permit",
 					"quantity": 1
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
+					"itemId": "item:paper",
 					"quantity": 1
 				},
 				{
@@ -3147,20 +3411,20 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
+					"itemId": "item:building-permit",
 					"quantity": 1
 				},
 				{
-					"capacity": 4,
+					"capacity": 8,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:paper",
+					"quantity": 2
 				},
 				{
 					"capacity": 12,
 					"consume": true,
 					"itemId": "item:coin",
-					"quantity": 2
+					"quantity": 3
 				}
 			],
 			"name": "Blueprint: Prospector Guild 2 input"
@@ -3176,7 +3440,36 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Blueprint: Purifier I input"
+		},
+		"input:academy:blueprint-roof-tile-factory": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				},
 				{
@@ -3188,23 +3481,52 @@
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:glass",
+					"itemId": "item:clay",
 					"quantity": 2
 				},
 				{
-					"capacity": 8,
+					"capacity": 4,
 					"consume": true,
 					"itemId": "item:charcoal",
-					"quantity": 2
+					"quantity": 1
 				},
 				{
 					"capacity": 12,
 					"consume": true,
 					"itemId": "item:coin",
-					"quantity": 4
+					"quantity": 3
 				}
 			],
-			"name": "Blueprint: Purifier I input"
+			"name": "Blueprint: Roof Tile Factory input"
+		},
+		"input:academy:blueprint-sand-pit": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sand-deposit",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Sand Pit input"
 		},
 		"input:academy:blueprint-smelter-t1": {
 			"inputs": [
@@ -3217,32 +3539,26 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:bricks",
+					"itemId": "item:coal",
 					"quantity": 2
 				},
 				{
-					"capacity": 8,
+					"capacity": 4,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 2
+					"itemId": "item:iron-ore",
+					"quantity": 1
 				},
 				{
 					"capacity": 12,
 					"consume": true,
 					"itemId": "item:coin",
-					"quantity": 3
+					"quantity": 4
 				}
 			],
 			"name": "Blueprint: Smelter I input"
@@ -3475,6 +3791,41 @@
 			],
 			"name": "Chicken coop grain and water input"
 		},
+		"input:civic-office-t1:blueprint-academy": {
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 3
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Blueprint: Academy input"
+		},
 		"input:civic-office-t1:building-permit": {
 			"inputs": [
 				{
@@ -3531,41 +3882,6 @@
 				}
 			],
 			"name": "Coal mine crew supplies"
-		},
-		"input:construction-yard-t1:blueprint-academy": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 2
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 2
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
-				}
-			],
-			"name": "Blueprint: Academy input"
 		},
 		"input:construction-yard-t1:construction-bundle": {
 			"inputs": [
@@ -4143,7 +4459,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
+					"itemId": "item:paper",
 					"quantity": 1
 				},
 				{
@@ -4172,7 +4488,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
+					"itemId": "item:paper",
 					"quantity": 1
 				},
 				{
@@ -4201,7 +4517,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
+					"itemId": "item:paper",
 					"quantity": 1
 				},
 				{
@@ -4262,7 +4578,7 @@
 		"input:purifier-t1:pollution-bulk": {
 			"inputs": [
 				{
-					"capacity": 4,
+					"capacity": 8,
 					"consume": true,
 					"itemId": "item:pollution",
 					"quantity": 4
@@ -4274,7 +4590,7 @@
 					"quantity": 4
 				},
 				{
-					"capacity": 8,
+					"capacity": 6,
 					"consume": true,
 					"itemId": "item:charcoal",
 					"quantity": 2
@@ -5004,64 +5320,6 @@
 			],
 			"name": "Survey: Vineyard input"
 		},
-		"input:townhall-t4:blueprint-brickyard": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:clay",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Brickyard input"
-		},
-		"input:townhall-t4:blueprint-charcoal-burner-t1": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:log",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Charcoal Burner I input"
-		},
 		"input:townhall-t4:blueprint-civic-office-t1": {
 			"inputs": [
 				{
@@ -5084,70 +5342,6 @@
 				}
 			],
 			"name": "Blueprint: Civic Office I input"
-		},
-		"input:townhall-t4:blueprint-clay-pit": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Clay Pit input"
-		},
-		"input:townhall-t4:blueprint-construction-yard-t1": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:bricks",
-					"quantity": 2
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:roof-tiles",
-					"quantity": 2
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
-				}
-			],
-			"name": "Blueprint: Construction Yard I input"
 		},
 		"input:townhall-t4:blueprint-dye-workshop-t1": {
 			"inputs": [
@@ -5177,35 +5371,6 @@
 				}
 			],
 			"name": "Blueprint: Dye Workshop I input"
-		},
-		"input:townhall-t4:blueprint-glassworks": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:sand",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Glassworks input"
 		},
 		"input:townhall-t4:blueprint-market-t2": {
 			"inputs": [
@@ -5275,58 +5440,6 @@
 				}
 			],
 			"name": "Blueprint: Prospector Guild 1 input"
-		},
-		"input:townhall-t4:blueprint-roof-tile-factory": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:clay",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Roof Tile Factory input"
-		},
-		"input:townhall-t4:blueprint-sand-pit": {
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
-			"name": "Blueprint: Sand Pit input"
 		},
 		"input:townhall-t4:blueprint-school": {
 			"inputs": [
@@ -5548,7 +5661,7 @@
 		"item:advanced-knowledge": {
 			"assetId": "asset:item:advanced-knowledge",
 			"code": "advanced-knowledge",
-			"description": "Master industrial knowledge produced by academies and used to unlock mining, metallurgy, and pollution cleanup.",
+			"description": "Advanced civic and technical knowledge produced by academies and used to unlock prospecting, mining, and later industrial plans.",
 			"maxStackSize": 50,
 			"name": "Advanced Knowledge",
 			"storage": "both",
@@ -5556,8 +5669,7 @@
 				"knowledge",
 				"education",
 				"research",
-				"era:VII",
-				"master"
+				"era:VII"
 			],
 			"tier": 3
 		},
@@ -5586,7 +5698,8 @@
 				"equipment",
 				"weapon",
 				"blacksmith",
-				"hero"
+				"hero",
+				"era:IX"
 			],
 			"tier": 1
 		},
@@ -5680,7 +5793,7 @@
 				"building",
 				"craft-target",
 				"blacksmith",
-				"era:VIII"
+				"era:IX"
 			],
 			"tier": 0
 		},
@@ -5714,7 +5827,8 @@
 				"construction",
 				"clay",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -5746,7 +5860,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -5798,7 +5913,8 @@
 				"construction",
 				"clay",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -5846,7 +5962,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -5930,7 +6047,8 @@
 				"construction",
 				"glass",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -5962,7 +6080,7 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VIII"
+				"era:IX"
 			],
 			"tier": 0
 		},
@@ -5980,7 +6098,7 @@
 				"craft-target",
 				"hero",
 				"guild",
-				"era:VIII"
+				"era:IX"
 			],
 			"tier": 0
 		},
@@ -6138,7 +6256,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VII"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -6172,7 +6291,8 @@
 				"construction",
 				"roof",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -6191,7 +6311,8 @@
 				"sand",
 				"glass",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -6272,7 +6393,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VII"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 0
 		},
@@ -6532,7 +6654,8 @@
 				"material",
 				"construction",
 				"clay",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 3
 		},
@@ -6563,7 +6686,8 @@
 				"material",
 				"fuel",
 				"construction",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 6
 		},
@@ -6657,7 +6781,8 @@
 				"material",
 				"construction",
 				"earth",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 3
 		},
@@ -6756,7 +6881,7 @@
 		"item:construction-bundle": {
 			"assetId": "asset:item:construction-bundle",
 			"code": "construction-bundle",
-			"description": "Master package of advanced construction materials used to unlock heavier expansion and industry.",
+			"description": "Master package of fired bricks, glass, roof tiles, permits, and prestige materials used to unlock advanced civic and guild buildings.",
 			"maxStackSize": 20,
 			"name": "Construction Bundle",
 			"storage": "both",
@@ -6764,7 +6889,7 @@
 				"material",
 				"construction",
 				"master",
-				"era:VI"
+				"era:VIII"
 			],
 			"tier": 6
 		},
@@ -6866,7 +6991,8 @@
 				"material",
 				"construction",
 				"glass",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 4
 		},
@@ -6898,14 +7024,14 @@
 				"industry",
 				"ingot",
 				"gold",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 7
 		},
 		"item:gold-ore": {
 			"assetId": "asset:item:gold-ore",
 			"code": "gold-ore",
-			"description": "A mining cart loaded with gold ore. Smelters refine it into gold ingots.",
+			"description": "A mining cart loaded with gold ore. This is the high-value mining output that proves the settlement can reach deep mineral resources.",
 			"maxStackSize": 20,
 			"name": "Gold Ore Cart",
 			"storage": "both",
@@ -6914,7 +7040,8 @@
 				"industry",
 				"ore",
 				"gold",
-				"era:VII"
+				"era:VII",
+				"master"
 			],
 			"tier": 7
 		},
@@ -6993,7 +7120,8 @@
 				"armor",
 				"blacksmith",
 				"hero",
-				"iron"
+				"iron",
+				"era:IX"
 			],
 			"tier": 3
 		},
@@ -7025,7 +7153,7 @@
 				"industry",
 				"ingot",
 				"iron",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 7
 		},
@@ -7125,7 +7253,8 @@
 				"armor",
 				"blacksmith",
 				"hero",
-				"leather"
+				"leather",
+				"era:IX"
 			],
 			"tier": 2
 		},
@@ -7264,7 +7393,7 @@
 		"item:pollution": {
 			"assetId": "asset:item:pollution",
 			"code": "pollution",
-			"description": "Dirty industrial pollution emitted by smelting. It stays on the board and must be dealt with there.",
+			"description": "Dirty board-only industrial pollution emitted by coal or charcoal processing. It stays on the board and must be cleaned by Purifier I.",
 			"maxStackSize": 1,
 			"name": "Pollution",
 			"storage": "board",
@@ -7272,7 +7401,7 @@
 				"danger",
 				"industry",
 				"pollution",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 7
 		},
@@ -7318,7 +7447,8 @@
 				"construction",
 				"clay",
 				"roof",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 4
 		},
@@ -7347,7 +7477,8 @@
 				"material",
 				"construction",
 				"glass",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 4
 		},
@@ -7435,7 +7566,8 @@
 				"equipment",
 				"weapon",
 				"blacksmith",
-				"hero"
+				"hero",
+				"era:IX"
 			],
 			"tier": 2
 		},
@@ -7631,7 +7763,7 @@
 				"blacksmith",
 				"equipment",
 				"hero",
-				"era:VIII"
+				"era:IX"
 			],
 			"tier": 4
 		},
@@ -7664,7 +7796,8 @@
 				"producer",
 				"construction",
 				"clay",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 3
 		},
@@ -7687,7 +7820,7 @@
 		"producer:charcoal-burner-t1": {
 			"assetId": "asset:producer:charcoal-burner-t1",
 			"code": "charcoal-burner-t1",
-			"description": "Pre-industrial fuel workshop that turns logs into charcoal for advanced construction kilns.",
+			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
 			"maxStackSize": 1,
 			"name": "Charcoal Burner I",
 			"producerId": "producer:charcoal-burner-t1",
@@ -7697,7 +7830,8 @@
 				"producer",
 				"construction",
 				"fuel",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 6
 		},
@@ -7747,7 +7881,8 @@
 				"producer",
 				"construction",
 				"clay",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 3
 		},
@@ -7797,7 +7932,8 @@
 				"producer",
 				"construction",
 				"master",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 6
 		},
@@ -7880,7 +8016,8 @@
 				"producer",
 				"construction",
 				"glass",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 4
 		},
@@ -7914,7 +8051,7 @@
 				"economy",
 				"goldsmith",
 				"coin",
-				"era:VIII"
+				"era:IX"
 			],
 			"tier": 1
 		},
@@ -7931,7 +8068,7 @@
 				"hero",
 				"guild",
 				"expedition",
-				"era:VIII"
+				"era:IX"
 			],
 			"tier": 4
 		},
@@ -8074,7 +8211,7 @@
 		"producer:purifier-t1": {
 			"assetId": "asset:producer:purifier-t1",
 			"code": "purifier-t1",
-			"description": "Expensive industrial cleanup producer that consumes board pollution together with water and charcoal.",
+			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
 			"maxStackSize": 1,
 			"name": "Purifier I",
 			"producerId": "producer:purifier-t1",
@@ -8084,7 +8221,7 @@
 				"industry",
 				"purifier",
 				"pollution",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 7
 		},
@@ -8116,7 +8253,8 @@
 				"producer",
 				"construction",
 				"roof",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 4
 		},
@@ -8134,7 +8272,8 @@
 				"construction",
 				"sand",
 				"glass",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"tier": 4
 		},
@@ -8206,7 +8345,7 @@
 		"producer:smelter-t1": {
 			"assetId": "asset:producer:smelter-t1",
 			"code": "smelter-t1",
-			"description": "Refines ore with coal and water into metal ingots, while dumping board-only pollution.",
+			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
 			"maxStackSize": 1,
 			"name": "Smelter I",
 			"producerId": "producer:smelter-t1",
@@ -8215,7 +8354,7 @@
 				"producer",
 				"industry",
 				"smelter",
-				"era:VII"
+				"era:VIII"
 			],
 			"tier": 7
 		},
@@ -8485,11 +8624,61 @@
 				}
 			]
 		},
+		"loot:academy:blueprint-brickyard": {
+			"name": "Academy Brickyard blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-brickyard",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-charcoal-burner-t1": {
+			"name": "Academy Charcoal Burner I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-charcoal-burner-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-clay-pit": {
+			"name": "Academy Clay Pit blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-clay-pit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:academy:blueprint-coal-mine-t1": {
 			"name": "Blueprint: Coal Mine I output",
 			"output": [
 				{
 					"itemId": "item:blueprint-coal-mine-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-construction-yard-t1": {
+			"name": "Academy Construction Yard I blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-construction-yard-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-glassworks": {
+			"name": "Academy Glassworks blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-glassworks",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -8526,7 +8715,7 @@
 			]
 		},
 		"loot:academy:blueprint-purifier-t1": {
-			"name": "Blueprint: Purifier I output",
+			"name": "Academy Purifier I blueprint output",
 			"output": [
 				{
 					"itemId": "item:blueprint-purifier-t1",
@@ -8535,8 +8724,28 @@
 				}
 			]
 		},
+		"loot:academy:blueprint-roof-tile-factory": {
+			"name": "Academy Roof Tile Factory blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-roof-tile-factory",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"loot:academy:blueprint-sand-pit": {
+			"name": "Academy Sand Pit blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-sand-pit",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:academy:blueprint-smelter-t1": {
-			"name": "Blueprint: Smelter I output",
+			"name": "Academy Smelter I blueprint output",
 			"output": [
 				{
 					"itemId": "item:blueprint-smelter-t1",
@@ -8632,6 +8841,18 @@
 					"itemId": "item:bricks",
 					"quantity": 2,
 					"type": "guaranteed"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -8652,6 +8873,18 @@
 					"itemId": "item:charcoal",
 					"quantity": 2,
 					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -8771,6 +9004,16 @@
 				}
 			]
 		},
+		"loot:civic-office-t1:blueprint-academy": {
+			"name": "Civic Office Academy blueprint output",
+			"output": [
+				{
+					"itemId": "item:blueprint-academy",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			]
+		},
 		"loot:civic-office-t1:building-permit": {
 			"name": "Civic Office building permit output",
 			"output": [
@@ -8796,16 +9039,6 @@
 			"output": [
 				{
 					"itemId": "item:coal",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:construction-yard-t1:blueprint-academy": {
-			"name": "Blueprint: Academy output",
-			"output": [
-				{
-					"itemId": "item:blueprint-academy",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -8868,6 +9101,18 @@
 					"itemId": "item:glass",
 					"quantity": 1,
 					"type": "guaranteed"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.15,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -9192,6 +9437,18 @@
 					"itemId": "item:roof-tiles",
 					"quantity": 2,
 					"type": "guaranteed"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -9259,9 +9516,16 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.75,
 					"itemId": "item:pollution",
 					"quantity": 1,
-					"type": "guaranteed"
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -9274,9 +9538,16 @@
 					"type": "guaranteed"
 				},
 				{
+					"chance": 0.75,
 					"itemId": "item:pollution",
 					"quantity": 1,
-					"type": "guaranteed"
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
 				}
 			]
 		},
@@ -9610,26 +9881,6 @@
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-brickyard": {
-			"name": "Town Hall IV Brickyard blueprint output",
-			"output": [
-				{
-					"itemId": "item:blueprint-brickyard",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-charcoal-burner-t1": {
-			"name": "Town Hall IV Charcoal Burner I blueprint output",
-			"output": [
-				{
-					"itemId": "item:blueprint-charcoal-burner-t1",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
 		"loot:townhall-t4:blueprint-civic-office-t1": {
 			"name": "Town Hall IV Civic Office I blueprint output",
 			"output": [
@@ -9640,41 +9891,11 @@
 				}
 			]
 		},
-		"loot:townhall-t4:blueprint-clay-pit": {
-			"name": "Town Hall IV Clay Pit blueprint output",
-			"output": [
-				{
-					"itemId": "item:blueprint-clay-pit",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-construction-yard-t1": {
-			"name": "Town Hall IV Construction Yard I blueprint output",
-			"output": [
-				{
-					"itemId": "item:blueprint-construction-yard-t1",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
 		"loot:townhall-t4:blueprint-dye-workshop-t1": {
 			"name": "Town Hall IV Dye Workshop I blueprint output",
 			"output": [
 				{
 					"itemId": "item:blueprint-dye-workshop-t1",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-glassworks": {
-			"name": "Town Hall IV Glassworks blueprint output",
-			"output": [
-				{
-					"itemId": "item:blueprint-glassworks",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -9705,26 +9926,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-prospector-guild-t1",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-roof-tile-factory": {
-			"name": "Town Hall IV Roof Tile Factory blueprint output",
-			"output": [
-				{
-					"itemId": "item:blueprint-roof-tile-factory",
-					"quantity": 1,
-					"type": "guaranteed"
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-sand-pit": {
-			"name": "Town Hall IV Sand Pit blueprint output",
-			"output": [
-				{
-					"itemId": "item:blueprint-sand-pit",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -9882,8 +10083,15 @@
 				"product:academy:blueprint-coal-mine-t1",
 				"product:academy:blueprint-iron-mine-t1",
 				"product:academy:blueprint-gold-mine-t1",
+				"product:academy:blueprint-purifier-t1",
+				"product:academy:blueprint-charcoal-burner-t1",
+				"product:academy:blueprint-clay-pit",
+				"product:academy:blueprint-sand-pit",
+				"product:academy:blueprint-brickyard",
+				"product:academy:blueprint-glassworks",
+				"product:academy:blueprint-roof-tile-factory",
 				"product:academy:blueprint-smelter-t1",
-				"product:academy:blueprint-purifier-t1"
+				"product:academy:blueprint-construction-yard-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -9966,7 +10174,8 @@
 		"producer:civic-office-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:civic-office-t1:building-permit"
+				"product:civic-office-t1:building-permit",
+				"product:civic-office-t1:blueprint-academy"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -9994,8 +10203,7 @@
 		"producer:construction-yard-t1": {
 			"maxQueueSize": 1,
 			"productIds": [
-				"product:construction-yard-t1:construction-bundle",
-				"product:construction-yard-t1:blueprint-academy"
+				"product:construction-yard-t1:construction-bundle"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -10332,14 +10540,7 @@
 				"product:townhall-t4:blueprint-tannery-t1",
 				"product:townhall-t4:blueprint-weaver-hut-t1",
 				"product:townhall-t4:blueprint-dye-workshop-t1",
-				"product:townhall-t4:blueprint-tailor-workshop-t1",
-				"product:townhall-t4:blueprint-charcoal-burner-t1",
-				"product:townhall-t4:blueprint-clay-pit",
-				"product:townhall-t4:blueprint-sand-pit",
-				"product:townhall-t4:blueprint-brickyard",
-				"product:townhall-t4:blueprint-glassworks",
-				"product:townhall-t4:blueprint-roof-tile-factory",
-				"product:townhall-t4:blueprint-construction-yard-t1"
+				"product:townhall-t4:blueprint-tailor-workshop-t1"
 			],
 			"requirementIds": [],
 			"type": "producer"
@@ -10426,11 +10627,51 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
+		"product:academy:blueprint-brickyard": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-brickyard",
+			"name": "Blueprint: Brickyard",
+			"outputTableId": "loot:academy:blueprint-brickyard",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-charcoal-burner-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-charcoal-burner-t1",
+			"name": "Blueprint: Charcoal Burner I",
+			"outputTableId": "loot:academy:blueprint-charcoal-burner-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-clay-pit": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-clay-pit",
+			"name": "Blueprint: Clay Pit",
+			"outputTableId": "loot:academy:blueprint-clay-pit",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
 		"product:academy:blueprint-coal-mine-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:academy:blueprint-coal-mine-t1",
 			"name": "Blueprint: Coal Mine I",
 			"outputTableId": "loot:academy:blueprint-coal-mine-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-construction-yard-t1": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-construction-yard-t1",
+			"name": "Blueprint: Construction Yard I",
+			"outputTableId": "loot:academy:blueprint-construction-yard-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-glassworks": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-glassworks",
+			"name": "Blueprint: Glassworks",
+			"outputTableId": "loot:academy:blueprint-glassworks",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -10463,6 +10704,22 @@
 			"inputRefId": "input:academy:blueprint-purifier-t1",
 			"name": "Blueprint: Purifier I",
 			"outputTableId": "loot:academy:blueprint-purifier-t1",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-roof-tile-factory": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-roof-tile-factory",
+			"name": "Blueprint: Roof Tile Factory",
+			"outputTableId": "loot:academy:blueprint-roof-tile-factory",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:academy:blueprint-sand-pit": {
+			"durationMs": 2000,
+			"inputRefId": "input:academy:blueprint-sand-pit",
+			"name": "Blueprint: Sand Pit",
+			"outputTableId": "loot:academy:blueprint-sand-pit",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -10544,7 +10801,9 @@
 			"name": "Bricks",
 			"outputTableId": "loot:brickyard:bricks",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:cattle-farm-t1:milk": {
 			"durationMs": 5000,
@@ -10570,7 +10829,9 @@
 			"name": "Charcoal",
 			"outputTableId": "loot:charcoal-burner-t1:charcoal",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:chicken-coop-t1:egg": {
 			"durationMs": 5000,
@@ -10587,6 +10848,14 @@
 			"inputRefId": "input:chicken-coop-t1:grain-water",
 			"name": "Egg",
 			"outputTableId": "loot:chicken-coop-t1:egg",
+			"placement": "board_then_inventory",
+			"requirementIds": []
+		},
+		"product:civic-office-t1:blueprint-academy": {
+			"durationMs": 2500,
+			"inputRefId": "input:civic-office-t1:blueprint-academy",
+			"name": "Blueprint: Academy",
+			"outputTableId": "loot:civic-office-t1:blueprint-academy",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -10611,14 +10880,6 @@
 			"inputRefId": "input:coal-mine-t1:bread-water",
 			"name": "Coal Cart",
 			"outputTableId": "loot:coal-mine-t1:coal",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:construction-yard-t1:blueprint-academy": {
-			"durationMs": 2000,
-			"inputRefId": "input:construction-yard-t1:blueprint-academy",
-			"name": "Blueprint: Academy",
-			"outputTableId": "loot:construction-yard-t1:blueprint-academy",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -10678,7 +10939,9 @@
 			"name": "Glass",
 			"outputTableId": "loot:glassworks:glass",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:gold-mine-t1:gold-ore": {
 			"durationMs": 9000,
@@ -10940,7 +11203,9 @@
 			"name": "Roof Tiles",
 			"outputTableId": "loot:roof-tile-factory:roof-tiles",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:sand-pit:sand": {
 			"durationMs": 6500,
@@ -10997,7 +11262,9 @@
 			"name": "Gold Ingot",
 			"outputTableId": "loot:smelter-t1:gold-ingot",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:smelter-t1:iron-ingot": {
 			"durationMs": 10000,
@@ -11005,7 +11272,9 @@
 			"name": "Iron Ingot",
 			"outputTableId": "loot:smelter-t1:iron-ingot",
 			"placement": "board_then_inventory",
-			"requirementIds": []
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			]
 		},
 		"product:stonemason-t1:stone-block": {
 			"durationMs": 5000,
@@ -11271,22 +11540,6 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t4:blueprint-brickyard": {
-			"durationMs": 2500,
-			"inputRefId": "input:townhall-t4:blueprint-brickyard",
-			"name": "Blueprint: Brickyard",
-			"outputTableId": "loot:townhall-t4:blueprint-brickyard",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t4:blueprint-charcoal-burner-t1": {
-			"durationMs": 2500,
-			"inputRefId": "input:townhall-t4:blueprint-charcoal-burner-t1",
-			"name": "Blueprint: Charcoal Burner I",
-			"outputTableId": "loot:townhall-t4:blueprint-charcoal-burner-t1",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
 		"product:townhall-t4:blueprint-civic-office-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t4:blueprint-civic-office-t1",
@@ -11295,35 +11548,11 @@
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
-		"product:townhall-t4:blueprint-clay-pit": {
-			"durationMs": 2500,
-			"inputRefId": "input:townhall-t4:blueprint-clay-pit",
-			"name": "Blueprint: Clay Pit",
-			"outputTableId": "loot:townhall-t4:blueprint-clay-pit",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t4:blueprint-construction-yard-t1": {
-			"durationMs": 2500,
-			"inputRefId": "input:townhall-t4:blueprint-construction-yard-t1",
-			"name": "Blueprint: Construction Yard I",
-			"outputTableId": "loot:townhall-t4:blueprint-construction-yard-t1",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
 		"product:townhall-t4:blueprint-dye-workshop-t1": {
 			"durationMs": 2000,
 			"inputRefId": "input:townhall-t4:blueprint-dye-workshop-t1",
 			"name": "Blueprint: Dye Workshop I",
 			"outputTableId": "loot:townhall-t4:blueprint-dye-workshop-t1",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t4:blueprint-glassworks": {
-			"durationMs": 2500,
-			"inputRefId": "input:townhall-t4:blueprint-glassworks",
-			"name": "Blueprint: Glassworks",
-			"outputTableId": "loot:townhall-t4:blueprint-glassworks",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -11348,22 +11577,6 @@
 			"inputRefId": "input:townhall-t4:blueprint-prospector-guild-t1",
 			"name": "Blueprint: Prospector Guild 1",
 			"outputTableId": "loot:townhall-t4:blueprint-prospector-guild-t1",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t4:blueprint-roof-tile-factory": {
-			"durationMs": 2500,
-			"inputRefId": "input:townhall-t4:blueprint-roof-tile-factory",
-			"name": "Blueprint: Roof Tile Factory",
-			"outputTableId": "loot:townhall-t4:blueprint-roof-tile-factory",
-			"placement": "board_then_inventory",
-			"requirementIds": []
-		},
-		"product:townhall-t4:blueprint-sand-pit": {
-			"durationMs": 2500,
-			"inputRefId": "input:townhall-t4:blueprint-sand-pit",
-			"name": "Blueprint: Sand Pit",
-			"outputTableId": "loot:townhall-t4:blueprint-sand-pit",
 			"placement": "board_then_inventory",
 			"requirementIds": []
 		},
@@ -11519,6 +11732,14 @@
 			"durationFactor": 1,
 			"itemIds": [
 				"item:coal-deposit"
+			],
+			"type": "proximity"
+		},
+		"proximity:dirty-processing:purifier": {
+			"distance": 3,
+			"durationFactor": 1,
+			"itemIds": [
+				"producer:purifier-t1"
 			],
 			"type": "proximity"
 		},

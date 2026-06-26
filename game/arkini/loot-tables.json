@@ -209,8 +209,15 @@
 					"quantity": 1
 				},
 				{
-					"type": "guaranteed",
+					"type": "chance",
 					"itemId": "item:pollution",
+					"chance": 0.75,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.3,
 					"quantity": 1
 				}
 			]
@@ -224,8 +231,15 @@
 					"quantity": 1
 				},
 				{
-					"type": "guaranteed",
+					"type": "chance",
 					"itemId": "item:pollution",
+					"chance": 0.75,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.3,
 					"quantity": 1
 				}
 			]
@@ -1162,6 +1176,18 @@
 					"type": "guaranteed",
 					"itemId": "item:charcoal",
 					"quantity": 2
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.4,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.08,
+					"quantity": 1
 				}
 			]
 		},
@@ -1192,6 +1218,18 @@
 					"type": "guaranteed",
 					"itemId": "item:bricks",
 					"quantity": 2
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.55,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.12,
+					"quantity": 1
 				}
 			]
 		},
@@ -1201,6 +1239,18 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:glass",
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.65,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.15,
 					"quantity": 1
 				}
 			]
@@ -1212,6 +1262,18 @@
 					"type": "guaranteed",
 					"itemId": "item:roof-tiles",
 					"quantity": 2
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.55,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.12,
+					"quantity": 1
 				}
 			]
 		},
@@ -1221,86 +1283,6 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:construction-bundle",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-charcoal-burner-t1": {
-			"name": "Town Hall IV Charcoal Burner I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-charcoal-burner-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-clay-pit": {
-			"name": "Town Hall IV Clay Pit blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-clay-pit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-sand-pit": {
-			"name": "Town Hall IV Sand Pit blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-sand-pit",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-brickyard": {
-			"name": "Town Hall IV Brickyard blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-brickyard",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-glassworks": {
-			"name": "Town Hall IV Glassworks blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-glassworks",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-roof-tile-factory": {
-			"name": "Town Hall IV Roof Tile Factory blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-roof-tile-factory",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:townhall-t4:blueprint-construction-yard-t1": {
-			"name": "Town Hall IV Construction Yard I blueprint output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-construction-yard-t1",
-					"quantity": 1
-				}
-			]
-		},
-		"loot:construction-yard-t1:blueprint-academy": {
-			"name": "Blueprint: Academy output",
-			"output": [
-				{
-					"type": "guaranteed",
-					"itemId": "item:blueprint-academy",
 					"quantity": 1
 				}
 			]
@@ -1336,7 +1318,7 @@
 			]
 		},
 		"loot:academy:blueprint-smelter-t1": {
-			"name": "Blueprint: Smelter I output",
+			"name": "Academy Smelter I blueprint output",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -1346,7 +1328,7 @@
 			]
 		},
 		"loot:academy:blueprint-purifier-t1": {
-			"name": "Blueprint: Purifier I output",
+			"name": "Academy Purifier I blueprint output",
 			"output": [
 				{
 					"type": "guaranteed",
@@ -1401,6 +1383,86 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:clay-deposit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:civic-office-t1:blueprint-academy": {
+			"name": "Civic Office Academy blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-academy",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-charcoal-burner-t1": {
+			"name": "Academy Charcoal Burner I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-charcoal-burner-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-clay-pit": {
+			"name": "Academy Clay Pit blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-clay-pit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-sand-pit": {
+			"name": "Academy Sand Pit blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-sand-pit",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-brickyard": {
+			"name": "Academy Brickyard blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-brickyard",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-glassworks": {
+			"name": "Academy Glassworks blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-glassworks",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-roof-tile-factory": {
+			"name": "Academy Roof Tile Factory blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-roof-tile-factory",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:academy:blueprint-construction-yard-t1": {
+			"name": "Academy Construction Yard I blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-construction-yard-t1",
 					"quantity": 1
 				}
 			]

@@ -7,13 +7,12 @@
 			"tier": 3,
 			"maxStackSize": 50,
 			"storage": "both",
-			"description": "Master industrial knowledge produced by academies and used to unlock mining, metallurgy, and pollution cleanup.",
+			"description": "Advanced civic and technical knowledge produced by academies and used to unlock prospecting, mining, and later industrial plans.",
 			"tags": [
 				"knowledge",
 				"education",
 				"research",
-				"era:VII",
-				"master"
+				"era:VII"
 			]
 		},
 		"item:aquamarine": {
@@ -42,7 +41,8 @@
 				"equipment",
 				"weapon",
 				"blacksmith",
-				"hero"
+				"hero",
+				"era:IX"
 			]
 		},
 		"item:basic-knowledge": {
@@ -135,7 +135,7 @@
 				"building",
 				"craft-target",
 				"blacksmith",
-				"era:VIII"
+				"era:IX"
 			],
 			"craftRecipeId": "craft:blacksmith-t1"
 		},
@@ -169,7 +169,8 @@
 				"construction",
 				"clay",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:brickyard"
 		},
@@ -187,7 +188,8 @@
 				"construction",
 				"clay",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:clay-pit"
 		},
@@ -253,7 +255,8 @@
 				"construction",
 				"glass",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:glassworks"
 		},
@@ -285,7 +288,7 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VIII"
+				"era:IX"
 			],
 			"craftRecipeId": "craft:goldsmith-t1"
 		},
@@ -303,7 +306,7 @@
 				"craft-target",
 				"hero",
 				"guild",
-				"era:VIII"
+				"era:IX"
 			],
 			"craftRecipeId": "craft:heroes-guild-t1"
 		},
@@ -385,7 +388,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VII"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:purifier-t1"
 		},
@@ -419,7 +423,8 @@
 				"construction",
 				"roof",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:roof-tile-factory"
 		},
@@ -438,7 +443,8 @@
 				"sand",
 				"glass",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:sand-pit"
 		},
@@ -503,7 +509,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VII"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:smelter-t1"
 		},
@@ -694,7 +701,8 @@
 				"material",
 				"construction",
 				"clay",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			]
 		},
 		"item:chest-t1": {
@@ -773,7 +781,8 @@
 				"material",
 				"construction",
 				"earth",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			]
 		},
 		"item:clay-deposit": {
@@ -895,7 +904,8 @@
 				"material",
 				"construction",
 				"glass",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			]
 		},
 		"item:gold-deposit": {
@@ -927,7 +937,7 @@
 				"industry",
 				"ingot",
 				"gold",
-				"era:VII"
+				"era:VIII"
 			]
 		},
 		"item:gold-ore": {
@@ -937,13 +947,14 @@
 			"tier": 7,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "A mining cart loaded with gold ore. Smelters refine it into gold ingots.",
+			"description": "A mining cart loaded with gold ore. This is the high-value mining output that proves the settlement can reach deep mineral resources.",
 			"tags": [
 				"material",
 				"industry",
 				"ore",
 				"gold",
-				"era:VII"
+				"era:VII",
+				"master"
 			]
 		},
 		"item:grain": {
@@ -1022,7 +1033,8 @@
 				"armor",
 				"blacksmith",
 				"hero",
-				"iron"
+				"iron",
+				"era:IX"
 			]
 		},
 		"item:iron-deposit": {
@@ -1054,7 +1066,7 @@
 				"industry",
 				"ingot",
 				"iron",
-				"era:VII"
+				"era:VIII"
 			]
 		},
 		"item:iron-ore": {
@@ -1154,7 +1166,8 @@
 				"armor",
 				"blacksmith",
 				"hero",
-				"leather"
+				"leather",
+				"era:IX"
 			]
 		},
 		"item:log": {
@@ -1235,12 +1248,12 @@
 			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "board",
-			"description": "Dirty industrial pollution emitted by smelting. It stays on the board and must be dealt with there.",
+			"description": "Dirty board-only industrial pollution emitted by coal or charcoal processing. It stays on the board and must be cleaned by Purifier I.",
 			"tags": [
 				"danger",
 				"industry",
 				"pollution",
-				"era:VII"
+				"era:VIII"
 			]
 		},
 		"item:rock": {
@@ -1270,7 +1283,8 @@
 				"construction",
 				"clay",
 				"roof",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			]
 		},
 		"item:ruby": {
@@ -1299,7 +1313,8 @@
 				"material",
 				"construction",
 				"glass",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			]
 		},
 		"item:sand-deposit": {
@@ -1387,7 +1402,8 @@
 				"equipment",
 				"weapon",
 				"blacksmith",
-				"hero"
+				"hero",
+				"era:IX"
 			]
 		},
 		"item:topaz": {
@@ -1554,7 +1570,7 @@
 				"blacksmith",
 				"equipment",
 				"hero",
-				"era:VIII"
+				"era:IX"
 			],
 			"producerId": "producer:blacksmith-t1"
 		},
@@ -1587,7 +1603,8 @@
 				"producer",
 				"construction",
 				"clay",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"producerId": "producer:brickyard"
 		},
@@ -1604,7 +1621,8 @@
 				"producer",
 				"construction",
 				"clay",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"producerId": "producer:clay-pit"
 		},
@@ -1670,7 +1688,8 @@
 				"producer",
 				"construction",
 				"glass",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"producerId": "producer:glassworks"
 		},
@@ -1704,7 +1723,7 @@
 				"economy",
 				"goldsmith",
 				"coin",
-				"era:VIII"
+				"era:IX"
 			],
 			"producerId": "producer:goldsmith-t1"
 		},
@@ -1721,7 +1740,7 @@
 				"hero",
 				"guild",
 				"expedition",
-				"era:VIII"
+				"era:IX"
 			],
 			"producerId": "producer:heroes-guild-t1"
 		},
@@ -1796,13 +1815,13 @@
 			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Expensive industrial cleanup producer that consumes board pollution together with water and charcoal.",
+			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
 			"tags": [
 				"producer",
 				"industry",
 				"purifier",
 				"pollution",
-				"era:VII"
+				"era:VIII"
 			],
 			"producerId": "producer:purifier-t1"
 		},
@@ -1834,7 +1853,8 @@
 				"producer",
 				"construction",
 				"roof",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"producerId": "producer:roof-tile-factory"
 		},
@@ -1852,7 +1872,8 @@
 				"construction",
 				"sand",
 				"glass",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"producerId": "producer:sand-pit"
 		},
@@ -1912,12 +1933,12 @@
 			"tier": 7,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Refines ore with coal and water into metal ingots, while dumping board-only pollution.",
+			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
 			"tags": [
 				"producer",
 				"industry",
 				"smelter",
-				"era:VII"
+				"era:VIII"
 			],
 			"producerId": "producer:smelter-t1"
 		},
@@ -2829,13 +2850,14 @@
 			"tier": 6,
 			"maxStackSize": 1,
 			"storage": "both",
-			"description": "Pre-industrial fuel workshop that turns logs into charcoal for advanced construction kilns.",
+			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
 			"tags": [
 				"building",
 				"producer",
 				"construction",
 				"fuel",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"producerId": "producer:charcoal-burner-t1"
 		},
@@ -2852,7 +2874,8 @@
 				"producer",
 				"construction",
 				"master",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"producerId": "producer:construction-yard-t1"
 		},
@@ -2868,7 +2891,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:charcoal-burner-t1"
 		},
@@ -2884,7 +2908,8 @@
 				"blueprint",
 				"building",
 				"craft-target",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			],
 			"craftRecipeId": "craft:construction-yard-t1"
 		},
@@ -2900,7 +2925,8 @@
 				"material",
 				"fuel",
 				"construction",
-				"era:VI"
+				"era:VIII",
+				"industry"
 			]
 		},
 		"item:construction-bundle": {
@@ -2910,12 +2936,12 @@
 			"tier": 6,
 			"maxStackSize": 20,
 			"storage": "both",
-			"description": "Master package of advanced construction materials used to unlock heavier expansion and industry.",
+			"description": "Master package of fired bricks, glass, roof tiles, permits, and prestige materials used to unlock advanced civic and guild buildings.",
 			"tags": [
 				"material",
 				"construction",
 				"master",
-				"era:VI"
+				"era:VIII"
 			]
 		}
 	}

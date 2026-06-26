@@ -18,6 +18,12 @@ describe("readNextWakeAtMsFx", () => {
 		});
 		save.producerJobs["job:ready"] = {
 			id: "job:ready",
+			outputItems: [
+				{
+					itemId: "item:twig",
+					quantity: 2,
+				},
+			],
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",

@@ -47,17 +47,22 @@ const GameSaveProducerDeliveryItemSchema = z
 
 const GameSaveProducerDeliverySchema = z
 	.object({
-		items: z.array(GameSaveProducerDeliveryItemSchema).min(1),
-		lastBlockedAtMs: GameInstantMsSchema.optional(),
-		nextAttemptAtMs: GameInstantMsSchema.optional(),
+		lastBlockedAtMs: GameInstantMsSchema,
+		nextAttemptAtMs: GameInstantMsSchema,
 	})
-	.strict();
+	.strict()
+	.refine((value) => value.nextAttemptAtMs >= value.lastBlockedAtMs, {
+		message: "nextAttemptAtMs must be >= lastBlockedAtMs",
+		path: [
+			"nextAttemptAtMs",
+		],
+	});
 
 const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
 		delivery: GameSaveProducerDeliverySchema.optional(),
-		outputItems: z.array(GameSaveProducerDeliveryItemSchema).optional(),
+		outputItems: z.array(GameSaveProducerDeliveryItemSchema),
 		producerItemInstanceId: IdSchema,
 		placement: z.literal("board_then_inventory").optional(),
 		productId: IdSchema,
@@ -711,36 +716,19 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		const producerJobOutputLists = [
-			[
-				"delivery",
-				job.delivery?.items ?? [],
-			],
-			[
-				"outputItems",
-				job.outputItems ?? [],
-			],
-		] as const;
-		for (const [fieldName, items] of producerJobOutputLists) {
-			for (const [index, outputItem] of items.entries()) {
-				if (!config.items[outputItem.itemId]) {
-					addSaveIssue(
-						ctx,
-						[
-							"producerJobs",
-							jobId,
-							fieldName,
-							...(fieldName === "delivery"
-								? [
-										"items",
-									]
-								: []),
-							index,
-							"itemId",
-						],
-						`Missing item "${outputItem.itemId}".`,
-					);
-				}
+		for (const [index, outputItem] of job.outputItems.entries()) {
+			if (!config.items[outputItem.itemId]) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerJobs",
+						jobId,
+						"outputItems",
+						index,
+						"itemId",
+					],
+					`Missing item "${outputItem.itemId}".`,
+				);
 			}
 		}
 

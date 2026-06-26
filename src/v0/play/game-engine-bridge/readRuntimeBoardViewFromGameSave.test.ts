@@ -362,16 +362,16 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			delivery: {
-				items: [
-					{
-						itemId: "item:twig",
-						quantity: 1,
-					},
-				],
 				lastBlockedAtMs: 1000,
 				nextAttemptAtMs: 2000,
 			},
 			id: "job:1",
+			outputItems: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",

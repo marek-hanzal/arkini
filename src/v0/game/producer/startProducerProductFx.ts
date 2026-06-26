@@ -9,6 +9,7 @@ import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readProducerJobWakeAtMs } from "~/v0/game/producer/producerDeliveryTiming";
+import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
@@ -132,10 +133,16 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		nextSave.activeEffects[activatedEffect.id] = activatedEffect;
 	}
 
+	const outputItems = (yield* rollEffectiveLootPlanItemsFx({
+		config,
+		lootPlan: checked.effectiveProductLine.lootPlan,
+	})).items;
+
 	const jobId = yield* createGameJobIdFx();
 	nextSave.producerJobs[jobId] = {
 		readyAtMs,
 		id: jobId,
+		outputItems,
 		placement: checked.product.placement,
 		producerItemInstanceId: action.producerItemInstanceId,
 		productId: checked.productId,

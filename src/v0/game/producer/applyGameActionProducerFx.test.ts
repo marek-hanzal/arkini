@@ -1,6 +1,10 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
+import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
+import { withRandomService } from "~/v0/random/logic/withRandomService";
 import {
 	findBoardItem,
 	readOnlyRecordValue,
@@ -8,6 +12,9 @@ import {
 	runActionEither,
 	runInitialSave,
 } from "~/v0/game/engine/applyGameActionFx.testSupport";
+
+const runTick = (props: runGameTickFx.Props) =>
+	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
 
 describe("applyGameActionFx Producer", () => {
 	it("starts a no-input producer product as an Effect action", () => {
@@ -49,6 +56,92 @@ describe("applyGameActionFx Producer", () => {
 			},
 		]);
 		expect(result.nextWakeAtMs).toBe(1500);
+	});
+
+	it("snapshots producer output when product starts so later effects cannot rewrite completion", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:replace-output": {
+					name: "Replace output",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					durationMs: 1000,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:replace-output"] = {
+			endAtMs: 750,
+			effectId: "effect:replace-output",
+			id: "effect-instance:replace-output",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+
+		const started = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+		const job = readOnlyRecordValue(started.save.producerJobs);
+		expect(job.outputItems).toEqual([
+			{
+				itemId: "item:plank",
+				quantity: 1,
+			},
+		]);
+
+		const completed = runTick({
+			config,
+			nowMs: 1500,
+			save: started.save,
+		});
+
+		expect(completed.events).toMatchObject([
+			{
+				productId: "product:test",
+				type: "product.completed",
+			},
+			{
+				itemId: "item:plank",
+				type: "item.created",
+			},
+			{
+				type: "effect.expired",
+			},
+		]);
 	});
 
 	it("starts active effect product lines as timed producer jobs", () => {

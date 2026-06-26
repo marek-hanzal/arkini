@@ -57,6 +57,7 @@ const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
 		delivery: GameSaveProducerDeliverySchema.optional(),
+		outputItems: z.array(GameSaveProducerDeliveryItemSchema).optional(),
 		producerItemInstanceId: IdSchema,
 		placement: z.literal("board_then_inventory").optional(),
 		productId: IdSchema,
@@ -638,6 +639,13 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	const producerJobCountByProducerItemInstanceId = new Map<string, number>();
+	const producerJobsByProducerItemInstanceId = new Map<
+		string,
+		{
+			job: GameSaveProducerJob;
+			jobId: string;
+		}[]
+	>();
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
 		if (job.id !== jobId) {
 			addSaveIssue(
@@ -703,20 +711,34 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if (job.delivery) {
-			for (const [index, deliveryItem] of job.delivery.items.entries()) {
-				if (!config.items[deliveryItem.itemId]) {
+		const producerJobOutputLists = [
+			[
+				"delivery",
+				job.delivery?.items ?? [],
+			],
+			[
+				"outputItems",
+				job.outputItems ?? [],
+			],
+		] as const;
+		for (const [fieldName, items] of producerJobOutputLists) {
+			for (const [index, outputItem] of items.entries()) {
+				if (!config.items[outputItem.itemId]) {
 					addSaveIssue(
 						ctx,
 						[
 							"producerJobs",
 							jobId,
-							"delivery",
-							"items",
+							fieldName,
+							...(fieldName === "delivery"
+								? [
+										"items",
+									]
+								: []),
 							index,
 							"itemId",
 						],
-						`Missing item "${deliveryItem.itemId}".`,
+						`Missing item "${outputItem.itemId}".`,
 					);
 				}
 			}
@@ -726,6 +748,13 @@ const validateGameSaveAgainstConfig = (
 			job.producerItemInstanceId,
 			(producerJobCountByProducerItemInstanceId.get(job.producerItemInstanceId) ?? 0) + 1,
 		);
+		const producerJobs =
+			producerJobsByProducerItemInstanceId.get(job.producerItemInstanceId) ?? [];
+		producerJobs.push({
+			job,
+			jobId,
+		});
+		producerJobsByProducerItemInstanceId.set(job.producerItemInstanceId, producerJobs);
 	}
 
 	for (const [activeEffectId, activeEffect] of Object.entries(save.activeEffects ?? {})) {
@@ -789,6 +818,33 @@ const validateGameSaveAgainstConfig = (
 				],
 				`Producer "${producerItemInstanceId}" queue has ${jobCount} jobs but maxQueueSize is ${maxQueueSize}.`,
 			);
+		}
+	}
+
+	for (const [producerItemInstanceId, producerJobs] of producerJobsByProducerItemInstanceId) {
+		const sortedProducerJobs = [
+			...producerJobs,
+		].sort(
+			(left, right) =>
+				left.job.startAtMs - right.job.startAtMs ||
+				left.job.readyAtMs - right.job.readyAtMs ||
+				left.jobId.localeCompare(right.jobId),
+		);
+		for (let index = 1; index < sortedProducerJobs.length; index += 1) {
+			const previous = sortedProducerJobs[index - 1];
+			const current = sortedProducerJobs[index];
+			if (!previous || !current) continue;
+			if (current.job.startAtMs < previous.job.readyAtMs) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerJobs",
+						current.jobId,
+						"startAtMs",
+					],
+					`Producer job "${current.jobId}" for "${producerItemInstanceId}" starts before previous job "${previous.jobId}" is ready.`,
+				);
+			}
 		}
 	}
 

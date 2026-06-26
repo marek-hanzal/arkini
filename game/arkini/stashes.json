@@ -1,8 +1,6 @@
 {
 	"stashes": {
 		"item:chest-t1": {
-			"type": "stash",
-			"placement": "board_then_inventory",
 			"inputs": [
 				{
 					"itemId": "item:key-t1",
@@ -11,9 +9,6 @@
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"charges": 1,
-			"onDepleted": "remove",
 			"output": [
 				{
 					"itemId": "item:coin",
@@ -38,8 +33,6 @@
 			]
 		},
 		"item:chest-t2": {
-			"type": "stash",
-			"placement": "board_then_inventory",
 			"inputs": [
 				{
 					"itemId": "item:key-t2",
@@ -48,9 +41,6 @@
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"charges": 1,
-			"onDepleted": "remove",
 			"output": [
 				{
 					"itemId": "item:coin",
@@ -81,8 +71,6 @@
 			]
 		},
 		"item:chest-t3": {
-			"type": "stash",
-			"placement": "board_then_inventory",
 			"inputs": [
 				{
 					"itemId": "item:key-t3",
@@ -91,9 +79,6 @@
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"charges": 1,
-			"onDepleted": "remove",
 			"output": [
 				{
 					"itemId": "item:coin",
@@ -124,8 +109,6 @@
 			]
 		},
 		"item:chest-t4": {
-			"type": "stash",
-			"placement": "board_then_inventory",
 			"inputs": [
 				{
 					"itemId": "item:key-t4",
@@ -134,9 +117,6 @@
 					"consume": true
 				}
 			],
-			"requirements": [],
-			"charges": 1,
-			"onDepleted": "remove",
 			"output": [
 				{
 					"itemId": "item:coin",

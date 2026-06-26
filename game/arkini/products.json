@@ -3,8 +3,6 @@
 		"product:academy:advanced-knowledge": {
 			"durationMs": 22000,
 			"name": "Advanced Knowledge",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -36,8 +34,6 @@
 		"product:academy:basic-knowledge": {
 			"durationMs": 8000,
 			"name": "Basic Knowledge",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -63,8 +59,6 @@
 		"product:academy:blueprint-armory-t1": {
 			"durationMs": 2500,
 			"name": "Blueprint: Armory I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -114,8 +108,6 @@
 		"product:academy:blueprint-blacksmith-t1": {
 			"durationMs": 2500,
 			"name": "Blueprint: Blacksmith I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -165,8 +157,6 @@
 		"product:academy:blueprint-brickyard": {
 			"durationMs": 2000,
 			"name": "Blueprint: Brickyard",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -210,8 +200,6 @@
 		"product:academy:blueprint-charcoal-burner-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Charcoal Burner I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -261,8 +249,6 @@
 		"product:academy:blueprint-clay-pit": {
 			"durationMs": 2000,
 			"name": "Blueprint: Clay Pit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -300,8 +286,6 @@
 		"product:academy:blueprint-coal-mine-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Coal Mine I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -339,8 +323,6 @@
 		"product:academy:blueprint-construction-yard-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Construction Yard I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -390,8 +372,6 @@
 		"product:academy:blueprint-glassworks": {
 			"durationMs": 2000,
 			"name": "Blueprint: Glassworks",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -435,8 +415,6 @@
 		"product:academy:blueprint-gold-mine-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Gold Mine I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -474,8 +452,6 @@
 		"product:academy:blueprint-goldsmith-t1": {
 			"durationMs": 2500,
 			"name": "Blueprint: Goldsmith I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -525,8 +501,6 @@
 		"product:academy:blueprint-iron-mine-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Iron Mine I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -564,8 +538,6 @@
 		"product:academy:blueprint-prospector-guild-t2": {
 			"durationMs": 2000,
 			"name": "Blueprint: Prospector Guild 2",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -603,8 +575,6 @@
 		"product:academy:blueprint-purifier-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Purifier I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -648,8 +618,6 @@
 		"product:academy:blueprint-roof-tile-factory": {
 			"durationMs": 2000,
 			"name": "Blueprint: Roof Tile Factory",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -693,8 +661,6 @@
 		"product:academy:blueprint-sand-pit": {
 			"durationMs": 2000,
 			"name": "Blueprint: Sand Pit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -732,8 +698,6 @@
 		"product:academy:blueprint-smelter-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Smelter I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -777,8 +741,6 @@
 		"product:academy:blueprint-university": {
 			"durationMs": 2500,
 			"name": "Blueprint: University",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -834,7 +796,6 @@
 		"product:armory-t1:iron-armor": {
 			"durationMs": 36000,
 			"name": "Iron Armor",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -887,8 +848,6 @@
 		"product:armory-t1:leather-armor": {
 			"durationMs": 22000,
 			"name": "Leather Armor",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -920,8 +879,6 @@
 		"product:bakery-t1:bread": {
 			"durationMs": 8000,
 			"name": "Bread",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -947,8 +904,6 @@
 		"product:bakery-t1:bread-morale-t1": {
 			"durationMs": 6000,
 			"name": "Bread (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -980,7 +935,6 @@
 		"product:blacksmith-t1:axe": {
 			"durationMs": 15000,
 			"name": "Axe",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -1027,7 +981,6 @@
 		"product:blacksmith-t1:nails": {
 			"durationMs": 10000,
 			"name": "Nails",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -1068,7 +1021,6 @@
 		"product:blacksmith-t1:sword": {
 			"durationMs": 22000,
 			"name": "Sword",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -1115,8 +1067,6 @@
 		"product:brewery-t1:beer-barrel": {
 			"durationMs": 5000,
 			"name": "Beer Barrel",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1142,8 +1092,6 @@
 		"product:brewery-t1:beer-barrel-from-beer": {
 			"durationMs": 5000,
 			"name": "Beer Barrel",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1163,8 +1111,6 @@
 		"product:brewery-t1:hops": {
 			"durationMs": 5000,
 			"name": "Hops",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1184,7 +1130,6 @@
 		"product:brickyard:bricks": {
 			"durationMs": 8500,
 			"name": "Bricks",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -1241,8 +1186,6 @@
 				}
 			],
 			"name": "Milk",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1268,7 +1211,6 @@
 		"product:charcoal-burner-t1:charcoal": {
 			"durationMs": 6500,
 			"name": "Charcoal",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -1313,8 +1255,6 @@
 				}
 			],
 			"name": "Egg",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1340,8 +1280,6 @@
 		"product:civic-office-t1:blueprint-academy": {
 			"durationMs": 2500,
 			"name": "Blueprint: Academy",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1385,8 +1323,6 @@
 		"product:civic-office-t1:building-permit": {
 			"durationMs": 10000,
 			"name": "Building Permit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1418,8 +1354,6 @@
 		"product:civic-office-t1:building-permit-morale-t2": {
 			"durationMs": 8000,
 			"name": "Building Permit (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1457,8 +1391,6 @@
 		"product:civic-office-t1:guild-charter": {
 			"durationMs": 12000,
 			"name": "Guild Charter",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1502,8 +1434,6 @@
 		"product:clay-pit:clay": {
 			"durationMs": 6500,
 			"name": "Clay",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1523,8 +1453,6 @@
 		"product:coal-mine-t1:coal": {
 			"durationMs": 8000,
 			"name": "Coal Cart",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1556,8 +1484,6 @@
 		"product:construction-yard-t1:construction-bundle": {
 			"durationMs": 12000,
 			"name": "Construction Bundle",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -1607,8 +1533,6 @@
 		"product:construction-yard-t1:construction-bundle-morale-t3": {
 			"durationMs": 9000,
 			"name": "Construction Bundle (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -1664,8 +1588,6 @@
 		"product:cookhouse-t1:feast": {
 			"durationMs": 9000,
 			"name": "Feast",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1709,8 +1631,6 @@
 		"product:dairy-t1:cheese": {
 			"durationMs": 7000,
 			"name": "Cheese",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1730,8 +1650,6 @@
 		"product:dye-workshop-t1:luxury-cloth": {
 			"durationMs": 9000,
 			"name": "Luxury Cloth",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1763,8 +1681,6 @@
 		"product:dye-workshop-t1:pigment": {
 			"durationMs": 5000,
 			"name": "Pigment",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -1800,8 +1716,6 @@
 				}
 			],
 			"name": "Grain",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1821,8 +1735,6 @@
 		"product:farm-t1:grain-morale-t1": {
 			"durationMs": 3500,
 			"name": "Grain (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"hinderedBy": [
 				{
 					"distance": 2,
@@ -1858,7 +1770,6 @@
 		"product:glassworks:glass": {
 			"durationMs": 9000,
 			"name": "Glass",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -1899,7 +1810,6 @@
 		"product:glazier-workshop-t1:stained-glass": {
 			"durationMs": 14000,
 			"name": "Stained Glass",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -1952,7 +1862,6 @@
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
 			"durationMs": 10500,
 			"name": "Stained Glass (Inspired)",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -2011,8 +1920,6 @@
 		"product:gold-mine-t1:gold-ore": {
 			"durationMs": 9000,
 			"name": "Gold Ore Cart",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2044,7 +1951,6 @@
 		"product:goldsmith-t1:coin-stack": {
 			"durationMs": 12000,
 			"name": "Coin Stack",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -2085,7 +1991,6 @@
 		"product:goldsmith-t1:key-t1": {
 			"durationMs": 14000,
 			"name": "Key I",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -2138,7 +2043,6 @@
 		"product:goldsmith-t1:key-t2": {
 			"durationMs": 18000,
 			"name": "Key II",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -2191,7 +2095,6 @@
 		"product:goldsmith-t1:key-t3": {
 			"durationMs": 22000,
 			"name": "Key III",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -2244,7 +2147,6 @@
 		"product:goldsmith-t1:key-t4": {
 			"durationMs": 26000,
 			"name": "Key IV",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -2297,8 +2199,6 @@
 		"product:heroes-guild-t1:chest-t1": {
 			"durationMs": 90000,
 			"name": "Chest I Expedition",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2336,8 +2236,6 @@
 		"product:heroes-guild-t1:chest-t2": {
 			"durationMs": 150000,
 			"name": "Chest II Expedition",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2375,8 +2273,6 @@
 		"product:heroes-guild-t1:chest-t3": {
 			"durationMs": 240000,
 			"name": "Chest III Expedition",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2420,8 +2316,6 @@
 		"product:heroes-guild-t1:chest-t4": {
 			"durationMs": 420000,
 			"name": "Chest IV Expedition",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2471,8 +2365,6 @@
 		"product:heroes-guild-t1:treasure-chest": {
 			"durationMs": 600000,
 			"name": "Grand Expedition",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2540,8 +2432,6 @@
 		"product:heroes-guild-t1:treasure-chest-morale-t4": {
 			"durationMs": 420000,
 			"name": "Grand Expedition (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2627,8 +2517,6 @@
 		"product:house-t1:morale-t1": {
 			"durationMs": 8000,
 			"name": "Morale I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2654,8 +2542,6 @@
 		"product:house-t2:morale-t2": {
 			"durationMs": 12000,
 			"name": "Morale II",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2692,8 +2578,6 @@
 		"product:house-t3:morale-t3": {
 			"durationMs": 18000,
 			"name": "Morale III",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2741,8 +2625,6 @@
 		"product:house-t4:morale-t4": {
 			"durationMs": 24000,
 			"name": "Morale IV",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2795,8 +2677,6 @@
 		"product:iron-mine-t1:iron-ore": {
 			"durationMs": 8000,
 			"name": "Iron Ore Cart",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2828,8 +2708,6 @@
 		"product:lumberjack-t1:log": {
 			"durationMs": 5000,
 			"name": "Log",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"output": [
 				{
 					"itemId": "item:log",
@@ -2841,8 +2719,6 @@
 		"product:market-t1:coin-from-beer": {
 			"durationMs": 4000,
 			"name": "Coins from Beer",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2862,8 +2738,6 @@
 		"product:market-t1:coin-from-bread": {
 			"durationMs": 4000,
 			"name": "Coins from Bread",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2883,8 +2757,6 @@
 		"product:market-t1:coin-from-cheese": {
 			"durationMs": 4000,
 			"name": "Coins from Cheese",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2904,8 +2776,6 @@
 		"product:market-t1:coin-from-feast": {
 			"durationMs": 6000,
 			"name": "Coins from Feast",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2925,8 +2795,6 @@
 		"product:market-t1:coin-from-sausage": {
 			"durationMs": 4000,
 			"name": "Coins from Sausage",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2946,8 +2814,6 @@
 		"product:market-t1:coin-from-wine-glass": {
 			"durationMs": 4000,
 			"name": "Coins from Wine Glass",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2967,8 +2833,6 @@
 		"product:market-t2:coin-from-common-clothing": {
 			"durationMs": 5000,
 			"name": "Coins from Common Clothing",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2988,8 +2852,6 @@
 		"product:market-t2:coin-from-feast": {
 			"durationMs": 5000,
 			"name": "Better Coins from Feast",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3009,8 +2871,6 @@
 		"product:market-t2:coin-from-luxury-clothing": {
 			"durationMs": 5000,
 			"name": "Coins from Luxury Clothing",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3030,8 +2890,6 @@
 		"product:market-t2:coin-from-paper": {
 			"durationMs": 3500,
 			"name": "Coins from Paper",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -3051,8 +2909,6 @@
 		"product:paper-mill-t1:paper": {
 			"durationMs": 7000,
 			"name": "Paper",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3088,8 +2944,6 @@
 				}
 			],
 			"name": "Piglet",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3115,8 +2969,6 @@
 		"product:prospector-guild-t1:clay-deposit": {
 			"durationMs": 9000,
 			"name": "Prospect: Clay Deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3148,8 +3000,6 @@
 		"product:prospector-guild-t1:sand-deposit": {
 			"durationMs": 9000,
 			"name": "Prospect: Sand Deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3181,8 +3031,6 @@
 		"product:prospector-guild-t2:clay-deposit": {
 			"durationMs": 9000,
 			"name": "Prospect: Clay Deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3214,8 +3062,6 @@
 		"product:prospector-guild-t2:coal-deposit": {
 			"durationMs": 10000,
 			"name": "Prospect: Coal Deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3253,8 +3099,6 @@
 		"product:prospector-guild-t2:gold-deposit": {
 			"durationMs": 12000,
 			"name": "Prospect: Gold Deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3292,8 +3136,6 @@
 		"product:prospector-guild-t2:iron-deposit": {
 			"durationMs": 10000,
 			"name": "Prospect: Iron Deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3331,8 +3173,6 @@
 		"product:prospector-guild-t2:marble-deposit": {
 			"durationMs": 14000,
 			"name": "Prospect: Marble Deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3370,8 +3210,6 @@
 		"product:prospector-guild-t2:sand-deposit": {
 			"durationMs": 9000,
 			"name": "Prospect: Sand Deposit",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3403,8 +3241,6 @@
 		"product:purifier-t1:pollution": {
 			"durationMs": 6000,
 			"name": "Purify Pollution",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3429,8 +3265,6 @@
 		"product:purifier-t1:pollution-bulk": {
 			"durationMs": 18000,
 			"name": "Purify Pollution x4",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -3455,8 +3289,6 @@
 		"product:quarry-t1:stone": {
 			"durationMs": 5000,
 			"name": "Stone",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"output": [
 				{
 					"itemId": "item:stone",
@@ -3468,8 +3300,6 @@
 		"product:quarry-t2:marble": {
 			"durationMs": 12000,
 			"name": "Marble",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"output": [
 				{
 					"itemId": "item:marble",
@@ -3481,8 +3311,6 @@
 		"product:quarry-t2:stone": {
 			"durationMs": 4000,
 			"name": "Stone",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"output": [
 				{
 					"itemId": "item:stone",
@@ -3494,7 +3322,6 @@
 		"product:roof-tile-factory:roof-tiles": {
 			"durationMs": 8500,
 			"name": "Roof Tiles",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -3541,8 +3368,6 @@
 		"product:sand-pit:sand": {
 			"durationMs": 6500,
 			"name": "Sand",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"output": [
 				{
 					"itemId": "item:sand",
@@ -3554,8 +3379,6 @@
 		"product:sawmill-t1:plank": {
 			"durationMs": 5000,
 			"name": "Plank",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3575,8 +3398,6 @@
 		"product:school:basic-knowledge": {
 			"durationMs": 12000,
 			"name": "Basic Knowledge",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3602,8 +3423,6 @@
 		"product:school:basic-knowledge-morale-t2": {
 			"durationMs": 9000,
 			"name": "Basic Knowledge (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3645,8 +3464,6 @@
 				}
 			],
 			"name": "Wool",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3672,8 +3489,6 @@
 		"product:slaughterhouse-t1:sausage-raw-hide": {
 			"durationMs": 8000,
 			"name": "Sausage + Raw Hide",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3698,7 +3513,6 @@
 		"product:smelter-t1:gold-ingot": {
 			"durationMs": 10000,
 			"name": "Gold Ingot",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -3745,7 +3559,6 @@
 		"product:smelter-t1:iron-ingot": {
 			"durationMs": 10000,
 			"name": "Iron Ingot",
-			"placement": "board_then_inventory",
 			"requirementIds": [
 				"proximity:dirty-processing:purifier"
 			],
@@ -3792,8 +3605,6 @@
 		"product:stonemason-t1:stone-block": {
 			"durationMs": 5000,
 			"name": "Stone Block",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3813,8 +3624,6 @@
 		"product:stonemason-t2:marble-block": {
 			"durationMs": 13000,
 			"name": "Marble Block",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3840,8 +3649,6 @@
 		"product:stonemason-t2:marble-block-morale-t4": {
 			"durationMs": 10000,
 			"name": "Marble Block (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3873,8 +3680,6 @@
 		"product:stonemason-t2:stone-block": {
 			"durationMs": 4000,
 			"name": "Stone Block",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3894,8 +3699,6 @@
 		"product:tailor-workshop-t1:common-clothing": {
 			"durationMs": 9000,
 			"name": "Common Clothing",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3921,8 +3724,6 @@
 		"product:tailor-workshop-t1:luxury-clothing": {
 			"durationMs": 12000,
 			"name": "Luxury Clothing",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3954,8 +3755,6 @@
 		"product:tailor-workshop-t1:luxury-clothing-morale-t3": {
 			"durationMs": 9000,
 			"name": "Luxury Clothing (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3993,8 +3792,6 @@
 		"product:tannery-t1:leather": {
 			"durationMs": 8000,
 			"name": "Leather",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4020,8 +3817,6 @@
 		"product:tavern-t1:beer": {
 			"durationMs": 5000,
 			"name": "Beer",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4041,8 +3836,6 @@
 		"product:tavern-t1:wine-glass": {
 			"durationMs": 5000,
 			"name": "Wine Glass",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4062,8 +3855,6 @@
 		"product:townhall-t1:blueprint-lumberjack-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Lumberjack I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4083,8 +3874,6 @@
 		"product:townhall-t1:blueprint-quarry-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Quarry I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4104,8 +3893,6 @@
 		"product:townhall-t1:blueprint-sawmill-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Sawmill I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4125,8 +3912,6 @@
 		"product:townhall-t1:blueprint-stonemason-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Stonemason I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4146,8 +3931,6 @@
 		"product:townhall-t1:blueprint-townhall-t2": {
 			"durationMs": 2000,
 			"name": "Blueprint: Town Hall II",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4179,8 +3962,6 @@
 		"product:townhall-t1:blueprint-well-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Well I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4200,8 +3981,6 @@
 		"product:townhall-t2:blueprint-cattle-farm-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Cattle Farm I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4233,8 +4012,6 @@
 		"product:townhall-t2:blueprint-chicken-coop-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Chicken Coop I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4260,8 +4037,6 @@
 		"product:townhall-t2:blueprint-farm-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Farm I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4287,8 +4062,6 @@
 		"product:townhall-t2:blueprint-house-t1": {
 			"durationMs": 3000,
 			"name": "Blueprint: House I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4314,8 +4087,6 @@
 		"product:townhall-t2:blueprint-pig-farm-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Pig Farm I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4341,8 +4112,6 @@
 		"product:townhall-t2:blueprint-sheep-pasture-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Sheep Pasture I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4374,8 +4143,6 @@
 		"product:townhall-t2:blueprint-townhall-t3": {
 			"durationMs": 2000,
 			"name": "Blueprint: Town Hall III",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4413,8 +4180,6 @@
 		"product:townhall-t2:blueprint-vegetable-garden-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Vegetable Garden I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4440,8 +4205,6 @@
 		"product:townhall-t2:food-supply": {
 			"durationMs": 2000,
 			"name": "Food Supply",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4485,8 +4248,6 @@
 		"product:townhall-t2:wheat-field": {
 			"durationMs": 2000,
 			"name": "Survey: Wheat Field",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4506,8 +4267,6 @@
 		"product:townhall-t3:blueprint-bakery-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Bakery I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4533,8 +4292,6 @@
 		"product:townhall-t3:blueprint-brewery-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Brewery I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4566,8 +4323,6 @@
 		"product:townhall-t3:blueprint-cookhouse-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Cookhouse I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4599,8 +4354,6 @@
 		"product:townhall-t3:blueprint-dairy-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Dairy I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4626,8 +4379,6 @@
 		"product:townhall-t3:blueprint-house-t2": {
 			"durationMs": 3500,
 			"name": "Blueprint: House II",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4659,8 +4410,6 @@
 		"product:townhall-t3:blueprint-market-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Market",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4692,8 +4441,6 @@
 		"product:townhall-t3:blueprint-slaughterhouse-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Slaughterhouse I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4719,8 +4466,6 @@
 		"product:townhall-t3:blueprint-tavern-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Tavern I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4746,8 +4491,6 @@
 		"product:townhall-t3:blueprint-townhall-t4": {
 			"durationMs": 2000,
 			"name": "Blueprint: Town Hall IV",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4785,8 +4528,6 @@
 		"product:townhall-t3:blueprint-windmill-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Windmill I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4812,8 +4553,6 @@
 		"product:townhall-t3:blueprint-winery-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Winery I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4845,8 +4584,6 @@
 		"product:townhall-t3:hop-field": {
 			"durationMs": 2000,
 			"name": "Survey: Hop Field",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4872,8 +4609,6 @@
 		"product:townhall-t3:vineyard": {
 			"durationMs": 2000,
 			"name": "Survey: Vineyard",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4899,8 +4634,6 @@
 		"product:townhall-t4:blueprint-civic-office-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Civic Office I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4932,8 +4665,6 @@
 		"product:townhall-t4:blueprint-dye-workshop-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Dye Workshop I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4971,8 +4702,6 @@
 		"product:townhall-t4:blueprint-house-t3": {
 			"durationMs": 4000,
 			"name": "Blueprint: House III",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5010,8 +4739,6 @@
 		"product:townhall-t4:blueprint-market-t2": {
 			"durationMs": 2000,
 			"name": "Blueprint: Market II",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5043,8 +4770,6 @@
 		"product:townhall-t4:blueprint-paper-mill-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Paper Mill I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -5076,8 +4801,6 @@
 		"product:townhall-t4:blueprint-prospector-guild-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Prospector Guild 1",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5109,8 +4832,6 @@
 		"product:townhall-t4:blueprint-school": {
 			"durationMs": 2000,
 			"name": "Blueprint: School",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5136,8 +4857,6 @@
 		"product:townhall-t4:blueprint-tailor-workshop-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Tailor Workshop I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5175,8 +4894,6 @@
 		"product:townhall-t4:blueprint-tannery-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Tannery I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5208,8 +4925,6 @@
 		"product:townhall-t4:blueprint-weaver-hut-t1": {
 			"durationMs": 2000,
 			"name": "Blueprint: Weaver Hut I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5241,8 +4956,6 @@
 		"product:university:advanced-knowledge": {
 			"durationMs": 14000,
 			"name": "Advanced Knowledge",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5268,8 +4981,6 @@
 		"product:university:basic-knowledge": {
 			"durationMs": 6000,
 			"name": "Basic Knowledge",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5289,8 +5000,6 @@
 		"product:university:blueprint-cathedral": {
 			"durationMs": 4000,
 			"name": "Blueprint: Cathedral",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5352,8 +5061,6 @@
 		"product:university:blueprint-glazier-workshop-t1": {
 			"durationMs": 3000,
 			"name": "Blueprint: Glazier Workshop I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5397,8 +5104,6 @@
 		"product:university:blueprint-heroes-guild-t1": {
 			"durationMs": 3000,
 			"name": "Blueprint: Heroes Guild I",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5448,8 +5153,6 @@
 		"product:university:blueprint-house-of-engineers": {
 			"durationMs": 4000,
 			"name": "Blueprint: House of Engineers",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5511,8 +5214,6 @@
 		"product:university:blueprint-house-t4": {
 			"durationMs": 5000,
 			"name": "Blueprint: House IV",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5550,8 +5251,6 @@
 		"product:university:blueprint-mage-lodge": {
 			"durationMs": 4000,
 			"name": "Blueprint: Mage Lodge",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5613,8 +5312,6 @@
 		"product:university:blueprint-quarry-t2": {
 			"durationMs": 3500,
 			"name": "Blueprint: Quarry 2",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5652,8 +5349,6 @@
 		"product:university:blueprint-stonemason-t2": {
 			"durationMs": 3500,
 			"name": "Blueprint: Stonemason 2",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5691,8 +5386,6 @@
 		"product:university:master-knowledge": {
 			"durationMs": 36000,
 			"name": "Master Knowledge",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 6,
@@ -5730,8 +5423,6 @@
 		"product:university:master-knowledge-morale-t4": {
 			"durationMs": 26000,
 			"name": "Master Knowledge (Inspired)",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 6,
@@ -5785,8 +5476,6 @@
 				}
 			],
 			"name": "Vegetables",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5806,8 +5495,6 @@
 		"product:weaver-hut-t1:common-cloth": {
 			"durationMs": 7000,
 			"name": "Common Cloth",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5827,8 +5514,6 @@
 		"product:well-t1:water": {
 			"durationMs": 5000,
 			"name": "Water",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"output": [
 				{
 					"itemId": "item:water",
@@ -5840,8 +5525,6 @@
 		"product:windmill-t1:flour": {
 			"durationMs": 6000,
 			"name": "Flour",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5861,8 +5544,6 @@
 		"product:winery-t1:grapes": {
 			"durationMs": 5000,
 			"name": "Grapes",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5882,8 +5563,6 @@
 		"product:winery-t1:wine-barrel": {
 			"durationMs": 5000,
 			"name": "Wine Barrel",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5909,8 +5588,6 @@
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
 			"durationMs": 5000,
 			"name": "Wine Barrel",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"inputs": [
 				{
 					"capacity": 4,

@@ -135,7 +135,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 					"product:shred",
 				],
 				requirementIds: [],
-				type: "producer",
 			},
 		},
 		products: {
@@ -188,7 +187,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				],
 				placement: "board_then_inventory",
 				requirements: [],
-				type: "stash",
 			},
 		},
 		craftRecipes: {

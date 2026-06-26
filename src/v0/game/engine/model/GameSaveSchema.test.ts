@@ -19,6 +19,7 @@ const createProducerJob = (id: string) => ({
 			quantity: 2,
 		},
 	],
+	placement: "board_then_inventory" as const,
 	productId: "product:test",
 	producerItemInstanceId: "item-instance:1",
 	startAtMs: 0,

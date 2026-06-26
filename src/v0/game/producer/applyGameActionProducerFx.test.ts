@@ -144,6 +144,185 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("snapshots producer output after consumed input effects leave the save", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:key-replaces-output": {
+					name: "Key replaces output",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productIds: [
+									"product:shred",
+								],
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:key": {
+					...baseConfig.items["item:key"],
+					passiveEffectIds: [
+						"effect:key-replaces-output",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					inputs: [
+						{
+							capacity: 1,
+							consume: true,
+							itemId: "item:key",
+							quantity: 1,
+						},
+					],
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:key",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		const job = readOnlyRecordValue(result.save.producerJobs);
+		expect(job.outputItems).toEqual([
+			{
+				itemId: "item:twig",
+				quantity: 1,
+			},
+		]);
+		expect(result.save.inventory.slots[0]).toBeNull();
+	});
+
+	it("evaluates queued producer output against the queued start time", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:early-replace-output": {
+					name: "Early replace output",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:early-replace-output"] = {
+			endAtMs: 500,
+			effectId: "effect:early-replace-output",
+			id: "effect-instance:early-replace-output",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+
+		const first = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const second = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save: first.save,
+		});
+
+		const jobs = Object.values(second.save.producerJobs).sort(
+			(left, right) => left.startAtMs - right.startAtMs,
+		);
+		expect(jobs.map((job) => job.startAtMs)).toEqual([
+			0,
+			1000,
+		]);
+		expect(jobs[0]?.outputItems).toEqual([
+			{
+				itemId: "item:plank",
+				quantity: 1,
+			},
+		]);
+		expect(jobs[1]?.outputItems).toEqual([
+			{
+				itemId: "item:twig",
+				quantity: 2,
+			},
+		]);
+	});
+
 	it("starts active effect product lines as timed producer jobs", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

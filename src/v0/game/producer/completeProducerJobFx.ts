@@ -6,7 +6,6 @@ import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/producer/producerDeliveryTiming";
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
-import { readProductFx } from "~/v0/game/producer/readProductFx";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
 import type {
@@ -70,10 +69,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		} satisfies GameEngineCompletionResult;
 	}
 
-	const product = yield* readProductFx({
-		productId: liveJob.productId,
-	});
-	const placement = liveJob.placement ?? product.placement;
+	const placement = liveJob.placement;
 	yield* match(placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();

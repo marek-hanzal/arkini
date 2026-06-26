@@ -4,7 +4,6 @@ import { readProducerQueueWakeAtMsValues } from "~/v0/game/producer/readProducer
 import { readMinGameWakeAtMs } from "~/v0/game/time/GameTime";
 
 export const pastDueGameJobWakeDelayMs = 1;
-export const pastDueItemSpawnJobWakeDelayMs = pastDueGameJobWakeDelayMs;
 
 export namespace readNextWakeAtMsFx {
 	export interface Props {

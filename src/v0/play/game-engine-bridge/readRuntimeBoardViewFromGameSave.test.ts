@@ -396,7 +396,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				...baseConfig.items,
 				"item:craft-table": {
 					assetId: "asset:test",
-					code: "craft-table",
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -467,7 +466,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				...baseConfig.items,
 				"item:craft-table": {
 					assetId: "asset:test",
-					code: "craft-table",
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -575,7 +573,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				...baseConfig.items,
 				"item:craft-table": {
 					assetId: "asset:test",
-					code: "craft-table",
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -639,12 +636,14 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 						{
 							chance: 0.25,
 							itemId: "item:plank",
+							quantity: 1,
 							type: "chance",
 						},
 						{
 							entries: [
 								{
 									itemId: "item:axe",
+									quantity: 1,
 									weight: 1,
 								},
 								{

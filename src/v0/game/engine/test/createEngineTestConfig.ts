@@ -30,7 +30,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 		items: {
 			"item:producer": {
 				assetId: "asset:test",
-				code: "producer",
 				description: "Producer",
 				maxStackSize: 1,
 				name: "Producer",
@@ -39,7 +38,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:twig": {
 				assetId: "asset:test",
-				code: "twig",
 				description: "Twig",
 				maxStackSize: 3,
 				mergeIds: [
@@ -51,7 +49,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:plank": {
 				assetId: "asset:test",
-				code: "plank",
 				description: "Plank",
 				maxStackSize: 2,
 				name: "Plank",
@@ -60,7 +57,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:craft-table": {
 				assetId: "asset:test",
-				code: "craft-table",
 				description: "Craft table",
 				maxStackSize: 1,
 				name: "Craft Table",
@@ -69,7 +65,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:key": {
 				assetId: "asset:test",
-				code: "key",
 				description: "Key",
 				maxStackSize: 3,
 				name: "Key",
@@ -78,7 +73,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:stash": {
 				assetId: "asset:test",
-				code: "stash",
 				description: "Stash",
 				maxStackSize: 1,
 				name: "Stash",
@@ -87,7 +81,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:axe": {
 				assetId: "asset:test",
-				code: "axe",
 				description: "Axe",
 				maxStackSize: 1,
 				name: "Axe",
@@ -96,7 +89,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:rock": {
 				assetId: "asset:test",
-				code: "rock",
 				description: "Rock",
 				maxStackSize: 1,
 				name: "Rock",
@@ -111,7 +103,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:empty-stash": {
 				assetId: "asset:test",
-				code: "empty-stash",
 				description: "Empty stash",
 				maxStackSize: 1,
 				name: "Empty Stash",

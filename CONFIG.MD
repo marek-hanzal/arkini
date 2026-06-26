@@ -45,7 +45,7 @@ Items define physical tiles/stacks. Source items omit identity fields that can b
 }
 ```
 
-The compiler derives `code` from the item id suffix and `assetId` as `asset:<itemId>`. It also synthesizes conventional item assets; `assets.json` only contains overrides such as intentional resource reuse. `storage` is `board`, `inventory`, or `both`; omitted means `both`. `tier` defaults to `0`, `maxStackSize` defaults to `10`, and `tags` default to `[]`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, and craft capabilities are not referenced from the item; they are keyed by the owning item id in `producers`, `stashes`, and `craftRecipes`.
+The compiler derives `assetId` as `asset:<itemId>` and synthesizes conventional item assets; `assets.json` only contains overrides such as intentional resource reuse. Item `code` no longer exists; the item id is the single stable identity. `storage` is `board`, `inventory`, or `both`; omitted means `both`. `tier` defaults to `0`, `maxStackSize` defaults to `10`, and `tags` default to `[]`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, and craft capabilities are not referenced from the item; they are keyed by the owning item id in `producers`, `stashes`, and `craftRecipes`.
 
 ## Producers and products
 
@@ -134,7 +134,7 @@ When depleted, `onDepleted` may be `remove`, `keep`, or `{ "replaceWithItemId": 
 
 ## Craft recipes
 
-Craft recipes are keyed by the craft target item id, usually a blueprint item. Inputs are stored through the normal DnD interaction model.
+Craft recipes are keyed by the craft target item id, usually a blueprint item. Blueprint recipes may omit `resultItemId`; the compiler derives `producer:<suffix>` from `item:blueprint-<suffix>`. Inputs are stored through the normal DnD interaction model. Input `quantity` defaults to `1`; keep it only when the recipe needs more than one item.
 
 ```json
 {
@@ -143,8 +143,7 @@ Craft recipes are keyed by the craft target item id, usually a blueprint item. I
       "durationMs": 10000,
       "inputs": [
         { "itemId": "item:plank", "quantity": 4, "consume": true }
-      ],
-      "resultItemId": "item:townhall-2"
+      ]
     }
   }
 }

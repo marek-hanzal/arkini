@@ -26,7 +26,6 @@
 			"output": [
 				{
 					"itemId": "item:advanced-knowledge",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -38,14 +37,12 @@
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 12,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
@@ -63,14 +60,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"capacity": 8,
@@ -87,8 +82,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				},
 				{
 					"capacity": 20,
@@ -100,7 +94,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-armory-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -112,14 +105,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"capacity": 6,
@@ -136,8 +127,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 20,
@@ -149,7 +139,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-blacksmith-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -161,14 +150,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 8,
@@ -179,8 +166,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"capacity": 12,
@@ -192,7 +178,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-brickyard",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -204,20 +189,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
+					"itemId": "item:coal"
 				},
 				{
 					"capacity": 8,
@@ -228,8 +210,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 12,
@@ -241,7 +222,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-charcoal-burner-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -253,20 +233,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:clay-deposit",
-					"quantity": 1
+					"itemId": "item:clay-deposit"
 				},
 				{
 					"capacity": 12,
@@ -278,7 +255,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-clay-pit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -290,20 +266,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 12,
@@ -315,7 +288,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-coal-mine-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -327,14 +299,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 8,
@@ -345,8 +315,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
+					"itemId": "item:glass"
 				},
 				{
 					"capacity": 8,
@@ -364,7 +333,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-construction-yard-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -376,14 +344,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 8,
@@ -394,8 +360,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"capacity": 12,
@@ -407,7 +372,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-glassworks",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -419,20 +383,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 12,
@@ -444,7 +405,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-gold-mine-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -456,14 +416,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"capacity": 6,
@@ -474,14 +432,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
+					"itemId": "item:glass"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 20,
@@ -493,7 +449,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-goldsmith-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -505,20 +460,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 12,
@@ -530,7 +482,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-iron-mine-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -542,14 +493,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 8,
@@ -567,7 +516,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-prospector-guild-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -579,14 +527,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 8,
@@ -610,7 +556,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-purifier-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -622,14 +567,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 8,
@@ -640,8 +583,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"capacity": 12,
@@ -653,7 +595,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-roof-tile-factory",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -665,20 +606,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sand-deposit",
-					"quantity": 1
+					"itemId": "item:sand-deposit"
 				},
 				{
 					"capacity": 12,
@@ -690,7 +628,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-sand-pit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -702,14 +639,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 8,
@@ -720,8 +655,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:iron-ore",
-					"quantity": 1
+					"itemId": "item:iron-ore"
 				},
 				{
 					"capacity": 12,
@@ -733,7 +667,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-smelter-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -745,14 +678,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"capacity": 6,
@@ -788,7 +719,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-university",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -803,8 +733,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:leather-armor",
-					"quantity": 1
+					"itemId": "item:leather-armor"
 				},
 				{
 					"capacity": 8,
@@ -821,26 +750,22 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:iron-armor",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.45,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.1,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -858,20 +783,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:nails",
-					"quantity": 1
+					"itemId": "item:nails"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:leather-armor",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -883,20 +805,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:flour",
-					"quantity": 1
+					"itemId": "item:flour"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:bread",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -908,20 +827,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:flour",
-					"quantity": 1
+					"itemId": "item:flour"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t1",
-					"quantity": 1
+					"itemId": "item:morale-t1"
 				}
 			],
 			"output": [
@@ -942,38 +858,32 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:iron-ingot",
-					"quantity": 1
+					"itemId": "item:iron-ingot"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:axe",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.4,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.08,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -988,14 +898,12 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:iron-ingot",
-					"quantity": 1
+					"itemId": "item:iron-ingot"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
@@ -1007,13 +915,11 @@
 				{
 					"chance": 0.35,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -1034,32 +940,27 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 1
+					"itemId": "item:leather"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:sword",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.45,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.1,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -1071,20 +972,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:hops",
-					"quantity": 1
+					"itemId": "item:hops"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:beer-barrel",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1103,7 +1001,6 @@
 			"output": [
 				{
 					"itemId": "item:beer-barrel",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1115,14 +1012,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:hops",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1143,14 +1038,12 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
@@ -1162,13 +1055,11 @@
 				{
 					"chance": 0.55,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.12,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -1190,20 +1081,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:milk",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1231,13 +1119,11 @@
 				{
 					"chance": 0.4,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.08,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -1259,20 +1145,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:egg",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1284,8 +1167,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 8,
@@ -1302,8 +1184,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 12,
@@ -1315,7 +1196,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-academy",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1327,26 +1207,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:building-permit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1358,26 +1234,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t2",
-					"quantity": 1
+					"itemId": "item:morale-t2"
 				}
 			],
 			"output": [
@@ -1395,26 +1267,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 20,
@@ -1426,7 +1294,6 @@
 			"output": [
 				{
 					"itemId": "item:guild-charter",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1438,8 +1305,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
@@ -1457,26 +1323,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:coal",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1494,8 +1356,7 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
+					"itemId": "item:glass"
 				},
 				{
 					"capacity": 8,
@@ -1506,14 +1367,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 12,
@@ -1525,7 +1384,6 @@
 			"output": [
 				{
 					"itemId": "item:construction-bundle",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1543,8 +1401,7 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
+					"itemId": "item:glass"
 				},
 				{
 					"capacity": 8,
@@ -1555,14 +1412,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 12,
@@ -1573,8 +1428,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t3",
-					"quantity": 1
+					"itemId": "item:morale-t3"
 				}
 			],
 			"output": [
@@ -1592,38 +1446,32 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
+					"itemId": "item:sausage"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:cheese",
-					"quantity": 1
+					"itemId": "item:cheese"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:vegetables",
-					"quantity": 1
+					"itemId": "item:vegetables"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:egg",
-					"quantity": 1
+					"itemId": "item:egg"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:feast",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1635,14 +1483,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:milk",
-					"quantity": 1
+					"itemId": "item:milk"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:cheese",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1654,26 +1500,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-cloth",
-					"quantity": 1
+					"itemId": "item:common-cloth"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:pigment",
-					"quantity": 1
+					"itemId": "item:pigment"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:luxury-cloth",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1691,14 +1533,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:pigment",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1720,14 +1560,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:grain",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1749,14 +1587,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t1",
-					"quantity": 1
+					"itemId": "item:morale-t1"
 				}
 			],
 			"output": [
@@ -1790,19 +1626,16 @@
 			"output": [
 				{
 					"itemId": "item:glass",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.65,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.15,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -1823,38 +1656,32 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:pigment",
-					"quantity": 1
+					"itemId": "item:pigment"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:stained-glass",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.5,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.1,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -1875,26 +1702,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:pigment",
-					"quantity": 1
+					"itemId": "item:pigment"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t4",
-					"quantity": 1
+					"itemId": "item:morale-t4"
 				}
 			],
 			"output": [
@@ -1906,13 +1729,11 @@
 				{
 					"chance": 0.5,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.1,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -1924,26 +1745,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-glass",
-					"quantity": 1
+					"itemId": "item:wine-glass"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:gold-ore",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -1958,32 +1775,27 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 1
+					"itemId": "item:gold-ingot"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:coin-stack",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -1998,44 +1810,37 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 1
+					"itemId": "item:gold-ingot"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:iron-ingot",
-					"quantity": 1
+					"itemId": "item:iron-ingot"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:key-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -2050,44 +1855,37 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:key-t1",
-					"quantity": 1
+					"itemId": "item:key-t1"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 1
+					"itemId": "item:gold-ingot"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:ruby",
-					"quantity": 1
+					"itemId": "item:ruby"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:key-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -2102,44 +1900,37 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:key-t2",
-					"quantity": 1
+					"itemId": "item:key-t2"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 1
+					"itemId": "item:gold-ingot"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:emerald",
-					"quantity": 1
+					"itemId": "item:emerald"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:key-t3",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -2154,44 +1945,37 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:key-t3",
-					"quantity": 1
+					"itemId": "item:key-t3"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 1
+					"itemId": "item:gold-ingot"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sapphire",
-					"quantity": 1
+					"itemId": "item:sapphire"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:key-t4",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -2203,20 +1987,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:axe",
-					"quantity": 1
+					"itemId": "item:axe"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:leather-armor",
-					"quantity": 1
+					"itemId": "item:leather-armor"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 12,
@@ -2228,7 +2009,6 @@
 			"output": [
 				{
 					"itemId": "item:chest-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2240,32 +2020,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sword",
-					"quantity": 1
+					"itemId": "item:sword"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:iron-armor",
-					"quantity": 1
+					"itemId": "item:iron-armor"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:chest-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2277,38 +2052,32 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sword",
-					"quantity": 1
+					"itemId": "item:sword"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:iron-armor",
-					"quantity": 1
+					"itemId": "item:iron-armor"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:key-t1",
-					"quantity": 1
+					"itemId": "item:key-t1"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:chest-t3",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2320,44 +2089,37 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sword",
-					"quantity": 1
+					"itemId": "item:sword"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:iron-armor",
-					"quantity": 1
+					"itemId": "item:iron-armor"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:key-t2",
-					"quantity": 1
+					"itemId": "item:key-t2"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:chest-t4",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2369,50 +2131,42 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sword",
-					"quantity": 1
+					"itemId": "item:sword"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:iron-armor",
-					"quantity": 1
+					"itemId": "item:iron-armor"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:key-t4",
-					"quantity": 1
+					"itemId": "item:key-t4"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:topaz",
-					"quantity": 1
+					"itemId": "item:topaz"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:aquamarine",
-					"quantity": 1
+					"itemId": "item:aquamarine"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 6,
@@ -2424,7 +2178,6 @@
 			"output": [
 				{
 					"itemId": "item:treasure-chest",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2436,50 +2189,42 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sword",
-					"quantity": 1
+					"itemId": "item:sword"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:iron-armor",
-					"quantity": 1
+					"itemId": "item:iron-armor"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:key-t4",
-					"quantity": 1
+					"itemId": "item:key-t4"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:topaz",
-					"quantity": 1
+					"itemId": "item:topaz"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:aquamarine",
-					"quantity": 1
+					"itemId": "item:aquamarine"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 6,
@@ -2490,26 +2235,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t4",
-					"quantity": 1
+					"itemId": "item:morale-t4"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:treasure-chest",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.3,
 					"itemId": "item:aquamarine",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.3,
 					"itemId": "item:topaz",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -2521,20 +2262,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:morale-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2546,31 +2284,26 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:morale-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"itemId": "item:morale-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2582,20 +2315,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 1
+					"itemId": "item:beer"
 				},
 				{
 					"capacity": 12,
@@ -2607,17 +2337,14 @@
 			"output": [
 				{
 					"itemId": "item:morale-t3",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"itemId": "item:morale-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"itemId": "item:morale-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2629,47 +2356,39 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-glass",
-					"quantity": 1
+					"itemId": "item:wine-glass"
 				},
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:morale-t4",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"itemId": "item:morale-t3",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"itemId": "item:morale-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"itemId": "item:morale-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2681,26 +2400,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
+					"itemId": "item:sausage"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 1
+					"itemId": "item:beer"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:iron-ore",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2711,7 +2426,6 @@
 			"output": [
 				{
 					"itemId": "item:log",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2723,14 +2437,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 1
+					"itemId": "item:beer"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:coin",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2742,14 +2454,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:coin",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2761,14 +2471,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:cheese",
-					"quantity": 1
+					"itemId": "item:cheese"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:coin",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2780,8 +2488,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				}
 			],
 			"output": [
@@ -2799,14 +2506,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
+					"itemId": "item:sausage"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:coin",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2818,14 +2523,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-glass",
-					"quantity": 1
+					"itemId": "item:wine-glass"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:coin",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2837,8 +2540,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				}
 			],
 			"output": [
@@ -2856,8 +2558,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				}
 			],
 			"output": [
@@ -2875,8 +2576,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				}
 			],
 			"output": [
@@ -2901,7 +2601,6 @@
 			"output": [
 				{
 					"itemId": "item:coin",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2913,20 +2612,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:paper",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2948,20 +2644,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:piglet",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -2973,26 +2666,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:clay-deposit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3004,26 +2693,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:sand-deposit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3035,26 +2720,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:clay-deposit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3066,20 +2747,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 12,
@@ -3091,7 +2769,6 @@
 			"output": [
 				{
 					"itemId": "item:coal-deposit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3103,20 +2780,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 12,
@@ -3128,7 +2802,6 @@
 			"output": [
 				{
 					"itemId": "item:gold-deposit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3140,20 +2813,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
+					"itemId": "item:advanced-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 12,
@@ -3165,7 +2835,6 @@
 			"output": [
 				{
 					"itemId": "item:iron-deposit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3177,32 +2846,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:marble-deposit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3214,26 +2878,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:sand-deposit",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3245,20 +2905,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:pollution",
-					"quantity": 1
+					"itemId": "item:pollution"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				}
 			]
 		},
@@ -3292,7 +2949,6 @@
 			"output": [
 				{
 					"itemId": "item:stone",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3303,7 +2959,6 @@
 			"output": [
 				{
 					"itemId": "item:marble",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3314,7 +2969,6 @@
 			"output": [
 				{
 					"itemId": "item:stone",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3335,14 +2989,12 @@
 				{
 					"capacity": 6,
 					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"itemId": "item:charcoal"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
@@ -3354,13 +3006,11 @@
 				{
 					"chance": 0.55,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.12,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -3383,14 +3033,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:plank",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3402,20 +3050,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:basic-knowledge",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3427,20 +3072,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t2",
-					"quantity": 1
+					"itemId": "item:morale-t2"
 				}
 			],
 			"output": [
@@ -3468,20 +3110,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:wool",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3493,19 +3132,16 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:piglet",
-					"quantity": 1
+					"itemId": "item:piglet"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:sausage",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"itemId": "item:raw-hide",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3520,8 +3156,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:gold-ore",
-					"quantity": 1
+					"itemId": "item:gold-ore"
 				},
 				{
 					"capacity": 4,
@@ -3532,26 +3167,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:gold-ingot",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.75,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.3,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -3566,38 +3197,32 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:iron-ore",
-					"quantity": 1
+					"itemId": "item:iron-ore"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
+					"itemId": "item:coal"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:iron-ingot",
-					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.75,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.3,
 					"itemId": "item:pollution",
-					"quantity": 1,
 					"type": "chance"
 				}
 			]
@@ -3609,14 +3234,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
+					"itemId": "item:stone"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:stone-block",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3628,20 +3251,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:marble",
-					"quantity": 1
+					"itemId": "item:marble"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:marble-block",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3653,20 +3273,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:marble",
-					"quantity": 1
+					"itemId": "item:marble"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t4",
-					"quantity": 1
+					"itemId": "item:morale-t4"
 				}
 			],
 			"output": [
@@ -3684,14 +3301,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
+					"itemId": "item:stone"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:stone-block",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3703,20 +3318,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-cloth",
-					"quantity": 1
+					"itemId": "item:common-cloth"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 1
+					"itemId": "item:leather"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:common-clothing",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3728,26 +3340,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-cloth",
-					"quantity": 1
+					"itemId": "item:luxury-cloth"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 1
+					"itemId": "item:leather"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:luxury-clothing",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3759,26 +3367,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-cloth",
-					"quantity": 1
+					"itemId": "item:luxury-cloth"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 1
+					"itemId": "item:leather"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t3",
-					"quantity": 1
+					"itemId": "item:morale-t3"
 				}
 			],
 			"output": [
@@ -3796,20 +3400,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:raw-hide",
-					"quantity": 1
+					"itemId": "item:raw-hide"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:leather",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3821,8 +3422,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer-barrel",
-					"quantity": 1
+					"itemId": "item:beer-barrel"
 				}
 			],
 			"output": [
@@ -3840,8 +3440,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wine-barrel",
-					"quantity": 1
+					"itemId": "item:wine-barrel"
 				}
 			],
 			"output": [
@@ -3859,14 +3458,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-lumberjack-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3878,14 +3475,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
+					"itemId": "item:stone"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-quarry-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3897,14 +3492,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:log",
-					"quantity": 1
+					"itemId": "item:log"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-sawmill-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3916,14 +3509,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
+					"itemId": "item:stone"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-stonemason-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3935,26 +3526,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-townhall-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3966,14 +3553,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-well-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -3985,26 +3570,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-cattle-farm-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4016,20 +3597,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-chicken-coop-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4041,20 +3619,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-farm-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4066,20 +3641,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:food-supply",
-					"quantity": 1
+					"itemId": "item:food-supply"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-house-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4091,20 +3663,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-pig-farm-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4116,26 +3685,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-sheep-pasture-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4147,32 +3712,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:food-supply",
-					"quantity": 1
+					"itemId": "item:food-supply"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wool",
-					"quantity": 1
+					"itemId": "item:wool"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-townhall-t3",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4184,20 +3744,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-vegetable-garden-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4209,38 +3766,32 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:piglet",
-					"quantity": 1
+					"itemId": "item:piglet"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:milk",
-					"quantity": 1
+					"itemId": "item:milk"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:egg",
-					"quantity": 1
+					"itemId": "item:egg"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:vegetables",
-					"quantity": 1
+					"itemId": "item:vegetables"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:food-supply",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4252,14 +3803,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:wheat-field",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4271,20 +3820,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:flour",
-					"quantity": 1
+					"itemId": "item:flour"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-bakery-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4296,26 +3842,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-brewery-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4327,26 +3869,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:vegetables",
-					"quantity": 1
+					"itemId": "item:vegetables"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
+					"itemId": "item:stone-block"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-cookhouse-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4358,20 +3896,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:milk",
-					"quantity": 1
+					"itemId": "item:milk"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-dairy-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4383,26 +3918,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer",
-					"quantity": 1
+					"itemId": "item:beer"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-house-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4414,26 +3945,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
+					"itemId": "item:sausage"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-market-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4445,20 +3972,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:piglet",
-					"quantity": 1
+					"itemId": "item:piglet"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-slaughterhouse-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4470,20 +3994,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:beer-barrel",
-					"quantity": 1
+					"itemId": "item:beer-barrel"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-tavern-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4495,8 +4016,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 8,
@@ -4520,7 +4040,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-townhall-t4",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4532,20 +4051,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-windmill-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4557,26 +4073,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-winery-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4588,20 +4100,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:hop-field",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4613,20 +4122,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:vineyard",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4638,26 +4144,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-civic-office-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4669,32 +4171,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-cloth",
-					"quantity": 1
+					"itemId": "item:common-cloth"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:vegetables",
-					"quantity": 1
+					"itemId": "item:vegetables"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-dye-workshop-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4706,20 +4203,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
+					"itemId": "item:common-clothing"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 12,
@@ -4731,7 +4225,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-house-t3",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4743,14 +4236,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 8,
@@ -4762,7 +4253,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-market-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4774,26 +4264,22 @@
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
+					"itemId": "item:plank"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-paper-mill-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4805,14 +4291,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 8,
@@ -4824,7 +4308,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-prospector-guild-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4836,20 +4319,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				},
 				{
 					"capacity": 8,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-school",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4861,32 +4341,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:common-cloth",
-					"quantity": 1
+					"itemId": "item:common-cloth"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 1
+					"itemId": "item:leather"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-tailor-workshop-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4898,26 +4373,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:raw-hide",
-					"quantity": 1
+					"itemId": "item:raw-hide"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-tannery-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4929,26 +4400,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
+					"itemId": "item:building-permit"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wool",
-					"quantity": 1
+					"itemId": "item:wool"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
+					"itemId": "item:paper"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-weaver-hut-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -4960,14 +4427,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
+					"itemId": "item:basic-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
+					"itemId": "item:coin"
 				}
 			],
 			"output": [
@@ -4985,8 +4450,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
+					"itemId": "item:bread"
 				}
 			],
 			"output": [
@@ -5004,20 +4468,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 2,
 					"consume": true,
-					"itemId": "item:treasure-chest",
-					"quantity": 1
+					"itemId": "item:treasure-chest"
 				},
 				{
 					"capacity": 4,
@@ -5034,8 +4495,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 8,
@@ -5053,7 +4513,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-cathedral",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5065,14 +4524,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 6,
@@ -5083,20 +4540,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:pigment",
-					"quantity": 1
+					"itemId": "item:pigment"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-glazier-workshop-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5108,32 +4562,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
+					"itemId": "item:luxury-clothing"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
+					"itemId": "item:feast"
 				},
 				{
 					"capacity": 6,
@@ -5145,7 +4594,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-heroes-guild-t1",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5157,32 +4605,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 2,
 					"consume": true,
-					"itemId": "item:treasure-chest",
-					"quantity": 1
+					"itemId": "item:treasure-chest"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
+					"itemId": "item:marble-block"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
+					"itemId": "item:stained-glass"
 				},
 				{
 					"capacity": 6,
@@ -5206,7 +4649,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-house-of-engineers",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5218,20 +4660,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
+					"itemId": "item:marble-block"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
+					"itemId": "item:stained-glass"
 				},
 				{
 					"capacity": 6,
@@ -5243,7 +4682,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-house-t4",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5255,26 +4693,22 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 2,
 					"consume": true,
-					"itemId": "item:treasure-chest",
-					"quantity": 1
+					"itemId": "item:treasure-chest"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
+					"itemId": "item:marble-block"
 				},
 				{
 					"capacity": 4,
@@ -5291,8 +4725,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:sapphire",
-					"quantity": 1
+					"itemId": "item:sapphire"
 				},
 				{
 					"capacity": 6,
@@ -5304,7 +4737,6 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-mage-lodge",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5316,32 +4748,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
+					"itemId": "item:construction-bundle"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-quarry-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5353,32 +4780,27 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
+					"itemId": "item:master-knowledge"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
+					"itemId": "item:guild-charter"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
+					"itemId": "item:stained-glass"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:blueprint-stonemason-t2",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5402,20 +4824,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
+					"itemId": "item:glass"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:master-knowledge",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5439,20 +4858,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
+					"itemId": "item:glass"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
+					"itemId": "item:coin-stack"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:morale-t4",
-					"quantity": 1
+					"itemId": "item:morale-t4"
 				}
 			],
 			"output": [
@@ -5480,14 +4896,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:vegetables",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5499,14 +4913,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:wool",
-					"quantity": 1
+					"itemId": "item:wool"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:common-cloth",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5517,7 +4929,6 @@
 			"output": [
 				{
 					"itemId": "item:water",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5529,14 +4940,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
+					"itemId": "item:grain"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:flour",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5548,14 +4957,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:grapes",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5567,20 +4974,17 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:grapes",
-					"quantity": 1
+					"itemId": "item:grapes"
 				},
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:water"
 				}
 			],
 			"output": [
 				{
 					"itemId": "item:wine-barrel",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]
@@ -5599,7 +5003,6 @@
 			"output": [
 				{
 					"itemId": "item:wine-barrel",
-					"quantity": 1,
 					"type": "guaranteed"
 				}
 			]

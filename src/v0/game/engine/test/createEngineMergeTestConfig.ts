@@ -8,7 +8,6 @@ export const createEngineMergeTestConfig = () => {
 			...config.items,
 			"item:water": {
 				assetId: "asset:test",
-				code: "water",
 				description: "Water",
 				maxStackSize: 3,
 				mergeIds: [
@@ -21,7 +20,6 @@ export const createEngineMergeTestConfig = () => {
 			},
 			"item:sprout": {
 				assetId: "asset:test",
-				code: "sprout",
 				description: "Sprout",
 				maxStackSize: 3,
 				name: "Sprout",

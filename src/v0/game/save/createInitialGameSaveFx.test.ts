@@ -33,7 +33,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 		items: {
 			"item:producer": {
 				assetId: "asset:test",
-				code: "producer",
 				description: "Producer",
 				maxStackSize: 1,
 				name: "Producer",
@@ -42,7 +41,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 			"item:twig": {
 				assetId: "asset:test",
-				code: "twig",
 				description: "Twig",
 				maxStackSize: 5,
 				name: "Twig",

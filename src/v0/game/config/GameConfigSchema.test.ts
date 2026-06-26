@@ -124,7 +124,6 @@ const createValidConfigValue = () => ({
 	items: {
 		"item:producer": {
 			assetId: "asset:item",
-			code: "producer",
 			description: "Producer",
 			maxStackSize: 1,
 			name: "Producer",
@@ -133,7 +132,6 @@ const createValidConfigValue = () => ({
 		},
 		"item:twig": {
 			assetId: "asset:item",
-			code: "twig",
 			description: "Twig",
 			maxStackSize: 3,
 			name: "Twig",
@@ -144,7 +142,6 @@ const createValidConfigValue = () => ({
 		},
 		"item:plank": {
 			assetId: "asset:item",
-			code: "plank",
 			description: "Plank",
 			maxStackSize: 2,
 			name: "Plank",
@@ -153,7 +150,6 @@ const createValidConfigValue = () => ({
 		},
 		"item:craft-target": {
 			assetId: "asset:item",
-			code: "craft-target",
 			description: "Craft target",
 			maxStackSize: 1,
 			name: "Craft Target",
@@ -327,13 +323,6 @@ describe("GameConfigSchema", () => {
 		config.items["item:twig"].assetId = "asset:ui";
 
 		expect(() => parseGameConfig(config)).toThrow(/must have kind/);
-	});
-
-	it("rejects duplicate item authoring codes", () => {
-		const config = createValidConfigValue();
-		config.items["item:plank"].code = "twig";
-
-		expect(() => parseGameConfig(config)).toThrow(/Duplicate item code/);
 	});
 
 	it("rejects duplicate producer product lines", () => {

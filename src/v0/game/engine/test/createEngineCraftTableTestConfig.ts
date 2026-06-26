@@ -22,7 +22,6 @@ export const createEngineCraftTableTestConfig = ({
 			...baseConfig.items,
 			"item:craft-table": {
 				assetId: "asset:test",
-				code: "craft-table",
 				description: "Craft table",
 				maxStackSize: 1,
 				name: "Craft Table",

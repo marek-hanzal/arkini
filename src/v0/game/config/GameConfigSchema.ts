@@ -15,7 +15,7 @@ import { z } from "zod";
  * after compile/merge the engine must only see this single shape:
  *
  * ```txt
- * resources -> assets -> items -> merge/producers/products/stashes/craft/loot
+ * resources -> assets -> items -> merge/producers/products/stashes/craft/effects
  * ```
  *
  * The package contains static game truth only. Mutable save state such as occupied
@@ -48,15 +48,13 @@ import { z } from "zod";
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
  *   definitions are owned by exactly one producer line. Producer shells do not own
- *   inputs; product lines own their normal `inputs` inline. `inputRefId` remains only
- *   for rare shared/legacy bundles. Runtime may still choose between multiple product lines accepting the same dragged
+ *   inputs. Runtime may still choose between multiple product lines accepting the same dragged
  *   item by default-line priority, then configured order. `maxQueueSize` is a hard per-producer-instance cap
  *   covering both running and queued jobs.
  * - Product inputs are stored per product line. Craft inputs are stored per craft
  *   target instance until the player explicitly starts the craft. Completion replaces
  *   the target with exactly one result item.
- * - Product lines own their normal `output` inline. `outputTableId` remains only for
- *   rare reusable loot tables. A product without `output` or `outputTableId` is valid.
+ * - Product lines own their normal `output` inline. A product without `output` is valid.
  *   That is a delayed sink/destructor such as a shredder.
  * - `items.*.removeBy` is a generic board/tile removal rule. It is not producer logic.
  *
@@ -229,14 +227,6 @@ const PassiveItemRequirementSchema = z
 
 const ActivationInputSchema = z.array(ItemStackInputSchema);
 
-/** Optional shared/legacy product-line input bundle. Normal product inputs live inline on products. */
-const ProductInputDefinitionSchema = z
-	.object({
-		name: z.string().min(1),
-		inputs: ActivationInputSchema,
-	})
-	.strict();
-
 const ActivationRequirementSchema = z.array(
 	z.discriminatedUnion("type", [
 		StoredItemRequirementSchema,
@@ -326,6 +316,49 @@ const GameEffectItemOperationBaseSchema = {
 	target: GameEffectItemTargetSchema,
 };
 
+/**
+ * Loot output model.
+ *
+ * `guaranteed` always emits, `chance` is an independent probability roll, and
+ * `weighted` chooses from weighted entries for the configured number of rolls.
+ */
+const ActivationOutputSchema = z.array(
+	z.discriminatedUnion("type", [
+		z
+			.object({
+				type: z.literal("guaranteed"),
+				itemId: IdSchema,
+				quantity: QuantitySchema.optional(),
+			})
+			.strict(),
+		z
+			.object({
+				type: z.literal("chance"),
+				itemId: IdSchema,
+				chance: z.number().min(0).max(1),
+				quantity: QuantitySchema.optional(),
+			})
+			.strict(),
+		z
+			.object({
+				type: z.literal("weighted"),
+				rolls: QuantitySchema.optional(),
+				entries: z
+					.array(
+						z
+							.object({
+								itemId: IdSchema,
+								weight: PositiveIntegerSchema,
+								quantity: QuantitySchema.optional(),
+							})
+							.strict(),
+					)
+					.min(1),
+			})
+			.strict(),
+	]),
+);
+
 /** Runtime-only product-line and loot mutator operation. */
 const GameEffectOperationSchema = z.discriminatedUnion("kind", [
 	z
@@ -364,16 +397,16 @@ const GameEffectOperationSchema = z.discriminatedUnion("kind", [
 	z
 		.object({
 			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("loot.appendTable"),
-			lootTableId: IdSchema,
+			kind: z.literal("loot.appendOutput"),
+			output: ActivationOutputSchema.min(1),
 			chance: ProbabilitySchema.optional(),
 		})
 		.strict(),
 	z
 		.object({
 			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("loot.replaceTable"),
-			lootTableId: IdSchema,
+			kind: z.literal("loot.replaceOutput"),
+			output: ActivationOutputSchema.min(1),
 		})
 		.strict(),
 	z
@@ -436,49 +469,6 @@ const GameRequirementDefinitionSchema = z.discriminatedUnion("type", [
 	PassiveItemRequirementSchema,
 	ProximityItemRequirementSchema,
 ]);
-
-/**
- * Loot output model.
- *
- * `guaranteed` always emits, `chance` is an independent probability roll, and
- * `weighted` chooses from weighted entries for the configured number of rolls.
- */
-const ActivationOutputSchema = z.array(
-	z.discriminatedUnion("type", [
-		z
-			.object({
-				type: z.literal("guaranteed"),
-				itemId: IdSchema,
-				quantity: QuantitySchema.optional(),
-			})
-			.strict(),
-		z
-			.object({
-				type: z.literal("chance"),
-				itemId: IdSchema,
-				chance: z.number().min(0).max(1),
-				quantity: QuantitySchema.optional(),
-			})
-			.strict(),
-		z
-			.object({
-				type: z.literal("weighted"),
-				rolls: QuantitySchema.optional(),
-				entries: z
-					.array(
-						z
-							.object({
-								itemId: IdSchema,
-								weight: PositiveIntegerSchema,
-								quantity: QuantitySchema.optional(),
-							})
-							.strict(),
-					)
-					.min(1),
-			})
-			.strict(),
-	]),
-);
 
 /** Package-level board/inventory dimensions and human-readable title. */
 const GameMetaSchema = z
@@ -589,7 +579,7 @@ const StashDefinitionSchema = z
 	.object({
 		type: z.literal("stash"),
 		placement: PlacementSchema,
-		outputTableId: IdSchema,
+		output: ActivationOutputSchema.min(1),
 		inputs: ActivationInputSchema,
 		requirements: ActivationRequirementSchema,
 		charges: PositiveIntegerSchema,
@@ -620,17 +610,10 @@ const CraftRecipeSchema = z
 	.strict();
 
 /** Reusable output table referenced by stashes/effects and rare shared product outputs. */
-const LootTableDefinitionSchema = z
-	.object({
-		name: z.string().min(1),
-		output: ActivationOutputSchema.min(1),
-	})
-	.strict();
-
 /**
  * Producer product line.
  *
- * Missing `output` and `outputTableId` means a valid delayed sink/destructor product.
+ * Missing `output` means a valid delayed sink/destructor product.
  * `visibility: "hidden"` makes the line hidden until an effect reveals it.
  */
 const ProductDefinitionSchema = z
@@ -646,11 +629,9 @@ const ProductDefinitionSchema = z
 		durationMs: PositiveIntegerSchema,
 		placement: PlacementSchema,
 		inputs: ActivationInputSchema.optional(),
-		inputRefId: IdSchema.optional(),
 		requirementIds: z.array(IdSchema),
 		hinderedBy: GameHindrancesSchema.optional(),
 		output: ActivationOutputSchema.min(1).optional(),
-		outputTableId: IdSchema.optional(),
 		activatesEffectId: IdSchema.optional(),
 	})
 	.strict();
@@ -690,14 +671,12 @@ const GameConfigFragmentSchema = z
 		assets: z.record(IdSchema, AssetDefinitionSchema).optional(),
 		items: z.record(IdSchema, ItemDefinitionSchema).optional(),
 		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
-		inputs: z.record(IdSchema, ProductInputDefinitionSchema).optional(),
 		requirements: z.record(IdSchema, GameRequirementDefinitionSchema).optional(),
 		effects: z.record(IdSchema, GameEffectDefinitionSchema).optional(),
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema).optional(),
 		products: z.record(IdSchema, ProductDefinitionSchema).optional(),
-		lootTables: z.record(IdSchema, LootTableDefinitionSchema).optional(),
 		startingState: StartingStateDefinitionSchema.optional(),
 	})
 	.strict();
@@ -711,14 +690,12 @@ const BaseGameConfigSchema = z
 		assets: z.record(IdSchema, AssetDefinitionSchema),
 		items: z.record(IdSchema, ItemDefinitionSchema),
 		merge: z.record(IdSchema, MergeDefinitionSchema),
-		inputs: z.record(IdSchema, ProductInputDefinitionSchema),
 		requirements: z.record(IdSchema, GameRequirementDefinitionSchema),
 		effects: z.record(IdSchema, GameEffectDefinitionSchema).default({}),
 		producers: z.record(IdSchema, ProducerDefinitionSchema),
 		stashes: z.record(IdSchema, StashDefinitionSchema),
 		craftRecipes: z.record(IdSchema, CraftRecipeSchema),
 		products: z.record(IdSchema, ProductDefinitionSchema),
-		lootTables: z.record(IdSchema, LootTableDefinitionSchema),
 		startingState: StartingStateDefinitionSchema,
 	})
 	.strict();
@@ -735,14 +712,12 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasAsset = createRecordGuard(value.assets);
 	const hasItem = createRecordGuard(value.items);
 	const hasMerge = createRecordGuard(value.merge);
-	const hasInput = createRecordGuard(value.inputs);
 	const hasRequirement = createRecordGuard(value.requirements);
 	const hasEffect = createRecordGuard(value.effects);
 	const hasProducer = createRecordGuard(value.producers);
 	const hasProduct = createRecordGuard(value.products);
 	const hasStash = createRecordGuard(value.stashes);
 	const hasCraftRecipe = createRecordGuard(value.craftRecipes);
-	const hasLootTable = createRecordGuard(value.lootTables);
 
 	validateUniqueRecordField(
 		ctx,
@@ -943,19 +918,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
-	for (const [inputId, inputDefinition] of Object.entries(value.inputs)) {
-		validateItemInputs(
-			ctx,
-			[
-				"inputs",
-				inputId,
-				"inputs",
-			],
-			inputDefinition.inputs,
-			hasItem,
-		);
-	}
-
 	for (const [requirementId, requirement] of Object.entries(value.requirements)) {
 		validateGameRequirement(
 			ctx,
@@ -1004,20 +966,18 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				);
 			}
 
-			if (
-				(operation.kind === "loot.appendTable" || operation.kind === "loot.replaceTable") &&
-				!hasLootTable(operation.lootTableId)
-			) {
-				addIssue(
+			if (operation.kind === "loot.appendOutput" || operation.kind === "loot.replaceOutput") {
+				validateActivationOutput(
 					ctx,
 					[
 						"effects",
 						effectId,
 						"operations",
 						operationIndex,
-						"lootTableId",
+						"output",
 					],
-					`Missing loot table "${operation.lootTableId}".`,
+					operation.output,
+					hasItem,
 				);
 			}
 
@@ -1087,17 +1047,16 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [stashId, stash] of Object.entries(value.stashes)) {
-		if (!hasLootTable(stash.outputTableId)) {
-			addIssue(
-				ctx,
-				[
-					"stashes",
-					stashId,
-					"outputTableId",
-				],
-				`Missing loot table "${stash.outputTableId}".`,
-			);
-		}
+		validateActivationOutput(
+			ctx,
+			[
+				"stashes",
+				stashId,
+				"output",
+			],
+			stash.output,
+			hasItem,
+		);
 
 		validateItemInputs(
 			ctx,
@@ -1169,31 +1128,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		);
 	}
 
-	for (const [lootTableId, lootTable] of Object.entries(value.lootTables)) {
-		validateActivationOutput(
-			ctx,
-			[
-				"lootTables",
-				lootTableId,
-				"output",
-			],
-			lootTable.output,
-			hasItem,
-		);
-	}
-
 	for (const [productId, product] of Object.entries(value.products)) {
-		if (product.inputRefId && !hasInput(product.inputRefId)) {
-			addIssue(
-				ctx,
-				[
-					"products",
-					productId,
-					"inputRefId",
-				],
-				`Missing input "${product.inputRefId}".`,
-			);
-		}
 		if (product.inputs) {
 			validateItemInputs(
 				ctx,
@@ -1204,18 +1139,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				],
 				product.inputs,
 				hasItem,
-			);
-		}
-
-		if (product.inputRefId && product.inputs) {
-			addIssue(
-				ctx,
-				[
-					"products",
-					productId,
-					"inputs",
-				],
-				"Product lines must not define both inputs and inputRefId.",
 			);
 		}
 		validateRequirementIds(
@@ -1249,18 +1172,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			product.tags,
 			(value) => `Duplicate tag "${value}".`,
 		);
-
-		if (product.outputTableId && !hasLootTable(product.outputTableId)) {
-			addIssue(
-				ctx,
-				[
-					"products",
-					productId,
-					"outputTableId",
-				],
-				`Missing loot table "${product.outputTableId}".`,
-			);
-		}
 		if (product.output) {
 			validateActivationOutput(
 				ctx,
@@ -1271,18 +1182,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				],
 				product.output,
 				hasItem,
-			);
-		}
-
-		if (product.outputTableId && product.output) {
-			addIssue(
-				ctx,
-				[
-					"products",
-					productId,
-					"output",
-				],
-				"Product lines must not define both output and outputTableId.",
 			);
 		}
 
@@ -1298,7 +1197,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 
-		if (product.activatesEffectId && (product.outputTableId || product.output)) {
+		if (product.activatesEffectId && product.output) {
 			addIssue(
 				ctx,
 				[
@@ -1306,7 +1205,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					productId,
 					"activatesEffectId",
 				],
-				"Active effect product lines must not also define output or outputTableId.",
+				"Active effect product lines must not also define output.",
 			);
 		}
 	}
@@ -1561,51 +1460,6 @@ const validateProductLineOwnership = (
 
 			ownerByProductId.set(productId, producerId);
 		}
-	}
-
-	validateProductInputRefOwnership(
-		ctx,
-		[
-			"products",
-		],
-		Object.fromEntries(
-			Object.entries(config.products).flatMap(([productId, product]) =>
-				product.inputRefId
-					? [
-							[
-								productId,
-								product.inputRefId,
-							],
-						]
-					: [],
-			),
-		),
-	);
-};
-
-const validateProductInputRefOwnership = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	inputRefIdByProductId: Readonly<Record<string, string>>,
-) => {
-	const productIdByInputRefId = new Map<string, string>();
-
-	for (const [productId, inputRefId] of Object.entries(inputRefIdByProductId)) {
-		const previousProductId = productIdByInputRefId.get(inputRefId);
-		if (previousProductId) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					productId,
-					"inputRefId",
-				],
-				`Input ref "${inputRefId}" must be owned by exactly one product line. First used by "${previousProductId}".`,
-			);
-			continue;
-		}
-
-		productIdByInputRefId.set(inputRefId, productId);
 	}
 };
 

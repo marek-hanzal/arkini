@@ -4,7 +4,6 @@ import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectivePr
 import { rollGameQuantityFx } from "~/v0/game/loot/rollGameQuantityFx";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import type { LootTableRollResult } from "~/v0/game/loot/LootTableRollResult";
-import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 
 export namespace rollEffectiveLootPlanItemsFx {
@@ -17,7 +16,7 @@ export namespace rollEffectiveLootPlanItemsFx {
 const rollLootOutputFx = Effect.fn("rollLootOutputFx")(function* ({
 	output,
 }: {
-	output: GameConfig["lootTables"][string]["output"];
+	output: NonNullable<GameConfig["products"][string]["output"]>;
 }) {
 	return yield* rollLootTableItemsFx({
 		lootTable: {
@@ -27,58 +26,24 @@ const rollLootOutputFx = Effect.fn("rollLootOutputFx")(function* ({
 	});
 });
 
-const rollLootTableByIdFx = Effect.fn("rollLootTableByIdFx")(function* ({
-	config,
-	lootTableId,
-}: {
-	config: GameConfig;
-	lootTableId: string;
-}) {
-	const lootTable = config.lootTables[lootTableId];
-	if (!lootTable) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing loot table "${lootTableId}".`),
-		);
-	}
-
-	return yield* rollLootTableItemsFx({
-		lootTable,
-	});
-});
-
 export const rollEffectiveLootPlanItemsFx = Effect.fn("rollEffectiveLootPlanItemsFx")(function* ({
-	config,
 	lootPlan,
 }: rollEffectiveLootPlanItemsFx.Props) {
 	const random = yield* RandomServiceFx;
 	const items: LootTableRollResult["items"] = [];
 
-	if (
-		(lootPlan.baseOutput.length > 0 || lootPlan.lootTableIds.length > 0) &&
-		random.chance(lootPlan.baseDropChance)
-	) {
-		if (lootPlan.baseOutput.length > 0) {
-			const rolled = yield* rollLootOutputFx({
-				output: lootPlan.baseOutput,
-			});
-			items.push(...rolled.items);
-		}
-
-		for (const lootTableId of lootPlan.lootTableIds) {
-			const rolled = yield* rollLootTableByIdFx({
-				config,
-				lootTableId,
-			});
-			items.push(...rolled.items);
-		}
+	if (lootPlan.baseOutput.length > 0 && random.chance(lootPlan.baseDropChance)) {
+		const rolled = yield* rollLootOutputFx({
+			output: lootPlan.baseOutput,
+		});
+		items.push(...rolled.items);
 	}
 
-	for (const appendTable of lootPlan.appendTables) {
-		if (!random.chance(appendTable.chance)) continue;
+	for (const appendOutput of lootPlan.appendOutputs) {
+		if (!random.chance(appendOutput.chance)) continue;
 
-		const rolled = yield* rollLootTableByIdFx({
-			config,
-			lootTableId: appendTable.lootTableId,
+		const rolled = yield* rollLootOutputFx({
+			output: appendOutput.output,
 		});
 		items.push(...rolled.items);
 	}

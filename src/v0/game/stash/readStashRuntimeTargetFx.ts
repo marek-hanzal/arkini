@@ -32,15 +32,8 @@ export const readStashRuntimeTargetFx = Effect.fn("readStashRuntimeTargetFx")(fu
 		);
 	}
 
-	const lootTable = config.lootTables[stash.outputTableId];
-	if (!lootTable) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing loot table "${stash.outputTableId}".`),
-		);
-	}
-
 	return {
-		lootTable,
+		output: stash.output,
 		stash,
 		stashId,
 		stashItem,

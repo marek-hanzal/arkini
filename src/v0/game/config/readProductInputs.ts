@@ -6,13 +6,4 @@ export const readProductInputs = ({
 }: {
 	config: GameConfig;
 	productId: string;
-}) => {
-	const product = config.products[productId];
-	if (!product) return [];
-	if (product.inputs) return product.inputs;
-
-	const inputRefId = product.inputRefId;
-	if (!inputRefId) return [];
-
-	return config.inputs[inputRefId]?.inputs ?? [];
-};
+}) => config.products[productId]?.inputs ?? [];

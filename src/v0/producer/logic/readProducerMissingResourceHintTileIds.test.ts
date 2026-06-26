@@ -14,17 +14,6 @@ const config = {
 			producerId: "producer:target",
 		},
 	},
-	lootTables: {
-		"loot:water": {
-			output: [
-				{
-					itemId: "item:water",
-					quantity: 1,
-					type: "guaranteed",
-				},
-			],
-		},
-	},
 	producers: {
 		"producer:source": {
 			productIds: [
@@ -39,7 +28,13 @@ const config = {
 	},
 	products: {
 		"product:source-water": {
-			outputTableId: "loot:water",
+			output: [
+				{
+					itemId: "item:water",
+					quantity: 1,
+					type: "guaranteed",
+				},
+			],
 		},
 		"product:target": {},
 	},

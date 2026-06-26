@@ -110,12 +110,7 @@ export const readEffectiveProducerProductLine = ({
 	let durationMultiplier = 1;
 	let baseDropChance = 1;
 	let baseOutput = product.output ?? [];
-	let lootTableIds = product.outputTableId
-		? [
-				product.outputTableId,
-			]
-		: [];
-	const appendTables: EffectiveProducerProductLine["lootPlan"]["appendTables"] = [];
+	const appendOutputs: EffectiveProducerProductLine["lootPlan"]["appendOutputs"] = [];
 	const chanceItems: EffectiveProducerProductLine["lootPlan"]["chanceItems"] = [];
 	const appliedEffects: AppliedGameEffectOperation[] = [];
 	const blockReasons: AppliedGameEffectOperation[] = [];
@@ -212,23 +207,21 @@ export const readEffectiveProducerProductLine = ({
 				)
 				.with(
 					{
-						kind: "loot.appendTable",
+						kind: "loot.appendOutput",
 					},
 					(operation) => {
-						appendTables.push({
+						appendOutputs.push({
 							chance: operation.chance ?? 1,
-							lootTableId: operation.lootTableId,
+							output: operation.output,
 						});
 					},
 				)
 				.with(
 					{
-						kind: "loot.replaceTable",
+						kind: "loot.replaceOutput",
 					},
 					(operation) => {
-						lootTableIds = [
-							operation.lootTableId,
-						];
+						baseOutput = operation.output;
 					},
 				)
 				.with(
@@ -261,11 +254,10 @@ export const readEffectiveProducerProductLine = ({
 		blockReasons,
 		durationMs: Math.max(1, Math.ceil((baseDurationMs + durationAddMs) * durationMultiplier)),
 		lootPlan: {
-			appendTables,
+			appendOutputs,
 			baseDropChance: clampProbability(baseDropChance),
 			baseOutput,
 			chanceItems,
-			lootTableIds,
 		},
 		visible: revealed && !hidden,
 	};

@@ -671,7 +671,7 @@ Because inventory is passive, producer jobs require the producer item to be on t
 
 ### 10.4 Producer product lines
 
-A producer owns ordered product lines through `productIds`. Each product line defines its own duration, inline inputs, requirements, placement, tags, baseline runtime visibility, optional active-effect activation, and inline output. `inputRefId` and `outputTableId` remain only rare shared/legacy escape hatches; normal product data lives on the product itself.
+A producer owns ordered product lines through `productIds`. Each product line defines its own duration, inline inputs, requirements, placement, tags, baseline runtime visibility, optional active-effect activation, and inline output. There are no legacy product input/output reference tables; product-specific data lives on the product itself.
 
 Product lines can start as `visibility: "hidden"` and be revealed by runtime effects. Hidden lines are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. A matching hide effect has higher priority than reveal. A matching block effect leaves the line visible but prevents starting new production. Running jobs are not paused or cancelled by block effects, because the game already has enough ways to generate admin work without inventing time-travel bookkeeping.
 
@@ -681,7 +681,7 @@ Runtime effects are product-line mutators and item-creation rules. They do not p
 
 Passive effects come from items via `passiveEffectIds`. Each effect definition decides where its source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Local effects must be board-sourced because distance needs a board cell; config validation rejects local effects that claim inventory/both source scope. Inventory-sourced effects are for global hard rules such as path locks. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
 
-Effects currently operate on product-line visibility, start blocking, duration, loot plan evaluation, and item creation blocking. They can reveal or hide lines, block starts, add or multiply duration, append or replace loot tables, add chance item drops, adjust the chance that base loot is rolled, and block creation of matching items. They intentionally do not mutate config, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
+Effects currently operate on product-line visibility, start blocking, duration, output plan evaluation, and item creation blocking. They can reveal or hide lines, block starts, add or multiply duration, append or replace inline output, add chance item drops, adjust the chance that base output is rolled, and block creation of matching items. They intentionally do not mutate config, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
 
 Effect conflict rules are simple: hide beats reveal, any product-line block blocks start, and any matching `item.blockCreate` blocks creation while the effect applies. Numeric duration and loot chance operations are aggregated deterministically after effects are sorted by scope and activation/source order.
 
@@ -703,7 +703,7 @@ If the default line is full, feeding continues to the next matching line.
 
 ### 10.5 Producer loot output and sink products
 
-A product line normally owns its generated `output` inline. Named loot tables remain for stashes, runtime effect mutations, and deliberately shared output tables.
+A product line owns its generated `output` inline. Stashes and runtime effects also own their output inline, so normal gameplay data is readable at the point of use.
 
 A loot-producing product may generate:
 
@@ -711,9 +711,9 @@ A loot-producing product may generate:
 - multiple different items
 - multiple copies of the same item
 
-The output count and probability rules must be encoded in product `output` data or an intentionally shared loot table, not hidden in UI code or random item definitions.
+The output count and probability rules must be encoded in product `output` data, not hidden in UI code or random item definitions.
 
-A product line may also omit both `output` and `outputTableId`. Missing output means a valid delayed sink/destructor product: the product job consumes its inputs, waits for its duration, completes, and creates no output. This is not a zero-output loot table. It is an explicit no-output product.
+A product line may omit `output`. Missing output means a valid delayed sink/destructor product: the product job consumes its inputs, waits for its duration, completes, and creates no output. This is an explicit no-output product.
 
 ### 10.6 Producer output placement and blocked delivery
 

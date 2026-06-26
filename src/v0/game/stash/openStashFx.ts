@@ -35,7 +35,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	action,
 	nowMs,
 }: openStashFx.Props) {
-	const { lootTable, remainingCharges, stash, stashId, stashItem } = yield* readStashOpenCoreFx({
+	const { output, remainingCharges, stash, stashId, stashItem } = yield* readStashOpenCoreFx({
 		config,
 		save,
 		stashItemInstanceId: action.stashItemInstanceId,
@@ -92,7 +92,10 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	const placementRequests: GameSaveItemPlacementRequest[] = [];
 	for (let chargeIndex = 0; chargeIndex < remainingCharges; chargeIndex += 1) {
 		const roll = yield* rollLootTableItemsFx({
-			lootTable,
+			lootTable: {
+				name: stashId,
+				output,
+			},
 		});
 		placementRequests.push(
 			...roll.items.map(

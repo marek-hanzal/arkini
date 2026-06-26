@@ -120,19 +120,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				withItemId: "item:twig",
 			},
 		},
-		inputs: {
-			"input:shred": {
-				name: "Shred input",
-				inputs: [
-					{
-						capacity: 1,
-						consume: true,
-						itemId: "item:twig",
-						quantity: 1,
-					},
-				],
-			},
-		},
 		producers: {
 			"producer:test": {
 				maxQueueSize: 1,
@@ -148,13 +135,26 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 			"product:test": {
 				durationMs: 1000,
 				name: "Test product",
-				outputTableId: "loot:test",
+				output: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+						type: "guaranteed",
+					},
+				],
 				placement: "board_then_inventory",
 				requirementIds: [],
 			},
 			"product:shred": {
 				durationMs: 1000,
-				inputRefId: "input:shred",
+				inputs: [
+					{
+						capacity: 1,
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
 				name: "Shred",
 				placement: "board_then_inventory",
 				requirementIds: [],
@@ -172,7 +172,13 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 					},
 				],
 				onDepleted: "remove",
-				outputTableId: "loot:test",
+				output: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+						type: "guaranteed",
+					},
+				],
 				placement: "board_then_inventory",
 				requirements: [],
 				type: "stash",
@@ -190,18 +196,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				],
 				requirements: [],
 				resultItemId: "item:plank",
-			},
-		},
-		lootTables: {
-			"loot:test": {
-				name: "Test loot",
-				output: [
-					{
-						itemId: "item:twig",
-						quantity: 2,
-						type: "guaranteed",
-					},
-				],
 			},
 		},
 		startingState: {

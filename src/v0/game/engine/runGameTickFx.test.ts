@@ -22,7 +22,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -97,7 +96,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -176,7 +174,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -223,7 +220,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -276,7 +272,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -343,7 +338,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -414,7 +408,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -428,10 +421,10 @@ describe("runGameTickFx", () => {
 		});
 		const changedConfig = createEngineTestConfig({
 			...config,
-			lootTables: {
-				...config.lootTables,
-				"loot:test": {
-					name: "Changed loot",
+			products: {
+				...config.products,
+				"product:test": {
+					...config.products["product:test"],
 					output: [
 						{
 							itemId: "item:plank",
@@ -488,7 +481,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -548,18 +540,6 @@ describe("runGameTickFx", () => {
 				],
 				inventory: [],
 			},
-			lootTables: {
-				"loot:test": {
-					name: "Test loot",
-					output: [
-						{
-							itemId: "item:twig",
-							quantity: 1,
-							type: "guaranteed",
-						},
-					],
-				},
-			},
 		});
 		const save = runInitialSave({
 			config,
@@ -568,7 +548,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -577,7 +556,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:2"] = {
 			readyAtMs: 1000,
 			id: "job:2",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:2",
 			productId: "product:test",
@@ -719,7 +697,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: null,
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:shred",
@@ -777,7 +754,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -853,7 +829,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -862,7 +837,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:2"] = {
 			readyAtMs: 2000,
 			id: "job:2",
-			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",

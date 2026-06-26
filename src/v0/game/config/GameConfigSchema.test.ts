@@ -53,7 +53,6 @@ type TestProduct = {
 	tags?: string[];
 	visibility?: "visible" | "hidden";
 	inputs?: TestProductInput[];
-	inputRefId?: string;
 	name: string;
 	output?: {
 		chance?: number;
@@ -67,7 +66,6 @@ type TestProduct = {
 		rolls?: number;
 		type: "chance" | "guaranteed" | "weighted";
 	}[];
-	outputTableId?: string;
 	placement: "board_then_inventory";
 	requirementIds: string[];
 };
@@ -184,9 +182,10 @@ const createValidConfigValue = () => ({
 			resultItemId: "item:plank",
 		},
 	} as Record<string, TestCraftRecipe>,
-	inputs: {
-		"input:test": {
-			name: "Test input",
+	products: {
+		"product:test": {
+			hinderedBy: [] as TestGameHindrance[],
+			durationMs: 1000,
 			inputs: [
 				{
 					capacity: 2,
@@ -195,22 +194,7 @@ const createValidConfigValue = () => ({
 					quantity: 1,
 				},
 			],
-		},
-	},
-	products: {
-		"product:test": {
-			hinderedBy: [] as TestGameHindrance[],
-			durationMs: 1000,
-			inputRefId: "input:test",
 			name: "Test product",
-			outputTableId: "loot:test",
-			placement: "board_then_inventory",
-			requirementIds: [] as string[],
-		},
-	} as Record<string, TestProduct>,
-	lootTables: {
-		"loot:test": {
-			name: "Test loot",
 			output: [
 				{
 					itemId: "item:twig",
@@ -218,8 +202,10 @@ const createValidConfigValue = () => ({
 					type: "guaranteed",
 				},
 			],
+			placement: "board_then_inventory",
+			requirementIds: [] as string[],
 		},
-	},
+	} as Record<string, TestProduct>,
 	startingState: {
 		board: [
 			{
@@ -374,112 +360,17 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/owned by exactly one producer/);
 	});
 
-	it("rejects product input refs shared across product lines", () => {
-		const config = createValidConfigValue();
-		config.products["product:second"] = {
-			...config.products["product:test"],
-			name: "Second product",
-		};
-		config.producers["producer:test"].productIds.push("product:second");
-
-		expect(() => parseGameConfig(config)).toThrow(/Input ref.*input:test.*owned/);
-	});
-
-	it("allows separate product input refs to accept the same item", () => {
-		const config = createValidConfigValue();
-		(
-			config.inputs as Record<
-				string,
-				{
-					inputs: TestProductInput[];
-					name: string;
-				}
-			>
-		)["input:second"] = {
-			name: "Second input",
-			inputs: [
-				{
-					capacity: 2,
-					consume: true,
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-		};
-		config.products["product:second"] = {
-			...config.products["product:test"],
-			inputRefId: "input:second",
-			name: "Second product",
-		};
-		config.producers["producer:test"].productIds.push("product:second");
-
-		expect(parseGameConfig(config).products["product:second"].inputRefId).toBe("input:second");
-	});
-
-	it("accepts product-owned inline inputs and output", () => {
-		const config = createValidConfigValue();
-		config.products["product:test"].inputRefId = undefined;
-		config.products["product:test"].outputTableId = undefined;
-		config.products["product:test"].inputs = [
-			{
-				capacity: 2,
-				consume: true,
-				itemId: "item:twig",
-				quantity: 1,
-			},
-		];
-		config.products["product:test"].output = [
-			{
-				itemId: "item:plank",
-				quantity: 1,
-				type: "guaranteed",
-			},
-		];
-
-		expect(parseGameConfig(config).products["product:test"]).toMatchObject({
-			inputs: config.products["product:test"].inputs,
-			output: config.products["product:test"].output,
-		});
-	});
-
-	it("rejects product-owned inline inputs combined with inputRefId", () => {
-		const config = createValidConfigValue();
-		config.products["product:test"].inputs = [
-			{
-				capacity: 2,
-				consume: true,
-				itemId: "item:twig",
-				quantity: 1,
-			},
-		];
-
-		expect(() => parseGameConfig(config)).toThrow(/both inputs and inputRefId/);
-	});
-
-	it("rejects product-owned inline output combined with outputTableId", () => {
-		const config = createValidConfigValue();
-		config.products["product:test"].output = [
-			{
-				itemId: "item:plank",
-				quantity: 1,
-				type: "guaranteed",
-			},
-		];
-
-		expect(() => parseGameConfig(config)).toThrow(/both output and outputTableId/);
-	});
-
 	it("rejects activation input slots with capacity below required quantity", () => {
 		const config = createValidConfigValue();
-		config.inputs["input:test"].inputs[0].quantity = 3;
-		config.inputs["input:test"].inputs[0].capacity = 2;
+		config.products["product:test"].inputs![0]!.quantity = 3;
+		config.products["product:test"].inputs![0]!.capacity = 2;
 
 		expect(() => parseGameConfig(config)).toThrow(/Capacity must be >= quantity/);
 	});
 
 	it("rejects duplicate activation inputs for one product", () => {
 		const config = createValidConfigValue();
-		config.inputs["input:test"].inputs.push({
+		config.products["product:test"].inputs!.push({
 			capacity: 1,
 			consume: true,
 			itemId: "item:twig",
@@ -589,7 +480,7 @@ describe("GameConfigSchema", () => {
 			scope: "global",
 		};
 		config.products["product:test"].activatesEffectId = "effect:test";
-		config.products["product:test"].outputTableId = undefined;
+		config.products["product:test"].output = undefined;
 		config.products["product:test"].tags = [
 			"tag:test",
 		];
@@ -701,15 +592,12 @@ describe("GameConfigSchema", () => {
 		};
 		config.products["product:test"].activatesEffectId = "effect:test";
 
-		expect(() => parseGameConfig(config)).toThrow(
-			/must not also define output or outputTableId/,
-		);
+		expect(() => parseGameConfig(config)).toThrow(/must not also define output/);
 	});
 
 	it("rejects product active effect refs that point at missing effects", () => {
 		const config = createValidConfigValue();
 		config.products["product:test"].activatesEffectId = "effect:ghost";
-		config.products["product:test"].outputTableId = undefined;
 
 		expect(() => parseGameConfig(config)).toThrow(/Missing effect/);
 	});
@@ -771,10 +659,10 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
 	});
 
-	it("keeps structural checks for queue size and non-empty loot output", () => {
+	it("keeps structural checks for queue size and non-empty inline output", () => {
 		const config = createValidConfigValue();
 		config.producers["producer:test"].maxQueueSize = 0;
-		config.lootTables["loot:test"].output = [];
+		config.products["product:test"].output = [];
 
 		expect(() => parseGameConfig(config)).toThrow(/Too small/);
 	});

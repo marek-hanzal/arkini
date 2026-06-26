@@ -58,10 +58,6 @@ const GameSaveProducerJobSchema = z
 		id: IdSchema,
 		delivery: GameSaveProducerDeliverySchema.optional(),
 		producerItemInstanceId: IdSchema,
-		outputTableId: z.union([
-			IdSchema,
-			z.null(),
-		]),
 		placement: z.literal("board_then_inventory").optional(),
 		productId: IdSchema,
 		startAtMs: GameInstantMsSchema,
@@ -265,8 +261,8 @@ const addSaveIssue = (ctx: z.RefinementCtx, path: (string | number)[], message: 
 
 const readBoardItemDefinition = ({
 	config,
-	save,
 	itemInstanceId,
+	save,
 }: {
 	config: GameConfig;
 	save: GameSave;
@@ -284,8 +280,8 @@ const readBoardItemDefinition = ({
 
 const readItemInstanceDefinition = ({
 	config,
-	save,
 	itemInstanceId,
+	save,
 }: {
 	config: GameConfig;
 	save: GameSave;
@@ -293,8 +289,8 @@ const readItemInstanceDefinition = ({
 }) => {
 	const board = readBoardItemDefinition({
 		config,
-		itemInstanceId,
 		save,
+		itemInstanceId,
 	});
 	if (board) {
 		return {
@@ -333,8 +329,8 @@ const readStoredRequirementSlots = ({
 }) => {
 	const target = readItemInstanceDefinition({
 		config,
-		itemInstanceId: targetItemInstanceId,
 		save,
+		itemInstanceId: targetItemInstanceId,
 	});
 	if (!target) return [];
 
@@ -400,17 +396,10 @@ const readStoredRequirementCapacity = ({
 const readEffectiveProductInputSlots = ({
 	config,
 	productId,
-	save,
 }: {
 	config: GameConfig;
 	productId: string;
-	save: GameSave;
-}) => {
-	const inputRefId = config.products[productId]?.inputRefId;
-	if (!inputRefId) return [];
-
-	return config.inputs[inputRefId]?.inputs ?? [];
-};
+}) => config.products[productId]?.inputs ?? [];
 
 const readItemSpawnDependencyCycleJobIds = (save: GameSave) => {
 	const visiting = new Set<string>();
@@ -670,8 +659,8 @@ const validateGameSaveAgainstConfig = (
 
 		const target = readBoardItemDefinition({
 			config,
-			itemInstanceId: job.producerItemInstanceId,
 			save,
+			itemInstanceId: job.producerItemInstanceId,
 		});
 		const producerId = target?.item.producerId;
 		const producer = producerId ? config.producers[producerId] : undefined;
@@ -717,18 +706,6 @@ const validateGameSaveAgainstConfig = (
 					"productId",
 				],
 				`Missing product "${job.productId}".`,
-			);
-		}
-
-		if (job.outputTableId !== null && !config.lootTables[job.outputTableId]) {
-			addSaveIssue(
-				ctx,
-				[
-					"producerJobs",
-					jobId,
-					"outputTableId",
-				],
-				`Missing loot table "${job.outputTableId}".`,
 			);
 		}
 
@@ -785,8 +762,8 @@ const validateGameSaveAgainstConfig = (
 		if (
 			!readItemInstanceDefinition({
 				config,
-				itemInstanceId: activeEffect.sourceItemInstanceId,
 				save,
+				itemInstanceId: activeEffect.sourceItemInstanceId,
 			})
 		) {
 			addSaveIssue(
@@ -804,8 +781,8 @@ const validateGameSaveAgainstConfig = (
 	for (const [producerItemInstanceId, jobCount] of producerJobCountByProducerItemInstanceId) {
 		const target = readBoardItemDefinition({
 			config,
-			itemInstanceId: producerItemInstanceId,
 			save,
+			itemInstanceId: producerItemInstanceId,
 		});
 		const producerId = target?.item.producerId;
 		if (!producerId) continue;
@@ -824,8 +801,8 @@ const validateGameSaveAgainstConfig = (
 	for (const [producerItemInstanceId, lineState] of Object.entries(save.producerLines)) {
 		const target = readItemInstanceDefinition({
 			config,
-			itemInstanceId: producerItemInstanceId,
 			save,
+			itemInstanceId: producerItemInstanceId,
 		});
 		const producerId = target?.item.producerId;
 		const producer = producerId ? config.producers[producerId] : undefined;
@@ -860,8 +837,8 @@ const validateGameSaveAgainstConfig = (
 	for (const [producerItemInstanceId, state] of Object.entries(save.producerInputs)) {
 		const target = readItemInstanceDefinition({
 			config,
-			itemInstanceId: producerItemInstanceId,
 			save,
+			itemInstanceId: producerItemInstanceId,
 		});
 		const producerId = target?.item.producerId;
 		const producer = producerId ? config.producers[producerId] : undefined;
@@ -895,7 +872,6 @@ const validateGameSaveAgainstConfig = (
 			const inputSlots = readEffectiveProductInputSlots({
 				config,
 				productId,
-				save,
 			});
 
 			for (const [itemId, quantity] of Object.entries(productInputState.items)) {
@@ -963,8 +939,8 @@ const validateGameSaveAgainstConfig = (
 
 		const target = readBoardItemDefinition({
 			config,
-			itemInstanceId: job.targetItemInstanceId,
 			save,
+			itemInstanceId: job.targetItemInstanceId,
 		});
 		if (!target || target.item.craftRecipeId !== job.recipeId) {
 			addSaveIssue(
@@ -997,8 +973,8 @@ const validateGameSaveAgainstConfig = (
 	for (const [targetItemInstanceId, state] of Object.entries(save.craftInputs)) {
 		const target = readItemInstanceDefinition({
 			config,
-			itemInstanceId: targetItemInstanceId,
 			save,
+			itemInstanceId: targetItemInstanceId,
 		});
 		const recipeId = target?.item.craftRecipeId;
 		const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
@@ -1060,8 +1036,8 @@ const validateGameSaveAgainstConfig = (
 	for (const [stashItemInstanceId, state] of Object.entries(save.stashes)) {
 		const target = readItemInstanceDefinition({
 			config,
-			itemInstanceId: stashItemInstanceId,
 			save,
+			itemInstanceId: stashItemInstanceId,
 		});
 		const stashId = target?.item.stashId;
 		const stash = stashId ? config.stashes[stashId] : undefined;
@@ -1093,8 +1069,8 @@ const validateGameSaveAgainstConfig = (
 	for (const [stashItemInstanceId, state] of Object.entries(save.stashInputs)) {
 		const target = readItemInstanceDefinition({
 			config,
-			itemInstanceId: stashItemInstanceId,
 			save,
+			itemInstanceId: stashItemInstanceId,
 		});
 		const stashId = target?.item.stashId;
 		const stash = stashId ? config.stashes[stashId] : undefined;
@@ -1144,8 +1120,8 @@ const validateGameSaveAgainstConfig = (
 	for (const [targetItemInstanceId, state] of Object.entries(save.storedRequirements)) {
 		const target = readItemInstanceDefinition({
 			config,
-			itemInstanceId: targetItemInstanceId,
 			save,
+			itemInstanceId: targetItemInstanceId,
 		});
 		if (!target) {
 			addSaveIssue(
@@ -1176,8 +1152,8 @@ const validateGameSaveAgainstConfig = (
 
 			const capacity = readStoredRequirementCapacity({
 				config,
-				itemId,
 				save,
+				itemId,
 				targetItemInstanceId,
 			});
 			if (capacity === undefined) {

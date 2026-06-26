@@ -151,12 +151,46 @@ describe("RuntimeGameEngineAdapter", () => {
 				productId: "product:test",
 				type: "producer.product.start",
 			},
+			nowMs: 200,
 		});
 
 		expect(readiness).toMatchObject({
 			reason: "producer_queue_full",
 			type: "rejected",
 		});
+	});
+
+	it("catches up due ticks before reading readiness", async () => {
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createEngineTestConfig(),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+
+		await adapter.dispatch({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 100,
+		});
+
+		const readiness = await adapter.readiness({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 1200,
+		});
+
+		expect(readiness).toMatchObject({
+			type: "ready",
+		});
+		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
 	});
 
 	it("waits for queued mutations before reading readiness", async () => {

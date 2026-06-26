@@ -29,7 +29,13 @@ const readPassiveBoardSources = ({
 		const itemDefinition = config.items[item.itemId];
 		return (itemDefinition?.passiveEffectIds ?? []).flatMap((effectId) => {
 			const effect = config.effects[effectId];
-			if (!effect || !sourceScopeIncludes({ location: "board", sourceScope: effect.sourceScope })) {
+			if (
+				!effect ||
+				!sourceScopeIncludes({
+					location: "board",
+					sourceScope: effect.sourceScope,
+				})
+			) {
 				return [];
 			}
 
@@ -87,22 +93,27 @@ const readPassiveInventorySources = ({
 				return [];
 			}
 
-			return Array.from({ length: readInventorySlotQuantity(slot) }, (_, quantityIndex) => {
-				const sourceItemInstanceId = readInventorySlotSourceInstanceId({
-					quantityIndex,
-					slot,
-					slotIndex,
-				});
+			return Array.from(
+				{
+					length: readInventorySlotQuantity(slot),
+				},
+				(_, quantityIndex) => {
+					const sourceItemInstanceId = readInventorySlotSourceInstanceId({
+						quantityIndex,
+						slot,
+						slotIndex,
+					});
 
-				return {
-					activatedAtMs: 0,
-					effectId,
-					kind: "passive" as const,
-					sourceId: sourceItemInstanceId,
-					sourceItemInstanceId,
-					sourceLocation: "inventory" as const,
-				};
-			});
+					return {
+						activatedAtMs: 0,
+						effectId,
+						kind: "passive" as const,
+						sourceId: sourceItemInstanceId,
+						sourceItemInstanceId,
+						sourceLocation: "inventory" as const,
+					};
+				},
+			);
 		});
 	});
 
@@ -126,11 +137,8 @@ export const readGameEffectSourceInstances = ({
 					slot.kind === "instance" &&
 					slot.id === effect.sourceItemInstanceId,
 			);
-			const sourceLocation: GameEffectSourceInstance["sourceLocation"] | undefined = boardSource
-				? "board"
-				: inventorySource
-					? "inventory"
-					: undefined;
+			const sourceLocation: GameEffectSourceInstance["sourceLocation"] | undefined =
+				boardSource ? "board" : inventorySource ? "inventory" : undefined;
 			if (!sourceLocation) return [];
 
 			const effectDefinition = config.effects[effect.effectId];
@@ -157,8 +165,14 @@ export const readGameEffectSourceInstances = ({
 		});
 
 	return [
-		...readPassiveBoardSources({ config, save }),
-		...readPassiveInventorySources({ config, save }),
+		...readPassiveBoardSources({
+			config,
+			save,
+		}),
+		...readPassiveInventorySources({
+			config,
+			save,
+		}),
 		...activeSources,
 	].filter((source) => Boolean(config.effects[source.effectId]));
 };

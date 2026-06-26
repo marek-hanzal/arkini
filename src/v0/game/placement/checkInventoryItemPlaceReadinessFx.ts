@@ -265,16 +265,17 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			itemId: liveSlot.itemId,
 			save,
 		});
-		const boardPlacementCells = boardCapacity > 0
-			? yield* planEmptyBoardCellsFx({
-					config,
-					save,
-					seedCell: {
-						x: action.x,
-						y: action.y,
-					},
-				})
-			: [];
+		const boardPlacementCells =
+			boardCapacity > 0
+				? yield* planEmptyBoardCellsFx({
+						config,
+						save,
+						seedCell: {
+							x: action.x,
+							y: action.y,
+						},
+					})
+				: [];
 		for (const targetCell of boardPlacementCells.slice(0, Math.min(quantity, boardCapacity))) {
 			yield* checkItemCreateBlockedByEffectsFx({
 				config,

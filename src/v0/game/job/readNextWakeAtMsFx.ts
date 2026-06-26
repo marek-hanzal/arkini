@@ -22,7 +22,10 @@ export const readNextWakeAtMsFx = Effect.fn("readNextWakeAtMsFx")(function* ({
 		...Object.values(save.itemSpawnJobs).map((job) => job.dueAtMs),
 		...readProducerQueueWakeAtMsValues(save),
 		...Object.values(save.activeEffects ?? {}).flatMap((effect) => [
-			readWakeTime({ nowMs, value: effect.activatedAtMs }),
+			readWakeTime({
+				nowMs,
+				value: effect.activatedAtMs,
+			}),
 			effect.expiresAtMs,
 		]),
 		...Object.values(save.craftJobs).map((job) => job.completesAtMs),

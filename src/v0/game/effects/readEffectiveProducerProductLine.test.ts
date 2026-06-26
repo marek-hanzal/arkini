@@ -291,4 +291,76 @@ describe("readEffectiveProducerProductLine", () => {
 			}).visible,
 		).toBe(false);
 	});
+	it("applies passive global effects from inventory when the effect source scope includes inventory", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:inventory-reveal": {
+					name: "Inventory reveal",
+					operations: [
+						{
+							kind: "line.reveal",
+							target: {
+								productIds: [
+									"product:shred",
+								],
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:inventory-reveal",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					visibility: "hidden",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:axe",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:shred"];
+
+		expect(
+			readEffectiveProducerProductLine({
+				baseDurationMs: product.durationMs,
+				config,
+				nowMs: 0,
+				producerId: "producer:test",
+				producerItemId: "item:producer",
+				producerItemInstanceId: "item-instance:1",
+				product,
+				productId: "product:shred",
+				save,
+			}).visible,
+		).toBe(true);
+	});
 });

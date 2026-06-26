@@ -4096,7 +4096,8 @@
 					}
 				}
 			],
-			"scope": "global"
+			"scope": "global",
+			"sourceScope": "both"
 		},
 		"effect:path-faith-locks-counter-keystones": {
 			"name": "Faith path locks Engineers and Mages keystone plans",
@@ -4124,7 +4125,8 @@
 					}
 				}
 			],
-			"scope": "global"
+			"scope": "global",
+			"sourceScope": "both"
 		},
 		"effect:path-mages-locks-counter-keystones": {
 			"name": "Mages path locks Engineers and Faith keystone plans",
@@ -4152,7 +4154,8 @@
 					}
 				}
 			],
-			"scope": "global"
+			"scope": "global",
+			"sourceScope": "both"
 		}
 	},
 	"game": {

@@ -68,9 +68,16 @@ describe("applyGameActionFx Stash", () => {
 
 		expect(result.save.itemSpawnJobs).toEqual({});
 		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.save.inventory.slots[0]).toEqual({
 			itemId: "item:twig",
-			quantity: 2,
+			quantity: 1,
 		});
 		expect(result.events).toMatchObject([
 			{
@@ -89,24 +96,6 @@ describe("applyGameActionFx Stash", () => {
 				type: "stash.opened",
 			},
 			{
-				itemId: "item:twig",
-				reason: "stash-output",
-				to: {
-					kind: "inventory",
-					quantity: 1,
-				},
-				type: "item.created",
-			},
-			{
-				itemId: "item:twig",
-				reason: "stash-output",
-				to: {
-					kind: "inventory",
-					quantity: 1,
-				},
-				type: "item.created",
-			},
-			{
 				stashItemInstanceId: "item-instance:2",
 				type: "stash.depleted",
 			},
@@ -114,6 +103,27 @@ describe("applyGameActionFx Stash", () => {
 				itemInstanceId: "item-instance:2",
 				reason: "stash-depleted",
 				type: "item.removed",
+			},
+			{
+				itemId: "item:twig",
+				reason: "stash-output",
+				spawnSequenceIndex: 0,
+				to: {
+					kind: "board",
+					x: 1,
+					y: 0,
+				},
+				type: "item.created",
+			},
+			{
+				itemId: "item:twig",
+				reason: "stash-output",
+				spawnSequenceIndex: 1,
+				to: {
+					kind: "inventory",
+					quantity: 1,
+				},
+				type: "item.created",
 			},
 		]);
 	});
@@ -157,9 +167,16 @@ describe("applyGameActionFx Stash", () => {
 			save,
 		});
 
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 0,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.save.inventory.slots[0]).toEqual({
 			itemId: "item:twig",
-			quantity: 2,
+			quantity: 1,
 		});
 		expect(result.events.slice(0, 3)).toMatchObject([
 			{
@@ -363,27 +380,43 @@ describe("applyGameActionFx Stash", () => {
 		expect(
 			findBoardItem(result.save, {
 				itemId: "item:twig",
+				x: 0,
+				y: 0,
+			}),
+		).toBeDefined();
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
 				x: 1,
 				y: 0,
 			}),
 		).toBeDefined();
 		expect(result.save.inventory.slots[0]).toEqual({
 			itemId: "item:twig",
-			quantity: 3,
+			quantity: 2,
 		});
 		expect(result.events.map((event) => event.type)).toEqual([
 			"item.consumed",
 			"stash_input.stored",
 			"stash.opened",
-			"item.created",
-			"item.created",
-			"item.created",
-			"item.created",
 			"stash.depleted",
 			"item.removed",
+			"item.created",
+			"item.created",
+			"item.created",
+			"item.created",
 		]);
 		expect(result.events.filter((event) => event.type === "item.created")).toMatchObject([
 			{
+				spawnSequenceIndex: 0,
+				to: {
+					kind: "board",
+					x: 0,
+					y: 0,
+				},
+			},
+			{
+				spawnSequenceIndex: 1,
 				to: {
 					kind: "board",
 					x: 1,
@@ -391,6 +424,7 @@ describe("applyGameActionFx Stash", () => {
 				},
 			},
 			{
+				spawnSequenceIndex: 2,
 				to: {
 					kind: "inventory",
 					quantity: 1,
@@ -398,13 +432,7 @@ describe("applyGameActionFx Stash", () => {
 				},
 			},
 			{
-				to: {
-					kind: "inventory",
-					quantity: 1,
-					slotIndex: 0,
-				},
-			},
-			{
+				spawnSequenceIndex: 3,
 				to: {
 					kind: "inventory",
 					quantity: 1,
@@ -414,7 +442,7 @@ describe("applyGameActionFx Stash", () => {
 		]);
 	});
 
-	it("keeps board-only stash output atomic when only part of the output fits", () => {
+	it("counts a depleted stash cell as available for board-only output", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			items: {
@@ -469,12 +497,23 @@ describe("applyGameActionFx Stash", () => {
 			save,
 		});
 
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") {
-			expect(result.left).toMatchObject({
-				_tag: "GameActionRejected",
-				reason: "board:full",
-			});
+		expect(result._tag).toBe("Right");
+		if (result._tag === "Right") {
+			expect(result.right.save.board.items).not.toHaveProperty("item-instance:1");
+			expect(
+				findBoardItem(result.right.save, {
+					itemId: "item:twig",
+					x: 0,
+					y: 0,
+				}),
+			).toBeDefined();
+			expect(
+				findBoardItem(result.right.save, {
+					itemId: "item:twig",
+					x: 1,
+					y: 0,
+				}),
+			).toBeDefined();
 		}
 		expect(save.stashes).toEqual({});
 		expect(save.board.items).toEqual({
@@ -628,7 +667,7 @@ describe("applyGameActionFx Stash", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "board:full",
+				reason: "inventory:full",
 			});
 		}
 		expect(save.stashes).toEqual({});

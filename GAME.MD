@@ -299,6 +299,8 @@ Arkini uses real-world wall-clock time as the single source of truth for active 
 
 If the app is closed, reloaded, suspended, or reopened later, every timer that was allowed to run keeps advancing according to wall-clock elapsed time. If the player returns after a month, every eligible board timer, producer job, stash timer, and craft/construction/growth timer may be ready.
 
+Before dispatching an action or reading action readiness, the runtime catches up any due ticks against the current wall-clock time. Player actions must be evaluated against fresh time state, not against a stale save just because a browser timeout got lazy in a background tab.
+
 Changing the device clock can affect timers. This is accepted for current gameplay because Arkini is client-only/offline and does not try to punish offline players.
 
 Location still matters:
@@ -671,7 +673,7 @@ Product lines can start as `visibility: "hidden"` and be revealed by runtime eff
 
 Runtime effects are product-line mutators and item-creation rules. They do not patch or rewrite `GameConfig`; instead, a concrete product line asks the runtime which effects apply and receives an effective view. Effect sources have identity and board position, so local effects use Chebyshev distance just like proximity requirements, while global effects apply regardless of distance.
 
-Passive effects come from board items via `passiveEffectIds`. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
+Passive effects come from items via `passiveEffectIds`. Each effect definition decides where its source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Local effects still need a board position, so inventory-sourced effects are primarily for global hard rules such as path locks. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
 
 Effects currently operate on product-line visibility, start blocking, duration, loot plan evaluation, and item creation blocking. They can reveal or hide lines, block starts, add or multiply duration, append or replace loot tables, add chance item drops, adjust the chance that base loot is rolled, and block creation of matching items. They intentionally do not mutate config, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
 
@@ -796,7 +798,7 @@ Output capacity is checked at completion time, not start time. If completion out
 
 Path/faction exclusivity is not a separate item-level mechanic. It is authored through effects and enforced as a hard gameplay rule.
 
-A keystone building can emit passive global effects while it exists on the board. Those effects may use `line.blockStart` to prevent counter-path production lines from starting and `item.blockCreate` to prevent counter-path blueprints/buildings from entering gameplay through placement, merge/craft replacement, producer delivery, or spawn jobs.
+A keystone building can emit passive global effects with `sourceScope: "both"`, so the path lock stays active whether the keystone is placed on the board or stored in inventory. Those effects may use `line.blockStart` to prevent counter-path production lines from starting and `item.blockCreate` to prevent counter-path blueprints/buildings from entering gameplay through placement, merge/craft replacement, producer delivery, or spawn jobs.
 
 Effects are not soft UI gates. If an effect blocks creation, immediate actions must fail and delayed producer, craft, or spawn outputs must resolve as failed/discarded instead of retrying forever. The UI must always list generated effects on buildings/items so the player can understand exactly what commitment a keystone emits. Hidden rule magic is how tiny civilizations die screaming, now with worse UX.
 
@@ -846,11 +848,11 @@ If a stash needs a persistent non-consumed gate, it should use stored requiremen
 
 ### 11.5 Stash output placement
 
-Default stash output placement is `board_then_inventory`, using the same deterministic nearest-free-cell policy based on the stash origin.
+Default stash output placement is `board_then_inventory`, using the same deterministic nearest-free-cell policy based on the stash origin. If a stash depletes by removing itself, its own cell counts as available during output preflight and placement.
 
 Stash output is all-or-nothing for the whole open action. Activation must not consume inputs, advance charges, deplete contents, or mutate state unless the complete generated output can be placed across board and inventory.
 
-Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately, so stash dumps reuse the same spawn-job pipe as scheduled outputs instead of maintaining a cute little parallel universe.
+Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately. Spawn job sequence metadata is the backend source for visual spawn order, so UI does not need to invent a parallel spawn schedule just to animate items like a tiny circus.
 
 ## 12. Loot tables
 

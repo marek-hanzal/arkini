@@ -708,3 +708,8 @@ Choose The Path asset IDs:
 - `asset:item:blueprint-house-of-engineers` -> blueprint render over House of Engineers
 - `asset:item:blueprint-cathedral` -> blueprint render over Cathedral
 - `asset:item:blueprint-mage-lodge` -> blueprint render over Mage Lodge
+
+
+### Runtime effect source scope
+
+Passive effects can choose where their source item counts through `sourceScope`: `board`, `inventory`, or `both`. The Choose The Path keystone locks use `both`, so storing the chosen keystone does not accidentally reopen counter-path blueprints. Global effects work from inventory; local effects need a board position to have meaningful distance.

@@ -801,6 +801,14 @@
 			"requirementIds": [],
 			"outputTableId": "loot:dye-workshop-t1:luxury-cloth"
 		},
+		"product:dye-workshop-t1:pigment": {
+			"name": "Pigment",
+			"durationMs": 5000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:dye-workshop-t1:pigment",
+			"requirementIds": [],
+			"outputTableId": "loot:dye-workshop-t1:pigment"
+		},
 		"product:tailor-workshop-t1:common-clothing": {
 			"name": "Common Clothing",
 			"durationMs": 9000,
@@ -909,6 +917,16 @@
 				"proximity:dirty-processing:purifier"
 			],
 			"outputTableId": "loot:glassworks:glass"
+		},
+		"product:glazier-workshop-t1:stained-glass": {
+			"name": "Stained Glass",
+			"durationMs": 14000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:glazier-workshop-t1:stained-glass",
+			"requirementIds": [
+				"proximity:dirty-processing:purifier"
+			],
+			"outputTableId": "loot:glazier-workshop-t1:stained-glass"
 		},
 		"product:roof-tile-factory:roof-tiles": {
 			"name": "Roof Tiles",
@@ -1195,6 +1213,14 @@
 			"inputRefId": "input:university:blueprint-heroes-guild-t1",
 			"requirementIds": [],
 			"outputTableId": "loot:university:blueprint-heroes-guild-t1"
+		},
+		"product:university:blueprint-glazier-workshop-t1": {
+			"name": "Blueprint: Glazier Workshop I",
+			"durationMs": 3000,
+			"placement": "board_then_inventory",
+			"inputRefId": "input:university:blueprint-glazier-workshop-t1",
+			"requirementIds": [],
+			"outputTableId": "loot:university:blueprint-glazier-workshop-t1"
 		}
 	}
 }

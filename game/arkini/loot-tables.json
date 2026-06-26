@@ -1083,6 +1083,16 @@
 				}
 			]
 		},
+		"loot:dye-workshop-t1:pigment": {
+			"name": "Pigment output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:pigment",
+					"quantity": 1
+				}
+			]
+		},
 		"loot:tailor-workshop-t1:common-clothing": {
 			"name": "Tailor Workshop common clothing",
 			"output": [
@@ -1245,6 +1255,28 @@
 					"type": "chance",
 					"itemId": "item:pollution",
 					"chance": 0.15,
+					"quantity": 1
+				}
+			]
+		},
+		"loot:glazier-workshop-t1:stained-glass": {
+			"name": "Stained glass output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:stained-glass",
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.5,
+					"quantity": 1
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.1,
 					"quantity": 1
 				}
 			]
@@ -1669,6 +1701,16 @@
 				{
 					"type": "guaranteed",
 					"itemId": "item:blueprint-heroes-guild-t1",
+					"quantity": 1
+				}
+			]
+		},
+		"loot:university:blueprint-glazier-workshop-t1": {
+			"name": "University Glazier Workshop blueprint output",
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-glazier-workshop-t1",
 					"quantity": 1
 				}
 			]

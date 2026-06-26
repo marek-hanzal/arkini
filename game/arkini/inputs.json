@@ -1638,9 +1638,26 @@
 					"consume": true
 				},
 				{
-					"itemId": "item:vegetables",
+					"itemId": "item:pigment",
 					"quantity": 1,
 					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			]
+		},
+		"input:dye-workshop-t1:pigment": {
+			"name": "Dye Workshop pigment input",
+			"inputs": [
+				{
+					"itemId": "item:vegetables",
+					"quantity": 2,
+					"capacity": 8,
 					"consume": true
 				},
 				{
@@ -1875,6 +1892,35 @@
 					"itemId": "item:charcoal",
 					"quantity": 2,
 					"capacity": 8,
+					"consume": true
+				}
+			]
+		},
+		"input:glazier-workshop-t1:stained-glass": {
+			"name": "Glazier Workshop stained glass inputs",
+			"inputs": [
+				{
+					"itemId": "item:glass",
+					"quantity": 2,
+					"capacity": 8,
+					"consume": true
+				},
+				{
+					"itemId": "item:pigment",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"quantity": 1,
+					"capacity": 4,
 					"consume": true
 				}
 			]
@@ -2987,6 +3033,41 @@
 					"itemId": "item:coin-stack",
 					"quantity": 2,
 					"capacity": 6,
+					"consume": true
+				}
+			]
+		},
+		"input:university:blueprint-glazier-workshop-t1": {
+			"name": "Blueprint: Glazier Workshop I input",
+			"inputs": [
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:guild-charter",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:glass",
+					"quantity": 2,
+					"capacity": 6,
+					"consume": true
+				},
+				{
+					"itemId": "item:pigment",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin-stack",
+					"quantity": 1,
+					"capacity": 4,
 					"consume": true
 				}
 			]

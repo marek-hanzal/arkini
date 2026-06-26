@@ -55,7 +55,7 @@ producer:townhall-t3  Era III food processing and first trade blueprints
 producer:townhall-t4  Era IV civic administration, Market II, Era V textile/clothing, and Prospector Guild 1
 producer:civic-office  Era IV permits, Academy blueprint bridge, and Era IX Guild Charter
 producer:academy      Era VII mining expansion, Era VIII dirty-processing/material plans, and Era IX smith/armory/goldsmith/university blueprints
-producer:university   Era IX Master Knowledge and Heroes Guild blueprint
+producer:university   Era IX Master Knowledge / Heroes Guild blueprint and Era X Glazier Workshop blueprint
 ```
 
 Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
@@ -139,7 +139,7 @@ Market is a tiered trade building line. Market I starts first trade in Era III; 
 
 ### Implemented first wave
 
-The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, prospecting, an improved Market II trade step, Era V textile/clothing production, Era VII mining through Academy-driven Prospector Guild 2 plans, Era VIII dirty processing / advanced construction materials, and Era IX guild institutions / equipment / expeditions. The old “all heavy industry at once” blob has been split because apparently pacing is healthier than throwing every furnace at the player like a drunk civil engineer.
+The package currently contains wood, stone, raw food, food processing, brewing, wine, early trade, civic administration, permits, prospecting, an improved Market II trade step, Era V textile/clothing production with Pigment, Era VII mining through Academy-driven Prospector Guild 2 plans, Era VIII dirty processing / advanced construction materials, Era IX guild institutions / equipment / expeditions, and Era X prestige glass materials through Glazier Workshop. The old “all heavy industry at once” blob has been split because apparently pacing is healthier than throwing every furnace at the player like a drunk civil engineer.
 
 Wood pair:
 
@@ -257,6 +257,14 @@ Era IX guild institutions, equipment, keys, and expeditions
   University + Advanced Knowledge + Paper + Glass + Coin Stack -> Master Knowledge
   Heroes Guild I + gear + food + luxury + keys + knowledge -> Chests and Treasure Chest
   Treasure Chest is the current Era IX master output.
+
+Era X prestige glass materials
+  Dye Workshop I + Vegetables + Water -> Pigment
+  Dye Workshop I + Common Cloth + Pigment + Water -> Luxury Cloth
+  University + Master Knowledge + Guild Charter + Glass + Pigment + Coin Stack -> Glazier Workshop I Blueprint
+  Glazier Workshop I + Construction Bundle + Guild Charter + Glass + Bricks + Roof Tiles + Master Knowledge + Coin Stack -> Glazier Workshop I
+  Glazier Workshop I + Glass + Pigment + Charcoal + Water + nearby Glassworks + nearby Purifier -> Stained Glass + random Pollution
+  Stained Glass is the current Era X master/prestige construction output.
 ```
 
 ### Initial balance placeholder
@@ -330,7 +338,7 @@ The textile and clothing pass adds dedicated 128x128 transparent PNG coverage fo
 - `asset:item:common-clothing` -> `game/arkini/assets/item-common-clothing.png`
 - `asset:item:luxury-clothing` -> `game/arkini/assets/item-luxury-clothing.png`
 
-`Luxury Clothing` is the current Era V master item. It is also sellable through Market II so the chain stays useful before the next era consumes it.
+`Pigment` is now produced by Dye Workshop from vegetables and water, then reused by both `Luxury Cloth` and later stained-glass work. `Luxury Clothing` remains the current Era V master item. It is also sellable through Market II so the chain stays useful before the next era consumes it.
 
 ### Era VIII advanced construction / dirty processing asset IDs
 
@@ -344,6 +352,17 @@ The dirty processing / advanced construction pass uses the existing dedicated 12
 Existing prepared construction assets are now connected into Era VIII: Clay Pit, Sand Pit, Brickyard, Glassworks, Roof Tile Factory, Clay, Sand, Bricks, Glass, and Roof Tiles.
 
 `Construction Bundle` is the Era VIII master item and becomes the material base for later advanced civic/guild buildings.
+
+### Era X prestige glass material asset IDs
+
+The prestige glass pass adds dedicated 128x128 transparent PNGs for guild paperwork, pigment, stained glass, and the glazier producer:
+
+- `asset:item:guild-charter` -> `game/arkini/assets/item-guild-charter.png`
+- `asset:item:pigment` -> `game/arkini/assets/item-pigment.png`
+- `asset:item:stained-glass` -> `game/arkini/assets/item-stained-glass.png`
+- `asset:producer:glazier-workshop-t1` -> `game/arkini/assets/producer-glazier-workshop-t1.png`
+
+`Stained Glass` is currently a terminal Era X prestige construction output. Future high-civic buildings should consume it instead of pretending a university, observatory, or guild palace is just a heroic pile of planks with branding.
 
 ### Asset alignment and current art gaps
 

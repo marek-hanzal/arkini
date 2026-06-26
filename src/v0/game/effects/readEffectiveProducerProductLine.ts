@@ -3,6 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { AppliedGameEffectOperation } from "~/v0/game/effects/EffectiveProducerProductLine";
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
+import { compareGameEffectSourceInstances } from "~/v0/game/effects/compareGameEffectSourceInstances";
 import { doesGameEffectTargetProductLine } from "~/v0/game/effects/doesGameEffectTargetProductLine";
 import { doesGameEffectSourceApplyToBoardCell } from "~/v0/game/effects/doesGameEffectSourceApplyToBoardCell";
 import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSourceCell";
@@ -24,26 +25,6 @@ export namespace readEffectiveProducerProductLine {
 }
 
 const clampProbability = (value: number) => Math.max(0, Math.min(1, value));
-
-const compareGameEffectSources = ({
-	config,
-	left,
-	right,
-}: {
-	config: GameConfig;
-	left: GameEffectSourceInstance;
-	right: GameEffectSourceInstance;
-}) => {
-	const leftEffect = config.effects[left.effectId];
-	const rightEffect = config.effects[right.effectId];
-	const leftScopePriority = leftEffect?.scope === "local" ? 0 : 1;
-	const rightScopePriority = rightEffect?.scope === "local" ? 0 : 1;
-	if (leftScopePriority !== rightScopePriority) return leftScopePriority - rightScopePriority;
-	if (left.startAtMs !== right.startAtMs) return left.startAtMs - right.startAtMs;
-	return (
-		left.sourceId.localeCompare(right.sourceId) || left.effectId.localeCompare(right.effectId)
-	);
-};
 
 const readEffectSourceAppliesToTarget = ({
 	config,
@@ -122,7 +103,7 @@ export const readEffectiveProducerProductLine = ({
 			}),
 		)
 		.sort((left, right) =>
-			compareGameEffectSources({
+			compareGameEffectSourceInstances({
 				config,
 				left,
 				right,

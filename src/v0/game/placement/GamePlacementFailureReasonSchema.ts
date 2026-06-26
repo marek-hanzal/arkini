@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const GamePlacementFailureReasonSchema = z.enum([
 	"board:full",
+	"board:max-count",
 	"inventory:full",
 	"placement-failed:unknown",
 	"storage:inventory-forbidden",

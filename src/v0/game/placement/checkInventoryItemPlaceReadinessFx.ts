@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/v0/game/config/readGameConfigItemDefinitionFx";
+import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import {
@@ -23,6 +24,44 @@ const readEmptyBoardCellCount = ({ config, save }: { config: GameConfig; save: G
 	const boardCellCount = config.game.board.width * config.game.board.height;
 	return Math.max(0, boardCellCount - Object.keys(save.board.items).length);
 };
+
+const readBoardPlacementCapacity = ({
+	config,
+	itemId,
+	save,
+}: {
+	config: GameConfig;
+	itemId: string;
+	save: GameSave;
+}) =>
+	Math.min(
+		readEmptyBoardCellCount({
+			config,
+			save,
+		}),
+		readBoardItemMaxCountCapacity({
+			config,
+			itemId,
+			save,
+		}),
+	);
+
+const readBoardPlacementBlockReason = ({
+	config,
+	itemId,
+	save,
+}: {
+	config: GameConfig;
+	itemId: string;
+	save: GameSave;
+}) =>
+	readBoardItemMaxCountCapacity({
+		config,
+		itemId,
+		save,
+	}) <= 0
+		? "board:max-count"
+		: "board:full";
 
 const readInventoryStackCapacity = ({
 	itemId,
@@ -114,6 +153,21 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 		}
 
 		if (placementMode === "exact") {
+			if (
+				readBoardItemMaxCountCapacity({
+					config,
+					itemId: slot.itemId,
+					save,
+				}) <= 0
+			) {
+				return yield* Effect.fail(
+					GameEngineError.actionRejected(
+						"board:max-count",
+						`Board already has the maximum allowed count for "${slot.itemId}".`,
+					),
+				);
+			}
+
 			return {
 				itemDefinition,
 				slot,
@@ -141,14 +195,19 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			}
 
 			if (
-				readEmptyBoardCellCount({
+				readBoardPlacementCapacity({
 					config,
+					itemId: liveSlot.itemId,
 					save,
 				}) === 0
 			) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
-						"board:full",
+						readBoardPlacementBlockReason({
+							config,
+							itemId: liveSlot.itemId,
+							save,
+						}),
 						"No board placement target available.",
 					),
 				);
@@ -169,8 +228,9 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 					}
 				: null;
 
-		const boardCapacity = readEmptyBoardCellCount({
+		const boardCapacity = readBoardPlacementCapacity({
 			config,
+			itemId: liveSlot.itemId,
 			save,
 		});
 		const inventoryCapacity = readInventoryStackCapacity({
@@ -180,7 +240,14 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 		});
 
 		if (quantity > boardCapacity + inventoryCapacity) {
-			const reason = boardCapacity === 0 ? "board:full" : "inventory:full";
+			const reason =
+				boardCapacity === 0
+					? readBoardPlacementBlockReason({
+							config,
+							itemId: liveSlot.itemId,
+							save,
+						})
+					: "inventory:full";
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(reason, "No placement target available."),
 			);

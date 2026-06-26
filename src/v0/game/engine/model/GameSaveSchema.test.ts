@@ -79,6 +79,55 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.error?.issues[0]?.message).toContain("cannot coexist");
 	});
 
+	it("rejects board item counts above item maxCount", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 2,
+				},
+				board: {
+					height: 2,
+					width: 2,
+				},
+				title: "Test",
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					maxCount: 1,
+				},
+			},
+		});
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+		invalidSave.board.items["item-instance:3"] = {
+			id: "item-instance:3",
+			itemId: "item:twig",
+			x: 0,
+			y: 1,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("maxCount is 1");
+	});
+
 	it("rejects duplicate occupied board cells", () => {
 		const config = createEngineTestConfig();
 		const save = createInitialSave({

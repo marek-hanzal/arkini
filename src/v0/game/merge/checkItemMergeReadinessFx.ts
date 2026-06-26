@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
+import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/action/GameActionItemMerge";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -68,6 +69,23 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 	if (!config.items[merge.resultItemId]) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(`Missing merge result "${merge.resultItemId}".`),
+		);
+	}
+	if (
+		readBoardItemMaxCountCapacity({
+			config,
+			ignoredBoardItemInstanceIds: new Set([
+				target.id,
+			]),
+			itemId: merge.resultItemId,
+			save,
+		}) <= 0
+	) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"board:max-count",
+				`Board already has the maximum allowed count for "${merge.resultItemId}".`,
+			),
 		);
 	}
 	if (Object.values(save.producerJobs).some((job) => job.producerItemInstanceId === target.id)) {

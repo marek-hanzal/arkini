@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
+import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
@@ -77,6 +78,20 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 		const quantity = action.quantity ?? 1;
 
 		if (action.location === "board") {
+			const boardMaxCountCapacity = readBoardItemMaxCountCapacity({
+				config,
+				itemId: action.itemId,
+				save,
+			});
+			if (boardMaxCountCapacity < quantity) {
+				return yield* Effect.fail(
+					GameEngineError.actionRejected(
+						"board:max-count",
+						`Board already has the maximum allowed count for "${action.itemId}".`,
+					),
+				);
+			}
+
 			const freeBoardCells =
 				config.game.board.width * config.game.board.height -
 				Object.keys(save.board.items).length;

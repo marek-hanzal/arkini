@@ -18,6 +18,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 }: createInitialGameSaveFx.Props) {
 	const boardItems: GameSave["board"]["items"] = {};
 	const occupiedCells = new Set<string>();
+	const boardItemCountByItemId = new Map<string, number>();
 	let initialItemInstanceIndex = 1;
 
 	for (const entry of config.startingState.board) {
@@ -41,7 +42,18 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 			);
 		}
 
+		const currentItemCount = boardItemCountByItemId.get(entry.itemId) ?? 0;
+		const maxCount = config.items[entry.itemId]?.maxCount;
+		if (maxCount !== undefined && currentItemCount >= maxCount) {
+			return yield* Effect.fail(
+				GameEngineError.saveInvalid(
+					`Starting board has too many item(s) of "${entry.itemId}" for maxCount ${maxCount}.`,
+				),
+			);
+		}
+
 		occupiedCells.add(cellKey);
+		boardItemCountByItemId.set(entry.itemId, currentItemCount + 1);
 		const id = `item-instance:${initialItemInstanceIndex}`;
 		initialItemInstanceIndex += 1;
 		boardItems[id] = {

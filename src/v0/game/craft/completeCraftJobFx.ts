@@ -5,6 +5,7 @@ import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRunt
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
+import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameSave, GameSaveCraftJob } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace completeCraftJobFx {
@@ -74,6 +75,23 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		itemId: recipe.resultItemId,
 		save,
 	});
+	if (
+		readBoardItemMaxCountCapacity({
+			config,
+			ignoredBoardItemInstanceIds: new Set([
+				liveJob.targetItemInstanceId,
+			]),
+			itemId: recipe.resultItemId,
+			save,
+		}) <= 0
+	) {
+		return yield* Effect.fail(
+			GameEngineError.placementFailed(
+				"board:max-count",
+				`Board already has the maximum allowed count for "${recipe.resultItemId}".`,
+			),
+		);
+	}
 
 	const nextSave = yield* cloneGameSaveFx({
 		save,

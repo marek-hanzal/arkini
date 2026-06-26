@@ -524,6 +524,7 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	const usedBoardCells = new Map<string, string>();
+	const boardItemCountByItemId = new Map<string, number>();
 	for (const [itemInstanceId, boardItem] of Object.entries(save.board.items)) {
 		if (boardItem.id !== itemInstanceId) {
 			addSaveIssue(
@@ -537,6 +538,11 @@ const validateGameSaveAgainstConfig = (
 				`Board item id must match record key "${itemInstanceId}".`,
 			);
 		}
+
+		boardItemCountByItemId.set(
+			boardItem.itemId,
+			(boardItemCountByItemId.get(boardItem.itemId) ?? 0) + 1,
+		);
 
 		const boardItemDefinition = config.items[boardItem.itemId];
 		if (!boardItemDefinition) {
@@ -607,6 +613,20 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	const inventoryInstanceIds = new Set<string>();
+	for (const [itemId, quantity] of boardItemCountByItemId) {
+		const maxCount = config.items[itemId]?.maxCount;
+		if (maxCount === undefined || quantity <= maxCount) continue;
+
+		addSaveIssue(
+			ctx,
+			[
+				"board",
+				"items",
+			],
+			`Board has ${quantity} item(s) of "${itemId}" but maxCount is ${maxCount}.`,
+		);
+	}
+
 	for (const [slotIndex, slot] of save.inventory.slots.entries()) {
 		if (!slot) continue;
 

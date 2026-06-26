@@ -31,6 +31,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Loaded JSON `GameConfig` is the canonical immutable source of truth. There is no save-driven config overlay/layer and no global upgrade patch system.
 - Item-level `exclusiveToIds` is directional and explicit, never auto-symmetric. It is a hard ownership/creation constraint for path choices. UI must warn early on blueprints/craft targets before resource investment.
 - Heroes Guild / Goldsmith / Blacksmith / University definitions are currently prepared late-era content, not connected to the current townhall progression. Town Hall IV is now civic administration, paper, permits, surveys, and Market II.
+- Armory I currently exists only as a prepared producer asset/config asset (`asset:producer:armory-t1`, `producer-armory-t1.png`) for future leather/iron armor production; it is not yet connected as a producer/item/craft.
 - Job/event split: anything delayed, scheduled, retrying, blocked, or persisted for future processing is a job. `GameEvent` is only an output for something processed now.
 
 ## Hard rules

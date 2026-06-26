@@ -773,6 +773,12 @@
 			"render": "plain",
 			"resourceId": "producer-academy"
 		},
+		"asset:producer:armory-t1": {
+			"kind": "item",
+			"label": "Armory I",
+			"render": "plain",
+			"resourceId": "producer-armory-t1"
+		},
 		"asset:producer:bakery-t1": {
 			"kind": "item",
 			"label": "Bakery I",

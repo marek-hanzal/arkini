@@ -116,6 +116,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 	});
 
 	if (
+		effectiveProductLine.lootPlan.baseOutput.length === 0 &&
 		effectiveProductLine.lootPlan.lootTableIds.length === 0 &&
 		effectiveProductLine.lootPlan.appendTables.length === 0 &&
 		effectiveProductLine.lootPlan.chanceItems.length === 0

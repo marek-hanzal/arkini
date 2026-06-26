@@ -3,6 +3,7 @@ import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProductOutputItemIds } from "~/v0/game/config/readProductOutputItemIds";
 
 export namespace readProducerMissingResourceHintTileIds {
 	export interface Props {
@@ -95,30 +96,6 @@ const readInputItemIdsMissingOnBoard = ({
 	return itemIds;
 };
 
-const addLootOutputItemIds = ({
-	config,
-	itemIds,
-	outputTableId,
-}: {
-	config: GameConfig;
-	itemIds: Set<string>;
-	outputTableId: string | undefined;
-}) => {
-	if (!outputTableId) return;
-
-	const table = config.lootTables[outputTableId];
-	if (!table) return;
-
-	for (const output of table.output) {
-		if (output.type === "weighted") {
-			for (const entry of output.entries) itemIds.add(entry.itemId);
-			continue;
-		}
-
-		itemIds.add(output.itemId);
-	}
-};
-
 const readProducedItemIds = ({
 	boardItem,
 	config,
@@ -133,11 +110,12 @@ const readProducedItemIds = ({
 	if (!producer) return itemIds;
 
 	for (const productId of producer.productIds) {
-		addLootOutputItemIds({
+		for (const itemId of readProductOutputItemIds({
 			config,
-			itemIds,
-			outputTableId: config.products[productId]?.outputTableId,
-		});
+			productId,
+		})) {
+			itemIds.add(itemId);
+		}
 	}
 
 	return itemIds;

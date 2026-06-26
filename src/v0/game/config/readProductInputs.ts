@@ -8,7 +8,10 @@ export const readProductInputs = ({
 	productId: string;
 }) => {
 	const product = config.products[productId];
-	const inputRefId = product?.inputRefId;
+	if (!product) return [];
+	if (product.inputs) return product.inputs;
+
+	const inputRefId = product.inputRefId;
 	if (!inputRefId) return [];
 
 	return config.inputs[inputRefId]?.inputs ?? [];

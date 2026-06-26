@@ -82,7 +82,7 @@
 				"product:brickyard:bricks"
 			],
 			"requirementIds": [
-				"proximity:brickyard:clay-pit"
+				"proximity:clay-pit:nearby"
 			],
 			"type": "producer"
 		},
@@ -392,7 +392,7 @@
 				"product:roof-tile-factory:roof-tiles"
 			],
 			"requirementIds": [
-				"proximity:roof-tile-factory:clay-pit"
+				"proximity:clay-pit:nearby"
 			],
 			"type": "producer"
 		},

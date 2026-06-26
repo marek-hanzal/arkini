@@ -29,6 +29,7 @@ export const ProducerProductLineViewSchema = z.object({
 	requirementItemIds: z.array(IdSchema),
 	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	hindrances: z.array(ActivationHindranceViewSchema).optional(),
+	outputItemIds: z.array(IdSchema).optional(),
 	outputTableId: IdSchema.optional(),
 });
 

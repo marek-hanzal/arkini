@@ -14,6 +14,19 @@ export namespace rollEffectiveLootPlanItemsFx {
 	}
 }
 
+const rollLootOutputFx = Effect.fn("rollLootOutputFx")(function* ({
+	output,
+}: {
+	output: GameConfig["lootTables"][string]["output"];
+}) {
+	return yield* rollLootTableItemsFx({
+		lootTable: {
+			name: "Inline output",
+			output,
+		},
+	});
+});
+
 const rollLootTableByIdFx = Effect.fn("rollLootTableByIdFx")(function* ({
 	config,
 	lootTableId,
@@ -40,7 +53,17 @@ export const rollEffectiveLootPlanItemsFx = Effect.fn("rollEffectiveLootPlanItem
 	const random = yield* RandomServiceFx;
 	const items: LootTableRollResult["items"] = [];
 
-	if (lootPlan.lootTableIds.length > 0 && random.chance(lootPlan.baseDropChance)) {
+	if (
+		(lootPlan.baseOutput.length > 0 || lootPlan.lootTableIds.length > 0) &&
+		random.chance(lootPlan.baseDropChance)
+	) {
+		if (lootPlan.baseOutput.length > 0) {
+			const rolled = yield* rollLootOutputFx({
+				output: lootPlan.baseOutput,
+			});
+			items.push(...rolled.items);
+		}
+
 		for (const lootTableId of lootPlan.lootTableIds) {
 			const rolled = yield* rollLootTableByIdFx({
 				config,

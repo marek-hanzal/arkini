@@ -563,7 +563,7 @@ producer:smelter-t1
   Gold Ore Cart + 2 Coal Cart + Water + nearby Purifier -> Gold Ingot + random Pollution
 ```
 
-The purifier is an early required sink for board-only pollution. It intentionally has no output table; the product consumes pollution and finishes without spawning anything. It has a single-cleanup line plus a bulk quality-of-life line:
+The purifier is an early required sink for board-only pollution. Its product lines intentionally define no `output`; the product consumes pollution and finishes without spawning anything. It has a single-cleanup line plus a bulk quality-of-life line:
 
 ```txt
 producer:purifier-t1

@@ -15,7 +15,7 @@ import { z } from "zod";
  * after compile/merge the engine must only see this single shape:
  *
  * ```txt
- * resources -> assets -> items -> merge/inputs/producers/products/stashes/craft/loot
+ * resources -> assets -> items -> merge/producers/products/stashes/craft/loot
  * ```
  *
  * The package contains static game truth only. Mutable save state such as occupied
@@ -48,15 +48,16 @@ import { z } from "zod";
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
  *   definitions are owned by exactly one producer line. Producer shells do not own
- *   inputs; product lines reference named input definitions through `inputRefId`.
- *   Runtime may still choose between multiple product lines accepting the same dragged
+ *   inputs; product lines own their normal `inputs` inline. `inputRefId` remains only
+ *   for rare shared/legacy bundles. Runtime may still choose between multiple product lines accepting the same dragged
  *   item by default-line priority, then configured order. `maxQueueSize` is a hard per-producer-instance cap
  *   covering both running and queued jobs.
  * - Product inputs are stored per product line. Craft inputs are stored per craft
  *   target instance until the player explicitly starts the craft. Completion replaces
  *   the target with exactly one result item.
- * - A product without `outputTableId` is valid. That is a delayed sink/destructor such
- *   as a shredder.
+ * - Product lines own their normal `output` inline. `outputTableId` remains only for
+ *   rare reusable loot tables. A product without `output` or `outputTableId` is valid.
+ *   That is a delayed sink/destructor such as a shredder.
  * - `items.*.removeBy` is a generic board/tile removal rule. It is not producer logic.
  *
  * Minimal source fragment example:
@@ -113,21 +114,15 @@ import { z } from "zod";
  *       ]
  *     }
  *   },
- *   "inputs": {
- *     "input:lumber-camp.saw": {
- *       "name": "Saw inputs",
- *       "inputs": [{ "itemId": "item:log", "quantity": 1, "capacity": 1, "consume": true }]
- *     }
- *   },
  *   "products": {
  *     "product:lumber-camp.saw": {
  *       "name": "Saw logs",
  *       "durationMs": 5000,
  *       "placement": "board_then_inventory",
- *       "inputRefId": "input:lumber-camp.saw",
+ *       "inputs": [{ "itemId": "item:log", "quantity": 1, "capacity": 1, "consume": true }],
  *       "requirementIds": ["requirement:saw-license"],
  *       "hinderedBy": [],
- *       "outputTableId": "loot:lumber-camp.saw"
+ *       "output": [{ "type": "guaranteed", "itemId": "item:plank", "quantity": 1 }]
  *     }
  *   }
  * }
@@ -234,7 +229,7 @@ const PassiveItemRequirementSchema = z
 
 const ActivationInputSchema = z.array(ItemStackInputSchema);
 
-/** Named product-line input bundle. Product lines reference these by `inputRefId`. */
+/** Optional shared/legacy product-line input bundle. Normal product inputs live inline on products. */
 const ProductInputDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
@@ -518,7 +513,7 @@ const AssetDefinitionSchema = z
 			"item",
 			"ui",
 		]),
-		label: z.string().min(1),
+		label: z.string().min(1).optional(),
 		resourceId: IdSchema,
 		overlayAssetId: IdSchema.optional(),
 		render: z
@@ -624,7 +619,7 @@ const CraftRecipeSchema = z
 	})
 	.strict();
 
-/** Reusable output table referenced by stashes and product lines. */
+/** Reusable output table referenced by stashes/effects and rare shared product outputs. */
 const LootTableDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
@@ -635,7 +630,7 @@ const LootTableDefinitionSchema = z
 /**
  * Producer product line.
  *
- * Missing `outputTableId` means a valid delayed sink/destructor product.
+ * Missing `output` and `outputTableId` means a valid delayed sink/destructor product.
  * `visibility: "hidden"` makes the line hidden until an effect reveals it.
  */
 const ProductDefinitionSchema = z
@@ -650,9 +645,11 @@ const ProductDefinitionSchema = z
 			.default("visible"),
 		durationMs: PositiveIntegerSchema,
 		placement: PlacementSchema,
+		inputs: ActivationInputSchema.optional(),
 		inputRefId: IdSchema.optional(),
 		requirementIds: z.array(IdSchema),
 		hinderedBy: GameHindrancesSchema.optional(),
+		output: ActivationOutputSchema.min(1).optional(),
 		outputTableId: IdSchema.optional(),
 		activatesEffectId: IdSchema.optional(),
 	})
@@ -1197,6 +1194,30 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`Missing input "${product.inputRefId}".`,
 			);
 		}
+		if (product.inputs) {
+			validateItemInputs(
+				ctx,
+				[
+					"products",
+					productId,
+					"inputs",
+				],
+				product.inputs,
+				hasItem,
+			);
+		}
+
+		if (product.inputRefId && product.inputs) {
+			addIssue(
+				ctx,
+				[
+					"products",
+					productId,
+					"inputs",
+				],
+				"Product lines must not define both inputs and inputRefId.",
+			);
+		}
 		validateRequirementIds(
 			ctx,
 			[
@@ -1240,6 +1261,30 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`Missing loot table "${product.outputTableId}".`,
 			);
 		}
+		if (product.output) {
+			validateActivationOutput(
+				ctx,
+				[
+					"products",
+					productId,
+					"output",
+				],
+				product.output,
+				hasItem,
+			);
+		}
+
+		if (product.outputTableId && product.output) {
+			addIssue(
+				ctx,
+				[
+					"products",
+					productId,
+					"output",
+				],
+				"Product lines must not define both output and outputTableId.",
+			);
+		}
 
 		if (product.activatesEffectId && !hasEffect(product.activatesEffectId)) {
 			addIssue(
@@ -1253,7 +1298,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 
-		if (product.activatesEffectId && product.outputTableId) {
+		if (product.activatesEffectId && (product.outputTableId || product.output)) {
 			addIssue(
 				ctx,
 				[
@@ -1261,7 +1306,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					productId,
 					"activatesEffectId",
 				],
-				"Active effect product lines must not also define outputTableId.",
+				"Active effect product lines must not also define output or outputTableId.",
 			);
 		}
 	}

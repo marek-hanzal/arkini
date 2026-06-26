@@ -52,8 +52,21 @@ type TestProduct = {
 	durationMs: number;
 	tags?: string[];
 	visibility?: "visible" | "hidden";
+	inputs?: TestProductInput[];
 	inputRefId?: string;
 	name: string;
+	output?: {
+		chance?: number;
+		entries?: {
+			itemId: string;
+			quantity?: number;
+			weight: number;
+		}[];
+		itemId?: string;
+		quantity?: number;
+		rolls?: number;
+		type: "chance" | "guaranteed" | "weighted";
+	}[];
 	outputTableId?: string;
 	placement: "board_then_inventory";
 	requirementIds: string[];
@@ -403,6 +416,59 @@ describe("GameConfigSchema", () => {
 		expect(parseGameConfig(config).products["product:second"].inputRefId).toBe("input:second");
 	});
 
+	it("accepts product-owned inline inputs and output", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].inputRefId = undefined;
+		config.products["product:test"].outputTableId = undefined;
+		config.products["product:test"].inputs = [
+			{
+				capacity: 2,
+				consume: true,
+				itemId: "item:twig",
+				quantity: 1,
+			},
+		];
+		config.products["product:test"].output = [
+			{
+				itemId: "item:plank",
+				quantity: 1,
+				type: "guaranteed",
+			},
+		];
+
+		expect(parseGameConfig(config).products["product:test"]).toMatchObject({
+			inputs: config.products["product:test"].inputs,
+			output: config.products["product:test"].output,
+		});
+	});
+
+	it("rejects product-owned inline inputs combined with inputRefId", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].inputs = [
+			{
+				capacity: 2,
+				consume: true,
+				itemId: "item:twig",
+				quantity: 1,
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/both inputs and inputRefId/);
+	});
+
+	it("rejects product-owned inline output combined with outputTableId", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].output = [
+			{
+				itemId: "item:plank",
+				quantity: 1,
+				type: "guaranteed",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/both output and outputTableId/);
+	});
+
 	it("rejects activation input slots with capacity below required quantity", () => {
 		const config = createValidConfigValue();
 		config.inputs["input:test"].inputs[0].quantity = 3;
@@ -635,7 +701,9 @@ describe("GameConfigSchema", () => {
 		};
 		config.products["product:test"].activatesEffectId = "effect:test";
 
-		expect(() => parseGameConfig(config)).toThrow(/must not also define outputTableId/);
+		expect(() => parseGameConfig(config)).toThrow(
+			/must not also define output or outputTableId/,
+		);
 	});
 
 	it("rejects product active effect refs that point at missing effects", () => {

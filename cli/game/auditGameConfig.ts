@@ -1,7 +1,7 @@
 import type { GameConfig } from "../../src/v0/game/config/GameConfigSchema";
 
 export type GameConfigAuditWarning = {
-	code: "terminal-item" | "unused-definition";
+	code: "duplicate-definition-shape" | "terminal-item" | "unused-definition";
 	id: string;
 	message: string;
 	section: string;
@@ -47,6 +47,7 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 
 	return [
 		...readUnusedDefinitionWarnings(config, usage),
+		...readDuplicateDefinitionShapeWarnings(config),
 		...readTerminalItemWarnings(config, itemFlow),
 	].sort(compareGameConfigAuditWarnings);
 };
@@ -241,8 +242,14 @@ const collectProductUsage = (config: GameConfig, usage: UsageIndex, itemFlow: It
 		if (product.inputRefId) {
 			usage.inputs.add(product.inputRefId);
 		}
+		for (const input of product.inputs ?? []) {
+			itemFlow.consumedItemIds.add(input.itemId);
+		}
 		if (product.outputTableId) {
 			usage.lootTables.add(product.outputTableId);
+		}
+		if (product.output) {
+			collectLootOutputUsage(product.output, itemFlow);
 		}
 		for (const requirementId of product.requirementIds) {
 			usage.requirements.add(requirementId);
@@ -269,16 +276,23 @@ const collectHindranceItemUsage = (
 
 const collectLootTableUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
 	for (const lootTable of Object.values(config.lootTables)) {
-		for (const output of lootTable.output) {
-			if (output.type === "weighted") {
-				for (const entry of output.entries) {
-					itemFlow.producedItemIds.add(entry.itemId);
-				}
-				continue;
-			}
+		collectLootOutputUsage(lootTable.output, itemFlow);
+	}
+};
 
-			itemFlow.producedItemIds.add(output.itemId);
+const collectLootOutputUsage = (
+	output: GameConfig["lootTables"][string]["output"],
+	itemFlow: ItemFlowIndex,
+) => {
+	for (const entry of output) {
+		if (entry.type === "weighted") {
+			for (const weightedEntry of entry.entries) {
+				itemFlow.producedItemIds.add(weightedEntry.itemId);
+			}
+			continue;
 		}
+
+		itemFlow.producedItemIds.add(entry.itemId);
 	}
 };
 
@@ -289,6 +303,53 @@ const collectStartingStateUsage = (config: GameConfig, itemFlow: ItemFlowIndex) 
 	for (const entry of config.startingState.inventory) {
 		itemFlow.producedItemIds.add(entry.itemId);
 	}
+};
+
+const duplicateShapeSections = [
+	"inputs",
+	"requirements",
+	"stashes",
+	"craftRecipes",
+	"lootTables",
+] as const;
+
+const readDuplicateDefinitionShapeWarnings = (config: GameConfig): GameConfigAuditWarning[] =>
+	duplicateShapeSections.flatMap((section) =>
+		readDuplicateRecordShapeWarnings(section, config[section]),
+	);
+
+const readDuplicateRecordShapeWarnings = (
+	section: (typeof duplicateShapeSections)[number],
+	record: Readonly<Record<string, unknown>>,
+): GameConfigAuditWarning[] => {
+	const idsByShape = new Map<string, string[]>();
+
+	for (const [id, value] of Object.entries(record)) {
+		const shapeKey = JSON.stringify(omitName(value));
+		idsByShape.set(shapeKey, [
+			...(idsByShape.get(shapeKey) ?? []),
+			id,
+		]);
+	}
+
+	return [
+		...idsByShape.values(),
+	]
+		.filter((ids) => ids.length > 1)
+		.map((ids) => ({
+			code: "duplicate-definition-shape" as const,
+			id: ids[0] ?? section,
+			section,
+			message: `${section} definitions share identical gameplay data and should be centralized: ${ids.join(", ")}.`,
+		}));
+};
+
+const omitName = (value: unknown) => {
+	if (!value || typeof value !== "object" || Array.isArray(value)) return value;
+
+	const entries = Object.entries(value).filter(([key]) => key !== "name");
+
+	return Object.fromEntries(entries);
 };
 
 const readUnusedDefinitionWarnings = (

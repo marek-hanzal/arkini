@@ -198,6 +198,8 @@ const normalizePackage = (value: unknown): unknown => {
 	const normalizedItems: Record<string, unknown> = {};
 	const craftRecipes = asRecord(packageValue.craftRecipes);
 	const normalizedCraftRecipes: Record<string, unknown> = {};
+	const products = asRecord(packageValue.products);
+	const normalizedProducts: Record<string, unknown> = {};
 
 	for (const [itemId, itemEntry] of Object.entries(items)) {
 		if (!itemEntry || typeof itemEntry !== "object" || Array.isArray(itemEntry)) {
@@ -234,11 +236,26 @@ const normalizePackage = (value: unknown): unknown => {
 		normalizedCraftRecipes[craftRecipeId] = craftRecipe;
 	}
 
+	for (const [productId, productEntry] of Object.entries(products)) {
+		if (!productEntry || typeof productEntry !== "object" || Array.isArray(productEntry)) {
+			normalizedProducts[productId] = productEntry;
+			continue;
+		}
+
+		const product = {
+			...(productEntry as Record<string, unknown>),
+		};
+
+		product.name ??= readProductNameFromPrimaryOutput(product, normalizedItems);
+		normalizedProducts[productId] = product;
+	}
+
 	return {
 		...packageValue,
 		assets,
 		craftRecipes: normalizedCraftRecipes,
 		items: normalizedItems,
+		products: normalizedProducts,
 	};
 };
 
@@ -266,6 +283,34 @@ const asRecord = (value: unknown): Record<string, unknown> =>
 	value && typeof value === "object" && !Array.isArray(value)
 		? (value as Record<string, unknown>)
 		: {};
+
+const readProductNameFromPrimaryOutput = (
+	product: Readonly<Record<string, unknown>>,
+	items: Readonly<Record<string, unknown>>,
+) => {
+	const output = Array.isArray(product.output) ? product.output : [];
+	const primaryOutput = output.find(
+		(
+			entry,
+		): entry is {
+			itemId: string;
+		} =>
+			!!entry &&
+			typeof entry === "object" &&
+			!Array.isArray(entry) &&
+			typeof (entry as Record<string, unknown>).itemId === "string",
+	);
+
+	if (!primaryOutput) {
+		return undefined;
+	}
+
+	const item = items[primaryOutput.itemId];
+
+	return item && typeof item === "object" && !Array.isArray(item)
+		? (item as Record<string, unknown>).name
+		: undefined;
+};
 
 const readCraftResultItemIdFromCraftTargetId = (craftTargetItemId: string) => {
 	const prefix = "item:blueprint-";

@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import { readProducerProductIdsByPriority } from "~/v0/game/producer/readProducerProductIdsByPriority";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
@@ -91,10 +90,9 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 				);
 			}
 
-			const inputSlot = readProductInputs({
-				config,
-				productId,
-			}).find((input) => input.itemId === resolvedRef.itemId);
+			const inputSlot = config.products[productId]?.inputs?.find(
+				(input) => input.itemId === resolvedRef.itemId,
+			);
 			if (!inputSlot) {
 				continue;
 			}

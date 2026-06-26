@@ -1,7 +1,6 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readProductInputs } from "~/v0/game/config/readProductInputs";
 import { readProductOutputItemIds } from "~/v0/game/config/readProductOutputItemIds";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
@@ -169,10 +168,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				})
 			: undefined;
 
-		const inputs = readProductInputs({
-			config,
-			productId,
-		}).map((input) =>
+		const inputs = (product.inputs ?? []).map((input) =>
 			readRuntimeActivationInputView({
 				available: readRuntimeActivationInputAvailableQuantityFromGameSave({
 					itemId: input.itemId,

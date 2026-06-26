@@ -69,12 +69,10 @@ A product line owns its inputs and output inline:
 {
   "products": {
     "product:lumber-camp-1-twigs": {
-      "name": "Twigs",
       "durationMs": 3000,
       "inputs": [
         {
           "itemId": "item:water",
-          "quantity": 1,
           "capacity": 1,
           "consume": true
         }
@@ -91,19 +89,19 @@ A product line owns its inputs and output inline:
 }
 ```
 
-`placement` defaults to `board_then_inventory`; `requirementIds` defaults to `[]`. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence.
+`name` may be omitted when the product name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`; `requirementIds` defaults to `[]`. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence.
 
 Output entries support:
 
 ```json
 { "type": "guaranteed", "itemId": "item:twig", "quantity": 2 }
-{ "type": "chance", "itemId": "item:pollution", "chance": 0.2, "quantity": 1 }
+{ "type": "chance", "itemId": "item:pollution", "chance": 0.2 }
 {
   "type": "weighted",
   "rolls": 1,
   "entries": [
-    { "itemId": "item:twig", "weight": 3, "quantity": 1 },
-    { "itemId": "item:log", "weight": 1, "quantity": 1 }
+    { "itemId": "item:twig", "weight": 3 },
+    { "itemId": "item:log", "weight": 1 }
   ]
 }
 ```
@@ -130,7 +128,7 @@ A stash is a charged container/loot source. It owns its inputs and output inline
 
 `placement` defaults to `board_then_inventory`, `requirements` defaults to `[]`, `charges` defaults to `1`, and `onDepleted` defaults to `remove`. There is no `type: "stash"`; again, the section is not trying to trick anyone.
 
-When depleted, `onDepleted` may be `remove`, `keep`, or `{ "replaceWithItemId": "item:empty-stash" }`. Stash release preflights atomically, counts the removing stash cell as output space when relevant, and emits output through item spawn jobs so backend order and visual order share the same source.
+When depleted, `onDepleted` may be omitted/`remove` or `{ "replaceWithItemId": "item:empty-stash" }`. Stash release preflights atomically, counts the removing stash cell as output space when relevant, and emits output through item spawn jobs so backend order and visual order share the same source.
 
 ## Craft recipes
 

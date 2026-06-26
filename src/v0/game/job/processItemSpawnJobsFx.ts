@@ -57,7 +57,7 @@ export const processItemSpawnJobsFx = Effect.fn("processItemSpawnJobsFx")(functi
 			const alreadyBlocked = itemSpawnJob.lastBlockedAtMs !== undefined;
 			nextSave.itemSpawnJobs[itemSpawnJob.id] = {
 				...itemSpawnJob,
-				dueAtMs: nowMs + blockedItemSpawnJobRetryDelayMs,
+				readyAtMs: nowMs + blockedItemSpawnJobRetryDelayMs,
 				lastBlockedAtMs: nowMs,
 			};
 			nextSave.updatedAtMs = nowMs;

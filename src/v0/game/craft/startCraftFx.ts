@@ -89,12 +89,12 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 
 	delete nextSave.craftInputs[action.targetItemInstanceId];
 	const jobId = yield* createGameJobIdFx();
-	const completesAtMs = nowMs + checked.recipe.durationMs;
+	const readyAtMs = nowMs + checked.recipe.durationMs;
 	nextSave.craftJobs[jobId] = {
-		completesAtMs,
+		readyAtMs,
 		id: jobId,
 		recipeId: action.recipeId,
-		startedAtMs: nowMs,
+		startAtMs: nowMs,
 		targetItemInstanceId: action.targetItemInstanceId,
 	};
 	nextSave.updatedAtMs = nowMs;
@@ -103,10 +103,11 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 		events: [
 			...events,
 			{
-				completesAtMs,
+				atMs: nowMs,
+				readyAtMs,
 				jobId,
 				recipeId: action.recipeId,
-				startedAtMs: nowMs,
+				startAtMs: nowMs,
 				targetItemInstanceId: action.targetItemInstanceId,
 				type: "craft.started" as const,
 			},

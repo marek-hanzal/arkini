@@ -14,14 +14,14 @@ export function readProducerBoardProgress({ activation, nowMs }: readProducerBoa
 	const runningLine = activation.productLines
 		?.filter(
 			(line) =>
-				line.startedAtMs !== undefined &&
+				line.startAtMs !== undefined &&
 				line.readyAtMs !== undefined &&
-				line.startedAtMs <= nowMs &&
+				line.startAtMs <= nowMs &&
 				line.readyAtMs > nowMs,
 		)
 		.sort(
 			(left, right) =>
-				(left.startedAtMs ?? 0) - (right.startedAtMs ?? 0) ||
+				(left.startAtMs ?? 0) - (right.startAtMs ?? 0) ||
 				(left.readyAtMs ?? 0) - (right.readyAtMs ?? 0) ||
 				left.productId.localeCompare(right.productId),
 		)[0];

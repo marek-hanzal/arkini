@@ -58,7 +58,7 @@ export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* 
 		producerItemInstanceId: action.producerItemInstanceId,
 		productId: checked.productId,
 		quantity: checked.resolvedRef.quantity,
-		storedAtMs: nowMs,
+		atMs: nowMs,
 		type: "producer_input.stored",
 	});
 

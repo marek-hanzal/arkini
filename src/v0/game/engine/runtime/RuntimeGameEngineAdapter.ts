@@ -237,7 +237,7 @@ export class RuntimeGameEngineAdapter {
 		while (this.nextWakeAtMs !== null && this.nextWakeAtMs <= nowMs) {
 			tickCount += 1;
 			if (tickCount > 100) {
-				throw new Error("Game runtime catch-up exceeded 100 due ticks.");
+				throw new Error("Game runtime catch-up exceeded 100 ready ticks.");
 			}
 
 			const result = await runGameEngineEffect(

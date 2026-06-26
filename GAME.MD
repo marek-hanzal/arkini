@@ -299,7 +299,7 @@ Arkini uses real-world wall-clock time as the single source of truth for active 
 
 If the app is closed, reloaded, suspended, or reopened later, every timer that was allowed to run keeps advancing according to wall-clock elapsed time. If the player returns after a month, every eligible board timer, producer job, stash timer, and craft/construction/growth timer may be ready.
 
-Before dispatching an action or reading action readiness, the runtime catches up any due ticks against the current wall-clock time. Player actions must be evaluated against fresh time state, not against a stale save just because a browser timeout got lazy in a background tab.
+Before dispatching an action or reading action readiness, the runtime catches up any ready ticks against the current wall-clock time. Player actions must be evaluated against fresh time state, not against a stale save just because a browser timeout got lazy in a background tab.
 
 Changing the device clock can affect timers. This is accepted for current gameplay because Arkini is client-only/offline and does not try to punish offline players.
 
@@ -651,6 +651,12 @@ Single-click on the board starts the current runtime default product line only w
 
 Item detail may show all product lines and can start any line directly.
 
+### 10.2 Runtime time model
+
+Runtime time uses real-world wall-clock milliseconds, but save/event field names are normalized so the engine does not need five dialects of the same clock. Config authors still use `durationMs` for relative lengths. Runtime save state uses `startAtMs` for when a job/effect window begins, `readyAtMs` for when a producer/craft/spawn job may process, `endAtMs` for when an active effect stops applying, and `nextAttemptAtMs` for retryable blocked delivery. Events use `atMs` for the instant the event was emitted; events that describe a scheduled window may additionally include `startAtMs`, `readyAtMs`, or `endAtMs`.
+
+All progress, remaining-time, active-window, due/ready, and next-wake calculations should go through `src/v0/game/time/*`. Do not reintroduce inline timestamp arithmetic unless the time helper genuinely cannot express the rule. That way the runtime has one clock vocabulary instead of a tiny horological landfill.
+
 ### 10.3 Producer product jobs and queue
 
 Current producers do not use a separate refresh/cooldown clock. A successful activation starts a timed product job. Product duration is the production time between start and completion.
@@ -852,7 +858,7 @@ Default stash output placement is `board_then_inventory`, using the same determi
 
 Stash output is all-or-nothing for the whole open action. Activation must not consume inputs, advance charges, deplete contents, or mutate state unless the complete generated output can be placed across board and inventory.
 
-Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately. Spawn job sequence metadata is the backend source for visual spawn order, so UI does not need to invent a parallel spawn schedule just to animate items like a tiny circus. Spawn jobs with unresolved dependencies are not considered wakeable until their dependencies resolve, even if their own due time is already in the past; dependency cycles are invalid save data.
+Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately. Spawn job sequence metadata is the backend source for visual spawn order, so UI does not need to invent a parallel spawn schedule just to animate items like a tiny circus. Spawn jobs with unresolved dependencies are not considered wakeable until their dependencies resolve, even if their own ready time is already in the past; dependency cycles are invalid save data.
 
 ## 12. Loot tables
 

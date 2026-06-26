@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { compareGameTimedJobs } from "~/v0/game/job/compareGameTimedJobs";
+import { isGameTimeDue } from "~/v0/game/time/GameTime";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace readCompletedCraftJobsFx {
@@ -14,7 +15,12 @@ export const readCompletedCraftJobsFx = Effect.fn("readCompletedCraftJobsFx")(fu
 	nowMs,
 }: readCompletedCraftJobsFx.Props) {
 	return Object.values(save.craftJobs)
-		.filter((job) => job.completesAtMs <= nowMs)
+		.filter((job) =>
+			isGameTimeDue({
+				nowMs,
+				readyAtMs: job.readyAtMs,
+			}),
+		)
 		.sort((left, right) =>
 			compareGameTimedJobs({
 				left,

@@ -46,7 +46,7 @@ export const applyStashDepletionFx = Effect.fn("applyStashDepletionFx")(function
 				itemId: liveItem.itemId,
 				itemInstanceId: stashItemInstanceId,
 				reason: "stash-depleted" as const,
-				removedAtMs: nowMs,
+				atMs: nowMs,
 				type: "item.removed" as const,
 			},
 		] satisfies GameEvent[];
@@ -113,7 +113,7 @@ export const applyStashDepletionFx = Effect.fn("applyStashDepletionFx")(function
 			fromItemId: stashItemId,
 			itemInstanceId: stashItemInstanceId,
 			reason: "stash-depleted" as const,
-			replacedAtMs: nowMs,
+			atMs: nowMs,
 			toItemId: replacementItemId,
 			type: "item.replaced" as const,
 		},

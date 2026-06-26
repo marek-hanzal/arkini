@@ -13,6 +13,7 @@ import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisiblePro
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readFirstProducerQueueJobs } from "~/v0/game/producer/readFirstProducerQueueJobs";
+import { readGameTimeDurationMs, readGameTimeProgress } from "~/v0/game/time/GameTime";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
 	readRuntimeMissingRequirementItemIdsFromGameSave,
@@ -132,7 +133,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 			.filter((job) => job.productId === productId)
 			.sort(
 				(left, right) =>
-					left.startedAtMs - right.startedAtMs || left.id.localeCompare(right.id),
+					left.startAtMs - right.startAtMs || left.id.localeCompare(right.id),
 			);
 		const activeJob = firstProducerJob?.productId === productId ? firstProducerJob : undefined;
 		const baseDurationMs = readProducerProductDurationMs({
@@ -154,17 +155,17 @@ const readRuntimeProductLineViewsFromGameSave = ({
 			save,
 		});
 		const durationMs = activeJob
-			? activeJob.completesAtMs - activeJob.startedAtMs
+			? readGameTimeDurationMs({
+					readyAtMs: activeJob.readyAtMs,
+					startAtMs: activeJob.startAtMs,
+				})
 			: effectiveProductLine.durationMs;
 		const progress = activeJob
-			? Math.max(
-					0,
-					Math.min(
-						1,
-						(nowMs - activeJob.startedAtMs) /
-							Math.max(1, activeJob.completesAtMs - activeJob.startedAtMs),
-					),
-				)
+			? readGameTimeProgress({
+					nowMs,
+					readyAtMs: activeJob.readyAtMs,
+					startAtMs: activeJob.startAtMs,
+				})
 			: undefined;
 
 		const inputs = readProductInputs({
@@ -225,11 +226,11 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				queueFull,
 				queueSize: maxQueueSize,
 				queuedJobs: jobs.length,
-				readyAtMs: activeJob?.completesAtMs,
+				readyAtMs: activeJob?.readyAtMs,
 				requirementItemIds,
 				requirements: requirementViews,
 				requirementsReady,
-				startedAtMs: activeJob?.startedAtMs,
+				startAtMs: activeJob?.startAtMs,
 			},
 		];
 	});

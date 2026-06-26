@@ -142,7 +142,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		stashItemInstanceId: action.stashItemInstanceId,
 	});
 	yield* createItemSpawnJobsFx({
-		dueAtMs: nowMs,
+		readyAtMs: nowMs,
 		items: placementRequests,
 		save: nextSave,
 		seedCell,
@@ -158,14 +158,14 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		events: [
 			...events,
 			{
-				openedAtMs: nowMs,
+				atMs: nowMs,
 				remainingCharges: nextRemainingCharges,
 				stashId,
 				stashItemInstanceId: action.stashItemInstanceId,
 				type: "stash.opened" as const,
 			},
 			{
-				depletedAtMs: nowMs,
+				atMs: nowMs,
 				stashId,
 				stashItemInstanceId: action.stashItemInstanceId,
 				type: "stash.depleted" as const,

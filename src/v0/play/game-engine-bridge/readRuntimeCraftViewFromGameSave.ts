@@ -4,6 +4,7 @@ import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSav
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
+import { readGameTimeProgress, readGameTimeRemainingMs } from "~/v0/game/time/GameTime";
 
 export namespace readRuntimeCraftViewFromGameSave {
 	export interface Props {
@@ -36,11 +37,15 @@ export const readRuntimeCraftViewFromGameSave = ({
 	);
 	const inputProgress =
 		totalInputQuantity === 0 ? 1 : deliveredInputQuantity / totalInputQuantity;
-	const startedAtMs = runningJob?.startedAtMs;
-	const readyAtMs = runningJob?.completesAtMs;
+	const startAtMs = runningJob?.startAtMs;
+	const readyAtMs = runningJob?.readyAtMs;
 	const timeProgress =
-		startedAtMs !== undefined && readyAtMs !== undefined
-			? Math.max(0, Math.min(1, (nowMs - startedAtMs) / Math.max(1, readyAtMs - startedAtMs)))
+		startAtMs !== undefined && readyAtMs !== undefined
+			? readGameTimeProgress({
+					nowMs,
+					readyAtMs,
+					startAtMs,
+				})
 			: 0;
 	const phase =
 		readyAtMs !== undefined && readyAtMs <= nowMs
@@ -79,14 +84,20 @@ export const readRuntimeCraftViewFromGameSave = ({
 		phase,
 		progress: phase === "collecting_inputs" ? inputProgress : timeProgress,
 		readyAtMs,
-		remainingMs: readyAtMs !== undefined ? Math.max(0, readyAtMs - nowMs) : undefined,
+		remainingMs:
+			readyAtMs !== undefined
+				? readGameTimeRemainingMs({
+						nowMs,
+						readyAtMs,
+					})
+				: undefined,
 		requirements: readRuntimeActivationRequirementViewsFromGameSave({
 			requirements: recipe.requirements,
 			save,
 			targetItemInstanceId: boardItem.id,
 		}),
 		resultItemId: recipe.resultItemId as ItemId,
-		startedAtMs,
+		startAtMs,
 		timeProgress,
 	};
 };

@@ -23,7 +23,7 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	missingRequirementItemIds: [],
 	readyAtMs: 1000,
 	requirementItemIds: [],
-	startedAtMs: 0,
+	startAtMs: 0,
 	...overrides,
 });
 
@@ -51,7 +51,7 @@ describe("readLiveProducerProductLineView", () => {
 			inProgress: false,
 			progress: undefined,
 			readyAtMs: undefined,
-			startedAtMs: undefined,
+			startAtMs: undefined,
 		});
 
 		expect(

@@ -401,10 +401,10 @@ describe("applyGameActionFx BoardInventory", () => {
 			nowMs: 0,
 		});
 		save.craftJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			recipeId: "craft:plank",
-			startedAtMs: 0,
+			startAtMs: 0,
 			targetItemInstanceId: "item-instance:1",
 		};
 

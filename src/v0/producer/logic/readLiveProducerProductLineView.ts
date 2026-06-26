@@ -1,4 +1,5 @@
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import { readGameTimeProgress } from "~/v0/game/time/GameTime";
 
 export namespace readLiveProducerProductLineView {
 	export interface Props {
@@ -11,12 +12,13 @@ export const readLiveProducerProductLineView = ({
 	line,
 	nowMs,
 }: readLiveProducerProductLineView.Props): ProducerProductLineView => {
-	if (line.startedAtMs === undefined || line.readyAtMs === undefined) return line;
+	if (line.startAtMs === undefined || line.readyAtMs === undefined) return line;
 
-	const progress = Math.max(
-		0,
-		Math.min(1, (nowMs - line.startedAtMs) / Math.max(1, line.readyAtMs - line.startedAtMs)),
-	);
+	const progress = readGameTimeProgress({
+		nowMs,
+		readyAtMs: line.readyAtMs,
+		startAtMs: line.startAtMs,
+	});
 
 	return {
 		...line,

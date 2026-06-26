@@ -112,10 +112,10 @@ describe("applyGameActionFx Craft", () => {
 
 		expect(started.save.craftInputs).toEqual({});
 		expect(readOnlyRecordValue(started.save.craftJobs)).toMatchObject({
-			completesAtMs: 1150,
+			readyAtMs: 1150,
 			recipeId: "craft:plank",
 			targetItemInstanceId: "item-instance:1",
-			startedAtMs: 150,
+			startAtMs: 150,
 		});
 		expect(started.events).toEqual([
 			{
@@ -136,15 +136,16 @@ describe("applyGameActionFx Craft", () => {
 				previousQuantity: 1,
 				quantity: 1,
 				recipeId: "craft:plank",
-				storedAtMs: 150,
+				atMs: 150,
 				targetItemInstanceId: "item-instance:1",
 				type: "craft_input.stored",
 			},
 			{
-				completesAtMs: 1150,
+				atMs: 150,
+				readyAtMs: 1150,
 				jobId: readOnlyRecordValue(started.save.craftJobs).id,
 				recipeId: "craft:plank",
-				startedAtMs: 150,
+				startAtMs: 150,
 				targetItemInstanceId: "item-instance:1",
 				type: "craft.started",
 			},

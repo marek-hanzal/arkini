@@ -134,7 +134,7 @@ Keep IDs stable. Rename `name`, `label`, or `description` when display text chan
 
 - `quantity`: number of items.
 - `capacity`: how many items can be stored in the input/requirement slot.
-- `durationMs`: time in milliseconds.
+- `durationMs`: relative time in milliseconds. Runtime save state normalizes absolute timestamps as `startAtMs`, `readyAtMs`, `endAtMs`, `nextAttemptAtMs`, and event `atMs`; config does not author those absolute fields.
 - `tier`: item/content level.
 - `tags`: string labels used to group or describe content.
 - `placement`: output placement rule.

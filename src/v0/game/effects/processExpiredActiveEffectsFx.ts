@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
+import { isGameTimeDue } from "~/v0/game/time/GameTime";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -15,8 +16,11 @@ export const processExpiredActiveEffectsFx = Effect.fn("processExpiredActiveEffe
 	nowMs,
 	save,
 }: processExpiredActiveEffectsFx.Props) {
-	const expiredEffects = Object.values(save.activeEffects ?? {}).filter(
-		(effect) => effect.expiresAtMs <= nowMs,
+	const expiredEffects = Object.values(save.activeEffects ?? {}).filter((effect) =>
+		isGameTimeDue({
+			nowMs,
+			readyAtMs: effect.endAtMs,
+		}),
 	);
 
 	if (expiredEffects.length === 0) {
@@ -36,7 +40,7 @@ export const processExpiredActiveEffectsFx = Effect.fn("processExpiredActiveEffe
 		delete nextSave.activeEffects[effect.id];
 		events.push({
 			effectId: effect.effectId,
-			expiredAtMs: nowMs,
+			atMs: nowMs,
 			id: effect.id,
 			sourceItemInstanceId: effect.sourceItemInstanceId,
 			type: "effect.expired" as const,

@@ -116,13 +116,13 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			.map(readProducerJobWakeAtMs),
 	);
 	const durationMs = checked.effectiveProductLine.durationMs;
-	const completesAtMs = queuedStartAtMs + durationMs;
+	const readyAtMs = queuedStartAtMs + durationMs;
 
 	const activatedEffect = checked.product.activatesEffectId
 		? {
-				activatedAtMs: queuedStartAtMs,
+				startAtMs: queuedStartAtMs,
 				effectId: checked.product.activatesEffectId,
-				expiresAtMs: completesAtMs,
+				endAtMs: readyAtMs,
 				id: yield* createGameJobIdFx(),
 				sourceItemInstanceId: action.producerItemInstanceId,
 			}
@@ -133,13 +133,13 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 
 	const jobId = yield* createGameJobIdFx();
 	nextSave.producerJobs[jobId] = {
-		completesAtMs,
+		readyAtMs,
 		id: jobId,
 		outputTableId: checked.product.outputTableId ?? null,
 		placement: checked.product.placement,
 		producerItemInstanceId: action.producerItemInstanceId,
 		productId: checked.productId,
-		startedAtMs: queuedStartAtMs,
+		startAtMs: queuedStartAtMs,
 	};
 	nextSave.updatedAtMs = nowMs;
 
@@ -147,19 +147,21 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		events: [
 			...consumed.events,
 			{
-				completesAtMs,
+				atMs: nowMs,
+				readyAtMs,
 				jobId,
 				producerItemInstanceId: action.producerItemInstanceId,
 				productId: checked.productId,
-				startedAtMs: queuedStartAtMs,
+				startAtMs: queuedStartAtMs,
 				type: "product.started" as const,
 			},
 			...(activatedEffect
 				? [
 						{
-							activatedAtMs: activatedEffect.activatedAtMs,
+							atMs: nowMs,
+							startAtMs: activatedEffect.startAtMs,
 							effectId: activatedEffect.effectId,
-							expiresAtMs: activatedEffect.expiresAtMs,
+							endAtMs: activatedEffect.endAtMs,
 							id: activatedEffect.id,
 							sourceItemInstanceId: activatedEffect.sourceItemInstanceId,
 							type: "effect.activated" as const,

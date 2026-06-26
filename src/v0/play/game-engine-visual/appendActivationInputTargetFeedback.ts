@@ -23,7 +23,7 @@ const readTargetItemInstanceId = (target: TargetEvent) => {
 };
 
 const readFeedbackGroupId = (target: TargetEvent) =>
-	`engine:input-feedback:${readTargetItemInstanceId(target)}:${target.itemId}:${target.storedAtMs}`;
+	`engine:input-feedback:${readTargetItemInstanceId(target)}:${target.itemId}:${target.atMs}`;
 
 export const appendActivationInputTargetFeedback = ({
 	plan,

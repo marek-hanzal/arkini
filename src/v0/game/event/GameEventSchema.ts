@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GameInstantMsSchema } from "~/v0/game/time/GameTimeSchema";
 import { GamePlacementFailureReasonSchema } from "~/v0/game/placement/GamePlacementFailureReasonSchema";
 
 const IdSchema = z.string().min(1);
@@ -102,7 +103,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			itemId: IdSchema,
 			itemInstanceId: IdSchema,
 			reason: GameBoardItemChangeReasonSchema,
-			removedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -111,7 +112,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			fromItemId: IdSchema,
 			itemInstanceId: IdSchema,
 			reason: GameBoardItemChangeReasonSchema,
-			replacedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 			toItemId: IdSchema,
 		})
 		.strict(),
@@ -124,7 +125,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			quantity: PositiveIntegerSchema,
 			previousQuantity: NonNegativeIntegerSchema,
 			nextQuantity: PositiveIntegerSchema,
-			storedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -136,7 +137,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			quantity: PositiveIntegerSchema,
 			previousQuantity: PositiveIntegerSchema,
 			nextQuantity: NonNegativeIntegerSchema,
-			withdrawnAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -147,7 +148,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			quantity: PositiveIntegerSchema,
 			previousQuantity: NonNegativeIntegerSchema,
 			nextQuantity: PositiveIntegerSchema,
-			storedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -158,7 +159,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			quantity: PositiveIntegerSchema,
 			previousQuantity: PositiveIntegerSchema,
 			nextQuantity: NonNegativeIntegerSchema,
-			withdrawnAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 
@@ -171,7 +172,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			quantity: PositiveIntegerSchema,
 			previousQuantity: NonNegativeIntegerSchema,
 			nextQuantity: PositiveIntegerSchema,
-			storedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -183,7 +184,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			quantity: PositiveIntegerSchema,
 			previousQuantity: NonNegativeIntegerSchema,
 			nextQuantity: PositiveIntegerSchema,
-			storedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -195,28 +196,30 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			quantity: PositiveIntegerSchema,
 			previousQuantity: PositiveIntegerSchema,
 			nextQuantity: NonNegativeIntegerSchema,
-			withdrawnAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
 		.object({
 			type: z.literal("product.started"),
+			atMs: GameInstantMsSchema,
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
-			startedAtMs: NonNegativeIntegerSchema,
-			completesAtMs: NonNegativeIntegerSchema,
+			startAtMs: GameInstantMsSchema,
+			readyAtMs: GameInstantMsSchema,
 		})
 		.strict(),
 
 	z
 		.object({
 			type: z.literal("effect.activated"),
+			atMs: GameInstantMsSchema,
 			id: IdSchema,
 			effectId: IdSchema,
 			sourceItemInstanceId: IdSchema,
-			activatedAtMs: NonNegativeIntegerSchema,
-			expiresAtMs: NonNegativeIntegerSchema,
+			startAtMs: GameInstantMsSchema,
+			endAtMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -225,17 +228,18 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			id: IdSchema,
 			effectId: IdSchema,
 			sourceItemInstanceId: IdSchema,
-			expiredAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
 		.object({
 			type: z.literal("craft.started"),
+			atMs: GameInstantMsSchema,
 			jobId: IdSchema,
 			recipeId: IdSchema,
 			targetItemInstanceId: IdSchema,
-			startedAtMs: NonNegativeIntegerSchema,
-			completesAtMs: NonNegativeIntegerSchema,
+			startAtMs: GameInstantMsSchema,
+			readyAtMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -244,7 +248,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
-			completedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -254,7 +258,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
-			blockedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -264,7 +268,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
-			failedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -272,7 +276,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("stash.opened"),
 			stashId: IdSchema,
 			stashItemInstanceId: IdSchema,
-			openedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 			remainingCharges: NonNegativeIntegerSchema,
 		})
 		.strict(),
@@ -281,7 +285,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("stash.depleted"),
 			stashId: IdSchema,
 			stashItemInstanceId: IdSchema,
-			depletedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -290,7 +294,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			jobId: IdSchema,
 			recipeId: IdSchema,
 			targetItemInstanceId: IdSchema,
-			completedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -300,7 +304,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			recipeId: IdSchema,
 			targetItemInstanceId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
-			failedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -309,7 +313,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			jobId: IdSchema,
 			itemId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
-			blockedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -318,7 +322,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			jobId: IdSchema,
 			itemId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
-			failedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
@@ -327,7 +331,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			producerItemInstanceId: IdSchema,
 			previousProductId: IdSchema.optional(),
 			nextProductId: IdSchema.optional(),
-			changedAtMs: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 ]);

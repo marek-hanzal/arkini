@@ -54,7 +54,7 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 		previousQuantity: checked.previousQuantity,
 		quantity: checked.resolvedRef.quantity,
 		recipeId: checked.target.recipeId,
-		storedAtMs: nowMs,
+		atMs: nowMs,
 		targetItemInstanceId: action.targetItemInstanceId,
 		type: "craft_input.stored",
 	});

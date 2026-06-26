@@ -26,7 +26,7 @@ describe("processItemSpawnJobsFx", () => {
 			nowMs: 0,
 		});
 		runCreateItemSpawnJobs({
-			dueAtMs: 100,
+			readyAtMs: 100,
 			items: [
 				{
 					itemId: "item:twig",
@@ -58,7 +58,7 @@ describe("processItemSpawnJobsFx", () => {
 			nowMs: 0,
 		});
 		runCreateItemSpawnJobs({
-			dueAtMs: 100,
+			readyAtMs: 100,
 			exclusiveGroupKey: "spawn-group:stash-1",
 			intervalMs: 100,
 			items: [
@@ -117,7 +117,7 @@ describe("processItemSpawnJobsFx", () => {
 			quantity: 3,
 		};
 		const itemSpawn = runCreateItemSpawnJobs({
-			dueAtMs: 100,
+			readyAtMs: 100,
 			items: [
 				{
 					itemId: "item:twig",
@@ -137,7 +137,7 @@ describe("processItemSpawnJobsFx", () => {
 
 		expect(result.events).toEqual([
 			{
-				blockedAtMs: 100,
+				atMs: 100,
 				itemId: "item:twig",
 				reason: "board:full",
 				jobId,
@@ -145,7 +145,7 @@ describe("processItemSpawnJobsFx", () => {
 			},
 		]);
 		expect(result.save.itemSpawnJobs[jobId]).toMatchObject({
-			dueAtMs: 100 + blockedItemSpawnJobRetryDelayMs,
+			readyAtMs: 100 + blockedItemSpawnJobRetryDelayMs,
 			lastBlockedAtMs: 100,
 		});
 	});
@@ -172,7 +172,7 @@ describe("processItemSpawnJobsFx", () => {
 			quantity: 3,
 		};
 		const itemSpawn = runCreateItemSpawnJobs({
-			dueAtMs: 100,
+			readyAtMs: 100,
 			items: [
 				{
 					itemId: "item:twig",
@@ -198,7 +198,7 @@ describe("processItemSpawnJobsFx", () => {
 		expect(first.events).toHaveLength(1);
 		expect(second.events).toEqual([]);
 		expect(second.save.itemSpawnJobs[jobId]).toMatchObject({
-			dueAtMs: 100 + blockedItemSpawnJobRetryDelayMs * 2,
+			readyAtMs: 100 + blockedItemSpawnJobRetryDelayMs * 2,
 			lastBlockedAtMs: 100 + blockedItemSpawnJobRetryDelayMs,
 		});
 	});
@@ -212,7 +212,7 @@ describe("processItemSpawnJobsFx", () => {
 		const sourceJobId = "item-spawn-job:source";
 		const dependentJobId = "item-spawn-job:dependent";
 		save.itemSpawnJobs[sourceJobId] = {
-			dueAtMs: 1000,
+			readyAtMs: 1000,
 			id: sourceJobId,
 			itemId: "item:twig",
 			quantity: 1,
@@ -223,7 +223,7 @@ describe("processItemSpawnJobsFx", () => {
 			afterJobIds: [
 				sourceJobId,
 			],
-			dueAtMs: 100,
+			readyAtMs: 100,
 			id: dependentJobId,
 			itemId: "item:plank",
 			quantity: 1,
@@ -246,7 +246,7 @@ describe("processItemSpawnJobsFx", () => {
 			nowMs: 0,
 		});
 		const itemSpawn = runCreateItemSpawnJobs({
-			dueAtMs: 100,
+			readyAtMs: 100,
 			exclusiveGroupKey: "spawn-group:test",
 			items: [
 				{
@@ -263,7 +263,7 @@ describe("processItemSpawnJobsFx", () => {
 			afterJobIds: [
 				sourceJobId,
 			],
-			dueAtMs: 100,
+			readyAtMs: 100,
 			exclusiveGroupKey: "spawn-group:test",
 			id: dependentJobId,
 			itemId: "item:plank",
@@ -322,14 +322,14 @@ describe("processItemSpawnJobsFx", () => {
 			nowMs: 0,
 		});
 		save.activeEffects["effect-instance:block-twig"] = {
-			activatedAtMs: 0,
+			startAtMs: 0,
 			effectId: "effect:block-twig",
-			expiresAtMs: 10_000,
+			endAtMs: 10_000,
 			id: "effect-instance:block-twig",
 			sourceItemInstanceId: "item-instance:1",
 		};
 		const itemSpawn = runCreateItemSpawnJobs({
-			dueAtMs: 100,
+			readyAtMs: 100,
 			items: [
 				{
 					itemId: "item:twig",
@@ -349,7 +349,7 @@ describe("processItemSpawnJobsFx", () => {
 
 		expect(result.events).toEqual([
 			{
-				failedAtMs: 100,
+				atMs: 100,
 				itemId: "item:twig",
 				reason: "effect:block-create",
 				jobId,

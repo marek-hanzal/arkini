@@ -20,13 +20,13 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -63,9 +63,9 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.activeEffects["effect-instance:1"] = {
-			activatedAtMs: 0,
+			startAtMs: 0,
 			effectId: "effect:test",
-			expiresAtMs: 1000,
+			endAtMs: 1000,
 			id: "effect-instance:1",
 			sourceItemInstanceId: "item-instance:1",
 		};
@@ -80,7 +80,7 @@ describe("runGameTickFx", () => {
 		expect(result.events).toEqual([
 			{
 				effectId: "effect:test",
-				expiredAtMs: 1000,
+				atMs: 1000,
 				id: "effect-instance:1",
 				sourceItemInstanceId: "item-instance:1",
 				type: "effect.expired",
@@ -95,13 +95,13 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -174,13 +174,13 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -221,13 +221,13 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 		save.producerLines["item-instance:1"] = {
 			defaultProductId: "product:test",
@@ -274,13 +274,13 @@ describe("runGameTickFx", () => {
 			quantity: 3,
 		};
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -298,13 +298,13 @@ describe("runGameTickFx", () => {
 					},
 				],
 				lastBlockedAtMs: 1000,
-				retryAtMs: 2000,
+				nextAttemptAtMs: 2000,
 			},
 		});
 		expect(result.nextWakeAtMs).toBe(2000);
 		expect(result.events).toEqual([
 			{
-				blockedAtMs: 1000,
+				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
@@ -341,13 +341,13 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -358,7 +358,7 @@ describe("runGameTickFx", () => {
 
 		expect(result.events).toEqual([
 			{
-				blockedAtMs: 1000,
+				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
@@ -375,7 +375,7 @@ describe("runGameTickFx", () => {
 					},
 				],
 				lastBlockedAtMs: 1000,
-				retryAtMs: 2000,
+				nextAttemptAtMs: 2000,
 			},
 		});
 		expect(Object.values(result.save.board.items)).toEqual([
@@ -412,13 +412,13 @@ describe("runGameTickFx", () => {
 			quantity: 3,
 		};
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const blocked = runTick({
@@ -486,13 +486,13 @@ describe("runGameTickFx", () => {
 			quantity: 3,
 		};
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const blocked = runTick({
@@ -516,7 +516,7 @@ describe("runGameTickFx", () => {
 		expect(secondBlocked.events).toEqual([]);
 		expect(secondBlocked.save.producerJobs["job:1"]?.delivery).toMatchObject({
 			lastBlockedAtMs: 2000,
-			retryAtMs: 3000,
+			nextAttemptAtMs: 3000,
 		});
 	});
 
@@ -566,22 +566,22 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 		save.producerJobs["job:2"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:2",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:2",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -609,11 +609,11 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.craftJobs["job:craft"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:craft",
 			recipeId: "craft:plank",
 			targetItemInstanceId: "item-instance:1",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -674,18 +674,18 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.activeEffects["effect-instance:block-plank"] = {
-			activatedAtMs: 0,
+			startAtMs: 0,
 			effectId: "effect:block-plank",
-			expiresAtMs: 10_000,
+			endAtMs: 10_000,
 			id: "effect-instance:block-plank",
 			sourceItemInstanceId: "item-instance:1",
 		};
 		save.craftJobs["job:craft"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:craft",
 			recipeId: "craft:plank",
 			targetItemInstanceId: "item-instance:1",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -700,7 +700,7 @@ describe("runGameTickFx", () => {
 		});
 		expect(result.events).toEqual([
 			{
-				failedAtMs: 1000,
+				atMs: 1000,
 				jobId: "job:craft",
 				reason: "effect:block-create",
 				recipeId: "craft:plank",
@@ -717,13 +717,13 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: null,
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:shred",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -735,7 +735,7 @@ describe("runGameTickFx", () => {
 		expect(result.save.producerJobs).toEqual({});
 		expect(result.events).toEqual([
 			{
-				completedAtMs: 1000,
+				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:shred",
@@ -768,20 +768,20 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.activeEffects["effect-instance:block-twig"] = {
-			activatedAtMs: 0,
+			startAtMs: 0,
 			effectId: "effect:block-twig",
-			expiresAtMs: 10_000,
+			endAtMs: 10_000,
 			id: "effect-instance:block-twig",
 			sourceItemInstanceId: "item-instance:1",
 		};
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const result = runTick({
@@ -802,14 +802,14 @@ describe("runGameTickFx", () => {
 		]);
 		expect(result.events).toEqual([
 			{
-				completedAtMs: 1000,
+				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
 				type: "product.completed",
 			},
 			{
-				failedAtMs: 1000,
+				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
@@ -851,22 +851,22 @@ describe("runGameTickFx", () => {
 			quantity: 3,
 		};
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 		save.producerJobs["job:2"] = {
-			completesAtMs: 2000,
+			readyAtMs: 2000,
 			id: "job:2",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 1000,
+			startAtMs: 1000,
 		};
 
 		const result = runTick({
@@ -877,7 +877,7 @@ describe("runGameTickFx", () => {
 
 		expect(result.events).toEqual([
 			{
-				blockedAtMs: 2000,
+				atMs: 2000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",

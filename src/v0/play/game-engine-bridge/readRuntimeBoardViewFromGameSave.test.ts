@@ -360,7 +360,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			nowMs: 0,
 		});
 		save.producerJobs["job:1"] = {
-			completesAtMs: 1000,
+			readyAtMs: 1000,
 			delivery: {
 				items: [
 					{
@@ -369,14 +369,14 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					},
 				],
 				lastBlockedAtMs: 1000,
-				retryAtMs: 2000,
+				nextAttemptAtMs: 2000,
 			},
 			id: "job:1",
 			outputTableId: "loot:test",
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
-			startedAtMs: 0,
+			startAtMs: 0,
 		};
 
 		const board = readRuntimeBoardViewFromGameSave({

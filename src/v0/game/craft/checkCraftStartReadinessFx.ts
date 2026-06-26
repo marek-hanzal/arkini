@@ -7,12 +7,13 @@ import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxC
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace checkCraftStartReadinessFx {
 	export interface Props {
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 		action: GameActionCraftStart;
 	}
@@ -20,6 +21,7 @@ export namespace checkCraftStartReadinessFx {
 
 export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx")(function* ({
 	config,
+	nowMs,
 	save,
 	action,
 }: checkCraftStartReadinessFx.Props) {
@@ -45,12 +47,10 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		storedItems: storedRequirementItems,
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
-	yield* checkItemExclusiveOwnershipFx({
+	yield* checkItemCreateBlockedByEffectsFx({
 		config,
-		ignoredBoardItemInstanceIds: new Set([
-			action.targetItemInstanceId,
-		]),
 		itemId: target.recipe.resultItemId,
+		nowMs,
 		save,
 	});
 	if (

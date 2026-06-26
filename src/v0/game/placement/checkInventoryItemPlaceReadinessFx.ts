@@ -5,6 +5,7 @@ import { readGameConfigItemDefinitionFx } from "~/v0/game/config/readGameConfigI
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import {
 	isGameSaveInventoryInstance,
 	isGameSaveInventoryStack,
@@ -16,6 +17,7 @@ export namespace checkInventoryItemPlaceReadinessFx {
 	export interface Props {
 		action: GameActionInventoryItemPlaceSchema.Type;
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 	}
 }
@@ -85,7 +87,7 @@ const readInventoryStackCapacity = ({
 	}, 0);
 
 export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemPlaceReadinessFx")(
-	function* ({ action, config, save }: checkInventoryItemPlaceReadinessFx.Props) {
+	function* ({ action, config, nowMs, save }: checkInventoryItemPlaceReadinessFx.Props) {
 		if (action.x >= config.game.board.width || action.y >= config.game.board.height) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
@@ -101,6 +103,13 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 				GameEngineError.actionRejected("input_unavailable", "Inventory slot is empty."),
 			);
 		}
+
+		yield* checkItemCreateBlockedByEffectsFx({
+			config,
+			itemId: slot.itemId,
+			nowMs,
+			save,
+		});
 
 		const itemDefinition = yield* readGameConfigItemDefinitionFx({
 			config,

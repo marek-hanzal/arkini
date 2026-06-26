@@ -501,7 +501,7 @@ The item detail must show every gameplay-relevant piece of information available
 - merge chain participation
 - valid merge outputs
 - craft/construction/growth requirements
-- path-choice warnings and exclusive branch conflicts before the player invests resources
+- generated effects and path-choice rules before the player invests resources
 - deposited inputs
 - remaining inputs
 - active, ready, or paused timers
@@ -669,13 +669,13 @@ Product lines can start as `visibility: "hidden"` and be revealed by runtime eff
 
 ### 10.6 Runtime effects
 
-Runtime effects are product-line mutators. They do not patch or rewrite `GameConfig`; instead, a concrete product line asks the runtime which effects apply and receives an effective view. Effect sources have identity and board position, so local effects use Chebyshev distance just like proximity requirements, while global effects apply regardless of distance.
+Runtime effects are product-line mutators and item-creation rules. They do not patch or rewrite `GameConfig`; instead, a concrete product line asks the runtime which effects apply and receives an effective view. Effect sources have identity and board position, so local effects use Chebyshev distance just like proximity requirements, while global effects apply regardless of distance.
 
 Passive effects come from board items via `passiveEffectIds`. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
 
-Effects currently operate on product-line visibility, start blocking, duration, and loot plan evaluation. They can reveal or hide lines, block starts, add or multiply duration, append or replace loot tables, add chance item drops, and adjust the chance that base loot is rolled. They intentionally do not mutate storage/placement, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
+Effects currently operate on product-line visibility, start blocking, duration, loot plan evaluation, and item creation blocking. They can reveal or hide lines, block starts, add or multiply duration, append or replace loot tables, add chance item drops, adjust the chance that base loot is rolled, and block creation of matching items. They intentionally do not mutate config, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
 
-Effect conflict rules are simple: hide beats reveal, and any block blocks start. Numeric duration and loot chance operations are aggregated deterministically after effects are sorted by scope and activation/source order.
+Effect conflict rules are simple: hide beats reveal, any product-line block blocks start, and any matching `item.blockCreate` blocks creation while the effect applies. Numeric duration and loot chance operations are aggregated deterministically after effects are sorted by scope and activation/source order.
 
 ### Board max count
 
@@ -790,13 +790,13 @@ Starting production consumes configured input quantities immediately. Persistent
 
 Output capacity is checked at completion time, not start time. If completion output cannot fit, the job becomes blocked and preserves its rolled delivery for retry.
 
-### 10.10 Exclusive path choices
+### 10.10 Effect-authored path choices
 
-Items may define directional `exclusiveToIds`. This is a hard coexistence constraint, not a slowdown. If item A lists item B, A cannot be created or owned while B is owned. The reverse is not implied in config; asymmetric design is allowed. Runtime still checks both the item being created and already-owned items so an action cannot create a save where any owned item violates its declared exclusivity.
+Path/faction exclusivity is not a separate item-level mechanic. It is authored through effects and enforced as a hard gameplay rule.
 
-This rule is intended for branch choices such as faith versus engineering. The player must see the choice early enough to make an informed decision. For construction flows this means the blueprint/craft target must show the warning before any resources are invested. If the exclusive target is already owned, the craft cannot accept manual inputs, auto-fill inputs, partial-fill inputs, start, or complete. Final creation and save validation also enforce the same rule, because UI-only truth is how tiny civilizations die screaming.
+A keystone building can emit passive global effects while it exists on the board. Those effects may use `line.blockStart` to prevent counter-path production lines from starting and `item.blockCreate` to prevent counter-path blueprints/buildings from entering gameplay through placement, merge/craft replacement, producer delivery, or spawn jobs.
 
-Choice warnings are not hidden just because they are currently valid. Fulfilled normal requirements may be hidden, but an exclusive choice remains visible as a warning until the item exists or the player leaves that path alone.
+Effects are not soft UI gates. If an effect blocks creation, the action must fail or the delivery job must become blocked until the rule no longer applies. The UI must always list generated effects on buildings/items so the player can understand exactly what commitment a keystone emits. Hidden rule magic is how tiny civilizations die screaming, now with worse UX.
 
 ## 11. Stashes
 
@@ -1049,7 +1049,7 @@ The game should define feedback/animation rules for at least:
 - producer ready state
 - producer product job progress
 - producer product start
-- producer output blocked by insufficient placement capacity
+- producer output blocked by insufficient placement capacity or item-creation effects
 - stash ready state
 - stash opening/exhaust
 - stash output blocked by insufficient placement capacity

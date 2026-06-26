@@ -115,11 +115,6 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 			usage.craftRecipes.add(item.craftRecipeId);
 		}
 
-		for (const exclusiveItemId of item.exclusiveToIds ?? []) {
-			usage.items.add(exclusiveItemId);
-			itemFlow.consumedItemIds.add(exclusiveItemId);
-		}
-
 		for (const removal of item.removeBy ?? []) {
 			usage.items.add(removal.itemId);
 			itemFlow.consumedItemIds.add(removal.itemId);
@@ -179,6 +174,14 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Ite
 			if (operation.kind === "loot.addChanceItem") {
 				usage.items.add(operation.itemId);
 				itemFlow.producedItemIds.add(operation.itemId);
+			}
+
+			if (operation.kind === "item.blockCreate") {
+				for (const itemId of operation.target.itemIds ?? []) {
+					usage.items.add(itemId);
+					itemFlow.consumedItemIds.add(itemId);
+				}
+				continue;
 			}
 
 			for (const producerId of operation.target.producerIds ?? []) {
@@ -315,7 +318,7 @@ const readTerminalItemWarnings = (
 			code: "terminal-item",
 			id: itemId,
 			section: "items",
-			message: `${itemId} is produced or starts in the save, but no configured input, requirement, hindrance, exclusive rule, merge, removal rule, craft, or stash references it.`,
+			message: `${itemId} is produced or starts in the save, but no configured input, requirement, hindrance, effect, merge, removal rule, craft, or stash references it.`,
 		}));
 
 const readUnusedRecordWarnings = (

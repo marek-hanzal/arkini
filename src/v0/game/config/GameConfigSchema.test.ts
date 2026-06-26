@@ -238,20 +238,6 @@ const setItemStorage = (
 	).storage = storage;
 };
 
-const setItemExclusiveToIds = (
-	config: ReturnType<typeof createValidConfigValue>,
-	itemId: keyof ReturnType<typeof createValidConfigValue>["items"],
-	exclusiveToIds: string[],
-) => {
-	(
-		config.items[itemId] as ReturnType<
-			typeof createValidConfigValue
-		>["items"][typeof itemId] & {
-			exclusiveToIds: string[];
-		}
-	).exclusiveToIds = exclusiveToIds;
-};
-
 describe("GameConfigSchema", () => {
 	it("accepts the minimal valid test config", () => {
 		expect(parseGameConfig(createValidConfigValue()).game.id).toBe("game:test");
@@ -651,33 +637,48 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
 	});
 
-	it("accepts directional exclusive item ids without requiring symmetry", () => {
+	it("accepts item create blocking effects", () => {
 		const config = createValidConfigValue();
-		setItemExclusiveToIds(config, "item:plank", [
-			"item:twig",
-		]);
+		config.effects["effect:block-plank"] = {
+			name: "Block plank",
+			operations: [
+				{
+					kind: "item.blockCreate",
+					reason: "No planks today.",
+					target: {
+						itemIds: [
+							"item:plank",
+						],
+					},
+				},
+			],
+			scope: "global",
+		};
 
-		expect(parseGameConfig(config).items["item:plank"].exclusiveToIds).toEqual([
-			"item:twig",
-		]);
+		expect(parseGameConfig(config).effects["effect:block-plank"]?.operations[0]).toMatchObject({
+			kind: "item.blockCreate",
+			reason: "No planks today.",
+		});
 	});
 
-	it("rejects exclusive item ids that point at missing items", () => {
+	it("rejects item create blocking effects that point at missing items", () => {
 		const config = createValidConfigValue();
-		setItemExclusiveToIds(config, "item:plank", [
-			"item:ghost",
-		]);
+		config.effects["effect:block-ghost"] = {
+			name: "Block ghost",
+			operations: [
+				{
+					kind: "item.blockCreate",
+					target: {
+						itemIds: [
+							"item:ghost",
+						],
+					},
+				},
+			],
+			scope: "global",
+		};
 
 		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
-	});
-
-	it("rejects items that are exclusive to themselves", () => {
-		const config = createValidConfigValue();
-		setItemExclusiveToIds(config, "item:plank", [
-			"item:plank",
-		]);
-
-		expect(() => parseGameConfig(config)).toThrow(/cannot be exclusive to itself/);
 	});
 
 	it("keeps structural checks for queue size and non-empty loot output", () => {

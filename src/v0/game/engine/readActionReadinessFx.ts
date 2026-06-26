@@ -69,6 +69,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					checkCraftInputStoreReadinessFx({
 						action: storeCraftInputAction,
 						config,
+						nowMs,
 						save,
 					}),
 				craftInputWithdraw: (withdrawCraftInputAction) =>
@@ -81,6 +82,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					checkCraftStartReadinessFx({
 						action: craftAction,
 						config,
+						nowMs,
 						save,
 					}),
 				debugItemSpawn: (spawnAction) =>
@@ -93,6 +95,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					checkInventoryItemPlaceReadinessFx({
 						action: placeAction,
 						config,
+						nowMs,
 						save,
 					}),
 				inventorySlotsSwap: (swapAction) =>
@@ -104,6 +107,7 @@ export const readActionReadinessFx = Effect.fn("readActionReadinessFx")(function
 					checkItemMergeReadinessFx({
 						action: mergeAction,
 						config,
+						nowMs,
 						save,
 					}),
 				producerInputStore: (storeInputAction) =>

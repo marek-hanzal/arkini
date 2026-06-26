@@ -7,7 +7,7 @@ import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/action/GameActionItemMerge";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemExclusiveOwnershipFx } from "~/v0/game/exclusivity/checkItemExclusiveOwnershipFx";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -29,6 +29,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 	const checked = yield* checkItemMergeReadinessFx({
 		action,
 		config,
+		nowMs,
 		save,
 	});
 	const consumed = yield* consumeActivationInputsFx({
@@ -56,13 +57,12 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		);
 	}
 
-	yield* checkItemExclusiveOwnershipFx({
+	yield* checkItemCreateBlockedByEffectsFx({
 		config,
-		ignoredBoardItemInstanceIds: new Set([
-			checked.target.id,
-		]),
 		itemId: checked.merge.resultItemId,
+		nowMs,
 		save: nextSave,
+		targetCell: liveTarget,
 	});
 
 	liveTarget.itemId = checked.merge.resultItemId;

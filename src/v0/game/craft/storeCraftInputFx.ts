@@ -27,6 +27,7 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 	const checked = yield* checkCraftInputStoreReadinessFx({
 		action,
 		config,
+		nowMs,
 		save,
 	});
 	const nextSave = yield* cloneGameSaveFx({

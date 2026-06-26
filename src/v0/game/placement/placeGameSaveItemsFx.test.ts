@@ -380,27 +380,34 @@ describe("placeGameSaveItemsFx", () => {
 		]);
 	});
 
-	it("rejects placement when the new item is exclusive to owned items", () => {
+	it("rejects placement when an effect blocks item creation", () => {
 		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			items: {
-				...baseConfig.items,
-				"item:plank": {
-					...baseConfig.items["item:plank"],
-					exclusiveToIds: [
-						"item:twig",
-					],
+		const config = createEngineTestConfig();
+		config.effects["effect:block-plank"] = {
+			name: "Block plank",
+			operations: [
+				{
+					kind: "item.blockCreate",
+					reason: "Plank creation is blocked.",
+					target: {
+						itemIds: [
+							"item:plank",
+						],
+					},
 				},
-			},
-		});
+			],
+			scope: "global",
+		};
+		config.items["item:producer"] = {
+			...baseConfig.items["item:producer"],
+			passiveEffectIds: [
+				"effect:block-plank",
+			],
+		};
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
-		save.inventory.slots[0] = {
-			itemId: "item:twig",
-			quantity: 1,
-		};
 
 		const result = runPlacementEither({
 			config,
@@ -419,51 +426,7 @@ describe("placeGameSaveItemsFx", () => {
 			_tag: "Left",
 			left: {
 				_tag: "GamePlacementFailed",
-				reason: "exclusive:conflict",
-			},
-		});
-	});
-
-	it("rejects placement when owned items are exclusive to the new item", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			items: {
-				...baseConfig.items,
-				"item:twig": {
-					...baseConfig.items["item:twig"],
-					exclusiveToIds: [
-						"item:plank",
-					],
-				},
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-		save.inventory.slots[0] = {
-			itemId: "item:twig",
-			quantity: 1,
-		};
-
-		const result = runPlacementEither({
-			config,
-			items: [
-				{
-					itemId: "item:plank",
-					quantity: 1,
-					reason: "debug",
-				},
-			],
-			nowMs: 10,
-			save,
-		});
-
-		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
-				_tag: "GamePlacementFailed",
-				reason: "exclusive:conflict",
+				reason: "effect:block-create",
 			},
 		});
 	});

@@ -1,12 +1,19 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
+type ProductLineEffectOperation = Exclude<
+	GameConfig["effects"][string]["operations"][number],
+	{
+		kind: "item.blockCreate";
+	}
+>;
+
 export namespace doesGameEffectTargetProductLine {
 	export interface Props {
 		producerId: string;
 		producerTags: readonly string[];
 		product: GameConfig["products"][string];
 		productId: string;
-		target: GameConfig["effects"][string]["operations"][number]["target"];
+		target: ProductLineEffectOperation["target"];
 	}
 }
 

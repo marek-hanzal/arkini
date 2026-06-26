@@ -35,6 +35,7 @@ export const placeGameSaveItemsFx = Effect.fn("placeGameSaveItemsFx")(function* 
 			config,
 			events,
 			item,
+			nowMs,
 			save: nextSave,
 			seedCell,
 		});

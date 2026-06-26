@@ -145,6 +145,8 @@ export const readEffectiveProducerProductLine = ({
 		if (!effect) continue;
 
 		for (const operation of effect.operations) {
+			if (operation.kind === "item.blockCreate") continue;
+
 			if (
 				!doesGameEffectTargetProductLine({
 					producerId,

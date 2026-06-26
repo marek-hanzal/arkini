@@ -8,6 +8,7 @@ import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import {
@@ -34,6 +35,7 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 	yield* checkInventoryItemPlaceReadinessFx({
 		action,
 		config,
+		nowMs,
 		save,
 	});
 
@@ -100,6 +102,13 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 				),
 			);
 		}
+		yield* checkItemCreateBlockedByEffectsFx({
+			config,
+			itemId,
+			nowMs,
+			save: nextSave,
+			targetCell,
+		});
 
 		nextSave.board.items[liveSlot.id] = {
 			id: liveSlot.id,
@@ -174,6 +183,16 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 	}
 
 	const itemInstanceId = yield* createGameItemInstanceIdFx();
+	yield* checkItemCreateBlockedByEffectsFx({
+		config,
+		itemId,
+		nowMs,
+		save: nextSave,
+		targetCell: {
+			x: action.x,
+			y: action.y,
+		},
+	});
 	nextSave.board.items[itemInstanceId] = {
 		id: itemInstanceId,
 		itemId,

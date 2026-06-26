@@ -4,6 +4,7 @@ import { ItemStashDropsCard } from "~/v0/item/ui/ItemStashDropsCard";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
 import { ItemRequirementRulesCard } from "~/v0/item/ui/ItemRequirementRulesCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
+import { ItemGeneratedEffectsCard } from "~/v0/item/ui/ItemGeneratedEffectsCard";
 import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
@@ -41,7 +42,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	});
 	const actionError = itemAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
-	const craftHasRules = Boolean(liveCraft?.requirements?.length || liveCraft?.exclusiveTo.length);
+	const craftHasRules = Boolean(liveCraft?.requirements?.length);
 	const relations = useMemo(
 		() => ({
 			mergeResults: (item?.mergeResults ?? []).map((rule) => ({
@@ -81,11 +82,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 			</section>
 		);
 	}
-
-	const itemExclusiveTo = item.exclusiveToIds.map((itemId) => ({
-		blocked: false,
-		itemId,
-	}));
 
 	const setDefaultProductLine = (productId: string) => {
 		void itemAction.run({
@@ -161,16 +157,9 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 					storeDisabled={itemAction.isPending || item.storage === "board"}
 					onStore={storeBoardItem}
 				/>
-				{itemExclusiveTo.length ? (
-					<ItemRequirementRulesCard
-						exclusiveTo={itemExclusiveTo}
-						items={items}
-						title="Choice"
-					/>
-				) : null}
+				<ItemGeneratedEffectsCard effects={item.generatedEffects} />
 				{craftHasRules && liveCraft ? (
 					<ItemRequirementRulesCard
-						exclusiveTo={liveCraft.exclusiveTo}
 						items={items}
 						requirements={liveCraft.requirements}
 						title="Craft rules"

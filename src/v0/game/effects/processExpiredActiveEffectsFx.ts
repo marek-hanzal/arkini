@@ -49,6 +49,7 @@ export const processExpiredActiveEffectsFx = Effect.fn("processExpiredActiveEffe
 			effectId: effect.effectId,
 			atMs: nowMs,
 			id: effect.id,
+			producerJobId: effect.producerJobId,
 			sourceItemInstanceId: effect.sourceItemInstanceId,
 			type: "effect.expired" as const,
 		});

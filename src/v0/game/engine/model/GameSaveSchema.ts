@@ -84,6 +84,7 @@ const GameSaveActiveEffectSchema = z
 		sourceItemInstanceId: IdSchema,
 		startAtMs: GameInstantMsSchema,
 		endAtMs: GameInstantMsSchema,
+		producerJobId: IdSchema.optional(),
 	})
 	.strict()
 	.refine((value) => value.endAtMs >= value.startAtMs, {
@@ -745,6 +746,8 @@ const validateGameSaveAgainstConfig = (
 		producerJobsByProducerItemInstanceId.set(job.producerItemInstanceId, producerJobs);
 	}
 
+	const activeEffectIdsByProducerJobId = new Map<string, string[]>();
+
 	for (const [activeEffectId, activeEffect] of Object.entries(save.activeEffects ?? {})) {
 		if (activeEffect.id !== activeEffectId) {
 			addSaveIssue(
@@ -785,6 +788,89 @@ const validateGameSaveAgainstConfig = (
 					"sourceItemInstanceId",
 				],
 				`Active effect source "${activeEffect.sourceItemInstanceId}" must reference a save item instance.`,
+			);
+		}
+
+		if (activeEffect.producerJobId !== undefined) {
+			activeEffectIdsByProducerJobId.set(activeEffect.producerJobId, [
+				...(activeEffectIdsByProducerJobId.get(activeEffect.producerJobId) ?? []),
+				activeEffectId,
+			]);
+			const producerJob = save.producerJobs[activeEffect.producerJobId];
+			const product = producerJob ? config.products[producerJob.productId] : undefined;
+
+			if (!producerJob) {
+				addSaveIssue(
+					ctx,
+					[
+						"activeEffects",
+						activeEffectId,
+						"producerJobId",
+					],
+					`Active effect producer job "${activeEffect.producerJobId}" must reference a producer job.`,
+				);
+			} else {
+				if (activeEffect.sourceItemInstanceId !== producerJob.producerItemInstanceId) {
+					addSaveIssue(
+						ctx,
+						[
+							"activeEffects",
+							activeEffectId,
+							"sourceItemInstanceId",
+						],
+						`Active effect source must match producer job "${producerJob.id}" source.`,
+					);
+				}
+				if (activeEffect.startAtMs !== producerJob.startAtMs) {
+					addSaveIssue(
+						ctx,
+						[
+							"activeEffects",
+							activeEffectId,
+							"startAtMs",
+						],
+						`Active effect startAtMs must match producer job "${producerJob.id}" startAtMs.`,
+					);
+				}
+				if (activeEffect.endAtMs !== producerJob.readyAtMs) {
+					addSaveIssue(
+						ctx,
+						[
+							"activeEffects",
+							activeEffectId,
+							"endAtMs",
+						],
+						`Active effect endAtMs must match producer job "${producerJob.id}" readyAtMs.`,
+					);
+				}
+				if (product?.activatesEffectId !== activeEffect.effectId) {
+					addSaveIssue(
+						ctx,
+						[
+							"activeEffects",
+							activeEffectId,
+							"effectId",
+						],
+						`Active effect must match producer job "${producerJob.id}" activated effect.`,
+					);
+				}
+			}
+		}
+	}
+
+	for (const [jobId, job] of Object.entries(save.producerJobs)) {
+		const product = config.products[job.productId];
+		if (!product?.activatesEffectId) continue;
+
+		const activeEffectIds = activeEffectIdsByProducerJobId.get(jobId) ?? [];
+		if (activeEffectIds.length !== 1) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerJobs",
+					jobId,
+				],
+				`Producer job "${jobId}" activates effect "${product.activatesEffectId}" and must have exactly one linked active effect.`,
 			);
 		}
 	}

@@ -382,6 +382,7 @@ describe("applyGameActionFx Producer", () => {
 			startAtMs: 500,
 			effectId: "effect:test",
 			endAtMs: 1500,
+			producerJobId: job.id,
 			sourceItemInstanceId: "item-instance:1",
 		});
 		expect(activeEffect.id).toMatch(/^effect-instance:/);
@@ -401,6 +402,7 @@ describe("applyGameActionFx Producer", () => {
 				effectId: "effect:test",
 				endAtMs: 1500,
 				id: activeEffect.id,
+				producerJobId: job.id,
 				sourceItemInstanceId: "item-instance:1",
 				type: "effect.activated",
 			},

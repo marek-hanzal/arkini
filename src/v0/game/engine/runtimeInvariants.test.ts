@@ -279,4 +279,306 @@ describe("runtime invariants", () => {
 			}),
 		).toBe(3000 + pastDueGameJobWakeDelayMs);
 	});
+	it("requires active-effect producer jobs to keep a linked active effect instance", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:timed": {
+					name: "Timed effect",
+					operations: [
+						{
+							kind: "duration.addMs",
+							target: {
+								all: true,
+							},
+							valueMs: 0,
+						},
+					],
+					scope: "global",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					activatesEffectId: "effect:timed",
+					output: undefined,
+				},
+			},
+		});
+		const invalidSave = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		invalidSave.producerJobs["job:timed"] = {
+			id: "job:timed",
+			outputItems: [],
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					path: [
+						"save",
+						"producerJobs",
+						"job:timed",
+					],
+				}),
+			]),
+		);
+	});
+
+	it("reschedules queued producer jobs when a previous delivery blocks", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:replace-output": {
+					name: "Replace output",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productIds: [
+									"product:effect-output",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+					productIds: [
+						"product:test",
+						"product:effect-output",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:effect-output": {
+					durationMs: 1000,
+					name: "Effect output",
+					tags: [],
+					visibility: "visible",
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+					placement: "board_then_inventory",
+					requirementIds: [],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.activeEffects["effect-instance:replace-output"] = {
+			effectId: "effect:replace-output",
+			endAtMs: 1500,
+			id: "effect-instance:replace-output",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+		save.producerJobs["job:blocking"] = {
+			id: "job:blocking",
+			outputItems: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		save.producerJobs["job:queued"] = {
+			id: "job:queued",
+			outputItems: [
+				{
+					itemId: "item:plank",
+					quantity: 1,
+				},
+			],
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:effect-output",
+			readyAtMs: 2000,
+			startAtMs: 1000,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.producerJobs["job:blocking"]?.delivery).toEqual({
+			lastBlockedAtMs: 1000,
+			nextAttemptAtMs: 2000,
+		});
+		expect(result.save.producerJobs["job:queued"]).toMatchObject({
+			outputItems: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+			readyAtMs: 3000,
+			startAtMs: 2000,
+		});
+	});
+
+	it("keeps queued producer active effects aligned with blocked delivery delays", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:timed": {
+					name: "Timed effect",
+					operations: [
+						{
+							kind: "duration.addMs",
+							target: {
+								all: true,
+							},
+							valueMs: 0,
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+					productIds: [
+						"product:test",
+						"product:timed",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:timed": {
+					activatesEffectId: "effect:timed",
+					durationMs: 1000,
+					name: "Timed",
+					tags: [],
+					visibility: "visible",
+					placement: "board_then_inventory",
+					requirementIds: [],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.producerJobs["job:blocking"] = {
+			id: "job:blocking",
+			outputItems: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		save.producerJobs["job:timed"] = {
+			id: "job:timed",
+			outputItems: [],
+			placement: "board_then_inventory",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:timed",
+			readyAtMs: 2000,
+			startAtMs: 1000,
+		};
+		save.activeEffects["effect-instance:timed"] = {
+			effectId: "effect:timed",
+			endAtMs: 2000,
+			id: "effect-instance:timed",
+			producerJobId: "job:timed",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 1000,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.producerJobs["job:timed"]).toMatchObject({
+			readyAtMs: 3000,
+			startAtMs: 2000,
+		});
+		expect(result.save.activeEffects["effect-instance:timed"]).toMatchObject({
+			endAtMs: 3000,
+			producerJobId: "job:timed",
+			startAtMs: 2000,
+		});
+	});
 });

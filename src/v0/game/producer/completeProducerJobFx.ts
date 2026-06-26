@@ -5,6 +5,7 @@ import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/v0/game/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/producer/producerDeliveryTiming";
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
+import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/v0/game/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
 import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
@@ -147,13 +148,21 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			} satisfies GameEngineCompletionResult;
 		}
 
+		const nextAttemptAtMs = nowMs + blockedProducerDeliveryRetryDelayMs;
 		nextSave.producerJobs[liveJob.id] = {
 			...liveJob,
 			delivery: {
 				lastBlockedAtMs: nowMs,
-				nextAttemptAtMs: nowMs + blockedProducerDeliveryRetryDelayMs,
+				nextAttemptAtMs,
 			},
 		};
+		yield* rescheduleProducerQueueAfterBlockedDeliveryFx({
+			blockedJobId: liveJob.id,
+			config,
+			nextSave,
+			producerItemInstanceId: liveJob.producerItemInstanceId,
+			resumeAtMs: nextAttemptAtMs,
+		});
 		nextSave.updatedAtMs = nowMs;
 
 		return {

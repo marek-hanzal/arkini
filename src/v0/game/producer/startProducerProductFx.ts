@@ -9,9 +9,7 @@ import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readProducerJobWakeAtMs } from "~/v0/game/producer/producerDeliveryTiming";
-import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
-import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
-import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
+import { rollProducerJobSnapshotFx } from "~/v0/game/producer/rollProducerJobSnapshotFx";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
@@ -119,50 +117,35 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
 			.map(readProducerJobWakeAtMs),
 	);
-	const jobEffectiveProductLine = readEffectiveProducerProductLine({
-		baseDurationMs: readProducerProductDurationMs({
-			hindrances: checked.hindrances,
-			product: checked.product,
-			producerItemInstanceId: action.producerItemInstanceId,
-			requirements: checked.requirements,
-			save: nextSave,
-		}),
+	const jobId = yield* createGameJobIdFx();
+	const jobSnapshot = yield* rollProducerJobSnapshotFx({
 		config,
-		nowMs: queuedStartAtMs,
-		producerId: checked.producerId,
-		producerItemId: checked.producerItem.itemId,
 		producerItemInstanceId: action.producerItemInstanceId,
-		product: checked.product,
 		productId: checked.productId,
 		save: nextSave,
+		startAtMs: queuedStartAtMs,
 	});
-	const durationMs = jobEffectiveProductLine.durationMs;
-	const readyAtMs = queuedStartAtMs + durationMs;
+	const readyAtMs = jobSnapshot.readyAtMs;
 
 	const activatedEffect = checked.product.activatesEffectId
 		? {
-				startAtMs: queuedStartAtMs,
 				effectId: checked.product.activatesEffectId,
 				endAtMs: readyAtMs,
 				id: yield* createGameActiveEffectIdFx(),
+				producerJobId: jobId,
 				sourceItemInstanceId: action.producerItemInstanceId,
+				startAtMs: queuedStartAtMs,
 			}
 		: undefined;
 	if (activatedEffect) {
 		nextSave.activeEffects[activatedEffect.id] = activatedEffect;
 	}
 
-	const outputItems = (yield* rollEffectiveLootPlanItemsFx({
-		config,
-		lootPlan: jobEffectiveProductLine.lootPlan,
-	})).items;
-
-	const jobId = yield* createGameJobIdFx();
 	nextSave.producerJobs[jobId] = {
 		readyAtMs,
 		id: jobId,
-		outputItems,
-		placement: checked.product.placement,
+		outputItems: jobSnapshot.outputItems,
+		placement: jobSnapshot.placement,
 		producerItemInstanceId: action.producerItemInstanceId,
 		productId: checked.productId,
 		startAtMs: queuedStartAtMs,
@@ -189,6 +172,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 							effectId: activatedEffect.effectId,
 							endAtMs: activatedEffect.endAtMs,
 							id: activatedEffect.id,
+							producerJobId: activatedEffect.producerJobId,
 							sourceItemInstanceId: activatedEffect.sourceItemInstanceId,
 							type: "effect.activated" as const,
 						},

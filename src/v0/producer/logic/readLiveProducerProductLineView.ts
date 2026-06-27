@@ -15,7 +15,7 @@ export const readLiveProducerProductLineView = ({
 	if (line.startAtMs === undefined || line.readyAtMs === undefined) return line;
 
 	const progress = readGameTimeProgress({
-		nowMs,
+		nowMs: line.pausedAtMs ?? nowMs,
 		readyAtMs: line.readyAtMs,
 		startAtMs: line.startAtMs,
 	});

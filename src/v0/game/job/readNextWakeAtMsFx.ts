@@ -3,6 +3,7 @@ import type { GameSave, GameSaveItemSpawnJob } from "~/v0/game/engine/model/Game
 import { readCraftJobWakeAtMs } from "~/v0/game/craft/craftCompletionTiming";
 import { readProducerQueueWakeAtMsValues } from "~/v0/game/producer/readProducerQueueWakeAtMsValues";
 import { readMinGameWakeAtMs } from "~/v0/game/time/GameTime";
+import { isProducerJobPaused } from "~/v0/game/producer/producerDeliveryTiming";
 
 export const pastDueGameJobWakeDelayMs = 1;
 
@@ -44,11 +45,15 @@ const readItemSpawnWakeTimes = ({ nowMs, save }: { nowMs?: number; save: GameSav
 	});
 
 const readProducerWakeTimes = ({ nowMs, save }: { nowMs?: number; save: GameSave }) =>
-	readProducerQueueWakeAtMsValues(save).map((readyAtMs) =>
-		readProcessableJobWakeAtMs({
-			nowMs,
-			readyAtMs,
-		}),
+	readProducerQueueWakeAtMsValues(save).flatMap((readyAtMs) =>
+		readyAtMs === undefined
+			? []
+			: [
+					readProcessableJobWakeAtMs({
+						nowMs,
+						readyAtMs,
+					}),
+				],
 	);
 
 const readCraftWakeTimes = ({ nowMs, save }: { nowMs?: number; save: GameSave }) =>
@@ -60,13 +65,20 @@ const readCraftWakeTimes = ({ nowMs, save }: { nowMs?: number; save: GameSave })
 	);
 
 const readActiveEffectWakeTimes = ({ nowMs, save }: { nowMs?: number; save: GameSave }) =>
-	Object.values(save.activeEffects ?? {}).flatMap((effect) => [
-		effect.startAtMs,
-		readProcessableJobWakeAtMs({
-			nowMs,
-			readyAtMs: effect.endAtMs,
-		}),
-	]);
+	Object.values(save.activeEffects ?? {}).flatMap((effect) => {
+		const producerJob = effect.producerJobId
+			? save.producerJobs[effect.producerJobId]
+			: undefined;
+		if (producerJob && isProducerJobPaused(producerJob)) return [];
+
+		return [
+			effect.startAtMs,
+			readProcessableJobWakeAtMs({
+				nowMs,
+				readyAtMs: effect.endAtMs,
+			}),
+		];
+	});
 
 export const readNextWakeAtMsFx = Effect.fn("readNextWakeAtMsFx")(function* ({
 	nowMs,

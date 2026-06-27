@@ -914,7 +914,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(2500);
 	});
 
-	it("extends a running producer when its proximity requirement source moves out of range", () => {
+	it("pauses a running producer while its proximity requirement source is out of range", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -1002,10 +1002,302 @@ describe("applyGameActionFx Producer", () => {
 			]),
 		);
 		expect(moved.save.producerJobs[job.id]).toMatchObject({
-			readyAtMs: 3000,
+			pausedAtMs: 500,
+			readyAtMs: 2000,
+			remainingMs: 1500,
 			startAtMs: 0,
 		});
-		expect(moved.nextWakeAtMs).toBe(3000);
+		expect(moved.nextWakeAtMs).toBeNull();
+
+		const stillPaused = runTick({
+			config,
+			nowMs: 2000,
+			save: moved.save,
+		});
+		expect(stillPaused.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					type: "product.completed",
+				}),
+			]),
+		);
+		expect(stillPaused.save.producerJobs[job.id]).toMatchObject({
+			pausedAtMs: 500,
+			remainingMs: 1500,
+		});
+		expect(stillPaused.nextWakeAtMs).toBeNull();
+
+		const resumed = runAction({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 2,
+				y: 0,
+			},
+			config,
+			nowMs: 2500,
+			save: stillPaused.save,
+		});
+		expect(resumed.save.producerJobs[job.id]).toMatchObject({
+			readyAtMs: 4000,
+			startAtMs: 2000,
+		});
+		expect(resumed.save.producerJobs[job.id]?.pausedAtMs).toBeUndefined();
+		expect(resumed.save.producerJobs[job.id]?.remainingMs).toBeUndefined();
+		expect(resumed.nextWakeAtMs).toBe(4000);
+	});
+
+	it("pauses a running producer when the producer moves outside its proximity requirement", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 5,
+				},
+			},
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:near-twig": {
+					distance: 1,
+					durationFactor: 1,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					requirementIds: [
+						"requirement:near-twig",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const started = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const job = readOnlyRecordValue(started.save.producerJobs);
+		expect(job).toMatchObject({
+			readyAtMs: 1000,
+			startAtMs: 0,
+		});
+
+		const movedAway = runAction({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 4,
+				y: 0,
+			},
+			config,
+			nowMs: 250,
+			save: started.save,
+		});
+		expect(movedAway.save.producerJobs[job.id]).toMatchObject({
+			pausedAtMs: 250,
+			remainingMs: 750,
+		});
+		expect(movedAway.nextWakeAtMs).toBeNull();
+
+		const staleTime = runTick({
+			config,
+			nowMs: 1000,
+			save: movedAway.save,
+		});
+		expect(staleTime.save.producerJobs[job.id]).toMatchObject({
+			pausedAtMs: 250,
+			remainingMs: 750,
+		});
+		expect(staleTime.events).toEqual([]);
+
+		const movedBack = runAction({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 1250,
+			save: staleTime.save,
+		});
+		expect(movedBack.save.producerJobs[job.id]).toMatchObject({
+			readyAtMs: 2000,
+			startAtMs: 1000,
+		});
+		expect(movedBack.nextWakeAtMs).toBe(2000);
+	});
+
+	it("does not expire active producer effects while their requirement-paused job is stopped", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test": {
+					name: "Test effect",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0.5,
+							target: {
+								productIds: [
+									"product:shred",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 5,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					activatesEffectId: "effect:test",
+					output: undefined,
+				},
+			},
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:near-twig": {
+					distance: 1,
+					durationFactor: 1,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					requirementIds: [
+						"requirement:near-twig",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const job = readOnlyRecordValue(started.save.producerJobs);
+		const activeEffect = readOnlyRecordValue(started.save.activeEffects);
+		expect(activeEffect).toMatchObject({
+			endAtMs: 1000,
+			producerJobId: job.id,
+			startAtMs: 0,
+		});
+
+		const paused = runAction({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 4,
+				y: 0,
+			},
+			config,
+			nowMs: 250,
+			save: started.save,
+		});
+		expect(paused.nextWakeAtMs).toBeNull();
+
+		const expiredWindow = runTick({
+			config,
+			nowMs: 1000,
+			save: paused.save,
+		});
+		expect(expiredWindow.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					type: "effect.expired",
+				}),
+			]),
+		);
+		expect(expiredWindow.save.activeEffects[activeEffect.id]).toBeDefined();
+
+		const resumed = runAction({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 1250,
+			save: expiredWindow.save,
+		});
+		expect(resumed.save.activeEffects[activeEffect.id]).toMatchObject({
+			endAtMs: 2000,
+			startAtMs: 1000,
+		});
+		expect(resumed.nextWakeAtMs).toBe(2000);
 	});
 
 	it("averages producer and product proximity duration multipliers", () => {

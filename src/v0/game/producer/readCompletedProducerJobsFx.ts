@@ -15,10 +15,13 @@ export const readCompletedProducerJobsFx = Effect.fn("readCompletedProducerJobsF
 	nowMs,
 }: readCompletedProducerJobsFx.Props) {
 	return readFirstProducerQueueJobs(save)
-		.filter((job) => readProducerJobWakeAtMs(job) <= nowMs)
-		.sort(
-			(left, right) =>
-				readProducerJobWakeAtMs(left) - readProducerJobWakeAtMs(right) ||
-				left.id.localeCompare(right.id),
-		);
+		.filter((job) => {
+			const wakeAtMs = readProducerJobWakeAtMs(job);
+			return wakeAtMs !== undefined && wakeAtMs <= nowMs;
+		})
+		.sort((left, right) => {
+			const leftWakeAtMs = readProducerJobWakeAtMs(left) ?? Number.MAX_SAFE_INTEGER;
+			const rightWakeAtMs = readProducerJobWakeAtMs(right) ?? Number.MAX_SAFE_INTEGER;
+			return leftWakeAtMs - rightWakeAtMs || left.id.localeCompare(right.id);
+		});
 });

@@ -58,6 +58,8 @@ const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
 		delivery: GameSaveDeliveryRetrySchema.optional(),
+		pausedAtMs: GameInstantMsSchema.optional(),
+		remainingMs: NonNegativeIntegerSchema.optional(),
 		producerItemInstanceId: IdSchema,
 		productId: IdSchema,
 		startAtMs: GameInstantMsSchema,
@@ -68,6 +70,18 @@ const GameSaveProducerJobSchema = z
 		message: "readyAtMs must be >= startAtMs",
 		path: [
 			"readyAtMs",
+		],
+	})
+	.refine((value) => (value.pausedAtMs === undefined) === (value.remainingMs === undefined), {
+		message: "pausedAtMs and remainingMs must be set together",
+		path: [
+			"pausedAtMs",
+		],
+	})
+	.refine((value) => value.pausedAtMs === undefined || value.pausedAtMs >= value.startAtMs, {
+		message: "pausedAtMs must be >= startAtMs",
+		path: [
+			"pausedAtMs",
 		],
 	});
 

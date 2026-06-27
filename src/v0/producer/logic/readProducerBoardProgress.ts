@@ -17,7 +17,7 @@ export function readProducerBoardProgress({ activation, nowMs }: readProducerBoa
 				line.startAtMs !== undefined &&
 				line.readyAtMs !== undefined &&
 				line.startAtMs <= nowMs &&
-				line.readyAtMs > nowMs,
+				(line.pausedAtMs !== undefined || line.readyAtMs > nowMs),
 		)
 		.sort(
 			(left, right) =>

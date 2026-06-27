@@ -116,7 +116,8 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		nowMs,
 		...Object.values(nextSave.producerJobs)
 			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
-			.map(readProducerJobWakeAtMs),
+			.map(readProducerJobWakeAtMs)
+			.filter((wakeAtMs): wakeAtMs is number => wakeAtMs !== undefined),
 	);
 	yield* checkProducerProductStartRuntimeConstraintsFx({
 		config,

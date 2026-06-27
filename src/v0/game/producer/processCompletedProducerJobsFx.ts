@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { completeProducerJobFx } from "~/v0/game/producer/completeProducerJobFx";
 import { readCompletedProducerJobsFx } from "~/v0/game/producer/readCompletedProducerJobsFx";
+import { syncRealtimeProducerJobsFx } from "~/v0/game/producer/syncRealtimeProducerJobsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -19,29 +20,32 @@ export const processCompletedProducerJobsFx = Effect.fn("processCompletedProduce
 		const events: GameEvent[] = [];
 
 		while (true) {
-			const producerJobs = yield* readCompletedProducerJobsFx({
+			nextSave = yield* syncRealtimeProducerJobsFx({
+				config,
+				nowMs,
+				save: nextSave,
+			});
+			const [job] = yield* readCompletedProducerJobsFx({
 				nowMs,
 				save: nextSave,
 			});
 
-			if (producerJobs.length === 0) break;
-
-			for (const job of producerJobs) {
-				const result = yield* completeProducerJobFx({
-					config,
-					job,
-					nowMs,
+			if (!job) {
+				return {
+					events,
 					save: nextSave,
-				});
-
-				nextSave = result.save;
-				events.push(...result.events);
+				};
 			}
-		}
 
-		return {
-			events,
-			save: nextSave,
-		};
+			const result = yield* completeProducerJobFx({
+				config,
+				job,
+				nowMs,
+				save: nextSave,
+			});
+
+			nextSave = result.save;
+			events.push(...result.events);
+		}
 	},
 );

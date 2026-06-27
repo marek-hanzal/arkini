@@ -18,7 +18,6 @@ import { storeProducerInputFx } from "~/v0/game/producer/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/v0/game/producer/withdrawProducerInputFx";
 import { startProducerProductFx } from "~/v0/game/producer/startProducerProductFx";
 import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
-import { syncRealtimeProducerJobsFx } from "~/v0/game/producer/syncRealtimeProducerJobsFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { processExpiredActiveEffectsFx } from "~/v0/game/effects/processExpiredActiveEffectsFx";
 import { storeStoredRequirementFx } from "~/v0/game/requirements/storeStoredRequirementFx";
@@ -185,15 +184,10 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		config,
 	});
 
-	const syncedSave = yield* syncRealtimeProducerJobsFx({
-		config,
-		nowMs,
-		save: actionResult.save,
-	});
 	const completedProducerJobs = yield* processCompletedProducerJobsFx({
 		config,
 		nowMs,
-		save: syncedSave,
+		save: actionResult.save,
 	});
 	const expiredActiveEffects = yield* processExpiredActiveEffectsFx({
 		nowMs,

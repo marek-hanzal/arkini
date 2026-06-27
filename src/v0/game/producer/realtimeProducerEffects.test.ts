@@ -169,6 +169,135 @@ const startProducer = ({ config, nowMs, save }: Parameters<typeof runAction>[0])
 		},
 	});
 
+const createOutputCreatesRealtimeSourceConfig = () => {
+	const baseConfig = createEngineTestConfig();
+	return createEngineTestConfig({
+		effects: {
+			"effect:nearby-speed": {
+				name: "Nearby speed",
+				operations: [
+					{
+						kind: "duration.multiply",
+						multiplier: 0.1,
+						target: {
+							productIds: [
+								"product:test",
+							],
+						},
+					},
+				],
+				radius: 1,
+				scope: "local",
+			},
+		},
+		game: {
+			...baseConfig.game,
+			board: {
+				height: 1,
+				width: 3,
+			},
+			inventory: {
+				slots: 3,
+			},
+		},
+		items: {
+			...baseConfig.items,
+			"item:axe": {
+				...baseConfig.items["item:axe"],
+				passiveEffectIds: [
+					"effect:nearby-speed",
+				],
+			},
+		},
+		producers: {
+			...baseConfig.producers,
+			"item:producer": {
+				...baseConfig.producers["item:producer"],
+				maxQueueSize: 2,
+				productIds: [
+					"product:test",
+					"product:spawn-buff",
+				],
+			},
+		},
+		products: {
+			...baseConfig.products,
+			"product:test": {
+				...baseConfig.products["product:test"],
+				durationMs: 5000,
+				output: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+						type: "guaranteed",
+					},
+				],
+			},
+			"product:spawn-buff": {
+				durationMs: 1000,
+				name: "Spawn buff",
+				output: [
+					{
+						itemId: "item:axe",
+						quantity: 1,
+						type: "guaranteed",
+					},
+				],
+				placement: "board_then_inventory",
+				requirementIds: [],
+				tags: [],
+				visibility: "visible",
+			},
+		},
+		startingState: {
+			board: [
+				{
+					itemId: "item:producer",
+					x: 0,
+					y: 0,
+				},
+				{
+					itemId: "item:producer",
+					x: 1,
+					y: 0,
+				},
+			],
+			inventory: [],
+		},
+	});
+};
+
+const createCraftCreatesRealtimeSourceConfig = () => {
+	const baseConfig = createOutputCreatesRealtimeSourceConfig();
+	return createEngineTestConfig({
+		...baseConfig,
+		craftRecipes: {
+			...baseConfig.craftRecipes,
+			"item:craft-table": {
+				durationMs: 1000,
+				inputs: [],
+				requirements: [],
+				resultItemId: "item:axe",
+			},
+		},
+		startingState: {
+			board: [
+				{
+					itemId: "item:producer",
+					x: 1,
+					y: 0,
+				},
+				{
+					itemId: "item:craft-table",
+					x: 2,
+					y: 0,
+				},
+			],
+			inventory: [],
+		},
+	});
+};
+
 describe("realtime producer effects", () => {
 	it("extends a running producer job when a local duration source leaves proximity", () => {
 		const config = createRealtimeDurationConfig({
@@ -335,5 +464,99 @@ describe("realtime producer effects", () => {
 				}),
 			]),
 		);
+	});
+
+	it("resyncs and completes producer jobs after another producer creates an effect source", () => {
+		const config = createOutputCreatesRealtimeSourceConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:creates-buff"] = {
+			id: "job:creates-buff",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:spawn-buff",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		save.producerJobs["job:uses-buff"] = {
+			id: "job:uses-buff",
+			producerItemInstanceId: "item-instance:2",
+			productId: "product:test",
+			readyAtMs: 5000,
+			startAtMs: 0,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					jobId: "job:creates-buff",
+					type: "product.completed",
+				}),
+				expect.objectContaining({
+					itemId: "item:axe",
+					type: "item.created",
+				}),
+				expect.objectContaining({
+					jobId: "job:uses-buff",
+					type: "product.completed",
+				}),
+			]),
+		);
+		expect(result.save.producerJobs).toEqual({});
+	});
+
+	it("resyncs and completes producer jobs after craft creates an effect source", () => {
+		const config = createCraftCreatesRealtimeSourceConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:uses-crafted-buff"] = {
+			id: "job:uses-crafted-buff",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 5000,
+			startAtMs: 0,
+		};
+		save.craftJobs["job:crafts-buff"] = {
+			id: "job:crafts-buff",
+			recipeId: "item:craft-table",
+			readyAtMs: 1000,
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:2",
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					jobId: "job:crafts-buff",
+					type: "craft.completed",
+				}),
+				expect.objectContaining({
+					fromItemId: "item:craft-table",
+					toItemId: "item:axe",
+					type: "item.replaced",
+				}),
+				expect.objectContaining({
+					jobId: "job:uses-crafted-buff",
+					type: "product.completed",
+				}),
+			]),
+		);
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.save.craftJobs).toEqual({});
 	});
 });

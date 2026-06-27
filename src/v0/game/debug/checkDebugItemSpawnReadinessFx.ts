@@ -120,6 +120,11 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 				}
 
 				simulatedSave.board.items[`debug-readiness:${index}`] = {
+					...(config.items[action.itemId]?.passiveEffectIds?.length
+						? {
+								createdAtMs: nowMs,
+							}
+						: {}),
 					id: `debug-readiness:${index}`,
 					itemId: action.itemId,
 					x: targetCell.x,

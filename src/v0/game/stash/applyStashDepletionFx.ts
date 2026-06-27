@@ -102,6 +102,11 @@ export const applyStashDepletionFx = Effect.fn("applyStashDepletionFx")(function
 		);
 	}
 
+	if (config.items[replacementItemId]?.passiveEffectIds?.length) {
+		liveItem.createdAtMs = nowMs;
+	} else {
+		delete liveItem.createdAtMs;
+	}
 	liveItem.itemId = replacementItemId;
 	removeBoardItemRuntimeState({
 		itemInstanceId: stashItemInstanceId,

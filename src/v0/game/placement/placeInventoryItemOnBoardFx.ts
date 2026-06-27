@@ -117,6 +117,15 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 		});
 
 		nextSave.board.items[liveSlot.id] = {
+			...(liveSlot.createdAtMs !== undefined
+				? {
+						createdAtMs: liveSlot.createdAtMs,
+					}
+				: config.items[itemId]?.passiveEffectIds?.length
+					? {
+							createdAtMs: nowMs,
+						}
+					: {}),
 			id: liveSlot.id,
 			itemId,
 			x: targetCell.x,
@@ -202,6 +211,11 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 		},
 	});
 	nextSave.board.items[itemInstanceId] = {
+		...(config.items[itemId]?.passiveEffectIds?.length
+			? {
+					createdAtMs: nowMs,
+				}
+			: {}),
 		id: itemInstanceId,
 		itemId,
 		x: action.x,

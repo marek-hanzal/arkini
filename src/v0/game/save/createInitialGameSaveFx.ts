@@ -57,6 +57,11 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		const id = `item-instance:${initialItemInstanceIndex}`;
 		initialItemInstanceIndex += 1;
 		boardItems[id] = {
+			...(config.items[entry.itemId]?.passiveEffectIds?.length
+				? {
+						createdAtMs: nowMs,
+					}
+				: {}),
 			id,
 			itemId: entry.itemId,
 			x: entry.x,
@@ -76,6 +81,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 			config,
 			inventorySlots,
 			itemId: entry.itemId,
+			nowMs,
 			quantity: entry.quantity,
 		});
 	}

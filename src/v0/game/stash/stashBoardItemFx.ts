@@ -52,6 +52,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 		const events: GameEvent[] = [];
 		yield* placeGameSaveInventoryInstanceFx({
 			config,
+			createdAtMs: item.createdAtMs,
 			events,
 			itemId: item.itemId,
 			itemInstanceId: item.id,

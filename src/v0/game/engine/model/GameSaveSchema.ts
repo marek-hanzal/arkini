@@ -10,6 +10,7 @@ const PositiveIntegerSchema = z.number().int().positive();
 
 const GameSaveBoardItemSchema = z
 	.object({
+		createdAtMs: GameInstantMsSchema.optional(),
 		id: IdSchema,
 		itemId: IdSchema,
 		x: NonNegativeIntegerSchema,
@@ -19,6 +20,7 @@ const GameSaveBoardItemSchema = z
 
 const GameSaveInventoryStackSchema = z
 	.object({
+		createdAtMs: GameInstantMsSchema.optional(),
 		itemId: IdSchema,
 		quantity: PositiveIntegerSchema,
 	})
@@ -26,6 +28,7 @@ const GameSaveInventoryStackSchema = z
 
 const GameSaveInventoryInstanceSchema = z
 	.object({
+		createdAtMs: GameInstantMsSchema.optional(),
 		id: IdSchema,
 		itemId: IdSchema,
 		kind: z.literal("instance"),

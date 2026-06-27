@@ -371,4 +371,275 @@ describe("readEffectiveProducerProductLine", () => {
 			}).visible,
 		).toBe(true);
 	});
+
+	it("applies local effects from farthest to nearest so the nearest replace output wins", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 5,
+				},
+			},
+			effects: {
+				"effect:far-replace": {
+					name: "Far replace",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					radius: 5,
+					scope: "local",
+				},
+				"effect:near-replace": {
+					name: "Near replace",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:key",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					radius: 5,
+					scope: "local",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:far-replace",
+					],
+				},
+				"item:rock": {
+					...baseConfig.items["item:rock"],
+					passiveEffectIds: [
+						"effect:near-replace",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 2,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 3,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:test"];
+
+		const beforeMove = readEffectiveProducerProductLine({
+			baseDurationMs: product.durationMs,
+			config,
+			nowMs: 0,
+			producerId: "item:producer",
+			producerItemId: "item:producer",
+			producerItemInstanceId: "item-instance:1",
+			product,
+			productId: "product:test",
+			save,
+		});
+		expect(beforeMove.lootPlan.baseOutput).toMatchObject([
+			{
+				itemId: "item:key",
+			},
+		]);
+
+		save.board.items["item-instance:2"] = {
+			...save.board.items["item-instance:2"],
+			x: 3,
+		};
+		save.board.items["item-instance:3"] = {
+			...save.board.items["item-instance:3"],
+			x: 0,
+		};
+
+		const afterMove = readEffectiveProducerProductLine({
+			baseDurationMs: product.durationMs,
+			config,
+			nowMs: 0,
+			producerId: "item:producer",
+			producerItemId: "item:producer",
+			producerItemInstanceId: "item-instance:1",
+			product,
+			productId: "product:test",
+			save,
+		});
+		expect(afterMove.lootPlan.baseOutput).toMatchObject([
+			{
+				itemId: "item:plank",
+			},
+		]);
+	});
+
+	it("uses source creation time as the tie breaker when local effects have the same proximity", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+			effects: {
+				"effect:older-replace": {
+					name: "Older replace",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					radius: 1,
+					scope: "local",
+				},
+				"effect:younger-replace": {
+					name: "Younger replace",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:key",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					radius: 1,
+					scope: "local",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:older-replace",
+					],
+				},
+				"item:rock": {
+					...baseConfig.items["item:rock"],
+					passiveEffectIds: [
+						"effect:younger-replace",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			...save.board.items["item-instance:2"],
+			createdAtMs: 200,
+		};
+		save.board.items["item-instance:3"] = {
+			...save.board.items["item-instance:3"],
+			createdAtMs: 300,
+		};
+		const product = config.products["product:test"];
+
+		const effective = readEffectiveProducerProductLine({
+			baseDurationMs: product.durationMs,
+			config,
+			nowMs: 1000,
+			producerId: "item:producer",
+			producerItemId: "item:producer",
+			producerItemInstanceId: "item-instance:1",
+			product,
+			productId: "product:test",
+			save,
+		});
+
+		expect(effective.lootPlan.baseOutput).toMatchObject([
+			{
+				itemId: "item:key",
+			},
+		]);
+		expect(effective.appliedEffects.map((effect) => effect.effectId)).toEqual([
+			"effect:older-replace",
+			"effect:younger-replace",
+		]);
+	});
 });

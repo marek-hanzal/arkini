@@ -90,6 +90,10 @@ export const readEffectiveProducerProductLine = ({
 	const chanceItems: EffectiveProducerProductLine["lootPlan"]["chanceItems"] = [];
 	const appliedEffects: AppliedGameEffectOperation[] = [];
 	const blockReasons: AppliedGameEffectOperation[] = [];
+	const targetCell = readGameEffectSourceCell({
+		save,
+		sourceItemInstanceId: producerItemInstanceId,
+	});
 
 	const sources = readGameEffectSourceInstances({
 		config,
@@ -110,6 +114,8 @@ export const readEffectiveProducerProductLine = ({
 				config,
 				left,
 				right,
+				save,
+				targetCell,
 			}),
 		);
 

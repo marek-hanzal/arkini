@@ -35,6 +35,8 @@ export const readGameEffectItemCreateBlockReasons = ({
 			config,
 			left,
 			right,
+			save,
+			targetCell,
 		}),
 	);
 

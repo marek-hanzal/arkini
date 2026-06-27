@@ -205,6 +205,11 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		itemInstanceId: liveJob.targetItemInstanceId,
 		save: nextSave,
 	});
+	if (config.items[recipe.resultItemId]?.passiveEffectIds?.length) {
+		nextTarget.createdAtMs = nowMs;
+	} else {
+		delete nextTarget.createdAtMs;
+	}
 	nextTarget.itemId = recipe.resultItemId;
 	nextSave.updatedAtMs = nowMs;
 

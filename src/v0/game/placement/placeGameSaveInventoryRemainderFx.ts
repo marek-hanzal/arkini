@@ -7,6 +7,7 @@ import type { GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchem
 export namespace placeGameSaveInventoryRemainderFx {
 	export interface Props {
 		events: GameEvent[];
+		createdAtMs?: number;
 		item: GameSaveItemPlacementRequest;
 		maxStackSize: number;
 		remainingQuantity: number;
@@ -17,6 +18,7 @@ export namespace placeGameSaveInventoryRemainderFx {
 export const placeGameSaveInventoryRemainderFx = Effect.fn("placeGameSaveInventoryRemainderFx")(
 	function* ({
 		events,
+		createdAtMs,
 		item,
 		maxStackSize,
 		remainingQuantity,
@@ -61,6 +63,11 @@ export const placeGameSaveInventoryRemainderFx = Effect.fn("placeGameSaveInvento
 
 			const placedQuantity = Math.min(maxStackSize, remaining);
 			slots[slotIndex] = {
+				...(createdAtMs !== undefined
+					? {
+							createdAtMs,
+						}
+					: {}),
 				itemId: item.itemId,
 				quantity: placedQuantity,
 			};

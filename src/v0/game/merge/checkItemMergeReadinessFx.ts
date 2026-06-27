@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { checkBoardItemIdleFx } from "~/v0/game/board/checkBoardItemIdleFx";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
@@ -98,14 +99,11 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 			),
 		);
 	}
-	if (Object.values(save.producerJobs).some((job) => job.producerItemInstanceId === target.id)) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"invalid_actor",
-				"Merge target has a running producer job.",
-			),
-		);
-	}
+	yield* checkBoardItemIdleFx({
+		itemInstanceId: target.id,
+		message: "Merge target has a running job.",
+		save,
+	});
 
 	return {
 		merge,

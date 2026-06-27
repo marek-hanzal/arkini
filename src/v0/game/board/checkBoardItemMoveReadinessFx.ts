@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionBoardItemMoveSchema } from "~/v0/game/action/GameActionBoardItemMoveSchema";
+import { checkBoardItemIdleFx } from "~/v0/game/board/checkBoardItemIdleFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -29,6 +30,14 @@ export const checkBoardItemMoveReadinessFx = Effect.fn("checkBoardItemMoveReadin
 			GameEngineError.actionRejected("invalid_actor", "Board item does not exist."),
 		);
 	}
+
+	if (item.x === action.x && item.y === action.y) return item;
+
+	yield* checkBoardItemIdleFx({
+		itemInstanceId: item.id,
+		message: "Board item has a running job and cannot be moved.",
+		save,
+	});
 
 	const occupied = Object.values(save.board.items).find(
 		(entry) => entry.id !== item.id && entry.x === action.x && entry.y === action.y,

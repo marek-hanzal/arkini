@@ -516,6 +516,77 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("rejects queued producer start when the product line is hidden at queued start time", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:hide-test": {
+					name: "Hide test",
+					operations: [
+						{
+							kind: "line.hide",
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:hide-test"] = {
+			endAtMs: 2000,
+			effectId: "effect:hide-test",
+			id: "effect-instance:hide-test",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 1000,
+		};
+
+		const first = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const second = runActionEither({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save: first.save,
+		});
+
+		expect(second).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "invalid_actor",
+			},
+		});
+	});
+
 	it("starts active effect product lines as timed producer jobs", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

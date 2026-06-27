@@ -66,6 +66,15 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 		save,
 	});
 
+	if (!effectiveProductLine.visible) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"invalid_actor",
+				`Product "${productId}" is hidden by an active effect at its scheduled start.`,
+			),
+		);
+	}
+
 	if (effectiveProductLine.blocked) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

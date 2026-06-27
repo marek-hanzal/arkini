@@ -25,6 +25,7 @@ export const createItemSpawnJobsFx = Effect.fn("createItemSpawnJobsFx")(function
 }: createItemSpawnJobsFx.Props) {
 	let itemSpawnIndex = 0;
 	let lastDueAtMs = readyAtMs;
+	let previousJobId: string | undefined;
 	const jobIds: string[] = [];
 
 	for (const item of items) {
@@ -34,6 +35,12 @@ export const createItemSpawnJobsFx = Effect.fn("createItemSpawnJobsFx")(function
 			const id = yield* createGameItemSpawnJobIdFx();
 			save.itemSpawnJobs[id] = {
 				readyAtMs: itemSpawnDueAtMs,
+				afterJobIds:
+					exclusiveGroupKey && previousJobId
+						? [
+								previousJobId,
+							]
+						: undefined,
 				exclusiveGroupKey,
 				id,
 				itemId: item.itemId,
@@ -45,6 +52,7 @@ export const createItemSpawnJobsFx = Effect.fn("createItemSpawnJobsFx")(function
 				type: "item.spawn",
 			};
 			jobIds.push(id);
+			previousJobId = id;
 			itemSpawnIndex += 1;
 		}
 	}

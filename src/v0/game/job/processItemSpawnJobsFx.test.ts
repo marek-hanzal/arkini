@@ -100,6 +100,84 @@ describe("processItemSpawnJobsFx", () => {
 		expect(Object.values(nextTick.save.itemSpawnJobs)).toHaveLength(1);
 	});
 
+	it("keeps exclusive spawn jobs behind a blocked previous sequence job", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					storage: "board",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const itemSpawn = runCreateItemSpawnJobs({
+			readyAtMs: 100,
+			exclusiveGroupKey: "spawn-group:test",
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					reason: "debug",
+				},
+				{
+					itemId: "item:plank",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			save,
+		});
+		const [blockedJobId, waitingJobId] = itemSpawn.jobIds;
+		expect(save.itemSpawnJobs[waitingJobId ?? ""]?.afterJobIds).toEqual([
+			blockedJobId,
+		]);
+
+		const blocked = runItemSpawn({
+			config,
+			nowMs: 100,
+			save,
+		});
+		const nextTick = runItemSpawn({
+			config,
+			nowMs: 101,
+			save: blocked.save,
+		});
+
+		expect(blocked.events).toEqual([
+			{
+				atMs: 100,
+				itemId: "item:twig",
+				reason: "board:full",
+				jobId: blockedJobId,
+				type: "item.spawn.blocked",
+			},
+		]);
+		expect(nextTick.events).toEqual([]);
+		expect(nextTick.save.itemSpawnJobs[waitingJobId ?? ""]).toBeDefined();
+		expect(
+			runNextWakeAtMs({
+				nowMs: 101,
+				save: nextTick.save,
+			}),
+		).toBe(100 + blockedItemSpawnJobRetryDelayMs);
+	});
+
 	it("keeps blocked item spawn jobs pending", () => {
 		const config = createEngineTestConfig({
 			game: {

@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { checkBoardItemIdleFx } from "~/v0/game/board/checkBoardItemIdleFx";
 import type { GameActionBoardItemsSwapSchema } from "~/v0/game/action/GameActionBoardItemsSwapSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -26,6 +27,17 @@ export const checkBoardItemsSwapReadinessFx = Effect.fn("checkBoardItemsSwapRead
 				GameEngineError.actionRejected("invalid_actor", "Both board items must exist."),
 			);
 		}
+
+		yield* checkBoardItemIdleFx({
+			itemInstanceId: source.id,
+			message: "Board item has a running job and cannot be swapped.",
+			save,
+		});
+		yield* checkBoardItemIdleFx({
+			itemInstanceId: target.id,
+			message: "Board item has a running job and cannot be swapped.",
+			save,
+		});
 
 		return {
 			source,

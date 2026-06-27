@@ -399,6 +399,53 @@ describe("GameSaveConfigSchema", () => {
 		).not.toThrow();
 	});
 
+	it("accepts blocked craft jobs that are waiting for a future retry", () => {
+		const config = createEngineCraftTableTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const blockedSave = cloneSave(save);
+		blockedSave.craftJobs["job:1"] = {
+			...createCraftJob("job:1", "item-instance:1"),
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2000,
+			},
+		};
+
+		expect(() =>
+			GameSaveConfigSchema.parse({
+				config,
+				save: blockedSave,
+			}),
+		).not.toThrow();
+	});
+
+	it("rejects craft jobs blocked before their result is ready", () => {
+		const config = createEngineCraftTableTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.craftJobs["job:1"] = {
+			...createCraftJob("job:1", "item-instance:1"),
+			delivery: {
+				lastBlockedAtMs: 999,
+				nextAttemptAtMs: 2000,
+			},
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("cannot be blocked before it is ready");
+	});
+
 	it("rejects producer queues above their effective max queue size", () => {
 		const config = createEngineTestConfig();
 		const save = createInitialSave({

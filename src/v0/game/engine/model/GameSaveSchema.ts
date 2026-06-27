@@ -38,7 +38,7 @@ const GameSaveInventorySlotSchema = z.union([
 	z.null(),
 ]);
 
-const GameSaveProducerDeliverySchema = z
+const GameSaveDeliveryRetrySchema = z
 	.object({
 		lastBlockedAtMs: GameInstantMsSchema,
 		nextAttemptAtMs: GameInstantMsSchema,
@@ -54,7 +54,7 @@ const GameSaveProducerDeliverySchema = z
 const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
-		delivery: GameSaveProducerDeliverySchema.optional(),
+		delivery: GameSaveDeliveryRetrySchema.optional(),
 		producerItemInstanceId: IdSchema,
 		productId: IdSchema,
 		startAtMs: GameInstantMsSchema,
@@ -88,6 +88,7 @@ const GameSaveActiveEffectSchema = z
 const GameSaveCraftJobSchema = z
 	.object({
 		id: IdSchema,
+		delivery: GameSaveDeliveryRetrySchema.optional(),
 		recipeId: IdSchema,
 		startAtMs: GameInstantMsSchema,
 		readyAtMs: GameInstantMsSchema,
@@ -1070,6 +1071,19 @@ const validateGameSaveAgainstConfig = (
 					"targetItemInstanceId",
 				],
 				`Craft job target "${job.targetItemInstanceId}" must reference item recipe "${job.recipeId}".`,
+			);
+		}
+
+		if (job.delivery && job.delivery.lastBlockedAtMs < job.readyAtMs) {
+			addSaveIssue(
+				ctx,
+				[
+					"craftJobs",
+					jobId,
+					"delivery",
+					"lastBlockedAtMs",
+				],
+				`Craft job "${jobId}" cannot be blocked before it is ready.`,
 			);
 		}
 

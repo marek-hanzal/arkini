@@ -301,6 +301,16 @@ const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
+			type: z.literal("craft.blocked"),
+			jobId: IdSchema,
+			recipeId: IdSchema,
+			targetItemInstanceId: IdSchema,
+			reason: GamePlacementFailureReasonSchema,
+			atMs: GameInstantMsSchema,
+		})
+		.strict(),
+	z
+		.object({
 			type: z.literal("craft.failed"),
 			jobId: IdSchema,
 			recipeId: IdSchema,

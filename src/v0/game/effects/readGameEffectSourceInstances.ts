@@ -43,10 +43,11 @@ const readPassiveBoardSources = ({
 
 			return [
 				{
-					startAtMs: 0,
+					startAtMs: item.createdAtMs ?? 0,
 					effectId,
 					kind: "passive" as const,
 					sourceId: item.id,
+					sourceCreatedAtMs: item.createdAtMs ?? 0,
 					sourceItemInstanceId: item.id,
 					sourceLocation: "board" as const,
 				},
@@ -107,10 +108,11 @@ const readPassiveInventorySources = ({
 					});
 
 					return {
-						startAtMs: 0,
+						startAtMs: slot.createdAtMs ?? 0,
 						effectId,
 						kind: "passive" as const,
 						sourceId: sourceItemInstanceId,
+						sourceCreatedAtMs: slot.createdAtMs ?? 0,
 						sourceItemInstanceId,
 						sourceLocation: "inventory" as const,
 					};
@@ -168,6 +170,7 @@ export const readGameEffectSourceInstances = ({
 					effectId: effect.effectId,
 					kind: "active" as const,
 					sourceId: effect.id,
+					sourceCreatedAtMs: effect.startAtMs,
 					sourceItemInstanceId: effect.sourceItemInstanceId,
 					sourceLocation,
 				},

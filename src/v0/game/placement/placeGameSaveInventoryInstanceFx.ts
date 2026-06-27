@@ -11,6 +11,7 @@ export namespace placeGameSaveInventoryInstanceFx {
 		events: GameEvent[];
 		itemId: string;
 		itemInstanceId: string;
+		createdAtMs?: number;
 		reason: Extract<
 			GameEvent,
 			{
@@ -27,6 +28,7 @@ export const placeGameSaveInventoryInstanceFx = Effect.fn("placeGameSaveInventor
 		events,
 		itemId,
 		itemInstanceId,
+		createdAtMs,
 		reason,
 		slots,
 	}: placeGameSaveInventoryInstanceFx.Props) {
@@ -53,6 +55,11 @@ export const placeGameSaveInventoryInstanceFx = Effect.fn("placeGameSaveInventor
 		}
 
 		slots[slotIndex] = {
+			...(createdAtMs !== undefined
+				? {
+						createdAtMs,
+					}
+				: {}),
 			id: itemInstanceId,
 			itemId,
 			kind: "instance",

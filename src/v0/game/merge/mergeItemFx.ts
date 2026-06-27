@@ -65,6 +65,11 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		targetCell: liveTarget,
 	});
 
+	if (config.items[checked.merge.resultItemId]?.passiveEffectIds?.length) {
+		liveTarget.createdAtMs = nowMs;
+	} else {
+		delete liveTarget.createdAtMs;
+	}
 	liveTarget.itemId = checked.merge.resultItemId;
 	removeBoardItemRuntimeState({
 		itemInstanceId: checked.target.id,

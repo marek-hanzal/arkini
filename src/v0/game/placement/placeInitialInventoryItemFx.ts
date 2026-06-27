@@ -10,6 +10,7 @@ export namespace placeInitialInventoryItemFx {
 		config: GameConfig;
 		inventorySlots: GameSaveInventorySlot[];
 		itemId: string;
+		nowMs: number;
 		quantity: number;
 	}
 }
@@ -18,6 +19,7 @@ export const placeInitialInventoryItemFx = Effect.fn("placeInitialInventoryItemF
 	config,
 	inventorySlots,
 	itemId,
+	nowMs,
 	quantity,
 }: placeInitialInventoryItemFx.Props) {
 	const item = config.items[itemId];
@@ -67,6 +69,11 @@ export const placeInitialInventoryItemFx = Effect.fn("placeInitialInventoryItemF
 
 		const placedQuantity = Math.min(item.maxStackSize, remainingQuantity);
 		inventorySlots[slotIndex] = {
+			...(item.passiveEffectIds?.length
+				? {
+						createdAtMs: nowMs,
+					}
+				: {}),
 			itemId,
 			quantity: placedQuantity,
 		};

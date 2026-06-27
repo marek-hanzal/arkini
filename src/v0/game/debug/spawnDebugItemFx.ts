@@ -89,6 +89,11 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 
 			const itemInstanceId = yield* createGameItemInstanceIdFx();
 			nextSave.board.items[itemInstanceId] = {
+				...(item.passiveEffectIds?.length
+					? {
+							createdAtMs: nowMs,
+						}
+					: {}),
 				id: itemInstanceId,
 				itemId: action.itemId,
 				x: emptyCell.x,
@@ -108,6 +113,7 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 		}
 	} else {
 		const placed = yield* placeGameSaveInventoryRemainderFx({
+			createdAtMs: item.passiveEffectIds?.length ? nowMs : undefined,
 			events,
 			item: {
 				itemId: action.itemId,

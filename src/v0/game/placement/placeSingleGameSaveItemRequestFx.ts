@@ -136,6 +136,11 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 
 			const itemInstanceId = yield* createGameItemInstanceIdFx();
 			save.board.items[itemInstanceId] = {
+				...(itemDefinition.passiveEffectIds?.length
+					? {
+							createdAtMs: nowMs,
+						}
+					: {}),
 				id: itemInstanceId,
 				itemId: item.itemId,
 				x: emptyCell.x,
@@ -159,6 +164,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 
 		const inventoryPlaced = canPlaceInInventory
 			? yield* placeGameSaveInventoryRemainderFx({
+					createdAtMs: itemDefinition.passiveEffectIds?.length ? nowMs : undefined,
 					events,
 					item,
 					maxStackSize: itemDefinition.maxStackSize,

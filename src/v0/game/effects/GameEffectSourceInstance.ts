@@ -3,6 +3,7 @@ export interface GameEffectSourceInstance {
 	effectId: string;
 	kind: "active" | "passive";
 	sourceId: string;
+	sourceCreatedAtMs?: number;
 	sourceItemInstanceId: string;
 	sourceLocation: "board" | "inventory";
 }

@@ -925,15 +925,6 @@ const validateGameSaveAgainstConfig = (
 
 			const previousQueueBarrierAtMs = readProducerQueueBarrierAtMs(previous.job);
 			if (previousQueueBarrierAtMs === undefined) {
-				addSaveIssue(
-					ctx,
-					[
-						"producerJobs",
-						current.jobId,
-						"startAtMs",
-					],
-					`Producer job "${current.jobId}" for "${producerItemInstanceId}" starts after paused previous job "${previous.jobId}" without a finite queue release time.`,
-				);
 				continue;
 			}
 

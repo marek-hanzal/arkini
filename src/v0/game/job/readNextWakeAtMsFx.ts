@@ -3,7 +3,10 @@ import type { GameSave, GameSaveItemSpawnJob } from "~/v0/game/engine/model/Game
 import { readCraftJobWakeAtMs } from "~/v0/game/craft/craftCompletionTiming";
 import { readProducerQueueWakeAtMsValues } from "~/v0/game/producer/readProducerQueueWakeAtMsValues";
 import { readMinGameWakeAtMs } from "~/v0/game/time/GameTime";
-import { isProducerJobPaused } from "~/v0/game/producer/producerDeliveryTiming";
+import {
+	isProducerJobBlockedByPausedQueueHead,
+	isProducerJobPaused,
+} from "~/v0/game/producer/producerDeliveryTiming";
 
 export const pastDueGameJobWakeDelayMs = 1;
 
@@ -69,7 +72,16 @@ const readActiveEffectWakeTimes = ({ nowMs, save }: { nowMs?: number; save: Game
 		const producerJob = effect.producerJobId
 			? save.producerJobs[effect.producerJobId]
 			: undefined;
-		if (producerJob && isProducerJobPaused(producerJob)) return [];
+		if (
+			producerJob &&
+			(isProducerJobPaused(producerJob) ||
+				isProducerJobBlockedByPausedQueueHead({
+					job: producerJob,
+					save,
+				}))
+		) {
+			return [];
+		}
 
 		return [
 			effect.startAtMs,

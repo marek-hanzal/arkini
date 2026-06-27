@@ -129,9 +129,14 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 	const preflightSave = yield* cloneGameSaveFx({
 		save: nextSave,
 	});
-	if (stash.onDepleted === "remove") {
-		delete preflightSave.board.items[action.stashItemInstanceId];
-	}
+	yield* applyStashDepletionFx({
+		config,
+		nowMs,
+		onDepleted: stash.onDepleted,
+		save: preflightSave,
+		stashItemId: stashItem.itemId,
+		stashItemInstanceId: action.stashItemInstanceId,
+	});
 	yield* placeGameSaveItemsFx({
 		config,
 		items: placementRequests,

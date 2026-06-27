@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { rollProducerJobSnapshotFx } from "~/v0/game/producer/rollProducerJobSnapshotFx";
+import { findActiveEffectByProducerJobId } from "~/v0/game/effects/findActiveEffectByProducerJobId";
+import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
 
 export namespace rescheduleProducerQueueAfterBlockedDeliveryFx {
 	export interface Props {
@@ -13,22 +15,6 @@ export namespace rescheduleProducerQueueAfterBlockedDeliveryFx {
 		resumeAtMs: number;
 	}
 }
-
-const compareProducerQueueOrder = (left: GameSaveProducerJob, right: GameSaveProducerJob) =>
-	left.startAtMs - right.startAtMs ||
-	left.readyAtMs - right.readyAtMs ||
-	left.id.localeCompare(right.id);
-
-const findActiveEffectByProducerJobId = ({
-	producerJobId,
-	save,
-}: {
-	producerJobId: string;
-	save: GameSave;
-}) =>
-	Object.values(save.activeEffects ?? {}).find(
-		(effect) => effect.producerJobId === producerJobId,
-	);
 
 export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 	"rescheduleProducerQueueAfterBlockedDeliveryFx",
@@ -45,7 +31,7 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 			(job) =>
 				job.producerItemInstanceId === producerItemInstanceId && job.id !== blockedJobId,
 		)
-		.sort(compareProducerQueueOrder);
+		.sort(compareProducerQueueJobs);
 	const rescheduledProducerJobIds = new Set(queuedJobs.map((job) => job.id));
 
 	for (const job of queuedJobs) {

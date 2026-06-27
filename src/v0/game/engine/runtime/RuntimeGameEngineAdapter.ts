@@ -4,6 +4,7 @@ import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx"
 import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
 import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
+import { syncRealtimeProducerJobsFx } from "~/v0/game/producer/syncRealtimeProducerJobsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import type { GameAction } from "~/v0/game/action/GameActionSchema";
@@ -94,10 +95,20 @@ export class RuntimeGameEngineAdapter {
 				},
 			));
 
+		const syncedSave = await runGameEngineEffect(
+			syncRealtimeProducerJobsFx({
+				config,
+				nowMs,
+				save,
+			}),
+			{
+				random,
+			},
+		);
 		const nextWakeAtMs = await runGameEngineEffect(
 			readNextWakeAtMsFx({
 				nowMs,
-				save,
+				save: syncedSave,
 			}),
 			{
 				random,
@@ -106,7 +117,7 @@ export class RuntimeGameEngineAdapter {
 
 		return new RuntimeGameEngineAdapter({
 			config,
-			initialSave: save,
+			initialSave: syncedSave,
 			nextWakeAtMs,
 			random,
 		});
@@ -185,10 +196,20 @@ export class RuntimeGameEngineAdapter {
 		save,
 	}: RuntimeGameEngineAdapter.ReplaceSaveProps): Promise<GameEngineResult> {
 		return this.enqueueMutation(async () => {
+			const syncedSave = await runGameEngineEffect(
+				syncRealtimeProducerJobsFx({
+					config: this.config,
+					nowMs,
+					save,
+				}),
+				{
+					random: this.random,
+				},
+			);
 			const nextWakeAtMs = await runGameEngineEffect(
 				readNextWakeAtMsFx({
 					nowMs,
-					save,
+					save: syncedSave,
 				}),
 				{
 					random: this.random,
@@ -201,7 +222,7 @@ export class RuntimeGameEngineAdapter {
 				],
 				nextWakeAtMs,
 				save: {
-					...save,
+					...syncedSave,
 					updatedAtMs: nowMs,
 				},
 			} satisfies GameEngineResult;

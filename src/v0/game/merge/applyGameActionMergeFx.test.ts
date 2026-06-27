@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import {
 	runAction,
@@ -148,5 +149,77 @@ describe("applyGameActionFx merge", () => {
 				type: "item.replaced",
 			},
 		]);
+	});
+	it("rejects merging into a target with a running craft job", () => {
+		const baseConfig = createEngineCraftTableTestConfig({
+			noRecipeInputs: true,
+		});
+		const config = createEngineTestConfig({
+			...baseConfig,
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					mergeIds: [
+						"merge:twig-craft-table",
+					],
+				},
+			},
+			merge: {
+				...baseConfig.merge,
+				"merge:twig-craft-table": {
+					resultItemId: "item:plank",
+					withItemId: "item:craft-table",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:1"] = {
+			readyAtMs: 1000,
+			id: "job:1",
+			recipeId: "item:craft-table",
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const result = runActionEither({
+			action: {
+				sourceRef: {
+					kind: "board",
+					itemInstanceId: "item-instance:2",
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "item.merge",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "item_busy",
+			},
+		});
 	});
 });

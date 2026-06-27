@@ -35,6 +35,77 @@ describe("applyGameActionFx BoardInventory", () => {
 		});
 	});
 
+	it("rejects moving a board item with a running job", () => {
+		const config = createEngineCraftTableTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:1"] = {
+			readyAtMs: 1000,
+			id: "job:1",
+			recipeId: "item:craft-table",
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const result = runActionEither({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "item_busy",
+			},
+		});
+	});
+
+	it("rejects swapping a board item with a running job", () => {
+		const config = createEngineCraftTableTestConfig({
+			boardItemCount: 2,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:1"] = {
+			readyAtMs: 1000,
+			id: "job:1",
+			recipeId: "item:craft-table",
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const result = runActionEither({
+			action: {
+				sourceBoardItemId: "item-instance:1",
+				targetBoardItemId: "item-instance:2",
+				type: "board.items.swap",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "item_busy",
+			},
+		});
+	});
+
 	it("places one inventory item on a board cell", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

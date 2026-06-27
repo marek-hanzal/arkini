@@ -38,6 +38,51 @@ export const validateWorldSnapshotFx = Effect.fn("validateWorldSnapshotFx")(func
 	if (
 		includesCheck({
 			checks,
+			id: "job-delivery",
+		})
+	) {
+		for (const producerJobFacts of facts.producerJobs) {
+			const { job } = producerJobFacts;
+			if (!job.delivery || job.delivery.lastBlockedAtMs >= job.readyAtMs) continue;
+			issues.push({
+				code: "producer_delivery_before_ready",
+				entity: {
+					id: job.id,
+					kind: "producerJob",
+				},
+				evidence: {
+					lastBlockedAtMs: job.delivery.lastBlockedAtMs,
+					nextAttemptAtMs: job.delivery.nextAttemptAtMs,
+					readyAtMs: job.readyAtMs,
+				},
+				message: `Producer job "${job.id}" has blocked delivery before it is ready.`,
+				severity: "error",
+			});
+		}
+
+		for (const craftJobFacts of facts.craftJobs) {
+			const { job } = craftJobFacts;
+			if (!job.delivery || job.delivery.lastBlockedAtMs >= job.readyAtMs) continue;
+			issues.push({
+				code: "craft_delivery_before_ready",
+				entity: {
+					id: job.id,
+					kind: "craftJob",
+				},
+				evidence: {
+					lastBlockedAtMs: job.delivery.lastBlockedAtMs,
+					nextAttemptAtMs: job.delivery.nextAttemptAtMs,
+					readyAtMs: job.readyAtMs,
+				},
+				message: `Craft job "${job.id}" has blocked delivery before it is ready.`,
+				severity: "error",
+			});
+		}
+	}
+
+	if (
+		includesCheck({
+			checks,
 			id: "producer-queues",
 		})
 	) {
@@ -109,16 +154,30 @@ export const validateWorldSnapshotFx = Effect.fn("validateWorldSnapshotFx")(func
 		})
 	) {
 		for (const effectFacts of facts.activeEffects) {
-			if (effectFacts.status !== "active" || !effectFacts.producerJobId) continue;
+			if (!effectFacts.producerJobId) continue;
 			const producerJobFacts = facts.producerJobs.find(
 				(candidate) => candidate.job.id === effectFacts.producerJobId,
 			);
 			if (!producerJobFacts) continue;
-			if (
-				producerJobFacts.status !== "running" &&
-				producerJobFacts.status !== "ready" &&
-				producerJobFacts.status !== "delivery_blocked"
-			) {
+			if (producerJobFacts.job.delivery) {
+				issues.push({
+					code: "active_effect_delivery_job_linked",
+					entity: {
+						id: effectFacts.effect.id,
+						kind: "activeEffect",
+					},
+					evidence: {
+						producerJobId: effectFacts.producerJobId,
+						producerStatus: producerJobFacts.status,
+						status: effectFacts.status,
+					},
+					message: `Active effect "${effectFacts.effect.id}" is linked to completed delivery job "${effectFacts.producerJobId}".`,
+					severity: "error",
+				});
+				continue;
+			}
+			if (effectFacts.status !== "active") continue;
+			if (producerJobFacts.status !== "running" && producerJobFacts.status !== "ready") {
 				issues.push({
 					code: "active_effect_apply_state_invalid",
 					entity: {

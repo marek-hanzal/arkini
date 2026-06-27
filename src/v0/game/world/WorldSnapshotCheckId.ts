@@ -1,1 +1,5 @@
-export type WorldSnapshotCheckId = "active-effects" | "producer-queues" | "replacement-safety";
+export type WorldSnapshotCheckId =
+	| "active-effects"
+	| "job-delivery"
+	| "producer-queues"
+	| "replacement-safety";

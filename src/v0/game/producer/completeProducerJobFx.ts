@@ -84,6 +84,30 @@ const rollProducerDeliveryItemsFx = Effect.fn("completeProducerJobFx.rollProduce
 	},
 );
 
+const rescheduleQueueAfterCompletedDeliveryFx = Effect.fn(
+	"completeProducerJobFx.rescheduleQueueAfterCompletedDeliveryFx",
+)(function* ({
+	config,
+	liveJob,
+	nextSave,
+	nowMs,
+}: {
+	config: GameConfig;
+	liveJob: GameSaveProducerJob;
+	nextSave: GameSave;
+	nowMs: number;
+}) {
+	if (!liveJob.delivery) return;
+
+	yield* rescheduleProducerQueueAfterBlockedDeliveryFx({
+		blockedJobId: liveJob.id,
+		config,
+		nextSave,
+		producerItemInstanceId: liveJob.producerItemInstanceId,
+		resumeAtMs: nowMs,
+	});
+});
+
 export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function* ({
 	config,
 	save,
@@ -124,6 +148,12 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			save,
 		});
 		delete nextSave.producerJobs[liveJob.id];
+		yield* rescheduleQueueAfterCompletedDeliveryFx({
+			config,
+			liveJob,
+			nextSave,
+			nowMs,
+		});
 		nextSave.updatedAtMs = nowMs;
 
 		return {
@@ -168,6 +198,12 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 		if (!isGamePlacementFailureRetryable(error.reason)) {
 			delete nextSave.producerJobs[liveJob.id];
+			yield* rescheduleQueueAfterCompletedDeliveryFx({
+				config,
+				liveJob,
+				nextSave,
+				nowMs,
+			});
 			nextSave.updatedAtMs = nowMs;
 
 			return {
@@ -228,6 +264,12 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 	const placementResult = placementEither.right;
 	delete placementResult.save.producerJobs[liveJob.id];
+	yield* rescheduleQueueAfterCompletedDeliveryFx({
+		config,
+		liveJob,
+		nextSave: placementResult.save,
+		nowMs,
+	});
 	placementResult.save.updatedAtMs = nowMs;
 
 	return {

@@ -940,6 +940,26 @@ const validateGameSaveAgainstConfig = (
 				);
 			}
 		}
+
+		for (const current of sortedProducerJobs) {
+			if (
+				!current.job.delivery ||
+				current.job.delivery.lastBlockedAtMs >= current.job.readyAtMs
+			) {
+				continue;
+			}
+
+			addSaveIssue(
+				ctx,
+				[
+					"producerJobs",
+					current.jobId,
+					"delivery",
+					"lastBlockedAtMs",
+				],
+				`Producer job "${current.jobId}" cannot be blocked before it is ready.`,
+			);
+		}
 	}
 
 	for (const [producerItemInstanceId, lineState] of Object.entries(save.producerLines)) {

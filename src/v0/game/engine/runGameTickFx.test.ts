@@ -492,6 +492,76 @@ describe("runGameTickFx", () => {
 		});
 	});
 
+	it("reschedules queued producer work from a late blocked-delivery release", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		save.producerJobs["job:blocked"] = {
+			readyAtMs: 1000,
+			id: "job:blocked",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startAtMs: 0,
+		};
+		save.producerJobs["job:queued"] = {
+			readyAtMs: 2000,
+			id: "job:queued",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			startAtMs: 1000,
+		};
+
+		const blocked = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+		expect(blocked.save.producerJobs["job:queued"]).toMatchObject({
+			readyAtMs: 3000,
+			startAtMs: 2000,
+		});
+
+		const retrySave = structuredClone(blocked.save);
+		retrySave.inventory.slots[0] = null;
+		const retry = runTick({
+			config,
+			nowMs: 2500,
+			save: retrySave,
+		});
+
+		expect(retry.save.producerJobs).not.toHaveProperty("job:blocked");
+		expect(retry.save.producerJobs["job:queued"]).toMatchObject({
+			readyAtMs: 3500,
+			startAtMs: 2500,
+		});
+	});
+
 	it("reserves placement across multiple producers completing in one tick", () => {
 		const config = createEngineTestConfig({
 			game: {

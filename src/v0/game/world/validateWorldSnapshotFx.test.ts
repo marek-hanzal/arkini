@@ -454,6 +454,145 @@ describe("validateWorldSnapshotFx", () => {
 		]);
 	});
 
+	it("reports delivery retry state that predates job readiness", () => {
+		const producerConfig = createEngineTestConfig();
+		const producerSave = cloneSave(
+			runInitialSave({
+				config: producerConfig,
+				nowMs: 0,
+			}),
+		);
+		producerSave.producerJobs["job:producer"] = {
+			delivery: {
+				lastBlockedAtMs: 999,
+				nextAttemptAtMs: 2000,
+			},
+			id: "job:producer",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+
+		const producerResult = runWorldValidation({
+			checks: [
+				"job-delivery",
+			],
+			config: producerConfig,
+			nowMs: 1500,
+			save: producerSave,
+		});
+
+		expect(producerResult.issues).toEqual([
+			expect.objectContaining({
+				code: "producer_delivery_before_ready",
+			}),
+		]);
+
+		const craftConfig = createEngineCraftTableTestConfig();
+		const craftSave = cloneSave(
+			runInitialSave({
+				config: craftConfig,
+				nowMs: 0,
+			}),
+		);
+		craftSave.craftJobs["job:craft"] = {
+			delivery: {
+				lastBlockedAtMs: 999,
+				nextAttemptAtMs: 2000,
+			},
+			id: "job:craft",
+			recipeId: "item:craft-table",
+			readyAtMs: 1000,
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const craftResult = runWorldValidation({
+			checks: [
+				"job-delivery",
+			],
+			config: craftConfig,
+			nowMs: 1500,
+			save: craftSave,
+		});
+
+		expect(craftResult.issues).toEqual([
+			expect.objectContaining({
+				code: "craft_delivery_before_ready",
+			}),
+		]);
+	});
+
+	it("reports linked active effects left on completed delivery jobs", () => {
+		const baseConfig = createEngineTestConfig();
+		const { output: _output, ...effectProduct } = baseConfig.products["product:test"];
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:product": {
+					name: "Product effect",
+					operations: [
+						{
+							kind: "duration.addMs",
+							target: {
+								all: true,
+							},
+							valueMs: 0,
+						},
+					],
+					scope: "global",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...effectProduct,
+					activatesEffectId: "effect:product",
+				},
+			},
+		});
+		const save = cloneSave(
+			runInitialSave({
+				config,
+				nowMs: 0,
+			}),
+		);
+		save.producerJobs["job:producer"] = {
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2000,
+			},
+			id: "job:producer",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+		save.activeEffects["effect-instance:producer"] = {
+			effectId: "effect:product",
+			endAtMs: 1000,
+			id: "effect-instance:producer",
+			producerJobId: "job:producer",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+
+		const result = runWorldValidation({
+			checks: [
+				"active-effects",
+			],
+			config,
+			nowMs: 1500,
+			save,
+		});
+
+		expect(result.issues).toEqual([
+			expect.objectContaining({
+				code: "active_effect_delivery_job_linked",
+			}),
+		]);
+	});
+
 	it("can validate the adapter live state without mutating the snapshot", async () => {
 		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createEngineTestConfig(),

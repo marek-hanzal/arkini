@@ -446,6 +446,30 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.error?.issues[0]?.message).toContain("cannot be blocked before it is ready");
 	});
 
+	it("rejects producer jobs blocked before their output is ready", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.producerJobs["job:1"] = {
+			...createProducerJob("job:1"),
+			delivery: {
+				lastBlockedAtMs: 999,
+				nextAttemptAtMs: 2000,
+			},
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain("cannot be blocked before it is ready");
+	});
+
 	it("rejects producer queues above their effective max queue size", () => {
 		const config = createEngineTestConfig();
 		const save = createInitialSave({

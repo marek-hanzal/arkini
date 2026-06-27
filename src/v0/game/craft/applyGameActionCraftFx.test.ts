@@ -152,6 +152,229 @@ describe("applyGameActionFx Craft", () => {
 		]);
 	});
 
+	it("completes zero-duration craft jobs in the same action", () => {
+		const baseConfig = createEngineCraftTableTestConfig();
+		const config = createEngineTestConfig({
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:craft-table": {
+					...baseConfig.craftRecipes["item:craft-table"],
+					durationMs: 0,
+					inputs: [],
+					resultItemId: "item:plank",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.craftJobs).toEqual({});
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:plank",
+			x: 0,
+			y: 0,
+		});
+		expect(result.nextWakeAtMs).toBeNull();
+		expect(result.events).toEqual([
+			{
+				atMs: 100,
+				jobId: expect.any(String),
+				readyAtMs: 100,
+				recipeId: "item:craft-table",
+				startAtMs: 100,
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.started",
+			},
+			{
+				atMs: 100,
+				jobId: expect.any(String),
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.completed",
+			},
+			{
+				atMs: 100,
+				fromItemId: "item:craft-table",
+				itemInstanceId: "item-instance:1",
+				reason: "craft-result",
+				toItemId: "item:plank",
+				type: "item.replaced",
+			},
+		]);
+	});
+
+	it("lets an instant craft result resync and complete a due producer in the same action", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:crafted-nearby-speed": {
+					name: "Crafted nearby speed",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0.1,
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					radius: 1,
+					scope: "local",
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+				inventory: {
+					slots: 1,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:crafted-nearby-speed",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					durationMs: 1000,
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:craft-table": {
+					...baseConfig.craftRecipes["item:craft-table"],
+					durationMs: 0,
+					inputs: [],
+					resultItemId: "item:axe",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:craft-table",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const producing = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		expect(readOnlyRecordValue(producing.save.producerJobs)).toMatchObject({
+			readyAtMs: 1000,
+			startAtMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:2",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 500,
+			save: producing.save,
+		});
+
+		expect(result.save.craftJobs).toEqual({});
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:axe",
+			x: 1,
+			y: 0,
+		});
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 2,
+				y: 0,
+			}),
+		).toBeDefined();
+		expect(result.events).toEqual([
+			expect.objectContaining({
+				readyAtMs: 500,
+				type: "craft.started",
+			}),
+			expect.objectContaining({
+				type: "craft.completed",
+			}),
+			expect.objectContaining({
+				fromItemId: "item:craft-table",
+				toItemId: "item:axe",
+				type: "item.replaced",
+			}),
+			expect.objectContaining({
+				productId: "product:test",
+				type: "product.completed",
+			}),
+			expect.objectContaining({
+				itemId: "item:twig",
+				reason: "product-output",
+				type: "item.created",
+			}),
+		]);
+	});
+
 	it("rejects craft input investment when an effect blocks the result item", () => {
 		const baseConfig = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,

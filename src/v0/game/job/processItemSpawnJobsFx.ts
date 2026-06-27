@@ -21,15 +21,23 @@ export const processItemSpawnJobsFx = Effect.fn("processItemSpawnJobsFx")(functi
 	save,
 	nowMs,
 }: processItemSpawnJobsFx.Props) {
+	const dueJobs = yield* readDueItemSpawnJobsFx({
+		nowMs,
+		save,
+	});
+
+	if (dueJobs.length === 0) {
+		return {
+			events: [],
+			save,
+		};
+	}
+
 	let nextSave = yield* cloneGameSaveFx({
 		save,
 	});
 	const events: GameEvent[] = [];
 	const processedExclusiveGroupKeys = new Set<string>();
-	const dueJobs = yield* readDueItemSpawnJobsFx({
-		nowMs,
-		save: nextSave,
-	});
 
 	for (const itemSpawnJob of dueJobs) {
 		if (

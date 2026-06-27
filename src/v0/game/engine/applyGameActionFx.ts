@@ -11,20 +11,16 @@ import { parseGameActionFx } from "~/v0/game/engine/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/remove/removeTileFx";
 import { setProducerProductLineDefaultFx } from "~/v0/game/producer/setProducerProductLineDefaultFx";
 import { startCraftFx } from "~/v0/game/craft/startCraftFx";
-import { processCompletedCraftJobsFx } from "~/v0/game/craft/processCompletedCraftJobsFx";
 import { spawnDebugItemFx } from "~/v0/game/debug/spawnDebugItemFx";
 import { storeCraftInputFx } from "~/v0/game/craft/storeCraftInputFx";
 import { withdrawCraftInputFx } from "~/v0/game/craft/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/v0/game/producer/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/v0/game/producer/withdrawProducerInputFx";
 import { startProducerProductFx } from "~/v0/game/producer/startProducerProductFx";
-import { processCompletedProducerJobsFx } from "~/v0/game/producer/processCompletedProducerJobsFx";
-import { processItemSpawnJobsFx } from "~/v0/game/job/processItemSpawnJobsFx";
-import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
-import { processExpiredActiveEffectsFx } from "~/v0/game/effects/processExpiredActiveEffectsFx";
 import { storeStoredRequirementFx } from "~/v0/game/requirements/storeStoredRequirementFx";
 import { withdrawStoredRequirementFx } from "~/v0/game/requirements/withdrawStoredRequirementFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
+import { processWorldSnapshotFx } from "~/v0/game/world/processWorldSnapshotFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -186,44 +182,18 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		config,
 	});
 
-	const itemSpawnJobs = yield* processItemSpawnJobsFx({
+	const processedWorld = yield* processWorldSnapshotFx({
 		config,
 		nowMs,
 		save: actionResult.save,
-	});
-	const completedProducerJobs = yield* processCompletedProducerJobsFx({
-		config,
-		nowMs,
-		save: itemSpawnJobs.save,
-	});
-	const completedCraftJobs = yield* processCompletedCraftJobsFx({
-		config,
-		nowMs,
-		save: completedProducerJobs.save,
-	});
-	const completedProducerJobsAfterCrafts = yield* processCompletedProducerJobsFx({
-		config,
-		nowMs,
-		save: completedCraftJobs.save,
-	});
-	const expiredActiveEffects = yield* processExpiredActiveEffectsFx({
-		nowMs,
-		save: completedProducerJobsAfterCrafts.save,
 	});
 
 	return {
 		events: [
 			...actionResult.events,
-			...itemSpawnJobs.events,
-			...completedProducerJobs.events,
-			...completedCraftJobs.events,
-			...completedProducerJobsAfterCrafts.events,
-			...expiredActiveEffects.events,
+			...processedWorld.events,
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			nowMs,
-			save: expiredActiveEffects.save,
-		}),
-		save: expiredActiveEffects.save,
+		nextWakeAtMs: processedWorld.nextWakeAtMs,
+		save: processedWorld.save,
 	} satisfies GameEngineResult;
 });

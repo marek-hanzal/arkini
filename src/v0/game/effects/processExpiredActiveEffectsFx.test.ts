@@ -39,6 +39,7 @@ describe("processExpiredActiveEffectsFx", () => {
 		};
 
 		const result = runExpiredEffects({
+			config,
 			nowMs: 500,
 			save,
 		});

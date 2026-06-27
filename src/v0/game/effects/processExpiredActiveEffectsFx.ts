@@ -1,40 +1,36 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { isGameTimeDue } from "~/v0/game/time/GameTime";
-import {
-	isProducerJobBlockedByPausedQueueHead,
-	isProducerJobPaused,
-} from "~/v0/game/producer/producerDeliveryTiming";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readWorldActiveEffectFacts } from "~/v0/game/world/readWorldActiveEffectFacts";
 
 export namespace processExpiredActiveEffectsFx {
 	export interface Props {
+		config: GameConfig;
 		nowMs: number;
 		save: GameSave;
 	}
 }
 
 export const processExpiredActiveEffectsFx = Effect.fn("processExpiredActiveEffectsFx")(function* ({
+	config,
 	nowMs,
 	save,
 }: processExpiredActiveEffectsFx.Props) {
-	const expiredEffects = Object.values(save.activeEffects ?? {})
-		.filter((effect) => {
-			const producerJob = effect.producerJobId
-				? save.producerJobs[effect.producerJobId]
-				: undefined;
-
-			return (
-				!producerJob ||
-				(!isProducerJobPaused(producerJob) &&
-					!isProducerJobBlockedByPausedQueueHead({
-						job: producerJob,
-						save,
-					}))
-			);
-		})
+	const expiredEffects = readWorldActiveEffectFacts({
+		config,
+		nowMs,
+		save,
+	})
+		.filter(
+			(effectFacts) =>
+				effectFacts.status !== "producer_paused" &&
+				effectFacts.status !== "blocked_by_paused_queue_head",
+		)
+		.map((effectFacts) => effectFacts.effect)
 		.filter((effect) =>
 			isGameTimeDue({
 				nowMs,

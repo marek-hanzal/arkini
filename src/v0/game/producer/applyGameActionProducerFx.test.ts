@@ -1210,6 +1210,133 @@ describe("applyGameActionFx Producer", () => {
 		expect(resumed.nextWakeAtMs).toBe(2000);
 	});
 
+	it("pauses a queued producer job when a block effect appears before its scheduled start", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-test": {
+					name: "Block test",
+					operations: [
+						{
+							kind: "line.blockStart",
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:blocker": {
+					assetId: "asset:test",
+					description: "Blocker",
+					maxStackSize: 1,
+					name: "Blocker",
+					passiveEffectIds: [
+						"effect:block-test",
+					],
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:blocker",
+			quantity: 1,
+		};
+
+		const first = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const queued = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save: first.save,
+		});
+		const blockedBeforeStart = runAction({
+			action: {
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 500,
+			save: queued.save,
+		});
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save: blockedBeforeStart.save,
+		});
+		const remainingJob = readOnlyRecordValue(result.save.producerJobs);
+
+		expect(remainingJob).toMatchObject({
+			pausedAtMs: 1000,
+			productId: "product:test",
+			remainingMs: 1000,
+			startAtMs: 1000,
+		});
+		expect(result.nextWakeAtMs).toBeNull();
+
+		const blocker = findBoardItem(result.save, {
+			itemId: "item:blocker",
+			x: 1,
+			y: 0,
+		});
+		expect(blocker).toBeDefined();
+		if (!blocker) return;
+
+		const resumed = runAction({
+			action: {
+				boardItemId: blocker.id,
+				type: "board.item.stash",
+			},
+			config,
+			nowMs: 1500,
+			save: result.save,
+		});
+		const resumedJob = readOnlyRecordValue(resumed.save.producerJobs);
+		expect(resumedJob).toMatchObject({
+			pausedAtMs: undefined,
+			readyAtMs: 2500,
+			remainingMs: undefined,
+			startAtMs: 1500,
+		});
+		expect(resumed.nextWakeAtMs).toBe(2500);
+	});
+
 	it("rejects starting another producer job behind a requirement-paused first job", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

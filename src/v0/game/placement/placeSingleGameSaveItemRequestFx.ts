@@ -84,6 +84,8 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			save,
 		});
 
+		const createdAtMs =
+			item.createdAtMs ?? (itemDefinition.passiveEffectIds?.length ? nowMs : undefined);
 		let remainingQuantity = item.quantity;
 		let boardPlacedQuantity = 0;
 		let boardHitMaxCount = false;
@@ -136,9 +138,9 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 
 			const itemInstanceId = yield* createGameItemInstanceIdFx();
 			save.board.items[itemInstanceId] = {
-				...(itemDefinition.passiveEffectIds?.length
+				...(createdAtMs !== undefined
 					? {
-							createdAtMs: nowMs,
+							createdAtMs,
 						}
 					: {}),
 				id: itemInstanceId,
@@ -164,7 +166,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 
 		const inventoryPlaced = canPlaceInInventory
 			? yield* placeGameSaveInventoryRemainderFx({
-					createdAtMs: itemDefinition.passiveEffectIds?.length ? nowMs : undefined,
+					createdAtMs,
 					events,
 					item,
 					maxStackSize: itemDefinition.maxStackSize,

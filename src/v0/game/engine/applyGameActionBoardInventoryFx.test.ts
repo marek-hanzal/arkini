@@ -152,6 +152,128 @@ describe("applyGameActionFx BoardInventory", () => {
 		]);
 	});
 
+	it("preserves passive inventory stack creation time when placing on the board", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:passive-order": {
+					name: "Passive order",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 1,
+							target: {
+								all: true,
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:passive-order",
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			createdAtMs: 123,
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 999,
+			save,
+		});
+
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toMatchObject({
+			createdAtMs: 123,
+		});
+	});
+
+	it("preserves passive board item creation time when storing it in inventory", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:passive-order": {
+					name: "Passive order",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 1,
+							target: {
+								all: true,
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:passive-order",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 50,
+		});
+		const twig = readOnlyRecordValue(save.board.items);
+
+		const result = runAction({
+			action: {
+				boardItemId: twig.id,
+				type: "board.item.stash",
+			},
+			config,
+			nowMs: 999,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toMatchObject({
+			createdAtMs: 50,
+			itemId: "item:twig",
+			quantity: 1,
+		});
+	});
+
 	it("rejects placing inventory-only items on the board", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

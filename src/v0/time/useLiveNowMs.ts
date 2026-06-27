@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 const liveNowTickMs = 250;
+const useLiveNowEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export function useLiveNowMs(untilMs: readonly (number | null | undefined)[] = []) {
 	const [nowMs, setNowMs] = useState(() => Date.now());
@@ -12,9 +13,11 @@ export function useLiveNowMs(untilMs: readonly (number | null | undefined)[] = [
 	);
 	const activeUntilKey = activeUntilMs.join("|");
 
-	useEffect(() => {
+	useLiveNowEffect(() => {
 		const readNow = () => Date.now();
-		if (activeUntilMs.every((time) => time <= readNow())) return undefined;
+		const initialNowMs = readNow();
+		setNowMs(initialNowMs);
+		if (activeUntilMs.every((time) => time <= initialNowMs)) return undefined;
 
 		const interval = window.setInterval(() => {
 			const nextNowMs = readNow();

@@ -51,6 +51,7 @@ const readRunButtonLabel = ({
 	inputsPartiallyAvailable: boolean;
 	canRunAction: boolean;
 }) => {
+	if (line.pausedAtMs !== undefined) return "Paused";
 	if (line.queueFull) return "Queue full";
 	if (line.blocked) return "Blocked by effect";
 	if (!line.requirementsReady) return "Requirements missing";
@@ -197,12 +198,14 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						line.requirementsReady &&
 						!line.blocked &&
 						!line.queueFull;
+					const lineClockNowMs = line.pausedAtMs ?? nowMs;
 					const remainingMs = line.readyAtMs
 						? readGameTimeRemainingMs({
-								nowMs,
+								nowMs: lineClockNowMs,
 								readyAtMs: line.readyAtMs,
 							})
 						: undefined;
+					const progressLabel = line.pausedAtMs !== undefined ? "Paused" : "Running";
 					const runButtonLabel = readRunButtonLabel({
 						canRunAction,
 						inputsPartiallyAvailable,
@@ -350,7 +353,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								<div className="mt-2.5 rounded-sm bg-ak-surface-soft p-2.5">
 									<div className="flex justify-between gap-3 text-sm font-bold text-ak-primary">
 										<span>
-											Running
+											{progressLabel}
 											{line.queuedJobs > 1
 												? ` +${line.queuedJobs - 1} queued`
 												: ""}

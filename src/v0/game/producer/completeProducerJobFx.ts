@@ -7,13 +7,12 @@ import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/producer/producer
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/v0/game/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
 import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
+import { readProducerJobEffectiveProductLineFx } from "~/v0/game/producer/readProducerJobEffectiveProductLineFx";
+import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
+import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
+import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
-import type {
-	GameSave,
-	GameSaveProducerDeliveryItem,
-	GameSaveProducerJob,
-} from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace completeProducerJobFx {
 	export interface Props {
@@ -38,11 +37,16 @@ const createProductCompletedEvent = ({
 	type: "product.completed" as const,
 });
 
+type ProducerDeliveryItem = {
+	itemId: string;
+	quantity: number;
+};
+
 const toPlacementRequests = ({
 	items,
 	producerItemInstanceId,
 }: {
-	items: readonly GameSaveProducerDeliveryItem[];
+	items: readonly ProducerDeliveryItem[];
 	producerItemInstanceId: string;
 }) =>
 	items.map(
@@ -53,6 +57,32 @@ const toPlacementRequests = ({
 				reason: "product-output",
 			}) satisfies GameSaveItemPlacementRequest,
 	);
+
+const rollProducerDeliveryItemsFx = Effect.fn("completeProducerJobFx.rollProducerDeliveryItemsFx")(
+	function* ({
+		config,
+		job,
+		nowMs,
+		save,
+	}: {
+		config: GameConfig;
+		job: GameSaveProducerJob;
+		nowMs: number;
+		save: GameSave;
+	}) {
+		const effectiveProductLine = yield* readProducerJobEffectiveProductLineFx({
+			config,
+			nowMs,
+			producerItemInstanceId: job.producerItemInstanceId,
+			productId: job.productId,
+			save,
+		});
+		return (yield* rollEffectiveLootPlanItemsFx({
+			config,
+			lootPlan: effectiveProductLine.lootPlan,
+		})).items;
+	},
+);
 
 export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function* ({
 	config,
@@ -70,12 +100,24 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		} satisfies GameEngineCompletionResult;
 	}
 
-	const placement = liveJob.placement;
+	const product = config.products[liveJob.productId];
+	if (!product) {
+		return yield* Effect.fail(
+			GameEngineError.configReferenceMissing(`Missing product "${liveJob.productId}".`),
+		);
+	}
+
+	const placement = product.placement;
 	yield* match(placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
 
-	const deliveryItems = liveJob.outputItems;
+	const deliveryItems = yield* rollProducerDeliveryItemsFx({
+		config,
+		job: liveJob,
+		nowMs,
+		save,
+	});
 
 	if (deliveryItems.length === 0) {
 		const nextSave = yield* cloneGameSaveFx({

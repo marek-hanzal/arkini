@@ -39,7 +39,6 @@ describe("applyGameActionFx Producer", () => {
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
 			readyAtMs: 1500,
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 500,
@@ -58,7 +57,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
-	it("snapshots producer output when product starts so later effects cannot rewrite completion", () => {
+	it("rolls producer output from currently active effects at completion", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -69,7 +68,7 @@ describe("applyGameActionFx Producer", () => {
 							kind: "loot.replaceOutput",
 							output: [
 								{
-									itemId: "item:plank",
+									itemId: "item:twig",
 									quantity: 1,
 									type: "guaranteed",
 								},
@@ -116,12 +115,6 @@ describe("applyGameActionFx Producer", () => {
 			save,
 		});
 		const job = readOnlyRecordValue(started.save.producerJobs);
-		expect(job.outputItems).toEqual([
-			{
-				itemId: "item:plank",
-				quantity: 1,
-			},
-		]);
 
 		const completed = runTick({
 			config,
@@ -129,22 +122,32 @@ describe("applyGameActionFx Producer", () => {
 			save: started.save,
 		});
 
-		expect(completed.events).toMatchObject([
-			{
-				productId: "product:test",
-				type: "product.completed",
-			},
-			{
-				itemId: "item:plank",
-				type: "item.created",
-			},
-			{
-				type: "effect.expired",
-			},
-		]);
+		expect(completed.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					productId: "product:test",
+					type: "product.completed",
+				}),
+				expect.objectContaining({
+					itemId: "item:twig",
+					type: "item.created",
+				}),
+				expect.objectContaining({
+					type: "effect.expired",
+				}),
+			]),
+		);
+		expect(completed.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					itemId: "item:plank",
+					type: "item.created",
+				}),
+			]),
+		);
 	});
 
-	it("snapshots producer output after consumed input effects leave the save", () => {
+	it("does not keep consumed input loot effects after producer input consumption", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -224,12 +227,6 @@ describe("applyGameActionFx Producer", () => {
 		});
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
-		expect(job.outputItems).toEqual([
-			{
-				itemId: "item:twig",
-				quantity: 1,
-			},
-		]);
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 
@@ -426,7 +423,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("evaluates queued producer output against the queued start time", () => {
+	it("keeps queued producer start times in configured FIFO order", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -501,18 +498,6 @@ describe("applyGameActionFx Producer", () => {
 		expect(jobs.map((job) => job.startAtMs)).toEqual([
 			0,
 			1000,
-		]);
-		expect(jobs[0]?.outputItems).toEqual([
-			{
-				itemId: "item:plank",
-				quantity: 1,
-			},
-		]);
-		expect(jobs[1]?.outputItems).toEqual([
-			{
-				itemId: "item:twig",
-				quantity: 2,
-			},
 		]);
 	});
 
@@ -637,7 +622,6 @@ describe("applyGameActionFx Producer", () => {
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
 			readyAtMs: 1500,
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 500,

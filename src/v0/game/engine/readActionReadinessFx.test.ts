@@ -164,13 +164,6 @@ describe("readActionReadinessFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,

@@ -27,7 +27,7 @@ const createOutputItems = () => [
 ];
 
 describe("runtime invariants", () => {
-	it("requires producer jobs to snapshot output items in the save", () => {
+	it("rejects stale producer output or placement fields in the save", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -36,8 +36,9 @@ describe("runtime invariants", () => {
 		const invalidSave = cloneSave(save) as unknown as {
 			producerJobs: Record<string, unknown>;
 		};
-		invalidSave.producerJobs["job:missing-output"] = {
-			id: "job:missing-output",
+		invalidSave.producerJobs["job:stale-derived"] = {
+			id: "job:stale-derived",
+			outputItems: createOutputItems(),
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
@@ -54,12 +55,11 @@ describe("runtime invariants", () => {
 		expect(result.error?.issues[0]?.path).toEqual([
 			"save",
 			"producerJobs",
-			"job:missing-output",
-			"outputItems",
+			"job:stale-derived",
 		]);
 	});
 
-	it("keeps blocked delivery metadata separate from output item snapshots", () => {
+	it("keeps blocked delivery metadata separate from derived output items", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -75,8 +75,6 @@ describe("runtime invariants", () => {
 				nextAttemptAtMs: 2000,
 			},
 			id: "job:duplicated-output",
-			outputItems: createOutputItems(),
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -97,7 +95,7 @@ describe("runtime invariants", () => {
 		]);
 	});
 
-	it("uses empty producer output snapshots as an intentional sink, not a config fallback", () => {
+	it("completes live sink products without generated output", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -105,10 +103,8 @@ describe("runtime invariants", () => {
 		});
 		save.producerJobs["job:empty-output"] = {
 			id: "job:empty-output",
-			outputItems: [],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			productId: "product:shred",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -125,13 +121,13 @@ describe("runtime invariants", () => {
 				atMs: 1000,
 				jobId: "job:empty-output",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				productId: "product:shred",
 				type: "product.completed",
 			},
 		]);
 	});
 
-	it("uses producer output snapshots even when product config changes before completion", () => {
+	it("rolls producer output from live config at completion", () => {
 		const baseConfig = createEngineTestConfig();
 		const changedConfig = createEngineTestConfig({
 			products: {
@@ -152,10 +148,8 @@ describe("runtime invariants", () => {
 			config: baseConfig,
 			nowMs: 0,
 		});
-		save.producerJobs["job:snapshot"] = {
-			id: "job:snapshot",
-			outputItems: createOutputItems(),
-			placement: "board_then_inventory",
+		save.producerJobs["job:live-output"] = {
+			id: "job:live-output",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -171,7 +165,7 @@ describe("runtime invariants", () => {
 		expect(result.events).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					itemId: "item:twig",
+					itemId: "item:plank",
 					type: "item.created",
 				}),
 			]),
@@ -179,7 +173,7 @@ describe("runtime invariants", () => {
 		expect(result.events).not.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					itemId: "item:plank",
+					itemId: "item:twig",
 					type: "item.created",
 				}),
 			]),
@@ -218,8 +212,6 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:boundary"] = {
 			id: "job:boundary",
-			outputItems: createOutputItems(),
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -264,8 +256,6 @@ describe("runtime invariants", () => {
 				nextAttemptAtMs: 2000,
 			},
 			id: "job:blocked",
-			outputItems: createOutputItems(),
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -312,8 +302,6 @@ describe("runtime invariants", () => {
 		});
 		invalidSave.producerJobs["job:timed"] = {
 			id: "job:timed",
-			outputItems: [],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -391,6 +379,7 @@ describe("runtime invariants", () => {
 				...baseConfig.products,
 				"product:effect-output": {
 					durationMs: 1000,
+					placement: "board_then_inventory",
 					name: "Effect output",
 					tags: [],
 					visibility: "visible",
@@ -401,7 +390,6 @@ describe("runtime invariants", () => {
 							type: "guaranteed",
 						},
 					],
-					placement: "board_then_inventory",
 					requirementIds: [],
 				},
 			},
@@ -423,13 +411,6 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:blocking"] = {
 			id: "job:blocking",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -437,13 +418,6 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:queued"] = {
 			id: "job:queued",
-			outputItems: [
-				{
-					itemId: "item:plank",
-					quantity: 1,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:effect-output",
 			readyAtMs: 2000,
@@ -461,12 +435,6 @@ describe("runtime invariants", () => {
 			nextAttemptAtMs: 2000,
 		});
 		expect(result.save.producerJobs["job:queued"]).toMatchObject({
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
 			readyAtMs: 3000,
 			startAtMs: 2000,
 		});
@@ -517,10 +485,10 @@ describe("runtime invariants", () => {
 				"product:timed": {
 					activatesEffectId: "effect:timed",
 					durationMs: 1000,
+					placement: "board_then_inventory",
 					name: "Timed",
 					tags: [],
 					visibility: "visible",
-					placement: "board_then_inventory",
 					requirementIds: [],
 				},
 			},
@@ -535,13 +503,6 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:blocking"] = {
 			id: "job:blocking",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -549,8 +510,6 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:timed"] = {
 			id: "job:timed",
-			outputItems: [],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:timed",
 			readyAtMs: 2000,
@@ -581,7 +540,7 @@ describe("runtime invariants", () => {
 			startAtMs: 2000,
 		});
 	});
-	it("ignores stale queued active effects while rescheduling producer snapshots", () => {
+	it("ignores stale queued active effects while rescheduling producer timing", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -628,10 +587,10 @@ describe("runtime invariants", () => {
 				"product:self-timed": {
 					activatesEffectId: "effect:self-slow",
 					durationMs: 4000,
+					placement: "board_then_inventory",
 					name: "Self timed",
 					tags: [],
 					visibility: "visible",
-					placement: "board_then_inventory",
 					requirementIds: [],
 				},
 			},
@@ -646,13 +605,6 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:blocking"] = {
 			id: "job:blocking",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -660,8 +612,6 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:self-timed"] = {
 			id: "job:self-timed",
-			outputItems: [],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:self-timed",
 			readyAtMs: 5000,
@@ -683,7 +633,6 @@ describe("runtime invariants", () => {
 		});
 
 		expect(result.save.producerJobs["job:self-timed"]).toMatchObject({
-			outputItems: [],
 			readyAtMs: 6000,
 			startAtMs: 2000,
 		});
@@ -694,7 +643,7 @@ describe("runtime invariants", () => {
 		});
 	});
 
-	it("allows blocked active-effect producer delivery after the linked effect expires", () => {
+	it("allows completed active-effect sink products after the linked effect expires", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -742,13 +691,6 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:timed-blocked"] = {
 			id: "job:timed-blocked",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -769,10 +711,7 @@ describe("runtime invariants", () => {
 			save,
 		});
 
-		expect(result.save.producerJobs["job:timed-blocked"]?.delivery).toEqual({
-			lastBlockedAtMs: 1000,
-			nextAttemptAtMs: 2000,
-		});
+		expect(result.save.producerJobs).toEqual({});
 		expect(result.save.activeEffects).toEqual({});
 		expect(
 			GameSaveConfigSchema.safeParse({
@@ -803,8 +742,6 @@ describe("runtime invariants", () => {
 				nextAttemptAtMs: 3000,
 			},
 			id: "job:blocked",
-			outputItems: createOutputItems(),
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -812,8 +749,6 @@ describe("runtime invariants", () => {
 		};
 		invalidSave.producerJobs["job:stale"] = {
 			id: "job:stale",
-			outputItems: createOutputItems(),
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 2000,
@@ -856,8 +791,6 @@ describe("runtime invariants", () => {
 		});
 		invalidSave.producerJobs["job:first"] = {
 			id: "job:first",
-			outputItems: createOutputItems(),
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 1000,
@@ -869,8 +802,6 @@ describe("runtime invariants", () => {
 				nextAttemptAtMs: 3000,
 			},
 			id: "job:blocked-second",
-			outputItems: createOutputItems(),
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 2000,

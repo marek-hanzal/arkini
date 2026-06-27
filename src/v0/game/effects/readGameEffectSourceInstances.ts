@@ -1,7 +1,10 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { isGameTimeWindowActive } from "~/v0/game/time/GameTime";
 import type { GameSave, GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
-import { isProducerJobPaused } from "~/v0/game/producer/producerDeliveryTiming";
+import {
+	isProducerJobBlockedByPausedQueueHead,
+	isProducerJobPaused,
+} from "~/v0/game/producer/producerDeliveryTiming";
 import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourceInstance";
 
 export namespace readGameEffectSourceInstances {
@@ -137,7 +140,14 @@ export const readGameEffectSourceInstances = ({
 				? save.producerJobs[effect.producerJobId]
 				: undefined;
 
-			return !producerJob || !isProducerJobPaused(producerJob);
+			return (
+				!producerJob ||
+				(!isProducerJobPaused(producerJob) &&
+					!isProducerJobBlockedByPausedQueueHead({
+						job: producerJob,
+						save,
+					}))
+			);
 		})
 		.filter(
 			(effect) =>

@@ -327,7 +327,7 @@ describe("runtime invariants", () => {
 		);
 	});
 
-	it("rejects producer queue jobs behind a paused previous job", () => {
+	it("allows already queued producer jobs behind a paused previous job", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			producers: {
@@ -351,8 +351,8 @@ describe("runtime invariants", () => {
 			remainingMs: 750,
 			startAtMs: 0,
 		};
-		save.producerJobs["job:illegal-behind-pause"] = {
-			id: "job:illegal-behind-pause",
+		save.producerJobs["job:queued-behind-pause"] = {
+			id: "job:queued-behind-pause",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			readyAtMs: 2500,
@@ -364,19 +364,7 @@ describe("runtime invariants", () => {
 			save,
 		});
 
-		expect(result.success).toBe(false);
-		expect(result.error?.issues).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					path: [
-						"save",
-						"producerJobs",
-						"job:illegal-behind-pause",
-						"startAtMs",
-					],
-				}),
-			]),
-		);
+		expect(result.success).toBe(true);
 	});
 
 	it("reschedules queued producer jobs when a previous delivery blocks", () => {

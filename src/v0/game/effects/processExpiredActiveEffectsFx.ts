@@ -1,7 +1,10 @@
 import { Effect } from "effect";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { isGameTimeDue } from "~/v0/game/time/GameTime";
-import { isProducerJobPaused } from "~/v0/game/producer/producerDeliveryTiming";
+import {
+	isProducerJobBlockedByPausedQueueHead,
+	isProducerJobPaused,
+} from "~/v0/game/producer/producerDeliveryTiming";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -23,7 +26,14 @@ export const processExpiredActiveEffectsFx = Effect.fn("processExpiredActiveEffe
 				? save.producerJobs[effect.producerJobId]
 				: undefined;
 
-			return !producerJob || !isProducerJobPaused(producerJob);
+			return (
+				!producerJob ||
+				(!isProducerJobPaused(producerJob) &&
+					!isProducerJobBlockedByPausedQueueHead({
+						job: producerJob,
+						save,
+					}))
+			);
 		})
 		.filter((effect) =>
 			isGameTimeDue({

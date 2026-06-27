@@ -193,6 +193,46 @@ describe("RuntimeGameEngineAdapter", () => {
 		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
 	});
 
+	it("catches up a stale loaded save before same-instant readiness checks", async () => {
+		const config = createEngineTestConfig();
+		const sourceAdapter = await RuntimeGameEngineAdapter.create({
+			config,
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		await sourceAdapter.dispatch({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 0,
+		});
+
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config,
+			initialSave: sourceAdapter.readSave(),
+			nowMs: 1500,
+			random: TestRandomService,
+		});
+
+		const readiness = await adapter.readiness({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 1500,
+		});
+
+		expect(readiness).toMatchObject({
+			type: "ready",
+		});
+		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
+	});
+
 	it("waits for queued mutations before reading readiness", async () => {
 		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createConcurrencyTestConfig(),

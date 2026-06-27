@@ -745,6 +745,85 @@ describe("applyGameActionFx Stash", () => {
 		});
 	});
 
+	it("rejects stash open when depletion replacement would block its output creation", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:empty-blocks-twig": {
+					name: "Empty blocks twig",
+					operations: [
+						{
+							kind: "item.blockCreate",
+							reason: "Empty stash blocks twig creation.",
+							target: {
+								itemIds: [
+									"item:twig",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:empty-stash": {
+					...baseConfig.items["item:empty-stash"],
+					passiveEffectIds: [
+						"effect:empty-blocks-twig",
+					],
+				},
+			},
+			stashes: {
+				...baseConfig.stashes,
+				"item:stash": {
+					...baseConfig.stashes["item:stash"],
+					inputs: [],
+					onDepleted: {
+						replaceWithItemId: "item:empty-stash",
+					},
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				stashItemInstanceId: "item-instance:1",
+				type: "stash.open",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "effect:block-create",
+			},
+		});
+		expect(save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:stash",
+		});
+		expect(save.itemSpawnJobs).toEqual({});
+	});
+
 	it("replaces a depleted stash atomically when configured", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

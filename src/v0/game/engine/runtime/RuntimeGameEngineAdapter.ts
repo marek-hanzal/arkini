@@ -6,6 +6,7 @@ import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { syncRealtimeProducerJobsFx } from "~/v0/game/producer/syncRealtimeProducerJobsFx";
 import { validateWorldSnapshotFx } from "~/v0/game/world/validateWorldSnapshotFx";
+import { hasProcessableWorldJobs } from "~/v0/game/world/hasProcessableWorldJobs";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import type { GameAction } from "~/v0/game/action/GameActionSchema";
@@ -283,7 +284,14 @@ export class RuntimeGameEngineAdapter {
 
 	private async catchUpDueTicks(nowMs: number) {
 		let tickCount = 0;
-		while (this.nextWakeAtMs !== null && this.nextWakeAtMs <= nowMs) {
+		while (
+			(this.nextWakeAtMs !== null && this.nextWakeAtMs <= nowMs) ||
+			hasProcessableWorldJobs({
+				config: this.config,
+				nowMs,
+				save: this.save,
+			})
+		) {
 			tickCount += 1;
 			if (tickCount > 100) {
 				throw new Error("Game runtime catch-up exceeded 100 ready ticks.");

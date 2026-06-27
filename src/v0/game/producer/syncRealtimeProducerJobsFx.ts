@@ -4,13 +4,13 @@ import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { findActiveEffectByProducerJobId } from "~/v0/game/effects/findActiveEffectByProducerJobId";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import {
-	isProducerJobPaused,
-	readProducerJobWakeAtMs,
-} from "~/v0/game/producer/producerDeliveryTiming";
+	isWorldProducerJobPaused,
+	readWorldProducerJobReleaseAtMs,
+} from "~/v0/game/world/readWorldProducerJobReleaseAtMs";
 import { readProducerJobEffectiveTimingFx } from "~/v0/game/producer/readProducerJobEffectiveTimingFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
-import { readProducerJobRequirementsReadyFx } from "~/v0/game/producer/readProducerJobRequirementsReadyFx";
+import { readWorldProducerRequirementFactsFx } from "~/v0/game/world/readWorldProducerRequirementFactsFx";
 import { readProducerJobStartGateReadyFx } from "~/v0/game/producer/readProducerJobStartGateReadyFx";
 
 export namespace syncRealtimeProducerJobsFx {
@@ -132,20 +132,21 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 				.some((previousJob) => !previousJob.delivery);
 
 			if (job.delivery) {
-				const wakeAtMs = readProducerJobWakeAtMs(job);
+				const wakeAtMs = readWorldProducerJobReleaseAtMs(job);
 				if (wakeAtMs === undefined) break;
 				cursorAtMs = wakeAtMs;
 				continue;
 			}
 
 			const startAtMs = Math.max(job.startAtMs, cursorAtMs);
-			const requirementsReady = yield* readProducerJobRequirementsReadyFx({
+			const requirementFacts = yield* readWorldProducerRequirementFactsFx({
 				config,
 				job,
 				save: nextSave ?? save,
 			});
+			const requirementsReady = requirementFacts.ready;
 
-			if (isProducerJobPaused(job)) {
+			if (isWorldProducerJobPaused(job)) {
 				const startGateReady = yield* readProducerJobStartGateReadyFx({
 					config,
 					evaluateAtMs: nowMs,

@@ -8,7 +8,7 @@ export const pastDueGameJobWakeDelayMs = pastDueWorldJobWakeDelayMs;
 
 export namespace readNextWakeAtMsFx {
 	export interface Props {
-		config?: GameConfig;
+		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;
 	}

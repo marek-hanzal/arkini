@@ -26,6 +26,7 @@ describe("readNextWakeAtMsFx", () => {
 
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 500,
 				save,
 			}),
@@ -48,6 +49,7 @@ describe("readNextWakeAtMsFx", () => {
 
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 500,
 				save,
 			}),
@@ -70,10 +72,74 @@ describe("readNextWakeAtMsFx", () => {
 
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 500,
 				save,
 			}),
 		).toBe(500 + pastDueGameJobWakeDelayMs);
+	});
+
+	it("does not wake paused producer active effects through the legacy next-wake facade", () => {
+		const baseConfig = createEngineTestConfig();
+		const baseProduct = baseConfig.products["product:test"];
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:producer": {
+					name: "Producer effect",
+					operations: [
+						{
+							kind: "duration.addMs",
+							target: {
+								all: true,
+							},
+							valueMs: 0,
+						},
+					],
+					scope: "global",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					activatesEffectId: "effect:producer",
+					durationMs: baseProduct.durationMs,
+					name: baseProduct.name,
+					placement: baseProduct.placement,
+					requirementIds: baseProduct.requirementIds,
+					tags: baseProduct.tags,
+					visibility: baseProduct.visibility,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:paused"] = {
+			id: "job:paused",
+			pausedAtMs: 250,
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			remainingMs: 750,
+			startAtMs: 0,
+		};
+		save.activeEffects["effect-instance:paused"] = {
+			effectId: "effect:producer",
+			endAtMs: 1000,
+			id: "effect-instance:paused",
+			producerJobId: "job:paused",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+
+		expect(
+			runNextWakeAtMs({
+				config,
+				nowMs: 500,
+				save,
+			}),
+		).toBeNull();
 	});
 
 	it("does not keep waking on an active effect start time that is already in the past", () => {
@@ -92,6 +158,7 @@ describe("readNextWakeAtMsFx", () => {
 
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 500,
 				save,
 			}),

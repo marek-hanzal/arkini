@@ -264,6 +264,7 @@ describe("runtime invariants", () => {
 
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 3000,
 				save,
 			}),

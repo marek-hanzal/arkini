@@ -143,21 +143,31 @@ export const validateWorldSnapshotFx = Effect.fn("validateWorldSnapshotFx")(func
 			id: "replacement-safety",
 		})
 	) {
-		const producerJobTargetIds = new Set(
-			Object.values(save.producerJobs).map((job) => job.producerItemInstanceId),
-		);
-		for (const job of Object.values(save.craftJobs)) {
-			if (!producerJobTargetIds.has(job.targetItemInstanceId)) continue;
+		for (const replacementFacts of facts.replacementSafety) {
+			if (
+				!replacementFacts.blockReasons.includes("craft_job") ||
+				!replacementFacts.blockReasons.includes("producer_job")
+			) {
+				continue;
+			}
+			const craftJobIds = Object.values(save.craftJobs)
+				.filter((job) => job.targetItemInstanceId === replacementFacts.itemInstanceId)
+				.map((job) => job.id);
+			const producerJobIds = Object.values(save.producerJobs)
+				.filter((job) => job.producerItemInstanceId === replacementFacts.itemInstanceId)
+				.map((job) => job.id);
 			issues.push({
 				code: "craft_and_producer_share_target",
 				entity: {
-					id: job.targetItemInstanceId,
+					id: replacementFacts.itemInstanceId,
 					kind: "boardItem",
 				},
 				evidence: {
-					craftJobId: job.id,
+					blockReasons: replacementFacts.blockReasons,
+					craftJobIds,
+					producerJobIds,
 				},
-				message: `Board item "${job.targetItemInstanceId}" has both craft and producer runtime jobs.`,
+				message: `Board item "${replacementFacts.itemInstanceId}" has both craft and producer runtime jobs.`,
 				severity: "error",
 			});
 		}

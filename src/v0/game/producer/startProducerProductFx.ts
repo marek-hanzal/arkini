@@ -9,8 +9,8 @@ import { createGameActiveEffectIdFx } from "~/v0/game/effects/createGameActiveEf
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
-import { readProducerJobWakeAtMs } from "~/v0/game/producer/producerDeliveryTiming";
 import { readProducerJobTimingFx } from "~/v0/game/producer/readProducerJobTimingFx";
+import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
@@ -99,6 +99,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 			return {
 				events: consumed.events,
 				nextWakeAtMs: yield* readNextWakeAtMsFx({
+					config,
 					nowMs,
 					save: nextSave,
 				}),
@@ -114,9 +115,12 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	}
 	const queuedStartAtMs = Math.max(
 		nowMs,
-		...Object.values(nextSave.producerJobs)
-			.filter((job) => job.producerItemInstanceId === action.producerItemInstanceId)
-			.map(readProducerJobWakeAtMs)
+		...readWorldProducerJobFacts({
+			nowMs,
+			save: nextSave,
+		})
+			.filter((facts) => facts.producerItemInstanceId === action.producerItemInstanceId)
+			.map((facts) => facts.releaseAtMs)
 			.filter((wakeAtMs): wakeAtMs is number => wakeAtMs !== undefined),
 	);
 	yield* checkProducerProductStartRuntimeConstraintsFx({
@@ -192,6 +196,7 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 				: []),
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: nextSave,
 		}),

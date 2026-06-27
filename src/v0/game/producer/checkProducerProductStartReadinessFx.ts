@@ -10,7 +10,7 @@ import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDef
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
-import { isProducerJobPaused } from "~/v0/game/producer/producerDeliveryTiming";
+import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
@@ -81,11 +81,12 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		);
 	}
 
-	const producerJobs = Object.values(save.producerJobs).filter(
-		(job) => job.producerItemInstanceId === action.producerItemInstanceId,
-	);
-	const producerJobCount = producerJobs.length;
-	if (producerJobs.some((job) => job.delivery)) {
+	const producerJobFacts = readWorldProducerJobFacts({
+		nowMs,
+		save,
+	}).filter((facts) => facts.producerItemInstanceId === action.producerItemInstanceId);
+	const producerJobCount = producerJobFacts.length;
+	if (producerJobFacts.some((facts) => facts.status === "delivery_blocked")) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"producer_queue_full",
@@ -94,7 +95,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		);
 	}
 
-	if (producerJobs.some(isProducerJobPaused)) {
+	if (producerJobFacts.some((facts) => facts.status === "paused")) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"producer_queue_full",

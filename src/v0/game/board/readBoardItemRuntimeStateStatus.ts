@@ -1,4 +1,5 @@
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readWorldReplacementSafetyFactsForItem } from "~/v0/game/world/readWorldReplacementSafetyFactsForItem";
 
 export const readBoardItemRuntimeStateStatus = ({
 	itemInstanceId,
@@ -7,22 +8,19 @@ export const readBoardItemRuntimeStateStatus = ({
 	itemInstanceId: string;
 	save: GameSave;
 }) => {
-	const hasProducerJob = Object.values(save.producerJobs).some(
-		(job) => job.producerItemInstanceId === itemInstanceId,
-	);
-	const hasCraftJob = Object.values(save.craftJobs).some(
-		(job) => job.targetItemInstanceId === itemInstanceId,
-	);
+	const facts = readWorldReplacementSafetyFactsForItem({
+		itemInstanceId,
+		save,
+	});
+	const craftBusy = facts.blockReasons.includes("craft_job");
+	const producerBusy = facts.blockReasons.includes("producer_job");
 
 	return {
-		busy: hasProducerJob || hasCraftJob,
-		craftBusy: hasCraftJob,
-		producerBusy: hasProducerJob,
-		preservable:
-			Boolean(save.stashes[itemInstanceId]) ||
-			Boolean(save.producerLines[itemInstanceId]) ||
-			Boolean(save.producerInputs[itemInstanceId]) ||
-			Boolean(save.craftInputs[itemInstanceId]) ||
-			Boolean(save.storedRequirements[itemInstanceId]),
+		busy: producerBusy || craftBusy,
+		craftBusy,
+		preservable: facts.blockReasons.some(
+			(reason) => reason !== "craft_job" && reason !== "producer_job",
+		),
+		producerBusy,
 	};
 };

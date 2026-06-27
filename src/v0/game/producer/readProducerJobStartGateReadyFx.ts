@@ -3,7 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
-import { readProducerJobRequirementsReadyFx } from "~/v0/game/producer/readProducerJobRequirementsReadyFx";
+import { readWorldProducerRequirementFactsFx } from "~/v0/game/world/readWorldProducerRequirementFactsFx";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
@@ -25,12 +25,12 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 		job,
 		save,
 	}: readProducerJobStartGateReadyFx.Props) {
-		const requirementsReady = yield* readProducerJobRequirementsReadyFx({
+		const requirementFacts = yield* readWorldProducerRequirementFactsFx({
 			config,
 			job,
 			save,
 		});
-		if (!requirementsReady) return false;
+		if (!requirementFacts.ready) return false;
 
 		const producerItem = save.board.items[job.producerItemInstanceId];
 		if (!producerItem) {

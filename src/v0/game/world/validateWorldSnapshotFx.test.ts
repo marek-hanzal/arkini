@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
+import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
 import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
@@ -222,6 +223,100 @@ describe("validateWorldSnapshotFx", () => {
 				],
 			},
 		]);
+	});
+
+	it("normalizes craft job lifecycle and wake reasons in the same snapshot report", () => {
+		const config = createEngineCraftTableTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:running"] = {
+			id: "job:running",
+			readyAtMs: 1000,
+			recipeId: "item:craft-table",
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const runningFacts = runWorldFacts({
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(runningFacts.craftJobs).toMatchObject([
+			{
+				job: {
+					id: "job:running",
+				},
+				releaseAtMs: 1000,
+				status: "running",
+			},
+		]);
+		expect(runningFacts.wakePlan.wakeReasons).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					atMs: 1000,
+					entity: {
+						id: "job:running",
+						kind: "craftJob",
+					},
+					reason: "craft_ready",
+				}),
+			]),
+		);
+
+		save.craftJobs["job:running"] = {
+			...save.craftJobs["job:running"],
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2500,
+			},
+		};
+		const blockedFacts = runWorldFacts({
+			config,
+			nowMs: 1500,
+			save,
+		});
+
+		expect(blockedFacts.craftJobs).toMatchObject([
+			{
+				releaseAtMs: 2500,
+				status: "delivery_blocked",
+			},
+		]);
+	});
+
+	it("normalizes replacement safety facts without turning normal runtime state into an issue", () => {
+		const config = createEngineCraftTableTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftInputs["item-instance:1"] = {
+			items: {
+				"item:twig": 1,
+			},
+		};
+
+		const result = runWorldValidation({
+			checks: [
+				"replacement-safety",
+			],
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(result.issues).toEqual([]);
+		expect(result.facts.replacementSafety).toContainEqual({
+			blockReasons: [
+				"craft_input_state",
+			],
+			itemInstanceId: "item-instance:1",
+			status: "blocked",
+		});
 	});
 
 	it("reports live replacement-safety conflicts against a selected check set", () => {

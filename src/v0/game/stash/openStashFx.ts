@@ -83,6 +83,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		return {
 			events,
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				config,
 				nowMs,
 				save: nextSave,
 			}),
@@ -190,6 +191,7 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 			...spawned.events,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: spawned.save,
 		}),

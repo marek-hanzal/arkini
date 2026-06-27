@@ -46,6 +46,7 @@ describe("GameRuntimeStore", () => {
 			y: 0,
 		});
 		expect(store.getSnapshot().revision).toBe(1);
+		expect(store.getSnapshot().nowMs).toBe(10);
 
 		unsubscribe();
 		store.destroy();
@@ -76,6 +77,7 @@ describe("GameRuntimeStore", () => {
 			x: 1,
 			y: 0,
 		});
+		expect(updates[0]!.current.nowMs).toBe(10);
 
 		unsubscribe();
 		store.destroy();

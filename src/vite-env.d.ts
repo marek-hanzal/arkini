@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 import type { DebugBugReport } from "~/v0/debug/DebugBugReport";
-import type { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import type { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import type { DevScenarioDefinition } from "~/v0/debug/scenario/DevScenarioDefinition";
 
 declare global {

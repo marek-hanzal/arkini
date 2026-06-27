@@ -1,5 +1,5 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { dragSessionRect } from "~/v0/tile-engine/dragSessionRect";
 import { createTileDropMotionId } from "~/v0/tile-engine/createTileDropMotionId";
 import { dropOutcomeAnimation } from "~/v0/tile-engine/dropOutcomeAnimation";

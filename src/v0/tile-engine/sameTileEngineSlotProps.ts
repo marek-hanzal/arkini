@@ -1,4 +1,4 @@
-import type { TileEngineSlot } from "~/v0/tile-engine/TileEngineSlot";
+import type { TileEngineSlot } from "~/v0/tile-engine/TileEngineSlot.types";
 import { sameOptionalTileEngineTile } from "~/v0/tile-engine/sameOptionalTileEngineTile";
 import { sameTileEngineDropFeedback } from "~/v0/tile-engine/sameTileEngineDropFeedback";
 import { sameTileEngineSlot } from "~/v0/tile-engine/sameTileEngineSlot";

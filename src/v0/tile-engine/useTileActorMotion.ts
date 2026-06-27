@@ -1,4 +1,4 @@
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { type RefObject, useCallback } from "react";
 import { startTileTransformMotion, tileMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
 import { translate3d } from "~/v0/tile-engine/TileVisualSnapshot";

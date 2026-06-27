@@ -1,5 +1,5 @@
 import { type RefObject, useLayoutEffect, useRef } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
 import {

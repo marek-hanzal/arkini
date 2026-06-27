@@ -1,5 +1,5 @@
 import { type RefObject, useLayoutEffect } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 import type { TileFeedbackMotionSchema } from "~/v0/tile-engine/TileFeedbackMotionSchema";
 import {

@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { cn } from "~/v0/ui/cn";
 import { actorStyle } from "~/v0/tile-engine/actorStyle";
 import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/TileEngineActor.types";

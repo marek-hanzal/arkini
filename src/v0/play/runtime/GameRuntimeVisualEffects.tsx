@@ -1,5 +1,5 @@
 import { type FC, useEffect } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { applyGameEngineVisualPlan } from "~/v0/play/game-engine-visual/applyGameEngineVisualPlan";
 import { createGameEngineVisualPlan } from "~/v0/play/game-engine-visual/createGameEngineVisualPlan";
 import { summarizeGameEngineVisualPlan } from "~/v0/play/game-engine-visual/summarizeGameEngineVisualPlan";

@@ -1,4 +1,4 @@
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import {
 	freezeElementVisualState,
 	readTileVisualSnapshot,

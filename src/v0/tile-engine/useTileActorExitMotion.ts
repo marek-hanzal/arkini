@@ -1,5 +1,5 @@
 import { type RefObject, useLayoutEffect } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { findTileEngineActorById } from "~/v0/tile-engine/findTileEngineActorById";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { targetDelta } from "~/v0/tile-engine/targetDelta";

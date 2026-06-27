@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import type { TileEngineMotionSchema } from "~/v0/tile-engine/TileEngineMotionSchema";
 import type { TileEngineMotionRequest } from "~/v0/tile-engine/TileEngineMotionRequest";
 

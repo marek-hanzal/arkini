@@ -133,6 +133,182 @@ describe("RuntimeGameEngineAdapter", () => {
 		]);
 	});
 
+	it("publishes due tick catch-up and a dispatched action as one runtime update", async () => {
+		const base = createEngineTestConfig();
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createEngineTestConfig({
+				game: {
+					...base.game,
+					board: {
+						height: 1,
+						width: 4,
+					},
+				},
+				products: {
+					...base.products,
+					"product:test": {
+						...base.products["product:test"],
+						output: [
+							{
+								itemId: "item:twig",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
+					},
+				},
+				startingState: {
+					board: [
+						{
+							itemId: "item:producer",
+							x: 0,
+							y: 0,
+						},
+						{
+							itemId: "item:rock",
+							x: 1,
+							y: 0,
+						},
+					],
+					inventory: [],
+				},
+			}),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		const updates: string[][] = [];
+		adapter.subscribe(({ result }) => {
+			updates.push(result.events.map((event) => event.type));
+		});
+
+		await adapter.dispatch({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 0,
+		});
+		updates.length = 0;
+
+		const result = await adapter.dispatch({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 3,
+				y: 0,
+			},
+			nowMs: 1200,
+		});
+
+		expect(result.events.map((event) => event.type)).toEqual([
+			"product.completed",
+			"item.created",
+		]);
+		expect(updates).toEqual([
+			[
+				"product.completed",
+				"item.created",
+			],
+		]);
+		expect(adapter.readSnapshot().save.board.items["item-instance:2"]).toMatchObject({
+			x: 3,
+			y: 0,
+		});
+	});
+
+	it("keeps and publishes due catch-up when the following dispatched action is rejected", async () => {
+		const base = createEngineTestConfig();
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createEngineTestConfig({
+				game: {
+					...base.game,
+					board: {
+						height: 1,
+						width: 3,
+					},
+				},
+				products: {
+					...base.products,
+					"product:test": {
+						...base.products["product:test"],
+						output: [
+							{
+								itemId: "item:twig",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
+					},
+				},
+				startingState: {
+					board: [
+						{
+							itemId: "item:producer",
+							x: 0,
+							y: 0,
+						},
+						{
+							itemId: "item:rock",
+							x: 1,
+							y: 0,
+						},
+					],
+					inventory: [],
+				},
+			}),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		const updates: string[][] = [];
+		adapter.subscribe(({ result }) => {
+			updates.push(result.events.map((event) => event.type));
+		});
+
+		await adapter.dispatch({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 0,
+		});
+		updates.length = 0;
+
+		await expect(
+			adapter.dispatch({
+				action: {
+					boardItemId: "item-instance:2",
+					type: "board.item.move",
+					x: 2,
+					y: 0,
+				},
+				nowMs: 1200,
+			}),
+		).rejects.toThrow();
+
+		expect(updates).toEqual([
+			[
+				"product.completed",
+				"item.created",
+			],
+		]);
+		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
+		expect(adapter.readSnapshot().save.board.items["item-instance:2"]).toMatchObject({
+			x: 1,
+			y: 0,
+		});
+		expect(Object.values(adapter.readSnapshot().save.board.items)).toContainEqual(
+			expect.objectContaining({
+				itemId: "item:twig",
+				x: 2,
+				y: 0,
+			}),
+		);
+	});
+
 	it("reads readiness from the current stored save", async () => {
 		const adapter = await RuntimeGameEngineAdapter.create({
 			config: createEngineTestConfig(),

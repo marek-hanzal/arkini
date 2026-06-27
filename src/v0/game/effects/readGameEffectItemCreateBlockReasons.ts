@@ -10,6 +10,7 @@ import { readGameEffectSourceInstances } from "~/v0/game/effects/readGameEffectS
 export namespace readGameEffectItemCreateBlockReasons {
 	export interface Props {
 		config: GameConfig;
+		ignoredSourceIds?: ReadonlySet<string>;
 		itemId: string;
 		nowMs?: number;
 		save: GameSave;
@@ -19,6 +20,7 @@ export namespace readGameEffectItemCreateBlockReasons {
 
 export const readGameEffectItemCreateBlockReasons = ({
 	config,
+	ignoredSourceIds,
 	itemId,
 	nowMs,
 	save,
@@ -30,15 +32,17 @@ export const readGameEffectItemCreateBlockReasons = ({
 		config,
 		nowMs,
 		save,
-	}).sort((left, right) =>
-		compareGameEffectSourceInstances({
-			config,
-			left,
-			right,
-			save,
-			targetCell,
-		}),
-	);
+	})
+		.filter((source) => !ignoredSourceIds?.has(source.sourceId))
+		.sort((left, right) =>
+			compareGameEffectSourceInstances({
+				config,
+				left,
+				right,
+				save,
+				targetCell,
+			}),
+		);
 
 	for (const source of sources) {
 		const effect = config.effects[source.effectId];

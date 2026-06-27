@@ -4,6 +4,7 @@ import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationI
 import { planProducerProductAutoFillInputRefsFx } from "~/v0/game/producer/planProducerProductAutoFillInputRefsFx";
 import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
+import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
@@ -50,6 +51,19 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			producerItemInstanceId: action.producerItemInstanceId,
 			save,
 		});
+	const producerStateStatus = readBoardItemRuntimeStateStatus({
+		itemInstanceId: action.producerItemInstanceId,
+		save,
+	});
+	if (producerStateStatus.craftBusy) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"item_busy",
+				`Producer item "${action.producerItemInstanceId}" has a running craft job.`,
+			),
+		);
+	}
+
 	if (!productId || !producerDefinition.productIds.includes(productId)) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

@@ -1,6 +1,10 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
+import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
+import { withRandomService } from "~/v0/random/logic/withRandomService";
 import {
 	findBoardItem,
 	readOnlyRecordValue,
@@ -8,6 +12,9 @@ import {
 	runActionEither,
 	runInitialSave,
 } from "~/v0/game/engine/applyGameActionFx.testSupport";
+
+const runTick = (props: runGameTickFx.Props) =>
+	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
 
 describe("applyGameActionFx Craft", () => {
 	it("rejects starting another craft job on the same target", () => {
@@ -226,6 +233,98 @@ describe("applyGameActionFx Craft", () => {
 		]);
 	});
 
+	it("does not let a craft target block its own replacement result", () => {
+		const baseConfig = createEngineCraftTableTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:craft-table-blocks-plank": {
+					name: "Craft table blocks plank",
+					operations: [
+						{
+							kind: "item.blockCreate",
+							reason: "Craft table blocks plank creation.",
+							target: {
+								itemIds: [
+									"item:plank",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					...baseConfig.items["item:craft-table"],
+					passiveEffectIds: [
+						"effect:craft-table-blocks-plank",
+					],
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:craft-table": {
+					...baseConfig.craftRecipes["item:craft-table"],
+					inputs: [],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const started = runAction({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+		expect(readOnlyRecordValue(started.save.craftJobs)).toMatchObject({
+			readyAtMs: 1100,
+			recipeId: "item:craft-table",
+			targetItemInstanceId: "item-instance:1",
+		});
+
+		const completed = runTick({
+			config,
+			nowMs: 1100,
+			save: started.save,
+		});
+
+		expect(completed.save.craftJobs).toEqual({});
+		expect(completed.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:plank",
+			x: 0,
+			y: 0,
+		});
+		expect(completed.events).toEqual([
+			expect.objectContaining({
+				type: "craft.completed",
+			}),
+			expect.objectContaining({
+				fromItemId: "item:craft-table",
+				toItemId: "item:plank",
+				type: "item.replaced",
+			}),
+		]);
+	});
+
 	it("lets an instant craft result resync and complete a due producer in the same action", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -373,6 +472,66 @@ describe("applyGameActionFx Craft", () => {
 				type: "item.created",
 			}),
 		]);
+	});
+
+	it("rejects craft start while the same target has a running producer job", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:producer": {
+					durationMs: 1000,
+					inputs: [],
+					requirements: [],
+					resultItemId: "item:plank",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const producing = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		const result = runActionEither({
+			action: {
+				recipeId: "item:producer",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 200,
+			save: producing.save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "item_busy",
+			},
+		});
+		expect(Object.values(producing.save.producerJobs)).toHaveLength(1);
 	});
 
 	it("rejects craft input investment when an effect blocks the result item", () => {

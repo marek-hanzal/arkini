@@ -39,6 +39,9 @@ export const checkCraftStartRuntimeConstraintsFx = Effect.fn("checkCraftStartRun
 		});
 		yield* checkItemCreateBlockedByEffectsFx({
 			config,
+			ignoredSourceIds: new Set([
+				targetItemInstanceId,
+			]),
 			itemId: recipe.resultItemId,
 			nowMs,
 			save,

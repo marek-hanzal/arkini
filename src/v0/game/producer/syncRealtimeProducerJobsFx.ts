@@ -123,7 +123,14 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 			sortedQueue.filter((job) => !job.delivery).map((job) => job.id),
 		);
 
-		for (const job of sortedQueue) {
+		for (let queueIndex = 0; queueIndex < sortedQueue.length; queueIndex += 1) {
+			const job = sortedQueue[queueIndex];
+			if (!job) continue;
+
+			const hasPreviousNonDeliveryQueueJob = sortedQueue
+				.slice(0, queueIndex)
+				.some((previousJob) => !previousJob.delivery);
+
 			if (job.delivery) {
 				const wakeAtMs = readProducerJobWakeAtMs(job);
 				if (wakeAtMs === undefined) break;
@@ -186,22 +193,25 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 				continue;
 			}
 
-			const startGateReady =
-				startAtMs === nowMs
-					? yield* readProducerJobStartGateReadyFx({
-							config,
-							evaluateAtMs: startAtMs,
-							ignoredProducerJobIds: realtimeProducerJobIds,
-							job,
-							save: nextSave ?? save,
-						})
-					: true;
+			const shouldCheckStartGate =
+				startAtMs === nowMs || (hasPreviousNonDeliveryQueueJob && startAtMs <= nowMs);
+			const startGateReady = shouldCheckStartGate
+				? yield* readProducerJobStartGateReadyFx({
+						config,
+						evaluateAtMs: nowMs,
+						ignoredProducerJobIds: realtimeProducerJobIds,
+						job,
+						save: nextSave ?? save,
+					})
+				: true;
 			if ((!requirementsReady || !startGateReady) && startAtMs <= nowMs) {
-				const remainingMs = readRemainingMsAtPause({
-					job,
-					nowMs,
-					startAtMs,
-				});
+				const remainingMs = startGateReady
+					? readRemainingMsAtPause({
+							job,
+							nowMs,
+							startAtMs,
+						})
+					: Math.max(0, job.readyAtMs - job.startAtMs);
 				const readyAtMs = nowMs + remainingMs;
 				const draft = yield* ensureNextSave();
 				const liveJob = draft.producerJobs[job.id];

@@ -1,12 +1,14 @@
 import { z } from "zod";
 import { GameInstantMsSchema } from "~/v0/game/time/GameTimeSchema";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
+const NonNegativeNumberSchema = z.number().min(0);
 
 const GameSaveBoardItemSchema = z
 	.object({
@@ -119,15 +121,9 @@ const GameSaveCraftJobSchema = z
 		],
 	});
 
-const GameSaveStashStateSchema = z
+const GameSaveProducerChargeStateSchema = z
 	.object({
-		remainingCharges: NonNegativeIntegerSchema,
-	})
-	.strict();
-
-const GameSaveStashInputStateSchema = z
-	.object({
-		items: z.record(IdSchema, PositiveIntegerSchema),
+		remainingCharges: NonNegativeNumberSchema,
 	})
 	.strict();
 
@@ -231,10 +227,9 @@ const GameSaveSchema = z
 		activeEffects: z.record(IdSchema, GameSaveActiveEffectSchema).default({}),
 		producerLines: z.record(IdSchema, GameSaveProducerLineStateSchema),
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
+		producerCharges: z.record(IdSchema, GameSaveProducerChargeStateSchema).default({}),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
 		craftInputs: z.record(IdSchema, GameSaveCraftInputStateSchema),
-		stashes: z.record(IdSchema, GameSaveStashStateSchema),
-		stashInputs: z.record(IdSchema, GameSaveStashInputStateSchema).default({}),
 		storedRequirements: z.record(IdSchema, GameSaveStoredRequirementStateSchema),
 		itemSpawnJobs: z.record(IdSchema, GameSaveItemSpawnJobSchema),
 	})
@@ -377,7 +372,25 @@ const readStoredRequirementSlots = ({
 	if (recipe) requirements.push(...recipe.requirements);
 
 	const stash = config.stashes[target.itemId];
-	if (stash) requirements.push(...stash.requirements);
+	if (stash) {
+		requirements.push(
+			...resolveGameRequirements({
+				config,
+				requirementIds: stash.requirementIds,
+			}),
+		);
+		for (const productId of stash.productIds) {
+			const product = config.products[productId];
+			if (product) {
+				requirements.push(
+					...resolveGameRequirements({
+						config,
+						requirementIds: product.requirementIds,
+					}),
+				);
+			}
+		}
+	}
 
 	return requirements.filter((requirement) => requirement.type === "stored");
 };
@@ -686,7 +699,12 @@ const validateGameSaveAgainstConfig = (
 			itemInstanceId: job.producerItemInstanceId,
 		});
 		const producerId = target?.boardItem.itemId;
-		const producer = producerId ? config.producers[producerId] : undefined;
+		const producer = producerId
+			? readProducerCapabilityDefinition({
+					config,
+					producerId,
+				})
+			: undefined;
 
 		if (!target) {
 			addSaveIssue(
@@ -706,7 +724,7 @@ const validateGameSaveAgainstConfig = (
 					jobId,
 					"producerItemInstanceId",
 				],
-				`Producer job target "${job.producerItemInstanceId}" must reference a producer item.`,
+				`Producer job target "${job.producerItemInstanceId}" must reference a producer-like item.`,
 			);
 		} else if (!producer.productIds.includes(job.productId)) {
 			addSaveIssue(
@@ -884,8 +902,13 @@ const validateGameSaveAgainstConfig = (
 			itemInstanceId: producerItemInstanceId,
 		});
 		const producerId = target?.boardItem.itemId;
-		if (!producerId || !config.producers[producerId]) continue;
-		const maxQueueSize = config.producers[producerId]?.maxQueueSize;
+		if (!producerId) continue;
+		const producer = readProducerCapabilityDefinition({
+			config,
+			producerId,
+		});
+		if (!producer) continue;
+		const maxQueueSize = producer.maxQueueSize;
 		if (maxQueueSize !== undefined && jobCount > maxQueueSize) {
 			addSaveIssue(
 				ctx,
@@ -969,7 +992,12 @@ const validateGameSaveAgainstConfig = (
 			itemInstanceId: producerItemInstanceId,
 		});
 		const producerId = target?.itemId;
-		const producer = producerId ? config.producers[producerId] : undefined;
+		const producer = producerId
+			? readProducerCapabilityDefinition({
+					config,
+					producerId,
+				})
+			: undefined;
 		if (!target || !producerId || !producer) {
 			addSaveIssue(
 				ctx,
@@ -977,7 +1005,7 @@ const validateGameSaveAgainstConfig = (
 					"producerLines",
 					producerItemInstanceId,
 				],
-				`Producer line state target "${producerItemInstanceId}" must reference a producer item.`,
+				`Producer line state target "${producerItemInstanceId}" must reference a producer-like item.`,
 			);
 			continue;
 		}
@@ -1005,7 +1033,12 @@ const validateGameSaveAgainstConfig = (
 			itemInstanceId: producerItemInstanceId,
 		});
 		const producerId = target?.itemId;
-		const producer = producerId ? config.producers[producerId] : undefined;
+		const producer = producerId
+			? readProducerCapabilityDefinition({
+					config,
+					producerId,
+				})
+			: undefined;
 		if (!target || !producerId || !producer) {
 			addSaveIssue(
 				ctx,
@@ -1013,7 +1046,7 @@ const validateGameSaveAgainstConfig = (
 					"producerInputs",
 					producerItemInstanceId,
 				],
-				`Producer input state target "${producerItemInstanceId}" must reference a producer item.`,
+				`Producer input state target "${producerItemInstanceId}" must reference a producer-like item.`,
 			);
 			continue;
 		}
@@ -1210,87 +1243,53 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
-	for (const [stashItemInstanceId, state] of Object.entries(save.stashes)) {
+	for (const [producerItemInstanceId, state] of Object.entries(save.producerCharges)) {
 		const target = readItemInstanceDefinition({
 			config,
 			save,
-			itemInstanceId: stashItemInstanceId,
+			itemInstanceId: producerItemInstanceId,
 		});
-		const stashId = target?.itemId;
-		const stash = stashId ? config.stashes[stashId] : undefined;
-		if (!target || !stashId || !stash) {
+		const producerId = target?.itemId;
+		const producer = producerId
+			? readProducerCapabilityDefinition({
+					config,
+					producerId,
+				})
+			: undefined;
+		if (!target || !producerId || !producer) {
 			addSaveIssue(
 				ctx,
 				[
-					"stashes",
-					stashItemInstanceId,
+					"producerCharges",
+					producerItemInstanceId,
 				],
-				`Stash state target "${stashItemInstanceId}" must reference a stash item.`,
+				`Producer charge state target "${producerItemInstanceId}" must reference a producer-like item.`,
 			);
 			continue;
 		}
 
-		if (state.remainingCharges > stash.charges) {
+		if (producer.charges === undefined) {
 			addSaveIssue(
 				ctx,
 				[
-					"stashes",
-					stashItemInstanceId,
+					"producerCharges",
+					producerItemInstanceId,
+				],
+				`Producer charge state target "${producerItemInstanceId}" references a producer-like item without finite charges.`,
+			);
+			continue;
+		}
+
+		if (state.remainingCharges > producer.charges) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerCharges",
+					producerItemInstanceId,
 					"remainingCharges",
 				],
-				`remainingCharges must be <= stash charges (${stash.charges}).`,
+				`remainingCharges must be <= producer charges (${producer.charges}).`,
 			);
-		}
-	}
-
-	for (const [stashItemInstanceId, state] of Object.entries(save.stashInputs)) {
-		const target = readItemInstanceDefinition({
-			config,
-			save,
-			itemInstanceId: stashItemInstanceId,
-		});
-		const stashId = target?.itemId;
-		const stash = stashId ? config.stashes[stashId] : undefined;
-		if (!target || !stashId || !stash) {
-			addSaveIssue(
-				ctx,
-				[
-					"stashInputs",
-					stashItemInstanceId,
-				],
-				`Stash input state target "${stashItemInstanceId}" must reference a stash item.`,
-			);
-			continue;
-		}
-
-		for (const [itemId, quantity] of Object.entries(state.items)) {
-			const inputSlot = stash.inputs.find((input) => input.itemId === itemId);
-			if (!inputSlot) {
-				addSaveIssue(
-					ctx,
-					[
-						"stashInputs",
-						stashItemInstanceId,
-						"items",
-						itemId,
-					],
-					`Stash "${stashId}" has no input "${itemId}".`,
-				);
-				continue;
-			}
-
-			if (quantity > inputSlot.capacity) {
-				addSaveIssue(
-					ctx,
-					[
-						"stashInputs",
-						stashItemInstanceId,
-						"items",
-						itemId,
-					],
-					`Stash input quantity must be <= input capacity (${inputSlot.capacity}).`,
-				);
-			}
 		}
 	}
 

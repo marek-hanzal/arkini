@@ -142,6 +142,28 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				placement: "board_then_inventory",
 				requirementIds: [],
 			},
+			"product:stash": {
+				chargeCost: 1,
+				durationMs: 0,
+				inputs: [
+					{
+						capacity: 1,
+						consume: true,
+						itemId: "item:key",
+						quantity: 1,
+					},
+				],
+				name: "Open stash",
+				output: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+						type: "guaranteed",
+					},
+				],
+				placement: "board_then_inventory",
+				requirementIds: [],
+			},
 			"product:shred": {
 				durationMs: 1000,
 				inputs: [
@@ -160,24 +182,12 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 		stashes: {
 			"item:stash": {
 				charges: 1,
-				inputs: [
-					{
-						capacity: 1,
-						consume: true,
-						itemId: "item:key",
-						quantity: 1,
-					},
+				maxQueueSize: 1,
+				onChargesDepleted: "remove",
+				productIds: [
+					"product:stash",
 				],
-				onDepleted: "remove",
-				output: [
-					{
-						itemId: "item:twig",
-						quantity: 2,
-						type: "guaranteed",
-					},
-				],
-				placement: "board_then_inventory",
-				requirements: [],
+				requirementIds: [],
 			},
 		},
 		craftRecipes: {

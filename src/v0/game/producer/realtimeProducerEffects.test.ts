@@ -234,6 +234,7 @@ const createOutputCreatesRealtimeSourceConfig = () => {
 				],
 			},
 			"product:spawn-buff": {
+				chargeCost: 0,
 				durationMs: 1000,
 				name: "Spawn buff",
 				output: [

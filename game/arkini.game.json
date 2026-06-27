@@ -6987,6 +6987,7 @@
 	"producers": {
 		"producer:academy": {
 			"maxQueueSize": 2,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:academy:basic-knowledge",
 				"product:academy:advanced-knowledge",
@@ -7012,6 +7013,7 @@
 		},
 		"producer:armory-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:armory-t1:leather-armor",
 				"product:armory-t1:iron-armor"
@@ -7020,6 +7022,7 @@
 		},
 		"producer:bakery-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:bakery-t1:bread",
 				"product:bakery-t1:bread-morale-t1"
@@ -7028,6 +7031,7 @@
 		},
 		"producer:blacksmith-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:blacksmith-t1:nails",
 				"product:blacksmith-t1:axe",
@@ -7047,6 +7051,7 @@
 				}
 			],
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:brewery-t1:hops",
 				"product:brewery-t1:beer-barrel",
@@ -7058,6 +7063,7 @@
 		},
 		"producer:brickyard": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:brickyard:bricks"
 			],
@@ -7067,6 +7073,7 @@
 		},
 		"producer:cattle-farm-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:cattle-farm-t1:milk"
 			],
@@ -7074,6 +7081,7 @@
 		},
 		"producer:charcoal-burner-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:charcoal-burner-t1:charcoal"
 			],
@@ -7081,6 +7089,7 @@
 		},
 		"producer:chicken-coop-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:chicken-coop-t1:egg"
 			],
@@ -7088,6 +7097,7 @@
 		},
 		"producer:civic-office-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:civic-office-t1:building-permit",
 				"product:civic-office-t1:building-permit-morale-t2",
@@ -7098,6 +7108,7 @@
 		},
 		"producer:clay-pit": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:clay-pit:clay"
 			],
@@ -7107,6 +7118,7 @@
 		},
 		"producer:coal-mine-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:coal-mine-t1:coal"
 			],
@@ -7116,6 +7128,7 @@
 		},
 		"producer:construction-yard-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:construction-yard-t1:construction-bundle",
 				"product:construction-yard-t1:construction-bundle-morale-t3"
@@ -7124,6 +7137,7 @@
 		},
 		"producer:cookhouse-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:cookhouse-t1:feast"
 			],
@@ -7131,6 +7145,7 @@
 		},
 		"producer:dairy-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:dairy-t1:cheese"
 			],
@@ -7138,6 +7153,7 @@
 		},
 		"producer:dye-workshop-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:dye-workshop-t1:pigment",
 				"product:dye-workshop-t1:luxury-cloth"
@@ -7146,6 +7162,7 @@
 		},
 		"producer:farm-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:farm-t1:grain",
 				"product:farm-t1:grain-morale-t1"
@@ -7156,6 +7173,7 @@
 		},
 		"producer:glassworks": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:glassworks:glass"
 			],
@@ -7165,6 +7183,7 @@
 		},
 		"producer:glazier-workshop-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:glazier-workshop-t1:stained-glass",
 				"product:glazier-workshop-t1:stained-glass-morale-t4"
@@ -7175,6 +7194,7 @@
 		},
 		"producer:gold-mine-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:gold-mine-t1:gold-ore"
 			],
@@ -7184,6 +7204,7 @@
 		},
 		"producer:goldsmith-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:goldsmith-t1:coin-stack",
 				"product:goldsmith-t1:key-t1",
@@ -7195,6 +7216,7 @@
 		},
 		"producer:heroes-guild-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:heroes-guild-t1:chest-t1",
 				"product:heroes-guild-t1:chest-t2",
@@ -7207,6 +7229,7 @@
 		},
 		"producer:house-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:house-t1:morale-t1"
 			],
@@ -7214,6 +7237,7 @@
 		},
 		"producer:house-t2": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:house-t2:morale-t2"
 			],
@@ -7221,6 +7245,7 @@
 		},
 		"producer:house-t3": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:house-t3:morale-t3"
 			],
@@ -7228,6 +7253,7 @@
 		},
 		"producer:house-t4": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:house-t4:morale-t4"
 			],
@@ -7235,6 +7261,7 @@
 		},
 		"producer:iron-mine-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:iron-mine-t1:iron-ore"
 			],
@@ -7244,6 +7271,7 @@
 		},
 		"producer:lumberjack-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:lumberjack-t1:log"
 			],
@@ -7253,6 +7281,7 @@
 		},
 		"producer:market-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:market-t1:coin-from-bread",
 				"product:market-t1:coin-from-sausage",
@@ -7265,6 +7294,7 @@
 		},
 		"producer:market-t2": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:market-t2:coin-from-paper",
 				"product:market-t2:coin-from-feast",
@@ -7275,6 +7305,7 @@
 		},
 		"producer:paper-mill-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:paper-mill-t1:paper"
 			],
@@ -7282,6 +7313,7 @@
 		},
 		"producer:pig-farm-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:pig-farm-t1:piglet"
 			],
@@ -7289,6 +7321,7 @@
 		},
 		"producer:prospector-guild-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:prospector-guild-t1:clay-deposit",
 				"product:prospector-guild-t1:sand-deposit"
@@ -7297,6 +7330,7 @@
 		},
 		"producer:prospector-guild-t2": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:prospector-guild-t2:clay-deposit",
 				"product:prospector-guild-t2:sand-deposit",
@@ -7309,6 +7343,7 @@
 		},
 		"producer:purifier-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:purifier-t1:pollution",
 				"product:purifier-t1:pollution-bulk"
@@ -7317,6 +7352,7 @@
 		},
 		"producer:quarry-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:quarry-t1:stone"
 			],
@@ -7326,6 +7362,7 @@
 		},
 		"producer:quarry-t2": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:quarry-t2:stone",
 				"product:quarry-t2:marble"
@@ -7336,6 +7373,7 @@
 		},
 		"producer:roof-tile-factory": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:roof-tile-factory:roof-tiles"
 			],
@@ -7345,6 +7383,7 @@
 		},
 		"producer:sand-pit": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:sand-pit:sand"
 			],
@@ -7354,6 +7393,7 @@
 		},
 		"producer:sawmill-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:sawmill-t1:plank"
 			],
@@ -7363,6 +7403,7 @@
 		},
 		"producer:school": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:school:basic-knowledge",
 				"product:school:basic-knowledge-morale-t2"
@@ -7371,6 +7412,7 @@
 		},
 		"producer:sheep-pasture-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:sheep-pasture-t1:wool"
 			],
@@ -7378,6 +7420,7 @@
 		},
 		"producer:slaughterhouse-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:slaughterhouse-t1:sausage-raw-hide"
 			],
@@ -7385,6 +7428,7 @@
 		},
 		"producer:smelter-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:smelter-t1:iron-ingot",
 				"product:smelter-t1:gold-ingot"
@@ -7393,6 +7437,7 @@
 		},
 		"producer:stonemason-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:stonemason-t1:stone-block"
 			],
@@ -7402,6 +7447,7 @@
 		},
 		"producer:stonemason-t2": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:stonemason-t2:stone-block",
 				"product:stonemason-t2:marble-block",
@@ -7413,6 +7459,7 @@
 		},
 		"producer:tailor-workshop-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:tailor-workshop-t1:common-clothing",
 				"product:tailor-workshop-t1:luxury-clothing",
@@ -7422,6 +7469,7 @@
 		},
 		"producer:tannery-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:tannery-t1:leather"
 			],
@@ -7429,6 +7477,7 @@
 		},
 		"producer:tavern-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:tavern-t1:beer",
 				"product:tavern-t1:wine-glass"
@@ -7437,6 +7486,7 @@
 		},
 		"producer:townhall-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:townhall-t1:blueprint-lumberjack-t1",
 				"product:townhall-t1:blueprint-sawmill-t1",
@@ -7449,6 +7499,7 @@
 		},
 		"producer:townhall-t2": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:townhall-t2:wheat-field",
 				"product:townhall-t2:blueprint-farm-t1",
@@ -7465,6 +7516,7 @@
 		},
 		"producer:townhall-t3": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:townhall-t3:blueprint-windmill-t1",
 				"product:townhall-t3:blueprint-bakery-t1",
@@ -7484,6 +7536,7 @@
 		},
 		"producer:townhall-t4": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:townhall-t4:blueprint-paper-mill-t1",
 				"product:townhall-t4:blueprint-school",
@@ -7500,6 +7553,7 @@
 		},
 		"producer:university": {
 			"maxQueueSize": 2,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:university:basic-knowledge",
 				"product:university:advanced-knowledge",
@@ -7518,6 +7572,7 @@
 		},
 		"producer:vegetable-garden-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:vegetable-garden-t1:vegetables"
 			],
@@ -7525,6 +7580,7 @@
 		},
 		"producer:weaver-hut-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:weaver-hut-t1:common-cloth"
 			],
@@ -7532,6 +7588,7 @@
 		},
 		"producer:well-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:well-t1:water"
 			],
@@ -7539,6 +7596,7 @@
 		},
 		"producer:windmill-t1": {
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:windmill-t1:flour"
 			],
@@ -7556,6 +7614,7 @@
 				}
 			],
 			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:winery-t1:grapes",
 				"product:winery-t1:wine-barrel",
@@ -7568,6 +7627,7 @@
 	},
 	"products": {
 		"product:academy:advanced-knowledge": {
+			"chargeCost": 0,
 			"durationMs": 22000,
 			"inputs": [
 				{
@@ -7603,6 +7663,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:basic-knowledge": {
+			"chargeCost": 0,
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -7632,6 +7693,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-armory-t1": {
+			"chargeCost": 0,
 			"durationMs": 2500,
 			"inputs": [
 				{
@@ -7685,6 +7747,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-blacksmith-t1": {
+			"chargeCost": 0,
 			"durationMs": 2500,
 			"inputs": [
 				{
@@ -7738,6 +7801,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-brickyard": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -7785,6 +7849,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-charcoal-burner-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -7838,6 +7903,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-clay-pit": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -7879,6 +7945,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-coal-mine-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -7920,6 +7987,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-construction-yard-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -7973,6 +8041,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-glassworks": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -8020,6 +8089,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-gold-mine-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -8061,6 +8131,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-goldsmith-t1": {
+			"chargeCost": 0,
 			"durationMs": 2500,
 			"inputs": [
 				{
@@ -8114,6 +8185,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-iron-mine-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -8155,6 +8227,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-prospector-guild-t2": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -8196,6 +8269,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-purifier-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -8243,6 +8317,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-roof-tile-factory": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -8290,6 +8365,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-sand-pit": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -8331,6 +8407,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-smelter-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -8378,6 +8455,7 @@
 			"visibility": "visible"
 		},
 		"product:academy:blueprint-university": {
+			"chargeCost": 0,
 			"durationMs": 2500,
 			"inputs": [
 				{
@@ -8437,6 +8515,7 @@
 			"visibility": "visible"
 		},
 		"product:armory-t1:iron-armor": {
+			"chargeCost": 0,
 			"durationMs": 36000,
 			"inputs": [
 				{
@@ -8492,6 +8571,7 @@
 			"visibility": "visible"
 		},
 		"product:armory-t1:leather-armor": {
+			"chargeCost": 0,
 			"durationMs": 22000,
 			"inputs": [
 				{
@@ -8527,6 +8607,7 @@
 			"visibility": "visible"
 		},
 		"product:bakery-t1:bread": {
+			"chargeCost": 0,
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -8556,6 +8637,7 @@
 			"visibility": "visible"
 		},
 		"product:bakery-t1:bread-morale-t1": {
+			"chargeCost": 0,
 			"durationMs": 6000,
 			"inputs": [
 				{
@@ -8591,6 +8673,7 @@
 			"visibility": "visible"
 		},
 		"product:blacksmith-t1:axe": {
+			"chargeCost": 0,
 			"durationMs": 15000,
 			"inputs": [
 				{
@@ -8640,6 +8723,7 @@
 			"visibility": "visible"
 		},
 		"product:blacksmith-t1:nails": {
+			"chargeCost": 0,
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -8683,6 +8767,7 @@
 			"visibility": "visible"
 		},
 		"product:blacksmith-t1:sword": {
+			"chargeCost": 0,
 			"durationMs": 22000,
 			"inputs": [
 				{
@@ -8732,6 +8817,7 @@
 			"visibility": "visible"
 		},
 		"product:brewery-t1:beer-barrel": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -8761,6 +8847,7 @@
 			"visibility": "visible"
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -8784,6 +8871,7 @@
 			"visibility": "visible"
 		},
 		"product:brewery-t1:hops": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -8807,6 +8895,7 @@
 			"visibility": "visible"
 		},
 		"product:brickyard:bricks": {
+			"chargeCost": 0,
 			"durationMs": 8500,
 			"inputs": [
 				{
@@ -8856,6 +8945,7 @@
 			"visibility": "visible"
 		},
 		"product:cattle-farm-t1:milk": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"hinderedBy": [
 				{
@@ -8895,6 +8985,7 @@
 			"visibility": "visible"
 		},
 		"product:charcoal-burner-t1:charcoal": {
+			"chargeCost": 0,
 			"durationMs": 6500,
 			"inputs": [
 				{
@@ -8931,7 +9022,182 @@
 			"tags": [],
 			"visibility": "visible"
 		},
+		"product:chest-t1:open": {
+			"chargeCost": 1,
+			"durationMs": 0,
+			"inputs": [
+				{
+					"capacity": 1,
+					"consume": true,
+					"itemId": "item:key-t1",
+					"quantity": 1
+				}
+			],
+			"name": "Open Chest T1",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 4,
+						"min": 2
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:ruby",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:chest-t2:open": {
+			"chargeCost": 1,
+			"durationMs": 0,
+			"inputs": [
+				{
+					"capacity": 1,
+					"consume": true,
+					"itemId": "item:key-t2",
+					"quantity": 1
+				}
+			],
+			"name": "Open Chest T2",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 7,
+						"min": 4
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:ruby",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.18,
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:chest-t3:open": {
+			"chargeCost": 1,
+			"durationMs": 0,
+			"inputs": [
+				{
+					"capacity": 1,
+					"consume": true,
+					"itemId": "item:key-t3",
+					"quantity": 1
+				}
+			],
+			"name": "Open Chest T3",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 10,
+						"min": 7
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:emerald",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.25,
+					"itemId": "item:topaz",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:chest-t4:open": {
+			"chargeCost": 1,
+			"durationMs": 0,
+			"inputs": [
+				{
+					"capacity": 1,
+					"consume": true,
+					"itemId": "item:key-t4",
+					"quantity": 1
+				}
+			],
+			"name": "Open Chest T4",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 15,
+						"min": 10
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:sapphire",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:topaz",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:aquamarine",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
 		"product:chicken-coop-t1:egg": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"hinderedBy": [
 				{
@@ -8971,6 +9237,7 @@
 			"visibility": "visible"
 		},
 		"product:civic-office-t1:blueprint-academy": {
+			"chargeCost": 0,
 			"durationMs": 2500,
 			"inputs": [
 				{
@@ -9018,6 +9285,7 @@
 			"visibility": "visible"
 		},
 		"product:civic-office-t1:building-permit": {
+			"chargeCost": 0,
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -9053,6 +9321,7 @@
 			"visibility": "visible"
 		},
 		"product:civic-office-t1:building-permit-morale-t2": {
+			"chargeCost": 0,
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -9094,6 +9363,7 @@
 			"visibility": "visible"
 		},
 		"product:civic-office-t1:guild-charter": {
+			"chargeCost": 0,
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -9141,6 +9411,7 @@
 			"visibility": "visible"
 		},
 		"product:clay-pit:clay": {
+			"chargeCost": 0,
 			"durationMs": 6500,
 			"inputs": [
 				{
@@ -9164,6 +9435,7 @@
 			"visibility": "visible"
 		},
 		"product:coal-mine-t1:coal": {
+			"chargeCost": 0,
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -9199,6 +9471,7 @@
 			"visibility": "visible"
 		},
 		"product:construction-yard-t1:construction-bundle": {
+			"chargeCost": 0,
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -9252,6 +9525,7 @@
 			"visibility": "visible"
 		},
 		"product:construction-yard-t1:construction-bundle-morale-t3": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -9311,6 +9585,7 @@
 			"visibility": "visible"
 		},
 		"product:cookhouse-t1:feast": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -9358,6 +9633,7 @@
 			"visibility": "visible"
 		},
 		"product:dairy-t1:cheese": {
+			"chargeCost": 0,
 			"durationMs": 7000,
 			"inputs": [
 				{
@@ -9381,6 +9657,7 @@
 			"visibility": "visible"
 		},
 		"product:dye-workshop-t1:luxury-cloth": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -9416,6 +9693,7 @@
 			"visibility": "visible"
 		},
 		"product:dye-workshop-t1:pigment": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -9445,6 +9723,7 @@
 			"visibility": "visible"
 		},
 		"product:farm-t1:grain": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"hinderedBy": [
 				{
@@ -9478,6 +9757,7 @@
 			"visibility": "visible"
 		},
 		"product:farm-t1:grain-morale-t1": {
+			"chargeCost": 0,
 			"durationMs": 3500,
 			"hinderedBy": [
 				{
@@ -9517,6 +9797,7 @@
 			"visibility": "visible"
 		},
 		"product:glassworks:glass": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -9560,6 +9841,7 @@
 			"visibility": "visible"
 		},
 		"product:glazier-workshop-t1:stained-glass": {
+			"chargeCost": 0,
 			"durationMs": 14000,
 			"inputs": [
 				{
@@ -9615,6 +9897,7 @@
 			"visibility": "visible"
 		},
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
+			"chargeCost": 0,
 			"durationMs": 10500,
 			"inputs": [
 				{
@@ -9676,6 +9959,7 @@
 			"visibility": "visible"
 		},
 		"product:gold-mine-t1:gold-ore": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -9711,6 +9995,7 @@
 			"visibility": "visible"
 		},
 		"product:goldsmith-t1:coin-stack": {
+			"chargeCost": 0,
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -9754,6 +10039,7 @@
 			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t1": {
+			"chargeCost": 0,
 			"durationMs": 14000,
 			"inputs": [
 				{
@@ -9809,6 +10095,7 @@
 			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t2": {
+			"chargeCost": 0,
 			"durationMs": 18000,
 			"inputs": [
 				{
@@ -9864,6 +10151,7 @@
 			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t3": {
+			"chargeCost": 0,
 			"durationMs": 22000,
 			"inputs": [
 				{
@@ -9919,6 +10207,7 @@
 			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t4": {
+			"chargeCost": 0,
 			"durationMs": 26000,
 			"inputs": [
 				{
@@ -9974,6 +10263,7 @@
 			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t1": {
+			"chargeCost": 0,
 			"durationMs": 90000,
 			"inputs": [
 				{
@@ -10015,6 +10305,7 @@
 			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t2": {
+			"chargeCost": 0,
 			"durationMs": 150000,
 			"inputs": [
 				{
@@ -10056,6 +10347,7 @@
 			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t3": {
+			"chargeCost": 0,
 			"durationMs": 240000,
 			"inputs": [
 				{
@@ -10103,6 +10395,7 @@
 			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t4": {
+			"chargeCost": 0,
 			"durationMs": 420000,
 			"inputs": [
 				{
@@ -10156,6 +10449,7 @@
 			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:treasure-chest": {
+			"chargeCost": 0,
 			"durationMs": 600000,
 			"inputs": [
 				{
@@ -10227,6 +10521,7 @@
 			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:treasure-chest-morale-t4": {
+			"chargeCost": 0,
 			"durationMs": 420000,
 			"inputs": [
 				{
@@ -10316,6 +10611,7 @@
 			"visibility": "visible"
 		},
 		"product:house-t1:morale-t1": {
+			"chargeCost": 0,
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -10345,6 +10641,7 @@
 			"visibility": "visible"
 		},
 		"product:house-t2:morale-t2": {
+			"chargeCost": 0,
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -10385,6 +10682,7 @@
 			"visibility": "visible"
 		},
 		"product:house-t3:morale-t3": {
+			"chargeCost": 0,
 			"durationMs": 18000,
 			"inputs": [
 				{
@@ -10436,6 +10734,7 @@
 			"visibility": "visible"
 		},
 		"product:house-t4:morale-t4": {
+			"chargeCost": 0,
 			"durationMs": 24000,
 			"inputs": [
 				{
@@ -10492,6 +10791,7 @@
 			"visibility": "visible"
 		},
 		"product:iron-mine-t1:iron-ore": {
+			"chargeCost": 0,
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -10527,6 +10827,7 @@
 			"visibility": "visible"
 		},
 		"product:lumberjack-t1:log": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"name": "Log",
 			"output": [
@@ -10542,6 +10843,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-beer": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -10565,6 +10867,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-bread": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -10588,6 +10891,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-cheese": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -10611,6 +10915,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-feast": {
+			"chargeCost": 0,
 			"durationMs": 6000,
 			"inputs": [
 				{
@@ -10634,6 +10939,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-sausage": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -10657,6 +10963,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-wine-glass": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -10680,6 +10987,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t2:coin-from-common-clothing": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -10703,6 +11011,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t2:coin-from-feast": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -10726,6 +11035,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t2:coin-from-luxury-clothing": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -10749,6 +11059,7 @@
 			"visibility": "visible"
 		},
 		"product:market-t2:coin-from-paper": {
+			"chargeCost": 0,
 			"durationMs": 3500,
 			"inputs": [
 				{
@@ -10772,6 +11083,7 @@
 			"visibility": "visible"
 		},
 		"product:paper-mill-t1:paper": {
+			"chargeCost": 0,
 			"durationMs": 7000,
 			"inputs": [
 				{
@@ -10801,6 +11113,7 @@
 			"visibility": "visible"
 		},
 		"product:pig-farm-t1:piglet": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"hinderedBy": [
 				{
@@ -10840,6 +11153,7 @@
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t1:clay-deposit": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -10875,6 +11189,7 @@
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t1:sand-deposit": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -10910,6 +11225,7 @@
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:clay-deposit": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -10945,6 +11261,7 @@
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:coal-deposit": {
+			"chargeCost": 0,
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -10986,6 +11303,7 @@
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:gold-deposit": {
+			"chargeCost": 0,
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -11027,6 +11345,7 @@
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:iron-deposit": {
+			"chargeCost": 0,
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -11068,6 +11387,7 @@
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:marble-deposit": {
+			"chargeCost": 0,
 			"durationMs": 14000,
 			"inputs": [
 				{
@@ -11109,6 +11429,7 @@
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t2:sand-deposit": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -11144,6 +11465,7 @@
 			"visibility": "visible"
 		},
 		"product:purifier-t1:pollution": {
+			"chargeCost": 0,
 			"durationMs": 6000,
 			"inputs": [
 				{
@@ -11172,6 +11494,7 @@
 			"visibility": "visible"
 		},
 		"product:purifier-t1:pollution-bulk": {
+			"chargeCost": 0,
 			"durationMs": 18000,
 			"inputs": [
 				{
@@ -11200,6 +11523,7 @@
 			"visibility": "visible"
 		},
 		"product:quarry-t1:stone": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"name": "Stone",
 			"output": [
@@ -11215,6 +11539,7 @@
 			"visibility": "visible"
 		},
 		"product:quarry-t2:marble": {
+			"chargeCost": 0,
 			"durationMs": 12000,
 			"name": "Marble",
 			"output": [
@@ -11230,6 +11555,7 @@
 			"visibility": "visible"
 		},
 		"product:quarry-t2:stone": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"name": "Stone",
 			"output": [
@@ -11245,6 +11571,7 @@
 			"visibility": "visible"
 		},
 		"product:roof-tile-factory:roof-tiles": {
+			"chargeCost": 0,
 			"durationMs": 8500,
 			"inputs": [
 				{
@@ -11294,6 +11621,7 @@
 			"visibility": "visible"
 		},
 		"product:sand-pit:sand": {
+			"chargeCost": 0,
 			"durationMs": 6500,
 			"name": "Sand",
 			"output": [
@@ -11309,6 +11637,7 @@
 			"visibility": "visible"
 		},
 		"product:sawmill-t1:plank": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -11332,6 +11661,7 @@
 			"visibility": "visible"
 		},
 		"product:school:basic-knowledge": {
+			"chargeCost": 0,
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -11361,6 +11691,7 @@
 			"visibility": "visible"
 		},
 		"product:school:basic-knowledge-morale-t2": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -11396,6 +11727,7 @@
 			"visibility": "visible"
 		},
 		"product:sheep-pasture-t1:wool": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"hinderedBy": [
 				{
@@ -11435,6 +11767,7 @@
 			"visibility": "visible"
 		},
 		"product:slaughterhouse-t1:sausage-raw-hide": {
+			"chargeCost": 0,
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -11463,6 +11796,7 @@
 			"visibility": "visible"
 		},
 		"product:smelter-t1:gold-ingot": {
+			"chargeCost": 0,
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -11512,6 +11846,7 @@
 			"visibility": "visible"
 		},
 		"product:smelter-t1:iron-ingot": {
+			"chargeCost": 0,
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -11561,6 +11896,7 @@
 			"visibility": "visible"
 		},
 		"product:stonemason-t1:stone-block": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -11584,6 +11920,7 @@
 			"visibility": "visible"
 		},
 		"product:stonemason-t2:marble-block": {
+			"chargeCost": 0,
 			"durationMs": 13000,
 			"inputs": [
 				{
@@ -11613,6 +11950,7 @@
 			"visibility": "visible"
 		},
 		"product:stonemason-t2:marble-block-morale-t4": {
+			"chargeCost": 0,
 			"durationMs": 10000,
 			"inputs": [
 				{
@@ -11648,6 +11986,7 @@
 			"visibility": "visible"
 		},
 		"product:stonemason-t2:stone-block": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -11671,6 +12010,7 @@
 			"visibility": "visible"
 		},
 		"product:tailor-workshop-t1:common-clothing": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -11700,6 +12040,7 @@
 			"visibility": "visible"
 		},
 		"product:tailor-workshop-t1:luxury-clothing": {
+			"chargeCost": 0,
 			"durationMs": 12000,
 			"inputs": [
 				{
@@ -11735,6 +12076,7 @@
 			"visibility": "visible"
 		},
 		"product:tailor-workshop-t1:luxury-clothing-morale-t3": {
+			"chargeCost": 0,
 			"durationMs": 9000,
 			"inputs": [
 				{
@@ -11776,6 +12118,7 @@
 			"visibility": "visible"
 		},
 		"product:tannery-t1:leather": {
+			"chargeCost": 0,
 			"durationMs": 8000,
 			"inputs": [
 				{
@@ -11805,6 +12148,7 @@
 			"visibility": "visible"
 		},
 		"product:tavern-t1:beer": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -11828,6 +12172,7 @@
 			"visibility": "visible"
 		},
 		"product:tavern-t1:wine-glass": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -11851,6 +12196,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-lumberjack-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -11874,6 +12220,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-quarry-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -11897,6 +12244,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-sawmill-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -11920,6 +12268,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-stonemason-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -11943,6 +12292,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-townhall-t2": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -11978,6 +12328,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-well-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12001,6 +12352,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-cattle-farm-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12036,6 +12388,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-chicken-coop-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12065,6 +12418,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-farm-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12094,6 +12448,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-house-t1": {
+			"chargeCost": 0,
 			"durationMs": 3000,
 			"inputs": [
 				{
@@ -12123,6 +12478,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-pig-farm-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12152,6 +12508,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-sheep-pasture-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12187,6 +12544,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-townhall-t3": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12228,6 +12586,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-vegetable-garden-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12257,6 +12616,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:food-supply": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12304,6 +12664,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t2:wheat-field": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12327,6 +12688,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-bakery-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12356,6 +12718,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-brewery-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12391,6 +12754,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-cookhouse-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12426,6 +12790,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-dairy-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12455,6 +12820,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-house-t2": {
+			"chargeCost": 0,
 			"durationMs": 3500,
 			"inputs": [
 				{
@@ -12490,6 +12856,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-market-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12525,6 +12892,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-slaughterhouse-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12554,6 +12922,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-tavern-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12583,6 +12952,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-townhall-t4": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12624,6 +12994,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-windmill-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12653,6 +13024,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-winery-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12688,6 +13060,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:hop-field": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12717,6 +13090,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t3:vineyard": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12746,6 +13120,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-civic-office-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12781,6 +13156,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-dye-workshop-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12822,6 +13198,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-house-t3": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -12863,6 +13240,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-market-t2": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12898,6 +13276,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-paper-mill-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12933,6 +13312,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-prospector-guild-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12968,6 +13348,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-school": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -12997,6 +13378,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-tailor-workshop-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -13038,6 +13420,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-tannery-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -13073,6 +13456,7 @@
 			"visibility": "visible"
 		},
 		"product:townhall-t4:blueprint-weaver-hut-t1": {
+			"chargeCost": 0,
 			"durationMs": 2000,
 			"inputs": [
 				{
@@ -13108,6 +13492,7 @@
 			"visibility": "visible"
 		},
 		"product:university:advanced-knowledge": {
+			"chargeCost": 0,
 			"durationMs": 14000,
 			"inputs": [
 				{
@@ -13137,6 +13522,7 @@
 			"visibility": "visible"
 		},
 		"product:university:basic-knowledge": {
+			"chargeCost": 0,
 			"durationMs": 6000,
 			"inputs": [
 				{
@@ -13160,6 +13546,7 @@
 			"visibility": "visible"
 		},
 		"product:university:blueprint-cathedral": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -13225,6 +13612,7 @@
 			"visibility": "visible"
 		},
 		"product:university:blueprint-glazier-workshop-t1": {
+			"chargeCost": 0,
 			"durationMs": 3000,
 			"inputs": [
 				{
@@ -13272,6 +13660,7 @@
 			"visibility": "visible"
 		},
 		"product:university:blueprint-heroes-guild-t1": {
+			"chargeCost": 0,
 			"durationMs": 3000,
 			"inputs": [
 				{
@@ -13325,6 +13714,7 @@
 			"visibility": "visible"
 		},
 		"product:university:blueprint-house-of-engineers": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -13390,6 +13780,7 @@
 			"visibility": "visible"
 		},
 		"product:university:blueprint-house-t4": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -13431,6 +13822,7 @@
 			"visibility": "visible"
 		},
 		"product:university:blueprint-mage-lodge": {
+			"chargeCost": 0,
 			"durationMs": 4000,
 			"inputs": [
 				{
@@ -13496,6 +13888,7 @@
 			"visibility": "visible"
 		},
 		"product:university:blueprint-quarry-t2": {
+			"chargeCost": 0,
 			"durationMs": 3500,
 			"inputs": [
 				{
@@ -13537,6 +13930,7 @@
 			"visibility": "visible"
 		},
 		"product:university:blueprint-stonemason-t2": {
+			"chargeCost": 0,
 			"durationMs": 3500,
 			"inputs": [
 				{
@@ -13578,6 +13972,7 @@
 			"visibility": "visible"
 		},
 		"product:university:master-knowledge": {
+			"chargeCost": 0,
 			"durationMs": 36000,
 			"inputs": [
 				{
@@ -13619,6 +14014,7 @@
 			"visibility": "visible"
 		},
 		"product:university:master-knowledge-morale-t4": {
+			"chargeCost": 0,
 			"durationMs": 26000,
 			"inputs": [
 				{
@@ -13666,6 +14062,7 @@
 			"visibility": "visible"
 		},
 		"product:vegetable-garden-t1:vegetables": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"hinderedBy": [
 				{
@@ -13699,6 +14096,7 @@
 			"visibility": "visible"
 		},
 		"product:weaver-hut-t1:common-cloth": {
+			"chargeCost": 0,
 			"durationMs": 7000,
 			"inputs": [
 				{
@@ -13722,6 +14120,7 @@
 			"visibility": "visible"
 		},
 		"product:well-t1:water": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"name": "Water",
 			"output": [
@@ -13737,6 +14136,7 @@
 			"visibility": "visible"
 		},
 		"product:windmill-t1:flour": {
+			"chargeCost": 0,
 			"durationMs": 6000,
 			"inputs": [
 				{
@@ -13760,6 +14160,7 @@
 			"visibility": "visible"
 		},
 		"product:winery-t1:grapes": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -13783,6 +14184,7 @@
 			"visibility": "visible"
 		},
 		"product:winery-t1:wine-barrel": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -13812,6 +14214,7 @@
 			"visibility": "visible"
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
+			"chargeCost": 0,
 			"durationMs": 5000,
 			"inputs": [
 				{
@@ -14001,165 +14404,39 @@
 	"stashes": {
 		"item:chest-t1": {
 			"charges": 1,
-			"inputs": [
-				{
-					"capacity": 1,
-					"consume": true,
-					"itemId": "item:key-t1",
-					"quantity": 1
-				}
+			"maxQueueSize": 1,
+			"onChargesDepleted": "remove",
+			"productIds": [
+				"product:chest-t1:open"
 			],
-			"onDepleted": "remove",
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": {
-						"max": 4,
-						"min": 2
-					},
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.65,
-					"itemId": "item:ruby",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.12,
-					"itemId": "item:emerald",
-					"quantity": 1,
-					"type": "chance"
-				}
-			],
-			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"item:chest-t2": {
 			"charges": 1,
-			"inputs": [
-				{
-					"capacity": 1,
-					"consume": true,
-					"itemId": "item:key-t2",
-					"quantity": 1
-				}
+			"maxQueueSize": 1,
+			"onChargesDepleted": "remove",
+			"productIds": [
+				"product:chest-t2:open"
 			],
-			"onDepleted": "remove",
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": {
-						"max": 7,
-						"min": 4
-					},
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.35,
-					"itemId": "item:ruby",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.65,
-					"itemId": "item:emerald",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.18,
-					"itemId": "item:sapphire",
-					"quantity": 1,
-					"type": "chance"
-				}
-			],
-			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"item:chest-t3": {
 			"charges": 1,
-			"inputs": [
-				{
-					"capacity": 1,
-					"consume": true,
-					"itemId": "item:key-t3",
-					"quantity": 1
-				}
+			"maxQueueSize": 1,
+			"onChargesDepleted": "remove",
+			"productIds": [
+				"product:chest-t3:open"
 			],
-			"onDepleted": "remove",
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": {
-						"max": 10,
-						"min": 7
-					},
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.35,
-					"itemId": "item:emerald",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.65,
-					"itemId": "item:sapphire",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.25,
-					"itemId": "item:topaz",
-					"quantity": 1,
-					"type": "chance"
-				}
-			],
-			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		},
 		"item:chest-t4": {
 			"charges": 1,
-			"inputs": [
-				{
-					"capacity": 1,
-					"consume": true,
-					"itemId": "item:key-t4",
-					"quantity": 1
-				}
+			"maxQueueSize": 1,
+			"onChargesDepleted": "remove",
+			"productIds": [
+				"product:chest-t4:open"
 			],
-			"onDepleted": "remove",
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": {
-						"max": 15,
-						"min": 10
-					},
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.35,
-					"itemId": "item:sapphire",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.55,
-					"itemId": "item:topaz",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.35,
-					"itemId": "item:aquamarine",
-					"quantity": 1,
-					"type": "chance"
-				}
-			],
-			"placement": "board_then_inventory",
-			"requirements": []
+			"requirementIds": []
 		}
 	},
 	"version": 1

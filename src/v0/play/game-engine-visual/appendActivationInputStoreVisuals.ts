@@ -16,7 +16,7 @@ type ConsumedEvent = Extract<
 type TargetEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored" | "craft_input.stored" | "stash_input.stored";
+		type: "producer_input.stored" | "craft_input.stored";
 	}
 >;
 
@@ -31,14 +31,12 @@ export namespace appendActivationInputStoreVisuals {
 
 const readTargetItemInstanceId = (target: TargetEvent) => {
 	if (target.type === "producer_input.stored") return target.producerItemInstanceId;
-	if (target.type === "craft_input.stored") return target.targetItemInstanceId;
-	return target.stashItemInstanceId;
+	return target.targetItemInstanceId;
 };
 
 const readTargetCause = (target: TargetEvent): GameVisualMotion["cause"] => {
 	if (target.type === "producer_input.stored") return "producer";
-	if (target.type === "craft_input.stored") return "craft";
-	return "stash";
+	return "craft";
 };
 
 export const appendActivationInputStoreVisuals = ({

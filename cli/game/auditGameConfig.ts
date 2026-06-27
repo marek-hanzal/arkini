@@ -195,19 +195,13 @@ const collectProducerUsage = (config: GameConfig, usage: UsageIndex, itemFlow: I
 
 const collectStashUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const stash of Object.values(config.stashes)) {
-		collectLootOutputUsage(stash.output, itemFlow);
-
-		for (const input of stash.inputs) {
-			itemFlow.consumedItemIds.add(input.itemId);
+		for (const productId of stash.productIds) {
+			usage.products.add(productId);
 		}
-		for (const requirement of stash.requirements) {
-			itemFlow.consumedItemIds.add(requirement.itemId);
+		for (const requirementId of stash.requirementIds) {
+			usage.requirements.add(requirementId);
 		}
-
-		if (typeof stash.onDepleted === "object") {
-			usage.items.add(stash.onDepleted.replaceWithItemId);
-			itemFlow.producedItemIds.add(stash.onDepleted.replaceWithItemId);
-		}
+		collectHindranceItemUsage(stash.hinderedBy ?? [], itemFlow);
 	}
 };
 

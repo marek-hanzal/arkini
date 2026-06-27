@@ -54,6 +54,7 @@ describe("validateWorldSnapshotFx", () => {
 				...baseConfig.products,
 				"product:queued": {
 					activatesEffectId: "effect:queued",
+					chargeCost: 0,
 					durationMs: 1000,
 					name: "Queued",
 					placement: "board_then_inventory",

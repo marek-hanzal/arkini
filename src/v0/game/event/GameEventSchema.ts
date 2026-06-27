@@ -8,7 +8,6 @@ const PositiveIntegerSchema = z.number().int().positive();
 
 export const GameItemCreatedReasonSchema = z.enum([
 	"product-output",
-	"stash-output",
 	"stored-requirement-withdraw",
 	"producer-input-withdraw",
 	"craft-input-withdraw",
@@ -21,8 +20,6 @@ const GameItemConsumedReasonSchema = z.enum([
 	"product-input",
 	"producer-input-store",
 	"producer-input-auto-fill",
-	"stash-input",
-	"stash-input-auto-fill",
 	"craft-input",
 	"craft-input-store",
 	"craft-input-auto-fill",
@@ -165,18 +162,6 @@ const GameEventSchema = z.discriminatedUnion("type", [
 
 	z
 		.object({
-			type: z.literal("stash_input.stored"),
-			stashItemInstanceId: IdSchema,
-			stashId: IdSchema,
-			itemId: IdSchema,
-			quantity: PositiveIntegerSchema,
-			previousQuantity: NonNegativeIntegerSchema,
-			nextQuantity: PositiveIntegerSchema,
-			atMs: GameInstantMsSchema,
-		})
-		.strict(),
-	z
-		.object({
 			type: z.literal("craft_input.stored"),
 			targetItemInstanceId: IdSchema,
 			recipeId: IdSchema,
@@ -270,23 +255,6 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
-			atMs: GameInstantMsSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("stash.opened"),
-			stashId: IdSchema,
-			stashItemInstanceId: IdSchema,
-			atMs: GameInstantMsSchema,
-			remainingCharges: NonNegativeIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("stash.depleted"),
-			stashId: IdSchema,
-			stashItemInstanceId: IdSchema,
 			atMs: GameInstantMsSchema,
 		})
 		.strict(),

@@ -79,8 +79,7 @@ export const createGameEngineVisualPlan = ({
 
 				if (
 					event.reason === "producer-input-auto-fill" ||
-					event.reason === "craft-input-auto-fill" ||
-					event.reason === "stash-input-auto-fill"
+					event.reason === "craft-input-auto-fill"
 				) {
 					const targetIndex = findActivationInputTargetEventIndex({
 						afterIndex: index,
@@ -91,8 +90,7 @@ export const createGameEngineVisualPlan = ({
 					const target = events[targetIndex];
 					if (
 						target?.type === "producer_input.stored" ||
-						target?.type === "craft_input.stored" ||
-						target?.type === "stash_input.stored"
+						target?.type === "craft_input.stored"
 					) {
 						skipped.add(targetIndex);
 						appendActivationInputTargetFeedback({
@@ -132,7 +130,6 @@ export const createGameEngineVisualPlan = ({
 
 			case "producer_input.stored":
 			case "craft_input.stored":
-			case "stash_input.stored":
 				appendActivationInputTargetFeedback({
 					plan,
 					target: event,
@@ -173,8 +170,6 @@ export const createGameEngineVisualPlan = ({
 			case "product.blocked":
 			case "product.failed":
 			case "product.started":
-			case "stash.depleted":
-			case "stash.opened":
 			case "stored_requirement.stored":
 			case "stored_requirement.withdrawn":
 				plan.ignoredEventTypes.push(event.type);

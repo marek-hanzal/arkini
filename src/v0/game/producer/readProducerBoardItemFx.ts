@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace readProducerBoardItemFx {
@@ -25,11 +26,16 @@ export const readProducerBoardItemFx = Effect.fn("readProducerBoardItemFx")(func
 			),
 		);
 	}
-	if (!config.producers[boardItem.itemId]) {
+	if (
+		!readProducerCapabilityDefinition({
+			config,
+			producerId: boardItem.itemId,
+		})
+	) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
-				`Board item "${producerItemInstanceId}" is not a producer.`,
+				`Board item "${producerItemInstanceId}" is not a producer-like capability.`,
 			),
 		);
 	}

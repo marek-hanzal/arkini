@@ -61,7 +61,7 @@ A producer capability is keyed by the owning item id and owns ordered product id
 }
 ```
 
-`maxQueueSize` defaults to `1`; `requirementIds` defaults to `[]`. There is no `type: "producer"` field because the section already says the thing is a producer. Humans, tragically, can infer this too.
+`maxQueueSize` defaults to `1`; `requirementIds` defaults to `[]`. A producer may also define finite `charges` and `onChargesDepleted` (`stop` or `remove`). Product lines may define `chargeCost`; if omitted, the product costs no charges. There is no `type: "producer"` field because the section already says the thing is a producer. Humans, tragically, can infer this too.
 
 A product line owns its inputs and output inline:
 
@@ -110,25 +110,35 @@ Quantity may be a number or `{ "min": number, "max": number }`.
 
 ## Stashes
 
-A stash is a charged container/loot source. It owns its inputs and output inline.
+A stash is an authoring-level producer facade for finite loot/container behavior. It is keyed by the owning item id, has exactly one `productId`, and uses the same product-line execution path as producers. The product line owns inputs, output, placement, requirements, duration, effects, and `chargeCost`. The stash owns the finite charges and depletion mode.
 
 ```json
 {
   "stashes": {
     "item:crate-1": {
+      "charges": 1,
+      "onChargesDepleted": "remove",
+      "productIds": ["product:crate-1-open"]
+    }
+  },
+  "products": {
+    "product:crate-1-open": {
+      "chargeCost": 1,
+      "durationMs": 0,
       "inputs": [],
       "output": [
         { "type": "guaranteed", "itemId": "item:twig", "quantity": { "min": 1, "max": 3 } },
         { "type": "chance", "itemId": "item:plank", "chance": 0.25, "quantity": 1 }
-      ]
+      ],
+      "placement": "board_then_inventory"
     }
   }
 }
 ```
 
-`placement` defaults to `board_then_inventory`, `requirements` defaults to `[]`, `charges` defaults to `1`, and `onDepleted` defaults to `remove`. There is no `type: "stash"`; again, the section is not trying to trick anyone.
+`charges` defaults to `1`, `onChargesDepleted` defaults to `remove`, and stash `productIds` must contain exactly one product. Stash products must spend charges with `chargeCost > 0`; otherwise the finite container would be an infinite loot faucet, because apparently we do need to say that out loud.
 
-When depleted, `onDepleted` may be omitted/`remove` or `{ "replaceWithItemId": "item:empty-stash" }`. Stash release preflights atomically, counts the removing stash cell as output space when relevant, and emits output through item spawn jobs so backend order and visual order share the same source.
+For the current chest implementation, depletion mode is `remove`: when the product line completes successfully and spends the last charge, the stash item is removed. Its own board cell is considered available for the output placement attempt, while failed placement keeps the original stash/job state intact through the normal producer blocked-delivery path.
 
 ## Craft recipes
 

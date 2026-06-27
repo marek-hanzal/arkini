@@ -44,17 +44,19 @@ import { z } from "zod";
  *   includes diagonals around the target tile. Producer/product `hinderedBy` entries are
  *   negative production effects: every active hindrance instance may slow the selected product without
  *   preventing start.
- * - Producer `productIds` are ordered production lines. Runtime board-click activation
+ * - Producer/stash `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
  *   definitions are owned by exactly one producer line. Producer shells do not own
  *   inputs. Runtime may still choose between multiple product lines accepting the same dragged
- *   item by default-line priority, then configured order. `maxQueueSize` is a hard per-producer-instance cap
- *   covering both running and queued jobs.
+ *   item by default-line priority, then configured order. `maxQueueSize` is a hard per-capability-instance cap
+ *   covering both running and queued jobs. Optional `charges` live on the producer capability,
+ *   product lines spend `chargeCost`, and `onChargesDepleted` decides whether depletion stops
+ *   future starts or removes the tile.
  * - Product inputs are stored per product line. Craft inputs are stored per craft
  *   target instance until the player explicitly starts the craft. Completion replaces
  *   the target with exactly one result item.
- * - Product lines own their normal `output` inline. A product without `output` is valid.
+ * - Product lines own their normal `output` inline and may spend producer charges with `chargeCost`. A product without `output` is valid.
  *   That is a delayed sink/destructor such as a shredder.
  * - `items.*.removeBy` is a generic board/tile removal rule. It is not producer logic.
  *
@@ -135,6 +137,8 @@ import { z } from "zod";
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
+const NonNegativeNumberSchema = z.number().min(0);
+const PositiveNumberSchema = z.number().positive();
 const SignedIntegerSchema = z.number().int();
 const ProbabilitySchema = z.number().min(0).max(1);
 const ProbabilityDeltaSchema = z.number().min(-1).max(1);
@@ -174,7 +178,7 @@ const QuantitySchema = z.union([
 ]);
 
 /**
- * Input slot for activations that can be gradually filled, currently products/stashes.
+ * Input slot for activations that can be gradually filled by product lines.
  * `consume` is required because config authors must see whether a fed item disappears. Missing quantity defaults to 1 because needing one item is the boring common case, not a revelation.
  */
 const ItemStackInputSchema = z
@@ -571,36 +575,41 @@ const ItemDefinitionFragmentSchema = ItemDefinitionSchema.extend({
 	assetId: IdSchema.optional(),
 });
 
-/** Producer shell with ordered product lines and producer-level requirements. Inputs live on product lines. */
+const ProducerDepletedModeSchema = z.enum([
+	"stop",
+	"remove",
+]);
+
+/** Producer-like capability with ordered product lines and capability-level requirements. Inputs live on product lines. */
 const ProducerDefinitionSchema = z
 	.object({
 		maxQueueSize: PositiveIntegerSchema.default(1),
 		productIds: z.array(IdSchema).min(1),
 		requirementIds: z.array(IdSchema).default([]),
 		hinderedBy: GameHindrancesSchema.optional(),
+		charges: PositiveNumberSchema.optional(),
+		onChargesDepleted: ProducerDepletedModeSchema.default("stop"),
 	})
 	.strict();
 
-/** Click/open container that may consume inputs, check requirements and emit loot charges. */
-const StashDefinitionSchema = z
-	.object({
-		placement: PlacementSchema,
-		output: ActivationOutputSchema.min(1),
-		inputs: ActivationInputSchema,
-		requirements: ActivationRequirementSchema.default([]),
-		charges: PositiveIntegerSchema.default(1),
-		onDepleted: z
-			.union([
-				z.literal("remove"),
-				z
-					.object({
-						replaceWithItemId: IdSchema,
-					})
-					.strict(),
-			])
-			.default("remove"),
-	})
-	.strict();
+/** Stash is a producer-like shell with exactly one product line and finite charges. */
+const StashDefinitionSchema = ProducerDefinitionSchema.extend({
+	productIds: z.array(IdSchema).length(1),
+	charges: PositiveNumberSchema.default(1),
+	onChargesDepleted: ProducerDepletedModeSchema.default("remove"),
+})
+	.strict()
+	.superRefine((stash, ctx) => {
+		if (stash.onChargesDepleted !== "remove") {
+			ctx.addIssue({
+				code: "custom",
+				message: "Stashes must remove themselves when charges are depleted.",
+				path: [
+					"onChargesDepleted",
+				],
+			});
+		}
+	});
 
 /**
  * Delayed recipe outside two-item merge.
@@ -638,8 +647,9 @@ const ProductDefinitionSchema = z
 				"hidden",
 			])
 			.default("visible"),
-		durationMs: PositiveIntegerSchema,
+		durationMs: NonNegativeIntegerSchema,
 		placement: PlacementSchema,
+		chargeCost: NonNegativeNumberSchema.default(0),
 		inputs: ActivationInputSchema.optional(),
 		requirementIds: z.array(IdSchema).default([]),
 		hinderedBy: GameHindrancesSchema.optional(),
@@ -1007,29 +1017,52 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
-	for (const [producerId, producer] of Object.entries(value.producers)) {
+	const validateProducerCapability = ({
+		capability,
+		capabilityId,
+		section,
+	}: {
+		capability: GameConfig["producers"][string] | GameConfig["stashes"][string];
+		capabilityId: string;
+		section: "producers" | "stashes";
+	}) => {
 		validateUniqueStringList(
 			ctx,
 			[
-				"producers",
-				producerId,
+				section,
+				capabilityId,
 				"productIds",
 			],
-			producer.productIds,
+			capability.productIds,
 			(value) => `Duplicate product "${value}".`,
 		);
 
-		for (const [index, productId] of producer.productIds.entries()) {
-			if (!hasProduct(productId)) {
+		for (const [index, productId] of capability.productIds.entries()) {
+			const product = value.products[productId];
+			if (!product) {
 				addIssue(
 					ctx,
 					[
-						"producers",
-						producerId,
+						section,
+						capabilityId,
 						"productIds",
 						index,
 					],
 					`Missing product "${productId}".`,
+				);
+				continue;
+			}
+
+			if (section === "stashes" && product.chargeCost <= 0) {
+				addIssue(
+					ctx,
+					[
+						section,
+						capabilityId,
+						"productIds",
+						index,
+					],
+					`Stash product "${productId}" must spend charges with chargeCost > 0.`,
 				);
 			}
 		}
@@ -1037,70 +1070,39 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		validateRequirementIds(
 			ctx,
 			[
-				"producers",
-				producerId,
+				section,
+				capabilityId,
 				"requirementIds",
 			],
-			producer.requirementIds,
+			capability.requirementIds,
 			hasRequirement,
 		);
 		validateGameHindrances(
 			ctx,
 			[
-				"producers",
-				producerId,
+				section,
+				capabilityId,
 				"hinderedBy",
 			],
-			producer.hinderedBy ?? [],
+			capability.hinderedBy ?? [],
 			hasItem,
 		);
+	};
+
+	for (const [producerId, producer] of Object.entries(value.producers)) {
+		validateProducerCapability({
+			capability: producer,
+			capabilityId: producerId,
+			section: "producers",
+		});
 	}
 
 	for (const [stashId, stash] of Object.entries(value.stashes)) {
-		validateActivationOutput(
-			ctx,
-			[
-				"stashes",
-				stashId,
-				"output",
-			],
-			stash.output,
-			hasItem,
-		);
-
-		validateItemInputs(
-			ctx,
-			[
-				"stashes",
-				stashId,
-				"inputs",
-			],
-			stash.inputs,
-			hasItem,
-		);
-		validateItemRequirements(
-			ctx,
-			[
-				"stashes",
-				stashId,
-				"requirements",
-			],
-			stash.requirements,
-			hasItem,
-		);
-
-		if (typeof stash.onDepleted === "object" && !hasItem(stash.onDepleted.replaceWithItemId)) {
-			addIssue(
-				ctx,
-				[
-					"stashes",
-					stashId,
-					"onDepleted",
-					"replaceWithItemId",
-				],
-				`Missing item "${stash.onDepleted.replaceWithItemId}".`,
-			);
-		}
+		validateProducerCapability({
+			capability: stash,
+			capabilityId: stashId,
+			section: "stashes",
+		});
 	}
 
 	for (const [craftRecipeId, recipe] of Object.entries(value.craftRecipes)) {
@@ -1424,26 +1426,48 @@ const validateProductLineOwnership = (
 	config: z.infer<typeof BaseGameConfigSchema>,
 ) => {
 	const ownerByProductId = new Map<string, string>();
-
-	for (const [producerId, producer] of Object.entries(config.producers)) {
-		for (const [productIndex, productId] of producer.productIds.entries()) {
-			const previousProducerId = ownerByProductId.get(productId);
-			if (previousProducerId) {
+	const validateOwner = ({
+		capabilityId,
+		productIds,
+		section,
+	}: {
+		capabilityId: string;
+		productIds: readonly string[];
+		section: "producers" | "stashes";
+	}) => {
+		for (const [productIndex, productId] of productIds.entries()) {
+			const previousCapabilityId = ownerByProductId.get(productId);
+			if (previousCapabilityId) {
 				addIssue(
 					ctx,
 					[
-						"producers",
-						producerId,
+						section,
+						capabilityId,
 						"productIds",
 						productIndex,
 					],
-					`Product "${productId}" must be owned by exactly one producer. First used by "${previousProducerId}".`,
+					`Product "${productId}" must be owned by exactly one producer-like capability. First used by "${previousCapabilityId}".`,
 				);
 				continue;
 			}
 
-			ownerByProductId.set(productId, producerId);
+			ownerByProductId.set(productId, capabilityId);
 		}
+	};
+
+	for (const [producerId, producer] of Object.entries(config.producers)) {
+		validateOwner({
+			capabilityId: producerId,
+			productIds: producer.productIds,
+			section: "producers",
+		});
+	}
+	for (const [stashId, stash] of Object.entries(config.stashes)) {
+		validateOwner({
+			capabilityId: stashId,
+			productIds: stash.productIds,
+			section: "stashes",
+		});
 	}
 };
 

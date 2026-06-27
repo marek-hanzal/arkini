@@ -3,6 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readProducerBoardItemFx } from "~/v0/game/producer/readProducerBoardItemFx";
+import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 
 export namespace readProducerRuntimeTargetFx {
 	export interface Props {
@@ -23,11 +24,14 @@ export const readProducerRuntimeTargetFx = Effect.fn("readProducerRuntimeTargetF
 		save,
 	});
 	const producerId = producerItem.itemId;
-	const producerDefinition = config.producers[producerId];
+	const producerDefinition = readProducerCapabilityDefinition({
+		config,
+		producerId,
+	});
 	if (!producerDefinition) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(
-				`Item "${producerItem.itemId}" is not a producer.`,
+				`Item "${producerItem.itemId}" is not a producer-like capability.`,
 			),
 		);
 	}

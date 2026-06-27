@@ -8,6 +8,9 @@ import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/v0/game/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
 import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveProductLineFx } from "~/v0/game/producer/readProducerJobEffectiveProductLineFx";
+import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
+import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
+import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
@@ -84,6 +87,108 @@ const rollProducerDeliveryItemsFx = Effect.fn("completeProducerJobFx.rollProduce
 	},
 );
 
+type ProducerChargeCompletionOutcome = {
+	producerId: string;
+	nextRemainingCharges: number;
+	removeOnDepleted: boolean;
+};
+
+const readProducerChargeCompletionOutcome = ({
+	config,
+	job,
+	save,
+}: {
+	config: GameConfig;
+	job: GameSaveProducerJob;
+	save: GameSave;
+}): ProducerChargeCompletionOutcome | undefined => {
+	const producerItem = save.board.items[job.producerItemInstanceId];
+	if (!producerItem) return undefined;
+
+	const producerId = producerItem.itemId;
+	const producer = readProducerCapabilityDefinition({
+		config,
+		producerId,
+	});
+	const product = config.products[job.productId];
+	if (!producer || !product || producer.charges === undefined || product.chargeCost <= 0) {
+		return undefined;
+	}
+
+	const remainingCharges = readProducerRemainingCharges({
+		config,
+		producerId,
+		producerItemInstanceId: job.producerItemInstanceId,
+		save,
+	});
+	if (remainingCharges === undefined) return undefined;
+
+	const nextRemainingCharges = Math.max(0, remainingCharges - product.chargeCost);
+
+	return {
+		nextRemainingCharges,
+		producerId,
+		removeOnDepleted: nextRemainingCharges === 0 && producer.onChargesDepleted === "remove",
+	};
+};
+
+const createProducerChargesDepletedRemovalEvent = ({
+	job,
+	nowMs,
+	producerId,
+}: {
+	job: GameSaveProducerJob;
+	nowMs: number;
+	producerId: string;
+}) => ({
+	atMs: nowMs,
+	itemId: producerId,
+	itemInstanceId: job.producerItemInstanceId,
+	reason: "stash-depleted" as const,
+	type: "item.removed" as const,
+});
+
+const spendProducerChargeCostAfterCompletedDelivery = ({
+	config,
+	job,
+	nextSave,
+	nowMs,
+}: {
+	config: GameConfig;
+	job: GameSaveProducerJob;
+	nextSave: GameSave;
+	nowMs: number;
+}) => {
+	const outcome = readProducerChargeCompletionOutcome({
+		config,
+		job,
+		save: nextSave,
+	});
+	if (!outcome) return [] satisfies GameEngineCompletionResult["events"];
+
+	nextSave.producerCharges[job.producerItemInstanceId] = {
+		remainingCharges: outcome.nextRemainingCharges,
+	};
+
+	if (!outcome.removeOnDepleted) {
+		return [] satisfies GameEngineCompletionResult["events"];
+	}
+
+	delete nextSave.board.items[job.producerItemInstanceId];
+	removeBoardItemRuntimeState({
+		itemInstanceId: job.producerItemInstanceId,
+		save: nextSave,
+	});
+
+	return [
+		createProducerChargesDepletedRemovalEvent({
+			job,
+			nowMs,
+			producerId: outcome.producerId,
+		}),
+	] satisfies GameEngineCompletionResult["events"];
+};
+
 const rescheduleQueueAfterCompletedDeliveryFx = Effect.fn(
 	"completeProducerJobFx.rescheduleQueueAfterCompletedDeliveryFx",
 )(function* ({
@@ -148,6 +253,12 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			save,
 		});
 		delete nextSave.producerJobs[liveJob.id];
+		const chargeEvents = spendProducerChargeCostAfterCompletedDelivery({
+			config,
+			job: liveJob,
+			nextSave,
+			nowMs,
+		});
 		yield* rescheduleQueueAfterCompletedDeliveryFx({
 			config,
 			liveJob,
@@ -162,6 +273,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 					job: liveJob,
 					nowMs,
 				}),
+				...chargeEvents,
 			],
 			save: nextSave,
 			type: "completed" as const,
@@ -176,12 +288,29 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		itemInstanceId: liveJob.producerItemInstanceId,
 		save,
 	});
+	const chargeOutcome = readProducerChargeCompletionOutcome({
+		config,
+		job: liveJob,
+		save,
+	});
+	const placementSourceSave = chargeOutcome?.removeOnDepleted
+		? yield* cloneGameSaveFx({
+				save,
+			})
+		: save;
+	if (chargeOutcome?.removeOnDepleted) {
+		delete placementSourceSave.board.items[liveJob.producerItemInstanceId];
+		removeBoardItemRuntimeState({
+			itemInstanceId: liveJob.producerItemInstanceId,
+			save: placementSourceSave,
+		});
+	}
 	const placementEither = yield* Effect.either(
 		placeGameSaveItemsFx({
 			config,
 			items: placementRequests,
 			nowMs,
-			save,
+			save: placementSourceSave,
 			seedCell,
 		}),
 	);
@@ -264,6 +393,20 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 	const placementResult = placementEither.right;
 	delete placementResult.save.producerJobs[liveJob.id];
+	const chargeEvents = chargeOutcome?.removeOnDepleted
+		? [
+				createProducerChargesDepletedRemovalEvent({
+					job: liveJob,
+					nowMs,
+					producerId: chargeOutcome.producerId,
+				}),
+			]
+		: spendProducerChargeCostAfterCompletedDelivery({
+				config,
+				job: liveJob,
+				nextSave: placementResult.save,
+				nowMs,
+			});
 	yield* rescheduleQueueAfterCompletedDeliveryFx({
 		config,
 		liveJob,
@@ -278,6 +421,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 				job: liveJob,
 				nowMs,
 			}),
+			...chargeEvents,
 			...placementResult.events,
 		],
 		save: placementResult.save,

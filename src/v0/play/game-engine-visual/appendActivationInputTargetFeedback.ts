@@ -5,7 +5,7 @@ import type { GameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/Gam
 type TargetEvent = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored" | "craft_input.stored" | "stash_input.stored";
+		type: "producer_input.stored" | "craft_input.stored";
 	}
 >;
 
@@ -18,8 +18,7 @@ export namespace appendActivationInputTargetFeedback {
 
 const readTargetItemInstanceId = (target: TargetEvent) => {
 	if (target.type === "producer_input.stored") return target.producerItemInstanceId;
-	if (target.type === "craft_input.stored") return target.targetItemInstanceId;
-	return target.stashItemInstanceId;
+	return target.targetItemInstanceId;
 };
 
 const readFeedbackGroupId = (target: TargetEvent) =>

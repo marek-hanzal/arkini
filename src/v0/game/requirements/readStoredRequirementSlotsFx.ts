@@ -37,7 +37,7 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 
 	const requirements: GameRequirement[] = [];
 
-	const producer = config.producers[targetItem.itemId];
+	const producer = config.producers[targetItem.itemId] ?? config.stashes[targetItem.itemId];
 	if (producer) {
 		requirements.push(
 			...resolveGameRequirements({
@@ -50,7 +50,7 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 			if (!product) {
 				return yield* Effect.fail(
 					GameEngineError.configReferenceMissing(
-						`Producer "${targetItem.itemId}" references missing product "${productId}".`,
+						`Producer-like capability "${targetItem.itemId}" references missing product "${productId}".`,
 					),
 				);
 			}
@@ -66,11 +66,6 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 	const recipe = config.craftRecipes[targetItem.itemId];
 	if (recipe) {
 		requirements.push(...recipe.requirements);
-	}
-
-	const stash = config.stashes[targetItem.itemId];
-	if (stash) {
-		requirements.push(...stash.requirements);
 	}
 
 	const storedRequirements = requirements.filter(

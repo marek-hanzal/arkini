@@ -13,6 +13,5 @@ export const readGameVisualCreatedCause = (
 ): GameVisualMotion["cause"] => {
 	if (reason === "product-output" || reason === "producer-input-withdraw") return "producer";
 	if (reason === "craft-input-withdraw") return "craft";
-	if (reason === "stash-output") return "stash";
 	return "inventory";
 };

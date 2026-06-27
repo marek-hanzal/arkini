@@ -613,10 +613,10 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 	it("shows stash drop previews with probabilities", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
+			products: {
+				...baseConfig.products,
+				"product:stash": {
+					...baseConfig.products["product:stash"],
 					output: [
 						{
 							itemId: "item:twig",

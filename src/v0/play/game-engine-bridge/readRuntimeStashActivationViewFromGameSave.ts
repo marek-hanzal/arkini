@@ -1,6 +1,10 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
+import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
+import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
+import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
@@ -10,6 +14,7 @@ export namespace readRuntimeStashActivationViewFromGameSave {
 	export interface Props {
 		boardItem: GameSaveBoardItem;
 		config: GameConfig;
+		nowMs?: number;
 		save: GameSave;
 	}
 }
@@ -17,15 +22,49 @@ export namespace readRuntimeStashActivationViewFromGameSave {
 export const readRuntimeStashActivationViewFromGameSave = ({
 	boardItem,
 	config,
+	nowMs,
 	save,
 }: readRuntimeStashActivationViewFromGameSave.Props): ActivationView | undefined => {
 	const stash = config.stashes[boardItem.itemId];
-	if (!stash) return undefined;
+	const productId = stash?.productIds[0];
+	const product = productId ? config.products[productId] : undefined;
+	if (!stash || !productId || !product) return undefined;
 
-	const storedInputs = save.stashInputs[boardItem.id]?.items ?? {};
+	const storedInputs = save.producerInputs[boardItem.id]?.productInputs[productId]?.items ?? {};
+	const requirements = resolveGameRequirements({
+		config,
+		requirementIds: [
+			...stash.requirementIds,
+			...product.requirementIds,
+		],
+	});
+	const hindrances = [
+		...(stash.hinderedBy ?? []),
+		...(product.hinderedBy ?? []),
+	];
+	const effectiveProductLine = readEffectiveProducerProductLine({
+		baseDurationMs: readProducerProductDurationMs({
+			hindrances,
+			product,
+			producerItemInstanceId: boardItem.id,
+			requirements,
+			save,
+		}),
+		config,
+		nowMs,
+		producerId: boardItem.itemId,
+		producerItemId: boardItem.itemId,
+		producerItemInstanceId: boardItem.id,
+		product,
+		productId,
+		save,
+	});
 
 	return {
-		inputs: stash.inputs.map((input) =>
+		drops: readRuntimeLootDropViewsFromGameConfig({
+			output: effectiveProductLine.lootPlan.baseOutput,
+		}),
+		inputs: (product.inputs ?? []).map((input) =>
 			readRuntimeActivationInputView({
 				available: readRuntimeActivationInputAvailableQuantityFromGameSave({
 					itemId: input.itemId,
@@ -36,13 +75,15 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 				stored: storedInputs[input.itemId] ?? 0,
 			}),
 		),
-		drops: readRuntimeLootDropViewsFromGameConfig({
-			output: stash.output,
-		}),
 		kind: "stash",
-		remainingCharges: save.stashes[boardItem.id]?.remainingCharges ?? stash.charges,
+		remainingCharges: readProducerRemainingCharges({
+			config,
+			producerId: boardItem.itemId,
+			producerItemInstanceId: boardItem.id,
+			save,
+		}),
 		requirements: readRuntimeActivationRequirementViewsFromGameSave({
-			requirements: stash.requirements,
+			requirements,
 			save,
 			targetItemInstanceId: boardItem.id,
 		}),

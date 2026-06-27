@@ -311,6 +311,7 @@ const createActiveEffectConfig = () => {
 			...baseConfig.products,
 			"product:activate-speed": {
 				activatesEffectId: "effect:active-speed",
+				chargeCost: 0,
 				durationMs: 500,
 				name: "Activate speed",
 				placement: "board_then_inventory",

@@ -1,11 +1,10 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readWorldProducerRequirementFactsFx } from "~/v0/game/world/readWorldProducerRequirementFactsFx";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
-import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
+import { readWorldProducerJobSubjectFx } from "~/v0/game/world/readWorldProducerJobSubjectFx";
 
 export namespace readProducerJobStartGateReadyFx {
 	export interface Props {
@@ -32,62 +31,26 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 		});
 		if (!requirementFacts.ready) return false;
 
-		const producerItem = save.board.items[job.producerItemInstanceId];
-		if (!producerItem) {
-			return yield* Effect.fail(
-				GameEngineError.saveInvalid(
-					`Producer job target "${job.producerItemInstanceId}" must be a board item.`,
-				),
-			);
-		}
-
-		const producerDefinition = config.producers[producerItem.itemId];
-		if (!producerDefinition) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(
-					`Missing producer definition "${producerItem.itemId}".`,
-				),
-			);
-		}
-
-		const product = config.products[job.productId];
-		if (!product) {
-			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(`Missing product "${job.productId}".`),
-			);
-		}
-
-		const producerRequirements = resolveGameRequirements({
+		const subject = yield* readWorldProducerJobSubjectFx({
 			config,
-			requirementIds: producerDefinition.requirementIds,
+			job,
+			save,
 		});
-		const productRequirements = resolveGameRequirements({
-			config,
-			requirementIds: product.requirementIds,
-		});
-		const requirements = [
-			...producerRequirements,
-			...productRequirements,
-		];
-		const hindrances = [
-			...(producerDefinition.hinderedBy ?? []),
-			...(product.hinderedBy ?? []),
-		];
 		const effectiveProductLine = readEffectiveProducerProductLine({
 			baseDurationMs: readProducerProductDurationMs({
-				hindrances,
-				product,
+				hindrances: subject.hindrances,
+				product: subject.product,
 				producerItemInstanceId: job.producerItemInstanceId,
-				requirements,
+				requirements: subject.requirements,
 				save,
 			}),
 			config,
 			ignoredProducerJobIds,
 			nowMs: evaluateAtMs,
-			producerId: producerItem.itemId,
-			producerItemId: producerItem.itemId,
+			producerId: subject.producerItem.itemId,
+			producerItemId: subject.producerItem.itemId,
 			producerItemInstanceId: job.producerItemInstanceId,
-			product,
+			product: subject.product,
 			productId: job.productId,
 			save,
 		});

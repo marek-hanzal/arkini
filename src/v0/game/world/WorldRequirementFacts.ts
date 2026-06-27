@@ -1,6 +1,6 @@
 import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 
-export type WorldRequirementStatus = "missing" | "ok" | "out_of_range" | "unsupported";
+type WorldRequirementStatus = "missing" | "ok" | "out_of_range" | "unsupported";
 
 export interface WorldRequirementFacts {
 	availableQuantity?: number;

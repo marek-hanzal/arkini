@@ -1,6 +1,6 @@
 import type { GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 
-export type WorldProducerJobStatus =
+type WorldProducerJobStatus =
 	| "blocked_by_paused_queue_head"
 	| "delivery_blocked"
 	| "paused"

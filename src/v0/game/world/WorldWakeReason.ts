@@ -1,6 +1,6 @@
 import type { WorldEntityRef } from "~/v0/game/world/WorldEntityRef";
 
-export type WorldWakeReasonCode =
+type WorldWakeReasonCode =
 	| "active_effect_end"
 	| "active_effect_start"
 	| "craft_ready"

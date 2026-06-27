@@ -1,4 +1,4 @@
-export type WorldReplacementSafetyStatus = "blocked" | "safe";
+type WorldReplacementSafetyStatus = "blocked" | "safe";
 
 export type WorldReplacementBlockReason =
 	| "craft_input_state"

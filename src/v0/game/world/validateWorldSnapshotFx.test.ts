@@ -136,6 +136,51 @@ describe("validateWorldSnapshotFx", () => {
 		);
 	});
 
+	it("keeps active effect wake reasons focused on future transitions", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:running"] = {
+			effectId: "effect:test",
+			endAtMs: 1000,
+			id: "effect-instance:running",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 100,
+		};
+
+		const facts = runWorldFacts({
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(facts.wakePlan.wakeReasons).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					entity: {
+						id: "effect-instance:running",
+						kind: "activeEffect",
+					},
+					reason: "active_effect_start",
+				}),
+			]),
+		);
+		expect(facts.wakePlan.wakeReasons).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					atMs: 1000,
+					entity: {
+						id: "effect-instance:running",
+						kind: "activeEffect",
+					},
+					reason: "active_effect_end",
+				}),
+			]),
+		);
+	});
+
 	it("normalizes producer requirement failures in the same snapshot report", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

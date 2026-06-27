@@ -12,6 +12,7 @@ import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
 import { readWorldProducerRequirementFactsFx } from "~/v0/game/world/readWorldProducerRequirementFactsFx";
 import { readProducerJobStartGateReadyFx } from "~/v0/game/producer/readProducerJobStartGateReadyFx";
+import { groupWorldProducerJobs } from "~/v0/game/world/groupWorldProducerJobs";
 
 export namespace syncRealtimeProducerJobsFx {
 	export interface Props {
@@ -20,17 +21,6 @@ export namespace syncRealtimeProducerJobsFx {
 		save: GameSave;
 	}
 }
-
-const groupProducerJobs = (save: GameSave) => {
-	const groups = new Map<string, GameSaveProducerJob[]>();
-	for (const job of Object.values(save.producerJobs)) {
-		groups.set(job.producerItemInstanceId, [
-			...(groups.get(job.producerItemInstanceId) ?? []),
-			job,
-		]);
-	}
-	return groups;
-};
 
 const readShiftedReadyAtMs = ({
 	job,
@@ -114,7 +104,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 		return nextSave;
 	});
 
-	for (const [, queue] of groupProducerJobs(save)) {
+	for (const [, queue] of groupWorldProducerJobs(save)) {
 		let cursorAtMs = 0;
 		const sortedQueue = [
 			...queue,

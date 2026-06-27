@@ -7,7 +7,7 @@ import { appendItemReplaceVisuals } from "~/v0/play/game-engine-visual/appendIte
 import { appendActivationInputStoreVisuals } from "~/v0/play/game-engine-visual/appendActivationInputStoreVisuals";
 import { appendActivationInputTargetFeedback } from "~/v0/play/game-engine-visual/appendActivationInputTargetFeedback";
 import { appendProducerProductCompletedFeedback } from "~/v0/play/game-engine-visual/appendProducerProductCompletedFeedback";
-import { appendStashDepletedRetainedTile } from "~/v0/play/game-engine-visual/appendStashDepletedRetainedTile";
+import { appendProducerDepletedRetainedTile } from "~/v0/play/game-engine-visual/appendProducerDepletedRetainedTile";
 import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngineVisualPlan";
 import { createGameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { findMergeResultEventIndex } from "~/v0/play/game-engine-visual/findMergeResultEventIndex";
@@ -144,10 +144,10 @@ export const createGameEngineVisualPlan = ({
 				break;
 
 			case "item.removed":
-				if (event.reason === "stash-depleted") {
+				if (event.reason === "producer-depleted") {
 					deferredStashDepletionRemovals.push(event);
 				} else {
-					appendStashDepletedRetainedTile({
+					appendProducerDepletedRetainedTile({
 						currentBoard,
 						event,
 						plan,
@@ -183,7 +183,7 @@ export const createGameEngineVisualPlan = ({
 	}
 
 	for (const event of deferredStashDepletionRemovals) {
-		appendStashDepletedRetainedTile({
+		appendProducerDepletedRetainedTile({
 			currentBoard,
 			event,
 			plan,

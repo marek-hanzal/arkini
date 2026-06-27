@@ -3,8 +3,8 @@ import type { GameActionStashOpen } from "~/v0/game/action/GameActionStashOpen";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { readStashBoardItemFx } from "~/v0/game/stash/readStashBoardItemFx";
 import { startProducerProductFx } from "~/v0/game/producer/startProducerProductFx";
+import { readStashBoardItemFx } from "~/v0/game/stash/readStashBoardItemFx";
 
 export namespace openStashFx {
 	export interface Props {

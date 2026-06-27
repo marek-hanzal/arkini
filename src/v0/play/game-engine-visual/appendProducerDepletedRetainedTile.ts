@@ -5,7 +5,7 @@ import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { TileEngineTiming } from "~/v0/tile-engine";
 
-export namespace appendStashDepletedRetainedTile {
+export namespace appendProducerDepletedRetainedTile {
 	export interface Props {
 		currentBoard: BoardView | undefined;
 		event: Extract<
@@ -24,34 +24,34 @@ const readMotionStartMs = (delayMs: number | undefined) => Math.max(0, delayMs ?
 const readMotionEndMs = (cleanupDelayMs: number | undefined) =>
 	Math.max(0, (cleanupDelayMs ?? 0) - TileEngineTiming.motionCleanupBufferMs);
 
-const stashExitDurationMs = 1;
+const producerExitDurationMs = 1;
 
 const readRetainedTileExitDelayMs = ({
 	plan,
-	stashItemInstanceId,
+	producerItemInstanceId,
 }: {
 	plan: GameEngineVisualPlanDraft;
-	stashItemInstanceId: string;
+	producerItemInstanceId: string;
 }) => {
 	const linkedMotionMilestonesMs = [
 		...plan.boardEnterRequests
-			.filter((request) => request.enter?.fromTileId === stashItemInstanceId)
+			.filter((request) => request.enter?.fromTileId === producerItemInstanceId)
 			.map((request) => readMotionStartMs(request.enter?.delayMs)),
 		...plan.boardTransientTilePlans
-			.filter((entry) => entry.request.exit?.toTileId === stashItemInstanceId)
+			.filter((entry) => entry.request.exit?.toTileId === producerItemInstanceId)
 			.map((entry) => readMotionEndMs(entry.cleanupDelayMs)),
 	];
 
 	return linkedMotionMilestonesMs.length ? Math.max(...linkedMotionMilestonesMs) : 0;
 };
 
-export const appendStashDepletedRetainedTile = ({
+export const appendProducerDepletedRetainedTile = ({
 	currentBoard,
 	event,
 	plan,
 	previousBoard,
-}: appendStashDepletedRetainedTile.Props) => {
-	if (event.reason !== "stash-depleted") return;
+}: appendProducerDepletedRetainedTile.Props) => {
+	if (event.reason !== "producer-depleted") return;
 	if (currentBoard?.byId[event.itemInstanceId]) return;
 
 	const previousItem = previousBoard?.byId[event.itemInstanceId];
@@ -59,10 +59,10 @@ export const appendStashDepletedRetainedTile = ({
 
 	const delayMs = readRetainedTileExitDelayMs({
 		plan,
-		stashItemInstanceId: event.itemInstanceId,
+		producerItemInstanceId: event.itemInstanceId,
 	});
-	const durationMs = stashExitDurationMs;
-	const groupId = `engine:stash-retain:${event.itemInstanceId}:${event.atMs}`;
+	const durationMs = producerExitDurationMs;
+	const groupId = `engine:producer-depleted-retain:${event.itemInstanceId}:${event.atMs}`;
 	const cleanupDelayMs = delayMs + durationMs + TileEngineTiming.motionCleanupBufferMs;
 	const tile: BoardTransientTile = {
 		groupId,

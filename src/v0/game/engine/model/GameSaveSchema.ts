@@ -347,7 +347,10 @@ const readStoredRequirementSlots = ({
 
 	const requirements = [];
 
-	const producer = config.producers[target.itemId];
+	const producer = readProducerCapabilityDefinition({
+		config,
+		producerId: target.itemId,
+	});
 	if (producer) {
 		requirements.push(
 			...resolveGameRequirements({
@@ -370,27 +373,6 @@ const readStoredRequirementSlots = ({
 
 	const recipe = config.craftRecipes[target.itemId];
 	if (recipe) requirements.push(...recipe.requirements);
-
-	const stash = config.stashes[target.itemId];
-	if (stash) {
-		requirements.push(
-			...resolveGameRequirements({
-				config,
-				requirementIds: stash.requirementIds,
-			}),
-		);
-		for (const productId of stash.productIds) {
-			const product = config.products[productId];
-			if (product) {
-				requirements.push(
-					...resolveGameRequirements({
-						config,
-						requirementIds: product.requirementIds,
-					}),
-				);
-			}
-		}
-	}
 
 	return requirements.filter((requirement) => requirement.type === "stored");
 };

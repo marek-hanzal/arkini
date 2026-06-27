@@ -71,6 +71,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 				...events,
 			],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				config,
 				nowMs,
 				save: nextSave,
 			}),
@@ -110,6 +111,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 			...placed.events,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: placed.save,
 		}),

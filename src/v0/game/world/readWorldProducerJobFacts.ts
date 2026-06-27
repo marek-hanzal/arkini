@@ -1,9 +1,9 @@
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
 import {
-	isProducerJobPaused,
-	readProducerJobWakeAtMs,
-} from "~/v0/game/producer/producerDeliveryTiming";
+	isWorldProducerJobPaused,
+	readWorldProducerJobReleaseAtMs,
+} from "~/v0/game/world/readWorldProducerJobReleaseAtMs";
 import type { WorldProducerJobFacts } from "~/v0/game/world/WorldProducerJobFacts";
 
 export namespace readWorldProducerJobFacts {
@@ -35,7 +35,7 @@ const readJobStatus = ({
 }): WorldProducerJobFacts["status"] => {
 	if (blockedByPausedQueueHead) return "blocked_by_paused_queue_head";
 	if (job.delivery) return "delivery_blocked";
-	if (isProducerJobPaused(job)) return "paused";
+	if (isWorldProducerJobPaused(job)) return "paused";
 	if (nowMs !== undefined && job.readyAtMs <= nowMs) return "ready";
 	if (nowMs !== undefined && job.startAtMs <= nowMs) return "running";
 	return "queued";
@@ -55,7 +55,9 @@ export const readWorldProducerJobFacts = ({
 
 		for (const [queueIndex, job] of sortedQueue.entries()) {
 			const blockedByPausedQueueHead = hasPausedBarrier;
-			const releaseAtMs = blockedByPausedQueueHead ? undefined : readProducerJobWakeAtMs(job);
+			const releaseAtMs = blockedByPausedQueueHead
+				? undefined
+				: readWorldProducerJobReleaseAtMs(job);
 			const previousJob = sortedQueue[queueIndex - 1];
 
 			facts.push({
@@ -71,7 +73,7 @@ export const readWorldProducerJobFacts = ({
 				}),
 			});
 
-			if (isProducerJobPaused(job)) {
+			if (isWorldProducerJobPaused(job)) {
 				hasPausedBarrier = true;
 			}
 		}

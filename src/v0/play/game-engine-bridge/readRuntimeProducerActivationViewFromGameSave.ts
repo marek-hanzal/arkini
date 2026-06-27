@@ -12,7 +12,7 @@ import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerPr
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
-import { readFirstProducerQueueJobs } from "~/v0/game/producer/readFirstProducerQueueJobs";
+import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import { readGameTimeDurationMs, readGameTimeProgress } from "~/v0/game/time/GameTime";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
@@ -64,13 +64,13 @@ const readRuntimeProductLineViewsFromGameSave = ({
 	save: GameSave;
 	targetItemInstanceId: string;
 }): ProducerProductLineView[] => {
-	const producerJobs = Object.values(save.producerJobs).filter(
-		(job) => job.producerItemInstanceId === targetItemInstanceId,
-	);
+	const producerJobFacts = readWorldProducerJobFacts({
+		nowMs,
+		save,
+	}).filter((facts) => facts.producerItemInstanceId === targetItemInstanceId);
+	const producerJobs = producerJobFacts.map((facts) => facts.job);
 	const producerQueuedJobs = producerJobs.length;
-	const firstProducerJob = readFirstProducerQueueJobs(save).find(
-		(job) => job.producerItemInstanceId === targetItemInstanceId,
-	);
+	const firstProducerJob = producerJobFacts.find((facts) => facts.queueIndex === 0)?.job;
 	const queueFull = producerQueuedJobs >= maxQueueSize;
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,

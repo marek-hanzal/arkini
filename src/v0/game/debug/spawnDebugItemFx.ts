@@ -140,6 +140,7 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 	return {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: nextSave,
 		}),

@@ -85,6 +85,7 @@ describe("processItemSpawnJobsFx", () => {
 		expect(Object.values(lateTick.save.itemSpawnJobs)).toHaveLength(2);
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 1000,
 				save: lateTick.save,
 			}),
@@ -172,6 +173,7 @@ describe("processItemSpawnJobsFx", () => {
 		expect(nextTick.save.itemSpawnJobs[waitingJobId ?? ""]).toBeDefined();
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 101,
 				save: nextTick.save,
 			}),
@@ -304,6 +306,7 @@ describe("processItemSpawnJobsFx", () => {
 
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 500,
 				save,
 			}),
@@ -340,6 +343,7 @@ describe("processItemSpawnJobsFx", () => {
 
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 500,
 				save,
 			}),
@@ -391,6 +395,7 @@ describe("processItemSpawnJobsFx", () => {
 		expect(Object.values(lateTick.save.itemSpawnJobs)).toHaveLength(1);
 		expect(
 			runNextWakeAtMs({
+				config,
 				nowMs: 1000,
 				save: lateTick.save,
 			}),

@@ -79,6 +79,7 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 			},
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: nextSave,
 		}),

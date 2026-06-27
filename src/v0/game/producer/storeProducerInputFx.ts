@@ -65,6 +65,7 @@ export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* 
 	return {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: nextSave,
 		}),

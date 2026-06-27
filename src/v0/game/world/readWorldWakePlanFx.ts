@@ -1,18 +1,18 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readCraftJobWakeAtMs } from "~/v0/game/craft/craftCompletionTiming";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readMinGameWakeAtMs } from "~/v0/game/time/GameTime";
 import { isItemSpawnJobWaitingForDependencies } from "~/v0/game/world/isItemSpawnJobWaitingForDependencies";
 import { readProcessableWorldWakeAtMs } from "~/v0/game/world/readProcessableWorldWakeAtMs";
 import { readWorldActiveEffectFacts } from "~/v0/game/world/readWorldActiveEffectFacts";
+import { readWorldCraftJobFacts } from "~/v0/game/world/readWorldCraftJobFacts";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import type { WorldWakePlanFacts } from "~/v0/game/world/WorldWakePlanFacts";
 import type { WorldWakeReason } from "~/v0/game/world/WorldWakeReason";
 
 export namespace readWorldWakePlanFx {
 	export interface Props {
-		config?: GameConfig;
+		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;
 	}
@@ -71,16 +71,11 @@ export const readWorldWakePlanFx = Effect.fn("readWorldWakePlanFx")(function* ({
 		});
 	}
 
-	for (const effectFacts of config
-		? readWorldActiveEffectFacts({
-				config,
-				nowMs,
-				save,
-			})
-		: Object.values(save.activeEffects ?? {}).map((effect) => ({
-				effect,
-				status: "active" as const,
-			}))) {
+	for (const effectFacts of readWorldActiveEffectFacts({
+		config,
+		nowMs,
+		save,
+	})) {
 		if (
 			effectFacts.status === "producer_paused" ||
 			effectFacts.status === "blocked_by_paused_queue_head"
@@ -109,14 +104,17 @@ export const readWorldWakePlanFx = Effect.fn("readWorldWakePlanFx")(function* ({
 		});
 	}
 
-	for (const job of Object.values(save.craftJobs)) {
+	for (const craftJobFacts of readWorldCraftJobFacts({
+		nowMs,
+		save,
+	})) {
 		wakeReasons.push({
 			atMs: readProcessableWorldWakeAtMs({
 				nowMs,
-				readyAtMs: readCraftJobWakeAtMs(job),
+				readyAtMs: craftJobFacts.releaseAtMs,
 			}),
 			entity: {
-				id: job.id,
+				id: craftJobFacts.job.id,
 				kind: "craftJob",
 			},
 			reason: "craft_ready",

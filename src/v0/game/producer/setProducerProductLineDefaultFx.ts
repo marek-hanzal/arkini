@@ -55,6 +55,7 @@ export const setProducerProductLineDefaultFx = Effect.fn("setProducerProductLine
 				},
 			],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				config,
 				nowMs,
 				save: nextSave,
 			}),

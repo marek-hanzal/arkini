@@ -81,6 +81,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 		return {
 			events,
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				config,
 				nowMs,
 				save: nextSave,
 			}),
@@ -122,6 +123,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 			},
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: nextSave,
 		}),

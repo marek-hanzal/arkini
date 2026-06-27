@@ -69,6 +69,7 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		boardItemsSwap: (swapAction) =>
 			swapBoardItemsFx({
 				action: swapAction,
+				config,
 				nowMs,
 				save,
 			}),
@@ -110,6 +111,7 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		inventorySlotsSwap: (swapAction) =>
 			swapInventorySlotsFx({
 				action: swapAction,
+				config,
 				nowMs,
 				save,
 			}),

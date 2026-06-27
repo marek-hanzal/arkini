@@ -84,6 +84,7 @@ export const withdrawStoredRequirementFx = Effect.fn("withdrawStoredRequirementF
 	return {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: placement.save,
 		}),

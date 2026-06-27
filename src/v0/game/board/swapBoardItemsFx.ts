@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { checkBoardItemsSwapReadinessFx } from "~/v0/game/board/checkBoardItemsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
@@ -10,6 +11,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 export namespace swapBoardItemsFx {
 	export interface Props {
 		action: GameActionBoardItemsSwapSchema.Type;
+		config: GameConfig;
 		save: GameSave;
 		nowMs: number;
 	}
@@ -17,6 +19,7 @@ export namespace swapBoardItemsFx {
 
 export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 	action,
+	config,
 	save,
 	nowMs,
 }: swapBoardItemsFx.Props) {
@@ -24,6 +27,7 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 		return {
 			events: [],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				config,
 				nowMs,
 				save,
 			}),
@@ -39,6 +43,7 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 		return {
 			events: [],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				config,
 				nowMs,
 				save,
 			}),
@@ -70,6 +75,7 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 	return {
 		events: [],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: nextSave,
 		}),

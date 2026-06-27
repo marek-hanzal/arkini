@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { checkInventorySlotsSwapReadinessFx } from "~/v0/game/inventory/checkInventorySlotsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
@@ -9,6 +10,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 export namespace swapInventorySlotsFx {
 	export interface Props {
 		action: GameActionInventorySlotsSwapSchema.Type;
+		config: GameConfig;
 		save: GameSave;
 		nowMs: number;
 	}
@@ -16,6 +18,7 @@ export namespace swapInventorySlotsFx {
 
 export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* ({
 	action,
+	config,
 	save,
 	nowMs,
 }: swapInventorySlotsFx.Props) {
@@ -27,6 +30,7 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 		return {
 			events: [],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({
+				config,
 				nowMs,
 				save,
 			}),
@@ -46,6 +50,7 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 	return {
 		events: [],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
 			nowMs,
 			save: nextSave,
 		}),

@@ -596,6 +596,23 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Missing effect/);
 	});
 
+	it("rejects craft results that cannot replace the board target", () => {
+		const config = createValidConfigValue();
+		setItemStorage(config, "item:plank", "inventory");
+
+		expect(() => parseGameConfig(config)).toThrow(/must be placeable on the board/);
+	});
+
+	it("rejects non-consumed craft inputs until craft can return preserved inputs", () => {
+		const config = createValidConfigValue();
+		config.craftRecipes["item:craft-target"].inputs[0] = {
+			...config.craftRecipes["item:craft-target"].inputs[0],
+			consume: false,
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/Craft inputs must currently be consumed/);
+	});
+
 	it("rejects proximity requirements that point at missing items", () => {
 		const config = createValidConfigValue();
 		config.requirements["requirement:near-ghost"] = {

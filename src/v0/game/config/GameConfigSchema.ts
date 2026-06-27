@@ -1114,6 +1114,16 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				],
 				`Missing item "${recipe.resultItemId}".`,
 			);
+		} else if (value.items[recipe.resultItemId]?.storage === "inventory") {
+			addIssue(
+				ctx,
+				[
+					"craftRecipes",
+					craftRecipeId,
+					"resultItemId",
+				],
+				`Craft recipe result "${recipe.resultItemId}" must be placeable on the board because craft completion replaces the board target.`,
+			);
 		}
 
 		validateCraftRecipeInputs(
@@ -1485,6 +1495,7 @@ const validateCraftRecipeInputs = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
 	inputs: readonly {
+		consume: boolean;
 		itemId: string;
 	}[],
 	hasItem: (itemId: string) => boolean,
@@ -1506,6 +1517,18 @@ const validateCraftRecipeInputs = (
 					"itemId",
 				],
 				`Missing item "${input.itemId}".`,
+			);
+		}
+
+		if (!input.consume) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+					"consume",
+				],
+				"Craft inputs must currently be consumed because craft start clears stored input state and completion replaces the board target.",
 			);
 		}
 	}

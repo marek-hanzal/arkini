@@ -25,9 +25,9 @@ export const readProximityRequirementDurationMultiplier = ({
 		save,
 		targetItemInstanceId,
 	});
-	if (!match || match.distance > requirement.distance) return undefined;
+	const effectiveDistance = match?.distance ?? requirement.distance + 1;
 
-	return Math.max(1, match.distance * (requirement.durationFactor ?? 1));
+	return Math.max(1, effectiveDistance * (requirement.durationFactor ?? 1));
 };
 
 export namespace readProximityRequirementsDurationMultiplier {

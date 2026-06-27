@@ -10,7 +10,9 @@ export const RandomServiceLive: RandomService = {
 		return min + Math.floor(randomFloat() * (max - min + 1));
 	},
 	chance(probability) {
-		return randomFloat() <= probability;
+		if (probability <= 0) return false;
+		if (probability >= 1) return true;
+		return randomFloat() < probability;
 	},
 	weighted(entries, options) {
 		const total = entries.reduce((sum, entry) => sum + entry.weight, 0);

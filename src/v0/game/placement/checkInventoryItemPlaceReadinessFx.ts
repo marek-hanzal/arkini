@@ -87,6 +87,39 @@ const readInventoryStackCapacity = ({
 		return capacity;
 	}, 0);
 
+const readSaveAfterInventoryRemovalPreview = ({
+	quantity,
+	save,
+	slotIndex,
+}: {
+	quantity: number;
+	save: GameSave;
+	slotIndex: number;
+}): GameSave => {
+	const slots = save.inventory.slots.map((slot, index) => {
+		if (index !== slotIndex) return slot;
+		if (!slot) return null;
+
+		if (isGameSaveInventoryInstance(slot)) return null;
+
+		const nextQuantity = slot.quantity - quantity;
+		return nextQuantity > 0
+			? {
+					...slot,
+					quantity: nextQuantity,
+				}
+			: null;
+	});
+
+	return {
+		...save,
+		inventory: {
+			...save.inventory,
+			slots,
+		},
+	};
+};
+
 export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemPlaceReadinessFx")(
 	function* ({ action, config, nowMs, save }: checkInventoryItemPlaceReadinessFx.Props) {
 		if (action.x >= config.game.board.width || action.y >= config.game.board.height) {
@@ -136,6 +169,12 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			);
 		}
 
+		const saveAfterInventoryRemoval = readSaveAfterInventoryRemovalPreview({
+			quantity,
+			save,
+			slotIndex: action.slotIndex,
+		});
+
 		const placementMode = action.placementMode ?? "exact";
 		if (placementMode === "exact" && quantity !== 1) {
 			return yield* Effect.fail(
@@ -175,7 +214,7 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 				config,
 				itemId: slot.itemId,
 				nowMs,
-				save,
+				save: saveAfterInventoryRemoval,
 				targetCell: {
 					x: action.x,
 					y: action.y,
@@ -188,10 +227,8 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			};
 		}
 
-		const nextSlots = save.inventory.slots.map((nextSlot) =>
-			nextSlot ? structuredClone(nextSlot) : null,
-		);
-		const liveSlot = nextSlots[action.slotIndex];
+		const nextSlots = saveAfterInventoryRemoval.inventory.slots;
+		const liveSlot = save.inventory.slots[action.slotIndex];
 		if (!liveSlot) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected("input_unavailable", "Inventory slot disappeared."),
@@ -231,7 +268,7 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 				config,
 				itemId: liveSlot.itemId,
 				nowMs,
-				save,
+				save: saveAfterInventoryRemoval,
 				seedCell: {
 					x: action.x,
 					y: action.y,
@@ -252,15 +289,6 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			};
 		}
 
-		const nextQuantity = liveSlot.quantity - quantity;
-		nextSlots[action.slotIndex] =
-			nextQuantity > 0
-				? {
-						...liveSlot,
-						quantity: nextQuantity,
-					}
-				: null;
-
 		const boardCapacity = readBoardPlacementCapacity({
 			config,
 			itemId: liveSlot.itemId,
@@ -272,7 +300,7 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 						config,
 						itemId: liveSlot.itemId,
 						nowMs,
-						save,
+						save: saveAfterInventoryRemoval,
 						seedCell: {
 							x: action.x,
 							y: action.y,

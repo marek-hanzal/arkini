@@ -7,6 +7,7 @@ import { withRandomService } from "~/v0/random/logic/withRandomService";
 import {
 	findBoardItem,
 	runAction,
+	runActionEither,
 	runInitialSave,
 } from "~/v0/game/engine/applyGameActionFx.testSupport";
 
@@ -44,6 +45,59 @@ const readSingleProducerJob = (save: Parameters<typeof startProducer>[0]["save"]
 	const [job] = jobs;
 	if (!job) throw new Error("Missing producer job.");
 	return job;
+};
+
+const createInventorySelfBlockConfig = ({ quantity }: { quantity: number }) => {
+	const baseConfig = createEngineTestConfig();
+	return createEngineTestConfig({
+		effects: {
+			"effect:inventory-self-block": {
+				name: "Inventory self block",
+				operations: [
+					{
+						kind: "item.blockCreate",
+						reason: "inventory axe blocks axe creation",
+						target: {
+							itemIds: [
+								"item:axe",
+							],
+						},
+					},
+				],
+				scope: "global",
+				sourceScope: "inventory",
+			},
+		},
+		game: {
+			...baseConfig.game,
+			board: {
+				height: 1,
+				width: 2,
+			},
+			inventory: {
+				slots: 1,
+			},
+		},
+		items: {
+			...baseConfig.items,
+			"item:axe": {
+				...baseConfig.items["item:axe"],
+				maxStackSize: Math.max(baseConfig.items["item:axe"].maxStackSize, quantity),
+				passiveEffectIds: [
+					"effect:inventory-self-block",
+				],
+			},
+		},
+		startingState: {
+			board: [],
+			inventory: [
+				{
+					itemId: "item:axe",
+					quantity,
+				},
+			],
+		},
+	});
 };
 
 const createInventoryOnlySpeedConfig = () => {
@@ -505,6 +559,71 @@ const createLocalBlockCreateConfig = () => {
 };
 
 describe("brutal effect runtime integration", () => {
+	it("does not let the inventory source being moved block its own board placement", () => {
+		const config = createInventorySelfBlockConfig({
+			quantity: 1,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const placed = runAction({
+			config,
+			nowMs: 100,
+			save,
+			action: {
+				placementMode: "exact",
+				quantity: 1,
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 0,
+				y: 0,
+			},
+		});
+
+		expect(placed.save.inventory.slots[0]).toBeNull();
+		expect(
+			findBoardItem(placed.save, {
+				itemId: "item:axe",
+				x: 0,
+				y: 0,
+			}),
+		).toBeDefined();
+	});
+
+	it("keeps remaining inventory self-block sources active after one stack item is moved", () => {
+		const config = createInventorySelfBlockConfig({
+			quantity: 2,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			config,
+			nowMs: 100,
+			save,
+			action: {
+				placementMode: "exact",
+				quantity: 1,
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 0,
+				y: 0,
+			},
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "effect:block-create",
+			});
+		}
+	});
+
 	it("extends a running job when an inventory-only global source leaves inventory", () => {
 		const config = createInventoryOnlySpeedConfig();
 		const save = runInitialSave({

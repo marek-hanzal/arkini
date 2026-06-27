@@ -5,6 +5,7 @@ import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
 import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { syncRealtimeProducerJobsFx } from "~/v0/game/producer/syncRealtimeProducerJobsFx";
+import { validateWorldSnapshotFx } from "~/v0/game/world/validateWorldSnapshotFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import type { GameAction } from "~/v0/game/action/GameActionSchema";
@@ -13,6 +14,7 @@ import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { RandomService } from "~/v0/random/context/RandomService";
+import type { WorldSnapshotCheckId } from "~/v0/game/world/WorldSnapshotCheckId";
 import { runGameEngineEffect } from "~/v0/game/engine/runtime/runGameEngineEffect";
 
 export type GameEngineRuntimeListener = (result: GameEngineResult) => void;
@@ -49,6 +51,11 @@ export namespace RuntimeGameEngineAdapter {
 	}
 
 	export interface TickProps {
+		nowMs?: number;
+	}
+
+	export interface ValidateSnapshotProps {
+		checks?: readonly WorldSnapshotCheckId[];
 		nowMs?: number;
 	}
 }
@@ -107,6 +114,7 @@ export class RuntimeGameEngineAdapter {
 		);
 		const nextWakeAtMs = await runGameEngineEffect(
 			readNextWakeAtMsFx({
+				config,
 				nowMs,
 				save: syncedSave,
 			}),
@@ -208,6 +216,7 @@ export class RuntimeGameEngineAdapter {
 			);
 			const nextWakeAtMs = await runGameEngineEffect(
 				readNextWakeAtMsFx({
+					config: this.config,
 					nowMs,
 					save: syncedSave,
 				}),
@@ -251,6 +260,25 @@ export class RuntimeGameEngineAdapter {
 
 			return result;
 		});
+	}
+
+	async validateSnapshot({
+		checks,
+		nowMs = Date.now(),
+	}: RuntimeGameEngineAdapter.ValidateSnapshotProps = {}) {
+		return this.enqueueMutation(async () =>
+			runGameEngineEffect(
+				validateWorldSnapshotFx({
+					checks,
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			),
+		);
 	}
 
 	private async catchUpDueTicks(nowMs: number) {

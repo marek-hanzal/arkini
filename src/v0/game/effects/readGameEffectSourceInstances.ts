@@ -1,11 +1,7 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { isGameTimeWindowActive } from "~/v0/game/time/GameTime";
 import type { GameSave, GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
-import {
-	isProducerJobBlockedByPausedQueueHead,
-	isProducerJobPaused,
-} from "~/v0/game/producer/producerDeliveryTiming";
 import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourceInstance";
+import { readWorldActiveEffectFacts } from "~/v0/game/world/readWorldActiveEffectFacts";
 
 export namespace readGameEffectSourceInstances {
 	export interface Props {
@@ -131,69 +127,26 @@ export const readGameEffectSourceInstances = ({
 	nowMs,
 	save,
 }: readGameEffectSourceInstances.Props): GameEffectSourceInstance[] => {
-	const activeSources = Object.values(save.activeEffects ?? {})
+	const activeSources = readWorldActiveEffectFacts({
+		config,
+		nowMs,
+		save,
+	})
 		.filter(
-			(effect) => !effect.producerJobId || !ignoredProducerJobIds?.has(effect.producerJobId),
+			(effectFacts) =>
+				effectFacts.status === "active" &&
+				(!effectFacts.effect.producerJobId ||
+					!ignoredProducerJobIds?.has(effectFacts.effect.producerJobId)),
 		)
-		.filter((effect) => {
-			const producerJob = effect.producerJobId
-				? save.producerJobs[effect.producerJobId]
-				: undefined;
-
-			return (
-				!producerJob ||
-				(!isProducerJobPaused(producerJob) &&
-					!isProducerJobBlockedByPausedQueueHead({
-						job: producerJob,
-						save,
-					}))
-			);
-		})
-		.filter(
-			(effect) =>
-				nowMs === undefined ||
-				isGameTimeWindowActive({
-					endAtMs: effect.endAtMs,
-					nowMs,
-					startAtMs: effect.startAtMs,
-				}),
-		)
-		.flatMap((effect) => {
-			const boardSource = save.board.items[effect.sourceItemInstanceId];
-			const inventorySource = save.inventory.slots.some(
-				(slot) =>
-					slot !== null &&
-					"kind" in slot &&
-					slot.kind === "instance" &&
-					slot.id === effect.sourceItemInstanceId,
-			);
-			const sourceLocation: GameEffectSourceInstance["sourceLocation"] | undefined =
-				boardSource ? "board" : inventorySource ? "inventory" : undefined;
-			if (!sourceLocation) return [];
-
-			const effectDefinition = config.effects[effect.effectId];
-			if (
-				!effectDefinition ||
-				!sourceScopeIncludes({
-					location: sourceLocation,
-					sourceScope: effectDefinition.sourceScope,
-				})
-			) {
-				return [];
-			}
-
-			return [
-				{
-					startAtMs: effect.startAtMs,
-					effectId: effect.effectId,
-					kind: "active" as const,
-					sourceId: effect.id,
-					sourceCreatedAtMs: effect.startAtMs,
-					sourceItemInstanceId: effect.sourceItemInstanceId,
-					sourceLocation,
-				},
-			];
-		});
+		.map(({ effect, sourceLocation }) => ({
+			startAtMs: effect.startAtMs,
+			effectId: effect.effectId,
+			kind: "active" as const,
+			sourceId: effect.id,
+			sourceCreatedAtMs: effect.startAtMs,
+			sourceItemInstanceId: effect.sourceItemInstanceId,
+			sourceLocation: sourceLocation ?? "board",
+		}));
 
 	return [
 		...readPassiveBoardSources({

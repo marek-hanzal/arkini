@@ -1,7 +1,6 @@
 import { Effect } from "effect";
-import { readFirstProducerQueueJobs } from "~/v0/game/producer/readFirstProducerQueueJobs";
+import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { readProducerJobWakeAtMs } from "~/v0/game/producer/producerDeliveryTiming";
 
 export namespace readCompletedProducerJobsFx {
 	export interface Props {
@@ -14,14 +13,20 @@ export const readCompletedProducerJobsFx = Effect.fn("readCompletedProducerJobsF
 	save,
 	nowMs,
 }: readCompletedProducerJobsFx.Props) {
-	return readFirstProducerQueueJobs(save)
-		.filter((job) => {
-			const wakeAtMs = readProducerJobWakeAtMs(job);
-			return wakeAtMs !== undefined && wakeAtMs <= nowMs;
-		})
+	return readWorldProducerJobFacts({
+		nowMs,
+		save,
+	})
+		.filter(
+			(facts) =>
+				facts.queueIndex === 0 &&
+				facts.releaseAtMs !== undefined &&
+				facts.releaseAtMs <= nowMs,
+		)
 		.sort((left, right) => {
-			const leftWakeAtMs = readProducerJobWakeAtMs(left) ?? Number.MAX_SAFE_INTEGER;
-			const rightWakeAtMs = readProducerJobWakeAtMs(right) ?? Number.MAX_SAFE_INTEGER;
-			return leftWakeAtMs - rightWakeAtMs || left.id.localeCompare(right.id);
-		});
+			const leftWakeAtMs = left.releaseAtMs ?? Number.MAX_SAFE_INTEGER;
+			const rightWakeAtMs = right.releaseAtMs ?? Number.MAX_SAFE_INTEGER;
+			return leftWakeAtMs - rightWakeAtMs || left.job.id.localeCompare(right.job.id);
+		})
+		.map((facts) => facts.job);
 });

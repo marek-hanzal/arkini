@@ -11,6 +11,7 @@ import { readProducerJobEffectiveTimingFx } from "~/v0/game/producer/readProduce
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
 import { readProducerJobRequirementsReadyFx } from "~/v0/game/producer/readProducerJobRequirementsReadyFx";
+import { readProducerJobStartGateReadyFx } from "~/v0/game/producer/readProducerJobStartGateReadyFx";
 
 export namespace syncRealtimeProducerJobsFx {
 	export interface Props {
@@ -138,7 +139,14 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 			});
 
 			if (isProducerJobPaused(job)) {
-				if (!requirementsReady) break;
+				const startGateReady = yield* readProducerJobStartGateReadyFx({
+					config,
+					evaluateAtMs: nowMs,
+					ignoredProducerJobIds: realtimeProducerJobIds,
+					job,
+					save: nextSave ?? save,
+				});
+				if (!startGateReady) break;
 
 				const remainingMs = job.remainingMs ?? 0;
 				const effectiveTiming = yield* readProducerJobEffectiveTimingFx({
@@ -178,7 +186,17 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 				continue;
 			}
 
-			if (!requirementsReady && startAtMs <= nowMs) {
+			const startGateReady =
+				startAtMs === nowMs
+					? yield* readProducerJobStartGateReadyFx({
+							config,
+							evaluateAtMs: startAtMs,
+							ignoredProducerJobIds: realtimeProducerJobIds,
+							job,
+							save: nextSave ?? save,
+						})
+					: true;
+			if ((!requirementsReady || !startGateReady) && startAtMs <= nowMs) {
 				const remainingMs = readRemainingMsAtPause({
 					job,
 					nowMs,

@@ -62,6 +62,40 @@ describe("consumeResolvedInputRefFx", () => {
 			},
 		]);
 	});
+
+	it("preserves inventory stack creation time when only part of a passive stack is consumed", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			createdAtMs: 123,
+			itemId: "item:twig",
+			quantity: 3,
+		};
+		const events: GameEvent[] = [];
+
+		runFx(
+			consumeResolvedInputRefFx({
+				events,
+				nextSave: save,
+				reason: "product-input",
+				ref: {
+					itemId: "item:twig",
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+			}),
+		);
+
+		expect(save.inventory.slots[0]).toEqual({
+			createdAtMs: 123,
+			itemId: "item:twig",
+			quantity: 2,
+		});
+	});
 });
 
 describe("resolveInputRefsFx", () => {

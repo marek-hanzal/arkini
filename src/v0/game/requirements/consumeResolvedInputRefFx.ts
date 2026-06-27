@@ -89,6 +89,11 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 							nextQuantity === 0
 								? null
 								: ({
+										...(slot.createdAtMs !== undefined
+											? {
+													createdAtMs: slot.createdAtMs,
+												}
+											: {}),
 										itemId: slot.itemId,
 										quantity: nextQuantity,
 									} satisfies GameSaveInventoryStack);

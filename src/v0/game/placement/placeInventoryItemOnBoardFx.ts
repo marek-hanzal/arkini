@@ -53,6 +53,9 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 	}
 
 	const itemId = liveSlot.itemId;
+	const placedCreatedAtMs =
+		liveSlot.createdAtMs ??
+		(config.items[itemId]?.passiveEffectIds?.length ? nowMs : undefined);
 	const previousQuantity = readGameSaveInventorySlotQuantity(liveSlot);
 	const nextQuantity = previousQuantity - quantity;
 	const consumedEvent = {
@@ -117,15 +120,11 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 		});
 
 		nextSave.board.items[liveSlot.id] = {
-			...(liveSlot.createdAtMs !== undefined
+			...(placedCreatedAtMs !== undefined
 				? {
-						createdAtMs: liveSlot.createdAtMs,
+						createdAtMs: placedCreatedAtMs,
 					}
-				: config.items[itemId]?.passiveEffectIds?.length
-					? {
-							createdAtMs: nowMs,
-						}
-					: {}),
+				: {}),
 			id: liveSlot.id,
 			itemId,
 			x: targetCell.x,
@@ -167,6 +166,7 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 			config,
 			items: [
 				{
+					createdAtMs: placedCreatedAtMs,
 					itemId,
 					quantity,
 					reason: "inventory-placement",
@@ -211,9 +211,9 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 		},
 	});
 	nextSave.board.items[itemInstanceId] = {
-		...(config.items[itemId]?.passiveEffectIds?.length
+		...(placedCreatedAtMs !== undefined
 			? {
-					createdAtMs: nowMs,
+					createdAtMs: placedCreatedAtMs,
 				}
 			: {}),
 		id: itemInstanceId,

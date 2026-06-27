@@ -87,6 +87,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 		config,
 		items: [
 			{
+				createdAtMs: item.createdAtMs,
 				itemId: item.itemId,
 				originItemInstanceId: item.id,
 				quantity: 1,

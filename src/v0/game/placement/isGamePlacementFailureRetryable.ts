@@ -4,6 +4,7 @@ const retryablePlacementFailureReasons = new Set<GamePlacementFailureReason>([
 	"board:full",
 	"board:max-count",
 	"inventory:full",
+	"effect:block-create",
 	"placement-failed:unknown",
 ]);
 

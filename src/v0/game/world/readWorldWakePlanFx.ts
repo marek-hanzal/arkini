@@ -83,14 +83,17 @@ export const readWorldWakePlanFx = Effect.fn("readWorldWakePlanFx")(function* ({
 			continue;
 		}
 
-		wakeReasons.push({
-			atMs: effectFacts.effect.startAtMs,
-			entity: {
-				id: effectFacts.effect.id,
-				kind: "activeEffect",
-			},
-			reason: "active_effect_start",
-		});
+		if (nowMs === undefined || effectFacts.status === "scheduled") {
+			wakeReasons.push({
+				atMs: effectFacts.effect.startAtMs,
+				entity: {
+					id: effectFacts.effect.id,
+					kind: "activeEffect",
+				},
+				reason: "active_effect_start",
+			});
+		}
+
 		wakeReasons.push({
 			atMs: readProcessableWorldWakeAtMs({
 				nowMs,

@@ -69,17 +69,3 @@ export const readMinGameWakeAtMs = ({ nowMs, values }: GameTime.ReadMinWakeAtMsP
 
 	return wakeTimes.length > 0 ? Math.min(...wakeTimes) : null;
 };
-
-export const compareGameReadyTimes = ({
-	left,
-	right,
-}: {
-	left: {
-		id: string;
-		readyAtMs: number;
-	};
-	right: {
-		id: string;
-		readyAtMs: number;
-	};
-}) => left.readyAtMs - right.readyAtMs || left.id.localeCompare(right.id);

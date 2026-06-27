@@ -1,5 +1,6 @@
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
+import { groupWorldProducerJobs } from "~/v0/game/world/groupWorldProducerJobs";
 import {
 	isWorldProducerJobPaused,
 	readWorldProducerJobReleaseAtMs,
@@ -12,17 +13,6 @@ export namespace readWorldProducerJobFacts {
 		save: GameSave;
 	}
 }
-
-const groupProducerJobs = (save: GameSave) => {
-	const groups = new Map<string, GameSaveProducerJob[]>();
-	for (const job of Object.values(save.producerJobs)) {
-		groups.set(job.producerItemInstanceId, [
-			...(groups.get(job.producerItemInstanceId) ?? []),
-			job,
-		]);
-	}
-	return groups;
-};
 
 const readJobStatus = ({
 	blockedByPausedQueueHead,
@@ -47,7 +37,7 @@ export const readWorldProducerJobFacts = ({
 }: readWorldProducerJobFacts.Props): WorldProducerJobFacts[] => {
 	const facts: WorldProducerJobFacts[] = [];
 
-	for (const [producerItemInstanceId, queue] of groupProducerJobs(save)) {
+	for (const [producerItemInstanceId, queue] of groupWorldProducerJobs(save)) {
 		let hasPausedBarrier = false;
 		const sortedQueue = [
 			...queue,

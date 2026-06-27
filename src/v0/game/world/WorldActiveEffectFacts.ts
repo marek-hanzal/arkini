@@ -1,6 +1,6 @@
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
-export type WorldActiveEffectStatus =
+type WorldActiveEffectStatus =
 	| "active"
 	| "blocked_by_paused_queue_head"
 	| "expired"

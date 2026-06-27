@@ -16,12 +16,24 @@ export const checkCraftTargetIdleFx = Effect.fn("checkCraftTargetIdleFx")(functi
 	const runningCraftJob = Object.values(save.craftJobs).find(
 		(job) => job.targetItemInstanceId === targetItemInstanceId,
 	);
-	if (!runningCraftJob) return;
+	if (runningCraftJob) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"craft_in_progress",
+				`Craft target "${targetItemInstanceId}" already has running craft job "${runningCraftJob.id}".`,
+			),
+		);
+	}
+
+	const runningProducerJob = Object.values(save.producerJobs).find(
+		(job) => job.producerItemInstanceId === targetItemInstanceId,
+	);
+	if (!runningProducerJob) return;
 
 	return yield* Effect.fail(
 		GameEngineError.actionRejected(
-			"craft_in_progress",
-			`Craft target "${targetItemInstanceId}" already has running craft job "${runningCraftJob.id}".`,
+			"item_busy",
+			`Craft target "${targetItemInstanceId}" already has running producer job "${runningProducerJob.id}".`,
 		),
 	);
 });

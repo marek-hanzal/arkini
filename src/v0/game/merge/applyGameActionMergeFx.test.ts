@@ -150,6 +150,173 @@ describe("applyGameActionFx merge", () => {
 			},
 		]);
 	});
+	it("does not let consumed merge participants block their own merge result", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-plank": {
+					name: "Block plank",
+					operations: [
+						{
+							kind: "item.blockCreate",
+							reason: "plank blocked by merge participant",
+							target: {
+								itemIds: [
+									"item:plank",
+								],
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "both",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:block-plank",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				sourceRef: {
+					kind: "board",
+					itemInstanceId: "item-instance:1",
+				},
+				targetItemInstanceId: "item-instance:2",
+				type: "item.merge",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:plank",
+		});
+	});
+
+	it("rejects merging into a target with preservable runtime state", () => {
+		const baseConfig = createEngineCraftTableTestConfig({
+			boardItemCount: 2,
+			noRecipeInputs: false,
+		});
+		const config = createEngineTestConfig({
+			...baseConfig,
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					...baseConfig.items["item:craft-table"],
+					mergeIds: [
+						"merge:craft-table-craft-table",
+					],
+				},
+			},
+			merge: {
+				...baseConfig.merge,
+				"merge:craft-table-craft-table": {
+					resultItemId: "item:plank",
+					withItemId: "item:craft-table",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:craft-table",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const stored = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+		expect(stored.save.craftInputs["item-instance:1"]).toMatchObject({
+			items: {
+				"item:twig": 1,
+			},
+		});
+
+		const result = runActionEither({
+			action: {
+				sourceRef: {
+					kind: "board",
+					itemInstanceId: "item-instance:2",
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "item.merge",
+			},
+			config,
+			nowMs: 200,
+			save: stored.save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "item_busy",
+			},
+		});
+		expect(stored.save.craftInputs["item-instance:1"]).toMatchObject({
+			items: {
+				"item:twig": 1,
+			},
+		});
+	});
+
 	it("rejects merging into a target with a running craft job", () => {
 		const baseConfig = createEngineCraftTableTestConfig({
 			noRecipeInputs: true,

@@ -59,6 +59,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 
 	yield* checkItemCreateBlockedByEffectsFx({
 		config,
+		ignoredSourceIds: checked.ignoredEffectSourceIds,
 		itemId: checked.merge.resultItemId,
 		nowMs,
 		save: nextSave,

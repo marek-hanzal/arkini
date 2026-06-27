@@ -8,6 +8,7 @@ import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGame
 export namespace checkItemCreateBlockedByEffectsFx {
 	export interface Props {
 		config: GameConfig;
+		ignoredSourceIds?: ReadonlySet<string>;
 		itemId: string;
 		nowMs?: number;
 		save: GameSave;
@@ -18,6 +19,7 @@ export namespace checkItemCreateBlockedByEffectsFx {
 export const checkItemCreateBlockedByEffectsFx = Effect.fn("checkItemCreateBlockedByEffectsFx")(
 	function* ({
 		config,
+		ignoredSourceIds,
 		itemId,
 		nowMs,
 		save,
@@ -25,6 +27,7 @@ export const checkItemCreateBlockedByEffectsFx = Effect.fn("checkItemCreateBlock
 	}: checkItemCreateBlockedByEffectsFx.Props) {
 		const blockReasons = readGameEffectItemCreateBlockReasons({
 			config,
+			ignoredSourceIds,
 			itemId,
 			nowMs,
 			save,

@@ -153,6 +153,9 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 
 	const effectBlocks = readGameEffectItemCreateBlockReasons({
 		config,
+		ignoredSourceIds: new Set([
+			liveJob.targetItemInstanceId,
+		]),
 		itemId: recipe.resultItemId,
 		nowMs,
 		save,

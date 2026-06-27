@@ -58,6 +58,56 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
+	it("rejects producer start while the same target has a running craft job", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:producer": {
+					durationMs: 1000,
+					inputs: [],
+					requirements: [],
+					resultItemId: "item:plank",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const crafting = runAction({
+			action: {
+				recipeId: "item:producer",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 200,
+			save: crafting.save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "item_busy",
+			},
+		});
+		expect(Object.values(crafting.save.craftJobs)).toHaveLength(1);
+	});
+
 	it("rolls producer output from currently active effects at completion", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -1335,6 +1385,134 @@ describe("applyGameActionFx Producer", () => {
 			startAtMs: 1500,
 		});
 		expect(resumed.nextWakeAtMs).toBe(2500);
+	});
+
+	it("pauses an overdue queued producer start with full remaining time when a block effect is active", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:block-test": {
+					name: "Block test",
+					operations: [
+						{
+							kind: "line.blockStart",
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:blocker": {
+					assetId: "asset:test",
+					description: "Blocker",
+					maxStackSize: 1,
+					name: "Blocker",
+					passiveEffectIds: [
+						"effect:block-test",
+					],
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:blocker",
+			quantity: 1,
+		};
+
+		const first = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const queued = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save: first.save,
+		});
+		const blockedBeforeStart = runAction({
+			action: {
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 500,
+			save: queued.save,
+		});
+
+		const result = runTick({
+			config,
+			nowMs: 1500,
+			save: blockedBeforeStart.save,
+		});
+		const remainingJob = readOnlyRecordValue(result.save.producerJobs);
+
+		expect(remainingJob).toMatchObject({
+			pausedAtMs: 1500,
+			productId: "product:test",
+			readyAtMs: 2500,
+			remainingMs: 1000,
+			startAtMs: 1000,
+		});
+		expect(result.nextWakeAtMs).toBeNull();
+
+		const blocker = findBoardItem(result.save, {
+			itemId: "item:blocker",
+			x: 1,
+			y: 0,
+		});
+		expect(blocker).toBeDefined();
+		if (!blocker) return;
+
+		const resumed = runAction({
+			action: {
+				boardItemId: blocker.id,
+				type: "board.item.stash",
+			},
+			config,
+			nowMs: 1600,
+			save: result.save,
+		});
+		const resumedJob = readOnlyRecordValue(resumed.save.producerJobs);
+		expect(resumedJob).toMatchObject({
+			pausedAtMs: undefined,
+			readyAtMs: 2600,
+			remainingMs: undefined,
+			startAtMs: 1600,
+		});
+		expect(resumed.nextWakeAtMs).toBe(2600);
 	});
 
 	it("rejects starting another producer job behind a requirement-paused first job", () => {

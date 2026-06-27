@@ -698,7 +698,7 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
-	it("voids product output blocked by a hard creation effect instead of retrying forever", () => {
+	it("keeps product output blocked by a creation effect pending for realtime retry", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:block-twig": {
@@ -742,7 +742,12 @@ describe("runGameTickFx", () => {
 			save,
 		});
 
-		expect(result.save.producerJobs).toEqual({});
+		expect(result.save.producerJobs["job:1"]).toMatchObject({
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2000,
+			},
+		});
 		expect(result.save.board.items).toEqual({
 			"item-instance:1": expect.objectContaining({
 				itemId: "item:producer",
@@ -752,21 +757,15 @@ describe("runGameTickFx", () => {
 			null,
 			null,
 		]);
+		expect(result.nextWakeAtMs).toBe(2000);
 		expect(result.events).toEqual([
 			{
 				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
-				type: "product.completed",
-			},
-			{
-				atMs: 1000,
-				jobId: "job:1",
-				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
 				reason: "effect:block-create",
-				type: "product.failed",
+				type: "product.blocked",
 			},
 		]);
 	});

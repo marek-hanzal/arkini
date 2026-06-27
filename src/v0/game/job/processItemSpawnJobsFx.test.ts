@@ -411,7 +411,7 @@ describe("processItemSpawnJobsFx", () => {
 		expect(nextTick.save.itemSpawnJobs).toEqual({});
 	});
 
-	it("drops item spawn jobs blocked by hard creation effects", () => {
+	it("keeps item spawn jobs blocked by creation effects pending for realtime retry", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:block-twig": {
@@ -466,9 +466,12 @@ describe("processItemSpawnJobsFx", () => {
 				itemId: "item:twig",
 				reason: "effect:block-create",
 				jobId,
-				type: "item.spawn.failed",
+				type: "item.spawn.blocked",
 			},
 		]);
-		expect(result.save.itemSpawnJobs).toEqual({});
+		expect(result.save.itemSpawnJobs[jobId]).toMatchObject({
+			lastBlockedAtMs: 100,
+			readyAtMs: 1100,
+		});
 	});
 });

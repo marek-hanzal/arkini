@@ -411,8 +411,11 @@ const readEffectiveProductInputSlots = ({
 	productId: string;
 }) => config.products[productId]?.inputs ?? [];
 
+const isSaveProducerJobPaused = (job: GameSaveProducerJob) =>
+	job.pausedAtMs !== undefined && job.remainingMs !== undefined;
+
 const readProducerQueueBarrierAtMs = (job: GameSaveProducerJob) =>
-	job.delivery?.nextAttemptAtMs ?? job.readyAtMs;
+	isSaveProducerJobPaused(job) ? undefined : (job.delivery?.nextAttemptAtMs ?? job.readyAtMs);
 
 const readItemSpawnDependencyCycleJobIds = (save: GameSave) => {
 	const visiting = new Set<string>();
@@ -921,6 +924,19 @@ const validateGameSaveAgainstConfig = (
 			}
 
 			const previousQueueBarrierAtMs = readProducerQueueBarrierAtMs(previous.job);
+			if (previousQueueBarrierAtMs === undefined) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerJobs",
+						current.jobId,
+						"startAtMs",
+					],
+					`Producer job "${current.jobId}" for "${producerItemInstanceId}" starts after paused previous job "${previous.jobId}" without a finite queue release time.`,
+				);
+				continue;
+			}
+
 			if (current.job.startAtMs < previousQueueBarrierAtMs) {
 				addSaveIssue(
 					ctx,

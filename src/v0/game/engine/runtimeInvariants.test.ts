@@ -327,6 +327,58 @@ describe("runtime invariants", () => {
 		);
 	});
 
+	it("rejects producer queue jobs behind a paused previous job", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:paused"] = {
+			id: "job:paused",
+			pausedAtMs: 250,
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			remainingMs: 750,
+			startAtMs: 0,
+		};
+		save.producerJobs["job:illegal-behind-pause"] = {
+			id: "job:illegal-behind-pause",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 2500,
+			startAtMs: 1500,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					path: [
+						"save",
+						"producerJobs",
+						"job:illegal-behind-pause",
+						"startAtMs",
+					],
+				}),
+			]),
+		);
+	});
+
 	it("reschedules queued producer jobs when a previous delivery blocks", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

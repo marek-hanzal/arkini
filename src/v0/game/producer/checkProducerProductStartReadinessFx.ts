@@ -9,6 +9,7 @@ import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDef
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
+import { isProducerJobPaused } from "~/v0/game/producer/producerDeliveryTiming";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
@@ -75,6 +76,15 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			GameEngineError.actionRejected(
 				"producer_queue_full",
 				`Producer item "${action.producerItemInstanceId}" queue is waiting for blocked delivery.`,
+			),
+		);
+	}
+
+	if (producerJobs.some(isProducerJobPaused)) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"producer_queue_full",
+				`Producer item "${action.producerItemInstanceId}" queue is paused by unmet requirements.`,
 			),
 		);
 	}

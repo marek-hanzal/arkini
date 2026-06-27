@@ -1047,6 +1047,130 @@ describe("applyGameActionFx Producer", () => {
 		expect(resumed.nextWakeAtMs).toBe(4000);
 	});
 
+	it("rejects starting another producer job behind a requirement-paused first job", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 4,
+				},
+			},
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:near-twig": {
+					distance: 1,
+					durationFactor: 1,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+					productIds: [
+						"product:test",
+						"product:backup",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					requirementIds: [
+						"requirement:near-twig",
+					],
+				},
+				"product:backup": {
+					durationMs: 1000,
+					name: "Backup",
+					output: [
+						{
+							itemId: "item:plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+					placement: "board_then_inventory",
+					requirementIds: [],
+					tags: [],
+					visibility: "visible",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const started = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const paused = runAction({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 3,
+				y: 0,
+			},
+			config,
+			nowMs: 250,
+			save: started.save,
+		});
+		expect(readOnlyRecordValue(paused.save.producerJobs)).toMatchObject({
+			pausedAtMs: 250,
+		});
+
+		const queued = runActionEither({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:backup",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save: paused.save,
+		});
+
+		expect(queued).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "producer_queue_full",
+			},
+		});
+	});
+
 	it("pauses a running producer when the producer moves outside its proximity requirement", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

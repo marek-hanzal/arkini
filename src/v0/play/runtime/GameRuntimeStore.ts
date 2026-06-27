@@ -67,9 +67,9 @@ export class GameRuntimeStore {
 			revision: 0,
 			runtime: adapter.readSnapshot(),
 		});
-		this.unsubscribeAdapter = adapter.subscribe((result) => {
+		this.unsubscribeAdapter = adapter.subscribe(({ nowMs, result }) => {
 			this.publish({
-				nowMs: Date.now(),
+				nowMs,
 				result,
 			});
 		});

@@ -1,5 +1,5 @@
 import type { Sheet } from "~/v0/play/sheet/Sheet";
-import { DebugTimeline, createDebugJsonReplacer } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline, createDebugJsonReplacer } from "~/v0/diagnostics/DebugTimeline";
 import { readLastLoadedDevScenario } from "~/v0/debug/scenario/DevScenarioRuntime";
 
 export namespace DebugBugReport {

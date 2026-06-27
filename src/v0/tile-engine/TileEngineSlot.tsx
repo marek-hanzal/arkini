@@ -1,25 +1,10 @@
-import { memo, type ReactNode, type RefObject, useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { cn } from "~/v0/ui/cn";
-import type { TileEngineDrop } from "~/v0/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import { sameTileEngineSlotProps } from "~/v0/tile-engine/sameTileEngineSlotProps";
+import type { TileEngineSlot as TileEngineSlotType } from "~/v0/tile-engine/TileEngineSlot.types";
 import { useTileSlotFeedbackDebug } from "~/v0/tile-engine/useTileSlotFeedbackDebug";
 import { useTileSlotLongPress } from "~/v0/tile-engine/useTileSlotLongPress";
-
-export namespace TileEngineSlot {
-	export interface Props<TTile = unknown, TSlot = unknown, TDrop = unknown> {
-		layerRole: TileEngine.LayerRole;
-		slot: TileEngine.Slot<TSlot>;
-		index: number;
-		targetTile?: TileEngine.Tile<TTile>;
-		dropFeedback: TileEngine.ActiveDropFeedback | null;
-		disabled?: boolean;
-		className?: string;
-		dragRef: RefObject<TileEngine.DragConfig<TTile, TSlot, unknown, TDrop> | undefined>;
-		renderSlot(props: TileEngine.RenderSlotProps<TSlot>): ReactNode;
-		registerDrop(entry: TileEngineDrop.Registration<TSlot, TTile, TDrop>): () => void;
-	}
-}
 
 const dropFeedbackOverlayClassName = (feedback: TileEngine.ActiveDropFeedback | null): string => {
 	if (!feedback) return "opacity-0";
@@ -50,7 +35,7 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	dragRef,
 	renderSlot,
 	registerDrop,
-}: TileEngineSlot.Props<TTile, TSlot, TDrop>) => {
+}: TileEngineSlotType.Props<TTile, TSlot, TDrop>) => {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const binding = dragRef.current?.slot(slot, targetTile);
 	const dropId = binding?.id ?? slot.dropId ?? slot.id;

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { createGameSaveFromDevScenario } from "~/v0/debug/scenario/createGameSaveFromDevScenario";
 import type { DevScenarioId } from "~/v0/debug/scenario/DevScenarioDefinitions";
 import { setLastLoadedDevScenario } from "~/v0/debug/scenario/DevScenarioRuntime";

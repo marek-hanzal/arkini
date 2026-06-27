@@ -1,4 +1,4 @@
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { animateElementToRect } from "~/v0/tile-engine/animateElementToRect";
 import { createTileDropHandoffs } from "~/v0/tile-engine/createTileDropHandoffs";
 import { findTileEngineActorElement } from "~/v0/tile-engine/findTileEngineActorElement";

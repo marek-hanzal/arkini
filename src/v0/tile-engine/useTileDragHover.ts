@@ -1,5 +1,5 @@
 import { type RefObject, useCallback, useRef } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { dragSessionRect } from "~/v0/tile-engine/dragSessionRect";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import type { TileEngineActor } from "~/v0/tile-engine/TileEngineActor.types";

@@ -4,6 +4,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readWorldActiveEffectFacts } from "~/v0/game/world/readWorldActiveEffectFacts";
 import { readWorldCraftJobFacts } from "~/v0/game/world/readWorldCraftJobFacts";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
+import { readWorldProcessableJobFacts } from "~/v0/game/world/readWorldProcessableJobFacts";
 import { readWorldProducerRequirementFactsFx } from "~/v0/game/world/readWorldProducerRequirementFactsFx";
 import { readWorldReplacementSafetyFacts } from "~/v0/game/world/readWorldReplacementSafetyFacts";
 import { readWorldWakePlanFx } from "~/v0/game/world/readWorldWakePlanFx";
@@ -44,6 +45,11 @@ export const readWorldSnapshotFactsFx = Effect.fn("readWorldSnapshotFactsFx")(fu
 			save,
 		}),
 		craftJobs: readWorldCraftJobFacts({
+			nowMs,
+			save,
+		}),
+		processableJobs: readWorldProcessableJobFacts({
+			config,
 			nowMs,
 			save,
 		}),

@@ -1,7 +1,7 @@
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { hardResetBrowserStorage } from "~/v0/browser/hardResetBrowserStorage";
 import { DebugBugReport } from "~/v0/debug/DebugBugReport";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import {
 	DevScenarioDefinitions,
 	type DevScenarioId,

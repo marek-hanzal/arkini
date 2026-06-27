@@ -18,7 +18,12 @@ import type { RandomService } from "~/v0/random/context/RandomService";
 import type { WorldSnapshotCheckId } from "~/v0/game/world/WorldSnapshotCheckId";
 import { runGameEngineEffect } from "~/v0/game/engine/runtime/runGameEngineEffect";
 
-export type GameEngineRuntimeListener = (result: GameEngineResult) => void;
+export interface GameEngineRuntimeUpdate {
+	nowMs: number;
+	result: GameEngineResult;
+}
+
+export type GameEngineRuntimeListener = (update: GameEngineRuntimeUpdate) => void;
 
 export interface GameEngineRuntimeSnapshot {
 	config: GameConfig;
@@ -193,7 +198,10 @@ export class RuntimeGameEngineAdapter {
 				},
 			);
 
-			this.commit(result);
+			this.commit({
+				nowMs,
+				result,
+			});
 
 			return result;
 		});
@@ -236,7 +244,10 @@ export class RuntimeGameEngineAdapter {
 					updatedAtMs: nowMs,
 				},
 			} satisfies GameEngineResult;
-			this.commit(result);
+			this.commit({
+				nowMs,
+				result,
+			});
 
 			return result;
 		});
@@ -257,7 +268,10 @@ export class RuntimeGameEngineAdapter {
 				},
 			);
 
-			this.commit(result);
+			this.commit({
+				nowMs,
+				result,
+			});
 
 			return result;
 		});
@@ -308,7 +322,10 @@ export class RuntimeGameEngineAdapter {
 				},
 			);
 
-			this.commit(result);
+			this.commit({
+				nowMs,
+				result,
+			});
 		}
 	}
 
@@ -322,13 +339,16 @@ export class RuntimeGameEngineAdapter {
 		return queued;
 	}
 
-	private commit(result: GameEngineResult) {
+	private commit({ nowMs, result }: GameEngineRuntimeUpdate) {
 		this.save = result.save;
 		this.lastEvents = result.events;
 		this.nextWakeAtMs = result.nextWakeAtMs;
 
 		for (const listener of this.listeners) {
-			listener(result);
+			listener({
+				nowMs,
+				result,
+			});
 		}
 	}
 }

@@ -61,7 +61,9 @@ describe("RuntimeGameEngineAdapter", () => {
 			random: TestRandomService,
 		});
 		const emitted: string[] = [];
-		adapter.subscribe((result) => {
+		const emittedAtMs: number[] = [];
+		adapter.subscribe(({ nowMs, result }) => {
+			emittedAtMs.push(nowMs);
 			emitted.push(...result.events.map((event) => event.type));
 		});
 
@@ -88,6 +90,9 @@ describe("RuntimeGameEngineAdapter", () => {
 		expect(emitted).toEqual([
 			"product.started",
 		]);
+		expect(emittedAtMs).toEqual([
+			200,
+		]);
 	});
 
 	it("runs ticks against the stored save and publishes completion events", async () => {
@@ -97,7 +102,7 @@ describe("RuntimeGameEngineAdapter", () => {
 			random: TestRandomService,
 		});
 		const emitted: string[] = [];
-		adapter.subscribe((result) => {
+		adapter.subscribe(({ result }) => {
 			emitted.push(...result.events.map((event) => event.type));
 		});
 

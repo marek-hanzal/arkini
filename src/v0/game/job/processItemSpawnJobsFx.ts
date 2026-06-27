@@ -3,6 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { processItemSpawnJobFx } from "~/v0/game/job/processItemSpawnJobFx";
 import { readDueItemSpawnJobsFx } from "~/v0/game/job/readDueItemSpawnJobsFx";
+import { isItemSpawnJobWaitingForDependencies } from "~/v0/game/world/isItemSpawnJobWaitingForDependencies";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -46,7 +47,12 @@ export const processItemSpawnJobsFx = Effect.fn("processItemSpawnJobsFx")(functi
 		) {
 			continue;
 		}
-		if (itemSpawnJob.afterJobIds?.some((jobId) => nextSave.itemSpawnJobs[jobId])) {
+		if (
+			isItemSpawnJobWaitingForDependencies({
+				job: itemSpawnJob,
+				save: nextSave,
+			})
+		) {
 			continue;
 		}
 

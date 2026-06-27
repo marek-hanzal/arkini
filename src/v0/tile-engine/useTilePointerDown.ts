@@ -1,5 +1,5 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
 import { cancelTileMotion, tileMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
 import { rectFromElement } from "~/v0/tile-engine/rect";

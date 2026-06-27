@@ -1,5 +1,5 @@
 import { useEffect, type RefObject } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
 export namespace useTileSlotFeedbackDebug {

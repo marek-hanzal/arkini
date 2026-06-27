@@ -10,7 +10,7 @@ const boundaryRules = [
 		},
 		to: {
 			path: [
-				"^src/v0/(?:activation|board|craft|database|game|inventory|item|item-instance|manifest|play|upgrade)(?:/|$)",
+				"^src/v0/(?:activation|board|craft|database|debug|game|inventory|item|item-instance|manifest|play|upgrade)(?:/|$)",
 			],
 		},
 	},
@@ -53,8 +53,34 @@ const boundaryRules = [
 		},
 		to: {
 			path: "^node_modules/(?:@tanstack/react-query|react|react-dom)(?:/|$)",
-			dependencyTypesNot: [
-				"type-only",
+		},
+	},
+	{
+		name: "game-domain-no-runtime-ui-imports",
+		comment:
+			"The game domain is pure gameplay state/Effect logic. UI, Play runtime, Debug and TileEngine depend on it, never the other way around.",
+		severity: "error",
+		from: {
+			path: "^src/v0/game(?:/|$)",
+		},
+		to: {
+			path: [
+				"^src/v0/(?:board|debug|inventory|item|play|producer|tile-engine|ui)(?:/|$)",
+				"^node_modules/(?:@tanstack/react-query|react|react-dom)(?:/|$)",
+			],
+		},
+	},
+	{
+		name: "diagnostics-no-feature-imports",
+		comment:
+			"Diagnostics is low-level instrumentation. Feature layers may record to it, but it must not import feature/UI/game modules back.",
+		severity: "error",
+		from: {
+			path: "^src/v0/diagnostics(?:/|$)",
+		},
+		to: {
+			path: [
+				"^src/v0/(?:activation|board|craft|database|debug|game|inventory|item|item-instance|manifest|play|producer|tile-engine|upgrade)(?:/|$)",
 			],
 		},
 	},
@@ -75,6 +101,16 @@ const boundaryRules = [
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
 	forbidden: [
+		{
+			name: "no-circular",
+			comment:
+				"Circular imports make ownership unclear. Extract shared types/helpers instead of making modules shake hands behind the shed.",
+			severity: "error",
+			from: {},
+			to: {
+				circular: true,
+			},
+		},
 		{
 			name: "not-to-unresolvable",
 			comment:

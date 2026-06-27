@@ -184,26 +184,45 @@ export class RuntimeGameEngineAdapter {
 		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.DispatchProps): Promise<GameEngineResult> {
 		return this.enqueueMutation(async () => {
-			await this.catchUpDueTicks(nowMs);
-
-			const result = await runGameEngineEffect(
-				applyGameActionFx({
-					action,
-					config: this.config,
-					nowMs,
-					save: this.save,
-				}),
-				{
-					random: this.random,
-				},
-			);
-
-			this.commit({
-				nowMs,
-				result,
+			const catchUpResults = await this.catchUpDueTicks(nowMs, {
+				publish: false,
 			});
 
-			return result;
+			let result: GameEngineResult;
+			try {
+				result = await runGameEngineEffect(
+					applyGameActionFx({
+						action,
+						config: this.config,
+						nowMs,
+						save: this.save,
+					}),
+					{
+						random: this.random,
+					},
+				);
+			} catch (error) {
+				const catchUpResult = this.combineResults(catchUpResults);
+				if (catchUpResult) {
+					this.publish({
+						nowMs,
+						result: catchUpResult,
+					});
+				}
+				throw error;
+			}
+
+			const publishedResult =
+				this.combineResults([
+					...catchUpResults,
+					result,
+				]) ?? result;
+			this.publish({
+				nowMs,
+				result: publishedResult,
+			});
+
+			return publishedResult;
 		});
 	}
 
@@ -296,8 +315,16 @@ export class RuntimeGameEngineAdapter {
 		);
 	}
 
-	private async catchUpDueTicks(nowMs: number) {
+	private async catchUpDueTicks(
+		nowMs: number,
+		{
+			publish = true,
+		}: {
+			publish?: boolean;
+		} = {},
+	) {
 		let tickCount = 0;
+		const results: GameEngineResult[] = [];
 		while (
 			(this.nextWakeAtMs !== null && this.nextWakeAtMs <= nowMs) ||
 			hasProcessableWorldJobs({
@@ -322,11 +349,18 @@ export class RuntimeGameEngineAdapter {
 				},
 			);
 
-			this.commit({
-				nowMs,
-				result,
-			});
+			results.push(result);
+			if (publish) {
+				this.commit({
+					nowMs,
+					result,
+				});
+			} else {
+				this.storeResult(result);
+			}
 		}
+
+		return results;
 	}
 
 	private enqueueMutation<T>(run: () => Promise<T>): Promise<T> {
@@ -339,10 +373,25 @@ export class RuntimeGameEngineAdapter {
 		return queued;
 	}
 
-	private commit({ nowMs, result }: GameEngineRuntimeUpdate) {
+	private combineResults(results: readonly GameEngineResult[]) {
+		const lastResult = results.at(-1);
+		if (!lastResult) return null;
+
+		return {
+			events: results.flatMap((result) => result.events),
+			nextWakeAtMs: lastResult.nextWakeAtMs,
+			save: lastResult.save,
+		} satisfies GameEngineResult;
+	}
+
+	private storeResult(result: GameEngineResult) {
 		this.save = result.save;
 		this.lastEvents = result.events;
 		this.nextWakeAtMs = result.nextWakeAtMs;
+	}
+
+	private publish({ nowMs, result }: GameEngineRuntimeUpdate) {
+		this.storeResult(result);
 
 		for (const listener of this.listeners) {
 			listener({
@@ -350,6 +399,13 @@ export class RuntimeGameEngineAdapter {
 				result,
 			});
 		}
+	}
+
+	private commit({ nowMs, result }: GameEngineRuntimeUpdate) {
+		this.publish({
+			nowMs,
+			result,
+		});
 	}
 }
 

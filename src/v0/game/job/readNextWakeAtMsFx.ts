@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameSave, GameSaveItemSpawnJob } from "~/v0/game/engine/model/GameSaveSchema";
+import { readCraftJobWakeAtMs } from "~/v0/game/craft/craftCompletionTiming";
 import { readProducerQueueWakeAtMsValues } from "~/v0/game/producer/readProducerQueueWakeAtMsValues";
 import { readMinGameWakeAtMs } from "~/v0/game/time/GameTime";
 
@@ -54,7 +55,7 @@ const readCraftWakeTimes = ({ nowMs, save }: { nowMs?: number; save: GameSave })
 	Object.values(save.craftJobs).map((job) =>
 		readProcessableJobWakeAtMs({
 			nowMs,
-			readyAtMs: job.readyAtMs,
+			readyAtMs: readCraftJobWakeAtMs(job),
 		}),
 	);
 

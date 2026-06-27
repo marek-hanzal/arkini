@@ -607,7 +607,7 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
-	it("fails craft completion when the result is blocked by a hard creation effect", () => {
+	it("keeps craft completion blocked by a creation effect pending for realtime retry", () => {
 		const config = createEngineCraftTableTestConfig({
 			noRecipeInputs: true,
 		});
@@ -650,7 +650,12 @@ describe("runGameTickFx", () => {
 			save,
 		});
 
-		expect(result.save.craftJobs).toEqual({});
+		expect(result.save.craftJobs["job:craft"]).toMatchObject({
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2000,
+			},
+		});
 		expect(result.save.board.items["item-instance:1"]).toMatchObject({
 			itemId: "item:craft-table",
 		});
@@ -661,9 +666,10 @@ describe("runGameTickFx", () => {
 				reason: "effect:block-create",
 				recipeId: "item:craft-table",
 				targetItemInstanceId: "item-instance:1",
-				type: "craft.failed",
+				type: "craft.blocked",
 			},
 		]);
+		expect(result.nextWakeAtMs).toBe(2000);
 	});
 
 	it("completes delayed sink products without output", () => {

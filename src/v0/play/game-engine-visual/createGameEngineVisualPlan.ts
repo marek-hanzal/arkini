@@ -160,6 +160,7 @@ export const createGameEngineVisualPlan = ({
 				plan.ignoredEventTypes.push(event.type);
 				break;
 			case "craft.completed":
+			case "craft.blocked":
 			case "craft.failed":
 			case "effect.activated":
 			case "effect.expired":

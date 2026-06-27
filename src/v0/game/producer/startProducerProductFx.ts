@@ -10,7 +10,7 @@ import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readProducerJobWakeAtMs } from "~/v0/game/producer/producerDeliveryTiming";
-import { rollProducerJobSnapshotFx } from "~/v0/game/producer/rollProducerJobSnapshotFx";
+import { readProducerJobTimingFx } from "~/v0/game/producer/readProducerJobTimingFx";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
@@ -131,14 +131,14 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		startAtMs: queuedStartAtMs,
 	});
 	const jobId = yield* createGameJobIdFx();
-	const jobSnapshot = yield* rollProducerJobSnapshotFx({
+	const jobTiming = yield* readProducerJobTimingFx({
 		config,
 		producerItemInstanceId: action.producerItemInstanceId,
 		productId: checked.productId,
 		save: nextSave,
 		startAtMs: queuedStartAtMs,
 	});
-	const readyAtMs = jobSnapshot.readyAtMs;
+	const readyAtMs = jobTiming.readyAtMs;
 
 	const activatedEffect = checked.product.activatesEffectId
 		? {
@@ -157,8 +157,6 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	nextSave.producerJobs[jobId] = {
 		readyAtMs,
 		id: jobId,
-		outputItems: jobSnapshot.outputItems,
-		placement: jobSnapshot.placement,
 		producerItemInstanceId: action.producerItemInstanceId,
 		productId: checked.productId,
 		startAtMs: queuedStartAtMs,

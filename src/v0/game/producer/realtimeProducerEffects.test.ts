@@ -1,5 +1,9 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
+import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
+import { withRandomService } from "~/v0/random/logic/withRandomService";
 import {
 	findBoardItem,
 	runAction,
@@ -75,6 +79,83 @@ const createRealtimeDurationConfig = ({ sourceX }: { sourceX: number }) => {
 	});
 };
 
+const createRealtimeOutputConfig = ({ sourceX }: { sourceX: number }) => {
+	const baseConfig = createEngineTestConfig();
+	return createEngineTestConfig({
+		effects: {
+			"effect:nearby-output": {
+				name: "Nearby output",
+				operations: [
+					{
+						kind: "loot.replaceOutput",
+						output: [
+							{
+								itemId: "item:plank",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
+						target: {
+							productIds: [
+								"product:test",
+							],
+						},
+					},
+				],
+				radius: 1,
+				scope: "local",
+			},
+		},
+		game: {
+			...baseConfig.game,
+			board: {
+				height: 1,
+				width: 3,
+			},
+		},
+		items: {
+			...baseConfig.items,
+			"item:axe": {
+				...baseConfig.items["item:axe"],
+				passiveEffectIds: [
+					"effect:nearby-output",
+				],
+			},
+		},
+		products: {
+			...baseConfig.products,
+			"product:test": {
+				...baseConfig.products["product:test"],
+				output: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+						type: "guaranteed",
+					},
+				],
+			},
+		},
+		startingState: {
+			...baseConfig.startingState,
+			board: [
+				{
+					itemId: "item:producer",
+					x: 0,
+					y: 0,
+				},
+				{
+					itemId: "item:axe",
+					x: sourceX,
+					y: 0,
+				},
+			],
+		},
+	});
+};
+
+const runTick = (props: runGameTickFx.Props) =>
+	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
+
 const startProducer = ({ config, nowMs, save }: Parameters<typeof runAction>[0]) =>
 	runAction({
 		config,
@@ -140,6 +221,66 @@ describe("realtime producer effects", () => {
 			startAtMs: 0,
 		});
 		expect(moved.nextWakeAtMs).toBe(1000);
+	});
+
+	it("rerolls producer output when a local loot source leaves proximity before completion", () => {
+		const config = createRealtimeOutputConfig({
+			sourceX: 1,
+		});
+		const initialSave = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = startProducer({
+			config,
+			nowMs: 0,
+			save: initialSave,
+			action: null,
+		});
+
+		const source = findBoardItem(started.save, {
+			itemId: "item:axe",
+			x: 1,
+			y: 0,
+		});
+		expect(source).toBeDefined();
+
+		const moved = runAction({
+			config,
+			nowMs: 500,
+			save: started.save,
+			action: {
+				boardItemId: source?.id ?? "missing",
+				type: "board.item.move",
+				x: 2,
+				y: 0,
+			},
+		});
+		const completed = runTick({
+			config,
+			nowMs: 1000,
+			save: moved.save,
+		});
+
+		expect(completed.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					type: "product.completed",
+				}),
+				expect.objectContaining({
+					itemId: "item:twig",
+					type: "item.created",
+				}),
+			]),
+		);
+		expect(completed.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					itemId: "item:plank",
+					type: "item.created",
+				}),
+			]),
+		);
 	});
 
 	it("completes a running producer job immediately when a local duration source enters proximity", () => {

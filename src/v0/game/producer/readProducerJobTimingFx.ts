@@ -1,10 +1,9 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
-import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readProducerJobEffectiveProductLineFx } from "~/v0/game/producer/readProducerJobEffectiveProductLineFx";
 
-export namespace rollProducerJobSnapshotFx {
+export namespace readProducerJobTimingFx {
 	export interface Props {
 		config: GameConfig;
 		ignoredProducerJobIds?: ReadonlySet<string>;
@@ -15,22 +14,19 @@ export namespace rollProducerJobSnapshotFx {
 	}
 
 	export interface Result {
-		outputItems: GameSaveProducerJob["outputItems"];
-		placement: GameSaveProducerJob["placement"];
 		readyAtMs: number;
 		startAtMs: number;
 	}
 }
 
-export const rollProducerJobSnapshotFx = Effect.fn("rollProducerJobSnapshotFx")(function* ({
+export const readProducerJobTimingFx = Effect.fn("readProducerJobTimingFx")(function* ({
 	config,
 	ignoredProducerJobIds,
 	producerItemInstanceId,
 	productId,
 	save,
 	startAtMs,
-}: rollProducerJobSnapshotFx.Props) {
-	const product = config.products[productId];
+}: readProducerJobTimingFx.Props) {
 	const effectiveProductLine = yield* readProducerJobEffectiveProductLineFx({
 		config,
 		ignoredProducerJobIds,
@@ -39,15 +35,8 @@ export const rollProducerJobSnapshotFx = Effect.fn("rollProducerJobSnapshotFx")(
 		productId,
 		save,
 	});
-	const outputItems = (yield* rollEffectiveLootPlanItemsFx({
-		config,
-		lootPlan: effectiveProductLine.lootPlan,
-	})).items;
-
 	return {
-		outputItems,
-		placement: product!.placement,
 		readyAtMs: startAtMs + effectiveProductLine.durationMs,
 		startAtMs,
-	} satisfies rollProducerJobSnapshotFx.Result;
+	} satisfies readProducerJobTimingFx.Result;
 });

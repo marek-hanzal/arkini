@@ -366,13 +366,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				nextAttemptAtMs: 2000,
 			},
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,

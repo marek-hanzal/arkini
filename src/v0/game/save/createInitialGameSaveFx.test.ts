@@ -63,7 +63,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 			"product:test": {
 				durationMs: 1000,
 				name: "Test product",
-				placement: "board_then_inventory",
 				requirementIds: [],
 			},
 		},

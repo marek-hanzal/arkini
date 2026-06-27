@@ -38,13 +38,6 @@ const GameSaveInventorySlotSchema = z.union([
 	z.null(),
 ]);
 
-const GameSaveProducerDeliveryItemSchema = z
-	.object({
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
-	})
-	.strict();
-
 const GameSaveProducerDeliverySchema = z
 	.object({
 		lastBlockedAtMs: GameInstantMsSchema,
@@ -62,9 +55,7 @@ const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
 		delivery: GameSaveProducerDeliverySchema.optional(),
-		outputItems: z.array(GameSaveProducerDeliveryItemSchema),
 		producerItemInstanceId: IdSchema,
-		placement: z.literal("board_then_inventory"),
 		productId: IdSchema,
 		startAtMs: GameInstantMsSchema,
 		readyAtMs: GameInstantMsSchema,
@@ -720,22 +711,6 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		for (const [index, outputItem] of job.outputItems.entries()) {
-			if (!config.items[outputItem.itemId]) {
-				addSaveIssue(
-					ctx,
-					[
-						"producerJobs",
-						jobId,
-						"outputItems",
-						index,
-						"itemId",
-					],
-					`Missing item "${outputItem.itemId}".`,
-				);
-			}
-		}
-
 		producerJobCountByProducerItemInstanceId.set(
 			job.producerItemInstanceId,
 			(producerJobCountByProducerItemInstanceId.get(job.producerItemInstanceId) ?? 0) + 1,
@@ -1388,7 +1363,6 @@ export type GameSaveBoardItem = z.infer<typeof GameSaveBoardItemSchema>;
 export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema>;
 export type GameSaveInventoryInstance = z.infer<typeof GameSaveInventoryInstanceSchema>;
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
-export type GameSaveProducerDeliveryItem = z.infer<typeof GameSaveProducerDeliveryItemSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;

@@ -22,13 +22,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -102,13 +95,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -186,13 +172,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -238,13 +217,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -296,13 +268,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -319,12 +284,6 @@ describe("runGameTickFx", () => {
 				lastBlockedAtMs: 1000,
 				nextAttemptAtMs: 2000,
 			},
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
 		});
 		expect(result.nextWakeAtMs).toBe(2000);
 		expect(result.events).toEqual([
@@ -368,13 +327,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -401,12 +353,6 @@ describe("runGameTickFx", () => {
 				lastBlockedAtMs: 1000,
 				nextAttemptAtMs: 2000,
 			},
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
 		});
 		expect(Object.values(result.save.board.items)).toEqual([
 			expect.objectContaining({
@@ -419,7 +365,7 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
-	it("retries blocked product delivery without rerolling output", () => {
+	it("retries blocked product delivery by rerolling live output", () => {
 		const config = createEngineTestConfig({
 			game: {
 				id: "game:test",
@@ -438,19 +384,12 @@ describe("runGameTickFx", () => {
 			nowMs: 0,
 		});
 		save.inventory.slots[0] = {
-			itemId: "item:twig",
+			itemId: "item:plank",
 			quantity: 3,
 		};
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -492,7 +431,7 @@ describe("runGameTickFx", () => {
 				type: "product.completed",
 			}),
 			expect.objectContaining({
-				itemId: "item:twig",
+				itemId: "item:plank",
 				type: "item.created",
 			}),
 		]);
@@ -523,13 +462,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -596,13 +528,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -610,13 +535,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:2"] = {
 			readyAtMs: 1000,
 			id: "job:2",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:2",
 			productId: "product:test",
 			startAtMs: 0,
@@ -757,8 +675,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:shred",
 			startAtMs: 0,
@@ -815,13 +731,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -896,13 +805,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 0,
@@ -910,13 +812,6 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:2"] = {
 			readyAtMs: 2000,
 			id: "job:2",
-			outputItems: [
-				{
-					itemId: "item:twig",
-					quantity: 2,
-				},
-			],
-			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
 			productId: "product:test",
 			startAtMs: 1000,

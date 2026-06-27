@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { rollProducerJobSnapshotFx } from "~/v0/game/producer/rollProducerJobSnapshotFx";
+import { readProducerJobTimingFx } from "~/v0/game/producer/readProducerJobTimingFx";
 import { findActiveEffectByProducerJobId } from "~/v0/game/effects/findActiveEffectByProducerJobId";
 import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
 
@@ -41,7 +41,7 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 			continue;
 		}
 
-		const snapshot = yield* rollProducerJobSnapshotFx({
+		const timing = yield* readProducerJobTimingFx({
 			config,
 			ignoredProducerJobIds: rescheduledProducerJobIds,
 			producerItemInstanceId: job.producerItemInstanceId,
@@ -51,10 +51,8 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 		});
 		nextSave.producerJobs[job.id] = {
 			...job,
-			outputItems: snapshot.outputItems,
-			placement: snapshot.placement,
-			readyAtMs: snapshot.readyAtMs,
-			startAtMs: snapshot.startAtMs,
+			readyAtMs: timing.readyAtMs,
+			startAtMs: timing.startAtMs,
 		};
 
 		const product = config.products[job.productId];
@@ -78,13 +76,13 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 			nextSave.activeEffects[activeEffect.id] = {
 				...activeEffect,
 				effectId: product.activatesEffectId,
-				endAtMs: snapshot.readyAtMs,
+				endAtMs: timing.readyAtMs,
 				producerJobId: job.id,
 				sourceItemInstanceId: job.producerItemInstanceId,
-				startAtMs: snapshot.startAtMs,
+				startAtMs: timing.startAtMs,
 			};
 		}
 
-		cursorAtMs = snapshot.readyAtMs;
+		cursorAtMs = timing.readyAtMs;
 	}
 });

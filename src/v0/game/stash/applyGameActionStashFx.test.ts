@@ -77,7 +77,12 @@ describe("applyGameActionFx Stash", () => {
 			save: started.save,
 		});
 
-		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
 		expect(result.save.producerCharges).toEqual({});
 		expect(result.save.producerJobs).toEqual({});
 		expect(result.save.producerInputs).toEqual({});
@@ -106,6 +111,14 @@ describe("applyGameActionFx Stash", () => {
 				}),
 			]),
 		);
+		expect(result.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					itemInstanceId: "item-instance:2",
+					type: "item.removed",
+				}),
+			]),
+		);
 		expect(result.events).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
@@ -114,9 +127,11 @@ describe("applyGameActionFx Stash", () => {
 					type: "product.completed",
 				}),
 				expect.objectContaining({
+					fromItemId: "item:stash",
 					itemInstanceId: "item-instance:2",
-					reason: "stash-depleted",
-					type: "item.removed",
+					reason: "producer-depleted",
+					toItemId: "item:twig",
+					type: "item.replaced",
 				}),
 				expect.objectContaining({
 					itemId: "item:twig",
@@ -171,7 +186,12 @@ describe("applyGameActionFx Stash", () => {
 			save: started.save,
 		});
 
-		expect(result.save.board.items).not.toHaveProperty("item-instance:1");
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			id: "item-instance:1",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
 		expect(started.events).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({

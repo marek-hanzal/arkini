@@ -3446,4 +3446,92 @@ describe("applyGameActionFx Producer", () => {
 			},
 		]);
 	});
+
+	it("replaces a depleted remove-on-charges producer with source-cell output", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 2,
+				},
+				title: "Test",
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					charges: 1,
+					onChargesDepleted: "remove",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					chargeCost: 1,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const completed = runTick({
+			config,
+			nowMs: started.nextWakeAtMs ?? 1000,
+			save: started.save,
+		});
+
+		expect(completed.save.board.items["item-instance:1"]).toMatchObject({
+			id: "item-instance:1",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		expect(completed.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					fromItemId: "item:producer",
+					itemInstanceId: "item-instance:1",
+					reason: "producer-depleted",
+					toItemId: "item:twig",
+					type: "item.replaced",
+				}),
+			]),
+		);
+		expect(completed.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					itemInstanceId: "item-instance:1",
+					type: "item.removed",
+				}),
+			]),
+		);
+	});
 });

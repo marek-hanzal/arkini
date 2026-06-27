@@ -3,6 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
 export namespace readStoredRequirementSlotsFx {
@@ -37,7 +38,10 @@ export const readStoredRequirementSlotsFx = Effect.fn("readStoredRequirementSlot
 
 	const requirements: GameRequirement[] = [];
 
-	const producer = config.producers[targetItem.itemId] ?? config.stashes[targetItem.itemId];
+	const producer = readProducerCapabilityDefinition({
+		config,
+		producerId: targetItem.itemId,
+	});
 	if (producer) {
 		requirements.push(
 			...resolveGameRequirements({

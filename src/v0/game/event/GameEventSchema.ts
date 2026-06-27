@@ -32,7 +32,7 @@ const GameItemConsumedReasonSchema = z.enum([
 ]);
 
 const GameBoardItemChangeReasonSchema = z.enum([
-	"stash-depleted",
+	"producer-depleted",
 	"tile-remove",
 	"merge-result",
 	"craft-result",

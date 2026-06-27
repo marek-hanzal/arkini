@@ -16,6 +16,7 @@ import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameSaveItemPlacementRequest } from "~/v0/game/placement/GameSaveItemPlacementRequest";
+import { replaceDepletedProducerSourceCellOutput } from "~/v0/game/producer/replaceDepletedProducerSourceCellOutput";
 
 export namespace completeProducerJobFx {
 	export interface Props {
@@ -144,7 +145,7 @@ const createProducerChargesDepletedRemovalEvent = ({
 	atMs: nowMs,
 	itemId: producerId,
 	itemInstanceId: job.producerItemInstanceId,
-	reason: "stash-depleted" as const,
+	reason: "producer-depleted" as const,
 	type: "item.removed" as const,
 });
 
@@ -393,20 +394,45 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 	const placementResult = placementEither.right;
 	delete placementResult.save.producerJobs[liveJob.id];
-	const chargeEvents = chargeOutcome?.removeOnDepleted
-		? [
+	let placementEvents = placementResult.events;
+	let chargeEvents: GameEngineCompletionResult["events"];
+	if (chargeOutcome?.removeOnDepleted) {
+		const producerItem = save.board.items[liveJob.producerItemInstanceId];
+		if (!producerItem) {
+			chargeEvents = [
 				createProducerChargesDepletedRemovalEvent({
 					job: liveJob,
 					nowMs,
 					producerId: chargeOutcome.producerId,
 				}),
-			]
-		: spendProducerChargeCostAfterCompletedDelivery({
-				config,
+			];
+		} else {
+			const replacedSource = yield* replaceDepletedProducerSourceCellOutput({
+				events: placementEvents,
 				job: liveJob,
 				nextSave: placementResult.save,
 				nowMs,
+				producerItem,
 			});
+			placementEvents = replacedSource.events;
+			chargeEvents = replacedSource.replaced
+				? []
+				: [
+						createProducerChargesDepletedRemovalEvent({
+							job: liveJob,
+							nowMs,
+							producerId: chargeOutcome.producerId,
+						}),
+					];
+		}
+	} else {
+		chargeEvents = spendProducerChargeCostAfterCompletedDelivery({
+			config,
+			job: liveJob,
+			nextSave: placementResult.save,
+			nowMs,
+		});
+	}
 	yield* rescheduleQueueAfterCompletedDeliveryFx({
 		config,
 		liveJob,
@@ -422,7 +448,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 				nowMs,
 			}),
 			...chargeEvents,
-			...placementResult.events,
+			...placementEvents,
 		],
 		save: placementResult.save,
 		type: "completed" as const,

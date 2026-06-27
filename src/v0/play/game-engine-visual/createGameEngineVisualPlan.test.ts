@@ -567,7 +567,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:chest",
 					itemInstanceId: "stash",
-					reason: "stash-depleted",
+					reason: "producer-depleted",
 					atMs: 1,
 					type: "item.removed",
 				},
@@ -633,7 +633,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:chest",
 					itemInstanceId: "stash",
-					reason: "stash-depleted",
+					reason: "producer-depleted",
 					atMs: 1,
 					type: "item.removed",
 				},
@@ -724,7 +724,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:chest",
 					itemInstanceId: "stash",
-					reason: "stash-depleted",
+					reason: "producer-depleted",
 					atMs: 1,
 					type: "item.removed",
 				},

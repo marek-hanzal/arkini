@@ -16,6 +16,8 @@ export const readBoardItemRuntimeStateStatus = ({
 
 	return {
 		busy: hasProducerJob || hasCraftJob,
+		craftBusy: hasCraftJob,
+		producerBusy: hasProducerJob,
 		preservable:
 			Boolean(save.stashes[itemInstanceId]) ||
 			Boolean(save.producerLines[itemInstanceId]) ||

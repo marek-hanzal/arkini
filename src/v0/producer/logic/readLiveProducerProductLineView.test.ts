@@ -46,6 +46,17 @@ describe("readLiveProducerProductLineView", () => {
 		expect(line.progress).toBe(1);
 	});
 
+	it("freezes paused product progress at the pause time", () => {
+		const line = readLiveProducerProductLineView({
+			line: createLine({
+				pausedAtMs: 250,
+			}),
+			nowMs: 1500,
+		});
+
+		expect(line.progress).toBe(0.25);
+	});
+
 	it("keeps idle lines unchanged", () => {
 		const baseLine = createLine({
 			inProgress: false,

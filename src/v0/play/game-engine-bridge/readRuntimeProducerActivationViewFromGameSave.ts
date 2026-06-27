@@ -162,7 +162,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 			: effectiveProductLine.durationMs;
 		const progress = activeJob
 			? readGameTimeProgress({
-					nowMs,
+					nowMs: activeJob.pausedAtMs ?? nowMs,
 					readyAtMs: activeJob.readyAtMs,
 					startAtMs: activeJob.startAtMs,
 				})
@@ -222,6 +222,7 @@ const readRuntimeProductLineViewsFromGameSave = ({
 				}),
 				productId,
 				producerQueuedJobs,
+				pausedAtMs: activeJob?.pausedAtMs,
 				progress,
 				queueFull,
 				queueSize: maxQueueSize,

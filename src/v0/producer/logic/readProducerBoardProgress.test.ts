@@ -77,6 +77,41 @@ describe("readProducerBoardProgress", () => {
 		).toBeUndefined();
 	});
 
+	it("shows paused producer progress even after the old ready time passes", () => {
+		expect(
+			readProducerBoardProgress({
+				activation: producerActivation([
+					{
+						durationMs: 1000,
+						inProgress: true,
+						isDefault: true,
+						inputItemIds: [],
+						inputs: [],
+						inputsReady: true,
+						inputsAvailable: true,
+						missingRequirementItemIds: [],
+						name: "Twig",
+						pausedAtMs: 1250,
+						productId: "product:twig",
+						producerQueuedJobs: 1,
+						queueFull: true,
+						blocked: false,
+						blockReasonEffectIds: [],
+						queueSize: 1,
+						queuedJobs: 1,
+						readyAtMs: 2000,
+						requirementItemIds: [],
+						requirementsReady: true,
+						startAtMs: 1000,
+					},
+				]),
+				nowMs: 3000,
+			}),
+		).toEqual({
+			progress: 0.25,
+		});
+	});
+
 	it("does not show completed blocked deliveries as running progress", () => {
 		expect(
 			readProducerBoardProgress({

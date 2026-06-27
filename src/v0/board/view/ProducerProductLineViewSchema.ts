@@ -24,6 +24,7 @@ export const ProducerProductLineViewSchema = z.object({
 	missingRequirementItemIds: z.array(IdSchema),
 	startAtMs: z.number().int().nonnegative().optional(),
 	readyAtMs: z.number().int().nonnegative().optional(),
+	pausedAtMs: z.number().int().nonnegative().optional(),
 	progress: z.number().min(0).max(1).optional(),
 	inputItemIds: z.array(IdSchema),
 	requirementItemIds: z.array(IdSchema),

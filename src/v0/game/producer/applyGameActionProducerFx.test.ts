@@ -1139,6 +1139,7 @@ describe("applyGameActionFx Producer", () => {
 					],
 				},
 				"product:backup": {
+					chargeCost: 0,
 					durationMs: 1000,
 					name: "Backup",
 					output: [
@@ -1556,6 +1557,7 @@ describe("applyGameActionFx Producer", () => {
 					],
 				},
 				"product:backup": {
+					chargeCost: 0,
 					durationMs: 1000,
 					name: "Backup",
 					output: [
@@ -1700,6 +1702,7 @@ describe("applyGameActionFx Producer", () => {
 				},
 				"product:blocker": {
 					activatesEffectId: "effect:block-test",
+					chargeCost: 0,
 					durationMs: 1000,
 					name: "Blocker",
 					output: undefined,

@@ -1,135 +1,40 @@
 {
 	"stashes": {
 		"item:chest-t1": {
-			"inputs": [
-				{
-					"itemId": "item:key-t1",
-					"capacity": 1,
-					"consume": true
-				}
+			"charges": 1,
+			"maxQueueSize": 1,
+			"onChargesDepleted": "remove",
+			"productIds": [
+				"product:chest-t1:open"
 			],
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": {
-						"max": 4,
-						"min": 2
-					},
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.65,
-					"itemId": "item:ruby",
-					"type": "chance"
-				},
-				{
-					"chance": 0.12,
-					"itemId": "item:emerald",
-					"type": "chance"
-				}
-			]
+			"requirementIds": []
 		},
 		"item:chest-t2": {
-			"inputs": [
-				{
-					"itemId": "item:key-t2",
-					"capacity": 1,
-					"consume": true
-				}
+			"charges": 1,
+			"maxQueueSize": 1,
+			"onChargesDepleted": "remove",
+			"productIds": [
+				"product:chest-t2:open"
 			],
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": {
-						"max": 7,
-						"min": 4
-					},
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.35,
-					"itemId": "item:ruby",
-					"type": "chance"
-				},
-				{
-					"chance": 0.65,
-					"itemId": "item:emerald",
-					"type": "chance"
-				},
-				{
-					"chance": 0.18,
-					"itemId": "item:sapphire",
-					"type": "chance"
-				}
-			]
+			"requirementIds": []
 		},
 		"item:chest-t3": {
-			"inputs": [
-				{
-					"itemId": "item:key-t3",
-					"capacity": 1,
-					"consume": true
-				}
+			"charges": 1,
+			"maxQueueSize": 1,
+			"onChargesDepleted": "remove",
+			"productIds": [
+				"product:chest-t3:open"
 			],
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": {
-						"max": 10,
-						"min": 7
-					},
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.35,
-					"itemId": "item:emerald",
-					"type": "chance"
-				},
-				{
-					"chance": 0.65,
-					"itemId": "item:sapphire",
-					"type": "chance"
-				},
-				{
-					"chance": 0.25,
-					"itemId": "item:topaz",
-					"type": "chance"
-				}
-			]
+			"requirementIds": []
 		},
 		"item:chest-t4": {
-			"inputs": [
-				{
-					"itemId": "item:key-t4",
-					"capacity": 1,
-					"consume": true
-				}
+			"charges": 1,
+			"maxQueueSize": 1,
+			"onChargesDepleted": "remove",
+			"productIds": [
+				"product:chest-t4:open"
 			],
-			"output": [
-				{
-					"itemId": "item:coin",
-					"quantity": {
-						"max": 15,
-						"min": 10
-					},
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.35,
-					"itemId": "item:sapphire",
-					"type": "chance"
-				},
-				{
-					"chance": 0.55,
-					"itemId": "item:topaz",
-					"type": "chance"
-				},
-				{
-					"chance": 0.35,
-					"itemId": "item:aquamarine",
-					"type": "chance"
-				}
-			]
+			"requirementIds": []
 		}
 	}
 }

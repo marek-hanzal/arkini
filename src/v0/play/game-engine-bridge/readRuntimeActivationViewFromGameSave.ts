@@ -22,6 +22,7 @@ export const readRuntimeActivationViewFromGameSave = ({
 	readRuntimeStashActivationViewFromGameSave({
 		boardItem,
 		config,
+		nowMs,
 		save,
 	}) ??
 	readRuntimeProducerActivationViewFromGameSave({

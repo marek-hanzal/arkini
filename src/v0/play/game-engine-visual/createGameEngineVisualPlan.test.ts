@@ -389,7 +389,7 @@ describe("createGameEngineVisualPlan", () => {
 						kind: "board",
 					},
 					itemId: "item:key",
-					reason: "stash-input-auto-fill",
+					reason: "producer-input-auto-fill",
 					type: "item.consumed",
 				},
 				{
@@ -397,17 +397,10 @@ describe("createGameEngineVisualPlan", () => {
 					nextQuantity: 1,
 					previousQuantity: 0,
 					quantity: 1,
-					stashItemInstanceId: "stash",
+					producerItemInstanceId: "stash",
 					atMs: 1,
-					type: "stash_input.stored",
-					stashId: "item:stash",
-				},
-				{
-					atMs: 1,
-					remainingCharges: 0,
-					stashItemInstanceId: "stash",
-					type: "stash.opened",
-					stashId: "item:stash",
+					type: "producer_input.stored",
+					productId: "product:stash",
 				},
 			] satisfies GameEvent[],
 			previousBoard,
@@ -471,7 +464,7 @@ describe("createGameEngineVisualPlan", () => {
 						kind: "board",
 					},
 					itemId: "item:key",
-					reason: "stash-input",
+					reason: "product-input",
 					type: "item.consumed",
 				},
 				{
@@ -479,17 +472,10 @@ describe("createGameEngineVisualPlan", () => {
 					nextQuantity: 1,
 					previousQuantity: 0,
 					quantity: 1,
-					stashItemInstanceId: "stash",
+					producerItemInstanceId: "stash",
 					atMs: 1,
-					type: "stash_input.stored",
-					stashId: "item:stash",
-				},
-				{
-					atMs: 1,
-					remainingCharges: 0,
-					stashItemInstanceId: "stash",
-					type: "stash.opened",
-					stashId: "item:stash",
+					type: "producer_input.stored",
+					productId: "product:stash",
 				},
 			] satisfies GameEvent[],
 			previousBoard,
@@ -543,16 +529,9 @@ describe("createGameEngineVisualPlan", () => {
 			currentInventory: undefined,
 			events: [
 				{
-					atMs: 1,
-					remainingCharges: 0,
-					stashItemInstanceId: "stash",
-					type: "stash.opened",
-					stashId: "item:stash",
-				},
-				{
 					itemId: "item:twig",
 					originItemInstanceId: "stash",
-					reason: "stash-output",
+					reason: "product-output",
 					to: {
 						itemInstanceId: "output:1",
 						kind: "board",
@@ -564,7 +543,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:stone",
 					originItemInstanceId: "stash",
-					reason: "stash-output",
+					reason: "product-output",
 					to: {
 						itemInstanceId: "output:2",
 						kind: "board",
@@ -576,7 +555,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:log",
 					originItemInstanceId: "stash",
-					reason: "stash-output",
+					reason: "product-output",
 					to: {
 						itemInstanceId: "output:3",
 						kind: "board",
@@ -584,12 +563,6 @@ describe("createGameEngineVisualPlan", () => {
 						y: 0,
 					},
 					type: "item.created",
-				},
-				{
-					atMs: 1,
-					stashItemInstanceId: "stash",
-					type: "stash.depleted",
-					stashId: "item:stash",
 				},
 				{
 					itemId: "item:chest",
@@ -658,12 +631,6 @@ describe("createGameEngineVisualPlan", () => {
 			currentInventory: undefined,
 			events: [
 				{
-					atMs: 1,
-					stashItemInstanceId: "stash",
-					type: "stash.depleted",
-					stashId: "item:stash",
-				},
-				{
 					itemId: "item:chest",
 					itemInstanceId: "stash",
 					reason: "stash-depleted",
@@ -673,7 +640,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:twig",
 					originItemInstanceId: "stash",
-					reason: "stash-output",
+					reason: "product-output",
 					spawnSequenceIndex: 0,
 					to: {
 						itemInstanceId: "output:1",
@@ -686,7 +653,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:stone",
 					originItemInstanceId: "stash",
-					reason: "stash-output",
+					reason: "product-output",
 					spawnSequenceIndex: 1,
 					to: {
 						itemInstanceId: "output:2",
@@ -737,15 +704,15 @@ describe("createGameEngineVisualPlan", () => {
 					nextQuantity: 1,
 					previousQuantity: 0,
 					quantity: 1,
-					stashItemInstanceId: "stash",
+					producerItemInstanceId: "stash",
 					atMs: 1,
-					type: "stash_input.stored",
-					stashId: "item:stash",
+					type: "producer_input.stored",
+					productId: "product:stash",
 				},
 				{
 					itemId: "item:twig",
 					originItemInstanceId: "stash",
-					reason: "stash-output",
+					reason: "product-output",
 					to: {
 						itemInstanceId: "output:1",
 						kind: "board",
@@ -753,12 +720,6 @@ describe("createGameEngineVisualPlan", () => {
 						y: 0,
 					},
 					type: "item.created",
-				},
-				{
-					atMs: 1,
-					stashItemInstanceId: "stash",
-					type: "stash.depleted",
-					stashId: "item:stash",
 				},
 				{
 					itemId: "item:chest",
@@ -840,7 +801,7 @@ describe("createGameEngineVisualPlan", () => {
 			events: [
 				{
 					itemId: "item:twig",
-					reason: "stash-output",
+					reason: "product-output",
 					to: {
 						kind: "inventory",
 						nextQuantity: 2,

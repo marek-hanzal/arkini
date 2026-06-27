@@ -113,6 +113,7 @@ const createLineVisibilityConfig = () => {
 		products: {
 			...baseConfig.products,
 			"product:other": {
+				chargeCost: 0,
 				durationMs: 1000,
 				name: "Other product",
 				output: [

@@ -4,11 +4,13 @@ import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx"
 import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
 import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
+import { withRandomService } from "~/v0/random/logic/withRandomService";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));
 const runReadiness = (props: readActionReadinessFx.Props) =>
-	Effect.runSync(readActionReadinessFx(props));
+	Effect.runSync(readActionReadinessFx(props).pipe(withRandomService(TestRandomService)));
 
 describe("readActionReadinessFx", () => {
 	it("returns ready for a valid producer product action", () => {
@@ -286,10 +288,10 @@ describe("readActionReadinessFx", () => {
 	it("returns ready for stash partial auto-fill readiness", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
+			products: {
+				...baseConfig.products,
+				"product:stash": {
+					...baseConfig.products["product:stash"],
 					inputs: [
 						{
 							capacity: 2,

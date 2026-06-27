@@ -35,11 +35,12 @@ export const readWorldReplacementSafetyFactsForItem = ({
 	) {
 		pushReason(blockReasons, "producer_job");
 	}
-	if (save.producerInputs[itemInstanceId] || save.producerLines[itemInstanceId]) {
+	if (
+		save.producerInputs[itemInstanceId] ||
+		save.producerLines[itemInstanceId] ||
+		save.producerCharges[itemInstanceId]
+	) {
 		pushReason(blockReasons, "producer_runtime_state");
-	}
-	if (save.stashes[itemInstanceId] || save.stashInputs[itemInstanceId]) {
-		pushReason(blockReasons, "stash_runtime_state");
 	}
 	if (save.storedRequirements[itemInstanceId]) {
 		pushReason(blockReasons, "stored_requirement_state");

@@ -1,16 +1,21 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createEngineCraftTableTestConfig } from "~/v0/game/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
+import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
+import { withRandomService } from "~/v0/random/logic/withRandomService";
 import {
 	findBoardItem,
-	readOnlyRecordValue,
 	runAction,
 	runActionEither,
 	runInitialSave,
 } from "~/v0/game/engine/applyGameActionFx.testSupport";
 
+const runTick = (props: runGameTickFx.Props) =>
+	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
+
 describe("applyGameActionFx Stash", () => {
-	it("opens a stash by applying output and depletion atomically", () => {
+	it("opens a stash through its producer product line and removes it when charges are depleted", () => {
 		const config = createEngineTestConfig({
 			game: {
 				id: "game:test",
@@ -49,7 +54,7 @@ describe("applyGameActionFx Stash", () => {
 			nowMs: 0,
 		});
 
-		const result = runAction({
+		const started = runAction({
 			action: {
 				inputRefs: [
 					{
@@ -66,8 +71,16 @@ describe("applyGameActionFx Stash", () => {
 			save,
 		});
 
-		expect(result.save.itemSpawnJobs).toEqual({});
+		const result = runTick({
+			config,
+			nowMs: started.nextWakeAtMs ?? 101,
+			save: started.save,
+		});
+
 		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
+		expect(result.save.producerCharges).toEqual({});
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.save.producerInputs).toEqual({});
 		expect(
 			findBoardItem(result.save, {
 				itemId: "item:twig",
@@ -79,56 +92,42 @@ describe("applyGameActionFx Stash", () => {
 			itemId: "item:twig",
 			quantity: 1,
 		});
-		expect(result.events).toMatchObject([
-			{
-				itemId: "item:key",
-				reason: "stash-input",
-				type: "item.consumed",
-			},
-			{
-				itemId: "item:key",
-				stashItemInstanceId: "item-instance:2",
-				type: "stash_input.stored",
-			},
-			{
-				remainingCharges: 0,
-				stashItemInstanceId: "item-instance:2",
-				type: "stash.opened",
-			},
-			{
-				stashItemInstanceId: "item-instance:2",
-				type: "stash.depleted",
-			},
-			{
-				itemInstanceId: "item-instance:2",
-				reason: "stash-depleted",
-				type: "item.removed",
-			},
-			{
-				itemId: "item:twig",
-				reason: "stash-output",
-				spawnSequenceIndex: 0,
-				to: {
-					kind: "board",
-					x: 1,
-					y: 0,
-				},
-				type: "item.created",
-			},
-			{
-				itemId: "item:twig",
-				reason: "stash-output",
-				spawnSequenceIndex: 1,
-				to: {
-					kind: "inventory",
-					quantity: 1,
-				},
-				type: "item.created",
-			},
-		]);
+		expect(started.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					itemId: "item:key",
+					reason: "product-input",
+					type: "item.consumed",
+				}),
+				expect.objectContaining({
+					producerItemInstanceId: "item-instance:2",
+					productId: "product:stash",
+					type: "product.started",
+				}),
+			]),
+		);
+		expect(result.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					producerItemInstanceId: "item-instance:2",
+					productId: "product:stash",
+					type: "product.completed",
+				}),
+				expect.objectContaining({
+					itemInstanceId: "item-instance:2",
+					reason: "stash-depleted",
+					type: "item.removed",
+				}),
+				expect.objectContaining({
+					itemId: "item:twig",
+					reason: "product-output",
+					type: "item.created",
+				}),
+			]),
+		);
 	});
 
-	it("auto-fills stash input refs from inventory when opening a stash", () => {
+	it("auto-fills stash inputs through producer input storage", () => {
 		const config = createEngineTestConfig({
 			startingState: {
 				board: [
@@ -156,7 +155,7 @@ describe("applyGameActionFx Stash", () => {
 			nowMs: 0,
 		});
 
-		const result = runAction({
+		const started = runAction({
 			action: {
 				inputRefs: [],
 				stashItemInstanceId: "item-instance:1",
@@ -166,109 +165,42 @@ describe("applyGameActionFx Stash", () => {
 			nowMs: 100,
 			save,
 		});
-
-		expect(
-			findBoardItem(result.save, {
-				itemId: "item:twig",
-				x: 0,
-				y: 0,
-			}),
-		).toBeDefined();
-		expect(result.save.inventory.slots[0]).toEqual({
-			itemId: "item:twig",
-			quantity: 1,
+		const result = runTick({
+			config,
+			nowMs: started.nextWakeAtMs ?? 101,
+			save: started.save,
 		});
-		expect(result.events.slice(0, 3)).toMatchObject([
-			{
-				itemId: "item:key",
-				reason: "stash-input-auto-fill",
-				type: "item.consumed",
-			},
-			{
-				itemId: "item:key",
-				stashItemInstanceId: "item-instance:1",
-				type: "stash_input.stored",
-			},
-			{
-				stashItemInstanceId: "item-instance:1",
-				type: "stash.opened",
-			},
-		]);
+
+		expect(result.save.board.items).not.toHaveProperty("item-instance:1");
+		expect(started.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					itemId: "item:key",
+					reason: "producer-input-auto-fill",
+					type: "item.consumed",
+				}),
+				expect.objectContaining({
+					itemId: "item:key",
+					producerItemInstanceId: "item-instance:1",
+					productId: "product:stash",
+					type: "producer_input.stored",
+				}),
+				expect.objectContaining({
+					producerItemInstanceId: "item-instance:1",
+					productId: "product:stash",
+					type: "product.started",
+				}),
+			]),
+		);
 	});
 
-	it("auto-fills stash input refs from board before inventory", () => {
-		const config = createEngineTestConfig({
-			game: {
-				board: {
-					height: 1,
-					width: 3,
-				},
-				id: "game:test",
-				inventory: {
-					slots: 2,
-				},
-				title: "Test",
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:stash",
-						x: 0,
-						y: 0,
-					},
-					{
-						itemId: "item:key",
-						x: 1,
-						y: 0,
-					},
-				],
-				inventory: [
-					{
-						itemId: "item:key",
-						quantity: 1,
-					},
-				],
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-
-		const result = runAction({
-			action: {
-				inputRefs: [],
-				stashItemInstanceId: "item-instance:1",
-				type: "stash.open",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
-		expect(result.save.inventory.slots[0]).toEqual({
-			itemId: "item:key",
-			quantity: 1,
-		});
-		expect(result.events[0]).toMatchObject({
-			from: {
-				itemInstanceId: "item-instance:2",
-				kind: "board",
-			},
-			itemId: "item:key",
-			reason: "stash-input-auto-fill",
-			type: "item.consumed",
-		});
-	});
-
-	it("partially auto-fills stash inputs without opening the stash yet", () => {
+	it("keeps partially auto-filled stash inputs in producer input state", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
+			products: {
+				...baseConfig.products,
+				"product:stash": {
+					...baseConfig.products["product:stash"],
 					inputs: [
 						{
 							capacity: 2,
@@ -286,131 +218,6 @@ describe("applyGameActionFx Stash", () => {
 						x: 0,
 						y: 0,
 					},
-					{
-						itemId: "item:key",
-						x: 1,
-						y: 0,
-					},
-				],
-				inventory: [],
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-
-		const result = runAction({
-			action: {
-				inputRefs: [],
-				stashItemInstanceId: "item-instance:1",
-				type: "stash.open",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		expect(result.save.board.items).toHaveProperty("item-instance:1");
-		expect(result.save.board.items).not.toHaveProperty("item-instance:2");
-		expect(result.save.stashInputs).toEqual({
-			"item-instance:1": {
-				items: {
-					"item:key": 1,
-				},
-			},
-		});
-		expect(result.events.map((event) => event.type)).toEqual([
-			"item.consumed",
-			"stash_input.stored",
-		]);
-	});
-
-	it("rechecks stash requirements after auto-filled inputs are consumed", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			game: {
-				...baseConfig.game,
-				board: {
-					height: 1,
-					width: 2,
-				},
-			},
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
-					requirements: [
-						{
-							itemId: "item:key",
-							quantity: 1,
-							scope: "board",
-							type: "passive",
-						},
-					],
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:stash",
-						x: 0,
-						y: 0,
-					},
-					{
-						itemId: "item:key",
-						x: 1,
-						y: 0,
-					},
-				],
-				inventory: [],
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-
-		const result = runActionEither({
-			action: {
-				inputRefs: [],
-				stashItemInstanceId: "item-instance:1",
-				type: "stash.open",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") {
-			expect(result.left).toMatchObject({
-				_tag: "GameActionRejected",
-				reason: "missing_requirement",
-			});
-		}
-		expect(save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:key",
-		});
-	});
-
-	it("opens every remaining stash charge in one atomic sequential-placement batch", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
-					charges: 2,
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:stash",
-						x: 0,
-						y: 0,
-					},
 				],
 				inventory: [
 					{
@@ -427,13 +234,7 @@ describe("applyGameActionFx Stash", () => {
 
 		const result = runAction({
 			action: {
-				inputRefs: [
-					{
-						kind: "inventory",
-						quantity: 1,
-						slotIndex: 0,
-					},
-				],
+				inputRefs: [],
 				stashItemInstanceId: "item-instance:1",
 				type: "stash.open",
 			},
@@ -442,111 +243,52 @@ describe("applyGameActionFx Stash", () => {
 			save,
 		});
 
-		expect(result.save.stashes).toEqual({});
-		expect(result.save.itemSpawnJobs).toEqual({});
-		expect(result.save.board.items).not.toHaveProperty("item-instance:1");
-		expect(
-			findBoardItem(result.save, {
-				itemId: "item:twig",
-				x: 0,
-				y: 0,
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:stash",
+		});
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.save.producerCharges).toEqual({});
+		expect(result.save.producerInputs["item-instance:1"]).toEqual({
+			productInputs: {
+				"product:stash": {
+					items: {
+						"item:key": 1,
+					},
+				},
+			},
+		});
+		expect(result.events).toEqual([
+			expect.objectContaining({
+				itemId: "item:key",
+				reason: "producer-input-auto-fill",
+				type: "item.consumed",
 			}),
-		).toBeDefined();
-		expect(
-			findBoardItem(result.save, {
-				itemId: "item:twig",
-				x: 1,
-				y: 0,
+			expect.objectContaining({
+				itemId: "item:key",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:stash",
+				type: "producer_input.stored",
 			}),
-		).toBeDefined();
-		expect(result.save.inventory.slots[0]).toEqual({
-			itemId: "item:twig",
-			quantity: 2,
-		});
-		expect(result.events.map((event) => event.type)).toEqual([
-			"item.consumed",
-			"stash_input.stored",
-			"stash.opened",
-			"stash.depleted",
-			"item.removed",
-			"item.created",
-			"item.created",
-			"item.created",
-			"item.created",
-		]);
-		expect(result.events.filter((event) => event.type === "item.created")).toMatchObject([
-			{
-				spawnSequenceIndex: 0,
-				to: {
-					kind: "board",
-					x: 0,
-					y: 0,
-				},
-			},
-			{
-				spawnSequenceIndex: 1,
-				to: {
-					kind: "board",
-					x: 1,
-					y: 0,
-				},
-			},
-			{
-				spawnSequenceIndex: 2,
-				to: {
-					kind: "inventory",
-					quantity: 1,
-					slotIndex: 0,
-				},
-			},
-			{
-				spawnSequenceIndex: 3,
-				to: {
-					kind: "inventory",
-					quantity: 1,
-					slotIndex: 0,
-				},
-			},
 		]);
 	});
 
-	it("counts a depleted stash cell as available for board-only output", () => {
+	it("reserves producer charges while queued jobs are pending", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			items: {
-				...baseConfig.items,
-				"item:twig": {
-					...baseConfig.items["item:twig"],
-					storage: "board",
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					charges: 1,
+					maxQueueSize: 2,
 				},
 			},
-			game: {
-				id: "game:test",
-				inventory: {
-					slots: 2,
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					chargeCost: 1,
 				},
-				board: {
-					height: 1,
-					width: 2,
-				},
-				title: "Test",
-			},
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
-					inputs: [],
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:stash",
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [],
 			},
 		});
 		const save = runInitialSave({
@@ -554,359 +296,33 @@ describe("applyGameActionFx Stash", () => {
 			nowMs: 0,
 		});
 
-		const result = runActionEither({
-			action: {
-				stashItemInstanceId: "item-instance:1",
-				inputRefs: [],
-				type: "stash.open",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		expect(result._tag).toBe("Right");
-		if (result._tag === "Right") {
-			expect(result.right.save.board.items).not.toHaveProperty("item-instance:1");
-			expect(
-				findBoardItem(result.right.save, {
-					itemId: "item:twig",
-					x: 0,
-					y: 0,
-				}),
-			).toBeDefined();
-			expect(
-				findBoardItem(result.right.save, {
-					itemId: "item:twig",
-					x: 1,
-					y: 0,
-				}),
-			).toBeDefined();
-		}
-		expect(save.stashes).toEqual({});
-		expect(save.board.items).toEqual({
-			"item-instance:1": {
-				id: "item-instance:1",
-				itemId: "item:stash",
-				x: 0,
-				y: 0,
-			},
-		});
-		expect(save.inventory.slots).toEqual([
-			null,
-			null,
-		]);
-	});
-
-	it("rejects a full stash open when only part of the remaining output fits", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			game: {
-				id: "game:test",
-				inventory: {
-					slots: 1,
-				},
-				board: {
-					height: 1,
-					width: 1,
-				},
-				title: "Test",
-			},
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
-					charges: 2,
-					inputs: [],
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:stash",
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [
-					{
-						itemId: "item:twig",
-						quantity: 1,
-					},
-				],
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-
-		const result = runActionEither({
-			action: {
-				stashItemInstanceId: "item-instance:1",
-				inputRefs: [],
-				type: "stash.open",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") {
-			expect(result.left).toMatchObject({
-				_tag: "GameActionRejected",
-				reason: "board:full",
-			});
-		}
-		expect(save.stashes).toEqual({});
-		expect(save.board.items["item-instance:1"]).toMatchObject({
-			itemId: "item:stash",
-		});
-		expect(save.inventory.slots[0]).toEqual({
-			itemId: "item:twig",
-			quantity: 1,
-		});
-	});
-
-	it("keeps stash open state untouched when output placement is unavailable", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			game: {
-				id: "game:test",
-				inventory: {
-					slots: 2,
-				},
-				board: {
-					height: 1,
-					width: 2,
-				},
-				title: "Test",
-			},
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
-					inputs: [],
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:producer",
-						x: 0,
-						y: 0,
-					},
-					{
-						itemId: "item:stash",
-						x: 1,
-						y: 0,
-					},
-				],
-				inventory: [
-					{
-						itemId: "item:twig",
-						quantity: 3,
-					},
-					{
-						itemId: "item:plank",
-						quantity: 2,
-					},
-				],
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-
-		const result = runActionEither({
-			action: {
-				stashItemInstanceId: "item-instance:2",
-				inputRefs: [],
-				type: "stash.open",
-			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") {
-			expect(result.left).toMatchObject({
-				_tag: "GameActionRejected",
-				reason: "inventory:full",
-			});
-		}
-		expect(save.stashes).toEqual({});
-		expect(save.itemSpawnJobs).toEqual({});
-		expect(save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:stash",
-		});
-	});
-
-	it("rejects stash open when depletion replacement would block its output creation", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			effects: {
-				"effect:empty-blocks-twig": {
-					name: "Empty blocks twig",
-					operations: [
-						{
-							kind: "item.blockCreate",
-							reason: "Empty stash blocks twig creation.",
-							target: {
-								itemIds: [
-									"item:twig",
-								],
-							},
-						},
-					],
-					scope: "global",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:empty-stash": {
-					...baseConfig.items["item:empty-stash"],
-					passiveEffectIds: [
-						"effect:empty-blocks-twig",
-					],
-				},
-			},
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
-					inputs: [],
-					onDepleted: {
-						replaceWithItemId: "item:empty-stash",
-					},
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:stash",
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [],
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-
-		const result = runActionEither({
+		const first = runAction({
 			action: {
 				inputRefs: [],
-				stashItemInstanceId: "item-instance:1",
-				type: "stash.open",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
 			},
-			config,
-			nowMs: 100,
-			save,
-		});
-
-		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
-				_tag: "GameActionRejected",
-				reason: "effect:block-create",
-			},
-		});
-		expect(save.board.items["item-instance:1"]).toMatchObject({
-			itemId: "item:stash",
-		});
-		expect(save.itemSpawnJobs).toEqual({});
-	});
-
-	it("replaces a depleted stash atomically when configured", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			game: {
-				id: "game:test",
-				inventory: {
-					slots: 2,
-				},
-				board: {
-					height: 1,
-					width: 2,
-				},
-				title: "Test",
-			},
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
-					onDepleted: {
-						replaceWithItemId: "item:empty-stash",
-					},
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:producer",
-						x: 0,
-						y: 0,
-					},
-					{
-						itemId: "item:stash",
-						x: 1,
-						y: 0,
-					},
-				],
-				inventory: [
-					{
-						itemId: "item:key",
-						quantity: 1,
-					},
-				],
-			},
-		});
-		const save = runInitialSave({
 			config,
 			nowMs: 0,
-		});
-
-		const result = runAction({
-			action: {
-				inputRefs: [
-					{
-						kind: "inventory",
-						quantity: 1,
-						slotIndex: 0,
-					},
-				],
-				stashItemInstanceId: "item-instance:2",
-				type: "stash.open",
-			},
-			config,
-			nowMs: 100,
 			save,
 		});
-
-		expect(result.save.itemSpawnJobs).toEqual({});
-		expect(result.save.board.items["item-instance:2"]).toMatchObject({
-			itemId: "item:empty-stash",
-			x: 1,
-			y: 0,
+		const second = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 1,
+			save: first.save,
 		});
-		expect(result.save.stashes).toEqual({});
-		expect(result.events).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					fromItemId: "item:stash",
-					itemInstanceId: "item-instance:2",
-					reason: "stash-depleted",
-					toItemId: "item:empty-stash",
-					type: "item.replaced",
-				}),
-			]),
-		);
+
+		expect(second._tag).toBe("Left");
+		expect(second._tag === "Left" ? second.left : undefined).toMatchObject({
+			_tag: "GameActionRejected",
+			reason: "producer_charges_depleted",
+		});
 	});
 });

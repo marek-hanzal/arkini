@@ -419,6 +419,7 @@ describe("runtime invariants", () => {
 			products: {
 				...baseConfig.products,
 				"product:effect-output": {
+					chargeCost: 0,
 					durationMs: 1000,
 					placement: "board_then_inventory",
 					name: "Effect output",
@@ -525,6 +526,7 @@ describe("runtime invariants", () => {
 				...baseConfig.products,
 				"product:timed": {
 					activatesEffectId: "effect:timed",
+					chargeCost: 0,
 					durationMs: 1000,
 					placement: "board_then_inventory",
 					name: "Timed",
@@ -627,6 +629,7 @@ describe("runtime invariants", () => {
 				...baseConfig.products,
 				"product:self-timed": {
 					activatesEffectId: "effect:self-slow",
+					chargeCost: 0,
 					durationMs: 4000,
 					placement: "board_then_inventory",
 					name: "Self timed",

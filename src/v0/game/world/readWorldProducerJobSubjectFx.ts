@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
+import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
 export namespace readWorldProducerJobSubjectFx {
@@ -26,11 +27,14 @@ export const readWorldProducerJobSubjectFx = Effect.fn("readWorldProducerJobSubj
 		);
 	}
 
-	const producerDefinition = config.producers[producerItem.itemId];
+	const producerDefinition = readProducerCapabilityDefinition({
+		config,
+		producerId: producerItem.itemId,
+	});
 	if (!producerDefinition) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(
-				`Missing producer definition "${producerItem.itemId}".`,
+				`Missing producer-like definition "${producerItem.itemId}".`,
 			),
 		);
 	}

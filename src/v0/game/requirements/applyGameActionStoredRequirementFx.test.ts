@@ -245,6 +245,15 @@ describe("applyGameActionFx StoredRequirement", () => {
 	it("uses stash stored requirements from the stash item save state", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			requirements: {
+				...baseConfig.requirements,
+				"requirement:stash-axe": {
+					capacity: 1,
+					itemId: "item:axe",
+					quantity: 1,
+					type: "stored",
+				},
+			},
 			game: {
 				...baseConfig.game,
 				board: {
@@ -256,13 +265,8 @@ describe("applyGameActionFx StoredRequirement", () => {
 				...baseConfig.stashes,
 				"item:stash": {
 					...baseConfig.stashes["item:stash"],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:axe",
-							quantity: 1,
-							type: "stored",
-						},
+					requirementIds: [
+						"requirement:stash-axe",
 					],
 				},
 			},
@@ -330,8 +334,9 @@ describe("applyGameActionFx StoredRequirement", () => {
 		expect(opened.events).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					stashItemInstanceId: "item-instance:1",
-					type: "stash.opened",
+					producerItemInstanceId: "item-instance:1",
+					productId: "product:stash",
+					type: "product.started",
 				}),
 			]),
 		);

@@ -31,10 +31,6 @@ const matchesTargetEvent = ({
 		return candidate.type === "craft_input.stored" && candidate.itemId === source.itemId;
 	}
 
-	if (source.reason === "stash-input-auto-fill") {
-		return candidate.type === "stash_input.stored" && candidate.itemId === source.itemId;
-	}
-
 	return false;
 };
 

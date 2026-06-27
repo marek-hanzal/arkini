@@ -22,9 +22,9 @@ export type GameEngineError =
 				| "missing_requirement"
 				| GamePlacementFailureReason
 				| "producer_queue_full"
+				| "producer_charges_depleted"
 				| "blocked"
 				| "storage_restricted"
-				| "stash_depleted"
 				| "unsupported_target"
 				| "unsupported_requirement";
 			readonly message: string;

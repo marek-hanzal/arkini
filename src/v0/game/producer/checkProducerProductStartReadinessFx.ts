@@ -17,6 +17,7 @@ import type { GameActionProducerProductStart } from "~/v0/game/action/GameAction
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
+import { checkProducerChargesAvailableFx } from "~/v0/game/producer/checkProducerChargesAvailableFx";
 
 export namespace checkProducerProductStartReadinessFx {
 	export interface Props {
@@ -152,6 +153,14 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	yield* match(product.placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
+	yield* checkProducerChargesAvailableFx({
+		config,
+		producerId,
+		producerItemInstanceId: action.producerItemInstanceId,
+		productChargeCost: product.chargeCost,
+		save,
+	});
+
 	const productInputs = product.inputs ?? [];
 	if (action.inputRefs.length > 0) {
 		yield* checkActivationInputsFx({

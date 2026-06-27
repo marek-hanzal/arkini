@@ -102,6 +102,7 @@ describe("readNextWakeAtMsFx", () => {
 				...baseConfig.products,
 				"product:test": {
 					activatesEffectId: "effect:producer",
+					chargeCost: baseProduct.chargeCost,
 					durationMs: baseProduct.durationMs,
 					name: baseProduct.name,
 					placement: baseProduct.placement,

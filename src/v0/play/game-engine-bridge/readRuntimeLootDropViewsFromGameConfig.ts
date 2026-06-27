@@ -3,11 +3,11 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
 export namespace readRuntimeLootDropViewsFromGameConfig {
 	export interface Props {
-		output: NonNullable<GameConfig["stashes"][string]["output"]>;
+		output: NonNullable<GameConfig["products"][string]["output"]>;
 	}
 }
 
-type LootOutput = NonNullable<GameConfig["stashes"][string]["output"]>[number];
+type LootOutput = NonNullable<GameConfig["products"][string]["output"]>[number];
 type LootQuantity = NonNullable<
 	Extract<
 		LootOutput,

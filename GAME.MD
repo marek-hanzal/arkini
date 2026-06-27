@@ -152,7 +152,7 @@ Examples of runtime state:
 - active or paused completion timer
 - producer product-line job/queue state
 - producer stored input items
-- finite stash remaining charges/contents
+- finite producer/stash remaining charges
 - growth progress
 - any other instance-specific value
 
@@ -208,7 +208,7 @@ Examples:
 
 A stash is a finite producer-like entity.
 
-A stash owns inline output rules, but unlike a normal producer it has finite charges, finite stored contents, or another explicit depletion rule.
+A stash keeps its own gameplay type for UX and authoring, but internally it uses the same product-line execution model as producers. The stash definition points to exactly one product line. That product line owns inputs, output, requirements, duration, effects, and charge cost. The stash owns finite charges and what happens when those charges are depleted.
 
 A stash may require input items before it can be opened or collected.
 
@@ -217,7 +217,7 @@ Example:
 - a normal chest can be opened for finite loot
 - an epic chest may require a key before it can output loot
 
-Stash and producer are separate entity types even if they share large parts of their implementation. Do not merge finite and infinite production into one vague type. Shared implementation is allowed, but gameplay entity types remain separate.
+Stash and producer are separate entity types, but they should not have separate runtime physics. If a behavior can be expressed through product lines, charges, requirements, effects, and delivery, it belongs on the shared producer path.
 
 ### 4.12 Item-owned input storage and requirements
 
@@ -503,8 +503,7 @@ The item detail must show every gameplay-relevant piece of information available
 - active, ready, or paused timers
 - producer product-line jobs, queue, readiness, and blocked delivery
 - producer input storage
-- stash requirements, inputs, charges, and depletion state
-- stash remaining charges or depletion state
+- stash facade state through product-line requirements, inputs, charges, and depletion mode
 - possible output drops and their rules/probabilities, when known to the player
 - explicit actions available from the detail
 
@@ -819,19 +818,11 @@ Board item storage still belongs to the explicit item-detail store action. Doubl
 
 ### 11.3 Stash depletion
 
-A stash must define its finite behavior explicitly.
+A stash must define its finite behavior explicitly through the shared producer charge model.
 
-Current gameplay opens the whole stash in one action. If the stash has multiple remaining charges, one successful open rolls/releases every remaining charge and then depletes the stash. This avoids turning a chest into a weird loot vending machine that needs ten taps because apparently fingers are free.
+Current chest gameplay uses `charges: 1`, a single stash product line with `chargeCost: 1`, and `onChargesDepleted: "remove"`. The product line starts like any other producer product, completes through the normal job/tick path, rolls output through the normal producer loot path, and then removes the stash item after the last charge is successfully spent.
 
-Possible depletion models:
-
-- fixed number of charges
-- fixed stored contents
-- fixed number of inline weighted-output rolls
-- removal on depletion
-- transformation into an empty item on depletion
-
-The selected depletion behavior must be data-driven.
+General producer charges are numeric and may be fractional. Product lines spend their own `chargeCost`. Depletion mode is `stop` for long-lived finite producers and `remove` for finite containers like chests. For now, only chests use the remove behavior.
 
 ### 11.4 Stash inputs and requirements
 
@@ -841,23 +832,23 @@ Example:
 
 An epic chest may require a key.
 
-Consumable stash inputs are supplied at open time. Single-click may auto-fill these inputs from board/inventory. The input item is consumed only if the whole stash open succeeds. If placement fails, the input remains unchanged.
+Consumable stash inputs are normal product-line inputs. Single-click may auto-fill these inputs from board/inventory into the shared producer input state. Dragging a matching key/item onto a stash may start the stash product line directly with that input. If the product cannot start, input consumption follows the same rules as producer product start. If output placement later blocks, the job remains blocked and charges are not spent until delivery succeeds.
 
 If a stash needs a persistent non-consumed gate, it should use stored requirements. Stored requirements must be present to satisfy the gate, but they are not consumed when the stash opens unless a future rule explicitly says otherwise.
 
 ### 11.5 Stash output placement
 
-Default stash output placement is `board_then_inventory`, using the same deterministic nearest-free-cell policy based on the stash origin. If a stash depletes by removing itself, its own cell counts as available during output preflight and placement.
+Default stash output placement is `board_then_inventory`, using the same deterministic nearest-free-cell policy based on the stash origin. If a stash depletes by removing itself, its own cell counts as available during the output placement attempt.
 
-Stash output is all-or-nothing for the whole open action. Activation must not consume inputs, advance charges, deplete contents, or mutate state unless the complete generated output can be placed across board and inventory.
+Stash output now follows producer blocked-delivery semantics. Product start may consume inputs and create a job; the charge is spent only after successful delivery. If delivery blocks because the board/inventory cannot accept the rolled output, the job keeps its delivery state and retries through the normal producer retry path without rerolling.
 
-Random stash output is rolled during the open attempt. If the rolled output cannot fit, activation is rejected and the player does not receive a free extra roll. Once preflight succeeds, actual stash output is emitted through item spawn jobs and processed immediately. Spawn job sequence metadata is the backend source for visual spawn order, so UI does not need to invent a parallel spawn schedule just to animate items like a tiny circus. Spawn jobs with unresolved dependencies are not considered wakeable until their dependencies resolve, even if their own ready time is already in the past; dependency cycles are invalid save data.
+Random stash output is rolled during producer delivery. UI visuals consume the same `product.started`, `product.completed`, `item.created`, and `item.removed` events as producers. There are no stash-specific output/input events anymore, because duplicate event dialects are how codebases develop mold.
 
 ## 12. Output rules
 
 ### 12.1 Inline output ownership
 
-Outputs live inline on the thing that emits them: product lines, stashes, and effect loot operations. There are no standalone loot-table IDs in the current config.
+Outputs live inline on the product/effect operation that emits them: product lines and effect loot operations. Stashes emit through their single product line, not through a second stash-only output field. There are no standalone loot-table IDs in the current config.
 
 Example:
 
@@ -1132,7 +1123,7 @@ Runtime state must be able to represent:
 - producer input storage
 - craft/construction/growth input storage
 - stored requirement state
-- stash charges/contents/depletion state
+- finite producer/stash charge state
 
 ### 18.3 Inventory definition
 
@@ -1194,13 +1185,12 @@ Expected fields:
 - `name`
 - trigger: `click`
 - finite behavior model
-- charges and inline output
-- current whole-stash open behavior
-- open-time consumable inputs, if any
-- persistent stored requirements, if any
-- depletion behavior
-- output placement rules
-- all-or-nothing output validation
+- exactly one product line id
+- finite `charges`
+- `onChargesDepleted`
+- product-line `chargeCost`
+- product-line consumable inputs, output, effects, and requirements
+- output placement and blocked-delivery retry through the shared producer path
 
 ### 18.8 Output definition
 
@@ -1311,10 +1301,10 @@ These notes track where the current implementation already matches this document
 2. Inventory supports stateless stacks and stateful item instances. Stateful items are non-stackable.
 3. Board -> inventory storage preserves runtime state through the explicit item-detail store action.
 4. Inventory -> board placement restores runtime state and supports empty-cell long-press placement targets.
-5. Producers and stashes are separate entity types.
-6. Producer and stash outputs are authored inline when they generate items.
-7. Producer output capacity is handled at completion time with blocked delivery retry and preserved rolled delivery.
-8. Stash activation is all-or-nothing for the whole open action.
+5. Producers and stashes are separate entity types, but stash runtime execution is producer-like.
+6. Producer outputs are authored on product lines; stashes emit through exactly one product line.
+7. Producer/stash output capacity is handled at completion time with blocked delivery retry and preserved rolled delivery.
+8. Stash charges are spent only after successful product delivery.
 9. Producer and craft input withdrawal is exposed through item detail and must not silently destroy nested items.
 10. Active timers/jobs use real-world timestamps and are processed by the runtime tick. Inventory remains passive.
 11. Merge direction, requirement definitions, storage policy, starting state invariants, and ambiguous interaction rules are centralized in game config/schema validation where they belong.
@@ -1334,7 +1324,7 @@ These concepts are not part of canonical gameplay and should be removed during c
 7. `collect` as a special item behavior for currency.
 8. Double-click exhaust/open/collect behavior. Double-click is inventory placement only.
 9. `doubleClickBehavior: "exhaust"`. It is replaced by single-click stash exhaust/open.
-10. Mixed `producer.mode` finite/infinite model. Finite entities are `stash`; infinite/long-lived entities are `producer`.
+10. Mixed `producer.mode` finite/infinite model. Finite behavior is expressed through `charges` and `onChargesDepleted`; stashes are a one-product facade for finite containers.
 11. Player-inventory capacity mechanics as a separate storage layer.
 12. Inventory capacity changes as current gameplay. Inventory size is fixed at `7 x 5`.
 13. Any global upgrade UI, schema, or copy that implies save-driven config patching.
@@ -1395,10 +1385,10 @@ A gameplay implementation should provide tests or validation for:
 46. producer blocked delivery preserves rolled output and retries without rerolling
 47. producer output uses deterministic nearest-free-cell placement from producer origin
 48. sink product lines with no output complete without spawning output
-49. stash finite depletion
-50. stash single open releases all remaining charges
-51. stash open-time input requirement, for keyed/locked stashes
-52. stash activation rejects when full generated output cannot fit
+49. stash finite depletion through shared producer charges
+50. product line charge costs reserve pending finite producer/stash charges
+51. stash product-line input requirement, for keyed/locked stashes
+52. stash blocked delivery keeps the rolled output and does not spend charges until delivery succeeds
 53. stash output uses deterministic nearest-free-cell placement from stash origin
 54. concrete blueprint item can enter craft/construction flow
 55. concrete blueprint receiving construction inputs

@@ -5,7 +5,6 @@ import { resolveBoardDropFeedback } from "~/v0/board/drop/resolveBoardDropFeedba
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
 import { readProducerMissingResourceHintTileIds } from "~/v0/producer/logic/readProducerMissingResourceHintTileIds";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
-import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { useBoardTransientTiles } from "~/v0/board/animation/BoardTransientTileStore";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -49,7 +48,6 @@ export const useBoardTileEngineModel = ({
 	const board = useGameBoardView();
 	const actions = useGameRuntimeDropActions();
 	const runtimeStore = useGameRuntimeStore();
-	const config = useGameRuntimeSelector((state) => state.runtime.config);
 	const boardLayout = useGameRuntimeSelector((state) => state.runtime.config.game.board);
 	const transientTiles = useBoardTransientTiles();
 
@@ -115,16 +113,22 @@ export const useBoardTileEngineModel = ({
 	);
 
 	const activateBoardItem = useCallback(
-		(boardItem: BoardViewItem) => {
+		(boardItemId: string) => {
+			const snapshot = runtimeStore.getSnapshot();
+			const nowMs = Date.now();
+			const liveBoard = readBoardView(snapshot);
+			const liveBoardItem = liveBoard.byId[boardItemId];
+			if (!liveBoardItem) return;
+
 			const action = resolveBoardItemTapAction({
-				boardItem,
-				nowMs: Date.now(),
+				boardItem: liveBoardItem,
+				nowMs,
 			});
 
 			if (action.type === "claim-craft") {
 				void runtimeStore
 					.tick({
-						nowMs: Date.now(),
+						nowMs,
 					})
 					.catch(feedback.showError);
 				return;
@@ -138,6 +142,7 @@ export const useBoardTileEngineModel = ({
 							targetItemInstanceId: action.boardItemId,
 							type: "craft.start",
 						},
+						nowMs,
 					})
 					.catch(feedback.showError);
 				return;
@@ -150,7 +155,7 @@ export const useBoardTileEngineModel = ({
 
 			if (action.type !== "activate") return;
 
-			const activation = boardItem.activation;
+			const activation = liveBoardItem.activation;
 			if (!activation) return;
 
 			if (activation.kind === "stash") {
@@ -158,22 +163,23 @@ export const useBoardTileEngineModel = ({
 					.dispatch({
 						action: {
 							inputRefs: [],
-							stashItemInstanceId: boardItem.id,
+							stashItemInstanceId: liveBoardItem.id,
 							type: "stash.open",
 						},
+						nowMs,
 					})
 					.catch(feedback.showError);
 				return;
 			}
 
 			const hintTileIds = readProducerMissingResourceHintTileIds({
-				board,
-				config,
-				producerItem: boardItem,
+				board: liveBoard,
+				config: snapshot.runtime.config,
+				producerItem: liveBoardItem,
 			});
 			if (hintTileIds.length > 0) {
 				registerBoardTileBounceFeedback({
-					groupId: `producer-missing-resource-hint:${boardItem.id}:${Date.now()}`,
+					groupId: `producer-missing-resource-hint:${liveBoardItem.id}:${nowMs}`,
 					tileIds: hintTileIds,
 				});
 			}
@@ -182,15 +188,14 @@ export const useBoardTileEngineModel = ({
 				.dispatch({
 					action: {
 						inputRefs: [],
-						producerItemInstanceId: boardItem.id,
+						producerItemInstanceId: liveBoardItem.id,
 						type: "producer.product.start",
 					},
+					nowMs,
 				})
 				.catch(feedback.showError);
 		},
 		[
-			board,
-			config,
 			feedback.showError,
 			onOpenItem,
 			runtimeStore,
@@ -215,7 +220,7 @@ export const useBoardTileEngineModel = ({
 						itemId: boardItem.itemId,
 						boardItem,
 					},
-					onSingleActivate: () => activateBoardItem(boardItem),
+					onSingleActivate: () => activateBoardItem(boardItem.id),
 					onLongActivate: () => onOpenItem(boardItem.id),
 				};
 			},
@@ -270,7 +275,6 @@ export const useBoardTileEngineModel = ({
 		[
 			actions,
 			activateBoardItem,
-			config,
 			board,
 			feedback,
 			runtimeStore,

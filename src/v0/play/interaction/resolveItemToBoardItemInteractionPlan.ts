@@ -130,21 +130,21 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		)
 		.with(
 			{
+				canSupplyStashInput: true,
+			},
+			() => ({
+				feedbackVariant: "secondary" as const,
+				type: "stash-input" as const,
+			}),
+		)
+		.with(
+			{
 				producerInputProductId: P.string,
 			},
 			({ producerInputProductId }) => ({
 				feedbackVariant: "secondary" as const,
 				productId: producerInputProductId,
 				type: "producer-input" as const,
-			}),
-		)
-		.with(
-			{
-				canSupplyStashInput: true,
-			},
-			() => ({
-				feedbackVariant: "secondary" as const,
-				type: "stash-input" as const,
 			}),
 		)
 		.otherwise(() => ({

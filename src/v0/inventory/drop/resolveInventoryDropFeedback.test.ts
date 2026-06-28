@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { resolveInventoryDropFeedback } from "~/v0/inventory/drop/resolveInventoryDropFeedback";
+import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import type { InventorySurface } from "~/v0/inventory/InventorySurface.types";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
@@ -19,6 +20,29 @@ const source = {
 		},
 	},
 } satisfies DragSource;
+
+const inventory = rebuildInventoryView([
+	{
+		slotIndex: 0,
+		stack: {
+			id: "stack:source",
+			itemId: "item:twig",
+			quantity: 1,
+		},
+	},
+	{
+		slotIndex: 1,
+	},
+]);
+
+const staleInventory = rebuildInventoryView([
+	{
+		slotIndex: 0,
+	},
+	{
+		slotIndex: 1,
+	},
+]);
 
 const createContext = ({
 	targetSlotIndex,
@@ -54,6 +78,7 @@ describe("resolveInventoryDropFeedback", () => {
 				context: createContext({
 					targetSlotIndex: 0,
 				}),
+				inventory,
 			}),
 		).toBeNull();
 	});
@@ -64,6 +89,7 @@ describe("resolveInventoryDropFeedback", () => {
 				context: createContext({
 					targetSlotIndex: 1,
 				}),
+				inventory,
 			}),
 		).toEqual({
 			effect: "empty",
@@ -86,9 +112,23 @@ describe("resolveInventoryDropFeedback", () => {
 						},
 					},
 				}),
+				inventory,
 			}),
 		).toEqual({
 			effect: "empty",
+		});
+	});
+
+	it("blocks feedback for stale inventory sources", () => {
+		expect(
+			resolveInventoryDropFeedback({
+				context: createContext({
+					targetSlotIndex: 1,
+				}),
+				inventory: staleInventory,
+			}),
+		).toEqual({
+			effect: "blocked",
 		});
 	});
 });

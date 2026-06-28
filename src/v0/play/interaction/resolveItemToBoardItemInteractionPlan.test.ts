@@ -58,6 +58,29 @@ const producerTarget = (productLines: ProducerProductLineView[]): BoardViewItem 
 	y: 0,
 });
 
+const stashTarget = (productLines: ProducerProductLineView[]): BoardViewItem => ({
+	activation: {
+		inputs: [
+			{
+				capacity: 1,
+				consume: true,
+				itemId: "item:twig",
+				quantity: 1,
+				stored: 0,
+			},
+		],
+		kind: "stash",
+		productLines,
+		requirements: [],
+		trigger: "click",
+	},
+	id: "stash",
+	itemId: "item:stash",
+	state: {},
+	x: 0,
+	y: 0,
+});
+
 describe("resolveItemToBoardItemInteractionPlan", () => {
 	it("routes producer inputs into the default product line before earlier matching lines", () => {
 		const plan = resolveItemToBoardItemInteractionPlan({
@@ -110,6 +133,22 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 		expect(plan).toMatchObject({
 			productId: "product:next",
 			type: "producer-input",
+		});
+	});
+
+	it("routes stash inputs to stash open even when shared producer-line views are present", () => {
+		const plan = resolveItemToBoardItemInteractionPlan({
+			config: createEngineTestConfig(),
+			sourceItemId: "item:twig",
+			targetItem: stashTarget([
+				productLine({
+					productId: "product:stash",
+				}),
+			]),
+		});
+
+		expect(plan).toMatchObject({
+			type: "stash-input",
 		});
 	});
 

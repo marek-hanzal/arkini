@@ -67,6 +67,83 @@ describe("resolveBoardDropFeedback", () => {
 		});
 	});
 
+	it("blocks empty board cell feedback for inventory-only items", () => {
+		const inventoryOnlyConfig = createEngineTestConfig({
+			items: {
+				...config.items,
+				"item:inventory-only": {
+					...config.items["item:twig"],
+					description: "Inventory only",
+					mergeIds: [],
+					name: "Inventory Only",
+					storage: "inventory",
+				},
+			},
+		});
+		const inventory = rebuildInventoryView([
+			{
+				slotIndex: 0,
+				stack: {
+					id: "stack:inventory-only",
+					itemId: "item:inventory-only",
+					quantity: 1,
+				},
+			},
+		]);
+
+		expect(
+			resolveBoardDropFeedback({
+				config: inventoryOnlyConfig,
+				inventory,
+				board: boardView([]),
+				context: context({
+					source: {
+						kind: "inventory",
+						slot: inventory.bySlotIndex["0"]!,
+						itemId: "item:inventory-only",
+						slotIndex: 0,
+					},
+					target: {
+						kind: "cell",
+						x: 0,
+						y: 0,
+					},
+					targetTile: null,
+				}),
+			}),
+		).toEqual({
+			effect: "blocked",
+		});
+	});
+
+	it("blocks empty board cell feedback when the dragged inventory source is stale", () => {
+		expect(
+			resolveBoardDropFeedback({
+				config,
+				inventory: emptyInventory,
+				board: boardView([]),
+				context: context({
+					source: {
+						kind: "inventory",
+						slot: {
+							slotIndex: 0,
+						},
+						itemId: "item:twig",
+						slotIndex: 0,
+					},
+					target: {
+						kind: "cell",
+						x: 0,
+						y: 0,
+					},
+					targetTile: null,
+				}),
+			}),
+		).toEqual({
+			effect: "blocked",
+		});
+	});
+
 	it("marks mergeable target items as merge feedback", () => {
 		const source = boardItem({
 			id: "a",
@@ -228,6 +305,105 @@ describe("resolveBoardDropFeedback", () => {
 						queuedJobs: 0,
 						queueSize: 1,
 						requirementItemIds: [],
+						requirementsReady: true,
+					},
+				],
+				requirements: [],
+				trigger: "click",
+			},
+		};
+
+		expect(
+			resolveBoardDropFeedback({
+				config,
+				inventory: emptyInventory,
+				board: boardView([
+					source,
+					target,
+				]),
+				context: context({
+					source: {
+						kind: "board",
+						boardItemId: source.id,
+						itemId: source.itemId,
+						boardItem: source,
+					},
+					target: {
+						kind: "cell",
+						x: target.x,
+						y: target.y,
+						boardItemId: target.id,
+					},
+					targetTile: {
+						id: target.id,
+						slotId: "1:0",
+						data: {
+							kind: "board-item",
+							boardItemId: target.id,
+						},
+					},
+				}),
+			}),
+		).toEqual({
+			effect: "merge",
+			variant: "secondary",
+		});
+	});
+
+	it("marks stash inputs as secondary merge feedback when shared product-line views are present", () => {
+		const source = boardItem({
+			id: "a",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target: BoardViewItem = {
+			id: "b",
+			itemId: "item:stash",
+			state: {},
+			x: 1,
+			y: 0,
+			activation: {
+				inputs: [
+					{
+						capacity: 1,
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+						stored: 0,
+					},
+				],
+				kind: "stash",
+				productLines: [
+					{
+						durationMs: 1000,
+						inProgress: false,
+						inputItemIds: [
+							"item:twig",
+						],
+						inputs: [
+							{
+								capacity: 1,
+								consume: true,
+								itemId: "item:twig",
+								quantity: 1,
+								stored: 0,
+							},
+						],
+						inputsAvailable: true,
+						inputsReady: false,
+						isDefault: false,
+						missingRequirementItemIds: [],
+						name: "Open stash",
+						producerQueuedJobs: 0,
+						productId: "product:stash",
+						queueFull: false,
+						blocked: false,
+						blockReasonEffectIds: [],
+						queuedJobs: 0,
+						queueSize: 1,
+						requirementItemIds: [],
+						requirements: [],
 						requirementsReady: true,
 					},
 				],

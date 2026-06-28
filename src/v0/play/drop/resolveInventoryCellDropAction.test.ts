@@ -93,7 +93,7 @@ describe("resolveInventoryCellDropAction", () => {
 		});
 	});
 
-	it("uses the live inventory stack item instead of a stale drag snapshot", () => {
+	it("rejects inventory cell drops when the live stack differs from the drag snapshot", () => {
 		const liveInventory = rebuildInventoryView([
 			{
 				slotIndex: 0,
@@ -124,11 +124,11 @@ describe("resolveInventoryCellDropAction", () => {
 				},
 			}),
 		).toEqual({
-			type: "apply-inventory-item-to-board-item",
-			input: {
-				sourceSlotIndex: 0,
-				targetBoardItemId: "merge-target",
+			feedback: {
+				kind: "inventory-slot",
+				slotIndex: 0,
 			},
+			type: "reject",
 		});
 	});
 

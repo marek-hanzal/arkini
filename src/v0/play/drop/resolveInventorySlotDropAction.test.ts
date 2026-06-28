@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import { resolveInventorySlotDropAction } from "~/v0/play/drop/resolveInventorySlotDropAction";
@@ -21,10 +22,35 @@ const source = (slotIndex: number) =>
 		slotIndex,
 	}) satisfies DragSource;
 
+const inventory = rebuildInventoryView([
+	slot(0),
+	{
+		slotIndex: 1,
+	},
+	{
+		slotIndex: 2,
+		stack: {
+			id: "stack-2",
+			itemId: "item:pebble",
+			quantity: 1,
+		},
+	},
+]);
+
+const staleInventory = rebuildInventoryView([
+	{
+		slotIndex: 0,
+	},
+	{
+		slotIndex: 1,
+	},
+]);
+
 describe("resolveInventorySlotDropAction", () => {
 	it("ignores drops onto the same inventory slot", () => {
 		expect(
 			resolveInventorySlotDropAction({
+				inventory,
 				source: source(0),
 				target: {
 					kind: "inventory-slot",
@@ -39,6 +65,7 @@ describe("resolveInventorySlotDropAction", () => {
 	it("swaps different inventory slots with parallel animation", () => {
 		expect(
 			resolveInventorySlotDropAction({
+				inventory,
 				source: source(0),
 				target: {
 					kind: "inventory-slot",
@@ -52,6 +79,21 @@ describe("resolveInventorySlotDropAction", () => {
 				sourceSlotIndex: 0,
 				targetSlotIndex: 2,
 			},
+		});
+	});
+
+	it("rejects drops when the source inventory slot is stale", () => {
+		expect(
+			resolveInventorySlotDropAction({
+				inventory: staleInventory,
+				source: source(0),
+				target: {
+					kind: "inventory-slot",
+					slotIndex: 2,
+				},
+			}),
+		).toEqual({
+			type: "reject",
 		});
 	});
 });

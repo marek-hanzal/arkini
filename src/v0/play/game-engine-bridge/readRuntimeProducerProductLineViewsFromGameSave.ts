@@ -17,7 +17,11 @@ import {
 	readRuntimeMissingRequirementItemIdsFromGameSave,
 	readRuntimeRequirementsReadyFromGameSave,
 } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
-import { readGameTimeDurationMs, readGameTimeProgress } from "~/v0/game/time/GameTime";
+import {
+	readGameTimeDurationMs,
+	readGameTimeProgress,
+	readGameTimeRemainingMs,
+} from "~/v0/game/time/GameTime";
 
 export namespace readRuntimeProducerProductLineViewsFromGameSave {
 	export interface Props {
@@ -66,7 +70,8 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 	}).filter((facts) => facts.producerItemInstanceId === targetItemInstanceId);
 	const producerJobs = producerJobFacts.map((facts) => facts.job);
 	const producerQueuedJobs = producerJobs.length;
-	const firstProducerJob = producerJobFacts.find((facts) => facts.queueIndex === 0)?.job;
+	const firstProducerJobFacts = producerJobFacts.find((facts) => facts.queueIndex === 0);
+	const firstProducerJob = firstProducerJobFacts?.job;
 	const queueFull = producerQueuedJobs >= maxQueueSize;
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
@@ -131,7 +136,10 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				(left, right) =>
 					left.startAtMs - right.startAtMs || left.id.localeCompare(right.id),
 			);
-		const activeJob = firstProducerJob?.productId === productId ? firstProducerJob : undefined;
+		const activeJobFacts =
+			firstProducerJob?.productId === productId ? firstProducerJobFacts : undefined;
+		const activeJob = activeJobFacts?.job;
+		const deliveryBlocked = activeJobFacts?.status === "delivery_blocked";
 		const baseDurationMs = readProducerProductDurationMs({
 			hindrances,
 			product,
@@ -156,13 +164,22 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 					startAtMs: activeJob.startAtMs,
 				})
 			: effectiveProductLine.durationMs;
-		const progress = activeJob
-			? readGameTimeProgress({
-					nowMs: activeJob.pausedAtMs ?? nowMs,
-					readyAtMs: activeJob.readyAtMs,
-					startAtMs: activeJob.startAtMs,
-				})
-			: undefined;
+		const lineClockNowMs = activeJob?.pausedAtMs ?? nowMs;
+		const progress =
+			activeJob && !deliveryBlocked
+				? readGameTimeProgress({
+						nowMs: lineClockNowMs,
+						readyAtMs: activeJob.readyAtMs,
+						startAtMs: activeJob.startAtMs,
+					})
+				: undefined;
+		const remainingMs =
+			activeJob && !deliveryBlocked
+				? readGameTimeRemainingMs({
+						nowMs: lineClockNowMs,
+						readyAtMs: activeJob.readyAtMs,
+					})
+				: undefined;
 
 		const inputs = (product.inputs ?? []).map((input) =>
 			readRuntimeActivationInputView({
@@ -198,6 +215,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				blockReasonEffectIds: effectiveProductLine.blockReasons.map(
 					(effect) => effect.effectId,
 				),
+				deliveryBlocked,
 				durationMs,
 				inProgress: jobs.length > 0,
 				hindrances: readRuntimeActivationHindranceViewsFromGameSave({
@@ -224,6 +242,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				queueSize: maxQueueSize,
 				queuedJobs: jobs.length,
 				readyAtMs: activeJob?.readyAtMs,
+				remainingMs,
 				requirementItemIds,
 				requirements: requirementViews,
 				requirementsReady,

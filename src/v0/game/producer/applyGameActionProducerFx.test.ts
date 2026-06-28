@@ -2169,6 +2169,147 @@ describe("applyGameActionFx Producer", () => {
 		expect(resumed.nextWakeAtMs).toBe(2000);
 	});
 
+	it("pauses activated effects when product requirements break", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:boost": {
+					name: "Boost",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0.5,
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 5,
+				},
+			},
+			requirements: {
+				"requirement:near-twig": {
+					distance: 1,
+					itemIds: [
+						"item:twig",
+					],
+					type: "proximity",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					productIds: [
+						"product:boost",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:boost": {
+					activatesEffectId: "effect:boost",
+					chargeCost: 0,
+					durationMs: 1000,
+					name: "Boost",
+					placement: "board_then_inventory",
+					requirementIds: [
+						"requirement:near-twig",
+					],
+					tags: [],
+					visibility: "visible",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:boost",
+				inputRefs: [],
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const effect = readOnlyRecordValue(started.save.activeEffects);
+
+		const paused = runAction({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 4,
+				y: 0,
+			},
+			config,
+			nowMs: 250,
+			save: started.save,
+		});
+		expect(readOnlyRecordValue(paused.save.producerJobs)).toMatchObject({
+			pausedAtMs: 250,
+			remainingMs: 750,
+		});
+
+		const expiredWindow = runTick({
+			config,
+			nowMs: 1100,
+			save: paused.save,
+		});
+		expect(expiredWindow.save.activeEffects[effect.id]).toBeDefined();
+		expect(expiredWindow.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					type: "effect.expired",
+				}),
+			]),
+		);
+
+		const resumed = runAction({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 0,
+				y: 0,
+			},
+			config,
+			nowMs: 1250,
+			save: expiredWindow.save,
+		});
+		expect(resumed.save.activeEffects[effect.id]).toMatchObject({
+			endAtMs: 2000,
+			startAtMs: 1000,
+		});
+		expect(resumed.nextWakeAtMs).toBe(2000);
+	});
+
 	it("averages producer and product proximity duration multipliers", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

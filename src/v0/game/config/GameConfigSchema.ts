@@ -1217,6 +1217,21 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 		}
 
+		const activatedEffect = product.activatesEffectId
+			? value.effects[product.activatesEffectId]
+			: undefined;
+		if (activatedEffect?.sourceScope === "inventory") {
+			addIssue(
+				ctx,
+				[
+					"products",
+					productId,
+					"activatesEffectId",
+				],
+				`Active effect product "${productId}" activates board-source effect "${product.activatesEffectId}" and cannot use inventory-only sourceScope.`,
+			);
+		}
+
 		if (product.activatesEffectId && product.output) {
 			addIssue(
 				ctx,

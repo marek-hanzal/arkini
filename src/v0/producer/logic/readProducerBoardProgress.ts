@@ -16,6 +16,7 @@ export function readProducerBoardProgress({ activation, nowMs }: readProducerBoa
 			(line) =>
 				line.startAtMs !== undefined &&
 				line.readyAtMs !== undefined &&
+				!line.deliveryBlocked &&
 				line.startAtMs <= nowMs &&
 				(line.pausedAtMs !== undefined || line.readyAtMs > nowMs),
 		)

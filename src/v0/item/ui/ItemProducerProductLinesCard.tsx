@@ -6,7 +6,6 @@ import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import { ItemInlineAssetGroup } from "~/v0/item/ui/ItemInlineAssetGroup";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
-import { readGameTimeRemainingMs } from "~/v0/game/time/GameTime";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiSection } from "~/v0/ui/UiSection";
@@ -53,6 +52,7 @@ const readRunButtonLabel = ({
 	canRunAction: boolean;
 }) => {
 	if (line.pausedAtMs !== undefined) return "Paused";
+	if (line.deliveryBlocked) return "Delivery blocked";
 	if (line.queueFull) return "Queue full";
 	if (line.blocked) return "Blocked by effect";
 	if (!line.requirementsReady) return "Requirements missing";
@@ -198,15 +198,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					const canRunAction =
 						(line.inputsReady || line.inputsAvailable || inputsPartiallyAvailable) &&
 						line.requirementsReady &&
+						!line.deliveryBlocked &&
 						!line.blocked &&
 						!line.queueFull;
-					const lineClockNowMs = line.pausedAtMs ?? nowMs;
-					const remainingMs = line.readyAtMs
-						? readGameTimeRemainingMs({
-								nowMs: lineClockNowMs,
-								readyAtMs: line.readyAtMs,
-							})
-						: undefined;
 					const progressLabel = line.pausedAtMs !== undefined ? "Paused" : "Running";
 					const runButtonLabel = readRunButtonLabel({
 						canRunAction,
@@ -351,7 +345,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								</div>
 							) : null}
 
-							{line.inProgress ? (
+							{line.inProgress && !line.deliveryBlocked ? (
 								<div className="mt-2.5 rounded-sm bg-ak-surface-soft p-2.5">
 									<div className="flex justify-between gap-3 text-sm font-bold text-ak-primary">
 										<span>
@@ -361,8 +355,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												: ""}
 										</span>
 										<span>
-											{remainingMs !== undefined
-												? formatMs(remainingMs)
+											{line.remainingMs !== undefined
+												? formatMs(line.remainingMs)
 												: "Queued"}
 										</span>
 									</div>

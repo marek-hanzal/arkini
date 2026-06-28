@@ -14,6 +14,7 @@ export namespace ItemCraftCard {
 		craft: CraftProgressView;
 		items: ItemCatalogView;
 		pending: boolean;
+		onClaim(): void;
 		onStart(): void;
 		onWithdrawInput(itemId: string): void;
 	}
@@ -23,6 +24,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 	craft,
 	items,
 	pending,
+	onClaim,
 	onStart,
 	onWithdrawInput,
 }) => {
@@ -118,10 +120,10 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 				})}
 			</div>
 			<UiButton
-				disabled={!runState.canRunAction || pending}
-				tone={runState.canRunAction ? "primary" : "secondary"}
+				disabled={(!runState.canRunAction && !runState.canClaim) || pending}
+				tone={runState.canRunAction || runState.canClaim ? "primary" : "secondary"}
 				className="mt-3"
-				onClick={onStart}
+				onClick={runState.canClaim ? onClaim : onStart}
 			>
 				{runState.label}
 			</UiButton>

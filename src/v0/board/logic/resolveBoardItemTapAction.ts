@@ -1,6 +1,6 @@
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
-import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
 import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
+import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 
@@ -30,25 +30,6 @@ export namespace resolveBoardItemTapAction {
 				boardItemId: string;
 		  };
 }
-
-type ActivationView = NonNullable<BoardViewItem["activation"]>;
-
-const activationRequirementReady = (requirement: ActivationView["requirements"][number]) => {
-	if (requirement.type === "proximity") return requirement.satisfied;
-	return requirement.stored >= requirement.quantity;
-};
-
-const activationRequirementsReady = (activation: ActivationView) =>
-	activation.requirements.every(activationRequirementReady);
-
-const activationInputsReady = (inputs: readonly ActivationInputView[]) =>
-	inputs.every((input) => input.stored >= input.quantity);
-
-const activationInputsFillable = (inputs: readonly ActivationInputView[]) =>
-	inputs.some((input) => {
-		const missingQuantity = input.quantity - input.stored;
-		return missingQuantity > 0 && Math.min(missingQuantity, input.available ?? 0) > 0;
-	});
 
 export const resolveBoardItemTapAction = ({
 	boardItem,
@@ -86,11 +67,7 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (boardItem.activation?.kind === "stash") {
-		if (
-			activationRequirementsReady(boardItem.activation) &&
-			(activationInputsReady(boardItem.activation.inputs) ||
-				activationInputsFillable(boardItem.activation.inputs))
-		) {
+		if (isProducerReady(boardItem.activation, nowMs)) {
 			return {
 				type: "activate",
 				activation: "exhaust",

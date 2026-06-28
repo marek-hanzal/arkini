@@ -19,11 +19,18 @@ export function isProducerStocked(activation: ActivationView | undefined) {
 			: false;
 	}
 
-	return (
-		activation.inputs.every(
-			(input) =>
-				input.stored >= input.quantity ||
-				input.stored + (input.available ?? 0) >= input.quantity,
-		) && activation.requirements.every(isRequirementReady)
-	);
+	const stashLine = activation.productLines?.[0];
+	if (stashLine) {
+		return readProducerProductLineRunState({
+			line: stashLine,
+		}).canRunAction;
+	}
+
+	const inputsReady = activation.inputs.every((input) => input.stored >= input.quantity);
+	const inputsFillable = activation.inputs.some((input) => {
+		const missingQuantity = input.quantity - input.stored;
+		return missingQuantity > 0 && Math.min(missingQuantity, input.available ?? 0) > 0;
+	});
+
+	return (inputsReady || inputsFillable) && activation.requirements.every(isRequirementReady);
 }

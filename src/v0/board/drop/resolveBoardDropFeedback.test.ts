@@ -278,7 +278,7 @@ describe("resolveBoardDropFeedback", () => {
 		});
 	});
 
-	it("marks occupied non-merge targets as blocked feedback", () => {
+	it("does not show blocked feedback for plain swap targets", () => {
 		const source = boardItem({
 			id: "a",
 			itemId: "item:twig",
@@ -305,6 +305,52 @@ describe("resolveBoardDropFeedback", () => {
 						boardItemId: source.id,
 						itemId: source.itemId,
 						boardItem: source,
+					},
+					target: {
+						kind: "cell",
+						x: target.x,
+						y: target.y,
+						boardItemId: target.id,
+					},
+					targetTile: {
+						id: target.id,
+						slotId: "1:0",
+						data: {
+							kind: "board-item",
+							boardItemId: target.id,
+						},
+					},
+				}),
+			}),
+		).toBeNull();
+	});
+	it("marks inventory drops to plain swap targets as blocked feedback", () => {
+		const target = boardItem({
+			id: "b",
+			itemId: "item:branch",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardDropFeedback({
+				config,
+				board: boardView([
+					target,
+				]),
+				context: context({
+					source: {
+						kind: "inventory",
+						itemId: "item:twig",
+						slotIndex: 0,
+						slot: {
+							slotIndex: 0,
+							stack: {
+								id: "stack:twig",
+								itemId: "item:twig",
+								quantity: 1,
+							},
+						},
 					},
 					target: {
 						kind: "cell",

@@ -292,6 +292,26 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
+	it("opens detail for stashes whose producer-like line is queue blocked", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("stash", {
+						productLines: [
+							productLine(false, {
+								queueBlockedReason: "delivery_blocked",
+							}),
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-detail",
+		});
+	});
+
 	it("opens detail for stashes with missing inputs", () => {
 		expect(
 			resolveBoardItemTapAction({

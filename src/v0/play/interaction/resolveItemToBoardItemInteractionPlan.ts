@@ -1,4 +1,6 @@
 import { match, P } from "ts-pattern";
+import { isBoardViewItemRuntimeBusy } from "~/v0/board/logic/isBoardViewItemRuntimeBusy";
+import { isBoardViewItemRuntimeStatePreserved } from "~/v0/board/logic/isBoardViewItemRuntimeStatePreserved";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -41,9 +43,10 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		sourceItemId,
 		targetItemId: targetItem.itemId,
 	});
-	const canMerge = Boolean(
-		mergeRule && (!targetItem.craft || targetItem.craft.phase === "collecting_inputs"),
-	);
+	const canReplaceTarget =
+		!isBoardViewItemRuntimeBusy(targetItem) &&
+		!isBoardViewItemRuntimeStatePreserved(targetItem);
+	const canMerge = Boolean(mergeRule && canReplaceTarget);
 	const canSupplyStoredRequirement = Boolean(
 		targetItem.activation?.requirements.some(
 			(requirement) =>

@@ -165,4 +165,58 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 			type: "stored-requirement",
 		});
 	});
+	it("does not route replacement merges into producer-like targets with runtime jobs", () => {
+		const plan = resolveItemToBoardItemInteractionPlan({
+			config: createEngineTestConfig(),
+			sourceItemId: "item:twig",
+			targetItem: producerTarget([
+				productLine({
+					inProgress: true,
+					productId: "product:running",
+					producerQueuedJobs: 1,
+				}),
+			]),
+		});
+
+		expect(plan).toMatchObject({
+			type: "producer-input",
+		});
+	});
+
+	it("does not route replacement merges into targets with stored runtime state", () => {
+		const plan = resolveItemToBoardItemInteractionPlan({
+			config: createEngineTestConfig(),
+			sourceItemId: "item:twig",
+			targetItem: {
+				...producerTarget([]),
+				craft: {
+					acceptedInputItemIds: [
+						"item:twig",
+					],
+					canAcceptInputs: true,
+					complete: false,
+					delivered: {
+						"item:twig": 1,
+					},
+					durationMs: 1000,
+					id: "craft:test",
+					inputProgress: 0.5,
+					inputs: [
+						{
+							itemId: "item:twig",
+							quantity: 2,
+						},
+					],
+					phase: "collecting_inputs",
+					progress: 0.5,
+					resultItemId: "item:plank",
+					timeProgress: 0,
+				},
+			},
+		});
+
+		expect(plan).toMatchObject({
+			type: "craft-input",
+		});
+	});
 });

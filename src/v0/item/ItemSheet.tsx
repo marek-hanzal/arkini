@@ -197,6 +197,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						lines={boardItem.activation.productLines}
 						nowMs={nowMs}
 						pending={itemAction.isPending}
+						canSetDefault={boardItem.activation.kind === "producer"}
 						onSetDefault={setDefaultProductLine}
 						onStart={startProductLine}
 						onWithdrawInput={withdrawProductLineInput}

@@ -9,12 +9,13 @@ import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/pl
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 import { readRuntimeLootDropViewsFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromGameConfig";
+import { readRuntimeProducerProductLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerProductLineViewsFromGameSave";
 
 export namespace readRuntimeStashActivationViewFromGameSave {
 	export interface Props {
 		boardItem: GameSaveBoardItem;
 		config: GameConfig;
-		nowMs?: number;
+		nowMs: number;
 		save: GameSave;
 	}
 }
@@ -59,6 +60,18 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 		productId,
 		save,
 	});
+	const productLines = readRuntimeProducerProductLineViewsFromGameSave({
+		config,
+		maxQueueSize: stash.maxQueueSize,
+		nowMs,
+		producerHinderedBy: stash.hinderedBy ?? [],
+		producerId: boardItem.itemId,
+		producerItemId: boardItem.itemId,
+		producerRequirementIds: stash.requirementIds,
+		productIds: stash.productIds,
+		save,
+		targetItemInstanceId: boardItem.id,
+	});
 
 	return {
 		drops: readRuntimeLootDropViewsFromGameConfig({
@@ -76,6 +89,7 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 			}),
 		),
 		kind: "stash",
+		productLines,
 		remainingCharges: readProducerRemainingCharges({
 			config,
 			producerId: boardItem.itemId,

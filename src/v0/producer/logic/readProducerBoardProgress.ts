@@ -9,7 +9,7 @@ export namespace readProducerBoardProgress {
 }
 
 export function readProducerBoardProgress({ activation, nowMs }: readProducerBoardProgress.Props) {
-	if (activation?.kind !== "producer") return undefined;
+	if (!activation?.productLines?.length) return undefined;
 
 	const runningLine = activation.productLines
 		?.filter(

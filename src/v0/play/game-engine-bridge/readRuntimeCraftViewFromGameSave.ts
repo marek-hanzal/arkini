@@ -5,7 +5,7 @@ import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 import { readGameTimeProgress, readGameTimeRemainingMs } from "~/v0/game/time/GameTime";
-import { readProximityRequirementsDurationMultiplier } from "~/v0/game/requirements/readProximityRequirementsDurationMultiplier";
+import { readCraftRecipeDurationMs } from "~/v0/game/craft/readCraftRecipeDurationMs";
 
 export namespace readRuntimeCraftViewFromGameSave {
 	export interface Props {
@@ -37,17 +37,11 @@ export const readRuntimeCraftViewFromGameSave = ({
 	);
 	const inputProgress =
 		totalInputQuantity === 0 ? 1 : deliveredInputQuantity / totalInputQuantity;
-	const durationMs = Math.max(
-		0,
-		Math.ceil(
-			recipe.durationMs *
-				readProximityRequirementsDurationMultiplier({
-					requirements: recipe.requirements,
-					save,
-					targetItemInstanceId: boardItem.id,
-				}),
-		),
-	);
+	const durationMs = readCraftRecipeDurationMs({
+		recipe,
+		save,
+		targetItemInstanceId: boardItem.id,
+	});
 	const startAtMs = runningJob?.startAtMs;
 	const readyAtMs = runningJob?.readyAtMs;
 	const pausedAtMs = runningJob?.pausedAtMs;

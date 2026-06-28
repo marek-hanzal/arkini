@@ -17,6 +17,7 @@ export namespace ItemProducerProductLinesCard {
 		lines: readonly ProducerProductLineView[];
 		nowMs: number;
 		pending: boolean;
+		canSetDefault?: boolean;
 		onSetDefault(productId: string): void;
 		onStart(productId: string): void;
 		onWithdrawInput(productId: string, itemId: string): void;
@@ -173,6 +174,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 	lines,
 	nowMs,
 	pending,
+	canSetDefault = true,
 	onSetDefault,
 	onStart,
 	onWithdrawInput,
@@ -375,22 +377,30 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								</div>
 							) : null}
 
-							<div className="mt-2.5 grid grid-cols-3 gap-2">
+							<div
+								className={
+									canSetDefault
+										? "mt-2.5 grid grid-cols-3 gap-2"
+										: "mt-2.5 grid gap-2"
+								}
+							>
 								<UiButton
 									disabled={!canRunAction || pending}
 									tone={canRunAction ? "primary" : "secondary"}
-									className="col-span-2"
+									className={canSetDefault ? "col-span-2" : undefined}
 									onClick={() => onStart(line.productId)}
 								>
 									{runButtonLabel}
 								</UiButton>
-								<UiButton
-									fullWidth
-									disabled={pending}
-									onClick={() => onSetDefault(line.productId)}
-								>
-									{line.isDefault ? "Un-default" : "Default"}
-								</UiButton>
+								{canSetDefault ? (
+									<UiButton
+										fullWidth
+										disabled={pending}
+										onClick={() => onSetDefault(line.productId)}
+									>
+										{line.isDefault ? "Un-default" : "Default"}
+									</UiButton>
+								) : null}
 							</div>
 						</div>
 					);

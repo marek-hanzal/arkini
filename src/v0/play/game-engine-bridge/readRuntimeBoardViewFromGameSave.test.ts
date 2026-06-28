@@ -693,6 +693,60 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		]);
 	});
 
+	it("exposes stash producer-line progress through the shared product-line view", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:stash": {
+					...baseConfig.products["product:stash"],
+					durationMs: 1000,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:stash"] = {
+			id: "job:stash",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:stash",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation).toMatchObject({
+			kind: "stash",
+			productLines: [
+				{
+					inProgress: true,
+					isDefault: false,
+					productId: "product:stash",
+					progress: 0.5,
+					readyAtMs: 1000,
+					startAtMs: 0,
+				},
+			],
+		});
+	});
+
 	it("marks craft inputs complete without auto-starting the craft", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

@@ -19,6 +19,7 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	producerQueuedJobs: 1,
 	productId: "product:lumberjack-t1:log",
 	progress: 0.2,
+	remainingMs: 4000,
 	queueFull: true,
 	queuedJobs: 1,
 	queueSize: 1,
@@ -37,7 +38,6 @@ describe("ItemProducerProductLinesCard", () => {
 				lines={[
 					createLine(),
 				]}
-				nowMs={10_000}
 				pending={false}
 				onSetDefault={() => undefined}
 				onStart={() => undefined}
@@ -62,7 +62,6 @@ describe("ItemProducerProductLinesCard", () => {
 						requirementsReady: true,
 					}),
 				]}
-				nowMs={10_000}
 				pending={false}
 				onSetDefault={() => undefined}
 				onStart={() => undefined}
@@ -90,7 +89,6 @@ describe("ItemProducerProductLinesCard", () => {
 						startAtMs: undefined,
 					}),
 				]}
-				nowMs={0}
 				pending={false}
 				canSetDefault={false}
 				onSetDefault={() => undefined}

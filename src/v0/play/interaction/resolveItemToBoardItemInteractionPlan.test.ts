@@ -112,4 +112,57 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 			type: "producer-input",
 		});
 	});
+
+	it("does not show producer product passive requirements as droppable stored requirements", () => {
+		const plan = resolveItemToBoardItemInteractionPlan({
+			config: createEngineTestConfig(),
+			sourceItemId: "item:water",
+			targetItem: producerTarget([
+				productLine({
+					missingRequirementItemIds: [
+						"item:water",
+					],
+					productId: "product:watered",
+					requirements: [
+						{
+							capacity: 1,
+							itemId: "item:water",
+							quantity: 1,
+							stored: 0,
+							type: "passive",
+						},
+					],
+				}),
+			]),
+		});
+
+		expect(plan).toMatchObject({
+			type: "swap",
+		});
+	});
+
+	it("shows producer product stored requirements as droppable", () => {
+		const plan = resolveItemToBoardItemInteractionPlan({
+			config: createEngineTestConfig(),
+			sourceItemId: "item:water",
+			targetItem: producerTarget([
+				productLine({
+					productId: "product:watered",
+					requirements: [
+						{
+							capacity: 1,
+							itemId: "item:water",
+							quantity: 1,
+							stored: 0,
+							type: "stored",
+						},
+					],
+				}),
+			]),
+		});
+
+		expect(plan).toMatchObject({
+			type: "stored-requirement",
+		});
+	});
 });

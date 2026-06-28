@@ -1,8 +1,8 @@
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
-import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
+import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
+import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
 export namespace resolveBoardItemTapAction {
 	export interface Props {
@@ -31,19 +31,15 @@ export namespace resolveBoardItemTapAction {
 		  };
 }
 
-const requirementReady = (requirement: ActivationRequirementView) => {
+type ActivationView = NonNullable<BoardViewItem["activation"]>;
+
+const activationRequirementReady = (requirement: ActivationView["requirements"][number]) => {
 	if (requirement.type === "proximity") return requirement.satisfied;
 	return requirement.stored >= requirement.quantity;
 };
 
-const requirementsReady = (requirements: readonly ActivationRequirementView[] | undefined) =>
-	(requirements ?? []).every(requirementReady);
-
-const productLineCanStart = (line: ProducerProductLineView) =>
-	!line.queueFull &&
-	!line.blocked &&
-	line.requirementsReady &&
-	(line.inputsReady || line.inputsAvailable);
+const activationRequirementsReady = (activation: ActivationView) =>
+	activation.requirements.every(activationRequirementReady);
 
 const activationInputsReady = (inputs: readonly ActivationInputView[]) =>
 	inputs.every((input) => input.stored >= input.quantity);
@@ -52,12 +48,6 @@ const activationInputsFillable = (inputs: readonly ActivationInputView[]) =>
 	inputs.some((input) => {
 		const missingQuantity = input.quantity - input.stored;
 		return missingQuantity > 0 && Math.min(missingQuantity, input.available ?? 0) > 0;
-	});
-
-const craftInputFillable = (craft: NonNullable<BoardViewItem["craft"]>) =>
-	craft.inputs.some((input) => {
-		const delivered = craft.delivered[input.itemId] ?? 0;
-		return delivered < input.quantity && (input.available ?? 0) > 0;
 	});
 
 export const resolveBoardItemTapAction = ({
@@ -77,17 +67,16 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (liveCraft?.phase === "collecting_inputs") {
-		if (requirementsReady(liveCraft.requirements)) {
-			const inputsReady = liveCraft.inputProgress >= 1;
-			const inputsFillable = craftInputFillable(liveCraft);
+		const craftRunState = readCraftRunState({
+			craft: liveCraft,
+		});
 
-			if (inputsReady || inputsFillable) {
-				return {
-					type: "start-craft",
-					boardItemId: boardItem.id,
-					recipeId: liveCraft.id,
-				};
-			}
+		if (craftRunState.canRunAction) {
+			return {
+				type: "start-craft",
+				boardItemId: boardItem.id,
+				recipeId: liveCraft.id,
+			};
 		}
 
 		return {
@@ -98,7 +87,7 @@ export const resolveBoardItemTapAction = ({
 
 	if (boardItem.activation?.kind === "stash") {
 		if (
-			requirementsReady(boardItem.activation.requirements) &&
+			activationRequirementsReady(boardItem.activation) &&
 			(activationInputsReady(boardItem.activation.inputs) ||
 				activationInputsFillable(boardItem.activation.inputs))
 		) {
@@ -117,7 +106,12 @@ export const resolveBoardItemTapAction = ({
 
 	if (boardItem.activation?.kind === "producer") {
 		const defaultLine = boardItem.activation.productLines?.find((line) => line.isDefault);
-		if (defaultLine && productLineCanStart(defaultLine)) {
+		const runState = defaultLine
+			? readProducerProductLineRunState({
+					line: defaultLine,
+				})
+			: undefined;
+		if (runState?.canRunAction) {
 			return {
 				type: "activate",
 				activation: "single",

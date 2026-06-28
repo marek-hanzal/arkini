@@ -80,6 +80,43 @@ describe("isProducerStocked", () => {
 		).toBe(true);
 	});
 
+	it("does not treat default producer product line blocked by queue delivery as stocked", () => {
+		expect(
+			isProducerStocked(
+				producerActivation([
+					productLine({
+						isDefault: true,
+						queueBlockedReason: "delivery_blocked",
+					}),
+				]),
+			),
+		).toBe(false);
+	});
+
+	it("treats default producer product line with partial fill availability as stocked", () => {
+		expect(
+			isProducerStocked(
+				producerActivation([
+					productLine({
+						inputs: [
+							{
+								available: 1,
+								capacity: 2,
+								consume: true,
+								itemId: "item:twig",
+								quantity: 2,
+								stored: 0,
+							},
+						],
+						inputsAvailable: false,
+						inputsReady: false,
+						isDefault: true,
+					}),
+				]),
+			),
+		).toBe(true);
+	});
+
 	it("treats stash inputs with auto-fill availability as stocked", () => {
 		expect(
 			isProducerStocked({

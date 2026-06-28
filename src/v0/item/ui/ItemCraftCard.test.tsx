@@ -42,4 +42,37 @@ describe("ItemCraftCard", () => {
 		expect(html).toContain("Delivery blocked");
 		expect(html).not.toContain("Running");
 	});
+
+	it("uses shared craft run state for available auto-fill inputs", () => {
+		const html = renderToStaticMarkup(
+			<ItemCraftCard
+				craft={createCraft({
+					acceptedInputItemIds: [
+						"item:twig",
+					],
+					canAcceptInputs: true,
+					inputProgress: 0,
+					inputs: [
+						{
+							available: 1,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+					phase: "collecting_inputs",
+					progress: 0,
+					readyAtMs: undefined,
+					startAtMs: undefined,
+					timeProgress: 0,
+				})}
+				items={{}}
+				pending={false}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Auto-fill inputs</button>");
+		expect(html).not.toContain('disabled=""');
+	});
 });

@@ -1,6 +1,8 @@
 import { type FC, useMemo } from "react";
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { ItemStashDropsCard } from "~/v0/item/ui/ItemStashDropsCard";
+import { readBoardItemStoreState } from "~/v0/item/logic/readBoardItemStoreState";
+import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
 import { ItemRequirementRulesCard } from "~/v0/item/ui/ItemRequirementRulesCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
@@ -40,6 +42,26 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		craft: boardItem?.craft,
 		nowMs,
 	});
+	const liveProductLines = useMemo(
+		() =>
+			boardItem?.activation?.productLines?.map((line) =>
+				readLiveProducerProductLineView({
+					line,
+					nowMs,
+				}),
+			) ?? [],
+		[
+			boardItem?.activation?.productLines,
+			nowMs,
+		],
+	);
+	const storeState =
+		boardItem && item
+			? readBoardItemStoreState({
+					boardItem,
+					item,
+				})
+			: undefined;
 	const actionError = itemAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 	const craftHasRules = Boolean(liveCraft?.requirements?.length);
@@ -154,7 +176,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				) : null}
 				<ItemSummaryCard
 					item={item}
-					storeDisabled={itemAction.isPending || item.storage === "board"}
+					storeDisabled={itemAction.isPending || storeState?.canStore !== true}
 					onStore={storeBoardItem}
 				/>
 				<ItemGeneratedEffectsCard effects={item.generatedEffects} />
@@ -191,13 +213,12 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						}
 					/>
 				) : null}
-				{boardItem.activation?.productLines?.length ? (
+				{liveProductLines.length ? (
 					<ItemProducerProductLinesCard
 						items={items}
-						lines={boardItem.activation.productLines}
-						nowMs={nowMs}
+						lines={liveProductLines}
 						pending={itemAction.isPending}
-						canSetDefault={boardItem.activation.kind === "producer"}
+						canSetDefault={boardItem.activation?.kind === "producer"}
 						onSetDefault={setDefaultProductLine}
 						onStart={startProductLine}
 						onWithdrawInput={withdrawProductLineInput}

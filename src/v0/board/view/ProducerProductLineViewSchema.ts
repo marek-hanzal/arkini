@@ -16,6 +16,12 @@ export const ProducerProductLineViewSchema = z.object({
 	blocked: z.boolean(),
 	blockReasonEffectIds: z.array(IdSchema),
 	deliveryBlocked: z.boolean().optional(),
+	queueBlockedReason: z
+		.enum([
+			"delivery_blocked",
+			"paused",
+		])
+		.optional(),
 	queueSize: z.number().int().positive(),
 	queuedJobs: z.number().int().nonnegative(),
 	inputs: z.array(ActivationInputViewSchema),

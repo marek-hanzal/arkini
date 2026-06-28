@@ -70,6 +70,13 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 	}).filter((facts) => facts.producerItemInstanceId === targetItemInstanceId);
 	const producerJobs = producerJobFacts.map((facts) => facts.job);
 	const producerQueuedJobs = producerJobs.length;
+	const producerQueueBlockedReason = producerJobFacts.some(
+		(facts) => facts.status === "delivery_blocked",
+	)
+		? "delivery_blocked"
+		: producerJobFacts.some((facts) => facts.status === "paused")
+			? "paused"
+			: undefined;
 	const firstProducerJobFacts = producerJobFacts.find((facts) => facts.queueIndex === 0);
 	const firstProducerJob = firstProducerJobFacts?.job;
 	const queueFull = producerQueuedJobs >= maxQueueSize;
@@ -238,6 +245,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				producerQueuedJobs,
 				pausedAtMs: activeJob?.pausedAtMs,
 				progress,
+				queueBlockedReason: producerQueueBlockedReason,
 				queueFull,
 				queueSize: maxQueueSize,
 				queuedJobs: jobs.length,

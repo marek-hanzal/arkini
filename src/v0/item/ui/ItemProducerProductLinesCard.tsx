@@ -5,7 +5,7 @@ import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLin
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import { ItemInlineAssetGroup } from "~/v0/item/ui/ItemInlineAssetGroup";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
+import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiSection } from "~/v0/ui/UiSection";
@@ -14,7 +14,6 @@ export namespace ItemProducerProductLinesCard {
 	export interface Props {
 		items: ItemCatalogView;
 		lines: readonly ProducerProductLineView[];
-		nowMs: number;
 		pending: boolean;
 		canSetDefault?: boolean;
 		onSetDefault(productId: string): void;
@@ -36,32 +35,8 @@ const readRequirementReady = (requirement: ActivationRequirementView) =>
 const readInputFillableQuantity = (input: ProducerProductLineView["inputs"][number]) =>
 	Math.min(Math.max(0, input.quantity - input.stored), input.available ?? 0);
 
-const readInputsPartiallyAvailable = (line: ProducerProductLineView) =>
-	!line.inputsReady && line.inputs.some((input) => readInputFillableQuantity(input) > 0);
-
 const readHindrancesMultiplier = (hindrances: readonly ActivationHindranceView[]) =>
 	hindrances.reduce((total, hindrance) => total * hindrance.durationMultiplier, 1);
-
-const readRunButtonLabel = ({
-	canRunAction,
-	inputsPartiallyAvailable,
-	line,
-}: {
-	line: ProducerProductLineView;
-	inputsPartiallyAvailable: boolean;
-	canRunAction: boolean;
-}) => {
-	if (line.pausedAtMs !== undefined) return "Paused";
-	if (line.deliveryBlocked) return "Delivery blocked";
-	if (line.queueFull) return "Queue full";
-	if (line.blocked) return "Blocked by effect";
-	if (!line.requirementsReady) return "Requirements missing";
-	if (!canRunAction) return "Feed items by drag";
-	if (line.inputsReady) return "Start";
-	if (line.inputsAvailable) return "Auto-fill & start";
-	if (inputsPartiallyAvailable) return "Partial fill";
-	return "Feed items by drag";
-};
 
 const renderRequirementAsset = (
 	requirement: ActivationRequirementView,
@@ -172,7 +147,6 @@ const readHindranceMeta = (hindrance: ActivationHindranceView, items: ItemCatalo
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
 	items,
 	lines,
-	nowMs,
 	pending,
 	canSetDefault = true,
 	onSetDefault,
@@ -187,26 +161,13 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 			title="Product lines"
 		>
 			<div className="grid gap-2.5">
-				{lines.map((baseLine) => {
-					const line = readLiveProducerProductLineView({
-						line: baseLine,
-						nowMs,
-					});
+				{lines.map((line) => {
 					const activeHindrances = line.hindrances ?? [];
 					const hindranceMultiplier = readHindrancesMultiplier(activeHindrances);
-					const inputsPartiallyAvailable = readInputsPartiallyAvailable(line);
-					const canRunAction =
-						(line.inputsReady || line.inputsAvailable || inputsPartiallyAvailable) &&
-						line.requirementsReady &&
-						!line.deliveryBlocked &&
-						!line.blocked &&
-						!line.queueFull;
-					const progressLabel = line.pausedAtMs !== undefined ? "Paused" : "Running";
-					const runButtonLabel = readRunButtonLabel({
-						canRunAction,
-						inputsPartiallyAvailable,
+					const runState = readProducerProductLineRunState({
 						line,
 					});
+					const progressLabel = line.pausedAtMs !== undefined ? "Paused" : "Running";
 
 					return (
 						<div
@@ -232,7 +193,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 															? "input ready"
 															: line.inputsAvailable
 																? "auto-fill ready"
-																: inputsPartiallyAvailable
+																: runState.inputsPartiallyAvailable
 																	? "partial fill ready"
 																	: "needs input"
 													}`
@@ -379,12 +340,12 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								}
 							>
 								<UiButton
-									disabled={!canRunAction || pending}
-									tone={canRunAction ? "primary" : "secondary"}
+									disabled={!runState.canRunAction || pending}
+									tone={runState.canRunAction ? "primary" : "secondary"}
 									className={canSetDefault ? "col-span-2" : undefined}
 									onClick={() => onStart(line.productId)}
 								>
-									{runButtonLabel}
+									{runState.label}
 								</UiButton>
 								{canSetDefault ? (
 									<UiButton

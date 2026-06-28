@@ -1,5 +1,6 @@
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
+import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 
 const isRequirementReady = (requirement: ActivationRequirementView) =>
 	requirement.type === "proximity"
@@ -11,12 +12,11 @@ export function isProducerStocked(activation: ActivationView | undefined) {
 
 	if (activation.kind === "producer") {
 		const defaultLine = activation.productLines?.find((line) => line.isDefault);
-		return Boolean(
-			defaultLine &&
-				(defaultLine.inputsReady || defaultLine.inputsAvailable) &&
-				defaultLine.requirementsReady &&
-				!defaultLine.queueFull,
-		);
+		return defaultLine
+			? readProducerProductLineRunState({
+					line: defaultLine,
+				}).canRunAction
+			: false;
 	}
 
 	return (

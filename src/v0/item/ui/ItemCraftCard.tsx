@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
+import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import { craftStatusLabel } from "~/v0/item/logic/craftStatusLabel";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
@@ -25,8 +26,9 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 	onStart,
 	onWithdrawInput,
 }) => {
-	const canStart =
-		craft.phase === "collecting_inputs" && craft.inputProgress >= 1 && !craft.complete;
+	const runState = readCraftRunState({
+		craft,
+	});
 	const resultItem = items[craft.resultItemId];
 
 	return (
@@ -116,20 +118,12 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 				})}
 			</div>
 			<UiButton
-				disabled={!canStart || pending}
-				tone={canStart ? "primary" : "secondary"}
+				disabled={!runState.canRunAction || pending}
+				tone={runState.canRunAction ? "primary" : "secondary"}
 				className="mt-3"
 				onClick={onStart}
 			>
-				{craft.phase === "paused"
-					? "Paused"
-					: craft.phase === "delivery_blocked"
-						? "Delivery blocked"
-						: craft.phase !== "collecting_inputs"
-							? "Running"
-							: canStart
-								? "Start craft"
-								: "Auto-fill or drag inputs"}
+				{runState.label}
 			</UiButton>
 		</UiSection>
 	);

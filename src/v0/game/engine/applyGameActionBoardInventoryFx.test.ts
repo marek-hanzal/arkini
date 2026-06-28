@@ -106,6 +106,68 @@ describe("applyGameActionFx BoardInventory", () => {
 		});
 	});
 
+	it("swaps a board producer with a running producer job", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		const result = runAction({
+			action: {
+				sourceBoardItemId: "item-instance:1",
+				targetBoardItemId: "item-instance:2",
+				type: "board.items.swap",
+			},
+			config,
+			nowMs: 200,
+			save: started.save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:producer",
+			x: 1,
+			y: 0,
+		});
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:rock",
+			x: 0,
+			y: 0,
+		});
+		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+		});
+	});
+
 	it("places one inventory item on a board cell", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

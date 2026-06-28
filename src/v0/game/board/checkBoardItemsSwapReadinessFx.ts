@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { checkBoardItemIdleFx } from "~/v0/game/board/checkBoardItemIdleFx";
+import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import type { GameActionBoardItemsSwapSchema } from "~/v0/game/action/GameActionBoardItemsSwapSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -28,16 +28,31 @@ export const checkBoardItemsSwapReadinessFx = Effect.fn("checkBoardItemsSwapRead
 			);
 		}
 
-		yield* checkBoardItemIdleFx({
+		const sourceStatus = readBoardItemRuntimeStateStatus({
 			itemInstanceId: source.id,
-			message: "Board item has a running job and cannot be swapped.",
 			save,
 		});
-		yield* checkBoardItemIdleFx({
+		if (sourceStatus.craftBusy) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"item_busy",
+					"Board item has a running craft job and cannot be swapped.",
+				),
+			);
+		}
+
+		const targetStatus = readBoardItemRuntimeStateStatus({
 			itemInstanceId: target.id,
-			message: "Board item has a running job and cannot be swapped.",
 			save,
 		});
+		if (targetStatus.craftBusy) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"item_busy",
+					"Board item has a running craft job and cannot be swapped.",
+				),
+			);
+		}
 
 		return {
 			source,

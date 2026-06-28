@@ -88,7 +88,10 @@ export const useBoardTileEngineModel = ({
 	const blockedCellKeys = useMemo(
 		() =>
 			Object.entries(board.byCellKey)
-				.filter(([, boardItem]) => boardItem.activation?.deliveryBlocked)
+				.filter(
+					([, boardItem]) =>
+						boardItem.activation?.deliveryBlocked || boardItem.craft?.deliveryBlocked,
+				)
 				.map(([key]) => key),
 		[
 			board.byCellKey,

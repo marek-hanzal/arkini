@@ -317,6 +317,27 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
+	it("opens detail for blocked craft delivery instead of claiming it", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					craft: craft({
+						complete: false,
+						deliveryBlocked: true,
+						phase: "delivery_blocked",
+						progress: 0,
+						readyAtMs: 1000,
+						timeProgress: 1,
+					}),
+				}),
+				nowMs: 1500,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-detail",
+		});
+	});
+
 	it("opens detail for passive items", () => {
 		expect(
 			resolveBoardItemTapAction({

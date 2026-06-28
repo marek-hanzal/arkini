@@ -10,6 +10,7 @@ import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/rea
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 import { readRuntimeLootDropViewsFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromGameConfig";
 import { readRuntimeProducerProductLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerProductLineViewsFromGameSave";
+import { readProducerDeliveryBlocked } from "~/v0/game/producer/readProducerDeliveryBlocked";
 
 export namespace readRuntimeStashActivationViewFromGameSave {
 	export interface Props {
@@ -72,8 +73,13 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 		save,
 		targetItemInstanceId: boardItem.id,
 	});
+	const deliveryBlocked = readProducerDeliveryBlocked({
+		producerItemInstanceId: boardItem.id,
+		save,
+	});
 
 	return {
+		deliveryBlocked,
 		drops: readRuntimeLootDropViewsFromGameConfig({
 			output: effectiveProductLine.lootPlan.baseOutput,
 		}),

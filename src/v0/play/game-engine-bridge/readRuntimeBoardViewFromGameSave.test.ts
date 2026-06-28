@@ -508,6 +508,63 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
+	it("marks blocked craft delivery without exposing it as ready", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					assetId: "asset:test",
+					description: "Craft table",
+					maxStackSize: 1,
+					name: "Craft Table",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:craft"] = {
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2000,
+			},
+			id: "job:craft",
+			readyAtMs: 1000,
+			recipeId: "item:craft-table",
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 1500,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.craft).toMatchObject({
+			complete: false,
+			deliveryBlocked: true,
+			phase: "delivery_blocked",
+			progress: 0,
+			timeProgress: 1,
+		});
+	});
+
 	it("shows proximity-adjusted craft duration in the runtime view", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -749,6 +806,54 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					progress: 0.5,
 					readyAtMs: 1000,
 					startAtMs: 0,
+				},
+			],
+		});
+	});
+
+	it("marks stash activation danger when delivery is blocked", () => {
+		const config = createEngineTestConfig({
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerJobs["job:stash-blocked"] = {
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2000,
+			},
+			id: "job:stash-blocked",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:stash",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 1500,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation).toMatchObject({
+			deliveryBlocked: true,
+			kind: "stash",
+			productLines: [
+				{
+					deliveryBlocked: true,
+					productId: "product:stash",
+					progress: undefined,
 				},
 			],
 		});

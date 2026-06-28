@@ -12,6 +12,17 @@ export const readLiveCraftView = ({ craft, nowMs }: readLiveCraftView.Props) => 
 	if (!craft) return undefined;
 	if (craft.phase === "collecting_inputs" || craft.readyAtMs === undefined) return craft;
 
+	if (craft.deliveryBlocked) {
+		return {
+			...craft,
+			phase: "delivery_blocked",
+			complete: false,
+			progress: 0,
+			canAcceptInputs: false,
+			acceptedInputItemIds: [],
+		} satisfies CraftProgressView;
+	}
+
 	const clockNowMs = craft.pausedAtMs ?? nowMs;
 	const timeProgress =
 		craft.startAtMs === undefined

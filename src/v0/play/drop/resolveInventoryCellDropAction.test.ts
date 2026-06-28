@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import { resolveInventoryCellDropAction } from "~/v0/play/drop/resolveInventoryCellDropAction";
@@ -70,6 +71,67 @@ describe("resolveInventoryCellDropAction", () => {
 		});
 	});
 
+	it("uses the live target cell item instead of a stale empty target snapshot", () => {
+		expect(
+			resolveInventoryCellDropAction({
+				board,
+				config,
+				inventory,
+				source: inventorySource(0),
+				target: {
+					kind: "cell",
+					x: 2,
+					y: 1,
+				},
+			}),
+		).toEqual({
+			type: "apply-inventory-item-to-board-item",
+			input: {
+				sourceSlotIndex: 0,
+				targetBoardItemId: "merge-target",
+			},
+		});
+	});
+
+	it("uses the live inventory stack item instead of a stale drag snapshot", () => {
+		const liveInventory = rebuildInventoryView([
+			{
+				slotIndex: 0,
+				stack: {
+					id: "stack-0",
+					itemId: "item:water",
+					quantity: 1,
+				},
+			},
+		]);
+
+		expect(
+			resolveInventoryCellDropAction({
+				board,
+				config: createEngineMergeTestConfig(),
+				inventory: liveInventory,
+				source: {
+					kind: "inventory",
+					slotIndex: 0,
+					itemId: "item:twig",
+					slot: liveInventory.bySlotIndex["0"]!,
+				},
+				target: {
+					kind: "cell",
+					x: 2,
+					y: 1,
+					boardItemId: "merge-target",
+				},
+			}),
+		).toEqual({
+			type: "apply-inventory-item-to-board-item",
+			input: {
+				sourceSlotIndex: 0,
+				targetBoardItemId: "merge-target",
+			},
+		});
+	});
+
 	it("rejects occupied board cells that cannot accept the inventory item", () => {
 		expect(
 			resolveInventoryCellDropAction({
@@ -115,7 +177,7 @@ describe("resolveInventoryCellDropAction", () => {
 		});
 	});
 
-	it("places inventory items into empty board cells", () => {
+	it("places inventory items into live empty board cells", () => {
 		expect(
 			resolveInventoryCellDropAction({
 				board,
@@ -124,7 +186,7 @@ describe("resolveInventoryCellDropAction", () => {
 				source: inventorySource(0),
 				target: {
 					kind: "cell",
-					x: 2,
+					x: 4,
 					y: 1,
 				},
 			}),
@@ -132,7 +194,7 @@ describe("resolveInventoryCellDropAction", () => {
 			type: "place-inventory-item",
 			input: {
 				slotIndex: 0,
-				x: 2,
+				x: 4,
 				y: 1,
 			},
 		});

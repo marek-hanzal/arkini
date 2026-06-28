@@ -11,6 +11,7 @@ import {
 	useGameBoardFirstEmptyCell,
 	useGameInventoryView,
 	useGameRuntimeDropActions,
+	useGameRuntimeSelector,
 	useGameRuntimeStore,
 } from "~/v0/play/runtime";
 import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
@@ -28,6 +29,7 @@ export namespace useInventoryTileEngineModel {
 	export interface Result {
 		slots: TileEngine.Slot<InventorySurface.SlotData>[];
 		tiles: TileEngine.Tile<InventorySurface.TileData>[];
+		columns: number;
 		drag: TileEngine.DragConfig<
 			InventorySurface.TileData,
 			InventorySurface.SlotData,
@@ -43,6 +45,7 @@ export const useInventoryTileEngineModel = ({
 }: useInventoryTileEngineModel.Props): useInventoryTileEngineModel.Result => {
 	const firstEmptyCell = useGameBoardFirstEmptyCell();
 	const inventory = useGameInventoryView();
+	const columns = useGameRuntimeSelector((state) => state.runtime.config.game.board.width);
 	const actions = useGameRuntimeDropActions();
 	const runtimeStore = useGameRuntimeStore();
 
@@ -197,6 +200,7 @@ export const useInventoryTileEngineModel = ({
 	);
 
 	return {
+		columns,
 		drag,
 		slots,
 		tiles,

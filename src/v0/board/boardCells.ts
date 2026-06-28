@@ -1,16 +1,26 @@
-import { boardColumns } from "~/v0/board/boardColumns";
-import { boardRows } from "~/v0/board/boardRows";
 import { cellKey } from "~/v0/board/cellKey";
 
-export const boardCells = Array.from(
-	{
-		length: boardColumns * boardRows,
-	},
-	(_, index) => ({
-		x: index % boardColumns,
-		y: Math.floor(index / boardColumns),
-		key: cellKey(index % boardColumns, Math.floor(index / boardColumns)),
-	}),
-);
+export interface BoardCellView {
+	x: number;
+	y: number;
+	key: string;
+}
 
-export type BoardCellView = (typeof boardCells)[number];
+export namespace readBoardCells {
+	export interface Props {
+		width: number;
+		height: number;
+	}
+}
+
+export const readBoardCells = ({ width, height }: readBoardCells.Props): BoardCellView[] =>
+	Array.from(
+		{
+			length: width * height,
+		},
+		(_, index) => ({
+			x: index % width,
+			y: Math.floor(index / width),
+			key: cellKey(index % width, Math.floor(index / width)),
+		}),
+	);

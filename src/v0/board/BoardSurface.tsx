@@ -1,8 +1,7 @@
 import { memo, type ReactNode, useCallback, useMemo, useRef } from "react";
 import { BoardCell } from "~/v0/board/BoardCell";
 import type { BoardSurface as BoardSurfaceType } from "~/v0/board/BoardSurface.types";
-import { boardCells, type BoardCellView } from "~/v0/board/boardCells";
-import { boardColumns } from "~/v0/board/boardColumns";
+import type { BoardCellView } from "~/v0/board/boardCells";
 import { cellKey } from "~/v0/board/cellKey";
 import { renderBoardTile } from "~/v0/board/renderBoardTile";
 import { useBoardTileEngineModel } from "~/v0/board/useBoardTileEngineModel";
@@ -18,13 +17,6 @@ const boardCellFeedbackVariants = [
 	"danger",
 ] as const;
 
-const boardSlots = boardCells.map((cell) => ({
-	id: cell.key,
-	dropId: `board-cell:${cell.key}`,
-	renderKey: cell.key,
-	data: cell,
-})) satisfies readonly TileEngineType.Slot<BoardCellView>[];
-
 export const BoardSurface = memo(
 	({
 		feedback,
@@ -34,7 +26,7 @@ export const BoardSurface = memo(
 		disabled = false,
 	}: BoardSurfaceType.Props) => {
 		const boardDragBoundsRef = useRef<HTMLDivElement | null>(null);
-		const { blockedCellKeys, drag, tiles } = useBoardTileEngineModel({
+		const { blockedCellKeys, columns, drag, slots, tiles } = useBoardTileEngineModel({
 			feedback,
 			onOpenInventoryPlacementTarget,
 			onOpenItem,
@@ -81,8 +73,8 @@ export const BoardSurface = memo(
 				<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
 					id="board"
 					rootRef={boardDragBoundsRef}
-					columns={boardColumns}
-					slots={boardSlots}
+					columns={columns}
+					slots={slots}
 					tiles={tiles}
 					gapPx={1}
 					className="bg-ak-board"

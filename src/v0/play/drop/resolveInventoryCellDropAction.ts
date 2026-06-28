@@ -68,6 +68,7 @@ export const resolveInventoryCellDropAction = ({
 	source,
 	target,
 }: resolveInventoryCellDropAction.Props): InventoryCellDropAction => {
+	const targetCellKey = cellKey(target.x, target.y);
 	const sourceSlot = inventory.bySlotIndex[String(source.slotIndex)];
 	if (!sourceSlot?.stack) {
 		return {
@@ -79,28 +80,18 @@ export const resolveInventoryCellDropAction = ({
 		};
 	}
 
-	if (target.boardItemId) {
-		const targetItem = board.byId[target.boardItemId];
-		if (!targetItem) {
-			return {
-				feedback: {
-					kind: "board-cell",
-					cellKey: cellKey(target.x, target.y),
-				},
-				type: "reject",
-			};
-		}
-
+	const targetItem = board.byCellKey[targetCellKey];
+	if (targetItem) {
 		const plan = resolveItemToBoardItemInteractionPlan({
 			config,
-			sourceItemId: source.itemId,
+			sourceItemId: sourceSlot.stack.itemId,
 			targetItem,
 		});
 		if (plan.type === "reject" || plan.type === "swap") {
 			return {
 				feedback: {
 					kind: "board-cell",
-					cellKey: cellKey(target.x, target.y),
+					cellKey: targetCellKey,
 				},
 				type: "reject",
 			};
@@ -111,12 +102,12 @@ export const resolveInventoryCellDropAction = ({
 				plan.type === "merge" || plan.type === "producer-input"
 					? undefined
 					: {
-							cellKey: cellKey(target.x, target.y),
+							cellKey: targetCellKey,
 							variant: plan.feedbackVariant,
 						},
 			input: {
 				sourceSlotIndex: source.slotIndex,
-				targetBoardItemId: target.boardItemId,
+				targetBoardItemId: targetItem.id,
 			},
 			type: "apply-inventory-item-to-board-item",
 		};
@@ -125,14 +116,14 @@ export const resolveInventoryCellDropAction = ({
 	if (
 		!isItemStorageAllowed({
 			config,
-			itemId: source.itemId,
+			itemId: sourceSlot.stack.itemId,
 			location: "board",
 		})
 	) {
 		return {
 			feedback: {
 				kind: "board-cell",
-				cellKey: cellKey(target.x, target.y),
+				cellKey: targetCellKey,
 			},
 			type: "reject",
 		};

@@ -8,6 +8,46 @@ const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));
 
 describe("readRuntimeBoardViewFromGameSave", () => {
+	it("derives first empty cell from the runtime config board dimensions", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		expect(
+			readRuntimeBoardViewFromGameSave({
+				config,
+				nowMs: 0,
+				save,
+			}).firstEmptyCell,
+		).toBeUndefined();
+	});
+
 	it("marks producer product lines blocked until stored requirements are stocked", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

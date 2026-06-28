@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardCellView } from "~/v0/board/boardCells";
+import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
+import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
@@ -14,18 +15,7 @@ const boardItem = (props: Pick<BoardViewItem, "id" | "itemId" | "x" | "y">): Boa
 	state: {},
 });
 
-const boardView = (items: readonly BoardViewItem[]): BoardView => ({
-	items: [
-		...items,
-	],
-	byId: Object.fromEntries(
-		items.map((item) => [
-			item.id,
-			item,
-		]),
-	),
-	byCellKey: {},
-});
+const boardView = rebuildBoardView;
 
 const context = (
 	props: Pick<
@@ -39,6 +29,7 @@ const context = (
 });
 
 const config = createEngineTestConfig();
+const emptyInventory = rebuildInventoryView([]);
 
 describe("resolveBoardDropFeedback", () => {
 	it("marks empty board cells as empty feedback", () => {
@@ -52,6 +43,7 @@ describe("resolveBoardDropFeedback", () => {
 		expect(
 			resolveBoardDropFeedback({
 				config,
+				inventory: emptyInventory,
 				board: boardView([
 					source,
 				]),
@@ -92,6 +84,7 @@ describe("resolveBoardDropFeedback", () => {
 		expect(
 			resolveBoardDropFeedback({
 				config,
+				inventory: emptyInventory,
 				board: boardView([
 					source,
 					target,
@@ -156,6 +149,7 @@ describe("resolveBoardDropFeedback", () => {
 		expect(
 			resolveBoardDropFeedback({
 				config,
+				inventory: emptyInventory,
 				board: boardView([
 					source,
 					target,
@@ -245,6 +239,7 @@ describe("resolveBoardDropFeedback", () => {
 		expect(
 			resolveBoardDropFeedback({
 				config,
+				inventory: emptyInventory,
 				board: boardView([
 					source,
 					target,
@@ -295,6 +290,7 @@ describe("resolveBoardDropFeedback", () => {
 		expect(
 			resolveBoardDropFeedback({
 				config,
+				inventory: emptyInventory,
 				board: boardView([
 					source,
 					target,
@@ -335,6 +331,7 @@ describe("resolveBoardDropFeedback", () => {
 		expect(
 			resolveBoardDropFeedback({
 				config,
+				inventory: emptyInventory,
 				board: boardView([
 					target,
 				]),

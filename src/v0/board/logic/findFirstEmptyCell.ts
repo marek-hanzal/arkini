@@ -1,9 +1,22 @@
-import type { BoardView } from "~/v0/board/view/BoardViewSchema";
+import type { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
+import { cellKey } from "~/v0/board/cellKey";
 
-export function findFirstEmptyCell(byCellKey: BoardView["byCellKey"]): BoardView["firstEmptyCell"] {
-	for (let y = 0; y < 9; y++) {
-		for (let x = 0; x < 7; x++) {
-			if (!byCellKey[`${x}:${y}`]) {
+export namespace findFirstEmptyCell {
+	export interface Props {
+		height: number;
+		occupiedCellKeys: ReadonlySet<string>;
+		width: number;
+	}
+}
+
+export function findFirstEmptyCell({
+	height,
+	occupiedCellKeys,
+	width,
+}: findFirstEmptyCell.Props): BoardCellSchema.Type | undefined {
+	for (let y = 0; y < height; y += 1) {
+		for (let x = 0; x < width; x += 1) {
+			if (!occupiedCellKeys.has(cellKey(x, y))) {
 				return {
 					x,
 					y,

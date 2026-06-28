@@ -16,19 +16,17 @@ export namespace readProximityRequirementMatch {
 const readGridDistance = (left: GameSaveBoardItem, right: GameSaveBoardItem) =>
 	Math.max(Math.abs(left.x - right.x), Math.abs(left.y - right.y));
 
-export namespace readProximityRequirementMatches {
-	export interface Props {
-		itemIds: readonly string[];
-		save: GameSave;
-		targetItemInstanceId: string;
-	}
+interface ReadProximityRequirementMatchesProps {
+	itemIds: readonly string[];
+	save: GameSave;
+	targetItemInstanceId: string;
 }
 
-export const readProximityRequirementMatches = ({
+const readProximityRequirementMatches = ({
 	itemIds,
 	save,
 	targetItemInstanceId,
-}: readProximityRequirementMatches.Props): ProximityRequirementMatch[] => {
+}: ReadProximityRequirementMatchesProps): ProximityRequirementMatch[] => {
 	const target = save.board.items[targetItemInstanceId];
 	if (!target) return [];
 

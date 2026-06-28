@@ -40,13 +40,8 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 			...product.requirementIds,
 		],
 	});
-	const hindrances = [
-		...(stash.hinderedBy ?? []),
-		...(product.hinderedBy ?? []),
-	];
 	const effectiveProductLine = readEffectiveProducerProductLine({
 		baseDurationMs: readProducerProductDurationMs({
-			hindrances,
 			product,
 			producerItemInstanceId: boardItem.id,
 			requirements,
@@ -65,7 +60,6 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 		config,
 		maxQueueSize: stash.maxQueueSize,
 		nowMs,
-		producerHinderedBy: stash.hinderedBy ?? [],
 		producerId: boardItem.itemId,
 		producerItemId: boardItem.itemId,
 		producerRequirementIds: stash.requirementIds,

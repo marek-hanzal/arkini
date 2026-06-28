@@ -75,14 +75,8 @@ export const readProducerJobEffectiveProductLineFx = Effect.fn(
 		...producerRequirements,
 		...productRequirements,
 	];
-	const hindrances = [
-		...(producerDefinition.hinderedBy ?? []),
-		...(product.hinderedBy ?? []),
-	];
-
 	return readEffectiveProducerProductLine({
 		baseDurationMs: readProducerProductDurationMs({
-			hindrances,
 			product,
 			producerItemInstanceId,
 			requirements,

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ActivationHindranceViewSchema } from "~/v0/board/view/ActivationHindranceViewSchema";
 import { ActivationInputViewSchema } from "~/v0/board/view/ActivationInputViewSchema";
 import { ActivationRequirementViewSchema } from "~/v0/board/view/ActivationRequirementViewSchema";
 
@@ -42,7 +41,7 @@ export const ProducerProductLineViewSchema = z.object({
 	inputItemIds: z.array(IdSchema),
 	requirementItemIds: z.array(IdSchema),
 	requirements: z.array(ActivationRequirementViewSchema).optional(),
-	hindrances: z.array(ActivationHindranceViewSchema).optional(),
+	effectDurationMultiplier: z.number().min(1).optional(),
 	outputs: z.array(ProducerProductLineOutputViewSchema).optional(),
 });
 

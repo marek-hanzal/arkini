@@ -287,7 +287,7 @@ Examples:
 
 A building tier progression is a physical replacement of one concrete building/item tier with another. The usual model is a blueprint/craft recipe that consumes the previous tier plus materials and produces the next tier.
 
-Global/world-wide upgrade effects are intentionally not part of gameplay. If a farm should become better, define `farm-t2`. If a producer needs different duration, inputs, requirements, hindrances, queue size, or loot, define those rules on the concrete higher-tier producer/product.
+Global/world-wide upgrade effects are intentionally not part of gameplay. If a farm should become better, define `farm-t2`. If a producer needs different duration, inputs, requirements, queue size, effects, or loot, define those rules on the concrete higher-tier producer/product/item set.
 
 ## 5. Time model
 
@@ -663,7 +663,7 @@ Each producer definition has `maxQueueSize`. This is a per-producer-instance lim
 
 Jobs for one producer instance run sequentially. Starting a second job while the first is running queues it after the previous job's completion time instead of running it in parallel. Completion is FIFO, including blocked delivery: a later queued job cannot complete ahead of an earlier unresolved delivery just because its timestamp is due. Queues are not tiny wormholes for skipping failed logistics.
 
-Product duration may be changed by concrete product tier data, requirements, hindrances, and proximity duration multipliers. The computed duration is captured when the job starts. Moving a resource after job start does not retroactively change that running job.
+Product duration may be changed by concrete product tier data, requirements, local/global duration effects, and proximity duration multipliers. The computed duration is captured when the job starts. Moving a resource after job start does not retroactively change that running job.
 
 Because inventory is passive, producer jobs require the producer item to be on the board. A producer item with a running job cannot be moved into inventory by normal storage.
 
@@ -679,9 +679,9 @@ Runtime effects are product-line mutators and item-creation rules. They do not p
 
 Passive effects come from items via `passiveEffectIds`. Each effect definition decides where its source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Local effects must be board-sourced because distance needs a board cell; config validation rejects local effects that claim inventory/both source scope. Inventory-sourced effects are for global hard rules such as path locks. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
 
-Effects currently operate on product-line visibility, start blocking, duration, output plan evaluation, and item creation blocking. They can reveal or hide lines, block starts, add or multiply duration, append or replace inline output, add chance item drops, adjust the chance that base output is rolled, and block creation of matching items. They intentionally do not mutate config, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
+Effects currently operate on product-line visibility, start blocking, duration, proximity duration penalties, output plan evaluation, and item creation blocking. They can reveal or hide lines, block starts, add or multiply duration, append or replace inline output, add chance item drops, adjust the chance that base output is rolled, and block creation of matching items. They intentionally do not mutate config, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
 
-Effect conflict rules are simple: hide beats reveal, any product-line block blocks start, and any matching `item.blockCreate` blocks creation while the effect applies. Numeric duration and loot chance operations are aggregated deterministically after effects are sorted by scope and activation/source order.
+Effect conflict rules are simple: hide beats reveal, any product-line block blocks start, and any matching `item.blockCreate` blocks creation while the effect applies. Numeric duration, proximity duration penalty, and loot chance operations are aggregated deterministically after effects are sorted by scope and activation/source order.
 
 ### Board max count
 
@@ -765,7 +765,7 @@ A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`
 
 Stored requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
 
-Production hindrances are negative effects on producers or product lines. They do not prevent production from starting. Every active hindrance instance applies a duration penalty, and active penalties stack multiplicatively. Passive hindrances react to item presence in a configured scope. Proximity hindrances react to every matching nearby board item; closer hindrances are worse. Example: each pollution tile within radius `2` near a farm slows grain production without making the farm invalid.
+Negative production pressure is authored through the effect system. A passive item can provide a local `duration.proximityPenalty` effect that targets producer/product lines; it slows production without blocking start. Every active source item applies its own multiplier, multiple sources stack multiplicatively, and closer local sources apply stronger penalties. Example: each Pollution tile carries passive local effects that slow nearby farm/brewery/winery product lines without making those producers invalid.
 
 
 ### 10.8 Producer input storage and auto-fill
@@ -1003,7 +1003,7 @@ Progression to a better building is modeled as a concrete physical tier:
 1. The player acquires a target-specific blueprint or craft target.
 2. The craft recipe consumes required materials and usually the previous building tier.
 3. Completion replaces the old tier with the new concrete item/producer tier.
-4. The new tier carries its own config: product lines, requirements, hindrances, durations, queue size, inline outputs, art, and labels.
+4. The new tier carries its own config: product lines, requirements, effects, durations, queue size, inline outputs, art, and labels.
 
 This keeps gameplay readable. The player owns `farm-t2`, not an invisible save overlay that secretly mutates `farm-t1`. Capacity or world-scale mechanics may be introduced later as explicit systems, but not through a generic global upgrade patch layer.
 

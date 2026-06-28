@@ -24,21 +24,6 @@ type TestGameRequirement =
 			type: "proximity";
 	  };
 
-type TestGameHindrance =
-	| {
-			durationFactor?: number;
-			itemId: string;
-			quantity: number;
-			scope: "board" | "inventory" | "board_or_inventory";
-			type: "passive";
-	  }
-	| {
-			distance: number;
-			durationFactor?: number;
-			itemIds: string[];
-			type: "proximity";
-	  };
-
 type TestProductInput = {
 	capacity: number;
 	consume: boolean;
@@ -48,7 +33,6 @@ type TestProductInput = {
 };
 
 type TestProduct = {
-	hinderedBy?: TestGameHindrance[];
 	activatesEffectId?: string;
 	durationMs: number;
 	tags?: string[];
@@ -154,7 +138,6 @@ const createValidConfigValue = () => ({
 	effects: {} as Record<string, unknown>,
 	producers: {
 		"item:producer": {
-			hinderedBy: [] as TestGameHindrance[],
 			maxQueueSize: 1,
 			productIds: [
 				"product:test",
@@ -179,7 +162,6 @@ const createValidConfigValue = () => ({
 	} as Record<string, TestCraftRecipe>,
 	products: {
 		"product:test": {
-			hinderedBy: [] as TestGameHindrance[],
 			durationMs: 1000,
 			inputs: [
 				{
@@ -436,34 +418,47 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/durationFactor/);
 	});
 
-	it("rejects negative hindrance duration factors", () => {
+	it("rejects negative proximity penalty duration factors", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].hinderedBy = [
-			{
-				distance: 1,
-				durationFactor: -1,
-				itemIds: [
-					"item:twig",
-				],
-				type: "proximity",
-			},
-		];
+		config.effects["effect:test"] = {
+			name: "Test proximity penalty",
+			operations: [
+				{
+					durationFactor: -1,
+					kind: "duration.proximityPenalty",
+					target: {
+						productIds: [
+							"product:test",
+						],
+					},
+				},
+			],
+			radius: 1,
+			scope: "local",
+		};
 
 		expect(() => parseGameConfig(config)).toThrow(/durationFactor/);
 	});
 
-	it("rejects hindrances that point at missing items", () => {
+	it("rejects proximity penalty operations on global effects", () => {
 		const config = createValidConfigValue();
-		config.producers["item:producer"].hinderedBy = [
-			{
-				itemId: "item:ghost",
-				quantity: 1,
-				scope: "board_or_inventory",
-				type: "passive",
-			},
-		];
+		config.effects["effect:test"] = {
+			name: "Global proximity lie",
+			operations: [
+				{
+					durationFactor: 0.5,
+					kind: "duration.proximityPenalty",
+					target: {
+						productIds: [
+							"product:test",
+						],
+					},
+				},
+			],
+			scope: "global",
+		};
 
-		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
+		expect(() => parseGameConfig(config)).toThrow(/requires a local effect scope/);
 	});
 
 	it("accepts product visibility, tags, and active effect refs", () => {

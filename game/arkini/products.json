@@ -1054,16 +1054,6 @@
 		},
 		"product:cattle-farm-t1:milk": {
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1116,16 +1106,6 @@
 		},
 		"product:chicken-coop-t1:egg": {
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1521,16 +1501,6 @@
 		},
 		"product:farm-t1:grain": {
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -1547,16 +1517,6 @@
 		},
 		"product:farm-t1:grain-morale-t1": {
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -2589,16 +2549,6 @@
 		},
 		"product:pig-farm-t1:piglet": {
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -3015,16 +2965,6 @@
 		},
 		"product:sheep-pasture-t1:wool": {
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -4786,16 +4726,6 @@
 		},
 		"product:vegetable-garden-t1:vegetables": {
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,

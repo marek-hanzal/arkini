@@ -44,16 +44,6 @@
 			]
 		},
 		"producer:brewery-t1": {
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"productIds": [
 				"product:brewery-t1:hops",
 				"product:brewery-t1:beer-barrel",
@@ -462,16 +452,6 @@
 			]
 		},
 		"producer:winery-t1": {
-			"hinderedBy": [
-				{
-					"distance": 3,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"productIds": [
 				"product:winery-t1:grapes",
 				"product:winery-t1:wine-barrel",

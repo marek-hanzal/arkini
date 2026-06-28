@@ -3570,6 +3570,47 @@
 			],
 			"scope": "global",
 			"sourceScope": "both"
+		},
+		"effect:pollution-slows-farms-and-beer": {
+			"name": "Pollution slows nearby farms and brewery production",
+			"operations": [
+				{
+					"durationFactor": 0.5,
+					"kind": "duration.proximityPenalty",
+					"target": {
+						"producerIds": [
+							"producer:brewery-t1"
+						],
+						"productIds": [
+							"product:cattle-farm-t1:milk",
+							"product:chicken-coop-t1:egg",
+							"product:farm-t1:grain",
+							"product:farm-t1:grain-morale-t1",
+							"product:pig-farm-t1:piglet",
+							"product:sheep-pasture-t1:wool",
+							"product:vegetable-garden-t1:vegetables"
+						]
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:pollution-slows-winery": {
+			"name": "Pollution slows nearby winery production",
+			"operations": [
+				{
+					"durationFactor": 0.5,
+					"kind": "duration.proximityPenalty",
+					"target": {
+						"producerIds": [
+							"producer:winery-t1"
+						]
+					}
+				}
+			],
+			"radius": 3,
+			"scope": "local"
 		}
 	},
 	"game": {
@@ -5473,6 +5514,10 @@
 			"description": "Dirty board-only industrial pollution emitted by coal or charcoal processing. It stays on the board and must be cleaned by Purifier I.",
 			"maxStackSize": 1,
 			"name": "Pollution",
+			"passiveEffectIds": [
+				"effect:pollution-slows-farms-and-beer",
+				"effect:pollution-slows-winery"
+			],
 			"storage": "board",
 			"tags": [
 				"danger",
@@ -6809,16 +6854,6 @@
 			"requirementIds": []
 		},
 		"producer:brewery-t1": {
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
@@ -7371,16 +7406,6 @@
 			"requirementIds": []
 		},
 		"producer:winery-t1": {
-			"hinderedBy": [
-				{
-					"distance": 3,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
@@ -8715,16 +8740,6 @@
 		"product:cattle-farm-t1:milk": {
 			"chargeCost": 0,
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -8967,16 +8982,6 @@
 		"product:chicken-coop-t1:egg": {
 			"chargeCost": 0,
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -9493,16 +9498,6 @@
 		"product:farm-t1:grain": {
 			"chargeCost": 0,
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -9527,16 +9522,6 @@
 		"product:farm-t1:grain-morale-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -10883,16 +10868,6 @@
 		"product:pig-farm-t1:piglet": {
 			"chargeCost": 0,
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11457,16 +11432,6 @@
 		"product:sheep-pasture-t1:wool": {
 			"chargeCost": 0,
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13792,16 +13757,6 @@
 		"product:vegetable-garden-t1:vegetables": {
 			"chargeCost": 0,
 			"durationMs": 1000,
-			"hinderedBy": [
-				{
-					"distance": 2,
-					"durationFactor": 0.5,
-					"itemIds": [
-						"item:pollution"
-					],
-					"type": "proximity"
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,

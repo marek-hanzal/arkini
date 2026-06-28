@@ -96,6 +96,10 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 			itemFlow.consumedItemIds.add(itemId);
 		}
 
+		if (item.passiveEffectIds && item.passiveEffectIds.length > 0) {
+			itemFlow.consumedItemIds.add(itemId);
+		}
+
 		for (const mergeId of item.mergeIds ?? []) {
 			usage.merge.add(mergeId);
 		}
@@ -189,7 +193,6 @@ const collectProducerUsage = (config: GameConfig, usage: UsageIndex, itemFlow: I
 		for (const requirementId of producer.requirementIds) {
 			usage.requirements.add(requirementId);
 		}
-		collectHindranceItemUsage(producer.hinderedBy ?? [], itemFlow);
 	}
 };
 
@@ -201,7 +204,6 @@ const collectStashUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Item
 		for (const requirementId of stash.requirementIds) {
 			usage.requirements.add(requirementId);
 		}
-		collectHindranceItemUsage(stash.hinderedBy ?? [], itemFlow);
 	}
 };
 
@@ -234,23 +236,6 @@ const collectProductUsage = (config: GameConfig, usage: UsageIndex, itemFlow: It
 		}
 		for (const requirementId of product.requirementIds) {
 			usage.requirements.add(requirementId);
-		}
-		collectHindranceItemUsage(product.hinderedBy ?? [], itemFlow);
-	}
-};
-
-const collectHindranceItemUsage = (
-	hindrances: readonly NonNullable<GameConfig["products"][string]["hinderedBy"]>[number][],
-	itemFlow: ItemFlowIndex,
-) => {
-	for (const hindrance of hindrances) {
-		if (hindrance.type === "passive") {
-			itemFlow.consumedItemIds.add(hindrance.itemId);
-			continue;
-		}
-
-		for (const itemId of hindrance.itemIds) {
-			itemFlow.consumedItemIds.add(itemId);
 		}
 	}
 };
@@ -350,7 +335,7 @@ const readTerminalItemWarnings = (
 			code: "terminal-item",
 			id: itemId,
 			section: "items",
-			message: `${itemId} is produced or starts in the save, but no configured input, requirement, hindrance, effect, merge, removal rule, craft, or stash references it.`,
+			message: `${itemId} is produced or starts in the save, but no configured input, requirement, effect, merge, removal rule, craft, or stash references it.`,
 		}));
 
 const readUnusedRecordWarnings = (

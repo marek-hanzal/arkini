@@ -142,10 +142,6 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		storedItems,
 		targetItemInstanceId: action.producerItemInstanceId,
 	});
-	const hindrances = [
-		...(producerDefinition.hinderedBy ?? []),
-		...(product.hinderedBy ?? []),
-	];
 	const requirements = [
 		...producerRequirements,
 		...productRequirements,
@@ -192,7 +188,6 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	}
 
 	return {
-		hindrances,
 		producerDefinition,
 		producerId,
 		producerItem,

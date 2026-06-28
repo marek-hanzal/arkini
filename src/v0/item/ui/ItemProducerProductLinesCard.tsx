@@ -34,6 +34,19 @@ const readItemName = (itemId: string, items: ItemCatalogView) =>
 const readHindrancesMultiplier = (hindrances: readonly ActivationHindranceView[]) =>
 	hindrances.reduce((total, hindrance) => total * hindrance.durationMultiplier, 1);
 
+const readProductLineOutputOwnedLabel = (
+	outputs: NonNullable<ProducerProductLineView["outputs"]>,
+	items: ItemCatalogView,
+) => {
+	if (outputs.length === 0) return undefined;
+
+	if (outputs.length === 1) return `Owned ${outputs[0]?.ownedQuantity ?? 0}`;
+
+	return outputs
+		.map((output) => `${readItemName(output.itemId, items)} ${output.ownedQuantity}`)
+		.join(" · ");
+};
+
 const readLineActionLabel = ({
 	line,
 	runState,
@@ -189,6 +202,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					const runState = readProducerProductLineRunState({
 						line,
 					});
+					const outputs = line.outputs ?? [];
+					const outputOwnedLabel = readProductLineOutputOwnedLabel(outputs, items);
 
 					return (
 						<div
@@ -197,23 +212,41 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 						>
 							<div className="min-w-0">
 								<div className="flex min-w-0 items-start gap-2">
-									<div className="min-w-0 flex-1">
-										<p className="break-words text-base font-bold leading-6 text-ak-text">
-											{line.name}
-										</p>
-										<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
-											Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
-											{formatMs(line.durationMs)}
-											{hindranceMultiplier > 1
-												? ` · hindered ${formatMultiplier(hindranceMultiplier)}×`
-												: ""}
-											{runState.statusMetaLabel
-												? ` · ${runState.statusMetaLabel}`
-												: ""}
-											{runState.inputAvailabilityLabel
-												? ` · ${runState.inputAvailabilityLabel}`
-												: ""}
-										</p>
+									<div className="flex min-w-0 flex-1 items-start gap-2">
+										{outputs.length ? (
+											<div className="flex shrink-0 gap-1">
+												{outputs.slice(0, 3).map((output) => (
+													<ItemInlineAsset
+														key={output.itemId}
+														item={items[output.itemId]}
+														className="h-8 w-8"
+													/>
+												))}
+											</div>
+										) : null}
+										<div className="min-w-0 flex-1">
+											<p className="break-words text-base font-bold leading-6 text-ak-text">
+												{line.name}
+											</p>
+											{outputOwnedLabel ? (
+												<p className="mt-0.5 break-words text-xs leading-5 text-ak-text-muted">
+													{outputOwnedLabel}
+												</p>
+											) : null}
+											<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
+												Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
+												{formatMs(line.durationMs)}
+												{hindranceMultiplier > 1
+													? ` · hindered ${formatMultiplier(hindranceMultiplier)}×`
+													: ""}
+												{runState.statusMetaLabel
+													? ` · ${runState.statusMetaLabel}`
+													: ""}
+												{runState.inputAvailabilityLabel
+													? ` · ${runState.inputAvailabilityLabel}`
+													: ""}
+											</p>
+										</div>
 									</div>
 									{line.isDefault ? (
 										<span className="shrink-0 rounded-sm bg-ak-primary/15 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ak-primary">

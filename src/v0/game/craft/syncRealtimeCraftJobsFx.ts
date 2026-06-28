@@ -1,6 +1,10 @@
 import { Effect } from "effect";
 import { readCraftJobEffectiveTimingFx } from "~/v0/game/craft/readCraftJobEffectiveTimingFx";
-import { isCraftJobPaused } from "~/v0/game/craft/craftCompletionTiming";
+import {
+	isGamePausableJobPaused,
+	readGamePausableJobRemainingMsAtPause,
+	readGamePausableJobResumedTiming,
+} from "~/v0/game/job/GamePausableJobTiming";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveCraftJob } from "~/v0/game/engine/model/GameSaveSchema";
@@ -41,16 +45,6 @@ const readCraftRequirementsReadyFx = Effect.fn(
 	return facts.every((fact) => fact.status === "ok");
 });
 
-const readRemainingMsAtPause = ({
-	job,
-	nowMs,
-	readyAtMs,
-}: {
-	job: GameSaveCraftJob;
-	nowMs: number;
-	readyAtMs: number;
-}) => Math.max(0, readyAtMs - Math.max(nowMs, job.startAtMs));
-
 export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(function* ({
 	config,
 	nowMs,
@@ -89,7 +83,7 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 			save: nextSave ?? save,
 		});
 
-		if (isCraftJobPaused(job)) {
+		if (isGamePausableJobPaused(job)) {
 			if (!requirementsReady) continue;
 
 			const remainingMs = job.remainingMs ?? 0;
@@ -100,8 +94,11 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 				targetItemInstanceId: job.targetItemInstanceId,
 			});
 			const durationMs = Math.max(0, effectiveTiming.readyAtMs - effectiveTiming.startAtMs);
-			const resumedStartAtMs = nowMs - Math.max(0, durationMs - remainingMs);
-			const resumedReadyAtMs = resumedStartAtMs + durationMs;
+			const resumedTiming = readGamePausableJobResumedTiming({
+				durationMs,
+				nowMs,
+				remainingMs,
+			});
 
 			const draft = yield* ensureNextSave();
 			const liveJob = draft.craftJobs[job.id];
@@ -110,18 +107,17 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 			draft.craftJobs[job.id] = {
 				...liveJob,
 				pausedAtMs: undefined,
-				readyAtMs: resumedReadyAtMs,
+				readyAtMs: resumedTiming.readyAtMs,
 				remainingMs: undefined,
-				startAtMs: resumedStartAtMs,
+				startAtMs: resumedTiming.startAtMs,
 			};
 			continue;
 		}
 
 		if (!requirementsReady && job.startAtMs <= nowMs) {
-			const remainingMs = readRemainingMsAtPause({
+			const remainingMs = readGamePausableJobRemainingMsAtPause({
 				job,
 				nowMs,
-				readyAtMs: job.readyAtMs,
 			});
 			const draft = yield* ensureNextSave();
 			const liveJob = draft.craftJobs[job.id];

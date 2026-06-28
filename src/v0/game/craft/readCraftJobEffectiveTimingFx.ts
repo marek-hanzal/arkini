@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { readProximityRequirementsDurationMultiplier } from "~/v0/game/requirements/readProximityRequirementsDurationMultiplier";
+import { readCraftRecipeDurationMs } from "~/v0/game/craft/readCraftRecipeDurationMs";
 
 export namespace readCraftJobEffectiveTimingFx {
 	export interface Props {
@@ -18,12 +18,11 @@ export const readCraftJobEffectiveTimingFx = Effect.fn("readCraftJobEffectiveTim
 	startAtMs,
 	targetItemInstanceId,
 }: readCraftJobEffectiveTimingFx.Props) {
-	const durationMultiplier = readProximityRequirementsDurationMultiplier({
-		requirements: recipe.requirements,
+	const durationMs = readCraftRecipeDurationMs({
+		recipe,
 		save,
 		targetItemInstanceId,
 	});
-	const durationMs = Math.max(0, Math.ceil(recipe.durationMs * durationMultiplier));
 
 	return {
 		durationMs,

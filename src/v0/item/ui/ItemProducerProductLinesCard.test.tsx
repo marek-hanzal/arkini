@@ -49,4 +49,32 @@ describe("ItemProducerProductLinesCard", () => {
 		expect(html).toContain("4s");
 		expect(html).not.toContain("Queue full</button>");
 	});
+
+	it("hides default controls for producer-like views that do not support player defaults", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						inProgress: false,
+						isDefault: false,
+						pausedAtMs: undefined,
+						queueFull: false,
+						readyAtMs: undefined,
+						requirementsReady: true,
+						startAtMs: undefined,
+					}),
+				]}
+				nowMs={0}
+				pending={false}
+				canSetDefault={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).not.toContain(">Default</button>");
+		expect(html).toContain(">Start</button>");
+	});
 });

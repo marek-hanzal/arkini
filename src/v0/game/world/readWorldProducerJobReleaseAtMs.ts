@@ -1,7 +1,10 @@
 import type { GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
+import {
+	isGamePausableJobPaused,
+	readGamePausableJobWakeAtMs,
+} from "~/v0/game/job/GamePausableJobTiming";
 
-export const isWorldProducerJobPaused = (job: GameSaveProducerJob) =>
-	job.pausedAtMs !== undefined && job.remainingMs !== undefined;
+export const isWorldProducerJobPaused = (job: GameSaveProducerJob) => isGamePausableJobPaused(job);
 
 export const readWorldProducerJobReleaseAtMs = (job: GameSaveProducerJob) =>
-	isWorldProducerJobPaused(job) ? undefined : (job.delivery?.nextAttemptAtMs ?? job.readyAtMs);
+	readGamePausableJobWakeAtMs(job);

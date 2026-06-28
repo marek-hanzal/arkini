@@ -1,6 +1,10 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import {
+	readGamePausableJobRemainingMsAtPause,
+	readGamePausableJobResumedTiming,
+} from "~/v0/game/job/GamePausableJobTiming";
 import { findActiveEffectByProducerJobId } from "~/v0/game/effects/findActiveEffectByProducerJobId";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import {
@@ -21,31 +25,6 @@ export namespace syncRealtimeProducerJobsFx {
 		save: GameSave;
 	}
 }
-
-const readShiftedReadyAtMs = ({
-	job,
-	startAtMs,
-}: {
-	job: GameSaveProducerJob;
-	startAtMs: number;
-}) => Math.max(startAtMs, job.readyAtMs + (startAtMs - job.startAtMs));
-
-const readRemainingMsAtPause = ({
-	job,
-	nowMs,
-	startAtMs,
-}: {
-	job: GameSaveProducerJob;
-	nowMs: number;
-	startAtMs: number;
-}) =>
-	Math.max(
-		0,
-		readShiftedReadyAtMs({
-			job,
-			startAtMs,
-		}) - nowMs,
-	);
 
 const updateProducerJobActiveEffectFx = Effect.fn("updateProducerJobActiveEffectFx")(function* ({
 	config,
@@ -159,8 +138,11 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 					0,
 					effectiveTiming.readyAtMs - effectiveTiming.startAtMs,
 				);
-				const resumedStartAtMs = nowMs - Math.max(0, durationMs - remainingMs);
-				const resumedReadyAtMs = resumedStartAtMs + durationMs;
+				const resumedTiming = readGamePausableJobResumedTiming({
+					durationMs,
+					nowMs,
+					remainingMs,
+				});
 
 				const draft = yield* ensureNextSave();
 				const liveJob = draft.producerJobs[job.id];
@@ -169,18 +151,18 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 				draft.producerJobs[job.id] = {
 					...liveJob,
 					pausedAtMs: undefined,
-					readyAtMs: resumedReadyAtMs,
+					readyAtMs: resumedTiming.readyAtMs,
 					remainingMs: undefined,
-					startAtMs: resumedStartAtMs,
+					startAtMs: resumedTiming.startAtMs,
 				};
 				yield* updateProducerJobActiveEffectFx({
 					config,
 					draft,
 					job: draft.producerJobs[job.id],
-					readyAtMs: resumedReadyAtMs,
-					startAtMs: resumedStartAtMs,
+					readyAtMs: resumedTiming.readyAtMs,
+					startAtMs: resumedTiming.startAtMs,
 				});
-				cursorAtMs = resumedReadyAtMs;
+				cursorAtMs = resumedTiming.readyAtMs;
 				continue;
 			}
 
@@ -197,7 +179,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 				: true;
 			if ((!requirementsReady || !startGateReady) && startAtMs <= nowMs) {
 				const remainingMs = startGateReady
-					? readRemainingMsAtPause({
+					? readGamePausableJobRemainingMsAtPause({
 							job,
 							nowMs,
 							startAtMs,

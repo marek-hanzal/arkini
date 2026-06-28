@@ -1,1118 +1,907 @@
 {
 	"assets": {
 		"asset:item:advanced-knowledge": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-advanced-knowledge"
 		},
 		"asset:item:aquamarine": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-aquamarine"
 		},
 		"asset:item:axe": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-axe"
 		},
 		"asset:item:basic-knowledge": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-basic-knowledge"
 		},
 		"asset:item:beer": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-beer"
 		},
 		"asset:item:beer-barrel": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-beer-barrel"
 		},
 		"asset:item:blueprint-academy": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:academy",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-armory-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:armory-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-bakery-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:bakery-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-blacksmith-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:blacksmith-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-brewery-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:brewery-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-brickyard": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:brickyard",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-cathedral": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:cathedral",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-cattle-farm-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:cattle-farm-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-charcoal-burner-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:charcoal-burner-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-chicken-coop-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:chicken-coop-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-civic-office-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:civic-office-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-clay-pit": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:clay-pit",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-coal-mine-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:coal-mine-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-construction-yard-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:construction-yard-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-cookhouse-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:cookhouse-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-dairy-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:dairy-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-dye-workshop-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:dye-workshop-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-farm-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:farm-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-glassworks": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:glassworks",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-glazier-workshop-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:glazier-workshop-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-gold-mine-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:gold-mine-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-goldsmith-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:goldsmith-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-heroes-guild-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:heroes-guild-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-house-of-engineers": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:house-of-engineers",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-house-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:house-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-house-t2": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:house-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-house-t3": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:house-t3",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-house-t4": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:house-t4",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-iron-mine-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:iron-mine-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-lumberjack-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:lumberjack-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-mage-lodge": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:mage-lodge",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-market-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:market-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-market-t2": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:market-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-paper-mill-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:paper-mill-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-pig-farm-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:pig-farm-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-prospector-guild-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:prospector-guild-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-prospector-guild-t2": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:prospector-guild-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-purifier-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:purifier-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-quarry-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:quarry-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-quarry-t2": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:quarry-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-roof-tile-factory": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:roof-tile-factory",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-sand-pit": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:sand-pit",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-sawmill-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:sawmill-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-school": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:school",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-sheep-pasture-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:sheep-pasture-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-slaughterhouse-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:slaughterhouse-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-smelter-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:smelter-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-stonemason-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:stonemason-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-stonemason-t2": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:stonemason-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-tailor-workshop-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:tailor-workshop-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-tannery-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:tannery-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-tavern-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:tavern-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-townhall-t2": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:townhall-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-townhall-t3": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:townhall-t3",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-townhall-t4": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:townhall-t4",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-university": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:university",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-vegetable-garden-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:vegetable-garden-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-weaver-hut-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:weaver-hut-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-well-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:well-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-windmill-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:windmill-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:blueprint-winery-t1": {
-			"kind": "item",
 			"overlayAssetId": "asset:producer:winery-t1",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
 		"asset:item:bread": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-bread"
 		},
 		"asset:item:bricks": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-bricks"
 		},
 		"asset:item:building-permit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-building-permit"
 		},
 		"asset:item:charcoal": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-charcoal"
 		},
 		"asset:item:cheese": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-cheese"
 		},
 		"asset:item:chest-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-chest-t1"
 		},
 		"asset:item:chest-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-chest-t2"
 		},
 		"asset:item:chest-t3": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-chest-t3"
 		},
 		"asset:item:chest-t4": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-chest-t4"
 		},
 		"asset:item:clay": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-clay"
 		},
 		"asset:item:clay-deposit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-clay-deposit"
 		},
 		"asset:item:coal": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-coal"
 		},
 		"asset:item:coal-deposit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-coal-deposit"
 		},
 		"asset:item:coin": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-coin"
 		},
 		"asset:item:coin-stack": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-coin-stack"
 		},
 		"asset:item:common-cloth": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-common-cloth"
 		},
 		"asset:item:common-clothing": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-common-clothing"
 		},
 		"asset:item:construction-bundle": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-construction-bundle"
 		},
 		"asset:item:egg": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-egg"
 		},
 		"asset:item:emerald": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-emerald"
 		},
 		"asset:item:feast": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-feast"
 		},
 		"asset:item:flour": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-flour"
 		},
 		"asset:item:food-supply": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-food-supply"
 		},
 		"asset:item:glass": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-glass"
 		},
 		"asset:item:gold-deposit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-gold-deposit"
 		},
 		"asset:item:gold-ingot": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-gold-ingot"
 		},
 		"asset:item:gold-ore": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-gold-ore"
 		},
 		"asset:item:grain": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-grain"
 		},
 		"asset:item:grapes": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-grapes"
 		},
 		"asset:item:guild-charter": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-guild-charter"
 		},
 		"asset:item:hop-field": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-hop-field"
 		},
 		"asset:item:hops": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-hops"
 		},
 		"asset:item:iron-armor": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-iron-armor"
 		},
 		"asset:item:iron-deposit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-iron-deposit"
 		},
 		"asset:item:iron-ingot": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-iron-ingot"
 		},
 		"asset:item:iron-ore": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-iron-ore"
 		},
 		"asset:item:key-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-key-t1"
 		},
 		"asset:item:key-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-key-t2"
 		},
 		"asset:item:key-t3": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-key-t3"
 		},
 		"asset:item:key-t4": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-key-t4"
 		},
 		"asset:item:leather": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-leather"
 		},
 		"asset:item:leather-armor": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-leather-armor"
 		},
 		"asset:item:log": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-log"
 		},
 		"asset:item:luxury-cloth": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-luxury-cloth"
 		},
 		"asset:item:luxury-clothing": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-luxury-clothing"
 		},
 		"asset:item:marble": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-marble"
 		},
 		"asset:item:marble-block": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-marble-block"
 		},
 		"asset:item:marble-deposit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-marble-deposit"
 		},
 		"asset:item:master-knowledge": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-master-knowledge"
 		},
 		"asset:item:milk": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-milk"
 		},
 		"asset:item:morale-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-morale-t1"
 		},
 		"asset:item:morale-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-morale-t2"
 		},
 		"asset:item:morale-t3": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-morale-t3"
 		},
 		"asset:item:morale-t4": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-morale-t4"
 		},
 		"asset:item:nails": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-nails"
 		},
 		"asset:item:paper": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-paper"
 		},
 		"asset:item:piglet": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-piglet"
 		},
 		"asset:item:pigment": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-pigment"
 		},
 		"asset:item:plank": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-plank"
 		},
 		"asset:item:pollution": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-pollution"
 		},
 		"asset:item:raw-hide": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-raw-hide"
 		},
 		"asset:item:rock": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-rock"
 		},
 		"asset:item:roof-tiles": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-roof-tiles"
 		},
 		"asset:item:ruby": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-ruby"
 		},
 		"asset:item:sand": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-sand"
 		},
 		"asset:item:sand-deposit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-sand-deposit"
 		},
 		"asset:item:sapphire": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-sapphire"
 		},
 		"asset:item:sausage": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-sausage"
 		},
 		"asset:item:stained-glass": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-stained-glass"
 		},
 		"asset:item:stone": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-stone"
 		},
 		"asset:item:stone-block": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-stone-block"
 		},
 		"asset:item:sword": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-sword"
 		},
 		"asset:item:topaz": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-topaz"
 		},
 		"asset:item:treasure-chest": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-treasure-chest"
 		},
 		"asset:item:tree": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-tree"
 		},
 		"asset:item:vegetables": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-vegetables"
 		},
 		"asset:item:vineyard": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-vineyard"
 		},
 		"asset:item:water": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-water"
 		},
 		"asset:item:wheat-field": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-wheat-field"
 		},
 		"asset:item:wine-barrel": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-wine-barrel"
 		},
 		"asset:item:wine-glass": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-wine-glass"
 		},
 		"asset:item:wool": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "item-wool"
 		},
 		"asset:producer:academy": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-academy"
 		},
 		"asset:producer:armory-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-armory-t1"
 		},
 		"asset:producer:bakery-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-bakery-t1"
 		},
 		"asset:producer:blacksmith-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-blacksmith-t1"
 		},
 		"asset:producer:brewery-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-brewery-t1"
 		},
 		"asset:producer:brickyard": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-brickyard"
 		},
 		"asset:producer:cathedral": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-cathedral"
 		},
 		"asset:producer:cattle-farm-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-cattle-farm-t1"
 		},
 		"asset:producer:charcoal-burner-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-charcoal-burner-t1"
 		},
 		"asset:producer:chicken-coop-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-chicken-coop-t1"
 		},
 		"asset:producer:civic-office-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-civic-office-t1"
 		},
 		"asset:producer:clay-pit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-clay-pit"
 		},
 		"asset:producer:coal-mine-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-coal-mine-t1"
 		},
 		"asset:producer:construction-yard-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-construction-yard-t1"
 		},
 		"asset:producer:cookhouse-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-cookhouse-t1"
 		},
 		"asset:producer:dairy-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-dairy-t1"
 		},
 		"asset:producer:dye-workshop-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-dye-workshop-t1"
 		},
 		"asset:producer:farm-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-farm-t1"
 		},
 		"asset:producer:glassworks": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-glassworks"
 		},
 		"asset:producer:glazier-workshop-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-glazier-workshop-t1"
 		},
 		"asset:producer:gold-mine-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-gold-mine-t1"
 		},
 		"asset:producer:goldsmith-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-goldsmith-t1"
 		},
 		"asset:producer:heroes-guild-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-heroes-guild-t1"
 		},
 		"asset:producer:house-of-engineers": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-house-of-engineers"
 		},
 		"asset:producer:house-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-house-t1"
 		},
 		"asset:producer:house-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-house-t2"
 		},
 		"asset:producer:house-t3": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-house-t3"
 		},
 		"asset:producer:house-t4": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-house-t4"
 		},
 		"asset:producer:iron-mine-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-iron-mine-t1"
 		},
 		"asset:producer:lumberjack-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-lumberjack-t1"
 		},
 		"asset:producer:mage-lodge": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-mage-lodge"
 		},
 		"asset:producer:market-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-market-t1"
 		},
 		"asset:producer:market-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-market-t2"
 		},
 		"asset:producer:paper-mill-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-paper-mill-t1"
 		},
 		"asset:producer:pig-farm-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-pig-farm-t1"
 		},
 		"asset:producer:prospector-guild-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-prospector-guild-t1"
 		},
 		"asset:producer:prospector-guild-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-prospector-guild-t1"
 		},
 		"asset:producer:purifier-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-purifier-t1"
 		},
 		"asset:producer:quarry-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-quarry-t1"
 		},
 		"asset:producer:quarry-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-quarry-t2"
 		},
 		"asset:producer:roof-tile-factory": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-roof-tile-factory"
 		},
 		"asset:producer:sand-pit": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-sand-pit"
 		},
 		"asset:producer:sawmill-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-sawmill-t1"
 		},
 		"asset:producer:school": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-school"
 		},
 		"asset:producer:sheep-pasture-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-sheep-pasture-t1"
 		},
 		"asset:producer:slaughterhouse-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-slaughterhouse-t1"
 		},
 		"asset:producer:smelter-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-smelter-t1"
 		},
 		"asset:producer:stonemason-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-stonemason-t1"
 		},
 		"asset:producer:stonemason-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-stonemason-t2"
 		},
 		"asset:producer:tailor-workshop-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-tailor-workshop-t1"
 		},
 		"asset:producer:tannery-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-tannery-t1"
 		},
 		"asset:producer:tavern-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-tavern-t1"
 		},
 		"asset:producer:townhall-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-townhall-t1"
 		},
 		"asset:producer:townhall-t2": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-townhall-t2"
 		},
 		"asset:producer:townhall-t3": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-townhall-t3"
 		},
 		"asset:producer:townhall-t4": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-townhall-t4"
 		},
 		"asset:producer:university": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-university"
 		},
 		"asset:producer:vegetable-garden-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-vegetable-garden-t1"
 		},
 		"asset:producer:weaver-hut-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-weaver-hut-t1"
 		},
 		"asset:producer:well-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-well-t1"
 		},
 		"asset:producer:windmill-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-windmill-t1"
 		},
 		"asset:producer:winery-t1": {
-			"kind": "item",
 			"render": "plain",
 			"resourceId": "producer-winery-t1"
 		}

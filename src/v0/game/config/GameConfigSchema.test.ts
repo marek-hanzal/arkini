@@ -105,21 +105,12 @@ const createValidConfigValue = () => ({
 		"resource:item": {
 			data: "item-bytes",
 		},
-		"resource:ui": {
-			data: "ui-bytes",
-		},
 	},
 	assets: {
 		"asset:item": {
-			kind: "item",
 			label: "Item",
 			render: "plain",
 			resourceId: "resource:item",
-		},
-		"asset:ui": {
-			kind: "ui",
-			label: "UI",
-			resourceId: "resource:ui",
 		},
 	},
 	items: {
@@ -319,11 +310,11 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate starting board cell/);
 	});
 
-	it("rejects item definitions that point at non-item assets", () => {
+	it("rejects obsolete asset kind fields", () => {
 		const config = createValidConfigValue();
-		config.items["item:twig"].assetId = "asset:ui";
+		(config.assets["asset:item"] as Record<string, unknown>).kind = "item";
 
-		expect(() => parseGameConfig(config)).toThrow(/must have kind/);
+		expect(() => parseGameConfig(config)).toThrow(/Unrecognized key.*kind/);
 	});
 
 	it("rejects duplicate producer product lines", () => {

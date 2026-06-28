@@ -21,7 +21,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 		},
 		assets: {
 			"asset:test": {
-				kind: "item",
 				label: "Test",
 				render: "plain",
 				resourceId: "resource:test",

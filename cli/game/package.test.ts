@@ -100,5 +100,7 @@ describe("game package normalization", () => {
 		]);
 
 		expect(config.products["product:test"]?.name).toBe("Plank");
+		expect(config.assets["asset:item:plank"]).not.toHaveProperty("kind");
+		expect(config.assets["asset:producer:test"]).not.toHaveProperty("kind");
 	});
 });

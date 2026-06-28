@@ -499,7 +499,7 @@ The item detail must show the concrete selected item instance and its backward-f
 
 Relevant detail content includes, when applicable:
 
-- item identity, kind, tags, and description
+- item identity, tags, and description
 - unmet craft/construction/growth requirements
 - generated effects and path-choice rules before the player invests resources
 - deposited inputs
@@ -1101,15 +1101,11 @@ Expected fields:
 
 - `id`
 - `name`
-- `kind`
 - `description`
-- `asset`
+- `assetId`
 - `maxStackSize`
 - `storage`: `board`, `inventory`, or `both`; default `both`
 - `tags`
-- optional producer definition reference
-- optional stash definition reference
-- optional craft/construction definition reference
 - optional `removeBy` rules for board/tile removal
 
 ### 18.2 Item instance state

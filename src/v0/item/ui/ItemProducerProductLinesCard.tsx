@@ -336,6 +336,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									progress={
 										runState.showProgress ? (line.progress ?? 0) : undefined
 									}
+									progressAutoCompleteMs={runState.progressAutoCompleteMs}
 									tone={
 										runState.showProgress || runState.canRunAction
 											? "primary"

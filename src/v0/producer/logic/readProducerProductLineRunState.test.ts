@@ -61,6 +61,33 @@ describe("readProducerProductLineRunState", () => {
 		});
 	});
 
+	it("auto-completes active progress only for unpaused running lines", () => {
+		expect(
+			readProducerProductLineRunState({
+				line: line({
+					inProgress: true,
+					remainingMs: 800,
+				}),
+			}),
+		).toMatchObject({
+			progressAutoCompleteMs: 800,
+			showProgress: true,
+		});
+
+		expect(
+			readProducerProductLineRunState({
+				line: line({
+					inProgress: true,
+					pausedAtMs: 200,
+					remainingMs: 800,
+				}),
+			}),
+		).toMatchObject({
+			progressAutoCompleteMs: undefined,
+			showProgress: true,
+		});
+	});
+
 	it("blocks every line while the producer queue is waiting for delivery", () => {
 		expect(
 			readProducerProductLineRunState({

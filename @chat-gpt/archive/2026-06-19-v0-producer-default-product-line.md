@@ -1,5 +1,8 @@
 # V0 producer default product line
 
+
+> Superseded/current rule: producer default line is **not** the first configured product. A default product line exists only when the player explicitly selects it and it is stored in save/runtime state. Do not use this historical note as current architecture truth; it documents the old implementation that was later removed because implicit defaults are a tiny cursed UX/backend contract pretending to be convenience.
+
 Completed: producer default product line is the first `producer.productIds` entry.
 
 Changes:

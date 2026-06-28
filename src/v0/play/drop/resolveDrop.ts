@@ -94,6 +94,7 @@ export const resolveDrop = ({
 						source,
 						target,
 						actions,
+						inventory,
 					}),
 			)
 			.with(

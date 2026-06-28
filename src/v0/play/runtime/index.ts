@@ -5,7 +5,6 @@ export {
 } from "~/v0/play/runtime/GameRuntimeContext";
 export { useGameAction } from "~/v0/play/runtime/useGameAction";
 export {
-	useGameBoardFirstEmptyCell,
 	useGameBoardItem,
 	useGameBoardView,
 	useGameInventoryView,

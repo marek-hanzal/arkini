@@ -70,7 +70,11 @@ export const resolveInventoryCellDropAction = ({
 }: resolveInventoryCellDropAction.Props): InventoryCellDropAction => {
 	const targetCellKey = cellKey(target.x, target.y);
 	const sourceSlot = inventory.bySlotIndex[String(source.slotIndex)];
-	if (!sourceSlot?.stack) {
+	if (
+		!sourceSlot?.stack ||
+		sourceSlot.stack.id !== source.slot.stack?.id ||
+		sourceSlot.stack.itemId !== source.itemId
+	) {
 		return {
 			feedback: {
 				kind: "inventory-slot",

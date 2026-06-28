@@ -9,7 +9,6 @@ import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
 import {
-	readBoardFirstEmptyCell,
 	readBoardItem,
 	readBoardView,
 	readInventoryView,
@@ -83,9 +82,6 @@ export const useGameBoardItem = (boardItemId: string): BoardViewItem | null => {
 
 	return useGameRuntimeSelector(selector, sameBoardItem);
 };
-
-export const useGameBoardFirstEmptyCell = (): BoardCellSchema.Type | undefined =>
-	useGameRuntimeSelector(readBoardFirstEmptyCell, sameBoardCell);
 
 export const useGameItemCatalogView = (): ItemCatalogView =>
 	useGameRuntimeSelector(readItemCatalogView);

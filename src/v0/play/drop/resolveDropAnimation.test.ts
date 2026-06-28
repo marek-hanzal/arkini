@@ -47,6 +47,24 @@ const inventorySlot = (slotIndex: number) =>
 		},
 	}) satisfies InventorySlot;
 
+const inventoryWithSwapSource = {
+	bySlotIndex: {
+		0: inventorySlot(0),
+		1: inventorySlot(1),
+	},
+	firstEmptySlotIndex: undefined,
+	slots: [
+		inventorySlot(0),
+		inventorySlot(1),
+	],
+	stacksByItemId: {
+		"item:twig": [
+			inventorySlot(0),
+			inventorySlot(1),
+		],
+	},
+} satisfies InventoryView;
+
 const boardItem = ({ id, x, y }: { id: string; x: number; y: number }) =>
 	({
 		id,
@@ -76,7 +94,7 @@ describe("resolveDrop animation contract", () => {
 			config,
 			board: emptyBoard,
 			feedback,
-			inventory: emptyInventory,
+			inventory: inventoryWithSwapSource,
 			context: {
 				dragRect: rect,
 				source: {

@@ -44,6 +44,7 @@ type TestProductInput = {
 	consume: boolean;
 	itemId: string;
 	quantity: number;
+	mode?: "exact" | "upTo";
 };
 
 type TestProduct = {
@@ -360,6 +361,23 @@ describe("GameConfigSchema", () => {
 		config.products["product:test"].inputs![0]!.capacity = 2;
 
 		expect(() => parseGameConfig(config)).toThrow(/Capacity must be >= quantity/);
+	});
+
+	it("accepts up-to activation inputs", () => {
+		const config = createValidConfigValue();
+		config.products["product:test"].inputs![0] = {
+			capacity: 4,
+			consume: true,
+			itemId: "item:twig",
+			mode: "upTo",
+			quantity: 4,
+		};
+
+		expect(parseGameConfig(config).products["product:test"].inputs![0]).toMatchObject({
+			itemId: "item:twig",
+			mode: "upTo",
+			quantity: 4,
+		});
 	});
 
 	it("rejects duplicate activation inputs for one product", () => {

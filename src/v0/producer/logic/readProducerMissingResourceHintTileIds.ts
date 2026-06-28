@@ -1,3 +1,4 @@
+import { readActivationInputRequiredQuantity } from "~/v0/game/requirements/readActivationInputRequiredQuantity";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
@@ -82,7 +83,7 @@ const readInputItemIdsMissingOnBoard = ({
 			itemId: input.itemId,
 			producerItemId,
 		});
-		if (input.stored + boardQuantity >= input.quantity) continue;
+		if (input.stored + boardQuantity >= readActivationInputRequiredQuantity(input)) continue;
 
 		itemIds.add(input.itemId);
 	}

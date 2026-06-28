@@ -1,4 +1,6 @@
 import type { FC, ReactNode } from "react";
+import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
+import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
 import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInputViewReady";
 import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
 import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
@@ -103,13 +105,11 @@ const readRequirementRow = (
 
 const readInputRow = (input: ActivationInputView, items: ItemCatalogView): DetailRow => {
 	const capacityLabel = input.capacity > input.quantity ? `cap ${input.capacity}` : undefined;
-	const availableLabel =
-		input.stored < input.quantity && input.available
-			? `+${input.available} available`
-			: undefined;
+	const fillableQuantity = readActivationInputViewFillableQuantity(input);
+	const availableLabel = fillableQuantity > 0 ? `+${fillableQuantity} available` : undefined;
 	const consumeLabel = input.consume ? "consumed at start" : "returned or kept";
 	const meta = [
-		`${input.stored}/${input.quantity}`,
+		readActivationInputViewLabel(input),
 		capacityLabel,
 		availableLabel,
 		consumeLabel,

@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { mergeActivationInputRequirementsFx } from "~/v0/game/requirements/mergeActivationInputRequirementsFx";
+import { readActivationInputSelectedQuantityAccepted } from "~/v0/game/requirements/readActivationInputSelectedQuantityAccepted";
 import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
 import { sumResolvedInputRefsFx } from "~/v0/game/requirements/sumResolvedInputRefsFx";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
@@ -43,7 +44,12 @@ export const checkActivationInputsFx = Effect.fn("checkActivationInputsFx")(func
 				),
 			);
 		}
-		if (selectedQuantity !== required.quantity) {
+		if (
+			!readActivationInputSelectedQuantityAccepted({
+				input: required,
+				selectedQuantity,
+			})
+		) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"input_mismatch",
@@ -59,7 +65,12 @@ export const checkActivationInputsFx = Effect.fn("checkActivationInputsFx")(func
 			itemId,
 			quantities: selectedByItemId,
 		});
-		if (selectedQuantity !== required.quantity) {
+		if (
+			!readActivationInputSelectedQuantityAccepted({
+				input: required,
+				selectedQuantity,
+			})
+		) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"input_mismatch",

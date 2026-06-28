@@ -1,6 +1,7 @@
 import type { FC, ReactNode } from "react";
 import type { ActivationHindranceView } from "~/v0/board/view/ActivationHindranceViewSchema";
 import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
+import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
 import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
@@ -264,7 +265,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 															readItemName(input.itemId, items)}
 													</p>
 													<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
-														{input.stored}/{input.quantity}
+														{readActivationInputViewLabel(input)}
 														{readActivationInputViewFillableQuantity(
 															input,
 														) > 0

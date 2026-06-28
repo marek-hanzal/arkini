@@ -7325,8 +7325,7 @@
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
-				"product:purifier-t1:pollution",
-				"product:purifier-t1:pollution-bulk"
+				"product:purifier-t1:pollution"
 			],
 			"requirementIds": []
 		},
@@ -11452,51 +11451,11 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:pollution",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
+					"mode": "upTo",
+					"quantity": 4
 				}
 			],
 			"name": "Purify Pollution",
-			"placement": "board_then_inventory",
-			"requirementIds": [],
-			"tags": [],
-			"visibility": "visible"
-		},
-		"product:purifier-t1:pollution-bulk": {
-			"chargeCost": 0,
-			"durationMs": 18000,
-			"inputs": [
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:pollution",
-					"quantity": 4
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 4
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 2
-				}
-			],
-			"name": "Purify Pollution x4",
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],

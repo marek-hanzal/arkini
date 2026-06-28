@@ -240,6 +240,8 @@ Example:
 
 A coal mine may require `1 sausage` and `1 beer` per production cycle and may store up to `4 sausage` and `4 beer` in advance. The player can later withdraw stored producer inputs through item detail when rules allow it. Withdrawal places items onto the board first, then falls back to normal inventory.
 
+Product inputs are exact by default: a line with `quantity: 4` needs and consumes exactly four items to start. A product input may instead use `mode: "upTo"`; then `quantity` is the per-run maximum, the line can start with at least one stored item, and the run consumes as many as are stored/auto-filled up to that maximum while output stays fixed. This is for cleanup/sink mechanics such as Purifier I, whose single pollution line consumes `1..4` pollution tiles per run and produces no item output.
+
 Stash consumable inputs are currently open-time inputs, not persistent stash input storage. A locked chest can consume a key when opened. Persistent stash gates should use stored requirements instead.
 
 ### 4.13 Inline output model

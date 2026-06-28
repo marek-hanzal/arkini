@@ -19,6 +19,7 @@ export const mergeActivationInputRequirementsFx = Effect.fn("mergeActivationInpu
 			const previous = requirements[input.itemId];
 			requirements[input.itemId] = {
 				consume: (previous?.consume ?? false) || input.consume,
+				mode: previous?.mode ?? input.mode,
 				quantity: (previous?.quantity ?? 0) + input.quantity,
 			};
 		}

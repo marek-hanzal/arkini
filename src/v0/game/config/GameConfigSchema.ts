@@ -37,6 +37,7 @@ import { z } from "zod";
  *   reverse merges from target-owned rules.
  * - Activation inputs always say whether they are consumed. Product-line/stash/craft
  *   code must not guess consumption from context, because guessing is just a bug wearing a hat. Input quantity defaults to 1.
+ *   Product inputs may use `mode: "upTo"` when a run should consume 1..quantity items for the same fixed output.
  * - Passive requirements always declare their search scope (`board`, `inventory`, or
  *   `board_or_inventory`). They model global knowledge/permission/ownership gates.
  * - Producer/product requirements are referenced through central `requirements` entries by
@@ -142,6 +143,10 @@ const PositiveNumberSchema = z.number().positive();
 const SignedIntegerSchema = z.number().int();
 const ProbabilitySchema = z.number().min(0).max(1);
 const ProbabilityDeltaSchema = z.number().min(-1).max(1);
+const ActivationInputModeSchema = z.enum([
+	"exact",
+	"upTo",
+]);
 /**
  * Output placement policy.
  *
@@ -180,6 +185,8 @@ const QuantitySchema = z.union([
 /**
  * Input slot for activations that can be gradually filled by product lines.
  * `consume` is required because config authors must see whether a fed item disappears. Missing quantity defaults to 1 because needing one item is the boring common case, not a revelation.
+ * Missing `mode` means `exact`: the product needs and consumes exactly `quantity`.
+ * `mode: "upTo"` means the product can start with at least one stored item and consumes up to `quantity` for the same fixed output.
  */
 const ItemStackInputSchema = z
 	.object({
@@ -187,6 +194,7 @@ const ItemStackInputSchema = z
 		quantity: PositiveIntegerSchema.default(1),
 		capacity: PositiveIntegerSchema,
 		consume: z.boolean(),
+		mode: ActivationInputModeSchema.optional(),
 	})
 	.strict();
 

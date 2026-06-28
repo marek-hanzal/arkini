@@ -22,6 +22,7 @@ import {
 	readGameTimeProgress,
 	readGameTimeRemainingMs,
 } from "~/v0/game/time/GameTime";
+import { readActivationInputRequiredQuantity } from "~/v0/game/requirements/readActivationInputRequiredQuantity";
 
 export namespace readRuntimeProducerProductLineViewsFromGameSave {
 	export interface Props {
@@ -204,7 +205,9 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				}),
 			}),
 		);
-		const inputsReady = inputs.every((input) => input.stored >= input.quantity);
+		const inputsReady = inputs.every(
+			(input) => input.stored >= readActivationInputRequiredQuantity(input),
+		);
 		const inputsAvailable = inputs.every(
 			(input) =>
 				input.stored +
@@ -213,7 +216,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 						save,
 						targetItemInstanceId,
 					}) >=
-				input.quantity,
+				readActivationInputRequiredQuantity(input),
 		);
 
 		return [

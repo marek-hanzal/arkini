@@ -6,7 +6,6 @@ import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
 import { ItemRequirementRulesCard } from "~/v0/item/ui/ItemRequirementRulesCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
 import { ItemGeneratedEffectsCard } from "~/v0/item/ui/ItemGeneratedEffectsCard";
-import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
@@ -59,28 +58,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const actionError = itemAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 	const craftHasRules = Boolean(liveCraft?.requirements?.length);
-	const relations = useMemo(
-		() => ({
-			mergeResults: (item?.mergeResults ?? []).map((rule) => ({
-				key: `${rule.withItemId}:${rule.resultItemId}`,
-				leftItemId: rule.withItemId,
-				resultItemId: rule.resultItemId,
-			})),
-			usedInMerges: (item?.usedInMerges ?? []).map((rule) => ({
-				key: `${rule.targetItemId}:${rule.resultItemId}`,
-				leftItemId: rule.targetItemId,
-				resultItemId: rule.resultItemId,
-			})),
-			usedInCrafts: (item?.usedInCrafts ?? []).map((recipe) => ({
-				key: `${recipe.targetItemId}:${recipe.resultItemId}`,
-				leftItemId: recipe.targetItemId,
-				resultItemId: recipe.resultItemId,
-			})),
-		}),
-		[
-			item,
-		],
-	);
 
 	if (!liveBoardItem || !item) {
 		return (
@@ -225,21 +202,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						onWithdrawInput={withdrawProductLineInput}
 					/>
 				) : null}
-				<ItemRelationList
-					title="Can merge into"
-					items={items}
-					relations={relations.mergeResults}
-				/>
-				<ItemRelationList
-					title="Can be merged with"
-					items={items}
-					relations={relations.usedInMerges}
-				/>
-				<ItemRelationList
-					title="Used in crafts"
-					items={items}
-					relations={relations.usedInCrafts}
-				/>
 			</div>
 		</section>
 	);

@@ -159,6 +159,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 				{lines.map((line) => {
 					const activeHindrances = line.hindrances ?? [];
 					const hindranceMultiplier = readHindrancesMultiplier(activeHindrances);
+					const unmetRequirements = (line.requirements ?? []).filter(
+						(requirement) => !readActivationRequirementViewReady(requirement),
+					);
 					const runState = readProducerProductLineRunState({
 						line,
 					});
@@ -218,11 +221,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								</div>
 							) : null}
 
-							{line.requirements?.length ? (
+							{unmetRequirements.length ? (
 								<div className="mt-2.5 grid gap-1.5">
-									{line.requirements.map((requirement, requirementIndex) => {
-										const ready =
-											readActivationRequirementViewReady(requirement);
+									{unmetRequirements.map((requirement, requirementIndex) => {
 										return (
 											<div
 												key={`${requirementIndex}:${readRequirementLabel(requirement, items)}`}
@@ -238,7 +239,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 													</p>
 												</div>
 												<span className="mt-0.5 shrink-0 text-ak-text-muted">
-													{ready ? "ready" : "missing"}
+													missing
 												</span>
 											</div>
 										);

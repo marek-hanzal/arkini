@@ -16,6 +16,7 @@ export namespace ItemRequirementRulesCard {
 		requirements?: readonly ActivationRequirementView[];
 		inputs?: readonly ActivationInputView[];
 		items: ItemCatalogView;
+		hideSatisfied?: boolean;
 	}
 }
 
@@ -133,15 +134,17 @@ const readInputRow = (input: ActivationInputView, items: ItemCatalogView): Detai
 };
 
 export const ItemRequirementRulesCard: FC<ItemRequirementRulesCard.Props> = ({
+	hideSatisfied = true,
 	items,
 	inputs = [],
 	requirements = [],
 	title,
 }) => {
-	const rows: readonly DetailRow[] = [
+	const allRows: readonly DetailRow[] = [
 		...requirements.map((requirement, index) => readRequirementRow(requirement, items, index)),
 		...inputs.map((input) => readInputRow(input, items)),
 	];
+	const rows = hideSatisfied ? allRows.filter((row) => !row.satisfied) : allRows;
 
 	if (rows.length === 0) return null;
 

@@ -495,12 +495,12 @@ Long press on a board item opens the item detail for that item instance.
 
 Long press on an empty board cell opens inventory in placement-target mode using that empty cell as the placement seed.
 
-The item detail must show every gameplay-relevant piece of information available for that item, including when relevant:
+The item detail must show the concrete selected item instance and its backward-facing state: what this item needs, what is currently stored on it, what it can actively run or withdraw, and what output it is currently working toward. It must not spam forward usage lists such as every craft, recipe, or merge where the selected item could be used elsewhere.
+
+Relevant detail content includes, when applicable:
 
 - item identity, kind, tags, and description
-- merge chain participation
-- valid merge outputs
-- craft/construction/growth requirements
+- unmet craft/construction/growth requirements
 - generated effects and path-choice rules before the player invests resources
 - deposited inputs
 - remaining inputs
@@ -510,6 +510,8 @@ The item detail must show every gameplay-relevant piece of information available
 - stash facade state through product-line requirements, inputs, charges, and depletion mode
 - possible output drops and their rules/probabilities, when known to the player
 - explicit actions available from the detail
+
+Satisfied requirement rows should be omitted from normal item detail sections. They may exist in diagnostic tooling, but player-facing sheets should not become a checklist museum once an expectation is already fulfilled.
 
 Item detail is gameplay UI. If a mechanic exists and the player can reasonably inspect it, the detail is the canonical place to expose it.
 
@@ -1401,7 +1403,7 @@ A gameplay implementation should provide tests or validation for:
 58. craft/construction timer starts only after explicit start action
 59. craft/construction timer pauses in inventory
 60. craft/construction completion on board
-61. item detail shows merge information
+61. item detail hides forward usage lists and fulfilled expectations
 62. item detail shows craft/construction/growth progress and timers
 63. item detail shows producer/stash state, inputs, charges, and loot information
 64. obsolete `playerInventory` concepts are absent from gameplay logic

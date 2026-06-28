@@ -5,18 +5,13 @@ import { readBoardItemStoreState } from "~/v0/item/logic/readBoardItemStoreState
 
 const item = (overrides: Partial<ViewItem> = {}): ViewItem => ({
 	assetSrc: "test.svg",
-	canMerge: false,
-	canProduce: false,
 	description: "Test item",
 	generatedEffects: [],
 	id: "item:test",
 	maxStackSize: 10,
-	mergeResults: [],
 	name: "Test item",
 	storage: "both",
 	tags: [],
-	usedInCrafts: [],
-	usedInMerges: [],
 	...overrides,
 });
 

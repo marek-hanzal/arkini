@@ -1,4 +1,4 @@
-import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
+import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
 import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
@@ -35,10 +35,11 @@ export const resolveBoardItemTapAction = ({
 	boardItem,
 	nowMs,
 }: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result => {
-	const liveCraft = readLiveCraftView({
-		craft: boardItem.craft,
+	const liveBoardItem = readLiveBoardItemView({
+		boardItem,
 		nowMs,
 	});
+	const liveCraft = liveBoardItem?.craft;
 
 	if (liveCraft?.complete) {
 		return {
@@ -66,8 +67,8 @@ export const resolveBoardItemTapAction = ({
 		};
 	}
 
-	if (boardItem.activation?.kind === "stash") {
-		if (isProducerReady(boardItem.activation, nowMs)) {
+	if (liveBoardItem?.activation?.kind === "stash") {
+		if (isProducerReady(liveBoardItem.activation, nowMs)) {
 			return {
 				type: "activate",
 				activation: "exhaust",
@@ -81,8 +82,8 @@ export const resolveBoardItemTapAction = ({
 		};
 	}
 
-	if (boardItem.activation?.kind === "producer") {
-		const defaultLine = boardItem.activation.productLines?.find((line) => line.isDefault);
+	if (liveBoardItem?.activation?.kind === "producer") {
+		const defaultLine = liveBoardItem.activation.productLines?.find((line) => line.isDefault);
 		const runState = defaultLine
 			? readProducerProductLineRunState({
 					line: defaultLine,

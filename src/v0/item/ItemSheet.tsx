@@ -1,8 +1,7 @@
 import { type FC, useMemo } from "react";
-import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
+import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
 import { ItemStashDropsCard } from "~/v0/item/ui/ItemStashDropsCard";
 import { readBoardItemStoreState } from "~/v0/item/logic/readBoardItemStoreState";
-import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
 import { ItemRequirementRulesCard } from "~/v0/item/ui/ItemRequirementRulesCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
@@ -43,28 +42,17 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		],
 	);
 	const nowMs = useProducerClock(clockItems);
-	const item = boardItem ? items[boardItem.itemId] : undefined;
-	const liveCraft = readLiveCraftView({
-		craft: boardItem?.craft,
+	const liveBoardItem = readLiveBoardItemView({
+		boardItem,
 		nowMs,
 	});
-	const liveProductLines = useMemo(
-		() =>
-			boardItem?.activation?.productLines?.map((line) =>
-				readLiveProducerProductLineView({
-					line,
-					nowMs,
-				}),
-			) ?? [],
-		[
-			boardItem?.activation?.productLines,
-			nowMs,
-		],
-	);
+	const item = liveBoardItem ? items[liveBoardItem.itemId] : undefined;
+	const liveCraft = liveBoardItem?.craft;
+	const liveProductLines = liveBoardItem?.activation?.productLines ?? [];
 	const storeState =
-		boardItem && item
+		liveBoardItem && item
 			? readBoardItemStoreState({
-					boardItem,
+					boardItem: liveBoardItem,
 					item,
 				})
 			: undefined;
@@ -94,7 +82,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		],
 	);
 
-	if (!boardItem || !item) {
+	if (!liveBoardItem || !item) {
 		return (
 			<section
 				data-ui="tile detail"
@@ -113,7 +101,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 
 	const setDefaultProductLine = (productId: string) => {
 		void itemAction.run({
-			producerItemInstanceId: boardItem.id,
+			producerItemInstanceId: liveBoardItem.id,
 			productId,
 			type: "producer.product_line.set_default",
 		});
@@ -122,7 +110,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const startProductLine = (productId: string) => {
 		void itemAction.run({
 			inputRefs: [],
-			producerItemInstanceId: boardItem.id,
+			producerItemInstanceId: liveBoardItem.id,
 			productId,
 			type: "producer.product.start",
 		});
@@ -136,7 +124,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		if (!liveCraft) return;
 		void itemAction.run({
 			recipeId: liveCraft.id,
-			targetItemInstanceId: boardItem.id,
+			targetItemInstanceId: liveBoardItem.id,
 			type: "craft.start",
 		});
 	};
@@ -145,7 +133,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		void itemAction.run({
 			itemId,
 			quantity: 1,
-			targetItemInstanceId: boardItem.id,
+			targetItemInstanceId: liveBoardItem.id,
 			type: "craft.input.withdraw",
 		});
 	};
@@ -153,7 +141,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const withdrawProductLineInput = (productId: string, itemId: string) => {
 		void itemAction.run({
 			itemId,
-			producerItemInstanceId: boardItem.id,
+			producerItemInstanceId: liveBoardItem.id,
 			productId,
 			type: "producer.input.withdraw",
 		});
@@ -162,7 +150,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const storeBoardItem = () => {
 		void itemAction
 			.run({
-				boardItemId: boardItem.id,
+				boardItemId: liveBoardItem.id,
 				type: "board.item.stash",
 			})
 			.then(onClose)
@@ -207,20 +195,22 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						onWithdrawInput={withdrawCraftInput}
 					/>
 				) : null}
-				{boardItem.activation?.kind === "stash" ? (
+				{liveBoardItem.activation?.kind === "stash" ? (
 					<ItemStashDropsCard
-						drops={boardItem.activation.drops}
+						drops={liveBoardItem.activation.drops}
 						items={items}
 					/>
 				) : null}
-				{boardItem.activation?.inputs.length ||
-				boardItem.activation?.requirements.length ? (
+				{liveBoardItem.activation?.inputs.length ||
+				liveBoardItem.activation?.requirements.length ? (
 					<ItemRequirementRulesCard
-						inputs={boardItem.activation.inputs}
+						inputs={liveBoardItem.activation.inputs}
 						items={items}
-						requirements={boardItem.activation.requirements}
+						requirements={liveBoardItem.activation.requirements}
 						title={
-							boardItem.activation.kind === "stash" ? "Stash rules" : "Producer rules"
+							liveBoardItem.activation.kind === "stash"
+								? "Stash rules"
+								: "Producer rules"
 						}
 					/>
 				) : null}
@@ -229,7 +219,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						items={items}
 						lines={liveProductLines}
 						pending={itemAction.isPending}
-						canSetDefault={boardItem.activation?.kind === "producer"}
+						canSetDefault={liveBoardItem.activation?.kind === "producer"}
 						onSetDefault={setDefaultProductLine}
 						onStart={startProductLine}
 						onWithdrawInput={withdrawProductLineInput}

@@ -1,4 +1,4 @@
-import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
+import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
 
 export namespace readCraftRunState {
@@ -16,11 +16,6 @@ export namespace readCraftRunState {
 	}
 }
 
-const readRequirementReady = (requirement: ActivationRequirementView) =>
-	requirement.type === "proximity"
-		? requirement.satisfied
-		: requirement.stored >= requirement.quantity;
-
 const readCraftInputsPartiallyAvailable = (craft: CraftProgressView) =>
 	craft.inputs.some((input) => {
 		const delivered = craft.delivered[input.itemId] ?? 0;
@@ -28,7 +23,7 @@ const readCraftInputsPartiallyAvailable = (craft: CraftProgressView) =>
 	});
 
 export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraftRunState.Result => {
-	const requirementsReady = (craft.requirements ?? []).every(readRequirementReady);
+	const requirementsReady = (craft.requirements ?? []).every(readActivationRequirementViewReady);
 	const inputsReady = craft.inputProgress >= 1;
 	const inputsPartiallyAvailable = readCraftInputsPartiallyAvailable(craft);
 	const canClaim = craft.complete;

@@ -1021,6 +1021,8 @@ Producer product-line detail must keep its layout stable when a job starts, paus
 
 Feedback should be local to the affected board item or inventory slot whenever possible. Global toasts should be reserved for cases where local feedback cannot explain the state.
 
+During drag/drop over an occupied board item or inventory stack, feedback belongs on the target item actor rather than on the underlying slot chrome. Targets that can accept/absorb the dragged item should scale/brighten. Occupied targets that reject the dragged item, including destinations that will swap instead of absorb, should shrink/dim. Slot outline/background feedback is reserved for empty target cells/slots.
+
 ### 16.2 Required feedback categories
 
 The game should define feedback/animation rules for at least:

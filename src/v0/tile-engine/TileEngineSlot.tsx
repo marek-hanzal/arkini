@@ -3,6 +3,7 @@ import { cn } from "~/v0/ui/cn";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import { sameTileEngineSlotProps } from "~/v0/tile-engine/sameTileEngineSlotProps";
 import type { TileEngineSlot as TileEngineSlotType } from "~/v0/tile-engine/TileEngineSlot.types";
+import { readTileEngineSlotVisibleFeedback } from "~/v0/tile-engine/readTileEngineSlotVisibleFeedback";
 import { useTileSlotFeedbackDebug } from "~/v0/tile-engine/useTileSlotFeedbackDebug";
 import { useTileSlotLongPress } from "~/v0/tile-engine/useTileSlotLongPress";
 
@@ -40,7 +41,12 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 	const binding = dragRef.current?.slot(slot, targetTile);
 	const dropId = binding?.id ?? slot.dropId ?? slot.id;
 	const disabled = Boolean(engineDisabled || !binding || binding.disabled || slot.disabled);
-	const slotFeedback = disabled ? null : dropFeedback;
+	const slotFeedback = disabled
+		? null
+		: readTileEngineSlotVisibleFeedback({
+				dropFeedback,
+				targetTile,
+			});
 	const isOver = Boolean(slotFeedback);
 
 	const longPress = useTileSlotLongPress({

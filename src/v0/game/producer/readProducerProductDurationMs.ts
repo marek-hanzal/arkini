@@ -23,7 +23,7 @@ export const readProducerProductDurationMs = ({
 	save,
 }: readProducerProductDurationMs.Props) =>
 	Math.max(
-		1,
+		0,
 		Math.ceil(
 			product.durationMs *
 				readProximityRequirementsDurationMultiplier({

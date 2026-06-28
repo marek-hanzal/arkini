@@ -58,6 +58,123 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
+	it("completes zero-duration producer products in the same action", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					durationMs: 0,
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.nextWakeAtMs).toBeNull();
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
+		expect(result.events).toEqual([
+			expect.objectContaining({
+				atMs: 500,
+				readyAtMs: 500,
+				productId: "product:test",
+				type: "product.started",
+			}),
+			expect.objectContaining({
+				atMs: 500,
+				productId: "product:test",
+				type: "product.completed",
+			}),
+			expect.objectContaining({
+				itemId: "item:twig",
+				type: "item.created",
+			}),
+		]);
+	});
+
+	it("expires zero-duration activated effects in the same action", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:instant-window": {
+					name: "Instant window",
+					operations: [
+						{
+							kind: "line.reveal",
+							target: {
+								all: true,
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					activatesEffectId: "effect:instant-window",
+					durationMs: 0,
+					output: undefined,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result.save.producerJobs).toEqual({});
+		expect(result.save.activeEffects).toEqual({});
+		expect(result.events.map((event) => event.type)).toEqual([
+			"product.started",
+			"effect.activated",
+			"product.completed",
+			"effect.expired",
+		]);
+	});
+
 	it("rejects producer start while the same target has a running craft job", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

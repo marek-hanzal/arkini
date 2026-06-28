@@ -71,12 +71,9 @@ describe("applyGameActionFx Stash", () => {
 			save,
 		});
 
-		const result = runTick({
-			config,
-			nowMs: started.nextWakeAtMs ?? 101,
-			save: started.save,
-		});
+		const result = started;
 
+		expect(result.nextWakeAtMs).toBeNull();
 		expect(result.save.board.items["item-instance:2"]).toMatchObject({
 			id: "item-instance:2",
 			itemId: "item:twig",
@@ -97,7 +94,7 @@ describe("applyGameActionFx Stash", () => {
 			itemId: "item:twig",
 			quantity: 1,
 		});
-		expect(started.events).toEqual(
+		expect(result.events).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					itemId: "item:key",

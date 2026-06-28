@@ -173,6 +173,72 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(config.products["product:shred"].visibility).toBe("hidden");
 	});
 
+	it("allows duration effects to make a producer line instant", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:instant": {
+					name: "Instant",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0,
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:instant",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:test"];
+
+		expect(
+			readEffectiveProducerProductLine({
+				baseDurationMs: product.durationMs,
+				config,
+				nowMs: 0,
+				producerId: "item:producer",
+				producerItemId: "item:producer",
+				producerItemInstanceId: "item-instance:1",
+				product,
+				productId: "product:test",
+				save,
+			}).durationMs,
+		).toBe(0);
+	});
+
 	it("applies active effects only between activation and expiration", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

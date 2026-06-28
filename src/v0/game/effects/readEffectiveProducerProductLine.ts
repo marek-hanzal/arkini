@@ -235,7 +235,7 @@ export const readEffectiveProducerProductLine = ({
 		appliedEffects,
 		blocked,
 		blockReasons,
-		durationMs: Math.max(1, Math.ceil((baseDurationMs + durationAddMs) * durationMultiplier)),
+		durationMs: Math.max(0, Math.ceil((baseDurationMs + durationAddMs) * durationMultiplier)),
 		lootPlan: {
 			appendOutputs,
 			baseDropChance: clampProbability(baseDropChance),

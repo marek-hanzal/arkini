@@ -35,6 +35,25 @@ const inventory = rebuildInventoryView([
 	},
 ]);
 
+const occupiedInventory = rebuildInventoryView([
+	{
+		slotIndex: 0,
+		stack: {
+			id: "stack:source",
+			itemId: "item:twig",
+			quantity: 1,
+		},
+	},
+	{
+		slotIndex: 1,
+		stack: {
+			id: "stack:target",
+			itemId: "item:pebble",
+			quantity: 1,
+		},
+	},
+]);
+
 const staleInventory = rebuildInventoryView([
 	{
 		slotIndex: 0,
@@ -96,7 +115,7 @@ describe("resolveInventoryDropFeedback", () => {
 		});
 	});
 
-	it("returns empty feedback for occupied inventory swap targets", () => {
+	it("marks occupied inventory swap targets as blocked target feedback", () => {
 		expect(
 			resolveInventoryDropFeedback({
 				context: createContext({
@@ -112,10 +131,10 @@ describe("resolveInventoryDropFeedback", () => {
 						},
 					},
 				}),
-				inventory,
+				inventory: occupiedInventory,
 			}),
 		).toEqual({
-			effect: "empty",
+			effect: "blocked",
 		});
 	});
 

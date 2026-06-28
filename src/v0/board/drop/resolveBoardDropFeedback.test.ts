@@ -487,7 +487,7 @@ describe("resolveBoardDropFeedback", () => {
 		});
 	});
 
-	it("does not show blocked feedback for plain swap targets", () => {
+	it("marks plain board swap targets as blocked target feedback", () => {
 		const source = boardItem({
 			id: "a",
 			itemId: "item:twig",
@@ -532,7 +532,9 @@ describe("resolveBoardDropFeedback", () => {
 					},
 				}),
 			}),
-		).toBeNull();
+		).toEqual({
+			effect: "blocked",
+		});
 	});
 	it("marks inventory drops to plain swap targets as blocked feedback", () => {
 		const target = boardItem({

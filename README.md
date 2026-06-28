@@ -49,7 +49,7 @@ The old browser SQLite/Kysely layer, database migrations, `dbFx`, `withTransacti
 
 ## Tile engine boundary
 
-Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/v0/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory gameplay data belongs to `RuntimeGameEngineAdapter`/`GameRuntimeStore`; persistence wraps that later. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules.
+Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/v0/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory gameplay data belongs to `RuntimeGameEngineAdapter`/`GameRuntimeStore`; persistence wraps that later. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules. Occupied drop-target feedback is actor-local: valid accepting targets scale/brighten, rejecting or swap targets shrink/dim, and the generic slot outline/background is suppressed when a target tile owns the hover feedback.
 
 `TileEngine` is standalone by design: it accepts slots, tiles, render callbacks, generic drag bindings, and drop resolution callbacks. It must not import Arkini board/inventory/producers directly. Game-specific stuff lives in `src/v0/play/drop` and the board/inventory surfaces. If a future game surface needs tile behavior, it should feed generic slots/tiles into `TileEngine` instead of inventing another tiny haunted renderer.
 

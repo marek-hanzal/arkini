@@ -187,9 +187,10 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 				className={cn(
 					"h-full w-full origin-center transition-[transform,filter,opacity] duration-150 ease-out will-change-[transform,opacity] [backface-visibility:hidden] data-[ak-tile-engine-presence-motion]:transition-none",
 					isOverlayLayer ? "[touch-action:pan-y]" : "touch-none",
-					dropFeedback?.effect === "merge" && "scale-[1.14]",
+					dropFeedback?.effect === "merge" &&
+						"scale-[1.1] saturate-[1.08] brightness-[1.1]",
 					dropFeedback?.effect === "blocked" &&
-						"scale-[0.88] opacity-90 saturate-[0.82] brightness-[0.86]",
+						"scale-[0.9] opacity-70 saturate-[0.78] brightness-[0.82]",
 				)}
 			>
 				{renderTile({

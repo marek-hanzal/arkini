@@ -103,12 +103,11 @@ export const resolveBoardDropFeedback = ({
 		};
 	}
 
-	if (intent.type === "swap")
-		return source.kind === "board"
-			? null
-			: {
-					effect: "blocked",
-				};
+	if (intent.type === "swap") {
+		return {
+			effect: "blocked",
+		};
+	}
 
 	return {
 		effect: "blocked",

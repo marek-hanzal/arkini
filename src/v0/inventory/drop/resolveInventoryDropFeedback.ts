@@ -36,6 +36,13 @@ export const resolveInventoryDropFeedback = ({
 		};
 	}
 
+	const targetStack = inventory.bySlotIndex[String(target.slotIndex)]?.stack;
+	if (targetStack) {
+		return {
+			effect: "blocked",
+		};
+	}
+
 	return {
 		effect: "empty",
 	};

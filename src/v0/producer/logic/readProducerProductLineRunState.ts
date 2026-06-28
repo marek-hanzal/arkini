@@ -1,3 +1,4 @@
+import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
 export namespace readProducerProductLineRunState {
@@ -8,15 +9,66 @@ export namespace readProducerProductLineRunState {
 	export interface Result {
 		canRunAction: boolean;
 		inputsPartiallyAvailable: boolean;
+		inputAvailabilityLabel?: string;
 		label: string;
+		progressLabel?: string;
+		showProgress: boolean;
+		statusMetaLabel?: string;
 	}
 }
 
-const readInputFillableQuantity = (input: ProducerProductLineView["inputs"][number]) =>
-	Math.min(Math.max(0, input.quantity - input.stored), input.available ?? 0);
-
 const readInputsPartiallyAvailable = (line: ProducerProductLineView) =>
-	!line.inputsReady && line.inputs.some((input) => readInputFillableQuantity(input) > 0);
+	!line.inputsReady &&
+	line.inputs.some((input) => readActivationInputViewFillableQuantity(input) > 0);
+
+const readInputAvailabilityLabel = ({
+	inputsPartiallyAvailable,
+	line,
+}: {
+	inputsPartiallyAvailable: boolean;
+	line: ProducerProductLineView;
+}) => {
+	if (line.inputItemIds.length === 0) return "tap to run";
+	if (line.inputsReady) return "input ready";
+	if (line.inputsAvailable) return "auto-fill ready";
+	if (inputsPartiallyAvailable) return "partial fill ready";
+	return "needs input";
+};
+
+const readStatusMetaLabel = (line: ProducerProductLineView) => {
+	if (line.deliveryBlocked || line.queueBlockedReason === "delivery_blocked") {
+		return "delivery blocked";
+	}
+	if (line.queueBlockedReason === "paused") return "queue paused";
+	if (line.pausedAtMs !== undefined) return "paused";
+	if (line.queueFull) return "queue full";
+	if (line.blocked) return "blocked by effect";
+	if (!line.requirementsReady) return "requirements missing";
+	return undefined;
+};
+
+const withCommonState = ({
+	canRunAction,
+	inputsPartiallyAvailable,
+	label,
+	line,
+}: {
+	canRunAction: boolean;
+	inputsPartiallyAvailable: boolean;
+	label: string;
+	line: ProducerProductLineView;
+}): readProducerProductLineRunState.Result => ({
+	canRunAction,
+	inputsPartiallyAvailable,
+	inputAvailabilityLabel: readInputAvailabilityLabel({
+		inputsPartiallyAvailable,
+		line,
+	}),
+	label,
+	progressLabel: line.pausedAtMs !== undefined ? "Paused" : "Running",
+	showProgress: line.inProgress && !line.deliveryBlocked,
+	statusMetaLabel: readStatusMetaLabel(line),
+});
 
 export const readProducerProductLineRunState = ({
 	line,
@@ -33,88 +85,99 @@ export const readProducerProductLineRunState = ({
 		!line.queueFull;
 
 	if (line.pausedAtMs !== undefined) {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Paused",
-		};
+			line,
+		});
 	}
 
 	if (line.deliveryBlocked || line.queueBlockedReason === "delivery_blocked") {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Delivery blocked",
-		};
+			line,
+		});
 	}
 
 	if (line.queueBlockedReason === "paused") {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Queue paused",
-		};
+			line,
+		});
 	}
 
 	if (line.queueFull) {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Queue full",
-		};
+			line,
+		});
 	}
 
 	if (line.blocked) {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Blocked by effect",
-		};
+			line,
+		});
 	}
 
 	if (!line.requirementsReady) {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Requirements missing",
-		};
+			line,
+		});
 	}
 
 	if (!canRunAction) {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Feed items by drag",
-		};
+			line,
+		});
 	}
 
 	if (line.inputsReady) {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Start",
-		};
+			line,
+		});
 	}
 
 	if (line.inputsAvailable) {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Auto-fill & start",
-		};
+			line,
+		});
 	}
 
 	if (inputsPartiallyAvailable) {
-		return {
+		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Partial fill",
-		};
+			line,
+		});
 	}
 
-	return {
+	return withCommonState({
 		canRunAction,
 		inputsPartiallyAvailable,
 		label: "Feed items by drag",
-	};
+		line,
+	});
 };

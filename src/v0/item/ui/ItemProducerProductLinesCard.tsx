@@ -1,5 +1,7 @@
 import type { FC, ReactNode } from "react";
 import type { ActivationHindranceView } from "~/v0/board/view/ActivationHindranceViewSchema";
+import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
+import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
@@ -26,14 +28,6 @@ const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "
 
 const readItemName = (itemId: string, items: ItemCatalogView) =>
 	items[itemId]?.name ?? itemId.replace(/^item:/, "").replace(/^producer:/, "");
-
-const readRequirementReady = (requirement: ActivationRequirementView) =>
-	requirement.type === "proximity"
-		? requirement.satisfied
-		: requirement.stored >= requirement.quantity;
-
-const readInputFillableQuantity = (input: ProducerProductLineView["inputs"][number]) =>
-	Math.min(Math.max(0, input.quantity - input.stored), input.available ?? 0);
 
 const readHindrancesMultiplier = (hindrances: readonly ActivationHindranceView[]) =>
 	hindrances.reduce((total, hindrance) => total * hindrance.durationMultiplier, 1);
@@ -167,7 +161,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					const runState = readProducerProductLineRunState({
 						line,
 					});
-					const progressLabel = line.pausedAtMs !== undefined ? "Paused" : "Running";
 
 					return (
 						<div
@@ -186,18 +179,12 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											{hindranceMultiplier > 1
 												? ` · hindered ${formatMultiplier(hindranceMultiplier)}×`
 												: ""}
-											{line.blocked ? " · blocked by effect" : ""}
-											{line.inputItemIds.length
-												? ` · ${
-														line.inputsReady
-															? "input ready"
-															: line.inputsAvailable
-																? "auto-fill ready"
-																: runState.inputsPartiallyAvailable
-																	? "partial fill ready"
-																	: "needs input"
-													}`
-												: " · tap to run"}
+											{runState.statusMetaLabel
+												? ` · ${runState.statusMetaLabel}`
+												: ""}
+											{runState.inputAvailabilityLabel
+												? ` · ${runState.inputAvailabilityLabel}`
+												: ""}
 										</p>
 									</div>
 									{line.isDefault ? (
@@ -233,7 +220,8 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 							{line.requirements?.length ? (
 								<div className="mt-2.5 grid gap-1.5">
 									{line.requirements.map((requirement, requirementIndex) => {
-										const ready = readRequirementReady(requirement);
+										const ready =
+											readActivationRequirementViewReady(requirement);
 										return (
 											<div
 												key={`${requirementIndex}:${readRequirementLabel(requirement, items)}`}
@@ -277,8 +265,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 													</p>
 													<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
 														{input.stored}/{input.quantity}
-														{readInputFillableQuantity(input) > 0
-															? ` · +${readInputFillableQuantity(input)} available`
+														{readActivationInputViewFillableQuantity(
+															input,
+														) > 0
+															? ` · +${readActivationInputViewFillableQuantity(input)} available`
 															: ""}
 														{input.capacity > input.quantity
 															? ` · cap ${input.capacity}`
@@ -306,11 +296,11 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								</div>
 							) : null}
 
-							{line.inProgress && !line.deliveryBlocked ? (
+							{runState.showProgress ? (
 								<div className="mt-2.5 rounded-sm bg-ak-surface-soft p-2.5">
 									<div className="flex justify-between gap-3 text-sm font-bold text-ak-primary">
 										<span>
-											{progressLabel}
+											{runState.progressLabel}
 											{line.queuedJobs > 1
 												? ` +${line.queuedJobs - 1} queued`
 												: ""}

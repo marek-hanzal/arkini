@@ -70,7 +70,7 @@ describe("resolveInventoryDropFeedback", () => {
 		});
 	});
 
-	it("returns blocked feedback for occupied inventory swap targets", () => {
+	it("returns empty feedback for occupied inventory swap targets", () => {
 		expect(
 			resolveInventoryDropFeedback({
 				context: createContext({
@@ -88,7 +88,7 @@ describe("resolveInventoryDropFeedback", () => {
 				}),
 			}),
 		).toEqual({
-			effect: "blocked",
+			effect: "empty",
 		});
 	});
 });

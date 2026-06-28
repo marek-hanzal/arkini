@@ -1,11 +1,8 @@
-import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
+import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
+import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInputViewReady";
+import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
-
-const isRequirementReady = (requirement: ActivationRequirementView) =>
-	requirement.type === "proximity"
-		? requirement.satisfied
-		: requirement.stored >= requirement.quantity;
 
 export function isProducerStocked(activation: ActivationView | undefined) {
 	if (!activation) return false;
@@ -26,11 +23,13 @@ export function isProducerStocked(activation: ActivationView | undefined) {
 		}).canRunAction;
 	}
 
-	const inputsReady = activation.inputs.every((input) => input.stored >= input.quantity);
-	const inputsFillable = activation.inputs.some((input) => {
-		const missingQuantity = input.quantity - input.stored;
-		return missingQuantity > 0 && Math.min(missingQuantity, input.available ?? 0) > 0;
-	});
+	const inputsReady = activation.inputs.every(readActivationInputViewReady);
+	const inputsFillable = activation.inputs.some(
+		(input) => readActivationInputViewFillableQuantity(input) > 0,
+	);
 
-	return (inputsReady || inputsFillable) && activation.requirements.every(isRequirementReady);
+	return (
+		(inputsReady || inputsFillable) &&
+		activation.requirements.every(readActivationRequirementViewReady)
+	);
 }

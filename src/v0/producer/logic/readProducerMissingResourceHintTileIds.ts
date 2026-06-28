@@ -1,6 +1,6 @@
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
+import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProductOutputItemIds } from "~/v0/game/config/readProductOutputItemIds";
@@ -61,15 +61,9 @@ const addUnsatisfiedRequirementItemIds = ({
 			continue;
 		}
 
-		if (requirement.stored >= requirement.quantity) continue;
+		if (readActivationRequirementViewReady(requirement)) continue;
 		itemIds.add(requirement.itemId);
 	}
-};
-
-const readRequirementSatisfied = (requirement: ActivationRequirementView) => {
-	if (requirement.type === "proximity") return requirement.satisfied;
-
-	return requirement.stored >= requirement.quantity;
 };
 
 const readInputItemIdsMissingOnBoard = ({
@@ -121,7 +115,9 @@ const readProducedItemIds = ({
 
 const lineHasUnsatisfiedRequirement = (line: ProducerProductLineView) => {
 	if (line.requirements) {
-		return line.requirements.some((requirement) => !readRequirementSatisfied(requirement));
+		return line.requirements.some(
+			(requirement) => !readActivationRequirementViewReady(requirement),
+		);
 	}
 
 	return line.missingRequirementItemIds.length > 0 || !line.requirementsReady;

@@ -45,6 +45,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 	const startAtMs = runningJob?.startAtMs;
 	const readyAtMs = runningJob?.readyAtMs;
 	const pausedAtMs = runningJob?.pausedAtMs;
+	const deliveryBlocked = runningJob?.delivery !== undefined;
 	const clockNowMs = pausedAtMs ?? nowMs;
 	const timeProgress =
 		startAtMs !== undefined && readyAtMs !== undefined
@@ -54,8 +55,9 @@ export const readRuntimeCraftViewFromGameSave = ({
 					startAtMs,
 				})
 			: 0;
-	const phase =
-		pausedAtMs !== undefined
+	const phase = deliveryBlocked
+		? "delivery_blocked"
+		: pausedAtMs !== undefined
 			? "paused"
 			: readyAtMs !== undefined && readyAtMs <= nowMs
 				? "ready"
@@ -77,6 +79,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 		acceptedInputItemIds,
 		canAcceptInputs: acceptedInputItemIds.length > 0,
 		complete: phase === "ready",
+		deliveryBlocked,
 		delivered,
 		durationMs,
 		id: recipeId,
@@ -91,7 +94,12 @@ export const readRuntimeCraftViewFromGameSave = ({
 			quantity: input.quantity,
 		})),
 		phase,
-		progress: phase === "collecting_inputs" ? inputProgress : timeProgress,
+		progress:
+			phase === "collecting_inputs"
+				? inputProgress
+				: phase === "delivery_blocked"
+					? 0
+					: timeProgress,
 		readyAtMs,
 		pausedAtMs,
 		remainingMs:

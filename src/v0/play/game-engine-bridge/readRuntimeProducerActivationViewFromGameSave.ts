@@ -6,6 +6,7 @@ import { readRuntimeProducerProductLineViewsFromGameSave } from "~/v0/play/game-
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
+import { readProducerDeliveryBlocked } from "~/v0/game/producer/readProducerDeliveryBlocked";
 
 export namespace readRuntimeProducerActivationViewFromGameSave {
 	export interface Props {
@@ -42,11 +43,10 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 	});
 	const selectedProduct = selectedProductId ? config.products[selectedProductId] : undefined;
 
-	const deliveryBlocked = Object.values(save.producerJobs).some(
-		(job) =>
-			job.producerItemInstanceId === boardItem.id &&
-			job.delivery?.lastBlockedAtMs !== undefined,
-	);
+	const deliveryBlocked = readProducerDeliveryBlocked({
+		producerItemInstanceId: boardItem.id,
+		save,
+	});
 
 	return {
 		deliveryBlocked,

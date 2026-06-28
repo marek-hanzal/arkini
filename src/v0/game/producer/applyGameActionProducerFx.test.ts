@@ -1602,7 +1602,7 @@ describe("applyGameActionFx Producer", () => {
 			productId: "product:test",
 			readyAtMs: 2500,
 			remainingMs: 1000,
-			startAtMs: 1000,
+			startAtMs: 1500,
 		});
 		expect(result.nextWakeAtMs).toBeNull();
 

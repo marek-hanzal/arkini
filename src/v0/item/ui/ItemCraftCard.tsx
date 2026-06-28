@@ -123,11 +123,13 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 			>
 				{craft.phase === "paused"
 					? "Paused"
-					: craft.phase !== "collecting_inputs"
-						? "Running"
-						: canStart
-							? "Start craft"
-							: "Auto-fill or drag inputs"}
+					: craft.phase === "delivery_blocked"
+						? "Delivery blocked"
+						: craft.phase !== "collecting_inputs"
+							? "Running"
+							: canStart
+								? "Start craft"
+								: "Auto-fill or drag inputs"}
 			</UiButton>
 		</UiSection>
 	);

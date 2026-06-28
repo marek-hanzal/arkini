@@ -178,6 +178,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 					})
 				: true;
 			if ((!requirementsReady || !startGateReady) && startAtMs <= nowMs) {
+				const pausedStartAtMs = startGateReady ? startAtMs : nowMs;
 				const remainingMs = startGateReady
 					? readGamePausableJobRemainingMsAtPause({
 							job,
@@ -195,14 +196,14 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 					pausedAtMs: nowMs,
 					readyAtMs,
 					remainingMs,
-					startAtMs,
+					startAtMs: pausedStartAtMs,
 				};
 				yield* updateProducerJobActiveEffectFx({
 					config,
 					draft,
 					job: draft.producerJobs[job.id],
 					readyAtMs,
-					startAtMs,
+					startAtMs: pausedStartAtMs,
 				});
 				break;
 			}

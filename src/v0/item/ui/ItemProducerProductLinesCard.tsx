@@ -11,6 +11,7 @@ import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
+import { UiProgressButton } from "~/v0/ui/UiProgressButton";
 import { UiSection } from "~/v0/ui/UiSection";
 
 export namespace ItemProducerProductLinesCard {
@@ -32,6 +33,29 @@ const readItemName = (itemId: string, items: ItemCatalogView) =>
 
 const readHindrancesMultiplier = (hindrances: readonly ActivationHindranceView[]) =>
 	hindrances.reduce((total, hindrance) => total * hindrance.durationMultiplier, 1);
+
+const readLineActionLabel = ({
+	line,
+	runState,
+}: {
+	line: ProducerProductLineView;
+	runState: ReturnType<typeof readProducerProductLineRunState>;
+}) => {
+	if (!runState.showProgress) return runState.label;
+
+	const statusLabel =
+		line.remainingMs === undefined ? "Queued" : (runState.progressLabel ?? "Running");
+	const timeLabel = line.remainingMs === undefined ? undefined : formatMs(line.remainingMs);
+	const queuedLabel = line.queuedJobs > 1 ? `+${line.queuedJobs - 1} queued` : undefined;
+
+	return [
+		statusLabel,
+		timeLabel,
+		queuedLabel,
+	]
+		.filter(Boolean)
+		.join(" · ");
+};
 
 const renderRequirementAsset = (
 	requirement: ActivationRequirementView,
@@ -298,32 +322,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								</div>
 							) : null}
 
-							{runState.showProgress ? (
-								<div className="mt-2.5 rounded-sm bg-ak-surface-soft p-2.5">
-									<div className="flex justify-between gap-3 text-sm font-bold text-ak-primary">
-										<span>
-											{runState.progressLabel}
-											{line.queuedJobs > 1
-												? ` +${line.queuedJobs - 1} queued`
-												: ""}
-										</span>
-										<span>
-											{line.remainingMs !== undefined
-												? formatMs(line.remainingMs)
-												: "Queued"}
-										</span>
-									</div>
-									<div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-ak-surface">
-										<div
-											className="h-full rounded-sm bg-ak-primary transition-[width] duration-200 ease-linear"
-											style={{
-												width: `${Math.round((line.progress ?? 0) * 100)}%`,
-											}}
-										/>
-									</div>
-								</div>
-							) : null}
-
 							<div
 								className={
 									canSetDefault
@@ -331,14 +329,26 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 										: "mt-2.5 grid gap-2"
 								}
 							>
-								<UiButton
-									disabled={!runState.canRunAction || pending}
-									tone={runState.canRunAction ? "primary" : "secondary"}
+								<UiProgressButton
+									disabled={
+										runState.showProgress || !runState.canRunAction || pending
+									}
+									progress={
+										runState.showProgress ? (line.progress ?? 0) : undefined
+									}
+									tone={
+										runState.showProgress || runState.canRunAction
+											? "primary"
+											: "secondary"
+									}
 									className={canSetDefault ? "col-span-2" : undefined}
 									onClick={() => onStart(line.productId)}
 								>
-									{runState.label}
-								</UiButton>
+									{readLineActionLabel({
+										line,
+										runState,
+									})}
+								</UiProgressButton>
 								{canSetDefault ? (
 									<UiButton
 										fullWidth

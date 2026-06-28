@@ -45,9 +45,34 @@ describe("ItemProducerProductLinesCard", () => {
 			/>,
 		);
 
-		expect(html).toContain("Paused");
-		expect(html).toContain("4s");
-		expect(html).not.toContain("Queue full</button>");
+		expect(html).toContain("Paused · 4s");
+		expect(html).toContain('style="width:20%"');
+		expect(html).not.toContain("Queue full</span></button>");
+		expect(html).not.toContain("mt-2 h-1.5 overflow-hidden");
+	});
+
+	it("keeps queued producer jobs in the action button", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						pausedAtMs: undefined,
+						progress: undefined,
+						remainingMs: undefined,
+						queuedJobs: 2,
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Queued · +1 queued");
+		expect(html).toContain('style="width:0%"');
+		expect(html).not.toContain("mt-2 h-1.5 overflow-hidden");
 	});
 
 	it("shows blocked delivery without rendering fake running progress", () => {
@@ -98,7 +123,7 @@ describe("ItemProducerProductLinesCard", () => {
 		);
 
 		expect(html).not.toContain(">Default</button>");
-		expect(html).toContain(">Start</button>");
+		expect(html).toContain(">Start</span></button>");
 	});
 
 	it("hides satisfied product-line requirement rows", () => {

@@ -1017,6 +1017,8 @@ Animation specs should define behavior, not final art direction. Exact colors, p
 
 Every active interaction should provide clear feedback for success, failure, blocked state, progress, and readiness.
 
+Producer product-line detail must keep its layout stable when a job starts, pauses, queues, or completes. Runtime progress and remaining time belong inside the locked action button as a background fill plus concise label, not in a separate block that appears/disappears and shifts the sheet layout.
+
 Feedback should be local to the affected board item or inventory slot whenever possible. Global toasts should be reserved for cases where local feedback cannot explain the state.
 
 ### 16.2 Required feedback categories

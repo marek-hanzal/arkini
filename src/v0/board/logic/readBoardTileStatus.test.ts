@@ -1,6 +1,31 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { readBoardTileStatus } from "~/v0/board/logic/readBoardTileStatus";
+
+const productLine = (
+	overrides: Partial<ProducerProductLineView> = {},
+): ProducerProductLineView => ({
+	blocked: false,
+	blockReasonEffectIds: [],
+	durationMs: 1000,
+	inProgress: false,
+	inputItemIds: [],
+	inputs: [],
+	inputsAvailable: true,
+	inputsReady: true,
+	isDefault: false,
+	missingRequirementItemIds: [],
+	name: "Product",
+	producerQueuedJobs: 0,
+	productId: "product:test",
+	queueFull: false,
+	queuedJobs: 0,
+	queueSize: 1,
+	requirementItemIds: [],
+	requirementsReady: true,
+	...overrides,
+});
 
 const boardItem = (overrides: Partial<BoardViewItem> = {}): BoardViewItem => ({
 	id: "item-instance:producer",
@@ -12,7 +37,7 @@ const boardItem = (overrides: Partial<BoardViewItem> = {}): BoardViewItem => ({
 });
 
 describe("readBoardTileStatus", () => {
-	it("dims producers without explicit default product line", () => {
+	it("keeps producers without explicit default product line visually neutral", () => {
 		expect(
 			readBoardTileStatus({
 				boardItem: boardItem({
@@ -20,26 +45,9 @@ describe("readBoardTileStatus", () => {
 						inputs: [],
 						kind: "producer",
 						productLines: [
-							{
-								blocked: false,
-								blockReasonEffectIds: [],
-								durationMs: 1000,
-								inProgress: false,
-								inputItemIds: [],
-								inputs: [],
-								inputsAvailable: true,
-								inputsReady: true,
+							productLine({
 								isDefault: false,
-								missingRequirementItemIds: [],
-								name: "Product",
-								producerQueuedJobs: 0,
-								productId: "product:test",
-								queueFull: false,
-								queuedJobs: 0,
-								queueSize: 1,
-								requirementItemIds: [],
-								requirementsReady: true,
-							},
+							}),
 						],
 						requirements: [],
 						trigger: "click",
@@ -48,6 +56,33 @@ describe("readBoardTileStatus", () => {
 				nowMs: 0,
 			}),
 		).toMatchObject({
+			dimmed: false,
+			ready: false,
+		});
+	});
+
+	it("dims producers with blocked explicit default product line", () => {
+		expect(
+			readBoardTileStatus({
+				boardItem: boardItem({
+					activation: {
+						inputs: [],
+						kind: "producer",
+						productLines: [
+							productLine({
+								inputsAvailable: false,
+								inputsReady: false,
+								isDefault: true,
+							}),
+						],
+						requirements: [],
+						trigger: "click",
+					},
+				}),
+				nowMs: 0,
+			}),
+		).toMatchObject({
+			dimmed: true,
 			ready: false,
 		});
 	});
@@ -60,26 +95,9 @@ describe("readBoardTileStatus", () => {
 						inputs: [],
 						kind: "producer",
 						productLines: [
-							{
-								blocked: false,
-								blockReasonEffectIds: [],
-								durationMs: 1000,
-								inProgress: false,
-								inputItemIds: [],
-								inputs: [],
-								inputsAvailable: true,
-								inputsReady: true,
+							productLine({
 								isDefault: true,
-								missingRequirementItemIds: [],
-								name: "Product",
-								producerQueuedJobs: 0,
-								productId: "product:test",
-								queueFull: false,
-								queuedJobs: 0,
-								queueSize: 1,
-								requirementItemIds: [],
-								requirementsReady: true,
-							},
+							}),
 						],
 						requirements: [],
 						trigger: "click",
@@ -88,6 +106,7 @@ describe("readBoardTileStatus", () => {
 				nowMs: 0,
 			}),
 		).toMatchObject({
+			dimmed: false,
 			ready: true,
 		});
 	});

@@ -212,10 +212,7 @@ const StoredItemRequirementSchema = z
 	})
 	.strict();
 
-/**
- * Passive requirement gates by ownership/presence in an explicit scope. This deliberately
- * avoids spatial rules such as adjacency; those are not part of the current engine DSL.
- */
+/** Passive requirement gates by ownership/presence in an explicit scope. */
 const PassiveItemScopeSchema = z.enum([
 	"board",
 	"inventory",
@@ -233,17 +230,10 @@ const PassiveItemRequirementSchema = z
 
 const ActivationInputSchema = z.array(ItemStackInputSchema);
 
-const ActivationRequirementSchema = z.array(
-	z.discriminatedUnion("type", [
-		StoredItemRequirementSchema,
-		PassiveItemRequirementSchema,
-	]),
-);
-
 /**
- * Proximity requirement gates a producer/product by nearby board items.
+ * Proximity requirement gates an activation by nearby board items.
  * Distance uses Chebyshev grid radius, so distance 1 includes diagonals.
- * `durationFactor` multiplies the matched resource distance into production time.
+ * `durationFactor` multiplies the matched resource distance into runtime duration.
  * Missing factor defaults to 1 at runtime.
  */
 const ProximityItemRequirementSchema = z
@@ -254,6 +244,14 @@ const ProximityItemRequirementSchema = z
 		durationFactor: z.number().min(0).optional(),
 	})
 	.strict();
+
+const ActivationRequirementSchema = z.array(
+	z.discriminatedUnion("type", [
+		StoredItemRequirementSchema,
+		PassiveItemRequirementSchema,
+		ProximityItemRequirementSchema,
+	]),
+);
 
 /**
  * Negative production hindrance. Hindrances do not gate production. Every active
@@ -1819,30 +1817,71 @@ const validateGameRequirement = (
 	);
 };
 
+type ValidatedItemRequirement =
+	| {
+			capacity?: number;
+			itemId: string;
+			quantity: number;
+			scope?: string;
+			type: "passive" | "stored";
+	  }
+	| {
+			distance: number;
+			itemIds: readonly string[];
+			type: "proximity";
+	  };
+
+const readRequirementItemIdsKey = (itemIds: readonly string[]) =>
+	[
+		...itemIds,
+	]
+		.sort()
+		.join("|");
+
+const readItemRequirementUniqueKey = (requirement: ValidatedItemRequirement) => {
+	if (requirement.type === "passive") {
+		return `${requirement.type}:${requirement.itemId}:${requirement.scope}`;
+	}
+
+	if (requirement.type === "proximity") {
+		return `${requirement.type}:${readRequirementItemIdsKey(requirement.itemIds)}:${requirement.distance}`;
+	}
+
+	return `${requirement.type}:${requirement.itemId}`;
+};
+
 const validateItemRequirements = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	requirements: readonly {
-		capacity?: number;
-		itemId: string;
-		quantity: number;
-		scope?: string;
-		type: string;
-	}[],
+	requirements: readonly ValidatedItemRequirement[],
 	hasItem: (itemId: string) => boolean,
 ) => {
 	validateUniqueStringList(
 		ctx,
 		path,
-		requirements.map((requirement) =>
-			requirement.type === "passive"
-				? `${requirement.type}:${requirement.itemId}:${requirement.scope}`
-				: `${requirement.type}:${requirement.itemId}`,
-		),
+		requirements.map(readItemRequirementUniqueKey),
 		(value) => `Duplicate requirement "${value}".`,
 	);
 
 	for (const [index, requirement] of requirements.entries()) {
+		if (requirement.type === "proximity") {
+			for (const [itemIndex, itemId] of requirement.itemIds.entries()) {
+				if (hasItem(itemId)) continue;
+
+				addIssue(
+					ctx,
+					[
+						...path,
+						index,
+						"itemIds",
+						itemIndex,
+					],
+					`Missing item "${itemId}".`,
+				);
+			}
+			continue;
+		}
+
 		if (!hasItem(requirement.itemId)) {
 			addIssue(
 				ctx,

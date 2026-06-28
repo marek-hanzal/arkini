@@ -445,6 +445,140 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
+	it("freezes paused craft progress in the runtime view", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					assetId: "asset:test",
+					description: "Craft table",
+					maxStackSize: 1,
+					name: "Craft Table",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:craft"] = {
+			id: "job:craft",
+			pausedAtMs: 250,
+			readyAtMs: 1000,
+			recipeId: "item:craft-table",
+			remainingMs: 750,
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 900,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.craft).toMatchObject({
+			complete: false,
+			pausedAtMs: 250,
+			phase: "paused",
+			progress: 0.25,
+			remainingMs: 750,
+			timeProgress: 0.25,
+		});
+	});
+
+	it("shows proximity-adjusted craft duration in the runtime view", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:craft-table": {
+					...baseConfig.craftRecipes["item:craft-table"],
+					requirements: [
+						{
+							distance: 2,
+							durationFactor: 1,
+							itemIds: [
+								"item:rock",
+							],
+							type: "proximity",
+						},
+					],
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:craft-table": {
+					assetId: "asset:test",
+					description: "Craft table",
+					maxStackSize: 1,
+					name: "Craft Table",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.craft).toMatchObject({
+			durationMs: 2000,
+			requirements: [
+				{
+					durationMultiplier: 2,
+					matchedDistance: 2,
+					satisfied: true,
+					type: "proximity",
+				},
+			],
+		});
+	});
+
 	it("shows available craft input resources from board and inventory", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

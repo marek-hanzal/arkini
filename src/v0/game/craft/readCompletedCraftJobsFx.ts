@@ -17,6 +17,6 @@ export const readCompletedCraftJobsFx = Effect.fn("readCompletedCraftJobsFx")(fu
 		nowMs,
 		save,
 	})
-		.filter((facts) => facts.releaseAtMs <= nowMs)
+		.filter((facts) => facts.releaseAtMs !== undefined && facts.releaseAtMs <= nowMs)
 		.map((facts) => facts.job);
 });

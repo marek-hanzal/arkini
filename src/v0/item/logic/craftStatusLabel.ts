@@ -13,5 +13,6 @@ export const craftStatusLabel = ({ craft }: craftStatusLabel.Props) => {
 		return craft.remainingMs !== undefined
 			? `Ready in ${formatMs(craft.remainingMs)}`
 			: "Building";
+	if (craft.phase === "paused") return "Paused";
 	return "Ready";
 };

@@ -6,6 +6,7 @@ import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
+import { readCraftJobEffectiveTimingFx } from "~/v0/game/craft/readCraftJobEffectiveTimingFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -99,12 +100,17 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 	});
 	delete nextSave.craftInputs[action.targetItemInstanceId];
 	const jobId = yield* createGameJobIdFx();
-	const readyAtMs = nowMs + checked.recipe.durationMs;
+	const timing = yield* readCraftJobEffectiveTimingFx({
+		recipe: checked.recipe,
+		save: nextSave,
+		startAtMs: nowMs,
+		targetItemInstanceId: action.targetItemInstanceId,
+	});
 	nextSave.craftJobs[jobId] = {
-		readyAtMs,
+		readyAtMs: timing.readyAtMs,
 		id: jobId,
 		recipeId: action.recipeId,
-		startAtMs: nowMs,
+		startAtMs: timing.startAtMs,
 		targetItemInstanceId: action.targetItemInstanceId,
 	};
 	nextSave.updatedAtMs = nowMs;
@@ -114,10 +120,10 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 			...events,
 			{
 				atMs: nowMs,
-				readyAtMs,
+				readyAtMs: timing.readyAtMs,
 				jobId,
 				recipeId: action.recipeId,
-				startAtMs: nowMs,
+				startAtMs: timing.startAtMs,
 				targetItemInstanceId: action.targetItemInstanceId,
 				type: "craft.started" as const,
 			},

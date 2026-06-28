@@ -5,6 +5,7 @@ import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 import { readGameTimeProgress, readGameTimeRemainingMs } from "~/v0/game/time/GameTime";
+import { readProximityRequirementsDurationMultiplier } from "~/v0/game/requirements/readProximityRequirementsDurationMultiplier";
 
 export namespace readRuntimeCraftViewFromGameSave {
 	export interface Props {
@@ -36,22 +37,37 @@ export const readRuntimeCraftViewFromGameSave = ({
 	);
 	const inputProgress =
 		totalInputQuantity === 0 ? 1 : deliveredInputQuantity / totalInputQuantity;
+	const durationMs = Math.max(
+		0,
+		Math.ceil(
+			recipe.durationMs *
+				readProximityRequirementsDurationMultiplier({
+					requirements: recipe.requirements,
+					save,
+					targetItemInstanceId: boardItem.id,
+				}),
+		),
+	);
 	const startAtMs = runningJob?.startAtMs;
 	const readyAtMs = runningJob?.readyAtMs;
+	const pausedAtMs = runningJob?.pausedAtMs;
+	const clockNowMs = pausedAtMs ?? nowMs;
 	const timeProgress =
 		startAtMs !== undefined && readyAtMs !== undefined
 			? readGameTimeProgress({
-					nowMs,
+					nowMs: clockNowMs,
 					readyAtMs,
 					startAtMs,
 				})
 			: 0;
 	const phase =
-		readyAtMs !== undefined && readyAtMs <= nowMs
-			? "ready"
-			: readyAtMs !== undefined
-				? "waiting"
-				: "collecting_inputs";
+		pausedAtMs !== undefined
+			? "paused"
+			: readyAtMs !== undefined && readyAtMs <= nowMs
+				? "ready"
+				: readyAtMs !== undefined
+					? "waiting"
+					: "collecting_inputs";
 	const acceptedInputItemIds =
 		phase === "collecting_inputs"
 			? recipe.inputs.flatMap((input) =>
@@ -68,7 +84,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 		canAcceptInputs: acceptedInputItemIds.length > 0,
 		complete: phase === "ready",
 		delivered,
-		durationMs: recipe.durationMs,
+		durationMs,
 		id: recipeId,
 		inputProgress,
 		inputs: recipe.inputs.map((input) => ({
@@ -83,10 +99,11 @@ export const readRuntimeCraftViewFromGameSave = ({
 		phase,
 		progress: phase === "collecting_inputs" ? inputProgress : timeProgress,
 		readyAtMs,
+		pausedAtMs,
 		remainingMs:
 			readyAtMs !== undefined
 				? readGameTimeRemainingMs({
-						nowMs,
+						nowMs: clockNowMs,
 						readyAtMs,
 					})
 				: undefined,

@@ -11,6 +11,7 @@ import {
 interface ActivationInputRequirement {
 	itemId: string;
 	quantity: number;
+	mode?: "exact" | "upTo";
 }
 
 export namespace planActivationInputRefsFx {

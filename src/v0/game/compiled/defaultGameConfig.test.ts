@@ -188,24 +188,16 @@ describe("defaultGameConfig", () => {
 			"proximity:dirty-processing:purifier",
 		]);
 
+		expect(defaultGameConfig.producers["producer:purifier-t1"].productIds).toEqual([
+			"product:purifier-t1:pollution",
+		]);
 		expect(readProductInputs("product:purifier-t1:pollution")).toEqual([
 			{
 				capacity: 4,
 				consume: true,
 				itemId: "item:pollution",
-				quantity: 1,
-			},
-			{
-				capacity: 4,
-				consume: true,
-				itemId: "item:water",
-				quantity: 1,
-			},
-			{
-				capacity: 4,
-				consume: true,
-				itemId: "item:charcoal",
-				quantity: 1,
+				mode: "upTo",
+				quantity: 4,
 			},
 		]);
 

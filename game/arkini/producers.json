@@ -267,8 +267,7 @@
 		},
 		"producer:purifier-t1": {
 			"productIds": [
-				"product:purifier-t1:pollution",
-				"product:purifier-t1:pollution-bulk"
+				"product:purifier-t1:pollution"
 			]
 		},
 		"producer:quarry-t1": {

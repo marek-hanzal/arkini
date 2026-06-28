@@ -2704,6 +2704,177 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("starts an up-to producer product with one explicit input ref", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					inputs: [
+						{
+							capacity: 4,
+							consume: true,
+							itemId: "item:twig",
+							mode: "upTo",
+							quantity: 4,
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+
+		const result = runAction({
+			action: {
+				inputRefs: [
+					{
+						itemInstanceId: "item-instance:2",
+						kind: "board",
+					},
+				],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toBeUndefined();
+		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:shred",
+			startAtMs: 100,
+		});
+	});
+
+	it("starts an up-to producer product with one stored input", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					inputs: [
+						{
+							capacity: 4,
+							consume: true,
+							itemId: "item:twig",
+							mode: "upTo",
+							quantity: 4,
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerInputs["item-instance:1"] = {
+			productInputs: {
+				"product:shred": {
+					items: {
+						"item:twig": 1,
+					},
+				},
+			},
+		};
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.producerInputs).toEqual({});
+		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:shred",
+			startAtMs: 100,
+		});
+	});
+
+	it("auto-fills an up-to producer product to its run maximum before starting", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					inputs: [
+						{
+							capacity: 4,
+							consume: true,
+							itemId: "item:twig",
+							mode: "upTo",
+							quantity: 4,
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		for (const [index, x] of [
+			1,
+			2,
+			3,
+			4,
+		].entries()) {
+			save.board.items[`item-instance:${index + 2}`] = {
+				id: `item-instance:${index + 2}`,
+				itemId: "item:twig",
+				x,
+				y: 0,
+			};
+		}
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.producerInputs).toEqual({});
+		expect(
+			Object.values(result.save.board.items).filter((item) => item.itemId === "item:twig"),
+		).toHaveLength(0);
+		expect(
+			result.events.filter((event) => event.type === "producer_input.stored"),
+		).toHaveLength(4);
+		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:shred",
+			startAtMs: 100,
+		});
+	});
+
 	it("leaves an incomplete producer product idle when auto-fill finds no inputs", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

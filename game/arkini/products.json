@@ -2863,44 +2863,12 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:pollution"
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water"
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:charcoal"
+					"itemId": "item:pollution",
+					"mode": "upTo",
+					"quantity": 4
 				}
 			],
 			"name": "Purify Pollution"
-		},
-		"product:purifier-t1:pollution-bulk": {
-			"durationMs": 18000,
-			"inputs": [
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:pollution",
-					"quantity": 4
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 4
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 2
-				}
-			],
-			"name": "Purify Pollution x4"
 		},
 		"product:quarry-t1:stone": {
 			"durationMs": 5000,

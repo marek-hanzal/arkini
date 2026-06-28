@@ -17,6 +17,7 @@ import type { GameActionProducerProductStart } from "~/v0/game/action/GameAction
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
+import { readActivationInputStoredQuantityReady } from "~/v0/game/requirements/readActivationInputStoredQuantityReady";
 
 export namespace startProducerProductFx {
 	export interface Props {
@@ -43,12 +44,14 @@ const readProducerStoredInputsReadyFx = Effect.fn("readProducerStoredInputsReady
 		productId,
 		save,
 	});
-	return inputs.every(
-		(input) =>
-			readGameItemQuantity({
+	return inputs.every((input) =>
+		readActivationInputStoredQuantityReady({
+			input,
+			storedQuantity: readGameItemQuantity({
 				itemId: input.itemId,
 				quantities: storedInputs,
-			}) >= input.quantity,
+			}),
+		}),
 	);
 });
 

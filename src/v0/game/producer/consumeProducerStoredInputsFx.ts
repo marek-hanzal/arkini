@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
+import { readActivationInputMode } from "~/v0/game/requirements/readActivationInputMode";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace consumeProducerStoredInputsFx {
@@ -25,7 +26,11 @@ export const consumeProducerStoredInputsFx = Effect.fn("consumeProducerStoredInp
 		if (!input.consume) continue;
 
 		const previousQuantity = productInputState.items[input.itemId] ?? 0;
-		const nextQuantity = previousQuantity - input.quantity;
+		const consumedQuantity =
+			readActivationInputMode(input) === "upTo"
+				? Math.min(previousQuantity, input.quantity)
+				: input.quantity;
+		const nextQuantity = previousQuantity - consumedQuantity;
 		if (nextQuantity > 0) {
 			productInputState.items[input.itemId] = nextQuantity;
 		} else {

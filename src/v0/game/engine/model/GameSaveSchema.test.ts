@@ -42,6 +42,34 @@ describe("GameSaveConfigSchema", () => {
 		).not.toThrow();
 	});
 
+	it("rejects paused delivery producer jobs", () => {
+		const config = createEngineTestConfig();
+		const save = createInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const invalidSave = cloneSave(save);
+		invalidSave.producerJobs["job:blocked-paused"] = {
+			...createProducerJob("job:blocked-paused"),
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2000,
+			},
+			pausedAtMs: 1000,
+			remainingMs: 500,
+		};
+
+		const result = GameSaveConfigSchema.safeParse({
+			config,
+			save: invalidSave,
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toContain(
+			"delivery producer jobs must not be paused",
+		);
+	});
+
 	it("rejects board item counts above item maxCount", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

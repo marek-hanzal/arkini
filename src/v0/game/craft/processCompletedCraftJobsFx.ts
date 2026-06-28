@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { completeCraftJobFx } from "~/v0/game/craft/completeCraftJobFx";
 import { readCompletedCraftJobsFx } from "~/v0/game/craft/readCompletedCraftJobsFx";
+import { syncRealtimeCraftJobsFx } from "~/v0/game/craft/syncRealtimeCraftJobsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -20,12 +21,25 @@ export const processCompletedCraftJobsFx = Effect.fn("processCompletedCraftJobsF
 }: processCompletedCraftJobsFx.Props) {
 	let nextSave = save;
 	const events: GameEvent[] = [];
-	const craftJobs = yield* readCompletedCraftJobsFx({
-		nowMs,
-		save: nextSave,
-	});
 
-	for (const job of craftJobs) {
+	while (true) {
+		nextSave = yield* syncRealtimeCraftJobsFx({
+			config,
+			nowMs,
+			save: nextSave,
+		});
+		const [job] = yield* readCompletedCraftJobsFx({
+			nowMs,
+			save: nextSave,
+		});
+
+		if (!job) {
+			return {
+				events,
+				save: nextSave,
+			};
+		}
+
 		const result = yield* completeCraftJobFx({
 			config,
 			job,
@@ -36,9 +50,4 @@ export const processCompletedCraftJobsFx = Effect.fn("processCompletedCraftJobsF
 		nextSave = result.save;
 		events.push(...result.events);
 	}
-
-	return {
-		events,
-		save: nextSave,
-	};
 });

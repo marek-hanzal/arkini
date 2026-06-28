@@ -111,6 +111,8 @@ export const readWorldWakePlanFx = Effect.fn("readWorldWakePlanFx")(function* ({
 		nowMs,
 		save,
 	})) {
+		if (craftJobFacts.releaseAtMs === undefined) continue;
+
 		wakeReasons.push({
 			atMs: readProcessableWorldWakeAtMs({
 				nowMs,

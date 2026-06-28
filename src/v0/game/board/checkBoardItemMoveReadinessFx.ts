@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionBoardItemMoveSchema } from "~/v0/game/action/GameActionBoardItemMoveSchema";
-import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -32,19 +31,6 @@ export const checkBoardItemMoveReadinessFx = Effect.fn("checkBoardItemMoveReadin
 	}
 
 	if (item.x === action.x && item.y === action.y) return item;
-
-	const stateStatus = readBoardItemRuntimeStateStatus({
-		itemInstanceId: item.id,
-		save,
-	});
-	if (stateStatus.craftBusy) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"item_busy",
-				"Board item has a running craft job and cannot be moved.",
-			),
-		);
-	}
 
 	const occupied = Object.values(save.board.items).find(
 		(entry) => entry.id !== item.id && entry.x === action.x && entry.y === action.y,

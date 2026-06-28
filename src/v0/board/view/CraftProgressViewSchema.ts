@@ -24,6 +24,7 @@ export const CraftProgressViewSchema = z.object({
 	canAcceptInputs: z.boolean(),
 	startAtMs: z.number().optional(),
 	readyAtMs: z.number().optional(),
+	pausedAtMs: z.number().optional(),
 	remainingMs: z.number().optional(),
 	acceptedInputItemIds: z.array(GameItemIdSchema),
 });

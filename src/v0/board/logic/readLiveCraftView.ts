@@ -12,24 +12,25 @@ export const readLiveCraftView = ({ craft, nowMs }: readLiveCraftView.Props) => 
 	if (!craft) return undefined;
 	if (craft.phase === "collecting_inputs" || craft.readyAtMs === undefined) return craft;
 
+	const clockNowMs = craft.pausedAtMs ?? nowMs;
 	const timeProgress =
 		craft.startAtMs === undefined
 			? craft.timeProgress
 			: readGameTimeProgress({
-					nowMs,
+					nowMs: clockNowMs,
 					readyAtMs: craft.readyAtMs,
 					startAtMs: craft.startAtMs,
 				});
-	const ready = craft.readyAtMs <= nowMs;
+	const ready = craft.pausedAtMs === undefined && craft.readyAtMs <= nowMs;
 
 	return {
 		...craft,
 		timeProgress,
 		progress: timeProgress,
-		phase: ready ? "ready" : "waiting",
+		phase: ready ? "ready" : craft.pausedAtMs !== undefined ? "paused" : "waiting",
 		complete: ready,
 		remainingMs: readGameTimeRemainingMs({
-			nowMs,
+			nowMs: clockNowMs,
 			readyAtMs: craft.readyAtMs,
 		}),
 		canAcceptInputs: false,

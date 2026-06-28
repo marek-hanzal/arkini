@@ -56,6 +56,46 @@ const GameSaveDeliveryRetrySchema = z
 		],
 	});
 
+const validateGameSavePausableJobTiming = (
+	value: {
+		pausedAtMs?: number;
+		readyAtMs: number;
+		remainingMs?: number;
+		startAtMs: number;
+	},
+	ctx: z.RefinementCtx,
+) => {
+	if (value.readyAtMs < value.startAtMs) {
+		ctx.addIssue({
+			code: "custom",
+			message: "readyAtMs must be >= startAtMs",
+			path: [
+				"readyAtMs",
+			],
+		});
+	}
+
+	if ((value.pausedAtMs === undefined) !== (value.remainingMs === undefined)) {
+		ctx.addIssue({
+			code: "custom",
+			message: "pausedAtMs and remainingMs must be set together",
+			path: [
+				"pausedAtMs",
+			],
+		});
+	}
+
+	if (value.pausedAtMs !== undefined && value.pausedAtMs < value.startAtMs) {
+		ctx.addIssue({
+			code: "custom",
+			message: "pausedAtMs must be >= startAtMs",
+			path: [
+				"pausedAtMs",
+			],
+		});
+	}
+};
+
 const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
@@ -68,23 +108,18 @@ const GameSaveProducerJobSchema = z
 		readyAtMs: GameInstantMsSchema,
 	})
 	.strict()
-	.refine((value) => value.readyAtMs >= value.startAtMs, {
-		message: "readyAtMs must be >= startAtMs",
-		path: [
-			"readyAtMs",
-		],
-	})
-	.refine((value) => (value.pausedAtMs === undefined) === (value.remainingMs === undefined), {
-		message: "pausedAtMs and remainingMs must be set together",
-		path: [
-			"pausedAtMs",
-		],
-	})
-	.refine((value) => value.pausedAtMs === undefined || value.pausedAtMs >= value.startAtMs, {
-		message: "pausedAtMs must be >= startAtMs",
-		path: [
-			"pausedAtMs",
-		],
+	.superRefine((value, ctx) => {
+		validateGameSavePausableJobTiming(value, ctx);
+
+		if (!value.delivery || value.pausedAtMs === undefined) return;
+
+		ctx.addIssue({
+			code: "custom",
+			message: "delivery producer jobs must not be paused",
+			path: [
+				"delivery",
+			],
+		});
 	});
 
 const GameSaveActiveEffectSchema = z
@@ -108,17 +143,26 @@ const GameSaveCraftJobSchema = z
 	.object({
 		id: IdSchema,
 		delivery: GameSaveDeliveryRetrySchema.optional(),
+		pausedAtMs: GameInstantMsSchema.optional(),
+		remainingMs: NonNegativeIntegerSchema.optional(),
 		recipeId: IdSchema,
 		startAtMs: GameInstantMsSchema,
 		readyAtMs: GameInstantMsSchema,
 		targetItemInstanceId: IdSchema,
 	})
 	.strict()
-	.refine((value) => value.readyAtMs >= value.startAtMs, {
-		message: "readyAtMs must be >= startAtMs",
-		path: [
-			"readyAtMs",
-		],
+	.superRefine((value, ctx) => {
+		validateGameSavePausableJobTiming(value, ctx);
+
+		if (!value.delivery || value.pausedAtMs === undefined) return;
+
+		ctx.addIssue({
+			code: "custom",
+			message: "delivery craft jobs must not be paused",
+			path: [
+				"delivery",
+			],
+		});
 	});
 
 const GameSaveProducerChargeStateSchema = z

@@ -212,6 +212,13 @@ const collectCraftRecipeUsage = (config: GameConfig, itemFlow: ItemFlowIndex) =>
 			usageItem(itemFlow, input.itemId, "consumed");
 		}
 		for (const requirement of recipe.requirements) {
+			if (requirement.type === "proximity") {
+				for (const itemId of requirement.itemIds) {
+					usageItem(itemFlow, itemId, "consumed");
+				}
+				continue;
+			}
+
 			usageItem(itemFlow, requirement.itemId, "consumed");
 		}
 	}

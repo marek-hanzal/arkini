@@ -121,11 +121,13 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 				className="mt-3"
 				onClick={onStart}
 			>
-				{craft.phase !== "collecting_inputs"
-					? "Running"
-					: canStart
-						? "Start craft"
-						: "Auto-fill or drag inputs"}
+				{craft.phase === "paused"
+					? "Paused"
+					: craft.phase !== "collecting_inputs"
+						? "Running"
+						: canStart
+							? "Start craft"
+							: "Auto-fill or drag inputs"}
 			</UiButton>
 		</UiSection>
 	);

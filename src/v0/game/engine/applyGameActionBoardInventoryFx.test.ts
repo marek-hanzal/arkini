@@ -35,7 +35,7 @@ describe("applyGameActionFx BoardInventory", () => {
 		});
 	});
 
-	it("rejects moving a board item with a running job", () => {
+	it("moves a board item with a running craft job", () => {
 		const config = createEngineCraftTableTestConfig();
 		const save = runInitialSave({
 			config,
@@ -49,7 +49,7 @@ describe("applyGameActionFx BoardInventory", () => {
 			targetItemInstanceId: "item-instance:1",
 		};
 
-		const result = runActionEither({
+		const result = runAction({
 			action: {
 				boardItemId: "item-instance:1",
 				type: "board.item.move",
@@ -61,16 +61,16 @@ describe("applyGameActionFx BoardInventory", () => {
 			save,
 		});
 
-		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
-				_tag: "GameActionRejected",
-				reason: "item_busy",
-			},
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			x: 1,
+			y: 0,
+		});
+		expect(readOnlyRecordValue(result.save.craftJobs)).toMatchObject({
+			targetItemInstanceId: "item-instance:1",
 		});
 	});
 
-	it("rejects swapping a board item with a running job", () => {
+	it("swaps a board item with a running craft job", () => {
 		const config = createEngineCraftTableTestConfig({
 			boardItemCount: 2,
 		});
@@ -86,7 +86,7 @@ describe("applyGameActionFx BoardInventory", () => {
 			targetItemInstanceId: "item-instance:1",
 		};
 
-		const result = runActionEither({
+		const result = runAction({
 			action: {
 				sourceBoardItemId: "item-instance:1",
 				targetBoardItemId: "item-instance:2",
@@ -97,13 +97,115 @@ describe("applyGameActionFx BoardInventory", () => {
 			save,
 		});
 
-		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
-				_tag: "GameActionRejected",
-				reason: "item_busy",
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			x: 1,
+			y: 0,
+		});
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			x: 0,
+			y: 0,
+		});
+		expect(readOnlyRecordValue(result.save.craftJobs)).toMatchObject({
+			targetItemInstanceId: "item-instance:1",
+		});
+	});
+
+	it("pauses and resumes a moved craft target when proximity requirements break and return", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 4,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:craft-table": {
+					...baseConfig.craftRecipes["item:craft-table"],
+					inputs: [],
+					requirements: [
+						{
+							distance: 1,
+							itemIds: [
+								"item:rock",
+							],
+							type: "proximity",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
 			},
 		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = runAction({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		const paused = runAction({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 3,
+				y: 0,
+			},
+			config,
+			nowMs: 250,
+			save: started.save,
+		});
+		expect(readOnlyRecordValue(paused.save.craftJobs)).toMatchObject({
+			pausedAtMs: 250,
+			readyAtMs: 1000,
+			remainingMs: 750,
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		});
+		expect(paused.nextWakeAtMs).toBeNull();
+
+		const resumed = runAction({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 2,
+				y: 0,
+			},
+			config,
+			nowMs: 500,
+			save: paused.save,
+		});
+		expect(readOnlyRecordValue(resumed.save.craftJobs)).toMatchObject({
+			pausedAtMs: undefined,
+			readyAtMs: 1250,
+			remainingMs: undefined,
+			startAtMs: 250,
+			targetItemInstanceId: "item-instance:1",
+		});
+		expect(resumed.nextWakeAtMs).toBe(1250);
 	});
 
 	it("swaps a board producer with a running producer job", () => {

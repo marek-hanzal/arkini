@@ -4,7 +4,7 @@ import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx"
 import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
 import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
-import { syncRealtimeProducerJobsFx } from "~/v0/game/producer/syncRealtimeProducerJobsFx";
+import { syncRealtimeWorldJobsFx } from "~/v0/game/world/syncRealtimeWorldJobsFx";
 import { validateWorldSnapshotFx } from "~/v0/game/world/validateWorldSnapshotFx";
 import { hasProcessableWorldJobs } from "~/v0/game/world/hasProcessableWorldJobs";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -109,7 +109,7 @@ export class RuntimeGameEngineAdapter {
 			));
 
 		const syncedSave = await runGameEngineEffect(
-			syncRealtimeProducerJobsFx({
+			syncRealtimeWorldJobsFx({
 				config,
 				nowMs,
 				save,
@@ -233,7 +233,7 @@ export class RuntimeGameEngineAdapter {
 	}: RuntimeGameEngineAdapter.ReplaceSaveProps): Promise<GameEngineResult> {
 		return this.enqueueMutation(async () => {
 			const syncedSave = await runGameEngineEffect(
-				syncRealtimeProducerJobsFx({
+				syncRealtimeWorldJobsFx({
 					config: this.config,
 					nowMs,
 					save,

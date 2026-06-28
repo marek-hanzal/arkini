@@ -83,7 +83,7 @@ type TestCraftRecipe = {
 		itemId: string;
 		quantity: number;
 	}[];
-	requirements: TestActivationRequirement[];
+	requirements: TestGameRequirement[];
 	resultItemId: string;
 };
 
@@ -624,6 +624,55 @@ describe("GameConfigSchema", () => {
 		};
 
 		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
+	});
+
+	it("accepts inline craft proximity requirements", () => {
+		const config = createValidConfigValue();
+		config.craftRecipes["item:craft-target"].requirements = [
+			{
+				distance: 1,
+				itemIds: [
+					"item:twig",
+				],
+				type: "proximity",
+			},
+		];
+
+		expect(
+			parseGameConfig(config).craftRecipes["item:craft-target"]?.requirements,
+		).toMatchObject([
+			{
+				distance: 1,
+				itemIds: [
+					"item:twig",
+				],
+				type: "proximity",
+			},
+		]);
+	});
+
+	it("allows multiple inline proximity requirements with the same items and different distances", () => {
+		const config = createValidConfigValue();
+		config.craftRecipes["item:craft-target"].requirements = [
+			{
+				distance: 1,
+				itemIds: [
+					"item:twig",
+					"item:plank",
+				],
+				type: "proximity",
+			},
+			{
+				distance: 2,
+				itemIds: [
+					"item:plank",
+					"item:twig",
+				],
+				type: "proximity",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).not.toThrow();
 	});
 
 	it("accepts item create blocking effects", () => {

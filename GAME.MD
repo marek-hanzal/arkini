@@ -432,9 +432,11 @@ Single-click is the default active interaction.
 
 Single-click may:
 
-- start the default producer product line, when it can start
+- start the explicitly selected default producer product line, when it can start
 - open/collect/exhaust from a ready stash
 - activate another explicit item action, if later defined
+
+If no default producer product line has been explicitly selected for that concrete producer instance, single-click opens item detail instead of inventing a line from config order.
 
 Single-click is allowed to start production, consume producer inputs, consume successful stash open-time inputs, advance stash depletion, or otherwise perform active gameplay.
 
@@ -639,7 +641,7 @@ A producer is triggered by single-click on the board or by an explicit product-l
 
 There are no automatic producers in current gameplay. A producer that can start does nothing until the player activates it.
 
-Single-click on the board starts the current runtime default product line only when the player explicitly selected one for that concrete producer instance. Without an explicit default, the click is a noop.
+Single-click on the board starts the current runtime default product line only when the player explicitly selected one for that concrete producer instance. Without an explicit default, the click opens item detail.
 
 Item detail may show all product lines and can start any line directly.
 

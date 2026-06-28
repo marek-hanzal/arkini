@@ -45,6 +45,32 @@ const inventorySource = (slotIndex: number) =>
 		slot: inventory.bySlotIndex[String(slotIndex)]!,
 	}) satisfies DragSource;
 
+const inventoryStackInput = (slotIndex: number) => {
+	const stack = inventory.bySlotIndex[String(slotIndex)]!.stack!;
+	return {
+		expectedItemId: stack.itemId,
+		expectedStackId: stack.id,
+		slotIndex,
+	};
+};
+
+const inventoryBoardInput = (
+	slotIndex: number,
+	target: {
+		id: string;
+		itemId: string;
+	},
+) => {
+	const stack = inventory.bySlotIndex[String(slotIndex)]!.stack!;
+	return {
+		expectedSourceItemId: stack.itemId,
+		expectedSourceStackId: stack.id,
+		expectedTargetItemId: target.itemId,
+		sourceSlotIndex: slotIndex,
+		targetBoardItemId: target.id,
+	};
+};
+
 const config = createEngineTestConfig();
 
 describe("resolveInventoryCellDropAction", () => {
@@ -64,10 +90,7 @@ describe("resolveInventoryCellDropAction", () => {
 			}),
 		).toEqual({
 			type: "apply-inventory-item-to-board-item",
-			input: {
-				sourceSlotIndex: 0,
-				targetBoardItemId: "merge-target",
-			},
+			input: inventoryBoardInput(0, board.byId["merge-target"]!),
 		});
 	});
 
@@ -86,10 +109,7 @@ describe("resolveInventoryCellDropAction", () => {
 			}),
 		).toEqual({
 			type: "apply-inventory-item-to-board-item",
-			input: {
-				sourceSlotIndex: 0,
-				targetBoardItemId: "merge-target",
-			},
+			input: inventoryBoardInput(0, board.byId["merge-target"]!),
 		});
 	});
 
@@ -193,7 +213,7 @@ describe("resolveInventoryCellDropAction", () => {
 		).toEqual({
 			type: "place-inventory-item",
 			input: {
-				slotIndex: 0,
+				...inventoryStackInput(0),
 				x: 4,
 				y: 1,
 			},
@@ -244,10 +264,7 @@ describe("resolveInventoryCellDropAction", () => {
 				cellKey: "1:0",
 				variant: "primary",
 			},
-			input: {
-				sourceSlotIndex: 0,
-				targetBoardItemId: "requirement-target",
-			},
+			input: inventoryBoardInput(0, targetBoard.byId["requirement-target"]!),
 		});
 	});
 	it("applies inventory items to stash inputs", () => {
@@ -294,10 +311,7 @@ describe("resolveInventoryCellDropAction", () => {
 				cellKey: "1:0",
 				variant: "secondary",
 			},
-			input: {
-				sourceSlotIndex: 0,
-				targetBoardItemId: "stash-target",
-			},
+			input: inventoryBoardInput(0, targetBoard.byId["stash-target"]!),
 		});
 	});
 });

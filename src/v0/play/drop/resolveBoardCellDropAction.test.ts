@@ -20,6 +20,26 @@ const boardSource = (item: BoardViewItem) =>
 		boardItem: item,
 	}) satisfies DragSource;
 
+const boardMoveInput = (
+	item: BoardViewItem,
+	cell: {
+		x: number;
+		y: number;
+	},
+) => ({
+	boardItemId: item.id,
+	expectedItemId: item.itemId,
+	x: cell.x,
+	y: cell.y,
+});
+
+const boardPairInput = (source: BoardViewItem, target: BoardViewItem) => ({
+	expectedSourceItemId: source.itemId,
+	expectedTargetItemId: target.itemId,
+	sourceBoardItemId: source.id,
+	targetBoardItemId: target.id,
+});
+
 const config = createEngineTestConfig();
 const directionalMergeConfig = createEngineMergeTestConfig();
 
@@ -74,11 +94,10 @@ describe("resolveBoardCellDropAction", () => {
 			}),
 		).toEqual({
 			type: "move-board-item",
-			input: {
-				boardItemId: "source",
+			input: boardMoveInput(source, {
 				x: 2,
 				y: 1,
-			},
+			}),
 		});
 	});
 
@@ -106,11 +125,10 @@ describe("resolveBoardCellDropAction", () => {
 			}),
 		).toEqual({
 			type: "move-board-item",
-			input: {
-				boardItemId: "source",
+			input: boardMoveInput(source, {
 				x: 1,
 				y: 3,
-			},
+			}),
 		});
 	});
 
@@ -150,10 +168,7 @@ describe("resolveBoardCellDropAction", () => {
 				kind: "merge-cell",
 				cellKey: "1:0",
 			},
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
@@ -247,14 +262,11 @@ describe("resolveBoardCellDropAction", () => {
 				kind: "merge-cell",
 				cellKey: "1:0",
 			},
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
-	it("uses the live board source item instead of a stale drag snapshot", () => {
+	it("rejects stale board drag sources whose live item id changed", () => {
 		const source = boardItem({
 			id: "source",
 			itemId: "item:water",
@@ -286,9 +298,12 @@ describe("resolveBoardCellDropAction", () => {
 					boardItemId: target.id,
 				},
 			}),
-		).toMatchObject({
-			animation: "parallel-merge",
-			type: "merge-board-items",
+		).toEqual({
+			type: "reject",
+			feedback: {
+				kind: "board-cell",
+				cellKey: "1:0",
+			},
 		});
 	});
 
@@ -370,10 +385,7 @@ describe("resolveBoardCellDropAction", () => {
 		).toEqual({
 			type: "swap-board-items",
 			animation: "parallel-swap",
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
@@ -409,10 +421,7 @@ describe("resolveBoardCellDropAction", () => {
 		).toEqual({
 			type: "swap-board-items",
 			animation: "parallel-swap",
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
@@ -463,10 +472,7 @@ describe("resolveBoardCellDropAction", () => {
 		).toEqual({
 			type: "swap-board-items",
 			animation: "parallel-swap",
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
@@ -521,10 +527,7 @@ describe("resolveBoardCellDropAction", () => {
 				kind: "cell-feedback",
 				variant: "primary",
 			},
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
@@ -598,10 +601,7 @@ describe("resolveBoardCellDropAction", () => {
 				kind: "cell-feedback",
 				variant: "primary",
 			},
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 	it("applies board items to stash inputs", () => {
@@ -655,10 +655,7 @@ describe("resolveBoardCellDropAction", () => {
 				kind: "cell-feedback",
 				variant: "secondary",
 			},
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 });

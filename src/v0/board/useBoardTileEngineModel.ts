@@ -113,12 +113,12 @@ export const useBoardTileEngineModel = ({
 	);
 
 	const activateBoardItem = useCallback(
-		(boardItemId: string) => {
+		(boardItemId: string, expectedItemId: string) => {
 			const snapshot = runtimeStore.getSnapshot();
 			const nowMs = Date.now();
 			const liveBoard = readBoardView(snapshot);
 			const liveBoardItem = liveBoard.byId[boardItemId];
-			if (!liveBoardItem) return;
+			if (!liveBoardItem || liveBoardItem.itemId !== expectedItemId) return;
 
 			const action = resolveBoardItemTapAction({
 				boardItem: liveBoardItem,
@@ -220,7 +220,7 @@ export const useBoardTileEngineModel = ({
 						itemId: boardItem.itemId,
 						boardItem,
 					},
-					onSingleActivate: () => activateBoardItem(boardItem.id),
+					onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
 					onLongActivate: () => onOpenItem(boardItem.id),
 				};
 			},

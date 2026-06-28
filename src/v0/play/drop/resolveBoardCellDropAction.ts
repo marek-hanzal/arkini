@@ -21,6 +21,7 @@ export type BoardCellDropAction =
 			type: "move-board-item";
 			input: {
 				boardItemId: string;
+				expectedItemId: string;
 				x: number;
 				y: number;
 			};
@@ -29,6 +30,8 @@ export type BoardCellDropAction =
 			type: "swap-board-items";
 			animation: "parallel-swap";
 			input: {
+				expectedSourceItemId: string;
+				expectedTargetItemId: string;
 				sourceBoardItemId: string;
 				targetBoardItemId: string;
 			};
@@ -41,6 +44,8 @@ export type BoardCellDropAction =
 				cellKey: string;
 			};
 			input: {
+				expectedSourceItemId: string;
+				expectedTargetItemId: string;
 				sourceBoardItemId: string;
 				targetBoardItemId: string;
 			};
@@ -53,6 +58,8 @@ export type BoardCellDropAction =
 				variant: TileEngine.DropFeedbackVariant;
 			};
 			input: {
+				expectedSourceItemId: string;
+				expectedTargetItemId: string;
 				sourceBoardItemId: string;
 				targetBoardItemId: string;
 			};
@@ -86,6 +93,16 @@ export const resolveBoardCellDropAction = ({
 	const targetCellKey = cellKey(target.x, target.y);
 	const sourceItem = board.byId[source.boardItemId];
 
+	if (sourceItem && sourceItem.itemId !== source.itemId) {
+		return {
+			type: "reject",
+			feedback: {
+				kind: "board-cell",
+				cellKey: targetCellKey,
+			},
+		};
+	}
+
 	if (!sourceItem) {
 		return {
 			type: "reject",
@@ -109,6 +126,7 @@ export const resolveBoardCellDropAction = ({
 			type: "move-board-item",
 			input: {
 				boardItemId: source.boardItemId,
+				expectedItemId: sourceItem.itemId,
 				x: target.x,
 				y: target.y,
 			},
@@ -136,6 +154,8 @@ export const resolveBoardCellDropAction = ({
 			type: "swap-board-items",
 			animation: "parallel-swap",
 			input: {
+				expectedSourceItemId: sourceItem.itemId,
+				expectedTargetItemId: targetItem.itemId,
 				sourceBoardItemId: source.boardItemId,
 				targetBoardItemId: targetItem.id,
 			},
@@ -151,25 +171,35 @@ export const resolveBoardCellDropAction = ({
 				cellKey: targetCellKey,
 			},
 			input: {
+				expectedSourceItemId: sourceItem.itemId,
+				expectedTargetItemId: targetItem.itemId,
 				sourceBoardItemId: source.boardItemId,
 				targetBoardItemId: targetItem.id,
 			},
 		};
 	}
 
+	const input = {
+		expectedSourceItemId: sourceItem.itemId,
+		expectedTargetItemId: targetItem.itemId,
+		sourceBoardItemId: source.boardItemId,
+		targetBoardItemId: targetItem.id,
+	};
+
+	if (plan.type === "producer-input") {
+		return {
+			input,
+			type: "apply-board-item-to-board-item",
+		};
+	}
+
 	return {
 		type: "apply-board-item-to-board-item",
-		feedback:
-			plan.type === "producer-input"
-				? undefined
-				: {
-						cellKey: targetCellKey,
-						kind: "cell-feedback",
-						variant: plan.feedbackVariant,
-					},
-		input: {
-			sourceBoardItemId: source.boardItemId,
-			targetBoardItemId: targetItem.id,
+		feedback: {
+			cellKey: targetCellKey,
+			kind: "cell-feedback",
+			variant: plan.feedbackVariant,
 		},
+		input,
 	};
 };

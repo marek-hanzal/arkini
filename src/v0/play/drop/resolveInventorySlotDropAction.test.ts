@@ -22,6 +22,19 @@ const source = (slotIndex: number) =>
 		slotIndex,
 	}) satisfies DragSource;
 
+const swapInput = (sourceSlotIndex: number, targetSlotIndex: number) => {
+	const sourceStack = inventory.bySlotIndex[String(sourceSlotIndex)]!.stack!;
+	const targetStack = inventory.bySlotIndex[String(targetSlotIndex)]?.stack;
+	return {
+		expectedSourceItemId: sourceStack.itemId,
+		expectedSourceStackId: sourceStack.id,
+		expectedTargetItemId: targetStack?.itemId,
+		expectedTargetStackId: targetStack?.id,
+		sourceSlotIndex,
+		targetSlotIndex,
+	};
+};
+
 const inventory = rebuildInventoryView([
 	slot(0),
 	{
@@ -75,10 +88,7 @@ describe("resolveInventorySlotDropAction", () => {
 		).toEqual({
 			type: "swap-inventory-slots",
 			animation: "parallel-swap",
-			input: {
-				sourceSlotIndex: 0,
-				targetSlotIndex: 2,
-			},
+			input: swapInput(0, 2),
 		});
 	});
 

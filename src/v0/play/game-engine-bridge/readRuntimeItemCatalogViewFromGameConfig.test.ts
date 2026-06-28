@@ -5,23 +5,12 @@ import { readRuntimeItemCatalogViewFromGameConfig } from "~/v0/play/game-engine-
 const config = createEngineMergeTestConfig();
 
 describe("readRuntimeItemCatalogViewFromGameConfig", () => {
-	it("surfaces only executable merge relations from the catalog", () => {
+	it("does not expose forward usage relation lists in item detail catalog data", () => {
 		const catalog = readRuntimeItemCatalogViewFromGameConfig(config);
+		const water = catalog["item:water"] as Record<string, unknown>;
 
-		expect(catalog["item:water"]?.mergeResults).toContainEqual({
-			resultItemId: "item:sprout",
-			secret: true,
-			withItemId: "item:twig",
-		});
-		expect(catalog["item:water"]?.usedInMerges ?? []).not.toContainEqual({
-			resultItemId: "item:sprout",
-			secret: true,
-			targetItemId: "item:twig",
-		});
-		expect(catalog["item:twig"]?.usedInMerges).toContainEqual({
-			resultItemId: "item:sprout",
-			secret: true,
-			targetItemId: "item:water",
-		});
+		expect(water).not.toHaveProperty("mergeResults");
+		expect(water).not.toHaveProperty("usedInMerges");
+		expect(water).not.toHaveProperty("usedInCrafts");
 	});
 });

@@ -2,7 +2,6 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
-import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 
 const catalogCache = new WeakMap<GameConfig, ItemCatalogView>();
 
@@ -21,68 +20,6 @@ const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameCon
 
 	return resourceDataSrc(config.resources[asset.resourceId]?.data) ?? fallbackAssetSrc;
 };
-
-const readMergeResults = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	Object.keys(config.items).flatMap((targetItemId) => {
-		const executable = resolveExecutableItemMergeRule({
-			config,
-			sourceItemId: itemId,
-			targetItemId,
-		});
-		if (!executable) return [];
-
-		return [
-			{
-				withItemId: targetItemId as ItemId,
-				resultItemId: executable.merge.resultItemId as ItemId,
-				secret: executable.merge.secret,
-			},
-		];
-	});
-
-const readUsedInMerges = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	Object.keys(config.items).flatMap((sourceItemId) => {
-		const executable = resolveExecutableItemMergeRule({
-			config,
-			sourceItemId,
-			targetItemId: itemId,
-		});
-		if (!executable) return [];
-
-		const reverseExecutable = resolveExecutableItemMergeRule({
-			config,
-			sourceItemId: itemId,
-			targetItemId: sourceItemId,
-		});
-		if (reverseExecutable?.merge.resultItemId === executable.merge.resultItemId) {
-			return [];
-		}
-
-		return [
-			{
-				targetItemId: sourceItemId as ItemId,
-				resultItemId: executable.merge.resultItemId as ItemId,
-				secret: executable.merge.secret,
-			},
-		];
-	});
-
-const readUsedInCrafts = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	Object.entries(config.craftRecipes).flatMap(([targetItemId, recipe]) => {
-		if (!recipe.inputs.some((input) => input.itemId === itemId)) return [];
-
-		return [
-			{
-				targetItemId: targetItemId as ItemId,
-				resultItemId: recipe.resultItemId as ItemId,
-			},
-		];
-	});
-
-const isMergeableItem = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	Object.values(config.merge).some(
-		(rule) => rule.resultItemId === itemId || rule.withItemId === itemId,
-	) || Boolean(config.items[itemId]?.mergeIds?.length);
 
 const readEffectTargetSummary = (
 	target: GameConfig["effects"][string]["operations"][number]["target"],
@@ -189,25 +126,7 @@ const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: strin
 		tags: [
 			...item.tags,
 		],
-		canProduce: Boolean(config.producers[itemId] || config.stashes[itemId]),
-		producerTrigger: config.producers[itemId] || config.stashes[itemId] ? "click" : undefined,
-		canMerge: isMergeableItem({
-			config,
-			itemId,
-		}),
 		generatedEffects: readGeneratedEffects({
-			config,
-			itemId,
-		}),
-		mergeResults: readMergeResults({
-			config,
-			itemId,
-		}),
-		usedInCrafts: readUsedInCrafts({
-			config,
-			itemId,
-		}),
-		usedInMerges: readUsedInMerges({
 			config,
 			itemId,
 		}),

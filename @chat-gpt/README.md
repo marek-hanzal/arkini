@@ -61,3 +61,5 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Keep active notes short. Archive completed task notes immediately.
 - Do not reintroduce pending/scheduled event queues; future delayed gameplay belongs in explicit job maps/families.
 - Prospector Guild is the long-term tiered source-discovery hub. Use numeric tile labels via item `label` (`1`, `2`, …): T1 finds Clay/Sand deposits, T2 keeps Clay/Sand and adds Coal/Iron/Gold. Do not reintroduce Surveyor Camp as a separate concept.
+
+- Item detail is backward-facing, not an encyclopedia of future uses: show what the selected instance needs, stores, can run, can withdraw, and may output. Do not show forward usage lists like “used in crafts”, “can merge into”, or other places where this item could be consumed elsewhere. Normal player-facing requirement sections omit satisfied rows; diagnostic views may opt into showing fulfilled expectations.

@@ -42,36 +42,7 @@ export const ViewItemSchema = z.object({
 		"both",
 	]),
 	tags: z.array(z.string()),
-	canProduce: z.boolean(),
-	producerTrigger: z.literal("click").optional(),
-	canMerge: z.boolean(),
 	generatedEffects: z.array(ViewItemGeneratedEffectSchema),
-	mergeResults: z
-		.array(
-			z.object({
-				withItemId: GameItemIdSchema,
-				resultItemId: GameItemIdSchema,
-				secret: z.boolean().optional(),
-			}),
-		)
-		.optional(),
-	usedInCrafts: z
-		.array(
-			z.object({
-				targetItemId: GameItemIdSchema,
-				resultItemId: GameItemIdSchema,
-			}),
-		)
-		.optional(),
-	usedInMerges: z
-		.array(
-			z.object({
-				targetItemId: GameItemIdSchema,
-				resultItemId: GameItemIdSchema,
-				secret: z.boolean().optional(),
-			}),
-		)
-		.optional(),
 });
 
 type ViewItemSchema = typeof ViewItemSchema;

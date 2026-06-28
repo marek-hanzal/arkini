@@ -1246,6 +1246,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	validateProductLineOwnership(ctx, value);
+	validateBlueprintDependencyCycles(ctx, value);
 	if (value.startingState.inventory.length > value.game.inventory.slots) {
 		addIssue(
 			ctx,
@@ -1483,6 +1484,544 @@ const validateProductLineOwnership = (
 		});
 	}
 };
+
+type BlueprintDependencyEdge = {
+	path: GameConfigIssuePath;
+	toBlueprintItemId: string;
+	viaItemId: string;
+};
+
+const validateBlueprintDependencyCycles = (
+	ctx: z.RefinementCtx,
+	config: z.infer<typeof BaseGameConfigSchema>,
+) => {
+	const blueprintItemIds = readBlueprintItemIds(config);
+	const blueprintItemIdsByCraftResultItemId = readBlueprintItemIdsByCraftResultItemId(
+		config,
+		blueprintItemIds,
+	);
+	const edgesByBlueprintItemId = new Map<string, BlueprintDependencyEdge[]>();
+	const addDependencyItem = (props: {
+		fromBlueprintItemId: string;
+		itemId: string;
+		path: GameConfigIssuePath;
+	}) => {
+		for (const toBlueprintItemId of readBlueprintDependenciesForItem({
+			blueprintItemIds,
+			blueprintItemIdsByCraftResultItemId,
+			itemId: props.itemId,
+		})) {
+			const edges = edgesByBlueprintItemId.get(props.fromBlueprintItemId) ?? [];
+			edges.push({
+				path: props.path,
+				toBlueprintItemId,
+				viaItemId: props.itemId,
+			});
+			edgesByBlueprintItemId.set(props.fromBlueprintItemId, edges);
+		}
+	};
+
+	collectCraftRecipeBlueprintDependencies({
+		addDependencyItem,
+		blueprintItemIds,
+		config,
+	});
+	collectProductBlueprintDependencies({
+		addDependencyItem,
+		blueprintItemIds,
+		config,
+	});
+	collectMergeBlueprintDependencies({
+		addDependencyItem,
+		blueprintItemIds,
+		config,
+	});
+
+	for (const cycle of readBlueprintDependencyCycles({
+		blueprintItemIds,
+		edgesByBlueprintItemId,
+	})) {
+		const firstCycleEdge = cycle.edges[0];
+		const issuePath = firstCycleEdge?.path ?? [
+			"items",
+			cycle.blueprintItemIds[0] ?? "blueprints",
+		];
+		const cycleLabel = cycle.blueprintItemIds
+			.map((itemId) => readBlueprintItemDisplayName(config, itemId))
+			.join(" -> ");
+		const viaLabel = firstCycleEdge ? ` via required item "${firstCycleEdge.viaItemId}"` : "";
+
+		addIssue(
+			ctx,
+			issuePath,
+			`Blueprint dependency cycle detected${viaLabel}: ${cycleLabel}. Blueprint progression must not require itself directly or through another blueprint/building chain.`,
+		);
+	}
+};
+
+const readBlueprintItemIds = (config: z.infer<typeof BaseGameConfigSchema>) =>
+	new Set(
+		Object.entries(config.items)
+			.filter(([itemId, item]) => {
+				const asset = config.assets[item.assetId];
+
+				return (
+					itemId.startsWith("item:blueprint-") ||
+					item.tags.includes("blueprint") ||
+					asset?.render === "blueprint"
+				);
+			})
+			.map(([itemId]) => itemId),
+	);
+
+const readBlueprintItemIdsByCraftResultItemId = (
+	config: z.infer<typeof BaseGameConfigSchema>,
+	blueprintItemIds: ReadonlySet<string>,
+) => {
+	const result = new Map<string, string[]>();
+
+	for (const [craftRecipeId, recipe] of Object.entries(config.craftRecipes)) {
+		if (!blueprintItemIds.has(craftRecipeId)) continue;
+
+		result.set(recipe.resultItemId, [
+			...(result.get(recipe.resultItemId) ?? []),
+			craftRecipeId,
+		]);
+	}
+
+	return result;
+};
+
+const readBlueprintDependenciesForItem = ({
+	blueprintItemIds,
+	blueprintItemIdsByCraftResultItemId,
+	itemId,
+}: {
+	blueprintItemIds: ReadonlySet<string>;
+	blueprintItemIdsByCraftResultItemId: ReadonlyMap<string, readonly string[]>;
+	itemId: string;
+}) => {
+	const dependencies = new Set<string>();
+
+	if (blueprintItemIds.has(itemId)) {
+		dependencies.add(itemId);
+	}
+
+	for (const blueprintItemId of blueprintItemIdsByCraftResultItemId.get(itemId) ?? []) {
+		dependencies.add(blueprintItemId);
+	}
+
+	return dependencies;
+};
+
+const collectCraftRecipeBlueprintDependencies = ({
+	addDependencyItem,
+	blueprintItemIds,
+	config,
+}: {
+	addDependencyItem: (props: {
+		fromBlueprintItemId: string;
+		itemId: string;
+		path: GameConfigIssuePath;
+	}) => void;
+	blueprintItemIds: ReadonlySet<string>;
+	config: z.infer<typeof BaseGameConfigSchema>;
+}) => {
+	for (const [craftRecipeId, recipe] of Object.entries(config.craftRecipes)) {
+		if (!blueprintItemIds.has(craftRecipeId)) continue;
+
+		for (const [inputIndex, input] of recipe.inputs.entries()) {
+			addDependencyItem({
+				fromBlueprintItemId: craftRecipeId,
+				itemId: input.itemId,
+				path: [
+					"craftRecipes",
+					craftRecipeId,
+					"inputs",
+					inputIndex,
+					"itemId",
+				],
+			});
+		}
+
+		collectInlineRequirementDependencyItems({
+			addDependencyItem,
+			fromBlueprintItemId: craftRecipeId,
+			path: [
+				"craftRecipes",
+				craftRecipeId,
+				"requirements",
+			],
+			requirements: recipe.requirements,
+		});
+	}
+};
+
+const collectProductBlueprintDependencies = ({
+	addDependencyItem,
+	blueprintItemIds,
+	config,
+}: {
+	addDependencyItem: (props: {
+		fromBlueprintItemId: string;
+		itemId: string;
+		path: GameConfigIssuePath;
+	}) => void;
+	blueprintItemIds: ReadonlySet<string>;
+	config: z.infer<typeof BaseGameConfigSchema>;
+}) => {
+	const productOwnerByProductId = readProductOwnerByProductId(config);
+
+	for (const [productId, product] of Object.entries(config.products)) {
+		const outputBlueprintItemIds = readOutputBlueprintItemIds(
+			product.output ?? [],
+			blueprintItemIds,
+		);
+
+		for (const fromBlueprintItemId of outputBlueprintItemIds) {
+			const owner = productOwnerByProductId.get(productId);
+			if (owner) {
+				addDependencyItem({
+					fromBlueprintItemId,
+					itemId: owner.capabilityId,
+					path: [
+						owner.section,
+						owner.capabilityId,
+						"productIds",
+						owner.productIndex,
+					],
+				});
+				collectRequirementIdDependencyItems({
+					addDependencyItem,
+					config,
+					fromBlueprintItemId,
+					path: [
+						owner.section,
+						owner.capabilityId,
+						"requirementIds",
+					],
+					requirementIds: owner.capability.requirementIds,
+				});
+			}
+
+			for (const [inputIndex, input] of (product.inputs ?? []).entries()) {
+				addDependencyItem({
+					fromBlueprintItemId,
+					itemId: input.itemId,
+					path: [
+						"products",
+						productId,
+						"inputs",
+						inputIndex,
+						"itemId",
+					],
+				});
+			}
+
+			collectRequirementIdDependencyItems({
+				addDependencyItem,
+				config,
+				fromBlueprintItemId,
+				path: [
+					"products",
+					productId,
+					"requirementIds",
+				],
+				requirementIds: product.requirementIds,
+			});
+		}
+	}
+};
+
+const collectMergeBlueprintDependencies = ({
+	addDependencyItem,
+	blueprintItemIds,
+	config,
+}: {
+	addDependencyItem: (props: {
+		fromBlueprintItemId: string;
+		itemId: string;
+		path: GameConfigIssuePath;
+	}) => void;
+	blueprintItemIds: ReadonlySet<string>;
+	config: z.infer<typeof BaseGameConfigSchema>;
+}) => {
+	for (const [sourceItemId, item] of Object.entries(config.items)) {
+		for (const [mergeIndex, mergeId] of (item.mergeIds ?? []).entries()) {
+			const merge = config.merge[mergeId];
+			if (!merge || !blueprintItemIds.has(merge.resultItemId)) continue;
+
+			addDependencyItem({
+				fromBlueprintItemId: merge.resultItemId,
+				itemId: sourceItemId,
+				path: [
+					"items",
+					sourceItemId,
+					"mergeIds",
+					mergeIndex,
+				],
+			});
+			addDependencyItem({
+				fromBlueprintItemId: merge.resultItemId,
+				itemId: merge.withItemId,
+				path: [
+					"merge",
+					mergeId,
+					"withItemId",
+				],
+			});
+		}
+	}
+};
+
+const readProductOwnerByProductId = (config: z.infer<typeof BaseGameConfigSchema>) => {
+	const owners = new Map<
+		string,
+		{
+			capability: GameConfig["producers"][string] | GameConfig["stashes"][string];
+			capabilityId: string;
+			productIndex: number;
+			section: "producers" | "stashes";
+		}
+	>();
+	const collectOwner = (
+		section: "producers" | "stashes",
+		capabilityId: string,
+		capability: GameConfig["producers"][string] | GameConfig["stashes"][string],
+	) => {
+		for (const [productIndex, productId] of capability.productIds.entries()) {
+			owners.set(productId, {
+				capability,
+				capabilityId,
+				productIndex,
+				section,
+			});
+		}
+	};
+
+	for (const [producerId, producer] of Object.entries(config.producers)) {
+		collectOwner("producers", producerId, producer);
+	}
+	for (const [stashId, stash] of Object.entries(config.stashes)) {
+		collectOwner("stashes", stashId, stash);
+	}
+
+	return owners;
+};
+
+const readOutputBlueprintItemIds = (
+	output: z.infer<typeof ActivationOutputSchema>,
+	blueprintItemIds: ReadonlySet<string>,
+) => {
+	const outputBlueprintItemIds = new Set<string>();
+
+	for (const outputEntry of output) {
+		if (outputEntry.type === "weighted") {
+			for (const entry of outputEntry.entries) {
+				if (blueprintItemIds.has(entry.itemId)) {
+					outputBlueprintItemIds.add(entry.itemId);
+				}
+			}
+			continue;
+		}
+
+		if (blueprintItemIds.has(outputEntry.itemId)) {
+			outputBlueprintItemIds.add(outputEntry.itemId);
+		}
+	}
+
+	return outputBlueprintItemIds;
+};
+
+const collectRequirementIdDependencyItems = ({
+	addDependencyItem,
+	config,
+	fromBlueprintItemId,
+	path,
+	requirementIds,
+}: {
+	addDependencyItem: (props: {
+		fromBlueprintItemId: string;
+		itemId: string;
+		path: GameConfigIssuePath;
+	}) => void;
+	config: z.infer<typeof BaseGameConfigSchema>;
+	fromBlueprintItemId: string;
+	path: GameConfigIssuePath;
+	requirementIds: readonly string[];
+}) => {
+	for (const [requirementIndex, requirementId] of requirementIds.entries()) {
+		const requirement = config.requirements[requirementId];
+		if (!requirement) continue;
+
+		collectRequirementDependencyItems({
+			addDependencyItem,
+			fromBlueprintItemId,
+			path: [
+				...path,
+				requirementIndex,
+			],
+			requirement,
+		});
+	}
+};
+
+const collectInlineRequirementDependencyItems = ({
+	addDependencyItem,
+	fromBlueprintItemId,
+	path,
+	requirements,
+}: {
+	addDependencyItem: (props: {
+		fromBlueprintItemId: string;
+		itemId: string;
+		path: GameConfigIssuePath;
+	}) => void;
+	fromBlueprintItemId: string;
+	path: GameConfigIssuePath;
+	requirements: z.infer<typeof ActivationRequirementSchema>;
+}) => {
+	for (const [requirementIndex, requirement] of requirements.entries()) {
+		collectRequirementDependencyItems({
+			addDependencyItem,
+			fromBlueprintItemId,
+			path: [
+				...path,
+				requirementIndex,
+			],
+			requirement,
+		});
+	}
+};
+
+const collectRequirementDependencyItems = ({
+	addDependencyItem,
+	fromBlueprintItemId,
+	path,
+	requirement,
+}: {
+	addDependencyItem: (props: {
+		fromBlueprintItemId: string;
+		itemId: string;
+		path: GameConfigIssuePath;
+	}) => void;
+	fromBlueprintItemId: string;
+	path: GameConfigIssuePath;
+	requirement: z.infer<typeof GameRequirementDefinitionSchema>;
+}) => {
+	if (requirement.type === "proximity") {
+		for (const [itemIndex, itemId] of requirement.itemIds.entries()) {
+			addDependencyItem({
+				fromBlueprintItemId,
+				itemId,
+				path: [
+					...path,
+					"itemIds",
+					itemIndex,
+				],
+			});
+		}
+		return;
+	}
+
+	addDependencyItem({
+		fromBlueprintItemId,
+		itemId: requirement.itemId,
+		path: [
+			...path,
+			"itemId",
+		],
+	});
+};
+
+const readBlueprintDependencyCycles = ({
+	blueprintItemIds,
+	edgesByBlueprintItemId,
+}: {
+	blueprintItemIds: ReadonlySet<string>;
+	edgesByBlueprintItemId: ReadonlyMap<string, readonly BlueprintDependencyEdge[]>;
+}) => {
+	const cycles: {
+		blueprintItemIds: string[];
+		edges: BlueprintDependencyEdge[];
+	}[] = [];
+	const reportedCycleKeys = new Set<string>();
+	const visited = new Set<string>();
+	const visiting = new Set<string>();
+	const stack: string[] = [];
+	const edgeStack: BlueprintDependencyEdge[] = [];
+	const stackIndexByBlueprintItemId = new Map<string, number>();
+
+	const visit = (blueprintItemId: string) => {
+		if (visited.has(blueprintItemId)) return;
+
+		visiting.add(blueprintItemId);
+		stackIndexByBlueprintItemId.set(blueprintItemId, stack.length);
+		stack.push(blueprintItemId);
+
+		for (const edge of edgesByBlueprintItemId.get(blueprintItemId) ?? []) {
+			const nextBlueprintItemId = edge.toBlueprintItemId;
+			const cycleStartIndex = stackIndexByBlueprintItemId.get(nextBlueprintItemId);
+			if (cycleStartIndex !== undefined) {
+				const cycleBlueprintItemIds = [
+					...stack.slice(cycleStartIndex),
+					nextBlueprintItemId,
+				];
+				const cycleEdges = [
+					...edgeStack.slice(cycleStartIndex),
+					edge,
+				];
+				const cycleKey = readBlueprintDependencyCycleKey(cycleBlueprintItemIds);
+				if (!reportedCycleKeys.has(cycleKey)) {
+					reportedCycleKeys.add(cycleKey);
+					cycles.push({
+						blueprintItemIds: cycleBlueprintItemIds,
+						edges: cycleEdges,
+					});
+				}
+				continue;
+			}
+
+			if (!visiting.has(nextBlueprintItemId)) {
+				edgeStack.push(edge);
+				visit(nextBlueprintItemId);
+				edgeStack.pop();
+			}
+		}
+
+		stack.pop();
+		stackIndexByBlueprintItemId.delete(blueprintItemId);
+		visiting.delete(blueprintItemId);
+		visited.add(blueprintItemId);
+	};
+
+	for (const blueprintItemId of [
+		...blueprintItemIds,
+	].sort()) {
+		visit(blueprintItemId);
+	}
+
+	return cycles;
+};
+
+const readBlueprintDependencyCycleKey = (cycleBlueprintItemIds: readonly string[]) => {
+	const uniqueCycleItemIds = cycleBlueprintItemIds.slice(0, -1);
+	if (uniqueCycleItemIds.length === 0) return cycleBlueprintItemIds.join("->");
+
+	const rotations = uniqueCycleItemIds.map((_, index) =>
+		[
+			...uniqueCycleItemIds.slice(index),
+			...uniqueCycleItemIds.slice(0, index),
+		].join("->"),
+	);
+
+	return rotations.sort()[0] ?? cycleBlueprintItemIds.join("->");
+};
+
+const readBlueprintItemDisplayName = (
+	config: z.infer<typeof BaseGameConfigSchema>,
+	itemId: string,
+) => config.items[itemId]?.name ?? itemId;
 
 const validateItemInputs = (
 	ctx: z.RefinementCtx,

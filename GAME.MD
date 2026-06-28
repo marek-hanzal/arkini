@@ -900,9 +900,9 @@ It defines a recipe and optional completion timer. It is not a special hardcoded
 
 Example pattern:
 
-- `item:blueprint-lumber-camp-2` may require its own recipe and then complete into `item:lumber-camp-2`
+- `item:blueprint-lumber-camp-2` may have a recipe and then complete into `item:lumber-camp-2`
 
-The exact recipe belongs to economy design and central data, not to special gameplay branching.
+The exact recipe belongs to economy design and central data, not to special gameplay branching. A blueprint recipe must not consume or require the same blueprint item it is attached to; the blueprint itself is already the craft target. The config validator also rejects indirect blueprint/building dependency cycles, because soft-locking progression through circular paperwork is funny only when someone else is debugging it.
 
 ### 13.4 Era gate blueprint
 

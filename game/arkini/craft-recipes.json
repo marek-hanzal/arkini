@@ -1006,10 +1006,6 @@
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:blueprint-house-t1"
-				},
-				{
-					"consume": true,
 					"itemId": "item:plank",
 					"quantity": 2
 				},
@@ -1042,10 +1038,6 @@
 				{
 					"consume": true,
 					"itemId": "producer:house-t1"
-				},
-				{
-					"consume": true,
-					"itemId": "item:blueprint-house-t2"
 				},
 				{
 					"consume": true,
@@ -1095,10 +1087,6 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:blueprint-house-t3"
-				},
-				{
-					"consume": true,
 					"itemId": "item:building-permit"
 				},
 				{
@@ -1141,10 +1129,6 @@
 				{
 					"consume": true,
 					"itemId": "producer:house-t3"
-				},
-				{
-					"consume": true,
-					"itemId": "item:blueprint-house-t4"
 				},
 				{
 					"consume": true,

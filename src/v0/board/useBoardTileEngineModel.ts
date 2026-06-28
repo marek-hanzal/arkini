@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import type { BoardCellView } from "~/v0/board/boardCells";
+import { readBoardCells, type BoardCellView } from "~/v0/board/boardCells";
 import { cellKey } from "~/v0/board/cellKey";
 import { resolveBoardDropFeedback } from "~/v0/board/drop/resolveBoardDropFeedback";
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
@@ -32,6 +32,8 @@ export namespace useBoardTileEngineModel {
 		tiles: TileEngine.Tile<BoardSurface.TileData>[];
 		drag: TileEngine.DragConfig<BoardSurface.TileData, BoardCellView, DragSource, DropTarget>;
 		blockedCellKeys: readonly string[];
+		columns: number;
+		slots: TileEngine.Slot<BoardCellView>[];
 	}
 }
 
@@ -48,7 +50,21 @@ export const useBoardTileEngineModel = ({
 	const actions = useGameRuntimeDropActions();
 	const runtimeStore = useGameRuntimeStore();
 	const config = useGameRuntimeSelector((state) => state.runtime.config);
+	const boardLayout = useGameRuntimeSelector((state) => state.runtime.config.game.board);
 	const transientTiles = useBoardTransientTiles();
+
+	const slots = useMemo(
+		() =>
+			readBoardCells(boardLayout).map((cell) => ({
+				id: cell.key,
+				dropId: `board-cell:${cell.key}`,
+				renderKey: cell.key,
+				data: cell,
+			})) satisfies TileEngine.Slot<BoardCellView>[],
+		[
+			boardLayout,
+		],
+	);
 
 	const tiles = useMemo(
 		() =>
@@ -226,10 +242,13 @@ export const useBoardTileEngineModel = ({
 				};
 			},
 			dropFeedback(context) {
+				const snapshot = runtimeStore.getSnapshot();
+
 				return resolveBoardDropFeedback({
-					board,
-					config,
+					board: readBoardView(snapshot),
+					config: snapshot.runtime.config,
 					context,
+					inventory: readInventoryView(snapshot),
 				});
 			},
 			onDrop(context) {
@@ -262,7 +281,9 @@ export const useBoardTileEngineModel = ({
 
 	return {
 		blockedCellKeys,
+		columns: boardLayout.width,
 		drag,
+		slots,
 		tiles,
 	};
 };

@@ -84,14 +84,27 @@ export const resolveBoardCellDropAction = ({
 	target,
 }: resolveBoardCellDropAction.Props): BoardCellDropAction => {
 	const targetCellKey = cellKey(target.x, target.y);
+	const sourceItem = board.byId[source.boardItemId];
 
-	if (target.boardItemId === source.boardItemId) {
+	if (!sourceItem) {
+		return {
+			type: "reject",
+			feedback: {
+				kind: "board-cell",
+				cellKey: targetCellKey,
+			},
+		};
+	}
+
+	const targetItem = board.byCellKey[targetCellKey];
+
+	if (targetItem?.id === source.boardItemId) {
 		return {
 			type: "ignore",
 		};
 	}
 
-	if (!target.boardItemId) {
+	if (!targetItem) {
 		return {
 			type: "move-board-item",
 			input: {
@@ -102,20 +115,9 @@ export const resolveBoardCellDropAction = ({
 		};
 	}
 
-	const targetItem = board.byId[target.boardItemId];
-	if (!targetItem) {
-		return {
-			type: "reject",
-			feedback: {
-				kind: "board-cell",
-				cellKey: targetCellKey,
-			},
-		};
-	}
-
 	const plan = resolveItemToBoardItemInteractionPlan({
 		config,
-		sourceItemId: source.itemId,
+		sourceItemId: sourceItem.itemId,
 		targetItem,
 	});
 

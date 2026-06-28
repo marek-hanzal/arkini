@@ -1,7 +1,6 @@
 import { memo, type ReactNode, useCallback, useRef } from "react";
 import { InventoryCell } from "~/v0/inventory/InventoryCell";
 import type { InventorySurface as InventorySurfaceType } from "~/v0/inventory/InventorySurface.types";
-import { inventoryColumns } from "~/v0/inventory/inventoryColumns";
 import { renderInventoryTile } from "~/v0/inventory/renderInventoryTile";
 import { useInventoryTileEngineModel } from "~/v0/inventory/useInventoryTileEngineModel";
 import type { DragSource } from "~/v0/play/drag/DragSource";
@@ -13,7 +12,7 @@ import type { TileEngineNamespace as TileEngineType } from "~/v0/tile-engine";
 export const InventorySurface = memo(
 	({ feedback, feedbackFlags, onClose, placementTarget }: InventorySurfaceType.Props) => {
 		const inventoryTileEngineRef = useRef<HTMLDivElement | null>(null);
-		const { drag, slots, tiles } = useInventoryTileEngineModel({
+		const { columns, drag, slots, tiles } = useInventoryTileEngineModel({
 			feedback,
 			placementTarget,
 		});
@@ -53,7 +52,7 @@ export const InventorySurface = memo(
 						>
 							id="inventory"
 							rootRef={inventoryTileEngineRef}
-							columns={inventoryColumns}
+							columns={columns}
 							slots={slots}
 							tiles={tiles}
 							gapPx={1}

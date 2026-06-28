@@ -194,7 +194,24 @@ describe("resolveDrop animation contract", () => {
 			inventory: emptyInventory,
 			board: {
 				...emptyBoard,
+				byCellKey: {
+					"0:0": boardItem({
+						id: "source",
+						x: 0,
+						y: 0,
+					}),
+					"1:0": boardItem({
+						id: "target",
+						x: 1,
+						y: 0,
+					}),
+				},
 				byId: {
+					source: boardItem({
+						id: "source",
+						x: 0,
+						y: 0,
+					}),
 					target: boardItem({
 						id: "target",
 						x: 1,

@@ -39,5 +39,5 @@ export const readRuntimeBoardViewFromGameSave = ({
 				: [];
 		});
 
-	return rebuildBoardView(items);
+	return rebuildBoardView(items, config.game.board);
 };

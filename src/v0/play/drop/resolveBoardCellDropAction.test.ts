@@ -82,7 +82,7 @@ describe("resolveBoardCellDropAction", () => {
 		});
 	});
 
-	it("rejects cells that point to missing board items", () => {
+	it("uses the live empty cell instead of a stale target item id", () => {
 		const source = boardItem({
 			id: "source",
 			itemId: "item:twig",
@@ -105,10 +105,11 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
-			type: "reject",
-			feedback: {
-				kind: "board-cell",
-				cellKey: "1:3",
+			type: "move-board-item",
+			input: {
+				boardItemId: "source",
+				x: 1,
+				y: 3,
 			},
 		});
 	});
@@ -208,6 +209,123 @@ describe("resolveBoardCellDropAction", () => {
 		).toMatchObject({
 			animation: "parallel-swap",
 			type: "swap-board-items",
+		});
+	});
+
+	it("uses the live target cell item instead of a stale empty target snapshot", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "target",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				board: rebuildBoardView([
+					source,
+					target,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+				},
+			}),
+		).toEqual({
+			type: "merge-board-items",
+			animation: "parallel-merge",
+			feedback: {
+				kind: "merge-cell",
+				cellKey: "1:0",
+			},
+			input: {
+				sourceBoardItemId: "source",
+				targetBoardItemId: "target",
+			},
+		});
+	});
+
+	it("uses the live board source item instead of a stale drag snapshot", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:water",
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "target",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config: directionalMergeConfig,
+				board: rebuildBoardView([
+					source,
+					target,
+				]),
+				source: {
+					...boardSource(source),
+					itemId: "item:twig",
+				},
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: target.id,
+				},
+			}),
+		).toMatchObject({
+			animation: "parallel-merge",
+			type: "merge-board-items",
+		});
+	});
+
+	it("rejects stale board drag sources that no longer exist in the live board view", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "target",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				board: rebuildBoardView([
+					target,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: target.id,
+				},
+			}),
+		).toEqual({
+			type: "reject",
+			feedback: {
+				kind: "board-cell",
+				cellKey: "1:0",
+			},
 		});
 	});
 

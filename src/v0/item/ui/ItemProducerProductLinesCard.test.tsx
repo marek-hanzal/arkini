@@ -50,6 +50,31 @@ describe("ItemProducerProductLinesCard", () => {
 		expect(html).not.toContain("Queue full</button>");
 	});
 
+	it("shows blocked delivery without rendering fake running progress", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						deliveryBlocked: true,
+						pausedAtMs: undefined,
+						progress: undefined,
+						requirementsReady: true,
+					}),
+				]}
+				nowMs={10_000}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Delivery blocked");
+		expect(html).not.toContain("Running");
+		expect(html).not.toContain("Queue full</button>");
+	});
+
 	it("hides default controls for producer-like views that do not support player defaults", () => {
 		const html = renderToStaticMarkup(
 			<ItemProducerProductLinesCard

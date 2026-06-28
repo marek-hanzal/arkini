@@ -377,8 +377,15 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			save,
 		});
 
-		expect(board.byId["item-instance:1"]?.activation).toMatchObject({
+		const activation = board.byId["item-instance:1"]?.activation;
+		expect(activation).toMatchObject({
 			deliveryBlocked: true,
+		});
+		expect(
+			activation?.productLines?.find((line) => line.productId === "product:test"),
+		).toMatchObject({
+			deliveryBlocked: true,
+			progress: undefined,
 		});
 	});
 

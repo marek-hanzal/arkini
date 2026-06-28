@@ -57,6 +57,20 @@ describe("readLiveProducerProductLineView", () => {
 		expect(line.progress).toBe(0.25);
 	});
 
+	it("keeps blocked delivery lines unchanged instead of inventing progress", () => {
+		const baseLine = createLine({
+			deliveryBlocked: true,
+			progress: undefined,
+		});
+
+		expect(
+			readLiveProducerProductLineView({
+				line: baseLine,
+				nowMs: 500,
+			}),
+		).toBe(baseLine);
+	});
+
 	it("keeps idle lines unchanged", () => {
 		const baseLine = createLine({
 			inProgress: false,

@@ -568,6 +568,30 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/inventory sources have no board cell/);
 	});
 
+	it("rejects active effect product lines with inventory-only source scope", () => {
+		const config = createValidConfigValue();
+		config.effects["effect:inventory-only"] = {
+			name: "Inventory-only boost",
+			operations: [
+				{
+					kind: "duration.multiply",
+					multiplier: 0.5,
+					target: {
+						productIds: [
+							"product:test",
+						],
+					},
+				},
+			],
+			scope: "global",
+			sourceScope: "inventory",
+		};
+		config.products["product:test"].activatesEffectId = "effect:inventory-only";
+		config.products["product:test"].output = undefined;
+
+		expect(() => parseGameConfig(config)).toThrow(/inventory-only sourceScope/);
+	});
+
 	it("rejects active effect product lines that also define output loot", () => {
 		const config = createValidConfigValue();
 		config.effects["effect:test"] = {

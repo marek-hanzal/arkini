@@ -152,6 +152,39 @@ describe("readProducerBoardProgress", () => {
 		});
 	});
 
+	it("ignores blocked delivery product lines even before their retry wake", () => {
+		expect(
+			readProducerBoardProgress({
+				activation: producerActivation([
+					{
+						deliveryBlocked: true,
+						durationMs: 1000,
+						inProgress: true,
+						isDefault: true,
+						inputItemIds: [],
+						inputs: [],
+						inputsReady: true,
+						inputsAvailable: true,
+						missingRequirementItemIds: [],
+						name: "Twig",
+						productId: "product:twig",
+						producerQueuedJobs: 1,
+						queueFull: true,
+						blocked: false,
+						blockReasonEffectIds: [],
+						queueSize: 1,
+						queuedJobs: 1,
+						readyAtMs: 2000,
+						requirementItemIds: [],
+						requirementsReady: true,
+						startAtMs: 1000,
+					},
+				]),
+				nowMs: 1500,
+			}),
+		).toBeUndefined();
+	});
+
 	it("does not show completed blocked deliveries as running progress", () => {
 		expect(
 			readProducerBoardProgress({

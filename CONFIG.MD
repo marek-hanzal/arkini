@@ -169,7 +169,7 @@ Craft recipes are keyed by the craft target item id, usually a blueprint item. B
 }
 ```
 
-## Requirements and hindrances
+## Requirements
 
 Requirements can be passive, stored, or proximity-based. Product/producers reference reusable requirements through `requirementIds`. Craft/stash requirements are inline. Requirement `durationFactor` defaults to `1`; write it only when it actually changes duration.
 
@@ -178,8 +178,6 @@ Requirements can be passive, stored, or proximity-based. Product/producers refer
 { "type": "stored", "itemId": "item:water", "quantity": 1, "capacity": 2 }
 { "type": "proximity", "itemIds": ["item:purifier"], "distance": 2 }
 ```
-
-Hindrances use the passive/proximity shapes but slow production instead of gating start. Multiple active hindrances stack.
 
 ## Effects
 
@@ -196,23 +194,24 @@ Effect source fields:
 }
 ```
 
-`sourceScope` is `board`, `inventory`, or `both`; omitted means `board`. Local effects must be board-sourced because distance needs a board cell.
+`sourceScope` is `board`, `inventory`, or `both`; omitted means `board`. Local effects must be board-sourced because distance needs a board cell. `duration.proximityPenalty` is local-only and multiplies duration per nearby source item; closer sources apply a stronger penalty and multiple source instances stack.
 
 Operation targets must be explicit. Use `target: { "all": true }` for match-everything. Do not use empty target objects.
 
 Supported operations:
 
 ```json
-{ "kind": "line.reveal", "target": { "productTags": ["engineers"] } }
+{ "kind": "line.reveal", "target": { "productTagsAny": ["engineers"] } }
 { "kind": "line.hide", "target": { "productIds": ["product:secret"] } }
-{ "kind": "line.blockStart", "reason": "Wrong path.", "target": { "productTags": ["faith"] } }
+{ "kind": "line.blockStart", "reason": "Wrong path.", "target": { "productTagsAny": ["faith"] } }
 { "kind": "duration.addMs", "valueMs": 1000, "target": { "all": true } }
-{ "kind": "duration.multiply", "multiplier": 0.5, "target": { "productTags": ["engineers"] } }
+{ "kind": "duration.multiply", "multiplier": 0.5, "target": { "productTagsAny": ["engineers"] } }
+{ "kind": "duration.proximityPenalty", "durationFactor": 0.5, "target": { "productIds": ["product:farm-t1:grain"] } }
 { "kind": "loot.appendOutput", "chance": 0.2, "output": [{ "type": "guaranteed", "itemId": "item:pollution", "quantity": 1 }], "target": { "all": true } }
 { "kind": "loot.replaceOutput", "output": [{ "type": "guaranteed", "itemId": "item:void-splinter", "quantity": 1 }], "target": { "productIds": ["product:test"] } }
 { "kind": "loot.addChanceItem", "itemId": "item:pollution", "chance": 0.1, "quantity": 1, "target": { "all": true } }
 { "kind": "loot.dropChance.add", "delta": -0.2, "target": { "all": true } }
-{ "kind": "item.blockCreate", "reason": "Counter path locked.", "target": { "itemTags": ["faith"] } }
+{ "kind": "item.blockCreate", "reason": "Counter path locked.", "target": { "itemTagsAny": ["faith"] } }
 ```
 
 `line.blockStart` blocks new enqueue/start attempts. Already queued jobs keep their chance; the output can still be affected or voided by hard create rules at completion. `item.blockCreate` is hard: immediate creation actions reject, delayed producer/craft/spawn outputs are discarded instead of retrying forever.

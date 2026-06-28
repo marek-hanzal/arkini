@@ -38,7 +38,6 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 		});
 		const effectiveProductLine = readEffectiveProducerProductLine({
 			baseDurationMs: readProducerProductDurationMs({
-				hindrances: subject.hindrances,
 				product: subject.product,
 				producerItemInstanceId: job.producerItemInstanceId,
 				requirements: subject.requirements,

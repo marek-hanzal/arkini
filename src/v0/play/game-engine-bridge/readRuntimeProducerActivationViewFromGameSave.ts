@@ -56,7 +56,6 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 			config,
 			maxQueueSize: producer.maxQueueSize,
 			nowMs,
-			producerHinderedBy: producer.hinderedBy ?? [],
 			producerId,
 			producerItemId: boardItem.itemId,
 			producerRequirementIds: producer.requirementIds,

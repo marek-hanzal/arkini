@@ -86,6 +86,47 @@
 				}
 			],
 			"sourceScope": "both"
+		},
+		"effect:pollution-slows-farms-and-beer": {
+			"name": "Pollution slows nearby farms and brewery production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "duration.proximityPenalty",
+					"durationFactor": 0.5,
+					"target": {
+						"productIds": [
+							"product:cattle-farm-t1:milk",
+							"product:chicken-coop-t1:egg",
+							"product:farm-t1:grain",
+							"product:farm-t1:grain-morale-t1",
+							"product:pig-farm-t1:piglet",
+							"product:sheep-pasture-t1:wool",
+							"product:vegetable-garden-t1:vegetables"
+						],
+						"producerIds": [
+							"producer:brewery-t1"
+						]
+					}
+				}
+			]
+		},
+		"effect:pollution-slows-winery": {
+			"name": "Pollution slows nearby winery production",
+			"scope": "local",
+			"radius": 3,
+			"operations": [
+				{
+					"kind": "duration.proximityPenalty",
+					"durationFactor": 0.5,
+					"target": {
+						"producerIds": [
+							"producer:winery-t1"
+						]
+					}
+				}
+			]
 		}
 	}
 }

@@ -153,23 +153,35 @@ describe("auditGameConfig", () => {
 		);
 	});
 
-	it("does not warn about produced items used as hindrances", () => {
+	it("does not warn about produced items used as passive effect sources", () => {
 		const config = createConfigValue();
 		const warnings = auditGameConfig(
 			parseGameConfig({
 				...config,
-				products: {
-					...config.products,
-					"product:test": {
-						...config.products["product:test"],
-						hinderedBy: [
+				effects: {
+					"effect:pollution-slow": {
+						name: "Pollution slow",
+						operations: [
 							{
-								distance: 2,
-								itemIds: [
-									"item:pollution",
-								],
-								type: "proximity",
+								durationFactor: 0.5,
+								kind: "duration.proximityPenalty",
+								target: {
+									productIds: [
+										"product:test",
+									],
+								},
 							},
+						],
+						radius: 2,
+						scope: "local",
+					},
+				},
+				items: {
+					...config.items,
+					"item:pollution": {
+						...config.items["item:pollution"],
+						passiveEffectIds: [
+							"effect:pollution-slow",
 						],
 					},
 				},

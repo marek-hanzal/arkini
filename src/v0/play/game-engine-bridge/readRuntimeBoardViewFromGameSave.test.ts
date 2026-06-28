@@ -240,9 +240,28 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
-	it("shows active producer product hindrances in the runtime view", () => {
+	it("shows active producer duration effects in the runtime view", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			effects: {
+				...baseConfig.effects,
+				"effect:twig-proximity-slow": {
+					name: "Twig proximity slow",
+					operations: [
+						{
+							durationFactor: 0.5,
+							kind: "duration.proximityPenalty",
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					radius: 2,
+					scope: "local",
+				},
+			},
 			game: {
 				...baseConfig.game,
 				board: {
@@ -250,19 +269,12 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					width: 3,
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					hinderedBy: [
-						{
-							distance: 2,
-							durationFactor: 0.5,
-							itemIds: [
-								"item:twig",
-							],
-							type: "proximity",
-						},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:twig-proximity-slow",
 					],
 				},
 			},
@@ -303,20 +315,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 
 		expect(line).toMatchObject({
 			durationMs: 3000,
-			hindrances: [
-				{
-					durationMultiplier: 3,
-					matches: [
-						{
-							distance: 1,
-						},
-						{
-							distance: 2,
-						},
-					],
-					type: "proximity",
-				},
-			],
+			effectDurationMultiplier: 3,
 		});
 	});
 

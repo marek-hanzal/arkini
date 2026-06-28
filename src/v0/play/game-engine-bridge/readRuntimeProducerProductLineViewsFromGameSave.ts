@@ -10,7 +10,6 @@ import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerPr
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
-import { readRuntimeActivationHindranceViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationHindranceViewsFromGameSave";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
 import {
@@ -30,9 +29,6 @@ export namespace readRuntimeProducerProductLineViewsFromGameSave {
 		config: GameConfig;
 		maxQueueSize: number;
 		nowMs: number;
-		producerHinderedBy: NonNullable<
-			(GameConfig["producers"][string] | GameConfig["stashes"][string])["hinderedBy"]
-		>;
 		producerId: string;
 		producerItemId: string;
 		producerRequirementIds: readonly string[];
@@ -58,7 +54,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 	config,
 	maxQueueSize,
 	nowMs,
-	producerHinderedBy,
 	producerId,
 	producerItemId,
 	producerRequirementIds,
@@ -109,10 +104,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				...product.requirementIds,
 			],
 		});
-		const hindrances = [
-			...producerHinderedBy,
-			...(product.hinderedBy ?? []),
-		];
 		const requirementViews = readRuntimeActivationRequirementViewsFromGameSave({
 			requirements,
 			save,
@@ -150,7 +141,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		const activeJob = activeJobFacts?.job;
 		const deliveryBlocked = activeJobFacts?.status === "delivery_blocked";
 		const baseDurationMs = readProducerProductDurationMs({
-			hindrances,
 			product,
 			producerItemInstanceId: targetItemInstanceId,
 			requirements,
@@ -237,12 +227,11 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				),
 				deliveryBlocked,
 				durationMs,
+				effectDurationMultiplier:
+					effectiveProductLine.durationMs > baseDurationMs && baseDurationMs > 0
+						? effectiveProductLine.durationMs / baseDurationMs
+						: undefined,
 				inProgress: jobs.length > 0,
-				hindrances: readRuntimeActivationHindranceViewsFromGameSave({
-					hindrances,
-					save,
-					targetItemInstanceId,
-				}),
 				inputItemIds: inputs.map((input) => input.itemId as ItemId),
 				isDefault,
 				inputs,

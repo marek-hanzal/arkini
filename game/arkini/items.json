@@ -1495,7 +1495,11 @@
 				"pollution",
 				"era:VIII"
 			],
-			"tier": 7
+			"tier": 7,
+			"passiveEffectIds": [
+				"effect:pollution-slows-farms-and-beer",
+				"effect:pollution-slows-winery"
+			]
 		},
 		"item:raw-hide": {
 			"description": "Untreated animal hide produced by slaughterhouses and processed by tanneries into leather.",

@@ -53,13 +53,7 @@ export const readWorldProducerJobSubjectFx = Effect.fn("readWorldProducerJobSubj
 			...product.requirementIds,
 		],
 	});
-	const hindrances = [
-		...(producerDefinition.hinderedBy ?? []),
-		...(product.hinderedBy ?? []),
-	];
-
 	return {
-		hindrances,
 		producerDefinition,
 		producerItem,
 		product,

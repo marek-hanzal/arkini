@@ -23,7 +23,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - TileEngine is generic and must not import Arkini domain/debug/play modules. Shared instrumentation belongs in `src/v0/diagnostics/*`, not in dev UI/debug feature folders.
 - `GameConfigSchema` / `GameSaveConfigSchema` are central validation gates.
 - `GameConfig` is the primary gameplay contract: if config validation accepts an item/capability combination, the engine/runtime must support and honor it deterministically.
-- Producer/product `hinderedBy` entries are negative production effects: every active hindrance instance slows duration, active penalties stack, and they do not gate or block product start.
+- Negative production pressure belongs in the effect system. Pollution uses passive local `duration.proximityPenalty` effects; producer/product-owned `hinderedBy` side tables are obsolete and must not be reintroduced.
 - Townhall era progression is one-way: the next Town Hall craft consumes the current Town Hall and requires ownership of every physical building/place unlocked by the current era via passive `board_or_inventory` requirements. Higher Town Halls do not inherit older blueprint products.
 - Do not add storage buildings; storage is handled by inventory plus passive storage through producer input capacity.
 - Building Permit is an Era IV gameplay item/master produced by Civic Office and used for survey, academy, mining, market, and later construction progression.

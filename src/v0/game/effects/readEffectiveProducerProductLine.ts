@@ -6,6 +6,7 @@ import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectivePr
 import { compareGameEffectSourceInstances } from "~/v0/game/effects/compareGameEffectSourceInstances";
 import { doesGameEffectTargetProductLine } from "~/v0/game/effects/doesGameEffectTargetProductLine";
 import { doesGameEffectSourceApplyToBoardCell } from "~/v0/game/effects/doesGameEffectSourceApplyToBoardCell";
+import { readChebyshevDistance } from "~/v0/game/effects/readChebyshevDistance";
 import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSourceCell";
 import { readGameEffectSourceInstances } from "~/v0/game/effects/readGameEffectSourceInstances";
 import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourceInstance";
@@ -47,6 +48,38 @@ const readEffectSourceAppliesToTarget = ({
 			sourceItemInstanceId: targetItemInstanceId,
 		}),
 	});
+
+const readProximityPenaltyMultiplier = ({
+	config,
+	save,
+	source,
+	targetCell,
+	operation,
+}: {
+	config: GameConfig;
+	save: GameSave;
+	source: GameEffectSourceInstance;
+	targetCell: ReturnType<typeof readGameEffectSourceCell>;
+	operation: Extract<
+		GameConfig["effects"][string]["operations"][number],
+		{
+			kind: "duration.proximityPenalty";
+		}
+	>;
+}) => {
+	const effect = config.effects[source.effectId];
+	if (!effect || effect.scope !== "local" || !targetCell) return 1;
+
+	const sourceCell = readGameEffectSourceCell({
+		save,
+		sourceItemInstanceId: source.sourceItemInstanceId,
+	});
+	if (!sourceCell) return 1;
+
+	const distance = readChebyshevDistance(sourceCell, targetCell);
+	const proximityStrength = effect.radius - distance + 1;
+	return Math.max(1, 1 + proximityStrength * operation.durationFactor);
+};
 
 const createAppliedOperation = ({
 	effectId,
@@ -186,6 +219,20 @@ export const readEffectiveProducerProductLine = ({
 					},
 					(operation) => {
 						durationMultiplier *= operation.multiplier;
+					},
+				)
+				.with(
+					{
+						kind: "duration.proximityPenalty",
+					},
+					(operation) => {
+						durationMultiplier *= readProximityPenaltyMultiplier({
+							config,
+							operation,
+							save,
+							source,
+							targetCell,
+						});
 					},
 				)
 				.with(

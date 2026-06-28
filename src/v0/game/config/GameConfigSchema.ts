@@ -42,9 +42,8 @@ import { z } from "zod";
  *   `board_or_inventory`). They model global knowledge/permission/ownership gates.
  * - Producer/product requirements are referenced through central `requirements` entries by
  *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
- *   includes diagonals around the target tile. Producer/product `hinderedBy` entries are
- *   negative production effects: every active hindrance instance may slow the selected product without
- *   preventing start.
+ *   includes diagonals around the target tile. Negative production pressure is authored
+ *   as passive item effects, not producer-owned hindrance side tables.
  * - Producer/stash `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
@@ -107,10 +106,7 @@ import { z } from "zod";
  *       "type": "producer",
  *       "maxQueueSize": 1,
  *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
- *       "requirementIds": ["requirement:lumber-camp.near-tree"],
- *       "hinderedBy": [
- *         { "type": "proximity", "itemIds": ["item:pollution"], "distance": 2, "durationFactor": 0.5 }
- *       ]
+ *       "requirementIds": ["requirement:lumber-camp.near-tree"]
  *     }
  *   },
  *   "products": {
@@ -120,7 +116,6 @@ import { z } from "zod";
  *       "placement": "board_then_inventory",
  *       "inputs": [{ "itemId": "item:log", "quantity": 1, "capacity": 1, "consume": true }],
  *       "requirementIds": ["requirement:saw-license"],
- *       "hinderedBy": [],
  *       "output": [{ "type": "guaranteed", "itemId": "item:plank", "quantity": 1 }]
  *     }
  *   }
@@ -261,42 +256,6 @@ const ActivationRequirementSchema = z.array(
 	]),
 );
 
-/**
- * Negative production hindrance. Hindrances do not gate production. Every active
- * hindrance instance applies a duration penalty, and active penalties stack. Passive
- * hindrances react to item presence in a scope; proximity hindrances react to nearby
- * board items and get stronger when closer.
- */
-const PassiveItemHindranceSchema = z
-	.object({
-		type: z.literal("passive"),
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
-		scope: z.enum([
-			"board",
-			"inventory",
-			"board_or_inventory",
-		]),
-		durationFactor: z.number().min(0).optional(),
-	})
-	.strict();
-
-const ProximityItemHindranceSchema = z
-	.object({
-		type: z.literal("proximity"),
-		itemIds: z.array(IdSchema).min(1),
-		distance: PositiveIntegerSchema,
-		durationFactor: z.number().min(0).optional(),
-	})
-	.strict();
-
-const GameHindranceDefinitionSchema = z.discriminatedUnion("type", [
-	PassiveItemHindranceSchema,
-	ProximityItemHindranceSchema,
-]);
-
-const GameHindrancesSchema = z.array(GameHindranceDefinitionSchema);
-
 /** Selects which producer product lines an effect operation may touch. */
 const GameEffectProductLineTargetSchema = z
 	.object({
@@ -404,6 +363,13 @@ const GameEffectOperationSchema = z.discriminatedUnion("kind", [
 			...GameEffectProductLineOperationBaseSchema,
 			kind: z.literal("duration.multiply"),
 			multiplier: z.number().min(0),
+		})
+		.strict(),
+	z
+		.object({
+			...GameEffectProductLineOperationBaseSchema,
+			kind: z.literal("duration.proximityPenalty"),
+			durationFactor: z.number().min(0),
 		})
 		.strict(),
 	z
@@ -586,7 +552,6 @@ const ProducerDefinitionSchema = z
 		maxQueueSize: PositiveIntegerSchema.default(1),
 		productIds: z.array(IdSchema).min(1),
 		requirementIds: z.array(IdSchema).default([]),
-		hinderedBy: GameHindrancesSchema.optional(),
 		charges: PositiveNumberSchema.optional(),
 		onChargesDepleted: ProducerDepletedModeSchema.default("stop"),
 	})
@@ -652,7 +617,6 @@ const ProductDefinitionSchema = z
 		chargeCost: NonNegativeNumberSchema.default(0),
 		inputs: ActivationInputSchema.optional(),
 		requirementIds: z.array(IdSchema).default([]),
-		hinderedBy: GameHindrancesSchema.optional(),
 		output: ActivationOutputSchema.min(1).optional(),
 		activatesEffectId: IdSchema.optional(),
 	})
@@ -936,6 +900,20 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				);
 			}
 
+			if (operation.kind === "duration.proximityPenalty" && effect.scope !== "local") {
+				addIssue(
+					ctx,
+					[
+						"effects",
+						effectId,
+						"operations",
+						operationIndex,
+						"kind",
+					],
+					`Effect operation "duration.proximityPenalty" requires a local effect scope.`,
+				);
+			}
+
 			if (operation.kind === "loot.appendOutput" || operation.kind === "loot.replaceOutput") {
 				validateActivationOutput(
 					ctx,
@@ -1066,16 +1044,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			capability.requirementIds,
 			hasRequirement,
 		);
-		validateGameHindrances(
-			ctx,
-			[
-				section,
-				capabilityId,
-				"hinderedBy",
-			],
-			capability.hinderedBy ?? [],
-			hasItem,
-		);
 	};
 
 	for (const [producerId, producer] of Object.entries(value.producers)) {
@@ -1162,17 +1130,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			product.requirementIds,
 			hasRequirement,
 		);
-		validateGameHindrances(
-			ctx,
-			[
-				"products",
-				productId,
-				"hinderedBy",
-			],
-			product.hinderedBy ?? [],
-			hasItem,
-		);
-
 		validateUniqueStringList(
 			ctx,
 			[
@@ -2453,67 +2410,6 @@ const validateItemRequirements = (
 				],
 				`Capacity must be >= quantity (${requirement.quantity}).`,
 			);
-		}
-	}
-};
-
-const validateGameHindrances = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	hindrances: readonly z.infer<typeof GameHindranceDefinitionSchema>[],
-	hasItem: (itemId: string) => boolean,
-) => {
-	validateUniqueStringList(
-		ctx,
-		path,
-		hindrances.map((hindrance) =>
-			hindrance.type === "passive"
-				? `${hindrance.type}:${hindrance.itemId}:${hindrance.scope}`
-				: `${hindrance.type}:${hindrance.itemIds.join("|")}:${hindrance.distance}`,
-		),
-		(value) => `Duplicate hindrance "${value}".`,
-	);
-
-	for (const [index, hindrance] of hindrances.entries()) {
-		if (hindrance.type === "passive") {
-			if (!hasItem(hindrance.itemId)) {
-				addIssue(
-					ctx,
-					[
-						...path,
-						index,
-						"itemId",
-					],
-					`Missing item "${hindrance.itemId}".`,
-				);
-			}
-			continue;
-		}
-
-		validateUniqueStringList(
-			ctx,
-			[
-				...path,
-				index,
-				"itemIds",
-			],
-			hindrance.itemIds,
-			(value) => `Duplicate hindrance item "${value}".`,
-		);
-
-		for (const [itemIndex, itemId] of hindrance.itemIds.entries()) {
-			if (!hasItem(itemId)) {
-				addIssue(
-					ctx,
-					[
-						...path,
-						index,
-						"itemIds",
-						itemIndex,
-					],
-					`Missing item "${itemId}".`,
-				);
-			}
 		}
 	}
 };

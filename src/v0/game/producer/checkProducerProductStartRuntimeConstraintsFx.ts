@@ -11,7 +11,6 @@ import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readSt
 export namespace checkProducerProductStartRuntimeConstraintsFx {
 	export interface Props {
 		config: GameConfig;
-		hindrances: NonNullable<GameConfig["products"][string]["hinderedBy"]>;
 		producerId: string;
 		producerItemId: string;
 		producerItemInstanceId: string;
@@ -27,7 +26,6 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 	"checkProducerProductStartRuntimeConstraintsFx",
 )(function* ({
 	config,
-	hindrances,
 	producerId,
 	producerItemId,
 	producerItemInstanceId,
@@ -50,7 +48,6 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 
 	const effectiveProductLine = readEffectiveProducerProductLine({
 		baseDurationMs: readProducerProductDurationMs({
-			hindrances,
 			product,
 			producerItemInstanceId,
 			requirements,

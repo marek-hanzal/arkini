@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from "react";
-import type { ActivationHindranceView } from "~/v0/board/view/ActivationHindranceViewSchema";
 import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
 import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
 import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
@@ -30,9 +29,6 @@ const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "
 
 const readItemName = (itemId: string, items: ItemCatalogView) =>
 	items[itemId]?.name ?? itemId.replace(/^item:/, "").replace(/^producer:/, "");
-
-const readHindrancesMultiplier = (hindrances: readonly ActivationHindranceView[]) =>
-	hindrances.reduce((total, hindrance) => total * hindrance.durationMultiplier, 1);
 
 const readProductLineOutputOwnedLabel = (
 	outputs: NonNullable<ProducerProductLineView["outputs"]>,
@@ -128,54 +124,6 @@ const readRequirementMeta = (requirement: ActivationRequirementView) => {
 		.join(" · ");
 };
 
-const renderHindranceAsset = (hindrance: ActivationHindranceView, items: ItemCatalogView) => {
-	if (hindrance.type === "passive") {
-		return (
-			<ItemInlineAsset
-				item={items[hindrance.itemId]}
-				className="h-9 w-9"
-			/>
-		);
-	}
-
-	return (
-		<ItemInlineAssetGroup
-			itemIds={hindrance.itemIds}
-			items={items}
-			assetClassName="h-7 w-7"
-		/>
-	);
-};
-
-const readHindranceLabel = (hindrance: ActivationHindranceView, items: ItemCatalogView) => {
-	if (hindrance.type === "passive") {
-		return readItemName(hindrance.itemId, items);
-	}
-
-	return hindrance.itemIds.map((itemId) => readItemName(itemId, items)).join(" / ");
-};
-
-const readHindranceMeta = (hindrance: ActivationHindranceView, items: ItemCatalogView) => {
-	if (hindrance.type === "passive") {
-		return `${hindrance.activeQuantity} active · ${hindrance.activeStacks} stack${
-			hindrance.activeStacks === 1 ? "" : "s"
-		} · ${formatMultiplier(hindrance.durationMultiplier)}× time`;
-	}
-
-	const matchLabel = hindrance.matches
-		.map((match) => `${readItemName(match.itemId, items)} at ${match.distance}`)
-		.join(", ");
-
-	return [
-		`within ${hindrance.distance}`,
-		`${hindrance.matches.length} active`,
-		`${formatMultiplier(hindrance.durationMultiplier)}× time`,
-		matchLabel,
-	]
-		.filter(Boolean)
-		.join(" · ");
-};
-
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
 	items,
 	lines,
@@ -194,8 +142,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 		>
 			<div className="grid gap-2.5">
 				{lines.map((line) => {
-					const activeHindrances = line.hindrances ?? [];
-					const hindranceMultiplier = readHindrancesMultiplier(activeHindrances);
 					const unmetRequirements = (line.requirements ?? []).filter(
 						(requirement) => !readActivationRequirementViewReady(requirement),
 					);
@@ -236,8 +182,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
 												Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
 												{formatMs(line.durationMs)}
-												{hindranceMultiplier > 1
-													? ` · hindered ${formatMultiplier(hindranceMultiplier)}×`
+												{line.effectDurationMultiplier &&
+												line.effectDurationMultiplier > 1
+													? ` · slowed ${formatMultiplier(line.effectDurationMultiplier)}×`
 													: ""}
 												{runState.statusMetaLabel
 													? ` · ${runState.statusMetaLabel}`
@@ -255,28 +202,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									) : null}
 								</div>
 							</div>
-
-							{activeHindrances.length ? (
-								<div className="mt-2.5 grid gap-1.5">
-									{activeHindrances.map((hindrance, hindranceIndex) => (
-										<div
-											key={`${hindranceIndex}:${readHindranceLabel(hindrance, items)}`}
-											className="flex min-w-0 items-start gap-2 rounded-sm bg-rose-500/10 px-2.5 py-2 text-xs"
-										>
-											{renderHindranceAsset(hindrance, items)}
-											<div className="min-w-0 flex-1">
-												<p className="break-words font-semibold text-ak-text">
-													{readHindranceLabel(hindrance, items)}
-												</p>
-												<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
-													{readHindranceMeta(hindrance, items)}
-												</p>
-											</div>
-											<span className="mt-0.5 shrink-0 text-rose-300">⚠</span>
-										</div>
-									))}
-								</div>
-							) : null}
 
 							{unmetRequirements.length ? (
 								<div className="mt-2.5 grid gap-1.5">

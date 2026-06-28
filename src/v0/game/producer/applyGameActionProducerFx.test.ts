@@ -2402,9 +2402,28 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("stacks product duration penalties from every active proximity hindrance", () => {
+	it("stacks product duration penalties from every active local effect source", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
+			effects: {
+				...baseConfig.effects,
+				"effect:twig-proximity-slow": {
+					name: "Twig proximity slow",
+					operations: [
+						{
+							durationFactor: 0.5,
+							kind: "duration.proximityPenalty",
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
+						},
+					],
+					radius: 2,
+					scope: "local",
+				},
+			},
 			game: {
 				...baseConfig.game,
 				board: {
@@ -2412,19 +2431,12 @@ describe("applyGameActionFx Producer", () => {
 					width: 3,
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					hinderedBy: [
-						{
-							distance: 2,
-							durationFactor: 0.5,
-							itemIds: [
-								"item:twig",
-							],
-							type: "proximity",
-						},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:twig-proximity-slow",
 					],
 				},
 			},
@@ -2473,28 +2485,56 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("stacks active passive hindrance duration penalties", () => {
+	it("stacks active passive duration effects", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					hinderedBy: [
+			effects: {
+				...baseConfig.effects,
+				"effect:rock-slow": {
+					name: "Rock slow",
+					operations: [
 						{
-							durationFactor: 1,
-							itemId: "item:rock",
-							quantity: 1,
-							scope: "board_or_inventory",
-							type: "passive",
+							kind: "duration.multiply",
+							multiplier: 2,
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
 						},
+					],
+					scope: "global",
+					sourceScope: "both",
+				},
+				"effect:twig-inventory-slow": {
+					name: "Twig inventory slow",
+					operations: [
 						{
-							durationFactor: 0.5,
-							itemId: "item:twig",
-							quantity: 1,
-							scope: "inventory",
-							type: "passive",
+							kind: "duration.multiply",
+							multiplier: 1.5,
+							target: {
+								productIds: [
+									"product:test",
+								],
+							},
 						},
+					],
+					scope: "global",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:rock": {
+					...baseConfig.items["item:rock"],
+					passiveEffectIds: [
+						"effect:rock-slow",
+					],
+				},
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:twig-inventory-slow",
 					],
 				},
 			},

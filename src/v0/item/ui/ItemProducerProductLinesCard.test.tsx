@@ -46,9 +46,34 @@ describe("ItemProducerProductLinesCard", () => {
 		);
 
 		expect(html).toContain("Paused · 4s");
-		expect(html).toContain('style="width:20%"');
+		expect(html).toContain("--ui-progress-button-start:0.2");
+		expect(html).toContain("transform:scaleX(0.2)");
+		expect(html).not.toContain("ui-progress-button-fill-to-end");
 		expect(html).not.toContain("Queue full</span></button>");
 		expect(html).not.toContain("mt-2 h-1.5 overflow-hidden");
+	});
+
+	it("lets running producer button fill complete to the end between runtime samples", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						pausedAtMs: undefined,
+						remainingMs: 800,
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Running · 1s");
+		expect(html).toContain("--ui-progress-button-start:0.2");
+		expect(html).toContain("animation:ui-progress-button-fill-to-end 800ms linear forwards");
+		expect(html).toContain("transform:scaleX(0.2)");
 	});
 
 	it("keeps queued producer jobs in the action button", () => {
@@ -71,7 +96,8 @@ describe("ItemProducerProductLinesCard", () => {
 		);
 
 		expect(html).toContain("Queued · +1 queued");
-		expect(html).toContain('style="width:0%"');
+		expect(html).toContain("--ui-progress-button-start:0");
+		expect(html).toContain("transform:scaleX(0)");
 		expect(html).not.toContain("mt-2 h-1.5 overflow-hidden");
 	});
 

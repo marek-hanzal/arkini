@@ -73,3 +73,13 @@ button:focus-visible,
 	--ak-layer-overlay-tile: 0;
 	--ak-layer-overlay-drag-tile: 20;
 }
+
+@keyframes ui-progress-button-fill-to-end {
+	from {
+		transform: scaleX(var(--ui-progress-button-start, 0));
+	}
+
+	to {
+		transform: scaleX(1);
+	}
+}

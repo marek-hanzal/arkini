@@ -1,4 +1,5 @@
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { isBoardViewItemRuntimeBusy } from "~/v0/board/logic/isBoardViewItemRuntimeBusy";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 
 export namespace readBoardItemStoreState {
@@ -13,21 +14,6 @@ export namespace readBoardItemStoreState {
 	}
 }
 
-const isCraftBusy = (craft: BoardViewItem["craft"]) =>
-	craft !== undefined && craft.phase !== "collecting_inputs";
-
-const isActivationBusy = (activation: BoardViewItem["activation"]) =>
-	Boolean(
-		activation?.deliveryBlocked ||
-			activation?.productLines?.some(
-				(line) =>
-					line.inProgress ||
-					line.deliveryBlocked ||
-					line.queueBlockedReason !== undefined ||
-					line.producerQueuedJobs > 0,
-			),
-	);
-
 export const readBoardItemStoreState = ({
 	boardItem,
 	item,
@@ -39,7 +25,7 @@ export const readBoardItemStoreState = ({
 		};
 	}
 
-	if (isCraftBusy(boardItem.craft) || isActivationBusy(boardItem.activation)) {
+	if (isBoardViewItemRuntimeBusy(boardItem)) {
 		return {
 			canStore: false,
 			reason: "busy",

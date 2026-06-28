@@ -66,7 +66,7 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			canRunAction,
 			inputsPartiallyAvailable,
 			inputsReady,
-			label: "Ready",
+			label: "Claim",
 			requirementsReady,
 		};
 	}

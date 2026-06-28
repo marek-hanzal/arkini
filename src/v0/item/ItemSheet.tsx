@@ -11,7 +11,12 @@ import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
-import { useGameAction, useGameBoardItem, useGameItemCatalogView } from "~/v0/play/runtime";
+import {
+	useGameAction,
+	useGameBoardItem,
+	useGameItemCatalogView,
+	useGameRuntimeStore,
+} from "~/v0/play/runtime";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 
 export namespace ItemSheet {
@@ -25,6 +30,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const boardItem = useGameBoardItem(boardItemId ?? "");
 	const items = useGameItemCatalogView();
 	const itemAction = useGameAction();
+	const runtimeStore = useGameRuntimeStore();
 	const clockItems = useMemo(
 		() =>
 			boardItem
@@ -122,6 +128,10 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		});
 	};
 
+	const claimCraft = () => {
+		void runtimeStore.tick();
+	};
+
 	const startCraft = () => {
 		if (!liveCraft) return;
 		void itemAction.run({
@@ -192,6 +202,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						craft={liveCraft}
 						items={items}
 						pending={itemAction.isPending}
+						onClaim={claimCraft}
 						onStart={startCraft}
 						onWithdrawInput={withdrawCraftInput}
 					/>

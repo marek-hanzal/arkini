@@ -34,6 +34,7 @@ describe("ItemCraftCard", () => {
 				})}
 				items={{}}
 				pending={false}
+				onClaim={() => undefined}
 				onStart={() => undefined}
 				onWithdrawInput={() => undefined}
 			/>,
@@ -67,12 +68,33 @@ describe("ItemCraftCard", () => {
 				})}
 				items={{}}
 				pending={false}
+				onClaim={() => undefined}
 				onStart={() => undefined}
 				onWithdrawInput={() => undefined}
 			/>,
 		);
 
 		expect(html).toContain("Auto-fill inputs</button>");
+		expect(html).not.toContain('disabled=""');
+	});
+	it("enables ready crafts as claim actions in detail", () => {
+		const html = renderToStaticMarkup(
+			<ItemCraftCard
+				craft={createCraft({
+					complete: true,
+					phase: "ready",
+					progress: 1,
+					timeProgress: 1,
+				})}
+				items={{}}
+				pending={false}
+				onClaim={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Claim</button>");
 		expect(html).not.toContain('disabled=""');
 	});
 });

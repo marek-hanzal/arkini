@@ -156,4 +156,19 @@ describe("isProducerStocked", () => {
 			}),
 		).toBe(false);
 	});
+	it("uses stash product line run state when producer-like line views are available", () => {
+		expect(
+			isProducerStocked({
+				inputs: [],
+				kind: "stash",
+				productLines: [
+					productLine({
+						queueBlockedReason: "paused",
+					}),
+				],
+				requirements: [],
+				trigger: "click",
+			}),
+		).toBe(false);
+	});
 });

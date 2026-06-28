@@ -637,6 +637,155 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Craft inputs must currently be consumed/);
 	});
 
+	it("rejects blueprint craft recipes that require their own target", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:blueprint-house-t1"] = {
+			assetId: "asset:item",
+			description: "House I Blueprint",
+			maxStackSize: 1,
+			name: "House I Blueprint",
+			tags: [],
+			tier: 0,
+		};
+		config.items["producer:house-t1"] = {
+			assetId: "asset:item",
+			description: "House I",
+			maxStackSize: 1,
+			name: "House I",
+			tags: [],
+			tier: 1,
+		};
+		config.craftRecipes["item:blueprint-house-t1"] = {
+			durationMs: 1000,
+			inputs: [
+				{
+					consume: true,
+					itemId: "item:blueprint-house-t1",
+					quantity: 1,
+				},
+			],
+			requirements: [],
+			resultItemId: "producer:house-t1",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/House I Blueprint -> House I Blueprint/);
+	});
+
+	it("rejects indirect blueprint dependency cycles through crafted buildings", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:blueprint-a"] = {
+			assetId: "asset:item",
+			description: "Blueprint A",
+			maxStackSize: 1,
+			name: "Blueprint A",
+			tags: [],
+			tier: 0,
+		};
+		config.items["item:blueprint-b"] = {
+			assetId: "asset:item",
+			description: "Blueprint B",
+			maxStackSize: 1,
+			name: "Blueprint B",
+			tags: [],
+			tier: 0,
+		};
+		config.items["producer:a"] = {
+			assetId: "asset:item",
+			description: "A",
+			maxStackSize: 1,
+			name: "A",
+			tags: [],
+			tier: 1,
+		};
+		config.items["producer:b"] = {
+			assetId: "asset:item",
+			description: "B",
+			maxStackSize: 1,
+			name: "B",
+			tags: [],
+			tier: 1,
+		};
+		config.craftRecipes["item:blueprint-a"] = {
+			durationMs: 1000,
+			inputs: [
+				{
+					consume: true,
+					itemId: "producer:b",
+					quantity: 1,
+				},
+			],
+			requirements: [],
+			resultItemId: "producer:a",
+		};
+		config.craftRecipes["item:blueprint-b"] = {
+			durationMs: 1000,
+			inputs: [
+				{
+					consume: true,
+					itemId: "producer:a",
+					quantity: 1,
+				},
+			],
+			requirements: [],
+			resultItemId: "producer:b",
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/Blueprint A -> Blueprint B -> Blueprint A/);
+	});
+
+	it("rejects blueprint product lines that require the building they unlock", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:blueprint-a"] = {
+			assetId: "asset:item",
+			description: "Blueprint A",
+			maxStackSize: 1,
+			name: "Blueprint A",
+			tags: [],
+			tier: 0,
+		};
+		config.items["producer:a"] = {
+			assetId: "asset:item",
+			description: "A",
+			maxStackSize: 1,
+			name: "A",
+			tags: [],
+			tier: 1,
+		};
+		config.craftRecipes["item:blueprint-a"] = {
+			durationMs: 1000,
+			inputs: [
+				{
+					consume: true,
+					itemId: "item:twig",
+					quantity: 1,
+				},
+			],
+			requirements: [],
+			resultItemId: "producer:a",
+		};
+		config.producers["producer:a"] = {
+			maxQueueSize: 1,
+			productIds: [
+				"product:producer-a:blueprint-a",
+			],
+			requirementIds: [],
+		};
+		config.products["product:producer-a:blueprint-a"] = {
+			durationMs: 1000,
+			name: "Blueprint A",
+			output: [
+				{
+					itemId: "item:blueprint-a",
+					type: "guaranteed",
+				},
+			],
+			placement: "board_then_inventory",
+			requirementIds: [],
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/Blueprint A -> Blueprint A/);
+	});
+
 	it("rejects proximity requirements that point at missing items", () => {
 		const config = createValidConfigValue();
 		config.requirements["requirement:near-ghost"] = {

@@ -31,6 +31,42 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 });
 
 describe("ItemProducerProductLinesCard", () => {
+	it("shows product output ownership with the output icon", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{
+					"item:grain": {
+						assetSrc: "grain.svg",
+						description: "Grain",
+						generatedEffects: [],
+						id: "item:grain",
+						maxStackSize: 99,
+						name: "Grain",
+						storage: "both",
+						tags: [],
+					},
+				}}
+				lines={[
+					createLine({
+						name: "Grain",
+						outputs: [
+							{
+								itemId: "item:grain",
+								ownedQuantity: 7,
+							},
+						],
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Owned 7");
+		expect(html).toContain("grain.svg");
+	});
 	it("shows paused producer jobs with frozen remaining time", () => {
 		const html = renderToStaticMarkup(
 			<ItemProducerProductLinesCard

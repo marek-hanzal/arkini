@@ -48,6 +48,62 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		).toBeUndefined();
 	});
 
+	it("counts owned product outputs across board and inventory", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(
+			board.byId["item-instance:1"]?.activation?.productLines?.find(
+				(line) => line.productId === "product:test",
+			),
+		).toMatchObject({
+			outputs: [
+				{
+					itemId: "item:twig",
+					ownedQuantity: 3,
+				},
+			],
+		});
+	});
+
 	it("marks producer product lines blocked until stored requirements are stocked", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

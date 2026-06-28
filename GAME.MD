@@ -505,7 +505,7 @@ Relevant detail content includes, when applicable:
 - deposited inputs
 - remaining inputs
 - active, ready, or paused timers
-- producer product-line jobs, queue, readiness, and blocked delivery
+- producer product-line jobs, queue, readiness, blocked delivery, output icon, and current owned quantity for each output item across board plus inventory
 - producer input storage
 - stash facade state through product-line requirements, inputs, charges, and depletion mode
 - possible output drops and their rules/probabilities, when known to the player
@@ -647,7 +647,7 @@ There are no automatic producers in current gameplay. A producer that can start 
 
 Single-click on the board starts the current runtime default product line only when the player explicitly selected one for that concrete producer instance. Without an explicit default, the click opens item detail and the producer remains visually neutral instead of being treated as inactive or blocked.
 
-Item detail may show all product lines and can start any line directly.
+Item detail may show all product lines and can start any line directly. Each product-line header should expose its output item image and how many of that output the player currently owns across board plus inventory, so progression planning does not require opening inventory like a spreadsheet gremlin.
 
 ### 10.2 Runtime time model
 

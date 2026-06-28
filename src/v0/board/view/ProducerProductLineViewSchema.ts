@@ -5,6 +5,11 @@ import { ActivationRequirementViewSchema } from "~/v0/board/view/ActivationRequi
 
 const IdSchema = z.string().min(1);
 
+const ProducerProductLineOutputViewSchema = z.object({
+	itemId: IdSchema,
+	ownedQuantity: z.number().int().nonnegative(),
+});
+
 export const ProducerProductLineViewSchema = z.object({
 	productId: IdSchema,
 	name: z.string().min(1),
@@ -38,7 +43,7 @@ export const ProducerProductLineViewSchema = z.object({
 	requirementItemIds: z.array(IdSchema),
 	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	hindrances: z.array(ActivationHindranceViewSchema).optional(),
-	outputItemIds: z.array(IdSchema).optional(),
+	outputs: z.array(ProducerProductLineOutputViewSchema).optional(),
 });
 
 type ProducerProductLineViewSchema = typeof ProducerProductLineViewSchema;

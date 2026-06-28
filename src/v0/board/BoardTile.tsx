@@ -55,10 +55,10 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			data-ui="board item"
 			data-ak-board-item-id={boardItem.id}
 			data-ak-board-tile-ready={tileStatus.ready ? "true" : undefined}
-			data-ak-board-tile-dimmed={!tileStatus.ready ? "true" : undefined}
+			data-ak-board-tile-dimmed={tileStatus.dimmed ? "true" : undefined}
 			className={cn(
 				"relative h-full w-full overflow-hidden transition-opacity duration-200 ease-out",
-				tileStatus.ready ? "opacity-100" : "opacity-[0.68]",
+				tileStatus.dimmed ? "opacity-[0.68]" : "opacity-100",
 			)}
 		>
 			<GameItemView

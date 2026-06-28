@@ -9,6 +9,7 @@ export namespace readBoardTileStatus {
 
 	export interface Result {
 		ready: boolean;
+		dimmed: boolean;
 	}
 }
 
@@ -16,11 +17,16 @@ export const readBoardTileStatus = ({
 	boardItem,
 	nowMs,
 }: readBoardTileStatus.Props): readBoardTileStatus.Result => {
-	const activationReady = isProducerReady(boardItem?.activation, nowMs);
+	const activation = boardItem?.activation;
+	const activationReady = isProducerReady(activation, nowMs);
 	const craftReady = Boolean(boardItem?.craft?.complete);
-	const hasReadyState = Boolean(boardItem?.activation || boardItem?.craft);
+	const hasReadyState = Boolean(activation || boardItem?.craft);
+	const ready = !hasReadyState || activationReady || craftReady;
+	const noExplicitDefaultProducer =
+		activation?.kind === "producer" && !activation.productLines?.some((line) => line.isDefault);
 
 	return {
-		ready: !hasReadyState || activationReady || craftReady,
+		ready,
+		dimmed: hasReadyState && !ready && !noExplicitDefaultProducer,
 	};
 };

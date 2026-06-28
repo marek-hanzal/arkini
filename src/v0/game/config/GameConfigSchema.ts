@@ -508,15 +508,9 @@ const ResourceDefinitionSchema = z
 	})
 	.strict();
 
-/** Render-facing asset metadata that maps game definitions to generated resources. */
+/** Render-facing asset metadata that maps game definitions to generated resources. Asset ids carry the domain convention; no duplicate kind field. */
 const AssetDefinitionSchema = z
 	.object({
-		kind: z
-			.enum([
-				"item",
-				"ui",
-			])
-			.default("item"),
 		label: z.string().min(1).optional(),
 		resourceId: IdSchema,
 		overlayAssetId: IdSchema.optional(),
@@ -778,8 +772,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [itemId, item] of Object.entries(value.items)) {
-		const itemAsset = value.assets[item.assetId];
-		if (!itemAsset) {
+		if (!value.assets[item.assetId]) {
 			addIssue(
 				ctx,
 				[
@@ -788,16 +781,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					"assetId",
 				],
 				`Missing asset "${item.assetId}".`,
-			);
-		} else if (itemAsset.kind !== "item") {
-			addIssue(
-				ctx,
-				[
-					"items",
-					itemId,
-					"assetId",
-				],
-				`Item asset "${item.assetId}" must have kind "item".`,
 			);
 		}
 

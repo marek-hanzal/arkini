@@ -268,7 +268,6 @@ const normalizeAssetDefinition = (assetId: string, sourceAsset: unknown): unknow
 			: {};
 	const blueprintSuffix = readBlueprintAssetSuffix(assetId);
 
-	asset.kind ??= "item";
 	asset.render ??= blueprintSuffix ? "blueprint" : "plain";
 	asset.resourceId ??= blueprintSuffix ? "item-blueprint" : readResourceIdFromAssetId(assetId);
 

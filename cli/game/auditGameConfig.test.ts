@@ -22,7 +22,6 @@ const createConfigValue = () => ({
 	},
 	assets: {
 		"asset:item": {
-			kind: "item",
 			label: "Item",
 			render: "plain",
 			resourceId: "resource:item",

@@ -13,6 +13,10 @@ export type InventorySlotDropAction =
 			type: "swap-inventory-slots";
 			animation: "parallel-swap";
 			input: {
+				expectedSourceItemId: string;
+				expectedSourceStackId: string;
+				expectedTargetItemId?: string;
+				expectedTargetStackId?: string;
 				sourceSlotIndex: number;
 				targetSlotIndex: number;
 			};
@@ -58,10 +62,16 @@ export const resolveInventorySlotDropAction = ({
 		};
 	}
 
+	const targetStack = inventory.bySlotIndex[String(target.slotIndex)]?.stack;
+
 	return {
 		type: "swap-inventory-slots",
 		animation: "parallel-swap",
 		input: {
+			expectedSourceItemId: sourceStack.itemId,
+			expectedSourceStackId: sourceStack.id,
+			expectedTargetItemId: targetStack?.itemId,
+			expectedTargetStackId: targetStack?.id,
 			sourceSlotIndex: source.slotIndex,
 			targetSlotIndex: target.slotIndex,
 		},

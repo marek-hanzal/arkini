@@ -1,12 +1,13 @@
 import { useMemo } from "react";
+import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameAction } from "~/v0/game/action/GameActionSchema";
 import type { GameActionItemRef } from "~/v0/game/action/GameActionItemRefSchema";
 import type { DropActions } from "~/v0/play/drop/DropActions";
 import { createGameActionFromItemToBoardItemInteractionPlan } from "~/v0/play/interaction/createGameActionFromItemToBoardItemInteractionPlan";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 import { useGameRuntimeStore } from "~/v0/play/runtime/GameRuntimeContext";
-import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
-import { readBoardView } from "~/v0/play/runtime/readers/readBoardView";
+import type { GameRuntimeState, GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
+import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
 
 const createFallbackMergeAction = ({
 	sourceRef,
@@ -21,28 +22,39 @@ const createFallbackMergeAction = ({
 });
 
 const dispatchItemToBoardItemAction = ({
+	expectedSourceItemId,
+	expectedTargetItemId,
 	resolveSourceItemId,
 	sourceRef,
 	store,
 	targetBoardItemId,
 }: {
-	resolveSourceItemId(): string | undefined;
+	expectedSourceItemId: string;
+	expectedTargetItemId: string;
+	resolveSourceItemId(input: {
+		board: BoardView;
+		snapshot: GameRuntimeState;
+	}): string | undefined;
 	sourceRef: GameActionItemRef;
 	store: GameRuntimeStore;
 	targetBoardItemId: string;
 }) => {
 	const snapshot = store.getSnapshot();
 	const { config } = snapshot.runtime;
-	const sourceItemId = resolveSourceItemId();
-	const target = readBoardView(snapshot).byId[targetBoardItemId];
+	const board = readBoardView(snapshot);
+	const sourceItemId = resolveSourceItemId({
+		board,
+		snapshot,
+	});
+	const target = board.byId[targetBoardItemId];
 
-	if (!sourceItemId || !target) {
-		return store.dispatch({
-			action: createFallbackMergeAction({
-				sourceRef,
-				targetItemInstanceId: targetBoardItemId,
-			}),
-		});
+	if (
+		!sourceItemId ||
+		sourceItemId !== expectedSourceItemId ||
+		!target ||
+		target.itemId !== expectedTargetItemId
+	) {
+		return Promise.resolve();
 	}
 
 	const action = createGameActionFromItemToBoardItemInteractionPlan({
@@ -72,9 +84,9 @@ export const useGameRuntimeDropActions = (): DropActions => {
 		() => ({
 			applyBoardItemToBoardItem(input) {
 				return dispatchItemToBoardItemAction({
-					resolveSourceItemId: () =>
-						store.getSnapshot().runtime.save.board.items[input.sourceBoardItemId]
-							?.itemId,
+					expectedSourceItemId: input.expectedSourceItemId,
+					expectedTargetItemId: input.expectedTargetItemId,
+					resolveSourceItemId: ({ board }) => board.byId[input.sourceBoardItemId]?.itemId,
 					sourceRef: {
 						kind: "board",
 						itemInstanceId: input.sourceBoardItemId,
@@ -85,9 +97,21 @@ export const useGameRuntimeDropActions = (): DropActions => {
 			},
 			applyInventoryItemToBoardItem(input) {
 				return dispatchItemToBoardItemAction({
-					resolveSourceItemId: () =>
-						store.getSnapshot().runtime.save.inventory.slots[input.sourceSlotIndex]
-							?.itemId,
+					expectedSourceItemId: input.expectedSourceItemId,
+					expectedTargetItemId: input.expectedTargetItemId,
+					resolveSourceItemId: ({ snapshot }) => {
+						const stack =
+							readInventoryView(snapshot).bySlotIndex[String(input.sourceSlotIndex)]
+								?.stack;
+						if (
+							!stack ||
+							stack.id !== input.expectedSourceStackId ||
+							stack.itemId !== input.expectedSourceItemId
+						) {
+							return undefined;
+						}
+						return stack.itemId;
+					},
 					sourceRef: {
 						kind: "inventory",
 						quantity: 1,
@@ -98,6 +122,10 @@ export const useGameRuntimeDropActions = (): DropActions => {
 				});
 			},
 			moveBoardItem(input) {
+				const boardItem = readBoardView(store.getSnapshot()).byId[input.boardItemId];
+				if (!boardItem || boardItem.itemId !== input.expectedItemId)
+					return Promise.resolve();
+
 				return store.dispatch({
 					action: {
 						boardItemId: input.boardItemId,
@@ -108,6 +136,17 @@ export const useGameRuntimeDropActions = (): DropActions => {
 				});
 			},
 			placeInventoryItem(input) {
+				const stack = readInventoryView(store.getSnapshot()).bySlotIndex[
+					String(input.slotIndex)
+				]?.stack;
+				if (
+					!stack ||
+					stack.id !== input.expectedStackId ||
+					stack.itemId !== input.expectedItemId
+				) {
+					return Promise.resolve();
+				}
+
 				return store.dispatch({
 					action: {
 						placementMode: input.placementMode,
@@ -120,6 +159,18 @@ export const useGameRuntimeDropActions = (): DropActions => {
 				});
 			},
 			swapBoardItems(input) {
+				const board = readBoardView(store.getSnapshot());
+				const source = board.byId[input.sourceBoardItemId];
+				const target = board.byId[input.targetBoardItemId];
+				if (
+					!source ||
+					source.itemId !== input.expectedSourceItemId ||
+					!target ||
+					target.itemId !== input.expectedTargetItemId
+				) {
+					return Promise.resolve();
+				}
+
 				return store.dispatch({
 					action: {
 						sourceBoardItemId: input.sourceBoardItemId,
@@ -129,6 +180,19 @@ export const useGameRuntimeDropActions = (): DropActions => {
 				});
 			},
 			swapInventorySlots(input) {
+				const inventory = readInventoryView(store.getSnapshot());
+				const source = inventory.bySlotIndex[String(input.sourceSlotIndex)]?.stack;
+				const target = inventory.bySlotIndex[String(input.targetSlotIndex)]?.stack;
+				if (
+					!source ||
+					source.id !== input.expectedSourceStackId ||
+					source.itemId !== input.expectedSourceItemId ||
+					target?.id !== input.expectedTargetStackId ||
+					target?.itemId !== input.expectedTargetItemId
+				) {
+					return Promise.resolve();
+				}
+
 				return store.dispatch({
 					action: {
 						sourceSlotIndex: input.sourceSlotIndex,

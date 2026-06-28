@@ -28,6 +28,9 @@ export type InventoryCellDropAction =
 				variant: TileEngine.DropFeedbackVariant;
 			};
 			input: {
+				expectedSourceItemId: string;
+				expectedSourceStackId: string;
+				expectedTargetItemId: string;
 				sourceSlotIndex: number;
 				targetBoardItemId: string;
 			};
@@ -35,6 +38,8 @@ export type InventoryCellDropAction =
 	| {
 			type: "place-inventory-item";
 			input: {
+				expectedItemId: string;
+				expectedStackId: string;
 				slotIndex: number;
 				x: number;
 				y: number;
@@ -101,18 +106,27 @@ export const resolveInventoryCellDropAction = ({
 			};
 		}
 
+		const input = {
+			expectedSourceItemId: sourceSlot.stack.itemId,
+			expectedSourceStackId: sourceSlot.stack.id,
+			expectedTargetItemId: targetItem.itemId,
+			sourceSlotIndex: source.slotIndex,
+			targetBoardItemId: targetItem.id,
+		};
+
+		if (plan.type === "merge" || plan.type === "producer-input") {
+			return {
+				input,
+				type: "apply-inventory-item-to-board-item",
+			};
+		}
+
 		return {
-			feedback:
-				plan.type === "merge" || plan.type === "producer-input"
-					? undefined
-					: {
-							cellKey: targetCellKey,
-							variant: plan.feedbackVariant,
-						},
-			input: {
-				sourceSlotIndex: source.slotIndex,
-				targetBoardItemId: targetItem.id,
+			feedback: {
+				cellKey: targetCellKey,
+				variant: plan.feedbackVariant,
 			},
+			input,
 			type: "apply-inventory-item-to-board-item",
 		};
 	}
@@ -135,6 +149,8 @@ export const resolveInventoryCellDropAction = ({
 
 	return {
 		input: {
+			expectedItemId: sourceSlot.stack.itemId,
+			expectedStackId: sourceSlot.stack.id,
 			slotIndex: source.slotIndex,
 			x: target.x,
 			y: target.y,

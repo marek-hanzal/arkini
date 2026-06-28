@@ -135,6 +135,10 @@ describe("resolveDrop animation contract", () => {
 		}
 
 		expect(swapInventorySlots).toHaveBeenCalledWith({
+			expectedSourceItemId: "item:twig",
+			expectedSourceStackId: "stack-0",
+			expectedTargetItemId: "item:twig",
+			expectedTargetStackId: "stack-1",
 			sourceSlotIndex: 0,
 			targetSlotIndex: 1,
 		});
@@ -283,6 +287,8 @@ describe("resolveDrop animation contract", () => {
 		}
 
 		expect(applyBoardItemToBoardItem).toHaveBeenCalledWith({
+			expectedSourceItemId: "item:twig",
+			expectedTargetItemId: "item:twig",
 			sourceBoardItemId: "source",
 			targetBoardItemId: "target",
 		});

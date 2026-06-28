@@ -196,7 +196,7 @@ The router uses hash history, so static hosts do not need SPA rewrite rules.
 
 ## Debug timeline
 
-Dev builds expose a small structured timeline buffer for drag/drop/action-cache bug reports:
+Dev builds expose a small structured timeline buffer for drag/drop/action/runtime bug reports:
 
 ```js
 window.__ARKINI_DEBUG_TIMELINE__.dump();

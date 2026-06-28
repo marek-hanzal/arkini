@@ -93,11 +93,23 @@ export const useInventoryTileEngineModel = ({
 	);
 
 	const placeInventoryOnBoard = useCallback(
-		(slotIndex: number) => {
+		({
+			expectedItemId,
+			expectedStackId,
+			slotIndex,
+		}: {
+			expectedItemId: string;
+			expectedStackId: string;
+			slotIndex: number;
+		}) => {
 			const snapshot = runtimeStore.getSnapshot();
 			const liveInventory = readInventoryView(snapshot);
 			const liveSlot = liveInventory.bySlotIndex[String(slotIndex)];
-			if (!liveSlot?.stack) {
+			if (
+				!liveSlot?.stack ||
+				liveSlot.stack.id !== expectedStackId ||
+				liveSlot.stack.itemId !== expectedItemId
+			) {
 				feedback.flashInventorySlot(slotIndex);
 				return;
 			}
@@ -105,6 +117,8 @@ export const useInventoryTileEngineModel = ({
 			if (placementTarget) {
 				void actions
 					.placeInventoryItem({
+						expectedItemId: liveSlot.stack.itemId,
+						expectedStackId: liveSlot.stack.id,
 						placementMode: "nearest_by_manhattan",
 						quantity: 1,
 						slotIndex,
@@ -127,6 +141,8 @@ export const useInventoryTileEngineModel = ({
 
 			void actions
 				.placeInventoryItem({
+					expectedItemId: liveSlot.stack.itemId,
+					expectedStackId: liveSlot.stack.id,
 					slotIndex: action.slotIndex,
 					x: action.x,
 					y: action.y,
@@ -163,7 +179,12 @@ export const useInventoryTileEngineModel = ({
 						itemId: stack.itemId,
 						slot,
 					},
-					onDoubleActivate: () => placeInventoryOnBoard(slot.slotIndex),
+					onDoubleActivate: () =>
+						placeInventoryOnBoard({
+							expectedItemId: stack.itemId,
+							expectedStackId: stack.id,
+							slotIndex: slot.slotIndex,
+						}),
 				};
 			},
 			slot(slot) {

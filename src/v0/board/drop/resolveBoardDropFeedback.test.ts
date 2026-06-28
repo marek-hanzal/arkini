@@ -144,6 +144,44 @@ describe("resolveBoardDropFeedback", () => {
 		});
 	});
 
+	it("blocks empty board cell feedback when the dragged board source item changed", () => {
+		const source = boardItem({
+			id: "a",
+			itemId: "item:water",
+			x: 0,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardDropFeedback({
+				config,
+				inventory: emptyInventory,
+				board: boardView([
+					source,
+				]),
+				context: context({
+					source: {
+						kind: "board",
+						boardItemId: source.id,
+						itemId: "item:twig",
+						boardItem: {
+							...source,
+							itemId: "item:twig",
+						},
+					},
+					target: {
+						kind: "cell",
+						x: 1,
+						y: 0,
+					},
+					targetTile: null,
+				}),
+			}),
+		).toEqual({
+			effect: "blocked",
+		});
+	});
+
 	it("marks mergeable target items as merge feedback", () => {
 		const source = boardItem({
 			id: "a",

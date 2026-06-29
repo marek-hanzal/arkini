@@ -186,6 +186,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								});
 								const outputs = line.outputs ?? [];
 								const effectBenefits = line.effectBenefits ?? [];
+								const effectBonusLines = line.effectBonusLines ?? [];
 								const outputOwnedLabel = readProductLineOutputOwnedLabel(
 									outputs,
 									items,
@@ -265,6 +266,26 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 															{benefit}
 														</li>
 													))}
+												</ul>
+											</div>
+										) : null}
+
+										{effectBonusLines.length ? (
+											<div className="mt-2.5 rounded-sm bg-ak-primary/10 px-2.5 py-2 text-xs">
+												<p className="font-semibold text-ak-text">
+													Active bonus
+												</p>
+												<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+													{effectBonusLines.map(
+														(bonusLine, bonusIndex) => (
+															<li
+																key={`${line.productId}:effect-bonus:${bonusIndex}`}
+																className="break-words"
+															>
+																{bonusLine}
+															</li>
+														),
+													)}
 												</ul>
 											</div>
 										) : null}

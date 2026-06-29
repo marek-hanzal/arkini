@@ -963,6 +963,8 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(effective.lootPlan.chanceItems).toEqual([
 			{
 				chance: 0.35,
+				effectId: "effect:bounty",
+				effectName: "Bounty",
 				itemId: "item:twig",
 				quantity: 1,
 			},

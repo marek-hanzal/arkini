@@ -186,6 +186,30 @@ describe("ItemProducerProductLinesCard", () => {
 		expect(html.indexOf("Benefit")).toBeLessThan(html.indexOf("Water"));
 	});
 
+	it("shows active effect bonuses on affected product lines", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						effectBonusLines: [
+							"Bountiful Offering: 35% chance for +1× Log.",
+						],
+						lineKind: "product",
+						name: "Log",
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Active bonus");
+		expect(html).toContain("Bountiful Offering: 35% chance for +1× Log.");
+	});
+
 	it("keeps queued producer jobs in the action button", () => {
 		const html = renderToStaticMarkup(
 			<ItemProducerProductLinesCard

@@ -57,7 +57,8 @@
 			"tags": [
 				"food",
 				"beer",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:beer-barrel": {
@@ -68,7 +69,8 @@
 				"material",
 				"food",
 				"beer",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:blueprint-academy": {
@@ -772,7 +774,8 @@
 			"tags": [
 				"food",
 				"bread",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:bricks": {
@@ -784,7 +787,8 @@
 				"construction",
 				"clay",
 				"era:VIII",
-				"industry"
+				"industry",
+				"tier-3-resource"
 			],
 			"tier": 3
 		},
@@ -810,7 +814,8 @@
 				"fuel",
 				"construction",
 				"era:VIII",
-				"industry"
+				"industry",
+				"tier-6-resource"
 			],
 			"tier": 6
 		},
@@ -822,7 +827,8 @@
 				"food",
 				"dairy",
 				"cheese",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:chest-t1": {
@@ -886,7 +892,8 @@
 				"construction",
 				"earth",
 				"era:VIII",
-				"industry"
+				"industry",
+				"tier-3-resource"
 			],
 			"tier": 3
 		},
@@ -910,7 +917,8 @@
 				"industry",
 				"fuel",
 				"coal",
-				"era:VII"
+				"era:VII",
+				"tier-7-resource"
 			],
 			"tier": 7
 		},
@@ -958,7 +966,8 @@
 				"material",
 				"cloth",
 				"textile",
-				"era:V"
+				"era:V",
+				"tier-5-resource"
 			],
 			"tier": 5
 		},
@@ -969,7 +978,8 @@
 			"tags": [
 				"clothing",
 				"textile",
-				"era:V"
+				"era:V",
+				"tier-5-resource"
 			],
 			"tier": 5
 		},
@@ -981,7 +991,8 @@
 				"material",
 				"construction",
 				"master",
-				"era:VIII"
+				"era:VIII",
+				"tier-6-resource"
 			],
 			"tier": 6
 		},
@@ -992,7 +1003,8 @@
 			"tags": [
 				"food",
 				"egg",
-				"era:II"
+				"era:II",
+				"tier-2-resource"
 			]
 		},
 		"item:emerald": {
@@ -1015,7 +1027,8 @@
 				"food",
 				"master",
 				"feast",
-				"era:III"
+				"era:III",
+				"tier-4-resource"
 			]
 		},
 		"item:flour": {
@@ -1027,7 +1040,8 @@
 				"food",
 				"grain",
 				"flour",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:food-supply": {
@@ -1037,7 +1051,8 @@
 			"tags": [
 				"food",
 				"master",
-				"era:II"
+				"era:II",
+				"tier-3-resource"
 			]
 		},
 		"item:glass": {
@@ -1049,7 +1064,8 @@
 				"construction",
 				"glass",
 				"era:VIII",
-				"industry"
+				"industry",
+				"tier-4-resource"
 			],
 			"tier": 4
 		},
@@ -1074,7 +1090,8 @@
 				"industry",
 				"ingot",
 				"gold",
-				"era:VIII"
+				"era:VIII",
+				"tier-7-resource"
 			],
 			"tier": 7
 		},
@@ -1088,7 +1105,8 @@
 				"ore",
 				"gold",
 				"era:VII",
-				"master"
+				"master",
+				"tier-7-resource"
 			],
 			"tier": 7
 		},
@@ -1113,7 +1131,8 @@
 				"food",
 				"wine",
 				"grapes",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:guild-charter": {
@@ -1149,7 +1168,8 @@
 				"food",
 				"beer",
 				"hops",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:iron-armor": {
@@ -1185,7 +1205,8 @@
 				"industry",
 				"ingot",
 				"iron",
-				"era:VIII"
+				"era:VIII",
+				"tier-7-resource"
 			],
 			"tier": 7
 		},
@@ -1198,7 +1219,8 @@
 				"industry",
 				"ore",
 				"iron",
-				"era:VII"
+				"era:VII",
+				"tier-7-resource"
 			],
 			"tier": 7
 		},
@@ -1258,7 +1280,8 @@
 				"leather",
 				"animal",
 				"textile",
-				"era:V"
+				"era:V",
+				"tier-5-resource"
 			],
 			"tier": 5
 		},
@@ -1294,7 +1317,8 @@
 				"cloth",
 				"luxury",
 				"textile",
-				"era:V"
+				"era:V",
+				"tier-5-resource"
 			],
 			"tier": 5
 		},
@@ -1307,7 +1331,8 @@
 				"luxury",
 				"master",
 				"textile",
-				"era:V"
+				"era:V",
+				"tier-5-resource"
 			],
 			"tier": 5
 		},
@@ -1321,7 +1346,8 @@
 				"marble",
 				"luxury",
 				"prestige",
-				"era:X"
+				"era:X",
+				"tier-10-resource"
 			],
 			"tier": 10
 		},
@@ -1337,7 +1363,8 @@
 				"luxury",
 				"prestige",
 				"master",
-				"era:X"
+				"era:X",
+				"tier-10-resource"
 			],
 			"tier": 10
 		},
@@ -1376,7 +1403,8 @@
 			"tags": [
 				"food",
 				"dairy",
-				"era:II"
+				"era:II",
+				"tier-2-resource"
 			]
 		},
 		"item:morale-t1": {
@@ -1436,7 +1464,8 @@
 				"construction",
 				"metal",
 				"blacksmith",
-				"era:IX"
+				"era:IX",
+				"tier-4-resource"
 			],
 			"tier": 4
 		},
@@ -1448,7 +1477,8 @@
 				"resource",
 				"paper",
 				"civic",
-				"era:IV"
+				"era:IV",
+				"tier-4-resource"
 			],
 			"tier": 4
 		},
@@ -1460,7 +1490,8 @@
 				"animal",
 				"food",
 				"pig",
-				"era:II"
+				"era:II",
+				"tier-2-resource"
 			]
 		},
 		"item:pigment": {
@@ -1472,7 +1503,8 @@
 				"dye",
 				"pigment",
 				"craft",
-				"era:V"
+				"era:V",
+				"tier-5-resource"
 			],
 			"tier": 5
 		},
@@ -1513,7 +1545,8 @@
 				"animal",
 				"hide",
 				"textile",
-				"era:V"
+				"era:V",
+				"tier-5-resource"
 			],
 			"tier": 5
 		},
@@ -1536,7 +1569,8 @@
 				"clay",
 				"roof",
 				"era:VIII",
-				"industry"
+				"industry",
+				"tier-4-resource"
 			],
 			"tier": 4
 		},
@@ -1561,7 +1595,8 @@
 				"construction",
 				"glass",
 				"era:VIII",
-				"industry"
+				"industry",
+				"tier-4-resource"
 			],
 			"tier": 4
 		},
@@ -1596,7 +1631,8 @@
 				"food",
 				"meat",
 				"sausage",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:stained-glass": {
@@ -1610,7 +1646,8 @@
 				"glass",
 				"prestige",
 				"master",
-				"era:X"
+				"era:X",
+				"tier-10-resource"
 			],
 			"tier": 10
 		},
@@ -1632,7 +1669,8 @@
 			"tags": [
 				"material",
 				"stone",
-				"era:I"
+				"era:I",
+				"tier-2-resource"
 			]
 		},
 		"item:sword": {
@@ -1735,7 +1773,8 @@
 				"material",
 				"food",
 				"wine",
-				"era:III"
+				"era:III",
+				"tier-3-resource"
 			]
 		},
 		"item:wine-glass": {
@@ -1745,7 +1784,8 @@
 			"tags": [
 				"food",
 				"wine",
-				"era:III"
+				"era:III",
+				"tier-4-resource"
 			]
 		},
 		"item:wool": {
@@ -1755,7 +1795,8 @@
 			"tags": [
 				"material",
 				"animal",
-				"era:II"
+				"era:II",
+				"tier-2-resource"
 			]
 		},
 		"producer:academy": {

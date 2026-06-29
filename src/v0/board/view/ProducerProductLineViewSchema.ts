@@ -50,6 +50,7 @@ export const ProducerProductLineViewSchema = z.object({
 	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	effectDurationMultiplier: z.number().min(1).optional(),
 	effectBenefits: z.array(z.string().min(1)).optional(),
+	effectBonusLines: z.array(z.string().min(1)).optional(),
 	outputs: z.array(ProducerProductLineOutputViewSchema).optional(),
 });
 

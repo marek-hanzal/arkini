@@ -6,7 +6,9 @@ import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequire
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
+import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
+import { readProducerEffectLineLocked } from "~/v0/game/producer/readProducerEffectLineLocked";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
@@ -45,13 +47,28 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		productIds: producerDefinition.productIds,
 		save,
 	});
+	const defaultEffectProductId = readProducerDefaultEffectProductId({
+		productIds: visibleProductIds,
+		producerItemInstanceId: action.producerItemInstanceId,
+		save,
+	});
+	const defaultProductId = readProducerDefaultProductId({
+		productIds: visibleProductIds,
+		producerItemInstanceId: action.producerItemInstanceId,
+		save,
+	});
 	const productId =
 		action.productId ??
-		readProducerDefaultProductId({
-			productIds: visibleProductIds,
+		(defaultEffectProductId &&
+		!readProducerEffectLineLocked({
+			config,
+			nowMs,
 			producerItemInstanceId: action.producerItemInstanceId,
+			productId: defaultEffectProductId,
 			save,
-		});
+		})
+			? defaultEffectProductId
+			: defaultProductId);
 	const producerStateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: action.producerItemInstanceId,
 		save,
@@ -117,6 +134,23 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	const product = yield* readProductFx({
 		productId,
 	});
+	if (
+		product.activatesEffectId &&
+		readProducerEffectLineLocked({
+			config,
+			nowMs,
+			producerItemInstanceId: action.producerItemInstanceId,
+			productId,
+			save,
+		})
+	) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"item_busy",
+				`Effect product "${productId}" is already active for producer item "${action.producerItemInstanceId}".`,
+			),
+		);
+	}
 	const storedItems = yield* readStoredRequirementQuantitiesFx({
 		save,
 		targetItemInstanceId: action.producerItemInstanceId,

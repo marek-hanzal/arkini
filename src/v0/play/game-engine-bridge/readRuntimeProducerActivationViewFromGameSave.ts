@@ -1,5 +1,6 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readRuntimeProducerProductLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerProductLineViewsFromGameSave";
@@ -36,11 +37,18 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 		productIds: producer.productIds,
 		save,
 	});
-	const selectedProductId = readProducerDefaultProductId({
+	const selectedEffectProductId = readProducerDefaultEffectProductId({
 		productIds: visibleProductIds,
 		producerItemInstanceId: boardItem.id,
 		save,
 	});
+	const selectedProductId =
+		selectedEffectProductId ??
+		readProducerDefaultProductId({
+			productIds: visibleProductIds,
+			producerItemInstanceId: boardItem.id,
+			save,
+		});
 	const selectedProduct = selectedProductId ? config.products[selectedProductId] : undefined;
 
 	const deliveryBlocked = readProducerDeliveryBlocked({

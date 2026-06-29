@@ -189,6 +189,7 @@ export const useBoardTileEngineModel = ({
 					action: {
 						inputRefs: [],
 						producerItemInstanceId: liveBoardItem.id,
+						productId: action.productId,
 						type: "producer.product.start",
 					},
 					nowMs,

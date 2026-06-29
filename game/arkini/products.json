@@ -1536,7 +1536,9 @@
 			],
 			"tags": [
 				"pollution-sensitive",
-				"pollution-sensitive:radius-2"
+				"pollution-sensitive:radius-2",
+				"shrine:haste-target",
+				"shrine:bounty-target"
 			]
 		},
 		"product:farm-t1:grain-morale-t1": {
@@ -2377,6 +2379,10 @@
 					"itemId": "item:log",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"shrine:haste-target",
+				"shrine:bounty-target"
 			]
 		},
 		"product:market-t1:coin-from-beer": {
@@ -2859,6 +2865,10 @@
 					"itemId": "item:stone",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"shrine:haste-target",
+				"shrine:bounty-target"
 			]
 		},
 		"product:quarry-t2:marble": {
@@ -2944,6 +2954,10 @@
 					"itemId": "item:plank",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"shrine:haste-target",
+				"shrine:bounty-target"
 			]
 		},
 		"product:school:basic-knowledge": {
@@ -4777,7 +4791,9 @@
 			],
 			"tags": [
 				"pollution-sensitive",
-				"pollution-sensitive:radius-2"
+				"pollution-sensitive:radius-2",
+				"shrine:haste-target",
+				"shrine:bounty-target"
 			]
 		},
 		"product:weaver-hut-t1:common-cloth": {
@@ -4803,6 +4819,10 @@
 					"itemId": "item:water",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"shrine:haste-target",
+				"shrine:bounty-target"
 			]
 		},
 		"product:windmill-t1:flour": {
@@ -5037,6 +5057,51 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": []
+		},
+		"product:shrine-t1:minor-haste": {
+			"durationMs": 300000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				}
+			],
+			"name": "Minor Haste",
+			"activatesEffectId": "effect:shrine-minor-haste",
+			"tags": [
+				"shrine:effect"
+			]
+		},
+		"product:shrine-t1:bountiful-offering": {
+			"durationMs": 180000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Bountiful Offering",
+			"activatesEffectId": "effect:shrine-bountiful-offering",
+			"tags": [
+				"shrine:effect"
+			]
 		}
 	}
 }

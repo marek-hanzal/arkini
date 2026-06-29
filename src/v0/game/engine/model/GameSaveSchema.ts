@@ -2,6 +2,7 @@ import { z } from "zod";
 import { GameInstantMsSchema } from "~/v0/game/time/GameTimeSchema";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
+import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
@@ -174,6 +175,7 @@ const GameSaveProducerChargeStateSchema = z
 const GameSaveProducerLineStateSchema = z
 	.object({
 		defaultProductId: IdSchema.optional(),
+		defaultEffectProductId: IdSchema.optional(),
 	})
 	.strict();
 
@@ -1049,6 +1051,57 @@ const validateGameSaveAgainstConfig = (
 				],
 				`Default product "${lineState.defaultProductId}" does not belong to producer "${producerId}".`,
 			);
+		} else if (lineState.defaultProductId !== undefined) {
+			const product = config.products[lineState.defaultProductId];
+			if (
+				product &&
+				readProducerLineKind({
+					product,
+				}) !== "product"
+			) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerLines",
+						producerItemInstanceId,
+						"defaultProductId",
+					],
+					`Default product "${lineState.defaultProductId}" must reference a normal product line.`,
+				);
+			}
+		}
+
+		if (
+			lineState.defaultEffectProductId !== undefined &&
+			!producer.productIds.includes(lineState.defaultEffectProductId)
+		) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerLines",
+					producerItemInstanceId,
+					"defaultEffectProductId",
+				],
+				`Default effect product "${lineState.defaultEffectProductId}" does not belong to producer "${producerId}".`,
+			);
+		} else if (lineState.defaultEffectProductId !== undefined) {
+			const effectProduct = config.products[lineState.defaultEffectProductId];
+			if (
+				effectProduct &&
+				readProducerLineKind({
+					product: effectProduct,
+				}) !== "effect"
+			) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerLines",
+						producerItemInstanceId,
+						"defaultEffectProductId",
+					],
+					`Default effect product "${lineState.defaultEffectProductId}" must reference an effect product line.`,
+				);
+			}
 		}
 	}
 

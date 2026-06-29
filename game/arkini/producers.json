@@ -460,6 +460,14 @@
 			"requirementIds": [
 				"proximity:winery-t1:vineyard"
 			]
+		},
+		"producer:shrine-t1": {
+			"maxQueueSize": 2,
+			"productIds": [
+				"product:shrine-t1:minor-haste",
+				"product:shrine-t1:bountiful-offering"
+			],
+			"requirementIds": []
 		}
 	}
 }

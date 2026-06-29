@@ -2,6 +2,9 @@
 	"assets": {
 		"asset:producer:prospector-guild-t2": {
 			"resourceId": "producer-prospector-guild-t1"
+		},
+		"asset:producer:shrine-t1": {
+			"resourceId": "producer-cathedral"
 		}
 	}
 }

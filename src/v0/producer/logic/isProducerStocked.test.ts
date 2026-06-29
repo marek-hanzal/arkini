@@ -66,6 +66,42 @@ describe("isProducerStocked", () => {
 		).toBe(true);
 	});
 
+	it("uses runnable default effects before default product lines for stocked state", () => {
+		expect(
+			isProducerStocked(
+				producerActivation([
+					productLine({
+						inputsReady: false,
+						isDefault: true,
+						lineKind: "product",
+					}),
+					productLine({
+						isDefault: true,
+						lineKind: "effect",
+					}),
+				]),
+			),
+		).toBe(true);
+	});
+
+	it("falls back to default product stocked state while the default effect is locked", () => {
+		expect(
+			isProducerStocked(
+				producerActivation([
+					productLine({
+						effectLocked: true,
+						isDefault: true,
+						lineKind: "effect",
+					}),
+					productLine({
+						isDefault: true,
+						lineKind: "product",
+					}),
+				]),
+			),
+		).toBe(true);
+	});
+
 	it("treats default producer product line with auto-fill availability as stocked", () => {
 		expect(
 			isProducerStocked(

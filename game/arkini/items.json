@@ -2664,7 +2664,7 @@
 			"description": "A shameless little toolkit that opens the cheat inventory for testing.",
 			"maxStackSize": 1,
 			"maxCount": 1,
-			"storage": "board",
+			"storage": "both",
 			"tags": [
 				"special:cheat",
 				"utility",
@@ -2677,7 +2677,7 @@
 			"description": "A dangerous reset charge that opens the save nuke confirmation.",
 			"maxStackSize": 1,
 			"maxCount": 1,
-			"storage": "board",
+			"storage": "both",
 			"tags": [
 				"special:nuke-save",
 				"utility",

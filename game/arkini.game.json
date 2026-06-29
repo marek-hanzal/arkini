@@ -5073,7 +5073,7 @@
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Cheat Kit",
-			"storage": "board",
+			"storage": "both",
 			"tags": [
 				"special:cheat",
 				"utility",
@@ -5876,7 +5876,7 @@
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Save Nuke",
-			"storage": "board",
+			"storage": "both",
 			"tags": [
 				"special:nuke-save",
 				"utility",

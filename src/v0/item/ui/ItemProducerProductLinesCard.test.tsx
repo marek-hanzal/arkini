@@ -138,6 +138,54 @@ describe("ItemProducerProductLinesCard", () => {
 		expect(html).not.toContain("ui-progress-button-fill-to-end");
 	});
 
+	it("shows effect benefits before the offering inputs", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{
+					"item:water": {
+						assetSrc: "water.svg",
+						description: "Water",
+						generatedEffects: [],
+						id: "item:water",
+						maxStackSize: 99,
+						name: "Water",
+						storage: "both",
+						tags: [],
+					},
+				}}
+				lines={[
+					createLine({
+						effectBenefits: [
+							"25% faster production for Grain, Log, Stone, Plank, Vegetables, Water.",
+						],
+						inputs: [
+							{
+								available: 0,
+								capacity: 1,
+								consume: true,
+								itemId: "item:water",
+								quantity: 1,
+								stored: 0,
+							},
+						],
+						lineKind: "effect",
+						name: "Minor Haste",
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Benefit");
+		expect(html).toContain(
+			"25% faster production for Grain, Log, Stone, Plank, Vegetables, Water.",
+		);
+		expect(html.indexOf("Benefit")).toBeLessThan(html.indexOf("Water"));
+	});
+
 	it("keeps queued producer jobs in the action button", () => {
 		const html = renderToStaticMarkup(
 			<ItemProducerProductLinesCard

@@ -22,3 +22,6 @@ export const readBoardUtilityItemSheet = (itemId: ItemId): ActiveSheetState | un
 
 	return utilitySheetsByItemId[itemId as keyof typeof utilitySheetsByItemId];
 };
+
+export const isInventoryBoardItemId = (itemId: ItemId | string): boolean =>
+	itemId === inventoryBoardItemId;

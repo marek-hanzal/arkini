@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { inventoryBoardItemId } from "~/v0/board/BoardUtilityItem";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
+import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import { resolveBoardCellDropAction } from "~/v0/play/drop/resolveBoardCellDropAction";
 
 const boardItem = (props: Pick<BoardViewItem, "id" | "itemId" | "x" | "y">) =>
@@ -41,6 +43,12 @@ const boardPairInput = (source: BoardViewItem, target: BoardViewItem) => ({
 });
 
 const config = createEngineTestConfig();
+const emptyInventory = rebuildInventoryView([]);
+const inventoryWithEmptySlot = rebuildInventoryView([
+	{
+		slotIndex: 0,
+	},
+]);
 const directionalMergeConfig = createEngineMergeTestConfig();
 
 describe("resolveBoardCellDropAction", () => {
@@ -55,6 +63,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -82,6 +91,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -101,6 +111,89 @@ describe("resolveBoardCellDropAction", () => {
 		});
 	});
 
+	it("stores board items dropped onto the inventory board item", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const inventoryTarget = boardItem({
+			id: "inventory",
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				inventory: inventoryWithEmptySlot,
+				board: rebuildBoardView([
+					source,
+					inventoryTarget,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: inventoryTarget.x,
+					y: inventoryTarget.y,
+					boardItemId: inventoryTarget.id,
+				},
+			}),
+		).toEqual({
+			feedback: {
+				cellKey: "1:0",
+				kind: "cell-feedback",
+				variant: "primary",
+			},
+			input: {
+				boardItemId: source.id,
+				expectedItemId: source.itemId,
+			},
+			type: "store-board-item-in-inventory",
+		});
+	});
+
+	it("rejects board-only items dropped onto the inventory board item", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: inventoryBoardItemId,
+			x: 0,
+			y: 0,
+		});
+		const inventoryTarget = boardItem({
+			id: "inventory",
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				inventory: inventoryWithEmptySlot,
+				board: rebuildBoardView([
+					source,
+					inventoryTarget,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: inventoryTarget.x,
+					y: inventoryTarget.y,
+					boardItemId: inventoryTarget.id,
+				},
+			}),
+		).toEqual({
+			feedback: {
+				cellKey: "1:0",
+				kind: "board-cell",
+			},
+			type: "reject",
+		});
+	});
+
 	it("uses the live empty cell instead of a stale target item id", () => {
 		const source = boardItem({
 			id: "source",
@@ -112,6 +205,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -149,6 +243,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -189,6 +284,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config: directionalMergeConfig,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					twig,
 					water,
@@ -209,6 +305,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config: directionalMergeConfig,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					twig,
 					water,
@@ -244,6 +341,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -283,6 +381,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config: directionalMergeConfig,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -324,6 +423,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					target,
 				]),
@@ -370,6 +470,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config: runtimeConfig,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -406,6 +507,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -457,6 +559,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -508,6 +611,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -582,6 +686,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -636,6 +741,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,

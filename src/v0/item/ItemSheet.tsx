@@ -1,7 +1,6 @@
 import { type FC, useMemo } from "react";
 import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
 import { ItemStashDropsCard } from "~/v0/item/ui/ItemStashDropsCard";
-import { readBoardItemStoreState } from "~/v0/item/logic/readBoardItemStoreState";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
 import { ItemRequirementRulesCard } from "~/v0/item/ui/ItemRequirementRulesCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
@@ -48,13 +47,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const item = liveBoardItem ? items[liveBoardItem.itemId] : undefined;
 	const liveCraft = liveBoardItem?.craft;
 	const liveProductLines = liveBoardItem?.activation?.productLines ?? [];
-	const storeState =
-		liveBoardItem && item
-			? readBoardItemStoreState({
-					boardItem: liveBoardItem,
-					item,
-				})
-			: undefined;
 	const actionError = itemAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 	const craftHasRules = Boolean(liveCraft?.requirements?.length);
@@ -124,16 +116,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		});
 	};
 
-	const storeBoardItem = () => {
-		void itemAction
-			.run({
-				boardItemId: liveBoardItem.id,
-				type: "board.item.stash",
-			})
-			.then(onClose)
-			.catch(() => undefined);
-	};
-
 	return (
 		<section
 			data-ui="tile detail"
@@ -149,11 +131,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						{actionErrorMessage}
 					</div>
 				) : null}
-				<ItemSummaryCard
-					item={item}
-					storeDisabled={itemAction.isPending || storeState?.canStore !== true}
-					onStore={storeBoardItem}
-				/>
+				<ItemSummaryCard item={item} />
 				<ItemGeneratedEffectsCard effects={item.generatedEffects} />
 				{craftHasRules && liveCraft ? (
 					<ItemRequirementRulesCard

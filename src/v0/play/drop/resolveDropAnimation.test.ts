@@ -86,6 +86,7 @@ describe("resolveDrop animation contract", () => {
 			moveBoardItem: vi.fn(),
 			placeInventoryItem: vi.fn(),
 			swapBoardItems: vi.fn(),
+			storeBoardItem: vi.fn(),
 			swapInventorySlots,
 		} satisfies DropActions;
 
@@ -154,6 +155,7 @@ describe("resolveDrop animation contract", () => {
 			moveBoardItem: vi.fn(),
 			placeInventoryItem: vi.fn(),
 			swapBoardItems: vi.fn(),
+			storeBoardItem: vi.fn(),
 			swapInventorySlots: vi.fn(),
 		} satisfies DropActions;
 
@@ -206,6 +208,7 @@ describe("resolveDrop animation contract", () => {
 			moveBoardItem: vi.fn(),
 			placeInventoryItem: vi.fn(),
 			swapBoardItems: vi.fn(),
+			storeBoardItem: vi.fn(),
 			swapInventorySlots: vi.fn(),
 		} satisfies DropActions;
 

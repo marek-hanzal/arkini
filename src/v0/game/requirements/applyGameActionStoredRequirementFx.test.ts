@@ -10,7 +10,7 @@ import {
 } from "~/v0/game/engine/applyGameActionFx.testSupport";
 
 describe("applyGameActionFx StoredRequirement", () => {
-	it("stores producer requirements on the producer item before product start", () => {
+	it("stores product-line requirements on the producer item before product start", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			requirements: {
@@ -22,10 +22,10 @@ describe("applyGameActionFx StoredRequirement", () => {
 					type: "stored",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:producer-axe",
 					],
@@ -118,10 +118,10 @@ describe("applyGameActionFx StoredRequirement", () => {
 					type: "stored",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:producer-axe",
 					],
@@ -166,10 +166,10 @@ describe("applyGameActionFx StoredRequirement", () => {
 					type: "stored",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:producer-axe",
 					],
@@ -261,10 +261,10 @@ describe("applyGameActionFx StoredRequirement", () => {
 					width: 3,
 				},
 			},
-			stashes: {
-				...baseConfig.stashes,
-				"item:stash": {
-					...baseConfig.stashes["item:stash"],
+			products: {
+				...baseConfig.products,
+				"product:stash": {
+					...baseConfig.products["product:stash"],
 					requirementIds: [
 						"requirement:stash-axe",
 					],

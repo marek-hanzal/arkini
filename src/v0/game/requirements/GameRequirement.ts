@@ -17,5 +17,4 @@ export type GameRequirement =
 			type: "proximity";
 			itemIds: string[];
 			distance: number;
-			durationFactor?: number;
 	  };

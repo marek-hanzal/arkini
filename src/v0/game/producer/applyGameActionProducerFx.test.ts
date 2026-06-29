@@ -642,7 +642,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 
-	it("rechecks producer requirements after auto-filled inputs are consumed", () => {
+	it("rechecks product-line requirements after auto-filled inputs are consumed", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			requirements: {
@@ -1098,10 +1098,10 @@ describe("applyGameActionFx Producer", () => {
 					type: "proximity",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:near-twig",
 					],
@@ -1147,7 +1147,7 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
-	it("slows product duration by nearest satisfied producer proximity distance", () => {
+	it("applies local effect duration from nearby board sources", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -1157,23 +1157,37 @@ describe("applyGameActionFx Producer", () => {
 					width: 3,
 				},
 			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 2,
-					durationFactor: 1,
-					itemIds: [
-						"item:twig",
+			effects: {
+				...baseConfig.effects,
+				"effect:near-twig-duration": {
+					name: "Near Twig Duration",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 2,
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
 					],
-					type: "proximity",
+					radius: 2,
+					scope: "local",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
-					requirementIds: [
-						"requirement:near-twig",
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:near-twig-duration",
 					],
 				},
 			},
@@ -1232,17 +1246,16 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.requirements,
 				"requirement:near-twig": {
 					distance: 2,
-					durationFactor: 1,
 					itemIds: [
 						"item:twig",
 					],
 					type: "proximity",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:near-twig",
 					],
@@ -1282,7 +1295,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 		const job = readOnlyRecordValue(started.save.producerJobs);
 		expect(job).toMatchObject({
-			readyAtMs: 2000,
+			readyAtMs: 1000,
 			startAtMs: 0,
 		});
 
@@ -1307,8 +1320,8 @@ describe("applyGameActionFx Producer", () => {
 		);
 		expect(moved.save.producerJobs[job.id]).toMatchObject({
 			pausedAtMs: 500,
-			readyAtMs: 2000,
-			remainingMs: 1500,
+			readyAtMs: 1000,
+			remainingMs: 500,
 			startAtMs: 0,
 		});
 		expect(moved.nextWakeAtMs).toBeNull();
@@ -1327,7 +1340,7 @@ describe("applyGameActionFx Producer", () => {
 		);
 		expect(stillPaused.save.producerJobs[job.id]).toMatchObject({
 			pausedAtMs: 500,
-			remainingMs: 1500,
+			remainingMs: 500,
 		});
 		expect(stillPaused.nextWakeAtMs).toBeNull();
 
@@ -1343,12 +1356,12 @@ describe("applyGameActionFx Producer", () => {
 			save: stillPaused.save,
 		});
 		expect(resumed.save.producerJobs[job.id]).toMatchObject({
-			readyAtMs: 4000,
+			readyAtMs: 3000,
 			startAtMs: 2000,
 		});
 		expect(resumed.save.producerJobs[job.id]?.pausedAtMs).toBeUndefined();
 		expect(resumed.save.producerJobs[job.id]?.remainingMs).toBeUndefined();
-		expect(resumed.nextWakeAtMs).toBe(4000);
+		expect(resumed.nextWakeAtMs).toBe(3000);
 	});
 
 	it("keeps already queued producer jobs behind a newly paused head job until the head resumes", () => {
@@ -1365,7 +1378,6 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.requirements,
 				"requirement:near-twig": {
 					distance: 1,
-					durationFactor: 1,
 					itemIds: [
 						"item:twig",
 					],
@@ -1795,7 +1807,6 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.requirements,
 				"requirement:near-twig": {
 					distance: 1,
-					durationFactor: 1,
 					itemIds: [
 						"item:twig",
 					],
@@ -1942,7 +1953,6 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.requirements,
 				"requirement:near-twig": {
 					distance: 1,
-					durationFactor: 1,
 					itemIds: [
 						"item:twig",
 					],
@@ -2084,17 +2094,16 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.requirements,
 				"requirement:near-twig": {
 					distance: 1,
-					durationFactor: 1,
 					itemIds: [
 						"item:twig",
 					],
 					type: "proximity",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:near-twig",
 					],
@@ -2223,26 +2232,19 @@ describe("applyGameActionFx Producer", () => {
 					...baseConfig.products["product:test"],
 					activatesEffectId: "effect:test",
 					output: undefined,
+					requirementIds: [
+						"requirement:near-twig",
+					],
 				},
 			},
 			requirements: {
 				...baseConfig.requirements,
 				"requirement:near-twig": {
 					distance: 1,
-					durationFactor: 1,
 					itemIds: [
 						"item:twig",
 					],
 					type: "proximity",
-				},
-			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
 				},
 			},
 			startingState: {
@@ -2476,7 +2478,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(resumed.nextWakeAtMs).toBe(2000);
 	});
 
-	it("averages producer and product proximity duration multipliers", () => {
+	it("keeps product-line proximity requirements as gates instead of duration mutators", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -2490,7 +2492,6 @@ describe("applyGameActionFx Producer", () => {
 				...baseConfig.requirements,
 				"requirement:near-twig": {
 					distance: 2,
-					durationFactor: 1,
 					itemIds: [
 						"item:twig",
 					],
@@ -2498,20 +2499,10 @@ describe("applyGameActionFx Producer", () => {
 				},
 				"requirement:near-rock": {
 					distance: 1,
-					durationFactor: 1,
 					itemIds: [
 						"item:rock",
 					],
 					type: "proximity",
-				},
-			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
 				},
 			},
 			products: {
@@ -2563,7 +2554,7 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			readyAtMs: 1500,
+			readyAtMs: 1000,
 			startAtMs: 0,
 		});
 	});

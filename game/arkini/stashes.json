@@ -6,8 +6,7 @@
 			"onChargesDepleted": "remove",
 			"productIds": [
 				"product:chest-t1:open"
-			],
-			"requirementIds": []
+			]
 		},
 		"item:chest-t2": {
 			"charges": 1,
@@ -15,8 +14,7 @@
 			"onChargesDepleted": "remove",
 			"productIds": [
 				"product:chest-t2:open"
-			],
-			"requirementIds": []
+			]
 		},
 		"item:chest-t3": {
 			"charges": 1,
@@ -24,8 +22,7 @@
 			"onChargesDepleted": "remove",
 			"productIds": [
 				"product:chest-t3:open"
-			],
-			"requirementIds": []
+			]
 		},
 		"item:chest-t4": {
 			"charges": 1,
@@ -33,8 +30,7 @@
 			"onChargesDepleted": "remove",
 			"productIds": [
 				"product:chest-t4:open"
-			],
-			"requirementIds": []
+			]
 		}
 	}
 }

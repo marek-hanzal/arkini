@@ -233,21 +233,24 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.producers["producer:charcoal-burner-t1"].productIds).toEqual([
 			"product:charcoal-burner-t1:charcoal",
 		]);
-		expect(defaultGameConfig.producers["producer:clay-pit"].requirementIds).toEqual([
-			"proximity:clay-pit:clay-deposit",
-		]);
-		expect(defaultGameConfig.producers["producer:sand-pit"].requirementIds).toEqual([
-			"proximity:sand-pit:sand-deposit",
-		]);
+		expect(defaultGameConfig.items["item:clay-deposit"].passiveEffectIds).toContain(
+			"effect:proximity:clay-pit:clay-deposit",
+		);
+		expect(defaultGameConfig.products["product:clay-pit:clay"].visibility).toBe("hidden");
+		expect(defaultGameConfig.items["item:sand-deposit"].passiveEffectIds).toContain(
+			"effect:proximity:sand-pit:sand-deposit",
+		);
+		expect(defaultGameConfig.products["product:sand-pit:sand"].visibility).toBe("hidden");
 
-		expect(
-			defaultGameConfig.products["product:charcoal-burner-t1:charcoal"].requirementIds,
-		).toEqual([
-			"proximity:dirty-processing:purifier",
-		]);
-		expect(defaultGameConfig.products["product:smelter-t1:iron-ingot"].requirementIds).toEqual([
-			"proximity:dirty-processing:purifier",
-		]);
+		expect(defaultGameConfig.items["producer:purifier-t1"].passiveEffectIds).toContain(
+			"effect:proximity:dirty-processing:purifier",
+		);
+		expect(defaultGameConfig.products["product:charcoal-burner-t1:charcoal"].visibility).toBe(
+			"hidden",
+		);
+		expect(defaultGameConfig.products["product:smelter-t1:iron-ingot"].visibility).toBe(
+			"hidden",
+		);
 
 		expect(defaultGameConfig.producers["producer:purifier-t1"].productIds).toEqual([
 			"product:purifier-t1:pollution",
@@ -425,15 +428,11 @@ describe("defaultGameConfig", () => {
 			"product:heroes-guild-t1:treasure-chest-morale-t4",
 		]);
 
-		expect(defaultGameConfig.products["product:blacksmith-t1:nails"].requirementIds).toEqual([
-			"proximity:dirty-processing:purifier",
-		]);
-		expect(defaultGameConfig.products["product:armory-t1:iron-armor"].requirementIds).toEqual([
-			"proximity:dirty-processing:purifier",
-		]);
-		expect(defaultGameConfig.products["product:goldsmith-t1:key-t4"].requirementIds).toEqual([
-			"proximity:dirty-processing:purifier",
-		]);
+		expect(defaultGameConfig.products["product:blacksmith-t1:nails"].visibility).toBe("hidden");
+		expect(defaultGameConfig.products["product:armory-t1:iron-armor"].visibility).toBe(
+			"hidden",
+		);
+		expect(defaultGameConfig.products["product:goldsmith-t1:key-t4"].visibility).toBe("hidden");
 
 		expect(readProductInputs("product:heroes-guild-t1:treasure-chest")).toContainEqual({
 			capacity: 4,
@@ -468,15 +467,13 @@ describe("defaultGameConfig", () => {
 			"product:glazier-workshop-t1:stained-glass",
 			"product:glazier-workshop-t1:stained-glass-morale-t4",
 		]);
-		expect(defaultGameConfig.producers["producer:glazier-workshop-t1"].requirementIds).toEqual([
-			"proximity:glazier-workshop-t1:glassworks",
-		]);
-
+		expect(defaultGameConfig.items["producer:glassworks"].passiveEffectIds).toContain(
+			"effect:proximity:glazier-workshop-t1:glassworks",
+		);
 		expect(
-			defaultGameConfig.products["product:glazier-workshop-t1:stained-glass"].requirementIds,
-		).toEqual([
-			"proximity:dirty-processing:purifier",
-		]);
+			defaultGameConfig.products["product:glazier-workshop-t1:stained-glass"].visibility,
+		).toBe("hidden");
+
 		expect(readProductInputs("product:glazier-workshop-t1:stained-glass")).toContainEqual({
 			capacity: 4,
 			consume: true,
@@ -520,17 +517,21 @@ describe("defaultGameConfig", () => {
 			"product:quarry-t2:stone",
 			"product:quarry-t2:marble",
 		]);
-		expect(defaultGameConfig.producers["producer:quarry-t2"].requirementIds).toEqual([
-			"proximity:quarry-t2:marble-deposit",
-		]);
+		expect(defaultGameConfig.items["item:marble-deposit"].passiveEffectIds).toContain(
+			"effect:proximity:quarry-t2:marble-deposit",
+		);
+		expect(defaultGameConfig.products["product:quarry-t2:marble"].visibility).toBe("hidden");
 		expect(defaultGameConfig.producers["producer:stonemason-t2"].productIds).toEqual([
 			"product:stonemason-t2:stone-block",
 			"product:stonemason-t2:marble-block",
 			"product:stonemason-t2:marble-block-morale-t4",
 		]);
-		expect(defaultGameConfig.producers["producer:stonemason-t2"].requirementIds).toEqual([
-			"proximity:stonemason-t2:quarry-t2",
-		]);
+		expect(defaultGameConfig.items["producer:quarry-t2"].passiveEffectIds).toContain(
+			"effect:proximity:stonemason-t2:quarry-t2",
+		);
+		expect(defaultGameConfig.products["product:stonemason-t2:marble-block"].visibility).toBe(
+			"hidden",
+		);
 
 		expect(defaultGameConfig.craftRecipes["item:blueprint-quarry-t2"].inputs).toContainEqual({
 			consume: true,

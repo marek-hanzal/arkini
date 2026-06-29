@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
-import { readWorldProducerRequirementFactsFx } from "~/v0/game/world/readWorldProducerRequirementFactsFx";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readWorldProducerJobSubjectFx } from "~/v0/game/world/readWorldProducerJobSubjectFx";
 
@@ -24,13 +23,6 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 		job,
 		save,
 	}: readProducerJobStartGateReadyFx.Props) {
-		const requirementFacts = yield* readWorldProducerRequirementFactsFx({
-			config,
-			job,
-			save,
-		});
-		if (!requirementFacts.ready) return false;
-
 		const subject = yield* readWorldProducerJobSubjectFx({
 			config,
 			job,
@@ -39,9 +31,6 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 		const effectiveProductLine = readEffectiveProducerProductLine({
 			baseDurationMs: readProducerProductDurationMs({
 				product: subject.product,
-				producerItemInstanceId: job.producerItemInstanceId,
-				requirements: subject.requirements,
-				save,
 			}),
 			config,
 			ignoredProducerJobIds,

@@ -1,7 +1,6 @@
 import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
-import { readProximityRequirementDurationMultiplier } from "~/v0/game/requirements/readProximityRequirementsDurationMultiplier";
 import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGameSaveItemQuantityByScope";
 import { readProximityRequirementMatch } from "~/v0/game/requirements/readProximityRequirementMatch";
 
@@ -20,7 +19,6 @@ type RuntimeActivationRequirement =
 	  }
 	| {
 			distance: number;
-			durationFactor?: number;
 			itemIds: string[];
 			type: "proximity";
 	  };
@@ -119,14 +117,6 @@ const readRuntimeProximityRequirementViewFromGameSave = ({
 
 	return {
 		distance: requirement.distance,
-		durationFactor: requirement.durationFactor ?? 1,
-		durationMultiplier: satisfied
-			? readProximityRequirementDurationMultiplier({
-					requirement,
-					save,
-					targetItemInstanceId,
-				})
-			: undefined,
 		itemIds: requirement.itemIds as ItemId[],
 		matchedDistance: match?.distance,
 		matchedItemId: match?.item.itemId as ItemId | undefined,

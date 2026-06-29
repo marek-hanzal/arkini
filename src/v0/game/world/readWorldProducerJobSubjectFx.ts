@@ -48,10 +48,7 @@ export const readWorldProducerJobSubjectFx = Effect.fn("readWorldProducerJobSubj
 
 	const requirements = resolveGameRequirements({
 		config,
-		requirementIds: [
-			...producerDefinition.requirementIds,
-			...product.requirementIds,
-		],
+		requirementIds: product.requirementIds,
 	});
 	return {
 		producerDefinition,

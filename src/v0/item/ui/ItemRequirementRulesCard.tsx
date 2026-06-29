@@ -20,8 +20,6 @@ export namespace ItemRequirementRulesCard {
 	}
 }
 
-const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "");
-
 interface DetailRow {
 	key: string;
 	label: string;
@@ -76,14 +74,9 @@ const readRequirementRow = (
 		requirement.matchedDistance === undefined
 			? undefined
 			: `nearest ${requirement.matchedDistance}`;
-	const durationEffect =
-		requirement.durationMultiplier === undefined || requirement.durationMultiplier <= 1
-			? undefined
-			: `${formatMultiplier(requirement.durationMultiplier)}× time`;
 	const meta = [
 		distanceLabel,
 		matchedDistance,
-		durationEffect,
 	]
 		.filter(Boolean)
 		.join(" · ");

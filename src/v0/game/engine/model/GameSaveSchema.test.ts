@@ -529,10 +529,10 @@ describe("GameSaveConfigSchema", () => {
 					type: "stored",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:key-storage",
 					],

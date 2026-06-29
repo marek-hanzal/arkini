@@ -19,7 +19,6 @@ type TestGameRequirement =
 	| TestActivationRequirement
 	| {
 			distance: number;
-			durationFactor?: number;
 			itemIds: string[];
 			type: "proximity";
 	  };
@@ -142,7 +141,6 @@ const createValidConfigValue = () => ({
 			productIds: [
 				"product:test",
 			],
-			requirementIds: [] as string[],
 		},
 	},
 	stashes: {},
@@ -314,7 +312,6 @@ describe("GameConfigSchema", () => {
 				{
 					maxQueueSize: number;
 					productIds: string[];
-					requirementIds: string[];
 				}
 			>
 		)["producer:second"] = {
@@ -322,7 +319,6 @@ describe("GameConfigSchema", () => {
 			productIds: [
 				"product:test",
 			],
-			requirementIds: [],
 		};
 
 		expect(() => parseGameConfig(config)).toThrow(/owned by exactly one producer/);
@@ -404,11 +400,11 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate requirement id/);
 	});
 
-	it("rejects negative proximity duration factors", () => {
+	it("rejects requirement-owned proximity duration factors", () => {
 		const config = createValidConfigValue();
-		config.requirements["requirement:near-twig"] = {
+		(config.requirements as Record<string, unknown>)["requirement:near-twig"] = {
 			distance: 1,
-			durationFactor: -1,
+			durationFactor: 1,
 			itemIds: [
 				"item:twig",
 			],
@@ -818,7 +814,6 @@ describe("GameConfigSchema", () => {
 			productIds: [
 				"product:producer-a:blueprint-a",
 			],
-			requirementIds: [],
 		};
 		config.products["product:producer-a:blueprint-a"] = {
 			durationMs: 1000,

@@ -4128,6 +4128,533 @@
 			"radius": 3,
 			"scope": "local"
 		},
+		"effect:proximity:brewery-t1:hop-field": {
+			"name": "Nearby item:hop-field enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:brewery-t1:beer-barrel"
+									]
+								},
+								{
+									"ids": [
+										"product:brewery-t1:beer-barrel-from-beer"
+									]
+								},
+								{
+									"ids": [
+										"product:brewery-t1:hops"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:clay-pit:clay-deposit": {
+			"name": "Nearby item:clay-deposit enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:clay-pit:clay"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:clay-pit:nearby": {
+			"name": "Nearby producer:clay-pit enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:brickyard:bricks"
+									]
+								},
+								{
+									"ids": [
+										"product:roof-tile-factory:roof-tiles"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:coal-mine-t1:coal-deposit": {
+			"name": "Nearby item:coal-deposit enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:coal-mine-t1:coal"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:dirty-processing:purifier": {
+			"name": "Nearby producer:purifier-t1 enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:armory-t1:iron-armor"
+									]
+								},
+								{
+									"ids": [
+										"product:blacksmith-t1:axe"
+									]
+								},
+								{
+									"ids": [
+										"product:blacksmith-t1:nails"
+									]
+								},
+								{
+									"ids": [
+										"product:blacksmith-t1:sword"
+									]
+								},
+								{
+									"ids": [
+										"product:brickyard:bricks"
+									]
+								},
+								{
+									"ids": [
+										"product:charcoal-burner-t1:charcoal"
+									]
+								},
+								{
+									"ids": [
+										"product:glassworks:glass"
+									]
+								},
+								{
+									"ids": [
+										"product:glazier-workshop-t1:stained-glass"
+									]
+								},
+								{
+									"ids": [
+										"product:glazier-workshop-t1:stained-glass-morale-t4"
+									]
+								},
+								{
+									"ids": [
+										"product:goldsmith-t1:coin-stack"
+									]
+								},
+								{
+									"ids": [
+										"product:goldsmith-t1:key-t1"
+									]
+								},
+								{
+									"ids": [
+										"product:goldsmith-t1:key-t2"
+									]
+								},
+								{
+									"ids": [
+										"product:goldsmith-t1:key-t3"
+									]
+								},
+								{
+									"ids": [
+										"product:goldsmith-t1:key-t4"
+									]
+								},
+								{
+									"ids": [
+										"product:roof-tile-factory:roof-tiles"
+									]
+								},
+								{
+									"ids": [
+										"product:smelter-t1:gold-ingot"
+									]
+								},
+								{
+									"ids": [
+										"product:smelter-t1:iron-ingot"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 3,
+			"scope": "local"
+		},
+		"effect:proximity:farm-t1:wheat-field": {
+			"name": "Nearby item:wheat-field enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:farm-t1:grain"
+									]
+								},
+								{
+									"ids": [
+										"product:farm-t1:grain-morale-t1"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:glassworks:sand-pit": {
+			"name": "Nearby producer:sand-pit enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:glassworks:glass"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:glazier-workshop-t1:glassworks": {
+			"name": "Nearby producer:glassworks enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:glazier-workshop-t1:stained-glass"
+									]
+								},
+								{
+									"ids": [
+										"product:glazier-workshop-t1:stained-glass-morale-t4"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:gold-mine-t1:gold-deposit": {
+			"name": "Nearby item:gold-deposit enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:gold-mine-t1:gold-ore"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:iron-mine-t1:iron-deposit": {
+			"name": "Nearby item:iron-deposit enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:iron-mine-t1:iron-ore"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:lumberjack-t1:tree": {
+			"name": "Nearby item:tree enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:lumberjack-t1:log"
+									]
+								}
+							]
+						}
+					}
+				},
+				{
+					"kind": "duration.multiply",
+					"multiplier": 0.9,
+					"stacking": {
+						"category": "woodcutting:nearby-tree-speed",
+						"maxSources": 5
+					},
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:lumberjack-t1:log"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:quarry-t1:rock": {
+			"name": "Nearby item:rock enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:quarry-t1:stone"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:quarry-t2:marble-deposit": {
+			"name": "Nearby item:marble-deposit enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:quarry-t2:marble"
+									]
+								},
+								{
+									"ids": [
+										"product:quarry-t2:stone"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:sand-pit:sand-deposit": {
+			"name": "Nearby item:sand-deposit enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:sand-pit:sand"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:sawmill-t1:lumberjack-t1": {
+			"name": "Nearby producer:lumberjack-t1 enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:sawmill-t1:plank"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:stonemason-t1:quarry-t1": {
+			"name": "Nearby producer:quarry-t1 enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:stonemason-t1:stone-block"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:stonemason-t2:quarry-t2": {
+			"name": "Nearby producer:quarry-t2 enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:stonemason-t2:marble-block"
+									]
+								},
+								{
+									"ids": [
+										"product:stonemason-t2:marble-block-morale-t4"
+									]
+								},
+								{
+									"ids": [
+										"product:stonemason-t2:stone-block"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
+		"effect:proximity:winery-t1:vineyard": {
+			"name": "Nearby item:vineyard enables production",
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:winery-t1:grapes"
+									]
+								},
+								{
+									"ids": [
+										"product:winery-t1:wine-barrel"
+									]
+								},
+								{
+									"ids": [
+										"product:winery-t1:wine-barrel-from-wine-glasses"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"radius": 2,
+			"scope": "local"
+		},
 		"effect:shrine-bountiful-offering": {
 			"name": "Bountiful Offering",
 			"operations": [
@@ -5727,6 +6254,9 @@
 			"description": "Movable clay source used by nearby clay pits.",
 			"maxStackSize": 10,
 			"name": "Clay Deposit",
+			"passiveEffectIds": [
+				"effect:proximity:clay-pit:clay-deposit"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -5758,6 +6288,9 @@
 			"description": "Movable coal source used by nearby coal mines.",
 			"maxStackSize": 10,
 			"name": "Coal Deposit",
+			"passiveEffectIds": [
+				"effect:proximity:coal-mine-t1:coal-deposit"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -5935,6 +6468,9 @@
 			"description": "Movable gold source used by nearby gold mines.",
 			"maxStackSize": 10,
 			"name": "Gold Deposit",
+			"passiveEffectIds": [
+				"effect:proximity:gold-mine-t1:gold-deposit"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6029,6 +6565,9 @@
 			"description": "Movable hop source used by nearby breweries.",
 			"maxStackSize": 10,
 			"name": "Hop Field",
+			"passiveEffectIds": [
+				"effect:proximity:brewery-t1:hop-field"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6090,6 +6629,9 @@
 			"description": "Movable iron source used by nearby iron mines.",
 			"maxStackSize": 10,
 			"name": "Iron Deposit",
+			"passiveEffectIds": [
+				"effect:proximity:iron-mine-t1:iron-deposit"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6305,6 +6847,9 @@
 			"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
 			"maxStackSize": 10,
 			"name": "Marble Deposit",
+			"passiveEffectIds": [
+				"effect:proximity:quarry-t2:marble-deposit"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6533,6 +7078,9 @@
 			"description": "Movable stone source used by nearby quarries.",
 			"maxStackSize": 10,
 			"name": "Rock",
+			"passiveEffectIds": [
+				"effect:proximity:quarry-t1:rock"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6593,6 +7141,9 @@
 			"description": "Movable sand source used by nearby sand pits.",
 			"maxStackSize": 10,
 			"name": "Sand Deposit",
+			"passiveEffectIds": [
+				"effect:proximity:sand-pit:sand-deposit"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6743,6 +7294,9 @@
 			"description": "Movable wood source used by nearby lumberjacks.",
 			"maxStackSize": 10,
 			"name": "Tree",
+			"passiveEffectIds": [
+				"effect:proximity:lumberjack-t1:tree"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6770,6 +7324,9 @@
 			"description": "Movable vineyard source used by nearby wineries.",
 			"maxStackSize": 10,
 			"name": "Vineyard",
+			"passiveEffectIds": [
+				"effect:proximity:winery-t1:vineyard"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6800,6 +7357,9 @@
 			"description": "Movable grain source used by nearby farms.",
 			"maxStackSize": 10,
 			"name": "Wheat Field",
+			"passiveEffectIds": [
+				"effect:proximity:farm-t1:wheat-field"
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -7065,6 +7625,9 @@
 			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
 			"maxStackSize": 1,
 			"name": "Clay Pit",
+			"passiveEffectIds": [
+				"effect:proximity:clay-pit:nearby"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -7170,6 +7733,9 @@
 			"description": "Furnace workshop that turns sand and charcoal into glass.",
 			"maxStackSize": 1,
 			"name": "Glassworks",
+			"passiveEffectIds": [
+				"effect:proximity:glazier-workshop-t1:glassworks"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -7422,6 +7988,9 @@
 			"description": "Produces logs when placed near a tree.",
 			"maxStackSize": 1,
 			"name": "Lumberjack I",
+			"passiveEffectIds": [
+				"effect:proximity:sawmill-t1:lumberjack-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7548,6 +8117,9 @@
 			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
 			"maxStackSize": 1,
 			"name": "Purifier I",
+			"passiveEffectIds": [
+				"effect:proximity:dirty-processing:purifier"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7563,6 +8135,9 @@
 			"description": "Produces stone when placed near a rock.",
 			"maxStackSize": 1,
 			"name": "Quarry I",
+			"passiveEffectIds": [
+				"effect:proximity:stonemason-t1:quarry-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7577,6 +8152,9 @@
 			"label": "2",
 			"maxStackSize": 1,
 			"name": "Quarry",
+			"passiveEffectIds": [
+				"effect:proximity:stonemason-t2:quarry-t2"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7611,6 +8189,9 @@
 			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
 			"maxStackSize": 1,
 			"name": "Sand Pit",
+			"passiveEffectIds": [
+				"effect:proximity:glassworks:sand-pit"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -7994,8 +8575,7 @@
 				"product:academy:blueprint-armory-t1",
 				"product:academy:blueprint-goldsmith-t1",
 				"product:academy:blueprint-university"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:armory-t1": {
 			"maxQueueSize": 1,
@@ -8003,8 +8583,7 @@
 			"productIds": [
 				"product:armory-t1:leather-armor",
 				"product:armory-t1:iron-armor"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:bakery-t1": {
 			"maxQueueSize": 1,
@@ -8012,8 +8591,7 @@
 			"productIds": [
 				"product:bakery-t1:bread",
 				"product:bakery-t1:bread-morale-t1"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:bio-waste-processor-t1": {
 			"maxQueueSize": 1,
@@ -8021,8 +8599,7 @@
 			"productIds": [
 				"product:bio-waste-processor-t1:compost-bio-waste",
 				"product:bio-waste-processor-t1:burn-bio-waste-log"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:bio-waste-processor-t2": {
 			"maxQueueSize": 1,
@@ -8032,8 +8609,7 @@
 				"product:bio-waste-processor-t2:burn-bio-waste-log",
 				"product:bio-waste-processor-t2:burn-bio-waste-charcoal",
 				"product:bio-waste-processor-t2:burn-bio-waste-coal"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:blacksmith-t1": {
 			"maxQueueSize": 1,
@@ -8042,8 +8618,7 @@
 				"product:blacksmith-t1:nails",
 				"product:blacksmith-t1:axe",
 				"product:blacksmith-t1:sword"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:brewery-t1": {
 			"maxQueueSize": 1,
@@ -8052,9 +8627,6 @@
 				"product:brewery-t1:hops",
 				"product:brewery-t1:beer-barrel",
 				"product:brewery-t1:beer-barrel-from-beer"
-			],
-			"requirementIds": [
-				"proximity:brewery-t1:hop-field"
 			]
 		},
 		"producer:brickyard": {
@@ -8062,9 +8634,6 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:brickyard:bricks"
-			],
-			"requirementIds": [
-				"proximity:clay-pit:nearby"
 			]
 		},
 		"producer:cattle-farm-t1": {
@@ -8072,24 +8641,21 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:cattle-farm-t1:milk"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:charcoal-burner-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:charcoal-burner-t1:charcoal"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:chicken-coop-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:chicken-coop-t1:egg"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:civic-office-t1": {
 			"maxQueueSize": 1,
@@ -8099,17 +8665,13 @@
 				"product:civic-office-t1:building-permit-morale-t2",
 				"product:civic-office-t1:blueprint-academy",
 				"product:civic-office-t1:guild-charter"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:clay-pit": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:clay-pit:clay"
-			],
-			"requirementIds": [
-				"proximity:clay-pit:clay-deposit"
 			]
 		},
 		"producer:coal-mine-t1": {
@@ -8117,9 +8679,6 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:coal-mine-t1:coal"
-			],
-			"requirementIds": [
-				"proximity:coal-mine-t1:coal-deposit"
 			]
 		},
 		"producer:construction-yard-t1": {
@@ -8128,24 +8687,21 @@
 			"productIds": [
 				"product:construction-yard-t1:construction-bundle",
 				"product:construction-yard-t1:construction-bundle-morale-t3"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:cookhouse-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:cookhouse-t1:feast"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:dairy-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:dairy-t1:cheese"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:dye-workshop-t1": {
 			"maxQueueSize": 1,
@@ -8153,8 +8709,7 @@
 			"productIds": [
 				"product:dye-workshop-t1:pigment",
 				"product:dye-workshop-t1:luxury-cloth"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:farm-t1": {
 			"maxQueueSize": 1,
@@ -8162,9 +8717,6 @@
 			"productIds": [
 				"product:farm-t1:grain",
 				"product:farm-t1:grain-morale-t1"
-			],
-			"requirementIds": [
-				"proximity:farm-t1:wheat-field"
 			]
 		},
 		"producer:glassworks": {
@@ -8172,9 +8724,6 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:glassworks:glass"
-			],
-			"requirementIds": [
-				"proximity:glassworks:sand-pit"
 			]
 		},
 		"producer:glazier-workshop-t1": {
@@ -8183,9 +8732,6 @@
 			"productIds": [
 				"product:glazier-workshop-t1:stained-glass",
 				"product:glazier-workshop-t1:stained-glass-morale-t4"
-			],
-			"requirementIds": [
-				"proximity:glazier-workshop-t1:glassworks"
 			]
 		},
 		"producer:gold-mine-t1": {
@@ -8193,9 +8739,6 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:gold-mine-t1:gold-ore"
-			],
-			"requirementIds": [
-				"proximity:gold-mine-t1:gold-deposit"
 			]
 		},
 		"producer:goldsmith-t1": {
@@ -8207,8 +8750,7 @@
 				"product:goldsmith-t1:key-t2",
 				"product:goldsmith-t1:key-t3",
 				"product:goldsmith-t1:key-t4"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:heroes-guild-t1": {
 			"maxQueueSize": 1,
@@ -8220,49 +8762,41 @@
 				"product:heroes-guild-t1:chest-t4",
 				"product:heroes-guild-t1:treasure-chest",
 				"product:heroes-guild-t1:treasure-chest-morale-t4"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:house-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:house-t1:morale-t1"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:house-t2": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:house-t2:morale-t2"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:house-t3": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:house-t3:morale-t3"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:house-t4": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:house-t4:morale-t4"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:iron-mine-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:iron-mine-t1:iron-ore"
-			],
-			"requirementIds": [
-				"proximity:iron-mine-t1:iron-deposit"
 			]
 		},
 		"producer:lumberjack-t1": {
@@ -8270,9 +8804,6 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:lumberjack-t1:log"
-			],
-			"requirementIds": [
-				"proximity:lumberjack-t1:tree"
 			]
 		},
 		"producer:market-t1": {
@@ -8285,8 +8816,7 @@
 				"product:market-t1:coin-from-beer",
 				"product:market-t1:coin-from-wine-glass",
 				"product:market-t1:coin-from-feast"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:market-t2": {
 			"maxQueueSize": 1,
@@ -8296,24 +8826,21 @@
 				"product:market-t2:coin-from-feast",
 				"product:market-t2:coin-from-common-clothing",
 				"product:market-t2:coin-from-luxury-clothing"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:paper-mill-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:paper-mill-t1:paper"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:pig-farm-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:pig-farm-t1:piglet"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:prospector-guild-t1": {
 			"maxQueueSize": 1,
@@ -8321,8 +8848,7 @@
 			"productIds": [
 				"product:prospector-guild-t1:clay-deposit",
 				"product:prospector-guild-t1:sand-deposit"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:prospector-guild-t2": {
 			"maxQueueSize": 1,
@@ -8334,25 +8860,20 @@
 				"product:prospector-guild-t2:iron-deposit",
 				"product:prospector-guild-t2:gold-deposit",
 				"product:prospector-guild-t2:marble-deposit"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:purifier-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:purifier-t1:pollution"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:quarry-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:quarry-t1:stone"
-			],
-			"requirementIds": [
-				"proximity:quarry-t1:rock"
 			]
 		},
 		"producer:quarry-t2": {
@@ -8361,9 +8882,6 @@
 			"productIds": [
 				"product:quarry-t2:stone",
 				"product:quarry-t2:marble"
-			],
-			"requirementIds": [
-				"proximity:quarry-t2:marble-deposit"
 			]
 		},
 		"producer:roof-tile-factory": {
@@ -8371,9 +8889,6 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:roof-tile-factory:roof-tiles"
-			],
-			"requirementIds": [
-				"proximity:clay-pit:nearby"
 			]
 		},
 		"producer:sand-pit": {
@@ -8381,9 +8896,6 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:sand-pit:sand"
-			],
-			"requirementIds": [
-				"proximity:sand-pit:sand-deposit"
 			]
 		},
 		"producer:sawmill-t1": {
@@ -8391,9 +8903,6 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:sawmill-t1:plank"
-			],
-			"requirementIds": [
-				"proximity:sawmill-t1:lumberjack-t1"
 			]
 		},
 		"producer:school": {
@@ -8402,16 +8911,14 @@
 			"productIds": [
 				"product:school:basic-knowledge",
 				"product:school:basic-knowledge-morale-t2"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:sheep-pasture-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:sheep-pasture-t1:wool"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:shrine-t1": {
 			"maxQueueSize": 2,
@@ -8419,16 +8926,14 @@
 			"productIds": [
 				"product:shrine-t1:minor-haste",
 				"product:shrine-t1:bountiful-offering"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:slaughterhouse-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:slaughterhouse-t1:sausage-raw-hide"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:smelter-t1": {
 			"maxQueueSize": 1,
@@ -8436,17 +8941,13 @@
 			"productIds": [
 				"product:smelter-t1:iron-ingot",
 				"product:smelter-t1:gold-ingot"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:stonemason-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:stonemason-t1:stone-block"
-			],
-			"requirementIds": [
-				"proximity:stonemason-t1:quarry-t1"
 			]
 		},
 		"producer:stonemason-t2": {
@@ -8456,9 +8957,6 @@
 				"product:stonemason-t2:stone-block",
 				"product:stonemason-t2:marble-block",
 				"product:stonemason-t2:marble-block-morale-t4"
-			],
-			"requirementIds": [
-				"proximity:stonemason-t2:quarry-t2"
 			]
 		},
 		"producer:tailor-workshop-t1": {
@@ -8468,16 +8966,14 @@
 				"product:tailor-workshop-t1:common-clothing",
 				"product:tailor-workshop-t1:luxury-clothing",
 				"product:tailor-workshop-t1:luxury-clothing-morale-t3"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:tannery-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:tannery-t1:leather"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:tavern-t1": {
 			"maxQueueSize": 1,
@@ -8485,8 +8981,7 @@
 			"productIds": [
 				"product:tavern-t1:beer",
 				"product:tavern-t1:wine-glass"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:townhall-t1": {
 			"maxQueueSize": 1,
@@ -8499,8 +8994,7 @@
 				"product:townhall-t1:blueprint-well-t1",
 				"product:townhall-t1:blueprint-library-t1",
 				"product:townhall-t1:blueprint-townhall-t2"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:townhall-t2": {
 			"maxQueueSize": 1,
@@ -8518,8 +9012,7 @@
 				"product:townhall-t2:food-supply",
 				"product:townhall-t2:blueprint-house-t1",
 				"product:townhall-t2:blueprint-townhall-t3"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:townhall-t3": {
 			"maxQueueSize": 1,
@@ -8538,8 +9031,7 @@
 				"product:townhall-t3:blueprint-market-t1",
 				"product:townhall-t3:blueprint-house-t2",
 				"product:townhall-t3:blueprint-townhall-t4"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:townhall-t4": {
 			"maxQueueSize": 1,
@@ -8558,8 +9050,7 @@
 				"product:townhall-t4:blueprint-dye-workshop-t1",
 				"product:townhall-t4:blueprint-tailor-workshop-t1",
 				"product:townhall-t4:blueprint-house-t3"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:university": {
 			"maxQueueSize": 2,
@@ -8577,16 +9068,14 @@
 				"product:university:blueprint-house-of-engineers",
 				"product:university:blueprint-cathedral",
 				"product:university:blueprint-mage-lodge"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:vegetable-garden-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:vegetable-garden-t1:vegetables"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:waste-processor-t1": {
 			"maxQueueSize": 1,
@@ -8594,8 +9083,7 @@
 			"productIds": [
 				"product:waste-processor-t1:recycle-trash",
 				"product:waste-processor-t1:burn-trash-log"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:waste-processor-t2": {
 			"maxQueueSize": 1,
@@ -8605,32 +9093,28 @@
 				"product:waste-processor-t2:burn-trash-log",
 				"product:waste-processor-t2:burn-trash-charcoal",
 				"product:waste-processor-t2:burn-trash-coal"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:weaver-hut-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:weaver-hut-t1:common-cloth"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:well-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:well-t1:water"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:windmill-t1": {
 			"maxQueueSize": 1,
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:windmill-t1:flour"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:winery-t1": {
 			"maxQueueSize": 1,
@@ -8639,9 +9123,6 @@
 				"product:winery-t1:grapes",
 				"product:winery-t1:wine-barrel",
 				"product:winery-t1:wine-barrel-from-wine-glasses"
-			],
-			"requirementIds": [
-				"proximity:winery-t1:vineyard"
 			]
 		}
 	},
@@ -9680,11 +10161,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:armory-t1:leather-armor": {
 			"chargeCost": 0,
@@ -10020,11 +10499,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:blacksmith-t1:nails": {
 			"chargeCost": 0,
@@ -10064,11 +10541,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:blacksmith-t1:sword": {
 			"chargeCost": 0,
@@ -10114,11 +10589,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:brewery-t1:beer-barrel": {
 			"chargeCost": 0,
@@ -10151,7 +10624,7 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
 			"chargeCost": 0,
@@ -10178,7 +10651,7 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:brewery-t1:hops": {
 			"chargeCost": 0,
@@ -10205,7 +10678,7 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:brickyard:bricks": {
 			"chargeCost": 0,
@@ -10251,11 +10724,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:cattle-farm-t1:milk": {
 			"chargeCost": 0,
@@ -10322,11 +10793,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:chest-t1:open": {
 			"chargeCost": 1,
@@ -10731,7 +11200,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:coal-mine-t1:coal": {
 			"chargeCost": 0,
@@ -10767,7 +11236,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:construction-yard-t1:construction-bundle": {
 			"chargeCost": 0,
@@ -11047,7 +11516,7 @@
 				"pollution-sensitive:radius-2",
 				"shrine:haste-target"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:farm-t1:grain-morale-t1": {
 			"chargeCost": 0,
@@ -11080,7 +11549,7 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:glassworks:glass": {
 			"chargeCost": 0,
@@ -11120,11 +11589,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:glazier-workshop-t1:stained-glass": {
 			"chargeCost": 0,
@@ -11176,11 +11643,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
 			"chargeCost": 0,
@@ -11238,11 +11703,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:gold-mine-t1:gold-ore": {
 			"chargeCost": 0,
@@ -11278,7 +11741,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:coin-stack": {
 			"chargeCost": 0,
@@ -11318,11 +11781,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:key-t1": {
 			"chargeCost": 0,
@@ -11374,11 +11835,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:key-t2": {
 			"chargeCost": 0,
@@ -11430,11 +11889,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:key-t3": {
 			"chargeCost": 0,
@@ -11486,11 +11943,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:key-t4": {
 			"chargeCost": 0,
@@ -11542,11 +11997,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:heroes-guild-t1:chest-t1": {
 			"chargeCost": 0,
@@ -12110,7 +12563,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:lumberjack-t1:log": {
 			"chargeCost": 0,
@@ -12128,7 +12581,7 @@
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:market-t1:coin-from-beer": {
 			"chargeCost": 0,
@@ -12779,7 +13232,7 @@
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:quarry-t2:marble": {
 			"chargeCost": 0,
@@ -12795,7 +13248,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:quarry-t2:stone": {
 			"chargeCost": 0,
@@ -12811,7 +13264,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:roof-tile-factory:roof-tiles": {
 			"chargeCost": 0,
@@ -12857,11 +13310,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:sand-pit:sand": {
 			"chargeCost": 0,
@@ -12877,7 +13328,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:sawmill-t1:plank": {
 			"chargeCost": 0,
@@ -12903,7 +13354,7 @@
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:school:basic-knowledge": {
 			"chargeCost": 0,
@@ -13135,11 +13586,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:smelter-t1:iron-ingot": {
 			"chargeCost": 0,
@@ -13185,11 +13634,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			],
+			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:stonemason-t1:stone-block": {
 			"chargeCost": 0,
@@ -13213,7 +13660,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:stonemason-t2:marble-block": {
 			"chargeCost": 0,
@@ -13243,7 +13690,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:stonemason-t2:marble-block-morale-t4": {
 			"chargeCost": 0,
@@ -13279,7 +13726,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:stonemason-t2:stone-block": {
 			"chargeCost": 0,
@@ -13303,7 +13750,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:tailor-workshop-t1:common-clothing": {
 			"chargeCost": 0,
@@ -15880,7 +16327,7 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:winery-t1:wine-barrel": {
 			"chargeCost": 0,
@@ -15913,7 +16360,7 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
 			"chargeCost": 0,
@@ -15940,137 +16387,10 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "visible"
+			"visibility": "hidden"
 		}
 	},
-	"requirements": {
-		"proximity:brewery-t1:hop-field": {
-			"distance": 2,
-			"itemIds": [
-				"item:hop-field"
-			],
-			"type": "proximity"
-		},
-		"proximity:clay-pit:clay-deposit": {
-			"distance": 2,
-			"itemIds": [
-				"item:clay-deposit"
-			],
-			"type": "proximity"
-		},
-		"proximity:clay-pit:nearby": {
-			"distance": 2,
-			"itemIds": [
-				"producer:clay-pit"
-			],
-			"type": "proximity"
-		},
-		"proximity:coal-mine-t1:coal-deposit": {
-			"distance": 2,
-			"itemIds": [
-				"item:coal-deposit"
-			],
-			"type": "proximity"
-		},
-		"proximity:dirty-processing:purifier": {
-			"distance": 3,
-			"itemIds": [
-				"producer:purifier-t1"
-			],
-			"type": "proximity"
-		},
-		"proximity:farm-t1:wheat-field": {
-			"distance": 2,
-			"itemIds": [
-				"item:wheat-field"
-			],
-			"type": "proximity"
-		},
-		"proximity:glassworks:sand-pit": {
-			"distance": 2,
-			"itemIds": [
-				"producer:sand-pit"
-			],
-			"type": "proximity"
-		},
-		"proximity:glazier-workshop-t1:glassworks": {
-			"distance": 2,
-			"itemIds": [
-				"producer:glassworks"
-			],
-			"type": "proximity"
-		},
-		"proximity:gold-mine-t1:gold-deposit": {
-			"distance": 2,
-			"itemIds": [
-				"item:gold-deposit"
-			],
-			"type": "proximity"
-		},
-		"proximity:iron-mine-t1:iron-deposit": {
-			"distance": 2,
-			"itemIds": [
-				"item:iron-deposit"
-			],
-			"type": "proximity"
-		},
-		"proximity:lumberjack-t1:tree": {
-			"distance": 2,
-			"itemIds": [
-				"item:tree"
-			],
-			"type": "proximity"
-		},
-		"proximity:quarry-t1:rock": {
-			"distance": 2,
-			"itemIds": [
-				"item:rock"
-			],
-			"type": "proximity"
-		},
-		"proximity:quarry-t2:marble-deposit": {
-			"distance": 2,
-			"itemIds": [
-				"item:marble-deposit"
-			],
-			"type": "proximity"
-		},
-		"proximity:sand-pit:sand-deposit": {
-			"distance": 2,
-			"itemIds": [
-				"item:sand-deposit"
-			],
-			"type": "proximity"
-		},
-		"proximity:sawmill-t1:lumberjack-t1": {
-			"distance": 2,
-			"itemIds": [
-				"producer:lumberjack-t1"
-			],
-			"type": "proximity"
-		},
-		"proximity:stonemason-t1:quarry-t1": {
-			"distance": 2,
-			"itemIds": [
-				"producer:quarry-t1"
-			],
-			"type": "proximity"
-		},
-		"proximity:stonemason-t2:quarry-t2": {
-			"distance": 2,
-			"itemIds": [
-				"producer:quarry-t2"
-			],
-			"type": "proximity"
-		},
-		"proximity:winery-t1:vineyard": {
-			"distance": 2,
-			"itemIds": [
-				"item:vineyard"
-			],
-			"type": "proximity"
-		}
-	},
+	"requirements": {},
 	"startingState": {
 		"board": [
 			{
@@ -16133,8 +16453,7 @@
 			"onChargesDepleted": "remove",
 			"productIds": [
 				"product:chest-t1:open"
-			],
-			"requirementIds": []
+			]
 		},
 		"item:chest-t2": {
 			"charges": 1,
@@ -16142,8 +16461,7 @@
 			"onChargesDepleted": "remove",
 			"productIds": [
 				"product:chest-t2:open"
-			],
-			"requirementIds": []
+			]
 		},
 		"item:chest-t3": {
 			"charges": 1,
@@ -16151,8 +16469,7 @@
 			"onChargesDepleted": "remove",
 			"productIds": [
 				"product:chest-t3:open"
-			],
-			"requirementIds": []
+			]
 		},
 		"item:chest-t4": {
 			"charges": 1,
@@ -16160,8 +16477,7 @@
 			"onChargesDepleted": "remove",
 			"productIds": [
 				"product:chest-t4:open"
-			],
-			"requirementIds": []
+			]
 		}
 	},
 	"version": 1

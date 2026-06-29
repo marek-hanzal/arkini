@@ -2,8 +2,9 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
 import { planProducerProductAutoFillInputRefsFx } from "~/v0/game/producer/planProducerProductAutoFillInputRefsFx";
-import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
+import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
+import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
@@ -13,7 +14,6 @@ import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -156,30 +156,16 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		targetItemInstanceId: action.producerItemInstanceId,
 	});
 
-	const producerRequirements = resolveGameRequirements({
-		config,
-		requirementIds: producerDefinition.requirementIds,
-	});
-	const productRequirements = resolveGameRequirements({
+	const requirements = resolveGameRequirements({
 		config,
 		requirementIds: product.requirementIds,
 	});
 	yield* checkGameRequirementsFx({
-		requirements: producerRequirements,
+		requirements,
 		save,
 		storedItems,
 		targetItemInstanceId: action.producerItemInstanceId,
 	});
-	yield* checkGameRequirementsFx({
-		requirements: productRequirements,
-		save,
-		storedItems,
-		targetItemInstanceId: action.producerItemInstanceId,
-	});
-	const requirements = [
-		...producerRequirements,
-		...productRequirements,
-	];
 	yield* match(product.placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();

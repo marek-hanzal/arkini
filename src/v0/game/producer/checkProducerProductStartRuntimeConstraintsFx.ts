@@ -50,9 +50,6 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 	const effectiveProductLine = readEffectiveProducerProductLine({
 		baseDurationMs: readProducerProductDurationMs({
 			product,
-			producerItemInstanceId,
-			requirements,
-			save,
 		}),
 		config,
 		nowMs: startAtMs,

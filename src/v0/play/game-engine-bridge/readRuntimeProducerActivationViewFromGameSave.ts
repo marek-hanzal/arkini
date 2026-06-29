@@ -66,7 +66,6 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 			nowMs,
 			producerId,
 			producerItemId: boardItem.itemId,
-			producerRequirementIds: producer.requirementIds,
 			productIds: producer.productIds,
 			save,
 			targetItemInstanceId: boardItem.id,
@@ -74,10 +73,7 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 		requirements: readRuntimeActivationRequirementViewsFromGameSave({
 			requirements: resolveGameRequirements({
 				config,
-				requirementIds: [
-					...producer.requirementIds,
-					...(selectedProduct?.requirementIds ?? []),
-				],
+				requirementIds: selectedProduct?.requirementIds ?? [],
 			}),
 			save,
 			targetItemInstanceId: boardItem.id,

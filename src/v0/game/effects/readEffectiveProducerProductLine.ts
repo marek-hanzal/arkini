@@ -197,6 +197,42 @@ const createAppliedOperation = ({
 	sourceItemInstanceId: source.sourceItemInstanceId,
 });
 
+const isStackingLimitReached = ({
+	appliedCountsByCategory,
+	operation,
+}: {
+	appliedCountsByCategory: ReadonlyMap<string, number>;
+	operation: Exclude<
+		GameConfig["effects"][string]["operations"][number],
+		{
+			kind: "item.blockCreate";
+		}
+	>;
+}) => {
+	const stacking = operation.stacking;
+	if (!stacking?.maxSources) return false;
+
+	return (appliedCountsByCategory.get(stacking.category) ?? 0) >= stacking.maxSources;
+};
+
+const countStackingApplication = ({
+	appliedCountsByCategory,
+	operation,
+}: {
+	appliedCountsByCategory: Map<string, number>;
+	operation: Exclude<
+		GameConfig["effects"][string]["operations"][number],
+		{
+			kind: "item.blockCreate";
+		}
+	>;
+}) => {
+	const category = operation.stacking?.category;
+	if (!category) return;
+
+	appliedCountsByCategory.set(category, (appliedCountsByCategory.get(category) ?? 0) + 1);
+};
+
 export const readEffectiveProducerProductLine = ({
 	baseDurationMs,
 	config,
@@ -220,6 +256,7 @@ export const readEffectiveProducerProductLine = ({
 	const chanceItems: EffectiveProducerProductLine["lootPlan"]["chanceItems"] = [];
 	const appliedEffects: AppliedGameEffectOperation[] = [];
 	const blockReasons: AppliedGameEffectOperation[] = [];
+	const appliedCountsByCategory = new Map<string, number>();
 	const targetCell = readGameEffectSourceCell({
 		save,
 		sourceItemInstanceId: producerItemInstanceId,
@@ -266,6 +303,15 @@ export const readEffectiveProducerProductLine = ({
 				continue;
 			}
 
+			if (
+				isStackingLimitReached({
+					appliedCountsByCategory,
+					operation,
+				})
+			) {
+				continue;
+			}
+
 			const extraOutputChanceItems =
 				operation.kind === "loot.extraOutputChance.add"
 					? readExtraOutputChanceItems({
@@ -287,6 +333,10 @@ export const readEffectiveProducerProductLine = ({
 				effectName: effect.name,
 				kind: operation.kind,
 				source,
+			});
+			countStackingApplication({
+				appliedCountsByCategory,
+				operation,
 			});
 			appliedEffects.push(appliedOperation);
 

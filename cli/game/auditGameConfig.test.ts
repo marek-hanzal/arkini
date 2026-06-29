@@ -64,7 +64,6 @@ const createConfigValue = () => ({
 			productIds: [
 				"product:test",
 			],
-			requirementIds: [],
 		},
 	},
 	stashes: {},
@@ -139,7 +138,7 @@ describe("auditGameConfig", () => {
 				type: "proximity",
 			},
 		};
-		config.producers["item:producer"].requirementIds = [
+		config.products["product:test"].requirementIds = [
 			"requirement:near-a",
 		];
 

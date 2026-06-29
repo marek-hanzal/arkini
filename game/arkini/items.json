@@ -906,6 +906,9 @@
 				"clay",
 				"deposit",
 				"era:VI"
+			],
+			"passiveEffectIds": [
+				"effect:proximity:clay-pit:clay-deposit"
 			]
 		},
 		"item:coal": {
@@ -932,7 +935,10 @@
 				"coal",
 				"era:VII"
 			],
-			"tier": 7
+			"tier": 7,
+			"passiveEffectIds": [
+				"effect:proximity:coal-mine-t1:coal-deposit"
+			]
 		},
 		"item:coin": {
 			"description": "Basic currency produced by markets from processed food and drink, and later by specialist economy buildings.",
@@ -1079,7 +1085,10 @@
 				"gold",
 				"era:VII"
 			],
-			"tier": 7
+			"tier": 7,
+			"passiveEffectIds": [
+				"effect:proximity:gold-mine-t1:gold-deposit"
+			]
 		},
 		"item:gold-ingot": {
 			"description": "Refined gold produced by smelters from gold ore and coal.",
@@ -1157,6 +1166,9 @@
 				"beer",
 				"hops",
 				"era:III"
+			],
+			"passiveEffectIds": [
+				"effect:proximity:brewery-t1:hop-field"
 			]
 		},
 		"item:hops": {
@@ -1194,7 +1206,10 @@
 				"iron",
 				"era:VII"
 			],
-			"tier": 7
+			"tier": 7,
+			"passiveEffectIds": [
+				"effect:proximity:iron-mine-t1:iron-deposit"
+			]
 		},
 		"item:iron-ingot": {
 			"description": "Refined iron produced by smelters from iron ore and coal.",
@@ -1381,7 +1396,10 @@
 				"prestige",
 				"era:X"
 			],
-			"tier": 10
+			"tier": 10,
+			"passiveEffectIds": [
+				"effect:proximity:quarry-t2:marble-deposit"
+			]
 		},
 		"item:master-knowledge": {
 			"description": "University-level scholarship used to authorize the most ambitious expeditions and future high-civic progression.",
@@ -1557,6 +1575,9 @@
 				"source",
 				"stone",
 				"era:I"
+			],
+			"passiveEffectIds": [
+				"effect:proximity:quarry-t1:rock"
 			]
 		},
 		"item:roof-tiles": {
@@ -1609,6 +1630,9 @@
 				"sand",
 				"glass",
 				"era:VI"
+			],
+			"passiveEffectIds": [
+				"effect:proximity:sand-pit:sand-deposit"
 			]
 		},
 		"item:sapphire": {
@@ -1719,6 +1743,9 @@
 				"source",
 				"wood",
 				"era:I"
+			],
+			"passiveEffectIds": [
+				"effect:proximity:lumberjack-t1:tree"
 			]
 		},
 		"item:vegetables": {
@@ -1741,6 +1768,9 @@
 				"wine",
 				"grapes",
 				"era:III"
+			],
+			"passiveEffectIds": [
+				"effect:proximity:winery-t1:vineyard"
 			]
 		},
 		"item:water": {
@@ -1763,6 +1793,9 @@
 				"food",
 				"grain",
 				"era:II"
+			],
+			"passiveEffectIds": [
+				"effect:proximity:farm-t1:wheat-field"
 			]
 		},
 		"item:wine-barrel": {
@@ -1960,7 +1993,10 @@
 				"era:VIII",
 				"industry"
 			],
-			"tier": 3
+			"tier": 3,
+			"passiveEffectIds": [
+				"effect:proximity:clay-pit:nearby"
+			]
 		},
 		"producer:coal-mine-t1": {
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
@@ -2051,7 +2087,10 @@
 				"era:VIII",
 				"industry"
 			],
-			"tier": 4
+			"tier": 4,
+			"passiveEffectIds": [
+				"effect:proximity:glazier-workshop-t1:glassworks"
+			]
 		},
 		"producer:glazier-workshop-t1": {
 			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
@@ -2210,7 +2249,10 @@
 				"wood",
 				"era:I"
 			],
-			"tier": 1
+			"tier": 1,
+			"passiveEffectIds": [
+				"effect:proximity:sawmill-t1:lumberjack-t1"
+			]
 		},
 		"producer:mage-lodge": {
 			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
@@ -2322,7 +2364,10 @@
 				"pollution",
 				"era:VIII"
 			],
-			"tier": 7
+			"tier": 7,
+			"passiveEffectIds": [
+				"effect:proximity:dirty-processing:purifier"
+			]
 		},
 		"producer:quarry-t1": {
 			"description": "Produces stone when placed near a rock.",
@@ -2333,7 +2378,10 @@
 				"stone",
 				"era:I"
 			],
-			"tier": 1
+			"tier": 1,
+			"passiveEffectIds": [
+				"effect:proximity:stonemason-t1:quarry-t1"
+			]
 		},
 		"producer:quarry-t2": {
 			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
@@ -2350,7 +2398,10 @@
 				"prestige",
 				"era:X"
 			],
-			"tier": 10
+			"tier": 10,
+			"passiveEffectIds": [
+				"effect:proximity:stonemason-t2:quarry-t2"
+			]
 		},
 		"producer:roof-tile-factory": {
 			"description": "Workshop that fires clay into sturdy roof tiles.",
@@ -2379,7 +2430,10 @@
 				"era:VIII",
 				"industry"
 			],
-			"tier": 4
+			"tier": 4,
+			"passiveEffectIds": [
+				"effect:proximity:glassworks:sand-pit"
+			]
 		},
 		"producer:sawmill-t1": {
 			"description": "Turns logs into planks when placed near a lumberjack.",

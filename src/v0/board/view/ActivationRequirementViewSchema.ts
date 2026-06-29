@@ -20,8 +20,6 @@ export const ActivationRequirementViewSchema = z.discriminatedUnion("type", [
 		type: z.literal("proximity"),
 		itemIds: z.array(GameItemIdSchema),
 		distance: z.number().int().positive(),
-		durationFactor: z.number().nonnegative().optional(),
-		durationMultiplier: z.number().min(1).optional(),
 		satisfied: z.boolean(),
 		matchedItemId: GameItemIdSchema.optional(),
 		matchedDistance: z.number().int().nonnegative().optional(),

@@ -274,10 +274,10 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					type: "stored",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:producer-axe",
 					],
@@ -325,7 +325,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
-	it("shows proximity-adjusted producer product duration", () => {
+	it("shows proximity product requirements as gates without duration mutation", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -339,17 +339,16 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				...baseConfig.requirements,
 				"requirement:near-twig": {
 					distance: 2,
-					durationFactor: 1,
 					itemIds: [
 						"item:twig",
 					],
 					type: "proximity",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
-				"item:producer": {
-					...baseConfig.producers["item:producer"],
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
 					requirementIds: [
 						"requirement:near-twig",
 					],
@@ -386,10 +385,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		);
 
 		expect(line).toMatchObject({
-			durationMs: 2000,
+			durationMs: 1000,
 			requirements: [
 				{
-					durationMultiplier: 2,
 					matchedDistance: 2,
 					satisfied: true,
 					type: "proximity",
@@ -830,7 +828,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
-	it("shows proximity-adjusted craft duration in the runtime view", () => {
+	it("shows craft proximity requirements as gates without duration mutation", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -847,7 +845,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					requirements: [
 						{
 							distance: 2,
-							durationFactor: 1,
 							itemIds: [
 								"item:rock",
 							],
@@ -896,10 +893,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 
 		expect(board.byId["item-instance:1"]?.craft).toMatchObject({
-			durationMs: 2000,
+			durationMs: 1000,
 			requirements: [
 				{
-					durationMultiplier: 2,
 					matchedDistance: 2,
 					satisfied: true,
 					type: "proximity",

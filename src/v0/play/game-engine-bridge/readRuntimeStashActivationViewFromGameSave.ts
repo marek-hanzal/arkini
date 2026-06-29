@@ -35,17 +35,11 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 	const storedInputs = save.producerInputs[boardItem.id]?.productInputs[productId]?.items ?? {};
 	const requirements = resolveGameRequirements({
 		config,
-		requirementIds: [
-			...stash.requirementIds,
-			...product.requirementIds,
-		],
+		requirementIds: product.requirementIds,
 	});
 	const effectiveProductLine = readEffectiveProducerProductLine({
 		baseDurationMs: readProducerProductDurationMs({
 			product,
-			producerItemInstanceId: boardItem.id,
-			requirements,
-			save,
 		}),
 		config,
 		nowMs,
@@ -62,7 +56,6 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 		nowMs,
 		producerId: boardItem.itemId,
 		producerItemId: boardItem.itemId,
-		producerRequirementIds: stash.requirementIds,
 		productIds: stash.productIds,
 		save,
 		targetItemInstanceId: boardItem.id,

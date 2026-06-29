@@ -2683,6 +2683,128 @@
 				"utility",
 				"ui"
 			]
+		},
+		"item:trash": {
+			"description": "Generic board waste byproduct from messy production lines. It is harmless, ugly, and should eventually be cleaned instead of hidden away.",
+			"maxStackSize": 1,
+			"name": "Trash",
+			"storage": "board",
+			"tags": [
+				"byproduct",
+				"waste",
+				"trash",
+				"cleanup",
+				"era:I"
+			],
+			"tier": 1
+		},
+		"producer:library-t1": {
+			"description": "Early archive that researches and reissues blueprints from Era I and Era II.",
+			"maxStackSize": 1,
+			"name": "Library I",
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"producer:library-t2": {
+			"description": "Established library that researches and reissues blueprints up through Era IV.",
+			"maxStackSize": 1,
+			"name": "Library II",
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"producer:library-t3": {
+			"description": "Advanced library that researches and reissues blueprints up through Era VIII.",
+			"maxStackSize": 1,
+			"name": "Library III",
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"era:VIII"
+			],
+			"tier": 8
+		},
+		"producer:library-t4": {
+			"description": "Grand library that researches and reissues every currently available blueprint through the final era.",
+			"maxStackSize": 1,
+			"name": "Library IV",
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"era:XI"
+			],
+			"tier": 11
+		},
+		"item:blueprint-library-t1": {
+			"description": "Build plan that can be filled with early resources to construct Library I.",
+			"name": "Library I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"item:blueprint-library-t2": {
+			"description": "Build plan that upgrades Library I into Library II.",
+			"name": "Library II Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"item:blueprint-library-t3": {
+			"description": "Build plan that upgrades Library II into Library III.",
+			"name": "Library III Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:VIII"
+			],
+			"tier": 8
+		},
+		"item:blueprint-library-t4": {
+			"description": "Build plan that upgrades Library III into Library IV.",
+			"name": "Library IV Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:XI"
+			],
+			"tier": 11
 		}
 	}
 }

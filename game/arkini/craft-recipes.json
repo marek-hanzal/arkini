@@ -2321,6 +2321,111 @@
 					"itemId": "item:water"
 				}
 			]
+		},
+		"item:blueprint-library-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"resultItemId": "producer:library-t1"
+		},
+		"item:blueprint-library-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:library-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				}
+			],
+			"resultItemId": "producer:library-t2"
+		},
+		"item:blueprint-library-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:library-t2"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				}
+			],
+			"resultItemId": "producer:library-t3"
+		},
+		"item:blueprint-library-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:library-t3"
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"resultItemId": "producer:library-t4"
 		}
 	}
 }

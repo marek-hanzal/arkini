@@ -32,6 +32,8 @@ describe("defaultGameConfig", () => {
 		expect(readItemResourceData("item:rock")).toMatch(/^iVBOR/);
 		expect(readItemResourceData("producer:sawmill-t1")).toMatch(/^iVBOR/);
 		expect(readItemResourceData("producer:stonemason-t1")).toMatch(/^iVBOR/);
+		expect(readItemResourceData("item:trash")).toMatch(/^iVBOR/);
+		expect(readItemResourceData("producer:library-t4")).toMatch(/^iVBOR/);
 	});
 
 	const expectPassiveOwnedRequirements = (
@@ -50,6 +52,57 @@ describe("defaultGameConfig", () => {
 			})),
 		);
 	};
+
+	it("wires tiered libraries as blueprint catch-up producers", () => {
+		expect(defaultGameConfig.items["producer:library-t1"].tags).toContain("era:II");
+		expect(defaultGameConfig.items["producer:library-t4"].tags).toContain("era:XI");
+
+		expect(defaultGameConfig.producers["producer:townhall-t1"].productIds).toContain(
+			"product:townhall-t1:blueprint-library-t1",
+		);
+		expect(defaultGameConfig.producers["producer:library-t1"].productIds).toContain(
+			"product:library-t1:blueprint-townhall-t2",
+		);
+		expect(defaultGameConfig.producers["producer:library-t1"].productIds).not.toContain(
+			"product:library-t1:blueprint-bakery-t1",
+		);
+
+		expect(defaultGameConfig.producers["producer:library-t2"].productIds).toContain(
+			"product:library-t2:blueprint-bakery-t1",
+		);
+		expect(defaultGameConfig.producers["producer:library-t2"].productIds).toContain(
+			"product:library-t2:blueprint-school",
+		);
+		expect(defaultGameConfig.producers["producer:library-t2"].productIds).not.toContain(
+			"product:library-t2:blueprint-tannery-t1",
+		);
+
+		expect(defaultGameConfig.producers["producer:library-t3"].productIds).toContain(
+			"product:library-t3:blueprint-purifier-t1",
+		);
+		expect(defaultGameConfig.producers["producer:library-t3"].productIds).toContain(
+			"product:library-t3:blueprint-library-t4",
+		);
+		expect(defaultGameConfig.producers["producer:library-t3"].productIds).not.toContain(
+			"product:library-t3:blueprint-university",
+		);
+
+		expect(defaultGameConfig.producers["producer:library-t4"].productIds).toContain(
+			"product:library-t4:blueprint-cathedral",
+		);
+		expect(defaultGameConfig.producers["producer:library-t4"].productIds).toContain(
+			"product:library-t4:blueprint-mage-lodge",
+		);
+		expect(defaultGameConfig.producers["producer:library-t4"].productIds).toContain(
+			"product:library-t4:blueprint-house-of-engineers",
+		);
+
+		expect(defaultGameConfig.craftRecipes["item:blueprint-library-t4"].inputs).toContainEqual({
+			consume: true,
+			itemId: "producer:library-t3",
+			quantity: 1,
+		});
+	});
 
 	it("wires era IV civic progression through permits and Market II", () => {
 		expect(defaultGameConfig.producers["producer:townhall-t4"].productIds).toEqual([

@@ -6,6 +6,8 @@ interface EffectiveOutputAppend {
 }
 
 interface EffectiveChanceItemEntry {
+	effectId?: string;
+	effectName?: string;
 	itemId: string;
 	chance: number;
 	quantity?:

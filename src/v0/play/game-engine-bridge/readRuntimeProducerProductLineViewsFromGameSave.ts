@@ -15,7 +15,10 @@ import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequi
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
-import { readRuntimeEffectBenefitLines } from "~/v0/play/game-engine-bridge/readRuntimeEffectOperationSummary";
+import {
+	readRuntimeEffectBenefitLines,
+	readRuntimeProductLineActiveEffectBonusLines,
+} from "~/v0/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 import {
 	readRuntimeActivationRequirementViewsFromGameSave,
 	readRuntimeMissingRequirementItemIdsFromGameSave,
@@ -240,6 +243,11 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 					}) >=
 				readActivationInputRequiredQuantity(input),
 		);
+		const effectBonusLines = readRuntimeProductLineActiveEffectBonusLines({
+			baseDurationMs,
+			config,
+			effectiveProductLine,
+		});
 
 		return [
 			{
@@ -260,6 +268,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 							effectId: product.activatesEffectId,
 						})
 					: undefined,
+				effectBonusLines: effectBonusLines.length ? effectBonusLines : undefined,
 				inProgress: jobs.length > 0,
 				inputItemIds: inputs.map((input) => input.itemId as ItemId),
 				isDefault,

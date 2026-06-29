@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 import { formatMs } from "~/v0/time/formatMs";
 
 export namespace readRuntimeEffectOperationSummary {
@@ -12,6 +13,14 @@ export namespace readRuntimeEffectBenefitLines {
 	export interface Props {
 		config: GameConfig;
 		effectId: string;
+	}
+}
+
+export namespace readRuntimeProductLineActiveEffectBonusLines {
+	export interface Props {
+		baseDurationMs: number;
+		config: GameConfig;
+		effectiveProductLine: EffectiveProducerProductLine;
 	}
 }
 
@@ -78,6 +87,8 @@ const formatSignedPercent = (value: number) => {
 	const prefix = value > 0 ? "+" : "";
 	return `${prefix}${formatPercent(value)}`;
 };
+
+const formatEffectNameList = (effectNames: readonly string[]) => formatList(unique(effectNames));
 
 const readSelectorIds = (
 	selector: ResolvedDomainSelector | undefined,
@@ -325,4 +336,49 @@ export const readRuntimeEffectBenefitLines = ({
 			operation,
 		}),
 	);
+};
+
+export const readRuntimeProductLineActiveEffectBonusLines = ({
+	baseDurationMs,
+	config,
+	effectiveProductLine,
+}: readRuntimeProductLineActiveEffectBonusLines.Props) => {
+	const chanceItemLines = effectiveProductLine.lootPlan.chanceItems.flatMap((chanceItem) => {
+		if (!chanceItem.effectName) return [];
+
+		return [
+			`${chanceItem.effectName}: ${formatPercent(chanceItem.chance)} chance for +${formatQuantity(
+				chanceItem.quantity ?? 1,
+			)} ${readItemName({
+				config,
+				itemId: chanceItem.itemId,
+			})}.`,
+		];
+	});
+
+	const durationEffectNames = unique(
+		effectiveProductLine.appliedEffects.flatMap((effect) =>
+			effect.kind.startsWith("duration.")
+				? [
+						effect.effectName,
+					]
+				: [],
+		),
+	);
+	const durationRatio = baseDurationMs > 0 ? effectiveProductLine.durationMs / baseDurationMs : 1;
+	const durationLine =
+		durationEffectNames.length === 0 || durationRatio === 1
+			? undefined
+			: durationRatio < 1
+				? `${formatEffectNameList(durationEffectNames)}: ${formatPercent(
+						1 - durationRatio,
+					)} faster production.`
+				: `${formatEffectNameList(durationEffectNames)}: ${formatPercent(
+						durationRatio - 1,
+					)} slower production.`;
+
+	return [
+		durationLine,
+		...chanceItemLines,
+	].filter((line): line is string => Boolean(line));
 };

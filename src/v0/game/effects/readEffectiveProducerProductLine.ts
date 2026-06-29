@@ -90,9 +90,13 @@ const doesOutputItemTargetMatch = ({
 
 const readExtraOutputChanceItems = ({
 	baseOutput,
+	effectId,
+	effectName,
 	operation,
 }: {
 	baseOutput: NonNullable<GameConfig["products"][string]["output"]>;
+	effectId: string;
+	effectName: string;
 	operation: Extract<
 		GameConfig["effects"][string]["operations"][number],
 		{
@@ -114,6 +118,8 @@ const readExtraOutputChanceItems = ({
 		return [
 			{
 				chance: operation.chance,
+				effectId,
+				effectName,
 				itemId: output.itemId,
 				quantity: operation.quantity,
 			},
@@ -264,6 +270,8 @@ export const readEffectiveProducerProductLine = ({
 				operation.kind === "loot.extraOutputChance.add"
 					? readExtraOutputChanceItems({
 							baseOutput,
+							effectId: source.effectId,
+							effectName: effect.name,
 							operation,
 						})
 					: [];
@@ -364,6 +372,8 @@ export const readEffectiveProducerProductLine = ({
 					(operation) => {
 						chanceItems.push({
 							chance: operation.chance,
+							effectId: source.effectId,
+							effectName: effect.name,
 							itemId: operation.itemId,
 							quantity: operation.quantity,
 						});

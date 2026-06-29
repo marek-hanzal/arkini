@@ -236,6 +236,120 @@
 							]
 						}
 					}
+				},
+				{
+					"kind": "loot.extraOutputChance.add",
+					"chance": 0.25,
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					},
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"tag": "tier-3-resource"
+								}
+							]
+						}
+					}
+				},
+				{
+					"kind": "loot.extraOutputChance.add",
+					"chance": 0.2,
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					},
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"tag": "tier-4-resource"
+								}
+							]
+						}
+					}
+				},
+				{
+					"kind": "loot.extraOutputChance.add",
+					"chance": 0.15,
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					},
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"tag": "tier-5-resource"
+								}
+							]
+						}
+					}
+				},
+				{
+					"kind": "loot.extraOutputChance.add",
+					"chance": 0.12,
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					},
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"tag": "tier-6-resource"
+								}
+							]
+						}
+					}
+				},
+				{
+					"kind": "loot.extraOutputChance.add",
+					"chance": 0.1,
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					},
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"tag": "tier-7-resource"
+								}
+							]
+						}
+					}
+				},
+				{
+					"kind": "loot.extraOutputChance.add",
+					"chance": 0.05,
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					},
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"tag": "tier-10-resource"
+								}
+							]
+						}
+					}
 				}
 			],
 			"sourceScope": "board"

@@ -3,6 +3,7 @@ import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
 export namespace resolveBoardItemTapAction {
 	export interface Props {
@@ -24,6 +25,7 @@ export namespace resolveBoardItemTapAction {
 				type: "activate";
 				activation: "single" | "exhaust";
 				boardItemId: string;
+				productId?: string;
 		  }
 		| {
 				type: "open-detail";
@@ -83,17 +85,28 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (liveBoardItem?.activation?.kind === "producer") {
-		const defaultLine = liveBoardItem.activation.productLines?.find((line) => line.isDefault);
-		const runState = defaultLine
-			? readProducerProductLineRunState({
-					line: defaultLine,
-				})
-			: undefined;
-		if (runState?.canRunAction) {
+		const readLineKind = (line: ProducerProductLineView) => line.lineKind ?? "product";
+		const defaultLines = [
+			liveBoardItem.activation.productLines?.find(
+				(line) => line.isDefault && readLineKind(line) === "effect",
+			),
+			liveBoardItem.activation.productLines?.find(
+				(line) => line.isDefault && readLineKind(line) === "product",
+			),
+		].filter((line): line is NonNullable<typeof line> => Boolean(line));
+		const runnableDefaultLine = defaultLines.find(
+			(line) =>
+				readProducerProductLineRunState({
+					line,
+				}).canRunAction,
+		);
+
+		if (runnableDefaultLine) {
 			return {
 				type: "activate",
 				activation: "single",
 				boardItemId: boardItem.id,
+				productId: runnableDefaultLine.productId,
 			};
 		}
 		return {

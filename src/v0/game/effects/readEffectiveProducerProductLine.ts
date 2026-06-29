@@ -28,6 +28,48 @@ export namespace readEffectiveProducerProductLine {
 
 const clampProbability = (value: number) => Math.max(0, Math.min(1, value));
 
+const addQuantityValue = <
+	TQuantity extends
+		| number
+		| {
+				min: number;
+				max: number;
+		  }
+		| undefined,
+>(
+	quantity: TQuantity,
+	value: number,
+): TQuantity => {
+	if (quantity === undefined) return (1 + value) as TQuantity;
+	if (typeof quantity === "number") return (quantity + value) as TQuantity;
+	return {
+		min: quantity.min + value,
+		max: quantity.max + value,
+	} as TQuantity;
+};
+
+type ProducerProductLineOutput = NonNullable<GameConfig["products"][string]["output"]>[number];
+
+const addLootOutputQuantity = <TOutput extends ProducerProductLineOutput>(
+	output: TOutput,
+	value: number,
+): TOutput => {
+	if (output.type === "weighted") {
+		return {
+			...output,
+			entries: output.entries.map((entry) => ({
+				...entry,
+				quantity: addQuantityValue(entry.quantity, value),
+			})),
+		} as TOutput;
+	}
+
+	return {
+		...output,
+		quantity: addQuantityValue(output.quantity, value),
+	} as TOutput;
+};
+
 const readEffectSourceAppliesToTarget = ({
 	config,
 	save,
@@ -269,6 +311,16 @@ export const readEffectiveProducerProductLine = ({
 					},
 					(operation) => {
 						baseDropChance += operation.delta;
+					},
+				)
+				.with(
+					{
+						kind: "loot.quantity.add",
+					},
+					(operation) => {
+						baseOutput = baseOutput.map((output) =>
+							addLootOutputQuantity(output, operation.value),
+						);
 					},
 				)
 				.exhaustive();

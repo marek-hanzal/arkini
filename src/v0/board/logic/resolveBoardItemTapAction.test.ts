@@ -102,6 +102,62 @@ describe("resolveBoardItemTapAction", () => {
 		).toEqual({
 			activation: "single",
 			boardItemId: "board:item",
+			productId: "product:test",
+			type: "activate",
+		});
+	});
+
+	it("activates default effect lines before default product lines", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("producer", {
+						productLines: [
+							productLine(true, {
+								lineKind: "product",
+								productId: "product:normal",
+							}),
+							productLine(true, {
+								lineKind: "effect",
+								productId: "product:effect",
+							}),
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			activation: "single",
+			boardItemId: "board:item",
+			productId: "product:effect",
+			type: "activate",
+		});
+	});
+
+	it("falls back to the default product line while the default effect is active", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					activation: activation("producer", {
+						productLines: [
+							productLine(true, {
+								effectLocked: true,
+								lineKind: "effect",
+								productId: "product:effect",
+							}),
+							productLine(true, {
+								lineKind: "product",
+								productId: "product:normal",
+							}),
+						],
+					}),
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			activation: "single",
+			boardItemId: "board:item",
+			productId: "product:normal",
 			type: "activate",
 		});
 	});

@@ -47,6 +47,14 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 		activation: liveBoardItem?.activation,
 		nowMs,
 	});
+	const hasActiveEffect = liveBoardItem?.activation?.productLines?.some(
+		(line) =>
+			line.lineKind === "effect" &&
+			line.startAtMs !== undefined &&
+			line.readyAtMs !== undefined &&
+			line.startAtMs <= nowMs &&
+			(line.pausedAtMs !== undefined || line.readyAtMs > nowMs),
+	);
 
 	if (!boardItem || !item) return null;
 
@@ -65,6 +73,11 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 				item={item}
 				variant="board"
 			/>
+			{hasActiveEffect ? (
+				<div className="pointer-events-none absolute right-1 top-1 rounded-sm bg-ak-primary/90 px-1 py-0.5 text-[0.56rem] font-black uppercase leading-none tracking-[0.12em] text-white shadow-sm">
+					FX
+				</div>
+			) : null}
 			<BoardCellProgress progress={liveBoardItem?.craft?.progress} />
 			<BoardCellCooldownProgress
 				progress={producerProgress?.progress ?? producerCooldown?.progress}

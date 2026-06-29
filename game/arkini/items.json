@@ -2583,6 +2583,20 @@
 				"era:III"
 			],
 			"tier": 1
+		},
+		"producer:shrine-t1": {
+			"assetId": "asset:producer:shrine-t1",
+			"description": "A small roadside shrine that turns simple offerings into temporary production blessings.",
+			"maxStackSize": 1,
+			"name": "Wayside Shrine",
+			"tags": [
+				"building",
+				"producer",
+				"shrine",
+				"effect-source",
+				"era:I"
+			],
+			"tier": 1
 		}
 	}
 }

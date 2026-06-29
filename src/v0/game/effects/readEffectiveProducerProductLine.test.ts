@@ -800,4 +800,81 @@ describe("readEffectiveProducerProductLine", () => {
 			"effect:younger-replace",
 		]);
 	});
+	it("adds loot quantity to matching product-line outputs", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:bounty": {
+					name: "Bounty",
+					operations: [
+						{
+							kind: "loot.quantity.add",
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+							value: 1,
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:bounty",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:test"];
+
+		expect(
+			readEffectiveProducerProductLine({
+				baseDurationMs: product.durationMs,
+				config,
+				nowMs: 0,
+				producerId: "item:producer",
+				producerItemId: "item:producer",
+				producerItemInstanceId: "item-instance:1",
+				product,
+				productId: "product:test",
+				save,
+			}).lootPlan.baseOutput,
+		).toEqual([
+			{
+				itemId: "item:twig",
+				quantity: 3,
+				type: "guaranteed",
+			},
+		]);
+	});
 });

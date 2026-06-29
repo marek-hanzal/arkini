@@ -837,6 +837,10 @@
 			"render": "plain",
 			"resourceId": "producer-sheep-pasture-t1"
 		},
+		"asset:producer:shrine-t1": {
+			"render": "plain",
+			"resourceId": "producer-cathedral"
+		},
 		"asset:producer:slaughterhouse-t1": {
 			"render": "plain",
 			"resourceId": "producer-slaughterhouse-t1"
@@ -3709,6 +3713,60 @@
 			],
 			"radius": 3,
 			"scope": "local"
+		},
+		"effect:shrine-bountiful-offering": {
+			"name": "Bountiful Offering",
+			"operations": [
+				{
+					"kind": "loot.quantity.add",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:farm-t1:grain",
+										"product:lumberjack-t1:log",
+										"product:quarry-t1:stone",
+										"product:sawmill-t1:plank",
+										"product:vegetable-garden-t1:vegetables",
+										"product:well-t1:water"
+									]
+								}
+							]
+						}
+					},
+					"value": 1
+				}
+			],
+			"scope": "global",
+			"sourceScope": "board"
+		},
+		"effect:shrine-minor-haste": {
+			"name": "Minor Haste",
+			"operations": [
+				{
+					"kind": "duration.multiply",
+					"multiplier": 0.75,
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"ids": [
+										"product:farm-t1:grain",
+										"product:lumberjack-t1:log",
+										"product:quarry-t1:stone",
+										"product:sawmill-t1:plank",
+										"product:vegetable-garden-t1:vegetables",
+										"product:well-t1:water"
+									]
+								}
+							]
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "board"
 		}
 	},
 	"game": {
@@ -6645,6 +6703,21 @@
 			],
 			"tier": 1
 		},
+		"producer:shrine-t1": {
+			"assetId": "asset:producer:shrine-t1",
+			"description": "A small roadside shrine that turns simple offerings into temporary production blessings.",
+			"maxStackSize": 1,
+			"name": "Wayside Shrine",
+			"storage": "both",
+			"tags": [
+				"building",
+				"producer",
+				"shrine",
+				"effect-source",
+				"era:I"
+			],
+			"tier": 1
+		},
 		"producer:slaughterhouse-t1": {
 			"assetId": "asset:producer:slaughterhouse-t1",
 			"description": "Processes piglets into sausage and leather.",
@@ -7316,6 +7389,15 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:sheep-pasture-t1:wool"
+			],
+			"requirementIds": []
+		},
+		"producer:shrine-t1": {
+			"maxQueueSize": 2,
+			"onChargesDepleted": "stop",
+			"productIds": [
+				"product:shrine-t1:minor-haste",
+				"product:shrine-t1:bountiful-offering"
 			],
 			"requirementIds": []
 		},
@@ -9631,7 +9713,9 @@
 			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
-				"pollution-sensitive:radius-2"
+				"pollution-sensitive:radius-2",
+				"shrine:haste-target",
+				"shrine:bounty-target"
 			],
 			"visibility": "visible"
 		},
@@ -10711,7 +10795,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"shrine:haste-target",
+				"shrine:bounty-target"
+			],
 			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-beer": {
@@ -11360,7 +11447,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"shrine:haste-target",
+				"shrine:bounty-target"
+			],
 			"visibility": "visible"
 		},
 		"product:quarry-t2:marble": {
@@ -11482,7 +11572,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"shrine:haste-target",
+				"shrine:bounty-target"
+			],
 			"visibility": "visible"
 		},
 		"product:school:basic-knowledge": {
@@ -11581,6 +11674,64 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
+			],
+			"visibility": "visible"
+		},
+		"product:shrine-t1:bountiful-offering": {
+			"activatesEffectId": "effect:shrine-bountiful-offering",
+			"chargeCost": 0,
+			"durationMs": 180000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Bountiful Offering",
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [
+				"shrine:effect"
+			],
+			"visibility": "visible"
+		},
+		"product:shrine-t1:minor-haste": {
+			"activatesEffectId": "effect:shrine-minor-haste",
+			"chargeCost": 0,
+			"durationMs": 300000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Minor Haste",
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [
+				"shrine:effect"
 			],
 			"visibility": "visible"
 		},
@@ -13902,7 +14053,9 @@
 			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
-				"pollution-sensitive:radius-2"
+				"pollution-sensitive:radius-2",
+				"shrine:haste-target",
+				"shrine:bounty-target"
 			],
 			"visibility": "visible"
 		},
@@ -13943,7 +14096,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"shrine:haste-target",
+				"shrine:bounty-target"
+			],
 			"visibility": "visible"
 		},
 		"product:windmill-t1:flour": {
@@ -14217,6 +14373,11 @@
 				"itemId": "producer:quarry-t1",
 				"x": 1,
 				"y": 6
+			},
+			{
+				"itemId": "producer:shrine-t1",
+				"x": 3,
+				"y": 2
 			}
 		],
 		"inventory": []

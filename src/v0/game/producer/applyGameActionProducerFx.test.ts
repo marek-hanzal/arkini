@@ -3969,6 +3969,257 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("stores default effect and default product lines independently", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:boost": {
+					name: "Boost",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0.5,
+							target: {
+								productLines: {
+									mode: "all",
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					productIds: [
+						"product:test",
+						"product:boost",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:boost": {
+					activatesEffectId: "effect:boost",
+					chargeCost: 0,
+					durationMs: 1000,
+					name: "Boost",
+					placement: "board_then_inventory",
+					requirementIds: [],
+					tags: [],
+					visibility: "visible",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const productDefaulted = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product_line.set_default",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+		const effectDefaulted = runAction({
+			action: {
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:boost",
+				type: "producer.product_line.set_default",
+			},
+			config,
+			nowMs: 200,
+			save: productDefaulted.save,
+		});
+
+		expect(effectDefaulted.save.producerLines).toEqual({
+			"item-instance:1": {
+				defaultEffectProductId: "product:boost",
+				defaultProductId: "product:test",
+			},
+		});
+	});
+
+	it("starts the default effect before the default product and falls back while the effect is active", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:boost": {
+					name: "Boost",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0.5,
+							target: {
+								productLines: {
+									mode: "all",
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+					productIds: [
+						"product:test",
+						"product:boost",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:boost": {
+					activatesEffectId: "effect:boost",
+					chargeCost: 0,
+					durationMs: 1000,
+					name: "Boost",
+					placement: "board_then_inventory",
+					requirementIds: [],
+					tags: [],
+					visibility: "visible",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.producerLines["item-instance:1"] = {
+			defaultEffectProductId: "product:boost",
+			defaultProductId: "product:test",
+		};
+
+		const effectStarted = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+		const effectJob = readOnlyRecordValue(effectStarted.save.producerJobs);
+		expect(effectJob).toMatchObject({
+			productId: "product:boost",
+		});
+
+		const productStarted = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 600,
+			save: effectStarted.save,
+		});
+		expect(Object.values(productStarted.save.producerJobs)).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					productId: "product:boost",
+				}),
+				expect.objectContaining({
+					productId: "product:test",
+				}),
+			]),
+		);
+	});
+
+	it("rejects buying the same active effect line again", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:boost": {
+					name: "Boost",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0.5,
+							target: {
+								productLines: {
+									mode: "all",
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+					productIds: [
+						"product:test",
+						"product:boost",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:boost": {
+					activatesEffectId: "effect:boost",
+					chargeCost: 0,
+					durationMs: 1000,
+					name: "Boost",
+					placement: "board_then_inventory",
+					requirementIds: [],
+					tags: [],
+					visibility: "visible",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:boost",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		const rejected = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:boost",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 600,
+			save: started.save,
+		});
+
+		expect(rejected._tag).toBe("Left");
+		if (rejected._tag === "Left") {
+			expect(rejected.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "item_busy",
+			});
+		}
+	});
+
 	it("unsets the runtime default when the selected producer product line is clicked again", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

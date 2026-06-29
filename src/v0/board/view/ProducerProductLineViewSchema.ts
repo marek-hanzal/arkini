@@ -12,12 +12,19 @@ const ProducerProductLineOutputViewSchema = z.object({
 export const ProducerProductLineViewSchema = z.object({
 	productId: IdSchema,
 	name: z.string().min(1),
+	lineKind: z
+		.enum([
+			"effect",
+			"product",
+		])
+		.optional(),
 	isDefault: z.boolean(),
 	durationMs: z.number().int().nonnegative(),
 	inProgress: z.boolean(),
 	producerQueuedJobs: z.number().int().nonnegative(),
 	queueFull: z.boolean(),
 	blocked: z.boolean(),
+	effectLocked: z.boolean().optional(),
 	blockReasonEffectIds: z.array(IdSchema),
 	deliveryBlocked: z.boolean().optional(),
 	queueBlockedReason: z

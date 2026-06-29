@@ -18,6 +18,8 @@ export namespace readProducerProductLineRunState {
 	}
 }
 
+const readLineKind = (line: ProducerProductLineView) => line.lineKind ?? "product";
+
 const readInputsPartiallyAvailable = (line: ProducerProductLineView) =>
 	!line.inputsReady &&
 	line.inputs.some((input) => readActivationInputViewFillableQuantity(input) > 0);
@@ -29,7 +31,8 @@ const readInputAvailabilityLabel = ({
 	inputsPartiallyAvailable: boolean;
 	line: ProducerProductLineView;
 }) => {
-	if (line.inputItemIds.length === 0) return "tap to run";
+	const actionLabel = readLineKind(line) === "effect" ? "activate" : "run";
+	if (line.inputItemIds.length === 0) return `tap to ${actionLabel}`;
 	if (line.inputsReady) return "input ready";
 	if (line.inputsAvailable) return "auto-fill ready";
 	if (inputsPartiallyAvailable) return "partial fill ready";
@@ -43,6 +46,7 @@ const readStatusMetaLabel = (line: ProducerProductLineView) => {
 	if (line.queueBlockedReason === "paused") return "queue paused";
 	if (line.pausedAtMs !== undefined) return "paused";
 	if (line.queueFull) return "queue full";
+	if (line.effectLocked) return readLineKind(line) === "effect" ? "effect active" : "locked";
 	if (line.blocked) return "blocked by effect";
 	if (!line.requirementsReady) return "requirements missing";
 	return undefined;
@@ -73,7 +77,12 @@ const withCommonState = ({
 		line.remainingMs !== undefined
 			? line.remainingMs
 			: undefined,
-	progressLabel: line.pausedAtMs !== undefined ? "Paused" : "Running",
+	progressLabel:
+		line.pausedAtMs !== undefined
+			? "Paused"
+			: readLineKind(line) === "effect"
+				? "Active"
+				: "Running",
 	showProgress: line.inProgress && !line.deliveryBlocked,
 	statusMetaLabel: readStatusMetaLabel(line),
 });
@@ -89,6 +98,7 @@ export const readProducerProductLineRunState = ({
 		line.pausedAtMs === undefined &&
 		!line.deliveryBlocked &&
 		!queueBlocked &&
+		!line.effectLocked &&
 		!line.blocked &&
 		!line.queueFull;
 
@@ -128,6 +138,15 @@ export const readProducerProductLineRunState = ({
 		});
 	}
 
+	if (line.effectLocked) {
+		return withCommonState({
+			canRunAction,
+			inputsPartiallyAvailable,
+			label: readLineKind(line) === "effect" ? "Active" : "Locked",
+			line,
+		});
+	}
+
 	if (line.blocked) {
 		return withCommonState({
 			canRunAction,
@@ -159,7 +178,7 @@ export const readProducerProductLineRunState = ({
 		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
-			label: "Start",
+			label: readLineKind(line) === "effect" ? "Activate" : "Start",
 			line,
 		});
 	}
@@ -168,7 +187,7 @@ export const readProducerProductLineRunState = ({
 		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
-			label: "Auto-fill & start",
+			label: readLineKind(line) === "effect" ? "Auto-fill & activate" : "Auto-fill & start",
 			line,
 		});
 	}

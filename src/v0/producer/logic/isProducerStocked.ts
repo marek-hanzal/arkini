@@ -8,12 +8,23 @@ export function isProducerStocked(activation: ActivationView | undefined) {
 	if (!activation) return false;
 
 	if (activation.kind === "producer") {
-		const defaultLine = activation.productLines?.find((line) => line.isDefault);
-		return defaultLine
-			? readProducerProductLineRunState({
-					line: defaultLine,
-				}).canRunAction
-			: false;
+		const readLineKind = (line: NonNullable<typeof activation.productLines>[number]) =>
+			line.lineKind ?? "product";
+		const defaultLines = [
+			activation.productLines?.find(
+				(line) => line.isDefault && readLineKind(line) === "effect",
+			),
+			activation.productLines?.find(
+				(line) => line.isDefault && readLineKind(line) === "product",
+			),
+		].filter((line): line is NonNullable<typeof line> => Boolean(line));
+
+		return defaultLines.some(
+			(line) =>
+				readProducerProductLineRunState({
+					line,
+				}).canRunAction,
+		);
 	}
 
 	const stashLine = activation.productLines?.[0];

@@ -1,4 +1,5 @@
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 
 export namespace readProducerProductIdsByPriority {
@@ -14,18 +15,29 @@ export const readProducerProductIdsByPriority = ({
 	producerItemInstanceId,
 	save,
 }: readProducerProductIdsByPriority.Props) => {
+	const defaultEffectProductId = readProducerDefaultEffectProductId({
+		productIds,
+		producerItemInstanceId,
+		save,
+	});
 	const defaultProductId = readProducerDefaultProductId({
 		productIds,
 		producerItemInstanceId,
 		save,
 	});
-	if (!defaultProductId)
+	const defaultProductIds = [
+		defaultEffectProductId,
+		defaultProductId,
+	].filter((productId): productId is string => Boolean(productId));
+
+	if (defaultProductIds.length === 0) {
 		return [
 			...productIds,
 		];
+	}
 
 	return [
-		defaultProductId,
-		...productIds.filter((productId) => productId !== defaultProductId),
+		...defaultProductIds,
+		...productIds.filter((productId) => !defaultProductIds.includes(productId)),
 	];
 };

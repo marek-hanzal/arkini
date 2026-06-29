@@ -475,6 +475,13 @@ const createGameEffectOperationSchema = <
 			.strict(),
 		z
 			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("loot.quantity.add"),
+				value: PositiveIntegerSchema,
+			})
+			.strict(),
+		z
+			.object({
 				...itemOperationBaseSchema,
 				kind: z.literal("item.blockCreate"),
 				reason: z.string().min(1).optional(),

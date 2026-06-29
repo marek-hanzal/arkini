@@ -5,7 +5,10 @@ import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGame
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
+import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
+import { readProducerEffectLineLocked } from "~/v0/game/producer/readProducerEffectLineLocked";
+import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
@@ -91,11 +94,22 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		producerItemInstanceId: targetItemInstanceId,
 		save,
 	});
+	const selectedDefaultEffectProductId = readProducerDefaultEffectProductId({
+		productIds: visibleProductIds,
+		producerItemInstanceId: targetItemInstanceId,
+		save,
+	});
 
 	return visibleProductIds.flatMap((productId) => {
 		const product = config.products[productId];
 		if (!product) return [];
-		const isDefault = productId === selectedDefaultProductId;
+		const lineKind = readProducerLineKind({
+			product,
+		});
+		const isDefault =
+			lineKind === "effect"
+				? productId === selectedDefaultEffectProductId
+				: productId === selectedDefaultProductId;
 
 		const requirements = resolveGameRequirements({
 			config,
@@ -129,6 +143,13 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			requirements,
 			save,
 			targetItemInstanceId,
+		});
+		const effectLocked = readProducerEffectLineLocked({
+			config,
+			nowMs,
+			producerItemInstanceId: targetItemInstanceId,
+			productId,
+			save,
 		});
 		const jobs = producerJobs
 			.filter((job) => job.productId === productId)
@@ -222,6 +243,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		return [
 			{
 				blocked: effectiveProductLine.blocked,
+				effectLocked,
 				blockReasonEffectIds: effectiveProductLine.blockReasons.map(
 					(effect) => effect.effectId,
 				),
@@ -234,6 +256,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				inProgress: jobs.length > 0,
 				inputItemIds: inputs.map((input) => input.itemId as ItemId),
 				isDefault,
+				lineKind,
 				inputs,
 				inputsReady,
 				inputsAvailable,

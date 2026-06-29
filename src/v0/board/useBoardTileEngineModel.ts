@@ -5,6 +5,7 @@ import { resolveBoardDropFeedback } from "~/v0/board/drop/resolveBoardDropFeedba
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
 import { readProducerMissingResourceHintTileIds } from "~/v0/producer/logic/readProducerMissingResourceHintTileIds";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
+import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
 import { useBoardTransientTiles } from "~/v0/board/animation/BoardTransientTileStore";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
@@ -18,19 +19,13 @@ import {
 	useGameRuntimeStore,
 } from "~/v0/play/runtime";
 import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
+import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
-import { isCheatBoardItemId } from "~/v0/inventory/CheatBoardItem";
-import { isInventoryBoardItemId } from "~/v0/inventory/InventoryBoardItem";
-import { isNukeSaveBoardItemId } from "~/v0/inventory/NukeSaveBoardItem";
 
 export namespace useBoardTileEngineModel {
 	export interface Props {
 		feedback: Feedback.Type;
-		onOpenCheatInventory(): void;
-		onOpenInventory(): void;
-		onOpenInventoryPlacementTarget(cell: { x: number; y: number }): void;
-		onOpenItem(boardItemId: string): void;
-		onOpenNukeSave(): void;
+		onOpenSheet(sheet: ActiveSheetState): void;
 	}
 
 	export interface Result {
@@ -46,13 +41,21 @@ const transientTileStyle = {
 	pointerEvents: "none" as const,
 };
 
+const readBoardItemSheet = ({
+	boardItemId,
+	itemId,
+}: {
+	boardItemId: string;
+	itemId: string;
+}): ActiveSheetState =>
+	readBoardUtilityItemSheet(itemId) ?? {
+		boardItemId,
+		type: "item",
+	};
+
 export const useBoardTileEngineModel = ({
 	feedback,
-	onOpenCheatInventory,
-	onOpenInventory,
-	onOpenInventoryPlacementTarget,
-	onOpenItem,
-	onOpenNukeSave,
+	onOpenSheet,
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
 	const board = useGameBoardView();
 	const actions = useGameRuntimeDropActions();
@@ -157,23 +160,8 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
-			if (action.type === "open-detail") {
-				onOpenItem(action.boardItemId);
-				return;
-			}
-
-			if (action.type === "open-inventory") {
-				onOpenInventory();
-				return;
-			}
-
-			if (action.type === "open-cheat-inventory") {
-				onOpenCheatInventory();
-				return;
-			}
-
-			if (action.type === "open-nuke-save") {
-				onOpenNukeSave();
+			if (action.type === "open-sheet") {
+				onOpenSheet(action.sheet);
 				return;
 			}
 
@@ -222,10 +210,7 @@ export const useBoardTileEngineModel = ({
 		},
 		[
 			feedback.showError,
-			onOpenCheatInventory,
-			onOpenInventory,
-			onOpenItem,
-			onOpenNukeSave,
+			onOpenSheet,
 			runtimeStore,
 		],
 	);
@@ -240,10 +225,6 @@ export const useBoardTileEngineModel = ({
 				const boardItem = board.byId[tile.data.boardItemId];
 				if (!boardItem) return undefined;
 
-				const opensInventory = isInventoryBoardItemId(boardItem.itemId);
-				const opensCheatInventory = isCheatBoardItemId(boardItem.itemId);
-				const opensNukeSave = isNukeSaveBoardItemId(boardItem.itemId);
-
 				return {
 					id: `board:${boardItem.id}`,
 					data: {
@@ -253,13 +234,13 @@ export const useBoardTileEngineModel = ({
 						boardItem,
 					},
 					onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
-					onLongActivate: opensInventory
-						? onOpenInventory
-						: opensCheatInventory
-							? onOpenCheatInventory
-							: opensNukeSave
-								? onOpenNukeSave
-								: () => onOpenItem(boardItem.id),
+					onLongActivate: () =>
+						onOpenSheet(
+							readBoardItemSheet({
+								boardItemId: boardItem.id,
+								itemId: boardItem.itemId,
+							}),
+						),
 				};
 			},
 			slot(slot, targetTile) {
@@ -278,9 +259,12 @@ export const useBoardTileEngineModel = ({
 					onLongActivate: targetBoardItemId
 						? undefined
 						: () =>
-								onOpenInventoryPlacementTarget({
-									x: cell.x,
-									y: cell.y,
+								onOpenSheet({
+									placementTarget: {
+										x: cell.x,
+										y: cell.y,
+									},
+									type: "inventory",
 								}),
 				};
 			},
@@ -316,11 +300,7 @@ export const useBoardTileEngineModel = ({
 			board,
 			feedback,
 			runtimeStore,
-			onOpenCheatInventory,
-			onOpenInventory,
-			onOpenInventoryPlacementTarget,
-			onOpenItem,
-			onOpenNukeSave,
+			onOpenSheet,
 		],
 	);
 

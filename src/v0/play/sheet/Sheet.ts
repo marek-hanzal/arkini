@@ -1,1 +1,3 @@
-export type Sheet = "inventory" | "cheat-inventory" | "nuke-save" | "item";
+import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
+
+export type Sheet = ActiveSheetState["type"];

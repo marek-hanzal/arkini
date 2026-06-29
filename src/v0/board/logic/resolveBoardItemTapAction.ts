@@ -3,9 +3,8 @@ import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import { isCheatBoardItemId } from "~/v0/inventory/CheatBoardItem";
-import { isInventoryBoardItemId } from "~/v0/inventory/InventoryBoardItem";
-import { isNukeSaveBoardItemId } from "~/v0/inventory/NukeSaveBoardItem";
+import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
+import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
 export namespace resolveBoardItemTapAction {
@@ -31,20 +30,8 @@ export namespace resolveBoardItemTapAction {
 				productId?: string;
 		  }
 		| {
-				type: "open-detail";
-				boardItemId: string;
-		  }
-		| {
-				type: "open-inventory";
-				boardItemId: string;
-		  }
-		| {
-				type: "open-cheat-inventory";
-				boardItemId: string;
-		  }
-		| {
-				type: "open-nuke-save";
-				boardItemId: string;
+				type: "open-sheet";
+				sheet: ActiveSheetState;
 		  };
 }
 
@@ -52,24 +39,11 @@ export const resolveBoardItemTapAction = ({
 	boardItem,
 	nowMs,
 }: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result => {
-	if (isInventoryBoardItemId(boardItem.itemId)) {
+	const utilitySheet = readBoardUtilityItemSheet(boardItem.itemId);
+	if (utilitySheet) {
 		return {
-			boardItemId: boardItem.id,
-			type: "open-inventory",
-		};
-	}
-
-	if (isCheatBoardItemId(boardItem.itemId)) {
-		return {
-			boardItemId: boardItem.id,
-			type: "open-cheat-inventory",
-		};
-	}
-
-	if (isNukeSaveBoardItemId(boardItem.itemId)) {
-		return {
-			boardItemId: boardItem.id,
-			type: "open-nuke-save",
+			sheet: utilitySheet,
+			type: "open-sheet",
 		};
 	}
 
@@ -100,8 +74,11 @@ export const resolveBoardItemTapAction = ({
 		}
 
 		return {
-			type: "open-detail",
-			boardItemId: boardItem.id,
+			sheet: {
+				boardItemId: boardItem.id,
+				type: "item",
+			},
+			type: "open-sheet",
 		};
 	}
 
@@ -115,8 +92,11 @@ export const resolveBoardItemTapAction = ({
 		}
 
 		return {
-			type: "open-detail",
-			boardItemId: boardItem.id,
+			sheet: {
+				boardItemId: boardItem.id,
+				type: "item",
+			},
+			type: "open-sheet",
 		};
 	}
 
@@ -146,13 +126,19 @@ export const resolveBoardItemTapAction = ({
 			};
 		}
 		return {
-			type: "open-detail",
-			boardItemId: boardItem.id,
+			sheet: {
+				boardItemId: boardItem.id,
+				type: "item",
+			},
+			type: "open-sheet",
 		};
 	}
 
 	return {
-		type: "open-detail",
-		boardItemId: boardItem.id,
+		sheet: {
+			boardItemId: boardItem.id,
+			type: "item",
+		},
+		type: "open-sheet",
 	};
 };

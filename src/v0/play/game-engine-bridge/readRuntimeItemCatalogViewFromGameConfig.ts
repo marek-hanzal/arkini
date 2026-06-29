@@ -2,6 +2,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
+import { readRuntimeEffectOperationSummary } from "~/v0/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 
 const catalogCache = new WeakMap<GameConfig, ItemCatalogView>();
 
@@ -21,105 +22,6 @@ const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameCon
 	return resourceDataSrc(config.resources[asset.resourceId]?.data) ?? fallbackAssetSrc;
 };
 
-const readResolvedSelectorSummary = (
-	label: string,
-	selector:
-		| {
-				mode: "all";
-		  }
-		| {
-				anyOf?: readonly {
-					ids: readonly string[];
-				}[];
-				allOf?: readonly {
-					ids: readonly string[];
-				}[];
-				noneOf?: readonly {
-					ids: readonly string[];
-				}[];
-		  }
-		| undefined,
-	formatId: (id: string) => string = (id) => id,
-) => {
-	if (!selector) return undefined;
-	if ("mode" in selector) return `${label}: all`;
-
-	const parts = [
-		readSelectorClauseSummary("any", selector.anyOf, formatId),
-		readSelectorClauseSummary("all", selector.allOf, formatId),
-		readSelectorClauseSummary("none", selector.noneOf, formatId),
-	].filter((part): part is string => Boolean(part));
-
-	return parts.length ? `${label}: ${parts.join("; ")}` : `${label}: targeted`;
-};
-
-const readSelectorClauseSummary = (
-	label: string,
-	clauses:
-		| readonly {
-				ids: readonly string[];
-		  }[]
-		| undefined,
-	formatId: (id: string) => string,
-) => {
-	if (!clauses?.length) return undefined;
-	return `${label}(${clauses.map((clause) => clause.ids.map(formatId).join(", ")).join(" | ")})`;
-};
-
-const readEffectTargetSummary = (
-	target: GameConfig["effects"][string]["operations"][number]["target"],
-) => {
-	const parts = [];
-	if ("items" in target) {
-		const itemSummary = readResolvedSelectorSummary(
-			"items",
-			target.items,
-			configItemNameFallback,
-		);
-		if (itemSummary) parts.push(itemSummary);
-	}
-	if ("producers" in target) {
-		const producerSummary = readResolvedSelectorSummary(
-			"producers",
-			target.producers,
-			configItemNameFallback,
-		);
-		if (producerSummary) parts.push(producerSummary);
-	}
-	if ("productLines" in target) {
-		const productLineSummary = readResolvedSelectorSummary(
-			"product lines",
-			target.productLines,
-		);
-		if (productLineSummary) parts.push(productLineSummary);
-	}
-	return parts.join(" · ") || "targeted";
-};
-
-const configItemNameFallback = (itemId: string) =>
-	itemId.replace(/^item:/, "").replace(/^producer:/, "");
-
-const readEffectOperationSummary = (
-	operation: GameConfig["effects"][string]["operations"][number],
-) => {
-	const target = readEffectTargetSummary(operation.target);
-	if (operation.kind === "line.reveal") return `Reveal product lines for ${target}`;
-	if (operation.kind === "line.hide") return `Hide product lines for ${target}`;
-	if (operation.kind === "line.blockStart") return `Block product start for ${target}`;
-	if (operation.kind === "duration.addMs")
-		return `Add ${operation.valueMs} ms duration to ${target}`;
-	if (operation.kind === "duration.multiply") {
-		return `Multiply duration by ${operation.multiplier} for ${target}`;
-	}
-	if (operation.kind === "loot.appendOutput") return `Append output to ${target}`;
-	if (operation.kind === "loot.replaceOutput") return `Replace output for ${target}`;
-	if (operation.kind === "loot.addChanceItem")
-		return `Add chance item ${operation.itemId} to ${target}`;
-	if (operation.kind === "loot.dropChance.add")
-		return `Adjust drop chance by ${operation.delta} for ${target}`;
-	return `Block item creation for ${target}`;
-};
-
 const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
 	(config.items[itemId]?.passiveEffectIds ?? []).flatMap((effectId) => {
 		const effect = config.effects[effectId];
@@ -131,7 +33,10 @@ const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: 
 				name: effect.name,
 				operations: effect.operations.map((operation) => ({
 					kind: operation.kind,
-					summary: readEffectOperationSummary(operation),
+					summary: readRuntimeEffectOperationSummary({
+						config,
+						operation,
+					}),
 				})),
 				radius: effect.scope === "local" ? effect.radius : undefined,
 				scope: effect.scope,

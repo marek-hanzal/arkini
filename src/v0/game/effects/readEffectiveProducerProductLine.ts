@@ -149,6 +149,36 @@ const readEffectSourceAppliesToTarget = ({
 		}),
 	});
 
+const readSourceSupportsStackingCategory = ({
+	category,
+	config,
+	producerId,
+	productId,
+	source,
+}: {
+	category: string;
+	config: GameConfig;
+	producerId: string;
+	productId: string;
+	source: GameEffectSourceInstance;
+}) => {
+	const effect = config.effects[source.effectId];
+	if (!effect) return false;
+
+	return effect.operations.some((operation) => {
+		if (operation.kind === "item.blockCreate" || operation.kind === "grant.add") {
+			return false;
+		}
+		if (operation.stacking?.category !== category) return false;
+
+		return doesGameEffectTargetProductLine({
+			producerId,
+			productId,
+			target: operation.target,
+		});
+	});
+};
+
 const readProximityPenaltyMultiplier = ({
 	config,
 	save,
@@ -200,39 +230,56 @@ const createAppliedOperation = ({
 });
 
 const isStackingLimitReached = ({
-	appliedCountsByCategory,
+	config,
 	operation,
+	producerId,
+	productId,
+	source,
+	sources,
+	targetCell,
+	save,
 }: {
-	appliedCountsByCategory: ReadonlyMap<string, number>;
+	config: GameConfig;
 	operation: Extract<
 		GameConfig["effects"][string]["operations"][number],
 		{
 			stacking?: unknown;
 		}
 	>;
+	producerId: string;
+	productId: string;
+	source: GameEffectSourceInstance;
+	sources: readonly GameEffectSourceInstance[];
+	targetCell: ReturnType<typeof readGameEffectSourceCell>;
+	save: GameSave;
 }) => {
 	const stacking = operation.stacking;
 	if (!stacking?.maxSources) return false;
 
-	return (appliedCountsByCategory.get(stacking.category) ?? 0) >= stacking.maxSources;
-};
+	const selectedSourceIds = sources
+		.filter((candidate) =>
+			readSourceSupportsStackingCategory({
+				category: stacking.category,
+				config,
+				producerId,
+				productId,
+				source: candidate,
+			}),
+		)
+		.sort((left, right) =>
+			compareGameEffectSourceInstances({
+				config,
+				distanceOrder: "closest-first",
+				left,
+				right,
+				save,
+				targetCell,
+			}),
+		)
+		.slice(0, stacking.maxSources)
+		.map((candidate) => candidate.sourceId);
 
-const countStackingApplication = ({
-	appliedCountsByCategory,
-	operation,
-}: {
-	appliedCountsByCategory: Map<string, number>;
-	operation: Extract<
-		GameConfig["effects"][string]["operations"][number],
-		{
-			stacking?: unknown;
-		}
-	>;
-}) => {
-	const category = operation.stacking?.category;
-	if (!category) return;
-
-	appliedCountsByCategory.set(category, (appliedCountsByCategory.get(category) ?? 0) + 1);
+	return !selectedSourceIds.includes(source.sourceId);
 };
 
 export const readEffectiveProducerProductLine = ({
@@ -258,7 +305,6 @@ export const readEffectiveProducerProductLine = ({
 	const chanceItems: EffectiveProducerProductLine["lootPlan"]["chanceItems"] = [];
 	const appliedEffects: AppliedGameEffectOperation[] = [];
 	const blockReasons: AppliedGameEffectOperation[] = [];
-	const appliedCountsByCategory = new Map<string, number>();
 	const targetCell = readGameEffectSourceCell({
 		save,
 		sourceItemInstanceId: producerItemInstanceId,
@@ -326,8 +372,14 @@ export const readEffectiveProducerProductLine = ({
 
 			if (
 				isStackingLimitReached({
-					appliedCountsByCategory,
+					config,
 					operation,
+					producerId,
+					productId,
+					save,
+					source,
+					sources,
+					targetCell,
 				})
 			) {
 				continue;
@@ -354,10 +406,6 @@ export const readEffectiveProducerProductLine = ({
 				effectName: effect.name,
 				kind: operation.kind,
 				source,
-			});
-			countStackingApplication({
-				appliedCountsByCategory,
-				operation,
 			});
 			appliedEffects.push(appliedOperation);
 

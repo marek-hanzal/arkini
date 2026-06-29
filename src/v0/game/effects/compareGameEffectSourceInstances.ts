@@ -8,6 +8,7 @@ import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSource
 export namespace compareGameEffectSourceInstances {
 	export interface Props {
 		config: GameConfig;
+		distanceOrder?: "closest-first" | "farthest-first";
 		left: GameEffectSourceInstance;
 		right: GameEffectSourceInstance;
 		save: GameSave;
@@ -43,6 +44,7 @@ const readEffectSourceCreatedAtMs = (source: GameEffectSourceInstance) =>
 
 export const compareGameEffectSourceInstances = ({
 	config,
+	distanceOrder = "farthest-first",
 	left,
 	right,
 	save,
@@ -60,7 +62,11 @@ export const compareGameEffectSourceInstances = ({
 		source: right,
 		targetCell,
 	});
-	if (leftDistance !== rightDistance) return rightDistance - leftDistance;
+	if (leftDistance !== rightDistance) {
+		return distanceOrder === "closest-first"
+			? leftDistance - rightDistance
+			: rightDistance - leftDistance;
+	}
 
 	const leftCreatedAtMs = readEffectSourceCreatedAtMs(left);
 	const rightCreatedAtMs = readEffectSourceCreatedAtMs(right);

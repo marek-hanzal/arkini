@@ -294,24 +294,18 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		job: liveJob,
 		save,
 	});
-	const placementSourceSave = chargeOutcome?.removeOnDepleted
-		? yield* cloneGameSaveFx({
-				save,
-			})
-		: save;
-	if (chargeOutcome?.removeOnDepleted) {
-		delete placementSourceSave.board.items[liveJob.producerItemInstanceId];
-		removeBoardItemRuntimeState({
-			itemInstanceId: liveJob.producerItemInstanceId,
-			save: placementSourceSave,
-		});
-	}
+	const freedBoardItemInstanceIds = chargeOutcome?.removeOnDepleted
+		? new Set([
+				liveJob.producerItemInstanceId,
+			])
+		: undefined;
 	const placementEither = yield* Effect.either(
 		placeGameSaveItemsFx({
 			config,
+			freedBoardItemInstanceIds,
 			items: placementRequests,
 			nowMs,
-			save: placementSourceSave,
+			save,
 			seedCell,
 		}),
 	);
@@ -415,6 +409,13 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 				producerItem,
 			});
 			placementEvents = replacedSource.events;
+			if (!replacedSource.replaced) {
+				delete placementResult.save.board.items[liveJob.producerItemInstanceId];
+				removeBoardItemRuntimeState({
+					itemInstanceId: liveJob.producerItemInstanceId,
+					save: placementResult.save,
+				});
+			}
 			chargeEvents = replacedSource.replaced
 				? []
 				: [

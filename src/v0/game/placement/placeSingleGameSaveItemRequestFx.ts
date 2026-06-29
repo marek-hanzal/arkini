@@ -104,6 +104,7 @@ export namespace placeSingleGameSaveItemRequestFx {
 	export interface Props {
 		config: GameConfig;
 		events: GameEvent[];
+		freedBoardItemInstanceIds?: ReadonlySet<string>;
 		item: GameSaveItemPlacementRequest;
 		nowMs: number;
 		save: GameSave;
@@ -115,6 +116,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 	function* ({
 		config,
 		events,
+		freedBoardItemInstanceIds,
 		item,
 		nowMs,
 		save,
@@ -158,6 +160,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			if (
 				readBoardItemMaxCountCapacity({
 					config,
+					ignoredBoardItemInstanceIds: freedBoardItemInstanceIds,
 					itemId: item.itemId,
 					save,
 				}) <= 0
@@ -168,6 +171,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 
 			const emptyCells = yield* planEmptyBoardCellsFx({
 				config,
+				freedBoardItemInstanceIds,
 				save,
 				seedCell,
 			});
@@ -178,6 +182,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 
 			const [emptyCell] = yield* planItemBoardPlacementCellsFx({
 				config,
+				freedBoardItemInstanceIds,
 				itemId: item.itemId,
 				nowMs,
 				save,

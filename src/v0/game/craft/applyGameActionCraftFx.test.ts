@@ -245,8 +245,12 @@ describe("applyGameActionFx Craft", () => {
 							reason: "Craft table blocks plank creation.",
 							target: {
 								items: {
-									ids: [
-										"item:plank",
+									anyOf: [
+										{
+											ids: [
+												"item:plank",
+											],
+										},
 									],
 								},
 							},
@@ -339,8 +343,12 @@ describe("applyGameActionFx Craft", () => {
 							multiplier: 0.1,
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},
@@ -553,8 +561,12 @@ describe("applyGameActionFx Craft", () => {
 					reason: "Plank creation is blocked.",
 					target: {
 						items: {
-							ids: [
-								"item:plank",
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
 							],
 						},
 					},
@@ -626,8 +638,12 @@ describe("applyGameActionFx Craft", () => {
 					reason: "Twig blocks plank creation.",
 					target: {
 						items: {
-							ids: [
-								"item:plank",
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
 							],
 						},
 					},

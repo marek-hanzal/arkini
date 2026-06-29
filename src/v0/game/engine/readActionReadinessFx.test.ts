@@ -119,8 +119,12 @@ describe("readActionReadinessFx", () => {
 							kind: "line.blockStart",
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},

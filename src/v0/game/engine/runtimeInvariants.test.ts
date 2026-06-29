@@ -190,8 +190,12 @@ describe("runtime invariants", () => {
 							kind: "item.blockCreate",
 							target: {
 								items: {
-									ids: [
-										"item:twig",
+									anyOf: [
+										{
+											ids: [
+												"item:twig",
+											],
+										},
 									],
 								},
 							},
@@ -283,7 +287,7 @@ describe("runtime invariants", () => {
 							kind: "duration.addMs",
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 							valueMs: 0,
@@ -390,8 +394,12 @@ describe("runtime invariants", () => {
 							],
 							target: {
 								productLines: {
-									ids: [
-										"product:effect-output",
+									anyOf: [
+										{
+											ids: [
+												"product:effect-output",
+											],
+										},
 									],
 								},
 							},
@@ -499,7 +507,7 @@ describe("runtime invariants", () => {
 							kind: "duration.addMs",
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 							valueMs: 0,
@@ -602,8 +610,12 @@ describe("runtime invariants", () => {
 							kind: "duration.addMs",
 							target: {
 								productLines: {
-									ids: [
-										"product:self-timed",
+									anyOf: [
+										{
+											ids: [
+												"product:self-timed",
+											],
+										},
 									],
 								},
 							},
@@ -708,7 +720,7 @@ describe("runtime invariants", () => {
 							kind: "duration.addMs",
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 							valueMs: 0,

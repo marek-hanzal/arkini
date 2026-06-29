@@ -32,7 +32,7 @@ describe("validateWorldSnapshotFx", () => {
 							kind: "duration.addMs",
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 							valueMs: 0,
@@ -539,7 +539,7 @@ describe("validateWorldSnapshotFx", () => {
 							kind: "duration.addMs",
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 							valueMs: 0,

@@ -34,8 +34,12 @@ const createLocalCraftBlockConfig = () => {
 						reason: "plank blocked near axe",
 						target: {
 							items: {
-								ids: [
-									"item:plank",
+								anyOf: [
+									{
+										ids: [
+											"item:plank",
+										],
+									},
 								],
 							},
 						},
@@ -94,8 +98,12 @@ const createLineVisibilityConfig = () => {
 						kind: "line.hide",
 						target: {
 							productLines: {
-								ids: [
-									"product:test",
+								anyOf: [
+									{
+										ids: [
+											"product:test",
+										],
+									},
 								],
 							},
 						},
@@ -173,8 +181,12 @@ const createItemCreateTargetConfig = () => {
 						kind: "item.blockCreate",
 						target: {
 							items: {
-								ids: [
-									"item:plank",
+								anyOf: [
+									{
+										ids: [
+											"item:plank",
+										],
+									},
 								],
 							},
 						},
@@ -223,8 +235,12 @@ const createFutureActiveEffectConfig = () => {
 						multiplier: 0.1,
 						target: {
 							productLines: {
-								ids: [
-									"product:test",
+								anyOf: [
+									{
+										ids: [
+											"product:test",
+										],
+									},
 								],
 							},
 						},

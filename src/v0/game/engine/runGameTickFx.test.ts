@@ -47,8 +47,12 @@ describe("runGameTickFx", () => {
 							kind: "line.blockStart",
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},
@@ -690,8 +694,12 @@ describe("runGameTickFx", () => {
 					kind: "item.blockCreate",
 					target: {
 						items: {
-							ids: [
-								"item:plank",
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
 							],
 						},
 					},
@@ -788,8 +796,12 @@ describe("runGameTickFx", () => {
 							kind: "item.blockCreate",
 							target: {
 								items: {
-									ids: [
-										"item:twig",
+									anyOf: [
+										{
+											ids: [
+												"item:twig",
+											],
+										},
 									],
 								},
 							},

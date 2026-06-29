@@ -443,9 +443,17 @@ describe("defaultGameConfig", () => {
 			reason: "Engineers path is already chosen.",
 			target: {
 				productLines: {
-					ids: [
-						"product:university:blueprint-cathedral",
-						"product:university:blueprint-mage-lodge",
+					anyOf: [
+						{
+							ids: [
+								"product:university:blueprint-cathedral",
+							],
+						},
+						{
+							ids: [
+								"product:university:blueprint-mage-lodge",
+							],
+						},
 					],
 				},
 			},
@@ -457,11 +465,27 @@ describe("defaultGameConfig", () => {
 			reason: "Engineers path is already chosen.",
 			target: {
 				items: {
-					ids: [
-						"item:blueprint-cathedral",
-						"item:blueprint-mage-lodge",
-						"producer:cathedral",
-						"producer:mage-lodge",
+					anyOf: [
+						{
+							ids: [
+								"item:blueprint-cathedral",
+							],
+						},
+						{
+							ids: [
+								"item:blueprint-mage-lodge",
+							],
+						},
+						{
+							ids: [
+								"producer:cathedral",
+							],
+						},
+						{
+							ids: [
+								"producer:mage-lodge",
+							],
+						},
 					],
 				},
 			},
@@ -602,10 +626,14 @@ describe("defaultGameConfig", () => {
 			kind: "duration.proximityPenalty",
 			target: {
 				productLines: {
-					ids: expect.arrayContaining([
-						"product:farm-t1:grain",
-						"product:farm-t1:grain-morale-t1",
-					]),
+					anyOf: [
+						{
+							ids: expect.arrayContaining([
+								"product:farm-t1:grain",
+								"product:farm-t1:grain-morale-t1",
+							]),
+						},
+					],
 				},
 			},
 		});

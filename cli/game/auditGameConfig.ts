@@ -146,15 +146,51 @@ const collectRequirementUsage = (config: GameConfig, itemFlow: ItemFlowIndex) =>
 const readResolvedSelectorIds = (
 	selector:
 		| {
-				all?: true;
-				ids?: readonly string[];
+				mode: "all";
+		  }
+		| {
+				anyOf?: readonly {
+					ids: readonly string[];
+				}[];
+				allOf?: readonly {
+					ids: readonly string[];
+				}[];
+				noneOf?: readonly {
+					ids: readonly string[];
+				}[];
 		  }
 		| undefined,
 	collection: Readonly<Record<string, unknown>>,
 ) => {
-	if (!selector) return [];
-	if (selector.all) return Object.keys(collection);
-	return selector.ids ?? [];
+	const ids = Object.keys(collection);
+	if (!selector || "mode" in selector) return ids;
+	return ids.filter((id) => doesResolvedSelectorMatchId(id, selector));
+};
+
+const doesResolvedSelectorMatchId = (
+	id: string,
+	selector: {
+		anyOf?: readonly {
+			ids: readonly string[];
+		}[];
+		allOf?: readonly {
+			ids: readonly string[];
+		}[];
+		noneOf?: readonly {
+			ids: readonly string[];
+		}[];
+	},
+) => {
+	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(id))) {
+		return false;
+	}
+	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(id))) {
+		return false;
+	}
+	if (selector.noneOf?.some((clause) => clause.ids.includes(id))) {
+		return false;
+	}
+	return true;
 };
 
 const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {

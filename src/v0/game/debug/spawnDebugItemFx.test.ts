@@ -58,8 +58,12 @@ describe("spawnDebugItemFx", () => {
 							kind: "item.blockCreate",
 							target: {
 								items: {
-									ids: [
-										"item:twig",
+									anyOf: [
+										{
+											ids: [
+												"item:twig",
+											],
+										},
 									],
 								},
 							},

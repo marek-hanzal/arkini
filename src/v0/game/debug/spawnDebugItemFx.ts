@@ -8,6 +8,7 @@ import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGame
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
+import { readBoardItemCreateEffectFailureReason } from "~/v0/game/placement/readBoardItemCreateEffectFailureReason";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -71,10 +72,19 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 				save: nextSave,
 			});
 			if (!emptyCell) {
+				const effectFailureReason = readBoardItemCreateEffectFailureReason({
+					candidateCells: emptyCells,
+					config,
+					itemId: action.itemId,
+					nowMs,
+					save: nextSave,
+				});
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
-						"effect:block-create",
-						"No board placement target is allowed by active effects.",
+						effectFailureReason,
+						effectFailureReason === "effect:missing-grant"
+							? "No board placement target has the required effect grant."
+							: "No board placement target is allowed by active effects.",
 					),
 				);
 			}

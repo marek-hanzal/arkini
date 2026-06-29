@@ -6,7 +6,7 @@ import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxC
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
-import { readGameEffectItemCreateMissingGrant } from "~/v0/game/effects/readGameEffectItemCreateMissingGrant";
+import { readBoardItemCreateEffectFailureReason } from "~/v0/game/placement/readBoardItemCreateEffectFailureReason";
 import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
 import {
@@ -92,17 +92,13 @@ const readBoardEffectPlacementBlockReasonFx = Effect.fn(
 		seedCell,
 	});
 
-	return emptyCells.some((targetCell) =>
-		readGameEffectItemCreateMissingGrant({
-			config,
-			itemId,
-			nowMs,
-			save,
-			targetCell,
-		}),
-	)
-		? "effect:missing-grant"
-		: "effect:block-create";
+	return readBoardItemCreateEffectFailureReason({
+		candidateCells: emptyCells,
+		config,
+		itemId,
+		nowMs,
+		save,
+	});
 });
 
 const readInventoryStackCapacity = ({

@@ -2,6 +2,16 @@
 	"startingState": {
 		"board": [
 			{
+				"itemId": "item:nuke-save",
+				"x": 4,
+				"y": 0
+			},
+			{
+				"itemId": "item:cheat",
+				"x": 5,
+				"y": 0
+			},
+			{
 				"itemId": "item:inventory",
 				"x": 6,
 				"y": 0

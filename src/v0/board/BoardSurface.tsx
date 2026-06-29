@@ -21,17 +21,21 @@ export const BoardSurface = memo(
 	({
 		feedback,
 		feedbackFlags,
+		onOpenCheatInventory,
 		onOpenInventory,
 		onOpenInventoryPlacementTarget,
 		onOpenItem,
+		onOpenNukeSave,
 		disabled = false,
 	}: BoardSurfaceType.Props) => {
 		const boardDragBoundsRef = useRef<HTMLDivElement | null>(null);
 		const { blockedCellKeys, columns, drag, slots, tiles } = useBoardTileEngineModel({
 			feedback,
+			onOpenCheatInventory,
 			onOpenInventory,
 			onOpenInventoryPlacementTarget,
 			onOpenItem,
+			onOpenNukeSave,
 		});
 		const blockedCells = useMemo(
 			() => new Set(blockedCellKeys),

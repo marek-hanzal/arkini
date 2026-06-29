@@ -58,14 +58,12 @@ button:focus-visible,
 }
 
 :root {
-	--ak-bottom-nav-height: calc(clamp(3.75rem, 9.5dvh, 4.8rem) + env(safe-area-inset-bottom));
 	--ak-sheet-width: min(100dvw, 560px);
 	--ak-sheet-max-height: 88dvh;
 
 	--ak-layer-base-surface: 0;
 	--ak-layer-base-tile: 10;
 	--ak-layer-base-drag-tile: 20;
-	--ak-layer-bottom-nav: 30;
 	--ak-layer-toast: 40;
 	--ak-layer-overlay-root: 50;
 	--ak-layer-overlay-backdrop: 0;

@@ -2657,6 +2657,32 @@
 				"utility",
 				"ui"
 			]
+		},
+		"item:cheat": {
+			"name": "Cheat Kit",
+			"label": "Cheats",
+			"description": "A shameless little toolkit that opens the cheat inventory for testing.",
+			"maxStackSize": 1,
+			"maxCount": 1,
+			"storage": "board",
+			"tags": [
+				"special:cheat",
+				"utility",
+				"ui"
+			]
+		},
+		"item:nuke-save": {
+			"name": "Save Nuke",
+			"label": "Nuke",
+			"description": "A dangerous reset charge that opens the save nuke confirmation.",
+			"maxStackSize": 1,
+			"maxCount": 1,
+			"storage": "board",
+			"tags": [
+				"special:nuke-save",
+				"utility",
+				"ui"
+			]
 		}
 	}
 }

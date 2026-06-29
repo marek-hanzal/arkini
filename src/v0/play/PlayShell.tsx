@@ -2,15 +2,13 @@ import { match } from "ts-pattern";
 import { type FC, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BoardSurface } from "~/v0/board/BoardSurface";
 import { CheatInventorySheet } from "~/v0/debug/CheatInventorySheet";
-import { DevSheet } from "~/v0/debug/DevSheet";
+import { NukeSaveSheet } from "~/v0/debug/NukeSaveSheet";
 import { registerDebugBugReport } from "~/v0/debug/DebugBugReport";
 import { InventorySurface } from "~/v0/inventory/InventorySurface";
 import { ItemSheet } from "~/v0/item/ItemSheet";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
-import { BottomNav } from "~/v0/play/BottomNav";
 import { BottomSheet } from "~/v0/play/sheet/BottomSheet";
 import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
-import type { Sheet } from "~/v0/play/sheet/Sheet";
 import { useFeedbackFlags } from "~/v0/play/feedback/useFeedbackFlags";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import { GameRuntimeProvider, useGameRuntimeStore } from "~/v0/play/runtime";
@@ -30,13 +28,6 @@ const PlayShellContent: FC = () => {
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
 	const closeSheet = useCallback(() => setActiveSheet(undefined), []);
-	const openSheet = useCallback(
-		(sheet: Sheet) =>
-			setActiveSheet({
-				type: sheet,
-			}),
-		[],
-	);
 	const openItem = useCallback(
 		(boardItemId: string) =>
 			setActiveSheet({
@@ -49,6 +40,20 @@ const PlayShellContent: FC = () => {
 		() =>
 			setActiveSheet({
 				type: "inventory",
+			}),
+		[],
+	);
+	const openCheatInventory = useCallback(
+		() =>
+			setActiveSheet({
+				type: "cheat-inventory",
+			}),
+		[],
+	);
+	const openNukeSave = useCallback(
+		() =>
+			setActiveSheet({
+				type: "nuke-save",
 			}),
 		[],
 	);
@@ -129,9 +134,9 @@ const PlayShellContent: FC = () => {
 				)
 				.with(
 					{
-						type: "dev",
+						type: "nuke-save",
 					},
-					() => <DevSheet onClose={closeSheet} />,
+					() => <NukeSaveSheet onClose={closeSheet} />,
 				)
 				.with(
 					{
@@ -155,7 +160,7 @@ const PlayShellContent: FC = () => {
 		>
 			<div
 				data-ui="game screen"
-				className="relative h-full w-full overflow-hidden bg-ak-page pb-[calc(var(--ak-bottom-nav-height)+0.55rem)]"
+				className="relative h-full w-full overflow-hidden bg-ak-page"
 			>
 				<main
 					data-ui="play layout"
@@ -168,9 +173,11 @@ const PlayShellContent: FC = () => {
 						<BoardSurface
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}
+							onOpenCheatInventory={openCheatInventory}
 							onOpenInventory={openInventory}
 							onOpenInventoryPlacementTarget={openInventoryPlacementTarget}
 							onOpenItem={openItem}
+							onOpenNukeSave={openNukeSave}
 							disabled={Boolean(activeSheet)}
 						/>
 					</div>
@@ -179,7 +186,7 @@ const PlayShellContent: FC = () => {
 				{lastError && feedbackFlags.has("toast:error") ? (
 					<div
 						data-ui="error toast"
-						className="pointer-events-none absolute inset-x-3 bottom-[calc(var(--ak-bottom-nav-height)+0.85rem)] mx-auto max-w-[430px] rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-semibold text-rose-100"
+						className="pointer-events-none absolute inset-x-3 bottom-3 mx-auto max-w-[430px] rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-semibold text-rose-100"
 						style={{
 							zIndex: "var(--ak-layer-toast)",
 						}}
@@ -187,11 +194,6 @@ const PlayShellContent: FC = () => {
 						{lastError}
 					</div>
 				) : null}
-
-				<BottomNav
-					activeSheet={activeSheet?.type}
-					onOpen={openSheet}
-				/>
 			</div>
 
 			<BottomSheet

@@ -21,9 +21,11 @@ const createRealtimeDurationConfig = ({ sourceX }: { sourceX: number }) => {
 						kind: "duration.multiply",
 						multiplier: 0.1,
 						target: {
-							productIds: [
-								"product:test",
-							],
+							productLines: {
+								ids: [
+									"product:test",
+								],
+							},
 						},
 					},
 				],
@@ -96,9 +98,11 @@ const createRealtimeOutputConfig = ({ sourceX }: { sourceX: number }) => {
 							},
 						],
 						target: {
-							productIds: [
-								"product:test",
-							],
+							productLines: {
+								ids: [
+									"product:test",
+								],
+							},
 						},
 					},
 				],
@@ -180,9 +184,11 @@ const createOutputCreatesRealtimeSourceConfig = () => {
 						kind: "duration.multiply",
 						multiplier: 0.1,
 						target: {
-							productIds: [
-								"product:test",
-							],
+							productLines: {
+								ids: [
+									"product:test",
+								],
+							},
 						},
 					},
 				],

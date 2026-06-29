@@ -3491,22 +3491,26 @@
 					"kind": "line.blockStart",
 					"reason": "Engineers path is already chosen.",
 					"target": {
-						"productIds": [
-							"product:university:blueprint-cathedral",
-							"product:university:blueprint-mage-lodge"
-						]
+						"productLines": {
+							"ids": [
+								"product:university:blueprint-cathedral",
+								"product:university:blueprint-mage-lodge"
+							]
+						}
 					}
 				},
 				{
 					"kind": "item.blockCreate",
 					"reason": "Engineers path is already chosen.",
 					"target": {
-						"itemIds": [
-							"item:blueprint-cathedral",
-							"item:blueprint-mage-lodge",
-							"producer:cathedral",
-							"producer:mage-lodge"
-						]
+						"items": {
+							"ids": [
+								"item:blueprint-cathedral",
+								"item:blueprint-mage-lodge",
+								"producer:cathedral",
+								"producer:mage-lodge"
+							]
+						}
 					}
 				}
 			],
@@ -3520,22 +3524,26 @@
 					"kind": "line.blockStart",
 					"reason": "Faith path is already chosen.",
 					"target": {
-						"productIds": [
-							"product:university:blueprint-house-of-engineers",
-							"product:university:blueprint-mage-lodge"
-						]
+						"productLines": {
+							"ids": [
+								"product:university:blueprint-house-of-engineers",
+								"product:university:blueprint-mage-lodge"
+							]
+						}
 					}
 				},
 				{
 					"kind": "item.blockCreate",
 					"reason": "Faith path is already chosen.",
 					"target": {
-						"itemIds": [
-							"item:blueprint-house-of-engineers",
-							"item:blueprint-mage-lodge",
-							"producer:house-of-engineers",
-							"producer:mage-lodge"
-						]
+						"items": {
+							"ids": [
+								"item:blueprint-house-of-engineers",
+								"item:blueprint-mage-lodge",
+								"producer:house-of-engineers",
+								"producer:mage-lodge"
+							]
+						}
 					}
 				}
 			],
@@ -3549,155 +3557,73 @@
 					"kind": "line.blockStart",
 					"reason": "Mages path is already chosen.",
 					"target": {
-						"productIds": [
-							"product:university:blueprint-house-of-engineers",
-							"product:university:blueprint-cathedral"
-						]
+						"productLines": {
+							"ids": [
+								"product:university:blueprint-house-of-engineers",
+								"product:university:blueprint-cathedral"
+							]
+						}
 					}
 				},
 				{
 					"kind": "item.blockCreate",
 					"reason": "Mages path is already chosen.",
 					"target": {
-						"itemIds": [
-							"item:blueprint-house-of-engineers",
-							"item:blueprint-cathedral",
-							"producer:house-of-engineers",
-							"producer:cathedral"
-						]
+						"items": {
+							"ids": [
+								"item:blueprint-house-of-engineers",
+								"item:blueprint-cathedral",
+								"producer:house-of-engineers",
+								"producer:cathedral"
+							]
+						}
 					}
 				}
 			],
 			"scope": "global",
 			"sourceScope": "both"
 		},
-		"effect:pollution-slows-brewery": {
-			"name": "Pollution slows nearby brewery production",
+		"effect:pollution-slows-nearby-radius-2": {
+			"name": "Pollution slows nearby sensitive production",
 			"operations": [
 				{
 					"durationFactor": 0.5,
 					"kind": "duration.proximityPenalty",
 					"target": {
-						"productIds": [
-							"product:brewery-t1:beer-barrel",
-							"product:brewery-t1:beer-barrel-from-beer",
-							"product:brewery-t1:hops"
-						]
+						"productLines": {
+							"ids": [
+								"product:brewery-t1:beer-barrel",
+								"product:brewery-t1:beer-barrel-from-beer",
+								"product:brewery-t1:hops",
+								"product:cattle-farm-t1:milk",
+								"product:chicken-coop-t1:egg",
+								"product:farm-t1:grain",
+								"product:farm-t1:grain-morale-t1",
+								"product:pig-farm-t1:piglet",
+								"product:sheep-pasture-t1:wool",
+								"product:vegetable-garden-t1:vegetables"
+							]
+						}
 					}
 				}
 			],
 			"radius": 2,
 			"scope": "local"
 		},
-		"effect:pollution-slows-cattle-milk": {
-			"name": "Pollution slows nearby cattle milk production",
+		"effect:pollution-slows-nearby-radius-3": {
+			"name": "Pollution slows wider winery production",
 			"operations": [
 				{
 					"durationFactor": 0.5,
 					"kind": "duration.proximityPenalty",
 					"target": {
-						"productIds": [
-							"product:cattle-farm-t1:milk"
-						]
-					}
-				}
-			],
-			"radius": 2,
-			"scope": "local"
-		},
-		"effect:pollution-slows-chicken-eggs": {
-			"name": "Pollution slows nearby chicken egg production",
-			"operations": [
-				{
-					"durationFactor": 0.5,
-					"kind": "duration.proximityPenalty",
-					"target": {
-						"productIds": [
-							"product:chicken-coop-t1:egg"
-						]
-					}
-				}
-			],
-			"radius": 2,
-			"scope": "local"
-		},
-		"effect:pollution-slows-farm-grain": {
-			"name": "Pollution slows nearby farm grain production",
-			"operations": [
-				{
-					"durationFactor": 0.5,
-					"kind": "duration.proximityPenalty",
-					"target": {
-						"productIds": [
-							"product:farm-t1:grain",
-							"product:farm-t1:grain-morale-t1"
-						]
-					}
-				}
-			],
-			"radius": 2,
-			"scope": "local"
-		},
-		"effect:pollution-slows-piglets": {
-			"name": "Pollution slows nearby piglet production",
-			"operations": [
-				{
-					"durationFactor": 0.5,
-					"kind": "duration.proximityPenalty",
-					"target": {
-						"productIds": [
-							"product:pig-farm-t1:piglet"
-						]
-					}
-				}
-			],
-			"radius": 2,
-			"scope": "local"
-		},
-		"effect:pollution-slows-sheep-wool": {
-			"name": "Pollution slows nearby sheep wool production",
-			"operations": [
-				{
-					"durationFactor": 0.5,
-					"kind": "duration.proximityPenalty",
-					"target": {
-						"productIds": [
-							"product:sheep-pasture-t1:wool"
-						]
-					}
-				}
-			],
-			"radius": 2,
-			"scope": "local"
-		},
-		"effect:pollution-slows-vegetables": {
-			"name": "Pollution slows nearby vegetable production",
-			"operations": [
-				{
-					"durationFactor": 0.5,
-					"kind": "duration.proximityPenalty",
-					"target": {
-						"productIds": [
-							"product:vegetable-garden-t1:vegetables"
-						]
-					}
-				}
-			],
-			"radius": 2,
-			"scope": "local"
-		},
-		"effect:pollution-slows-winery": {
-			"name": "Pollution slows nearby winery production",
-			"operations": [
-				{
-					"durationFactor": 0.5,
-					"kind": "duration.proximityPenalty",
-					"target": {
-						"productIds": [
-							"product:winery-t1:grapes",
-							"product:winery-t1:wine-barrel",
-							"product:winery-t1:wine-barrel-from-wine-glasses"
-						]
+						"productLines": {
+							"ids": [
+								"product:winery-t1:grapes",
+								"product:winery-t1:wine-barrel",
+								"product:winery-t1:wine-barrel-from-wine-glasses"
+							]
+						}
 					}
 				}
 			],
@@ -5607,14 +5533,8 @@
 			"maxStackSize": 1,
 			"name": "Pollution",
 			"passiveEffectIds": [
-				"effect:pollution-slows-cattle-milk",
-				"effect:pollution-slows-chicken-eggs",
-				"effect:pollution-slows-farm-grain",
-				"effect:pollution-slows-piglets",
-				"effect:pollution-slows-sheep-wool",
-				"effect:pollution-slows-vegetables",
-				"effect:pollution-slows-brewery",
-				"effect:pollution-slows-winery"
+				"effect:pollution-slows-nearby-radius-2",
+				"effect:pollution-slows-nearby-radius-3"
 			],
 			"storage": "board",
 			"tags": [
@@ -8734,7 +8654,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
@@ -8758,7 +8681,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:brewery-t1:hops": {
@@ -8782,7 +8708,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:brickyard:bricks": {
@@ -8862,7 +8791,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:charcoal-burner-t1:charcoal": {
@@ -9104,7 +9036,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:civic-office-t1:blueprint-academy": {
@@ -9614,7 +9549,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:farm-t1:grain-morale-t1": {
@@ -9644,7 +9582,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:glassworks:glass": {
@@ -10990,7 +10931,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:prospector-guild-t1:clay-deposit": {
@@ -11554,7 +11498,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:slaughterhouse-t1:sausage-raw-hide": {
@@ -13873,7 +13820,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
 			"visibility": "visible"
 		},
 		"product:weaver-hut-t1:common-cloth": {
@@ -13961,7 +13911,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
+			],
 			"visibility": "visible"
 		},
 		"product:winery-t1:wine-barrel": {
@@ -13991,7 +13944,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
+			],
 			"visibility": "visible"
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
@@ -14015,7 +13971,10 @@
 			],
 			"placement": "board_then_inventory",
 			"requirementIds": [],
-			"tags": [],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
+			],
 			"visibility": "visible"
 		}
 	},

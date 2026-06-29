@@ -427,9 +427,11 @@ describe("GameConfigSchema", () => {
 					durationFactor: -1,
 					kind: "duration.proximityPenalty",
 					target: {
-						productIds: [
-							"product:test",
-						],
+						productLines: {
+							ids: [
+								"product:test",
+							],
+						},
 					},
 				},
 			],
@@ -449,9 +451,11 @@ describe("GameConfigSchema", () => {
 					durationFactor: 0.5,
 					kind: "duration.proximityPenalty",
 					target: {
-						productIds: [
-							"product:test",
-						],
+						productLines: {
+							ids: [
+								"product:test",
+							],
+						},
 					},
 				},
 			],
@@ -469,9 +473,11 @@ describe("GameConfigSchema", () => {
 				{
 					kind: "line.blockStart",
 					target: {
-						productIds: [
-							"product:test",
-						],
+						productLines: {
+							ids: [
+								"product:test",
+							],
+						},
 					},
 				},
 			],
@@ -501,7 +507,9 @@ describe("GameConfigSchema", () => {
 				{
 					kind: "line.blockStart",
 					target: {
-						all: true,
+						productLines: {
+							all: true,
+						},
 					},
 				},
 			],
@@ -509,7 +517,9 @@ describe("GameConfigSchema", () => {
 		};
 
 		expect(parseGameConfig(config).effects["effect:test"]?.operations[0]?.target).toEqual({
-			all: true,
+			productLines: {
+				all: true,
+			},
 		});
 	});
 
@@ -526,7 +536,7 @@ describe("GameConfigSchema", () => {
 			scope: "global",
 		};
 
-		expect(() => parseGameConfig(config)).toThrow(/explicit all: true/);
+		expect(() => parseGameConfig(config)).toThrow(/at least one domain selector/);
 	});
 
 	it("rejects all-target effects combined with selectors", () => {
@@ -537,10 +547,12 @@ describe("GameConfigSchema", () => {
 				{
 					kind: "line.blockStart",
 					target: {
-						all: true,
-						productIds: [
-							"product:test",
-						],
+						productLines: {
+							all: true,
+							ids: [
+								"product:test",
+							],
+						},
 					},
 				},
 			],
@@ -558,9 +570,11 @@ describe("GameConfigSchema", () => {
 				{
 					kind: "item.blockCreate",
 					target: {
-						itemIds: [
-							"item:plank",
-						],
+						items: {
+							ids: [
+								"item:plank",
+							],
+						},
 					},
 				},
 			],
@@ -581,9 +595,11 @@ describe("GameConfigSchema", () => {
 					kind: "duration.multiply",
 					multiplier: 0.5,
 					target: {
-						productIds: [
-							"product:test",
-						],
+						productLines: {
+							ids: [
+								"product:test",
+							],
+						},
 					},
 				},
 			],
@@ -604,9 +620,11 @@ describe("GameConfigSchema", () => {
 				{
 					kind: "line.blockStart",
 					target: {
-						productIds: [
-							"product:test",
-						],
+						productLines: {
+							ids: [
+								"product:test",
+							],
+						},
 					},
 				},
 			],
@@ -861,9 +879,11 @@ describe("GameConfigSchema", () => {
 					kind: "item.blockCreate",
 					reason: "No planks today.",
 					target: {
-						itemIds: [
-							"item:plank",
-						],
+						items: {
+							ids: [
+								"item:plank",
+							],
+						},
 					},
 				},
 			],
@@ -884,9 +904,11 @@ describe("GameConfigSchema", () => {
 				{
 					kind: "item.blockCreate",
 					target: {
-						itemIds: [
-							"item:ghost",
-						],
+						items: {
+							ids: [
+								"item:ghost",
+							],
+						},
 					},
 				},
 			],

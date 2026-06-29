@@ -58,9 +58,11 @@ const createInventorySelfBlockConfig = ({ quantity }: { quantity: number }) => {
 						kind: "item.blockCreate",
 						reason: "inventory axe blocks axe creation",
 						target: {
-							itemIds: [
-								"item:axe",
-							],
+							items: {
+								ids: [
+									"item:axe",
+								],
+							},
 						},
 					},
 				],
@@ -111,9 +113,11 @@ const createInventoryOnlySpeedConfig = () => {
 						kind: "duration.multiply",
 						multiplier: 0.1,
 						target: {
-							productIds: [
-								"product:test",
-							],
+							productLines: {
+								ids: [
+									"product:test",
+								],
+							},
 						},
 					},
 				],
@@ -183,9 +187,11 @@ const createStackedInventorySpeedConfig = () => {
 						kind: "duration.multiply",
 						multiplier: 0.5,
 						target: {
-							productIds: [
-								"product:test",
-							],
+							productLines: {
+								ids: [
+									"product:test",
+								],
+							},
 						},
 					},
 				],
@@ -256,9 +262,11 @@ const createBoardSpeedConfig = ({ sourceScope }: { sourceScope?: "both" }) => {
 						kind: "duration.multiply",
 						multiplier: 0.1,
 						target: {
-							productIds: [
-								"product:test",
-							],
+							productLines: {
+								ids: [
+									"product:test",
+								],
+							},
 						},
 					},
 				],
@@ -332,9 +340,11 @@ const createActiveEffectConfig = () => {
 						kind: "duration.multiply",
 						multiplier: 0.1,
 						target: {
-							productIds: [
-								"product:test",
-							],
+							productLines: {
+								ids: [
+									"product:test",
+								],
+							},
 						},
 					},
 				],
@@ -421,9 +431,11 @@ const createLocalLootAppendConfig = () => {
 							},
 						],
 						target: {
-							productIds: [
-								"product:test",
-							],
+							productLines: {
+								ids: [
+									"product:test",
+								],
+							},
 						},
 					},
 				],
@@ -493,9 +505,11 @@ const createLocalBlockCreateConfig = () => {
 						kind: "item.blockCreate",
 						reason: "twigs blocked near axe",
 						target: {
-							itemIds: [
-								"item:twig",
-							],
+							items: {
+								ids: [
+									"item:twig",
+								],
+							},
 						},
 					},
 				],

@@ -161,9 +161,11 @@ describe("applyGameActionFx merge", () => {
 							kind: "item.blockCreate",
 							reason: "plank blocked by merge participant",
 							target: {
-								itemIds: [
-									"item:plank",
-								],
+								items: {
+									ids: [
+										"item:plank",
+									],
+								},
 							},
 						},
 					],

@@ -442,10 +442,12 @@ describe("defaultGameConfig", () => {
 			kind: "line.blockStart",
 			reason: "Engineers path is already chosen.",
 			target: {
-				productIds: [
-					"product:university:blueprint-cathedral",
-					"product:university:blueprint-mage-lodge",
-				],
+				productLines: {
+					ids: [
+						"product:university:blueprint-cathedral",
+						"product:university:blueprint-mage-lodge",
+					],
+				},
 			},
 		});
 		expect(
@@ -454,12 +456,14 @@ describe("defaultGameConfig", () => {
 			kind: "item.blockCreate",
 			reason: "Engineers path is already chosen.",
 			target: {
-				itemIds: [
-					"item:blueprint-cathedral",
-					"item:blueprint-mage-lodge",
-					"producer:cathedral",
-					"producer:mage-lodge",
-				],
+				items: {
+					ids: [
+						"item:blueprint-cathedral",
+						"item:blueprint-mage-lodge",
+						"producer:cathedral",
+						"producer:mage-lodge",
+					],
+				},
 			},
 		});
 
@@ -588,25 +592,21 @@ describe("defaultGameConfig", () => {
 
 	it("models pollution slowdown as product-scoped passive effects", () => {
 		expect(defaultGameConfig.items["item:pollution"].passiveEffectIds).toEqual([
-			"effect:pollution-slows-cattle-milk",
-			"effect:pollution-slows-chicken-eggs",
-			"effect:pollution-slows-farm-grain",
-			"effect:pollution-slows-piglets",
-			"effect:pollution-slows-sheep-wool",
-			"effect:pollution-slows-vegetables",
-			"effect:pollution-slows-brewery",
-			"effect:pollution-slows-winery",
+			"effect:pollution-slows-nearby-radius-2",
+			"effect:pollution-slows-nearby-radius-3",
 		]);
 
 		expect(
-			defaultGameConfig.effects["effect:pollution-slows-farm-grain"].operations[0],
+			defaultGameConfig.effects["effect:pollution-slows-nearby-radius-2"].operations[0],
 		).toMatchObject({
 			kind: "duration.proximityPenalty",
 			target: {
-				productIds: [
-					"product:farm-t1:grain",
-					"product:farm-t1:grain-morale-t1",
-				],
+				productLines: {
+					ids: expect.arrayContaining([
+						"product:farm-t1:grain",
+						"product:farm-t1:grain-morale-t1",
+					]),
+				},
 			},
 		});
 	});

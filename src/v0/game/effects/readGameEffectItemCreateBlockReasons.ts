@@ -62,7 +62,6 @@ export const readGameEffectItemCreateBlockReasons = ({
 			if (operation.kind !== "item.blockCreate") continue;
 			if (
 				!doesGameEffectTargetItem({
-					config,
 					itemId,
 					target: operation.target,
 				})

@@ -256,36 +256,54 @@ const ActivationRequirementSchema = z.array(
 	]),
 );
 
+const TagSchema = z.string().min(1);
+
+/** Canonical runtime selector. Tags are resolved to ids during package normalization. */
+const ResolvedDomainSelectorSchema = z
+	.object({
+		all: z.literal(true).optional(),
+		ids: z.array(IdSchema).min(1).optional(),
+	})
+	.strict();
+
+/** Source-only selector accepted by game package fragments before compile-time tag expansion. */
+const AuthoringDomainSelectorSchema = z
+	.object({
+		all: z.literal(true).optional(),
+		ids: z.array(IdSchema).min(1).optional(),
+		anyTags: z.array(TagSchema).min(1).optional(),
+		allTags: z.array(TagSchema).min(1).optional(),
+		noneTags: z.array(TagSchema).min(1).optional(),
+	})
+	.strict();
+
 /** Selects which producer product lines an effect operation may touch. */
 const GameEffectProductLineTargetSchema = z
 	.object({
-		all: z.literal(true).optional(),
-		producerIds: z.array(IdSchema).min(1).optional(),
-		productIds: z.array(IdSchema).min(1).optional(),
-		producerTagsAny: z.array(z.string().min(1)).min(1).optional(),
-		producerTagsAll: z.array(z.string().min(1)).min(1).optional(),
-		productTagsAny: z.array(z.string().min(1)).min(1).optional(),
-		productTagsAll: z.array(z.string().min(1)).min(1).optional(),
+		producers: ResolvedDomainSelectorSchema.optional(),
+		productLines: ResolvedDomainSelectorSchema.optional(),
+	})
+	.strict();
+
+const GameEffectProductLineAuthoringTargetSchema = z
+	.object({
+		producers: AuthoringDomainSelectorSchema.optional(),
+		productLines: AuthoringDomainSelectorSchema.optional(),
 	})
 	.strict();
 
 /** Selects which item definitions an effect operation may touch. */
 const GameEffectItemTargetSchema = z
 	.object({
-		all: z.literal(true).optional(),
-		itemIds: z.array(IdSchema).min(1).optional(),
-		itemTagsAny: z.array(z.string().min(1)).min(1).optional(),
-		itemTagsAll: z.array(z.string().min(1)).min(1).optional(),
+		items: ResolvedDomainSelectorSchema,
 	})
 	.strict();
 
-const GameEffectProductLineOperationBaseSchema = {
-	target: GameEffectProductLineTargetSchema,
-};
-
-const GameEffectItemOperationBaseSchema = {
-	target: GameEffectItemTargetSchema,
-};
+const GameEffectItemAuthoringTargetSchema = z
+	.object({
+		items: AuthoringDomainSelectorSchema,
+	})
+	.strict();
 
 /**
  * Loot output model.
@@ -330,87 +348,115 @@ const ActivationOutputSchema = z.array(
 	]),
 );
 
+const createGameEffectOperationSchema = ({
+	itemTarget,
+	productLineTarget,
+}: {
+	itemTarget: typeof GameEffectItemTargetSchema | typeof GameEffectItemAuthoringTargetSchema;
+	productLineTarget:
+		| typeof GameEffectProductLineTargetSchema
+		| typeof GameEffectProductLineAuthoringTargetSchema;
+}) => {
+	const productLineOperationBaseSchema = {
+		target: productLineTarget,
+	};
+	const itemOperationBaseSchema = {
+		target: itemTarget,
+	};
+
+	return z.discriminatedUnion("kind", [
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("line.reveal"),
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("line.hide"),
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("line.blockStart"),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("duration.addMs"),
+				valueMs: SignedIntegerSchema,
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("duration.multiply"),
+				multiplier: z.number().min(0),
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("duration.proximityPenalty"),
+				durationFactor: z.number().min(0),
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("loot.appendOutput"),
+				output: ActivationOutputSchema.min(1),
+				chance: ProbabilitySchema.optional(),
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("loot.replaceOutput"),
+				output: ActivationOutputSchema.min(1),
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("loot.addChanceItem"),
+				itemId: IdSchema,
+				chance: ProbabilitySchema,
+				quantity: QuantitySchema.default(1),
+			})
+			.strict(),
+		z
+			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("loot.dropChance.add"),
+				delta: ProbabilityDeltaSchema,
+			})
+			.strict(),
+		z
+			.object({
+				...itemOperationBaseSchema,
+				kind: z.literal("item.blockCreate"),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+	]);
+};
+
 /** Runtime-only product-line and loot mutator operation. */
-const GameEffectOperationSchema = z.discriminatedUnion("kind", [
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("line.reveal"),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("line.hide"),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("line.blockStart"),
-			reason: z.string().min(1).optional(),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("duration.addMs"),
-			valueMs: SignedIntegerSchema,
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("duration.multiply"),
-			multiplier: z.number().min(0),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("duration.proximityPenalty"),
-			durationFactor: z.number().min(0),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("loot.appendOutput"),
-			output: ActivationOutputSchema.min(1),
-			chance: ProbabilitySchema.optional(),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("loot.replaceOutput"),
-			output: ActivationOutputSchema.min(1),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("loot.addChanceItem"),
-			itemId: IdSchema,
-			chance: ProbabilitySchema,
-			quantity: QuantitySchema.default(1),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectProductLineOperationBaseSchema,
-			kind: z.literal("loot.dropChance.add"),
-			delta: ProbabilityDeltaSchema,
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectItemOperationBaseSchema,
-			kind: z.literal("item.blockCreate"),
-			reason: z.string().min(1).optional(),
-		})
-		.strict(),
-]);
+const GameEffectOperationSchema = createGameEffectOperationSchema({
+	itemTarget: GameEffectItemTargetSchema,
+	productLineTarget: GameEffectProductLineTargetSchema,
+});
+
+/** Source-only effect operation accepted before compile-time selector resolution. */
+const GameEffectAuthoringOperationSchema = createGameEffectOperationSchema({
+	itemTarget: GameEffectItemAuthoringTargetSchema,
+	productLineTarget: GameEffectProductLineAuthoringTargetSchema,
+});
 
 const GameEffectSourceScopeSchema = z.enum([
 	"board",
@@ -418,28 +464,38 @@ const GameEffectSourceScopeSchema = z.enum([
 	"both",
 ]);
 
-const GameEffectCommonDefinitionFieldsSchema = {
-	name: z.string().min(1),
-	operations: z.array(GameEffectOperationSchema).min(1),
-	sourceScope: GameEffectSourceScopeSchema.optional(),
+const createGameEffectDefinitionSchema = (
+	operationSchema: typeof GameEffectOperationSchema | typeof GameEffectAuthoringOperationSchema,
+) => {
+	const commonFields = {
+		name: z.string().min(1),
+		operations: z.array(operationSchema).min(1),
+		sourceScope: GameEffectSourceScopeSchema.optional(),
+	};
+
+	return z.discriminatedUnion("scope", [
+		z
+			.object({
+				...commonFields,
+				scope: z.literal("global"),
+			})
+			.strict(),
+		z
+			.object({
+				...commonFields,
+				scope: z.literal("local"),
+				radius: PositiveIntegerSchema,
+			})
+			.strict(),
+	]);
 };
 
 /** Runtime mutator definition. Effects never mutate GameConfig; they shape runtime views. */
-const GameEffectDefinitionSchema = z.discriminatedUnion("scope", [
-	z
-		.object({
-			...GameEffectCommonDefinitionFieldsSchema,
-			scope: z.literal("global"),
-		})
-		.strict(),
-	z
-		.object({
-			...GameEffectCommonDefinitionFieldsSchema,
-			scope: z.literal("local"),
-			radius: PositiveIntegerSchema,
-		})
-		.strict(),
-]);
+const GameEffectDefinitionSchema = createGameEffectDefinitionSchema(GameEffectOperationSchema);
+
+const GameEffectAuthoringDefinitionSchema = createGameEffectDefinitionSchema(
+	GameEffectAuthoringOperationSchema,
+);
 
 /** Central reusable requirement table entry referenced by producer/product requirementIds. */
 const GameRequirementDefinitionSchema = z.discriminatedUnion("type", [
@@ -662,7 +718,7 @@ const GameConfigFragmentSchema = z
 		items: z.record(IdSchema, ItemDefinitionFragmentSchema).optional(),
 		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
 		requirements: z.record(IdSchema, GameRequirementDefinitionSchema).optional(),
-		effects: z.record(IdSchema, GameEffectDefinitionSchema).optional(),
+		effects: z.record(IdSchema, GameEffectAuthoringDefinitionSchema).optional(),
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
 		craftRecipes: z.record(IdSchema, CraftRecipeFragmentSchema).optional(),
@@ -2085,6 +2141,52 @@ const validateRequirementIds = (
 	}
 };
 
+const validateResolvedDomainSelector = ({
+	ctx,
+	hasEntity,
+	label,
+	path,
+	selector,
+}: {
+	ctx: z.RefinementCtx;
+	hasEntity: (entityId: string) => boolean;
+	label: string;
+	path: GameConfigIssuePath;
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>;
+}) => {
+	const selectorCount = selector.ids ? 1 : 0;
+	if (!selector.all && selectorCount === 0) {
+		addIssue(ctx, path, `Domain selector must define ids or explicit all: true.`);
+	}
+	if (selector.all && selectorCount > 0) {
+		addIssue(ctx, path, `Domain selector all: true must not be combined with ids.`);
+	}
+
+	validateUniqueStringList(
+		ctx,
+		[
+			...path,
+			"ids",
+		],
+		selector.ids ?? [],
+		(value) => `Duplicate ${label} "${value}".`,
+	);
+
+	for (const [index, entityId] of (selector.ids ?? []).entries()) {
+		if (hasEntity(entityId)) continue;
+
+		addIssue(
+			ctx,
+			[
+				...path,
+				"ids",
+				index,
+			],
+			`Missing ${label} "${entityId}".`,
+		);
+	}
+};
+
 const validateGameEffectProductLineTarget = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
@@ -2092,97 +2194,34 @@ const validateGameEffectProductLineTarget = (
 	hasProducer: (producerId: string) => boolean,
 	hasProduct: (productId: string) => boolean,
 ) => {
-	const selectorFieldNames = [
-		"producerIds",
-		"productIds",
-		"producerTagsAny",
-		"producerTagsAll",
-		"productTagsAny",
-		"productTagsAll",
-	] as const;
-	const selectorCount = selectorFieldNames.filter((fieldName) => target[fieldName]).length;
-	if (!target.all && selectorCount === 0) {
-		addIssue(
-			ctx,
-			path,
-			`Effect target must define at least one selector or explicit all: true.`,
-		);
-	}
-	if (target.all && selectorCount > 0) {
-		addIssue(ctx, path, `Effect target all: true must not be combined with selectors.`);
+	if (!target.producers && !target.productLines) {
+		addIssue(ctx, path, `Effect product-line target must define at least one domain selector.`);
 	}
 
-	const targetLists = [
-		[
-			"producerIds",
-			target.producerIds ?? [],
-			(value: string) => `Duplicate producer "${value}".`,
-		] as const,
-		[
-			"productIds",
-			target.productIds ?? [],
-			(value: string) => `Duplicate product "${value}".`,
-		] as const,
-		[
-			"producerTagsAny",
-			target.producerTagsAny ?? [],
-			(value: string) => `Duplicate producer tag "${value}".`,
-		] as const,
-		[
-			"producerTagsAll",
-			target.producerTagsAll ?? [],
-			(value: string) => `Duplicate producer tag "${value}".`,
-		] as const,
-		[
-			"productTagsAny",
-			target.productTagsAny ?? [],
-			(value: string) => `Duplicate product tag "${value}".`,
-		] as const,
-		[
-			"productTagsAll",
-			target.productTagsAll ?? [],
-			(value: string) => `Duplicate product tag "${value}".`,
-		] as const,
-	];
-
-	for (const [field, values, createMessage] of targetLists) {
-		validateUniqueStringList(
+	if (target.producers) {
+		validateResolvedDomainSelector({
 			ctx,
-			[
+			hasEntity: hasProducer,
+			label: "producer",
+			path: [
 				...path,
-				field,
+				"producers",
 			],
-			values,
-			createMessage,
-		);
+			selector: target.producers,
+		});
 	}
 
-	for (const [index, producerId] of (target.producerIds ?? []).entries()) {
-		if (!hasProducer(producerId)) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"producerIds",
-					index,
-				],
-				`Missing producer "${producerId}".`,
-			);
-		}
-	}
-
-	for (const [index, productId] of (target.productIds ?? []).entries()) {
-		if (!hasProduct(productId)) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"productIds",
-					index,
-				],
-				`Missing product "${productId}".`,
-			);
-		}
+	if (target.productLines) {
+		validateResolvedDomainSelector({
+			ctx,
+			hasEntity: hasProduct,
+			label: "product line",
+			path: [
+				...path,
+				"productLines",
+			],
+			selector: target.productLines,
+		});
 	}
 };
 
@@ -2192,66 +2231,16 @@ const validateGameEffectItemTarget = (
 	target: z.infer<typeof GameEffectItemTargetSchema>,
 	hasItem: (itemId: string) => boolean,
 ) => {
-	const selectorFieldNames = [
-		"itemIds",
-		"itemTagsAny",
-		"itemTagsAll",
-	] as const;
-	const selectorCount = selectorFieldNames.filter((fieldName) => target[fieldName]).length;
-	if (!target.all && selectorCount === 0) {
-		addIssue(
-			ctx,
-			path,
-			`Effect target must define at least one selector or explicit all: true.`,
-		);
-	}
-	if (target.all && selectorCount > 0) {
-		addIssue(ctx, path, `Effect target all: true must not be combined with selectors.`);
-	}
-
-	const targetLists = [
-		[
-			"itemIds",
-			target.itemIds ?? [],
-			(value: string) => `Duplicate item "${value}".`,
-		] as const,
-		[
-			"itemTagsAny",
-			target.itemTagsAny ?? [],
-			(value: string) => `Duplicate item tag "${value}".`,
-		] as const,
-		[
-			"itemTagsAll",
-			target.itemTagsAll ?? [],
-			(value: string) => `Duplicate item tag "${value}".`,
-		] as const,
-	];
-
-	for (const [field, values, createMessage] of targetLists) {
-		validateUniqueStringList(
-			ctx,
-			[
-				...path,
-				field,
-			],
-			values,
-			createMessage,
-		);
-	}
-
-	for (const [index, itemId] of (target.itemIds ?? []).entries()) {
-		if (!hasItem(itemId)) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					"itemIds",
-					index,
-				],
-				`Missing item "${itemId}".`,
-			);
-		}
-	}
+	validateResolvedDomainSelector({
+		ctx,
+		hasEntity: hasItem,
+		label: "item",
+		path: [
+			...path,
+			"items",
+		],
+		selector: target.items,
+	});
 };
 
 const validateItemIds = (

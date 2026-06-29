@@ -7,43 +7,28 @@ type ProductLineEffectOperation = Exclude<
 	}
 >;
 
+type ResolvedDomainSelector = NonNullable<ProductLineEffectOperation["target"]["producers"]>;
+
 export namespace doesGameEffectTargetProductLine {
 	export interface Props {
 		producerId: string;
-		producerTags: readonly string[];
-		product: GameConfig["products"][string];
 		productId: string;
 		target: ProductLineEffectOperation["target"];
 	}
 }
 
-const hasAny = (source: ReadonlySet<string>, values: readonly string[] | undefined) =>
-	!values || values.length === 0 || values.some((value) => source.has(value));
-
-const hasAll = (source: ReadonlySet<string>, values: readonly string[] | undefined) =>
-	!values || values.length === 0 || values.every((value) => source.has(value));
-
-const includesId = (values: readonly string[] | undefined, value: string) =>
-	!values || values.length === 0 || values.includes(value);
+const matchesResolvedDomainSelector = (
+	entityId: string,
+	selector: ResolvedDomainSelector | undefined,
+) => {
+	if (!selector || selector.all) return true;
+	return selector.ids?.includes(entityId) ?? false;
+};
 
 export const doesGameEffectTargetProductLine = ({
 	producerId,
-	producerTags,
-	product,
 	productId,
 	target,
-}: doesGameEffectTargetProductLine.Props) => {
-	if (target.all) return true;
-
-	const producerTagSet = new Set(producerTags);
-	const productTagSet = new Set(product.tags);
-
-	return (
-		includesId(target.producerIds, producerId) &&
-		includesId(target.productIds, productId) &&
-		hasAny(producerTagSet, target.producerTagsAny) &&
-		hasAll(producerTagSet, target.producerTagsAll) &&
-		hasAny(productTagSet, target.productTagsAny) &&
-		hasAll(productTagSet, target.productTagsAll)
-	);
-};
+}: doesGameEffectTargetProductLine.Props) =>
+	matchesResolvedDomainSelector(producerId, target.producers) &&
+	matchesResolvedDomainSelector(productId, target.productLines);

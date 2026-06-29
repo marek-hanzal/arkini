@@ -166,9 +166,11 @@ describe("auditGameConfig", () => {
 								durationFactor: 0.5,
 								kind: "duration.proximityPenalty",
 								target: {
-									productIds: [
-										"product:test",
-									],
+									productLines: {
+										ids: [
+											"product:test",
+										],
+									},
 								},
 							},
 						],

@@ -2426,6 +2426,154 @@
 				}
 			],
 			"resultItemId": "producer:library-t4"
+		},
+		"item:blueprint-waste-processor-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"resultItemId": "producer:waste-processor-t1"
+		},
+		"item:blueprint-bio-waste-processor-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"resultItemId": "producer:bio-waste-processor-t1"
+		},
+		"item:blueprint-waste-processor-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:waste-processor-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:coal-mine-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:charcoal-burner-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"resultItemId": "producer:waste-processor-t2"
+		},
+		"item:blueprint-bio-waste-processor-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:bio-waste-processor-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:coal-mine-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:charcoal-burner-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory"
+				}
+			],
+			"resultItemId": "producer:bio-waste-processor-t2"
 		}
 	}
 }

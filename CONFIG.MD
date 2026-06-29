@@ -118,7 +118,7 @@ Output entries support:
 }
 ```
 
-Quantity may be a number or `{ "min": number, "max": number }`.
+Quantity may be a number or `{ "min": number, "max": number }`. Output entries may also define optional `sort` for display ordering when a line has several possible outputs such as trash, pollution, or weighted alternatives. Lower values appear first; omitted values fall back to deterministic item-id ordering.
 
 ## Stashes
 

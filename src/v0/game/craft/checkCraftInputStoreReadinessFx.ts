@@ -6,7 +6,6 @@ import { resolveInputRefsFx } from "~/v0/game/activation/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftInputStore } from "~/v0/game/action/GameActionCraftInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
@@ -20,7 +19,7 @@ export namespace checkCraftInputStoreReadinessFx {
 }
 
 export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreReadinessFx")(
-	function* ({ config, nowMs, save, action }: checkCraftInputStoreReadinessFx.Props) {
+	function* ({ config, save, action }: checkCraftInputStoreReadinessFx.Props) {
 		const target = yield* readCraftBoardItemFx({
 			config,
 			save,
@@ -56,13 +55,6 @@ export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreRe
 				),
 			);
 		}
-
-		yield* checkItemCreateBlockedByEffectsFx({
-			config,
-			itemId: target.recipe.resultItemId,
-			nowMs,
-			save,
-		});
 
 		const inputSlot = target.recipe.inputs.find((input) => input.itemId === resolvedRef.itemId);
 		if (!inputSlot) {

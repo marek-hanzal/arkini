@@ -227,6 +227,100 @@ describe("applyGameActionFx merge", () => {
 		});
 	});
 
+	it("keeps remaining inventory stack grants after consuming one merge source", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:twig-grants-plank-merge": {
+					name: "Twig grants plank merge",
+					operations: [
+						{
+							grantId: "grant:plank-merge",
+							kind: "grant.add",
+							target: {
+								items: {
+									anyOf: [
+										{
+											ids: [
+												"item:plank",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					maxStackSize: 3,
+					passiveEffectIds: [
+						"effect:twig-grants-plank-merge",
+					],
+				},
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					grantSelector: {
+						anyOf: [
+							{
+								ids: [
+									"grant:plank-merge",
+								],
+							},
+						],
+					},
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 2,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				sourceRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "item.merge",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toMatchObject({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:plank",
+		});
+	});
+
 	it("rejects merging into a target with preservable runtime state", () => {
 		const baseConfig = createEngineCraftTableTestConfig({
 			boardItemCount: 2,

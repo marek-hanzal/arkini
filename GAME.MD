@@ -765,7 +765,7 @@ A lumber camp may have `requirementIds: ["requirement:lumber-camp-1-near-tree"]`
 
 Stored requirements use the same owner item-instance storage principles as producer inputs. They are not player inventory and they make the owner item instance stateful while stored.
 
-Negative production pressure is authored through the effect system. A passive item can provide a local `duration.proximityPenalty` effect that targets producer/product lines; it slows production without blocking start. Every active source item applies its own multiplier, multiple sources stack multiplicatively, and closer local sources apply stronger penalties. Example: each Pollution tile carries passive local effects that slow nearby farm/brewery/winery product lines without making those producers invalid.
+Negative production pressure is authored through the effect system. A passive item can provide a local `duration.proximityPenalty` effect that targets producer/product lines; it slows production without blocking start. Every active source item applies its own multiplier, multiple sources stack multiplicatively, and closer local sources apply stronger penalties. Example: each Pollution tile carries passive local product-scoped effects that slow nearby farm, animal, vegetable, brewery, and winery product lines without making those producers invalid.
 
 
 ### 10.8 Producer input storage and auto-fill

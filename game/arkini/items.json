@@ -2644,6 +2644,19 @@
 				"era:I"
 			],
 			"tier": 1
+		},
+		"item:inventory": {
+			"name": "Backpack",
+			"label": "Inventory",
+			"description": "A trusty backpack that opens the shared inventory from the board.",
+			"maxStackSize": 1,
+			"maxCount": 1,
+			"storage": "board",
+			"tags": [
+				"special:inventory",
+				"utility",
+				"ui"
+			]
 		}
 	}
 }

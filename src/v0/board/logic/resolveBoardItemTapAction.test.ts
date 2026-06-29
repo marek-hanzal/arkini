@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { inventoryBoardItemId } from "~/v0/inventory/InventoryBoardItem";
 
 const baseBoardItem = (overrides: Partial<BoardViewItem> = {}): BoardViewItem => ({
 	id: "board:item",

@@ -121,6 +121,98 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
+	it("rejects blueprint producer output when the crafted target is already at maxCount", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+				"item:blueprint-plank": {
+					assetId: "asset:test",
+					description: "Plank blueprint",
+					maxStackSize: 1,
+					storage: "both",
+					name: "Plank Blueprint",
+					tags: [
+						"blueprint",
+					],
+					tier: 0,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:blueprint-plank": {
+					durationMs: 0,
+					inputs: [],
+					requirements: [],
+					resultItemId: "item:plank",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:blueprint-plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:plank",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "board:max-count",
+			},
+		});
+	});
+
 	it("expires zero-duration activated effects in the same action", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

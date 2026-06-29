@@ -30,6 +30,8 @@ import {
 	readGameTimeRemainingMs,
 } from "~/v0/game/time/GameTime";
 import { readActivationInputRequiredQuantity } from "~/v0/game/requirements/readActivationInputRequiredQuantity";
+import { readOutputTargetLimits } from "~/v0/game/limit/readOutputTargetLimits";
+import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
 
 export namespace readRuntimeProducerProductLineViewsFromGameSave {
 	export interface Props {
@@ -248,6 +250,11 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			config,
 			effectiveProductLine,
 		});
+		const targetLimits = readOutputTargetLimits({
+			config,
+			output: product.output,
+			save,
+		});
 
 		return [
 			{
@@ -257,6 +264,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 					(effect) => effect.effectId,
 				),
 				deliveryBlocked,
+				outputLimitBlocked: readTargetLimitBlocked(targetLimits),
 				durationMs,
 				effectDurationMultiplier:
 					effectiveProductLine.durationMs > baseDurationMs && baseDurationMs > 0
@@ -299,6 +307,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				requirementItemIds,
 				requirements: requirementViews,
 				requirementsReady,
+				targetLimits: targetLimits.length ? targetLimits : undefined,
 				startAtMs: activeJob?.startAtMs,
 			},
 		];

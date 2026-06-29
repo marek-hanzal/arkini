@@ -41,6 +41,12 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:library-t2",
+					"quantity": 1,
+					"scope": "board_or_inventory"
 				}
 			]
 		},
@@ -310,6 +316,12 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:library-t4",
+					"quantity": 1,
+					"scope": "board_or_inventory"
 				}
 			]
 		},
@@ -920,6 +932,12 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:library-t4",
+					"quantity": 1,
+					"scope": "board_or_inventory"
 				}
 			]
 		},
@@ -998,6 +1016,12 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:library-t4",
+					"quantity": 1,
+					"scope": "board_or_inventory"
 				}
 			]
 		},
@@ -1307,6 +1331,12 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:library-t4",
+					"quantity": 1,
+					"scope": "board_or_inventory"
 				}
 			]
 		},
@@ -1699,6 +1729,14 @@
 				{
 					"consume": true,
 					"itemId": "item:coin"
+				}
+			],
+			"requirements": [
+				{
+					"type": "passive",
+					"itemId": "producer:library-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory"
 				}
 			]
 		},
@@ -2232,6 +2270,12 @@
 					"quantity": 1,
 					"scope": "board_or_inventory",
 					"type": "passive"
+				},
+				{
+					"type": "passive",
+					"itemId": "producer:library-t3",
+					"quantity": 1,
+					"scope": "board_or_inventory"
 				}
 			]
 		},

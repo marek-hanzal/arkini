@@ -6,6 +6,8 @@ import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/pl
 import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 import { readGameTimeProgress, readGameTimeRemainingMs } from "~/v0/game/time/GameTime";
 import { readCraftRecipeDurationMs } from "~/v0/game/craft/readCraftRecipeDurationMs";
+import { readItemTargetLimits } from "~/v0/game/limit/readItemTargetLimits";
+import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
 
 export namespace readRuntimeCraftViewFromGameSave {
 	export interface Props {
@@ -74,12 +76,22 @@ export const readRuntimeCraftViewFromGameSave = ({
 						: [],
 				)
 			: [];
+	const targetLimits = readItemTargetLimits({
+		config,
+		ignoredBoardItemInstanceIds: new Set([
+			boardItem.id,
+		]),
+		itemId: recipe.resultItemId,
+		save,
+	});
 
 	return {
 		acceptedInputItemIds,
 		canAcceptInputs: acceptedInputItemIds.length > 0,
 		complete: phase === "ready",
 		deliveryBlocked,
+		targetLimitBlocked: readTargetLimitBlocked(targetLimits),
+		targetLimits: targetLimits.length ? targetLimits : undefined,
 		delivered,
 		durationMs,
 		id: recipeId,

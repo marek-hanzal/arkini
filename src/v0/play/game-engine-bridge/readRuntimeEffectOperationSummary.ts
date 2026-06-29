@@ -65,6 +65,15 @@ const formatList = (values: readonly string[]) => {
 
 const formatPercent = (value: number) => `${Math.round(value * 100)}%`;
 
+const formatQuantity = (
+	quantity:
+		| number
+		| {
+				max: number;
+				min: number;
+		  },
+) => (typeof quantity === "number" ? `${quantity}×` : `${quantity.min}-${quantity.max}×`);
+
 const formatSignedPercent = (value: number) => {
 	const prefix = value > 0 ? "+" : "";
 	return `${prefix}${formatPercent(value)}`;
@@ -203,7 +212,7 @@ const readOutputSummary = ({
 					`weighted ${entry.rolls}× from ${formatList(
 						entry.entries.map(
 							(weightedEntry) =>
-								`${weightedEntry.quantity}× ${readItemName({
+								`${formatQuantity(weightedEntry.quantity)} ${readItemName({
 									config,
 									itemId: weightedEntry.itemId,
 								})}`,
@@ -212,7 +221,7 @@ const readOutputSummary = ({
 				];
 			}
 
-			const itemLabel = `${entry.quantity}× ${readItemName({
+			const itemLabel = `${formatQuantity(entry.quantity)} ${readItemName({
 				config,
 				itemId: entry.itemId,
 			})}`;
@@ -278,7 +287,7 @@ export const readRuntimeEffectOperationSummary = ({
 		})} for ${target}.`;
 	}
 	if (operation.kind === "loot.addChanceItem") {
-		return `Adds ${formatPercent(operation.chance)} chance for ${operation.quantity}× ${readItemName(
+		return `Adds ${formatPercent(operation.chance)} chance for ${formatQuantity(operation.quantity)} ${readItemName(
 			{
 				config,
 				itemId: operation.itemId,
@@ -290,6 +299,14 @@ export const readRuntimeEffectOperationSummary = ({
 	}
 	if (operation.kind === "loot.quantity.add") {
 		return `Produces +${operation.value} extra item per output for ${target}.`;
+	}
+	if (operation.kind === "loot.extraOutputChance.add") {
+		return `Adds ${formatPercent(operation.chance)} chance for +${formatQuantity(operation.quantity)} extra output when producing ${readItemTargetSummary(
+			{
+				config,
+				target: operation.outputItems,
+			},
+		)}.`;
 	}
 
 	return `Blocks creating ${target}${operation.reason ? `: ${operation.reason}` : ""}.`;

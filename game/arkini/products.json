@@ -1537,8 +1537,7 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2",
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			]
 		},
 		"product:farm-t1:grain-morale-t1": {
@@ -2381,8 +2380,7 @@
 				}
 			],
 			"tags": [
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			]
 		},
 		"product:market-t1:coin-from-beer": {
@@ -2867,8 +2865,7 @@
 				}
 			],
 			"tags": [
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			]
 		},
 		"product:quarry-t2:marble": {
@@ -2956,8 +2953,7 @@
 				}
 			],
 			"tags": [
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			]
 		},
 		"product:school:basic-knowledge": {
@@ -4792,8 +4788,7 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2",
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			]
 		},
 		"product:weaver-hut-t1:common-cloth": {
@@ -4821,8 +4816,7 @@
 				}
 			],
 			"tags": [
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			]
 		},
 		"product:windmill-t1:flour": {

@@ -5,6 +5,7 @@ import type { AppliedGameEffectOperation } from "~/v0/game/effects/EffectiveProd
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 import { compareGameEffectSourceInstances } from "~/v0/game/effects/compareGameEffectSourceInstances";
 import { doesGameEffectTargetProductLine } from "~/v0/game/effects/doesGameEffectTargetProductLine";
+import { doesResolvedDomainSelectorMatchId } from "~/v0/game/effects/doesResolvedDomainSelectorMatchId";
 import { doesGameEffectSourceApplyToBoardCell } from "~/v0/game/effects/doesGameEffectSourceApplyToBoardCell";
 import { readChebyshevDistance } from "~/v0/game/effects/readChebyshevDistance";
 import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSourceCell";
@@ -69,6 +70,55 @@ const addLootOutputQuantity = <TOutput extends ProducerProductLineOutput>(
 		quantity: addQuantityValue(output.quantity, value),
 	} as TOutput;
 };
+
+const doesOutputItemTargetMatch = ({
+	itemId,
+	target,
+}: {
+	itemId: string;
+	target: Extract<
+		GameConfig["effects"][string]["operations"][number],
+		{
+			kind: "loot.extraOutputChance.add";
+		}
+	>["outputItems"];
+}) =>
+	doesResolvedDomainSelectorMatchId({
+		entityId: itemId,
+		selector: target.items,
+	});
+
+const readExtraOutputChanceItems = ({
+	baseOutput,
+	operation,
+}: {
+	baseOutput: NonNullable<GameConfig["products"][string]["output"]>;
+	operation: Extract<
+		GameConfig["effects"][string]["operations"][number],
+		{
+			kind: "loot.extraOutputChance.add";
+		}
+	>;
+}): EffectiveProducerProductLine["lootPlan"]["chanceItems"] =>
+	baseOutput.flatMap((output) => {
+		if (output.type === "weighted") return [];
+		if (
+			!doesOutputItemTargetMatch({
+				itemId: output.itemId,
+				target: operation.outputItems,
+			})
+		) {
+			return [];
+		}
+
+		return [
+			{
+				chance: operation.chance,
+				itemId: output.itemId,
+				quantity: operation.quantity,
+			},
+		];
+	});
 
 const readEffectSourceAppliesToTarget = ({
 	config,
@@ -210,6 +260,20 @@ export const readEffectiveProducerProductLine = ({
 				continue;
 			}
 
+			const extraOutputChanceItems =
+				operation.kind === "loot.extraOutputChance.add"
+					? readExtraOutputChanceItems({
+							baseOutput,
+							operation,
+						})
+					: [];
+			if (
+				operation.kind === "loot.extraOutputChance.add" &&
+				extraOutputChanceItems.length === 0
+			) {
+				continue;
+			}
+
 			const appliedOperation = createAppliedOperation({
 				effectId: source.effectId,
 				effectName: effect.name,
@@ -321,6 +385,14 @@ export const readEffectiveProducerProductLine = ({
 						baseOutput = baseOutput.map((output) =>
 							addLootOutputQuantity(output, operation.value),
 						);
+					},
+				)
+				.with(
+					{
+						kind: "loot.extraOutputChance.add",
+					},
+					() => {
+						chanceItems.push(...extraOutputChanceItems);
 					},
 				)
 				.exhaustive();

@@ -3718,24 +3718,50 @@
 			"name": "Bountiful Offering",
 			"operations": [
 				{
-					"kind": "loot.quantity.add",
-					"target": {
-						"productLines": {
+					"chance": 0.35,
+					"kind": "loot.extraOutputChance.add",
+					"outputItems": {
+						"items": {
 							"anyOf": [
 								{
 									"ids": [
-										"product:farm-t1:grain",
-										"product:lumberjack-t1:log",
-										"product:quarry-t1:stone",
-										"product:sawmill-t1:plank",
-										"product:vegetable-garden-t1:vegetables",
-										"product:well-t1:water"
+										"item:grain",
+										"item:log",
+										"item:stone",
+										"item:vegetables",
+										"item:water"
 									]
 								}
 							]
 						}
 					},
-					"value": 1
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					}
+				},
+				{
+					"chance": 0.3,
+					"kind": "loot.extraOutputChance.add",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:plank"
+									]
+								}
+							]
+						}
+					},
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					}
 				}
 			],
 			"scope": "global",
@@ -5206,7 +5232,8 @@
 				"material",
 				"food",
 				"grain",
-				"era:II"
+				"era:II",
+				"tier-1-resource"
 			],
 			"tier": 0
 		},
@@ -5424,7 +5451,8 @@
 			"tags": [
 				"material",
 				"wood",
-				"era:I"
+				"era:I",
+				"tier-1-resource"
 			],
 			"tier": 0
 		},
@@ -5661,7 +5689,8 @@
 			"tags": [
 				"material",
 				"wood",
-				"era:I"
+				"era:I",
+				"tier-2-resource"
 			],
 			"tier": 0
 		},
@@ -5825,7 +5854,8 @@
 			"tags": [
 				"material",
 				"stone",
-				"era:I"
+				"era:I",
+				"tier-1-resource"
 			],
 			"tier": 0
 		},
@@ -5909,7 +5939,8 @@
 			"tags": [
 				"food",
 				"vegetable",
-				"era:II"
+				"era:II",
+				"tier-1-resource"
 			],
 			"tier": 0
 		},
@@ -5938,7 +5969,8 @@
 				"material",
 				"food",
 				"water",
-				"era:I"
+				"era:I",
+				"tier-1-resource"
 			],
 			"tier": 0
 		},
@@ -9714,8 +9746,7 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2",
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			],
 			"visibility": "visible"
 		},
@@ -10796,8 +10827,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			],
 			"visibility": "visible"
 		},
@@ -11448,8 +11478,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			],
 			"visibility": "visible"
 		},
@@ -11573,8 +11602,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			],
 			"visibility": "visible"
 		},
@@ -14054,8 +14082,7 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2",
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			],
 			"visibility": "visible"
 		},
@@ -14097,8 +14124,7 @@
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [
-				"shrine:haste-target",
-				"shrine:bounty-target"
+				"shrine:haste-target"
 			],
 			"visibility": "visible"
 		},

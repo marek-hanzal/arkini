@@ -200,13 +200,38 @@
 			"scope": "global",
 			"operations": [
 				{
-					"kind": "loot.quantity.add",
-					"value": 1,
+					"kind": "loot.extraOutputChance.add",
+					"chance": 0.35,
+					"quantity": 1,
 					"target": {
 						"productLines": {
+							"mode": "all"
+						}
+					},
+					"outputItems": {
+						"items": {
 							"anyOf": [
 								{
-									"tag": "shrine:bounty-target"
+									"tag": "tier-1-resource"
+								}
+							]
+						}
+					}
+				},
+				{
+					"kind": "loot.extraOutputChance.add",
+					"chance": 0.3,
+					"quantity": 1,
+					"target": {
+						"productLines": {
+							"mode": "all"
+						}
+					},
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"tag": "tier-2-resource"
 								}
 							]
 						}

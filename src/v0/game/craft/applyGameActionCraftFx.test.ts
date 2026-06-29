@@ -681,6 +681,153 @@ describe("applyGameActionFx Craft", () => {
 		});
 	});
 
+	it("does not let a consumed input effect block its own craft input storage", () => {
+		const baseConfig = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		config.effects["effect:twig-blocks-plank"] = {
+			name: "Twig blocks plank",
+			operations: [
+				{
+					kind: "item.blockCreate",
+					reason: "Twig blocks plank creation.",
+					target: {
+						items: {
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
+							],
+						},
+					},
+				},
+			],
+			scope: "global",
+			sourceScope: "inventory",
+		};
+		config.items["item:twig"] = {
+			...baseConfig.items["item:twig"],
+			passiveEffectIds: [
+				"effect:twig-blocks-plank",
+			],
+		};
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toBeNull();
+		expect(result.save.craftInputs["item-instance:1"]?.items).toEqual({
+			"item:twig": 1,
+		});
+	});
+
+	it("uses the craft target cell when checking result grants during input storage", () => {
+		const baseConfig = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		config.effects["effect:key-grants-nearby-plank"] = {
+			name: "Key grants nearby plank",
+			operations: [
+				{
+					grantId: "grant:nearby-plank",
+					kind: "grant.add",
+					target: {
+						items: {
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
+							],
+						},
+					},
+				},
+			],
+			radius: 1,
+			scope: "local",
+		};
+		config.items["item:key"] = {
+			...baseConfig.items["item:key"],
+			passiveEffectIds: [
+				"effect:key-grants-nearby-plank",
+			],
+		};
+		config.items["item:plank"] = {
+			...baseConfig.items["item:plank"],
+			grantSelector: {
+				anyOf: [
+					{
+						ids: [
+							"grant:nearby-plank",
+						],
+					},
+				],
+			},
+		};
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:key",
+			x: 1,
+			y: 0,
+		};
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.craftInputs["item-instance:1"]?.items).toEqual({
+			"item:twig": 1,
+		});
+	});
+
 	it("does not let consumed input effects block their own craft start", () => {
 		const baseConfig = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,

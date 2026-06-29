@@ -87,8 +87,8 @@
 			],
 			"sourceScope": "both"
 		},
-		"effect:pollution-slows-farms-and-beer": {
-			"name": "Pollution slows nearby farms and brewery production",
+		"effect:pollution-slows-brewery": {
+			"name": "Pollution slows nearby brewery production",
 			"scope": "local",
 			"radius": 2,
 			"operations": [
@@ -97,16 +97,106 @@
 					"durationFactor": 0.5,
 					"target": {
 						"productIds": [
-							"product:cattle-farm-t1:milk",
-							"product:chicken-coop-t1:egg",
+							"product:brewery-t1:beer-barrel",
+							"product:brewery-t1:beer-barrel-from-beer",
+							"product:brewery-t1:hops"
+						]
+					}
+				}
+			]
+		},
+		"effect:pollution-slows-cattle-milk": {
+			"name": "Pollution slows nearby cattle milk production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "duration.proximityPenalty",
+					"durationFactor": 0.5,
+					"target": {
+						"productIds": [
+							"product:cattle-farm-t1:milk"
+						]
+					}
+				}
+			]
+		},
+		"effect:pollution-slows-chicken-eggs": {
+			"name": "Pollution slows nearby chicken egg production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "duration.proximityPenalty",
+					"durationFactor": 0.5,
+					"target": {
+						"productIds": [
+							"product:chicken-coop-t1:egg"
+						]
+					}
+				}
+			]
+		},
+		"effect:pollution-slows-farm-grain": {
+			"name": "Pollution slows nearby farm grain production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "duration.proximityPenalty",
+					"durationFactor": 0.5,
+					"target": {
+						"productIds": [
 							"product:farm-t1:grain",
-							"product:farm-t1:grain-morale-t1",
-							"product:pig-farm-t1:piglet",
-							"product:sheep-pasture-t1:wool",
+							"product:farm-t1:grain-morale-t1"
+						]
+					}
+				}
+			]
+		},
+		"effect:pollution-slows-piglets": {
+			"name": "Pollution slows nearby piglet production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "duration.proximityPenalty",
+					"durationFactor": 0.5,
+					"target": {
+						"productIds": [
+							"product:pig-farm-t1:piglet"
+						]
+					}
+				}
+			]
+		},
+		"effect:pollution-slows-sheep-wool": {
+			"name": "Pollution slows nearby sheep wool production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "duration.proximityPenalty",
+					"durationFactor": 0.5,
+					"target": {
+						"productIds": [
+							"product:sheep-pasture-t1:wool"
+						]
+					}
+				}
+			]
+		},
+		"effect:pollution-slows-vegetables": {
+			"name": "Pollution slows nearby vegetable production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "duration.proximityPenalty",
+					"durationFactor": 0.5,
+					"target": {
+						"productIds": [
 							"product:vegetable-garden-t1:vegetables"
-						],
-						"producerIds": [
-							"producer:brewery-t1"
 						]
 					}
 				}
@@ -121,8 +211,10 @@
 					"kind": "duration.proximityPenalty",
 					"durationFactor": 0.5,
 					"target": {
-						"producerIds": [
-							"producer:winery-t1"
+						"productIds": [
+							"product:winery-t1:grapes",
+							"product:winery-t1:wine-barrel",
+							"product:winery-t1:wine-barrel-from-wine-glasses"
 						]
 					}
 				}

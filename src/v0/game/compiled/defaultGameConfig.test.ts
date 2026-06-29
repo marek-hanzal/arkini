@@ -1,5 +1,8 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 
 const readItemResourceData = (itemId: string) => {
 	const item = defaultGameConfig.items[itemId];
@@ -581,6 +584,86 @@ describe("defaultGameConfig", () => {
 				type: "guaranteed",
 			},
 		]);
+	});
+
+	it("models pollution slowdown as product-scoped passive effects", () => {
+		expect(defaultGameConfig.items["item:pollution"].passiveEffectIds).toEqual([
+			"effect:pollution-slows-cattle-milk",
+			"effect:pollution-slows-chicken-eggs",
+			"effect:pollution-slows-farm-grain",
+			"effect:pollution-slows-piglets",
+			"effect:pollution-slows-sheep-wool",
+			"effect:pollution-slows-vegetables",
+			"effect:pollution-slows-brewery",
+			"effect:pollution-slows-winery",
+		]);
+
+		expect(
+			defaultGameConfig.effects["effect:pollution-slows-farm-grain"].operations[0],
+		).toMatchObject({
+			kind: "duration.proximityPenalty",
+			target: {
+				productIds: [
+					"product:farm-t1:grain",
+					"product:farm-t1:grain-morale-t1",
+				],
+			},
+		});
+	});
+
+	it("slows nearby farm product lines from pollution in the default content", () => {
+		const config = {
+			...defaultGameConfig,
+			game: {
+				...defaultGameConfig.game,
+				board: {
+					height: 5,
+					width: 5,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "producer:farm-t1",
+						x: 2,
+						y: 2,
+					},
+					{
+						itemId: "item:pollution",
+						x: 3,
+						y: 2,
+					},
+					{
+						itemId: "item:wheat-field",
+						x: 1,
+						y: 2,
+					},
+				],
+				inventory: [],
+			},
+		};
+		const save = Effect.runSync(
+			createInitialGameSaveFx({
+				config,
+				nowMs: 0,
+			}),
+		);
+
+		const effectiveLine = readEffectiveProducerProductLine({
+			baseDurationMs: 1000,
+			config,
+			nowMs: 0,
+			producerId: "producer:farm-t1",
+			producerItemId: "producer:farm-t1",
+			producerItemInstanceId: "item-instance:1",
+			product: config.products["product:farm-t1:grain"],
+			productId: "product:farm-t1:grain",
+			save,
+		});
+
+		expect(effectiveLine).toMatchObject({
+			durationMs: 2000,
+		});
 	});
 
 	it("requires complete era ownership before townhall tier progression", () => {

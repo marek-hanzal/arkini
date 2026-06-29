@@ -274,7 +274,7 @@ Era X prestige construction materials
 
 Most first-pass production durations stay in the `5000` to `9000` ms range. Windmill flour takes `6000` ms, bakery bread and slaughterhouse sausage/raw-hide and tannery leather take `8000` ms, dairy cheese takes `7000` ms, cookhouse feast takes `9000` ms, and market trades are intentionally short conversions. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
-Pollution is authored as passive local effects on `item:pollution`, not as producer/product-specific hindrance config. Nearby pollution applies `duration.proximityPenalty`: radius `2` slows the configured farm/brewery lines, radius `3` slows winery lines, multiple pollution tiles stack, and closer tiles hurt more. Tiny ecological disaster, now without a duplicate subsystem. Very touching.
+Pollution is authored as passive local effects on `item:pollution`, not as producer/product-specific hindrance config. Nearby pollution applies separate product-scoped `duration.proximityPenalty` effects: radius `2` slows configured farm/animal/vegetable/brewery product lines, radius `3` slows winery product lines, multiple pollution tiles stack, and closer tiles hurt more. Tiny ecological disaster, now without a duplicate subsystem. Very touching.
 
 Current processor input buffers use capacity `4`:
 

@@ -1497,7 +1497,13 @@
 			],
 			"tier": 7,
 			"passiveEffectIds": [
-				"effect:pollution-slows-farms-and-beer",
+				"effect:pollution-slows-cattle-milk",
+				"effect:pollution-slows-chicken-eggs",
+				"effect:pollution-slows-farm-grain",
+				"effect:pollution-slows-piglets",
+				"effect:pollution-slows-sheep-wool",
+				"effect:pollution-slows-vegetables",
+				"effect:pollution-slows-brewery",
 				"effect:pollution-slows-winery"
 			]
 		},

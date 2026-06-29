@@ -14,11 +14,10 @@ Implementation:
 - Multiple source items stack multiplicatively through the normal effect pipeline.
 
 Config migration:
-- `item:pollution` now has passive effects:
-  - `effect:pollution-slows-farms-and-beer`
-  - `effect:pollution-slows-winery`
-- Farm/beer product slowdown radius stays `2`.
-- Winery slowdown radius stays `3`.
+- `item:pollution` now has passive local slowdown effects.
+- Superseded detail: the original migration briefly grouped farm/beer slowdown into one mixed target effect; that was later split in `2026-06-29-v0-pollution-effect-split-fix.md` because effect target dimensions are conjunctive.
+- Farm/animal/vegetable/brewery product slowdown radius stays `2`.
+- Winery product slowdown radius stays `3`.
 - Old `hinderedBy` entries were removed from products/producers and the compiled config.
 
 Runtime cleanup:

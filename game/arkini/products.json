@@ -976,6 +976,10 @@
 					"itemId": "item:beer-barrel",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
@@ -993,6 +997,10 @@
 					"itemId": "item:beer-barrel",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:brewery-t1:hops": {
@@ -1009,6 +1017,10 @@
 					"itemId": "item:hops",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:brickyard:bricks": {
@@ -1071,6 +1083,10 @@
 					"itemId": "item:milk",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:charcoal-burner-t1:charcoal": {
@@ -1123,6 +1139,10 @@
 					"itemId": "item:egg",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:civic-office-t1:blueprint-academy": {
@@ -1513,6 +1533,10 @@
 					"itemId": "item:grain",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:farm-t1:grain-morale-t1": {
@@ -1536,6 +1560,10 @@
 					"quantity": 2,
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:glassworks:glass": {
@@ -2566,6 +2594,10 @@
 					"itemId": "item:piglet",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:prospector-guild-t1:clay-deposit": {
@@ -2982,6 +3014,10 @@
 					"itemId": "item:wool",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:slaughterhouse-t1:sausage-raw-hide": {
@@ -4738,6 +4774,10 @@
 					"itemId": "item:vegetables",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
 			]
 		},
 		"product:weaver-hut-t1:common-cloth": {
@@ -4795,6 +4835,10 @@
 					"itemId": "item:grapes",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
 			]
 		},
 		"product:winery-t1:wine-barrel": {
@@ -4816,6 +4860,10 @@
 					"itemId": "item:wine-barrel",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
 			]
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
@@ -4833,6 +4881,10 @@
 					"itemId": "item:wine-barrel",
 					"type": "guaranteed"
 				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
 			]
 		},
 		"product:chest-t1:open": {

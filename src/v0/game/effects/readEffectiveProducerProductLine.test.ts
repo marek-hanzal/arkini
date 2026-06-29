@@ -13,34 +13,42 @@ const createSaveWithEffectSource = () => {
 					{
 						kind: "line.reveal",
 						target: {
-							productIds: [
-								"product:shred",
-							],
+							productLines: {
+								ids: [
+									"product:shred",
+								],
+							},
 						},
 					},
 					{
 						kind: "line.hide",
 						target: {
-							productIds: [
-								"product:shred",
-							],
+							productLines: {
+								ids: [
+									"product:shred",
+								],
+							},
 						},
 					},
 					{
 						kind: "line.blockStart",
 						reason: "test block",
 						target: {
-							productIds: [
-								"product:shred",
-							],
+							productLines: {
+								ids: [
+									"product:shred",
+								],
+							},
 						},
 					},
 					{
 						kind: "duration.addMs",
 						target: {
-							productIds: [
-								"product:shred",
-							],
+							productLines: {
+								ids: [
+									"product:shred",
+								],
+							},
 						},
 						valueMs: 500,
 					},
@@ -48,9 +56,11 @@ const createSaveWithEffectSource = () => {
 						kind: "duration.multiply",
 						multiplier: 2,
 						target: {
-							productIds: [
-								"product:shred",
-							],
+							productLines: {
+								ids: [
+									"product:shred",
+								],
+							},
 						},
 					},
 					{
@@ -64,9 +74,11 @@ const createSaveWithEffectSource = () => {
 							},
 						],
 						target: {
-							productIds: [
-								"product:shred",
-							],
+							productLines: {
+								ids: [
+									"product:shred",
+								],
+							},
 						},
 					},
 					{
@@ -75,18 +87,22 @@ const createSaveWithEffectSource = () => {
 						itemId: "item:key",
 						quantity: 2,
 						target: {
-							productIds: [
-								"product:shred",
-							],
+							productLines: {
+								ids: [
+									"product:shred",
+								],
+							},
 						},
 					},
 					{
 						delta: -0.4,
 						kind: "loot.dropChance.add",
 						target: {
-							productIds: [
-								"product:shred",
-							],
+							productLines: {
+								ids: [
+									"product:shred",
+								],
+							},
 						},
 					},
 				],
@@ -184,9 +200,11 @@ describe("readEffectiveProducerProductLine", () => {
 							kind: "duration.multiply",
 							multiplier: 0,
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -249,7 +267,9 @@ describe("readEffectiveProducerProductLine", () => {
 						{
 							kind: "line.reveal",
 							target: {
-								all: true,
+								productLines: {
+									all: true,
+								},
 							},
 						},
 					],
@@ -312,9 +332,11 @@ describe("readEffectiveProducerProductLine", () => {
 						{
 							kind: "line.reveal",
 							target: {
-								productIds: [
-									"product:shred",
-								],
+								productLines: {
+									ids: [
+										"product:shred",
+									],
+								},
 							},
 						},
 					],
@@ -375,9 +397,11 @@ describe("readEffectiveProducerProductLine", () => {
 						{
 							kind: "line.reveal",
 							target: {
-								productIds: [
-									"product:shred",
-								],
+								productLines: {
+									ids: [
+										"product:shred",
+									],
+								},
 							},
 						},
 					],
@@ -462,9 +486,11 @@ describe("readEffectiveProducerProductLine", () => {
 								},
 							],
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -484,9 +510,11 @@ describe("readEffectiveProducerProductLine", () => {
 								},
 							],
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -604,9 +632,11 @@ describe("readEffectiveProducerProductLine", () => {
 								},
 							],
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -626,9 +656,11 @@ describe("readEffectiveProducerProductLine", () => {
 								},
 							],
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],

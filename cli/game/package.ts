@@ -200,6 +200,7 @@ const normalizePackage = (value: unknown): unknown => {
 	const normalizedCraftRecipes: Record<string, unknown> = {};
 	const products = asRecord(packageValue.products);
 	const normalizedProducts: Record<string, unknown> = {};
+	const effects = asRecord(packageValue.effects);
 
 	for (const [itemId, itemEntry] of Object.entries(items)) {
 		if (!itemEntry || typeof itemEntry !== "object" || Array.isArray(itemEntry)) {
@@ -250,10 +251,18 @@ const normalizePackage = (value: unknown): unknown => {
 		normalizedProducts[productId] = product;
 	}
 
+	const normalizedEffects = normalizeEffectDefinitions({
+		effects,
+		items: normalizedItems,
+		producers: asRecord(packageValue.producers),
+		products: normalizedProducts,
+	});
+
 	return {
 		...packageValue,
 		assets,
 		craftRecipes: normalizedCraftRecipes,
+		effects: normalizedEffects,
 		items: normalizedItems,
 		products: normalizedProducts,
 	};
@@ -282,6 +291,249 @@ const asRecord = (value: unknown): Record<string, unknown> =>
 	value && typeof value === "object" && !Array.isArray(value)
 		? (value as Record<string, unknown>)
 		: {};
+
+type AuthoringDomainSelector = {
+	all?: true;
+	ids?: string[];
+	anyTags?: string[];
+	allTags?: string[];
+	noneTags?: string[];
+};
+
+type DomainIndex = {
+	ids: readonly string[];
+	label: string;
+	tagsById: ReadonlyMap<string, ReadonlySet<string>>;
+};
+
+const normalizeEffectDefinitions = ({
+	effects,
+	items,
+	producers,
+	products,
+}: {
+	effects: Readonly<Record<string, unknown>>;
+	items: Readonly<Record<string, unknown>>;
+	producers: Readonly<Record<string, unknown>>;
+	products: Readonly<Record<string, unknown>>;
+}) => {
+	const domainIndexes = {
+		items: createTaggedDomainIndex({
+			entries: items,
+			ids: Object.keys(items),
+			label: "item",
+		}),
+		producers: createTaggedDomainIndex({
+			entries: items,
+			ids: Object.keys(producers),
+			label: "producer",
+		}),
+		productLines: createTaggedDomainIndex({
+			entries: products,
+			ids: Object.keys(products),
+			label: "product line",
+		}),
+	};
+	const normalizedEffects: Record<string, unknown> = {};
+
+	for (const [effectId, effectEntry] of Object.entries(effects)) {
+		if (!effectEntry || typeof effectEntry !== "object" || Array.isArray(effectEntry)) {
+			normalizedEffects[effectId] = effectEntry;
+			continue;
+		}
+
+		const effect = {
+			...(effectEntry as Record<string, unknown>),
+		};
+		const operations = Array.isArray(effect.operations) ? effect.operations : [];
+		effect.operations = operations.map((operationEntry, operationIndex) => {
+			if (
+				!operationEntry ||
+				typeof operationEntry !== "object" ||
+				Array.isArray(operationEntry)
+			) {
+				return operationEntry;
+			}
+
+			const operation = {
+				...(operationEntry as Record<string, unknown>),
+			};
+			const path = `effects.${effectId}.operations.${operationIndex}.target`;
+			operation.target = normalizeEffectOperationTarget({
+				domainIndexes,
+				kind: operation.kind,
+				path,
+				target: asRecord(operation.target),
+			});
+
+			return operation;
+		});
+		normalizedEffects[effectId] = effect;
+	}
+
+	return normalizedEffects;
+};
+
+const normalizeEffectOperationTarget = ({
+	domainIndexes,
+	kind,
+	path,
+	target,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+		producers: DomainIndex;
+		productLines: DomainIndex;
+	};
+	kind: unknown;
+	path: string;
+	target: Readonly<Record<string, unknown>>;
+}) => {
+	if (kind === "item.blockCreate") {
+		return {
+			items: normalizeAuthoringDomainSelector({
+				domain: domainIndexes.items,
+				path: `${path}.items`,
+				selector: asAuthoringDomainSelector(target.items),
+			}),
+		};
+	}
+
+	const normalizedTarget: Record<string, unknown> = {};
+	if (target.producers !== undefined) {
+		normalizedTarget.producers = normalizeAuthoringDomainSelector({
+			domain: domainIndexes.producers,
+			path: `${path}.producers`,
+			selector: asAuthoringDomainSelector(target.producers),
+		});
+	}
+	if (target.productLines !== undefined) {
+		normalizedTarget.productLines = normalizeAuthoringDomainSelector({
+			domain: domainIndexes.productLines,
+			path: `${path}.productLines`,
+			selector: asAuthoringDomainSelector(target.productLines),
+		});
+	}
+
+	return normalizedTarget;
+};
+
+const asAuthoringDomainSelector = (value: unknown): AuthoringDomainSelector =>
+	asRecord(value) as AuthoringDomainSelector;
+
+const createTaggedDomainIndex = ({
+	entries,
+	ids,
+	label,
+}: {
+	entries: Readonly<Record<string, unknown>>;
+	ids: readonly string[];
+	label: string;
+}): DomainIndex => ({
+	ids,
+	label,
+	tagsById: new Map(
+		ids.map((id) => [
+			id,
+			new Set(readDefinitionTags(entries[id])),
+		]),
+	),
+});
+
+const readDefinitionTags = (entry: unknown) => {
+	if (!entry || typeof entry !== "object" || Array.isArray(entry)) return [];
+	const tags = (entry as Record<string, unknown>).tags;
+	if (!Array.isArray(tags)) return [];
+	return tags.filter((tag): tag is string => typeof tag === "string");
+};
+
+const normalizeAuthoringDomainSelector = ({
+	domain,
+	path,
+	selector,
+}: {
+	domain: DomainIndex;
+	path: string;
+	selector: AuthoringDomainSelector;
+}) => {
+	const ids = selector.ids ?? [];
+	const anyTags = selector.anyTags ?? [];
+	const allTags = selector.allTags ?? [];
+	const noneTags = selector.noneTags ?? [];
+	const hasAnySelector =
+		ids.length > 0 || anyTags.length > 0 || allTags.length > 0 || noneTags.length > 0;
+
+	if (selector.all && hasAnySelector) {
+		throw new Error(`${path}: all: true must not be combined with ids or tags.`);
+	}
+	if (selector.all)
+		return {
+			all: true,
+		};
+	if (!hasAnySelector) {
+		throw new Error(`${path}: selector must define ids, tags, or all: true.`);
+	}
+
+	validateUniqueValues(ids, `${path}.ids`, (value) => `Duplicate ${domain.label} "${value}".`);
+	validateUniqueValues(anyTags, `${path}.anyTags`, (value) => `Duplicate tag "${value}".`);
+	validateUniqueValues(allTags, `${path}.allTags`, (value) => `Duplicate tag "${value}".`);
+	validateUniqueValues(noneTags, `${path}.noneTags`, (value) => `Duplicate tag "${value}".`);
+	validateKnownTags(domain, anyTags, `${path}.anyTags`);
+	validateKnownTags(domain, allTags, `${path}.allTags`);
+	validateKnownTags(domain, noneTags, `${path}.noneTags`);
+
+	const domainIdSet = new Set(domain.ids);
+	for (const [index, id] of ids.entries()) {
+		if (domainIdSet.has(id)) continue;
+		throw new Error(`${path}.ids.${index}: Missing ${domain.label} "${id}".`);
+	}
+
+	const candidates = ids.length > 0 ? ids : domain.ids;
+	const resolvedIds = candidates.filter((id) => {
+		const tags = domain.tagsById.get(id) ?? new Set<string>();
+		if (anyTags.length > 0 && !anyTags.some((tag) => tags.has(tag))) return false;
+		if (allTags.length > 0 && !allTags.every((tag) => tags.has(tag))) return false;
+		if (noneTags.length > 0 && noneTags.some((tag) => tags.has(tag))) return false;
+		return true;
+	});
+
+	if (resolvedIds.length === 0) {
+		throw new Error(`${path}: selector matched no ${domain.label}s.`);
+	}
+
+	return {
+		ids: resolvedIds,
+	};
+};
+
+const validateKnownTags = (domain: DomainIndex, tags: readonly string[], path: string) => {
+	for (const [index, tag] of tags.entries()) {
+		if (doesDomainContainTag(domain, tag)) continue;
+		throw new Error(`${path}.${index}: Unknown ${domain.label} tag "${tag}".`);
+	}
+};
+
+const doesDomainContainTag = (domain: DomainIndex, tag: string) => {
+	for (const tags of domain.tagsById.values()) {
+		if (tags.has(tag)) return true;
+	}
+	return false;
+};
+
+const validateUniqueValues = (
+	values: readonly string[],
+	path: string,
+	createMessage: (value: string) => string,
+) => {
+	const seen = new Set<string>();
+	for (const [index, value] of values.entries()) {
+		if (!seen.has(value)) {
+			seen.add(value);
+			continue;
+		}
+		throw new Error(`${path}.${index}: ${createMessage(value)}`);
+	}
+};
 
 const readProductNameFromPrimaryOutput = (
 	product: Readonly<Record<string, unknown>>,

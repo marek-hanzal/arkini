@@ -143,6 +143,20 @@ const collectRequirementUsage = (config: GameConfig, itemFlow: ItemFlowIndex) =>
 	}
 };
 
+const readResolvedSelectorIds = (
+	selector:
+		| {
+				all?: true;
+				ids?: readonly string[];
+		  }
+		| undefined,
+	collection: Readonly<Record<string, unknown>>,
+) => {
+	if (!selector) return [];
+	if (selector.all) return Object.keys(collection);
+	return selector.ids ?? [];
+};
+
 const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const item of Object.values(config.items)) {
 		for (const effectId of item.passiveEffectIds ?? []) {
@@ -168,17 +182,26 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Ite
 			}
 
 			if (operation.kind === "item.blockCreate") {
-				for (const itemId of operation.target.itemIds ?? []) {
+				for (const itemId of readResolvedSelectorIds(
+					operation.target.items,
+					config.items,
+				)) {
 					usage.items.add(itemId);
 					itemFlow.consumedItemIds.add(itemId);
 				}
 				continue;
 			}
 
-			for (const producerId of operation.target.producerIds ?? []) {
+			for (const producerId of readResolvedSelectorIds(
+				operation.target.producers,
+				config.producers,
+			)) {
 				usage.producers.add(producerId);
 			}
-			for (const productId of operation.target.productIds ?? []) {
+			for (const productId of readResolvedSelectorIds(
+				operation.target.productLines,
+				config.products,
+			)) {
 				usage.products.add(productId);
 			}
 		}

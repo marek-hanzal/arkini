@@ -131,7 +131,9 @@ describe("applyGameActionFx Producer", () => {
 						{
 							kind: "line.reveal",
 							target: {
-								all: true,
+								productLines: {
+									all: true,
+								},
 							},
 						},
 					],
@@ -242,9 +244,11 @@ describe("applyGameActionFx Producer", () => {
 								},
 							],
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -332,9 +336,11 @@ describe("applyGameActionFx Producer", () => {
 								},
 							],
 							target: {
-								productIds: [
-									"product:shred",
-								],
+								productLines: {
+									ids: [
+										"product:shred",
+									],
+								},
 							},
 						},
 					],
@@ -408,9 +414,11 @@ describe("applyGameActionFx Producer", () => {
 						{
 							kind: "line.blockStart",
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -479,9 +487,11 @@ describe("applyGameActionFx Producer", () => {
 						{
 							kind: "line.blockStart",
 							target: {
-								productIds: [
-									"product:shred",
-								],
+								productLines: {
+									ids: [
+										"product:shred",
+									],
+								},
 							},
 						},
 					],
@@ -608,9 +618,11 @@ describe("applyGameActionFx Producer", () => {
 								},
 							],
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -679,9 +691,11 @@ describe("applyGameActionFx Producer", () => {
 						{
 							kind: "line.hide",
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -751,9 +765,11 @@ describe("applyGameActionFx Producer", () => {
 							kind: "duration.multiply",
 							multiplier: 0.5,
 							target: {
-								productIds: [
-									"product:shred",
-								],
+								productLines: {
+									ids: [
+										"product:shred",
+									],
+								},
 							},
 						},
 					],
@@ -1388,9 +1404,11 @@ describe("applyGameActionFx Producer", () => {
 						{
 							kind: "line.blockStart",
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -1515,9 +1533,11 @@ describe("applyGameActionFx Producer", () => {
 						{
 							kind: "line.blockStart",
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -1768,9 +1788,11 @@ describe("applyGameActionFx Producer", () => {
 						{
 							kind: "line.blockStart",
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -2041,9 +2063,11 @@ describe("applyGameActionFx Producer", () => {
 							kind: "duration.multiply",
 							multiplier: 0.5,
 							target: {
-								productIds: [
-									"product:shred",
-								],
+								productLines: {
+									ids: [
+										"product:shred",
+									],
+								},
 							},
 						},
 					],
@@ -2180,9 +2204,11 @@ describe("applyGameActionFx Producer", () => {
 							kind: "duration.multiply",
 							multiplier: 0.5,
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -2414,9 +2440,11 @@ describe("applyGameActionFx Producer", () => {
 							durationFactor: 0.5,
 							kind: "duration.proximityPenalty",
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -2497,9 +2525,11 @@ describe("applyGameActionFx Producer", () => {
 							kind: "duration.multiply",
 							multiplier: 2,
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],
@@ -2513,9 +2543,11 @@ describe("applyGameActionFx Producer", () => {
 							kind: "duration.multiply",
 							multiplier: 1.5,
 							target: {
-								productIds: [
-									"product:test",
-								],
+								productLines: {
+									ids: [
+										"product:test",
+									],
+								},
 							},
 						},
 					],

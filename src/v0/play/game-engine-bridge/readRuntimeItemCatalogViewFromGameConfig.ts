@@ -21,37 +21,48 @@ const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameCon
 	return resourceDataSrc(config.resources[asset.resourceId]?.data) ?? fallbackAssetSrc;
 };
 
+const readResolvedSelectorSummary = (
+	label: string,
+	selector:
+		| {
+				all?: true;
+				ids?: readonly string[];
+		  }
+		| undefined,
+	formatId: (id: string) => string = (id) => id,
+) => {
+	if (!selector) return undefined;
+	if (selector.all) return `${label}: all`;
+	if (selector.ids?.length) return `${label}: ${selector.ids.map(formatId).join(", ")}`;
+	return `${label}: targeted`;
+};
+
 const readEffectTargetSummary = (
 	target: GameConfig["effects"][string]["operations"][number]["target"],
 ) => {
-	if ("all" in target && target.all) return "all targets";
 	const parts = [];
-	if ("producerIds" in target && target.producerIds?.length) {
-		parts.push(`producers ${target.producerIds.join(", ")}`);
+	if ("items" in target) {
+		const itemSummary = readResolvedSelectorSummary(
+			"items",
+			target.items,
+			configItemNameFallback,
+		);
+		if (itemSummary) parts.push(itemSummary);
 	}
-	if ("productIds" in target && target.productIds?.length) {
-		parts.push(`products ${target.productIds.join(", ")}`);
+	if ("producers" in target) {
+		const producerSummary = readResolvedSelectorSummary(
+			"producers",
+			target.producers,
+			configItemNameFallback,
+		);
+		if (producerSummary) parts.push(producerSummary);
 	}
-	if ("producerTagsAny" in target && target.producerTagsAny?.length) {
-		parts.push(`producer tag any ${target.producerTagsAny.join(", ")}`);
-	}
-	if ("producerTagsAll" in target && target.producerTagsAll?.length) {
-		parts.push(`producer tags ${target.producerTagsAll.join(", ")}`);
-	}
-	if ("productTagsAny" in target && target.productTagsAny?.length) {
-		parts.push(`product tag any ${target.productTagsAny.join(", ")}`);
-	}
-	if ("productTagsAll" in target && target.productTagsAll?.length) {
-		parts.push(`product tags ${target.productTagsAll.join(", ")}`);
-	}
-	if ("itemIds" in target && target.itemIds?.length) {
-		parts.push(`items ${target.itemIds.map((id) => configItemNameFallback(id)).join(", ")}`);
-	}
-	if ("itemTagsAny" in target && target.itemTagsAny?.length) {
-		parts.push(`item tag any ${target.itemTagsAny.join(", ")}`);
-	}
-	if ("itemTagsAll" in target && target.itemTagsAll?.length) {
-		parts.push(`item tags ${target.itemTagsAll.join(", ")}`);
+	if ("productLines" in target) {
+		const productLineSummary = readResolvedSelectorSummary(
+			"product lines",
+			target.productLines,
+		);
+		if (productLineSummary) parts.push(productLineSummary);
 	}
 	return parts.join(" · ") || "targeted";
 };

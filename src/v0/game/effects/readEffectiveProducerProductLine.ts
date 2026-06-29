@@ -111,7 +111,6 @@ export const readEffectiveProducerProductLine = ({
 	productId,
 	save,
 }: readEffectiveProducerProductLine.Props): EffectiveProducerProductLine => {
-	const producerTags = config.items[producerItemId]?.tags ?? [];
 	let revealed = product.visibility !== "hidden";
 	let hidden = false;
 	let blocked = false;
@@ -162,8 +161,6 @@ export const readEffectiveProducerProductLine = ({
 			if (
 				!doesGameEffectTargetProductLine({
 					producerId,
-					producerTags,
-					product,
 					productId,
 					target: operation.target,
 				})

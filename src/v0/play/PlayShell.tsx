@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { type FC, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { BoardSurface } from "~/v0/board/BoardSurface";
 import { CheatInventorySheet } from "~/v0/debug/CheatInventorySheet";
 import { NukeSaveSheet } from "~/v0/debug/NukeSaveSheet";
@@ -13,58 +13,13 @@ import { useFeedbackFlags } from "~/v0/play/feedback/useFeedbackFlags";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
 import { GameRuntimeProvider, useGameRuntimeStore } from "~/v0/play/runtime";
 
-export namespace PlayShell {
-	export interface Props {}
-}
-
-const SheetFallback: FC = () => (
-	<div className="p-4 text-sm text-ak-text-muted">Loading sheet…</div>
-);
-
 const PlayShellContent: FC = () => {
 	const runtimeStore = useGameRuntimeStore();
 	const feedbackFlags = useFeedbackFlags();
-	const playAreaRef = useRef<HTMLDivElement | null>(null);
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
 	const closeSheet = useCallback(() => setActiveSheet(undefined), []);
-	const openItem = useCallback(
-		(boardItemId: string) =>
-			setActiveSheet({
-				type: "item",
-				boardItemId,
-			}),
-		[],
-	);
-	const openInventory = useCallback(
-		() =>
-			setActiveSheet({
-				type: "inventory",
-			}),
-		[],
-	);
-	const openCheatInventory = useCallback(
-		() =>
-			setActiveSheet({
-				type: "cheat-inventory",
-			}),
-		[],
-	);
-	const openNukeSave = useCallback(
-		() =>
-			setActiveSheet({
-				type: "nuke-save",
-			}),
-		[],
-	);
-	const openInventoryPlacementTarget = useCallback(
-		(placementTarget: { x: number; y: number }) =>
-			setActiveSheet({
-				type: "inventory",
-				placementTarget,
-			}),
-		[],
-	);
+	const openSheet = useCallback((sheet: ActiveSheetState) => setActiveSheet(sheet), []);
 	const feedback = useMemo<Feedback.Type>(
 		() => ({
 			pulseMergeCell() {
@@ -88,6 +43,7 @@ const PlayShellContent: FC = () => {
 			feedbackFlags.pulse,
 		],
 	);
+
 	useEffect(() => {
 		registerDebugBugReport({
 			getContext: () => {
@@ -153,60 +109,37 @@ const PlayShellContent: FC = () => {
 		: null;
 
 	return (
-		<div
-			ref={playAreaRef}
-			data-ui="app root"
-			className="relative h-dvh w-dvw overflow-hidden"
-		>
-			<div
-				data-ui="game screen"
-				className="relative h-full w-full overflow-hidden bg-ak-page"
-			>
-				<main
-					data-ui="play layout"
-					className="flex h-full w-full min-h-0 flex-col overflow-hidden"
-				>
-					<div
-						data-ui="game board area"
-						className="min-h-0 flex-1 overflow-hidden"
-					>
-						<BoardSurface
-							feedback={feedback}
-							feedbackFlags={feedbackFlags.flags}
-							onOpenCheatInventory={openCheatInventory}
-							onOpenInventory={openInventory}
-							onOpenInventoryPlacementTarget={openInventoryPlacementTarget}
-							onOpenItem={openItem}
-							onOpenNukeSave={openNukeSave}
-							disabled={Boolean(activeSheet)}
-						/>
-					</div>
-				</main>
+		<div className="relative h-dvh w-dvw overflow-hidden bg-ak-page">
+			<BoardSurface
+				feedback={feedback}
+				feedbackFlags={feedbackFlags.flags}
+				onOpenSheet={openSheet}
+				disabled={Boolean(activeSheet)}
+			/>
 
-				{lastError && feedbackFlags.has("toast:error") ? (
-					<div
-						data-ui="error toast"
-						className="pointer-events-none absolute inset-x-3 bottom-3 mx-auto max-w-[430px] rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-semibold text-rose-100"
-						style={{
-							zIndex: "var(--ak-layer-toast)",
-						}}
-					>
-						{lastError}
-					</div>
-				) : null}
-			</div>
+			{lastError && feedbackFlags.has("toast:error") ? (
+				<div
+					data-ui="error toast"
+					className="pointer-events-none absolute inset-x-3 bottom-3 mx-auto max-w-[430px] rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-semibold text-rose-100"
+					style={{
+						zIndex: "var(--ak-layer-toast)",
+					}}
+				>
+					{lastError}
+				</div>
+			) : null}
 
 			<BottomSheet
 				open={Boolean(activeSheet)}
 				onClose={closeSheet}
 			>
-				<Suspense fallback={<SheetFallback />}>{sheetContent}</Suspense>
+				{sheetContent}
 			</BottomSheet>
 		</div>
 	);
 };
 
-export const PlayShell: FC<PlayShell.Props> = () => (
+export const PlayShell: FC = () => (
 	<GameRuntimeProvider>
 		<PlayShellContent />
 	</GameRuntimeProvider>

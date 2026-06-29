@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import { cheatBoardItemId } from "~/v0/inventory/CheatBoardItem";
-import { inventoryBoardItemId } from "~/v0/inventory/InventoryBoardItem";
-import { nukeSaveBoardItemId } from "~/v0/inventory/NukeSaveBoardItem";
+import {
+	cheatBoardItemId,
+	inventoryBoardItemId,
+	nukeSaveBoardItemId,
+} from "~/v0/board/BoardUtilityItem";
 
 const baseBoardItem = (overrides: Partial<BoardViewItem> = {}): BoardViewItem => ({
 	id: "board:item",
@@ -81,8 +83,10 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-inventory",
+			sheet: {
+				type: "inventory",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -95,8 +99,10 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-cheat-inventory",
+			sheet: {
+				type: "cheat-inventory",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -109,8 +115,10 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-nuke-save",
+			sheet: {
+				type: "nuke-save",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -220,8 +228,11 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-detail",
+			sheet: {
+				boardItemId: "board:item",
+				type: "item",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -241,8 +252,11 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-detail",
+			sheet: {
+				boardItemId: "board:item",
+				type: "item",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -321,8 +335,11 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-detail",
+			sheet: {
+				boardItemId: "board:item",
+				type: "item",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -408,8 +425,11 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-detail",
+			sheet: {
+				boardItemId: "board:item",
+				type: "item",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -433,8 +453,11 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-detail",
+			sheet: {
+				boardItemId: "board:item",
+				type: "item",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -454,8 +477,11 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 1500,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-detail",
+			sheet: {
+				boardItemId: "board:item",
+				type: "item",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -466,8 +492,11 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-detail",
+			sheet: {
+				boardItemId: "board:item",
+				type: "item",
+			},
+			type: "open-sheet",
 		});
 	});
 
@@ -492,8 +521,11 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			boardItemId: "board:item",
-			type: "open-detail",
+			sheet: {
+				boardItemId: "board:item",
+				type: "item",
+			},
+			type: "open-sheet",
 		});
 	});
 });

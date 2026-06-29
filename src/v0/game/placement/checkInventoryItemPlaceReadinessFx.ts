@@ -6,6 +6,8 @@ import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxC
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
+import { readGameEffectItemCreateMissingGrant } from "~/v0/game/effects/readGameEffectItemCreateMissingGrant";
+import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
 import {
 	isGameSaveInventoryInstance,
@@ -65,6 +67,43 @@ const readBoardPlacementBlockReason = ({
 	}) <= 0
 		? "board:max-count"
 		: "board:full";
+
+const readBoardEffectPlacementBlockReasonFx = Effect.fn(
+	"checkInventoryItemPlaceReadinessFx.readBoardEffectPlacementBlockReasonFx",
+)(function* ({
+	config,
+	itemId,
+	nowMs,
+	save,
+	seedCell,
+}: {
+	config: GameConfig;
+	itemId: string;
+	nowMs?: number;
+	save: GameSave;
+	seedCell: {
+		x: number;
+		y: number;
+	};
+}) {
+	const emptyCells = yield* planEmptyBoardCellsFx({
+		config,
+		save,
+		seedCell,
+	});
+
+	return emptyCells.some((targetCell) =>
+		readGameEffectItemCreateMissingGrant({
+			config,
+			itemId,
+			nowMs,
+			save,
+			targetCell,
+		}),
+	)
+		? "effect:missing-grant"
+		: "effect:block-create";
+});
 
 const readInventoryStackCapacity = ({
 	itemId,
@@ -277,7 +316,16 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			if (!targetCell) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
-						"effect:block-create",
+						yield* readBoardEffectPlacementBlockReasonFx({
+							config,
+							itemId: liveSlot.itemId,
+							nowMs,
+							save: saveAfterInventoryRemoval,
+							seedCell: {
+								x: action.x,
+								y: action.y,
+							},
+						}),
 						"No board placement target is allowed by active effects.",
 					),
 				);
@@ -323,7 +371,16 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 							save,
 						})
 					: allowedBoardCapacity === 0
-						? "effect:block-create"
+						? yield* readBoardEffectPlacementBlockReasonFx({
+								config,
+								itemId: liveSlot.itemId,
+								nowMs,
+								save: saveAfterInventoryRemoval,
+								seedCell: {
+									x: action.x,
+									y: action.y,
+								},
+							})
 						: "inventory:full";
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(reason, "No placement target available."),

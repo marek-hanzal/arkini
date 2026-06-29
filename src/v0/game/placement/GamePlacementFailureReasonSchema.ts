@@ -6,6 +6,7 @@ export const GamePlacementFailureReasonSchema = z.enum([
 	"inventory:full",
 	"placement-failed:unknown",
 	"storage:inventory-forbidden",
+	"effect:missing-grant",
 	"effect:block-create",
 ]);
 

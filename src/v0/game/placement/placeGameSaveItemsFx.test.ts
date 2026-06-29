@@ -519,6 +519,83 @@ describe("placeGameSaveItemsFx", () => {
 		});
 	});
 
+	it("rejects inventory fallback when an item creation grant is missing", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 1,
+				},
+				title: "Test",
+			},
+		});
+		config.effects["effect:grant-plank"] = {
+			name: "Grant plank",
+			operations: [
+				{
+					grantId: "grant:plank",
+					kind: "grant.add",
+					target: {
+						items: {
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
+							],
+						},
+					},
+				},
+			],
+			scope: "global",
+		};
+		config.items["item:plank"] = {
+			...config.items["item:plank"],
+			grantSelector: {
+				allOf: [
+					{
+						ids: [
+							"grant:plank",
+						],
+					},
+				],
+			},
+		};
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runPlacementEither({
+			config,
+			items: [
+				{
+					itemId: "item:plank",
+					quantity: 1,
+					reason: "debug",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GamePlacementFailed",
+				reason: "effect:missing-grant",
+			},
+		});
+		expect(save.inventory.slots).toEqual([
+			null,
+		]);
+	});
+
 	it("keeps placement atomic when board and inventory cannot fit the whole output", () => {
 		const config = createEngineTestConfig({
 			game: {

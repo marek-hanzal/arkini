@@ -51,6 +51,65 @@ describe("applyGameActionFx Craft", () => {
 		}
 	});
 
+	it("rejects craft start when the result item board maxCount is reached", () => {
+		const baseConfig = createEngineCraftTableTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+			},
+			craftRecipes: baseConfig.craftRecipes,
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:plank",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "board:max-count",
+			});
+		}
+	});
+
 	it("stores craft inputs gradually and starts only after required inputs are complete", () => {
 		const config = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,

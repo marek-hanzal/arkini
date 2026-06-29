@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ActivationInputViewSchema } from "~/v0/board/view/ActivationInputViewSchema";
 import { ActivationRequirementViewSchema } from "~/v0/board/view/ActivationRequirementViewSchema";
+import { ItemTargetLimitViewSchema } from "~/v0/board/view/ItemTargetLimitViewSchema";
 
 const IdSchema = z.string().min(1);
 
@@ -27,6 +28,7 @@ export const ProducerProductLineViewSchema = z.object({
 	effectLocked: z.boolean().optional(),
 	blockReasonEffectIds: z.array(IdSchema),
 	deliveryBlocked: z.boolean().optional(),
+	outputLimitBlocked: z.boolean().optional(),
 	queueBlockedReason: z
 		.enum([
 			"delivery_blocked",
@@ -51,6 +53,7 @@ export const ProducerProductLineViewSchema = z.object({
 	effectDurationMultiplier: z.number().min(1).optional(),
 	effectBenefits: z.array(z.string().min(1)).optional(),
 	effectBonusLines: z.array(z.string().min(1)).optional(),
+	targetLimits: z.array(ItemTargetLimitViewSchema).optional(),
 	outputs: z.array(ProducerProductLineOutputViewSchema).optional(),
 });
 

@@ -1810,7 +1810,8 @@
 				"knowledge",
 				"era:VII"
 			],
-			"tier": 7
+			"tier": 7,
+			"maxCount": 1
 		},
 		"producer:armory-t1": {
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
@@ -2402,7 +2403,8 @@
 				"knowledge",
 				"era:IV"
 			],
-			"tier": 2
+			"tier": 2,
+			"maxCount": 1
 		},
 		"producer:sheep-pasture-t1": {
 			"description": "Consumes grain and water to produce wool.",
@@ -2567,7 +2569,8 @@
 				"university",
 				"era:IX"
 			],
-			"tier": 9
+			"tier": 9,
+			"maxCount": 1
 		},
 		"producer:vegetable-garden-t1": {
 			"description": "Consumes water to produce vegetables.",
@@ -2710,7 +2713,8 @@
 				"knowledge",
 				"era:II"
 			],
-			"tier": 2
+			"tier": 2,
+			"maxCount": 1
 		},
 		"producer:library-t2": {
 			"description": "Established library that researches and reissues blueprints up through Era IV.",
@@ -2724,7 +2728,8 @@
 				"knowledge",
 				"era:IV"
 			],
-			"tier": 4
+			"tier": 4,
+			"maxCount": 1
 		},
 		"producer:library-t3": {
 			"description": "Advanced library that researches and reissues blueprints up through Era VIII.",
@@ -2738,7 +2743,8 @@
 				"knowledge",
 				"era:VIII"
 			],
-			"tier": 8
+			"tier": 8,
+			"maxCount": 1
 		},
 		"producer:library-t4": {
 			"description": "Grand library that researches and reissues every currently available blueprint through the final era.",
@@ -2752,7 +2758,8 @@
 				"knowledge",
 				"era:XI"
 			],
-			"tier": 11
+			"tier": 11,
+			"maxCount": 1
 		},
 		"item:blueprint-library-t1": {
 			"description": "Build plan that can be filled with early resources to construct Library I.",

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 import { CraftProgressPhaseSchema } from "./CraftProgressPhaseSchema";
 import { ActivationRequirementViewSchema } from "./ActivationRequirementViewSchema";
+import { ItemTargetLimitViewSchema } from "./ItemTargetLimitViewSchema";
 
 export const CraftProgressViewSchema = z.object({
 	id: z.string().min(1),
@@ -27,6 +28,8 @@ export const CraftProgressViewSchema = z.object({
 	pausedAtMs: z.number().optional(),
 	remainingMs: z.number().optional(),
 	deliveryBlocked: z.boolean().optional(),
+	targetLimitBlocked: z.boolean().optional(),
+	targetLimits: z.array(ItemTargetLimitViewSchema).optional(),
 	acceptedInputItemIds: z.array(GameItemIdSchema),
 });
 

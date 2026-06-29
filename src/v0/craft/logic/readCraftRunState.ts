@@ -31,6 +31,7 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 		craft.phase === "collecting_inputs" &&
 		!craft.complete &&
 		requirementsReady &&
+		!craft.targetLimitBlocked &&
 		(inputsReady || inputsPartiallyAvailable);
 
 	if (craft.phase === "delivery_blocked") {
@@ -84,6 +85,17 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Requirements missing",
+			requirementsReady,
+		};
+	}
+
+	if (craft.targetLimitBlocked) {
+		return {
+			canClaim,
+			canRunAction,
+			inputsPartiallyAvailable,
+			inputsReady,
+			label: "Limit reached",
 			requirementsReady,
 		};
 	}

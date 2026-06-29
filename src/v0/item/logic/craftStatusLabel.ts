@@ -8,7 +8,9 @@ export namespace craftStatusLabel {
 }
 
 export const craftStatusLabel = ({ craft }: craftStatusLabel.Props) => {
-	if (craft.phase === "collecting_inputs") return "Collecting inputs";
+	if (craft.phase === "collecting_inputs") {
+		return craft.targetLimitBlocked ? "Limit reached" : "Collecting inputs";
+	}
 	if (craft.phase === "waiting")
 		return craft.remainingMs !== undefined
 			? `Ready in ${formatMs(craft.remainingMs)}`

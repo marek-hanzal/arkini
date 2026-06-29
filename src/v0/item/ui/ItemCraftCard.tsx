@@ -20,6 +20,17 @@ export namespace ItemCraftCard {
 	}
 }
 
+const readTargetLimitLabel = (
+	limit: NonNullable<CraftProgressView["targetLimits"]>[number],
+	items: ItemCatalogView,
+) => {
+	const itemName = items[limit.itemId]?.name ?? limit.itemId;
+	const baseLabel = `${itemName} ${limit.ownedQuantity}/${limit.maxCount}`;
+	return limit.remainingQuantity < limit.requiredQuantity
+		? `${baseLabel} · limit reached`
+		: baseLabel;
+};
+
 export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 	craft,
 	items,
@@ -32,6 +43,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 		craft,
 	});
 	const resultItem = items[craft.resultItemId];
+	const targetLimits = craft.targetLimits ?? [];
 
 	return (
 		<UiSection
@@ -73,6 +85,21 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 					</div>
 				</div>
 			</div>
+			{targetLimits.length ? (
+				<div className="mt-3 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">
+					<p className="font-semibold text-ak-text">Target limit</p>
+					<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+						{targetLimits.map((limit) => (
+							<li
+								key={`${craft.id}:target-limit:${limit.itemId}`}
+								className="break-words"
+							>
+								{readTargetLimitLabel(limit, items)}
+							</li>
+						))}
+					</ul>
+				</div>
+			) : null}
 			<div className="mt-3 grid gap-2">
 				{craft.inputs.map((input) => {
 					const delivered = craft.delivered[input.itemId] ?? 0;

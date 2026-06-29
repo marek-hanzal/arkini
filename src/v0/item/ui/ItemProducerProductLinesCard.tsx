@@ -43,6 +43,17 @@ const readProductLineOutputOwnedLabel = (
 		.join(" · ");
 };
 
+const readTargetLimitLabel = (
+	limit: NonNullable<ProducerProductLineView["targetLimits"]>[number],
+	items: ItemCatalogView,
+) => {
+	const itemName = readItemName(limit.itemId, items);
+	const baseLabel = `${itemName} ${limit.ownedQuantity}/${limit.maxCount}`;
+	return limit.remainingQuantity < limit.requiredQuantity
+		? `${baseLabel} · limit reached`
+		: baseLabel;
+};
+
 const readLineActionLabel = ({
 	line,
 	runState,
@@ -185,6 +196,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 									line,
 								});
 								const outputs = line.outputs ?? [];
+								const targetLimits = line.targetLimits ?? [];
 								const effectBenefits = line.effectBenefits ?? [];
 								const effectBonusLines = line.effectBonusLines ?? [];
 								const outputOwnedLabel = readProductLineOutputOwnedLabel(
@@ -251,6 +263,24 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												) : null}
 											</div>
 										</div>
+
+										{targetLimits.length ? (
+											<div className="mt-2.5 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">
+												<p className="font-semibold text-ak-text">
+													Target limit
+												</p>
+												<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+													{targetLimits.map((limit) => (
+														<li
+															key={`${line.productId}:target-limit:${limit.itemId}`}
+															className="break-words"
+														>
+															{readTargetLimitLabel(limit, items)}
+														</li>
+													))}
+												</ul>
+											</div>
+										) : null}
 
 										{effectBenefits.length ? (
 											<div className="mt-2.5 rounded-sm bg-ak-primary/10 px-2.5 py-2 text-xs">

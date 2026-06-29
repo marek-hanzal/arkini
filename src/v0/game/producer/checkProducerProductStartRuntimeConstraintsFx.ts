@@ -7,6 +7,7 @@ import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerPr
 import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
 import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
+import { readOutputTargetLimits } from "~/v0/game/limit/readOutputTargetLimits";
 
 export namespace checkProducerProductStartRuntimeConstraintsFx {
 	export interface Props {
@@ -77,6 +78,21 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 			GameEngineError.actionRejected(
 				"blocked",
 				`Product "${productId}" is blocked by an active effect at its scheduled start.`,
+			),
+		);
+	}
+
+	const blockedLimit = readOutputTargetLimits({
+		config,
+		output: effectiveProductLine.lootPlan.baseOutput,
+		save,
+	}).find((limit) => limit.remainingQuantity < limit.requiredQuantity);
+
+	if (blockedLimit) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"board:max-count",
+				`Board already has the maximum allowed count for "${blockedLimit.itemId}".`,
 			),
 		);
 	}

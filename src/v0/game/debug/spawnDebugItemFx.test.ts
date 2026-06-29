@@ -119,6 +119,73 @@ describe("spawnDebugItemFx", () => {
 		).toBeDefined();
 	});
 
+	it("rejects board debug spawn with missing grant when no cell satisfies item grants", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:debug:unused-twig-grant": {
+					name: "Unused debug twig grant",
+					operations: [
+						{
+							grantId: "grant:debug:twig",
+							kind: "grant.add",
+							target: {
+								items: {
+									anyOf: [
+										{
+											ids: [
+												"item:twig",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					grantSelector: {
+						allOf: [
+							{
+								ids: [
+									"grant:debug:twig",
+								],
+							},
+						],
+					},
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				itemId: "item:twig",
+				location: "board",
+				type: "debug.item.spawn",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "effect:missing-grant",
+			},
+		});
+	});
+
 	it("adds a debug item to the real game inventory", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

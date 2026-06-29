@@ -7,6 +7,7 @@ import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
 import { readGameEffectItemCreateMissingGrant } from "~/v0/game/effects/readGameEffectItemCreateMissingGrant";
+import { readBoardItemCreateEffectFailureReason } from "~/v0/game/placement/readBoardItemCreateEffectFailureReason";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { BoardCell } from "~/v0/game/board/BoardCell";
@@ -183,15 +184,14 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 				seedCell,
 			});
 			if (!emptyCell) {
-				boardBlockedByMissingGrant = emptyCells.some((targetCell) =>
-					readGameEffectItemCreateMissingGrant({
-						config,
-						itemId: item.itemId,
-						nowMs,
-						save,
-						targetCell,
-					}),
-				);
+				const effectFailureReason = readBoardItemCreateEffectFailureReason({
+					candidateCells: emptyCells,
+					config,
+					itemId: item.itemId,
+					nowMs,
+					save,
+				});
+				boardBlockedByMissingGrant = effectFailureReason === "effect:missing-grant";
 				boardBlockedByEffect = true;
 				break;
 			}

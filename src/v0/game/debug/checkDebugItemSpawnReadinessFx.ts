@@ -6,6 +6,7 @@ import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCr
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
+import { readBoardItemCreateEffectFailureReason } from "~/v0/game/placement/readBoardItemCreateEffectFailureReason";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -93,7 +94,7 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 			const simulatedSave = yield* cloneGameSaveFx({
 				save,
 			});
-			let blockedByEffect = false;
+			let effectFailureReason: "effect:block-create" | "effect:missing-grant" | undefined;
 			for (let index = 0; index < quantity; index += 1) {
 				const emptyCells = yield* planEmptyBoardCellsFx({
 					config,
@@ -115,7 +116,13 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 					save: simulatedSave,
 				});
 				if (!targetCell) {
-					blockedByEffect = true;
+					effectFailureReason = readBoardItemCreateEffectFailureReason({
+						candidateCells: emptyCells,
+						config,
+						itemId: action.itemId,
+						nowMs,
+						save: simulatedSave,
+					});
 					break;
 				}
 
@@ -132,11 +139,13 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 				};
 			}
 
-			if (blockedByEffect) {
+			if (effectFailureReason) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
-						"effect:block-create",
-						"No board placement target is allowed by active effects.",
+						effectFailureReason,
+						effectFailureReason === "effect:missing-grant"
+							? "No board placement target has the required effect grant."
+							: "No board placement target is allowed by active effects.",
 					),
 				);
 			}

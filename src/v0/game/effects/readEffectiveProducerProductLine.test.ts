@@ -293,6 +293,84 @@ describe("readEffectiveProducerProductLine", () => {
 		).toBe(0);
 	});
 
+	it("caps stacked operations by effect category", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:capped-speed": {
+					name: "Capped speed",
+					operations: [
+						{
+							kind: "duration.multiply",
+							multiplier: 0.5,
+							stacking: {
+								category: "test:speed",
+								maxSources: 2,
+							},
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:capped-speed",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 3,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:test"];
+
+		const effective = readEffectiveProducerProductLine({
+			baseDurationMs: product.durationMs,
+			config,
+			nowMs: 0,
+			producerId: "item:producer",
+			producerItemId: "item:producer",
+			producerItemInstanceId: "item-instance:1",
+			product,
+			productId: "product:test",
+			save,
+		});
+
+		expect(effective.durationMs).toBe(250);
+		expect(effective.appliedEffects).toHaveLength(2);
+	});
+
 	it("applies active effects only between activation and expiration", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

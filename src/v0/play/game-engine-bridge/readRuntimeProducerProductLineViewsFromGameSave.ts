@@ -1,7 +1,7 @@
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
@@ -39,7 +39,6 @@ export namespace readRuntimeProducerProductLineViewsFromGameSave {
 		nowMs: number;
 		producerId: string;
 		producerItemId: string;
-		producerRequirementIds: readonly string[];
 		productIds: readonly string[];
 		save: GameSave;
 		targetItemInstanceId: string;
@@ -64,7 +63,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 	nowMs,
 	producerId,
 	producerItemId,
-	producerRequirementIds,
 	productIds,
 	save,
 	targetItemInstanceId,
@@ -118,10 +116,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 
 		const requirements = resolveGameRequirements({
 			config,
-			requirementIds: [
-				...producerRequirementIds,
-				...product.requirementIds,
-			],
+			requirementIds: product.requirementIds,
 		});
 		const requirementViews = readRuntimeActivationRequirementViewsFromGameSave({
 			requirements,
@@ -168,9 +163,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		const deliveryBlocked = activeJobFacts?.status === "delivery_blocked";
 		const baseDurationMs = readProducerProductDurationMs({
 			product,
-			producerItemInstanceId: targetItemInstanceId,
-			requirements,
-			save,
 		});
 		const effectiveProductLine = readEffectiveProducerProductLine({
 			baseDurationMs,

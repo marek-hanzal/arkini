@@ -763,9 +763,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:armory-t1:leather-armor": {
 			"durationMs": 1000,
@@ -878,9 +876,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:blacksmith-t1:nails": {
 			"durationMs": 1000,
@@ -913,9 +909,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:blacksmith-t1:sword": {
 			"durationMs": 1000,
@@ -953,9 +947,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:brewery-t1:beer-barrel": {
 			"durationMs": 1000,
@@ -980,7 +972,8 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
 			"durationMs": 1000,
@@ -1001,7 +994,8 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:brewery-t1:hops": {
 			"durationMs": 1000,
@@ -1021,7 +1015,8 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:brickyard:bricks": {
 			"durationMs": 1000,
@@ -1060,9 +1055,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:cattle-farm-t1:milk": {
 			"durationMs": 1000,
@@ -1116,9 +1109,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:chicken-coop-t1:egg": {
 			"durationMs": 1000,
@@ -1296,7 +1287,8 @@
 					"quantity": 2,
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:coal-mine-t1:coal": {
 			"durationMs": 1000,
@@ -1322,7 +1314,8 @@
 					"itemId": "item:coal",
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:construction-yard-t1:construction-bundle": {
 			"durationMs": 1000,
@@ -1538,7 +1531,8 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2",
 				"shrine:haste-target"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:farm-t1:grain-morale-t1": {
 			"durationMs": 1000,
@@ -1565,7 +1559,8 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:glassworks:glass": {
 			"durationMs": 1000,
@@ -1599,9 +1594,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:glazier-workshop-t1:stained-glass": {
 			"durationMs": 1000,
@@ -1644,9 +1637,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
 			"durationMs": 1000,
@@ -1696,9 +1687,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:gold-mine-t1:gold-ore": {
 			"durationMs": 1000,
@@ -1724,7 +1713,8 @@
 					"itemId": "item:gold-ore",
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:coin-stack": {
 			"durationMs": 1000,
@@ -1756,9 +1746,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:key-t1": {
 			"durationMs": 1000,
@@ -1800,9 +1788,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:key-t2": {
 			"durationMs": 1000,
@@ -1844,9 +1830,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:key-t3": {
 			"durationMs": 1000,
@@ -1888,9 +1872,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:goldsmith-t1:key-t4": {
 			"durationMs": 1000,
@@ -1932,9 +1914,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:heroes-guild-t1:chest-t1": {
 			"durationMs": 1000,
@@ -2369,7 +2349,8 @@
 					"itemId": "item:iron-ore",
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:lumberjack-t1:log": {
 			"durationMs": 1000,
@@ -2381,7 +2362,8 @@
 			],
 			"tags": [
 				"shrine:haste-target"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:market-t1:coin-from-beer": {
 			"durationMs": 1000,
@@ -2866,7 +2848,8 @@
 			],
 			"tags": [
 				"shrine:haste-target"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:quarry-t2:marble": {
 			"durationMs": 1000,
@@ -2875,7 +2858,8 @@
 					"itemId": "item:marble",
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:quarry-t2:stone": {
 			"durationMs": 1000,
@@ -2884,7 +2868,8 @@
 					"itemId": "item:stone",
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:roof-tile-factory:roof-tiles": {
 			"durationMs": 1000,
@@ -2923,9 +2908,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:sand-pit:sand": {
 			"durationMs": 1000,
@@ -2935,7 +2918,8 @@
 					"quantity": 2,
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:sawmill-t1:plank": {
 			"durationMs": 1000,
@@ -2954,7 +2938,8 @@
 			],
 			"tags": [
 				"shrine:haste-target"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:school:basic-knowledge": {
 			"durationMs": 1000,
@@ -3087,9 +3072,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:smelter-t1:iron-ingot": {
 			"durationMs": 1000,
@@ -3126,9 +3109,7 @@
 					"type": "chance"
 				}
 			],
-			"requirementIds": [
-				"proximity:dirty-processing:purifier"
-			]
+			"visibility": "hidden"
 		},
 		"product:stonemason-t1:stone-block": {
 			"durationMs": 1000,
@@ -3144,7 +3125,8 @@
 					"itemId": "item:stone-block",
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:stonemason-t2:marble-block": {
 			"durationMs": 1000,
@@ -3165,7 +3147,8 @@
 					"itemId": "item:marble-block",
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:stonemason-t2:marble-block-morale-t4": {
 			"durationMs": 1000,
@@ -3193,7 +3176,8 @@
 					"quantity": 2,
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:stonemason-t2:stone-block": {
 			"durationMs": 1000,
@@ -3209,7 +3193,8 @@
 					"itemId": "item:stone-block",
 					"type": "guaranteed"
 				}
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:tailor-workshop-t1:common-clothing": {
 			"durationMs": 1000,
@@ -4853,7 +4838,8 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:winery-t1:wine-barrel": {
 			"durationMs": 1000,
@@ -4878,7 +4864,8 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
 			"durationMs": 1000,
@@ -4899,7 +4886,8 @@
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
-			]
+			],
+			"visibility": "hidden"
 		},
 		"product:chest-t1:open": {
 			"chargeCost": 1,
@@ -4932,8 +4920,7 @@
 					"type": "chance"
 				}
 			],
-			"placement": "board_then_inventory",
-			"requirementIds": []
+			"placement": "board_then_inventory"
 		},
 		"product:chest-t2:open": {
 			"chargeCost": 1,
@@ -4971,8 +4958,7 @@
 					"type": "chance"
 				}
 			],
-			"placement": "board_then_inventory",
-			"requirementIds": []
+			"placement": "board_then_inventory"
 		},
 		"product:chest-t3:open": {
 			"chargeCost": 1,
@@ -5010,8 +4996,7 @@
 					"type": "chance"
 				}
 			],
-			"placement": "board_then_inventory",
-			"requirementIds": []
+			"placement": "board_then_inventory"
 		},
 		"product:chest-t4:open": {
 			"chargeCost": 1,
@@ -5049,8 +5034,7 @@
 					"type": "chance"
 				}
 			],
-			"placement": "board_then_inventory",
-			"requirementIds": []
+			"placement": "board_then_inventory"
 		},
 		"product:shrine-t1:minor-haste": {
 			"durationMs": 300000,

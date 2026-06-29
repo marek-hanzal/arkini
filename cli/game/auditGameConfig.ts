@@ -282,9 +282,6 @@ const collectProducerUsage = (config: GameConfig, usage: UsageIndex, itemFlow: I
 		for (const productId of producer.productIds) {
 			usage.products.add(productId);
 		}
-		for (const requirementId of producer.requirementIds) {
-			usage.requirements.add(requirementId);
-		}
 	}
 };
 
@@ -292,9 +289,6 @@ const collectStashUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Item
 	for (const stash of Object.values(config.stashes)) {
 		for (const productId of stash.productIds) {
 			usage.products.add(productId);
-		}
-		for (const requirementId of stash.requirementIds) {
-			usage.requirements.add(requirementId);
 		}
 	}
 };

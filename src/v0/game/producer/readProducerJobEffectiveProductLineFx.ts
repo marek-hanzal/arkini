@@ -4,7 +4,6 @@ import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
-import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 
 export namespace readProducerJobEffectiveProductLineFx {
@@ -63,24 +62,9 @@ export const readProducerJobEffectiveProductLineFx = Effect.fn(
 		);
 	}
 
-	const producerRequirements = resolveGameRequirements({
-		config,
-		requirementIds: producerDefinition.requirementIds,
-	});
-	const productRequirements = resolveGameRequirements({
-		config,
-		requirementIds: product.requirementIds,
-	});
-	const requirements = [
-		...producerRequirements,
-		...productRequirements,
-	];
 	return readEffectiveProducerProductLine({
 		baseDurationMs: readProducerProductDurationMs({
 			product,
-			producerItemInstanceId,
-			requirements,
-			save,
 		}),
 		config,
 		ignoredProducerJobIds,

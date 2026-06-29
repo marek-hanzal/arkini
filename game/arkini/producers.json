@@ -50,17 +50,11 @@
 				"product:brewery-t1:hops",
 				"product:brewery-t1:beer-barrel",
 				"product:brewery-t1:beer-barrel-from-beer"
-			],
-			"requirementIds": [
-				"proximity:brewery-t1:hop-field"
 			]
 		},
 		"producer:brickyard": {
 			"productIds": [
 				"product:brickyard:bricks"
-			],
-			"requirementIds": [
-				"proximity:clay-pit:nearby"
 			]
 		},
 		"producer:cattle-farm-t1": {
@@ -89,17 +83,11 @@
 		"producer:clay-pit": {
 			"productIds": [
 				"product:clay-pit:clay"
-			],
-			"requirementIds": [
-				"proximity:clay-pit:clay-deposit"
 			]
 		},
 		"producer:coal-mine-t1": {
 			"productIds": [
 				"product:coal-mine-t1:coal"
-			],
-			"requirementIds": [
-				"proximity:coal-mine-t1:coal-deposit"
 			]
 		},
 		"producer:construction-yard-t1": {
@@ -128,34 +116,22 @@
 			"productIds": [
 				"product:farm-t1:grain",
 				"product:farm-t1:grain-morale-t1"
-			],
-			"requirementIds": [
-				"proximity:farm-t1:wheat-field"
 			]
 		},
 		"producer:glassworks": {
 			"productIds": [
 				"product:glassworks:glass"
-			],
-			"requirementIds": [
-				"proximity:glassworks:sand-pit"
 			]
 		},
 		"producer:glazier-workshop-t1": {
 			"productIds": [
 				"product:glazier-workshop-t1:stained-glass",
 				"product:glazier-workshop-t1:stained-glass-morale-t4"
-			],
-			"requirementIds": [
-				"proximity:glazier-workshop-t1:glassworks"
 			]
 		},
 		"producer:gold-mine-t1": {
 			"productIds": [
 				"product:gold-mine-t1:gold-ore"
-			],
-			"requirementIds": [
-				"proximity:gold-mine-t1:gold-deposit"
 			]
 		},
 		"producer:goldsmith-t1": {
@@ -200,17 +176,11 @@
 		"producer:iron-mine-t1": {
 			"productIds": [
 				"product:iron-mine-t1:iron-ore"
-			],
-			"requirementIds": [
-				"proximity:iron-mine-t1:iron-deposit"
 			]
 		},
 		"producer:lumberjack-t1": {
 			"productIds": [
 				"product:lumberjack-t1:log"
-			],
-			"requirementIds": [
-				"proximity:lumberjack-t1:tree"
 			]
 		},
 		"producer:market-t1": {
@@ -265,42 +235,27 @@
 		"producer:quarry-t1": {
 			"productIds": [
 				"product:quarry-t1:stone"
-			],
-			"requirementIds": [
-				"proximity:quarry-t1:rock"
 			]
 		},
 		"producer:quarry-t2": {
 			"productIds": [
 				"product:quarry-t2:stone",
 				"product:quarry-t2:marble"
-			],
-			"requirementIds": [
-				"proximity:quarry-t2:marble-deposit"
 			]
 		},
 		"producer:roof-tile-factory": {
 			"productIds": [
 				"product:roof-tile-factory:roof-tiles"
-			],
-			"requirementIds": [
-				"proximity:clay-pit:nearby"
 			]
 		},
 		"producer:sand-pit": {
 			"productIds": [
 				"product:sand-pit:sand"
-			],
-			"requirementIds": [
-				"proximity:sand-pit:sand-deposit"
 			]
 		},
 		"producer:sawmill-t1": {
 			"productIds": [
 				"product:sawmill-t1:plank"
-			],
-			"requirementIds": [
-				"proximity:sawmill-t1:lumberjack-t1"
 			]
 		},
 		"producer:school": {
@@ -328,9 +283,6 @@
 		"producer:stonemason-t1": {
 			"productIds": [
 				"product:stonemason-t1:stone-block"
-			],
-			"requirementIds": [
-				"proximity:stonemason-t1:quarry-t1"
 			]
 		},
 		"producer:stonemason-t2": {
@@ -338,9 +290,6 @@
 				"product:stonemason-t2:stone-block",
 				"product:stonemason-t2:marble-block",
 				"product:stonemason-t2:marble-block-morale-t4"
-			],
-			"requirementIds": [
-				"proximity:stonemason-t2:quarry-t2"
 			]
 		},
 		"producer:tailor-workshop-t1": {
@@ -464,9 +413,6 @@
 				"product:winery-t1:grapes",
 				"product:winery-t1:wine-barrel",
 				"product:winery-t1:wine-barrel-from-wine-glasses"
-			],
-			"requirementIds": [
-				"proximity:winery-t1:vineyard"
 			]
 		},
 		"producer:shrine-t1": {
@@ -474,8 +420,7 @@
 			"productIds": [
 				"product:shrine-t1:minor-haste",
 				"product:shrine-t1:bountiful-offering"
-			],
-			"requirementIds": []
+			]
 		},
 		"producer:waste-processor-t1": {
 			"productIds": [

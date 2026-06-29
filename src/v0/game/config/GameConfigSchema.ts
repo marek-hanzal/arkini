@@ -39,11 +39,15 @@ import { z } from "zod";
  *   code must not guess consumption from context, because guessing is just a bug wearing a hat. Input quantity defaults to 1.
  *   Product inputs may use `mode: "upTo"` when a run should consume 1..quantity items for the same fixed output.
  * - Passive requirements always declare their search scope (`board`, `inventory`, or
- *   `board_or_inventory`). They model global knowledge/permission/ownership gates.
- * - Producer/product requirements are referenced through central `requirements` entries by
- *   `requirementIds`. Proximity requirements use Chebyshev grid distance, so radius 1
- *   includes diagonals around the target tile. Negative production pressure is authored
- *   as passive item effects, not producer-owned hindrance side tables.
+ *   `board_or_inventory`). They model explicit product-line/craft gates that are still
+ *   better expressed as stored or owned items than as ambient world mutators.
+ * - Ambient world rules such as proximity unlocks, speed boosts, pollution pressure,
+ *   path locks, and aura-style modifiers belong to `effects`. Effects are resolved
+ *   against concrete product-line targets at runtime; producer shells do not own
+ *   top-level requirement gates.
+ * - Product/craft proximity requirements still use Chebyshev grid distance, so radius 1
+ *   includes diagonals around the target tile. Production duration changes should be
+ *   authored as duration effects, not requirement-owned multipliers.
  * - Producer/stash `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
@@ -81,11 +85,10 @@ import { z } from "zod";
  *     }
  *   },
  *   "requirements": {
- *     "requirement:lumber-camp.near-tree": {
+ *     "requirement:near-townhall": {
  *       "type": "proximity",
- *       "itemIds": ["item:tree"],
- *       "distance": 1,
- *       "durationFactor": 1
+ *       "itemIds": ["item:townhall"],
+ *       "distance": 1
  *     },
  *     "requirement:saw-license": {
  *       "type": "passive",
@@ -105,8 +108,7 @@ import { z } from "zod";
  *     "producer:lumber-camp": {
  *       "type": "producer",
  *       "maxQueueSize": 1,
- *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"],
- *       "requirementIds": ["requirement:lumber-camp.near-tree"]
+ *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"]
  *     }
  *   },
  *   "products": {
@@ -238,15 +240,14 @@ const ActivationInputSchema = z.array(ItemStackInputSchema);
 /**
  * Proximity requirement gates an activation by nearby board items.
  * Distance uses Chebyshev grid radius, so distance 1 includes diagonals.
- * `durationFactor` multiplies the matched resource distance into runtime duration.
- * Missing factor defaults to 1 at runtime.
+ * Requirement proximity is only a gate; production duration/layout boosts belong to
+ * local duration effects so all ambient mutators resolve through the same engine.
  */
 const ProximityItemRequirementSchema = z
 	.object({
 		type: z.literal("proximity"),
 		itemIds: z.array(IdSchema).min(1),
 		distance: PositiveIntegerSchema,
-		durationFactor: z.number().min(0).optional(),
 	})
 	.strict();
 
@@ -339,6 +340,13 @@ const GameEffectItemAuthoringTargetSchema = z
 	})
 	.strict();
 
+const GameEffectOperationStackingSchema = z
+	.object({
+		category: z.string().min(1),
+		maxSources: PositiveIntegerSchema.optional(),
+	})
+	.strict();
+
 /**
  * Loot output model.
  *
@@ -401,6 +409,7 @@ const createGameEffectOperationSchema = <
 	productLineTarget: TProductLineTarget;
 }) => {
 	const productLineOperationBaseSchema = {
+		stacking: GameEffectOperationStackingSchema.optional(),
 		target: productLineTarget,
 	};
 	const itemOperationBaseSchema = {
@@ -560,7 +569,7 @@ const GameEffectAuthoringDefinitionSchema = createGameEffectDefinitionSchema(
 	GameEffectAuthoringOperationSchema,
 );
 
-/** Central reusable requirement table entry referenced by producer/product requirementIds. */
+/** Central reusable requirement table entry referenced by product-line or craft gates. */
 const GameRequirementDefinitionSchema = z.discriminatedUnion("type", [
 	StoredItemRequirementSchema,
 	PassiveItemRequirementSchema,
@@ -665,12 +674,11 @@ const ProducerDepletedModeSchema = z.enum([
 	"remove",
 ]);
 
-/** Producer-like capability with ordered product lines and capability-level requirements. Inputs live on product lines. */
+/** Producer-like capability with ordered product lines. Product-line gates live on product lines/effects. */
 const ProducerDefinitionSchema = z
 	.object({
 		maxQueueSize: PositiveIntegerSchema.default(1),
 		productIds: z.array(IdSchema).min(1),
-		requirementIds: z.array(IdSchema).default([]),
 		charges: PositiveNumberSchema.optional(),
 		onChargesDepleted: ProducerDepletedModeSchema.default("stop"),
 	})
@@ -1175,17 +1183,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				);
 			}
 		}
-
-		validateRequirementIds(
-			ctx,
-			[
-				section,
-				capabilityId,
-				"requirementIds",
-			],
-			capability.requirementIds,
-			hasRequirement,
-		);
 	};
 
 	for (const [producerId, producer] of Object.entries(value.producers)) {
@@ -1780,17 +1777,6 @@ const collectProductBlueprintDependencies = ({
 						"productIds",
 						owner.productIndex,
 					],
-				});
-				collectRequirementIdDependencyItems({
-					addDependencyItem,
-					config,
-					fromBlueprintItemId,
-					path: [
-						owner.section,
-						owner.capabilityId,
-						"requirementIds",
-					],
-					requirementIds: owner.capability.requirementIds,
 				});
 			}
 

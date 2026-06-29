@@ -123,7 +123,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 					job,
 					save: nextSave ?? save,
 				});
-				if (!startGateReady) break;
+				if (!requirementsReady || !startGateReady) break;
 
 				const remainingMs = job.remainingMs ?? 0;
 				const effectiveTiming = yield* readProducerJobEffectiveTimingFx({

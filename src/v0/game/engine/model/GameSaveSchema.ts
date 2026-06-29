@@ -398,12 +398,6 @@ const readStoredRequirementSlots = ({
 		producerId: target.itemId,
 	});
 	if (producer) {
-		requirements.push(
-			...resolveGameRequirements({
-				config,
-				requirementIds: producer.requirementIds,
-			}),
-		);
 		for (const productId of producer.productIds) {
 			const product = config.products[productId];
 			if (product) {

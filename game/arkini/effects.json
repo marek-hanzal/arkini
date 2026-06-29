@@ -353,6 +353,443 @@
 				}
 			],
 			"sourceScope": "board"
+		},
+		"effect:proximity:brewery-t1:hop-field": {
+			"name": "Nearby item:hop-field enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:brewery-t1:beer-barrel"
+								},
+								{
+									"id": "product:brewery-t1:beer-barrel-from-beer"
+								},
+								{
+									"id": "product:brewery-t1:hops"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:clay-pit:clay-deposit": {
+			"name": "Nearby item:clay-deposit enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:clay-pit:clay"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:clay-pit:nearby": {
+			"name": "Nearby producer:clay-pit enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:brickyard:bricks"
+								},
+								{
+									"id": "product:roof-tile-factory:roof-tiles"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:coal-mine-t1:coal-deposit": {
+			"name": "Nearby item:coal-deposit enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:coal-mine-t1:coal"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:dirty-processing:purifier": {
+			"name": "Nearby producer:purifier-t1 enables production",
+			"scope": "local",
+			"radius": 3,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:armory-t1:iron-armor"
+								},
+								{
+									"id": "product:blacksmith-t1:axe"
+								},
+								{
+									"id": "product:blacksmith-t1:nails"
+								},
+								{
+									"id": "product:blacksmith-t1:sword"
+								},
+								{
+									"id": "product:brickyard:bricks"
+								},
+								{
+									"id": "product:charcoal-burner-t1:charcoal"
+								},
+								{
+									"id": "product:glassworks:glass"
+								},
+								{
+									"id": "product:glazier-workshop-t1:stained-glass"
+								},
+								{
+									"id": "product:glazier-workshop-t1:stained-glass-morale-t4"
+								},
+								{
+									"id": "product:goldsmith-t1:coin-stack"
+								},
+								{
+									"id": "product:goldsmith-t1:key-t1"
+								},
+								{
+									"id": "product:goldsmith-t1:key-t2"
+								},
+								{
+									"id": "product:goldsmith-t1:key-t3"
+								},
+								{
+									"id": "product:goldsmith-t1:key-t4"
+								},
+								{
+									"id": "product:roof-tile-factory:roof-tiles"
+								},
+								{
+									"id": "product:smelter-t1:gold-ingot"
+								},
+								{
+									"id": "product:smelter-t1:iron-ingot"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:farm-t1:wheat-field": {
+			"name": "Nearby item:wheat-field enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:farm-t1:grain"
+								},
+								{
+									"id": "product:farm-t1:grain-morale-t1"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:glassworks:sand-pit": {
+			"name": "Nearby producer:sand-pit enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:glassworks:glass"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:glazier-workshop-t1:glassworks": {
+			"name": "Nearby producer:glassworks enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:glazier-workshop-t1:stained-glass"
+								},
+								{
+									"id": "product:glazier-workshop-t1:stained-glass-morale-t4"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:gold-mine-t1:gold-deposit": {
+			"name": "Nearby item:gold-deposit enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:gold-mine-t1:gold-ore"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:iron-mine-t1:iron-deposit": {
+			"name": "Nearby item:iron-deposit enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:iron-mine-t1:iron-ore"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:lumberjack-t1:tree": {
+			"name": "Nearby item:tree enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:lumberjack-t1:log"
+								}
+							]
+						}
+					}
+				},
+				{
+					"kind": "duration.multiply",
+					"multiplier": 0.9,
+					"stacking": {
+						"category": "woodcutting:nearby-tree-speed",
+						"maxSources": 5
+					},
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:lumberjack-t1:log"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:quarry-t1:rock": {
+			"name": "Nearby item:rock enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:quarry-t1:stone"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:quarry-t2:marble-deposit": {
+			"name": "Nearby item:marble-deposit enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:quarry-t2:marble"
+								},
+								{
+									"id": "product:quarry-t2:stone"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:sand-pit:sand-deposit": {
+			"name": "Nearby item:sand-deposit enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:sand-pit:sand"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:sawmill-t1:lumberjack-t1": {
+			"name": "Nearby producer:lumberjack-t1 enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:sawmill-t1:plank"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:stonemason-t1:quarry-t1": {
+			"name": "Nearby producer:quarry-t1 enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:stonemason-t1:stone-block"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:stonemason-t2:quarry-t2": {
+			"name": "Nearby producer:quarry-t2 enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:stonemason-t2:marble-block"
+								},
+								{
+									"id": "product:stonemason-t2:marble-block-morale-t4"
+								},
+								{
+									"id": "product:stonemason-t2:stone-block"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"effect:proximity:winery-t1:vineyard": {
+			"name": "Nearby item:vineyard enables production",
+			"scope": "local",
+			"radius": 2,
+			"operations": [
+				{
+					"kind": "line.reveal",
+					"target": {
+						"productLines": {
+							"anyOf": [
+								{
+									"id": "product:winery-t1:grapes"
+								},
+								{
+									"id": "product:winery-t1:wine-barrel"
+								},
+								{
+									"id": "product:winery-t1:wine-barrel-from-wine-glasses"
+								}
+							]
+						}
+					}
+				}
+			]
 		}
 	}
 }

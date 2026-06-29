@@ -140,14 +140,9 @@ const readRequirementMeta = (requirement: ActivationRequirementView) => {
 		requirement.matchedDistance === undefined
 			? undefined
 			: `nearest ${requirement.matchedDistance}`;
-	const durationLabel =
-		requirement.durationMultiplier === undefined || requirement.durationMultiplier <= 1
-			? undefined
-			: `${formatMultiplier(requirement.durationMultiplier)}× time`;
 	return [
 		`within ${requirement.distance}`,
 		nearestLabel,
-		durationLabel,
 	]
 		.filter(Boolean)
 		.join(" · ");

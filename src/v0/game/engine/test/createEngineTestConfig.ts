@@ -124,7 +124,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 					"product:test",
 					"product:shred",
 				],
-				requirementIds: [],
 			},
 		},
 		products: {
@@ -186,7 +185,6 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				productIds: [
 					"product:stash",
 				],
-				requirementIds: [],
 			},
 		},
 		craftRecipes: {

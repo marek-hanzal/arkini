@@ -24,6 +24,10 @@
 			"render": "plain",
 			"resourceId": "item-beer-barrel"
 		},
+		"asset:item:bio-waste": {
+			"render": "plain",
+			"resourceId": "item-bio-waste"
+		},
 		"asset:item:blueprint-academy": {
 			"overlayAssetId": "asset:producer:academy",
 			"render": "blueprint",
@@ -36,6 +40,16 @@
 		},
 		"asset:item:blueprint-bakery-t1": {
 			"overlayAssetId": "asset:producer:bakery-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-bio-waste-processor-t1": {
+			"overlayAssetId": "asset:producer:bio-waste-processor-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-bio-waste-processor-t2": {
+			"overlayAssetId": "asset:producer:bio-waste-processor-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -326,6 +340,16 @@
 		},
 		"asset:item:blueprint-vegetable-garden-t1": {
 			"overlayAssetId": "asset:producer:vegetable-garden-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-waste-processor-t1": {
+			"overlayAssetId": "asset:producer:waste-processor-t1",
+			"render": "blueprint",
+			"resourceId": "item-blueprint"
+		},
+		"asset:item:blueprint-waste-processor-t2": {
+			"overlayAssetId": "asset:producer:waste-processor-t2",
 			"render": "blueprint",
 			"resourceId": "item-blueprint"
 		},
@@ -705,6 +729,14 @@
 			"render": "plain",
 			"resourceId": "producer-bakery-t1"
 		},
+		"asset:producer:bio-waste-processor-t1": {
+			"render": "plain",
+			"resourceId": "producer-bio-waste-processor-t1"
+		},
+		"asset:producer:bio-waste-processor-t2": {
+			"render": "plain",
+			"resourceId": "producer-bio-waste-processor-t2"
+		},
 		"asset:producer:blacksmith-t1": {
 			"render": "plain",
 			"resourceId": "producer-blacksmith-t1"
@@ -945,6 +977,14 @@
 			"render": "plain",
 			"resourceId": "producer-vegetable-garden-t1"
 		},
+		"asset:producer:waste-processor-t1": {
+			"render": "plain",
+			"resourceId": "producer-waste-processor-t1"
+		},
+		"asset:producer:waste-processor-t2": {
+			"render": "plain",
+			"resourceId": "producer-waste-processor-t2"
+		},
 		"asset:producer:weaver-hut-t1": {
 			"render": "plain",
 			"resourceId": "producer-weaver-hut-t1"
@@ -1094,6 +1134,89 @@
 			],
 			"requirements": [],
 			"resultItemId": "producer:bakery-t1"
+		},
+		"item:blueprint-bio-waste-processor-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:bio-waste-processor-t1"
+		},
+		"item:blueprint-bio-waste-processor-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:bio-waste-processor-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:coal-mine-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:charcoal-burner-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:bio-waste-processor-t2"
 		},
 		"item:blueprint-blacksmith-t1": {
 			"durationMs": 1000,
@@ -3568,6 +3691,84 @@
 			"requirements": [],
 			"resultItemId": "producer:vegetable-garden-t1"
 		},
+		"item:blueprint-waste-processor-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"requirements": [],
+			"resultItemId": "producer:waste-processor-t1"
+		},
+		"item:blueprint-waste-processor-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:waste-processor-t1",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"requirements": [
+				{
+					"itemId": "producer:coal-mine-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:charcoal-burner-t1",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				},
+				{
+					"itemId": "producer:academy",
+					"quantity": 1,
+					"scope": "board_or_inventory",
+					"type": "passive"
+				}
+			],
+			"resultItemId": "producer:waste-processor-t2"
+		},
 		"item:blueprint-weaver-hut-t1": {
 			"durationMs": 1000,
 			"inputs": [
@@ -4225,6 +4426,22 @@
 			],
 			"tier": 0
 		},
+		"item:bio-waste": {
+			"assetId": "asset:item:bio-waste",
+			"description": "Farm byproduct from animals and messy food chains. It belongs on the board until processed, because pretending manure fits neatly in a pocket is how UI crimes begin.",
+			"maxStackSize": 1,
+			"name": "Bio Waste",
+			"storage": "board",
+			"tags": [
+				"byproduct",
+				"waste",
+				"bio-waste",
+				"farm",
+				"cleanup",
+				"era:II"
+			],
+			"tier": 2
+		},
 		"item:blueprint-academy": {
 			"assetId": "asset:item:blueprint-academy",
 			"description": "Build plan that upgrades a School into an Academy.",
@@ -4267,6 +4484,41 @@
 				"building",
 				"craft-target",
 				"era:III"
+			],
+			"tier": 0
+		},
+		"item:blueprint-bio-waste-processor-t1": {
+			"assetId": "asset:item:blueprint-bio-waste-processor-t1",
+			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
+			"maxStackSize": 10,
+			"name": "Bio-Waste Processor I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"bio-waste",
+				"farm",
+				"era:II"
+			],
+			"tier": 0
+		},
+		"item:blueprint-bio-waste-processor-t2": {
+			"assetId": "asset:item:blueprint-bio-waste-processor-t2",
+			"description": "Build plan that upgrades Bio-Waste Processor I into Bio-Waste Processor II for coal and charcoal disposal lines.",
+			"maxStackSize": 10,
+			"name": "Bio-Waste Processor II Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"bio-waste",
+				"farm",
+				"industry",
+				"era:VIII"
 			],
 			"tier": 0
 		},
@@ -5166,6 +5418,39 @@
 				"building",
 				"craft-target",
 				"era:II"
+			],
+			"tier": 0
+		},
+		"item:blueprint-waste-processor-t1": {
+			"assetId": "asset:item:blueprint-waste-processor-t1",
+			"description": "Build plan that can be filled with early resources to construct Waste Processor I.",
+			"maxStackSize": 10,
+			"name": "Waste Processor I Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"waste",
+				"era:II"
+			],
+			"tier": 0
+		},
+		"item:blueprint-waste-processor-t2": {
+			"assetId": "asset:item:blueprint-waste-processor-t2",
+			"description": "Build plan that upgrades Waste Processor I into Waste Processor II for coal and charcoal disposal lines.",
+			"maxStackSize": 10,
+			"name": "Waste Processor II Blueprint",
+			"storage": "both",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"waste",
+				"industry",
+				"era:VIII"
 			],
 			"tier": 0
 		},
@@ -6569,6 +6854,43 @@
 			],
 			"tier": 1
 		},
+		"producer:bio-waste-processor-t1": {
+			"assetId": "asset:producer:bio-waste-processor-t1",
+			"description": "Early farm cleanup building that composts bio-waste safely or burns it faster with wood at the cost of pollution risk.",
+			"label": "I",
+			"maxStackSize": 1,
+			"name": "Bio-Waste Processor I",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"bio-waste",
+				"farm",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"producer:bio-waste-processor-t2": {
+			"assetId": "asset:producer:bio-waste-processor-t2",
+			"description": "Upgraded farm cleanup building that can also burn bio-waste with coal or charcoal when speed beats dignity.",
+			"label": "II",
+			"maxStackSize": 1,
+			"name": "Bio-Waste Processor II",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"bio-waste",
+				"farm",
+				"industry",
+				"era:VIII"
+			],
+			"tier": 8
+		},
 		"producer:blacksmith-t1": {
 			"assetId": "asset:producer:blacksmith-t1",
 			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
@@ -7501,6 +7823,41 @@
 			],
 			"tier": 1
 		},
+		"producer:waste-processor-t1": {
+			"assetId": "asset:producer:waste-processor-t1",
+			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
+			"label": "I",
+			"maxStackSize": 1,
+			"name": "Waste Processor I",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"trash",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"producer:waste-processor-t2": {
+			"assetId": "asset:producer:waste-processor-t2",
+			"description": "Upgraded cleanup building that can also burn trash with coal or charcoal for faster disposal and uglier air.",
+			"label": "II",
+			"maxStackSize": 1,
+			"name": "Waste Processor II",
+			"storage": "both",
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"trash",
+				"industry",
+				"era:VIII"
+			],
+			"tier": 8
+		},
 		"producer:weaver-hut-t1": {
 			"assetId": "asset:producer:weaver-hut-t1",
 			"description": "Textile producer that weaves wool into common cloth.",
@@ -7574,6 +7931,8 @@
 				"product:academy:blueprint-gold-mine-t1",
 				"product:academy:blueprint-purifier-t1",
 				"product:academy:blueprint-charcoal-burner-t1",
+				"product:academy:blueprint-waste-processor-t2",
+				"product:academy:blueprint-bio-waste-processor-t2",
 				"product:academy:blueprint-clay-pit",
 				"product:academy:blueprint-sand-pit",
 				"product:academy:blueprint-brickyard",
@@ -7603,6 +7962,26 @@
 			"productIds": [
 				"product:bakery-t1:bread",
 				"product:bakery-t1:bread-morale-t1"
+			],
+			"requirementIds": []
+		},
+		"producer:bio-waste-processor-t1": {
+			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
+			"productIds": [
+				"product:bio-waste-processor-t1:compost-bio-waste",
+				"product:bio-waste-processor-t1:burn-bio-waste-log"
+			],
+			"requirementIds": []
+		},
+		"producer:bio-waste-processor-t2": {
+			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
+			"productIds": [
+				"product:bio-waste-processor-t2:compost-bio-waste",
+				"product:bio-waste-processor-t2:burn-bio-waste-log",
+				"product:bio-waste-processor-t2:burn-bio-waste-charcoal",
+				"product:bio-waste-processor-t2:burn-bio-waste-coal"
 			],
 			"requirementIds": []
 		},
@@ -7854,6 +8233,8 @@
 				"product:library-t1:blueprint-sheep-pasture-t1",
 				"product:library-t1:blueprint-townhall-t3",
 				"product:library-t1:blueprint-vegetable-garden-t1",
+				"product:library-t1:blueprint-waste-processor-t1",
+				"product:library-t1:blueprint-bio-waste-processor-t1",
 				"product:library-t1:blueprint-library-t2"
 			],
 			"requirementIds": []
@@ -7876,6 +8257,8 @@
 				"product:library-t2:blueprint-sheep-pasture-t1",
 				"product:library-t2:blueprint-townhall-t3",
 				"product:library-t2:blueprint-vegetable-garden-t1",
+				"product:library-t2:blueprint-waste-processor-t1",
+				"product:library-t2:blueprint-bio-waste-processor-t1",
 				"product:library-t2:blueprint-bakery-t1",
 				"product:library-t2:blueprint-brewery-t1",
 				"product:library-t2:blueprint-cookhouse-t1",
@@ -7914,6 +8297,8 @@
 				"product:library-t3:blueprint-sheep-pasture-t1",
 				"product:library-t3:blueprint-townhall-t3",
 				"product:library-t3:blueprint-vegetable-garden-t1",
+				"product:library-t3:blueprint-waste-processor-t1",
+				"product:library-t3:blueprint-bio-waste-processor-t1",
 				"product:library-t3:blueprint-bakery-t1",
 				"product:library-t3:blueprint-brewery-t1",
 				"product:library-t3:blueprint-cookhouse-t1",
@@ -7946,6 +8331,8 @@
 				"product:library-t3:blueprint-construction-yard-t1",
 				"product:library-t3:blueprint-glassworks",
 				"product:library-t3:blueprint-purifier-t1",
+				"product:library-t3:blueprint-waste-processor-t2",
+				"product:library-t3:blueprint-bio-waste-processor-t2",
 				"product:library-t3:blueprint-roof-tile-factory",
 				"product:library-t3:blueprint-sand-pit",
 				"product:library-t3:blueprint-smelter-t1",
@@ -7971,6 +8358,8 @@
 				"product:library-t4:blueprint-sheep-pasture-t1",
 				"product:library-t4:blueprint-townhall-t3",
 				"product:library-t4:blueprint-vegetable-garden-t1",
+				"product:library-t4:blueprint-waste-processor-t1",
+				"product:library-t4:blueprint-bio-waste-processor-t1",
 				"product:library-t4:blueprint-bakery-t1",
 				"product:library-t4:blueprint-brewery-t1",
 				"product:library-t4:blueprint-cookhouse-t1",
@@ -8003,6 +8392,8 @@
 				"product:library-t4:blueprint-construction-yard-t1",
 				"product:library-t4:blueprint-glassworks",
 				"product:library-t4:blueprint-purifier-t1",
+				"product:library-t4:blueprint-waste-processor-t2",
+				"product:library-t4:blueprint-bio-waste-processor-t2",
 				"product:library-t4:blueprint-roof-tile-factory",
 				"product:library-t4:blueprint-sand-pit",
 				"product:library-t4:blueprint-smelter-t1",
@@ -8269,6 +8660,8 @@
 				"product:townhall-t2:blueprint-chicken-coop-t1",
 				"product:townhall-t2:blueprint-sheep-pasture-t1",
 				"product:townhall-t2:blueprint-vegetable-garden-t1",
+				"product:townhall-t2:blueprint-waste-processor-t1",
+				"product:townhall-t2:blueprint-bio-waste-processor-t1",
 				"product:townhall-t2:food-supply",
 				"product:townhall-t2:blueprint-house-t1",
 				"product:townhall-t2:blueprint-townhall-t3"
@@ -8336,6 +8729,26 @@
 			"onChargesDepleted": "stop",
 			"productIds": [
 				"product:vegetable-garden-t1:vegetables"
+			],
+			"requirementIds": []
+		},
+		"producer:waste-processor-t1": {
+			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
+			"productIds": [
+				"product:waste-processor-t1:recycle-trash",
+				"product:waste-processor-t1:burn-trash-log"
+			],
+			"requirementIds": []
+		},
+		"producer:waste-processor-t2": {
+			"maxQueueSize": 1,
+			"onChargesDepleted": "stop",
+			"productIds": [
+				"product:waste-processor-t2:recycle-trash",
+				"product:waste-processor-t2:burn-trash-log",
+				"product:waste-processor-t2:burn-trash-charcoal",
+				"product:waste-processor-t2:burn-trash-coal"
 			],
 			"requirementIds": []
 		},
@@ -8488,6 +8901,54 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-armory-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:academy:blueprint-bio-waste-processor-t2": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Bio-Waste Processor II",
+			"output": [
+				{
+					"itemId": "item:blueprint-bio-waste-processor-t2",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -9265,6 +9726,54 @@
 			"tags": [],
 			"visibility": "visible"
 		},
+		"product:academy:blueprint-waste-processor-t2": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Waste Processor II",
+			"output": [
+				{
+					"itemId": "item:blueprint-waste-processor-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
 		"product:armory-t1:iron-armor": {
 			"chargeCost": 0,
 			"durationMs": 1000,
@@ -9418,6 +9927,194 @@
 					"type": "guaranteed"
 				}
 			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:bio-waste-processor-t1:burn-bio-waste-log": {
+			"chargeCost": 0,
+			"durationMs": 45000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bio-waste",
+					"mode": "upTo",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"name": "Burn Bio Waste: Wood",
+			"output": [
+				{
+					"chance": 0.2,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.04,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:bio-waste-processor-t1:compost-bio-waste": {
+			"chargeCost": 0,
+			"durationMs": 180000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bio-waste",
+					"mode": "upTo",
+					"quantity": 4
+				}
+			],
+			"name": "Compost Bio Waste",
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:bio-waste-processor-t2:burn-bio-waste-charcoal": {
+			"chargeCost": 0,
+			"durationMs": 30000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bio-waste",
+					"mode": "upTo",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Burn Bio Waste: Charcoal",
+			"output": [
+				{
+					"chance": 0.25,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:bio-waste-processor-t2:burn-bio-waste-coal": {
+			"chargeCost": 0,
+			"durationMs": 25000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bio-waste",
+					"mode": "upTo",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				}
+			],
+			"name": "Burn Bio Waste: Coal",
+			"output": [
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:bio-waste-processor-t2:burn-bio-waste-log": {
+			"chargeCost": 0,
+			"durationMs": 40000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bio-waste",
+					"mode": "upTo",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"name": "Burn Bio Waste: Wood",
+			"output": [
+				{
+					"chance": 0.2,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.04,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:bio-waste-processor-t2:compost-bio-waste": {
+			"chargeCost": 0,
+			"durationMs": 150000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bio-waste",
+					"mode": "upTo",
+					"quantity": 4
+				}
+			],
+			"name": "Compost Bio Waste",
 			"placement": "board_then_inventory",
 			"requirementIds": [],
 			"tags": [],
@@ -11559,6 +12256,36 @@
 			"tags": [],
 			"visibility": "visible"
 		},
+		"product:library-t1:blueprint-bio-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bio-Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-bio-waste-processor-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
 		"product:library-t1:blueprint-cattle-farm-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
@@ -11991,6 +12718,36 @@
 			"tags": [],
 			"visibility": "visible"
 		},
+		"product:library-t1:blueprint-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-waste-processor-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
 		"product:library-t1:blueprint-well-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
@@ -12036,6 +12793,36 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:library-t2:blueprint-bio-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bio-Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-bio-waste-processor-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -12927,6 +13714,36 @@
 			"tags": [],
 			"visibility": "visible"
 		},
+		"product:library-t2:blueprint-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-waste-processor-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
 		"product:library-t2:blueprint-well-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
@@ -13086,6 +13903,78 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:library-t3:blueprint-bio-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bio-Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-bio-waste-processor-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:library-t3:blueprint-bio-waste-processor-t2": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bio-Waste Processor II",
+			"output": [
+				{
+					"itemId": "item:blueprint-bio-waste-processor-t2",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -14739,6 +15628,78 @@
 			"tags": [],
 			"visibility": "visible"
 		},
+		"product:library-t3:blueprint-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-waste-processor-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:library-t3:blueprint-waste-processor-t2": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Waste Processor II",
+			"output": [
+				{
+					"itemId": "item:blueprint-waste-processor-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
 		"product:library-t3:blueprint-weaver-hut-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
@@ -14988,6 +15949,78 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-bakery-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:library-t4:blueprint-bio-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bio-Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-bio-waste-processor-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:library-t4:blueprint-bio-waste-processor-t2": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bio-Waste Processor II",
+			"output": [
+				{
+					"itemId": "item:blueprint-bio-waste-processor-t2",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -17199,6 +18232,78 @@
 			"tags": [],
 			"visibility": "visible"
 		},
+		"product:library-t4:blueprint-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-waste-processor-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:library-t4:blueprint-waste-processor-t2": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Waste Processor II",
+			"output": [
+				{
+					"itemId": "item:blueprint-waste-processor-t2",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
 		"product:library-t4:blueprint-weaver-hut-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
@@ -18896,6 +20001,42 @@
 			"tags": [],
 			"visibility": "visible"
 		},
+		"product:townhall-t2:blueprint-bio-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 1
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Bio-Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-bio-waste-processor-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
 		"product:townhall-t2:blueprint-cattle-farm-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
@@ -19151,6 +20292,42 @@
 			"output": [
 				{
 					"itemId": "item:blueprint-vegetable-garden-t1",
+					"quantity": 1,
+					"type": "guaranteed"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:townhall-t2:blueprint-waste-processor-t1": {
+			"chargeCost": 0,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 1
+				}
+			],
+			"name": "Blueprint: Waste Processor I",
+			"output": [
+				{
+					"itemId": "item:blueprint-waste-processor-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				}
@@ -20632,6 +21809,194 @@
 				"pollution-sensitive:radius-2",
 				"shrine:haste-target"
 			],
+			"visibility": "visible"
+		},
+		"product:waste-processor-t1:burn-trash-log": {
+			"chargeCost": 0,
+			"durationMs": 45000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:trash",
+					"mode": "upTo",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"name": "Burn Trash: Wood",
+			"output": [
+				{
+					"chance": 0.25,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.05,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:waste-processor-t1:recycle-trash": {
+			"chargeCost": 0,
+			"durationMs": 180000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:trash",
+					"mode": "upTo",
+					"quantity": 4
+				}
+			],
+			"name": "Recycle Trash",
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:waste-processor-t2:burn-trash-charcoal": {
+			"chargeCost": 0,
+			"durationMs": 30000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:trash",
+					"mode": "upTo",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Burn Trash: Charcoal",
+			"output": [
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:waste-processor-t2:burn-trash-coal": {
+			"chargeCost": 0,
+			"durationMs": 25000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:trash",
+					"mode": "upTo",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 1
+				}
+			],
+			"name": "Burn Trash: Coal",
+			"output": [
+				{
+					"chance": 0.45,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.15,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:waste-processor-t2:burn-trash-log": {
+			"chargeCost": 0,
+			"durationMs": 40000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:trash",
+					"mode": "upTo",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 1
+				}
+			],
+			"name": "Burn Trash: Wood",
+			"output": [
+				{
+					"chance": 0.25,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.05,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:waste-processor-t2:recycle-trash": {
+			"chargeCost": 0,
+			"durationMs": 150000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:trash",
+					"mode": "upTo",
+					"quantity": 4
+				}
+			],
+			"name": "Recycle Trash",
+			"placement": "board_then_inventory",
+			"requirementIds": [],
+			"tags": [],
 			"visibility": "visible"
 		},
 		"product:weaver-hut-t1:common-cloth": {

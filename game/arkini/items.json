@@ -2805,6 +2805,137 @@
 				"era:XI"
 			],
 			"tier": 11
+		},
+		"item:bio-waste": {
+			"name": "Bio Waste",
+			"description": "Farm byproduct from animals and messy food chains. It belongs on the board until processed, because pretending manure fits neatly in a pocket is how UI crimes begin.",
+			"tier": 2,
+			"maxStackSize": 1,
+			"storage": "board",
+			"tags": [
+				"byproduct",
+				"waste",
+				"bio-waste",
+				"farm",
+				"cleanup",
+				"era:II"
+			]
+		},
+		"producer:waste-processor-t1": {
+			"name": "Waste Processor I",
+			"label": "I",
+			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
+			"tier": 2,
+			"maxStackSize": 1,
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"trash",
+				"era:II"
+			]
+		},
+		"producer:waste-processor-t2": {
+			"name": "Waste Processor II",
+			"label": "II",
+			"description": "Upgraded cleanup building that can also burn trash with coal or charcoal for faster disposal and uglier air.",
+			"tier": 8,
+			"maxStackSize": 1,
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"trash",
+				"industry",
+				"era:VIII"
+			]
+		},
+		"producer:bio-waste-processor-t1": {
+			"name": "Bio-Waste Processor I",
+			"label": "I",
+			"description": "Early farm cleanup building that composts bio-waste safely or burns it faster with wood at the cost of pollution risk.",
+			"tier": 2,
+			"maxStackSize": 1,
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"bio-waste",
+				"farm",
+				"era:II"
+			]
+		},
+		"producer:bio-waste-processor-t2": {
+			"name": "Bio-Waste Processor II",
+			"label": "II",
+			"description": "Upgraded farm cleanup building that can also burn bio-waste with coal or charcoal when speed beats dignity.",
+			"tier": 8,
+			"maxStackSize": 1,
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"bio-waste",
+				"farm",
+				"industry",
+				"era:VIII"
+			]
+		},
+		"item:blueprint-waste-processor-t1": {
+			"name": "Waste Processor I Blueprint",
+			"description": "Build plan that can be filled with early resources to construct Waste Processor I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"waste",
+				"era:II"
+			]
+		},
+		"item:blueprint-waste-processor-t2": {
+			"name": "Waste Processor II Blueprint",
+			"description": "Build plan that upgrades Waste Processor I into Waste Processor II for coal and charcoal disposal lines.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"waste",
+				"industry",
+				"era:VIII"
+			]
+		},
+		"item:blueprint-bio-waste-processor-t1": {
+			"name": "Bio-Waste Processor I Blueprint",
+			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"bio-waste",
+				"farm",
+				"era:II"
+			]
+		},
+		"item:blueprint-bio-waste-processor-t2": {
+			"name": "Bio-Waste Processor II Blueprint",
+			"description": "Build plan that upgrades Bio-Waste Processor I into Bio-Waste Processor II for coal and charcoal disposal lines.",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"bio-waste",
+				"farm",
+				"industry",
+				"era:VIII"
+			]
 		}
 	}
 }

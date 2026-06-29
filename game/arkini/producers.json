@@ -11,6 +11,8 @@
 				"product:academy:blueprint-gold-mine-t1",
 				"product:academy:blueprint-purifier-t1",
 				"product:academy:blueprint-charcoal-burner-t1",
+				"product:academy:blueprint-waste-processor-t2",
+				"product:academy:blueprint-bio-waste-processor-t2",
 				"product:academy:blueprint-clay-pit",
 				"product:academy:blueprint-sand-pit",
 				"product:academy:blueprint-brickyard",
@@ -379,6 +381,8 @@
 				"product:townhall-t2:blueprint-chicken-coop-t1",
 				"product:townhall-t2:blueprint-sheep-pasture-t1",
 				"product:townhall-t2:blueprint-vegetable-garden-t1",
+				"product:townhall-t2:blueprint-waste-processor-t1",
+				"product:townhall-t2:blueprint-bio-waste-processor-t1",
 				"product:townhall-t2:food-supply",
 				"product:townhall-t2:blueprint-house-t1",
 				"product:townhall-t2:blueprint-townhall-t3"
@@ -486,6 +490,8 @@
 				"product:library-t1:blueprint-sheep-pasture-t1",
 				"product:library-t1:blueprint-townhall-t3",
 				"product:library-t1:blueprint-vegetable-garden-t1",
+				"product:library-t1:blueprint-waste-processor-t1",
+				"product:library-t1:blueprint-bio-waste-processor-t1",
 				"product:library-t1:blueprint-library-t2"
 			]
 		},
@@ -505,6 +511,8 @@
 				"product:library-t2:blueprint-sheep-pasture-t1",
 				"product:library-t2:blueprint-townhall-t3",
 				"product:library-t2:blueprint-vegetable-garden-t1",
+				"product:library-t2:blueprint-waste-processor-t1",
+				"product:library-t2:blueprint-bio-waste-processor-t1",
 				"product:library-t2:blueprint-bakery-t1",
 				"product:library-t2:blueprint-brewery-t1",
 				"product:library-t2:blueprint-cookhouse-t1",
@@ -540,6 +548,8 @@
 				"product:library-t3:blueprint-sheep-pasture-t1",
 				"product:library-t3:blueprint-townhall-t3",
 				"product:library-t3:blueprint-vegetable-garden-t1",
+				"product:library-t3:blueprint-waste-processor-t1",
+				"product:library-t3:blueprint-bio-waste-processor-t1",
 				"product:library-t3:blueprint-bakery-t1",
 				"product:library-t3:blueprint-brewery-t1",
 				"product:library-t3:blueprint-cookhouse-t1",
@@ -572,6 +582,8 @@
 				"product:library-t3:blueprint-construction-yard-t1",
 				"product:library-t3:blueprint-glassworks",
 				"product:library-t3:blueprint-purifier-t1",
+				"product:library-t3:blueprint-waste-processor-t2",
+				"product:library-t3:blueprint-bio-waste-processor-t2",
 				"product:library-t3:blueprint-roof-tile-factory",
 				"product:library-t3:blueprint-sand-pit",
 				"product:library-t3:blueprint-smelter-t1",
@@ -594,6 +606,8 @@
 				"product:library-t4:blueprint-sheep-pasture-t1",
 				"product:library-t4:blueprint-townhall-t3",
 				"product:library-t4:blueprint-vegetable-garden-t1",
+				"product:library-t4:blueprint-waste-processor-t1",
+				"product:library-t4:blueprint-bio-waste-processor-t1",
 				"product:library-t4:blueprint-bakery-t1",
 				"product:library-t4:blueprint-brewery-t1",
 				"product:library-t4:blueprint-cookhouse-t1",
@@ -626,6 +640,8 @@
 				"product:library-t4:blueprint-construction-yard-t1",
 				"product:library-t4:blueprint-glassworks",
 				"product:library-t4:blueprint-purifier-t1",
+				"product:library-t4:blueprint-waste-processor-t2",
+				"product:library-t4:blueprint-bio-waste-processor-t2",
 				"product:library-t4:blueprint-roof-tile-factory",
 				"product:library-t4:blueprint-sand-pit",
 				"product:library-t4:blueprint-smelter-t1",
@@ -641,6 +657,34 @@
 				"product:library-t4:blueprint-cathedral",
 				"product:library-t4:blueprint-house-of-engineers",
 				"product:library-t4:blueprint-mage-lodge"
+			]
+		},
+		"producer:waste-processor-t1": {
+			"productIds": [
+				"product:waste-processor-t1:recycle-trash",
+				"product:waste-processor-t1:burn-trash-log"
+			]
+		},
+		"producer:waste-processor-t2": {
+			"productIds": [
+				"product:waste-processor-t2:recycle-trash",
+				"product:waste-processor-t2:burn-trash-log",
+				"product:waste-processor-t2:burn-trash-charcoal",
+				"product:waste-processor-t2:burn-trash-coal"
+			]
+		},
+		"producer:bio-waste-processor-t1": {
+			"productIds": [
+				"product:bio-waste-processor-t1:compost-bio-waste",
+				"product:bio-waste-processor-t1:burn-bio-waste-log"
+			]
+		},
+		"producer:bio-waste-processor-t2": {
+			"productIds": [
+				"product:bio-waste-processor-t2:compost-bio-waste",
+				"product:bio-waste-processor-t2:burn-bio-waste-log",
+				"product:bio-waste-processor-t2:burn-bio-waste-charcoal",
+				"product:bio-waste-processor-t2:burn-bio-waste-coal"
 			]
 		}
 	}

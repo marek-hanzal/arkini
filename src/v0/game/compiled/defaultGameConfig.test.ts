@@ -63,6 +63,12 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.producers["producer:library-t1"].productIds).toContain(
 			"product:library-t1:blueprint-townhall-t2",
 		);
+		expect(defaultGameConfig.producers["producer:library-t1"].productIds).toContain(
+			"product:library-t1:blueprint-waste-processor-t1",
+		);
+		expect(defaultGameConfig.producers["producer:library-t1"].productIds).toContain(
+			"product:library-t1:blueprint-bio-waste-processor-t1",
+		);
 		expect(defaultGameConfig.producers["producer:library-t1"].productIds).not.toContain(
 			"product:library-t1:blueprint-bakery-t1",
 		);
@@ -79,6 +85,12 @@ describe("defaultGameConfig", () => {
 
 		expect(defaultGameConfig.producers["producer:library-t3"].productIds).toContain(
 			"product:library-t3:blueprint-purifier-t1",
+		);
+		expect(defaultGameConfig.producers["producer:library-t3"].productIds).toContain(
+			"product:library-t3:blueprint-waste-processor-t2",
+		);
+		expect(defaultGameConfig.producers["producer:library-t3"].productIds).toContain(
+			"product:library-t3:blueprint-bio-waste-processor-t2",
 		);
 		expect(defaultGameConfig.producers["producer:library-t3"].productIds).toContain(
 			"product:library-t3:blueprint-library-t4",
@@ -270,6 +282,100 @@ describe("defaultGameConfig", () => {
 			quantity: 1,
 			type: "guaranteed",
 		});
+	});
+
+	it("wires waste and bio-waste processors as early cleanup with coal upgrades", () => {
+		expect(defaultGameConfig.items["item:bio-waste"].storage).toBe("board");
+		expect(defaultGameConfig.items["producer:waste-processor-t1"].tags).toContain("era:II");
+		expect(defaultGameConfig.items["producer:waste-processor-t2"].tags).toContain("era:VIII");
+
+		expect(defaultGameConfig.producers["producer:townhall-t2"].productIds).toContain(
+			"product:townhall-t2:blueprint-waste-processor-t1",
+		);
+		expect(defaultGameConfig.producers["producer:townhall-t2"].productIds).toContain(
+			"product:townhall-t2:blueprint-bio-waste-processor-t1",
+		);
+		expect(defaultGameConfig.producers["producer:academy"].productIds).toContain(
+			"product:academy:blueprint-waste-processor-t2",
+		);
+		expect(defaultGameConfig.producers["producer:academy"].productIds).toContain(
+			"product:academy:blueprint-bio-waste-processor-t2",
+		);
+
+		expect(defaultGameConfig.producers["producer:waste-processor-t1"].productIds).toEqual([
+			"product:waste-processor-t1:recycle-trash",
+			"product:waste-processor-t1:burn-trash-log",
+		]);
+		expect(defaultGameConfig.producers["producer:waste-processor-t2"].productIds).toEqual([
+			"product:waste-processor-t2:recycle-trash",
+			"product:waste-processor-t2:burn-trash-log",
+			"product:waste-processor-t2:burn-trash-charcoal",
+			"product:waste-processor-t2:burn-trash-coal",
+		]);
+		expect(defaultGameConfig.producers["producer:bio-waste-processor-t1"].productIds).toEqual([
+			"product:bio-waste-processor-t1:compost-bio-waste",
+			"product:bio-waste-processor-t1:burn-bio-waste-log",
+		]);
+		expect(defaultGameConfig.producers["producer:bio-waste-processor-t2"].productIds).toEqual([
+			"product:bio-waste-processor-t2:compost-bio-waste",
+			"product:bio-waste-processor-t2:burn-bio-waste-log",
+			"product:bio-waste-processor-t2:burn-bio-waste-charcoal",
+			"product:bio-waste-processor-t2:burn-bio-waste-coal",
+		]);
+
+		expect(readProductInputs("product:waste-processor-t1:recycle-trash")).toEqual([
+			{
+				capacity: 4,
+				consume: true,
+				itemId: "item:trash",
+				mode: "upTo",
+				quantity: 4,
+			},
+		]);
+		expect(readProductOutput("product:waste-processor-t1:recycle-trash")).toEqual([]);
+		expect(readProductOutput("product:waste-processor-t2:burn-trash-coal")).toContainEqual({
+			chance: 0.45,
+			itemId: "item:pollution",
+			quantity: 1,
+			type: "chance",
+		});
+		expect(readProductInputs("product:bio-waste-processor-t1:compost-bio-waste")).toEqual([
+			{
+				capacity: 4,
+				consume: true,
+				itemId: "item:bio-waste",
+				mode: "upTo",
+				quantity: 4,
+			},
+		]);
+		expect(
+			readProductOutput("product:bio-waste-processor-t2:burn-bio-waste-charcoal"),
+		).toContainEqual({
+			chance: 0.25,
+			itemId: "item:pollution",
+			quantity: 1,
+			type: "chance",
+		});
+
+		expect(
+			defaultGameConfig.craftRecipes["item:blueprint-waste-processor-t2"].inputs,
+		).toContainEqual({
+			consume: true,
+			itemId: "producer:waste-processor-t1",
+			quantity: 1,
+		});
+		expect(
+			defaultGameConfig.craftRecipes["item:blueprint-bio-waste-processor-t2"].inputs,
+		).toContainEqual({
+			consume: true,
+			itemId: "producer:bio-waste-processor-t1",
+			quantity: 1,
+		});
+		expectPassiveOwnedRequirements("item:blueprint-waste-processor-t2", [
+			"producer:coal-mine-t1",
+			"producer:charcoal-burner-t1",
+			"producer:academy",
+		]);
 	});
 
 	it("wires era IX guild institutions, equipment, keys, and expeditions", () => {

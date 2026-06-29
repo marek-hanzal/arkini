@@ -211,10 +211,12 @@ Supported operations:
 { "kind": "loot.replaceOutput", "output": [{ "type": "guaranteed", "itemId": "item:void-splinter", "quantity": 1 }], "target": { "productLines": { "anyOf": [{ "id": "product:test" }] } } }
 { "kind": "loot.addChanceItem", "itemId": "item:pollution", "chance": 0.1, "quantity": 1, "target": { "productLines": { "mode": "all" } } }
 { "kind": "loot.dropChance.add", "delta": -0.2, "target": { "productLines": { "mode": "all" } } }
+{ "kind": "loot.quantity.add", "value": 1, "target": { "productLines": { "anyOf": [{ "tag": "resource-output" }] } } }
+{ "kind": "loot.extraOutputChance.add", "chance": 0.35, "quantity": 1, "target": { "productLines": { "mode": "all" } }, "outputItems": { "items": { "anyOf": [{ "tag": "tier-1-resource" }] } } }
 { "kind": "item.blockCreate", "reason": "Counter path locked.", "target": { "items": { "anyOf": [{ "tag": "faith" }] } } }
 ```
 
-`line.blockStart` blocks new enqueue/start attempts. Already queued jobs keep their chance; the output can still be affected or voided by hard create rules at completion. `item.blockCreate` is hard: immediate creation actions reject, delayed producer/craft/spawn outputs are discarded instead of retrying forever.
+`line.blockStart` blocks new enqueue/start attempts. Already queued jobs keep their chance; the output can still be affected or voided by hard create rules at completion. `loot.quantity.add` increases every matched output directly, so use it sparingly unless you enjoy printing resources like a doomed central bank. `loot.extraOutputChance.add` is the safer bounty form: it targets product lines, then only adds a chance-based extra drop for produced output items matching `outputItems`. `item.blockCreate` is hard: immediate creation actions reject, delayed producer/craft/spawn outputs are discarded instead of retrying forever.
 
 ## Time model
 

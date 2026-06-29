@@ -21,7 +21,8 @@ describe("readRuntimeEffectBenefitLines", () => {
 				effectId: "effect:shrine-bountiful-offering",
 			}),
 		).toEqual([
-			"Produces +1 extra item per output for Grain, Log, Stone, Plank, Vegetables, Water.",
+			"Adds 35% chance for +1× extra output when producing Grain, Log, Stone, Vegetables, Water.",
+			"Adds 30% chance for +1× extra output when producing Plank.",
 		]);
 	});
 });

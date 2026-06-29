@@ -482,6 +482,15 @@ const createGameEffectOperationSchema = <
 			.strict(),
 		z
 			.object({
+				...productLineOperationBaseSchema,
+				kind: z.literal("loot.extraOutputChance.add"),
+				chance: ProbabilitySchema,
+				outputItems: itemTarget,
+				quantity: QuantitySchema.default(1),
+			})
+			.strict(),
+		z
+			.object({
 				...itemOperationBaseSchema,
 				kind: z.literal("item.blockCreate"),
 				reason: z.string().min(1).optional(),
@@ -1049,6 +1058,24 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 						"itemId",
 					],
 					`Missing item "${operation.itemId}".`,
+				);
+			}
+
+			if (operation.kind === "loot.extraOutputChance.add") {
+				validateGameEffectItemTarget(
+					ctx,
+					[
+						"effects",
+						effectId,
+						"operations",
+						operationIndex,
+						"outputItems",
+					],
+					operation.outputItems,
+					{
+						entityIds: itemIds,
+						hasEntity: hasItem,
+					},
 				);
 			}
 		}

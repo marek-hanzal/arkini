@@ -217,6 +217,16 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Ite
 				itemFlow.producedItemIds.add(operation.itemId);
 			}
 
+			if (operation.kind === "loot.extraOutputChance.add") {
+				for (const itemId of readResolvedSelectorIds(
+					operation.outputItems.items,
+					config.items,
+				)) {
+					usage.items.add(itemId);
+					itemFlow.producedItemIds.add(itemId);
+				}
+			}
+
 			if (operation.kind === "item.blockCreate") {
 				for (const itemId of readResolvedSelectorIds(
 					operation.target.items,

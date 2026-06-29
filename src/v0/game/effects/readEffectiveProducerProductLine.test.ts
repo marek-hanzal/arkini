@@ -877,4 +877,98 @@ describe("readEffectiveProducerProductLine", () => {
 			},
 		]);
 	});
+
+	it("adds chance-based extra output only for matching output item tags", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:bounty": {
+					name: "Bounty",
+					operations: [
+						{
+							chance: 0.35,
+							kind: "loot.extraOutputChance.add",
+							outputItems: {
+								items: {
+									anyOf: [
+										{
+											ids: [
+												"item:twig",
+											],
+										},
+									],
+								},
+							},
+							quantity: 1,
+							target: {
+								productLines: {
+									mode: "all",
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:bounty",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:test"];
+
+		const effective = readEffectiveProducerProductLine({
+			baseDurationMs: product.durationMs,
+			config,
+			nowMs: 0,
+			producerId: "item:producer",
+			producerItemId: "item:producer",
+			producerItemInstanceId: "item-instance:1",
+			product,
+			productId: "product:test",
+			save,
+		});
+
+		expect(effective.lootPlan.baseOutput).toEqual([
+			{
+				itemId: "item:twig",
+				quantity: 2,
+				type: "guaranteed",
+			},
+		]);
+		expect(effective.lootPlan.chanceItems).toEqual([
+			{
+				chance: 0.35,
+				itemId: "item:twig",
+				quantity: 1,
+			},
+		]);
+		expect(effective.appliedEffects.map((effect) => effect.kind)).toEqual([
+			"loot.extraOutputChance.add",
+		]);
+	});
 });

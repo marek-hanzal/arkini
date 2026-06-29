@@ -390,6 +390,17 @@ const normalizeEffectDefinitions = ({
 				target: asRecord(operation.target),
 			});
 
+			if (operation.kind === "loot.extraOutputChance.add") {
+				const outputItems = asRecord(operation.outputItems);
+				operation.outputItems = {
+					items: normalizeAuthoringDomainSelector({
+						domain: domainIndexes.items,
+						path: `effects.${effectId}.operations.${operationIndex}.outputItems.items`,
+						selector: asAuthoringDomainSelector(outputItems.items),
+					}),
+				};
+			}
+
 			return operation;
 		});
 		normalizedEffects[effectId] = effect;

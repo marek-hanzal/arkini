@@ -1100,7 +1100,8 @@
 				"material",
 				"food",
 				"grain",
-				"era:II"
+				"era:II",
+				"tier-1-resource"
 			]
 		},
 		"item:grapes": {
@@ -1280,7 +1281,8 @@
 			"tags": [
 				"material",
 				"wood",
-				"era:I"
+				"era:I",
+				"tier-1-resource"
 			]
 		},
 		"item:luxury-cloth": {
@@ -1481,7 +1483,8 @@
 			"tags": [
 				"material",
 				"wood",
-				"era:I"
+				"era:I",
+				"tier-2-resource"
 			]
 		},
 		"item:pollution": {
@@ -1618,7 +1621,8 @@
 			"tags": [
 				"material",
 				"stone",
-				"era:I"
+				"era:I",
+				"tier-1-resource"
 			]
 		},
 		"item:stone-block": {
@@ -1686,7 +1690,8 @@
 			"tags": [
 				"food",
 				"vegetable",
-				"era:II"
+				"era:II",
+				"tier-1-resource"
 			]
 		},
 		"item:vineyard": {
@@ -1708,7 +1713,8 @@
 				"material",
 				"food",
 				"water",
-				"era:I"
+				"era:I",
+				"tier-1-resource"
 			]
 		},
 		"item:wheat-field": {

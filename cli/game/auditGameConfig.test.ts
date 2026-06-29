@@ -225,6 +225,68 @@ describe("auditGameConfig", () => {
 		]);
 	});
 
+	it("warns about unused asset definitions", () => {
+		const config: any = createConfigValue();
+		config.resources["resource:unused"] = {
+			data: "iVBOR-unused",
+		};
+		config.assets["asset:unused"] = {
+			label: "Unused",
+			render: "plain",
+			resourceId: "resource:unused",
+		};
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).toContainEqual(
+			expect.objectContaining({
+				code: "unused-definition",
+				id: "asset:unused",
+				section: "assets",
+			}),
+		);
+	});
+
+	it("warns about PNG resources that no asset references", () => {
+		const config: any = createConfigValue();
+		config.resources["resource:orphan-png"] = {
+			data: "iVBOR-orphan",
+		};
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).toContainEqual(
+			expect.objectContaining({
+				code: "unused-definition",
+				id: "resource:orphan-png",
+				section: "resources",
+			}),
+		);
+	});
+
+	it("does not warn about overlay assets referenced by used assets", () => {
+		const config: any = createConfigValue();
+		config.resources["resource:overlay"] = {
+			data: "iVBOR-overlay",
+		};
+		config.assets["asset:item"].overlayAssetId = "asset:overlay";
+		config.assets["asset:overlay"] = {
+			label: "Overlay",
+			render: "plain",
+			resourceId: "resource:overlay",
+		};
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).not.toContainEqual(
+			expect.objectContaining({
+				code: "unused-definition",
+				id: "asset:overlay",
+				section: "assets",
+			}),
+		);
+	});
+
 	it("formats warnings for CLI output", () => {
 		const warnings = auditGameConfig(parseGameConfig(createConfigValue()));
 

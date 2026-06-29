@@ -30,7 +30,6 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	const usage = createUsageIndex();
 	const itemFlow = createItemFlowIndex();
 
-	collectAssetUsage(config, usage);
 	collectItemUsage(config, usage, itemFlow);
 	collectMergeUsage(config, usage, itemFlow);
 	collectRequirementUsage(config, itemFlow);
@@ -40,6 +39,8 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	collectCraftRecipeUsage(config, itemFlow);
 	collectProductUsage(config, usage, itemFlow);
 	collectStartingStateUsage(config, itemFlow);
+	collectUsedAssetDependencyUsage(config, usage);
+	collectAssetResourceUsage(config, usage);
 
 	return [
 		...readUnusedDefinitionWarnings(config, usage),
@@ -79,11 +80,33 @@ const createItemFlowIndex = (): ItemFlowIndex => ({
 	producedItemIds: new Set(),
 });
 
-const collectAssetUsage = (config: GameConfig, usage: UsageIndex) => {
+const collectAssetResourceUsage = (config: GameConfig, usage: UsageIndex) => {
 	for (const asset of Object.values(config.assets)) {
 		usage.resources.add(asset.resourceId);
+	}
+};
+
+const collectUsedAssetDependencyUsage = (config: GameConfig, usage: UsageIndex) => {
+	const pendingAssetIds = [
+		...usage.assets,
+	];
+	const visitedAssetIds = new Set<string>();
+
+	while (pendingAssetIds.length > 0) {
+		const assetId = pendingAssetIds.shift();
+		if (!assetId || visitedAssetIds.has(assetId)) {
+			continue;
+		}
+
+		visitedAssetIds.add(assetId);
+		const asset = config.assets[assetId];
+		if (!asset) {
+			continue;
+		}
+
 		if (asset.overlayAssetId) {
 			usage.assets.add(asset.overlayAssetId);
+			pendingAssetIds.push(asset.overlayAssetId);
 		}
 	}
 };
@@ -383,6 +406,8 @@ const readUnusedDefinitionWarnings = (
 	config: GameConfig,
 	usage: UsageIndex,
 ): GameConfigAuditWarning[] => [
+	...readUnusedRecordWarnings("resources", config.resources, usage.resources),
+	...readUnusedRecordWarnings("assets", config.assets, usage.assets),
 	...readUnusedRecordWarnings("merge", config.merge, usage.merge),
 	...readUnusedRecordWarnings("requirements", config.requirements, usage.requirements),
 	...readUnusedRecordWarnings("effects", config.effects, usage.effects),
@@ -418,8 +443,23 @@ const readUnusedRecordWarnings = (
 			code: "unused-definition",
 			id,
 			section,
-			message: `${section}.${id} is defined but no other config entry references it.`,
+			message: readUnusedRecordWarningMessage(section, id),
 		}));
+
+const readUnusedRecordWarningMessage = (
+	section: Exclude<RecordName, "items">,
+	id: string,
+): string => {
+	if (section === "assets") {
+		return `assets.${id} is defined but no item or used overlay references it.`;
+	}
+
+	if (section === "resources") {
+		return `resources.${id} is packaged from assets but no asset references it.`;
+	}
+
+	return `${section}.${id} is defined but no other config entry references it.`;
+};
 
 const usageItem = (itemFlow: ItemFlowIndex, itemId: string, usage: "consumed" | "produced") => {
 	if (usage === "consumed") {

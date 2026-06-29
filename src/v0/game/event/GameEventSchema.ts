@@ -8,7 +8,6 @@ const PositiveIntegerSchema = z.number().int().positive();
 
 export const GameItemCreatedReasonSchema = z.enum([
 	"product-output",
-	"stored-requirement-withdraw",
 	"producer-input-withdraw",
 	"craft-input-withdraw",
 	"inventory-placement",
@@ -23,8 +22,6 @@ const GameItemConsumedReasonSchema = z.enum([
 	"craft-input",
 	"craft-input-store",
 	"craft-input-auto-fill",
-	"craft-requirement",
-	"stored-requirement-store",
 	"inventory-placement",
 	"board-stash",
 	"remove-tool",
@@ -130,28 +127,6 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			type: z.literal("producer_input.withdrawn"),
 			producerItemInstanceId: IdSchema,
 			productId: IdSchema,
-			itemId: IdSchema,
-			quantity: PositiveIntegerSchema,
-			previousQuantity: PositiveIntegerSchema,
-			nextQuantity: NonNegativeIntegerSchema,
-			atMs: GameInstantMsSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("stored_requirement.stored"),
-			targetItemInstanceId: IdSchema,
-			itemId: IdSchema,
-			quantity: PositiveIntegerSchema,
-			previousQuantity: NonNegativeIntegerSchema,
-			nextQuantity: PositiveIntegerSchema,
-			atMs: GameInstantMsSchema,
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("stored_requirement.withdrawn"),
-			targetItemInstanceId: IdSchema,
 			itemId: IdSchema,
 			quantity: PositiveIntegerSchema,
 			previousQuantity: PositiveIntegerSchema,

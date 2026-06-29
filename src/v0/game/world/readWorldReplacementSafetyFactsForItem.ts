@@ -42,10 +42,6 @@ export const readWorldReplacementSafetyFactsForItem = ({
 	) {
 		pushReason(blockReasons, "producer_runtime_state");
 	}
-	if (save.storedRequirements[itemInstanceId]) {
-		pushReason(blockReasons, "stored_requirement_state");
-	}
-
 	return {
 		blockReasons,
 		itemInstanceId,

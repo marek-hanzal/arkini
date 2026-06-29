@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { ActivationInputViewSchema } from "~/v0/board/view/ActivationInputViewSchema";
-import { ActivationRequirementViewSchema } from "~/v0/board/view/ActivationRequirementViewSchema";
 import { ItemTargetLimitViewSchema } from "~/v0/board/view/ItemTargetLimitViewSchema";
 
 const IdSchema = z.string().min(1);
@@ -61,16 +60,12 @@ export const ProducerProductLineViewSchema = z.object({
 	inputs: z.array(ActivationInputViewSchema),
 	inputsReady: z.boolean(),
 	inputsAvailable: z.boolean(),
-	requirementsReady: z.boolean(),
-	missingRequirementItemIds: z.array(IdSchema),
 	startAtMs: z.number().int().nonnegative().optional(),
 	readyAtMs: z.number().int().nonnegative().optional(),
 	remainingMs: z.number().int().nonnegative().optional(),
 	pausedAtMs: z.number().int().nonnegative().optional(),
 	progress: z.number().min(0).max(1).optional(),
 	inputItemIds: z.array(IdSchema),
-	requirementItemIds: z.array(IdSchema),
-	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	effectDurationMultiplier: z.number().min(1).optional(),
 	effectBenefits: z.array(z.string().min(1)).optional(),
 	effectBonusLines: z.array(z.string().min(1)).optional(),

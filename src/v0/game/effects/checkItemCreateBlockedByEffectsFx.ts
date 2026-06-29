@@ -4,6 +4,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
+import { readGameEffectItemCreateMissingGrant } from "~/v0/game/effects/readGameEffectItemCreateMissingGrant";
 
 export namespace checkItemCreateBlockedByEffectsFx {
 	export interface Props {
@@ -25,6 +26,24 @@ export const checkItemCreateBlockedByEffectsFx = Effect.fn("checkItemCreateBlock
 		save,
 		targetCell,
 	}: checkItemCreateBlockedByEffectsFx.Props) {
+		if (
+			readGameEffectItemCreateMissingGrant({
+				config,
+				ignoredSourceIds,
+				itemId,
+				nowMs,
+				save,
+				targetCell,
+			})
+		) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"effect:missing-grant",
+					`Item "${itemId}" is missing a required effect grant.`,
+				),
+			);
+		}
+
 		const blockReasons = readGameEffectItemCreateBlockReasons({
 			config,
 			ignoredSourceIds,

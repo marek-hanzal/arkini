@@ -108,7 +108,6 @@ describe("readNextWakeAtMsFx", () => {
 					durationMs: baseProduct.durationMs,
 					name: baseProduct.name,
 					placement: baseProduct.placement,
-					requirementIds: baseProduct.requirementIds,
 					tags: baseProduct.tags,
 					visibility: baseProduct.visibility,
 				},

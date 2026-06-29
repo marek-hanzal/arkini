@@ -3,7 +3,7 @@ import { autoFillProducerProductInputsFx } from "~/v0/game/producer/autoFillProd
 import { checkProducerProductStartReadinessFx } from "~/v0/game/producer/checkProducerProductStartReadinessFx";
 import { checkProducerProductStartRuntimeConstraintsFx } from "~/v0/game/producer/checkProducerProductStartRuntimeConstraintsFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
-import { consumeActivationInputsFx } from "~/v0/game/requirements/consumeActivationInputsFx";
+import { consumeActivationInputsFx } from "~/v0/game/activation/consumeActivationInputsFx";
 import { consumeProducerStoredInputsFx } from "~/v0/game/producer/consumeProducerStoredInputsFx";
 import { createGameActiveEffectIdFx } from "~/v0/game/effects/createGameActiveEffectIdFx";
 import { createGameJobIdFx } from "~/v0/game/job/createGameJobIdFx";
@@ -11,13 +11,13 @@ import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readProducerJobTimingFx } from "~/v0/game/producer/readProducerJobTimingFx";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
-import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
+import type { GameActivationInput } from "~/v0/game/activation/GameActivationInput";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
-import { readActivationInputStoredQuantityReady } from "~/v0/game/requirements/readActivationInputStoredQuantityReady";
+import { readActivationInputStoredQuantityReady } from "~/v0/game/activation/readActivationInputStoredQuantityReady";
 
 export namespace startProducerProductFx {
 	export interface Props {
@@ -133,7 +133,6 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 		producerItemInstanceId: action.producerItemInstanceId,
 		product: checked.product,
 		productId: checked.productId,
-		requirements: checked.requirements,
 		save: nextSave,
 		startAtMs: queuedStartAtMs,
 	});

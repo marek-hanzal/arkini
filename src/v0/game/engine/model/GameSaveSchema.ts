@@ -4,7 +4,6 @@ import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSc
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
-import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
@@ -197,12 +196,6 @@ const GameSaveCraftInputStateSchema = z
 	})
 	.strict();
 
-const GameSaveStoredRequirementStateSchema = z
-	.object({
-		items: z.record(IdSchema, PositiveIntegerSchema),
-	})
-	.strict();
-
 const GameSaveItemSpawnJobSeedCellSchema = z
 	.object({
 		x: NonNegativeIntegerSchema,
@@ -276,7 +269,6 @@ const GameSaveSchema = z
 		producerCharges: z.record(IdSchema, GameSaveProducerChargeStateSchema).default({}),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
 		craftInputs: z.record(IdSchema, GameSaveCraftInputStateSchema),
-		storedRequirements: z.record(IdSchema, GameSaveStoredRequirementStateSchema),
 		itemSpawnJobs: z.record(IdSchema, GameSaveItemSpawnJobSchema),
 	})
 	.strict()
@@ -373,69 +365,6 @@ const readItemInstanceDefinition = ({
 	}
 
 	return undefined;
-};
-
-const readStoredRequirementSlots = ({
-	config,
-	save,
-	targetItemInstanceId,
-}: {
-	config: GameConfig;
-	save: GameSave;
-	targetItemInstanceId: string;
-}) => {
-	const target = readItemInstanceDefinition({
-		config,
-		save,
-		itemInstanceId: targetItemInstanceId,
-	});
-	if (!target) return [];
-
-	const requirements = [];
-
-	const producer = readProducerCapabilityDefinition({
-		config,
-		producerId: target.itemId,
-	});
-	if (producer) {
-		for (const productId of producer.productIds) {
-			const product = config.products[productId];
-			if (product) {
-				requirements.push(
-					...resolveGameRequirements({
-						config,
-						requirementIds: product.requirementIds,
-					}),
-				);
-			}
-		}
-	}
-
-	const recipe = config.craftRecipes[target.itemId];
-	if (recipe) requirements.push(...recipe.requirements);
-
-	return requirements.filter((requirement) => requirement.type === "stored");
-};
-
-const readStoredRequirementCapacity = ({
-	config,
-	itemId,
-	save,
-	targetItemInstanceId,
-}: {
-	config: GameConfig;
-	itemId: string;
-	save: GameSave;
-	targetItemInstanceId: string;
-}) => {
-	const matchingSlots = readStoredRequirementSlots({
-		config,
-		save,
-		targetItemInstanceId,
-	}).filter((requirement) => requirement.itemId === itemId);
-
-	if (matchingSlots.length === 0) return undefined;
-	return Math.max(...matchingSlots.map((requirement) => requirement.capacity));
 };
 
 const readEffectiveProductInputSlots = ({
@@ -1363,74 +1292,6 @@ const validateGameSaveAgainstConfig = (
 				],
 				`remainingCharges must be <= producer charges (${producer.charges}).`,
 			);
-		}
-	}
-
-	for (const [targetItemInstanceId, state] of Object.entries(save.storedRequirements)) {
-		const target = readItemInstanceDefinition({
-			config,
-			save,
-			itemInstanceId: targetItemInstanceId,
-		});
-		if (!target) {
-			addSaveIssue(
-				ctx,
-				[
-					"storedRequirements",
-					targetItemInstanceId,
-				],
-				`Stored requirement target "${targetItemInstanceId}" must reference a save item instance.`,
-			);
-			continue;
-		}
-
-		for (const [itemId, quantity] of Object.entries(state.items)) {
-			if (!config.items[itemId]) {
-				addSaveIssue(
-					ctx,
-					[
-						"storedRequirements",
-						targetItemInstanceId,
-						"items",
-						itemId,
-					],
-					`Missing item "${itemId}".`,
-				);
-				continue;
-			}
-
-			const capacity = readStoredRequirementCapacity({
-				config,
-				save,
-				itemId,
-				targetItemInstanceId,
-			});
-			if (capacity === undefined) {
-				addSaveIssue(
-					ctx,
-					[
-						"storedRequirements",
-						targetItemInstanceId,
-						"items",
-						itemId,
-					],
-					`Item "${itemId}" is not accepted by target stored requirements.`,
-				);
-				continue;
-			}
-
-			if (quantity > capacity) {
-				addSaveIssue(
-					ctx,
-					[
-						"storedRequirements",
-						targetItemInstanceId,
-						"items",
-						itemId,
-					],
-					`Quantity must be <= stored requirement capacity (${capacity}).`,
-				);
-			}
 		}
 	}
 

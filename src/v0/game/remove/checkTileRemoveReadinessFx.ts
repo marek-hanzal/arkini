@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
+import { resolveInputRefsFx } from "~/v0/game/activation/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionTileRemove } from "~/v0/game/action/GameActionTileRemove";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";

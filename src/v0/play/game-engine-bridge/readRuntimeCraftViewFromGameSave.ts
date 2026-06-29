@@ -3,11 +3,12 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
-import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 import { readGameTimeProgress, readGameTimeRemainingMs } from "~/v0/game/time/GameTime";
 import { readCraftRecipeDurationMs } from "~/v0/game/craft/readCraftRecipeDurationMs";
 import { readItemTargetLimits } from "~/v0/game/limit/readItemTargetLimits";
 import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
+import { readGameEffectTargetGrantIds } from "~/v0/game/effects/readGameEffectTargetGrantIds";
+import { doesGameGrantSelectorMatchIds } from "~/v0/game/effects/doesGameGrantSelectorMatchIds";
 
 export namespace readRuntimeCraftViewFromGameSave {
 	export interface Props {
@@ -82,11 +83,30 @@ export const readRuntimeCraftViewFromGameSave = ({
 		itemId: recipe.resultItemId,
 		save,
 	});
+	const grantIds = recipe.grantSelector
+		? readGameEffectTargetGrantIds({
+				config,
+				nowMs,
+				save,
+				target: {
+					craftRecipeId: recipeId,
+					kind: "craftRecipe",
+					targetCell: boardItem,
+				},
+			})
+		: undefined;
+	const grantsReady = recipe.grantSelector
+		? doesGameGrantSelectorMatchIds({
+				grantIds: grantIds ?? new Set(),
+				selector: recipe.grantSelector,
+			})
+		: true;
 
 	return {
 		acceptedInputItemIds,
 		canAcceptInputs: acceptedInputItemIds.length > 0,
 		complete: phase === "ready",
+		grantsReady,
 		deliveryBlocked,
 		targetLimitBlocked: readTargetLimitBlocked(targetLimits),
 		targetLimits: targetLimits.length ? targetLimits : undefined,
@@ -119,11 +139,6 @@ export const readRuntimeCraftViewFromGameSave = ({
 						readyAtMs,
 					})
 				: undefined,
-		requirements: readRuntimeActivationRequirementViewsFromGameSave({
-			requirements: recipe.requirements,
-			save,
-			targetItemInstanceId: boardItem.id,
-		}),
 		resultItemId: recipe.resultItemId as ItemId,
 		startAtMs,
 		timeProgress,

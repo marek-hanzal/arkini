@@ -3,6 +3,7 @@ import type { BoardCell } from "~/v0/game/board/BoardCell";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
+import { readGameEffectItemCreateMissingGrant } from "~/v0/game/effects/readGameEffectItemCreateMissingGrant";
 import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 
 export namespace planItemBoardPlacementCellsFx {
@@ -30,6 +31,13 @@ export const planItemBoardPlacementCellsFx = Effect.fn("planItemBoardPlacementCe
 
 	return emptyCells.filter(
 		(targetCell) =>
+			!readGameEffectItemCreateMissingGrant({
+				config,
+				itemId,
+				nowMs,
+				save,
+				targetCell,
+			}) &&
 			readGameEffectItemCreateBlockReasons({
 				config,
 				itemId,

@@ -170,8 +170,6 @@ export const createGameEngineVisualPlan = ({
 			case "product.blocked":
 			case "product.failed":
 			case "product.started":
-			case "stored_requirement.stored":
-			case "stored_requirement.withdrawn":
 				plan.ignoredEventTypes.push(event.type);
 				break;
 

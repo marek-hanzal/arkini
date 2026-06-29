@@ -1,6 +1,5 @@
 import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
 import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInputViewReady";
-import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 
@@ -39,8 +38,5 @@ export function isProducerStocked(activation: ActivationView | undefined) {
 		(input) => readActivationInputViewFillableQuantity(input) > 0,
 	);
 
-	return (
-		(inputsReady || inputsFillable) &&
-		activation.requirements.every(readActivationRequirementViewReady)
-	);
+	return inputsReady || inputsFillable;
 }

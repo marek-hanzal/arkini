@@ -36,7 +36,6 @@ export const createEngineCraftTableTestConfig = ({
 					"item:craft-table": {
 						...baseConfig.craftRecipes["item:craft-table"],
 						inputs: [],
-						requirements: [],
 					},
 				}
 			: baseConfig.craftRecipes,

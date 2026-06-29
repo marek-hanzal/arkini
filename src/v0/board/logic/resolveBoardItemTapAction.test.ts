@@ -45,7 +45,6 @@ const activation = (
 	inputs: [],
 	kind,
 	remainingCharges: undefined,
-	requirements: [],
 	trigger: "click" as const,
 	...overrides,
 });
@@ -58,7 +57,6 @@ const productLine = (isDefault: boolean, overrides = {}) => ({
 	inputsAvailable: true,
 	inputsReady: true,
 	isDefault,
-	missingRequirementItemIds: [],
 	name: "Product",
 	producerQueuedJobs: 0,
 	productId: "product:test",
@@ -68,8 +66,6 @@ const productLine = (isDefault: boolean, overrides = {}) => ({
 	blockReasonEffectIds: [],
 	queueSize: 1,
 	queuedJobs: 0,
-	requirementItemIds: [],
-	requirementsReady: true,
 	...overrides,
 });
 
@@ -500,22 +496,14 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("opens detail for crafts with missing requirements", () => {
+	it("opens detail for crafts with missing grants", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					craft: craft({
+						grantsReady: false,
 						phase: "collecting_inputs",
 						readyAtMs: undefined,
-						requirements: [
-							{
-								capacity: 1,
-								itemId: "item:water",
-								quantity: 1,
-								stored: 0,
-								type: "passive",
-							},
-						],
 					}),
 				}),
 				nowMs: 0,

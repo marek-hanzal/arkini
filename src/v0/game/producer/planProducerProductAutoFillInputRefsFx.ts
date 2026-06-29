@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
+import type { GameActivationInput } from "~/v0/game/activation/GameActivationInput";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { planActivationInputRefsFx } from "~/v0/game/requirements/planActivationInputRefsFx";
+import { planActivationInputRefsFx } from "~/v0/game/activation/planActivationInputRefsFx";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 
 export namespace planProducerProductAutoFillInputRefsFx {

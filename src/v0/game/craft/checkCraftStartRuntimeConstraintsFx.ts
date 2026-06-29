@@ -4,8 +4,7 @@ import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCr
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
-import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
+import { checkGameEffectGrantSelectorFx } from "~/v0/game/effects/checkGameEffectGrantSelectorFx";
 
 export namespace checkCraftStartRuntimeConstraintsFx {
 	export interface Props {
@@ -27,15 +26,17 @@ export const checkCraftStartRuntimeConstraintsFx = Effect.fn("checkCraftStartRun
 		targetItem,
 		targetItemInstanceId,
 	}: checkCraftStartRuntimeConstraintsFx.Props) {
-		const storedRequirementItems = yield* readStoredRequirementQuantitiesFx({
+		yield* checkGameEffectGrantSelectorFx({
+			config,
+			missingReason: `Craft recipe for "${targetItem.itemId}" is missing a required effect grant.`,
+			nowMs,
 			save,
-			targetItemInstanceId,
-		});
-		yield* checkGameRequirementsFx({
-			requirements: recipe.requirements,
-			save,
-			storedItems: storedRequirementItems,
-			targetItemInstanceId,
+			selector: recipe.grantSelector,
+			target: {
+				kind: "craftRecipe",
+				craftRecipeId: targetItem.itemId,
+				targetCell: targetItem,
+			},
 		});
 		yield* checkItemCreateBlockedByEffectsFx({
 			config,

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
-import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
+import { resolveInputRefsFx } from "~/v0/game/activation/resolveInputRefsFx";
 import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";

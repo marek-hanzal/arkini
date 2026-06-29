@@ -11,7 +11,6 @@ export const removeBoardItemRuntimeState = ({
 	delete save.producerLines[itemInstanceId];
 	delete save.producerInputs[itemInstanceId];
 	delete save.craftInputs[itemInstanceId];
-	delete save.storedRequirements[itemInstanceId];
 
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
 		if (job.producerItemInstanceId === itemInstanceId) delete save.producerJobs[jobId];

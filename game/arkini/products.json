@@ -763,7 +763,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:armory-t1:leather-armor": {
 			"durationMs": 1000,
@@ -876,7 +885,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:blacksmith-t1:nails": {
 			"durationMs": 1000,
@@ -909,7 +927,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:blacksmith-t1:sword": {
 			"durationMs": 1000,
@@ -947,7 +974,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:brewery-t1:beer-barrel": {
 			"durationMs": 1000,
@@ -973,7 +1009,16 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:brewery-t1:hop-field"
+						]
+					}
+				]
+			}
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
 			"durationMs": 1000,
@@ -995,7 +1040,16 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:brewery-t1:hop-field"
+						]
+					}
+				]
+			}
 		},
 		"product:brewery-t1:hops": {
 			"durationMs": 1000,
@@ -1016,7 +1070,16 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:brewery-t1:hop-field"
+						]
+					}
+				]
+			}
 		},
 		"product:brickyard:bricks": {
 			"durationMs": 1000,
@@ -1055,7 +1118,21 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:clay-pit:nearby"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:cattle-farm-t1:milk": {
 			"durationMs": 1000,
@@ -1109,7 +1186,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:chicken-coop-t1:egg": {
 			"durationMs": 1000,
@@ -1288,7 +1374,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:clay-pit:clay-deposit"
+						]
+					}
+				]
+			}
 		},
 		"product:coal-mine-t1:coal": {
 			"durationMs": 1000,
@@ -1315,7 +1410,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:coal-mine-t1:coal-deposit"
+						]
+					}
+				]
+			}
 		},
 		"product:construction-yard-t1:construction-bundle": {
 			"durationMs": 1000,
@@ -1532,7 +1636,16 @@
 				"pollution-sensitive:radius-2",
 				"shrine:haste-target"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:farm-t1:wheat-field"
+						]
+					}
+				]
+			}
 		},
 		"product:farm-t1:grain-morale-t1": {
 			"durationMs": 1000,
@@ -1560,7 +1673,16 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:farm-t1:wheat-field"
+						]
+					}
+				]
+			}
 		},
 		"product:glassworks:glass": {
 			"durationMs": 1000,
@@ -1594,7 +1716,21 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:glassworks:sand-pit"
+						]
+					}
+				]
+			}
 		},
 		"product:glazier-workshop-t1:stained-glass": {
 			"durationMs": 1000,
@@ -1637,7 +1773,21 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:glazier-workshop-t1:glassworks"
+						]
+					}
+				]
+			}
 		},
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
 			"durationMs": 1000,
@@ -1687,7 +1837,21 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:glazier-workshop-t1:glassworks"
+						]
+					}
+				]
+			}
 		},
 		"product:gold-mine-t1:gold-ore": {
 			"durationMs": 1000,
@@ -1714,7 +1878,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:gold-mine-t1:gold-deposit"
+						]
+					}
+				]
+			}
 		},
 		"product:goldsmith-t1:coin-stack": {
 			"durationMs": 1000,
@@ -1746,7 +1919,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:goldsmith-t1:key-t1": {
 			"durationMs": 1000,
@@ -1788,7 +1970,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:goldsmith-t1:key-t2": {
 			"durationMs": 1000,
@@ -1830,7 +2021,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:goldsmith-t1:key-t3": {
 			"durationMs": 1000,
@@ -1872,7 +2072,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:goldsmith-t1:key-t4": {
 			"durationMs": 1000,
@@ -1914,7 +2123,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:heroes-guild-t1:chest-t1": {
 			"durationMs": 1000,
@@ -2350,7 +2568,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:iron-mine-t1:iron-deposit"
+						]
+					}
+				]
+			}
 		},
 		"product:lumberjack-t1:log": {
 			"durationMs": 1000,
@@ -2363,7 +2590,16 @@
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:lumberjack-t1:tree"
+						]
+					}
+				]
+			}
 		},
 		"product:market-t1:coin-from-beer": {
 			"durationMs": 1000,
@@ -2849,7 +3085,16 @@
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:quarry-t1:rock"
+						]
+					}
+				]
+			}
 		},
 		"product:quarry-t2:marble": {
 			"durationMs": 1000,
@@ -2859,7 +3104,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:quarry-t2:marble-deposit"
+						]
+					}
+				]
+			}
 		},
 		"product:quarry-t2:stone": {
 			"durationMs": 1000,
@@ -2869,7 +3123,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:quarry-t2:marble-deposit"
+						]
+					}
+				]
+			}
 		},
 		"product:roof-tile-factory:roof-tiles": {
 			"durationMs": 1000,
@@ -2908,7 +3171,21 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:clay-pit:nearby"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:sand-pit:sand": {
 			"durationMs": 1000,
@@ -2919,7 +3196,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:sand-pit:sand-deposit"
+						]
+					}
+				]
+			}
 		},
 		"product:sawmill-t1:plank": {
 			"durationMs": 1000,
@@ -2939,7 +3225,16 @@
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:sawmill-t1:lumberjack-t1"
+						]
+					}
+				]
+			}
 		},
 		"product:school:basic-knowledge": {
 			"durationMs": 1000,
@@ -3072,7 +3367,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:smelter-t1:iron-ingot": {
 			"durationMs": 1000,
@@ -3109,7 +3413,16 @@
 					"type": "chance"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			}
 		},
 		"product:stonemason-t1:stone-block": {
 			"durationMs": 1000,
@@ -3126,7 +3439,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:stonemason-t1:quarry-t1"
+						]
+					}
+				]
+			}
 		},
 		"product:stonemason-t2:marble-block": {
 			"durationMs": 1000,
@@ -3148,7 +3470,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:stonemason-t2:quarry-t2"
+						]
+					}
+				]
+			}
 		},
 		"product:stonemason-t2:marble-block-morale-t4": {
 			"durationMs": 1000,
@@ -3177,7 +3508,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:stonemason-t2:quarry-t2"
+						]
+					}
+				]
+			}
 		},
 		"product:stonemason-t2:stone-block": {
 			"durationMs": 1000,
@@ -3194,7 +3534,16 @@
 					"type": "guaranteed"
 				}
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:stonemason-t2:quarry-t2"
+						]
+					}
+				]
+			}
 		},
 		"product:tailor-workshop-t1:common-clothing": {
 			"durationMs": 1000,
@@ -4839,7 +5188,16 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:winery-t1:vineyard"
+						]
+					}
+				]
+			}
 		},
 		"product:winery-t1:wine-barrel": {
 			"durationMs": 1000,
@@ -4865,7 +5223,16 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:winery-t1:vineyard"
+						]
+					}
+				]
+			}
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
 			"durationMs": 1000,
@@ -4887,7 +5254,16 @@
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "hidden"
+			"visibility": "visible",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:winery-t1:vineyard"
+						]
+					}
+				]
+			}
 		},
 		"product:chest-t1:open": {
 			"chargeCost": 1,

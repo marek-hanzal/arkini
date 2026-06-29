@@ -61,7 +61,6 @@ describe("game package normalization", () => {
 				},
 			},
 			merge: {},
-			requirements: {},
 			effects: {},
 			producers: {
 				"producer:test": {

@@ -29,16 +29,6 @@ export const createGameActionFromItemToBoardItemInteractionPlan = ({
 		)
 		.with(
 			{
-				type: "stored-requirement",
-			},
-			() => ({
-				inputRef: sourceRef,
-				targetItemInstanceId,
-				type: "stored_requirement.store" as const,
-			}),
-		)
-		.with(
-			{
 				type: "craft-input",
 			},
 			() => ({

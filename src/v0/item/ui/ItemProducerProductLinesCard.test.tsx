@@ -13,7 +13,6 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	inputsAvailable: true,
 	inputsReady: true,
 	isDefault: true,
-	missingRequirementItemIds: [],
 	name: "Log",
 	pausedAtMs: 1000,
 	producerQueuedJobs: 1,
@@ -24,8 +23,6 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	queuedJobs: 1,
 	queueSize: 1,
 	readyAtMs: 5000,
-	requirementItemIds: [],
-	requirementsReady: false,
 	startAtMs: 0,
 	...overrides,
 });
@@ -305,7 +302,6 @@ describe("ItemProducerProductLinesCard", () => {
 						deliveryBlocked: true,
 						pausedAtMs: undefined,
 						progress: undefined,
-						requirementsReady: true,
 					}),
 				]}
 				pending={false}
@@ -331,7 +327,6 @@ describe("ItemProducerProductLinesCard", () => {
 						pausedAtMs: undefined,
 						queueFull: false,
 						readyAtMs: undefined,
-						requirementsReady: true,
 						startAtMs: undefined,
 					}),
 				]}
@@ -345,62 +340,5 @@ describe("ItemProducerProductLinesCard", () => {
 
 		expect(html).not.toContain(">Default</button>");
 		expect(html).toContain(">Start</span></button>");
-	});
-
-	it("hides satisfied product-line requirement rows", () => {
-		const html = renderToStaticMarkup(
-			<ItemProducerProductLinesCard
-				items={{
-					"item:done": {
-						assetSrc: "done.svg",
-						description: "Done requirement",
-						generatedEffects: [],
-						id: "item:done",
-						maxStackSize: 1,
-						name: "Done requirement",
-						storage: "both",
-						tags: [],
-					},
-					"item:missing": {
-						assetSrc: "missing.svg",
-						description: "Missing requirement",
-						generatedEffects: [],
-						id: "item:missing",
-						maxStackSize: 1,
-						name: "Missing requirement",
-						storage: "both",
-						tags: [],
-					},
-				}}
-				lines={[
-					createLine({
-						requirements: [
-							{
-								capacity: 1,
-								itemId: "item:done",
-								quantity: 1,
-								stored: 1,
-								type: "passive",
-							},
-							{
-								capacity: 1,
-								itemId: "item:missing",
-								quantity: 1,
-								stored: 0,
-								type: "passive",
-							},
-						],
-					}),
-				]}
-				pending={false}
-				onSetDefault={() => undefined}
-				onStart={() => undefined}
-				onWithdrawInput={() => undefined}
-			/>,
-		);
-
-		expect(html).not.toContain("Done requirement");
-		expect(html).toContain("Missing requirement");
-		expect(html).not.toContain("ready");
 	});
 });

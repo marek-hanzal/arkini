@@ -1,8 +1,7 @@
 import { Effect } from "effect";
-import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { checkCraftTargetIdleFx } from "~/v0/game/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
+import { checkGameEffectGrantSelectorFx } from "~/v0/game/effects/checkGameEffectGrantSelectorFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -34,15 +33,17 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
 
-	const storedRequirementItems = yield* readStoredRequirementQuantitiesFx({
+	yield* checkGameEffectGrantSelectorFx({
+		config,
+		missingReason: `Craft recipe "${action.recipeId}" is missing a required effect grant.`,
+		nowMs,
 		save,
-		targetItemInstanceId: action.targetItemInstanceId,
-	});
-	yield* checkGameRequirementsFx({
-		requirements: target.recipe.requirements,
-		save,
-		storedItems: storedRequirementItems,
-		targetItemInstanceId: action.targetItemInstanceId,
+		selector: target.recipe.grantSelector,
+		target: {
+			kind: "craftRecipe",
+			craftRecipeId: action.recipeId,
+			targetCell: target.targetItem,
+		},
 	});
 	return {
 		recipe: target.recipe,

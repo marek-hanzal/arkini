@@ -48,7 +48,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 			},
 		},
 		merge: {},
-		requirements: {},
 		producers: {
 			"item:producer": {
 				maxQueueSize: 1,
@@ -61,7 +60,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 			"product:test": {
 				durationMs: 1000,
 				name: "Test product",
-				requirementIds: [],
 			},
 		},
 		stashes: {},

@@ -49,7 +49,6 @@ const readStatusMetaLabel = (line: ProducerProductLineView) => {
 	if (line.effectLocked) return readLineKind(line) === "effect" ? "effect active" : "locked";
 	if (line.outputLimitBlocked) return "limit reached";
 	if (line.blocked) return "blocked by effect";
-	if (!line.requirementsReady) return "requirements missing";
 	return undefined;
 };
 
@@ -95,7 +94,6 @@ export const readProducerProductLineRunState = ({
 	const queueBlocked = line.queueBlockedReason !== undefined;
 	const canRunAction =
 		(line.inputsReady || line.inputsAvailable || inputsPartiallyAvailable) &&
-		line.requirementsReady &&
 		line.pausedAtMs === undefined &&
 		!line.deliveryBlocked &&
 		!queueBlocked &&
@@ -163,15 +161,6 @@ export const readProducerProductLineRunState = ({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Blocked by effect",
-			line,
-		});
-	}
-
-	if (!line.requirementsReady) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Requirements missing",
 			line,
 		});
 	}

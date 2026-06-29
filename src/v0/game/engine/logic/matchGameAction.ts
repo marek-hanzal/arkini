@@ -27,10 +27,6 @@ export namespace matchGameAction {
 		) => Result;
 		producerProductStart: (action: GameActionOfType<"producer.product.start">) => Result;
 		stashOpen: (action: GameActionOfType<"stash.open">) => Result;
-		storedRequirementStore: (action: GameActionOfType<"stored_requirement.store">) => Result;
-		storedRequirementWithdraw: (
-			action: GameActionOfType<"stored_requirement.withdraw">,
-		) => Result;
 		tileRemove: (action: GameActionOfType<"tile.remove">) => Result;
 	}
 }
@@ -129,18 +125,6 @@ export const matchGameAction = <Result>(
 				type: "stash.open",
 			},
 			cases.stashOpen,
-		)
-		.with(
-			{
-				type: "stored_requirement.store",
-			},
-			cases.storedRequirementStore,
-		)
-		.with(
-			{
-				type: "stored_requirement.withdraw",
-			},
-			cases.storedRequirementWithdraw,
 		)
 		.with(
 			{

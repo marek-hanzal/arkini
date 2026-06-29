@@ -3,9 +3,12 @@ import { doesResolvedDomainSelectorMatchId } from "~/v0/game/effects/doesResolve
 
 type ProductLineEffectOperation = Exclude<
 	GameConfig["effects"][string]["operations"][number],
-	{
-		kind: "item.blockCreate";
-	}
+	| {
+			kind: "grant.add";
+	  }
+	| {
+			kind: "item.blockCreate";
+	  }
 >;
 
 export namespace doesGameEffectTargetProductLine {

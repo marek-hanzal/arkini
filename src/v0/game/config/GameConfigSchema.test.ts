@@ -1,28 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseGameConfig } from "~/v0/game/config/GameConfigSchema";
 
-type TestActivationRequirement =
-	| {
-			capacity: number;
-			itemId: string;
-			quantity: number;
-			type: "stored";
-	  }
-	| {
-			itemId: string;
-			quantity: number;
-			scope: "board" | "inventory" | "board_or_inventory";
-			type: "passive";
-	  };
-
-type TestGameRequirement =
-	| TestActivationRequirement
-	| {
-			distance: number;
-			itemIds: string[];
-			type: "proximity";
-	  };
-
 type TestProductInput = {
 	capacity: number;
 	consume: boolean;
@@ -51,7 +29,6 @@ type TestProduct = {
 		type: "chance" | "guaranteed" | "weighted";
 	}[];
 	placement: "board_then_inventory";
-	requirementIds: string[];
 };
 
 type TestItemStorage = "board" | "inventory" | "both";
@@ -67,7 +44,6 @@ type TestCraftRecipe = {
 		itemId: string;
 		quantity: number;
 	}[];
-	requirements: TestGameRequirement[];
 	resultItemId: string;
 };
 
@@ -133,7 +109,6 @@ const createValidConfigValue = () => ({
 		},
 	},
 	merge: {},
-	requirements: {} as Record<string, TestGameRequirement>,
 	effects: {} as Record<string, unknown>,
 	producers: {
 		"item:producer": {
@@ -154,7 +129,6 @@ const createValidConfigValue = () => ({
 					quantity: 1,
 				},
 			],
-			requirements: [] as TestActivationRequirement[],
 			resultItemId: "item:plank",
 		},
 	} as Record<string, TestCraftRecipe>,
@@ -178,7 +152,6 @@ const createValidConfigValue = () => ({
 				},
 			],
 			placement: "board_then_inventory",
-			requirementIds: [] as string[],
 		},
 	} as Record<string, TestProduct>,
 	startingState: {
@@ -370,48 +343,6 @@ describe("GameConfigSchema", () => {
 		});
 
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate craft input item/);
-	});
-
-	it("rejects stored requirements with capacity below required quantity", () => {
-		const config = createValidConfigValue();
-		config.requirements["requirement:bad-stored"] = {
-			capacity: 1,
-			itemId: "item:twig",
-			quantity: 2,
-			type: "stored",
-		};
-
-		expect(() => parseGameConfig(config)).toThrow(/Capacity must be >= quantity/);
-	});
-
-	it("rejects duplicate requirement ids on product lines", () => {
-		const config = createValidConfigValue();
-		config.requirements["requirement:twig-passive"] = {
-			itemId: "item:twig",
-			quantity: 1,
-			scope: "board",
-			type: "passive",
-		};
-		config.products["product:test"].requirementIds.push(
-			"requirement:twig-passive",
-			"requirement:twig-passive",
-		);
-
-		expect(() => parseGameConfig(config)).toThrow(/Duplicate requirement id/);
-	});
-
-	it("rejects requirement-owned proximity duration factors", () => {
-		const config = createValidConfigValue();
-		(config.requirements as Record<string, unknown>)["requirement:near-twig"] = {
-			distance: 1,
-			durationFactor: 1,
-			itemIds: [
-				"item:twig",
-			],
-			type: "proximity",
-		};
-
-		expect(() => parseGameConfig(config)).toThrow(/durationFactor/);
 	});
 
 	it("rejects negative proximity penalty duration factors", () => {
@@ -710,7 +641,6 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			requirements: [],
 			resultItemId: "producer:house-t1",
 		};
 
@@ -760,7 +690,6 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			requirements: [],
 			resultItemId: "producer:a",
 		};
 		config.craftRecipes["item:blueprint-b"] = {
@@ -772,7 +701,6 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			requirements: [],
 			resultItemId: "producer:b",
 		};
 
@@ -806,7 +734,6 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			requirements: [],
 			resultItemId: "producer:a",
 		};
 		config.producers["producer:a"] = {
@@ -825,72 +752,9 @@ describe("GameConfigSchema", () => {
 				},
 			],
 			placement: "board_then_inventory",
-			requirementIds: [],
 		};
 
 		expect(() => parseGameConfig(config)).toThrow(/Blueprint A -> Blueprint A/);
-	});
-
-	it("rejects proximity requirements that point at missing items", () => {
-		const config = createValidConfigValue();
-		config.requirements["requirement:near-ghost"] = {
-			distance: 1,
-			itemIds: [
-				"item:ghost",
-			],
-			type: "proximity",
-		};
-
-		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
-	});
-
-	it("accepts inline craft proximity requirements", () => {
-		const config = createValidConfigValue();
-		config.craftRecipes["item:craft-target"].requirements = [
-			{
-				distance: 1,
-				itemIds: [
-					"item:twig",
-				],
-				type: "proximity",
-			},
-		];
-
-		expect(
-			parseGameConfig(config).craftRecipes["item:craft-target"]?.requirements,
-		).toMatchObject([
-			{
-				distance: 1,
-				itemIds: [
-					"item:twig",
-				],
-				type: "proximity",
-			},
-		]);
-	});
-
-	it("allows multiple inline proximity requirements with the same items and different distances", () => {
-		const config = createValidConfigValue();
-		config.craftRecipes["item:craft-target"].requirements = [
-			{
-				distance: 1,
-				itemIds: [
-					"item:twig",
-					"item:plank",
-				],
-				type: "proximity",
-			},
-			{
-				distance: 2,
-				itemIds: [
-					"item:plank",
-					"item:twig",
-				],
-				type: "proximity",
-			},
-		];
-
-		expect(() => parseGameConfig(config)).not.toThrow();
 	});
 
 	it("accepts item create blocking effects", () => {

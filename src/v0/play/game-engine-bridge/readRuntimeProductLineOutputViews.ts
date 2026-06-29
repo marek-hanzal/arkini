@@ -2,7 +2,7 @@ import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLin
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
-import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGameSaveItemQuantityByScope";
+import { readGameSaveItemQuantityByScope } from "~/v0/game/activation/readGameSaveItemQuantityByScope";
 
 type ProductOutput = NonNullable<GameConfig["products"][string]["output"]>;
 type ProductOutputEntry = ProductOutput[number];

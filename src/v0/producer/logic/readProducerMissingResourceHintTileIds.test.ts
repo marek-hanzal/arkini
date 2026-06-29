@@ -44,7 +44,6 @@ const line = (overrides: Partial<ProducerProductLineView>): ProducerProductLineV
 	inputsAvailable: false,
 	inputsReady: false,
 	isDefault: true,
-	missingRequirementItemIds: [],
 	name: "Target",
 	producerQueuedJobs: 0,
 	productId: "product:target",
@@ -53,9 +52,6 @@ const line = (overrides: Partial<ProducerProductLineView>): ProducerProductLineV
 	blockReasonEffectIds: [],
 	queuedJobs: 0,
 	queueSize: 1,
-	requirementItemIds: [],
-	requirements: [],
-	requirementsReady: true,
 	...overrides,
 });
 
@@ -79,7 +75,6 @@ const item = (props: {
 					productLines: [
 						props.line,
 					],
-					requirements: [],
 					trigger: "click" as const,
 				},
 			}
@@ -105,25 +100,11 @@ const board = (items: readonly BoardViewItem[]): BoardView => ({
 });
 
 describe("readProducerMissingResourceHintTileIds", () => {
-	it("does not bounce proximity requirement items that already satisfy the selected line", () => {
+	it("does not bounce local grant sources through the input hint path", () => {
 		const target = item({
 			id: "target",
 			itemId: "item:target-producer",
-			line: line({
-				requirements: [
-					{
-						distance: 1,
-						itemIds: [
-							"item:tree",
-						],
-						matchedDistance: 1,
-						matchedItemId: "item:tree",
-						satisfied: true,
-						type: "proximity",
-					},
-				],
-				requirementsReady: true,
-			}),
+			line: line({}),
 			x: 0,
 			y: 0,
 		});
@@ -146,25 +127,11 @@ describe("readProducerMissingResourceHintTileIds", () => {
 		).toEqual([]);
 	});
 
-	it("bounces proximity requirement items that are present but too far away", () => {
+	it("does not bounce out-of-range grant sources through the input hint path", () => {
 		const target = item({
 			id: "target",
 			itemId: "item:target-producer",
-			line: line({
-				requirements: [
-					{
-						distance: 1,
-						itemIds: [
-							"item:tree",
-						],
-						matchedDistance: 3,
-						matchedItemId: "item:tree",
-						satisfied: false,
-						type: "proximity",
-					},
-				],
-				requirementsReady: false,
-			}),
+			line: line({}),
 			x: 0,
 			y: 0,
 		});
@@ -184,9 +151,7 @@ describe("readProducerMissingResourceHintTileIds", () => {
 				config,
 				producerItem: target,
 			}),
-		).toEqual([
-			"tree",
-		]);
+		).toEqual([]);
 	});
 
 	it("does not bounce producers for inputs already available on the board", () => {

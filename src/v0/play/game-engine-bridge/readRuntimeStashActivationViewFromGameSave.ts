@@ -4,10 +4,8 @@ import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSav
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
-import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
-import { readRuntimeActivationRequirementViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
 import { readRuntimeLootDropViewsFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromGameConfig";
 import { readRuntimeProducerProductLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerProductLineViewsFromGameSave";
 import { readProducerDeliveryBlocked } from "~/v0/game/producer/readProducerDeliveryBlocked";
@@ -33,10 +31,6 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 	if (!stash || !productId || !product) return undefined;
 
 	const storedInputs = save.producerInputs[boardItem.id]?.productInputs[productId]?.items ?? {};
-	const requirements = resolveGameRequirements({
-		config,
-		requirementIds: product.requirementIds,
-	});
 	const effectiveProductLine = readEffectiveProducerProductLine({
 		baseDurationMs: readProducerProductDurationMs({
 			product,
@@ -88,11 +82,6 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 			producerId: boardItem.itemId,
 			producerItemInstanceId: boardItem.id,
 			save,
-		}),
-		requirements: readRuntimeActivationRequirementViewsFromGameSave({
-			requirements,
-			save,
-			targetItemInstanceId: boardItem.id,
 		}),
 		trigger: "click",
 	};

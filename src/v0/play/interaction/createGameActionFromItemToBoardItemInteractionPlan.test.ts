@@ -25,21 +25,6 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 		expect(
 			createGameActionFromItemToBoardItemInteractionPlan({
 				plan: {
-					feedbackVariant: "primary",
-					type: "stored-requirement",
-				},
-				sourceRef,
-				targetItemInstanceId: "target",
-			}),
-		).toEqual({
-			inputRef: sourceRef,
-			targetItemInstanceId: "target",
-			type: "stored_requirement.store",
-		});
-
-		expect(
-			createGameActionFromItemToBoardItemInteractionPlan({
-				plan: {
 					feedbackVariant: "secondary",
 					type: "craft-input",
 				},

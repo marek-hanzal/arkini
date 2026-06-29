@@ -12,7 +12,6 @@ type RecordName =
 	| "assets"
 	| "items"
 	| "merge"
-	| "requirements"
 	| "effects"
 	| "producers"
 	| "stashes"
@@ -32,7 +31,6 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 
 	collectItemUsage(config, usage, itemFlow);
 	collectMergeUsage(config, usage, itemFlow);
-	collectRequirementUsage(config, itemFlow);
 	collectEffectUsage(config, usage, itemFlow);
 	collectProducerUsage(config, usage, itemFlow);
 	collectStashUsage(config, usage, itemFlow);
@@ -67,7 +65,6 @@ const createUsageIndex = (): UsageIndex => ({
 	assets: new Set(),
 	items: new Set(),
 	merge: new Set(),
-	requirements: new Set(),
 	effects: new Set(),
 	producers: new Set(),
 	stashes: new Set(),
@@ -150,19 +147,6 @@ const collectMergeUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Item
 		usage.items.add(merge.resultItemId);
 		itemFlow.consumedItemIds.add(merge.withItemId);
 		itemFlow.producedItemIds.add(merge.resultItemId);
-	}
-};
-
-const collectRequirementUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
-	for (const requirement of Object.values(config.requirements)) {
-		if (requirement.type === "proximity") {
-			for (const itemId of requirement.itemIds) {
-				itemFlow.consumedItemIds.add(itemId);
-			}
-			continue;
-		}
-
-		itemFlow.consumedItemIds.add(requirement.itemId);
 	}
 };
 
@@ -261,17 +245,40 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Ite
 				continue;
 			}
 
-			for (const producerId of readResolvedSelectorIds(
-				operation.target.producers,
-				config.producers,
-			)) {
-				usage.producers.add(producerId);
+			if (operation.kind === "grant.add") {
+				if (operation.target.items) {
+					for (const itemId of readResolvedSelectorIds(
+						operation.target.items,
+						config.items,
+					)) {
+						usage.items.add(itemId);
+					}
+				}
+				if (operation.target.craftRecipes) {
+					for (const craftRecipeId of readResolvedSelectorIds(
+						operation.target.craftRecipes,
+						config.craftRecipes,
+					)) {
+						usage.craftRecipes.add(craftRecipeId);
+					}
+				}
 			}
-			for (const productId of readResolvedSelectorIds(
-				operation.target.productLines,
-				config.products,
-			)) {
-				usage.products.add(productId);
+
+			if ("producers" in operation.target) {
+				for (const producerId of readResolvedSelectorIds(
+					operation.target.producers,
+					config.producers,
+				)) {
+					usage.producers.add(producerId);
+				}
+			}
+			if ("productLines" in operation.target) {
+				for (const productId of readResolvedSelectorIds(
+					operation.target.productLines,
+					config.products,
+				)) {
+					usage.products.add(productId);
+				}
 			}
 		}
 	}
@@ -299,16 +306,6 @@ const collectCraftRecipeUsage = (config: GameConfig, itemFlow: ItemFlowIndex) =>
 		for (const input of recipe.inputs) {
 			usageItem(itemFlow, input.itemId, "consumed");
 		}
-		for (const requirement of recipe.requirements) {
-			if (requirement.type === "proximity") {
-				for (const itemId of requirement.itemIds) {
-					usageItem(itemFlow, itemId, "consumed");
-				}
-				continue;
-			}
-
-			usageItem(itemFlow, requirement.itemId, "consumed");
-		}
 	}
 };
 
@@ -319,9 +316,6 @@ const collectProductUsage = (config: GameConfig, usage: UsageIndex, itemFlow: It
 		}
 		if (product.output) {
 			collectLootOutputUsage(product.output, itemFlow);
-		}
-		for (const requirementId of product.requirementIds) {
-			usage.requirements.add(requirementId);
 		}
 	}
 };
@@ -352,7 +346,6 @@ const collectStartingStateUsage = (config: GameConfig, itemFlow: ItemFlowIndex) 
 };
 
 const duplicateShapeSections = [
-	"requirements",
 	"stashes",
 	"craftRecipes",
 ] as const;
@@ -403,7 +396,6 @@ const readUnusedDefinitionWarnings = (
 	...readUnusedRecordWarnings("resources", config.resources, usage.resources),
 	...readUnusedRecordWarnings("assets", config.assets, usage.assets),
 	...readUnusedRecordWarnings("merge", config.merge, usage.merge),
-	...readUnusedRecordWarnings("requirements", config.requirements, usage.requirements),
 	...readUnusedRecordWarnings("effects", config.effects, usage.effects),
 	...readUnusedRecordWarnings("producers", config.producers, usage.producers),
 	...readUnusedRecordWarnings("stashes", config.stashes, usage.stashes),
@@ -423,7 +415,7 @@ const readTerminalItemWarnings = (
 			code: "terminal-item",
 			id: itemId,
 			section: "items",
-			message: `${itemId} is produced or starts in the save, but no configured input, requirement, effect, merge, removal rule, craft, or stash references it.`,
+			message: `${itemId} is produced or starts in the save, but no configured input, grant/effect, merge, removal rule, craft, or stash references it.`,
 		}));
 
 const readUnusedRecordWarnings = (

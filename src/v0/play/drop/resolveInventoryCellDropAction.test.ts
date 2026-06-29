@@ -220,53 +220,6 @@ describe("resolveInventoryCellDropAction", () => {
 		});
 	});
 
-	it("applies inventory items to stored requirement slots", () => {
-		const targetBoard = rebuildBoardView([
-			{
-				id: "requirement-target",
-				itemId: "item:lumber-camp-1",
-				state: {},
-				x: 1,
-				y: 0,
-				activation: {
-					inputs: [],
-					kind: "producer",
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:twig",
-							quantity: 1,
-							stored: 0,
-							type: "stored",
-						},
-					],
-					trigger: "click",
-				},
-			},
-		]);
-
-		expect(
-			resolveInventoryCellDropAction({
-				board: targetBoard,
-				config,
-				inventory,
-				source: inventorySource(0),
-				target: {
-					kind: "cell",
-					x: 1,
-					y: 0,
-					boardItemId: "requirement-target",
-				},
-			}),
-		).toEqual({
-			type: "apply-inventory-item-to-board-item",
-			feedback: {
-				cellKey: "1:0",
-				variant: "primary",
-			},
-			input: inventoryBoardInput(0, targetBoard.byId["requirement-target"]!),
-		});
-	});
 	it("applies inventory items to stash inputs", () => {
 		const targetBoard = rebuildBoardView([
 			{
@@ -286,7 +239,6 @@ describe("resolveInventoryCellDropAction", () => {
 						},
 					],
 					kind: "stash",
-					requirements: [],
 					trigger: "click",
 				},
 			},

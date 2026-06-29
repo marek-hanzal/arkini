@@ -19,14 +19,13 @@ export type GameEngineError =
 				| "invalid_merge"
 				| "item_busy"
 				| "craft_in_progress"
-				| "missing_requirement"
+				| "effect:missing-grant"
 				| GamePlacementFailureReason
 				| "producer_queue_full"
 				| "producer_charges_depleted"
 				| "blocked"
 				| "storage_restricted"
-				| "unsupported_target"
-				| "unsupported_requirement";
+				| "unsupported_target";
 			readonly message: string;
 	  }
 	| {

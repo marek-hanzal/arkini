@@ -517,48 +517,6 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.error?.issues[0]?.message).toContain("maxQueueSize");
 	});
 
-	it("rejects stored requirements above their target capacity", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:key-storage": {
-					capacity: 1,
-					itemId: "item:key",
-					quantity: 1,
-					type: "stored",
-				},
-			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:key-storage",
-					],
-				},
-			},
-		});
-		const save = createInitialSave({
-			config,
-			nowMs: 0,
-		});
-		const invalidSave = cloneSave(save);
-		invalidSave.storedRequirements["item-instance:1"] = {
-			items: {
-				"item:key": 2,
-			},
-		};
-
-		const result = GameSaveConfigSchema.safeParse({
-			config,
-			save: invalidSave,
-		});
-
-		expect(result.success).toBe(false);
-		expect(result.error?.issues[0]?.message).toContain("capacity");
-	});
-
 	it("rejects craft inputs above their recipe quantity", () => {
 		const config = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,

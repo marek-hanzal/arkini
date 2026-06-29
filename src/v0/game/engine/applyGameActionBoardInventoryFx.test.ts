@@ -110,9 +110,36 @@ describe("applyGameActionFx BoardInventory", () => {
 		});
 	});
 
-	it("pauses and resumes a moved craft target when proximity requirements break and return", () => {
+	it("pauses and resumes a moved craft target when local grants break and return", () => {
 		const baseConfig = createEngineTestConfig();
+		const rockGrantId = "grant:test:near-rock";
 		const config = createEngineTestConfig({
+			effects: {
+				...baseConfig.effects,
+				"effect:test:near-rock-grant": {
+					name: "Nearby Rock Craft Grant",
+					operations: [
+						{
+							grantId: rockGrantId,
+							kind: "grant.add",
+							target: {
+								craftRecipes: {
+									anyOf: [
+										{
+											ids: [
+												"item:craft-table",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					radius: 1,
+					scope: "local",
+					sourceScope: "board",
+				},
+			},
 			game: {
 				...baseConfig.game,
 				board: {
@@ -120,20 +147,30 @@ describe("applyGameActionFx BoardInventory", () => {
 					width: 4,
 				},
 			},
+			items: {
+				...baseConfig.items,
+				"item:rock": {
+					...baseConfig.items["item:rock"],
+					passiveEffectIds: [
+						...(baseConfig.items["item:rock"].passiveEffectIds ?? []),
+						"effect:test:near-rock-grant",
+					],
+				},
+			},
 			craftRecipes: {
 				...baseConfig.craftRecipes,
 				"item:craft-table": {
 					...baseConfig.craftRecipes["item:craft-table"],
+					grantSelector: {
+						allOf: [
+							{
+								ids: [
+									rockGrantId,
+								],
+							},
+						],
+					},
 					inputs: [],
-					requirements: [
-						{
-							distance: 1,
-							itemIds: [
-								"item:rock",
-							],
-							type: "proximity",
-						},
-					],
 				},
 			},
 			startingState: {

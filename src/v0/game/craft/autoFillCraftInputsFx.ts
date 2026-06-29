@@ -5,8 +5,8 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 import { planCraftAutoFillInputRefsFx } from "~/v0/game/craft/planCraftAutoFillInputRefsFx";
-import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
-import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
+import { consumeResolvedInputRefFx } from "~/v0/game/activation/consumeResolvedInputRefFx";
+import { resolveInputRefsFx } from "~/v0/game/activation/resolveInputRefsFx";
 import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 
 export namespace autoFillCraftInputsFx {

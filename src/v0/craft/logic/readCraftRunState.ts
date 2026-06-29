@@ -1,4 +1,3 @@
-import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
 
 export namespace readCraftRunState {
@@ -12,7 +11,6 @@ export namespace readCraftRunState {
 		inputsPartiallyAvailable: boolean;
 		inputsReady: boolean;
 		label: string;
-		requirementsReady: boolean;
 	}
 }
 
@@ -23,15 +21,15 @@ const readCraftInputsPartiallyAvailable = (craft: CraftProgressView) =>
 	});
 
 export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraftRunState.Result => {
-	const requirementsReady = (craft.requirements ?? []).every(readActivationRequirementViewReady);
 	const inputsReady = craft.inputProgress >= 1;
 	const inputsPartiallyAvailable = readCraftInputsPartiallyAvailable(craft);
+	const grantsReady = craft.grantsReady !== false;
 	const canClaim = craft.complete;
 	const canRunAction =
 		craft.phase === "collecting_inputs" &&
 		!craft.complete &&
-		requirementsReady &&
 		!craft.targetLimitBlocked &&
+		grantsReady &&
 		(inputsReady || inputsPartiallyAvailable);
 
 	if (craft.phase === "delivery_blocked") {
@@ -41,7 +39,6 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Delivery blocked",
-			requirementsReady,
 		};
 	}
 
@@ -52,7 +49,6 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Paused",
-			requirementsReady,
 		};
 	}
 
@@ -63,7 +59,6 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Claim",
-			requirementsReady,
 		};
 	}
 
@@ -74,18 +69,6 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Running",
-			requirementsReady,
-		};
-	}
-
-	if (!requirementsReady) {
-		return {
-			canClaim,
-			canRunAction,
-			inputsPartiallyAvailable,
-			inputsReady,
-			label: "Requirements missing",
-			requirementsReady,
 		};
 	}
 
@@ -96,7 +79,16 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Limit reached",
-			requirementsReady,
+		};
+	}
+
+	if (!grantsReady) {
+		return {
+			canClaim,
+			canRunAction,
+			inputsPartiallyAvailable,
+			inputsReady,
+			label: "Grants missing",
 		};
 	}
 
@@ -107,7 +99,6 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Start craft",
-			requirementsReady,
 		};
 	}
 
@@ -118,7 +109,6 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Auto-fill inputs",
-			requirementsReady,
 		};
 	}
 
@@ -128,6 +118,5 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 		inputsPartiallyAvailable,
 		inputsReady,
 		label: "Auto-fill or drag inputs",
-		requirementsReady,
 	};
 };

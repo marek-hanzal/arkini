@@ -8,9 +8,9 @@ import {
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveCraftJob } from "~/v0/game/engine/model/GameSaveSchema";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
+import { doesGameGrantSelectorMatchIds } from "~/v0/game/effects/doesGameGrantSelectorMatchIds";
+import { readGameEffectTargetGrantIds } from "~/v0/game/effects/readGameEffectTargetGrantIds";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
-import { readWorldRequirementFactsFx } from "~/v0/game/world/readWorldRequirementFactsFx";
 
 export namespace syncRealtimeCraftJobsFx {
 	export interface Props {
@@ -20,30 +20,38 @@ export namespace syncRealtimeCraftJobsFx {
 	}
 }
 
-const readCraftRequirementsReadyFx = Effect.fn(
-	"syncRealtimeCraftJobsFx.readCraftRequirementsReadyFx",
-)(function* ({
+const readCraftGrantsReady = ({
+	config,
 	job,
+	nowMs,
 	recipe,
 	save,
+	targetItem,
 }: {
+	config: GameConfig;
 	job: GameSaveCraftJob;
+	nowMs: number;
 	recipe: GameConfig["craftRecipes"][string];
 	save: GameSave;
-}) {
-	const storedItems = yield* readStoredRequirementQuantitiesFx({
-		save,
-		targetItemInstanceId: job.targetItemInstanceId,
-	});
-	const facts = yield* readWorldRequirementFactsFx({
-		requirements: recipe.requirements,
-		save,
-		storedItems,
-		targetItemInstanceId: job.targetItemInstanceId,
-	});
+	targetItem: GameSave["board"]["items"][string];
+}) => {
+	if (!recipe.grantSelector) return true;
 
-	return facts.every((fact) => fact.status === "ok");
-});
+	const grantIds = readGameEffectTargetGrantIds({
+		config,
+		nowMs,
+		save,
+		target: {
+			kind: "craftRecipe",
+			craftRecipeId: job.recipeId,
+			targetCell: targetItem,
+		},
+	});
+	return doesGameGrantSelectorMatchIds({
+		grantIds,
+		selector: recipe.grantSelector,
+	});
+};
 
 export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(function* ({
 	config,
@@ -77,14 +85,17 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 		const targetItem = (nextSave ?? save).board.items[job.targetItemInstanceId];
 		if (!targetItem) continue;
 
-		const requirementsReady = yield* readCraftRequirementsReadyFx({
+		const grantsReady = readCraftGrantsReady({
+			config,
 			job,
+			nowMs,
 			recipe,
 			save: nextSave ?? save,
+			targetItem,
 		});
 
 		if (isGamePausableJobPaused(job)) {
-			if (!requirementsReady) continue;
+			if (!grantsReady) continue;
 
 			const remainingMs = job.remainingMs ?? 0;
 			const effectiveTiming = yield* readCraftJobEffectiveTimingFx({
@@ -114,7 +125,7 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 			continue;
 		}
 
-		if (!requirementsReady && job.startAtMs <= nowMs) {
+		if (!grantsReady && job.startAtMs <= nowMs) {
 			const remainingMs = readGamePausableJobRemainingMsAtPause({
 				job,
 				nowMs,

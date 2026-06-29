@@ -22,7 +22,6 @@ const createLocalCraftBlockConfig = () => {
 			"item:craft-table": {
 				...baseConfig.craftRecipes["item:craft-table"],
 				inputs: [],
-				requirements: [],
 			},
 		},
 		effects: {
@@ -136,7 +135,6 @@ const createLineVisibilityConfig = () => {
 					},
 				],
 				placement: "board_then_inventory",
-				requirementIds: [],
 				tags: [],
 				visibility: "visible",
 			},

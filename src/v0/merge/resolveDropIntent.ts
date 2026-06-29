@@ -19,9 +19,6 @@ export type DropIntent =
 			type: "stash-input";
 	  }
 	| {
-			type: "stored-requirement";
-	  }
-	| {
 			type: "swap";
 	  }
 	| {
@@ -79,14 +76,6 @@ export const resolveDropIntent = ({
 			},
 			() => ({
 				type: "stash-input" as const,
-			}),
-		)
-		.with(
-			{
-				type: "stored-requirement",
-			},
-			() => ({
-				type: "stored-requirement" as const,
 			}),
 		)
 		.with(
